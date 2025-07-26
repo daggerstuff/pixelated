@@ -1,0 +1,115 @@
+---
+import BaseHead from '@/components/base/Head.astro'
+import Header from '@/components/layout/Header.astro'
+import Footer from '@/components/layout/Footer.astro'
+import { BlogSearch } from '@/components/BlogSearch'
+
+interface Props {
+  title: string
+  description?: string
+  image?: string
+  canonicalURL?: string
+  pubDate?: Date
+  author?: string
+  tags?: string[]
+}
+
+const {
+  title,
+  description = 'A blog post',
+  image = '/images/blog-default.jpg',
+  pubDate,
+  author,
+  tags = [],
+} = Astro.props
+
+// Format date if provided
+const formattedDate = pubDate?.toLocaleDateString('en-us', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+})
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <BaseHead {title} {description} ogImage={image} />
+
+    <!-- Structured data for blog post -->
+    {
+      pubDate && author && (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            'headline': title,
+            'image': [image],
+            'datePublished': pubDate.toISOString(),
+            'author': [
+              {
+                '@type': 'Person',
+                'name': author,
+              },
+            ],
+          })}
+        />
+      )
+    }
+  </head>
+
+  <body class="min-h-screen theme-page font-sans antialiased theme-bg-primary">
+    <Header />
+
+    <main class="container mx-auto px-4 py-8">
+      <article class="prose prose-lg dark:prose-invert mx-auto">
+        <!-- Blog post header -->
+        <header class="mb-8">
+          <h1 class="text-4xl font-bold mb-4">{title}</h1>
+          {
+            formattedDate && (
+              <time
+                datetime={pubDate?.toISOString()}
+                class="text-muted-foreground"
+              >
+                {formattedDate}
+              </time>
+            )
+          }
+          {author && <p class="text-muted-foreground mt-2">By {author}</p>}
+          {
+            tags.length > 0 && (
+              <div class="flex gap-2 mt-4">
+                {tags.map((tag: unknown) => (
+                  <a
+                    href={`/blog/tags/${tag}`}
+                    class="text-sm px-3 py-1 bg-muted rounded-full hover:bg-muted/80 transition-colors"
+                    transition:animate="slide"
+                    data-astro-prefetch
+                  >
+                    {tag}
+                  </a>
+                ))}
+              </div>
+            )
+          }
+        </header>
+
+        <!-- Blog post content -->
+        <div class="blog-content">
+          <BlogSearch client:load />
+          <slot />
+        </div>
+      </article>
+    </main>
+
+    <Footer />
+    <script is:inline>
+      function speedInsightsBeforeSend(data) {
+        console.log('Speed Insights before send', data)
+        return data
+      }
+    </script>
+  </body>
+</html>

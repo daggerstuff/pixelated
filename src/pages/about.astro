@@ -1,0 +1,95 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Button from '../components/ui/Button.astro'
+---
+
+<BaseLayout
+  title="About Us | Pixelated Empathy"
+  description="Learn more about Pixelated Empathy and our mission to revolutionize AI-assisted emotional intelligence."
+>
+  <div class="max-w-3xl mx-auto py-12 px-4">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-white">About Pixelated Empathy</h1>
+      <p class="text-lg text-slate-400 mt-2">Revolutionizing AI-assisted emotional intelligence</p>
+    </div>
+    <div class="prose prose-invert max-w-none mx-auto">
+      <p>
+        Pixelated Empathy is at the forefront of AI-assisted emotional
+        intelligence, developing cutting-edge solutions that help people
+        understand and manage their emotions better.
+      </p>
+
+      <h2>Our Mission</h2>
+      <p>
+        Our mission is to create AI tools that enhance human emotional
+        intelligence, making emotional well-being accessible to everyone. We
+        believe that technology should serve humanity by augmenting our natural
+        capabilities and helping us overcome our limitations.
+      </p>
+
+      <h2>Our Team</h2>
+      <p>
+        We are a diverse team of AI researchers, psychologists, and engineers
+        passionate about the intersection of artificial intelligence and human
+        emotions. Our multidisciplinary approach allows us to create solutions
+        that are both technically advanced and deeply human-centered.
+      </p>
+
+      <h2>Our Approach</h2>
+      <p>
+        At Pixelated Empathy, we take a responsible approach to AI development.
+        We prioritize:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Privacy:</strong> Your emotional data belongs to you and is handled
+          with the utmost care.
+        </li>
+        <li>
+          <strong>Transparency:</strong> We're open about how our AI works and wha
+          it can and cannot do.
+        </li>
+        <li>
+          <strong>Inclusivity:</strong> Our solutions are designed to work for people
+          of all backgrounds and experiences.
+        </li>
+        <li>
+          <strong>Scientific Rigor:</strong> Our approaches are grounded in the lates
+          research in psychology and AI.
+        </li>
+      </ul>
+
+      <div class="mt-8 text-center">
+        <Button href="/contact" variant="default" size="lg">Get in Touch</Button
+        >
+      </div>
+    </div>
+  </StandardLayout>
+</BaseLayout>
+
+<style>
+  .lead {
+    font-size: 1.25rem;
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .prose {
+    max-width: 65ch;
+    color: inherit;
+  }
+
+  .prose h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .prose ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+  }
+</style>

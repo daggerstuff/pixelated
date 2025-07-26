@@ -1,0 +1,89 @@
+---
+interface Props {
+  defaultTab?: string
+  className?: string
+}
+
+const { className } = Astro.props
+---
+
+<div class={`tabs ${className || ''}`} role="tablist">
+  <div class="tabs-header">
+    <slot name="tabs" />
+  </div>
+  <div class="tabs-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .tabs {
+    margin: 1rem 0;
+  }
+
+  .tabs-header {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 6px 6px 0 0;
+    overflow-x: auto;
+  }
+
+  .tabs-content {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 1rem;
+  }
+
+  /* Dark mode support */
+  :global(.dark) .tabs-header {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+
+  :global(.dark) .tabs-content {
+    background: #111827;
+    border-color: #374151;
+  }
+</style>
+
+<script>
+  // Add basic tab functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabContainers = document.querySelectorAll('.tabs')
+
+    tabContainers.forEach((container) => {
+      const tabs = container.querySelectorAll('.tab')
+      const tabItems = container.querySelectorAll('.tab-item')
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs and tab items
+          tabs.forEach((t) => t.classList.remove('tab-active'))
+          tabItems.forEach((item) => {
+            item.classList.remove('tab-item-active')
+            item.setAttribute('aria-hidden', 'true')
+          })
+
+          // Add active class to clicked tab and corresponding item
+          tab.classList.add('tab-active')
+          if (tabItems[index]) {
+            tabItems[index].classList.add('tab-item-active')
+            tabItems[index].setAttribute('aria-hidden', 'false')
+          }
+        })
+      })
+
+      // Activate first tab by default
+      if (tabs.length > 0) {
+        tabs[0]?.classList.add('tab-active')
+        if (tabItems[0]) {
+          tabItems[0].classList.add('tab-item-active')
+          tabItems[0].setAttribute('aria-hidden', 'false')
+        }
+      }
+    })
+  })
+</script>

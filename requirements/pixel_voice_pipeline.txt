@@ -1,0 +1,33 @@
+# Voice Training Pipeline Dependencies
+# For use with WhisperX or Faster Whisper and YouTube audio processing
+
+# Core Python
+python>=3.9
+
+# Audio/video processing
+ffmpeg
+
+# YouTube download
+yt-dlp
+
+# WhisperX (for diarization and advanced features)
+whisperx
+
+# OR Faster Whisper (for speed, if diarization not needed)
+faster-whisper
+
+# Torch (GPU support)
+torch
+torchaudio
+
+# Audio quality assessment
+librosa
+pydub
+webrtcvad
+langdetect
+
+# Optional: CUDA toolkit (if not already installed via conda)
+# cudatoolkit
+
+# Jupyter (for notebooks, optional)
+jupyter

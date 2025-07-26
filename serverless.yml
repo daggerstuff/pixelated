@@ -1,0 +1,394 @@
+service: bias-detection-engine
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 1024
+  timeout: 30
+
+  # Environment variables
+  environment:
+    NODE_ENV: ${self:provider.stage}
+    DATABASE_URL: ${env:DATABASE_URL}
+    REDIS_URL: ${env:REDIS_URL}
+    JWT_SECRET: ${env:JWT_SECRET}
+    SUPABASE_URL: ${env:SUPABASE_URL}
+    SUPABASE_ANON_KEY: ${env:SUPABASE_ANON_KEY}
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY}
+    PYTHON_SERVICE_URL: ${env:PYTHON_SERVICE_URL, 'https://python-ml-service.amazonaws.com'}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+
+  # IAM permissions
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - 'arn:aws:dynamodb:${self:provider.region}:*:table/bias-detection-*'
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource:
+            - 'arn:aws:s3:::bias-detection-${self:provider.stage}/*'
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+            - ssm:GetParameters
+            - ssm:GetParametersByPath
+          Resource:
+            - 'arn:aws:ssm:${self:provider.region}:*:parameter/bias-detection/${self:provider.stage}/*'
+
+  # VPC configuration for database access
+  vpc:
+    securityGroupIds:
+      - ${env:SECURITY_GROUP_ID}
+    subnetIds:
+      - ${env:SUBNET_ID_1}
+      - ${env:SUBNET_ID_2}
+
+  # API Gateway configuration
+  apiGateway:
+    restApiId: ${env:API_GATEWAY_REST_API_ID, ''}
+    restApiRootResourceId: ${env:API_GATEWAY_ROOT_RESOURCE_ID, ''}
+    minimumCompressionSize: 1024
+    binaryMediaTypes:
+      - 'application/octet-stream'
+      - 'image/*'
+    apiKeys:
+      - bias-detection-api-key-${self:provider.stage}
+    usagePlan:
+      quota:
+        limit: 10000
+        period: MONTH
+      throttle:
+        rateLimit: 100
+        burstLimit: 200
+
+# Custom domain configuration
+custom:
+  # Domain configuration
+  customDomain:
+    domainName: ${env:DOMAIN_NAME, 'api-${self:provider.stage}.biasdetection.com'}
+    stage: ${self:provider.stage}
+    certificateName: '*.biasdetection.com'
+    createRoute53Record: true
+    endpointType: 'regional'
+    securityPolicy: tls_1_2
+    apiType: rest
+    autoDomain: true
+
+  # Webpack configuration for bundling
+  webpack:
+    webpackConfig: 'webpack.serverless.js'
+    includeModules: true
+    packager: 'pnpm'
+
+  # Environment-specific configurations
+  environments:
+    dev:
+      LOG_LEVEL: debug
+      MEMORY_SIZE: 512
+      TIMEOUT: 15
+    staging:
+      LOG_LEVEL: info
+      MEMORY_SIZE: 1024
+      TIMEOUT: 30
+    prod:
+      LOG_LEVEL: warn
+      MEMORY_SIZE: 2048
+      TIMEOUT: 30
+
+  # Monitoring and alerting
+  alerts:
+    stages:
+      - prod
+      - staging
+    topics:
+      alarm:
+        topic: ${self:service}-${self:provider.stage}-alerts
+        notifications:
+          - protocol: email
+            endpoint: ${env:ALERT_EMAIL}
+    definitions:
+      functionErrors:
+        metric: functionErrors
+        threshold: 5
+        statistic: Sum
+        period: 300
+        evaluationPeriods: 2
+        comparisonOperator: GreaterThanThreshold
+      functionDuration:
+        metric: functionDuration
+        threshold: 20000
+        statistic: Average
+        period: 300
+        evaluationPeriods: 2
+        comparisonOperator: GreaterThanThreshold
+
+# Functions
+functions:
+  # Health check endpoint
+  healthCheck:
+    handler: src/pages/api/bias-detection/health.handler
+    events:
+      - http:
+          path: /api/bias-detection/health
+          method: get
+          cors: true
+    memorySize: 256
+    timeout: 10
+
+  # Session analysis endpoint
+  analyzeSession:
+    handler: src/pages/api/bias-detection/analyze.handler
+    events:
+      - http:
+          path: /api/bias-detection/analyze
+          method: post
+          cors: true
+          authorizer:
+            type: CUSTOM
+            authorizerId: ${env:AUTHORIZER_ID}
+    memorySize: ${self:custom.environments.${self:provider.stage}.MEMORY_SIZE, 1024}
+    timeout: ${self:custom.environments.${self:provider.stage}.TIMEOUT, 30}
+    reservedConcurrency: 50
+    alarms:
+      - functionErrors
+      - functionDuration
+
+  # Dashboard data endpoint
+  dashboardData:
+    handler: src/pages/api/bias-detection/dashboard.handler
+    events:
+      - http:
+          path: /api/bias-detection/dashboard
+          method: get
+          cors: true
+          authorizer:
+            type: CUSTOM
+            authorizerId: ${env:AUTHORIZER_ID}
+    memorySize: 1024
+    timeout: 20
+    reservedConcurrency: 30
+
+  # Data export endpoint
+  exportData:
+    handler: src/pages/api/bias-detection/export.handler
+    events:
+      - http:
+          path: /api/bias-detection/export
+          method: get
+          cors: true
+          authorizer:
+            type: CUSTOM
+            authorizerId: ${env:AUTHORIZER_ID}
+    memorySize: 2048
+    timeout: 60
+    reservedConcurrency: 10
+
+  # Scheduled cleanup job
+  cleanupJob:
+    handler: src/lib/ai/bias-detection/cleanup.handler
+    events:
+      - schedule:
+          rate: rate(1 hour)
+          enabled: true
+          input:
+            action: cleanup_old_sessions
+    memorySize: 512
+    timeout: 300
+
+  # ML model warming function
+  warmupMLService:
+    handler: src/lib/ai/bias-detection/warmup.handler
+    events:
+      - schedule:
+          rate: rate(5 minutes)
+          enabled: ${env:ENABLE_WARMUP, 'true'}
+    memorySize: 256
+    timeout: 10
+
+# Resources
+resources:
+  Resources:
+    # DynamoDB tables for session storage
+    BiasDetectionSessionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: bias-detection-sessions-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: sessionId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+        KeySchema:
+          - AttributeName: sessionId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            BillingMode: PAY_PER_REQUEST
+        BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+    # S3 bucket for data exports and ML model artifacts
+    BiasDetectionDataBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: bias-detection-data-${self:provider.stage}
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+        VersioningConfiguration:
+          Status: Enabled
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteOldExports
+              Status: Enabled
+              ExpirationInDays: 30
+              Prefix: exports/
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
+    # CloudWatch Log Groups
+    AnalyzeSessionLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:service}-${self:provider.stage}-analyzeSession
+        RetentionInDays: 14
+
+    DashboardDataLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:service}-${self:provider.stage}-dashboardData
+        RetentionInDays: 14
+
+    # API Gateway request validator
+    ApiRequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: ${self:service}-${self:provider.stage}-request-validator
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
+
+    # CloudWatch Dashboard
+    BiasDetectionDashboard:
+      Type: AWS::CloudWatch::Dashboard
+      Properties:
+        DashboardName: BiasDetection-${self:provider.stage}
+        DashboardBody: |
+          {
+            "widgets": [
+              {
+                "type": "metric",
+                "properties": {
+                  "metrics": [
+                    ["AWS/Lambda", "Invocations", "FunctionName", "${self:service}-${self:provider.stage}-analyzeSession"],
+                    [".", "Errors", ".", "."],
+                    [".", "Duration", ".", "."]
+                  ],
+                  "period": 300,
+                  "stat": "Sum",
+                  "region": "${self:provider.region}",
+                  "title": "Session Analysis Function"
+                }
+              },
+              {
+                "type": "metric",
+                "properties": {
+                  "metrics": [
+                    ["AWS/ApiGateway", "Count", "ApiName", "${self:service}-${self:provider.stage}"],
+                    [".", "4XXError", ".", "."],
+                    [".", "5XXError", ".", "."],
+                    [".", "Latency", ".", "."]
+                  ],
+                  "period": 300,
+                  "stat": "Sum",
+                  "region": "${self:provider.region}",
+                  "title": "API Gateway Metrics"
+                }
+              }
+            ]
+          }
+
+  Outputs:
+    ApiGatewayUrl:
+      Description: 'API Gateway URL'
+      Value:
+        Fn::Join:
+          - ''
+          - - 'https://'
+            - Ref: ApiGatewayRestApi
+            - '.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}'
+
+    DynamoDBSessionsTable:
+      Description: 'DynamoDB Sessions Table'
+      Value:
+        Ref: BiasDetectionSessionsTable
+
+    S3DataBucket:
+      Description: 'S3 Data Bucket'
+      Value:
+        Ref: BiasDetectionDataBucket
+
+# Plugins
+plugins:
+  - serverless-webpack
+  - serverless-domain-manager
+  - serverless-plugin-aws-alerts
+  - serverless-offline
+  - serverless-dynamodb-local
+  - serverless-s3-local
+
+# Package configuration
+package:
+  individually: true
+  exclude:
+    - .git/**
+    - tests/**
+    - docs/**
+    - '*.md'
+    - .env*
+    - docker-compose.yml
+    - Dockerfile*
+  include:
+    - src/**
+    - package.json
+    - node_modules/**

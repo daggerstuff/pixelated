@@ -1,0 +1,451 @@
+---
+// FHE Demo Component for demonstrating Fully Homomorphic Encryption capabilities
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Badge from '@/components/ui/Badge.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardFooter from '@/components/ui/CardFooter.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+// Props interface - must be in frontmatter
+interface Props {
+  defaultMessage?: string
+}
+
+// Destructure props with default values
+const { defaultMessage = 'This is a secure message' } = Astro.props
+---
+
+<Card class="w-full max-w-3xl mx-auto">
+  <CardHeader>
+    <CardTitle>Fully Homomorphic Encryption Demo</CardTitle>
+    <CardDescription>
+      Explore secure data processing with FHE technology
+    </CardDescription>
+    <div class="flex gap-2 mt-2">
+      <Badge id="initialization-badge" variant="destructive">
+        Not Initialized
+      </Badge>
+      <Badge variant="outline" id="encryption-mode-badge">
+        Mode: Not initialized
+      </Badge>
+      <Badge variant="outline" id="key-id-badge"> Key ID: Not generated </Badge>
+    </div>
+  </CardHeader>
+  <CardContent>
+    <Tabs defaultValue="encrypt" className="w-full">
+      <TabsList className="grid grid-cols-3 mb-4">
+        <TabsTrigger value="encrypt">Encrypt</TabsTrigger>
+        <TabsTrigger value="process">Process</TabsTrigger>
+        <TabsTrigger value="decrypt">Decrypt</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="encrypt">
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <Label htmlFor="message">Message to Encrypt</Label>
+            <Input
+              id="message"
+              value={defaultMessage}
+              placeholder="Enter a message to encrypt"
+            />
+          </div>
+
+          <Button id="encrypt-btn" className="w-full"> Encrypt Message </Button>
+
+          <div
+            id="encrypted-message-container"
+            class="mt-4 p-3 bg-muted rounded-md hidden"
+          >
+            <Label>Encrypted Message</Label>
+            <p
+              id="encrypted-message-display"
+              class="text-xs font-mono break-all mt-1"
+            >
+            </p>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="process">
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <Label htmlFor="operation">Operation</Label>
+            <select
+              id="operation"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="sentiment">Sentiment Analysis</option>
+              <option value="entities">Entity Extraction</option>
+              <option value="keyphrase">Key Phrase Extraction</option>
+              <option value="classify">Text Classification</option>
+            </select>
+          </div>
+
+          <Button id="process-btn" className="w-full">
+            Process Encrypted Data
+          </Button>
+
+          <div
+            id="operation-result-container"
+            class="mt-4 p-3 bg-muted rounded-md hidden"
+          >
+            <Label>Operation Result</Label>
+            <div id="operation-result" class="text-sm mt-1"></div>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="decrypt">
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <Label htmlFor="encrypted-input">Encrypted Text</Label>
+            <Input
+              id="encrypted-input"
+              placeholder="Paste encrypted data here"
+            />
+          </div>
+
+          <Button id="decrypt-btn" className="w-full"> Decrypt Data </Button>
+
+          <div
+            id="decrypted-message-container"
+            class="mt-4 p-3 bg-muted rounded-md hidden"
+          >
+            <Label>Decrypted Message</Label>
+            <p id="decrypted-message" class="mt-1"></p>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+
+    <div id="key-management" class="mt-6 pt-4 border-t">
+      <h3 class="text-lg font-medium mb-3">Key Management</h3>
+      <Button id="rotate-key-btn" variant="outline" className="mr-2">
+        Rotate Encryption Keys
+      </Button>
+      <Button id="initialize-btn" variant="outline"> Initialize FHE </Button>
+    </div>
+
+    <div
+      id="error-container"
+      class="mt-4 p-3 bg-red-50 text-red-700 rounded-md hidden"
+    >
+      <p id="error-message"></p>
+    </div>
+  </CardContent>
+</Card>
+
+<script>
+  // FHE service initialization
+  let initialized = false
+  let encryptionMode = 'Not initialized'
+  let keyId = 'Not generated'
+  let encryptedMessage = ''
+
+  // DOM elements
+  const messageInput = document.getElementById('message') as HTMLInputElement
+  const encryptBtn = document.getElementById('encrypt-btn') as HTMLButtonElement
+  const encryptedMessageContainer = document.getElementById(
+    'encrypted-message-container',
+  ) as HTMLDivElement
+  const encryptedMessageDisplay = document.getElementById(
+    'encrypted-message-display',
+  ) as HTMLParagraphElement
+  const operationSelect = document.getElementById(
+    'operation',
+  ) as HTMLSelectElement
+  const processBtn = document.getElementById('process-btn') as HTMLButtonElement
+  const operationResultContainer = document.getElementById(
+    'operation-result-container',
+  ) as HTMLDivElement
+  const operationResult = document.getElementById(
+    'operation-result',
+  ) as HTMLDivElement
+  const encryptedInput = document.getElementById(
+    'encrypted-input',
+  ) as HTMLInputElement
+  const decryptBtn = document.getElementById('decrypt-btn') as HTMLButtonElement
+  const decryptedMessageContainer = document.getElementById(
+    'decrypted-message-container',
+  ) as HTMLDivElement
+  const decryptedMessage = document.getElementById(
+    'decrypted-message',
+  ) as HTMLParagraphElement
+  const rotateKeyBtn = document.getElementById(
+    'rotate-key-btn',
+  ) as HTMLButtonElement
+  const initializeBtn = document.getElementById(
+    'initialize-btn',
+  ) as HTMLButtonElement
+  const errorContainer = document.getElementById(
+    'error-container',
+  ) as HTMLDivElement
+  const errorMessage = document.getElementById(
+    'error-message',
+  ) as HTMLParagraphElement
+  const initializationBadge = document.getElementById(
+    'initialization-badge',
+  ) as HTMLElement
+  const encryptionModeBadge = document.getElementById(
+    'encryption-mode-badge',
+  ) as HTMLElement
+  const keyIdBadge = document.getElementById('key-id-badge') as HTMLElement
+
+  // UI update functions
+  function showError(message: string): void {
+    if (errorMessage && errorContainer) {
+      errorMessage.textContent = message
+      errorContainer.classList.remove('hidden')
+    }
+  }
+
+  function hideError(): void {
+    if (errorContainer) {
+      errorContainer.classList.add('hidden')
+    }
+  }
+
+  function updateUIState(): void {
+    if (initializationBadge) {
+      if (initialized) {
+        initializationBadge.textContent = 'FHE Initialized'
+        initializationBadge.setAttribute('variant', 'default')
+        initializationBadge.classList.remove('bg-red-500')
+        initializationBadge.classList.add('bg-green-500')
+      } else {
+        initializationBadge.textContent = 'Not Initialized'
+        initializationBadge.setAttribute('variant', 'destructive')
+        initializationBadge.classList.add('bg-red-500')
+        initializationBadge.classList.remove('bg-green-500')
+      }
+    }
+
+    if (encryptionModeBadge) {
+      encryptionModeBadge.textContent = `Mode: ${encryptionMode}`
+    }
+
+    if (keyIdBadge) {
+      keyIdBadge.textContent = `Key ID: ${keyId.substring(0, 8)}...`
+    }
+  }
+
+  // Mock FHE functions for UI demo
+  async function mockInitialize(): Promise<boolean> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        initialized = true
+        encryptionMode = 'fhe'
+        keyId = crypto.randomUUID()
+        resolve(true)
+      }, 1000)
+    })
+  }
+
+  async function mockEncrypt(text: string): Promise<string> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Create a simple "encrypted" version by encoding to base64
+        const encrypted = btoa(text + Math.random())
+        resolve(encrypted)
+      }, 800)
+    })
+  }
+
+  async function mockDecrypt(text: string): Promise<string> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Just return something plausible
+        resolve('Decrypted: ' + text.substring(0, 10) + '...')
+      }, 800)
+    })
+  }
+
+  async function mockProcess(
+    encrypted: string,
+    operation: string,
+  ): Promise<any> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const results = {
+          sentiment: {
+            score: Math.random(),
+            sentiment: Math.random() > 0.5 ? 'positive' : 'negative',
+          },
+          entities: [{ entity: 'Example', type: 'ORGANIZATION', score: 0.91 }],
+          keyphrase: ['encrypted', 'processing', 'secure'],
+          classify: { category: 'Technology', confidence: 0.89 },
+        }
+        resolve(results[operation as keyof typeof results])
+      }, 1200)
+    })
+  }
+
+  async function mockRotateKeys(): Promise<string> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        keyId = crypto.randomUUID()
+        resolve(keyId)
+      }, 600)
+    })
+  }
+
+  // Button event handlers
+  if (initializeBtn) {
+    initializeBtn.addEventListener('click', async () => {
+      try {
+        hideError()
+        initializeBtn.textContent = 'Initializing...'
+        initializeBtn.disabled = true
+        await mockInitialize()
+        updateUIState()
+      } catch (error: unknown) {
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        showError(`Initialization failed: ${errorMsg}`)
+      } finally {
+        initializeBtn.textContent = 'Initialize FHE'
+        initializeBtn.disabled = false
+      }
+    })
+  }
+
+  if (encryptBtn) {
+    encryptBtn.addEventListener('click', async () => {
+      if (!initialized) {
+        showError('Please initialize FHE first')
+        return
+      }
+
+      if (!messageInput?.value.trim()) {
+        showError('Please enter a message to encrypt')
+        return
+      }
+
+      try {
+        hideError()
+        encryptBtn.textContent = 'Encrypting...'
+        encryptBtn.disabled = true
+        encryptedMessage = await mockEncrypt(messageInput.value)
+
+        if (encryptedMessageDisplay) {
+          encryptedMessageDisplay.textContent = encryptedMessage
+        }
+
+        if (encryptedMessageContainer) {
+          encryptedMessageContainer.classList.remove('hidden')
+        }
+
+        if (encryptedInput) {
+          encryptedInput.value = encryptedMessage
+        }
+      } catch (error: unknown) {
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        showError(`Encryption failed: ${errorMsg}`)
+      } finally {
+        encryptBtn.textContent = 'Encrypt Message'
+        encryptBtn.disabled = false
+      }
+    })
+  }
+
+  if (processBtn) {
+    processBtn.addEventListener('click', async () => {
+      if (!initialized) {
+        showError('Please initialize FHE first')
+        return
+      }
+
+      if (!encryptedInput?.value.trim()) {
+        showError('Please encrypt a message first or enter encrypted data')
+        return
+      }
+
+      try {
+        hideError()
+        processBtn.textContent = 'Processing...'
+        processBtn.disabled = true
+        const result = await mockProcess(
+          encryptedInput.value,
+          operationSelect?.value || 'sentiment',
+        )
+
+        if (operationResult) {
+          operationResult.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`
+        }
+
+        if (operationResultContainer) {
+          operationResultContainer.classList.remove('hidden')
+        }
+      } catch (error: unknown) {
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        showError(`Processing failed: ${errorMsg}`)
+      } finally {
+        processBtn.textContent = 'Process Encrypted Data'
+        processBtn.disabled = false
+      }
+    })
+  }
+
+  if (decryptBtn) {
+    decryptBtn.addEventListener('click', async () => {
+      if (!initialized) {
+        showError('Please initialize FHE first')
+        return
+      }
+
+      if (!encryptedInput?.value.trim()) {
+        showError('Please encrypt a message first or enter encrypted data')
+        return
+      }
+
+      try {
+        hideError()
+        decryptBtn.textContent = 'Decrypting...'
+        decryptBtn.disabled = true
+        const result = await mockDecrypt(encryptedInput.value)
+
+        if (decryptedMessage) {
+          decryptedMessage.textContent = result
+        }
+
+        if (decryptedMessageContainer) {
+          decryptedMessageContainer.classList.remove('hidden')
+        }
+      } catch (error: unknown) {
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        showError(`Decryption failed: ${errorMsg}`)
+      } finally {
+        decryptBtn.textContent = 'Decrypt Data'
+        decryptBtn.disabled = false
+      }
+    })
+  }
+
+  if (rotateKeyBtn) {
+    rotateKeyBtn.addEventListener('click', async () => {
+      if (!initialized) {
+        showError('Please initialize FHE first')
+        return
+      }
+
+      try {
+        hideError()
+        rotateKeyBtn.textContent = 'Rotating...'
+        rotateKeyBtn.disabled = true
+        keyId = await mockRotateKeys()
+        updateUIState()
+      } catch (error: unknown) {
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        showError(`Key rotation failed: ${errorMsg}`)
+      } finally {
+        rotateKeyBtn.textContent = 'Rotate Encryption Keys'
+        rotateKeyBtn.disabled = false
+      }
+    })
+  }
+</script>

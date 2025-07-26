@@ -1,0 +1,108 @@
+# Azure CLI Setup Task for Azure DevOps Pipeline
+# This task can be included in your azure-pipelines.yml file
+
+# Option 1: Simple setup (recommended)
+- script: |
+    chmod +x ./scripts/setup-azure-cli-pipeline.sh
+    ./scripts/setup-azure-cli-pipeline.sh
+  displayName: 'Setup Azure CLI'
+  env:
+    PATH: $(PATH):$(HOME)/.local/bin
+
+# Option 2: With conda environment activation
+- script: |
+    # Activate conda environment if available
+    if [ -f "/home/vivi/miniconda3/etc/profile.d/conda.sh" ]; then
+      source /home/vivi/miniconda3/etc/profile.d/conda.sh
+      conda activate pixel 2>/dev/null || conda activate base 2>/dev/null || true
+    fi
+    
+    # Run Azure CLI setup
+    chmod +x ./scripts/setup-azure-cli-pipeline.sh
+    ./scripts/setup-azure-cli-pipeline.sh
+  displayName: 'Setup Azure CLI with Conda'
+  env:
+    PATH: $(PATH):$(HOME)/.local/bin
+
+# Option 3: Docker-based Azure CLI (fallback)
+- script: |
+    echo "Using Azure CLI Docker container as fallback..."
+    
+    # Create wrapper script for Azure CLI
+    mkdir -p ~/.local/bin
+    cat > ~/.local/bin/az << 'EOF'
+#!/bin/bash
+docker run --rm -v $(pwd):/workspace -w /workspace mcr.microsoft.com/azure-cli:latest az "$@"
+EOF
+    chmod +x ~/.local/bin/az
+    
+    # Test Azure CLI
+    ~/.local/bin/az version
+    
+    # Set pipeline variables
+    echo "##vso[task.setvariable variable=azCliInstalled]true"
+    echo "##vso[task.setvariable variable=azCliPath]$HOME/.local/bin"
+    echo "##vso[task.setvariable variable=azCliMethod]docker"
+  displayName: 'Setup Azure CLI via Docker'
+  condition: failed() # Only run if previous methods failed
+
+# Option 4: Pre-installed system Azure CLI check
+- script: |
+    echo "Checking for pre-installed Azure CLI..."
+    
+    # Common Azure CLI installation paths
+    AZURE_CLI_PATHS=(
+      "/usr/bin/az"
+      "/usr/local/bin/az"
+      "/opt/az/bin/az"
+      "/snap/bin/az"
+    )
+    
+    for az_path in "${AZURE_CLI_PATHS[@]}"; do
+      if [ -f "$az_path" ] && [ -x "$az_path" ]; then
+        echo "Found Azure CLI at: $az_path"
+        
+        # Test functionality
+        if $az_path version >/dev/null 2>&1; then
+          echo "Azure CLI is functional"
+          
+          # Set pipeline variables
+          echo "##vso[task.setvariable variable=azCliInstalled]true"
+          echo "##vso[task.setvariable variable=azCliPath]$(dirname $az_path)"
+          echo "##vso[task.setvariable variable=PATH]$(dirname $az_path):$PATH"
+          
+          exit 0
+        fi
+      fi
+    done
+    
+    echo "No pre-installed Azure CLI found"
+    exit 1
+  displayName: 'Check for Pre-installed Azure CLI'
+  continueOnError: true
+
+# Option 5: Microsoft-hosted agent detection
+- script: |
+    echo "Detecting agent type..."
+    
+    if [ -n "$AGENT_NAME" ] && [[ "$AGENT_NAME" == *"Hosted Agent"* ]]; then
+      echo "Running on Microsoft-hosted agent - Azure CLI should be pre-installed"
+      
+      if command -v az >/dev/null 2>&1; then
+        echo "Azure CLI found on Microsoft-hosted agent"
+        az version
+        
+        # Set pipeline variables
+        echo "##vso[task.setvariable variable=azCliInstalled]true"
+        echo "##vso[task.setvariable variable=azCliPath]$(dirname $(which az))"
+        echo "##vso[task.setvariable variable=azCliMethod]preinstalled"
+      else
+        echo "Azure CLI not found on Microsoft-hosted agent - this is unexpected"
+        exit 1
+      fi
+    else
+      echo "Running on self-hosted agent"
+      echo "##vso[task.setvariable variable=agentType]selfhosted"
+    fi
+  displayName: 'Detect Agent Type and Azure CLI'
+  continueOnError: true

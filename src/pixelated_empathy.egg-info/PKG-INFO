@@ -1,0 +1,39 @@
+Metadata-Version: 2.4
+Name: pixelated-empathy
+Version: 0.1.0
+Summary: Pixelated Empathy - AI-powered bias detection and mental health platform
+Author-email: Pixelated Empathy Team <team@pixelatedempathy.com>
+Requires-Python: >=3.10
+License-File: LICENSE
+Requires-Dist: flask
+Requires-Dist: flask-cors
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: scikit-learn
+Requires-Dist: pyjwt
+Requires-Dist: werkzeug
+Requires-Dist: aif360
+Requires-Dist: fairlearn
+Requires-Dist: shap
+Requires-Dist: lime
+Requires-Dist: transformers
+Requires-Dist: torch
+Requires-Dist: spacy
+Requires-Dist: nltk
+Requires-Dist: evaluate
+Requires-Dist: cryptography
+Requires-Dist: bcrypt
+Requires-Dist: requests
+Requires-Dist: python-dotenv
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-cov; extra == "test"
+Requires-Dist: pytest-mock; extra == "test"
+Requires-Dist: pytest-asyncio; extra == "test"
+Requires-Dist: coverage; extra == "test"
+Provides-Extra: dev
+Requires-Dist: black; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: pyright; extra == "dev"
+Dynamic: license-file

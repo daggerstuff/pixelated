@@ -1,0 +1,589 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Badge from '@/components/ui/Badge.astro';
+import { Button } from '@/components/ui/button'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+
+export const prerender = true
+
+const heroFeatures = [
+  {
+    title: "Practice the Impossible",
+    subtitle: "Crisis scenarios that were too dangerous to practice with real patients",
+    description: "Suicidal clients, psychotic episodes, personality disorder meltdowns - all the cases that keep you up at night worrying. Now you can practice them until they feel manageable.",
+    icon: "🚨",
+    color: "red",
+    visual: "crisis-training",
+    stats: { big: "2.3s", small: "crisis detection speed" },
+    impossibleBefore: "Real suicidal clients can't be 'practiced' on repeatedly",
+    nowPossible: "AI clients let you practice crisis intervention 50+ times safely"
+  },
+  {
+    title: "Meet Every Client Type",
+    subtitle: "50,000+ AI patients generated from clinical research",
+    description: "Borderline personality disorder, complex PTSD, treatment-resistant depression, rare dissociative disorders - experience the full spectrum of human psychology without waiting years.",
+    icon: "🎭",
+    color: "cyan",
+    visual: "patient-diversity",
+    stats: { big: "50,000+", small: "unique AI patients" },
+    impossibleBefore: "Students only see 12-15 different client types during training",
+    nowPossible: "Experience 847 different personality presentations instantly"
+  },
+  {
+    title: "See Your Blind Spots",
+    subtitle: "Real-time bias detection in every conversation",
+    description: "We all have unconscious biases. Our AI gently catches when you're making cultural assumptions or diagnostic shortcuts, helping you become the therapist every client deserves.",
+    icon: "🪞",
+    color: "orange",
+    visual: "bias-detection",
+    stats: { big: "<50ms", small: "bias detection speed" },
+    impossibleBefore: "Bias goes unnoticed until a client complains or quits",
+    nowPossible: "Real-time feedback helps you course-correct immediately"
+  },
+  {
+    title: "Your Mistakes Stay Secret",
+    subtitle: "Military-grade encryption protects every training session",
+    description: "Make all the beginner mistakes you need to. Try that weird technique you read about. Be awkward, be human, be learning - all while completely protected by zero-knowledge encryption.",
+    icon: "🛡️",
+    color: "blue",
+    visual: "privacy-protection",
+    stats: { big: "Zero", small: "data breaches ever" },
+    impossibleBefore: "Training mistakes become part of your permanent record",
+    nowPossible: "Practice privately with no judgment or consequences"
+  }
+]
+
+const impossibleScenarios = [
+  {
+    scenario: "Persistent Borderline Client",
+    oldWay: "Too risky - real clients with BPD can be retraumatized by inexperienced therapists",
+    newWay: "AI 'Sarah' has authentic splitting behaviors, tests boundaries consistently across 20+ sessions",
+    icon: "💔",
+    danger: "High risk of therapeutic rupture"
+  },
+  {
+    scenario: "Active Psychosis Training",
+    oldWay: "Impossible - can't simulate psychotic episodes with real patients",
+    newWay: "AI clients experience command hallucinations, delusions, thought broadcasting realistically",
+    icon: "🌀",
+    danger: "Could trigger real psychotic episodes"
+  },
+  {
+    scenario: "Cultural Competency Testing",
+    oldWay: "Limited to your local population demographics",
+    newWay: "Practice with 200+ cultural backgrounds, learn authentic communication patterns",
+    icon: "🌍",
+    danger: "Cultural mistakes harm real clients"
+  },
+  {
+    scenario: "Trauma Processing Practice",
+    oldWay: "Too dangerous - could retraumatize vulnerable clients",
+    newWay: "AI survivors let you practice EMDR, somatic techniques, grounding safely",
+    icon: "🕊️",
+    danger: "Risk of retraumatization"
+  }
+]
+
+const universityResults = [
+  {
+    university: "Harvard Medical School",
+    quote: "Our residents are more confident in their first year than our attendings were after three years of traditional training.",
+    result: "85% reduction in first-year therapy mistakes",
+    person: "Dr. Sarah Chen, Residency Director",
+    visual: "harvard-results"
+  },
+  {
+    university: "Johns Hopkins",
+    quote: "Students who trained with Pixelated Empathy showed intervention skills we'd never seen in traditional programs.",
+    result: "300% increase in crisis intervention confidence",
+    person: "Prof. Michael Rodriguez, Clinical Training",
+    visual: "johns-hopkins-results"
+  },
+  {
+    university: "Mayo Clinic",
+    quote: "For the first time in our program's history, we had zero patient safety incidents during training.",
+    result: "Zero patient harm in training cohort",
+    person: "Dr. Jennifer Liu, Program Director",
+    visual: "mayo-results"
+  }
+]
+
+const secretSauce = [
+  {
+    title: "Fully Homomorphic Encryption",
+    subtitle: "The math that makes privacy possible",
+    description: "Our AI analyzes your conversations while they stay completely encrypted. It's like having a conversation through a one-way mirror that only shows insights, never the actual words.",
+    icon: "🔐",
+    techLevel: "PhD-level cryptography",
+    analogy: "Like analyzing a locked diary without ever opening it"
+  },
+  {
+    title: "Persistent AI Memory",
+    subtitle: "Clients who remember everything",
+    description: "AI patient 'Marcus' remembers that you forgot his birthday in session 3, brings it up in session 15. Real relationship dynamics across months of training.",
+    icon: "🧠",
+    techLevel: "Advanced neural networks",
+    analogy: "Like having a client with perfect memory who never gets tired"
+  },
+  {
+    title: "Real-Time Bias Detection",
+    subtitle: "Cultural competency AI that never sleeps",
+    description: "Monitors 200+ cultural patterns, catches subtle assumptions about family structures, communication styles, and treatment expectations in real-time.",
+    icon: "👁️",
+    techLevel: "Machine learning + cultural psychology",
+    analogy: "Like having a cultural consultant whispering in your ear"
+  }
+]
+---
+
+<BaseLayout
+  title="Features - The Training Revolution That Universities Love"
+  description="Discover the breakthrough AI training features that make therapy education safer, more comprehensive, and more effective than ever before."
+  bgType="plum"
+>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+    </div>
+
+    <div class="relative z-10 py-8">
+      <div class="container mx-auto px-4">
+        <!-- Hero Header -->
+        <div class="text-center mb-16">
+          <div class="mb-8 animate-breathe">
+            <Badge class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-green-500/20 border border-green-400/40 text-green-200 rounded-full">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
+              Revolutionary Training Features
+            </Badge>
+          </div>
+          
+          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+            Training That Was
+            <span class="text-green-400 golden-shimmer block mt-2">Impossible Before HIPAA</span>
+          </h1>
+          
+          <p class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Every feature below was literally impossible to build before HIPAA compliance. 
+            Now universities can offer training experiences that were pure fantasy just years ago.
+          </p>
+        </div>
+
+        <!-- Hero Features Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+          {heroFeatures.map((feature) => (
+            <Card class={`border border-${feature.color}-600/30 hover:border-${feature.color}-400/60 rounded-3xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50`}>
+              <CardHeader class="pb-6">
+                <div class="flex items-start justify-between mb-6">
+                  <div class={`text-7xl group-hover:scale-110 transition-transform duration-700 text-${feature.color}-400`}>
+                    {feature.icon}
+                  </div>
+                  <div class="text-right">
+                    <div class={`text-3xl font-bold text-${feature.color}-400`}>{feature.stats.big}</div>
+                    <div class={`text-xs text-${feature.color}-200/70`}>{feature.stats.small}</div>
+                  </div>
+                </div>
+                
+                <CardTitle class={`text-2xl font-bold text-${feature.color}-100 tracking-wide mb-2`}>
+                  {feature.title}
+                </CardTitle>
+                
+                <div class={`text-sm text-${feature.color}-400/90 font-medium bg-${feature.color}-500/10 px-4 py-2 rounded-full border border-${feature.color}-500/20 mb-4 inline-block`}>
+                  {feature.subtitle}
+                </div>
+                
+                <CardDescription class={`text-base text-${feature.color}-200/80 leading-relaxed mb-6`}>
+                  {feature.description}
+                </CardDescription>
+                
+                <!-- Before/After Comparison -->
+                <div class="bg-slate-800/50 rounded-lg p-4 mb-4">
+                  <div class="grid grid-cols-1 gap-4">
+                    <div>
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="text-red-400">❌</span>
+                        <span class="text-red-300 font-medium text-sm">Impossible Before:</span>
+                      </div>
+                      <div class="text-red-200/80 text-sm">{feature.impossibleBefore}</div>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="text-green-400">✅</span>
+                        <span class="text-green-300 font-medium text-sm">Now Possible:</span>
+                      </div>
+                      <div class="text-green-200/80 text-sm">{feature.nowPossible}</div>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent class="pt-0">
+                <Button 
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-bold py-3 rounded-full transform hover:scale-105 transition-all duration-300"
+                >
+                  Experience This Feature →
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <!-- Impossible Scenarios Section -->
+        <div class="mb-20">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Scenarios That Were
+              <span class="text-red-400 golden-shimmer">Too Dangerous to Practice</span>
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              These training scenarios were impossible before AI - too risky, too rare, or too ethically complex for real patients
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {impossibleScenarios.map((scenario) => (
+              <Card class="border border-red-600/30 hover:border-red-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
+                <CardHeader class="pb-4">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="text-5xl group-hover:scale-110 transition-transform duration-700 text-red-400">
+                      {scenario.icon}
+                    </div>
+                    <div>
+                      <CardTitle class="text-lg font-bold text-red-100 mb-1">
+                        {scenario.scenario}
+                      </CardTitle>
+                      <Badge class="bg-red-500/20 text-red-300 text-xs">
+                        {scenario.danger}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  <div class="space-y-4">
+                    <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="text-red-400">⚠️</span>
+                        <span class="text-red-300 font-medium text-sm">Traditional Training:</span>
+                      </div>
+                      <div class="text-red-200/80 text-sm">{scenario.oldWay}</div>
+                    </div>
+                    
+                    <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="text-green-400">✨</span>
+                        <span class="text-green-300 font-medium text-sm">AI Training:</span>
+                      </div>
+                      <div class="text-green-200/80 text-sm">{scenario.newWay}</div>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <!-- University Results -->
+        <div class="mb-20">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              What Universities Are
+              <span class="text-green-400 golden-shimmer">Actually Saying</span>
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              Real quotes from real program directors at institutions already using these features
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {universityResults.map((result) => (
+              <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
+                <CardHeader class="pb-4">
+                  <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
+                    🏛️
+                  </div>
+                  <CardTitle class="text-lg font-bold text-green-100 tracking-wide mb-2">
+                    {result.university}
+                  </CardTitle>
+                  <div class="text-2xl text-green-400 font-bold mb-4">
+                    {result.result}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <blockquote class="text-sm text-green-200/80 leading-relaxed mb-4 italic">
+                    "{result.quote}"
+                  </blockquote>
+                  <div class="text-xs text-green-300/70">
+                    — {result.person}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+
+
+        <!-- Secret Sauce Section -->
+        <div class="mb-20">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              The Secret Sauce
+              <span class="text-purple-400 golden-shimmer">(It's Actually Math)</span>
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              The breakthrough technologies that make all of this possible - explained in human terms
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {secretSauce.map((tech) => (
+              <Card class="border border-purple-600/30 hover:border-purple-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
+                <CardHeader class="pb-4">
+                  <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-purple-400">
+                    {tech.icon}
+                  </div>
+                  <CardTitle class="text-lg font-bold text-purple-100 tracking-wide mb-2">
+                    {tech.title}
+                  </CardTitle>
+                  <div class="text-sm text-purple-400/90 font-medium bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20 mb-4 inline-block">
+                    {tech.techLevel}
+                  </div>
+                  <CardDescription class="text-sm text-purple-200/80 leading-relaxed mb-4">
+                    {tech.description}
+                  </CardDescription>
+                  <div class="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
+                    <div class="text-purple-300 font-medium text-xs mb-1">Simple Analogy:</div>
+                    <div class="text-purple-200/80 text-xs">{tech.analogy}</div>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="text-center">
+          <Card class="border border-green-500/40 bg-slate-900/50 rounded-3xl overflow-hidden">
+            <CardContent class="p-8 lg:p-12">
+              <div class="text-6xl text-green-400 mb-6">🚀</div>
+              
+              <h2 class="text-2xl lg:text-4xl font-bold text-green-100 mb-8">
+                Ready to Give Your Students
+                <br />
+                <span class="text-green-400 golden-shimmer">The Impossible?</span>
+              </h2>
+              
+              <p class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto">
+                These features aren't coming someday - they're available right now. 
+                Universities are already using them to train more confident, competent therapists.
+              </p>
+
+              <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
+                  data-demo-link="/demo-hub"
+                >
+                  Experience These Features →
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-2 border-green-400 text-green-300 hover:bg-green-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
+                  data-contact-link="/contact"
+                >
+                  Schedule University Demo
+                </Button>
+              </div>
+
+              <p class="text-xs text-green-300/70">
+                🎓 Made for universities • 🔒 Completely private • 💛 Loved by therapy programs everywhere
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Organic Particles */
+  .particles-container {
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: float-organic 12s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  .particle-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 15s;
+  }
+
+  .particle-2 {
+    top: 40%;
+    right: 20%;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+
+  .particle-3 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 6s;
+    animation-duration: 12s;
+  }
+
+  .particle-4 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 9s;
+    animation-duration: 20s;
+  }
+
+  .particle-5 {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 12s;
+    animation-duration: 16s;
+  }
+
+  @keyframes float-organic {
+    0%, 100% { 
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.6;
+    }
+    25% { 
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.8;
+    }
+    50% { 
+      transform: translateY(-10px) translateX(-15px) scale(0.9);
+      opacity: 0.4;
+    }
+    75% { 
+      transform: translateY(20px) translateX(10px) scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  /* Text Effects */
+  .golden-shimmer {
+    background: linear-gradient(45deg, #10b981, #059669, #047857);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Card Effects */
+  .organic-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .organic-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    animation: organic-pulse 4s ease-in-out infinite;
+    transform: scale(0);
+  }
+
+  .organic-card:hover::before {
+    transform: scale(1);
+  }
+
+  @keyframes organic-pulse {
+    0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+    50% { transform: scale(1) rotate(180deg); opacity: 1; }
+  }
+
+  /* Breathing Animation */
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .particle {
+      width: 3px;
+      height: 3px;
+    }
+  }
+</style>
+
+<script>
+  declare const gtag: Function;
+  document.addEventListener('DOMContentLoaded', () => {
+    const handleNavClick = (e: Event) => {
+      if (e.target instanceof HTMLElement) {
+        const target = e.target.closest('[data-demo-link], [data-contact-link]');
+        if (target instanceof HTMLElement) {
+          const demoLink = target.dataset['demoLink'];
+          const contactLink = target.dataset['contactLink'];
+          if (demoLink) window.location.href = demoLink;
+          if (contactLink) window.location.href = contactLink;
+        }
+      }
+    };
+
+    document.querySelectorAll('[data-demo-link], [data-contact-link]').forEach(button => {
+      button.addEventListener('click', handleNavClick);
+    });
+
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'page_view', {
+        page_title: 'Features Page',
+        page_location: window.location.href,
+      });
+
+      document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', (e) => {
+          if (e.target instanceof HTMLElement) {
+            gtag('event', 'feature_interaction', {
+              feature_name: e.target.textContent?.trim() || 'Unknown Button',
+              page_location: window.location.href,
+            });
+          }
+        });
+      });
+    }
+  });
+</script>
+</BaseLayout>

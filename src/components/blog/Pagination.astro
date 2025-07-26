@@ -1,0 +1,36 @@
+---
+import { Button } from '@/components/ui/button';
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  url: {
+    prev?: string;
+    next?: string;
+  };
+}
+
+const { currentPage, totalPages, url } = Astro.props;
+--- 
+
+<nav class="flex justify-center items-center gap-4 mt-16">
+  {url.prev ? (
+    <a href={url.prev}>
+      <Button variant="outline">← Previous</Button>
+    </a>
+  ) : (
+    <Button variant="outline" disabled>← Previous</Button>
+  )}
+
+  <span class="text-sm text-muted-foreground">
+    Page {currentPage} of {totalPages}
+  </span>
+
+  {url.next ? (
+    <a href={url.next}>
+      <Button variant="outline">Next →</Button>
+    </a>
+  ) : (
+    <Button variant="outline" disabled>Next →</Button>
+  )}
+</nav>

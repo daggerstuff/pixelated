@@ -1,0 +1,338 @@
+---
+// DataPortabilitySystem.astro
+// Component for standardized data portability under HIPAA compliance
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  title?: string
+}
+
+const { title = 'Data Portability System' } = Astro.props
+
+// Data format options for export
+const dataFormats = [
+  {
+    id: 'json',
+    name: 'JSON',
+    description: 'Standard JSON format for maximum compatibility',
+  },
+  {
+    id: 'csv',
+    name: 'CSV',
+    description: 'Comma-separated values for spreadsheet applications',
+  },
+  {
+    id: 'fhir',
+    name: 'FHIR',
+    description: 'Fast Healthcare Interoperability Resources standard',
+  },
+  { id: 'ccd', name: 'CCD', description: 'Continuity of Care Document format' },
+  {
+    id: 'hl7',
+    name: 'HL7',
+    description: 'Health Level Seven messaging standard',
+  },
+]
+
+// Sample data sections that can be exported
+const dataSections = [
+  {
+    id: 'profile',
+    name: 'Patient Profile',
+    description: 'Basic demographic information',
+  },
+  {
+    id: 'mental-health',
+    name: 'Mental Health Data',
+    description: 'Assessments, notes, and emotional analysis',
+  },
+  {
+    id: 'chat-history',
+    name: 'Chat History',
+    description: 'Conversation logs and interactions',
+  },
+  {
+    id: 'consent',
+    name: 'Consent Records',
+    description: 'History of consent grants and withdrawals',
+  },
+]
+
+// Sample recipient types for data transfer
+const recipientTypes = [
+  {
+    id: 'provider',
+    name: 'Healthcare Provider',
+    description: 'Other mental health professionals',
+  },
+  {
+    id: 'patient',
+    name: 'Patient Direct Access',
+    description: 'Direct access for the patient',
+  },
+  {
+    id: 'research',
+    name: 'Research Institution',
+    description: 'Approved research organizations with consent',
+  },
+]
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+  <div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      {title}
+    </h2>
+
+    <div class="mb-8">
+      <p class="text-gray-600 dark:text-gray-300 mb-4">
+        This system allows for standardized, secure transfer of patient data in
+        compliance with HIPAA regulations. All transfers are fully encrypted,
+        logged, and require appropriate authorization.
+      </p>
+
+      <div class="flex flex-wrap gap-4 mb-6">
+        <div
+          class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="shield-check"
+            class="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
+          />
+          <span class="text-green-700 dark:text-green-300 text-sm"
+            >End-to-end encryption</span
+          >
+        </div>
+
+        <div
+          class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="clipboard-check"
+            class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"
+          />
+          <span class="text-blue-700 dark:text-blue-300 text-sm"
+            >Comprehensive audit logging</span
+          >
+        </div>
+
+        <div
+          class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="document-check"
+            class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2"
+          />
+          <span class="text-purple-700 dark:text-purple-300 text-sm"
+            >Consent verification</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Portability Form -->
+    <form id="data-portability-form" class="space-y-6">
+      <!-- Patient Selection -->
+      <div>
+        <label
+          for="patient-id"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          Patient ID or Identifier
+        </label>
+        <input
+          type="text"
+          id="patient-id"
+          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Enter patient identifier"
+          required
+        />
+      </div>
+
+      <!-- Data Format Selection -->
+      <div>
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          Export Format
+        </label>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {
+            dataFormats.map((format) => (
+              <div class="relative">
+                <input
+                  type="radio"
+                  id={`format-${format.id}`}
+                  name="data-format"
+                  value={format.id}
+                  class="peer sr-only"
+                  required
+                />
+                <label
+                  for={`format-${format.id}`}
+                  class="flex p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-400 dark:text-white"
+                >
+                  <div>
+                    <h3 class="font-medium">{format.name}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {format.description}
+                    </p>
+                  </div>
+                </label>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Data Sections -->
+      <div>
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          Data Sections to Include
+        </label>
+        <div class="space-y-2">
+          {
+            dataSections.map((section) => (
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input
+                    id={`section-${section.id}`}
+                    name="data-sections"
+                    type="checkbox"
+                    value={section.id}
+                    class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
+                  />
+                </div>
+                <div class="ml-3 text-sm">
+                  <label
+                    for={`section-${section.id}`}
+                    class="font-medium text-gray-700 dark:text-white"
+                  >
+                    {section.name}
+                  </label>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {section.description}
+                  </p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Recipient Type -->
+      <div>
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          Recipient Type
+        </label>
+        <select
+          id="recipient-type"
+          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          required
+        >
+          <option value="">Select recipient type</option>
+          {
+            recipientTypes.map((type) => (
+              <option value={type.id}>{type.name}</option>
+            ))
+          }
+        </select>
+      </div>
+
+      <!-- Recipient Information -->
+      <div id="recipient-details" class="space-y-3">
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          Recipient Details
+        </label>
+        <input
+          type="text"
+          id="recipient-name"
+          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Recipient name or organization"
+          required
+        />
+        <input
+          type="email"
+          id="recipient-email"
+          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Recipient email"
+          required
+        />
+      </div>
+
+      <!-- Data Transfer Authorization -->
+      <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="authorization-checkbox"
+              type="checkbox"
+              required
+              class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
+            />
+          </div>
+          <div class="ml-3 text-sm">
+            <label
+              for="authorization-checkbox"
+              class="font-medium text-yellow-800 dark:text-yellow-300"
+              >Authorization Required</label
+            >
+            <p class="text-yellow-700 dark:text-yellow-400">
+              I confirm I have proper authorization to transfer this patient
+              data, and that appropriate consent has been verified.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600"
+        >
+          Generate Transfer
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Initialize the data portability form
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('data-portability-form')
+
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault()
+
+        // In a real implementation, we would collect form data and process it
+        const formData = new FormData(e.target as HTMLFormElement)
+
+        // For demonstration purposes, just show an alert
+        alert(
+          'Data transfer request submitted. In a production environment, this would generate a secure transfer package.',
+        )
+
+        // In production, this would trigger the actual data export and transfer process
+        console.log(
+          'Form submitted with data:',
+          Object.fromEntries(formData.entries()),
+        )
+      })
+    }
+  })
+</script>

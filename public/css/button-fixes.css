@@ -1,0 +1,290 @@
+/* Comprehensive Button Standardization System */
+
+/*
+ * UNIFIED BUTTON SIZING SYSTEM
+ * This ensures ALL buttons across the site have consistent sizing
+ * regardless of how they're implemented (button element, a tag, etc.)
+ */
+
+/* CRITICAL BUTTON FIXES - High specificity to override everything */
+html .btn,
+html button,
+html [type='button'],
+html [type='submit'],
+html [type='reset'],
+html a.btn,
+html .button,
+html .cta-button,
+html .action-button {
+  /* FORCE consistent sizing for ALL buttons */
+  min-height: 44px !important;
+  min-width: 120px !important;
+  max-width: 200px !important;
+  padding: 12px 24px !important;
+
+  /* FORCE layout standardization */
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  white-space: nowrap !important;
+
+  /* FORCE typography standardization */
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+
+  /* FORCE visual standardization */
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+/* Size variants for specific use cases */
+.btn-sm,
+.button-sm,
+[data-size='sm'] {
+  min-height: 36px !important;
+  min-width: 100px !important;
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+}
+
+.btn-lg,
+.button-lg,
+[data-size='lg'] {
+  min-height: 52px !important;
+  min-width: 140px !important;
+  padding: 16px 32px !important;
+  font-size: 16px !important;
+}
+
+.btn-icon,
+.button-icon,
+[data-size='icon'] {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 12px !important;
+}
+
+/* Specific button class standardization */
+.btn-mental-health,
+.btn-secondary,
+.btn-primary,
+.btn-outline,
+.btn-rose,
+.btn-yellow,
+.btn-destructive,
+.btn-ghost,
+.btn-link {
+  /* Inherit all base button styles */
+}
+
+/* Dark mode improvements */
+.dark {
+  color-scheme: dark;
+}
+
+/* Ensure proper dark mode background */
+.dark body {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+/* Fix ALL dark mode text colors */
+.dark .text-gray-600,
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+.dark .text-gray-300 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+/* Fix mental health theme colors in dark mode */
+.dark .text-mental-health {
+  color: #5eb4af !important;
+}
+
+.dark .text-therapy {
+  color: #7dd3fc !important;
+}
+
+.dark .text-research {
+  color: #a78bfa !important;
+}
+
+.dark .text-ai {
+  color: #fbbf24 !important;
+}
+
+/* Fix button colors in dark mode */
+.dark .bg-teal-600 {
+  background-color: #0d9488 !important;
+}
+
+.dark .bg-teal-600:hover,
+.dark .hover\:bg-teal-700:hover {
+  background-color: #0f766e !important;
+}
+
+.dark .text-teal-600 {
+  color: #5eead4 !important;
+}
+
+.dark .border-teal-600 {
+  border-color: #0d9488 !important;
+}
+
+.dark .hover\:bg-teal-600:hover {
+  background-color: #0d9488 !important;
+}
+
+.dark .hover\:text-white:hover {
+  color: #ffffff !important;
+}
+
+/* Ensure mental health gradient works in dark mode */
+.dark .mental-health-gradient {
+  background: linear-gradient(
+    to bottom right,
+    rgba(30, 58, 138, 0.3),
+    rgba(17, 94, 89, 0.3)
+  ) !important;
+}
+
+/* Fix card backgrounds in dark mode */
+.dark .card {
+  background-color: rgba(31, 41, 55, 0.8) !important;
+  border-color: rgba(75, 85, 99, 0.3) !important;
+}
+
+/* Fix gradient backgrounds in dark mode */
+.dark .bg-gradient-to-br {
+  background: linear-gradient(
+    to bottom right,
+    rgba(30, 58, 138, 0.2),
+    rgba(17, 94, 89, 0.2)
+  ) !important;
+}
+
+.dark .from-blue-100 {
+  --tw-gradient-from: rgba(30, 58, 138, 0.2) !important;
+}
+
+.dark .to-teal-100 {
+  --tw-gradient-to: rgba(17, 94, 89, 0.2) !important;
+}
+
+/* Fix CTA section colors in dark mode */
+.dark .bg-gradient-to-r {
+  background: linear-gradient(to right, #1e3a8a, #0d9488) !important;
+}
+
+/* Ensure theme switcher is visible */
+#theme-toggle {
+  z-index: 50;
+}
+
+/* Fix white backgrounds in dark mode */
+.dark .bg-white\/50 {
+  background-color: rgba(31, 41, 55, 0.5) !important;
+}
+
+.dark .bg-white {
+  background-color: rgba(31, 41, 55, 0.9) !important;
+  color: #f9fafb !important;
+}
+
+/* Fix hover states for white buttons in dark mode */
+.dark .hover\:bg-gray-100:hover {
+  background-color: rgba(55, 65, 81, 0.9) !important;
+}
+
+/* FORCE buttons to not stretch in flex containers */
+.flex .btn,
+.flex button,
+.flex .cta-button,
+.flex .action-button,
+.flex-col .btn,
+.flex-col button,
+.flex-col .cta-button,
+.flex-col .action-button,
+.flex-row .btn,
+.flex-row button,
+.flex-row .cta-button,
+.flex-row .action-button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: 200px !important;
+  align-self: center !important;
+}
+
+/* Mobile responsive button sizing */
+@media (max-width: 640px) {
+  /* Maintain consistent sizing on mobile but allow slightly smaller min-width */
+  .btn,
+  button,
+  [type='button'],
+  [type='submit'],
+  [type='reset'],
+  a.btn,
+  .button,
+  .cta-button,
+  .action-button {
+    min-width: 100px !important;
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+  }
+
+  /* Small buttons on mobile */
+  .btn-sm,
+  .button-sm,
+  [data-size='sm'] {
+    min-height: 32px !important;
+    min-width: 80px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* Large buttons on mobile */
+  .btn-lg,
+  .button-lg,
+  [data-size='lg'] {
+    min-height: 48px !important;
+    min-width: 120px !important;
+    padding: 14px 28px !important;
+    font-size: 15px !important;
+  }
+
+  /* Icon buttons on mobile */
+  .btn-icon,
+  .button-icon,
+  [data-size='icon'] {
+    min-height: 40px !important;
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 10px !important;
+  }
+
+  /* Flex layout adjustments for mobile */
+  .flex-col .btn,
+  .flex-col button,
+  .flex-col .cta-button,
+  .flex-col .action-button {
+    width: auto !important;
+    align-self: center !important;
+  }
+}

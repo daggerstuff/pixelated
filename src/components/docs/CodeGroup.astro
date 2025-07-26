@@ -1,0 +1,34 @@
+---
+// CodeGroup component for displaying multiple code blocks with tabs
+export interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<div class={`code-group ${className || ''}`}>
+  <slot />
+</div>
+
+<style>
+  .code-group {
+    @apply border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700;
+  }
+
+  .code-group :global(pre) {
+    @apply m-0 border-0 rounded-none;
+  }
+
+  .code-group :global(pre:first-child) {
+    @apply rounded-t-lg;
+  }
+
+  .code-group :global(pre:last-child) {
+    @apply rounded-b-lg;
+  }
+
+  .code-group :global(pre:only-child) {
+    @apply rounded-lg;
+  }
+</style>

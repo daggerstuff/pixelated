@@ -1,0 +1,201 @@
+---
+// Grouped imports for better organization
+// Style imports
+import '@unocss/reset/tailwind.css'
+import '@/styles/main.css'
+import '@/styles/pixelated-theme.css'
+import '@/styles/prose.css'
+import '@/styles/markdown.css'
+import '@/styles/page.css'
+
+// Astro components
+import Head from '@/components/base/Head.astro'
+import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
+
+// Layout components
+import Header from '@/components/layout/Header.astro'
+import Footer from '@/components/layout/Footer.astro'
+import Sidebar from '@/components/layout/Sidebar.astro'
+
+// Define a more robust props interface with JSDoc comments
+interface Props {
+  /** Page title - displayed in browser tab */
+  title?: string
+  /** Meta description for SEO */
+  description?: string
+  /** URL for the Open Graph image (social sharing) */
+  metaImage?: string
+  /** Control visibility of layout elements */
+  showHeader?: boolean
+  showFooter?: boolean
+  showSidebar?: boolean
+  /** Control features of layout elements */
+  showThemeToggle?: boolean
+  showUserMenu?: boolean
+  showSocialLinks?: boolean
+  /** Additional class names for the content container */
+  contentClassName?: string
+}
+
+const {
+  title = 'Pixelated Empathy Therapy | Dashboard',
+  description = 'Advanced therapeutic tools for mental health professionals',
+  metaImage = '/og-image.png',
+  showHeader = true,
+  showFooter = true,
+  showSidebar = true,
+  showThemeToggle = true,
+  showUserMenu = true,
+  showSocialLinks = true,
+  contentClassName = '',
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="en" class="h-full scroll-smooth">
+  <Head {title} {description} ogImage={metaImage} />
+  <body
+    class="relative font-sans theme-page flex flex-col min-h-screen theme-bg-primary"
+  >
+    <!-- Skip to content link for accessibility -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+    >
+      Skip to content
+    </a>
+
+    <ErrorBoundary>
+      {
+        showHeader && (
+          <Header
+            showThemeToggle={showThemeToggle}
+            showUserMenu={showUserMenu}
+            position="sticky"
+          />
+        )
+      }
+
+      <div class="flex flex-grow flex-col lg:flex-row">
+        {
+          showSidebar && (
+            <aside
+              class="fixed inset-y-0 z-20 flex-shrink-0 w-64 pt-16
+            backdrop-blur-sm bg-card/80 border-r border-border/30
+            transform transition-transform duration-300 lg:translate-x-0 lg:static lg:h-auto"
+              id="sidebar"
+            >
+              <Sidebar />
+            </aside>
+          )
+        }
+
+        <main
+          class:list={[
+            'relative flex-grow pt-16 transition-all duration-300 ease-in-out slide-enter',
+            showSidebar ? 'lg:ml-64' : 'w-full',
+            contentClassName,
+          ]}
+          id="main-content"
+        >
+          <div
+            class="container mx-auto px-4 py-6 min-h-[calc(100vh-4rem)] flex flex-col slide-enter-content"
+          >
+            <slot />
+          </div>
+
+          {
+            showFooter && (
+              <Footer
+                showSocialLinks={showSocialLinks}
+                className="mt-auto border-t border-border/30 backdrop-blur-sm"
+              />
+            )
+          }
+        </main>
+      </div>
+    </ErrorBoundary>
+
+    <!-- Theme handling script with improved performance -->
+    <script is:inline>
+      // Get saved theme or use system default
+      const getTheme = () => {
+        const savedTheme = localStorage?.getItem('theme')
+        if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+          return savedTheme
+        }
+        return 'system'
+      }
+
+      // Apply theme
+      const applyTheme = (theme) => {
+        const isDark =
+          theme === 'dark' ||
+          (theme === 'system' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+        document.documentElement.classList.toggle('dark', isDark)
+      }
+
+      // Initialize theme
+      applyTheme(getTheme())
+
+      // Listen for OS theme changes
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', () => {
+          const theme = getTheme()
+          if (theme === 'system') {
+            applyTheme('system')
+          }
+        })
+    </script>
+  </body>
+</html>
+
+<style>
+  /* Custom scrollbar that matches antfu style */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--c-scrollbar, #eee);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--c-scrollbar-hover, #bbb);
+  }
+
+  /* Selection styling */
+  ::selection {
+    background: var(--c-selection, rgba(125, 125, 255, 0.2));
+  }
+
+  /* Mobile sidebar handling with improved transitions */
+  @media (max-width: 1024px) {
+    #sidebar {
+      @apply -translate-x-full;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #sidebar.active {
+      @apply translate-x-0;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  /* Clean fade in animation for content */
+  main {
+    opacity: 0;
+    animation: fade-in 0.4s forwards;
+  }
+
+  @keyframes fade-in {
+    to {
+      opacity: 1;
+    }
+  }
+</style>

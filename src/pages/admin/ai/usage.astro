@@ -1,0 +1,548 @@
+---
+export const prerender = false
+import { requirePermission } from '~/lib/access-control'
+import BaseLayout from '~/layouts/BaseLayout.astro'
+
+// Check if user has admin permission
+const checkPermission = requirePermission('read:admin')
+const permissionResponse = await checkPermission({
+  cookies: Astro.cookies,
+  redirect: Astro.redirect,
+})
+
+// If permission check returned a response, return i
+if (permissionResponse) {
+  return permissionResponse
+}
+
+// Get query parameters
+const period = Astro.url.searchParams.get('period') || 'daily'
+---
+
+<BaseLayout title="AI Usage Statistics">
+  <main class="admin-container">
+    <div class="admin-header">
+      <h1>AI Usage Statistics</h1>
+      <p>Monitor AI usage across the platform.</p>
+    </div>
+
+    <div class="admin-actions">
+      <a href="/admin" class="btn btn-secondary">Back to Admin Dashboard</a>
+      <div class="period-selector">
+        <a
+          href="?period=daily"
+          class={`btn ${period === 'daily' ? 'btn-primary' : 'btn-outline'}`}
+          >Daily</a
+        >
+        <a
+          href="?period=weekly"
+          class={`btn ${period === 'weekly' ? 'btn-primary' : 'btn-outline'}`}
+          >Weekly</a
+        >
+        <a
+          href="?period=monthly"
+          class={`btn ${period === 'monthly' ? 'btn-primary' : 'btn-outline'}`}
+          >Monthly</a
+        >
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card" id="total-requests">
+        <h3>Total Requests</h3>
+        <div class="stat-value">Loading...</div>
+        <div class="stat-chart"></div>
+      </div>
+
+      <div class="stat-card" id="total-tokens">
+        <h3>Total Tokens</h3>
+        <div class="stat-value">Loading...</div>
+        <div class="stat-chart"></div>
+      </div>
+
+      <div class="stat-card" id="total-cost">
+        <h3>Estimated Cost</h3>
+        <div class="stat-value">Loading...</div>
+        <div class="stat-chart"></div>
+      </div>
+
+      <div class="stat-card" id="model-usage">
+        <h3>Model Usage</h3>
+        <div class="stat-chart-large"></div>
+      </div>
+    </div>
+
+    <div class="data-table-container">
+      <h2>Usage Details</h2>
+      <table class="data-table" id="usage-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Requests</th>
+            <th>Tokens</th>
+            <th>Cost</th>
+            <th>Models Used</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="5" class="loading-row">Loading data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</BaseLayout>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+></script>
+
+<script>
+  // Define types for usage statistics
+  interface ModelUsage {
+    requests: number
+    tokens: number
+    cost: number
+  }
+
+  interface DailyStats {
+    date: string
+    totalRequests: number
+    totalTokens: number
+    totalCost: number
+    modelUsage: Record<string, ModelUsage>
+  }
+
+  // Chart.js type declaration
+  declare class Chart {
+    constructor(ctx: CanvasRenderingContext2D, config: unknown)
+    destroy(): void
+  }
+
+  // Fetch AI usage statistics
+  async function fetchUsageStats(): Promise<DailyStats[]> {
+    try {
+      const urlParams = new URLSearchParams(window.location.search)
+      const period = urlParams.get('period') || 'daily'
+
+      const response = await fetch(
+        `/api/ai/usage-stats?period=${period}&allUsers=true`,
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch usage statistics')
+      }
+
+      const data = await response.json()
+      return data.stats
+    } catch (error) {
+      console.error('Error fetching usage statistics:', error)
+      return []
+    }
+  }
+
+  // Format numbers for display
+  function formatNumber(num: number): string {
+    return new Intl.NumberFormat().format(num)
+  }
+
+  // Format currency for display
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(amount)
+  }
+
+  // Create a line chart
+  function createLineChart(
+    elementId: string,
+    labels: string[],
+    data: number[],
+    label: string,
+    color: string,
+  ): Chart | null {
+    const element = document.querySelector(`#${elementId} .stat-chart`)
+    if (!element) return null
+
+    const canvas = element as HTMLCanvasElement
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return null
+
+    return new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label,
+            data,
+            borderColor: color,
+            backgroundColor: color + '20', // Add transparency
+            tension: 0.2,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            display: false,
+          },
+          y: {
+            display: false,
+            beginAtZero: true,
+          },
+        },
+      },
+    })
+  }
+
+  // Create a pie chart for model usage
+  function createModelUsageChart(
+    elementId: string,
+    models: string[],
+    data: number[],
+  ): Chart | null {
+    const element = document.querySelector(`#${elementId} .stat-chart-large`)
+    if (!element) return null
+
+    const canvas = element as HTMLCanvasElement
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return null
+
+    // Generate colors for each model
+    const colors = models.map((_: unknown, index: number) => {
+      const hue = (index * 137) % 360 // Use golden ratio to spread colors
+      return `hsl(${hue}, 70%, 60%)`
+    })
+
+    return new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: models,
+        datasets: [
+          {
+            data,
+            backgroundColor: colors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              boxWidth: 15,
+              padding: 15,
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label(context: unknown) {
+                const typedContext = context as {
+                  label: string
+                  raw: number
+                  parsed: number
+                }
+                const label = typedContext.label || ''
+                const value = typedContext.raw
+                const percentage = typedContext.parsed
+                return `${label}: ${value} (${percentage.toFixed(1)}%)`
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  // Update the UI with the fetched data
+  async function updateUI(): Promise<void> {
+    const stats = await fetchUsageStats()
+
+    if (!stats || stats.length === 0) {
+      const totalRequestsEl = document.querySelector(
+        '#total-requests .stat-value',
+      )
+      const totalTokensEl = document.querySelector('#total-tokens .stat-value')
+      const totalCostEl = document.querySelector('#total-cost .stat-value')
+      const usageTableEl = document.querySelector('#usage-table tbody')
+
+      if (totalRequestsEl) totalRequestsEl.textContent = 'No data'
+      if (totalTokensEl) totalTokensEl.textContent = 'No data'
+      if (totalCostEl) totalCostEl.textContent = 'No data'
+      if (usageTableEl)
+        usageTableEl.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-row">No usage data available</td>
+        </tr>
+      `
+      return
+    }
+
+    // Calculate totals
+    const totalRequests = stats.reduce(
+      (sum: number, day: DailyStats) => sum + day.totalRequests,
+      0,
+    )
+    const totalTokens = stats.reduce(
+      (sum: number, day: DailyStats) => sum + day.totalTokens,
+      0,
+    )
+    const totalCost = stats.reduce(
+      (sum: number, day: DailyStats) => sum + day.totalCost,
+      0,
+    )
+
+    // Update summary cards
+    const totalRequestsEl = document.querySelector(
+      '#total-requests .stat-value',
+    )
+    const totalTokensEl = document.querySelector('#total-tokens .stat-value')
+    const totalCostEl = document.querySelector('#total-cost .stat-value')
+
+    if (totalRequestsEl)
+      totalRequestsEl.textContent = formatNumber(totalRequests)
+    if (totalTokensEl) totalTokensEl.textContent = formatNumber(totalTokens)
+    if (totalCostEl) totalCostEl.textContent = formatCurrency(totalCost)
+
+    // Prepare data for charts
+    const dates = stats
+      .map((day: DailyStats) => {
+        const date = new Date(day.date)
+        return date.toLocaleDateString()
+      })
+      .reverse()
+
+    const requestData = stats
+      .map((day: DailyStats) => day.totalRequests)
+      .reverse()
+    const tokenData = stats.map((day: DailyStats) => day.totalTokens).reverse()
+    const costData = stats.map((day: DailyStats) => day.totalCost).reverse()
+
+    // Create charts
+    createLineChart('total-requests', dates, requestData, 'Requests', '#3b82f6')
+    createLineChart('total-tokens', dates, tokenData, 'Tokens', '#10b981')
+    createLineChart('total-cost', dates, costData, 'Cost', '#f59e0b')
+
+    // Prepare model usage data
+    const modelUsage: Record<string, number> = {}
+    stats.forEach((day: DailyStats) => {
+      Object.entries(day.modelUsage).forEach(([model, usage]) => {
+        if (!modelUsage[model]) {
+          modelUsage[model] = 0
+        }
+        modelUsage[model] += usage.requests
+      })
+    })
+
+    const models = Object.keys(modelUsage)
+    const modelData = Object.values(modelUsage)
+
+    // Create model usage char
+    createModelUsageChart('model-usage', models, modelData)
+
+    // Update table
+    const tableBody = document.querySelector('#usage-table tbody')
+    if (!tableBody) return
+
+    tableBody.innerHTML = ''
+
+    stats.forEach((day: DailyStats) => {
+      const row = document.createElement('tr')
+
+      // Format the date
+      const date = new Date(day.date)
+      const formattedDate = date.toLocaleDateString()
+
+      // Get model names
+      const modelNames = Object.keys(day.modelUsage).join(', ')
+
+      row.innerHTML = `
+        <td>${formattedDate}</td>
+        <td>${formatNumber(day.totalRequests)}</td>
+        <td>${formatNumber(day.totalTokens)}</td>
+        <td>${formatCurrency(day.totalCost)}</td>
+        <td>${modelNames || 'None'}</td>
+      `
+
+      tableBody.appendChild(row)
+    })
+  }
+
+  // Initialize the page
+  document.addEventListener('DOMContentLoaded', updateUI)
+</script>
+
+<style>
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .admin-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .period-selector {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+
+  .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #2563eb;
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #333;
+  }
+
+  .btn-outline:hover {
+    background-color: #f5f5f5;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(_250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  .stat-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 1rem;
+  }
+
+  .stat-chart {
+    height: 100px;
+  }
+
+  .stat-chart-large {
+    height: 200px;
+  }
+
+  .data-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  .data-table-container h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+
+  .data-table th {
+    font-weight: 600;
+    color: #666;
+  }
+
+  .loading-row,
+  .empty-row {
+    text-align: center;
+    color: #666;
+    padding: 2rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .data-table {
+      display: block;
+      overflow-x: auto;
+    }
+  }
+</style>

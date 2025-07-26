@@ -1,0 +1,118 @@
+---
+import { cn } from '@lib/utils'
+import Container from './Container.astro'
+import { progress } from '@tailus/themer-progress'
+---
+
+<section>
+  <Container>
+    <div class="text-center">
+      <h2
+        class="text-3xl text-gray-950 dark:text-white font-semibold md:text-4xl"
+      >
+        Superior outcomes compared to traditional methods
+      </h2>
+      <p class="mt-4 text-gray-600 dark:text-gray-400">
+        Evidence-based results showing improved therapeutic effectiveness and
+        patient engagement.
+      </p>
+    </div>
+    <div
+      class="my-12 p-[--card-padding] overflow-hidden lg:aspect-video flex rounded-[--card-border-radius] bg-gray-100 dark:bg-[--card-dark-bg]"
+    >
+      <div class="max-w-3xl w-full h-fit m-auto space-y-12">
+        <div>
+          <h3 class="text-2xl font-bold text-gray-600 dark:text-gray-400">
+            <span class="text-gray-950 dark:text-white"
+              >AI-enhanced therapy protocols</span
+            >
+            deliver measurably better patient outcomes.
+          </h3>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <div class={progress.root}>
+              <div
+                class={cn(
+                  progress.indicator.gradient,
+                  'w-[95%] from-primary-600 to-accent-300',
+                )}
+              >
+              </div>
+            </div>
+            <div class={progress.message}>Pixelated Empathy AI 95%</div>
+          </div>
+          <div>
+            <div class={progress.root}>
+              <div
+                class={cn(
+                  progress.indicator.gradient,
+                  'w-[72%] from-gray-600 to-gray-400',
+                )}
+              >
+              </div>
+            </div>
+            <div class={progress.message}>Traditional Therapy 72%</div>
+          </div>
+          <div>
+            <div class={progress.root}>
+              <div
+                class={cn(
+                  progress.indicator.gradient,
+                  'w-[68%] from-gray-600 to-gray-400',
+                )}
+              >
+              </div>
+            </div>
+            <div class={progress.message}>Standard Training 68%</div>
+          </div>
+          <div>
+            <div class={progress.root}>
+              <div
+                class={cn(
+                  progress.indicator.gradient,
+                  'w-[65%] from-gray-600 to-gray-400',
+                )}
+              >
+              </div>
+            </div>
+            <div class={progress.message}>Manual Assessment 65%</div>
+          </div>
+          <div>
+            <div class={progress.root}>
+              <div
+                class={cn(
+                  progress.indicator.gradient,
+                  'w-[58%] from-gray-600 to-gray-400',
+                )}
+              >
+              </div>
+            </div>
+            <div class={progress.message}>Paper-Based Methods 58%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4 sm:gap-12 max-w-3xl w-full mx-auto">
+      <div>
+        <h3 class="text-gray-950 dark:text-white text-2xl font-semibold">
+          Built by mental health professionals and AI researchers
+        </h3>
+      </div>
+      <div class="space-y-3">
+        <p class="text-gray-600 dark:text-gray-400">
+          Our platform is developed by a team of <span
+            class="text-gray-950 dark:text-white font-medium"
+            >licensed therapists, clinical psychologists, and machine learning
+            experts</span
+          > who understand the unique challenges of mental health care delivery.
+        </p>
+        <p class="text-gray-600 dark:text-gray-400">
+          Every feature is designed with both therapeutic effectiveness and
+          clinical workflow efficiency in mind, ensuring seamless integration
+          into existing practice environments.
+        </p>
+      </div>
+    </div>
+  </Container>
+</section>

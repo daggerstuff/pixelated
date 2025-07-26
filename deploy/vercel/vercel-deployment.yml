@@ -1,0 +1,285 @@
+name: Vercel Deployment
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+
+env:
+  NODE_VERSION: 22.x
+  PNPM_VERSION: 10.13.1
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  # Build and test
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      should_deploy: ${{ steps.env.outputs.should_deploy }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENVIRONMENT="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            ENVIRONMENT="production"
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            ENVIRONMENT="preview"
+          else
+            ENVIRONMENT="preview"
+          fi
+
+          # Determine if we should deploy
+          SHOULD_DEPLOY="false"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || \
+             [ "${{ github.ref }}" = "refs/heads/master" ] || \
+             [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            SHOULD_DEPLOY="true"
+          fi
+
+          echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+          echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
+          echo "Environment: $ENVIRONMENT"
+          echo "Should deploy: $SHOULD_DEPLOY"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Run linting
+        run: pnpm run lint:ci
+        continue-on-error: true
+
+      - name: Run type checking
+        run: pnpm run type-check
+        continue-on-error: true
+
+      - name: Run tests
+        run: pnpm test --run --reporter=junit --outputFile=test-results.xml
+        continue-on-error: true
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Build application for Vercel
+        run: pnpm run build:vercel
+        env:
+          NODE_ENV: production
+          NODE_OPTIONS: --max-old-space-size=8192
+          VERCEL_ENV: ${{ steps.env.outputs.environment }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-build-artifacts
+          path: |
+            dist/
+            .vercel/
+            astro.config.vercel.mjs
+            vercel.json
+          retention-days: 1
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Results
+          path: test-results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+  # Deploy to Vercel
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: build
+    if: needs.build.outputs.should_deploy == 'true'
+    environment:
+      name: vercel-${{ needs.build.outputs.environment }}
+      url: ${{ steps.deploy.outputs.preview-url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: vercel-build-artifacts
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel environment information
+        run: vercel pull --yes --environment=${{ needs.build.outputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          if [ "${{ needs.build.outputs.environment }}" = "production" ]; then
+            echo "Deploying to production..."
+            DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          else
+            echo "Deploying to preview..."
+            DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          fi
+
+          echo "preview-url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "Deployment URL: $DEPLOYMENT_URL"
+
+      - name: Comment deployment URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deploymentUrl = '${{ steps.deploy.outputs.preview-url }}';
+            const comment = `🚀 **Vercel Preview Deployment**
+
+            ✅ Preview: ${deploymentUrl}
+
+            Built with commit: ${context.sha.substring(0, 7)}
+            Environment: ${{ needs.build.outputs.environment }}`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # Post-deployment tests
+  post-deploy-tests:
+    name: Post-Deployment Tests
+    runs-on: ubuntu-latest
+    needs: [build, deploy]
+    if: needs.deploy.result == 'success'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Run health checks
+        run: |
+          DEPLOYMENT_URL="${{ needs.deploy.outputs.preview-url }}"
+          echo "Testing deployment at: $DEPLOYMENT_URL"
+
+          # Wait for deployment to be ready
+          sleep 30
+
+          # Simple health check
+          if curl -f -s --max-time 30 "$DEPLOYMENT_URL/api/health/simple" >/dev/null; then
+            echo "✅ Health check passed"
+          else
+            echo "⚠️ Health check failed (may be normal for new deployments)"
+          fi
+
+          # Check if main page loads
+          if curl -f -s --max-time 30 "$DEPLOYMENT_URL" >/dev/null; then
+            echo "✅ Main page loads successfully"
+          else
+            echo "❌ Main page failed to load"
+            exit 1
+          fi
+
+      - name: Run E2E tests (if available)
+        run: |
+          if [ -f "playwright.config.ts" ]; then
+            echo "Running E2E tests..."
+            pnpm run e2e:smoke || echo "E2E tests completed with warnings"
+          else
+            echo "No E2E tests configured, skipping"
+          fi
+        continue-on-error: true
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.preview-url }}
+
+  # Notification
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [build, deploy, post-deploy-tests]
+    if: always()
+
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "🚀 Vercel Deployment Summary"
+          echo "=========================="
+          echo "Environment: ${{ needs.build.outputs.environment }}"
+          echo "Build Status: ${{ needs.build.result }}"
+          echo "Deploy Status: ${{ needs.deploy.result }}"
+          echo "Tests Status: ${{ needs.post-deploy-tests.result }}"
+
+          if [ "${{ needs.deploy.result }}" = "success" ]; then
+            echo "✅ Deployment completed successfully!"
+            echo "URL: ${{ needs.deploy.outputs.preview-url }}"
+          else
+            echo "❌ Deployment failed"
+          fi

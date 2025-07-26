@@ -1,0 +1,141 @@
+version: 1
+frontend:
+  environment:
+    CUSTOM_IMAGE: 'amplify:al2023'
+    NODE_OPTIONS: '--max-old-space-size=12288'
+
+  phases:
+    install:
+      commands:
+        - echo Installing nvm...
+        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+        - export NVM_DIR="$HOME/.nvm"
+        - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+        - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+
+    preBuild:
+      commands:
+        - '. "$NVM_DIR/nvm.sh" && nvm install v22.16.0 && echo "node installed by arun"'
+        - nvm use v22.16.0
+        - npm i npm@latest -g
+        - npm install -g pnpm
+        - export SHELL=bash
+        - pnpm setup
+        - 'export PNPM_HOME="/root/.local/share/pnpm"'
+        - 'export PATH="$PNPM_HOME:$PATH"'
+        - 'export NODE_OPTIONS=--max-old-space-size=12288'
+        - pnpm config set store-dir .pnpm-store
+        - pnpm config set auto-install-peers true
+        - pnpm config set strict-peer-dependencies false
+        - pnpm config set dangerouslyallowallbuilds true
+        - pnpm install --no-frozen-lockfile
+        - pnpm rebuild
+
+    build:
+      commands:
+        - 'echo "NODE_ENV=production" > .env'
+        - 'echo "CDN_BASE_URL=${CDN_BASE_URL:-/}" >> .env'
+        - 'echo "AWS_REGION=${AWS_REGION:-us-east-1}" >> .env'
+        - 'echo "CDN_BUCKET_NAME=${CDN_BUCKET_NAME}" >> .env'
+        - 'echo "CDN_URL=${CDN_URL}" >> .env'
+        - 'echo "CLERK_SECRET_KEY=${CLERK_SECRET_KEY}" >> .env'
+        - 'echo "EMAIL_FROM=${EMAIL_FROM}" >> .env'
+        - 'echo "PUBLIC_CLERK_PUBLISHABLE_KEY=${PUBLIC_CLERK_PUBLISHABLE_KEY}" >> .env'
+        - 'echo "PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}" >> .env'
+        - 'echo "REDIS_URL=${REDIS_URL}" >> .env'
+        - 'echo "RESEND_API_KEY=${RESEND_API_KEY}" >> .env'
+        - 'echo "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}" >> .env'
+        - 'echo "SENTRY_DSN=${SENTRY_DSN}" >> .env'
+        - 'echo "SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}" >> .env'
+        - pnpm run build
+        - 'if [ -n "$CDN_BUCKET_NAME" ]; then node scripts/upload-to-cdn.js || echo "CDN upload failed, continuing..."; fi'
+        - 'pnpm prune --prod'
+        - 'mkdir -p .amplify-hosting/compute/default'
+        - 'cp -r node_modules ./.amplify-hosting/compute/default/'
+        - 'cp -r dist/* .amplify-hosting/compute/default/ || true'
+        - 'cp .env .amplify-hosting/compute/default/.env || true'
+        - 'mkdir -p .amplify-hosting/static'
+        - 'cp -r dist/client/* .amplify-hosting/static/ || true'
+        - ls -la .amplify-hosting/
+        - 'echo "Static assets:"'
+        - 'ls -la .amplify-hosting/static/ | head -10'
+        - 'echo "Compute functions:"'
+        - 'ls -la .amplify-hosting/compute/ | head -10'
+        - 'find .amplify-hosting -type f \( -name "*.map" -o -name "*.ts" -o -name "*.tsx" -o -name "*.test.*" -o -name "*.spec.*" -o -name "*.d.ts" -o -name "README*" -o -name "CHANGELOG*" -o -name "LICENSE*" -o -name "*.tsbuildinfo" \) -delete || true'
+        - 'find .amplify-hosting/compute/default/node_modules -type d \( -name "test" -o -name "tests" -o -name "__tests__" -o -name "docs" -o -name "examples" -o -name ".bin" -o -name ".*cache*" -o -name "coverage" -o -name "benchmark*" -o -name "demo*" \) -exec rm -rf {} + || true'
+        - 'find .amplify-hosting/compute/default/node_modules -name "*.md" -delete || true'
+        - 'find .amplify-hosting/compute/default/node_modules -name "*.json" \( -name "package.json" -prune -o -print \) -delete || true'
+        - 'find .amplify-hosting/compute/default/node_modules -type f \( -name "*.min.js.map" -o -name "*.esm.js" -o -name "*.umd.js" -o -name "*.browser.js" \) -delete || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/@types || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/typescript || true'
+        - 'find .amplify-hosting -type d -empty -delete || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/esbuild || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/rollup || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/vite || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/@rollup || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/@esbuild || true'
+        - 'rm -rf .amplify-hosting/compute/default/node_modules/astro || true'
+        - 'find .amplify-hosting/compute/default/node_modules -name "*.wasm" -delete || true'
+        - 'find .amplify-hosting/compute/default/node_modules -name "*.node" -delete || true'
+        - 'find .amplify-hosting/compute/default/node_modules -size +10M -delete || true'
+        - du -sh .amplify-hosting/
+
+  artifacts:
+    baseDirectory: .amplify-hosting
+    files:
+      - '**/*'
+
+  cache:
+    paths: []
+  customRules:
+    - source: '/'
+      target: '/index.html'
+      status: 200
+    - source: '/<*>/'
+      target: '/<*>/index.html'
+      status: 200
+    - source: '/<*>'
+      target: '/<*>/index.html'
+      status: 200
+    - source: '/blog/page/<page>'
+      target: '/blog/page/<page>/index.html'
+      status: 200
+    - source: '/blog/page/<page>/'
+      target: '/blog/page/<page>/index.html'
+      status: 200
+    - source: '/blog/<slug>'
+      target: '/blog/<slug>/index.html'
+      status: 200
+    - source: '/blog/<slug>/'
+      target: '/blog/<slug>/index.html'
+      status: 200
+    - source: '/changelog/<slug>'
+      target: '/changelog/<slug>/index.html'
+      status: 200
+    - source: '/changelog/<slug>/'
+      target: '/changelog/<slug>/index.html'
+      status: 200
+    - source: '/docs/<...slug>'
+      target: '/docs/<...slug>/index.html'
+      status: 200
+    - source: '/docs/<...slug>/'
+      target: '/docs/<...slug>/index.html'
+      status: 200
+    - source: '/authors/<author>'
+      target: '/authors/<author>/index.html'
+      status: 200
+    - source: '/authors/<author>/'
+      target: '/authors/<author>/index.html'
+      status: 200
+    - source: '/tags/<tag>'
+      target: '/tags/<tag>/index.html'
+      status: 200
+    - source: '/tags/<tag>/'
+      target: '/tags/<tag>/index.html'
+      status: 200
+    - source: '/categories/<category>'
+      target: '/categories/<category>/index.html'
+      status: 200
+    - source: '/categories/<category>/'
+      target: '/categories/<category>/index.html'
+      status: 200

@@ -1,0 +1,14 @@
+---
+interface Props {
+  fallback?: string
+}
+
+const { fallback = 'Something went wrong. Please try refreshing the page.' } =
+  Astro.props
+---
+
+<style>
+  error-boundary {
+    display: contents;
+  }
+</style>

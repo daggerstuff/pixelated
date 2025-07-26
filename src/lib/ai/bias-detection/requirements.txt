@@ -1,0 +1,55 @@
+# Bias Detection Engine Requirements
+# Core fairness and bias detection libraries
+aif360
+fairlearn
+witwidget
+evaluate
+
+# NLP processing libraries for linguistic bias detection
+spacy
+nltk
+textblob
+
+# Data processing and ML
+pandas
+numpy
+scikit-learn
+scipy
+
+# Visualization and monitoring
+matplotlib
+seaborn
+plotly
+dash
+
+# Model explanation and interpretability
+shap
+lime
+
+# Data validation and quality
+great-expectations
+pandera
+# Additional utilities
+tqdm
+jsonlines
+pyyaml
+requests
+
+# Deployment
+gunicorn
+python-json-logger
+
+# Development and testing
+pytest
+pytest-mock
+black
+flake8
+mypy
+
+# Language models for bias detection
+transformers
+torch
+datasets
+
+# Privacy and security
+cryptography

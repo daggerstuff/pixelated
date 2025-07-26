@@ -1,0 +1,225 @@
+---
+
+---
+
+<div
+  id="globe-container"
+  class="globe-wrapper slide-enter"
+  style="--enter-stage: 0; animation-duration: 1.2s;"
+>
+  <canvas id="globe-canvas"></canvas>
+</div>
+
+<script>
+  // Dynamically import Three.js only when needed
+  const initGlobe = async () => {
+    const {
+      Scene,
+      PerspectiveCamera,
+      WebGLRenderer,
+      BufferGeometry,
+      Float32BufferAttribute,
+      PointsMaterial,
+      Points,
+      Color,
+      SphereGeometry,
+      MeshBasicMaterial,
+      Mesh,
+    } = await import('three')
+    const canvas = document.getElementById('globe-canvas')
+    if (!(canvas instanceof HTMLCanvasElement)) return
+
+    // Create scene
+    const scene = new Scene()
+    const camera = new PerspectiveCamera(75, 1, 0.1, 1000)
+    const renderer = new WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+      preserveDrawingBuffer: true,
+    })
+
+    // Set size
+    const size = 250
+    renderer.setSize(size, size)
+    camera.position.z = 200
+
+    // Create globe with dots
+    const radius = 100
+    const dotGeometry = new BufferGeometry()
+    const positions: number[] = []
+    const colors: number[] = []
+    const color = new Color()
+
+    // Generate evenly distributed points on sphere (Fibonacci sphere algorithm)
+    const numPoints = 2000
+    const phi = Math.PI * (3 - Math.sqrt(5)) // golden angle
+
+    for (let i = 0; i < numPoints; i++) {
+      const y = 1 - (i / (numPoints - 1)) * 2 // y goes from 1 to -1
+      const radius_at_y = Math.sqrt(1 - y * y) // radius at y position
+      const theta = phi * i // golden angle increment
+
+      const x = Math.cos(theta) * radius_at_y
+      const z = Math.sin(theta) * radius_at_y
+
+      positions.push(x * radius, y * radius, z * radius)
+
+      // Slightly randomize dot color for visual interest
+      const intensity = 0.3 + Math.random() * 0.1
+      color.setRGB(intensity, intensity, intensity)
+      colors.push(color.r, color.g, color.b)
+    }
+
+    dotGeometry.setAttribute(
+      'position',
+      new Float32BufferAttribute(positions, 3),
+    )
+    dotGeometry.setAttribute('color', new Float32BufferAttribute(colors, 3))
+
+    // Create material and points
+    const dotMaterial = new PointsMaterial({
+      size: 2,
+      vertexColors: true,
+      transparent: false,
+      opacity: 1,
+      sizeAttenuation: true,
+    })
+
+    const globe = new Points(dotGeometry, dotMaterial)
+    scene.add(globe)
+
+    // Add subtle glow effect
+    const glowGeometry = new SphereGeometry(radius * 1.05, 32, 32)
+    const glowMaterial = new MeshBasicMaterial({
+      color: 0x888888,
+      transparent: true,
+      opacity: 0.03,
+    })
+    const glow = new Mesh(glowGeometry, glowMaterial)
+    scene.add(glow)
+
+    // Animation variables
+    let running = true
+    let animationId: number | null = null
+    const ROTATION_SPEED = 0.0015 // Slower rotation speed
+
+    // Animation loop
+    function animate() {
+      if (!running) return
+
+      animationId = requestAnimationFrame(animate)
+
+      // Apply very slow rotation
+      globe.rotation.y += ROTATION_SPEED
+      glow.rotation.y = globe.rotation.y
+
+      renderer.render(scene, camera)
+    }
+
+    // Start animation
+    animate()
+
+    // Handle window resize
+    const updateSize = () => {
+      const container = document.getElementById('globe-container')
+      if (!container) return
+
+      const containerWidth = container.clientWidth
+      const size = Math.min(250, containerWidth)
+      renderer.setSize(size, size)
+      camera.aspect = 1
+      camera.updateProjectionMatrix()
+    }
+
+    window.addEventListener('resize', updateSize)
+    // Initial size update
+    updateSize()
+
+    // Handle visibility change
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden
+      if (running && !animationId) {
+        animate()
+      } else if (!running && animationId) {
+        cancelAnimationFrame(animationId)
+        animationId = null
+      }
+    })
+
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      running = false
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+        animationId = null
+      }
+      renderer.dispose()
+    })
+  }
+
+  // Initialize when the component mounts and handle cleanup
+  let initialized = false
+
+  const init = () => {
+    if (!initialized) {
+      initialized = true
+      initGlobe()
+    }
+  }
+
+  // Check if the element is in viewport and initialize
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          init()
+          // Once initialized, no need to keep observing
+          observer.disconnect()
+        }
+      })
+    },
+    { threshold: 0.1 },
+  )
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('globe-container')
+    if (container) {
+      observer.observe(container)
+    }
+  })
+</script>
+
+<style>
+  .globe-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5rem auto 2rem;
+    width: 250px;
+    height: 250px;
+    position: relative;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  #globe-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  @media (max-width: 640px) {
+    .globe-wrapper {
+      width: 200px;
+      height: 200px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .globe-wrapper {
+      width: 180px;
+      height: 180px;
+    }
+  }
+</style>

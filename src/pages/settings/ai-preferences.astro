@@ -1,0 +1,718 @@
+---
+export const prerender = false
+
+// Only importing what we need
+import { requireAuth } from '../../lib/auth'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+
+// Check if user is authenticated
+const authResponse = await requireAuth({
+  cookies: Astro.cookies,
+  redirect: Astro.redirect,
+  request: Astro.request,
+})
+
+// If auth check returned a response, return i
+if (authResponse) {
+  return authResponse
+}
+
+// Get the current user
+// We're not using the user in this demo
+
+// Get user's current AI preferences (in a real implementation, this would come from the database)
+const defaultPreferences = {
+  defaultModel: 'gemini-2-flash',
+  preferredModels: ['gemini-2-flash', 'claude-3-sonnet'],
+  responseLength: 'medium',
+  responseStyle: 'balanced',
+  enableSentimentAnalysis: true,
+  enableCrisisDetection: true,
+  crisisDetectionSensitivity: 'medium',
+  saveAnalysisResults: true,
+  aiSuggestions: true,
+}
+
+// For demo purposes, we'll use the default preferences
+---
+
+<BaseLayout title="AI Preferences">
+  <main class="settings-container">
+    <div class="settings-header">
+      <h1>AI Preferences</h1>
+      <p>Customize your AI experience and preferences.</p>
+    </div>
+
+    <form id="ai-preferences-form" class="settings-form">
+      <div class="settings-section">
+        <h2>Model Preferences</h2>
+
+        <div class="form-group">
+          <label for="defaultModel">Default AI Model</label>
+          <select id="defaultModel" name="defaultModel" class="form-select">
+            <option
+              value="gemini-2-flash"
+              selected={defaultPreferences.defaultModel === 'gemini-2-flash'}
+              >Gemini 2 Flash (Balanced)</option
+            >
+            <option
+              value="gemini-2-flash-lite"
+              selected={defaultPreferences.defaultModel ===
+                'gemini-2-flash-lite'}>Gemini 2 Flash Lite (Faster)</option
+            >
+            <option
+              value="claude-3-opus"
+              selected={defaultPreferences.defaultModel === 'claude-3-opus'}
+              >Claude 3 Opus (Detailed)</option
+            >
+            <option
+              value="claude-3-sonnet"
+              selected={defaultPreferences.defaultModel === 'claude-3-sonnet'}
+              >Claude 3 Sonnet (Balanced)</option
+            >
+            <option
+              value="claude-3-haiku"
+              selected={defaultPreferences.defaultModel === 'claude-3-haiku'}
+              >Claude 3 Haiku (Fast)</option
+            >
+          </select>
+          <div class="form-hint">
+            This model will be used by default for all AI interactions.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Preferred Models</label>
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                name="preferredModels"
+                value="gemini-2-flash"
+                checked={defaultPreferences.preferredModels.includes(
+                  'gemini-2-flash',
+                )}
+              />
+              Gemini 2 Flash
+            </label>
+
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                name="preferredModels"
+                value="gemini-2-flash-lite"
+                checked={defaultPreferences.preferredModels.includes(
+                  'gemini-2-flash-lite',
+                )}
+              />
+              Gemini 2 Flash Lite
+            </label>
+
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                name="preferredModels"
+                value="claude-3-opus"
+                checked={defaultPreferences.preferredModels.includes(
+                  'claude-3-opus',
+                )}
+              />
+              Claude 3 Opus
+            </label>
+
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                name="preferredModels"
+                value="claude-3-sonnet"
+                checked={defaultPreferences.preferredModels.includes(
+                  'claude-3-sonnet',
+                )}
+              />
+              Claude 3 Sonnet
+            </label>
+
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                name="preferredModels"
+                value="claude-3-haiku"
+                checked={defaultPreferences.preferredModels.includes(
+                  'claude-3-haiku',
+                )}
+              />
+              Claude 3 Haiku
+            </label>
+          </div>
+          <div class="form-hint">
+            These models will be available for selection in the AI interface.
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Response Preferences</h2>
+
+        <div class="form-group">
+          <label for="responseLength">Response Length</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="responseLength"
+                value="concise"
+                checked={defaultPreferences.responseLength === 'concise'}
+              />
+              Concise
+            </label>
+
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="responseLength"
+                value="medium"
+                checked={defaultPreferences.responseLength === 'medium'}
+              />
+              Medium
+            </label>
+
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="responseLength"
+                value="detailed"
+                checked={defaultPreferences.responseLength === 'detailed'}
+              />
+              Detailed
+            </label>
+          </div>
+          <div class="form-hint">
+            Controls how detailed AI responses will be.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="responseStyle">Response Style</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="responseStyle"
+                value="supportive"
+                checked={defaultPreferences.responseStyle === 'supportive'}
+              />
+              Supportive
+            </label>
+
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="responseStyle"
+                value="balanced"
+                checked={defaultPreferences.responseStyle === 'balanced'}
+              />
+              Balanced
+            </label>
+
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="responseStyle"
+                value="direct"
+                checked={defaultPreferences.responseStyle === 'direct'}
+              />
+              Direct
+            </label>
+          </div>
+          <div class="form-hint">
+            Determines the tone and approach of AI responses.
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Analysis Features</h2>
+
+        <div class="form-group">
+          <div class="switch-container">
+            <label class="switch-label" for="enableSentimentAnalysis">
+              Enable Sentiment Analysis
+              <div class="form-hint">
+                Analyzes emotional tone of messages to provide better support.
+              </div>
+            </label>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="enableSentimentAnalysis"
+                name="enableSentimentAnalysis"
+                checked={defaultPreferences.enableSentimentAnalysis}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="switch-container">
+            <label class="switch-label" for="enableCrisisDetection">
+              Enable Crisis Detection
+              <div class="form-hint">
+                Identifies potential crisis situations in messages.
+              </div>
+            </label>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="enableCrisisDetection"
+                name="enableCrisisDetection"
+                checked={defaultPreferences.enableCrisisDetection}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" id="crisisDetectionSensitivityGroup">
+          <label for="crisisDetectionSensitivity"
+            >Crisis Detection Sensitivity</label
+          >
+          <select
+            id="crisisDetectionSensitivity"
+            name="crisisDetectionSensitivity"
+            class="form-select"
+          >
+            <option
+              value="low"
+              selected={defaultPreferences.crisisDetectionSensitivity === 'low'}
+              >Low</option
+            >
+            <option
+              value="medium"
+              selected={defaultPreferences.crisisDetectionSensitivity ===
+                'medium'}>Medium</option
+            >
+            <option
+              value="high"
+              selected={defaultPreferences.crisisDetectionSensitivity ===
+                'high'}>High</option
+            >
+          </select>
+          <div class="form-hint">
+            Higher sensitivity may result in more false positives.
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Privacy & Data</h2>
+
+        <div class="form-group">
+          <div class="switch-container">
+            <label class="switch-label" for="saveAnalysisResults">
+              Save Analysis Results
+              <div class="form-hint">
+                Store AI analysis results for improved personalization.
+              </div>
+            </label>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="saveAnalysisResults"
+                name="saveAnalysisResults"
+                checked={defaultPreferences.saveAnalysisResults}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="switch-container">
+            <label class="switch-label" for="aiSuggestions">
+              AI Suggestions
+              <div class="form-hint">
+                Allow AI to suggest relevant resources based on conversation.
+              </div>
+            </label>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="aiSuggestions"
+                name="aiSuggestions"
+                checked={defaultPreferences.aiSuggestions}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Preferences</button>
+        <button type="button" id="reset-defaults" class="btn btn-secondary"
+          >Reset to Defaults</button
+        >
+      </div>
+    </form>
+    <div id="ai-preferences-loading" class="hidden">Loading preferences...</div>
+  </main>
+</BaseLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('ai-preferences-form')
+    const resetButton = document.getElementById('reset-defaults')
+    const loadingIndicator = document.getElementById('ai-preferences-loading')
+
+    async function fetchPreferences() {
+      loadingIndicator.classList.remove('hidden')
+      try {
+        const res = await fetch('/api/v1/preferences')
+        if (!res.ok) throw new Error('Failed to load preferences')
+        const { preferences } = await res.json()
+        setFormValues(preferences)
+      } catch (err) {
+        showNotification('Failed to load preferences', 'error')
+      } finally {
+        loadingIndicator.classList.add('hidden')
+      }
+    }
+
+    function setFormValues(prefs) {
+      if (!prefs) return
+      form.defaultModel.value = prefs.defaultModel
+      Array.from(form.preferredModels).forEach((cb) => {
+        cb.checked = prefs.preferredModels?.includes(cb.value)
+      })
+      Array.from(form.responseLength).forEach((rb) => {
+        rb.checked = rb.value === prefs.responseLength
+      })
+      Array.from(form.responseStyle).forEach((rb) => {
+        rb.checked = rb.value === prefs.responseStyle
+      })
+      form.enableSentimentAnalysis.checked = !!prefs.enableSentimentAnalysis
+      form.enableCrisisDetection.checked = !!prefs.enableCrisisDetection
+      form.crisisDetectionSensitivity.value = prefs.crisisDetectionSensitivity
+      form.saveAnalysisResults.checked = !!prefs.saveAnalysisResults
+      form.aiSuggestions.checked = !!prefs.aiSuggestions
+      // Show/hide crisis sensitivity
+      document.getElementById('crisisDetectionSensitivityGroup').style.display =
+        form.enableCrisisDetection.checked ? 'block' : 'none'
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const formData = new FormData(form)
+        const preferences = {
+          defaultModel: formData.get('defaultModel'),
+          preferredModels: formData.getAll('preferredModels'),
+          responseLength: formData.get('responseLength'),
+          responseStyle: formData.get('responseStyle'),
+          enableSentimentAnalysis: formData.has('enableSentimentAnalysis'),
+          enableCrisisDetection: formData.has('enableCrisisDetection'),
+          crisisDetectionSensitivity: formData.get(
+            'crisisDetectionSensitivity',
+          ),
+          saveAnalysisResults: formData.has('saveAnalysisResults'),
+          aiSuggestions: formData.has('aiSuggestions'),
+        }
+        try {
+          const res = await fetch('/api/v1/preferences', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ preferences }),
+          })
+          if (!res.ok) {
+            const err = await res.json()
+            throw new Error(err.error || 'Failed to save preferences')
+          }
+          showNotification('Preferences saved successfully!', 'success')
+        } catch (error) {
+          showNotification(
+            error.message || 'Failed to save preferences',
+            'error',
+          )
+        }
+      })
+    }
+
+    if (resetButton) {
+      resetButton.addEventListener('click', async () => {
+        if (
+          confirm(
+            'Are you sure you want to reset all AI preferences to default values?',
+          )
+        ) {
+          try {
+            const res = await fetch('/api/v1/preferences', { method: 'DELETE' })
+            if (!res.ok) throw new Error('Failed to reset preferences')
+            await fetchPreferences()
+            showNotification('Preferences reset to defaults.', 'success')
+          } catch (error) {
+            showNotification(
+              error.message || 'Failed to reset preferences',
+              'error',
+            )
+          }
+        }
+      })
+    }
+
+    // Notification helper function
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div')
+      notification.className = `notification ${type}`
+      notification.textContent = message
+      document.body.appendChild(notification)
+      setTimeout(() => {
+        notification.classList.add('show')
+      }, 10)
+      setTimeout(() => {
+        notification.classList.remove('show')
+        setTimeout(() => {
+          notification.remove()
+        }, 300)
+      }, 3000)
+    }
+
+    // Initial load
+    fetchPreferences()
+  })
+</script>
+
+<style>
+  .settings-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .settings-header {
+    margin-bottom: 2rem;
+  }
+
+  .settings-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .settings-section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  .settings-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-hint {
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 0.5rem;
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 1rem;
+  }
+
+  .checkbox-group,
+  .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .checkbox-label,
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: normal;
+  }
+
+  .switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .switch-label {
+    flex: 1;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: '';
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background-color: #3b82f6;
+  }
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px #3b82f6;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #2563eb;
+  }
+
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+
+  .notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .notification.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .notification.success {
+    background-color: #10b981;
+  }
+
+  .notification.error {
+    background-color: #ef4444;
+  }
+
+  .notification.info {
+    background-color: #3b82f6;
+  }
+
+  @media (max-width: 768px) {
+    .settings-container {
+      padding: 1rem;
+    }
+
+    .checkbox-group,
+    .radio-group {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .switch-container {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+</style>

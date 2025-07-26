@@ -1,0 +1,142 @@
+# build output
+/dist/
+/.output
+/.astro
+/.python
+/.azure-artifacts/
+node_modules/
+*.node
+
+# logs
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+/pnpm-debug.log*
+/browser-compatibility/
+/build-errors.md
+
+# environment variables and credentials
+/.env
+/.env.production
+/.env.local
+/.env.staging
+/.env.test
+/.env.development
+/*.env.*
+!/.env.example
+/docs/security/credential-management.md
+/hipaa-security-report.json
+/phi-scan-results.json
+/secrets.*.json
+.gdrive-server-credentials.json
+
+# macOS-specific files
+/.DS_Store*
+
+# IDE files
+/.vscode/
+/.idea/
+/*.iml
+/.roo/
+/.cursor/
+/.goose/
+/.vscode-insiders/
+
+# test coverage
+/coverage/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# AWS
+/.aws-sam/
+/build-aws/
+
+# TypeScript
+/*.tsbuildinfo
+
+# Cache
+/.cache
+/.temp
+/.tmp
+
+# Misc
+/*.log*
+/.DS_Store*
+/Thumbs.db*
+
+# local archive
+/.local
+/tools/
+/security-reports/
+
+/tests/security/node_modules/
+
+# Security and credential reports
+/security-report.md
+/secret-scan-report.md
+/credential-scan-results.json
+
+# Python environments (prevent heavy ML environments from being committed)
+**/venv/
+**/.venv/
+**/env/
+**/conda_env/
+**/__pycache__/
+src/lib/ai/bias-detection/bias_detection_env/
+
+# Sentry
+.sentryclirc
+
+# Large
+.amazonq/
+.cursor/
+.zencoder/
+.github/insructions/
+
+.gitpod.yml
+.goosehints
+.sourcebot
+azure.yaml
+performance-results/
+.vercel
+mcp-servers.json
+package.json.bak
+test_pixel_logs
+.cursorrules
+security-scan-artifacts
+test_pixel_logs
+.mypy_cache
+.pytest_cache
+.github/copilot-instructions.md
+.github/instructions
+LogFiles/
+app-logs-detailed.zip.env.encryption.key
+
+.env.prod.gpg
+mcp-sourcebot-config.json
+pixelatedcr.azurecr.io_pixelated-web_latest.json
+security-baseline.json
+
+__azurite_db_blob_extent__.json
+__azurite_db_blob__.json
+
+# amplify
+.amplify
+amplify_outputs*
+amplifyconfiguration*
+.plandex-v2
+.gooseignore
+.madgerc
+.nolint
+.markdownlintignore
+.markdownlint.json
+.osv-scanner.toml
+.endgame
+packages
+pnpm-workspace.yaml
+.cursorindexingignore
+.cursorignore
+.amplify-hosting

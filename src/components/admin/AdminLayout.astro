@@ -1,0 +1,277 @@
+---
+// AdminLayout.astro
+// Main admin layout component for Astro pages
+import { SITE } from '../../config'
+import { isAuthenticated, hasAdminRole } from '../../lib/auth/authUtils'
+import { getUser } from '../../lib/auth/sessionUtils'
+import { ClientRouter } from 'astro:transitions'
+
+interface Props {
+  title?: string
+  description?: string
+  activeItem?: string
+  image?: string
+}
+
+const {
+  title = 'Admin Dashboard',
+  description = `Admin dashboard for ${SITE.title}`,
+  activeItem = 'dashboard',
+  image = '/og-image.png',
+} = Astro.props
+
+// Verify authentication and admin role
+const isLoggedIn = await isAuthenticated()
+const user = isLoggedIn ? await getUser() : null
+const isAdmin = isLoggedIn && user && (await hasAdminRole(user))
+
+// If not authenticated or not an admin, redirect to login page
+if (!isLoggedIn || !isAdmin) {
+  return Astro.redirect('/login?redirect=/admin')
+}
+
+// Define navigation items
+const navItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: '/admin' },
+  { id: 'users', label: 'Users', icon: 'users', href: '/admin/users' },
+  {
+    id: 'ai-performance',
+    label: 'AI Performance',
+    icon: 'stats',
+    href: '/admin/ai-performance',
+  },
+  {
+    id: 'security',
+    label: 'Security',
+    icon: 'shield',
+    href: '/admin/security-dashboard',
+  },
+  {
+    id: 'dlp',
+    label: 'DLP Rules',
+    icon: 'shield-check',
+    href: '/admin/dlp',
+  },
+  {
+    id: 'backup-security',
+    label: 'Backup Security',
+    icon: 'database',
+    href: '/admin/backup-security',
+  },
+  {
+    id: 'data-transfer',
+    label: 'Data Transfer',
+    icon: 'file-export',
+    href: '/admin/data-transfer',
+  },
+  {
+    id: 'data-retention',
+    label: 'Data Retention',
+    icon: 'calendar',
+    href: '/admin/data-retention',
+  },
+  {
+    id: 'audit-logs',
+    label: 'Audit Logs',
+    icon: 'list',
+    href: '/admin/audit-logs',
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: 'settings',
+    href: '/admin/settings',
+  },
+  {
+    id: 'patient-rights',
+    label: 'Patient Rights',
+    icon: 'user',
+    href: '/admin/patient-rights',
+  },
+]
+
+// Function to check if a navigation item is active
+const isActive = (navId: string) => activeItem === navId
+---
+
+<html lang={SITE.lang} transition:animate="fade">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | Admin Dashboard</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <ClientRouter />
+  </head>
+  <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <!-- Skip to content link for accessibility -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+    >
+      Skip to content
+    </a>
+
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside
+        id="sidebar"
+        class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 md:translate-x-0"
+        transition:persist
+      >
+        <div class="h-full px-3 py-4 overflow-y-auto">
+          <!-- Logo -->
+          <div class="flex items-center mb-5 p-2">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+              Admin Portal
+            </h2>
+          </div>
+
+          <!-- Navigation -->
+          <ul class="space-y-2 font-medium">
+            {
+              navItems.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class={`flex items-center p-2 rounded-lg ${
+                      isActive(item.id)
+                        ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200'
+                        : 'text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <span class="ms-3">{item.label}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Mobile header -->
+      <div
+        class="sticky top-0 z-30 w-full flex items-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sm:p-6 lg:px-8"
+        transition:persist
+      >
+        <button
+          id="sidebar-toggle"
+          type="button"
+          class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100"
+          aria-label="Toggle sidebar menu"
+        >
+          <svg
+            class="w-6 h-6"
+            aria-hidden="true"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              clip-rule="evenodd"
+              fill-rule="evenodd"
+              d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+            ></path>
+          </svg>
+        </button>
+        <div class="flex-1 flex justify-between items-center ml-2 md:ml-0">
+          <span class="font-semibold">{title}</span>
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <button
+                class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+                aria-label="Notifications"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+            <div class="relative">
+              <button
+                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                aria-label="User profile"
+              >
+                <img
+                  class="h-8 w-8 rounded-full object-cover"
+                  src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
+                  alt="Admin"
+                />
+                <span class="hidden md:inline">Admin</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <main
+        id="main-content"
+        class="p-4 md:ml-64 pt-20 w-full"
+        transition:animate="fade"
+      >
+        <div
+          class="p-4 border-2 border-gray-200 dark:border-gray-700 border-dashed rounded-lg"
+        >
+          <slot />
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Simple sidebar toggle functionality
+      document.addEventListener('DOMContentLoaded', () => {
+        const sidebarToggle = document.getElementById('sidebar-toggle')
+        const sidebar = document.getElementById('sidebar')
+
+        if (sidebarToggle && sidebar) {
+          sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full')
+          })
+        }
+      })
+    </script>
+
+    <style>
+      .slide-enter-content {
+        animation: slide-enter 0.3s ease-out;
+      }
+
+      @keyframes slide-enter {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </body>
+</html>

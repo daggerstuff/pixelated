@@ -1,0 +1,49 @@
+---
+// Warning component for displaying warning messages
+export interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<div class={`warning-box ${className || ''}`}>
+  <div class="warning-icon">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575L6.457 1.047ZM8 5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-1.5 0v-2.5A.75.75 0 0 1 8 5Zm1 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"
+        fill="currentColor"></path>
+    </svg>
+  </div>
+  <div class="warning-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .warning-box {
+    @apply flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-900 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-100;
+  }
+
+  .warning-icon {
+    @apply flex-shrink-0 text-yellow-600 dark:text-yellow-400;
+  }
+
+  .warning-content {
+    @apply flex-1 text-sm;
+  }
+
+  .warning-content :global(p:first-child) {
+    @apply mt-0;
+  }
+
+  .warning-content :global(p:last-child) {
+    @apply mb-0;
+  }
+</style>

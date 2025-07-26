@@ -1,0 +1,98 @@
+---
+/**
+ * Plum Background Component - Working Version
+ * Creates animated plum branches for background decoration
+ */
+---
+
+<div class="plum-background" id="plum-container" aria-hidden="true">
+  <canvas class="plum-canvas" id="plum-canvas"></canvas>
+</div>
+
+<style>
+  .plum-background {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+    opacity: 0.6;
+    mask-image: radial-gradient(circle, transparent 20%, black 60%, transparent);
+    -webkit-mask-image: radial-gradient(circle, transparent 20%, black 60%, transparent);
+  }
+
+  .plum-canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media print {
+    .plum-background {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plum-background {
+      opacity: 0.2;
+    }
+  }
+</style>
+
+<script>
+  function initPlumBackground() {
+    const canvas = document.getElementById('plum-canvas') as HTMLCanvasElement
+    if (!canvas) {
+      console.log('Canvas not found')
+      return
+    }
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      console.log('Context not found')
+      return
+    }
+
+    console.log('Initializing plum background')
+
+    // Set canvas size
+    const width = window.innerWidth
+    const height = window.innerHeight
+    canvas.width = width
+    canvas.height = height
+
+    // Configuration
+    const BRANCH_COLOR = '#88888840' // Subtle gray with transparency
+    const LINE_WIDTH = 0.8
+    const BRANCH_LENGTH = 30
+
+    ctx.strokeStyle = BRANCH_COLOR
+    ctx.lineWidth = LINE_WIDTH
+
+    // Simple test - draw a few static lines
+    ctx.beginPath()
+    ctx.moveTo(100, 100)
+    ctx.lineTo(200, 200)
+    ctx.stroke()
+
+    ctx.beginPath()
+    ctx.moveTo(300, 150)
+    ctx.lineTo(400, 250)
+    ctx.stroke()
+
+    ctx.beginPath()
+    ctx.moveTo(500, 200)
+    ctx.lineTo(600, 100)
+    ctx.stroke()
+
+    console.log('Plum background initialized with test lines')
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPlumBackground)
+  } else {
+    initPlumBackground()
+  }
+</script>
+
+

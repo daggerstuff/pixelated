@@ -1,0 +1,137 @@
+---
+import type { AstroGlobal } from 'astro'
+import { isAuthenticated } from '../lib/auth'
+import AuthLayout from '../layouts/AuthLayout.astro'
+import { RegisterForm } from '../components/auth/RegisterForm.tsx'
+import { ClientRouter } from 'astro:transitions'
+import { Icon } from 'astro-icon/components'
+
+// Cast Astro to proper type to fix TypeScript errors
+const astro = Astro as AstroGlobal
+
+// Check if user is already authenticated
+if (await isAuthenticated(astro.cookies)) {
+  return astro.redirect('/dashboard')
+}
+
+// Check for error query parameter
+const error = astro.url.searchParams.get('error')
+
+// Disable prerendering: This page needs to be server-rendered to handle
+// authentication state and dynamic redirects properly
+export const prerender = false
+---
+
+<AuthLayout
+  title="Create Account | Pixelated Empathy"
+  description="Join Pixelated Empathy to access mental health resources and personal therapy chat."
+  transitionMode="fade"
+>
+  <ClientRouter />
+  <div
+    class="w-full max-w-md mx-auto p-6 rounded-xl backdrop-blur-sm shadow-xl card-gradient form-container"
+  >
+    <div class="text-center mb-6">
+      <div
+        class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-green-700/40 to-green-600 mb-3"
+      >
+        <Icon name="lucide:user-plus" class="w-7 h-7 text-white" />
+      </div>
+      <p class="text-sm text-muted-foreground">
+        Create your account to get started
+      </p>
+    </div>
+
+    {
+      error && (
+        <div class="alert alert-error mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <p class="text-sm text-red-500">{decodeURIComponent(error)}</p>
+        </div>
+      )
+    }
+
+    <RegisterForm client:load showLogin={true} />
+
+    <div class="mt-5 text-center">
+      <p class="text-sm text-muted-foreground">
+        Already have an account?{' '}
+        <a
+          href="/login"
+          class="text-green-600 dark:text-green-500 hover:underline"
+          data-astro-prefetch
+        >
+          Sign in
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Security badges (simplified) -->
+  <div
+    class="mt-6 p-4 bg-card/20 backdrop-blur-sm rounded-lg max-w-xs mx-auto flex items-center justify-center space-x-4"
+  >
+    <Icon name="lucide:shield" class="w-4 h-4 text-green-600" />
+    <span class="text-xs text-muted-foreground">Protected by encryption</span>
+  </div>
+</AuthLayout>
+
+<style>
+  /* Simplified gradient with better performance */
+  .card-gradient {
+    background: linear-gradient(
+      135deg,
+      rgba(25, 25, 25, 0.8),
+      rgba(30, 30, 30, 0.4)
+    );
+    border: 1px solid rgba(50, 50, 50, 0.3);
+  }
+
+  /* Override dark mode styling */
+  :global(.dark) .card-gradient {
+    background: linear-gradient(
+      135deg,
+      rgba(20, 20, 20, 0.8),
+      rgba(25, 25, 25, 0.4)
+    );
+  }
+
+  /* Responsive text adjustments */
+  @media (max-width: 640px) {
+    .text-muted-foreground {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Performance improvements */
+  :global(.bg-gradient-to-br) {
+    will-change: transform;
+  }
+
+  /* Apply form container fixes for iOS */
+  .form-container {
+    position: relative;
+    padding-bottom: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    .form-container {
+      padding-bottom: 2.5rem;
+    }
+  }
+</style>
+
+<script>
+  // Preconnect to auth services to improve performance
+  const linkElement = document.createElement('link')
+  linkElement.rel = 'preconnect'
+  linkElement.href = 'https://accounts.google.com'
+  document.head.appendChild(linkElement)
+
+  // Add smooth rendering for card animation
+  document.addEventListener('DOMContentLoaded', () => {
+    const cardElement = document.querySelector('.card-gradient')
+    if (cardElement) {
+      cardElement.classList.add('fade-in')
+    }
+  })
+</script>

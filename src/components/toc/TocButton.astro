@@ -1,0 +1,60 @@
+---
+
+---
+
+<button
+  id="toc-open-button"
+  class="z-50 fixed right-5 bottom-18
+    w-10 h-10 rounded-full
+    op-0 bg-#8883 dark:bg-#8886 pointer-events-none op-transition
+    lt-lgp:(op-50 pointer-events-auto)
+    hover:op-100 print:hidden"
+  title="Open table of contents"
+>
+  <div u-i-lucide-table-of-contents></div>
+</button>
+
+<nav
+  id="toc-panel"
+  class="z-200 fixed top-20 left-5% right-5%
+    flex flex-col
+    w-90% max-h-82vh py-6 px-8 rounded-lg
+    bg-[var(--c-bg)]"
+>
+  <div class="pb-1 b-b b-[var(--c-scrollbar)] op-80 text-4.4 font-600">
+    Table of Contents
+  </div>
+  <ul>
+    <slot />
+  </ul>
+</nav>
+
+<script>
+  import { toggleFadeEffect } from '~/utils/animation'
+
+  document.addEventListener('astro:page-load', () => {
+    /* Open toc panel when user click on button */
+    const handleBtnClickToOpen = () => {
+      toggleFadeEffect('backdrop', true, 'hidden')
+      toggleFadeEffect('toc-panel', true, 'hidden!')
+    }
+
+    const tocOpenButton = document.getElementById('toc-open-button')
+    tocOpenButton?.addEventListener('click', handleBtnClickToOpen)
+
+    /* Close toc panel when user click on link */
+    const handleClickToClose = (event: MouseEvent) => {
+      const target = event.targe
+      const isClickedOnLink =
+        target instanceof HTMLElement && target.closest('a')
+
+      if (isClickedOnLink) {
+        toggleFadeEffect('toc-panel', false, 'hidden!')
+        toggleFadeEffect('backdrop', false, 'hidden')
+      }
+    }
+
+    const tocPanel = document.getElementById('toc-panel')
+    tocPanel?.addEventListener('click', (event) => handleClickToClose(event))
+  })
+</script>

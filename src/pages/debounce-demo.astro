@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import DebounceDemoComponent from '../components/demos/DebounceDemoComponent'
+---
+
+<BaseLayout title="Debounce Hooks Demo">
+  <main class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-center mb-2">Debounce Hooks Demo</h1>
+      <p class="text-center text-gray-600 dark:text-gray-400">
+        A demonstration of useDebounce and useDebouncedCallback hooks
+      </p>
+    </div>
+
+    <div class="mb-8">
+      <DebounceDemoComponent client:load />
+    </div>
+
+    <div
+      class="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+    >
+      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+        Implementation Details
+      </h2>
+
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+          useDebounce Hook
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
+          The <code class="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded"
+            >useDebounce</code
+          > hook takes a value and a delay, returning a debounced version of that
+          value that only updates after the specified delay has passed without changes.
+        </p>
+        <div
+          class="p-4 bg-gray-100 dark:bg-gray-900 rounded-md overflow-x-auto mb-4"
+        >
+          <pre><code class="language-tsx">
+// Usage example
+const [searchTerm, setSearchTerm] = useState(&apos;&apos;);
+const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+// Only runs when debouncedSearchTerm changes (500ms after user stops typing)
+useEffect(() =&gt; &#123;
+  performSearch(debouncedSearchTerm);
+&#125;, [debouncedSearchTerm]);
+          </code></pre>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+          useDebouncedCallback Hook
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
+          The <code class="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded"
+            >useDebouncedCallback</code
+          > hook creates a debounced version of the provided callback function that
+          will only execute after the specified delay.
+        </p>
+        <div
+          class="p-4 bg-gray-100 dark:bg-gray-900 rounded-md overflow-x-auto"
+        >
+          <pre><code class="language-tsx">
+// Usage example
+const debouncedSearch = useDebouncedCallback((query) =&gt; &#123;
+  performSearch(query);
+&#125;, 500);
+
+// Call the debounced function directly
+return &lt;input onChange=&#123;(e) =&gt; debouncedSearch(e.target.value)&#125; /&gt;;
+          </code></pre>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

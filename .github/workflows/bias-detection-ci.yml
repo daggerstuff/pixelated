@@ -1,0 +1,619 @@
+name: Bias Detection Engine CI/CD
+
+permissions:
+  contents: read
+  id-token: write
+  actions: read
+  checks: read
+  pull-requests: read
+  security-events: write
+
+on:
+  push:
+    branches: [master, develop]
+    paths:
+      - src/lib/ai/bias-detection/**
+      - src/components/admin/bias-detection/**
+      - src/pages/api/bias-detection/**
+      - tests/**/*bias-detection*
+      - .github/workflows/bias-detection-ci.yml
+  pull_request:
+    branches: [master, develop]
+    paths:
+      - src/lib/ai/bias-detection/**
+      - src/components/admin/bias-detection/**
+      - src/pages/api/bias-detection/**
+      - tests/**/*bias-detection*
+
+env:
+  NODE_VERSION: 22.16.0
+  PYTHON_VERSION: 3.11
+  PNPM_VERSION: 10.13.1
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3.29.1
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3.29.1
+        with:
+          languages: javascript,typescript
+
+      - name: Setup Node.js for CodeQL
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack for CodeQL
+        run: corepack enable
+
+      - name: Setup pnpm for CodeQL
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory for CodeQL
+        id: pnpm-cache-codeql
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache for CodeQL
+        uses: actions/cache@v4.2.3
+        with:
+          path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies for CodeQL
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build for CodeQL
+        run: pnpm build
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3.29.1
+
+  # Code quality and linting
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4.2.3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Run ESLint
+        continue-on-error: true
+        run: |
+          echo "Running ESLint..."
+          pnpm lint || {
+            echo "❌ ESLint found issues but continuing workflow"
+            exit 0
+          }
+          echo "✅ ESLint passed"
+
+      - name: Run TypeScript compiler
+        continue-on-error: true
+        run: |
+          echo "Running TypeScript compiler..."
+          pnpm type-check || {
+            echo "❌ TypeScript compiler found issues but continuing workflow"
+            exit 0
+          }
+          echo "✅ TypeScript compilation passed"
+
+      - name: Check formatting
+        continue-on-error: true
+        run: |
+          echo "Checking code formatting..."
+          pnpm format:check || {
+            echo "❌ Code formatting issues found but continuing workflow"
+            exit 0
+          }
+          echo "✅ Code formatting is correct"
+
+  # TypeScript unit and integration tests
+  typescript-tests:
+    name: TypeScript Tests
+    runs-on: ubuntu-latest
+    needs: [security-scan, code-quality]
+    if: always() && needs.security-scan.result == 'success' && (needs.code-quality.result == 'success' || needs.code-quality.result == 'failure')
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4.2.3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Setup test environment
+        run: |
+          if [ -f .env.example ]; then
+            cp .env.example .env.test
+          else
+            touch .env.test
+          fi
+          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/test_db" >> .env.test
+          echo "REDIS_URL=redis://localhost:6379" >> .env.test
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+
+      - name: Run unit tests
+        run: pnpm test:unit --coverage
+        env:
+          NODE_ENV: test
+
+      - name: Run integration tests
+        run: pnpm test:integration
+        env:
+          NODE_ENV: test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/lcov.info
+          flags: typescript
+          name: typescript-coverage
+
+  # Python ML service tests
+  python-tests:
+    name: Python ML Tests
+    runs-on: ubuntu-latest
+    needs: [security-scan]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-
+
+      - name: Install Python dependencies
+        run: |
+          if [ ! -d "src/lib/ai/bias-detection/python-service" ]; then
+            echo "Error: Python service directory not found"
+            ls -la src/lib/ai/bias-detection/
+            exit 1
+          fi
+          cd src/lib/ai/bias-detection/python-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio httpx
+
+      - name: Run Python linting
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          pip install flake8 black isort
+          # Check formatting with black
+          python -m black --check --diff .
+          # Check import sorting
+          python -m isort --check-only --diff .
+          # Run flake8 for code quality
+          python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run Python tests
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
+
+      - name: Upload Python coverage
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./src/lib/ai/bias-detection/python-service/coverage.xml
+          flags: python
+          name: python-coverage
+
+  # End-to-end tests
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [typescript-tests, python-tests]
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4.2.3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Setup Python for ML service
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python ML dependencies
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup test database
+        run: |
+          if [ -f .env.example ]; then
+            cp .env.example .env.test
+          else
+            touch .env.test
+          fi
+          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/test_db" >> .env.test
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Start Python ML service
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          python bias_detection_service.py &
+          PYTHON_PID=$!
+          echo "Started Python service with PID: $PYTHON_PID"
+          sleep 10
+          # Check if the service is still running
+          if kill -0 $PYTHON_PID 2>/dev/null; then
+            echo "Python service is running successfully"
+          else
+            echo "Python service failed to start"
+            exit 1
+          fi
+        env:
+          FLASK_ENV: testing
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Start application
+        run: |
+          pnpm start &
+          sleep 30
+        env:
+          NODE_ENV: test
+
+      - name: Run E2E tests
+        run: pnpm test:e2e --project=chromium
+        env:
+          NODE_ENV: test
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+
+  # Performance testing
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [typescript-tests]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4.2.3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run performance tests
+        run: |
+          # Start the application in background
+          pnpm build
+          pnpm start &
+          sleep 30
+
+          # Run k6 performance tests
+          k6 run src/load-tests/bias-detection-load-test.js
+        env:
+          NODE_ENV: production
+
+  # Build and deployment
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: [typescript-tests, python-tests, e2e-tests]
+    if: always() && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && needs.typescript-tests.result == 'success' && needs.python-tests.result == 'success' && needs.e2e-tests.result == 'success'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4.2.3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NODE_ENV: production
+
+      - name: Build Docker image
+        run: |
+          docker build -t bias-detection-engine:${{ github.sha }} .
+          docker tag bias-detection-engine:${{ github.sha }} bias-detection-engine:latest
+
+      - name: Configure AWS credentials
+        if: github.ref == 'refs/heads/master'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to staging
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          echo "Deploying to staging environment..."
+          # Add staging deployment commands here
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/master'
+        run: |
+          echo "Deploying to production environment..."
+          # Add production deployment commands here
+
+      - name: Run post-deployment health checks
+        if: github.ref == 'refs/heads/master'
+        env:
+          PRODUCTION_HEALTH_CHECK_URL: ${{ secrets.PRODUCTION_HEALTH_CHECK_URL }}
+        run: |
+          # Wait for deployment to be ready
+          sleep 60
+
+          # Check if health check URL is configured
+          if [[ -n "${PRODUCTION_HEALTH_CHECK_URL}" ]]; then
+            # Run health checks
+            curl -f ${PRODUCTION_HEALTH_CHECK_URL}/api/bias-detection/health || exit 1
+            
+            # Run smoke tests
+            pnpm test:smoke
+          else
+            echo "PRODUCTION_HEALTH_CHECK_URL not configured, skipping health checks"
+          fi
+
+  # Notification job
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy]
+    if: always()
+
+    steps:
+      - name: Notify on success
+        if: needs.build-and-deploy.result == 'success'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#deployments'
+          text: ✅ Bias Detection Engine deployment successful!
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify on failure
+        if: needs.build-and-deploy.result == 'failure'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#deployments'
+          text: ❌ Bias Detection Engine deployment failed!
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

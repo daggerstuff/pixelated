@@ -1,0 +1,104 @@
+---
+export const prerender = false
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import { ClientRouter } from 'astro:transitions'
+import { verifyAdmin } from '@/lib/auth/middleware'
+import type { AuthContext, SessionData } from '@/lib/auth/types'
+
+// Verify admin access
+const context: AuthContext = {
+  session: (Astro.locals as { session?: SessionData }).session || null,
+  securityVerification: undefined,
+  hipaaCompliance: undefined,
+}
+
+const response = await verifyAdmin(Astro.request, context)
+if (response) return response
+
+// Page metadata
+const pageTitle = 'Bias Detection Dashboard'
+const pageDescription =
+  'Monitor and analyze bias detection in therapeutic training sessions'
+---
+
+<AdminLayout
+  title={pageTitle}
+  description={pageDescription}
+  activeItem="bias-detection"
+>
+  <ClientRouter />
+
+  <div class="container mx-auto px-4 py-6">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+          Bias Detection Dashboard
+        </h1>
+        <p class="text-muted-foreground mt-2">
+          Real-time monitoring and analytics for bias detection in therapeutic
+          training sessions
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Component -->
+    <div
+      id="bias-dashboard"
+      data-testid="bias-dashboard"
+      class="bias-dashboard-container"
+    >
+      <!-- React component will be mounted here -->
+    </div>
+  </div>
+
+  <script>
+    import { BiasDashboard } from '@/components/admin/bias-detection/BiasDashboard'
+    import { createElement } from 'react'
+    import { createRoot } from 'react-dom/client'
+
+    // Mount the React component when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('bias-dashboard')
+      if (container) {
+        const root = createRoot(container)
+        root.render(
+          createElement(BiasDashboard, {
+            refreshInterval: 30000,
+            enableRealTimeUpdates: true,
+            className: 'w-full',
+          }),
+        )
+      }
+    })
+  </script>
+
+  <style>
+    .bias-dashboard-container {
+      min-height: 60vh;
+    }
+
+    /* Loading state styles */
+    .bias-dashboard-container:empty::before {
+      content: 'Loading bias detection dashboard...';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60vh;
+      color: #6b7280;
+      font-size: 1.125rem;
+    }
+
+    /* High contrast mode support */
+    .high-contrast {
+      filter: contrast(150%) brightness(110%);
+    }
+
+    /* Responsive chart adjustments */
+    @media (max-width: 768px) {
+      .bias-dashboard-container :global(.recharts-responsive-container) {
+        height: 250px !important;
+      }
+    }
+  </style>
+</AdminLayout>

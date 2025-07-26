@@ -1,0 +1,618 @@
+---
+import AdminLayout from '../../../../../layouts/AdminLayout.astro'
+import {
+  BusinessAssociateType,
+  ServiceCategory,
+} from '../../../../../lib/security/baa/types'
+import {
+  standardSections,
+  standardPlaceholders,
+} from '../../../../../lib/security/baa/templates/hipaa-standard'
+
+// Convert enum values to options for select inputs
+const associateTypeOptions = Object.values(BusinessAssociateType).map(
+  (type) => ({
+    value: type,
+    label: type
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase()),
+  }),
+)
+
+const serviceCategoryOptions = Object.values(ServiceCategory).map(
+  (category) => ({
+    value: category,
+    label: category
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase()),
+  }),
+)
+---
+
+<AdminLayout
+  title="Create BAA Template"
+  description="Create a new HIPAA-compliant Business Associate Agreement template"
+>
+  <div class="px-6 py-8">
+    <div class="flex items-center mb-6">
+      <a
+        href="/admin/security/baa/templates"
+        class="text-indigo-600 hover:text-indigo-900 mr-4"
+      >
+        &larr; Back to Templates
+      </a>
+      <h1 class="text-2xl font-bold text-gray-800">Create New BAA Template</h1>
+    </div>
+
+    <form id="template-form" class="space-y-8">
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-xl font-semibold mb-4">Template Details</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              for="templateName"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Template Name*</label
+            >
+            <input
+              type="text"
+              id="templateName"
+              name="templateName"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="e.g., Standard HIPAA BAA Template"
+            />
+          </div>
+
+          <div>
+            <label
+              for="templateVersion"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Version*</label
+            >
+            <input
+              type="text"
+              id="templateVersion"
+              name="templateVersion"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="e.g., 1.0.0"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label
+              for="templateDescription"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Description*</label
+            >
+            <textarea
+              id="templateDescription"
+              name="templateDescription"
+              rows="3"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Describe the purpose and use case for this template"
+            ></textarea>
+          </div>
+
+          <div>
+            <label
+              for="associateTypes"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Associate Types*</label
+            >
+            <select
+              id="associateTypes"
+              name="associateTypes"
+              multiple
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              size="5"
+            >
+              {
+                associateTypeOptions.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))
+              }
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+              Hold Ctrl/Cmd to select multiple types
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="serviceCategories"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Service Categories*</label
+            >
+            <select
+              id="serviceCategories"
+              name="serviceCategories"
+              multiple
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              size="5"
+            >
+              {
+                serviceCategoryOptions.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))
+              }
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+              Hold Ctrl/Cmd to select multiple categories
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="tags"
+              class="block text-sm font-medium text-gray-700 mb-1">Tags</label
+            >
+            <input
+              type="text"
+              id="tags"
+              name="tags"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="e.g., hipaa, vendor, cloud-storage"
+            />
+            <p class="text-xs text-gray-500 mt-1">Comma-separated tags</p>
+          </div>
+
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="isDefault"
+              name="isDefault"
+              class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label for="isDefault" class="ml-2 block text-sm text-gray-700">
+              Set as default template
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Template Sections</h2>
+          <button
+            type="button"
+            id="add-section-btn"
+            class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors text-sm"
+          >
+            Add New Section
+          </button>
+        </div>
+
+        <div id="sections-container" class="space-y-6">
+          <!-- Sections will be added here dynamically -->
+          <div class="border border-gray-200 p-4 rounded-md">
+            <p class="text-center text-gray-500 my-4">
+              No sections added yet. Click "Add New Section" or "Use Standard
+              Sections" to add sections to your template.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button
+            type="button"
+            id="use-standard-sections-btn"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+          >
+            Use Standard Sections
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Template Placeholders</h2>
+          <button
+            type="button"
+            id="add-placeholder-btn"
+            class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors text-sm"
+          >
+            Add New Placeholder
+          </button>
+        </div>
+
+        <div id="placeholders-container" class="space-y-6">
+          <!-- Placeholders will be added here dynamically -->
+          <div class="border border-gray-200 p-4 rounded-md">
+            <p class="text-center text-gray-500 my-4">
+              No placeholders added yet. Click "Add New Placeholder" or "Use
+              Standard Placeholders" to add placeholders to your template.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button
+            type="button"
+            id="use-standard-placeholders-btn"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+          >
+            Use Standard Placeholders
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <a
+          href="/admin/security/baa/templates"
+          class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Cancel
+        </a>
+        <button
+          type="submit"
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Create Template
+        </button>
+      </div>
+    </form>
+  </div>
+</AdminLayout>
+
+<script is:inline define:vars={{ standardSections, standardPlaceholders }}>
+  // Client-side JavaScript for template form management
+  document.addEventListener('DOMContentLoaded', () => {
+    const sectionsContainer = document.getElementById('sections-container')
+    const placeholdersContainer = document.getElementById(
+      'placeholders-container',
+    )
+    const addSectionBtn = document.getElementById('add-section-btn')
+    const addPlaceholderBtn = document.getElementById('add-placeholder-btn')
+    const useStandardSectionsBtn = document.getElementById(
+      'use-standard-sections-btn',
+    )
+    const useStandardPlaceholdersBtn = document.getElementById(
+      'use-standard-placeholders-btn',
+    )
+    const templateForm = document.getElementById('template-form')
+
+    let sections = []
+    let placeholders = []
+
+    // Function to render sections
+    function renderSections() {
+      if (sections.length === 0) {
+        sectionsContainer.innerHTML = `
+          <div class="border border-gray-200 p-4 rounded-md">
+            <p class="text-center text-gray-500 my-4">
+              No sections added yet. Click "Add New Section" or "Use Standard Sections" to add sections to your template.
+            </p>
+          </div>
+        `
+        return
+      }
+
+      sectionsContainer.innerHTML = ''
+      sections.forEach((section, index) => {
+        const sectionElement = document.createElement('div')
+        sectionElement.className = 'border border-gray-200 p-4 rounded-md'
+        sectionElement.innerHTML = `
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="font-medium">${section.title}</h3>
+            <div>
+              <button type="button" class="move-up-section text-gray-500 hover:text-gray-700 mr-2" ${index === 0 ? 'disabled' : ''}>
+                ↑
+              </button>
+              <button type="button" class="move-down-section text-gray-500 hover:text-gray-700 mr-2" ${index === sections.length - 1 ? 'disabled' : ''}>
+                ↓
+              </button>
+              <button type="button" class="remove-section text-red-500 hover:text-red-700">
+                ×
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input
+                type="text"
+                value="${section.title}"
+                class="section-title w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <input
+                type="text"
+                value="${section.description || ''}"
+                class="section-description w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+            <textarea
+              rows="4"
+              class="section-content w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            >${section.content}</textarea>
+            <p class="text-xs text-gray-500 mt-1">Supports basic Markdown formatting (e.g., **bold**, *italic*)</p>
+          </div>
+          <div>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="section-required h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                ${section.required ? 'checked' : ''}
+              />
+              <span class="ml-2 text-sm text-gray-700">Required section (cannot be removed from generated documents)</span>
+            </label>
+          </div>
+        `
+
+        // Add event listeners
+        const moveUpBtn = sectionElement.querySelector('.move-up-section')
+        const moveDownBtn = sectionElement.querySelector('.move-down-section')
+        const removeBtn = sectionElement.querySelector('.remove-section')
+        const titleInput = sectionElement.querySelector('.section-title')
+        const descriptionInput = sectionElement.querySelector(
+          '.section-description',
+        )
+        const contentTextarea = sectionElement.querySelector('.section-content')
+        const requiredCheckbox =
+          sectionElement.querySelector('.section-required')
+
+        moveUpBtn.addEventListener('click', () => {
+          if (index > 0) {
+            ;[sections[index - 1], sections[index]] = [
+              sections[index],
+              sections[index - 1],
+            ]
+            renderSections()
+          }
+        })
+
+        moveDownBtn.addEventListener('click', () => {
+          if (index < sections.length - 1) {
+            ;[sections[index], sections[index + 1]] = [
+              sections[index + 1],
+              sections[index],
+            ]
+            renderSections()
+          }
+        })
+
+        removeBtn.addEventListener('click', () => {
+          sections.splice(index, 1)
+          renderSections()
+        })
+
+        titleInput.addEventListener('change', (e) => {
+          sections[index].title = e.target.value
+        })
+
+        descriptionInput.addEventListener('change', (e) => {
+          sections[index].description = e.target.value
+        })
+
+        contentTextarea.addEventListener('change', (e) => {
+          sections[index].content = e.target.value
+        })
+
+        requiredCheckbox.addEventListener('change', (e) => {
+          sections[index].required = e.target.checked
+        })
+
+        sectionsContainer.appendChild(sectionElement)
+      })
+    }
+
+    // Function to render placeholders
+    function renderPlaceholders() {
+      if (placeholders.length === 0) {
+        placeholdersContainer.innerHTML = `
+          <div class="border border-gray-200 p-4 rounded-md">
+            <p class="text-center text-gray-500 my-4">
+              No placeholders added yet. Click "Add New Placeholder" or "Use Standard Placeholders" to add placeholders to your template.
+            </p>
+          </div>
+        `
+        return
+      }
+
+      placeholdersContainer.innerHTML = ''
+      placeholders.forEach((placeholder, index) => {
+        const placeholderElement = document.createElement('div')
+        placeholderElement.className = 'border border-gray-200 p-4 rounded-md'
+        placeholderElement.innerHTML = `
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="font-medium">${placeholder.label}</h3>
+            <button type="button" class="remove-placeholder text-red-500 hover:text-red-700">
+              ×
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Key</label>
+              <input
+                type="text"
+                value="${placeholder.key}"
+                class="placeholder-key w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <p class="text-xs text-gray-500 mt-1">Use in content as {{KEY}}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Label</label>
+              <input
+                type="text"
+                value="${placeholder.label}"
+                class="placeholder-label w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <input
+                type="text"
+                value="${placeholder.description}"
+                class="placeholder-description w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Default Value</label>
+              <input
+                type="text"
+                value="${placeholder.defaultValue || ''}"
+                class="placeholder-default w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="placeholder-required h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                ${placeholder.required ? 'checked' : ''}
+              />
+              <span class="ml-2 text-sm text-gray-700">Required (must be filled when creating a document)</span>
+            </label>
+          </div>
+        `
+
+        // Add event listeners
+        const removeBtn = placeholderElement.querySelector(
+          '.remove-placeholder',
+        )
+        const keyInput = placeholderElement.querySelector('.placeholder-key')
+        const labelInput =
+          placeholderElement.querySelector('.placeholder-label')
+        const descriptionInput = placeholderElement.querySelector(
+          '.placeholder-description',
+        )
+        const defaultInput = placeholderElement.querySelector(
+          '.placeholder-default',
+        )
+        const requiredCheckbox = placeholderElement.querySelector(
+          '.placeholder-required',
+        )
+
+        removeBtn.addEventListener('click', () => {
+          placeholders.splice(index, 1)
+          renderPlaceholders()
+        })
+
+        keyInput.addEventListener('change', (e) => {
+          placeholders[index].key = e.target.value.toUpperCase()
+          keyInput.value = placeholders[index].key // Update to show uppercase
+        })
+
+        labelInput.addEventListener('change', (e) => {
+          placeholders[index].label = e.target.value
+        })
+
+        descriptionInput.addEventListener('change', (e) => {
+          placeholders[index].description = e.target.value
+        })
+
+        defaultInput.addEventListener('change', (e) => {
+          placeholders[index].defaultValue = e.target.value
+        })
+
+        requiredCheckbox.addEventListener('change', (e) => {
+          placeholders[index].required = e.target.checked
+        })
+
+        placeholdersContainer.appendChild(placeholderElement)
+      })
+    }
+
+    // Add a new section
+    addSectionBtn.addEventListener('click', () => {
+      sections.push({
+        id: 'section-' + Date.now(),
+        title: 'New Section',
+        description: '',
+        content: 'Enter section content here...',
+        required: true,
+        order: sections.length,
+      })
+      renderSections()
+    })
+
+    // Add a new placeholder
+    addPlaceholderBtn.addEventListener('click', () => {
+      placeholders.push({
+        key: 'NEW_PLACEHOLDER',
+        label: 'New Placeholder',
+        description: 'Description of this placeholder',
+        required: false,
+        defaultValue: '',
+      })
+      renderPlaceholders()
+    })
+
+    // Use standard sections
+    useStandardSectionsBtn.addEventListener('click', () => {
+      if (sections.length > 0) {
+        if (!confirm('This will replace your current sections. Continue?')) {
+          return
+        }
+      }
+
+      sections = JSON.parse(JSON.stringify(standardSections))
+      renderSections()
+    })
+
+    // Use standard placeholders
+    useStandardPlaceholdersBtn.addEventListener('click', () => {
+      if (placeholders.length > 0) {
+        if (
+          !confirm('This will replace your current placeholders. Continue?')
+        ) {
+          return
+        }
+      }
+
+      placeholders = JSON.parse(JSON.stringify(standardPlaceholders))
+      renderPlaceholders()
+    })
+
+    // Form submission
+    templateForm.addEventListener('submit', (e) => {
+      e.preventDefault()
+
+      // In a real implementation, this would collect all form data and submit to an API
+      const formData = {
+        name: document.getElementById('templateName').value,
+        version: document.getElementById('templateVersion').value,
+        description: document.getElementById('templateDescription').value,
+        associateTypes: Array.from(
+          document.getElementById('associateTypes').selectedOptions,
+        ).map((opt) => opt.value),
+        serviceCategories: Array.from(
+          document.getElementById('serviceCategories').selectedOptions,
+        ).map((opt) => opt.value),
+        isDefault: document.getElementById('isDefault').checked,
+        tags: document
+          .getElementById('tags')
+          .value.split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag),
+        sections,
+        placeholders,
+      }
+
+      console.log('Template data:', formData)
+
+      // Redirect back to the templates list
+      // In a real implementation, this would happen after successful API response
+      alert('Template created successfully!')
+      window.location.href = '/admin/security/baa/templates'
+    })
+
+    // Initial render
+    renderSections()
+    renderPlaceholders()
+  })
+</script>

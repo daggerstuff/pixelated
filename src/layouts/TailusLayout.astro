@@ -1,0 +1,49 @@
+---
+import BaseHead from '@components/tailus/BaseHead.astro'
+import AppFooter from '@components/tailus/AppFooter.astro'
+import AppHeader from '@components/tailus/AppHeader.astro'
+
+interface Props {
+  title?: string
+  description?: string
+}
+
+const {
+  title = 'Pixelated Empathy - AI-Powered Mental Health Support',
+  description = 'Experience personalized mental health support through our advanced AI platform. Get insights, therapy assistance, and emotional wellness tools designed for your unique journey.',
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <BaseHead {title} {description} />
+    <!-- GoatCounter Analytics -->
+    <script
+      data-goatcounter="https://pixelated.goatcounter.com/count"
+      async
+      src="//gc.zgo.at/count.js"></script>
+  </head>
+  <body class="overflow-x-hidden bg-white dark:bg-gray-950">
+    <!-- Skip to content link for accessibility -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+    >
+      Skip to content
+    </a>
+
+    <AppHeader />
+    <main id="main-content">
+      <slot />
+    </main>
+    <AppFooter />
+
+    <script is:inline>
+      function speedInsightsBeforeSend(data) {
+        console.log('Speed Insights before send', data)
+        return data
+      }
+    </script>
+  </body>
+</html>

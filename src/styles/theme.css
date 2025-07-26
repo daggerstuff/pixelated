@@ -1,0 +1,52 @@
+/* Base theme variables */
+:root {
+  --primary: 147 51 234;
+  --secondary: 79 70 229;
+  --accent: 244 63 94;
+  --background: 255 255 255;
+  --foreground: 17 24 39;
+
+  /* Flowbite color scheme */
+  --gray-50: 249 250 251;
+  --gray-100: 243 244 246;
+  --gray-200: 229 231 235;
+  --gray-300: 209 213 219;
+  --gray-400: 156 163 175;
+  --gray-500: 107 114 128;
+  --gray-600: 75 85 99;
+  --gray-700: 55 65 81;
+  --gray-800: 31 41 55;
+  --gray-900: 17 24 39;
+}
+
+/* Dark theme */
+.dark {
+  --primary: 168 85 247;
+  --secondary: 99 102 241;
+  --accent: 251 113 133;
+  --background: 17 24 39;
+  --foreground: 249 250 251;
+
+  color-scheme: dark;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: more) {
+  :root {
+    --primary: 126 34 206;
+    --secondary: 67 56 202;
+    --accent: 225 29 72;
+  }
+
+  .dark {
+    --primary: 192 132 252;
+    --secondary: 129 140 248;
+    --accent: 251 113 133;
+  }
+}
+
+/* Base styles */
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+}

@@ -1,0 +1,298 @@
+---
+import Link from '~/components/base/Link.astro'
+import type { ShareConfig } from '~/types'
+
+interface _ShareLink {
+  baseUrl: string
+  formatUrl: (postUrl: URL, config?: [boolean, string?]) => string
+  label: string
+  title: string
+}
+
+interface Props {
+  config: ShareConfig
+}
+
+const { config } = Astro.props
+// Instead of directly using Astro.url, precompute the URL string
+// We'll get the full URL on the client side
+const postUrlString = Astro.url.toString()
+
+const SHARE_LINKS: Record<string, _ShareLink> = {
+  twitter: {
+    baseUrl: 'https://twitter.com/intent/tweet?text=',
+    formatUrl: (url, cfg) => {
+      const twitterConfig = SHARE_LINKS['twitter']
+      if (!twitterConfig) return ''
+      return `${twitterConfig.baseUrl}${encodeURIComponent(
+        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ''}${url}\n\nI think...`,
+      )}`
+    },
+    label: 'twitter',
+    title: 'Tweet this post',
+  },
+  mastodon: {
+    baseUrl: 'https://elk.zone/intent/post?text=',
+    formatUrl: (url, cfg) => {
+      const mastodonConfig = SHARE_LINKS['mastodon']
+      if (!mastodonConfig) return ''
+      return `${mastodonConfig.baseUrl}${encodeURIComponent(
+        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ''}${url}\n\nI think...`,
+      )}`
+    },
+    label: 'mastodon',
+    title: 'Share this post on Mastodon',
+  },
+  facebook: {
+    baseUrl: 'https://www.facebook.com/sharer.php?u=',
+    formatUrl: (url) => {
+      const facebookConfig = SHARE_LINKS['facebook']
+      if (!facebookConfig) return ''
+      return `${facebookConfig.baseUrl}${url}`
+    },
+    label: 'facebook',
+    title: 'Share this post on Facebook',
+  },
+  pinterest: {
+    baseUrl: 'https://pinterest.com/pin/create/button/?url=',
+    formatUrl: (url) => {
+      const pinterestConfig = SHARE_LINKS['pinterest']
+      if (!pinterestConfig) return ''
+      return `${pinterestConfig.baseUrl}${url}`
+    },
+    label: 'pinterest',
+    title: 'Share this post on Pinterest',
+  },
+  reddit: {
+    baseUrl: 'https://www.reddit.com/submit?url=',
+    formatUrl: (url) => {
+      const redditConfig = SHARE_LINKS['reddit']
+      if (!redditConfig) return ''
+      return `${redditConfig.baseUrl}${url}`
+    },
+    label: 'reddit',
+    title: 'Share this post on Reddit',
+  },
+  telegram: {
+    baseUrl: 'https://t.me/share/url?url=',
+    formatUrl: (url) => {
+      const telegramConfig = SHARE_LINKS['telegram']
+      if (!telegramConfig) return ''
+      return `${telegramConfig.baseUrl}${url}`
+    },
+    label: 'telegram',
+    title: 'Share this post via Telegram',
+  },
+  whatsapp: {
+    baseUrl: 'https://wa.me/?text=',
+    formatUrl: (url) => {
+      const whatsappConfig = SHARE_LINKS['whatsapp']
+      if (!whatsappConfig) return ''
+      return `${whatsappConfig.baseUrl}${url}`
+    },
+    label: 'whatsapp',
+    title: 'Share this post via WhatsApp',
+  },
+  email: {
+    baseUrl: 'mailto:?subject=See%20this%20post&body=',
+    formatUrl: (url) => {
+      const emailConfig = SHARE_LINKS['email']
+      if (!emailConfig) return ''
+      return `${emailConfig.baseUrl}${url}`
+    },
+    label: 'email',
+    title: 'Share this post via email',
+  },
+}
+
+// Only get the key/provider pairs
+const linkProviders = Object.entries(config)
+  .filter(([key, value]) => value && key in SHARE_LINKS)
+  .map(([key, cfg]) => ({ key, cfg }))
+---
+
+<span class="font-mono op-50">&gt; </span>
+<span class="op-50">share on</span>
+
+<div id="share-links" data-post-url={postUrlString}></div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    interface _ShareLink {
+      url: string
+      label: string
+      title: string
+    }
+
+    // Get the share links container
+    const shareLinksContainer = document.getElementById('share-links')
+    if (!shareLinksContainer) return
+
+    // Get the post URL from the data attribute
+    const postUrlString = shareLinksContainer.getAttribute('data-post-url')
+    if (!postUrlString) return
+
+    const postUrl = new URL(postUrlString)
+
+    // Clear existing content
+    shareLinksContainer.innerHTML = ''
+
+    // Re-add the share links
+    const shareLinks: Record<
+      string,
+      {
+        baseUrl: string
+        formatUrl: (url: URL, cfg?: [boolean, string?]) => string
+        label: string
+        title: string
+      }
+    > = {
+      twitter: {
+        baseUrl: 'https://twitter.com/intent/tweet?text=',
+        formatUrl: (url, cfg) => {
+          const baseUrl = shareLinks['twitter']?.baseUrl || ''
+          return `${baseUrl}${encodeURIComponent(
+            `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ''}${url}\n\nI think...`,
+          )}`
+        },
+        label: 'twitter',
+        title: 'Tweet this post',
+      },
+      mastodon: {
+        baseUrl: 'https://elk.zone/intent/post?text=',
+        formatUrl: (url, cfg) => {
+          const baseUrl = shareLinks['mastodon']?.baseUrl || ''
+          return `${baseUrl}${encodeURIComponent(
+            `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ''}${url}\n\nI think...`,
+          )}`
+        },
+        label: 'mastodon',
+        title: 'Share this post on Mastodon',
+      },
+      facebook: {
+        baseUrl: 'https://www.facebook.com/sharer.php?u=',
+        formatUrl: (url) => {
+          const baseUrl = shareLinks['facebook']?.baseUrl || ''
+          return `${baseUrl}${url}`
+        },
+        label: 'facebook',
+        title: 'Share this post on Facebook',
+      },
+      pinterest: {
+        baseUrl: 'https://pinterest.com/pin/create/button/?url=',
+        formatUrl: (url) => {
+          const baseUrl = shareLinks['pinterest']?.baseUrl || ''
+          return `${baseUrl}${url}`
+        },
+        label: 'pinterest',
+        title: 'Share this post on Pinterest',
+      },
+      reddit: {
+        baseUrl: 'https://www.reddit.com/submit?url=',
+        formatUrl: (url) => {
+          const baseUrl = shareLinks['reddit']?.baseUrl || ''
+          return `${baseUrl}${url}`
+        },
+        label: 'reddit',
+        title: 'Share this post on Reddit',
+      },
+      telegram: {
+        baseUrl: 'https://t.me/share/url?url=',
+        formatUrl: (url) => {
+          const baseUrl = shareLinks['telegram']?.baseUrl || ''
+          return `${baseUrl}${url}`
+        },
+        label: 'telegram',
+        title: 'Share this post via Telegram',
+      },
+      whatsapp: {
+        baseUrl: 'https://wa.me/?text=',
+        formatUrl: (url) => {
+          const baseUrl = shareLinks['whatsapp']?.baseUrl || ''
+          return `${baseUrl}${url}`
+        },
+        label: 'whatsapp',
+        title: 'Share this post via WhatsApp',
+      },
+      email: {
+        baseUrl: 'mailto:?subject=See%20this%20post&body=',
+        formatUrl: (url) => {
+          const baseUrl = shareLinks['email']?.baseUrl || ''
+          return `${baseUrl}${url}`
+        },
+        label: 'email',
+        title: 'Share this post via email',
+      },
+    }
+
+    // Get the config information from data-* attributes
+    const linkProviderElements = Array.from(
+      document.querySelectorAll('[data-provider-key]'),
+    )
+
+    // Create the link elements
+    linkProviderElements.forEach((providerEl, idx) => {
+      const key = providerEl.getAttribute('data-provider-key')
+      const cfgStr = providerEl.getAttribute('data-provider-config')
+      const cfg = cfgStr ? JSON.parse(cfgStr) : null
+
+      if (!key || !shareLinks[key]) return
+
+      const linkConfig = shareLinks[key]
+      if (!linkConfig) return
+
+      const linkUrl = linkConfig.formatUrl(postUrl, cfg)
+
+      const linkEl = document.createElement('a')
+      linkEl.href = linkUrl
+      linkEl.textContent = linkConfig.label
+      linkEl.className = 'op-50! hover:op-75! op-transition'
+      linkEl.title = linkConfig.title
+      linkEl.rel = 'noopener noreferrer'
+      linkEl.target = '_blank'
+
+      shareLinksContainer.appendChild(linkEl)
+
+      // Add separator if not the last elemen
+      if (idx < linkProviderElements.length - 1) {
+        const separator = document.createElement('span')
+        separator.className = 'op-25'
+        separator.textContent = '/'
+        shareLinksContainer.appendChild(separator)
+      }
+    })
+  })
+</script>
+
+{
+  // Render hidden elements with provider data for client-side scrip
+  linkProviders.map((provider, _idx) => (
+    <span
+      data-provider-key={provider.key}
+      data-provider-config={JSON.stringify(provider.cfg)}
+      style="display: none;"
+    />
+  ))
+}
+
+{
+  // Pre-render links for initial state (for SSR and SEO)
+  linkProviders.map((provider, idx) => {
+    const linkConfig = SHARE_LINKS[provider.key]
+    // For initial SSR, create a URL object from the string
+    const initialPostUrl = new URL(postUrlString)
+    return (
+      <>
+        <Link
+          class="op-50! hover:op-75! op-transition"
+          href={linkConfig.formatUrl(initialPostUrl, provider.cfg)}
+          title={linkConfig.title}
+          external={true}
+        >
+          {linkConfig.label}
+        </Link>
+        {idx < linkProviders.length - 1 && <span class="op-25">/</span>}
+      </>
+    )
+  })
+}

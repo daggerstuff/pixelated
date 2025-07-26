@@ -1,0 +1,613 @@
+---
+import { getCollection, type CollectionEntry, render } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Badge from '@/components/ui/Badge.astro'
+import { Button } from '@/components/ui/button'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog')
+  return posts
+    .filter((post: CollectionEntry<'blog'>) => !post.data.draft)
+    .map((post: CollectionEntry<'blog'>) => ({
+      params: { slug: post.data.slug || post.slug },
+      props: { entry: post },
+    }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+
+// Get related posts (same category or tags)
+const allPosts = await getCollection(
+  'blog',
+  ({ data }: CollectionEntry<'blog'>) => !data.draft,
+)
+
+const relatedPosts = allPosts
+  .filter(
+    (p: CollectionEntry<'blog'>) =>
+      p.id !== entry.id && // Not the current post
+      (p.data.category === entry.data.category || // Same category
+        p.data.tags?.some((tag: string) => entry.data.tags?.includes(tag))), // Shared tags
+  )
+  .sort(() => Math.random() - 0.5) // Randomize
+  .slice(0, 3) // Get up to 3 related posts
+
+// Category color mapping
+const categoryColors: Record<string, string> = {
+  'AI Training': 'cyan',
+  'Clinical Practice': 'green',
+  'Student Success': 'blue',
+  'Technology': 'purple',
+  'Research': 'orange',
+  'University Spotlight': 'red',
+}
+
+const categoryColor = categoryColors[entry.data.category as keyof typeof categoryColors] || 'gray'
+
+// Reading time calculation (rough estimate)
+const wordsPerMinute = 200
+const wordCount = entry.body?.split(/\s+/).length || 0
+const readingTime = Math.ceil(wordCount / wordsPerMinute)
+---
+
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  bgType="plum"
+>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div
+      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
+    >
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+    </div>
+
+    <div class="relative z-10 py-8">
+      <div class="container mx-auto px-4">
+        <!-- Back Navigation -->
+        <div class="mb-8">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-green-500/50 text-green-300 hover:bg-green-500/10"
+            data-back-button="true"
+          >
+            ← Back to Blog
+          </Button>
+        </div>
+
+        <!-- Article Header -->
+        <div class="max-w-4xl mx-auto mb-12">
+          <div class="text-center mb-8">
+            <!-- Category and Meta Info -->
+            <div class="flex items-center justify-center gap-4 mb-6">
+              {
+                entry.data.category && (
+                  <Badge
+                    class={`bg-${categoryColor}-500/20 text-${categoryColor}-300`}
+                  >
+                    {entry.data.category}
+                  </Badge>
+                )
+              }
+              <Badge class="bg-gray-500/20 text-gray-300">
+                {readingTime} min read
+              </Badge>
+              <Badge class="bg-gray-500/20 text-gray-300">
+                {new Date(entry.data.pubDate).toLocaleDateString()}
+              </Badge>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+              <span class={`text-${categoryColor}-400 golden-shimmer`}>
+                {entry.data.title}
+              </span>
+            </h1>
+
+            <!-- Description -->
+            {
+              entry.data.description && (
+                <p class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+                  {entry.data.description}
+                </p>
+              )
+            }
+
+            <!-- Featured Image -->
+            {
+              entry.data.image && (
+                <div class="w-full max-w-3xl mx-auto mb-8">
+                  <div
+                    class={`bg-gradient-to-br from-${categoryColor}-400/20 to-${categoryColor}-500/20 rounded-2xl p-2 overflow-hidden`}
+                  >
+                    <img
+                      src={entry.data.image.url}
+                      alt={entry.data.image.alt}
+                      class="w-full h-64 lg:h-96 object-cover rounded-xl"
+                    />
+                  </div>
+                </div>
+              )
+            }
+
+            <!-- Tags -->
+            {
+              entry.data.tags && entry.data.tags.length > 0 && (
+                <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+                  {entry.data.tags.map((tag: string) => (
+                    <Badge class="bg-slate-700/50 text-slate-300 text-xs">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              )
+            }
+          </div>
+        </div>
+
+        <!-- Article Content -->
+        <div class="max-w-4xl mx-auto">
+          <Card
+            class={`border border-${categoryColor}-600/30 bg-slate-900/50 rounded-2xl overflow-hidden mb-12`}
+          >
+            <CardContent class="p-8 lg:p-12">
+              <div class="prose prose-lg prose-invert max-w-none">
+                <Content />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Article Actions -->
+        <div class="max-w-4xl mx-auto mb-16">
+          <Card
+            class="border border-green-600/30 bg-green-900/20 rounded-2xl overflow-hidden"
+          >
+            <CardContent class="p-6 lg:p-8 text-center">
+              <div class="text-4xl mb-4 text-green-400">💡</div>
+              <h3 class="text-xl font-bold text-green-100 mb-4">
+                Found This Helpful?
+              </h3>
+              <p class="text-green-200/80 mb-6 max-w-2xl mx-auto">
+                Share your thoughts with other therapy educators or explore more
+                insights from the training revolution.
+              </p>
+              <div
+                class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              >
+                <Button
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-6 py-3 rounded-full"
+                  data-demo-link="/demo-hub"
+                >
+                  Try Our Training Demos →
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-green-500/50 text-green-300 hover:bg-green-500/10 px-6 py-3 rounded-full"
+                  data-blog-link="/blog"
+                >
+                  Read More Articles
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Related Posts -->
+        {
+          relatedPosts.length > 0 && (
+            <div class="max-w-6xl mx-auto mb-16">
+              <div class="text-center mb-12">
+                <h2 class="text-2xl lg:text-3xl font-bold text-white mb-4">
+                  You Might Also
+                  <span class={`text-${categoryColor}-400 golden-shimmer`}>
+                    Enjoy
+                  </span>
+                </h2>
+                <p class="text-base text-green-100/90 max-w-2xl mx-auto">
+                  More insights from the therapy training revolution
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {relatedPosts.map((post: CollectionEntry<'blog'>) => (
+                    <Card
+                      class="border border-slate-600/30 hover:border-slate-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50"
+                    >
+                      <CardHeader class="pb-4">
+                        {post.data.image && (
+                          <div class="w-full h-40 bg-gradient-to-br from-orange-400/20 to-red-500/20 rounded-lg mb-4 overflow-hidden">
+                            <img
+                              src={post.data.image.url}
+                              alt={post.data.image.alt}
+                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                          </div>
+                        )}
+
+                        {post.data.category && (
+                          <Badge
+                            class="bg-slate-500/20 text-slate-300 text-xs mb-3"
+                          >
+                            {post.data.category}
+                          </Badge>
+                        )}
+
+                        <CardTitle
+                          class="text-base font-bold text-slate-100 tracking-wide mb-3 group-hover:text-slate-50 transition-colors"
+                        >
+                          <a
+                            href={`/blog/${post.data.slug || post.slug}`}
+                            class="hover:underline"
+                          >
+                            {post.data.title}
+                          </a>
+                        </CardTitle>
+
+                        <CardDescription
+                          class="text-sm text-slate-200/80 leading-relaxed mb-4"
+                        >
+                          {post.data.description}
+                        </CardDescription>
+
+                        <div
+                          class="flex items-center justify-between text-xs text-slate-300/70"
+                        >
+                          <span>
+                            {new Date(post.data.pubDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </CardHeader>
+                    </Card>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <!-- Newsletter Signup -->
+        <div class="max-w-4xl mx-auto">
+          <Card
+            class="border border-blue-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12 text-center">
+              <div class="text-6xl text-blue-400 mb-6">📬</div>
+
+              <h2 class="text-2xl lg:text-3xl font-bold text-blue-100 mb-6">
+                Stay Ahead of the
+                <br />
+                <span class="text-blue-400 golden-shimmer"
+                  >Training Revolution</span
+                >
+              </h2>
+
+              <p
+                class="text-base text-blue-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
+              >
+                Get weekly insights like this delivered to your inbox.
+                University success stories, breakthrough research, and practical
+                tips for therapy educators.
+              </p>
+
+              <div
+                class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 max-w-md mx-auto"
+              >
+                <input
+                  type="email"
+                  placeholder="your.email@university.edu"
+                  class="flex-1 px-4 py-3 rounded-full bg-slate-800/50 border border-blue-500/30 text-blue-100 placeholder-blue-300/50 focus:outline-none focus:border-blue-400"
+                />
+                <Button
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-6 py-3 rounded-full transform hover:scale-105 transition-all duration-300"
+                >
+                  Subscribe
+                </Button>
+              </div>
+
+              <p class="text-xs text-blue-300/70">
+                📧 Weekly insights • 🎓 University-focused • 🔒 No spam, ever
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Organic Particles */
+  .particles-container {
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: float-organic 12s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  .particle-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 15s;
+  }
+
+  .particle-2 {
+    top: 40%;
+    right: 20%;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+
+  .particle-3 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 6s;
+    animation-duration: 12s;
+  }
+
+  .particle-4 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 9s;
+    animation-duration: 20s;
+  }
+
+  .particle-5 {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 12s;
+    animation-duration: 16s;
+  }
+
+  @keyframes float-organic {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.6;
+    }
+    25% {
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-10px) translateX(-15px) scale(0.9);
+      opacity: 0.4;
+    }
+    75% {
+      transform: translateY(20px) translateX(10px) scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  /* Text Effects */
+  .golden-shimmer {
+    background: linear-gradient(45deg, #10b981, #059669, #047857);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Card Effects */
+  .organic-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .organic-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    animation: organic-pulse 4s ease-in-out infinite;
+    transform: scale(0);
+  }
+
+  .organic-card:hover::before {
+    transform: scale(1);
+  }
+
+  @keyframes organic-pulse {
+    0%,
+    100% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1) rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  /* Enhanced Prose Styling */
+  .prose {
+    color: #e2e8f0;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    color: #f1f5f9;
+    font-weight: 700;
+  }
+
+  .prose h2 {
+    border-bottom: 2px solid #10b981;
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose blockquote {
+    border-left: 4px solid #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 0.5rem;
+  }
+
+  .prose code {
+    background: rgba(100, 116, 139, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+
+  .prose pre {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-radius: 0.5rem;
+  }
+
+  .prose a {
+    color: #10b981;
+    text-decoration: underline;
+    text-decoration-color: rgba(16, 185, 129, 0.5);
+  }
+
+  .prose a:hover {
+    color: #059669;
+    text-decoration-color: #059669;
+  }
+
+  .prose ul,
+  .prose ol {
+    margin: 1rem 0;
+  }
+
+  .prose li {
+    margin: 0.5rem 0;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .particle {
+      width: 3px;
+      height: 3px;
+    }
+  }
+</style>
+
+<script>
+  // Track blog post interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    // Handle navigation buttons
+    document.querySelectorAll('[data-back-button]').forEach((button) => {
+      button.addEventListener('click', () => {
+        window.history.back()
+      })
+    })
+
+    document.querySelectorAll('[data-demo-link]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement
+        const link = target?.dataset['demoLink']
+        if (link) {
+          window.location.href = link
+        }
+      })
+    })
+
+    document.querySelectorAll('[data-blog-link]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement
+        const link = target?.dataset['blogLink']
+        if (link) {
+          window.location.href = link
+        }
+      })
+    })
+
+    // Track page view
+    if (typeof (window as any).gtag !== 'undefined') {
+      (window as any).gtag('event', 'page_view', {
+        page_title: document.title,
+        page_location: window.location.href,
+        content_type: 'blog_post',
+      })
+    }
+
+    // Track reading progress
+    let maxScroll = 0
+    window.addEventListener('scroll', () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+          100,
+      )
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent
+
+        if (maxScroll % 25 === 0 && typeof (window as any).gtag !== 'undefined') {
+          (window as any).gtag('event', 'blog_reading_progress', {
+            article_title: document.title,
+            scroll_depth: maxScroll,
+          })
+        }
+      }
+    })
+
+    // Track CTA clicks
+    document.querySelectorAll('button').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement
+        if (typeof (window as any).gtag !== 'undefined') {
+          (window as any).gtag('event', 'blog_cta_click', {
+            article_title: document.title,
+            cta_text: target?.textContent || '',
+          })
+        }
+      })
+    })
+
+    // Track related post clicks
+    document.querySelectorAll('a[href*="/blog/"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement
+        if (typeof (window as any).gtag !== 'undefined') {
+          (window as any).gtag('event', 'related_post_click', {
+            current_article: document.title,
+            clicked_article: target?.textContent || '',
+          })
+        }
+      })
+    })
+  })
+</script>

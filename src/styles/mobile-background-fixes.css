@@ -1,0 +1,116 @@
+/**
+ * Mobile Background Fixes - Address backdrop and background issues
+ */
+
+/* Mobile background improvements */
+@media (max-width: 768px) {
+  /* Add subtle texture to backgrounds */
+  body {
+    background:
+      radial-gradient(
+        circle at 20% 80%,
+        rgba(16, 185, 129, 0.05) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        rgba(16, 185, 129, 0.03) 0%,
+        transparent 50%
+      ),
+      #050505 !important;
+  }
+
+  /* Improve backdrop blur effects */
+  .backdrop-blur-md {
+    backdrop-filter: blur(8px) saturate(1.1) !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Navigation background enhancement */
+  nav {
+    background: rgba(0, 0, 0, 0.6) !important;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.3) !important;
+  }
+
+  /* Card backgrounds */
+  .card,
+  [class*='card'],
+  .border {
+    background: rgba(16, 185, 129, 0.05) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+  }
+
+  /* Section backgrounds */
+  section {
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.02) 0%,
+      transparent 50%,
+      rgba(16, 185, 129, 0.01) 100%
+    ) !important;
+  }
+
+  /* Button background improvements */
+  .bg-gradient-to-r {
+    background: linear-gradient(
+      90deg,
+      rgba(16, 185, 129, 0.9) 0%,
+      rgba(5, 150, 105, 0.9) 100%
+    ) !important;
+  }
+
+  /* Badge backgrounds */
+  .badge,
+  [class*='badge'] {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+  }
+
+  /* Remove overly transparent elements */
+  .opacity-75 {
+    opacity: 0.9 !important;
+  }
+
+  .opacity-50 {
+    opacity: 0.7 !important;
+  }
+
+  /* Enhance text contrast */
+  .text-green-200\/90 {
+    color: rgba(187, 247, 208, 0.95) !important;
+  }
+
+  .text-green-200\/80 {
+    color: rgba(187, 247, 208, 0.9) !important;
+  }
+
+  .text-green-300\/70 {
+    color: rgba(134, 239, 172, 0.85) !important;
+  }
+}
+
+/* Extra enhancements for very small screens */
+@media (max-width: 480px) {
+  /* Stronger background for readability */
+  body {
+    background:
+      radial-gradient(
+        circle at 50% 50%,
+        rgba(16, 185, 129, 0.08) 0%,
+        transparent 70%
+      ),
+      #050505 !important;
+  }
+
+  /* Enhance card visibility */
+  .card,
+  [class*='card'] {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  }
+
+  /* Improve navigation visibility */
+  nav {
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+}

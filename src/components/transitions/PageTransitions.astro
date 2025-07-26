@@ -1,0 +1,187 @@
+---
+import { ClientRouter } from 'astro:transitions'
+
+interface Props {
+  mode?: 'default' | 'fade' | 'slide' | 'slide-up' | 'slide-down' | 'zoom'
+  duration?: number
+}
+
+// Define proper types for transition objects
+interface TransitionValue {
+  opacity: string
+  transform?: string
+}
+
+interface TransitionPair {
+  old: TransitionValue
+  new: TransitionValue
+}
+
+interface TransitionMap {
+  [key: string]: TransitionPair
+}
+
+const { mode = 'default', duration = 300 } = Astro.props
+
+// Different transition types
+const transitions: TransitionMap = {
+  'default': {
+    old: { opacity: '0', transform: 'scale(0.96)' },
+    new: { opacity: '0', transform: 'scale(1.04)' },
+  },
+  'fade': {
+    old: { opacity: '0' },
+    new: { opacity: '0' },
+  },
+  'slide': {
+    old: { opacity: '0', transform: 'translateX(-2%)' },
+    new: { opacity: '0', transform: 'translateX(2%)' },
+  },
+  'slide-up': {
+    old: { opacity: '0', transform: 'translateY(2%)' },
+    new: { opacity: '0', transform: 'translateY(-2%)' },
+  },
+  'slide-down': {
+    old: { opacity: '0', transform: 'translateY(-2%)' },
+    new: { opacity: '0', transform: 'translateY(2%)' },
+  },
+  'zoom': {
+    old: { opacity: '0', transform: 'scale(0.9)' },
+    new: { opacity: '0', transform: 'scale(1.1)' },
+  },
+}
+
+const currentTransition = transitions[mode]
+
+// Extract the animation values to be used in CSS
+const oldOpacity = currentTransition.old.opacity || '1'
+const oldTransform = currentTransition.old.transform || 'none'
+const newOpacity = currentTransition.new.opacity || '1'
+const newTransform = currentTransition.new.transform || 'none'
+---
+
+<ClientRouter />
+
+<style
+  define:vars={{
+    duration: `${duration}ms`,
+    oldOpacity: oldOpacity,
+    oldTransform: oldTransform,
+    newOpacity: newOpacity,
+    newTransform: newTransform,
+  }}
+>
+  /* Base transitions for all pages */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--duration);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* For the mode selected */
+  @keyframes old-animation {
+    from {
+      opacity: 1;
+      transform: translateX(0) translateY(0) scale(1);
+    }
+    to {
+      opacity: var(--oldOpacity);
+      transform: var(--oldTransform);
+    }
+  }
+
+  @keyframes new-animation {
+    from {
+      opacity: var(--newOpacity);
+      transform: var(--newTransform);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) translateY(0) scale(1);
+    }
+  }
+
+  ::view-transition-old(root) {
+    animation-name: old-animation;
+  }
+
+  ::view-transition-new(root) {
+    animation-name: new-animation;
+  }
+
+  /* Add support for dark mode transitions */
+  .dark::view-transition-old(root) {
+    animation-name: old-animation;
+  }
+
+  .dark::view-transition-new(root) {
+    animation-name: new-animation;
+  }
+
+  /* Ensure elements with transition names are properly handled */
+  html:has(link[rel='prefetch']) {
+    /* Force this content to stay visible during the page transition */
+    transition: none !important;
+  }
+
+  /* Add specific transitions for different elements */
+  @keyframes logo-transition {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  ::view-transition-group(logo) {
+    animation: none;
+  }
+
+  ::view-transition-old(logo),
+  ::view-transition-new(logo) {
+    animation: 0.5s logo-transition;
+  }
+
+  /* Navigation element transitions */
+  ::view-transition-group(site-name) {
+    animation: none;
+  }
+
+  ::view-transition-old(site-name),
+  ::view-transition-new(site-name) {
+    animation: 0.3s cubic-bezier(0.4, 0, 0.2, 1) both fade-in;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Add more specific transitions as needed */
+</style>
+
+<!-- Script to handle custom transitions logic -->
+<script>
+  document.addEventListener('astro:page-load', () => {
+    // Add here any JS that needs to run on page transitions
+    console.log('Page transition completed')
+  })
+
+  document.addEventListener('astro:before-swap', (event) => {
+    // Access the document that is about to be added to the page
+    const newDocument = event.newDocument
+
+    // You can manipulate both documents before the swap
+    // This is useful for maintaining scroll position, focus, etc.
+  })
+
+  // Handle back/forward navigation
+  window.addEventListener('popstate', () => {
+    // Add specific logic for back/forward navigation if needed
+  })
+</script>

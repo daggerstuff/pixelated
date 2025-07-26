@@ -1,0 +1,65 @@
+# Bias Detection Engine Python Service Requirements
+# Core fairness and bias detection libraries
+aif360
+fairlearn
+witwidget
+evaluate
+
+# Flask web framework and extensions
+Flask
+Flask-CORS
+Werkzeug
+
+# Authentication and security
+PyJWT
+cryptography
+
+# NLP processing libraries for linguistic bias detection
+spacy
+nltk
+textblob
+transformers
+torch
+datasets
+
+# Data processing and ML
+pandas
+numpy
+scikit-learn
+scipy
+
+# Visualization and monitoring
+matplotlib
+seaborn
+plotly
+
+# Model explanation and interpretability
+shap
+lime
+
+# Data validation and quality
+great-expectations
+pandera
+
+# Additional utilities
+tqdm
+jsonlines
+pyyaml
+requests
+
+# Development and testing
+pytest
+pytest-mock
+pytest-flask
+black
+flake8
+
+# Production server
+gunicorn
+gevent
+
+# Demographic analysis (optional)
+face-recognition
+
+# Environment and configuration
+python-dotenv

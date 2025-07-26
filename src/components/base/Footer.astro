@@ -1,0 +1,55 @@
+---
+const currentYear = new Date().getFullYear()
+---
+
+<footer class="site-footer">
+  <div class="container mx-auto px-4 text-center">
+    <p class="theme-text-secondary">
+      &copy; {currentYear} Pixelated Empathy. All rights reserved.
+    </p>
+    <div class="footer-links">
+      <a
+        href="/privacy"
+        class="footer-link theme-text-muted hover:theme-text-accent"
+        >Privacy Policy</a
+      >
+      <a
+        href="/terms"
+        class="footer-link theme-text-muted hover:theme-text-accent"
+        >Terms of Service</a
+      >
+      <a
+        href="/contact"
+        class="footer-link theme-text-muted hover:theme-text-accent">Contact</a
+      >
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    width: 100%;
+    padding: 3rem 0 2rem 0;
+    background-color: transparent;
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-link {
+    color: var(--c-text-lighter);
+    text-decoration: none;
+  }
+
+  .footer-link:hover {
+    text-decoration: underline;
+  }
+</style>

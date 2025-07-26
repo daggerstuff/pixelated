@@ -1,0 +1,78 @@
+---
+import type { ContentCollectionKey } from 'astro:content'
+
+interface Props {
+  collectionType: ContentCollectionKey
+  slug: string
+  pageToc?: boolean
+}
+
+const {
+  collectionType,
+  slug,
+  pageToc = false,
+} = Astro.props
+
+// Handle content rendering at the global scope to avoid TypeScript errors
+let contentResult
+let tocComponent
+
+try {
+  // Dynamically import the content and Toc component if needed
+  if (collectionType === 'pages') {
+    const component = await import('@/content/pages/' + slug + '.md')
+    contentResult = component.Content
+  } else if (collectionType === 'docs') {
+    const component = await import('@/content/docs/' + slug + '.md')
+    contentResult = component.Content
+  }
+  // Add additional collection types as needed
+
+  // Import Toc component if pageToc is enabled
+  if (pageToc) {
+    const Toc = (await import('@/components/toc/Toc.astro')).default
+    tocComponent = Toc
+  }
+} catch (error) {
+  console.error(`Failed to load ${slug} from ${collectionType}`, error)
+}
+---
+
+<div class="page-content">
+  {pageToc && tocComponent && <tocComponent />}
+
+  <div class:list={['content-wrapper', { 'content-with-toc': pageToc }]}>
+    {contentResult && <contentResult />}
+    {
+      !contentResult && (
+        <div class="error-message">
+          <p>Sorry, the content could not be loaded.</p>
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .page-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .content-with-toc {
+    margin-left: 2rem;
+  }
+
+  .error-message {
+    color: #e53e3e;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .page-content {
+      flex-direction: row;
+    }
+  }
+</style>

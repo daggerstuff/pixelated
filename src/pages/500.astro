@@ -1,0 +1,26 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const title = '500 - Internal Server Error'
+const description =
+  'Sorry, something went wrong on our end. Please try again later.'
+
+
+---
+
+<BaseLayout {title} {description}>
+  <div class="container mx-auto px-4 py-16 text-center">
+    <h1 class="text-4xl font-bold mb-4">500</h1>
+    <p class="text-xl mb-8">Internal Server Error</p>
+    <p>
+      We're experiencing some technical difficulties. Please try again later or
+      contact support if the issue persists.
+    </p>
+    <a
+      href="/"
+      class="inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4 hover:bg-blue-600"
+    >
+      Return Home
+    </a>
+  </div>
+</BaseLayout>

@@ -1,0 +1,225 @@
+---
+export const prerender = false
+import { requirePermission } from '../../lib/access-control'
+import { adminGetFlaggedMessages } from '../../lib/db/messages'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+
+// Check if user has admin permission
+const checkPermission = requirePermission('read:admin')
+const permissionResponse = await checkPermission({
+  cookies: Astro.cookies,
+  redirect: Astro.redirect,
+})
+
+// If permission check returned a response, return i
+if (permissionResponse) {
+  return permissionResponse
+}
+
+// Get flagged messages
+const flaggedMessages = await adminGetFlaggedMessages()
+
+// Helper function to get flag reason from metadata
+function getFlagReason(metadata: unknown): string {
+  if (metadata && typeof metadata === 'object') {
+    // Safe access with optional chaining
+    const meta = metadata as Record<string, unknown>
+    return (
+      (meta.reason as string) ||
+      (meta.flagged_reason as string) ||
+      'Not specified'
+    )
+  }
+  return 'Not specified'
+}
+---
+
+<BaseLayout title="Flagged Messages">
+  <main class="admin-container">
+    <div class="admin-header">
+      <h1>Flagged Messages</h1>
+      <p>Review and moderate messages that have been flagged for review.</p>
+    </div>
+
+    <div class="admin-actions">
+      <a href="/admin" class="btn btn-secondary">Back to Admin Dashboard</a>
+    </div>
+
+    <div class="flagged-messages">
+      {
+        flaggedMessages.length === 0 ? (
+          <div class="empty-state">
+            <p>No flagged messages to review at this time.</p>
+          </div>
+        ) : (
+          <table class="messages-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Conversation</th>
+                <th>Content</th>
+                <th>Reason</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {flaggedMessages.map((message) => (
+                <tr>
+                  <td>{new Date(message.created_at).toLocaleString()}</td>
+                  <td>
+                    <a href={`/admin/conversations/${message.conversation_id}`}>
+                      {message.conversation_id}
+                    </a>
+                  </td>
+                  <td class="message-content">{message.content}</td>
+                  <td>{getFlagReason(message.metadata)}</td>
+                  <td class="actions">
+                    <form action="/api/admin/messages/approve" method="post">
+                      <input
+                        type="hidden"
+                        name="messageId"
+                        value={message.id}
+                      />
+                      <button type="submit" class="btn btn-small btn-success">
+                        Approve
+                      </button>
+                    </form>
+                    <form action="/api/admin/messages/delete" method="post">
+                      <input
+                        type="hidden"
+                        name="messageId"
+                        value={message.id}
+                      />
+                      <button type="submit" class="btn btn-small btn-danger">
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )
+      }
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .admin-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-actions {
+    margin-bottom: 2rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-small {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+
+  .btn-success {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .btn-success:hover {
+    background-color: #388e3c;
+  }
+
+  .btn-danger {
+    background-color: #f44336;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background-color: #d32f2f;
+  }
+
+  .empty-state {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+  }
+
+  .messages-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .messages-table th,
+  .messages-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+
+  .messages-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+  }
+
+  .messages-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .message-content {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .messages-table {
+      display: block;
+      overflow-x: auto;
+    }
+  }
+</style>

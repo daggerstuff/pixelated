@@ -1,0 +1,152 @@
+---
+import LogoButton from '@/components/widgets/LogoButton.astro'
+import DarkThemeToggle from '@/components/ui/DarkThemeToggle.astro'
+import Hamburger from '@/components/Hamburger.astro'
+import { UI } from '@/config'
+import type { SocialLink } from '@/types'
+
+// Explicitly define the navigation items to ensure they're displayed correctly
+const navItems = [
+  { name: 'Training Demos', link: '/demo-hub' },
+  { name: 'Features', link: '/features' },
+  { name: 'Blog', link: '/blog' },
+  { name: 'Dashboard', link: '/dashboard' },
+]
+
+// Use proper type assertion for social links
+const socialLinks = (UI.socialLinks || []) as SocialLink[]
+---
+
+<nav
+  role="navigation"
+  aria-label="Main navigation"
+  class="flex items-center justify-between px-4 lg:px-6 py-4 lg:py-6 w-full absolute top-0 left-0 right-0 z-10 backdrop-blur-md bg-black/20 border-b border-green-500/20 rounded-b-2xl lg:rounded-b-3xl"
+>
+  <div class="flex items-center ml-5 lg:ml-8">
+    <LogoButton />
+  </div>
+
+  <div class="flex items-center gap-3 lg:gap-6">
+    <!-- Desktop Navigation -->
+    <ul class="hidden md:flex items-center gap-6">
+      {
+        navItems.map((item) => (
+          <li>
+            <a
+              href={item.link}
+              class="text-sm font-normal tracking-wide text-green-200 hover:text-green-100 transition-all duration-200 hover:scale-105 hover:shadow-[0_0_8px_2px_rgba(34,197,94,0.25)] focus-visible:scale-105 focus-visible:shadow-[0_0_8px_2px_rgba(34,197,94,0.25)]"
+            >
+              {item.name}
+            </a>
+          </li>
+        ))
+      }
+
+      {
+        socialLinks.map((item) => (
+          <li>
+            <a
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-green-300 hover:text-green-100 transition-colors"
+              aria-label={item.title}
+            >
+              <i class={item.icon as any} />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <DarkThemeToggle />
+
+    <!-- Mobile Menu Toggle -->
+    <div class="md:hidden">
+      <Hamburger />
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Menu -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden absolute top-full left-0 right-0 bg-black/90 border border-green-500/20 backdrop-blur-sm"
+  >
+    <ul class="flex flex-col items-center py-6 space-y-4">
+      {
+        navItems.map((item) => (
+          <li>
+            <a
+              href={item.link}
+              class="text-lg font-medium tracking-wide text-green-200 hover:text-green-100 transition-colors"
+            >
+              {item.name}
+            </a>
+          </li>
+        ))
+      }
+
+      <li class="flex items-center gap-4 pt-4">
+        {
+          socialLinks.map((item) => (
+            <a
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-green-300 hover:text-green-100 transition-colors"
+              aria-label={item.title}
+            >
+              <i class={item.icon as any} />
+            </a>
+          ))
+        }
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu toggle functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const hamburger = document.querySelector('.hamburger')
+    const mobileMenu = document.getElementById('mobile-menu')
+
+    if (!hamburger || !mobileMenu) {
+      console.warn('Mobile menu elements not found')
+      return
+    }
+
+    hamburger.addEventListener('click', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      // Toggle the hidden class
+      mobileMenu.classList.toggle('hidden')
+
+      // Update aria-expanded
+      const isExpanded = !mobileMenu.classList.contains('hidden')
+      hamburger.setAttribute('aria-expanded', isExpanded.toString())
+
+      console.log('Mobile menu toggled:', isExpanded ? 'opened' : 'closed')
+    })
+
+    // Close mobile menu when clicking on a link
+    const mobileLinks = mobileMenu.querySelectorAll('a')
+    mobileLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden')
+        hamburger.setAttribute('aria-expanded', 'false')
+        console.log('Mobile menu closed via link click')
+      })
+    })
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (event) => {
+      const target = event.target as Element
+      if (!hamburger.contains(target) && !mobileMenu.contains(target)) {
+        mobileMenu.classList.add('hidden')
+        hamburger.setAttribute('aria-expanded', 'false')
+      }
+    })
+  })
+</script>

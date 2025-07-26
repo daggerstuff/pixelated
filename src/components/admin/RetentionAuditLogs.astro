@@ -1,0 +1,403 @@
+---
+// RetentionAuditLogs.astro
+// Component for displaying audit logs related to data retention, archiving, and destruction
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  title?: string
+}
+
+const { title = 'Data Retention Audit Logs' } = Astro.props
+
+// Sample audit log data for demonstration
+const auditLogs = [
+  {
+    id: 'log-001',
+    timestamp: '2025-07-15T14:32:45Z',
+    action: 'ARCHIVE',
+    category: 'patient-records',
+    description: 'Automated archiving of patient records older than 5 years',
+    affectedRecords: 1287,
+    user: 'system',
+    status: 'success',
+  },
+  {
+    id: 'log-002',
+    timestamp: '2025-07-10T09:15:22Z',
+    action: 'DESTRUCTION',
+    category: 'emotion-analysis',
+    description:
+      'Scheduled secure destruction of emotion analysis data older than 2 years',
+    affectedRecords: 543,
+    user: 'system',
+    status: 'success',
+  },
+  {
+    id: 'log-003',
+    timestamp: '2025-07-05T16:48:12Z',
+    action: 'POLICY_UPDATE',
+    category: 'chat-logs',
+    description:
+      'Retention policy for chat logs updated from 3 years to 6 years',
+    affectedRecords: 0,
+    user: 'admin@example.com',
+    status: 'success',
+  },
+  {
+    id: 'log-004',
+    timestamp: '2025-06-30T11:22:35Z',
+    action: 'ARCHIVE',
+    category: 'mental-health-data',
+    description: 'Manual archiving of mental health data for inactive patients',
+    affectedRecords: 89,
+    user: 'provider@example.com',
+    status: 'success',
+  },
+  {
+    id: 'log-005',
+    timestamp: '2025-06-25T13:05:41Z',
+    action: 'DESTRUCTION',
+    category: 'backup-data',
+    description:
+      'Automated destruction of encrypted backup files past retention period',
+    affectedRecords: 25,
+    user: 'system',
+    status: 'success',
+  },
+  {
+    id: 'log-006',
+    timestamp: '2025-06-20T08:17:03Z',
+    action: 'DESTRUCTION_FAILED',
+    category: 'patient-records',
+    description:
+      'Failed attempt to destroy archived patient records due to file lock',
+    affectedRecords: 0,
+    user: 'system',
+    status: 'error',
+  },
+  {
+    id: 'log-007',
+    timestamp: '2025-06-15T10:42:19Z',
+    action: 'ARCHIVE',
+    category: 'patient-records',
+    description: 'Monthly automated archiving of patient records',
+    affectedRecords: 325,
+    user: 'system',
+    status: 'success',
+  },
+]
+
+// Format date for display
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  }).format(date)
+}
+
+// Get action icon
+const getActionIcon = (action: string) => {
+  switch (action) {
+    case 'ARCHIVE':
+      return 'archive'
+    case 'DESTRUCTION':
+    case 'DESTRUCTION_FAILED':
+      return 'trash'
+    case 'POLICY_UPDATE':
+      return 'pencil'
+    default:
+      return 'clipboard'
+  }
+}
+
+// Get status badge styling
+const getStatusBadge = (status: string) => {
+  switch (status) {
+    case 'success':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+    case 'error':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+    case 'warning':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+  }
+}
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+  <div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      {title}
+    </h2>
+
+    <div class="mb-8">
+      <p class="text-gray-600 dark:text-gray-300 mb-4">
+        Comprehensive audit logs for all archiving, retention policy changes,
+        and data destruction operations. These logs provide a complete history
+        for compliance and security auditing purposes.
+      </p>
+
+      <!-- Filters Section -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div>
+          <label
+            for="action-filter"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Action Type
+          </label>
+          <select
+            id="action-filter"
+            class="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="all">All Actions</option>
+            <option value="archive">Archive</option>
+            <option value="destruction">Destruction</option>
+            <option value="policy">Policy Changes</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="category-filter"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Data Category
+          </label>
+          <select
+            id="category-filter"
+            class="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="all">All Categories</option>
+            <option value="patient-records">Patient Records</option>
+            <option value="mental-health-data">Mental Health Data</option>
+            <option value="chat-logs">Chat Logs</option>
+            <option value="emotion-analysis">Emotion Analysis</option>
+            <option value="backup-data">Backup Data</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="date-from"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Date From
+          </label>
+          <input
+            type="date"
+            id="date-from"
+            class="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          />
+        </div>
+
+        <div>
+          <label
+            for="date-to"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Date To
+          </label>
+          <input
+            type="date"
+            id="date-to"
+            class="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          />
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <button
+          id="apply-filters"
+          type="button"
+          class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600"
+        >
+          Apply Filters
+        </button>
+
+        <div class="flex items-center space-x-2">
+          <button
+            type="button"
+            class="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
+          >
+            <Icon name="download" class="w-4 h-4 mr-1" />
+            Export Logs
+          </button>
+
+          <button
+            type="button"
+            class="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
+          >
+            <Icon name="refresh" class="w-4 h-4 mr-1" />
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit Logs Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead
+          class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+        >
+          <tr>
+            <th scope="col" class="py-3 px-4">Date & Time</th>
+            <th scope="col" class="py-3 px-4">Action</th>
+            <th scope="col" class="py-3 px-4">Category</th>
+            <th scope="col" class="py-3 px-4">Description</th>
+            <th scope="col" class="py-3 px-4">Records</th>
+            <th scope="col" class="py-3 px-4">User</th>
+            <th scope="col" class="py-3 px-4">Status</th>
+            <th scope="col" class="py-3 px-4">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            auditLogs.map((log) => (
+              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td class="py-3 px-4 whitespace-nowrap">
+                  {formatDate(log.timestamp)}
+                </td>
+                <td class="py-3 px-4">
+                  <div class="flex items-center">
+                    <Icon
+                      name={getActionIcon(log.action)}
+                      class="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400"
+                    />
+                    <span>{log.action.replace(/_/g, ' ')}</span>
+                  </div>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                    {log.category}
+                  </span>
+                </td>
+                <td class="py-3 px-4">{log.description}</td>
+                <td class="py-3 px-4 text-center">
+                  {log.affectedRecords.toLocaleString()}
+                </td>
+                <td class="py-3 px-4">
+                  <span
+                    class={
+                      log.user === 'system'
+                        ? 'text-gray-500 dark:text-gray-400 italic'
+                        : ''
+                    }
+                  >
+                    {log.user}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <span
+                    class={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(log.status)}`}
+                  >
+                    {log.status.charAt(0).toUpperCase() + log.status.slice(1)}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <button
+                    type="button"
+                    class="text-blue-600 dark:text-blue-500 hover:underline"
+                    data-log-id={log.id}
+                    aria-label="View details"
+                  >
+                    <Icon name="eye" class="w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between mt-4">
+      <div class="text-sm text-gray-700 dark:text-gray-300">
+        Showing <span class="font-medium">1-7</span> of <span
+          class="font-medium">7</span
+        > logs
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <button
+          type="button"
+          class="px-3 py-1 border border-gray-300 bg-white text-gray-500 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50"
+          disabled
+        >
+          Previous
+        </button>
+        <span
+          class="px-3 py-1 border border-blue-500 text-blue-600 bg-blue-50 rounded-md dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300"
+          >1</span
+        >
+        <button
+          type="button"
+          class="px-3 py-1 border border-gray-300 bg-white text-gray-500 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50"
+          disabled
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Filter functionality
+    const applyFiltersButton = document.getElementById('apply-filters')
+    if (applyFiltersButton) {
+      applyFiltersButton.addEventListener('click', () => {
+        const actionFilter = (
+          document.getElementById('action-filter') as HTMLSelectElement
+        ).value
+        const categoryFilter = (
+          document.getElementById('category-filter') as HTMLSelectElement
+        ).value
+        const dateFrom = (
+          document.getElementById('date-from') as HTMLInputElement
+        ).value
+        const dateTo = (document.getElementById('date-to') as HTMLInputElement)
+          .value
+
+        // In a real implementation, we would use these values to filter the logs
+        console.log('Applying filters:', {
+          actionFilter,
+          categoryFilter,
+          dateFrom,
+          dateTo,
+        })
+
+        // For demonstration, show an alert
+        alert(
+          `Filters applied! In a production environment, this would filter the logs based on your selections.`,
+        )
+      })
+    }
+
+    // Detail view handlers
+    const detailButtons = document.querySelectorAll('button[data-log-id]')
+    detailButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const logId = button.getAttribute('data-log-id')
+
+        // In a real implementation, we would show a modal with details
+        console.log('Viewing details for log:', logId)
+
+        // For demonstration, show an alert
+        alert(
+          `Viewing details for log ${logId}. In a production environment, this would open a modal with complete log details.`,
+        )
+      })
+    })
+  })
+</script>

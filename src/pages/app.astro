@@ -1,0 +1,74 @@
+---
+import { initializeApplication, shutdownApplication } from '../lib/startup'
+
+// Simple function to safely log during build/runtime
+function safeLog(level: 'info' | 'error', message: string, data?: any) {
+  const timestamp = new Date().toISOString()
+  const prefix = '[phi-audit]'
+
+  if (level === 'error') {
+    console.error(`${timestamp} ERROR ${prefix} ${message}`, data || '')
+  } else {
+    console.info(`${timestamp} INFO ${prefix} ${message}`, data || '')
+  }
+}
+
+// Execute startup logic in Astro's server context
+if (import.meta.env.SSR) {
+  try {
+    await initializeApplication()
+    safeLog('info', 'Application started successfully')
+
+    // Register shutdown handlers for the Node.js process
+    // Note: This will only work in SSR mode
+    process.on('SIGTERM', handleShutdown)
+    process.on('SIGINT', handleShutdown)
+  } catch (error) {
+    safeLog(
+      'error',
+      'Failed to start application',
+      error instanceof Error
+        ? { message: error.message, stack: error.stack }
+        : undefined,
+    )
+    // Cannot exit the process in Astro middleware, log the error instead
+    console.error('Application failed to start properly')
+  }
+}
+
+/**
+ * Handle graceful shutdown
+ */
+async function handleShutdown() {
+  safeLog('info', 'Shutdown signal received, gracefully shutting down...')
+
+  try {
+    await shutdownApplication()
+    safeLog('info', 'Application shutdown complete')
+    process.exit(0)
+  } catch (error) {
+    safeLog(
+      'error',
+      'Error during shutdown',
+      error instanceof Error
+        ? { message: error.message, stack: error.stack }
+        : undefined,
+    )
+    process.exit(1)
+  }
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Application</title>
+  </head>
+  <body>
+    <main>
+      <h1>Application Status</h1>
+      <p>The server-side application has been initialized.</p>
+    </main>
+  </body>
+</html>

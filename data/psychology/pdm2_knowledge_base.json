@@ -1,0 +1,543 @@
+{
+  "version": "PDM-2 Sample",
+  "created_at": "2024-01-01",
+  "attachment_patterns": [
+    {
+      "style": "secure",
+      "name": "Secure Attachment",
+      "description": "Comfortable with intimacy and autonomy, positive view of self and others",
+      "characteristics": [
+        "Comfortable with closeness and independence",
+        "Positive view of self and others",
+        "Effective emotion regulation",
+        "Clear communication of needs",
+        "Trusting and supportive relationships"
+      ],
+      "behavioral_indicators": [
+        "Seeks comfort when distressed",
+        "Explores environment confidently",
+        "Maintains stable relationships",
+        "Expresses emotions appropriately",
+        "Shows empathy and understanding"
+      ],
+      "therapeutic_considerations": [
+        "Generally good therapeutic alliance",
+        "Able to explore difficult emotions",
+        "Responds well to insight-oriented approaches",
+        "Can tolerate therapeutic challenges"
+      ],
+      "developmental_origins": [
+        "Consistent, responsive caregiving",
+        "Emotional attunement from caregivers",
+        "Safe, predictable environment",
+        "Balanced autonomy and support"
+      ],
+      "relationship_patterns": [
+        "Seeks mutual support and intimacy",
+        "Comfortable with interdependence",
+        "Effective conflict resolution",
+        "Maintains individual identity in relationships"
+      ],
+      "emotional_regulation": [
+        "Adaptive coping strategies",
+        "Ability to self-soothe",
+        "Seeks appropriate support",
+        "Balanced emotional expression"
+      ]
+    },
+    {
+      "style": "anxious_preoccupied",
+      "name": "Anxious-Preoccupied Attachment",
+      "description": "High anxiety about relationships, seeks excessive closeness, fear of abandonment",
+      "characteristics": [
+        "High relationship anxiety",
+        "Fear of abandonment",
+        "Seeks excessive reassurance",
+        "Preoccupied with relationships",
+        "Negative self-view, positive view of others"
+      ],
+      "behavioral_indicators": [
+        "Clingy or demanding behavior",
+        "Hypervigilant to relationship threats",
+        "Difficulty with partner's independence",
+        "Emotional dysregulation in relationships",
+        "Seeks constant validation"
+      ],
+      "therapeutic_considerations": [
+        "May form intense therapeutic attachment",
+        "Fear of therapeutic abandonment",
+        "Benefits from consistent, reliable therapy",
+        "May test therapeutic boundaries"
+      ],
+      "developmental_origins": [
+        "Inconsistent caregiving",
+        "Unpredictable emotional availability",
+        "Anxious or overwhelmed caregivers",
+        "Early separation or loss experiences"
+      ],
+      "relationship_patterns": [
+        "Pursues closeness intensely",
+        "Difficulty tolerating partner's autonomy",
+        "Jealousy and possessiveness",
+        "Emotional volatility in relationships"
+      ],
+      "emotional_regulation": [
+        "Difficulty self-soothing",
+        "Seeks external regulation",
+        "Intense emotional reactions",
+        "Rumination and worry"
+      ]
+    },
+    {
+      "style": "dismissive_avoidant",
+      "name": "Dismissive-Avoidant Attachment",
+      "description": "Discomfort with closeness, values independence, minimizes emotional needs",
+      "characteristics": [
+        "Discomfort with intimacy",
+        "Values self-reliance",
+        "Minimizes emotional needs",
+        "Positive self-view, negative view of others",
+        "Difficulty accessing emotions"
+      ],
+      "behavioral_indicators": [
+        "Avoids emotional conversations",
+        "Maintains emotional distance",
+        "Difficulty expressing vulnerability",
+        "Self-sufficient presentation",
+        "Minimizes importance of relationships"
+      ],
+      "therapeutic_considerations": [
+        "May be reluctant to engage emotionally",
+        "Benefits from gradual trust building",
+        "Cognitive approaches may be initially preferred",
+        "Needs respect for autonomy"
+      ],
+      "developmental_origins": [
+        "Emotionally unavailable caregivers",
+        "Rejection of emotional needs",
+        "Emphasis on self-reliance",
+        "Lack of emotional attunement"
+      ],
+      "relationship_patterns": [
+        "Maintains emotional distance",
+        "Difficulty with partner's emotional needs",
+        "Values independence over intimacy",
+        "May withdraw during conflict"
+      ],
+      "emotional_regulation": [
+        "Suppression of emotions",
+        "Self-reliant coping",
+        "Difficulty seeking support",
+        "Intellectualization of feelings"
+      ]
+    },
+    {
+      "style": "disorganized_fearful_avoidant",
+      "name": "Disorganized/Fearful-Avoidant Attachment",
+      "description": "Simultaneous desire for and fear of close relationships, chaotic attachment patterns",
+      "characteristics": [
+        "Simultaneous approach and avoidance",
+        "Fear of intimacy and abandonment",
+        "Chaotic relationship patterns",
+        "Negative view of self and others",
+        "Emotional dysregulation"
+      ],
+      "behavioral_indicators": [
+        "Inconsistent relationship behavior",
+        "Push-pull dynamics",
+        "Emotional volatility",
+        "Self-sabotaging behaviors",
+        "Difficulty trusting others"
+      ],
+      "therapeutic_considerations": [
+        "Complex therapeutic relationship",
+        "May recreate chaotic patterns in therapy",
+        "Needs trauma-informed approaches",
+        "Requires patience and consistency"
+      ],
+      "developmental_origins": [
+        "Traumatic or abusive caregiving",
+        "Caregiver as source of fear and comfort",
+        "Unresolved caregiver trauma",
+        "Chaotic family environment"
+      ],
+      "relationship_patterns": [
+        "Unstable relationship patterns",
+        "Fear of both intimacy and abandonment",
+        "Intense but chaotic connections",
+        "Difficulty maintaining boundaries"
+      ],
+      "emotional_regulation": [
+        "Severe dysregulation",
+        "Dissociation under stress",
+        "Self-harm or destructive behaviors",
+        "Difficulty identifying emotions"
+      ]
+    }
+  ],
+  "defense_mechanisms": [
+    {
+      "name": "Sublimation",
+      "level": "mature",
+      "description": "Channeling unacceptable impulses into socially acceptable activities",
+      "function": "Transform primitive impulses into constructive outlets",
+      "examples": [
+        "Channeling aggression into competitive sports",
+        "Transforming sexual energy into creative work",
+        "Using analytical skills to understand personal conflicts"
+      ],
+      "adaptive_aspects": [
+        "Promotes personal growth",
+        "Socially beneficial outcomes",
+        "Maintains psychological balance"
+      ],
+      "maladaptive_aspects": [],
+      "therapeutic_approach": [
+        "Encourage healthy outlets",
+        "Explore underlying impulses",
+        "Support creative expression"
+      ],
+      "developmental_context": null
+    },
+    {
+      "name": "Humor",
+      "level": "mature",
+      "description": "Using comedy to express thoughts and feelings without discomfort",
+      "function": "Reduce anxiety and maintain social connections",
+      "examples": [
+        "Making light of difficult situations",
+        "Self-deprecating humor about personal flaws",
+        "Using wit to address uncomfortable topics"
+      ],
+      "adaptive_aspects": [
+        "Maintains social bonds",
+        "Reduces tension",
+        "Provides perspective on problems"
+      ],
+      "maladaptive_aspects": [],
+      "therapeutic_approach": [
+        "Appreciate adaptive function",
+        "Explore what lies beneath humor",
+        "Balance humor with serious processing"
+      ],
+      "developmental_context": null
+    },
+    {
+      "name": "Repression",
+      "level": "neurotic",
+      "description": "Unconsciously blocking unacceptable thoughts or memories",
+      "function": "Protect ego from anxiety-provoking material",
+      "examples": [
+        "Forgetting traumatic childhood events",
+        "Unable to recall angry feelings toward loved ones",
+        "Blocking awareness of sexual desires"
+      ],
+      "adaptive_aspects": [
+        "Protects from overwhelming anxiety",
+        "Allows functioning in daily life"
+      ],
+      "maladaptive_aspects": [
+        "Prevents processing of important experiences",
+        "Can lead to symptoms and dysfunction",
+        "Limits self-awareness"
+      ],
+      "therapeutic_approach": [
+        "Gentle exploration of blocked material",
+        "Create safety for emergence of repressed content",
+        "Work through underlying conflicts"
+      ],
+      "developmental_context": null
+    },
+    {
+      "name": "Rationalization",
+      "level": "neurotic",
+      "description": "Creating logical explanations for unacceptable behavior or feelings",
+      "function": "Maintain self-esteem and reduce cognitive dissonance",
+      "examples": [
+        "Explaining away failures with external factors",
+        "Justifying harmful behavior with good intentions",
+        "Creating elaborate reasons for avoiding challenges"
+      ],
+      "adaptive_aspects": [
+        "Maintains psychological stability",
+        "Allows continued functioning"
+      ],
+      "maladaptive_aspects": [
+        "Prevents learning from mistakes",
+        "Blocks authentic self-reflection",
+        "Can damage relationships"
+      ],
+      "therapeutic_approach": [
+        "Gently challenge rationalizations",
+        "Explore underlying fears and shame",
+        "Encourage honest self-examination"
+      ],
+      "developmental_context": null
+    },
+    {
+      "name": "Projection",
+      "level": "immature",
+      "description": "Attributing one's own unacceptable thoughts or feelings to others",
+      "function": "Avoid awareness of uncomfortable aspects of self",
+      "examples": [
+        "Accusing others of being angry when you are angry",
+        "Believing others are judging you when you judge yourself",
+        "Seeing others as untrustworthy when feeling untrustworthy"
+      ],
+      "adaptive_aspects": [
+        "Protects from overwhelming self-criticism"
+      ],
+      "maladaptive_aspects": [
+        "Damages relationships",
+        "Prevents self-awareness",
+        "Creates interpersonal conflict"
+      ],
+      "therapeutic_approach": [
+        "Help recognize projection patterns",
+        "Explore disowned aspects of self",
+        "Develop tolerance for difficult feelings"
+      ],
+      "developmental_context": null
+    },
+    {
+      "name": "Splitting",
+      "level": "immature",
+      "description": "Viewing people or situations as all good or all bad",
+      "function": "Manage ambivalence and complexity",
+      "examples": [
+        "Idealizing then devaluing relationships",
+        "Seeing therapist as perfect or terrible",
+        "Black-and-white thinking about self and others"
+      ],
+      "adaptive_aspects": [
+        "Simplifies complex emotional situations"
+      ],
+      "maladaptive_aspects": [
+        "Creates unstable relationships",
+        "Prevents integrated view of self and others",
+        "Leads to emotional volatility"
+      ],
+      "therapeutic_approach": [
+        "Help integrate good and bad aspects",
+        "Explore fear of ambivalence",
+        "Develop tolerance for complexity"
+      ],
+      "developmental_context": null
+    },
+    {
+      "name": "Denial",
+      "level": "pathological",
+      "description": "Refusing to acknowledge obvious reality or experience",
+      "function": "Avoid overwhelming anxiety or pain",
+      "examples": [
+        "Refusing to acknowledge serious illness",
+        "Denying substance abuse problems",
+        "Ignoring obvious relationship problems"
+      ],
+      "adaptive_aspects": [
+        "May provide temporary protection from trauma"
+      ],
+      "maladaptive_aspects": [
+        "Prevents necessary action",
+        "Can be life-threatening",
+        "Blocks reality testing"
+      ],
+      "therapeutic_approach": [
+        "Very gentle reality testing",
+        "Build capacity to tolerate difficult truths",
+        "Address underlying trauma or fear"
+      ],
+      "developmental_context": null
+    },
+    {
+      "name": "Dissociation",
+      "level": "pathological",
+      "description": "Disconnection from thoughts, feelings, memories, or sense of identity",
+      "function": "Escape from overwhelming psychological pain",
+      "examples": [
+        "Feeling detached from one's body",
+        "Memory gaps during stressful events",
+        "Feeling like observing oneself from outside"
+      ],
+      "adaptive_aspects": [
+        "Protects from unbearable trauma"
+      ],
+      "maladaptive_aspects": [
+        "Interferes with daily functioning",
+        "Prevents integration of experience",
+        "Can be disorienting and frightening"
+      ],
+      "therapeutic_approach": [
+        "Trauma-informed treatment",
+        "Grounding and stabilization techniques",
+        "Gradual integration of dissociated material"
+      ],
+      "developmental_context": null
+    }
+  ],
+  "psychodynamic_patterns": [
+    {
+      "name": "Anxious-Attachment Pattern",
+      "domain": "attachment_relationships",
+      "description": "Chronic fear of abandonment with intense relationship preoccupation",
+      "core_features": [
+        "Pervasive fear of abandonment",
+        "Intense need for reassurance",
+        "Difficulty tolerating aloneness",
+        "Hypervigilance to relationship threats"
+      ],
+      "unconscious_conflicts": [
+        "Desire for closeness vs. fear of engulfment",
+        "Need for independence vs. fear of abandonment",
+        "Love vs. anger toward attachment figures"
+      ],
+      "object_relations": [
+        "Internal objects are unpredictable",
+        "Self as needy and vulnerable",
+        "Others as potentially abandoning"
+      ],
+      "transference_patterns": [
+        "Intense attachment to therapist",
+        "Fear of therapeutic abandonment",
+        "Testing of therapeutic commitment"
+      ],
+      "countertransference_patterns": [
+        "Feeling overwhelmed by client's needs",
+        "Urge to rescue or reject",
+        "Anxiety about setting boundaries"
+      ],
+      "therapeutic_goals": [
+        "Develop secure internal working models",
+        "Increase tolerance for aloneness",
+        "Build capacity for self-soothing"
+      ],
+      "treatment_considerations": [
+        "Consistent, reliable therapeutic frame",
+        "Gradual exploration of abandonment fears",
+        "Work with transference-countertransference"
+      ]
+    },
+    {
+      "name": "Emotional Dysregulation Pattern",
+      "domain": "affect_regulation",
+      "description": "Difficulty managing and modulating emotional experiences",
+      "core_features": [
+        "Intense, overwhelming emotions",
+        "Rapid mood fluctuations",
+        "Difficulty identifying emotions",
+        "Impulsive emotional responses"
+      ],
+      "unconscious_conflicts": [
+        "Need for emotional expression vs. fear of losing control",
+        "Desire for emotional connection vs. fear of vulnerability",
+        "Anger vs. guilt about having needs"
+      ],
+      "object_relations": [
+        "Emotions as dangerous and overwhelming",
+        "Self as emotionally chaotic",
+        "Others as unable to contain emotions"
+      ],
+      "transference_patterns": [
+        "Emotional storms in therapy",
+        "Testing therapist's capacity to contain",
+        "Fear of overwhelming therapist"
+      ],
+      "countertransference_patterns": [
+        "Feeling emotionally flooded",
+        "Urge to calm or control client",
+        "Anxiety about emotional intensity"
+      ],
+      "therapeutic_goals": [
+        "Develop emotional awareness and vocabulary",
+        "Build capacity for affect tolerance",
+        "Learn healthy emotional expression"
+      ],
+      "treatment_considerations": [
+        "Containment and stabilization focus",
+        "Gradual affect tolerance building",
+        "Psychoeducation about emotions"
+      ]
+    },
+    {
+      "name": "Identity Diffusion Pattern",
+      "domain": "identity_self_concept",
+      "description": "Unstable sense of self with shifting identity and values",
+      "core_features": [
+        "Unclear sense of identity",
+        "Shifting values and goals",
+        "Dependence on others for self-definition",
+        "Chronic feelings of emptiness"
+      ],
+      "unconscious_conflicts": [
+        "Desire for authentic self vs. need for approval",
+        "Independence vs. merger with others",
+        "Grandiosity vs. worthlessness"
+      ],
+      "object_relations": [
+        "Self as fragmented and unclear",
+        "Others as sources of identity",
+        "Relationships as identity-defining"
+      ],
+      "transference_patterns": [
+        "Adopting therapist's values and perspectives",
+        "Seeking therapist's definition of self",
+        "Identity shifts based on therapeutic relationship"
+      ],
+      "countertransference_patterns": [
+        "Feeling responsible for client's identity",
+        "Confusion about client's authentic self",
+        "Urge to provide structure and definition"
+      ],
+      "therapeutic_goals": [
+        "Develop coherent sense of identity",
+        "Increase self-awareness and authenticity",
+        "Build capacity for self-definition"
+      ],
+      "treatment_considerations": [
+        "Long-term therapy often needed",
+        "Focus on self-exploration and discovery",
+        "Work with identity-related transference"
+      ]
+    }
+  ],
+  "theoretical_frameworks": {
+    "psychoanalytic": [
+      "Drive theory",
+      "Ego psychology",
+      "Object relations theory",
+      "Self psychology"
+    ],
+    "attachment_theory": [
+      "Bowlby's attachment theory",
+      "Ainsworth's attachment styles",
+      "Adult attachment theory",
+      "Mentalization-based treatment"
+    ],
+    "developmental": [
+      "Erikson's psychosocial stages",
+      "Mahler's separation-individuation",
+      "Winnicott's transitional phenomena",
+      "Stern's sense of self"
+    ]
+  },
+  "developmental_considerations": {
+    "early_childhood": [
+      "Attachment formation",
+      "Basic trust vs. mistrust",
+      "Separation-individuation",
+      "Language and symbolic development"
+    ],
+    "adolescence": [
+      "Identity formation",
+      "Peer relationships",
+      "Sexual development",
+      "Autonomy struggles"
+    ],
+    "adulthood": [
+      "Intimate relationships",
+      "Career development",
+      "Generativity",
+      "Midlife transitions"
+    ]
+  }
+}

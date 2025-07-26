@@ -1,0 +1,488 @@
+---
+// DataDeletionRequestForm.astro - Form for handling patient data deletion requests
+import { Icon } from 'astro-icon/components'
+
+// Component props
+interface Props {
+  patientId?: string
+  patientName?: string
+}
+
+// Destructure props with defaults
+const { patientId = '', patientName = '' } = Astro.props
+
+// List of data categories that can be selected for deletion
+const dataCategories = [
+  {
+    id: 'demographics',
+    label: 'Demographics',
+    description: 'Basic patient information',
+  },
+  {
+    id: 'sessions',
+    label: 'Session Records',
+    description: 'Records of therapy sessions',
+  },
+  {
+    id: 'assessments',
+    label: 'Assessments',
+    description: 'Psychological assessment data',
+  },
+  {
+    id: 'emotions',
+    label: 'Emotion Data',
+    description: 'Tracked emotional patterns',
+  },
+  {
+    id: 'notes',
+    label: 'Clinical Notes',
+    description: 'Therapist notes and observations',
+  },
+  { id: 'messages', label: 'Messages', description: 'Communication records' },
+  {
+    id: 'media',
+    label: 'Media Files',
+    description: 'Uploaded photos or documents',
+  },
+]
+
+// HIPAA-compliant deletion reasons
+const deletionReasons = [
+  {
+    id: 'patient-request',
+    label: 'Patient Request',
+    description: 'Patient exercised right to delete under HIPAA',
+  },
+  {
+    id: 'data-error',
+    label: 'Data Error',
+    description: 'Data was incorrectly entered or associated',
+  },
+  {
+    id: 'end-treatment',
+    label: 'End of Treatment',
+    description: 'Patient has completed treatment',
+  },
+  {
+    id: 'legal-requirement',
+    label: 'Legal Requirement',
+    description: 'Deletion required by law or court order',
+  },
+  {
+    id: 'privacy-concern',
+    label: 'Privacy Concern',
+    description: 'Specific privacy concern raised by patient',
+  },
+]
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+  <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">
+    Patient Data Deletion Request
+  </h2>
+
+  <form id="deletion-request-form" class="space-y-6">
+    <!-- CSRF Token (Hidden) -->
+    <input
+      type="hidden"
+      id="csrf-token"
+      name="csrf-token"
+      value="generate-server-token-here"
+    />
+
+    <!-- Patient Information Section -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        Patient Information
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            for="patient-id"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Patient ID
+          </label>
+          <input
+            type="text"
+            id="patient-id"
+            name="patient-id"
+            value={patientId}
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            for="patient-name"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Patient Name
+          </label>
+          <input
+            type="text"
+            id="patient-name"
+            name="patient-name"
+            value={patientName}
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Deletion Scope Section -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        Deletion Scope
+      </h3>
+
+      <div class="space-y-4">
+        <div class="flex items-center">
+          <input
+            type="radio"
+            id="scope-all"
+            name="deletion-scope"
+            value="all"
+            class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+            checked
+          />
+          <label
+            for="scope-all"
+            class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Delete All Data (Complete Record)
+          </label>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            type="radio"
+            id="scope-specific"
+            name="deletion-scope"
+            value="specific"
+            class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+          />
+          <label
+            for="scope-specific"
+            class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Delete Specific Data Categories
+          </label>
+        </div>
+      </div>
+
+      <!-- Specific Data Categories (initially hidden, shown when "Specific" is selected) -->
+      <div id="data-categories-container" class="pl-7 mt-3 space-y-3 hidden">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Select data categories to delete:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {
+            dataCategories.map((category) => (
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input
+                    type="checkbox"
+                    id={`category-${category.id}`}
+                    name="data-categories"
+                    value={category.id}
+                    class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                  />
+                </div>
+                <div class="ml-3 text-sm">
+                  <label
+                    for={`category-${category.id}`}
+                    class="font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    {category.label}
+                  </label>
+                  <p class="text-gray-500 dark:text-gray-400">
+                    {category.description}
+                  </p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Deletion Reason Section -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        Deletion Reason
+      </h3>
+
+      <div>
+        <label
+          for="deletion-reason"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Primary Reason
+        </label>
+        <select
+          id="deletion-reason"
+          name="deletion-reason"
+          class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          required
+        >
+          <option value="">Select a reason...</option>
+          {
+            deletionReasons.map((reason) => (
+              <option value={reason.id}>
+                {reason.label} - {reason.description}
+              </option>
+            ))
+          }
+        </select>
+      </div>
+
+      <div>
+        <label
+          for="additional-details"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Additional Details
+        </label>
+        <textarea
+          id="additional-details"
+          name="additional-details"
+          rows="3"
+          class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Provide any additional context or details about this deletion request..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- HIPAA Compliance Section -->
+    <div
+      class="p-4 bg-yellow-50 border border-yellow-200 rounded-md dark:bg-yellow-900/20 dark:border-yellow-800"
+    >
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <Icon name="alert-triangle" class="h-5 w-5 text-yellow-400" />
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+            HIPAA Compliance Notice
+          </h3>
+          <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+            <p>
+              This deletion request will be logged and processed in accordance
+              with HIPAA regulations. Certain data may need to be retained for
+              the minimum required period per regulatory requirements.
+            </p>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input
+                  id="hipaa-confirmation"
+                  name="hipaa-confirmation"
+                  type="checkbox"
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                  required
+                />
+              </div>
+              <div class="ml-3 text-sm">
+                <label
+                  for="hipaa-confirmation"
+                  class="font-medium text-yellow-700 dark:text-yellow-300"
+                >
+                  I confirm this deletion request complies with HIPAA
+                  requirements
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end space-x-3">
+      <button
+        type="button"
+        id="cancel-button"
+        class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center"
+      >
+        <Icon name="trash" class="w-4 h-4 mr-2" />
+        Submit Deletion Request
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Toggle data categories visibility based on deletion scope selection
+  document.addEventListener('DOMContentLoaded', () => {
+    const scopeAllRadio = document.getElementById('scope-all') as HTMLInputElement | null
+    const scopeSpecificRadio = document.getElementById('scope-specific') as HTMLInputElement | null
+    const dataCategoriesContainer = document.getElementById(
+      'data-categories-container',
+    )
+    const dataCategoryCheckboxes = document.querySelectorAll(
+      'input[name="data-categories"]',
+    )
+    const form = document.getElementById('deletion-request-form') as HTMLFormElement | null
+    const cancelButton = document.getElementById('cancel-button')
+
+    if (!scopeAllRadio || !scopeSpecificRadio || !dataCategoriesContainer || !form || !cancelButton) {
+      console.error('Required DOM elements not found')
+      return
+    }
+
+    // Toggle data categories container visibility
+    function toggleDataCategories() {
+      if (scopeSpecificRadio?.checked) {
+        dataCategoriesContainer?.classList.remove('hidden')
+        // Make at least one category required when specific is selected
+        dataCategoryCheckboxes.forEach((checkbox) => {
+          (checkbox as HTMLInputElement).setAttribute('required', 'required')
+        })
+      } else {
+        dataCategoriesContainer?.classList.add('hidden')
+        // Remove required attribute when "All" is selected
+        dataCategoryCheckboxes.forEach((checkbox) => {
+          (checkbox as HTMLInputElement).removeAttribute('required')
+        })
+      }
+    }
+
+    // Initial setup
+    toggleDataCategories()
+
+    // Add event listeners for radio buttons
+    scopeAllRadio?.addEventListener('change', toggleDataCategories)
+    scopeSpecificRadio?.addEventListener('change', toggleDataCategories)
+
+    // Handle the requirement for at least one category to be selected
+    function updateCategoryRequirement() {
+      const atLeastOneChecked = Array.from(dataCategoryCheckboxes).some(
+        (checkbox) => (checkbox as HTMLInputElement).checked,
+      )
+
+      if (atLeastOneChecked) {
+        dataCategoryCheckboxes.forEach((checkbox) => {
+          (checkbox as HTMLInputElement).removeAttribute('required')
+        })
+      } else {
+        dataCategoryCheckboxes.forEach((checkbox) => {
+          if (scopeSpecificRadio?.checked) {
+            (checkbox as HTMLInputElement).setAttribute('required', 'required')
+          }
+        })
+      }
+    }
+
+    // Add change event listeners to checkboxes
+    dataCategoryCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', updateCategoryRequirement)
+    })
+
+    // Cancel button handler
+    cancelButton?.addEventListener('click', () => {
+      // Redirect back to the main data deletion log view
+      window.location.href = '/admin/patient-rights'
+    })
+
+    // Form submission handler
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault()
+
+      // Validate that at least one category is selected if 'specific' scope is chosen
+      if (scopeSpecificRadio?.checked) {
+        const atLeastOneChecked = Array.from(dataCategoryCheckboxes).some(
+          (checkbox) => (checkbox as HTMLInputElement).checked,
+        )
+
+        if (!atLeastOneChecked) {
+          alert('Please select at least one data category to delete.')
+          return
+        }
+      }
+
+      // Collect form data
+      const formData = new FormData(form)
+
+      try {
+        // Show loading state
+        const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
+        if (!submitButton) return
+        
+        const originalButtonText = submitButton.innerHTML
+        submitButton.disabled = true
+        submitButton.innerHTML =
+          '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...'
+
+        // Submit the form data to the server
+        const response = await fetch(
+          '/api/admin/patient-rights/delete-request',
+          {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+          },
+        )
+
+        const result = await response.json()
+
+        if (response.ok) {
+          // Show success message and redirect
+          if (window.toast) {
+            window.toast.success('Deletion request submitted successfully')
+          } else {
+            alert('Deletion request submitted successfully')
+          }
+
+          // Redirect back to patient rights page after a brief delay
+          setTimeout(() => {
+            window.location.href = '/admin/patient-rights'
+          }, 1500)
+        } else {
+          // Show error message
+          if (window.toast) {
+            window.toast.error(
+              result.message || 'Failed to submit deletion request',
+            )
+          } else {
+            alert(result.message || 'Failed to submit deletion request')
+          }
+
+          // Reset button
+          submitButton.disabled = false
+          submitButton.innerHTML = originalButtonText
+        }
+      } catch (error) {
+        console.error('Error submitting deletion request:', error)
+
+        // Show error message
+        if (window.toast) {
+          window.toast.error('An error occurred while submitting the request')
+        } else {
+          alert('An error occurred while submitting the request')
+        }
+
+        // Reset button
+        const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
+        if (submitButton) {
+          const originalButtonText = submitButton.innerHTML
+          submitButton.disabled = false
+          submitButton.innerHTML = originalButtonText
+        }
+      }
+    })
+  })
+</script>

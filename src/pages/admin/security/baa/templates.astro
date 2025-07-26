@@ -1,0 +1,241 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro'
+import { BaaTemplateService } from '../../../../lib/security/baa/BaaTemplateService'
+import {
+  standardSections,
+  standardPlaceholders,
+} from '../../../../lib/security/baa/templates/hipaa-standard'
+import {
+  BusinessAssociateType,
+  ServiceCategory,
+} from '../../../../lib/security/baa/types'
+
+// Initialize the BAA template service
+const templateService = new BaaTemplateService()
+
+// Create a default template if none exists
+const userId = 'admin-user' // In a real implementation, get the current user ID
+const templates = templateService.getAllTemplates()
+if (templates.length === 0) {
+  templateService.createDefaultTemplate(userId)
+}
+
+// Get all templates for display
+const allTemplates = templateService.getAllTemplates()
+---
+
+<AdminLayout
+  title="BAA Template Management"
+  description="Manage HIPAA-compliant Business Associate Agreement templates"
+>
+  <div class="px-6 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">BAA Template Management</h1>
+      <button
+        id="create-template"
+        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+      >
+        Create New Template
+      </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">Templates</h2>
+
+      {
+        allTemplates.length === 0 ? (
+          <p class="text-gray-500">
+            No templates found. Create your first template to get started.
+          </p>
+        ) : (
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Version
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Last Updated
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Associate Types
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Default
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {allTemplates.map((template) => (
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {template.name}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {template.version}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {template.lastUpdated.toLocaleDateString()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {template.associateTypes.map((type) => (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-1">
+                          {type.replace('_', ' ')}
+                        </span>
+                      ))}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {template.isDefault ? (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Default
+                        </span>
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <a
+                        href={`/admin/security/baa/templates/${template.id}`}
+                        class="text-indigo-600 hover:text-indigo-900 mr-3"
+                      >
+                        View
+                      </a>
+                      <a
+                        href={`/admin/security/baa/templates/${template.id}/edit`}
+                        class="text-indigo-600 hover:text-indigo-900 mr-3"
+                      >
+                        Edit
+                      </a>
+                      <button
+                        data-template-id={template.id}
+                        class="delete-template text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-xl font-semibold mb-4">Template Creation Guide</h2>
+        <div class="space-y-4">
+          <p class="text-gray-700">
+            BAA templates help enforce HIPAA compliance with your business
+            associates. Here's how to create an effective template:
+          </p>
+          <ol class="list-decimal list-inside text-gray-700 space-y-2">
+            <li>Start with the standard HIPAA BAA template as a foundation</li>
+            <li>
+              Customize required sections to match your organization's policies
+            </li>
+            <li>
+              Define placeholders for variable information that changes per
+              agreement
+            </li>
+            <li>
+              Add optional sections for specific types of business associates
+            </li>
+            <li>
+              Ensure all regulatory requirements are covered in your template
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-xl font-semibold mb-4">HIPAA Requirements</h2>
+        <div class="space-y-4">
+          <p class="text-gray-700">
+            Business Associate Agreements must include provisions that:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2">
+            <li>
+              Describe permitted and required uses of PHI by the business
+              associate
+            </li>
+            <li>
+              Prohibit the business associate from using or disclosing PHI other
+              than as permitted or required
+            </li>
+            <li>
+              Require appropriate safeguards to prevent unauthorized use or
+              disclosure
+            </li>
+            <li>Require reporting of breaches or unauthorized disclosures</li>
+            <li>
+              Require the business associate to comply with HIPAA Privacy Rule
+              requirements
+            </li>
+            <li>
+              Require the return or destruction of PHI upon termination of the
+              agreement
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  // Client-side JavaScript for template management
+  document.addEventListener('DOMContentLoaded', () => {
+    // Handle create template button
+    const createTemplateBtn = document.getElementById('create-template')
+    if (createTemplateBtn) {
+      createTemplateBtn.addEventListener('click', () => {
+        window.location.href = '/admin/security/baa/templates/new'
+      })
+    }
+
+    // Handle delete template buttons
+    const deleteButtons = document.querySelectorAll('.delete-template')
+    deleteButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const templateId = e.currentTarget.getAttribute('data-template-id')
+        if (
+          confirm(
+            'Are you sure you want to delete this template? This action cannot be undone.',
+          )
+        ) {
+          // In a real implementation, this would call an API endpoint to delete the template
+          console.log(`Delete template with ID: ${templateId}`)
+          // Redirect to refresh the page after deletion
+          window.location.href = '/admin/security/baa/templates'
+        }
+      })
+    })
+  })
+</script>

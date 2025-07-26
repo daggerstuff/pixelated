@@ -1,0 +1,165 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Todo from '../components/Todo.astro'
+import TodoIsland from '../components/TodoIsland.astro'
+import TodoPreactIsland from '../components/TodoPreactIsland.astro'
+import TodoAlpine from '../components/TodoAlpine.astro'
+
+// Some sample initial todos for demonstration
+const sampleTodos = [
+  {
+    id: 'sample1',
+    text: 'Learn Astro',
+    completed: true,
+  },
+  {
+    id: 'sample2',
+    text: 'Build a Todo app',
+    completed: false,
+  },
+  {
+    id: 'sample3',
+    text: 'Deploy to production',
+    completed: false,
+  },
+]
+---
+
+<Layout title="Todo Component Demos">
+  <main>
+    <h1>Todo Component Demos</h1>
+    <p class="description">
+      This page demonstrates different ways to implement the same Todo component
+      functionality using Astro's flexibility.
+    </p>
+
+    <section class="demo-container">
+      <h2 class="section-title">1. Vanilla Astro Component</h2>
+      <p class="section-description">
+        This version uses plain Astro with client-side JavaScript for
+        interactivity.
+      </p>
+      <div class="demo-wrapper">
+        <Todo title="Astro Todo" initialTodos={sampleTodos} />
+      </div>
+      <div class="badge">
+        <span class="js-size">~3KB JS</span>
+        <span class="tech">Astro + Vanilla JS</span>
+      </div>
+    </section>
+
+    <section class="demo-container">
+      <h2 class="section-title">2. React Island</h2>
+      <p class="section-description">
+        This version uses Astro with a React component for fully hydrated
+        interactivity.
+      </p>
+      <div class="demo-wrapper">
+        <TodoIsland title="React Todo" initialTodos={sampleTodos} />
+      </div>
+      <div class="badge">
+        <span class="js-size">~40KB JS</span>
+        <span class="tech">Astro + React</span>
+      </div>
+    </section>
+
+    <section class="demo-container">
+      <h2 class="section-title">3. Preact Island</h2>
+      <p class="section-description">
+        This version uses Astro with a Preact component for hydrated
+        interactivity with smaller bundle size.
+      </p>
+      <div class="demo-wrapper">
+        <TodoPreactIsland title="Preact Todo" initialTodos={sampleTodos} />
+      </div>
+      <div class="badge">
+        <span class="js-size">~10KB JS</span>
+        <span class="tech">Astro + Preact</span>
+      </div>
+    </section>
+
+    <section class="demo-container">
+      <h2 class="section-title">4. Alpine.js</h2>
+      <p class="section-description">
+        This version uses Astro with Alpine.js for lightweight, reactive
+        interactivity.
+      </p>
+      <div class="demo-wrapper">
+        <TodoAlpine title="Alpine Todo" initialTodos={sampleTodos} />
+      </div>
+      <div class="badge">
+        <span class="js-size">~7KB JS</span>
+        <span class="tech">Astro + Alpine.js</span>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary, #333);
+  }
+
+  .description {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--color-text-muted, #666);
+    font-size: 1.1rem;
+  }
+
+  .demo-container {
+    margin-bottom: 4rem;
+    position: relative;
+  }
+
+  .section-title {
+    margin-bottom: 0.5rem;
+    color: var(--color-primary, #333);
+  }
+
+  .section-description {
+    margin-bottom: 1.5rem;
+    color: var(--color-text-muted, #666);
+  }
+
+  .demo-wrapper {
+    padding: 1rem;
+    background-color: var(--color-bg-light, #f9f9f9);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .badge {
+    display: inline-flex;
+    position: absolute;
+    top: 0;
+    right: 0;
+    gap: 0.5rem;
+  }
+
+  .js-size,
+  .tech {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .js-size {
+    background-color: var(--color-warning-light, #fff3cd);
+    color: var(--color-warning, #856404);
+  }
+
+  .tech {
+    background-color: var(--color-info-light, #d1ecf1);
+    color: var(--color-info, #0c5460);
+  }
+</style>

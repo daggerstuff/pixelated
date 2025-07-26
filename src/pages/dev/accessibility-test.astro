@@ -1,0 +1,228 @@
+---
+import ChatLayout from '../../layouts/ChatLayout.astro'
+import { BrowserCompatibilityTester } from '../../components/testing/BrowserCompatibilityTester'
+import { ContrastChecker } from '../../components/accessibility/ContrastChecker'
+
+// Define size map outside component
+const sizeMap = {
+  small: { width: 50, height: 20 },
+  medium: { width: 100, height: 30 },
+  large: { width: 150, height: 40 },
+}
+
+// Component props
+interface LoadingIndicatorProps {
+  size: 'small' | 'medium' | 'large'
+  message: string
+}
+---
+
+<ChatLayout title="Accessibility Testing">
+  <div class="container">
+    <h1>Accessibility Testing Dashboard</h1>
+
+    <section class="test-section">
+      <h2>Browser Compatibility</h2>
+      <BrowserCompatibilityTester client:load />
+    </section>
+
+    <section class="test-section">
+      <h2>Color Contrast</h2>
+      <ContrastChecker client:load />
+    </section>
+
+    <section class="test-section">
+      <h2>Loading Indicators</h2>
+      <div class="loading-indicators-test">
+        <div>
+          <h3>Small</h3>
+          <!-- AccessibleLoadingIndicator replaced with inline implementation -->
+          <div class="loading-indicator" aria-live="polite">
+            <div
+              class="loading-skeleton"
+              style={`width: ${sizeMap.small.width}px; height: ${sizeMap.small.height}px;`}
+            >
+            </div>
+            <p class="loading-message">Loading small...</p>
+          </div>
+        </div>
+        <div>
+          <h3>Medium</h3>
+          <div class="loading-indicator" aria-live="polite">
+            <div
+              class="loading-skeleton"
+              style={`width: ${sizeMap.medium.width}px; height: ${sizeMap.medium.height}px;`}
+            >
+            </div>
+            <p class="loading-message">Loading medium...</p>
+          </div>
+        </div>
+        <div>
+          <h3>Large</h3>
+          <div class="loading-indicator" aria-live="polite">
+            <div
+              class="loading-skeleton"
+              style={`width: ${sizeMap.large.width}px; height: ${sizeMap.large.height}px;`}
+            >
+            </div>
+            <p class="loading-message">Loading large...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <h2>Keyboard Navigation Test</h2>
+      <p>Tab through the following elements to test keyboard navigation:</p>
+      <div class="keyboard-test">
+        <button class="test-button">Button 1</button>
+        <button class="test-button">Button 2</button>
+        <input type="text" placeholder="Text input" class="test-input" />
+        <textarea placeholder="Textarea" class="test-textarea"></textarea>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <h2>Screen Reader Test</h2>
+      <p>
+        The following elements should be properly announced by screen readers:
+      </p>
+      <div class="screen-reader-test">
+        <div aria-live="polite" class="live-region">
+          <button id="announce-btn" class="test-button">Announce Message</button
+          >
+          <div id="announcement-area" class="announcement-area">
+            No announcement ye
+          </div>
+        </div>
+
+        <div class="sr-only-test">
+          <p>This text is visible to everyone.</p>
+          <p class="sr-only">This text is only visible to screen readers.</p>
+        </div>
+
+        <div class="image-test">
+          <img
+            src="/images/test-image.jpg"
+            alt="A placeholder for testing alt text"
+            width="200"
+            height="100"
+          />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Add interactivity for the screen reader tes
+    document.addEventListener('DOMContentLoaded', () => {
+      const announceBtn = document.getElementById('announce-btn')
+      const announcementArea = document.getElementById('announcement-area')
+
+      if (announceBtn && announcementArea) {
+        announceBtn.addEventListener('click', () => {
+          announcementArea.textContent = `Announcement at ${new Date().toLocaleTimeString()}`
+        })
+      }
+    })
+  </script>
+
+  <style>
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .test-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      background-color: var(--background);
+    }
+
+    .loading-indicators-test {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .loading-skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+    }
+
+    .keyboard-test {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+    }
+
+    .test-button,
+    .test-link {
+      padding: 8px 16px;
+      border-radius: 4px;
+    }
+
+    .test-button {
+      background-color: var(--button-background);
+      color: var(--button-text);
+      border: none;
+      cursor: pointer;
+    }
+
+    .test-link {
+      color: var(--info);
+      text-decoration: underline;
+    }
+
+    .test-input,
+    .test-textarea {
+      padding: 8px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-background);
+      color: var(--input-text);
+    }
+
+    .test-textarea {
+      min-height: 100px;
+    }
+
+    .live-region {
+      margin-bottom: 20px;
+    }
+
+    .announcement-area {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: var(--ai-message-background);
+      border-radius: 4px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(_0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    @keyframes loading {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+  </style>
+</ChatLayout>

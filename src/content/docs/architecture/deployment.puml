@@ -1,0 +1,62 @@
+@startuml Deployment Flow
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v16.0/dist
+!include AWSPuml/AWSCommon.puml
+!include AWSPuml/DeveloperTools/CodeDeploy.puml
+!include AWSPuml/Compute/ECS.puml
+!include AWSPuml/NetworkingContentDelivery/ELBApplicationLoadBalancer.puml
+!include AWSPuml/ManagementGovernance/CloudWatch.puml
+!include AWSPuml/ApplicationIntegration/SNS.puml
+!include AWSPuml/SecurityIdentityCompliance/IAM.puml
+!include AWSPuml/Compute/Lambda.puml
+
+title Deployment Flow Architecture
+
+' Define participants
+participant "Developer" as dev
+participant "CodeDeploy" as codedeploy
+participant "ALB" as alb
+participant "Blue Environment" as blue
+participant "Green Environment" as green
+participant "Lambda" as lambda
+participant "CloudWatch" as cloudwatch
+participant "SNS" as sns
+
+' Define deployment flow
+dev -> codedeploy: Initiate deployment
+activate codedeploy
+
+codedeploy -> green: Create new task set
+activate green
+
+codedeploy -> alb: Update listener rules\n(10% traffic to green)
+activate alb
+
+codedeploy -> lambda: Trigger canary analysis
+activate lambda
+
+lambda -> cloudwatch: Monitor metrics
+activate cloudwatch
+
+cloudwatch --> lambda: Return metrics
+deactivate cloudwatch
+
+alt Canary successful
+    lambda --> codedeploy: Success
+    codedeploy -> alb: Update listener rules\n(100% traffic to green)
+    codedeploy -> blue: Terminate old task set
+    deactivate blue
+    codedeploy -> sns: Send success notification
+else Canary failed
+    lambda --> codedeploy: Failure
+    codedeploy -> alb: Rollback listener rules\n(100% traffic to blue)
+    codedeploy -> green: Terminate new task set
+    deactivate green
+    codedeploy -> sns: Send failure notification
+end
+
+deactivate lambda
+deactivate alb
+deactivate codedeploy
+
+@enduml 

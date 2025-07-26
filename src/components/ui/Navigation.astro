@@ -1,0 +1,170 @@
+---
+import { UI, SITE } from '../../config'
+import ThemeToggle from './ThemeToggle.astro'
+
+interface Props {
+  class?: string
+}
+
+const { class: className = '' } = Astro.props
+
+type NavPosition = 'fixed' | 'sticky' | 'static'
+
+const navPositionClasses: Record<NavPosition, string> = {
+  fixed: 'fixed top-0 left-0 right-0 z-50',
+  sticky: 'sticky top-0 z-50',
+  static: 'relative',
+}
+
+interface MenuItem {
+  link: string
+  text: string
+}
+
+// Define the nav classes based on the position setting in UI config
+const position = UI.nav.position as NavPosition
+const navClasses = `${navPositionClasses[position]} ${UI.nav.glassmorphism ? 'backdrop-blur-md bg-white/80 dark:bg-gray-900/80' : 'bg-white dark:bg-gray-900'} ${className}`
+
+const menuItems = Object.entries(SITE.menu).map(
+  ([key, value]): MenuItem => ({
+    link: `/${key === 'home' ? '' : key}`,
+    text: value,
+  }),
+)
+
+// Get the current page path to determine active link
+const currentPath = Astro.url.pathname
+---
+
+<nav class={navClasses} transition:persist>
+  <div class="container mx-auto px-4 flex justify-between items-center">
+    <a
+      href="/"
+      class="text-xl font-bold flex items-center gap-2"
+      transition:animate="slide"
+    >
+      <img
+        src="/favicon.svg"
+        alt="Logo"
+        class="w-8 h-8"
+        transition:name="logo"
+      />
+      <span transition:name="site-name">{SITE.name}</span>
+    </a>
+
+    <div class="hidden md:flex items-center gap-6">
+      {
+        menuItems.map((item) => {
+          // Check if this is the current page
+          const isActive =
+            (item.link === '/' && currentPath === '/') ||
+            (item.link !== '/' && currentPath.startsWith(item.link))
+          return (
+            <a
+              href={item.link}
+              class:list={[
+                'relative transition-colors',
+                isActive
+                  ? 'text-primary font-medium'
+                  : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
+              ]}
+              transition:animate="slide"
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {item.text}
+              {isActive && (
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-primary -mb-1.5" />
+              )}
+            </a>
+          )
+        })
+      }
+    </div>
+
+    <div class="flex items-center gap-4" transition:animate="slide">
+      <ThemeToggle />
+      <button
+        id="mobile-menu-toggle"
+        class="md:hidden"
+        aria-label="Toggle mobile menu"
+      >
+        <span class="sr-only">Menu</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="md:hidden hidden">
+    <div class="container mx-auto px-4 py-4 flex flex-col gap-4">
+      {
+        menuItems.map((item) => {
+          // Check if this is the current page
+          const isActive =
+            (item.link === '/' && currentPath === '/') ||
+            (item.link !== '/' && currentPath.startsWith(item.link))
+          return (
+            <a
+              href={item.link}
+              class:list={[
+                'relative block py-2 transition-colors',
+                isActive
+                  ? 'text-primary font-medium pl-3 border-l-2 border-primary'
+                  : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
+              ]}
+              transition:animate="slide"
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {item.text}
+            </a>
+          )
+        })
+      }
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu toggle
+  document.addEventListener('astro:page-load', () => {
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle')
+    const mobileMenu = document.getElementById('mobile-menu')
+
+    mobileMenuToggle?.addEventListener('click', () => {
+      mobileMenu?.classList.toggle('hidden')
+      if (mobileMenuToggle.getAttribute('aria-expanded') === 'true') {
+        mobileMenuToggle.setAttribute('aria-expanded', 'false')
+      } else {
+        mobileMenuToggle.setAttribute('aria-expanded', 'true')
+      }
+    })
+  })
+</script>
+
+<style>
+  /* Smooth transition for the active indicator */
+  a .absolute {
+    transition: width 0.2s ease;
+  }
+
+  /* Enhanced focus styles for accessibility */
+  a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+</style>

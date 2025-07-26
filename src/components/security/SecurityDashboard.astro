@@ -1,0 +1,301 @@
+---
+interface SecurityEvent {
+  timestamp: number
+  type: string
+  severity: 'critical' | 'high' | 'medium' | 'low'
+  userId?: string
+  ip?: string
+  metadata?: {
+    details: string
+    source?: string
+    context?: string
+  }
+}
+
+interface SecurityStats {
+  total: number
+  last24h: number
+  last7d: number
+  bySeverity: {
+    critical: number
+    high: number
+    medium: number
+    low: number
+  }
+}
+
+// Mock data for demonstration
+const initialEvents: SecurityEvent[] = [
+  {
+    timestamp: Date.now() - 3600000,
+    type: 'login',
+    severity: 'medium',
+    metadata: { details: 'Failed login attempt' },
+  },
+  {
+    timestamp: Date.now() - 7200000,
+    type: 'access',
+    severity: 'high',
+    metadata: { details: 'Unauthorized access attempt' },
+  },
+]
+
+const initialStats: SecurityStats = {
+  total: 42,
+  last24h: 8,
+  last7d: 23,
+  bySeverity: {
+    critical: 2,
+    high: 5,
+    medium: 12,
+    low: 23,
+  },
+}
+---
+
+<div class="p-6 space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold">Security Dashboard</h2>
+    <div class="flex gap-4">
+      <select id="eventType" class="rounded-md border p-2">
+        <option value="">All Types</option>
+        <option value="login">Login</option>
+        <option value="access">Access</option>
+        <option value="data">Data</option>
+        <option value="system">System</option>
+      </select>
+      <select id="severity" class="rounded-md border p-2">
+        <option value="">All Severities</option>
+        <option value="critical">Critical</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-2">Total Events</h3>
+      <p id="totalEvents" class="text-3xl font-bold">{initialStats.total}</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-2">Last 24h</h3>
+      <p id="last24h" class="text-3xl font-bold">{initialStats.last24h}</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-2">Last 7 Days</h3>
+      <p id="last7d" class="text-3xl font-bold">{initialStats.last7d}</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-2">By Severity</h3>
+      <div class="space-y-2">
+        <div class="flex justify-between">
+          <span class="text-red-500">Critical</span>
+          <span id="criticalCount">{initialStats.bySeverity.critical}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-orange-500">High</span>
+          <span id="highCount">{initialStats.bySeverity.high}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-yellow-500">Medium</span>
+          <span id="mediumCount">{initialStats.bySeverity.medium}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-green-500">Low</span>
+          <span id="lowCount">{initialStats.bySeverity.low}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="p-4">
+      <h3 class="text-lg font-semibold">Security Events</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-900">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+              >Time</th
+            >
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+              >Type</th
+            >
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+              >Severity</th
+            >
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+              >Details</th
+            >
+          </tr>
+        </thead>
+        <tbody
+          id="eventsTable"
+          class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+        >
+          {
+            initialEvents.map((event) => (
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  {new Date(event.timestamp).toLocaleString()}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  {event.type}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <span
+                    class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  ${
+                    event.severity === 'critical'
+                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                      : event.severity === 'high'
+                        ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                        : event.severity === 'medium'
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                          : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  }`}
+                  >
+                    {event.severity}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                  {event.metadata?.details || '-'}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface SecurityEvent {
+    timestamp: number
+    type: string
+    severity: 'critical' | 'high' | 'medium' | 'low'
+    userId?: string
+    ip?: string
+    metadata?: {
+      details: string
+      source?: string
+      context?: string
+    }
+  }
+
+  interface SecurityStats {
+    total: number
+    last24h: number
+    last7d: number
+    bySeverity: {
+      critical: number
+      high: number
+      medium: number
+      low: number
+    }
+  }
+
+  let currentType = ''
+  let currentSeverity = ''
+
+  // Mock data for demonstration
+  const mockEvents: SecurityEvent[] = [
+    {
+      timestamp: Date.now() - 3600000,
+      type: 'login',
+      severity: 'medium',
+      metadata: { details: 'Failed login attempt' },
+    },
+    {
+      timestamp: Date.now() - 7200000,
+      type: 'access',
+      severity: 'high',
+      metadata: { details: 'Unauthorized access attempt' },
+    },
+    {
+      timestamp: Date.now() - 10800000,
+      type: 'system',
+      severity: 'low',
+      metadata: { details: 'System maintenance completed' },
+    },
+  ]
+
+  const mockStats: SecurityStats = {
+    total: 42,
+    last24h: 8,
+    last7d: 23,
+    bySeverity: {
+      critical: 2,
+      high: 5,
+      medium: 12,
+      low: 23,
+    },
+  }
+
+  function updateEvents() {
+    let events = [...mockEvents]
+
+    // Apply client-side filtering
+    if (currentType) {
+      events = events.filter((event) => event.type === currentType)
+    }
+
+    if (currentSeverity) {
+      events = events.filter((event) => event.severity === currentSeverity)
+    }
+
+    // Update events table
+    const tbody = document.getElementById('eventsTable')
+    if (tbody) {
+      tbody.innerHTML = events
+        .map(
+          (event: SecurityEvent) => `
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">${new Date(event.timestamp).toLocaleString()}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">${event.type}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+              ${
+                event.severity === 'critical'
+                  ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                  : event.severity === 'high'
+                    ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                    : event.severity === 'medium'
+                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+              }">
+              ${event.severity}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm">${event.metadata?.details || '-'}</td>
+        </tr>
+      `,
+        )
+        .join('')
+    }
+  }
+
+  // Set up event listeners
+  const eventTypeSelect = document.getElementById('eventType')
+  const severitySelect = document.getElementById('severity')
+
+  eventTypeSelect?.addEventListener('change', (e) => {
+    const target = e.target as HTMLSelectElement
+    currentType = target.value
+    updateEvents()
+  })
+
+  severitySelect?.addEventListener('change', (e) => {
+    const target = e.target as HTMLSelectElement
+    currentSeverity = target.value
+    updateEvents()
+  })
+</script>

@@ -1,0 +1,747 @@
+﻿2025-06-04T21:51:38.9326298Z Current runner version: '2.325.0'
+2025-06-04T21:51:38.9361308Z ##[group]Runner Image Provisioner
+2025-06-04T21:51:38.9362463Z Hosted Compute Agent
+2025-06-04T21:51:38.9363338Z Version: 20250508.323
+2025-06-04T21:51:38.9364328Z Commit: 81b259f29879f73b4213d199e42d8c3465dae986
+2025-06-04T21:51:38.9365379Z Build Date: 2025-05-08T19:40:08Z
+2025-06-04T21:51:38.9366332Z ##[endgroup]
+2025-06-04T21:51:38.9367355Z ##[group]Operating System
+2025-06-04T21:51:38.9368378Z Ubuntu
+2025-06-04T21:51:38.9369325Z 24.04.2
+2025-06-04T21:51:38.9370217Z LTS
+2025-06-04T21:51:38.9370936Z ##[endgroup]
+2025-06-04T21:51:38.9371801Z ##[group]Runner Image
+2025-06-04T21:51:38.9372727Z Image: ubuntu-24.04
+2025-06-04T21:51:38.9373696Z Version: 20250511.1.0
+2025-06-04T21:51:38.9375464Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250511.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-06-04T21:51:38.9378264Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250511.1
+2025-06-04T21:51:38.9380176Z ##[endgroup]
+2025-06-04T21:51:38.9381981Z ##[group]GITHUB_TOKEN Permissions
+2025-06-04T21:51:38.9384774Z Contents: read
+2025-06-04T21:51:38.9385706Z Metadata: read
+2025-06-04T21:51:38.9386432Z ##[endgroup]
+2025-06-04T21:51:38.9389362Z Secret source: Actions
+2025-06-04T21:51:38.9390834Z Prepare workflow directory
+2025-06-04T21:51:39.0155225Z Prepare all required actions
+2025-06-04T21:51:39.0210613Z Getting action download info
+2025-06-04T21:51:39.2987366Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-06-04T21:51:39.2988397Z Version: 4.2.2
+2025-06-04T21:51:39.2989577Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-06-04T21:51:39.2990688Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-06-04T21:51:39.2991533Z ##[endgroup]
+2025-06-04T21:51:39.3975816Z ##[group]Download immutable action package 'actions/setup-node@v4'
+2025-06-04T21:51:39.3976711Z Version: 4.4.0
+2025-06-04T21:51:39.3977462Z Digest: sha256:9427cefe82346e992fb5b949e3569b39d537ae41aa3086483b14eceebfc16bc1
+2025-06-04T21:51:39.3978478Z Source commit SHA: 49933ea5288caeca8642d1e84afbd3f7d6820020
+2025-06-04T21:51:39.3979506Z ##[endgroup]
+2025-06-04T21:51:39.4924132Z Download action repository 'pnpm/action-setup@v4' (SHA:a7487c7e89a18df4991f7f222e4898a00d66ddda)
+2025-06-04T21:51:39.8117096Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-06-04T21:51:39.8117732Z Version: 4.2.3
+2025-06-04T21:51:39.8118360Z Digest: sha256:c8a3bb963e1f1826d8fcc8d1354f0dd29d8ac1db1d4f6f20247055ae11b81ed9
+2025-06-04T21:51:39.8119418Z Source commit SHA: 5a3ec84eff668545956fd18022155c47e93e2684
+2025-06-04T21:51:39.8119995Z ##[endgroup]
+2025-06-04T21:51:39.9782824Z Complete job name: TypeScript Check
+2025-06-04T21:51:40.0394709Z ##[group]Run actions/checkout@v4
+2025-06-04T21:51:40.0395518Z with:
+2025-06-04T21:51:40.0395895Z   submodules: recursive
+2025-06-04T21:51:40.0396351Z   repository: nochadisfaction/pixelated
+2025-06-04T21:51:40.0397022Z   token: ***
+2025-06-04T21:51:40.0397417Z   ssh-strict: true
+2025-06-04T21:51:40.0397808Z   ssh-user: git
+2025-06-04T21:51:40.0398200Z   persist-credentials: true
+2025-06-04T21:51:40.0398635Z   clean: true
+2025-06-04T21:51:40.0399244Z   sparse-checkout-cone-mode: true
+2025-06-04T21:51:40.0399748Z   fetch-depth: 1
+2025-06-04T21:51:40.0400119Z   fetch-tags: false
+2025-06-04T21:51:40.0400507Z   show-progress: true
+2025-06-04T21:51:40.0400894Z   lfs: false
+2025-06-04T21:51:40.0401264Z   set-safe-directory: true
+2025-06-04T21:51:40.0401928Z env:
+2025-06-04T21:51:40.0402388Z   PNPM_HOME: /home/runner/work/pixelated/pixelated/.pnpm
+2025-06-04T21:51:40.0403018Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:51:40.0403512Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:51:40.0403981Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:51:40.0404396Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:51:40.0404814Z   SKIP_FHE_TESTS: true
+2025-06-04T21:51:40.0405222Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:51:40.0405680Z ##[endgroup]
+2025-06-04T21:51:40.1458401Z Syncing repository: nochadisfaction/pixelated
+2025-06-04T21:51:40.1460839Z ##[group]Getting Git version info
+2025-06-04T21:51:40.1461547Z Working directory is '/home/runner/work/pixelated/pixelated'
+2025-06-04T21:51:40.1462477Z [command]/usr/bin/git version
+2025-06-04T21:51:40.1555863Z git version 2.49.0
+2025-06-04T21:51:40.1582151Z ##[endgroup]
+2025-06-04T21:51:40.1595326Z Temporarily overriding HOME='/home/runner/work/_temp/51efddf8-8cd6-42a6-aa5a-9644537ffba6' before making global git config changes
+2025-06-04T21:51:40.1596710Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-04T21:51:40.1600233Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pixelated/pixelated
+2025-06-04T21:51:40.1636216Z Deleting the contents of '/home/runner/work/pixelated/pixelated'
+2025-06-04T21:51:40.1640179Z ##[group]Initializing the repository
+2025-06-04T21:51:40.1644802Z [command]/usr/bin/git init /home/runner/work/pixelated/pixelated
+2025-06-04T21:51:40.1746684Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-06-04T21:51:40.1747658Z hint: is subject to change. To configure the initial branch name to use in all
+2025-06-04T21:51:40.1748532Z hint: of your new repositories, which will suppress this warning, call:
+2025-06-04T21:51:40.1749682Z hint:
+2025-06-04T21:51:40.1750437Z hint: 	git config --global init.defaultBranch <name>
+2025-06-04T21:51:40.1751158Z hint:
+2025-06-04T21:51:40.1751865Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-06-04T21:51:40.1753568Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-06-04T21:51:40.1754938Z hint:
+2025-06-04T21:51:40.1755611Z hint: 	git branch -m <name>
+2025-06-04T21:51:40.1756984Z Initialized empty Git repository in /home/runner/work/pixelated/pixelated/.git/
+2025-06-04T21:51:40.1766877Z [command]/usr/bin/git remote add origin https://github.com/nochadisfaction/pixelated
+2025-06-04T21:51:40.1802259Z ##[endgroup]
+2025-06-04T21:51:40.1803753Z ##[group]Disabling automatic garbage collection
+2025-06-04T21:51:40.1807073Z [command]/usr/bin/git config --local gc.auto 0
+2025-06-04T21:51:40.1836289Z ##[endgroup]
+2025-06-04T21:51:40.1837661Z ##[group]Setting up auth
+2025-06-04T21:51:40.1843986Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-04T21:51:40.1874294Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-04T21:51:40.2210698Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-04T21:51:40.2240909Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-04T21:51:40.2457883Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-06-04T21:51:40.2499875Z ##[endgroup]
+2025-06-04T21:51:40.2500815Z ##[group]Fetching the repository
+2025-06-04T21:51:40.2507901Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +eee88bf9c2234d2ab50d5d867568ad2a7638a9ac:refs/remotes/pull/2/merge
+2025-06-04T21:51:49.3577007Z From https://github.com/nochadisfaction/pixelated
+2025-06-04T21:51:49.3578668Z  * [new ref]             eee88bf9c2234d2ab50d5d867568ad2a7638a9ac -> pull/2/merge
+2025-06-04T21:51:49.3605681Z ##[endgroup]
+2025-06-04T21:51:49.3607332Z ##[group]Determining the checkout info
+2025-06-04T21:51:49.3608740Z ##[endgroup]
+2025-06-04T21:51:49.3613450Z [command]/usr/bin/git sparse-checkout disable
+2025-06-04T21:51:49.3658243Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-06-04T21:51:49.3686523Z ##[group]Checking out the ref
+2025-06-04T21:51:49.3690465Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/2/merge
+2025-06-04T21:51:50.6452409Z Updating files:   8% (6908/83443)
+2025-06-04T21:51:50.7095012Z Updating files:   9% (7510/83443)
+2025-06-04T21:51:50.7985957Z Updating files:  10% (8345/83443)
+2025-06-04T21:51:50.8536255Z Updating files:  11% (9179/83443)
+2025-06-04T21:51:50.8918357Z Updating files:  12% (10014/83443)
+2025-06-04T21:51:50.9381982Z Updating files:  13% (10848/83443)
+2025-06-04T21:51:51.0053180Z Updating files:  14% (11683/83443)
+2025-06-04T21:51:51.1128059Z Updating files:  15% (12517/83443)
+2025-06-04T21:51:51.2071811Z Updating files:  16% (13351/83443)
+2025-06-04T21:51:51.3395763Z Updating files:  17% (14186/83443)
+2025-06-04T21:51:51.4127797Z Updating files:  18% (15020/83443)
+2025-06-04T21:51:51.4504611Z Updating files:  19% (15855/83443)
+2025-06-04T21:51:51.4826961Z Updating files:  19% (16355/83443)
+2025-06-04T21:51:51.5591439Z Updating files:  20% (16689/83443)
+2025-06-04T21:51:51.6396892Z Updating files:  21% (17524/83443)
+2025-06-04T21:51:51.7280257Z Updating files:  22% (18358/83443)
+2025-06-04T21:51:51.8181558Z Updating files:  23% (19192/83443)
+2025-06-04T21:51:51.8978116Z Updating files:  24% (20027/83443)
+2025-06-04T21:51:52.0006552Z Updating files:  25% (20861/83443)
+2025-06-04T21:51:52.0744603Z Updating files:  26% (21696/83443)
+2025-06-04T21:51:52.1529125Z Updating files:  27% (22530/83443)
+2025-06-04T21:51:52.2138474Z Updating files:  28% (23365/83443)
+2025-06-04T21:51:52.2981065Z Updating files:  29% (24199/83443)
+2025-06-04T21:51:52.3647758Z Updating files:  30% (25033/83443)
+2025-06-04T21:51:52.4102763Z Updating files:  31% (25868/83443)
+2025-06-04T21:51:52.4504014Z Updating files:  32% (26702/83443)
+2025-06-04T21:51:52.4553787Z Updating files:  32% (27433/83443)
+2025-06-04T21:51:52.5516904Z Updating files:  33% (27537/83443)
+2025-06-04T21:51:52.5803608Z Updating files:  34% (28371/83443)
+2025-06-04T21:51:52.6087142Z Updating files:  35% (29206/83443)
+2025-06-04T21:51:52.6365224Z Updating files:  36% (30040/83443)
+2025-06-04T21:51:52.6657264Z Updating files:  37% (30874/83443)
+2025-06-04T21:51:52.6938388Z Updating files:  38% (31709/83443)
+2025-06-04T21:51:52.7204314Z Updating files:  39% (32543/83443)
+2025-06-04T21:51:52.7474379Z Updating files:  40% (33378/83443)
+2025-06-04T21:51:52.7740598Z Updating files:  41% (34212/83443)
+2025-06-04T21:51:52.8009581Z Updating files:  42% (35047/83443)
+2025-06-04T21:51:52.8280224Z Updating files:  43% (35881/83443)
+2025-06-04T21:51:52.8562872Z Updating files:  44% (36715/83443)
+2025-06-04T21:51:52.8839307Z Updating files:  45% (37550/83443)
+2025-06-04T21:51:52.9122795Z Updating files:  46% (38384/83443)
+2025-06-04T21:51:52.9401826Z Updating files:  47% (39219/83443)
+2025-06-04T21:51:52.9689111Z Updating files:  48% (40053/83443)
+2025-06-04T21:51:52.9962331Z Updating files:  49% (40888/83443)
+2025-06-04T21:51:53.0237175Z Updating files:  50% (41722/83443)
+2025-06-04T21:51:53.0507466Z Updating files:  51% (42556/83443)
+2025-06-04T21:51:53.0779517Z Updating files:  52% (43391/83443)
+2025-06-04T21:51:53.1047223Z Updating files:  53% (44225/83443)
+2025-06-04T21:51:53.1319515Z Updating files:  54% (45060/83443)
+2025-06-04T21:51:53.1594919Z Updating files:  55% (45894/83443)
+2025-06-04T21:51:53.1898453Z Updating files:  56% (46729/83443)
+2025-06-04T21:51:53.2176295Z Updating files:  57% (47563/83443)
+2025-06-04T21:51:53.2449515Z Updating files:  58% (48397/83443)
+2025-06-04T21:51:53.2717961Z Updating files:  59% (49232/83443)
+2025-06-04T21:51:53.2995673Z Updating files:  60% (50066/83443)
+2025-06-04T21:51:53.3264627Z Updating files:  61% (50901/83443)
+2025-06-04T21:51:53.3535325Z Updating files:  62% (51735/83443)
+2025-06-04T21:51:53.3804782Z Updating files:  63% (52570/83443)
+2025-06-04T21:51:53.4081462Z Updating files:  64% (53404/83443)
+2025-06-04T21:51:53.4463075Z Updating files:  65% (54238/83443)
+2025-06-04T21:51:53.4502570Z Updating files:  66% (55073/83443)
+2025-06-04T21:51:53.5281355Z Updating files:  66% (55130/83443)
+2025-06-04T21:51:53.6099549Z Updating files:  67% (55907/83443)
+2025-06-04T21:51:53.6864457Z Updating files:  68% (56742/83443)
+2025-06-04T21:51:53.7322335Z Updating files:  69% (57576/83443)
+2025-06-04T21:51:53.8196605Z Updating files:  70% (58411/83443)
+2025-06-04T21:51:53.9006531Z Updating files:  71% (59245/83443)
+2025-06-04T21:51:54.0134428Z Updating files:  72% (60079/83443)
+2025-06-04T21:51:54.1062739Z Updating files:  73% (60914/83443)
+2025-06-04T21:51:54.1903474Z Updating files:  74% (61748/83443)
+2025-06-04T21:51:54.2647161Z Updating files:  75% (62583/83443)
+2025-06-04T21:51:54.3586483Z Updating files:  76% (63417/83443)
+2025-06-04T21:51:54.4392863Z Updating files:  77% (64252/83443)
+2025-06-04T21:51:54.4502943Z Updating files:  78% (65086/83443)
+2025-06-04T21:51:54.5663204Z Updating files:  78% (65239/83443)
+2025-06-04T21:51:54.6544271Z Updating files:  79% (65920/83443)
+2025-06-04T21:51:54.7331486Z Updating files:  80% (66755/83443)
+2025-06-04T21:51:54.8431674Z Updating files:  81% (67589/83443)
+2025-06-04T21:51:54.9085045Z Updating files:  82% (68424/83443)
+2025-06-04T21:51:54.9741994Z Updating files:  83% (69258/83443)
+2025-06-04T21:51:55.0575626Z Updating files:  84% (70093/83443)
+2025-06-04T21:51:55.1493383Z Updating files:  85% (70927/83443)
+2025-06-04T21:51:55.2353237Z Updating files:  86% (71761/83443)
+2025-06-04T21:51:55.3391639Z Updating files:  87% (72596/83443)
+2025-06-04T21:51:55.4045346Z Updating files:  88% (73430/83443)
+2025-06-04T21:51:55.4505064Z Updating files:  89% (74265/83443)
+2025-06-04T21:51:55.4664329Z Updating files:  89% (74847/83443)
+2025-06-04T21:51:55.5224861Z Updating files:  90% (75099/83443)
+2025-06-04T21:51:55.6414744Z Updating files:  91% (75934/83443)
+2025-06-04T21:51:55.7276620Z Updating files:  92% (76768/83443)
+2025-06-04T21:51:55.8204716Z Updating files:  93% (77602/83443)
+2025-06-04T21:51:55.9526103Z Updating files:  94% (78437/83443)
+2025-06-04T21:51:56.0268255Z Updating files:  95% (79271/83443)
+2025-06-04T21:51:56.1035676Z Updating files:  96% (80106/83443)
+2025-06-04T21:51:56.1599974Z Updating files:  97% (80940/83443)
+2025-06-04T21:51:56.3081268Z Updating files:  98% (81775/83443)
+2025-06-04T21:51:56.3621851Z Updating files:  99% (82609/83443)
+2025-06-04T21:51:56.3622626Z Updating files: 100% (83443/83443)
+2025-06-04T21:51:56.3623043Z Updating files: 100% (83443/83443), done.
+2025-06-04T21:51:56.4698008Z Note: switching to 'refs/remotes/pull/2/merge'.
+2025-06-04T21:51:56.4699355Z 
+2025-06-04T21:51:56.4699817Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-06-04T21:51:56.4700524Z changes and commit them, and you can discard any commits you make in this
+2025-06-04T21:51:56.4702517Z state without impacting any branches by switching back to a branch.
+2025-06-04T21:51:56.4702972Z 
+2025-06-04T21:51:56.4703532Z If you want to create a new branch to retain commits you create, you may
+2025-06-04T21:51:56.4703970Z do so (now or later) by using -c with the switch command. Example:
+2025-06-04T21:51:56.4704205Z 
+2025-06-04T21:51:56.4704304Z   git switch -c <new-branch-name>
+2025-06-04T21:51:56.4704457Z 
+2025-06-04T21:51:56.4704541Z Or undo this operation with:
+2025-06-04T21:51:56.4704696Z 
+2025-06-04T21:51:56.4704777Z   git switch -
+2025-06-04T21:51:56.4704879Z 
+2025-06-04T21:51:56.4705067Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-06-04T21:51:56.4705342Z 
+2025-06-04T21:51:56.4705660Z HEAD is now at eee88bf9c Merge a7ab312bee181441b3edbb4a374fb42bff08c442 into a01b55b8ccd924680002ffc57ed60baa1f256fdc
+2025-06-04T21:51:56.6458282Z ##[endgroup]
+2025-06-04T21:51:56.6458748Z ##[group]Setting up auth for fetching submodules
+2025-06-04T21:51:56.6464865Z [command]/usr/bin/git config --global http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-06-04T21:51:56.6507442Z [command]/usr/bin/git config --global --unset-all url.https://github.com/.insteadOf
+2025-06-04T21:51:56.6536254Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+2025-06-04T21:51:56.6566217Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf org-150661001@github.com:
+2025-06-04T21:51:56.6591083Z ##[endgroup]
+2025-06-04T21:51:56.6591658Z ##[group]Fetching submodules
+2025-06-04T21:51:56.6595682Z [command]/usr/bin/git submodule sync --recursive
+2025-06-04T21:51:56.6894319Z [command]/usr/bin/git -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2025-06-04T21:51:56.7210151Z [command]/usr/bin/git submodule foreach --recursive git config --local gc.auto 0
+2025-06-04T21:51:56.7507437Z ##[endgroup]
+2025-06-04T21:51:56.7508116Z ##[group]Persisting credentials for submodules
+2025-06-04T21:51:56.7515095Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+2025-06-04T21:51:56.7819344Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2025-06-04T21:51:56.8123643Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+2025-06-04T21:51:56.8427494Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-150661001@github.com:'
+2025-06-04T21:51:56.8743682Z ##[endgroup]
+2025-06-04T21:51:56.8782386Z [command]/usr/bin/git log -1 --format=%H
+2025-06-04T21:51:56.8805228Z eee88bf9c2234d2ab50d5d867568ad2a7638a9ac
+2025-06-04T21:51:56.9005985Z ##[group]Run actions/setup-node@v4
+2025-06-04T21:51:56.9006244Z with:
+2025-06-04T21:51:56.9006420Z   node-version: 22.x
+2025-06-04T21:51:56.9006611Z   always-auth: false
+2025-06-04T21:51:56.9006796Z   check-latest: false
+2025-06-04T21:51:56.9007088Z   token: ***
+2025-06-04T21:51:56.9007252Z env:
+2025-06-04T21:51:56.9007472Z   PNPM_HOME: /home/runner/work/pixelated/pixelated/.pnpm
+2025-06-04T21:51:56.9007790Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:51:56.9008060Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:51:56.9008277Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:51:56.9008471Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:51:56.9008664Z   SKIP_FHE_TESTS: true
+2025-06-04T21:51:56.9009059Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:51:56.9009278Z ##[endgroup]
+2025-06-04T21:51:57.0778590Z Found in cache @ /opt/hostedtoolcache/node/22.15.0/x64
+2025-06-04T21:51:57.0785593Z ##[group]Environment details
+2025-06-04T21:51:58.9859132Z node: v22.15.0
+2025-06-04T21:51:58.9859492Z npm: 10.9.2
+2025-06-04T21:51:58.9859886Z yarn: 1.22.22
+2025-06-04T21:51:58.9860680Z ##[endgroup]
+2025-06-04T21:51:58.9969746Z ##[group]Run corepack enable
+2025-06-04T21:51:58.9970092Z [36;1mcorepack enable[0m
+2025-06-04T21:51:59.0232673Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:51:59.0232948Z env:
+2025-06-04T21:51:59.0233217Z   PNPM_HOME: /home/runner/work/pixelated/pixelated/.pnpm
+2025-06-04T21:51:59.0233578Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:51:59.0233866Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:51:59.0234218Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:51:59.0234442Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:51:59.0234658Z   SKIP_FHE_TESTS: true
+2025-06-04T21:51:59.0234896Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:51:59.0235143Z ##[endgroup]
+2025-06-04T21:51:59.1600171Z ##[group]Run pnpm/action-setup@v4
+2025-06-04T21:51:59.1600433Z with:
+2025-06-04T21:51:59.1600595Z   version: 10.11.0
+2025-06-04T21:51:59.1600776Z   run_install: false
+2025-06-04T21:51:59.1600968Z   dest: ~/setup-pnpm
+2025-06-04T21:51:59.1601171Z   package_json_file: package.json
+2025-06-04T21:51:59.1601394Z   standalone: false
+2025-06-04T21:51:59.1601565Z env:
+2025-06-04T21:51:59.1601778Z   PNPM_HOME: /home/runner/work/pixelated/pixelated/.pnpm
+2025-06-04T21:51:59.1602091Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:51:59.1602335Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:51:59.1602539Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:51:59.1602733Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:51:59.1602918Z   SKIP_FHE_TESTS: true
+2025-06-04T21:51:59.1603113Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:51:59.1603499Z ##[endgroup]
+2025-06-04T21:51:59.2145608Z ##[group]Running self-installer...
+2025-06-04T21:51:59.7666172Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2025-06-04T21:51:59.7782316Z Packages: +1
+2025-06-04T21:51:59.7782854Z +
+2025-06-04T21:52:00.2160681Z Progress: resolved 1, reused 0, downloaded 1, added 1, done
+2025-06-04T21:52:00.2717409Z 
+2025-06-04T21:52:00.2717923Z dependencies:
+2025-06-04T21:52:00.2718486Z + pnpm 10.11.0 (10.11.1 is available)
+2025-06-04T21:52:00.2718721Z 
+2025-06-04T21:52:00.2749493Z Done in 899ms
+2025-06-04T21:52:00.2937707Z ##[endgroup]
+2025-06-04T21:52:00.2942336Z Installation Completed!
+2025-06-04T21:52:00.3015767Z ##[group]Run mkdir -p /home/runner/work/pixelated/pixelated/node_modules/supabase/bin
+2025-06-04T21:52:00.3016402Z [36;1mmkdir -p /home/runner/work/pixelated/pixelated/node_modules/supabase/bin[0m
+2025-06-04T21:52:00.3070821Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:52:00.3071047Z env:
+2025-06-04T21:52:00.3071297Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:00.3071621Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:00.3071875Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:00.3072090Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:00.3072279Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:00.3072476Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:00.3072677Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:00.3072902Z ##[endgroup]
+2025-06-04T21:52:00.3181290Z ##[group]Run echo "Node.js version: $(node --version)"
+2025-06-04T21:52:00.3181659Z [36;1mecho "Node.js version: $(node --version)"[0m
+2025-06-04T21:52:00.3181971Z [36;1mecho "pnpm version: $(pnpm --version)"[0m
+2025-06-04T21:52:00.3229559Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:52:00.3229794Z env:
+2025-06-04T21:52:00.3230039Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:00.3230362Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:00.3230631Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:00.3230851Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:00.3231064Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:00.3231276Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:00.3231480Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:00.3231709Z ##[endgroup]
+2025-06-04T21:52:00.3337651Z Node.js version: v22.15.0
+2025-06-04T21:52:00.8947350Z pnpm version: 10.11.0
+2025-06-04T21:52:00.8973799Z ##[group]Run mkdir -p $PNPM_HOME
+2025-06-04T21:52:00.8974089Z [36;1mmkdir -p $PNPM_HOME[0m
+2025-06-04T21:52:00.8974328Z [36;1mecho "$PNPM_HOME" >> $GITHUB_PATH[0m
+2025-06-04T21:52:00.9039790Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:52:00.9040046Z env:
+2025-06-04T21:52:00.9040302Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:00.9040653Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:00.9040925Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:00.9041144Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:00.9041353Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:00.9041559Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:00.9041772Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:00.9042023Z ##[endgroup]
+2025-06-04T21:52:00.9144725Z ##[group]Run which pnpm || echo "pnpm not found in PATH"
+2025-06-04T21:52:00.9145089Z [36;1mwhich pnpm || echo "pnpm not found in PATH"[0m
+2025-06-04T21:52:00.9145369Z [36;1mpnpm --version[0m
+2025-06-04T21:52:00.9145581Z [36;1mecho "PNPM_HOME: $PNPM_HOME"[0m
+2025-06-04T21:52:00.9145823Z [36;1mecho "PATH: $PATH"[0m
+2025-06-04T21:52:00.9191627Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:52:00.9191842Z env:
+2025-06-04T21:52:00.9192067Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:00.9192382Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:00.9192621Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:00.9192819Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:00.9193008Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:00.9193199Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:00.9193384Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:00.9193598Z ##[endgroup]
+2025-06-04T21:52:00.9295524Z /home/runner/setup-pnpm/node_modules/.bin/pnpm
+2025-06-04T21:52:01.2070326Z 10.11.0
+2025-06-04T21:52:01.2136993Z PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:01.2139056Z PATH: /home/runner/setup-pnpm/node_modules/.bin:/opt/hostedtoolcache/node/22.15.0/x64/bin:/snap/bin:/home/runner/.local/bin:/opt/pipx_bin:/home/runner/.cargo/bin:/home/runner/.config/composer/vendor/bin:/usr/local/.ghcup/bin:/home/runner/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2025-06-04T21:52:01.2166779Z ##[group]Run echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+2025-06-04T21:52:01.2167223Z [36;1mecho "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT[0m
+2025-06-04T21:52:01.2220962Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-06-04T21:52:01.2221269Z env:
+2025-06-04T21:52:01.2221488Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:01.2221787Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:01.2222053Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:01.2222250Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:01.2222444Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:01.2222629Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:01.2222828Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:01.2223040Z ##[endgroup]
+2025-06-04T21:52:07.9491776Z ##[group]Run actions/cache@v4
+2025-06-04T21:52:07.9492008Z with:
+2025-06-04T21:52:07.9492247Z   path: /home/runner/setup-pnpm/node_modules/.bin/store/v10
+2025-06-04T21:52:07.9492730Z   key: Linux-pnpm-store-d40f7695f5fc24af859f4094fb70e2049dae2fa1d650dd8184c1fce824f04d32
+2025-06-04T21:52:07.9493165Z   restore-keys: Linux-pnpm-store-
+
+2025-06-04T21:52:07.9493406Z   enableCrossOsArchive: false
+2025-06-04T21:52:07.9493627Z   fail-on-cache-miss: false
+2025-06-04T21:52:07.9493823Z   lookup-only: false
+2025-06-04T21:52:07.9494002Z   save-always: false
+2025-06-04T21:52:07.9494170Z env:
+2025-06-04T21:52:07.9494369Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:07.9494668Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:07.9494912Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:07.9495105Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:07.9495287Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:07.9495473Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:07.9495702Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:07.9495911Z ##[endgroup]
+2025-06-04T21:52:08.1660311Z Cache hit for: Linux-pnpm-store-d40f7695f5fc24af859f4094fb70e2049dae2fa1d650dd8184c1fce824f04d32
+2025-06-04T21:52:09.2260848Z Received 247463936 of 650543306 (38.0%), 235.1 MBs/sec
+2025-06-04T21:52:10.2265918Z Received 469762048 of 650543306 (72.2%), 223.4 MBs/sec
+2025-06-04T21:52:10.9608369Z Received 650543306 of 650543306 (100.0%), 226.5 MBs/sec
+2025-06-04T21:52:10.9611600Z Cache Size: ~620 MB (650543306 B)
+2025-06-04T21:52:10.9655558Z [command]/usr/bin/tar -xf /home/runner/work/_temp/b013d89f-3b94-4ac2-acec-354800c8b873/cache.tzst -P -C /home/runner/work/pixelated/pixelated --use-compress-program unzstd
+2025-06-04T21:52:19.0887917Z Cache restored successfully
+2025-06-04T21:52:19.2045535Z Cache restored from key: Linux-pnpm-store-b3446d8c68abd51a30aaf9ae3f7360bf88b6376b2942c22c2944d55a191e2319
+2025-06-04T21:52:19.2178008Z ##[group]Run pnpm install --no-frozen-lockfile
+2025-06-04T21:52:19.2178661Z [36;1mpnpm install --no-frozen-lockfile[0m
+2025-06-04T21:52:19.2249892Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:52:19.2250123Z env:
+2025-06-04T21:52:19.2250363Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:19.2250701Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:19.2250961Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:19.2251174Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:19.2251374Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:19.2251570Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:19.2251768Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:19.2251993Z ##[endgroup]
+2025-06-04T21:52:19.6085611Z Lockfile is up to date, resolution step is skipped
+2025-06-04T21:52:19.7507583Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2025-06-04T21:52:20.0280058Z Packages: +2697
+2025-06-04T21:52:20.0280894Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2025-06-04T21:52:20.7516733Z Progress: resolved 2697, reused 1026, downloaded 0, added 0
+2025-06-04T21:52:21.7522203Z Progress: resolved 2697, reused 2541, downloaded 6, added 4
+2025-06-04T21:52:22.7531040Z Progress: resolved 2697, reused 2541, downloaded 154, added 298
+2025-06-04T21:52:23.7534836Z Progress: resolved 2697, reused 2541, downloaded 154, added 1130
+2025-06-04T21:52:24.7543324Z Progress: resolved 2697, reused 2541, downloaded 154, added 1562
+2025-06-04T21:52:25.7560533Z Progress: resolved 2697, reused 2541, downloaded 154, added 2000
+2025-06-04T21:52:26.7544763Z Progress: resolved 2697, reused 2541, downloaded 154, added 2494
+2025-06-04T21:52:27.1211513Z Progress: resolved 2697, reused 2541, downloaded 154, added 2697, done
+2025-06-04T21:52:31.8599983Z 
+2025-06-04T21:52:31.8600441Z dependencies:
+2025-06-04T21:52:31.8600882Z + @ai-sdk/openai 1.3.22
+2025-06-04T21:52:31.8601303Z + @astrojs/node 9.2.2
+2025-06-04T21:52:31.8601650Z + @astrojs/react 4.3.0
+2025-06-04T21:52:31.8602066Z + @aws-sdk/client-dynamodb 3.817.0
+2025-06-04T21:52:31.8602498Z + @aws-sdk/client-kms 3.812.0
+2025-06-04T21:52:31.8602882Z + @aws-sdk/client-s3 3.817.0
+2025-06-04T21:52:31.8603285Z + @aws-sdk/lib-dynamodb 3.817.0
+2025-06-04T21:52:31.8603711Z + @aws-sdk/util-dynamodb 3.817.0
+2025-06-04T21:52:31.8604091Z + @axe-core/react 4.10.1
+2025-06-04T21:52:31.8604422Z + @clerk/astro 2.8.1
+2025-06-04T21:52:31.8604888Z + @cloudflare/workers-types 4.20250529.0
+2025-06-04T21:52:31.8605390Z + @codesandbox/sdk 2.0.0-rc.3
+2025-06-04T21:52:31.8605821Z + @emotion/react 11.14.0
+2025-06-04T21:52:31.8606081Z + @emotion/styled 11.14.0
+2025-06-04T21:52:31.8606312Z + @eslint/eslintrc 3.3.1
+2025-06-04T21:52:31.8606538Z + @eslint/js 9.27.0
+2025-06-04T21:52:31.8606783Z + @google-cloud/storage 7.16.0
+2025-06-04T21:52:31.8607046Z + @iconify-json/lucide 1.2.44
+2025-06-04T21:52:31.8607297Z + @langchain/openai 0.5.11
+2025-06-04T21:52:31.8607542Z + @libsql/client 0.15.7
+2025-06-04T21:52:31.8607974Z + @mem0/vercel-ai-provider 1.0.5
+2025-06-04T21:52:31.8608440Z + @mui/material 7.1.0
+2025-06-04T21:52:31.8609029Z + @neondatabase/serverless 1.0.0
+2025-06-04T21:52:31.8609460Z + @next/font 14.2.15
+2025-06-04T21:52:31.8609900Z + @radix-ui/react-accordion 1.2.11
+2025-06-04T21:52:31.8610447Z + @radix-ui/react-alert-dialog 1.1.14
+2025-06-04T21:52:31.8610936Z + @radix-ui/react-checkbox 1.3.2
+2025-06-04T21:52:31.8611506Z + @radix-ui/react-dialog 1.1.14
+2025-06-04T21:52:31.8611958Z + @radix-ui/react-label 2.1.7
+2025-06-04T21:52:31.8612437Z + @radix-ui/react-popover 1.1.14
+2025-06-04T21:52:31.8612907Z + @radix-ui/react-select 2.2.5
+2025-06-04T21:52:31.8613368Z + @radix-ui/react-slider 1.3.5
+2025-06-04T21:52:31.8613874Z + @radix-ui/react-slot 1.2.3
+2025-06-04T21:52:31.8614330Z + @radix-ui/react-switch 1.2.5
+2025-06-04T21:52:31.8614758Z + @radix-ui/react-tabs 1.1.12
+2025-06-04T21:52:31.8615240Z + @radix-ui/react-tooltip 1.2.7
+2025-06-04T21:52:31.8615699Z + @react-three/fiber 9.1.2
+2025-06-04T21:52:31.8616112Z + @sentry/astro 9.15.0
+2025-06-04T21:52:31.8616503Z + @supabase/ssr 0.6.1
+2025-06-04T21:52:31.8617273Z + @supabase/supabase-js 2.49.8
+2025-06-04T21:52:31.8617785Z + @tensorflow/tfjs 4.22.0
+2025-06-04T21:52:31.8618266Z + @tensorflow/tfjs-layers 4.22.0
+2025-06-04T21:52:31.8618749Z + @testing-library/dom 10.4.0
+2025-06-04T21:52:31.8619444Z + @types/ws 8.18.1
+2025-06-04T21:52:31.8619925Z + @typescript-eslint/eslint-plugin 8.32.1
+2025-06-04T21:52:31.8620407Z + @unocss/reset 0.63.6
+2025-06-04T21:52:31.8620793Z + @upstash/redis 1.34.9
+2025-06-04T21:52:31.8621198Z + @vercel/analytics 1.5.0
+2025-06-04T21:52:31.8621713Z + @vercel/speed-insights 1.2.0
+2025-06-04T21:52:31.8622095Z + ai 4.3.16
+2025-06-04T21:52:31.8622425Z + astro-compress 2.3.8
+2025-06-04T21:52:31.8622787Z + astro-icon 1.1.5
+2025-06-04T21:52:31.8623132Z + astro-seo 0.8.4
+2025-06-04T21:52:31.8623467Z + aws-sdk 2.1692.0
+2025-06-04T21:52:31.8623788Z + axios 1.9.0
+2025-06-04T21:52:31.8624431Z + buffer 6.0.3
+2025-06-04T21:52:31.8624741Z + chart.js 4.4.9
+2025-06-04T21:52:31.8625070Z + circomlib 2.0.5
+2025-06-04T21:52:31.8625506Z + class-variance-authority 0.7.1
+2025-06-04T21:52:31.8625912Z + clsx 2.1.1
+2025-06-04T21:52:31.8626229Z + commander 13.1.0
+2025-06-04T21:52:31.8626583Z + composio-core 0.5.39
+2025-06-04T21:52:31.8626927Z + convex 1.24.1
+2025-06-04T21:52:31.8627258Z + crypto-js 4.2.0
+2025-06-04T21:52:31.8627661Z + date-fns 4.1.0
+2025-06-04T21:52:31.8628121Z + eslint-plugin-import-x 4.12.2
+2025-06-04T21:52:31.8628581Z + eslint-plugin-pnpm 0.3.1
+2025-06-04T21:52:31.8629269Z + eslint-plugin-react 7.37.5
+2025-06-04T21:52:31.8629767Z + eslint-plugin-react-hooks 5.2.0
+2025-06-04T21:52:31.8630301Z + eslint-plugin-unicorn 59.0.1
+2025-06-04T21:52:31.8630746Z + eslint-plugin-vue 10.1.0
+2025-06-04T21:52:31.8631231Z + eslint-processor-vue-blocks 2.0.0
+2025-06-04T21:52:31.8631700Z + fast-glob 3.3.3
+2025-06-04T21:52:31.8632064Z + flexsearch 0.8.204
+2025-06-04T21:52:31.8632446Z + framer-motion 12.12.1
+2025-06-04T21:52:31.8632849Z + gray-matter 4.0.3
+2025-06-04T21:52:31.8633196Z + ioredis 5.6.1
+2025-06-04T21:52:31.8633516Z + jotai 2.12.4
+2025-06-04T21:52:31.8633893Z + lucide-react 0.511.0
+2025-06-04T21:52:31.8634265Z + mem0ai 2.1.27
+2025-06-04T21:52:31.8634585Z + nanoid 5.1.5
+2025-06-04T21:52:31.8634907Z + newrelic 12.20.0
+2025-06-04T21:52:31.8635260Z + node-cron 3.0.3
+2025-06-04T21:52:31.8635617Z + node-seal 5.1.6
+2025-06-04T21:52:31.8635988Z + nprogress 0.2.0
+2025-06-04T21:52:31.8636324Z + openai 4.103.0
+2025-06-04T21:52:31.8636663Z + pdfkit 0.17.1
+2025-06-04T21:52:31.8636990Z + pg 8.16.0
+2025-06-04T21:52:31.8637305Z + postgres 3.4.7
+2025-06-04T21:52:31.8637637Z + preact 10.26.6
+2025-06-04T21:52:31.8637966Z + prismjs 1.30.0
+2025-06-04T21:52:31.8638351Z + promise-polyfill 8.3.0
+2025-06-04T21:52:31.8638734Z + react 19.1.0
+2025-06-04T21:52:31.8639346Z + react-chartjs-2 5.3.0
+2025-06-04T21:52:31.8639749Z + react-dom 19.1.0
+2025-06-04T21:52:31.8640135Z + react-hook-form 7.56.4
+2025-06-04T21:52:31.8640536Z + react-hot-toast 2.5.2
+2025-06-04T21:52:31.8640904Z + react-markdown 10.1.0
+2025-06-04T21:52:31.8641293Z + react-router-dom 7.6.0
+2025-06-04T21:52:31.8641761Z + react-syntax-highlighter 15.6.1
+2025-06-04T21:52:31.8642181Z + recharts 2.15.3
+2025-06-04T21:52:31.8642483Z + redis 5.1.0
+2025-06-04T21:52:31.8642818Z + rehype-sanitize 6.0.0
+2025-06-04T21:52:31.8643213Z + rehype-stringify 10.0.1
+2025-06-04T21:52:31.8643580Z + remark 15.0.1
+2025-06-04T21:52:31.8643912Z + remark-gfm 4.0.1
+2025-06-04T21:52:31.8644277Z + remark-parse 11.0.0
+2025-06-04T21:52:31.8644656Z + remark-rehype 11.1.2
+2025-06-04T21:52:31.8644981Z + resend 4.5.1
+2025-06-04T21:52:31.8645300Z + sanitize-html 2.17.0
+2025-06-04T21:52:31.8645651Z + simple-git 3.27.0
+2025-06-04T21:52:31.8645969Z + snarkjs 0.7.5
+2025-06-04T21:52:31.8646276Z + sonner 2.0.3
+2025-06-04T21:52:31.8646609Z + tailwind-merge 3.3.0
+2025-06-04T21:52:31.8646974Z + task-master-ai 0.16.1
+2025-06-04T21:52:31.8647310Z + three 0.176.0
+2025-06-04T21:52:31.8647640Z + three-stdlib 2.36.0
+2025-06-04T21:52:31.8647966Z + twilio 5.6.1
+2025-06-04T21:52:31.8648292Z + unstorage 1.16.0
+2025-06-04T21:52:31.8648616Z + uuid 11.1.0
+2025-06-04T21:52:31.8649401Z + web-push 3.6.7
+2025-06-04T21:52:31.8649780Z + whatwg-fetch 3.6.20
+2025-06-04T21:52:31.8650115Z + ws 8.18.2
+2025-06-04T21:52:31.8650411Z + zod 3.25.32
+2025-06-04T21:52:31.8650760Z + zod-to-json-schema 3.24.5
+2025-06-04T21:52:31.8651149Z + zustand 5.0.5
+2025-06-04T21:52:31.8651366Z 
+2025-06-04T21:52:31.8651510Z devDependencies:
+2025-06-04T21:52:31.8651920Z + @antfu/eslint-config 4.13.2
+2025-06-04T21:52:31.8652382Z + @ascorbic/feed-loader 1.0.4
+2025-06-04T21:52:31.8652833Z + @astrojs/check 0.9.4
+2025-06-04T21:52:31.8653253Z + @astrojs/cloudflare 12.5.3
+2025-06-04T21:52:31.8653760Z + @astrojs/language-server 2.15.4
+2025-06-04T21:52:31.8654261Z + @astrojs/markdown-remark 6.3.2
+2025-06-04T21:52:31.8654709Z + @astrojs/mdx 4.3.0
+2025-06-04T21:52:31.8655089Z + @astrojs/rss 4.0.11
+2025-06-04T21:52:31.8655488Z + @astrojs/sitemap 3.4.0
+2025-06-04T21:52:31.8656180Z + @astrojs/ts-plugin 1.10.4
+2025-06-04T21:52:31.8656611Z + @astrojs/vercel 8.1.4
+2025-06-04T21:52:31.8657077Z + @capacitor/preferences 7.0.1
+2025-06-04T21:52:31.8657615Z + @expressive-code/plugin-collapsible-sections 0.41.2
+2025-06-04T21:52:31.8658275Z + @expressive-code/plugin-line-numbers 0.41.2
+2025-06-04T21:52:31.8658957Z + @flydotio/dockerfile 0.7.10
+2025-06-04T21:52:31.8659394Z + @fontsource/dm-mono 5.2.5
+2025-06-04T21:52:31.8659777Z + @fontsource/inter 5.2.5
+2025-06-04T21:52:31.8660265Z + @fontsource/roboto-condensed 5.2.5
+2025-06-04T21:52:31.8660664Z + @iconify/json 2.2.342
+2025-06-04T21:52:31.8661158Z + @microsoft/eslint-formatter-sarif 3.1.0
+2025-06-04T21:52:31.8661647Z + @playwright/test 1.52.0
+2025-06-04T21:52:31.8662026Z + @shadcn/ui 0.0.4
+2025-06-04T21:52:31.8662459Z + @testing-library/react 16.3.0
+2025-06-04T21:52:31.8662956Z + @testing-library/user-event 14.6.1
+2025-06-04T21:52:31.8663415Z + @trunkio/launcher 1.3.4
+2025-06-04T21:52:31.8663805Z + @types/archiver 6.0.3
+2025-06-04T21:52:31.8664198Z + @types/cheerio 0.22.35
+2025-06-04T21:52:31.8664487Z + @types/k6 1.0.2
+2025-06-04T21:52:31.8664851Z + @types/mdast 4.0.4
+2025-06-04T21:52:31.8665238Z + @types/node 22.15.24
+2025-06-04T21:52:31.8665623Z + @types/node-fetch 2.6.12
+2025-06-04T21:52:31.8666021Z + @types/nprogress 0.2.3
+2025-06-04T21:52:31.8666350Z + @types/p5 1.7.6
+2025-06-04T21:52:31.8666727Z + @types/papaparse 5.3.16
+2025-06-04T21:52:31.8667067Z + @types/pg 8.15.2
+2025-06-04T21:52:31.8667376Z + @types/react 19.1.6
+2025-06-04T21:52:31.8667762Z + @types/react-dom 19.1.5
+2025-06-04T21:52:31.8668165Z + @types/sanitize-html 2.16.0
+2025-06-04T21:52:31.8668474Z + @types/three 0.175.0
+2025-06-04T21:52:31.8668987Z + @types/uuid 10.0.0
+2025-06-04T21:52:31.8669359Z + @types/web-push 3.6.4
+2025-06-04T21:52:31.8669802Z + @typescript-eslint/parser 8.32.1
+2025-06-04T21:52:31.8670214Z + @unocss/astro 66.1.3
+2025-06-04T21:52:31.8670584Z + @unocss/core 66.1.2
+2025-06-04T21:52:31.8671021Z + @unocss/preset-attributify 66.1.2
+2025-06-04T21:52:31.8671479Z + @unocss/preset-icons 66.1.2
+2025-06-04T21:52:31.8671898Z + @unocss/preset-uno 66.1.2
+2025-06-04T21:52:31.8672366Z + @unocss/preset-web-fonts 66.1.2
+2025-06-04T21:52:31.8672891Z + @unocss/transformer-directives 66.1.2
+2025-06-04T21:52:31.8673451Z + @unocss/transformer-variant-group 66.1.2
+2025-06-04T21:52:31.8673913Z + @unocss/vite 66.1.3
+2025-06-04T21:52:31.8674268Z + @vitest/coverage-v8 3.1.4
+2025-06-04T21:52:31.8674640Z + @vitest/ui 3.1.4
+2025-06-04T21:52:31.8674993Z + @vue/runtime-core 3.5.16
+2025-06-04T21:52:31.8675458Z + @webcomponents/custom-elements 1.6.0
+2025-06-04T21:52:31.8675873Z + archiver 7.0.1
+2025-06-04T21:52:31.8676172Z + astro 5.8.0
+2025-06-04T21:52:31.8676555Z + astro-expressive-code 0.41.2
+2025-06-04T21:52:31.8677013Z + astro-loader-github-prs 1.2.1
+2025-06-04T21:52:31.8677493Z + astro-loader-github-releases 2.0.1
+2025-06-04T21:52:31.8677932Z + astro-robots-txt 1.0.0
+2025-06-04T21:52:31.8678287Z + astro-vitesse 0.5.2
+2025-06-04T21:52:31.8678612Z + autoprefixer 10.4.21
+2025-06-04T21:52:31.8679165Z + axe-core 4.10.3
+2025-06-04T21:52:31.8679454Z + braces 3.0.3
+2025-06-04T21:52:31.8679758Z + chalk 5.4.1
+2025-06-04T21:52:31.8680237Z + chokidar 4.0.3
+2025-06-04T21:52:31.8680565Z + cross-env 7.0.3
+2025-06-04T21:52:31.8680852Z + dayjs 1.11.13
+2025-06-04T21:52:31.8681139Z + del-cli 6.0.0
+2025-06-04T21:52:31.8681425Z + dotenv 16.5.0
+2025-06-04T21:52:31.8681713Z + esbuild 0.25.4
+2025-06-04T21:52:31.8682006Z + eslint 9.27.0
+2025-06-04T21:52:31.8682403Z + eslint-config-prettier 9.1.0
+2025-06-04T21:52:31.8682835Z + eslint-plugin-astro 1.3.1
+2025-06-04T21:52:31.8683286Z + eslint-plugin-jsx-a11y 6.10.2
+2025-06-04T21:52:31.8683745Z + eslint-plugin-oxlint 0.16.11
+2025-06-04T21:52:31.8684234Z + eslint-plugin-vitest-globals 1.5.0
+2025-06-04T21:52:31.8684662Z + espree 10.3.0
+2025-06-04T21:52:31.8685042Z + fsevents 2.3.3
+2025-06-04T21:52:31.8685344Z + glob 10.4.5
+2025-06-04T21:52:31.8685672Z + glob-parent 6.0.2
+2025-06-04T21:52:31.8686001Z + globals 16.1.0
+2025-06-04T21:52:31.8686313Z + globby 14.1.0
+2025-06-04T21:52:31.8686929Z + hastscript 9.0.1
+2025-06-04T21:52:31.8687289Z + html-entities 2.6.0
+2025-06-04T21:52:31.8687721Z + intersection-observer 0.12.2
+2025-06-04T21:52:31.8688139Z + js-base64 3.7.7
+2025-06-04T21:52:31.8688433Z + jsdom 24.1.3
+2025-06-04T21:52:31.8688758Z + lint-staged 15.5.2
+2025-06-04T21:52:31.8689280Z + madge 8.0.0
+2025-06-04T21:52:31.8689624Z + mdast-util-directive 3.1.0
+2025-06-04T21:52:31.8690041Z + mdast-util-to-string 4.0.0
+2025-06-04T21:52:31.8690428Z + medium-zoom 1.1.0
+2025-06-04T21:52:31.8690736Z + mermaid 11.6.0
+2025-06-04T21:52:31.8691060Z + micromatch 4.0.8
+2025-06-04T21:52:31.8691364Z + oxlint 0.16.11
+2025-06-04T21:52:31.8691654Z + p5 1.11.7
+2025-06-04T21:52:31.8691966Z + papaparse 5.5.3
+2025-06-04T21:52:31.8692312Z + path-browserify 1.0.1
+2025-06-04T21:52:31.8692683Z + path-to-regexp 8.2.0
+2025-06-04T21:52:31.8693043Z + picomatch 4.0.2
+2025-06-04T21:52:31.8693395Z + playwright 1.52.0
+2025-06-04T21:52:31.8693732Z + postcss 8.5.3
+2025-06-04T21:52:31.8694084Z + postcss-import 16.1.0
+2025-06-04T21:52:31.8694572Z + postinstall-postinstall 2.1.0
+2025-06-04T21:52:31.8694982Z + prettier 3.5.3
+2025-06-04T21:52:31.8695424Z + prettier-plugin-astro 0.14.1
+2025-06-04T21:52:31.8695857Z + reading-time 1.5.0
+2025-06-04T21:52:31.8696313Z + rehype-autolink-headings 7.1.0
+2025-06-04T21:52:31.8696772Z + rehype-callouts 2.1.0
+2025-06-04T21:52:31.8697192Z + rehype-external-links 3.0.0
+2025-06-04T21:52:31.8697625Z + rehype-katex 7.0.1
+2025-06-04T21:52:31.8698017Z + remark-code-import 1.2.0
+2025-06-04T21:52:31.8698448Z + remark-directive 3.0.1
+2025-06-04T21:52:31.8698997Z + remark-imgattr 1.0.5
+2025-06-04T21:52:31.8699398Z + remark-math 6.0.0
+2025-06-04T21:52:31.8699783Z + remark-toc 9.0.0
+2025-06-04T21:52:31.8700227Z + resize-observer-polyfill 1.5.1
+2025-06-04T21:52:31.8700650Z + satori 0.12.2
+2025-06-04T21:52:31.8700997Z + satori-html 0.3.2
+2025-06-04T21:52:31.8701356Z + scheduler 0.26.0
+2025-06-04T21:52:31.8701691Z + sharp 0.33.5
+2025-06-04T21:52:31.8702011Z + shiki 3.4.2
+2025-06-04T21:52:31.8702388Z + stream-browserify 3.0.0
+2025-06-04T21:52:31.8702785Z + supabase 2.23.4
+2025-06-04T21:52:31.8703107Z + swiper 11.2.8
+2025-06-04T21:52:31.8703422Z + terser 5.39.2
+2025-06-04T21:52:31.8703755Z + ts-node 10.9.2
+2025-06-04T21:52:31.8704084Z + tsconfig 7.0.0
+2025-06-04T21:52:31.8704460Z + tsconfig-paths 4.2.0
+2025-06-04T21:52:31.8704816Z + tsx 4.19.4
+2025-06-04T21:52:31.8705178Z + typescript 5.8.3
+2025-06-04T21:52:31.8705524Z + unocss 66.1.3
+2025-06-04T21:52:31.8705888Z + url-polyfill 1.1.13
+2025-06-04T21:52:31.8706230Z + util 0.12.5
+2025-06-04T21:52:31.8706542Z + vfile 6.0.3
+2025-06-04T21:52:31.8706844Z + vite 6.3.5
+2025-06-04T21:52:31.8707210Z + vite-tsconfig-paths 5.1.4
+2025-06-04T21:52:31.8707589Z + vitest 3.1.4
+2025-06-04T21:52:31.8707903Z + vue 3.5.16
+2025-06-04T21:52:31.8708221Z + wait-on 7.2.0
+2025-06-04T21:52:31.8708587Z + web-animations-js 2.3.2
+2025-06-04T21:52:31.8709139Z + wrangler 4.17.0
+2025-06-04T21:52:31.8709357Z 
+2025-06-04T21:52:32.2826604Z Done in 13s using pnpm v10.11.0
+2025-06-04T21:52:32.3217026Z ##[group]Run pnpm check
+2025-06-04T21:52:32.3217275Z [36;1mpnpm check[0m
+2025-06-04T21:52:32.3269840Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:52:32.3270171Z env:
+2025-06-04T21:52:32.3270600Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2025-06-04T21:52:32.3271074Z   REDIS_URL: redis://localhost:6379
+2025-06-04T21:52:32.3271416Z   REDIS_KEY_PREFIX: test:
+2025-06-04T21:52:32.3271729Z   VITEST_TIMEOUT: 30000
+2025-06-04T21:52:32.3272040Z   SKIP_REDIS_TESTS: true
+2025-06-04T21:52:32.3272333Z   SKIP_FHE_TESTS: true
+2025-06-04T21:52:32.3272625Z   SKIP_BROWSER_COMPAT_TESTS: true
+2025-06-04T21:52:32.3272999Z ##[endgroup]
+2025-06-04T21:52:32.6053231Z 
+2025-06-04T21:52:32.6054010Z > pixelated@0.0.1 check /home/runner/work/pixelated/pixelated
+2025-06-04T21:52:32.6054649Z > trunk check
+2025-06-04T21:52:32.6054845Z 
+2025-06-04T21:52:34.1976583Z [0G
+2025-06-04T21:52:34.2124506Z [2K[0G
+2025-06-04T21:52:35.2532559Z [2K[0G[1m[31m✖ Unable to detect an upstream commit on this branch: Unable to detect a trunk branch such as 'main'. Checked the following - refs/remotes/origin/HEAD, refs/remotes/origin/main, refs/remotes/origin/master, main, master. See https://docs.trunk.io/docs/reference-trunk-yaml#repo for more information[0m
+2025-06-04T21:52:35.2767157Z  ELIFECYCLE  Command failed with exit code 2.
+2025-06-04T21:52:35.2944965Z ##[error]Process completed with exit code 2.
+2025-06-04T21:52:35.3003226Z Post job cleanup.
+2025-06-04T21:52:35.3535273Z Pruning is unnecessary.
+2025-06-04T21:52:35.3628677Z Post job cleanup.
+2025-06-04T21:52:35.4561595Z [command]/usr/bin/git version
+2025-06-04T21:52:35.4604215Z git version 2.49.0
+2025-06-04T21:52:35.4658751Z Temporarily overriding HOME='/home/runner/work/_temp/3c8c6a83-615d-4d8a-ab8a-987b1cc00b67' before making global git config changes
+2025-06-04T21:52:35.4660466Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-04T21:52:35.4665351Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pixelated/pixelated
+2025-06-04T21:52:35.4703476Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-04T21:52:35.4741232Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-04T21:52:35.5080435Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-04T21:52:35.5106152Z http.https://github.com/.extraheader
+2025-06-04T21:52:35.5119884Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-06-04T21:52:35.5153056Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-04T21:52:35.5575366Z Cleaning up orphan processes
+2025-06-04T21:52:35.5849178Z Terminate orphan process: pid (2571) (trunk(pixelated))
+2025-06-04T21:52:35.5882795Z Terminate orphan process: pid (2578) (crashpad_handler)

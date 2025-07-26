@@ -1,0 +1,417 @@
+---
+import BaseHead from '@/components/base/Head.astro'
+import Header from '@/components/layout/Header.astro'
+import Footer from '@/components/layout/Footer.astro'
+import ThemeToggle from '@/components/ui/ThemeToggle.astro'
+
+interface Props {
+  title: string
+  description?: string
+  image?: string
+  canonicalURL?: string
+  frontmatter?: {
+    title: string
+    description?: string
+    image?: string
+    pubDate?: Date
+    author?: string
+    tags?: string[]
+  }
+}
+
+// Use frontmatter if available, otherwise use props
+const {
+  frontmatter,
+  title: propTitle,
+  description: propDescription = 'Documentation',
+  image: propImage = '/logo/docs-image.png',
+} = Astro.props
+
+const title = frontmatter?.title || propTitle
+const description = frontmatter?.description || propDescription
+const image = frontmatter?.image || propImage
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <BaseHead {title} {description} ogImage={image} />
+
+    <!-- Documentation-specific styles -->
+    <style is:global>
+      /* Enhanced styling for documentation content */
+      .docs-content {
+        width: 100%;
+        max-width: 768px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .docs-content h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .docs-content h2 {
+        font-size: 1.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+        border-bottom: 1px solid;
+        padding-bottom: 0.5rem;
+      }
+
+      .docs-content h3 {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        margin-top: 1.5rem;
+      }
+
+      .docs-content h4 {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        margin-top: 1.25rem;
+      }
+
+      .docs-content p {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        line-height: 1.625;
+      }
+
+      .docs-content ul,
+      .docs-content ol {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        margin-left: 1.5rem;
+      }
+
+      .docs-content li {
+        margin-bottom: 0.5rem;
+      }
+
+      .docs-content a:not(.btn) {
+        color: #3b82f6;
+        text-decoration: underline;
+        transition: color 0.15s ease-in-out;
+      }
+
+      .docs-content a:not(.btn):hover {
+        color: #2563eb;
+      }
+
+      .docs-content blockquote {
+        border-left: 4px solid #3b82f6;
+        padding-left: 1rem;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        background-color: rgba(241, 245, 249, 0.5);
+        border-radius: 0.25rem;
+      }
+
+      .docs-content pre {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        overflow-x: auto;
+      }
+
+      .docs-content code {
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        background-color: #f1f5f9;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.875rem;
+      }
+
+      .docs-content pre code {
+        padding: 0;
+        background-color: transparent;
+      }
+
+      .docs-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .docs-content th,
+      .docs-content td {
+        border: 1px solid;
+        padding: 0.5rem;
+      }
+
+      .docs-content th {
+        background-color: #f1f5f9;
+        font-weight: 500;
+      }
+
+      /* Custom components styling */
+      .card-group {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      }
+
+      .card {
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid;
+        background-color: #ffffff;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        transition: box-shadow 0.15s ease-in-out;
+      }
+
+      .card:hover {
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0 0.625rem;
+        height: 1.25rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background-color: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+      }
+
+      .steps {
+        margin-left: 0;
+        list-style-type: none;
+      }
+
+      .steps > li {
+        position: relative;
+        padding-left: 2.5rem;
+        padding-bottom: 2rem;
+        border-left: 1px solid #f1f5f9;
+        margin-left: 1.5rem;
+      }
+
+      .steps > li:last-child {
+        border-left: 0;
+        padding-bottom: 0;
+      }
+
+      .steps > li::before {
+        position: absolute;
+        left: -0.5rem;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 9999px;
+        color: white;
+        background-color: #3b82f6;
+        font-size: 0.875rem;
+        font-weight: 700;
+        content: counter(step);
+        counter-increment: step;
+      }
+
+      /* Light/dark mode adjustments */
+      html.dark .docs-content blockquote {
+        background-color: rgba(241, 245, 249, 0.2);
+      }
+
+      html.dark .docs-content th {
+        background-color: rgba(241, 245, 249, 0.8);
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-background font-sans antialiased">
+    <Header />
+
+    <div class="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+      <!-- Sidebar for navigation -->
+      <aside class="md:w-64 shrink-0" transition:persist>
+        <div class="sticky top-24">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-lg">Documentation</h3>
+            <ThemeToggle />
+          </div>
+
+          <nav class="space-y-1">
+            <a
+              href="/docs"
+              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              transition:animate="slide">Home</a
+            >
+            <a
+              href="/docs/api"
+              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              transition:animate="slide">API Reference</a
+            >
+            <a
+              href="/docs/components"
+              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              transition:animate="slide">Components</a
+            >
+            <a
+              href="/docs/security"
+              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              transition:animate="slide">Security</a
+            >
+            <a
+              href="/docs/guides"
+              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              transition:animate="slide">Guides</a
+            >
+          </nav>
+
+          <!-- On this page navigation (generated from headings) -->
+          <div class="mt-8">
+            <h4 class="font-semibold text-sm mb-3 text-muted-foreground">
+              ON THIS PAGE
+            </h4>
+            <div class="text-sm space-y-1" id="on-this-page">
+              <!-- This will be populated by JS -->
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="flex-1" transition:animate="slide">
+        <article
+          class="prose prose-lg dark:prose-invert max-w-none docs-content"
+        >
+          <!-- Documentation title and metadata -->
+          <header class="mb-8">
+            <h1 class="text-4xl font-bold mb-4" transition:name="doc-title">
+              {title}
+            </h1>
+            <p class="text-muted-foreground" transition:name="doc-desc">
+              {description}
+            </p>
+          </header>
+
+          <!-- Documentation content -->
+          <div>
+            <slot />
+          </div>
+
+          <!-- Footer navigation -->
+          <div
+            class="mt-16 pt-8 border-t flex justify-between"
+            transition:animate="slide"
+          >
+            <a
+              href="#"
+              class="text-sm flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clip-rule="evenodd"></path>
+              </svg>
+              Previous Page
+            </a>
+            <a
+              href="#"
+              class="text-sm flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              Next Page
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </a>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <Footer />
+    <script is:inline>
+      function speedInsightsBeforeSend(data) {
+        console.log('Speed Insights before send', data)
+        return data
+      }
+    </script>
+    <script>
+      // Generate table of contents from headings
+      document.addEventListener('astro:page-load', () => {
+        const headings = document.querySelectorAll(
+          '.docs-content h2, .docs-content h3',
+        )
+        const tocContainer = document.getElementById('on-this-page')
+
+        if (tocContainer) {
+          tocContainer.innerHTML = ''
+
+          headings.forEach((heading) => {
+            if (!heading.id) {
+              // Generate ID if not present
+              const headingText = heading.textContent || ''
+              heading.id = headingText
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+            }
+
+            const link = document.createElement('a')
+            link.href = `#${heading.id}`
+            link.textContent = heading.textContent || ''
+            link.className =
+              heading.tagName === 'H2'
+                ? 'block py-1 hover:text-primary transition-colors'
+                : 'block py-1 pl-4 text-muted-foreground hover:text-primary transition-colors'
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault()
+              const targetElement = document.querySelector(`#${heading.id}`)
+              if (targetElement) {
+                targetElement.scrollIntoView({
+                  behavior: 'smooth',
+                })
+              }
+            })
+
+            tocContainer.appendChild(link)
+          })
+        }
+      })
+    </script>
+  </body>
+</html>

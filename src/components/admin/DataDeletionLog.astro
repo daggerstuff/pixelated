@@ -1,0 +1,584 @@
+---
+// DataDeletionLog.astro - Tracks all data deletion requests and their outcomes
+import { Icon } from 'astro-icon/components'
+import DataDeletionRequestForm from './DataDeletionRequestForm.astro'
+
+// Define types for request data
+interface DeletionRequest {
+  id: string
+  patientId: string
+  patientName: string
+  dateRequested: string
+  dataScope: 'all' | 'specific'
+  reason: string
+  status: 'pending' | 'completed' | 'in-progress' | 'denied'
+  dateProcessed: string | null
+  processedBy: string | null
+}
+
+// Sample deletion requests
+const deletionRequests: DeletionRequest[] = [
+  {
+    id: 'DEL-2025-5678',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Robert Garcia',
+    dateRequested: '2025-06-15T10:30:00Z',
+    dataScope: 'all',
+    reason: 'No longer a patient',
+    status: 'pending',
+    dateProcessed: null,
+    processedBy: null,
+  },
+  {
+    id: 'DEL-2025-5679',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Jessica Thompson',
+    dateRequested: '2025-06-12T14:15:00Z',
+    dataScope: 'specific',
+    reason: 'Privacy concerns for specific sessions',
+    status: 'completed',
+    dateProcessed: '2025-06-14T09:20:00Z',
+    processedBy: 'Admin Johnson',
+  },
+  {
+    id: 'DEL-2025-5680',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'James Brown',
+    dateRequested: '2025-06-10T08:45:00Z',
+    dataScope: 'all',
+    reason: 'Moving to different provider',
+    status: 'completed',
+    dateProcessed: '2025-06-11T16:30:00Z',
+    processedBy: 'Dr. Smith',
+  },
+  {
+    id: 'DEL-2025-5681',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Maria Rodriguez',
+    dateRequested: '2025-06-17T11:25:00Z',
+    dataScope: 'specific',
+    reason: 'Sensitive data from prior visit',
+    status: 'pending',
+    dateProcessed: null,
+    processedBy: null,
+  },
+  {
+    id: 'DEL-2025-5682',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'David Wilson',
+    dateRequested: '2025-05-30T09:10:00Z',
+    dataScope: 'all',
+    reason: 'Exercise HIPAA right to delete',
+    status: 'completed',
+    dateProcessed: '2025-06-02T13:45:00Z',
+    processedBy: 'Admin Johnson',
+  },
+]
+
+// Format date
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+// Get status badge class
+const getStatusBadgeClass = (status: DeletionRequest['status']): string => {
+  switch (status) {
+    case 'completed':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+    case 'in-progress':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+    case 'denied':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700/50 dark:text-gray-300'
+  }
+}
+
+// Get scope badge class
+const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
+  switch (scope) {
+    case 'all':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+    case 'specific':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700/50 dark:text-gray-300'
+  }
+}
+---
+
+<div class="space-y-6">
+  <!-- Header with Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+        Total Deletion Requests
+      </p>
+      <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">7</p>
+      <div class="flex items-center mt-4 text-green-500 dark:text-green-400">
+        <Icon name="trending-up" class="w-4 h-4 mr-1" />
+        <span class="text-sm font-medium">+3 from last month</span>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+        Pending Requests
+      </p>
+      <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">2</p>
+      <div class="flex items-center mt-4 text-yellow-500 dark:text-yellow-400">
+        <span class="text-sm font-medium">Requires attention</span>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+        Avg. Processing Time
+      </p>
+      <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+        1.8 days
+      </p>
+      <div class="flex items-center mt-4 text-green-500 dark:text-green-400">
+        <Icon name="trending-down" class="w-4 h-4 mr-1" />
+        <span class="text-sm font-medium">-0.5 days from last month</span>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+        Full Record Deletions
+      </p>
+      <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">60%</p>
+      <div class="flex items-center mt-4 text-gray-500 dark:text-gray-400">
+        <span class="text-sm font-medium">3 of 5 requests</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-end">
+    <button
+      id="new-deletion-request-btn"
+      type="button"
+      class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-700 dark:hover:bg-red-600 flex items-center"
+      aria-label="Create new deletion request"
+    >
+      <Icon name="plus" class="w-5 h-5 mr-2" />
+      New Deletion Request
+    </button>
+  </div>
+
+  <!-- Search and Filter Controls -->
+  <div
+    class="flex flex-col md:flex-row md:justify-between md:items-center gap-4"
+  >
+    <div class="flex flex-1 relative items-center max-w-md">
+      <div
+        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+      >
+        <Icon name="search" class="h-5 w-5 text-gray-400" />
+      </div>
+      <input
+        type="text"
+        placeholder="Search by ID, name, or patient ID..."
+        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      />
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <div class="inline-flex">
+        <select
+          id="filter-status"
+          class="block w-full py-2 pl-3 pr-10 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        >
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+          <option value="in-progress">In Progress</option>
+          <option value="denied">Denied</option>
+        </select>
+      </div>
+
+      <div class="inline-flex">
+        <select
+          id="filter-scope"
+          class="block w-full py-2 pl-3 pr-10 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        >
+          <option value="">All Scopes</option>
+          <option value="all">Full Record</option>
+          <option value="specific">Specific Data</option>
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
+      >
+        <Icon name="calendar" class="w-5 h-5 mr-2" />
+        Date Range
+      </button>
+    </div>
+  </div>
+
+  <!-- Deletion Requests Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <thead class="bg-gray-50 dark:bg-gray-800">
+        <tr>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Request ID
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Patient
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Requested
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Scope
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Status
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Processed
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700"
+      >
+        {
+          deletionRequests.map((request) => (
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                {request.id}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <div class="flex flex-col">
+                  <span class="font-medium text-gray-800 dark:text-white">
+                    {request.patientName}
+                  </span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {request.patientId}
+                  </span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                {formatDate(request.dateRequested)}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <span
+                  class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getScopeBadgeClass(request.dataScope)}`}
+                >
+                  {request.dataScope === 'all'
+                    ? 'Full Record'
+                    : 'Specific Data'}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <span
+                  class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(request.status)}`}
+                >
+                  {request.status.charAt(0).toUpperCase() +
+                    request.status.slice(1)}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                {request.dateProcessed
+                  ? formatDate(request.dateProcessed)
+                  : '-'}
+                {request.processedBy && (
+                  <span class="block text-xs text-gray-500 dark:text-gray-400">
+                    by {request.processedBy}
+                  </span>
+                )}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                    aria-label="View details"
+                  >
+                    <Icon name="eye" class="w-5 h-5" />
+                  </button>
+
+                  {request.status === 'pending' && (
+                    <button
+                      type="button"
+                      class="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+                      aria-label="Approve request"
+                      data-request-id={request.id}
+                      data-action="approve"
+                    >
+                      <Icon name="check" class="w-5 h-5" />
+                    </button>
+                  )}
+
+                  {request.status === 'pending' && (
+                    <button
+                      type="button"
+                      class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                      aria-label="Deny request"
+                      data-request-id={request.id}
+                      data-action="deny"
+                    >
+                      <Icon name="x" class="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))
+        }
+
+        {
+          deletionRequests.length === 0 && (
+            <tr>
+              <td
+                colspan="7"
+                class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400"
+              >
+                No deletion requests found
+              </td>
+            </tr>
+          )
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex items-center justify-between">
+    <div class="flex-1 flex justify-between items-center">
+      <button
+        type="button"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+      >
+        Previous
+      </button>
+      <span class="text-sm text-gray-700 dark:text-gray-300">
+        Page 1 of 1
+      </span>
+      <button
+        type="button"
+        class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for New Deletion Request -->
+<div
+  id="deletion-request-modal"
+  class="fixed inset-0 z-50 overflow-y-auto hidden"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
+    <!-- Background overlay -->
+    <div
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+      aria-hidden="true"
+    >
+    </div>
+
+    <!-- Modal panel -->
+    <div
+      class="inline-block align-bottom bg-white dark:bg-gray-900 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full"
+    >
+      <div class="absolute top-0 right-0 pt-4 pr-4">
+        <button
+          type="button"
+          id="close-modal-btn"
+          class="bg-white dark:bg-gray-900 rounded-md text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          aria-label="Close modal"
+        >
+          <span class="sr-only">Close</span>
+          <Icon name="x" class="h-6 w-6" />
+        </button>
+      </div>
+
+      <!-- Deletion Request Form -->
+      <DataDeletionRequestForm />
+    </div>
+  </div>
+</div>
+
+<script>
+  // Extend Window interface to include toast property
+  interface ToastInterface {
+    success: (message: string) => void
+    error: (message: string) => void
+  }
+
+  declare global {
+    interface Window {
+      toast?: ToastInterface
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Modal elements
+    const modal = document.getElementById('deletion-request-modal')
+    const newRequestBtn = document.getElementById('new-deletion-request-btn')
+    const closeModalBtn = document.getElementById('close-modal-btn')
+
+    // Handle approve/deny buttons
+    const actionButtons = document.querySelectorAll('[data-action]')
+
+    // Open modal
+    newRequestBtn?.addEventListener('click', () => {
+      modal?.classList.remove('hidden')
+      document.body.classList.add('overflow-hidden')
+    })
+
+    // Close modal
+    closeModalBtn?.addEventListener('click', () => {
+      modal?.classList.add('hidden')
+      document.body.classList.remove('overflow-hidden')
+    })
+
+    // Close modal when clicking outside
+    modal?.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.classList.add('hidden')
+        document.body.classList.remove('overflow-hidden')
+      }
+    })
+
+    // Escape key closes modal
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal?.classList.contains('hidden')) {
+        modal?.classList.add('hidden')
+        document.body.classList.remove('overflow-hidden')
+      }
+    })
+
+    // Handle approve/deny actions
+    actionButtons.forEach((button) => {
+      button.addEventListener('click', async () => {
+        const requestId = button.getAttribute('data-request-id')
+        const action = button.getAttribute('data-action')
+
+        if (!requestId || !action) return
+
+        try {
+          // Show confirmation before proceeding
+          let confirmed = false
+
+          if (action === 'approve') {
+            confirmed = confirm(
+              `Are you sure you want to approve deletion request ${requestId}? This action will permanently delete patient data and cannot be undone.`,
+            )
+          } else if (action === 'deny') {
+            confirmed = confirm(
+              `Are you sure you want to deny deletion request ${requestId}?`,
+            )
+          }
+
+          if (!confirmed) return
+
+          // Update request status via API
+          const response = await fetch(
+            '/api/admin/patient-rights/update-deletion-request',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+              },
+              body: JSON.stringify({
+                id: requestId,
+                status: action === 'approve' ? 'completed' : 'denied',
+                processingNotes:
+                  action === 'approve'
+                    ? 'Approved via admin interface'
+                    : 'Denied via admin interface',
+              }),
+            },
+          )
+
+          const result = await response.json()
+
+          if (response.ok) {
+            // Show success message
+            if (window.toast) {
+              window.toast.success(
+                `Request ${action === 'approve' ? 'approved' : 'denied'} successfully`,
+              )
+            } else {
+              alert(
+                `Request ${action === 'approve' ? 'approved' : 'denied'} successfully`,
+              )
+            }
+
+            // Refresh the page to show updated data
+            setTimeout(() => {
+              window.location.reload()
+            }, 1500)
+          } else {
+            // Show error message
+            if (window.toast) {
+              window.toast.error(
+                result.message || `Failed to ${action} request`,
+              )
+            } else {
+              alert(result.message || `Failed to ${action} request`)
+            }
+          }
+        } catch (error) {
+          console.error(`Error ${action}ing deletion request:`, error)
+
+          // Show error message
+          if (window.toast) {
+            window.toast.error(
+              `An error occurred while ${action}ing the request`,
+            )
+          } else {
+            alert(`An error occurred while ${action}ing the request`)
+          }
+        }
+      })
+    })
+  })
+</script>

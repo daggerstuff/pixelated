@@ -1,0 +1,239 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard.astro'
+import { PrivacyDashboard } from '@/components/analytics/PrivacyDashboard'
+import { MetricWidget } from '@/components/analytics/MetricWidget'
+import { ChartWidget } from '@/components/analytics/ChartWidget'
+import { TableWidget } from '@/components/analytics/TableWidget'
+
+// Type for engagement metrics
+interface EngagementMetrics {
+  totalSessions: number;
+  engagementRate: number;
+  avgSessionDuration: number;
+  activeUsers: number;
+  sessionTrends: {
+    labels: string[];
+    series: { name: string; data: number[]; color?: string }[];
+  };
+  engagementRateTrend: {
+    labels: string[];
+    series: { name: string; data: number[]; color?: string }[];
+  };
+  sessionDurationTrend: {
+    labels: string[];
+    series: { name: string; data: number[]; color?: string }[];
+  };
+  interactionBreakdown: {
+    label: string;
+    value: number;
+  }[];
+  recentActivity: {
+    user: string;
+    action: string;
+    duration: number;
+    timestamp: number;
+    sessionScore: number;
+  }[];
+}
+
+let metrics: EngagementMetrics | null = null
+let error: string | null = null
+try {
+  const res = await fetch('/api/analytics/engagement')
+  if (!res.ok) throw new Error('Failed to fetch engagement metrics')
+  metrics = await res.json()
+} catch (err) {
+  error = err instanceof Error ? err.message : 'Unknown error'
+}
+
+import type { Column } from '@/components/analytics/TableWidget'
+
+const activityTableColumns: Column[] = [
+  { key: 'user', label: 'User ID', sortable: true },
+  { key: 'action', label: 'Activity Type', sortable: true },
+  {
+    key: 'duration',
+    label: 'Duration (min)',
+    sortable: true,
+    render: (value) => (value as number).toFixed(1)
+  },
+  {
+    key: 'timestamp',
+    label: 'Time',
+    sortable: true,
+    render: (value) => new Date(value as number).toLocaleTimeString()
+  },
+  {
+    key: 'sessionScore',
+    label: 'Score',
+    sortable: true,
+    render: (value) => (
+      `<span class="${(value as number) >= 85 ? 'text-green-500' : (value as number) >= 70 ? 'text-yellow-500' : 'text-red-500'}">${value}%</span>`
+    )
+  },
+]
+---
+
+<BaseLayout
+  title="Engagement Metrics | Analytics"
+  description="Track and analyze user engagement metrics"
+>
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Sidebar -->
+      <div class="w-full lg:w-[350px] space-y-6">
+        <PrivacyDashboard client:load />
+
+        <div class="bg-card rounded-lg border p-4">
+          <h3 class="text-lg font-semibold mb-3">Analytics Sections</h3>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="/analytics"
+                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+              >
+                <span class="text-sm font-medium">Usage Analytics</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/analytics/engagement"
+                class="flex items-center py-2 px-3 bg-primary/10 text-primary rounded-md"
+              >
+                <span class="text-sm font-medium">Engagement Metrics</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/analytics/conversions"
+                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+              >
+                <span class="text-sm font-medium">Conversion Tracking</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/admin/performance-dashboard"
+                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+              >
+                <span class="text-sm font-medium">Performance Metrics</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1">
+        <AnalyticsDashboard
+          title="Engagement Metrics"
+          description="Track and analyze user engagement with your platform"
+          columns={2}
+          widgetGap="medium"
+        >
+          {error ? (
+            <div class="col-span-2 text-center text-red-600 font-semibold py-8">
+              Failed to load engagement metrics: {error}
+            </div>
+          ) : !metrics ? (
+            <div class="col-span-2 text-center text-gray-500 py-8">
+              Loading engagement metrics...
+            </div>
+          ) : (
+            <>
+              {/* Key Metrics Row */}
+              <MetricWidget
+                client:load
+                title="Total Sessions"
+                metricName="total_sessions"
+                value={metrics.totalSessions}
+                previousValue={undefined}
+              />
+              <MetricWidget
+                client:load
+                title="Engagement Rate"
+                metricName="engagement_rate"
+                value={metrics.engagementRate}
+                previousValue={undefined}
+                format="percentage"
+              />
+              <MetricWidget
+                client:load
+                title="Avg. Session Duration"
+                metricName="avg_session_duration"
+                value={metrics.avgSessionDuration}
+                previousValue={undefined}
+                suffix=" min"
+              />
+              <MetricWidget
+                client:load
+                title="Active Users"
+                metricName="active_users"
+                value={metrics.activeUsers}
+                previousValue={undefined}
+              />
+
+              <!-- Charts Row -->
+              <ChartWidget
+                client:load
+                title="Session Trends"
+                description="Daily session count and unique users"
+                chartType="line"
+                labels={metrics.sessionTrends.labels}
+                series={metrics.sessionTrends.series}
+                isTimeSeries={true}
+                allowRangeSelection={true}
+                height={300}
+              />
+              <ChartWidget
+                client:load
+                title="Engagement Rate Trend"
+                description="Daily engagement rate percentage"
+                chartType="line"
+                labels={metrics.engagementRateTrend.labels}
+                series={metrics.engagementRateTrend.series}
+                isTimeSeries={true}
+                allowRangeSelection={true}
+                height={300}
+              />
+              <ChartWidget
+                client:load
+                title="Session Duration Trend"
+                description="Average daily session duration in minutes"
+                chartType="line"
+                labels={metrics.sessionDurationTrend.labels}
+                series={metrics.sessionDurationTrend.series}
+                isTimeSeries={true}
+                allowRangeSelection={true}
+                height={300}
+              />
+              <ChartWidget
+                client:load
+                title="Interaction Breakdown"
+                description="Percentage distribution of user interactions"
+                chartType="pie"
+                labels={metrics.interactionBreakdown.map((i: { label: string }) => i.label)}
+                series={metrics.interactionBreakdown}
+                height={300}
+              />
+              <!-- Table Widget - Spans full width -->
+              <div class="col-span-1 lg:col-span-2">
+                <TableWidget
+                  client:load
+                  title="Recent Activity"
+                  description="Latest user engagement events"
+                  columns={activityTableColumns}
+                  data={metrics.recentActivity}
+                  enableSearch={true}
+                  enableExport={true}
+                  pagination={{ pageSize: 5 }}
+                />
+              </div>
+            </>
+          )}
+        </AnalyticsDashboard>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

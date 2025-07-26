@@ -1,0 +1,94 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import type { CollectionEntry } from 'astro:content'
+
+export const prerender = true
+
+// Get all blog posts that are not drafts
+const posts = await getCollection(
+  'blog',
+  ({ data }: { data: { draft?: boolean } }) => {
+    return import.meta.env.PROD ? !data.draft : true
+  },
+)
+
+// Extract all tags and count their occurrences
+const tagCounts = posts.reduce(
+  (acc: Record<string, number>, post: CollectionEntry<'blog'>) => {
+    if (!post.data.tags) return acc
+
+    post.data.tags.forEach((tag: string) => {
+      acc[tag] = (acc[tag] || 0) + 1
+    })
+
+    return acc
+  },
+  {} as Record<string, number>,
+)
+
+// Convert to array, sort alphabetically
+const sortedTags = Object.entries(tagCounts)
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .map(([tag, count]) => ({ tag, count }))
+
+const title = 'Blog Tags'
+const description = 'Browse all blog tags'
+const bgType = 'rose'
+---
+
+<BaseLayout {title} {description} {bgType}>
+  <main class="max-w-3xl mx-auto px-4 py-12">
+    <header class="mb-8">
+      <div class="flex items-center gap-2 mb-2 text-sm">
+        <a
+          href="/blog"
+          class="hover:text-primary transition-colors"
+          data-astro-prefetch>Blog</a
+        >
+        <span>/</span>
+        <span class="font-medium text-primary">Tags</span>
+      </div>
+      <h1 class="text-3xl font-bold mb-2">{title}</h1>
+      <p class="text-gray-600 dark:text-gray-400">{description}</p>
+    </header>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {
+        sortedTags.map(({ tag, count }) => (
+          <a
+            href={`/blog/tags/${tag}`}
+            class="p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group"
+            data-astro-prefetch
+          >
+            <div class="font-medium group-hover:text-primary transition-colors">
+              {tag}
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              {count} {count === 1 ? 'post' : 'posts'}
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="mt-12">
+      <a
+        href="/blog"
+        class="inline-flex items-center text-sm hover:text-primary transition-colors"
+        data-astro-prefetch
+      >
+        ← Back to all posts
+      </a>
+    </div>
+  </main>
+
+  <style>
+    /* Antfu-like font styles */
+    :global(body) {
+      font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+        Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+  </style>
+</BaseLayout>

@@ -1,0 +1,32 @@
+---
+export const prerender = false
+import Link from '@/components/base/Link.astro'
+import GithubView from '@/components/views/GithubView.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const frontmatter = {
+  title: 'AstroEco is Releasing...',
+  description:
+    'Example: Displaying GitHub releases using astro-loader-github-releases',
+}
+---
+
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+>
+  <section class="py-12">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <h1 class="text-4xl font-bold text-white mb-4">
+        AstroEco is <span class="animate-pulse">Releasing...</span>
+      </h1>
+      <p class="text-slate-400 italic mb-12">
+        Example: Displaying GitHub releases using <Link
+          href="https://github.com/lin-stephanie/astro-loaders/tree/main/packages/astro-loader-github-releases"
+          external={true}>astro-loader-github-releases</Link
+        >
+      </p>
+      <GithubView collectionType="releases" />
+    </div>
+  </section>
+</BaseLayout>

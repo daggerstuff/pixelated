@@ -1,0 +1,126 @@
+---
+import TodoComponent from '../components/TodoComponent.astro'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const pageTitle = 'Todo App'
+
+// Example initial todos
+const initialTodos = [
+  {
+    id: '1',
+    text: 'Learn Astro',
+    completed: true,
+  },
+  {
+    id: '2',
+    text: 'Build a Todo component',
+    completed: true,
+  },
+  {
+    id: '3',
+    text: 'Deploy to production',
+    completed: false,
+  },
+]
+---
+
+<BaseLayout title={pageTitle} centered={true} bgType="dot">
+  <main>
+    <div class="container">
+      <h1 class="page-title">{pageTitle}</h1>
+      <p class="intro">
+        A simple todo app built with Astro. Your todos are saved in your
+        browser's local storage.
+      </p>
+
+      <TodoComponent title="My Tasks" {initialTodos} />
+
+      <div class="instructions">
+        <h3>How to use:</h3>
+        <ul>
+          <li>Add a new task using the input field</li>
+          <li>Click the ✓ button to mark a task as completed</li>
+          <li>Click the ⟲ button to mark a completed task as active again</li>
+          <li>Click the × button to delete a task</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    padding: 2rem 0;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 1200px;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 0 1rem;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--color-text, #f3f3f3);
+    font-weight: 600;
+  }
+
+  .intro {
+    text-align: center;
+    max-width: 600px;
+    margin-bottom: 1rem;
+    color: var(--color-text-muted, #a1a1aa);
+  }
+
+  .instructions {
+    margin-top: 2rem;
+    padding: 1.5rem 2rem;
+    background-color: var(--color-card-bg, rgba(20, 20, 20, 0.85));
+    border-radius: var(--radius-md, 8px);
+    max-width: 650px;
+    width: 100%;
+    border: 1px solid var(--color-border, rgba(50, 50, 50, 0.3));
+  }
+
+  .instructions h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--color-text, #f3f3f3);
+    font-weight: 600;
+  }
+
+  .instructions ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: var(--color-text, #f3f3f3);
+  }
+
+  .instructions li {
+    margin-bottom: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 2rem;
+    }
+
+    .instructions {
+      width: 100%;
+      padding: 1.25rem 1.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,166 @@
+---
+import { getMonitoringConfig } from '@/lib/monitoring/config'
+
+interface Props {
+  title?: string
+  description?: string
+  refreshInterval?: number
+}
+
+const {
+  title = 'Real User Monitoring',
+  description = 'Monitor real user performance metrics',
+  refreshInterval = 60000,
+} = Astro.props
+
+const config = getMonitoringConfig()
+---
+
+<div
+  class="rum-dashboard bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
+  data-testid="astro-component"
+>
+  <div
+    class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"
+  >
+    <div>
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+        {title}
+      </h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+    </div>
+    <button
+      id="refresh-btn"
+      class="px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-200 rounded text-sm"
+    >
+      Refresh Now
+    </button>
+  </div>
+
+  <div class="metrics-container p-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Loading Performance
+        </h3>
+        <div id="loading-metrics">
+          <div><span>TTFB:</span> <span>Loading...</span></div>
+          <div><span>FCP:</span> <span>Loading...</span></div>
+          <div><span>LCP:</span> <span>Loading...</span></div>
+          <div><span>Speed Index:</span> <span>Loading...</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Interactivity
+        </h3>
+        <div id="interactivity-metrics">
+          <div><span>FID:</span> <span>Loading...</span></div>
+          <div><span>TBT:</span> <span>Loading...</span></div>
+          <div><span>TTI:</span> <span>Loading...</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Visual Stability
+        </h3>
+        <div id="stability-metrics">
+          <div><span>CLS:</span> <span>Loading...</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          User Demographics
+        </h3>
+        <div id="demographics-metrics">
+          <div><span>Devices:</span> <span>Loading...</span></div>
+          <div><span>Browsers:</span> <span>Loading...</span></div>
+          <div><span>Countries:</span> <span>Loading...</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Resource Metrics
+        </h3>
+        <div id="resource-metrics">
+          <div><span>JS Size:</span> <span>Loading...</span></div>
+          <div><span>CSS Size:</span> <span>Loading...</span></div>
+          <div><span>Requests:</span> <span>Loading...</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Error Rates
+        </h3>
+        <div id="error-metrics">
+          <div><span>JS Errors:</span> <span>Loading...</span></div>
+          <div><span>API Errors:</span> <span>Loading...</span></div>
+          <div><span>404s:</span> <span>Loading...</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <span id="last-updated">Last updated: Never</span>
+      <button id="refresh-btn">Refresh Now</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .rum-dashboard {
+    transition:
+      background-color 300ms ease-in-out,
+      color 300ms ease-in-out,
+      border-color 300ms ease-in-out;
+  }
+
+  .metric-card {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+  }
+
+  :global(.dark) .metric-card {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .loading-placeholder {
+    animation: pulse 1.5s infinite;
+    color: #cbd5e0;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .text-green-500 {
+    color: #48bb78;
+  }
+
+  .text-yellow-500 {
+    color: #ecc94b;
+  }
+
+  .text-red-500 {
+    color: #f56565;
+  }
+
+  .text-gray-500 {
+    color: #a0aec0;
+  }
+</style>

@@ -1,0 +1,194 @@
+---
+// DLPRulesList.astro
+// Displays the list of DLP rules with toggle controls
+
+import Badge from '@/components/ui/Badge.astro';
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import { Switch } from '@/components/ui/switch'
+import Button from '@/components/ui/Button.astro'
+import { DLPAction, type DLPRule } from '../../../lib/security/dlp'
+import { dlpService } from '../../../lib/security/dlp'
+import { Trash2 } from 'lucide-react'
+
+interface Props {
+  rules: DLPRule[]
+}
+
+const { rules } = Astro.props
+
+// Function to render badge for rule action
+const getActionBadge = (action: DLPAction) => {
+  switch (action) {
+    case DLPAction.ALLOW:
+      return { variant: 'outline', text: 'Allow' }
+    case DLPAction.REDACT:
+      return { variant: 'secondary', text: 'Redact' }
+    case DLPAction.BLOCK:
+      return { variant: 'destructive', text: 'Block' }
+    case DLPAction.BLOCK_AND_ALERT:
+      return { variant: 'destructive', text: 'Block & Alert' }
+    default:
+      return { variant: 'outline', text: 'Unknown' }
+  }
+}
+---
+
+<div class="rules-list">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">DLP Rules</h2>
+    <Button data-new-rule class="bg-primary text-white hover:bg-primary/90"
+      >Add New Rule</Button
+    >
+  </div>
+
+  {
+    rules.length === 0 ? (
+      <Card>
+        <CardContent class="py-8">
+          <p class="text-center text-muted-foreground">
+            No DLP rules found. Add a rule to get started.
+          </p>
+        </CardContent>
+      </Card>
+    ) : (
+      <div class="space-y-4">
+        {rules.map((ruleItem: DLPRule) => {
+          const actionBadge = getActionBadge(ruleItem.action as DLPAction);
+          return (
+            <div class="rule-card">
+              <Card>
+                <CardHeader class="pb-2">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <CardTitle class="text-lg">{ruleItem.name}</CardTitle>
+                      <CardDescription>{ruleItem.description}</CardDescription>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-sm text-muted-foreground">
+                        {ruleItem.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                      <Switch
+                        checked={ruleItem.isActive}
+                        data-rule-id={ruleItem.id}
+                        data-rule-name={ruleItem.name}
+                        className="toggle-rule"
+                        onCheckedChange={(isChecked: boolean) => {
+                          const ruleId = ruleItem.id;
+                          const ruleName = ruleItem.name;
+
+                          // Update rule in the service
+                          const allRules = dlpService.getRules();
+                          const existingRule = allRules.find(r => r.id === ruleId);
+
+                          if (existingRule) {
+                            const updatedRule: DLPRule = {
+                              ...existingRule,
+                              isActive: isChecked
+                            };
+                            dlpService.removeRule(ruleId);
+                            dlpService.addRule(updatedRule);
+                            
+                            // Dispatch event for the parent component to handle
+                            document.dispatchEvent(
+                              new CustomEvent('dlp:rule-updated', {
+                                detail: { id: ruleId, name: ruleName, isActive: isChecked },
+                              }),
+                            );
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent class="pt-0">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <Badge variant={actionBadge.variant as any}>
+                        {actionBadge.text}
+                      </Badge>
+                    </div>
+                    <div class="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        data-edit-rule={ruleItem.id}
+                        data-rule={JSON.stringify(ruleItem)}
+                        id={`edit-rule-${ruleItem.id}`}
+                        class="edit-rule-btn"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        class="delete-rule-btn"
+                        data-rule-id={ruleItem.id}
+                        data-rule-name={ruleItem.name}
+                      >
+                        <Trash2 class="h-4 w-4" />
+                        <span class="sr-only">Delete rule</span>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+</div>
+
+<!-- Import the TypeScript file for client-side logic -->
+<script>
+  import './DLPRulesList.astro.ts';
+  
+  // Set up event listeners when the component mounts
+  document.addEventListener('astro:mount', () => {
+    // Set up edit handlers
+    document.querySelectorAll('[data-edit-rule]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        const target = event.currentTarget as HTMLElement;
+        const ruleData = target.getAttribute('data-rule');
+
+        if (!ruleData) return;
+
+        try {
+          // Switch to the editor tab
+          const editorTab = document.querySelector('[data-tab="editor"]') as HTMLElement;
+          if (editorTab) {
+            editorTab.click();
+          }
+
+          // Populate the editor form
+          const editor = document.querySelector('dlp-rule-editor');
+          if (editor) {
+            editor.setAttribute('data-rule', ruleData);
+          }
+        } catch (error) {
+          console.error('Error parsing rule data:', error);
+        }
+      });
+    });
+
+    // Set up new rule button
+    const newRuleButton = document.querySelector('[data-new-rule]');
+    if (newRuleButton) {
+      newRuleButton.addEventListener('click', () => {
+        // Switch to the editor tab
+        const editorTab = document.querySelector('[data-tab="editor"]') as HTMLElement;
+        if (editorTab) {
+          editorTab.click();
+        }
+
+        // Dispatch event to reset the form
+        document.dispatchEvent(new CustomEvent('dlp:new-rule'));
+      });
+    }
+  });
+</script>

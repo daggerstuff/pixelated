@@ -1,0 +1,262 @@
+/**
+ * Mobile Form Validation Styles
+ *
+ * Enhanced mobile-optimized form validation styles with visual feedback
+ * and better touch targets for improved user experience.
+ */
+
+/* Base validation styles */
+.validation-error-summary {
+  margin: 16px 0;
+  padding: 16px;
+  background-color: #fff3f5;
+  border-left: 4px solid #e53e3e;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.validation-error-summary h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #e53e3e;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.validation-error-summary ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.validation-error-summary li {
+  margin-bottom: 8px;
+}
+
+.validation-error-summary a {
+  color: #e53e3e;
+  text-decoration: underline;
+}
+
+.validation-error-summary a:focus,
+.validation-error-summary a:hover {
+  text-decoration: none;
+}
+
+/* Mobile-specific styles */
+@media screen and (max-width: 767px) {
+  /* Larger touch targets */
+  .mobile-input {
+    min-height: 48px;
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* More visible feedback on error */
+  input[aria-invalid='true'],
+  textarea[aria-invalid='true'],
+  select[aria-invalid='true'] {
+    border: 2px solid #e53e3e;
+    box-shadow: 0 0 0 1px #e53e3e;
+    background-color: #fff5f5;
+  }
+
+  /* Success state feedback */
+  input[aria-invalid='false'][aria-required='true']:not(:placeholder-shown),
+  textarea[aria-invalid='false'][aria-required='true']:not(:placeholder-shown),
+  select[aria-invalid='false'][aria-required='true']:not([value='']) {
+    border: 1px solid #38a169;
+    background-color: #f0fff4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2338a169'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-size: 20px 20px;
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    padding-right: 40px;
+  }
+
+  /* Error message styles */
+  [id$='-error'] {
+    color: #e53e3e;
+    font-size: 14px;
+    margin-top: 4px;
+    padding-left: 4px;
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  /* Focus styles for better visibility */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+    border-color: #4299e1;
+  }
+
+  /* Style for validation-error-summary on mobile */
+  .validation-error-summary {
+    margin: 16px -16px; /* Negative margin to extend to screen edges */
+    border-radius: 0;
+    padding: 16px;
+  }
+
+  /* Floating error labels that appear when field is focused */
+  .form-group {
+    position: relative;
+  }
+
+  .error-label {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 0;
+    background-color: #e53e3e;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    z-index: 5;
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+    pointer-events: none;
+  }
+
+  .error-label::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 10px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #e53e3e transparent transparent transparent;
+  }
+
+  input:focus[aria-invalid='true'] + .error-label,
+  textarea:focus[aria-invalid='true'] + .error-label,
+  select:focus[aria-invalid='true'] + .error-label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Real-time validation feedback */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-5px);
+    }
+    40%,
+    80% {
+      transform: translateX(5px);
+    }
+  }
+
+  input[aria-invalid='true'].shake,
+  textarea[aria-invalid='true'].shake,
+  select[aria-invalid='true'].shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Input strength meter for passwords */
+  .password-strength-meter {
+    margin-top: 8px;
+    height: 4px;
+    width: 100%;
+    background-color: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .password-strength-meter div {
+    height: 100%;
+    transition:
+      width 0.3s ease-in-out,
+      background-color 0.3s ease-in-out;
+  }
+
+  .password-strength-meter .strength-weak {
+    background-color: #e53e3e;
+    width: 25%;
+  }
+
+  .password-strength-meter .strength-fair {
+    background-color: #f6ad55;
+    width: 50%;
+  }
+
+  .password-strength-meter .strength-good {
+    background-color: #68d391;
+    width: 75%;
+  }
+
+  .password-strength-meter .strength-strong {
+    background-color: #38a169;
+    width: 100%;
+  }
+
+  /* Helper text styles */
+  .form-helper-text {
+    color: #718096;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  /* Styles for autocomplete suggestions */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Improve tap highlight */
+  input[type='submit'],
+  button {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Validation status icons */
+  .validation-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  /* Add padding for feedback icon */
+  .input-with-validation {
+    padding-right: 38px;
+  }
+}
+
+/* Responsive adaptations for larger screens that maintain mobile UX benefits */
+@media screen and (min-width: 768px) {
+  .validation-error-summary {
+    max-width: 500px;
+    margin: 16px auto;
+  }
+
+  [id$='-error'] {
+    font-size: 14px;
+  }
+}

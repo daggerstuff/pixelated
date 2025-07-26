@@ -1,0 +1,600 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro'
+import { BusinessAssociateService } from '../../../../lib/security/baa/BusinessAssociateService'
+import {
+  BaaStatus,
+  BusinessAssociateType,
+  ComplianceLevel,
+} from '../../../../lib/security/baa/types'
+
+// Initialize services
+const businessAssociateService = new BusinessAssociateService()
+
+// Get current query parameters
+const { status = '', searchQuery = '' } = Astro.url.searchParams
+
+// Get all business associates
+const businessAssociates = businessAssociateService.getAllBusinessAssociates()
+
+// Filter by status and search query if provided
+const filteredAgreements = businessAssociates.filter((ba) => {
+  const matchesSearch =
+    !searchQuery || ba.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const hasMatchingStatus =
+    !status ||
+    (status === 'active' && ba.activeAgreementId) ||
+    (status === 'pending' &&
+      !ba.activeAgreementId &&
+      ba.agreementHistory.length > 0) ||
+    (status === 'none' && ba.agreementHistory.length === 0)
+
+  return matchesSearch && hasMatchingStatus
+})
+
+// Generate options for status filter
+const statusOptions = [
+  { value: '', label: 'All Statuses' },
+  { value: 'active', label: 'Active BAA' },
+  { value: 'pending', label: 'Pending BAA' },
+  { value: 'none', label: 'No BAA' },
+]
+
+// Generate workflow stage statistics
+const stats = {
+  total: businessAssociates.length,
+  withActiveBaa: businessAssociates.filter((ba) => ba.activeAgreementId).length,
+  pendingSignature: businessAssociates.filter(
+    (ba) => !ba.activeAgreementId && ba.agreementHistory.length > 0,
+  ).length,
+  noBaa: businessAssociates.filter((ba) => ba.agreementHistory.length === 0)
+    .length,
+  compliant: businessAssociates.filter(
+    (ba) =>
+      ba.activeAgreementId &&
+      [
+        ComplianceLevel.HIPAA_CERTIFIED,
+        ComplianceLevel.THIRD_PARTY_VERIFIED,
+      ].includes(ba.complianceLevel),
+  ).length,
+}
+
+// Mock BAA workflow stages for the sample implementation
+const workflowStages = [
+  {
+    id: 'identify',
+    name: 'Identify',
+    description: 'Identify vendors requiring BAAs',
+  },
+  { id: 'assess', name: 'Assess', description: 'Assess the compliance level' },
+  { id: 'prepare', name: 'Prepare', description: 'Prepare the BAA document' },
+  {
+    id: 'negotiate',
+    name: 'Negotiate',
+    description: 'Negotiate terms with vendor',
+  },
+  { id: 'sign', name: 'Execute', description: 'Sign and execute the BAA' },
+  {
+    id: 'monitor',
+    name: 'Monitor',
+    description: 'Monitor compliance and expiration',
+  },
+  {
+    id: 'renew',
+    name: 'Renew',
+    description: 'Renew or terminate upon expiration',
+  },
+]
+
+// Example due dates and status data for widgets
+const mockUpcomingActions = [
+  {
+    id: '1',
+    name: 'Analytics Partners LLC',
+    type: 'Renewal',
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    priority: 'high',
+  },
+  {
+    id: '2',
+    name: 'Secure Health Storage Inc.',
+    type: 'Compliance Review',
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+    priority: 'medium',
+  },
+  {
+    id: '3',
+    name: 'Healthcare API Solutions',
+    type: 'Document Update',
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    priority: 'low',
+  },
+]
+---
+
+<AdminLayout
+  title="BAA Management"
+  description="Manage Business Associate Agreements workflow"
+>
+  <div class="px-6 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">BAA Management Workflow</h1>
+      <div class="flex space-x-3">
+        <a
+          href="/admin/security/baa/vendors"
+          class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+        >
+          Vendor Directory
+        </a>
+        <a
+          href="/admin/security/baa/templates"
+          class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+        >
+          BAA Templates
+        </a>
+        <button
+          id="new-agreement-btn"
+          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+        >
+          Create New Agreement
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-500">Total Vendors</h3>
+        <p class="text-2xl font-bold text-gray-800">{stats.total}</p>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-500">Active BAAs</h3>
+        <p class="text-2xl font-bold text-green-600">{stats.withActiveBaa}</p>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-500">Pending Signature</h3>
+        <p class="text-2xl font-bold text-amber-500">
+          {stats.pendingSignature}
+        </p>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-500">No BAA</h3>
+        <p class="text-2xl font-bold text-red-600">{stats.noBaa}</p>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-500">Fully Compliant</h3>
+        <p class="text-2xl font-bold text-cyan-600">{stats.compliant}</p>
+      </div>
+    </div>
+
+    <!-- Workflow Process Visualization -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-semibold mb-4">BAA Management Workflow</h2>
+      <div class="relative">
+        <div
+          class="hidden sm:block absolute left-0 right-0 top-1/2 h-0.5 bg-gray-200 -translate-y-1/2"
+        >
+        </div>
+        <div class="flex flex-col sm:flex-row justify-between items-start">
+          {
+            workflowStages.map((stage, index) => (
+              <div class="relative flex flex-col items-center my-4">
+                <div
+                  class={`w-10 h-10 rounded-full border-2 flex items-center justify-center z-10 ${index < 3 ? 'bg-indigo-100 border-indigo-500 text-indigo-500' : 'bg-white border-gray-300 text-gray-500'}`}
+                >
+                  {index + 1}
+                </div>
+                <div class="mt-2 text-center">
+                  <h3 class="font-medium text-sm">{stage.name}</h3>
+                  <p class="text-xs text-gray-500 max-w-[120px]">
+                    {stage.description}
+                  </p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <!-- Search and Filter -->
+      <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold mb-4">
+          Business Associate Agreements
+        </h2>
+        <form
+          id="search-form"
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
+        >
+          <div class="md:col-span-2">
+            <label
+              for="searchQuery"
+              class="block text-sm font-medium text-gray-700 mb-1">Search</label
+            >
+            <input
+              type="text"
+              id="searchQuery"
+              name="searchQuery"
+              value={searchQuery}
+              placeholder="Vendor name or contact"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label
+              for="status"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >BAA Status</label
+            >
+            <select
+              id="status"
+              name="status"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {
+                statusOptions.map((option) => (
+                  <option
+                    value={option.value}
+                    selected={status === option.value}
+                  >
+                    {option.label}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+        </form>
+
+        {
+          filteredAgreements.length === 0 ? (
+            <div class="p-6 text-center text-gray-500">
+              No vendors match your search criteria. Try adjusting your filters
+              or add a new vendor.
+            </div>
+          ) : (
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Vendor
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Type
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Status
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Compliance
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  {filteredAgreements.map((vendor) => (
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">
+                          {vendor.name}
+                        </div>
+                        {vendor.website && (
+                          <div class="text-xs text-gray-500">
+                            <a
+                              href={vendor.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="text-indigo-600 hover:text-indigo-900"
+                            >
+                              {vendor.website.replace(/^https?:\/\//, '')}
+                            </a>
+                          </div>
+                        )}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {vendor.type.replace(/_/g, ' ')}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        {vendor.activeAgreementId ? (
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Active BAA
+                          </span>
+                        ) : vendor.agreementHistory.length > 0 ? (
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            Pending
+                          </span>
+                        ) : (
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            No BAA
+                          </span>
+                        )}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        {(() => {
+                          switch (vendor.complianceLevel) {
+                            case ComplianceLevel.HIPAA_CERTIFIED:
+                              return (
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  HIPAA Certified
+                                </span>
+                              )
+                            case ComplianceLevel.THIRD_PARTY_VERIFIED:
+                              return (
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                                  Third Party Verified
+                                </span>
+                              )
+                            case ComplianceLevel.SELF_ATTESTED:
+                              return (
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                  Self Attested
+                                </span>
+                              )
+                            case ComplianceLevel.NON_COMPLIANT:
+                              return (
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                  Non Compliant
+                                </span>
+                              )
+                            default:
+                              return (
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                  Not Verified
+                                </span>
+                              )
+                          }
+                        })()}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        {vendor.activeAgreementId ? (
+                          <>
+                            <a
+                              href={`/admin/security/baa/agreements/${vendor.activeAgreementId}`}
+                              class="text-indigo-600 hover:text-indigo-900 mr-3"
+                            >
+                              View BAA
+                            </a>
+                            <button
+                              data-vendor-id={vendor.id}
+                              class="renew-baa text-green-600 hover:text-green-900"
+                            >
+                              Renew
+                            </button>
+                          </>
+                        ) : vendor.agreementHistory.length > 0 ? (
+                          <>
+                            <a
+                              href={`/admin/security/baa/agreements/${vendor.agreementHistory[vendor.agreementHistory.length - 1]}`}
+                              class="text-indigo-600 hover:text-indigo-900 mr-3"
+                            >
+                              View Draft
+                            </a>
+                            <button
+                              data-vendor-id={vendor.id}
+                              class="send-baa text-amber-600 hover:text-amber-900"
+                            >
+                              Send
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            data-vendor-id={vendor.id}
+                            class="create-baa text-indigo-600 hover:text-indigo-900"
+                          >
+                            Create BAA
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Upcoming Actions Widget -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold mb-4">Upcoming BAA Actions</h2>
+        <div class="space-y-4">
+          {
+            mockUpcomingActions.map((action) => (
+              <div
+                class={`border-l-4 ${
+                  action.priority === 'high'
+                    ? 'border-red-500'
+                    : action.priority === 'medium'
+                      ? 'border-amber-500'
+                      : 'border-blue-500'
+                } pl-4 py-2`}
+              >
+                <div class="flex justify-between">
+                  <h3 class="font-medium text-gray-800">{action.name}</h3>
+                  <span
+                    class={`text-xs font-medium ${
+                      action.priority === 'high'
+                        ? 'text-red-600'
+                        : action.priority === 'medium'
+                          ? 'text-amber-600'
+                          : 'text-blue-600'
+                    }`}
+                  >
+                    {action.priority.toUpperCase()}
+                  </span>
+                </div>
+                <p class="text-sm text-gray-600">{action.type}</p>
+                <div class="mt-1 flex justify-between items-center">
+                  <span class="text-xs text-gray-500">
+                    Due: {action.dueDate.toLocaleDateString()}
+                  </span>
+                  <button
+                    class="text-xs text-indigo-600 hover:text-indigo-900"
+                    data-action-id={action.id}
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        <div class="mt-6">
+          <button
+            id="view-all-actions"
+            class="w-full px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition-colors text-sm"
+          >
+            View All Actions
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAA Process & Documentation Card -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-semibold mb-4">BAA Process Documentation</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="space-y-2">
+          <h3 class="font-medium text-gray-800">
+            Identifying Vendors Requiring BAAs
+          </h3>
+          <p class="text-sm text-gray-600">
+            Business associates who create, receive, maintain, or transmit PHI
+            on behalf of your organization must have a BAA. This includes
+            service providers, vendors, and partners with access to PHI.
+          </p>
+          <ul class="list-disc list-inside text-sm text-gray-600">
+            <li>Cloud storage providers</li>
+            <li>EHR/EMR vendors</li>
+            <li>IT service providers</li>
+            <li>Billing services</li>
+            <li>Consultants with PHI access</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="font-medium text-gray-800">Key BAA Components</h3>
+          <p class="text-sm text-gray-600">
+            A HIPAA-compliant BAA must include specific provisions that outline
+            the business associate's responsibilities regarding PHI protection.
+          </p>
+          <ul class="list-disc list-inside text-sm text-gray-600">
+            <li>Permitted uses and disclosures of PHI</li>
+            <li>Safeguards implementation requirements</li>
+            <li>Reporting obligations for breaches</li>
+            <li>Subcontractor compliance requirements</li>
+            <li>Termination protocols</li>
+            <li>Return or destruction of PHI procedures</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="font-medium text-gray-800">BAA Lifecycle Management</h3>
+          <p class="text-sm text-gray-600">
+            Effective BAA management requires ongoing attention to the full
+            agreement lifecycle.
+          </p>
+          <ul class="list-disc list-inside text-sm text-gray-600">
+            <li>Regular review of existing BAAs</li>
+            <li>Monitoring for compliance with terms</li>
+            <li>Updating agreements when regulations change</li>
+            <li>Documenting vendor compliance verification</li>
+            <li>Managing terminations and renewals</li>
+            <li>Maintaining detailed audit trails</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Auto-submit form when status changes
+    const statusSelect = document.getElementById('status')
+    statusSelect?.addEventListener('change', () => {
+      document.getElementById('search-form')?.submit()
+    })
+
+    // Handle search form submission
+    const searchForm = document.getElementById('search-form')
+    searchForm?.addEventListener('submit', (e) => {
+      e.preventDefault()
+      searchForm.submit()
+    })
+
+    // Handle "Create New Agreement" button
+    const newAgreementBtn = document.getElementById('new-agreement-btn')
+    newAgreementBtn?.addEventListener('click', () => {
+      window.location.href = '/admin/security/baa/create'
+    })
+
+    // Handle "Create BAA" buttons
+    const createBaaButtons = document.querySelectorAll('.create-baa')
+    createBaaButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const vendorId = (e.target as HTMLElement).getAttribute(
+          'data-vendor-id',
+        )
+        window.location.href = `/admin/security/baa/create?vendorId=${vendorId}`
+      })
+    })
+
+    // Handle "Send BAA" buttons
+    const sendBaaButtons = document.querySelectorAll('.send-baa')
+    sendBaaButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const vendorId = (e.target as HTMLElement).getAttribute(
+          'data-vendor-id',
+        )
+        // This would normally trigger a BAA sending workflow
+        alert(`This would send the BAA to vendor ID: ${vendorId}`)
+      })
+    })
+
+    // Handle "Renew BAA" buttons
+    const renewBaaButtons = document.querySelectorAll('.renew-baa')
+    renewBaaButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const vendorId = (e.target as HTMLElement).getAttribute(
+          'data-vendor-id',
+        )
+        window.location.href = `/admin/security/baa/renew?vendorId=${vendorId}`
+      })
+    })
+
+    // Handle "View All Actions" button
+    const viewAllActionsBtn = document.getElementById('view-all-actions')
+    viewAllActionsBtn?.addEventListener('click', () => {
+      window.location.href = '/admin/security/baa/actions'
+    })
+
+    // Handle action detail buttons
+    const actionButtons = document.querySelectorAll('[data-action-id]')
+    actionButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const actionId = (e.target as HTMLElement).getAttribute(
+          'data-action-id',
+        )
+        alert(`This would show details for action ID: ${actionId}`)
+      })
+    })
+  })
+</script>

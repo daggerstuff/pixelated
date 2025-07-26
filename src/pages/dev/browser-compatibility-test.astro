@@ -1,0 +1,406 @@
+---
+import ChatLayout from '../../layouts/ChatLayout.astro'
+import { BrowserCompatibilityTester } from '../../components/testing/BrowserCompatibilityTester'
+import AIChat from '../../components/AIChat.astro'
+import { LOADING_SIZES, SEVERITY_STYLES } from '../../constants/testing'
+import type { CompatibilityIssue, TestSections } from '../../types/testing'
+
+const TEST_SECTIONS: TestSections = {
+  browserInfo: {
+    title: 'Browser Information',
+    component: BrowserCompatibilityTester,
+  },
+  aiChat: {
+    title: 'AI Chat Component Test',
+    component: AIChat,
+    props: {
+      title: 'AI Chat Test',
+      description:
+        'This is a test of the AI Chat component for browser compatibility.',
+      showModelSelector: true,
+    },
+    instructions: [
+      'Verify that the chat interface loads correctly',
+      'Test keyboard navigation (Tab, Enter, Arrow keys)',
+      'Test screen reader compatibility',
+      'Verify that messages display correctly',
+      'Test sending and receiving messages',
+      'Verify loading states and animations',
+      'Test with reduced motion preference if available',
+      'Test with high contrast mode if available',
+    ],
+  },
+  loadingIndicator: {
+    title: 'Loading Indicator Test',
+    instructions: [
+      'Verify that loading indicators display correctly',
+      'Test with screen readers to verify announcements',
+      'Test with reduced motion preference if available',
+      'Verify that animations work correctly',
+    ],
+  },
+}
+---
+
+<ChatLayout title="Browser Compatibility Testing">
+  <div class="container">
+    <h1>Browser Compatibility Testing Dashboard</h1>
+    <p>
+      This page tests critical AI components across different browsers to ensure
+      consistent functionality and accessibility. Run this page in Chrome,
+      Firefox, Safari, and Edge to verify compatibility.
+    </p>
+
+    {
+      Object.entries(TEST_SECTIONS).map(([key, section]) => (
+        <section class="test-section" aria-labelledby={`${key}-title`}>
+          <h2 id={`${key}-title`}>{section.title}</h2>
+          <div class="component-test">
+            {section.instructions && (
+              <>
+                <h3>Test Instructions</h3>
+                <ul>
+                  {section.instructions.map((instruction) => (
+                    <li>{instruction}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <div class="component-container">
+              {key === 'browserInfo' && (
+                <BrowserCompatibilityTester client:load />
+              )}
+              {key === 'aiChat' && (
+                <AIChat
+                  title={section.props?.title}
+                  description={section.props?.description}
+                  showModelSelector={section.props?.showModelSelector}
+                />
+              )}
+              {key === 'loadingIndicator' && (
+                <div class="loading-indicators-test">
+                  {Object.entries(LOADING_SIZES).map(([size, dimensions]) => (
+                    <div>
+                      <h4>{size}</h4>
+                      <div
+                        class="loading-indicator"
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <div
+                          class="loading-skeleton"
+                          style={`width: ${dimensions.width}px; height: ${dimensions.height}px;`}
+                        />
+                        <p class="loading-message">
+                          Loading {size.toLowerCase()}...
+                        </p>
+                        <span class="sr-only">
+                          Loading {size.toLowerCase()} content, please wait.
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      ))
+    }
+
+    <section class="test-section" aria-labelledby="compatibility-log-title">
+      <h2 id="compatibility-log-title">Compatibility Issues Log</h2>
+      <div class="compatibility-log">
+        <form id="compatibility-form" class="compatibility-form">
+          <div class="form-group">
+            <label for="browser">Browser</label>
+            <input type="text" id="browser" name="browser" required />
+          </div>
+          <div class="form-group">
+            <label for="component">Component</label>
+            <select id="component" name="component" required>
+              <option value="">Select a component</option>
+              {
+                Object.entries(TEST_SECTIONS).map(([key, section]) => (
+                  <option value={key}>{section.title}</option>
+                ))
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="issue">Issue Description</label>
+            <textarea id="issue" name="issue" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="severity">Severity</label>
+            <select id="severity" name="severity" required>
+              <option value="">Select severity</option>
+              <option value="critical">Critical - Blocking functionality</option
+              >
+              <option value="major">Major - Significant impact</option>
+              <option value="minor">Minor - Cosmetic issues</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Log Issue</button>
+          </div>
+        </form>
+
+        <div class="issues-list">
+          <h3>Reported Issues</h3>
+          <div id="issues-container">
+            <p>No issues reported yet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    :root {
+      --border-color: #e2e8f0;
+      --input-border: #cbd5e1;
+      --primary: #3b82f6;
+      --error: #ef4444;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --bg-hover: #f8fafc;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      color: var(--text-primary);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .test-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: white;
+    }
+
+    .component-test {
+      margin-top: 20px;
+    }
+
+    .component-container {
+      margin-top: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 15px;
+    }
+
+    .loading-indicators-test {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .loading-skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes loading {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    .loading-message {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .compatibility-log {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .compatibility-log {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .compatibility-form {
+      padding: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-actions {
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: var(--error);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 14px;
+    }
+
+    .issues-list {
+      padding: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background-color: white;
+    }
+
+    .issue-item {
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      margin-bottom: 10px;
+      background-color: var(--bg-hover);
+    }
+
+    .issue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .issue-title {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .issue-severity {
+      font-size: 0.875rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .issue-severity.critical {
+      background-color: var(--error);
+    }
+
+    .issue-severity.major {
+      background-color: #f59e0b;
+    }
+
+    .issue-severity.minor {
+      background-color: #6b7280;
+    }
+
+    .issue-description {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+  </style>
+</ChatLayout>
+
+<script>
+  import {
+    addIssue,
+    removeIssue,
+    displayIssues,
+  } from '../../utils/compatibility-testing'
+  import type { CompatibilityIssue } from '../../types/testing'
+
+  // Initialize the issues array in localStorage if it doesn't exist
+  if (!localStorage.getItem('compatibility-issues')) {
+    localStorage.setItem('compatibility-issues', '[]')
+  }
+
+  // Form submission handler
+  const form = document.getElementById('compatibility-form') as HTMLFormElement
+  form?.addEventListener('submit', (e: SubmitEvent) => {
+    e.preventDefault()
+    const formElement = e.target as HTMLFormElement
+    const formData = new FormData(formElement)
+
+    const issue: CompatibilityIssue = {
+      browser: formData.get('browser') as string,
+      component: formData.get('component') as string,
+      description: formData.get('issue') as string,
+      severity: formData.get('severity') as 'critical' | 'major' | 'minor',
+      timestamp: new Date().toISOString(),
+    }
+
+    addIssue(issue)
+    formElement.reset()
+  })
+
+  // Initial display of issues
+  displayIssues()
+</script>

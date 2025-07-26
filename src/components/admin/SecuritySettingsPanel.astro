@@ -1,0 +1,349 @@
+---
+// We'll typically pre-load the current configuration
+// For demonstration, we'll use mock data
+const securityConfig = {
+  suspiciousAuthAlerts: true,
+  failedLoginThreshold: 5,
+  lockAccountAfterFailures: 10,
+  notifyOnNewDevices: true,
+  notifyOnPasswordChanges: true,
+  securityTeamEmail: 'security-team@example.com',
+}
+
+// Component props
+interface Props {
+  title?: string
+}
+
+const { title = 'Security Alert Settings' } = Astro.props
+---
+
+<div class="security-settings-panel">
+  <div class="panel-header">
+    <h2>{title}</h2>
+    <p class="description">
+      Configure security alerts and notifications for suspicious authentication
+      events.
+    </p>
+  </div>
+
+  <form id="security-settings-form" class="settings-form">
+    <div class="form-section">
+      <h3>Email Notifications</h3>
+
+      <div class="form-group">
+        <label for="securityTeamEmail">Security Team Email</label>
+        <input
+          type="email"
+          id="securityTeamEmail"
+          name="securityTeamEmail"
+          value={securityConfig.securityTeamEmail}
+          class="form-control"
+        />
+        <p class="input-help">
+          Security alerts will be sent to this email address
+        </p>
+      </div>
+
+      <div class="form-group checkbox">
+        <input
+          type="checkbox"
+          id="suspiciousAuthAlerts"
+          name="suspiciousAuthAlerts"
+          checked={securityConfig.suspiciousAuthAlerts}
+        />
+        <label for="suspiciousAuthAlerts"
+          >Enable Suspicious Authentication Alerts</label
+        >
+      </div>
+
+      <div class="form-group checkbox">
+        <input
+          type="checkbox"
+          id="notifyOnNewDevices"
+          name="notifyOnNewDevices"
+          checked={securityConfig.notifyOnNewDevices}
+        />
+        <label for="notifyOnNewDevices">Notify on Logins from New Devices</label
+        >
+      </div>
+
+      <div class="form-group checkbox">
+        <input
+          type="checkbox"
+          id="notifyOnPasswordChanges"
+          name="notifyOnPasswordChanges"
+          checked={securityConfig.notifyOnPasswordChanges}
+        />
+        <label for="notifyOnPasswordChanges">Notify on Password Changes</label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Authentication Security</h3>
+
+      <div class="form-group">
+        <label for="failedLoginThreshold">Failed Login Alert Threshold</label>
+        <input
+          type="number"
+          id="failedLoginThreshold"
+          name="failedLoginThreshold"
+          value={securityConfig.failedLoginThreshold}
+          min="1"
+          max="20"
+          class="form-control"
+        />
+        <p class="input-help">
+          Number of failed login attempts before sending an alert
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="lockAccountAfterFailures">Account Lockout Threshold</label>
+        <input
+          type="number"
+          id="lockAccountAfterFailures"
+          name="lockAccountAfterFailures"
+          value={securityConfig.lockAccountAfterFailures}
+          min="1"
+          max="50"
+          class="form-control"
+        />
+        <p class="input-help">
+          Number of failed login attempts before temporarily locking the account
+        </p>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" id="save-settings" class="btn btn-primary"
+        >Save Settings</button
+      >
+      <button type="button" id="test-alerts" class="btn btn-secondary"
+        >Test Alerts</button
+      >
+    </div>
+  </form>
+
+  <div id="alert-container" class="alert-container"></div>
+</div>
+
+<script>
+  // Client-side functionality for the security settings panel
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('security-settings-form')
+    const testButton = document.getElementById('test-alerts')
+    const alertContainer = document.getElementById('alert-container')
+
+    // Show alert message
+    function showAlert(message: string | null, type = 'success') {
+      const alert = document.createElement('div')
+      alert.className = `alert alert-${type}`
+      alert.textContent = message
+
+      // Add close button
+      const closeBtn = document.createElement('button')
+      closeBtn.type = 'button'
+      closeBtn.className = 'close-alert'
+      closeBtn.innerHTML = '&times;'
+      closeBtn.addEventListener('click', () => alert.remove())
+      alert.appendChild(closeBtn)
+
+      // Add to container and auto-remove after 5 seconds
+      alertContainer?.appendChild(alert)
+      setTimeout(() => alert.remove(), 5000)
+    }
+
+    // Handle form submission
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault()
+
+      // In a real implementation, this would send the form data to the server
+      // For demonstration, we'll just show a success message
+      showAlert('Security settings saved successfully!')
+
+      // Example of how a real implementation might look:
+      /*
+      try {
+        const formData = new FormData(form);
+        const response = await fetch('/api/admin/security-settings', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save settings');
+        }
+
+        showAlert('Security settings saved successfully!');
+      } catch (error) {
+        showAlert(`Error: ${error.message}`, 'error');
+      }
+      */
+    })
+
+    // Handle test button click
+    testButton?.addEventListener('click', async () => {
+      // In a real implementation, this would trigger a test alert
+      // For demonstration, we'll just show a success message
+      showAlert('Test security alert sent successfully!')
+
+      // Example of how a real implementation might look:
+      /*
+      try {
+        const response = await fetch('/api/admin/test-security-alert', {
+          method: 'POST'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send test alert');
+        }
+
+        showAlert('Test security alert sent successfully!');
+      } catch (error) {
+        showAlert(`Error: ${error.message}`, 'error');
+      }
+      */
+    })
+  })
+</script>
+
+<style>
+  .security-settings-panel {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .panel-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .panel-header h2 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.5rem;
+  }
+
+  .description {
+    color: #666;
+    margin: 0;
+  }
+
+  .form-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .form-section h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    color: #444;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+  }
+
+  .checkbox input {
+    margin-right: 0.5rem;
+  }
+
+  .checkbox label {
+    margin-bottom: 0;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  .input-help {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+    color: #777;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .btn-primary {
+    background-color: #0066cc;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #0055aa;
+  }
+
+  .btn-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+
+  .alert-container {
+    margin-top: 1rem;
+  }
+
+  .alert {
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  .close-alert {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: inherit;
+  }
+</style>

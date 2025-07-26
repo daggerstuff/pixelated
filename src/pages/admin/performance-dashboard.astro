@@ -1,0 +1,29 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import WebPerformanceDashboard from '@/components/monitoring/WebPerformanceDashboard.astro'
+import { getMonitoringConfig } from '@/lib/monitoring/config'
+
+// Get monitoring configuration
+const config = getMonitoringConfig()
+---
+
+<DashboardLayout title="Performance Dashboard | Admin">
+  <div class="container px-4 py-8 mx-auto">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Performance Dashboard
+      </h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        Monitor and analyze application performance metrics across all systems.
+      </p>
+    </header>
+
+    <div class="mb-8">
+      <WebPerformanceDashboard
+        title="Web Performance Metrics"
+        description="Core Web Vitals and performance metrics across the application"
+        refreshInterval={30000}
+      />
+    </div>
+  </div>
+</DashboardLayout>

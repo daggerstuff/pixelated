@@ -1,0 +1,503 @@
+---
+// PatientRightsSystem.astro
+// Component to manage patient data access rights and requests
+import { Icon } from 'astro-icon/components'
+
+// Sample data for access requests
+const accessRequests = [
+  {
+    id: 'REQ-2025-1234',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Emily Johnson',
+    type: 'data-access',
+    dateRequested: '2025-06-12T08:30:00Z',
+    status: 'fulfilled',
+    dateProcessed: '2025-06-14T16:45:00Z',
+    priority: 'medium',
+  },
+  {
+    id: 'REQ-2025-1235',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Michael Smith',
+    type: 'data-export',
+    dateRequested: '2025-06-15T14:20:00Z',
+    status: 'pending',
+    dateProcessed: null,
+    priority: 'high',
+  },
+  {
+    id: 'REQ-2025-1236',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Sarah Williams',
+    type: 'correction',
+    dateRequested: '2025-06-10T09:15:00Z',
+    status: 'fulfilled',
+    dateProcessed: '2025-06-12T11:30:00Z',
+    priority: 'medium',
+  },
+  {
+    id: 'REQ-2025-1237',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'James Brown',
+    type: 'data-access',
+    dateRequested: '2025-06-18T16:40:00Z',
+    status: 'overdue',
+    dateProcessed: null,
+    priority: 'high',
+  },
+  {
+    id: 'REQ-2025-1238',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Robert Garcia',
+    type: 'data-export',
+    dateRequested: '2025-06-19T10:05:00Z',
+    status: 'pending',
+    dateProcessed: null,
+    priority: 'low',
+  },
+  {
+    id: 'REQ-2025-1239',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Lisa Thompson',
+    type: 'data-access',
+    dateRequested: '2025-06-14T08:35:00Z',
+    status: 'fulfilled',
+    dateProcessed: '2025-06-15T14:25:00Z',
+    priority: 'medium',
+  },
+  {
+    id: 'REQ-2025-1240',
+    patientId: process.env['PATIENT_ID'] || 'example-patient-id',
+    patientName: 'Amanda Martinez',
+    type: 'correction',
+    dateRequested: '2025-06-16T15:50:00Z',
+    status: 'pending',
+    dateProcessed: null,
+    priority: 'high',
+  },
+]
+
+// Format date string to readable format
+const formatDate = (dateString: string | number | Date | null) => {
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+// Get status badge class based on status
+const getStatusBadgeClass = (status: string): string => {
+  switch (status) {
+    case 'fulfilled':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+    case 'overdue':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+  }
+}
+
+// Get priority badge class based on priority
+const getPriorityBadgeClass = (priority: string): string => {
+  switch (priority) {
+    case 'high':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    case 'medium':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+    case 'low':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+  }
+}
+
+// Get type badge class and label
+const getRequestTypeInfo = (type: string): { class: string; label: string } => {
+  switch (type) {
+    case 'data-access':
+      return {
+        class:
+          'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+        label: 'Data Access',
+      }
+    case 'data-export':
+      return {
+        class:
+          'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        label: 'Data Export',
+      }
+    case 'correction':
+      return {
+        class:
+          'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        label: 'Correction',
+      }
+    default:
+      return {
+        class:
+          'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+        label: 'Other',
+      }
+  }
+}
+---
+
+<div class="space-y-6">
+  <!-- Search and Filter Bar -->
+  <div
+    class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:justify-between md:items-center"
+  >
+    <div class="flex flex-1 relative items-center max-w-md">
+      <div
+        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+      >
+        <Icon name="search" class="h-5 w-5 text-gray-400" />
+      </div>
+      <input
+        type="text"
+        placeholder="Search by ID, name, or patient ID..."
+        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      />
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <div class="inline-flex">
+        <select
+          id="filter-status"
+          class="block w-full py-2 pl-3 pr-10 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        >
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="fulfilled">Fulfilled</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+
+      <div class="inline-flex">
+        <select
+          id="filter-type"
+          class="block w-full py-2 pl-3 pr-10 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        >
+          <option value="">All Types</option>
+          <option value="data-access">Data Access</option>
+          <option value="data-export">Data Export</option>
+          <option value="correction">Correction</option>
+        </select>
+      </div>
+
+      <div class="inline-flex">
+        <select
+          id="filter-priority"
+          class="block w-full py-2 pl-3 pr-10 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        >
+          <option value="">All Priorities</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Access Requests Table -->
+  <div
+    class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700"
+  >
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <thead class="bg-gray-50 dark:bg-gray-800">
+        <tr>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Request ID
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Patient
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Type
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Priority
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Requested
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Status
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Processed
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700"
+      >
+        {
+          accessRequests.map((request) => {
+            const typeInfo = getRequestTypeInfo(request.type)
+            return (
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                  {request.id}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <div class="flex flex-col">
+                    <span class="font-medium text-gray-800 dark:text-white">
+                      {request.patientName}
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      {request.patientId}
+                    </span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <span
+                    class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${typeInfo.class}`}
+                  >
+                    {typeInfo.label}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <span
+                    class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityBadgeClass(request.priority)}`}
+                  >
+                    {request.priority.charAt(0).toUpperCase() +
+                      request.priority.slice(1)}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  {formatDate(request.dateRequested)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <span
+                    class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(request.status)}`}
+                  >
+                    {request.status.charAt(0).toUpperCase() +
+                      request.status.slice(1)}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  {formatDate(request.dateProcessed)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex justify-end space-x-2">
+                    <button
+                      type="button"
+                      class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                      aria-label={`View request ${request.id}`}
+                    >
+                      <Icon name="eye" class="h-5 w-5" />
+                    </button>
+
+                    {request.status === 'pending' && (
+                      <button
+                        type="button"
+                        class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                        aria-label={`Process request ${request.id}`}
+                      >
+                        <Icon name="check-circle" class="h-5 w-5" />
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
+                      aria-label={`More options for request ${request.id}`}
+                    >
+                      <Icon name="more-vertical" class="h-5 w-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )
+          })
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex items-center justify-between">
+    <div class="flex-1 flex justify-between sm:hidden">
+      <button
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+      >
+        Previous
+      </button>
+      <button
+        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+      >
+        Next
+      </button>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700 dark:text-gray-300">
+          Showing <span class="font-medium">1</span> to <span
+            class="font-medium">7</span
+          > of <span class="font-medium">32</span> results
+        </p>
+      </div>
+      <div>
+        <nav
+          class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+          aria-label="Pagination"
+        >
+          <button
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            <span class="sr-only">Previous</span>
+            <Icon name="chevron-left" class="h-5 w-5" />
+          </button>
+          <button
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            1
+          </button>
+          <button
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900/30"
+            aria-current="page"
+          >
+            2
+          </button>
+          <button
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            3
+          </button>
+          <button
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            4
+          </button>
+          <span
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+          >
+            ...
+          </span>
+          <button
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            <span class="sr-only">Next</span>
+            <Icon name="chevron-right" class="h-5 w-5" />
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compliance Note -->
+  <div
+    class="mt-8 bg-blue-50 border-l-4 border-blue-400 p-4 dark:bg-blue-900/20 dark:border-blue-500"
+  >
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <Icon name="info-circle" class="h-5 w-5 text-blue-400" />
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+          HIPAA Compliance Note
+        </h3>
+        <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+          <p>
+            Under HIPAA regulations, patients have the right to access their
+            health information, request corrections, and obtain an electronic
+            copy of their records. Requests must be fulfilled within 30 days
+            (with a possible 30-day extension if needed). Track all request
+            activities for audit purposes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // When DOM is loaded, set up filter and search functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get filter elements with specific types and allow for null
+    const statusFilter = document.getElementById(
+      'filter-status',
+    ) as HTMLSelectElement | null
+    const typeFilter = document.getElementById(
+      'filter-type',
+    ) as HTMLSelectElement | null
+    const priorityFilter = document.getElementById(
+      'filter-priority',
+    ) as HTMLSelectElement | null
+    const searchInput = document.querySelector(
+      'input[type="text"]',
+    ) as HTMLInputElement | null
+
+    // Function to apply filters
+    const applyFilters = () => {
+      // Safely access values, providing defaults if elements are null
+      const statusValue = statusFilter ? statusFilter.value : ''
+      const typeValue = typeFilter ? typeFilter.value : ''
+      const priorityValue = priorityFilter ? priorityFilter.value : ''
+      const searchValue = searchInput ? searchInput.value : ''
+
+      console.log('Filtering with:', {
+        status: statusValue,
+        type: typeValue,
+        priority: priorityValue,
+        search: searchValue,
+      })
+      // In a real implementation, this would trigger an API call or filter the data
+    }
+
+    // Add event listeners to filters only if elements exist
+    if (statusFilter) {
+      statusFilter.addEventListener('change', applyFilters)
+    }
+    if (typeFilter) {
+      typeFilter.addEventListener('change', applyFilters)
+    }
+    if (priorityFilter) {
+      priorityFilter.addEventListener('change', applyFilters)
+    }
+
+    // Debounce function for search input
+    let searchTimeout: number // Explicitly type searchTimeout
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout)
+        searchTimeout = window.setTimeout(applyFilters, 300)
+      })
+    }
+  })
+</script>

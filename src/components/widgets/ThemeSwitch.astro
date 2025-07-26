@@ -1,0 +1,135 @@
+---
+
+---
+
+<button
+  id="theme-switch"
+  class="text-gray-400 hover:text-white transition-colors"
+  title="Toggle dark/light mode"
+  aria-label="Toggle dark/light mode"
+>
+  <i class="i-uil:moon dark:i-uil:sun text-lg"></i>
+</button>
+
+<!-- Initialize as inline scripts for faster response, avoiding FOUC  -->
+<script is:inline data-astro-rerun>
+  function initTheme() {
+    let theme
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      theme = localStorage.theme
+    } else {
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        theme = 'dark'
+      } else {
+        theme = 'light'
+      }
+      window.localStorage.setItem('theme', theme)
+    }
+
+    const toggleThemeButton = document.getElementById('theme-switch')
+    toggleThemeButton.setAttribute('role', 'switch')
+
+    if (theme === 'light') {
+      document.documentElement.classList.remove('dark')
+      toggleThemeButton.setAttribute('aria-label', 'light')
+      toggleThemeButton.setAttribute('aria-checked', 'false')
+    } else {
+      document.documentElement.classList.add('dark')
+      toggleThemeButton.setAttribute('aria-label', 'dark')
+      toggleThemeButton.setAttribute('aria-checked', 'true')
+    }
+
+    const colorThemeMetaTag = document.querySelector("meta[name='theme-color']")
+    const bgColor = getComputedStyle(document.body).getPropertyValue('--c-bg')
+    colorThemeMetaTag?.setAttribute('content', bgColor)
+  }
+
+  initTheme()
+</script>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    let isDark: boolean
+
+    const saveTheme = () => {
+      window.localStorage.setItem('theme', isDark ? 'dark' : 'light')
+    }
+
+    const updateAria = (buttonElement: HTMLElement) => {
+      buttonElement.setAttribute('aria-label', isDark ? 'dark' : 'light')
+      buttonElement.setAttribute('aria-checked', isDark ? 'true' : 'false')
+    }
+
+    const setColorTheme = () => {
+      const colorThemeMetaTag = document.querySelector(
+        "meta[name='theme-color']",
+      )
+      const bgColor = getComputedStyle(document.body).getPropertyValue('--c-bg')
+      colorThemeMetaTag?.setAttribute('content', bgColor)
+    }
+
+    /* Handle user toggle button */
+    const handleToggle = (event: MouseEvent) => {
+      const currentTarget = event.currentTarget
+
+      const toggle = () => {
+        document.documentElement.classList.toggle('dark')
+        isDark = document.documentElement.classList.contains('dark')
+        updateAria(currentTarget as HTMLElement)
+        saveTheme()
+        setColorTheme()
+      }
+
+      const isAppearanceTransition =
+        typeof document.startViewTransition === 'function' &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      if (!isAppearanceTransition) {
+        toggle()
+        return
+      }
+
+      const x = event.clientX
+      const y = event.clientY
+      const endRadius = Math.hypot(
+        Math.max(x, innerWidth - x),
+        Math.max(y, innerHeight - y),
+      )
+
+      const transition = document.startViewTransition(() => toggle())
+
+      transition.ready.then(() => {
+        const clipPath = [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${endRadius}px at ${x}px ${y}px)`,
+        ]
+
+        document.documentElement.animate(
+          {
+            clipPath: isDark ? clipPath.reverse() : clipPath,
+          },
+          {
+            duration: 400,
+            easing: 'ease-out',
+            pseudoElement: isDark
+              ? '::view-transition-old(root)'
+              : '::view-transition-new(root)',
+          },
+        )
+      })
+    }
+
+    const toggleThemeButton = document.getElementById('theme-switch')
+    toggleThemeButton?.addEventListener('click', (event) => handleToggle(event))
+
+    /* Listening system changes */
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', ({ matches }) => {
+        isDark = matches
+        document.documentElement.classList.toggle('dark', isDark)
+        saveTheme()
+        if (toggleThemeButton) updateAria(toggleThemeButton)
+      })
+  })
+</script>

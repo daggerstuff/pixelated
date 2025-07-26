@@ -1,0 +1,601 @@
+---
+// NOTE: This page uses Node.js modules (fs, path) and is SSR-only.
+// Vite warnings about 'node:fs' and 'node:path' can be safely ignored because of the SSR guard in fetchVisualRegressionData.
+// If Vite warnings persist, consider using a Vite pragma or plugin to suppress them for this file.
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { Icon } from 'astro-icon/components'
+
+const pageTitle = 'Visual Regression Dashboard'
+const pageDescription =
+  'Monitor visual regression test results across browsers and devices'
+
+// Define interfaces for the data structures
+interface Screenshot {
+  name: string
+  page: string
+  deviceType: string
+  baselinePath: string
+  actualPath: string | null
+  diffPath: string | null
+  hasDiff: boolean
+  lastUpdated: string
+}
+
+interface PageMap {
+  [page: string]: Screenshot[]
+}
+
+interface VisualRegressionData {
+  error: string | null
+  screenshots: Screenshot[]
+  byPage: PageMap
+  diffCount: number
+  lastUpdated: string | null
+}
+
+// Fetch visual regression test data
+const fetchVisualRegressionData = async (): Promise<VisualRegressionData> => {
+  try {
+    // Server-side only check to prevent client-side execution
+    // Check for Node.js environment more thoroughly
+    const isNodeJS =
+      typeof process !== 'undefined' &&
+      process.versions != null &&
+      process.versions.node != null &&
+      typeof process.cwd === 'function'
+
+    if (!isNodeJS) {
+      return {
+        error: 'This function requires server-side execution',
+        screenshots: [],
+        byPage: {},
+        diffCount: 0,
+        lastUpdated: null,
+      }
+    }
+
+    // SSR-only: Node.js imports are safe here
+    // Vite warning suppression: these imports are never run in the browser
+    let fs: any, path: any
+    try {
+      const fsModule = await import('node:fs')
+      const pathModule = await import('node:path')
+      fs = fsModule.default
+      path = pathModule.default
+    } catch (importError) {
+      return {
+        error: 'Node.js modules not available',
+        screenshots: [],
+        byPage: {},
+        diffCount: 0,
+        lastUpdated: null,
+      }
+    }
+
+    // Path to visual test results directory
+    const testResultsDir = path.join(process.cwd(), 'test-results')
+
+    if (!fs.existsSync(testResultsDir)) {
+      return {
+        error: 'No test results found',
+        screenshots: [],
+        byPage: {},
+        diffCount: 0,
+        lastUpdated: null,
+      }
+    }
+
+    // Get all screenshot files from test results - need to look in subdirectories
+    const screenshots: Screenshot[] = []
+    const scanDir = (dir: string): void => {
+      const files = fs.readdirSync(dir)
+
+      for (const file of files) {
+        const filePath = path.join(dir, file)
+        const stat = fs.statSync(filePath)
+
+        if (stat.isDirectory()) {
+          scanDir(filePath)
+        } else if (
+          file.endsWith('.png') &&
+          !file.includes('-diff.png') &&
+          !file.includes('-actual.png')
+        ) {
+          // This is a baseline screenshot
+          const relativePath = path.relative(testResultsDir, filePath)
+          const baseFilename = path.basename(filePath)
+          const fileDir = path.dirname(filePath)
+
+          // Check if we have actual and diff images
+          const actualFile = path.join(
+            fileDir,
+            baseFilename.replace('.png', '-actual.png'),
+          )
+          const diffFile = path.join(
+            fileDir,
+            baseFilename.replace('.png', '-diff.png'),
+          )
+
+          const hasActual = fs.existsSync(actualFile)
+          const hasDiff = fs.existsSync(diffFile)
+
+          // Parse name to extract details
+          const nameParts = baseFilename.split('-')
+          const page = nameParts[0] || 'unknown'
+          const deviceType =
+            nameParts.length > 1 ? nameParts[1] || 'unknown' : 'unknown'
+
+          screenshots.push({
+            name: baseFilename,
+            page,
+            deviceType,
+            baselinePath: `/test-results/${relativePath}`,
+            actualPath: hasActual
+              ? `/test-results/${path.relative(testResultsDir, actualFile)}`
+              : null,
+            diffPath: hasDiff
+              ? `/test-results/${path.relative(testResultsDir, diffFile)}`
+              : null,
+            hasDiff: hasDiff,
+            lastUpdated: new Date(stat.mtime).toISOString(),
+          })
+        }
+      }
+    }
+
+    try {
+      scanDir(testResultsDir)
+    } catch (err) {
+      console.error('Error scanning directories:', err)
+    }
+
+    // Group by page
+    const byPage: PageMap = {}
+    for (const screenshot of screenshots) {
+      if (!byPage[screenshot.page]) {
+        byPage[screenshot.page] = []
+      }
+      byPage[screenshot.page]!.push(screenshot)
+    }
+
+    return {
+      error: null,
+      screenshots,
+      byPage,
+      diffCount: screenshots.filter((s) => s.hasDiff).length,
+      lastUpdated:
+        screenshots.length > 0
+          ? new Date(
+              Math.max(
+                ...screenshots.map((s) => new Date(s.lastUpdated).getTime()),
+              ),
+            ).toISOString()
+          : null,
+    }
+  } catch (error) {
+    console.error('Error fetching visual regression data:', error)
+    return {
+      error: 'Error loading visual regression data',
+      screenshots: [],
+      byPage: {},
+      diffCount: 0,
+      lastUpdated: null,
+    }
+  }
+}
+
+// Get the test data
+const visualData = await fetchVisualRegressionData()
+const placeholderThumbnail =
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"%3E%3Crect width="200" height="150" fill="%23f0f0f0"/%3E%3Ctext x="100" y="75" font-family="Arial" font-size="14" text-anchor="middle" dominant-baseline="middle" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E'
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <div class="container mx-auto py-8 px-4">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gradient">
+      Visual Regression Dashboard
+    </h1>
+
+    <div class="text-center mb-8">
+      <p class="text-gray-600 dark:text-gray-400">
+        Monitor visual changes across browsers and devices
+      </p>
+      <div class="mt-4 flex justify-center space-x-4">
+        <a
+          href="/browser-compatibility/dashboard"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800"
+        >
+          <Icon name="tabler:device-desktop" class="w-4 h-4 mr-2" />
+          Compatibility Dashboard
+        </a>
+        <a
+          href="/browser-compatibility/visual-regression"
+          class="inline-flex items-center px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-md hover:bg-purple-700 dark:hover:bg-purple-800"
+        >
+          <Icon name="tabler:photo-edit" class="w-4 h-4 mr-2" />
+          Visual Regression Tests
+        </a>
+      </div>
+      {
+        visualData.error && (
+          <div class="mt-2 inline-block bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded text-sm">
+            <Icon name="tabler:alert-triangle" class="w-4 h-4 inline mr-1" />
+            {visualData.error}
+          </div>
+        )
+      }
+      {
+        visualData.diffCount > 0 && (
+          <div class="mt-2 inline-block bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-3 py-1 rounded text-sm animate-pulse">
+            <Icon name="tabler:alert-circle" class="w-4 h-4 inline mr-1" />
+            {visualData.diffCount} visual{' '}
+            {visualData.diffCount === 1 ? 'difference' : 'differences'}{' '}
+            detected!
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Total Screenshots
+            </p>
+            <h2 class="text-3xl font-bold">{visualData.screenshots.length}</h2>
+          </div>
+          <div class="text-2xl text-blue-500">
+            <Icon name="tabler:photo" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Visual Differences
+            </p>
+            <h2 class="text-3xl font-bold">{visualData.diffCount}</h2>
+          </div>
+          <div class="text-2xl text-red-500">
+            <Icon name="tabler:photo-off" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Pages Tested</p>
+            <h2 class="text-3xl font-bold">
+              {Object.keys(visualData.byPage || {}).length}
+            </h2>
+          </div>
+          <div class="text-2xl text-purple-500">
+            <Icon name="tabler:layout-dashboard" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diff Results -->
+    {
+      visualData.diffCount > 0 && (
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold">Visual Differences</h2>
+          </div>
+          <div class="p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visualData.screenshots
+                .filter((s) => s.hasDiff)
+                .map((screenshot) => (
+                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <h3 class="font-medium text-lg mb-2">{screenshot.name}</h3>
+
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                      <div>
+                        <p class="text-xs text-gray-500 mb-1">Expected</p>
+                        <img
+                          src={screenshot.baselinePath || placeholderThumbnail}
+                          alt={`Expected ${screenshot.name}`}
+                          class="w-full h-auto border border-gray-300 dark:border-gray-600 rounded"
+                          onerror={`this.onerror=null; this.src='${placeholderThumbnail}'`}
+                        />
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-500 mb-1">Actual</p>
+                        <img
+                          src={screenshot.actualPath || placeholderThumbnail}
+                          alt={`Actual ${screenshot.name}`}
+                          class="w-full h-auto border border-gray-300 dark:border-gray-600 rounded"
+                          onerror={`this.onerror=null; this.src='${placeholderThumbnail}'`}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <p class="text-xs text-gray-500 mb-1">Difference</p>
+                      <img
+                        src={screenshot.diffPath || placeholderThumbnail}
+                        alt={`Diff ${screenshot.name}`}
+                        class="w-full h-auto border border-gray-300 dark:border-gray-600 rounded"
+                        onerror={`this.onerror=null; this.src='${placeholderThumbnail}'`}
+                      />
+                    </div>
+
+                    <div class="mt-2 text-right">
+                      <a
+                        href="#"
+                        class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                        data-name={screenshot.name}
+                        onclick="openImageComparisonModal(this.dataset.name); return false;"
+                      >
+                        View Full Size
+                      </a>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    <!-- All Screenshots -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold">All Visual Tests</h2>
+      </div>
+      <div class="p-4">
+        {
+          Object.entries(visualData.byPage || {}).map(([page, screenshots]) => (
+            <div class="mb-8">
+              <h3 class="text-lg font-medium mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                {page.charAt(0).toUpperCase() + page.slice(1)} Page
+              </h3>
+
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {screenshots.map((screenshot: Screenshot) => (
+                  <div
+                    class={`border rounded-lg p-3 ${screenshot.hasDiff ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-700'}`}
+                  >
+                    <p
+                      class="text-sm font-medium mb-2 truncate"
+                      title={screenshot.name}
+                    >
+                      {screenshot.deviceType}
+                    </p>
+
+                    <div class="aspect-w-16 aspect-h-9 mb-2">
+                      <img
+                        src={screenshot.baselinePath || placeholderThumbnail}
+                        alt={screenshot.name}
+                        class="object-cover w-full h-full rounded border border-gray-300 dark:border-gray-600"
+                        onerror={`this.onerror=null; this.src='${placeholderThumbnail}'`}
+                      />
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-gray-500 dark:text-gray-400">
+                        {new Date(screenshot.lastUpdated).toLocaleDateString()}
+                      </span>
+
+                      {screenshot.hasDiff ? (
+                        <span class="text-red-600 dark:text-red-400 flex items-center">
+                          <Icon
+                            name="tabler:alert-circle"
+                            class="w-3 h-3 mr-1"
+                          />
+                          Diff
+                        </span>
+                      ) : (
+                        <span class="text-green-600 dark:text-green-400 flex items-center">
+                          <Icon
+                            name="tabler:check-circle"
+                            class="w-3 h-3 mr-1"
+                          />
+                          Pass
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+
+        {
+          Object.keys(visualData.byPage || {}).length === 0 && (
+            <div class="text-center py-8">
+              <p class="text-gray-500 dark:text-gray-400">
+                No visual test results found.
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Run visual regression tests to see results here.
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
+      Last updated: {
+        visualData.lastUpdated
+          ? new Date(visualData.lastUpdated).toLocaleString()
+          : 'N/A'
+      }
+      <button
+        id="refresh-data"
+        class="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
+      >
+        <Icon name="tabler:refresh" class="w-4 h-4 inline" />
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Image Comparison Modal -->
+  <div
+    id="imageModal"
+    class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center hidden"
+  >
+    <div
+      class="bg-white dark:bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto p-6 relative"
+    >
+      <button
+        id="closeModal"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+      >
+        <Icon name="tabler:x" class="w-6 h-6" />
+      </button>
+
+      <h2 id="modalTitle" class="text-xl font-semibold mb-4">
+        Image Comparison
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Expected</p>
+          <img
+            id="modalExpected"
+            src={placeholderThumbnail}
+            alt="Expected"
+            class="w-full h-auto border border-gray-300 dark:border-gray-600 rounded"
+          />
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Actual</p>
+          <img
+            id="modalActual"
+            src={placeholderThumbnail}
+            alt="Actual"
+            class="w-full h-auto border border-gray-300 dark:border-gray-600 rounded"
+          />
+        </div>
+      </div>
+
+      <div>
+        <p class="text-sm text-gray-500 mb-1">Difference</p>
+        <img
+          id="modalDiff"
+          src={placeholderThumbnail}
+          alt="Difference"
+          class="w-full h-auto border border-gray-300 dark:border-gray-600 rounded"
+        />
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600;
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Aspect ratio utility if not using Tailwind JIT mode */
+  .aspect-w-16 {
+    position: relative;
+    padding-bottom: calc(9 / 16 * 100%);
+  }
+
+  .aspect-w-16 > img {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    object-fit: cover;
+    object-position: center;
+  }
+</style>
+
+<script define:vars={{ visualData, placeholderThumbnail }}>
+  // Refresh button
+  document.getElementById('refresh-data')?.addEventListener('click', () => {
+    window.location.reload()
+  })
+
+  // Image comparison modal
+  const modal = document.getElementById('imageModal')
+  const closeModalBtn = document.getElementById('closeModal')
+  const modalTitle = document.getElementById('modalTitle')
+  const modalExpected = document.getElementById('modalExpected')
+  const modalActual = document.getElementById('modalActual')
+  const modalDiff = document.getElementById('modalDiff')
+
+  // Close modal with escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+      closeModal()
+    }
+  })
+
+  // Close modal function
+  function closeModal() {
+    modal?.classList.add('hidden')
+  }
+
+  // Close modal button click
+  closeModalBtn?.addEventListener('click', () => {
+    closeModal()
+  })
+
+  // Allow clicking outside modal to close
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal()
+    }
+  })
+
+  // Add the openImageComparisonModal function to the window object
+  function openImageComparisonModal(name) {
+    // Find the screenshot data
+    const screenshots = visualData.screenshots
+    const screenshot = screenshots.find((s) => s.name === name)
+
+    if (!screenshot) return
+
+    if (modalTitle) {
+      modalTitle.textContent = `Image Comparison: ${screenshot.name}`
+    }
+
+    if (modalExpected) {
+      modalExpected.src = screenshot.baselinePath || placeholderThumbnail
+    }
+
+    if (modalActual) {
+      modalActual.src = screenshot.actualPath || placeholderThumbnail
+    }
+
+    if (modalDiff) {
+      modalDiff.src = screenshot.diffPath || placeholderThumbnail
+    }
+
+    modal?.classList.remove('hidden')
+  }
+
+  // Make the function globally available
+  window.openImageComparisonModal = openImageComparisonModal
+</script>

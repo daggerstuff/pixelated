@@ -1,0 +1,97 @@
+---
+/**
+ * A utility component that provides client-side browser information
+ * This component works in both server-rendered and prerendered pages
+ */
+
+// Don't rely on Astro.locals for prerendered pages - detect everything client-side
+const initialLanguage = ''
+const initialDarkMode = false
+const initialReducedMotion = false
+---
+
+<script define:vars={{ initialLanguage, initialDarkMode, initialReducedMotion }} is:inline
+>
+  // Function to initialize browser info
+  function initBrowserInfo() {
+    // Use server-provided values when available, otherwise detect on client
+    const language = initialLanguage || navigator.language || 'en-US'
+
+    // For dark mode, check if we have server value, localStorage, or media query
+    let darkMode = initialDarkMode
+    if (darkMode === undefined || darkMode === false) {
+      if (
+        typeof localStorage !== 'undefined' &&
+        localStorage.getItem('theme') === 'dark'
+      ) {
+        darkMode = true
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        darkMode = true
+      }
+    }
+
+    // For reduced motion, check if we have server value or media query
+    const reducedMotion =
+      initialReducedMotion ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // Set CSS variables
+    document.documentElement.style.setProperty('--browser-language', language)
+
+    document.documentElement.style.setProperty(
+      '--prefers-dark-mode',
+      darkMode ? 'true' : 'false',
+    )
+
+    document.documentElement.style.setProperty(
+      '--prefers-reduced-motion',
+      reducedMotion ? 'true' : 'false',
+    )
+
+    // Make browser data available globally
+    window.browserInfo = {
+      language: language,
+      languages: navigator.languages || [language],
+      prefersDarkMode: darkMode,
+      prefersReducedMotion: reducedMotion,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      pathname: window.location.pathname,
+      host: window.location.host,
+    }
+
+    // Listen for scheme changes
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (e) => {
+        document.documentElement.style.setProperty(
+          '--prefers-dark-mode',
+          e.matches ? 'true' : 'false',
+        )
+        window.browserInfo.prefersDarkMode = e.matches
+      })
+
+    window
+      .matchMedia('(prefers-reduced-motion: reduce)')
+      .addEventListener('change', (e) => {
+        document.documentElement.style.setProperty(
+          '--prefers-reduced-motion',
+          e.matches ? 'true' : 'false',
+        )
+        window.browserInfo.prefersReducedMotion = e.matches
+      })
+
+    // Dispatch event when browser info is ready
+    document.dispatchEvent(
+      new CustomEvent('browser-info-ready', {
+        detail: window.browserInfo,
+      }),
+    )
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initBrowserInfo)
+
+  // Also initialize on page transitions
+  document.addEventListener('astro:page-load', initBrowserInfo)
+</script>

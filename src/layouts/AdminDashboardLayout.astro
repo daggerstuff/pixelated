@@ -1,0 +1,34 @@
+---
+import DashboardLayout from './DashboardLayout.astro'
+import AdminLayout from '@/components/admin/AdminLayout.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  metaImage?: string
+  contentClassName?: string
+}
+
+const {
+  title = 'Pixelated Empathy Therapy | Admin Dashboard',
+  description = 'Administrative tools for Pixelated Empathy Therapy',
+  metaImage = '/admin-og-image.png',
+  contentClassName = '',
+} = Astro.props
+---
+
+<DashboardLayout
+  {title}
+  {description}
+  {metaImage}
+  showSidebar={false}
+  {contentClassName}
+>
+  <div class="flex h-full">
+    <AdminLayout activeItem="dashboard">
+      <div class="flex-1 px-4 py-6">
+        <slot />
+      </div>
+    </AdminLayout>
+  </div>
+</DashboardLayout>

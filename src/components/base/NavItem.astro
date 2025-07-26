@@ -1,0 +1,105 @@
+---
+import Link from '@/components/base/Link.astro'
+import { ensureTrailingSlash, getUrl } from '@/utils/common'
+
+// Define the expected shape of navigation items
+interface NavItemBase {
+  name: string
+  link: string
+  desc?: string
+  icon?: string
+}
+
+export interface Props {
+  type: 'internal' | 'social'
+  item: NavItemBase
+  mergeOnMobile?: boolean
+  mobileItemType?: 'text' | 'icon'
+}
+
+const { type, item, mergeOnMobile = false, mobileItemType } = Astro.props
+
+let classList = ''
+let externalClass = ''
+
+if (type === 'internal') {
+  if (mergeOnMobile && mobileItemType === 'text') {
+    classList = 'font-semibold my-1'
+  } else if (mobileItemType === 'icon') {
+    classList = 'flex gap-2.5 items-center'
+  } else {
+    classList =
+      'text-sm font-medium tracking-wide text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors'
+  }
+}
+
+if (type === 'social') {
+  if (mergeOnMobile && mobileItemType === 'text') {
+    classList = 'flex gap-2.5 items-center my-1'
+  } else if (mobileItemType === 'icon') {
+    classList = 'block'
+  } else {
+    externalClass =
+      'text-sm font-medium tracking-wide text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors'
+  }
+}
+---
+
+{
+  type === 'internal' &&
+    (!mobileItemType ? (
+      <Link href={item.link} class={classList}>
+        {item.name}
+      </Link>
+    ) : mobileItemType === 'icon' ? (
+      <div class="py-3">
+        <Link href={item.link} class={classList}>
+          {item.icon ? <i class={item.icon} /> : null}
+          <span>{item.name}</span>
+        </Link>
+        {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
+      </div>
+    ) : (
+      <Link href={item.link} class={classList}>
+        {item.name}
+      </Link>
+    ))
+}
+
+{
+  type === 'social' &&
+    (!mobileItemType ? (
+      <a
+        href={item.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={externalClass}
+      >
+        {item.icon ? <i class={item.icon} /> : item.name}
+        <span class="sr-only">{item.name}</span>
+      </a>
+    ) : mobileItemType === 'icon' ? (
+      <div class="py-3">
+        <a
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          class={classList}
+        >
+          {item.icon ? <i class={item.icon} /> : null}
+          <span>{item.name}</span>
+        </a>
+        {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
+      </div>
+    ) : (
+      <a
+        href={item.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={classList}
+      >
+        {item.icon && <i class={item.icon} />}
+        <span>{item.name}</span>
+      </a>
+    ))
+}

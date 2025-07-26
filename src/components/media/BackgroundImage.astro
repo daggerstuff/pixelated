@@ -1,0 +1,294 @@
+---
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
+
+export interface Props {
+  src: string | ImageMetadata
+  mobileSrc?: string | ImageMetadata
+  tabletSrc?: string | ImageMetadata
+  alt: string
+  class?: string
+  overlayColor?: string
+  quality?: number
+  format?: 'webp' | 'avif' | 'jpg' | 'png'
+  blurEffect?: boolean
+  zIndex?: number
+  position?: string
+  size?: string
+  fixed?: boolean
+  mobileBreakpoint?: number
+  tabletBreakpoint?: number
+}
+
+const {
+  src,
+  mobileSrc,
+  tabletSrc,
+  alt,
+  class: className = '',
+  overlayColor,
+  quality = 80,
+  format = 'webp',
+  blurEffect = false, // Used for future blur effect implementation
+  zIndex = -1,
+  position = 'center',
+  size = 'cover',
+  fixed = false,
+  mobileBreakpoint = 640,
+  tabletBreakpoint = 1024,
+} = Astro.props
+
+// Helper to get appropriate attributes for each image source
+const getImageAttributes = (imageSrc: string | ImageMetadata) => {
+  if (typeof imageSrc === 'string') {
+    return {
+      src: imageSrc,
+      width: undefined,
+      height: undefined,
+    }
+  } else {
+    return {
+      src: imageSrc,
+      width: imageSrc.width,
+      height: imageSrc.height,
+    }
+  }
+}
+
+// Process main image
+const mainImage = getImageAttributes(src)
+
+// Process optional mobile and tablet images
+const mobileImage = mobileSrc ? getImageAttributes(mobileSrc) : null
+const tabletImage = tabletSrc ? getImageAttributes(tabletSrc) : null
+---
+
+<div class={`background-image-container ${className}`}>
+  <div class="background-image-inner">
+    <!-- Desktop Image -->
+    <div
+      class="background-image desktop-image"
+      style={`
+        background-image: url(${typeof src === 'string' ? src : ''});
+        background-position: ${position};
+        background-size: ${size};
+        ${fixed ? 'background-attachment: fixed;' : ''}
+        ${blurEffect ? 'filter: blur(5px);' : ''}
+        z-index: ${zIndex};
+      `}
+    >
+      {
+        typeof src !== 'string' && src && (
+          <Image
+            src={src}
+            alt={alt}
+            width={mainImage.width || 1000}
+            height={mainImage.height || 1000}
+            quality={quality}
+            format={format}
+            class="hidden"
+          />
+        )
+      }
+    </div>
+
+    <!-- Tablet Image (if provided) -->
+    {
+      tabletImage && (
+        <div
+          class="background-image tablet-image"
+          style={`
+          background-image: url(${typeof tabletSrc === 'string' ? tabletSrc : ''});
+          background-position: ${position};
+          background-size: ${size};
+          ${fixed ? 'background-attachment: fixed;' : ''}
+          ${blurEffect ? 'filter: blur(5px);' : ''}
+          z-index: ${zIndex};
+        `}
+        >
+          {typeof tabletSrc !== 'string' && tabletSrc && (
+            <Image
+              src={tabletSrc}
+              alt={`${alt} (tablet)`}
+              width={tabletImage?.width || 1000}
+              height={tabletImage?.height || 1000}
+              quality={quality}
+              format={format}
+              class="hidden"
+            />
+          )}
+        </div>
+      )
+    }
+
+    <!-- Mobile Image (if provided) -->
+    {
+      mobileImage && (
+        <div
+          class="background-image mobile-image"
+          style={`
+          background-image: url(${typeof mobileSrc === 'string' ? mobileSrc : ''});
+          background-position: ${position};
+          background-size: ${size};
+          ${fixed ? 'background-attachment: fixed;' : ''}
+          ${blurEffect ? 'filter: blur(5px);' : ''}
+          z-index: ${zIndex};
+        `}
+        >
+          {typeof mobileSrc !== 'string' && mobileSrc && (
+            <Image
+              src={mobileSrc}
+              alt={`${alt} (mobile)`}
+              width={mobileImage?.width || 1000}
+              height={mobileImage?.height || 1000}
+              quality={quality}
+              format={format}
+              class="hidden"
+            />
+          )}
+        </div>
+      )
+    }
+
+    <!-- Optional overlay -->
+    {
+      overlayColor && (
+        <div
+          class="background-overlay"
+          style={`background-color: ${overlayColor}; z-index: ${zIndex + 1};`}
+        />
+      )
+    }
+  </div>
+
+  <!-- Content slot -->
+  <div class="background-content" style={`z-index: ${zIndex + 2};`}>
+    <slot />
+  </div>
+</div>
+
+<style define:vars={{ mobileBreakpoint, tabletBreakpoint }}>
+  .background-image-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .background-image-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+  }
+
+  .background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .background-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* Responsive breakpoints */
+  .desktop-image {
+    display: none;
+  }
+
+  .tablet-image {
+    display: none;
+  }
+
+  .mobile-image {
+    display: block;
+  }
+
+  @media (min-width: calc(var(--mobileBreakpoint) * 1px)) {
+    .mobile-image {
+      display: none;
+    }
+
+    .tablet-image {
+      display: block;
+    }
+  }
+
+  @media (min-width: calc(var(--tabletBreakpoint) * 1px)) {
+    .tablet-image {
+      display: none;
+    }
+
+    .desktop-image {
+      display: block;
+    }
+  }
+
+  /* Fallbacks if specific breakpoint images aren't provided */
+  .desktop-image:only-of-type {
+    display: block;
+  }
+</style>
+
+<script>
+  // Optional: Add lazy loading for background images
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const container = entry.target as HTMLElement
+            const images = container.querySelectorAll('.background-image')
+
+            images.forEach((image) => {
+              if (image instanceof HTMLElement) {
+                // Load actual background image
+                const style = window.getComputedStyle(image)
+                const bgImage = style.backgroundImage
+
+                if (bgImage && bgImage.includes('url("data:image')) {
+                  const actualImage = image.dataset.src
+                  if (actualImage) {
+                    image.style.backgroundImage = `url(${actualImage})`
+                  }
+                }
+              }
+            })
+
+            // Stop observing once loaded
+            observer.unobserve(container)
+          }
+        })
+      },
+      {
+        rootMargin: '200px 0px',
+      },
+    )
+
+    // Start observing background containers
+    document
+      .querySelectorAll('.background-image-container')
+      .forEach((container) => {
+        observer.observe(container)
+      })
+  }
+</script>

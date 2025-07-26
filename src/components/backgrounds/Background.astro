@@ -1,0 +1,32 @@
+---
+import Plum from './Plum.astro'
+import Rose from './Rose.astro'
+import Particle from './Particle.astro'
+import GradientAnimation from './GradientAnimation.astro'
+
+import type { BgType } from '../../types'
+
+interface Props {
+  type: BgType
+  colorScheme?: 'default' | 'purple' | 'blue' | 'green' | 'sunset'
+}
+
+const { type, colorScheme = 'default' } = Astro.props
+---
+
+{
+  type === ('default' as BgType) && (
+    <div class="fixed inset-0 -z-10 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950" />
+  )
+}
+{type === ('plum' as BgType) && <Plum />}
+{type === ('pulse' as BgType) && <Particle />}
+{type === ('light' as BgType) && <div class="fixed inset-0 -z-10 bg-white" />}
+{type === ('dark' as BgType) && <div class="fixed inset-0 -z-10 bg-gray-900" />}
+{type === ('stars' as BgType) && <Rose />}
+{type === ('rose' as BgType) && <Rose />}
+{
+  type === ('animated' as BgType) && (
+    <GradientAnimation colorScheme={colorScheme} />
+  )
+}

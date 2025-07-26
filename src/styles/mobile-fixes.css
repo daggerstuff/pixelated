@@ -1,0 +1,183 @@
+/**
+ * Mobile Browser Compatibility Fixes
+ *
+ * This file contains fixes for common mobile browser viewport issues
+ * based on our documented compatibility best practices.
+ */
+
+/* Fix for iOS 100vh issue */
+:root {
+  --viewport-height: 100vh;
+}
+
+@supports (-webkit-touch-callout: none) {
+  :root {
+    --viewport-height: -webkit-fill-available;
+  }
+}
+
+.full-height {
+  height: var(--viewport-height);
+}
+
+/* Prevent unintended zoom on inputs */
+input,
+select,
+textarea {
+  font-size: 16px; /* Minimum font size to prevent zoom */
+}
+
+/* iOS-specific fixes */
+.ios-device {
+  /* Fix for iOS text fields with auto-zoom */
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='number'],
+  input[type='search'],
+  input[type='tel'],
+  input[type='url'],
+  textarea {
+    font-size: 16px !important; /* iOS zooms when font size is less than 16px */
+    max-height: 100%; /* Prevent sizing issues */
+  }
+
+  /* Fix for fixed headers disappearing during scroll on iOS */
+  .fixed-header,
+  .sticky-header,
+  .navbar-fixed {
+    position: fixed;
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+    z-index: 100;
+  }
+
+  /* Fix for overscroll bounce effect revealing background */
+  html,
+  body {
+    overscroll-behavior-y: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Main scrollable content container - only apply to specific mobile containers */
+  .mobile-scrollable-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    flex: 1 0 auto;
+  }
+
+  /* Fix for input fields shifting viewport */
+  .form-container {
+    position: relative;
+    padding-bottom: 40vh; /* Add extra space at bottom of forms to prevent shifting */
+  }
+}
+
+/* Smooth scrolling for iOS */
+.scrollable-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Disable 300ms tap delay */
+html {
+  touch-action: manipulation;
+}
+
+/* Improved touch interactions for buttons and links */
+button,
+a,
+.touch-target {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Better fixed element handling */
+.fixed-element {
+  position: fixed;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Prevent overscroll effect on Android */
+html {
+  overscroll-behavior: none;
+}
+
+/* Fix for sticky hover states on mobile */
+@media (hover: hover) {
+  .button:hover {
+    background-color: var(--hover-bg-color, rgba(0, 0, 0, 0.1));
+  }
+}
+
+@media (hover: none) {
+  .button:active {
+    background-color: var(--active-bg-color, rgba(0, 0, 0, 0.2));
+  }
+}
+
+/* Performance improvements for animations */
+.animated-element {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Safe area insets for notched devices */
+.container {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.has-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.has-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Bottom navigation bar with safe area support */
+.bottom-nav {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+/* Specific fixes for mobile form layouts */
+@media screen and (max-width: 767px) {
+  /* Ensure form elements are sized appropriately */
+  .form-container input,
+  .form-container select,
+  .form-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 44px; /* Minimum touch target size */
+  }
+
+  /* Ensure adequate spacing between form elements on mobile */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  /* Make buttons large enough for touch */
+  button,
+  .button,
+  [type='button'],
+  [type='submit'] {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+
+  /* Fix for iOS Safari keyboard appearing/disappearing */
+  .ios-device .form-group {
+    transition: none !important; /* Disable transitions during keyboard appearance */
+  }
+}

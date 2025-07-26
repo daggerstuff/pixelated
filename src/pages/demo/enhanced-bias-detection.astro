@@ -1,0 +1,456 @@
+---
+// Enhanced Bias Detection Demo Page
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { BiasDetectionDemo } from '../../components/demos/bias-detection/BiasDetectionDemo'
+---
+
+<BaseLayout
+  title="Enhanced Bias Detection Demo - Pixelated Empathy"
+  description="Advanced AI-powered bias detection system for therapeutic conversations with real-time analysis, counterfactual scenarios, and comprehensive reporting."
+  keywords="bias detection, AI therapy, mental health, therapeutic training, bias analysis, cultural competency"
+>
+  <main class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section
+      class="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-16"
+    >
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-4xl md:text-5xl font-bold mb-6">
+            Enhanced Bias Detection Demo
+          </h1>
+          <p class="text-xl md:text-2xl mb-8 text-blue-100">
+            Advanced AI-powered analysis of bias patterns in therapeutic
+            conversations
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div class="text-3xl font-bold text-blue-300 mb-2">6</div>
+              <div class="text-sm text-blue-100">
+                Sophisticated Preset Scenarios
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div class="text-3xl font-bold text-purple-300 mb-2">4</div>
+              <div class="text-sm text-purple-100">Analysis Layers</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div class="text-3xl font-bold text-indigo-300 mb-2">
+                Real-time
+              </div>
+              <div class="text-sm text-indigo-100">Bias Detection</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Overview -->
+    <section class="py-12 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+            Advanced Bias Detection Capabilities
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Multi-Dimensional Analysis -->
+            <div class="text-center">
+              <div
+                class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2V7a2 2 0 012-2h2a2 2 0 002 2v2a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 00-2 2h-2a2 2 0 00-2 2v6a2 2 0 01-2 2H9z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                Multi-Dimensional Analysis
+              </h3>
+              <p class="text-gray-600 text-sm">
+                Analyze bias across cultural, gender, age, linguistic, and
+                intersectional dimensions
+              </p>
+            </div>
+
+            <!-- Real-time Processing -->
+            <div class="text-center">
+              <div
+                class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                Real-time Processing
+              </h3>
+              <p class="text-gray-600 text-sm">
+                Instant analysis with confidence scoring and alert level
+                determination
+              </p>
+            </div>
+
+            <!-- Counterfactual Analysis -->
+            <div class="text-center">
+              <div
+                class="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                Counterfactual Analysis
+              </h3>
+              <p class="text-gray-600 text-sm">
+                Explore "what-if" scenarios to understand bias reduction
+                strategies
+              </p>
+            </div>
+
+            <!-- Historical Tracking -->
+            <div class="text-center">
+              <div
+                class="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2V7a2 2 0 012-2h2a2 2 0 002 2v2a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 00-2 2h-2a2 2 0 00-2 2v6a2 2 0 01-2 2H9z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                Historical Tracking
+              </h3>
+              <p class="text-gray-600 text-sm">
+                Monitor progress over time with trend analysis and percentile
+                ranking
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo Interface -->
+    <section class="py-12 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="max-w-7xl mx-auto">
+          <BiasDetectionDemo
+            client:load
+            enableExport={true}
+            showHistoricalData={true}
+            class="w-full"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Technical Specifications -->
+    <section class="py-12 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+            Technical Specifications
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Analysis Layers -->
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                Analysis Layers
+              </h3>
+              <ul class="space-y-3">
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">
+                      Preprocessing Layer
+                    </div>
+                    <div class="text-sm text-gray-600">
+                      Linguistic bias detection across demographic dimensions
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">Model Layer</div>
+                    <div class="text-sm text-gray-600">
+                      Fairness metrics including demographic parity and
+                      calibration
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">
+                      Interactive Layer
+                    </div>
+                    <div class="text-sm text-gray-600">
+                      Counterfactual analysis and consistency scoring
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">
+                      Evaluation Layer
+                    </div>
+                    <div class="text-sm text-gray-600">
+                      HuggingFace metrics and regard scoring
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Export Formats -->
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                Export Capabilities
+              </h3>
+              <ul class="space-y-3">
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">JSON Format</div>
+                    <div class="text-sm text-gray-600">
+                      Complete structured data with all analysis details
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">CSV Format</div>
+                    <div class="text-sm text-gray-600">
+                      Tabular data optimized for statistical analysis
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">PDF Reports</div>
+                    <div class="text-sm text-gray-600">
+                      Formatted reports for documentation and compliance
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div
+                    class="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0"
+                  >
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">Real-time API</div>
+                    <div class="text-sm text-gray-600">
+                      WebSocket support for live analysis streaming
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section
+      class="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+    >
+      <div class="container mx-auto px-4 text-center">
+        <div class="max-w-3xl mx-auto">
+          <h2 class="text-3xl font-bold mb-6">
+            Ready to Enhance Your Therapeutic Training?
+          </h2>
+          <p class="text-xl mb-8 text-blue-100">
+            Experience the power of advanced bias detection in therapeutic
+            conversations. Join our beta program for early access to the
+            complete system.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/beta"
+              class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            >
+              Join Beta Program
+            </a>
+            <a
+              href="/contact"
+              class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+            >
+              Contact Sales
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  // Analytics tracking for demo interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    // Track demo page view
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'page_view', {
+        page_title: 'Enhanced Bias Detection Demo',
+        page_location: window.location.href,
+        content_group1: 'Demo Pages',
+      })
+    }
+
+    // Track demo interactions
+    const demoContainer = document.querySelector('.bias-detection-demo')
+    if (demoContainer) {
+      // Track analysis starts
+      demoContainer.addEventListener('click', (e) => {
+        if (e.target?.textContent?.includes('Analyze for Bias')) {
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'demo_interaction', {
+              event_category: 'Bias Detection Demo',
+              event_label: 'Analysis Started',
+              value: 1,
+            })
+          }
+        }
+      })
+
+      // Track preset selections
+      demoContainer.addEventListener('click', (e) => {
+        if (e.target?.closest('.preset-scenario-selector')) {
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'demo_interaction', {
+              event_category: 'Bias Detection Demo',
+              event_label: 'Preset Selected',
+              value: 1,
+            })
+          }
+        }
+      })
+
+      // Track exports
+      demoContainer.addEventListener('click', (e) => {
+        if (e.target?.textContent?.includes('Export Data')) {
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'demo_interaction', {
+              event_category: 'Bias Detection Demo',
+              event_label: 'Data Exported',
+              value: 1,
+            })
+          }
+        }
+      })
+    }
+  })
+</script>
+
+<style>
+  /* Custom styles for demo page */
+  .bias-detection-demo {
+    /* Ensure proper spacing and layout */
+    min-height: 600px;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .bias-detection-demo {
+      padding: 1rem;
+    }
+  }
+
+  /* Loading animation for demo components */
+  .demo-loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Accessibility improvements */
+  .demo-container:focus-within {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Print styles for exported reports */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+
+    .print-break {
+      page-break-before: always;
+    }
+  }
+</style>

@@ -1,0 +1,678 @@
+---
+export const prerender = false
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { compatibility_placeholder_data } from '@/data/compatibility-placeholder.ts'
+import { Icon } from 'astro-icon/components'
+import { ToastContainer } from '@/components/common/Toast'
+
+const pageTitle = 'Browser Compatibility Dashboard'
+const pageDescription =
+  'Monitor browser compatibility status and issues across all supported platforms'
+
+// Define interfaces for type safety
+interface TestItem {
+  status: string
+  browser: string
+  name: string
+  type: string
+  duration: number
+  timestamp: string
+}
+
+interface IssueItem {
+  severity: string
+  timestamp: string
+  browser: string
+  component: string
+  description: string
+}
+
+// Fetch real data from API endpoint
+const fetchCompatibilityData = async () => {
+  try {
+    const response = await fetch('/api/browser-compatibility/data?latest=true')
+    if (!response.ok) {
+      throw new Error(`API responded with status: ${response.status}`)
+    }
+    const data = await response.json()
+    return data.reports && data.reports.length > 0 ? data.reports[0] : null
+  } catch (error) {
+    console.error('Error fetching compatibility data:', error)
+    return null
+  }
+}
+
+// Try to get real data, fallback to placeholder
+const apiData = await fetchCompatibilityData()
+const useRealData = apiData !== null
+
+// Use real data or fallback to placeholder
+const data = useRealData ? apiData : compatibility_placeholder_data
+
+// Extract data from response or placeholder
+const browsers = data.browsers || compatibility_placeholder_data.browsers
+const tests = data.tests || compatibility_placeholder_data.tests
+const issues = data.issues || []
+
+// Calculate overall statistics
+const totalTests = tests.length
+const passedTests = tests.filter(
+  (test: TestItem) => test.status === 'passed',
+).length
+const failedTests = tests.filter(
+  (test: TestItem) => test.status === 'failed',
+).length
+const skippedTests = tests.filter(
+  (test: TestItem) => test.status === 'skipped',
+).length
+
+const passRate =
+  totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0
+
+// Group issues by browser
+const issuesByBrowser: Record<string, any[]> = {}
+for (const test of tests) {
+  if (test.browser && !issuesByBrowser[test.browser]) {
+    issuesByBrowser[test.browser] = []
+  }
+}
+
+for (const issue of issues) {
+  if (!issuesByBrowser[issue.browser]) {
+    issuesByBrowser[issue.browser] = []
+  }
+  issuesByBrowser[issue.browser].push(issue)
+}
+
+// Group issues by severity
+const criticalIssues = issues.filter(
+  (issue: IssueItem) => issue.severity === 'critical',
+)
+const majorIssues = issues.filter(
+  (issue: IssueItem) => issue.severity === 'major',
+)
+const minorIssues = issues.filter(
+  (issue: IssueItem) => issue.severity === 'minor',
+)
+
+// Last update timestamp
+const lastUpdate = data.timestamp
+  ? new Date(data.timestamp).toLocaleString()
+  : new Date().toLocaleString()
+
+// Check if we have new issues in the last 24 hours
+const newIssues = issues.filter((issue: IssueItem) => {
+  if (!issue.timestamp) return false
+  const issueDate = new Date(issue.timestamp)
+  const oneDayAgo = new Date()
+  oneDayAgo.setDate(oneDayAgo.getDate() - 1)
+  return issueDate >= oneDayAgo
+})
+
+const hasNewIssues = newIssues.length > 0
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <ToastContainer client:only="react" />
+
+  <div class="container mx-auto py-8 px-4">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gradient">
+      Browser Compatibility Dashboard
+    </h1>
+
+    <div class="text-center mb-8">
+      <p class="text-gray-600 dark:text-gray-400">
+        Monitor compatibility issues across browsers and devices
+      </p>
+      <div class="mt-4 flex justify-center space-x-4">
+        <a
+          href="/browser-compatibility/dashboard"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800"
+        >
+          <Icon name="tabler:device-desktop" class="w-4 h-4 mr-2" />
+          Compatibility Dashboard
+        </a>
+        <a
+          href="/browser-compatibility/visual-regression"
+          class="inline-flex items-center px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-md hover:bg-purple-700 dark:hover:bg-purple-800"
+        >
+          <Icon name="tabler:photo-edit" class="w-4 h-4 mr-2" />
+          Visual Regression Tests
+        </a>
+      </div>
+      {
+        !useRealData && (
+          <div class="mt-2 inline-block bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded text-sm">
+            <Icon name="tabler:alert-triangle" class="w-4 h-4 inline mr-1" />
+            Using placeholder data. API connection failed.
+          </div>
+        )
+      }
+      {
+        hasNewIssues && (
+          <div class="mt-2 inline-block bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-3 py-1 rounded text-sm animate-pulse">
+            <Icon name="tabler:alert-circle" class="w-4 h-4 inline mr-1" />
+            {newIssues.length} new compatibility{' '}
+            {newIssues.length === 1 ? 'issue' : 'issues'} detected in the last
+            24 hours!
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Pass Rate</p>
+            <h2 class="text-3xl font-bold">{passRate}%</h2>
+          </div>
+          <div
+            class={`text-2xl ${passRate > 90 ? 'text-green-500' : passRate > 75 ? 'text-yellow-500' : 'text-red-500'}`}
+          >
+            <Icon name="tabler:chart-pie" />
+          </div>
+        </div>
+        <div
+          class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4"
+        >
+          <div
+            class={`h-2.5 rounded-full ${passRate > 90 ? 'bg-green-500' : passRate > 75 ? 'bg-yellow-500' : 'bg-red-500'}`}
+            style={`width: ${passRate}%`}
+          >
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Total Issues</p>
+            <h2 class="text-3xl font-bold">{issues.length}</h2>
+          </div>
+          <div class="text-2xl text-purple-500">
+            <Icon name="tabler:bug" />
+          </div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <span
+            class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs px-2 py-1 rounded"
+          >
+            {criticalIssues.length} Critical
+          </span>
+          <span
+            class="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-xs px-2 py-1 rounded"
+          >
+            {majorIssues.length} Major
+          </span>
+          <span
+            class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs px-2 py-1 rounded"
+          >
+            {minorIssues.length} Minor
+          </span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Tests Run</p>
+            <h2 class="text-3xl font-bold">{totalTests}</h2>
+          </div>
+          <div class="text-2xl text-blue-500">
+            <Icon name="tabler:test-pipe" />
+          </div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <span
+            class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs px-2 py-1 rounded"
+          >
+            {passedTests} Passed
+          </span>
+          <span
+            class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs px-2 py-1 rounded"
+          >
+            {failedTests} Failed
+          </span>
+          <span
+            class="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded"
+          >
+            {skippedTests} Skipped
+          </span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Browsers Tested
+            </p>
+            <h2 class="text-3xl font-bold">{browsers.length}</h2>
+          </div>
+          <div class="text-2xl text-teal-500">
+            <Icon name="tabler:browser" />
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-1">
+          {
+            browsers.map((browser: any) => (
+              <span class="inline-block">
+                <Icon
+                  name={`browser-${browser.icon || 'default'}`}
+                  class="w-5 h-5"
+                />
+              </span>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Browser Support Matrix -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold">Browser Support Matrix</h2>
+      </div>
+      <div class="p-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead>
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >Browser</th
+              >
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >Version</th
+              >
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >Status</th
+              >
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >Issues</th
+              >
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >Pass Rate</th
+              >
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            {
+              browsers.map((browser: any, index: number) => {
+                const browserIssues = issuesByBrowser[browser.name] || []
+                const browserTests = tests.filter(
+                  (test: TestItem) => test.browser === browser.name,
+                )
+                const passedBrowserTests = browserTests.filter(
+                  (test: TestItem) => test.status === 'passed',
+                )
+                const browserPassRate =
+                  browserTests.length > 0
+                    ? Math.round(
+                        (passedBrowserTests.length / browserTests.length) * 100,
+                      )
+                    : 0
+
+                return (
+                  <tr
+                    class={
+                      index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900/50' : ''
+                    }
+                  >
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <Icon
+                          name={`browser-${browser.icon || 'default'}`}
+                          class="w-5 h-5 mr-2"
+                        />
+                        <span>{browser.name}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      {browser.version}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      {browserIssues.some(
+                        (issue) => issue.severity === 'critical',
+                      ) ? (
+                        <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs px-2 py-1 rounded">
+                          Critical Issues
+                        </span>
+                      ) : browserIssues.some(
+                          (issue) => issue.severity === 'major',
+                        ) ? (
+                        <span class="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-xs px-2 py-1 rounded">
+                          Major Issues
+                        </span>
+                      ) : browserIssues.length > 0 ? (
+                        <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs px-2 py-1 rounded">
+                          Minor Issues
+                        </span>
+                      ) : (
+                        <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs px-2 py-1 rounded">
+                          Supported
+                        </span>
+                      )}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      {browserIssues.length}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
+                          <div
+                            class={`h-2 rounded-full ${browserPassRate > 90 ? 'bg-green-500' : browserPassRate > 75 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                            style={`width: ${browserPassRate}%`}
+                          />
+                        </div>
+                        <span>{browserPassRate}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Issues -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold">Recent Issues</h2>
+      </div>
+      <div class="p-4">
+        {
+          issues.length === 0 ? (
+            <p class="text-center text-gray-500 dark:text-gray-400 py-4">
+              No issues found
+            </p>
+          ) : (
+            <div class="space-y-4">
+              {issues.slice(0, 5).map((issue: IssueItem) => (
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <div
+                        class={`
+                      w-2 h-2 rounded-full mr-2
+                      ${
+                        issue.severity === 'critical'
+                          ? 'bg-red-500'
+                          : issue.severity === 'major'
+                            ? 'bg-yellow-500'
+                            : 'bg-blue-500'
+                      }
+                    `}
+                      />
+                      <span
+                        class={`
+                      text-xs font-medium px-2 py-1 rounded
+                      ${
+                        issue.severity === 'critical'
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          : issue.severity === 'major'
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                      }
+                    `}
+                      >
+                        {issue.severity.charAt(0).toUpperCase() +
+                          issue.severity.slice(1)}
+                      </span>
+                    </div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(issue.timestamp as string).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div class="mt-2">
+                    <h3 class="font-medium">{issue.component}</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">
+                      {issue.description}
+                    </p>
+                  </div>
+                  <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                    <Icon
+                      name={`browser-${issue.browser.toLowerCase().replace(/\s+/g, '-')}`}
+                      class="w-4 h-4 mr-1"
+                    />
+                    {issue.browser}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        }
+
+        {
+          issues.length > 5 && (
+            <div class="mt-4 text-center">
+              <a
+                href="/browser-compatibility/issues"
+                class="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                View all {issues.length} issues
+              </a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <!-- Recent Test Results -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold">Recent Test Results</h2>
+      </div>
+      <div class="p-4">
+        <div class="overflow-x-auto">
+          <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            <thead>
+              <tr>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >Test</th
+                >
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >Browser</th
+                >
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >Status</th
+                >
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >Duration</th
+                >
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >Run Date</th
+                >
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              {
+                tests.slice(0, 10).map((test: TestItem, index: number) => (
+                  <tr
+                    class={
+                      index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900/50' : ''
+                    }
+                  >
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <Icon
+                          name={
+                            test.type === 'visual'
+                              ? 'tabler:photo'
+                              : 'tabler:code'
+                          }
+                          class="w-4 h-4 mr-2"
+                        />
+                        <span>{test.name}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <Icon
+                          name={`browser-${test.browser.toLowerCase().replace(/\s+/g, '-')}`}
+                          class="w-4 h-4 mr-1"
+                        />
+                        {test.browser}
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <span
+                        class={`
+                      text-xs px-2 py-1 rounded
+                      ${
+                        test.status === 'passed'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : test.status === 'failed'
+                            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                      }
+                    `}
+                      >
+                        {test.status.charAt(0).toUpperCase() +
+                          test.status.slice(1)}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      {test.duration}ms
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(test.timestamp).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        {
+          tests.length > 10 && (
+            <div class="mt-4 text-center">
+              <a
+                href="/browser-compatibility/tests"
+                class="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                View all {tests.length} test results
+              </a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
+      Last updated: {lastUpdate}
+      {
+        useRealData && (
+          <button
+            id="refresh-data"
+            class="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            <Icon name="tabler:refresh" class="w-4 h-4 inline" />
+            Refresh
+          </button>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600;
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+</style>
+
+<script>
+  // Client-side code to check for new issues periodically
+  import { toast } from '@/components/common/Toast'
+
+  // Check for new issues when page loads
+  let lastCheckedTimestamp = new Date().toISOString()
+
+  // Refresh button logic
+  document.getElementById('refresh-data')?.addEventListener('click', () => {
+    window.location.reload()
+  })
+
+  // Function to check for new issues
+  async function checkForNewIssues() {
+    try {
+      const response = await fetch(
+        `/api/browser-compatibility/data?latest=true&since=${encodeURIComponent(lastCheckedTimestamp)}`,
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch updates')
+      }
+
+      const data = await response.json()
+
+      if (data.reports && data.reports.length > 0) {
+        const report = data.reports[0]
+        const newIssues = report.issues || []
+
+        if (newIssues.length > 0) {
+          // Show notification for new issues
+          toast.error(
+            `${newIssues.length} New Compatibility ${newIssues.length === 1 ? 'Issue' : 'Issues'}! New compatibility issues have been detected. Refresh to view details.`,
+            {
+              duration: 10000,
+            },
+          )
+
+          // Play notification sound if supported
+          if ('Audio' in window) {
+            const audio = new Audio('/sounds/alert.mp3')
+            audio
+              .play()
+              .catch((err) =>
+                console.log('Could not play notification sound:', err),
+              )
+          }
+        }
+      }
+
+      // Update the last checked timestamp
+      lastCheckedTimestamp = new Date().toISOString()
+    } catch (error) {
+      console.error('Error checking for new issues:', error)
+    }
+  }
+
+  // Check for new issues every 5 minutes
+  setInterval(checkForNewIssues, 5 * 60 * 1000)
+
+  // Request notification permission
+  if ('Notification' in window) {
+    Notification.requestPermission()
+  }
+</script>

@@ -1,0 +1,113 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { ComparativeProgressDisplay } from '../../components/analytics/ComparativeProgressDisplay'
+import Alert from '../../components/ui/Alert.astro'
+
+// Authentication check (replace with your actual auth logic)
+const isAuthenticated = Astro.cookies.get('auth-token') !== undefined
+const userId = isAuthenticated ? 'user-123' : undefined // Replace with actual user ID from session
+
+// Redirect if not authenticated
+if (!isAuthenticated || !userId) {
+  return Astro.redirect('/login?redirect=/analytics/comparative-progress')
+}
+
+// Page metadata
+const title = 'Comparative Progress Analysis'
+const description =
+  'Compare your progress against anonymized benchmarks and gain insights into your therapeutic journey.'
+---
+
+<Layout {title} {description}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6" aria-label="Breadcrumb">
+      <ol class="flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
+        <li>
+          <a href="/" class="hover:text-gray-700 dark:hover:text-gray-300"
+            >Home</a
+          >
+          <span class="mx-2">/</span>
+        </li>
+        <li>
+          <a
+            href="/analytics"
+            class="hover:text-gray-700 dark:hover:text-gray-300">Analytics</a
+          >
+          <span class="mx-2">/</span>
+        </li>
+        <li
+          class="font-medium text-gray-900 dark:text-gray-100"
+          aria-current="page"
+        >
+          Comparative Progress
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        Comparative Progress Analysis
+      </h1>
+      <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+        Compare your progress against anonymized benchmarks and gain insights
+        into your therapeutic journey.
+      </p>
+    </div>
+
+    <!-- Privacy notice -->
+    <Alert variant="info" class="mb-6">
+      <p>
+        <strong>Privacy Notice:</strong> All comparisons use anonymized data. Your
+        personal information is never shared with others. Benchmarks are derived
+        from aggregated, de-identified data in compliance with privacy regulations.
+      </p>
+    </Alert>
+
+    <!-- Main content -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <ComparativeProgressDisplay {userId} client:load />
+    </div>
+
+    <!-- Additional information -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Understanding Your Results</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
+          Comparative progress analysis helps you understand how your
+          therapeutic journey compares to others with similar profiles. This can
+          provide context for your progress and help identify areas where
+          additional focus might be beneficial.
+        </p>
+        <p class="text-gray-600 dark:text-gray-400">
+          Remember that each person's journey is unique, and these comparisons
+          are meant to provide context, not judgment. Always discuss your
+          results with your healthcare provider.
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">About the Metrics</h2>
+        <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+          <li>
+            <strong>PHQ-9 Score:</strong> Measures depression severity (lower scores
+            indicate improvement)
+          </li>
+          <li>
+            <strong>GAD-7 Score:</strong> Measures anxiety severity (lower scores
+            indicate improvement)
+          </li>
+          <li>
+            <strong>Session Engagement:</strong> Measures participation in therapy
+            sessions (higher scores indicate improvement)
+          </li>
+          <li>
+            <strong>Treatment Adherence:</strong> Measures consistency in following
+            treatment plans (higher scores indicate improvement)
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</Layout>

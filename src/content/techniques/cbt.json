@@ -1,0 +1,32 @@
+{
+  "id": "cbt",
+  "name": "Cognitive Behavioral Therapy (CBT)",
+  "description": "CBT is a structured, time-limited, and goal-oriented form of psychotherapy that aims to change patterns of thinking or behavior that are causing people's problems, and thus change the way they feel.",
+  "category": "CBT",
+  "evidenceLevel": "Strong",
+  "recommendedFor": [
+    "Depression",
+    "Anxiety Disorders",
+    "PTSD",
+    "OCD",
+    "Phobias",
+    "Eating Disorders"
+  ],
+  "contraindications": [
+    "Severe cognitive impairment",
+    "Active psychosis without stabilization"
+  ],
+  "steps": [
+    "Assessment and goal setting",
+    "Psychoeducation about the CBT model",
+    "Identifying and challenging negative thoughts",
+    "Behavioral activation and exposure tasks",
+    "Skills training (e.g., problem-solving, relaxation)",
+    "Relapse prevention planning"
+  ],
+  "references": [
+    "Beck, J. S. (2011). Cognitive Behavior Therapy: Basics and Beyond. Guilford Press.",
+    "Hofmann, S. G., Asnaani, A., Vonk, I. J., Sawyer, A. T., & Fang, A. (2012). The Efficacy of Cognitive Behavioral Therapy: A Review of Meta-analyses. Cognitive Therapy and Research, 36(5), 427-440."
+  ],
+  "created": "2025-01-17"
+}

@@ -1,0 +1,648 @@
+---
+// Pixelated Empathy Homepage - AI-Powered Mental Health Platform (Dark Mode Only)
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Button from '@/components/ui/Button.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import SpinningGlobe from '@/components/widgets/SpinningGlobe.astro';
+import Badge from '@/components/ui/Badge.astro';
+
+export const prerender = true
+
+const heroStats = [
+  { value: "500+", label: "Training Programs" },
+  { value: "92%", label: "Pass Rate Increase" }, 
+  { value: "50+", label: "Client Personas" },
+  { value: "Zero", label: "Real Harm Risk" }
+]
+
+// Add testimonials for social proof
+const testimonials = [
+  {
+    text: "Honestly? This saved my students from making some pretty painful mistakes. They practice the hard conversations here first.",
+    author: "Dr. Sarah M.",
+    role: "Clinical Supervisor",
+    rating: 5
+  },
+  {
+    text: "I had no idea I was being dismissive with certain clients until the AI caught it. Humbling, but so grateful.",
+    author: "Mike T.", 
+    role: "Therapist in Training",
+    rating: 5
+  },
+  {
+    text: "Our graduation rates went up 40% after we started using this. Students just seem... ready. Actually ready.",
+    author: "Dr. Jennifer L.",
+    role: "Program Director",
+    rating: 5
+  }
+]
+
+const features = [
+  {
+    title: "50+ Different Personalities to Learn From",
+    description: "Every challenging client type you can imagine - from the quietly withdrawn to the explosively angry. Practice until you feel ready for anything.",
+    icon: "🎭",
+    accent: "green",
+    benefit: "No real person gets hurt while you learn"
+  },
+  {
+    title: "Catch Your Blind Spots (Gently)", 
+    description: "We all have biases. Our AI notices when you might be reacting from your own stuff instead of helping theirs. It's like having a really wise supervisor who never judges.",
+    icon: "🪞",
+    accent: "emerald",
+    benefit: "See yourself clearly without shame"
+  },
+  {
+    title: "Your Mistakes Stay Private",
+    description: "Everything here is completely confidential. Make all the beginner mistakes you need to without anyone knowing except you.",
+    icon: "🤐",
+    accent: "green",
+    benefit: "Learn without fear of judgment"
+  },
+  {
+    title: "See Your Growth Over Time",
+    description: "Track how you're improving session by session. Watch yourself get more confident, more skilled, more ready to help real people heal.",
+    icon: "🌱",
+    accent: "emerald",
+    benefit: "Actual proof you're getting better at this"
+  },
+  {
+    title: "Try Wild New Ideas Safely",
+    description: "Read about some new technique? Wondered if art therapy might work? Test it here first. No ethics boards to worry about, just learning.",
+    icon: "🎨",
+    accent: "green",
+    benefit: "Innovation without consequences"
+  },
+  {
+    title: "Practice the Really Hard Stuff",
+    description: "Suicidal clients. Trauma responses. Full meltdowns. The scenarios that keep you up at night worrying - practice them until you feel steady.",
+    icon: "💪",
+    accent: "emerald",
+    benefit: "Ready for anything life throws at you"
+  }
+]
+---
+
+<BaseLayout
+  title="Pixelated Empathy - AI Therapist Training Platform"
+  description="Safe AI role-play training for therapists. Practice with difficult client personas, get bias detection feedback, and build confidence without real-world risk."
+  bgType="plum"
+  
+>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative py-12 lg:py-20 z-10 hero-section min-h-screen flex items-center">
+      <div class="relative container mx-auto px-6 lg:px-8 max-w-7xl w-full">
+        <div class="w-full max-w-none">
+          <!-- Status Badge -->
+          <div class="mb-8 animate-breathe text-center">
+            <Badge class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-green-500/20 border border-green-400/40 text-green-200 rounded-full">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
+              AI Training Simulator Active
+            </Badge>
+          </div>
+
+          <!-- Spinning Globe - Centered below badge -->
+          <div class="flex justify-center mb-12">
+            <div class="w-48 h-48 lg:w-56 lg:h-56 flex items-center justify-center">
+              <!-- Spinning Globe Component - Clean, no box -->
+              <SpinningGlobe />
+            </div>
+          </div>
+
+          <!-- Power Headlines with Value Proposition -->
+          <div class="text-center mb-16">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-8 leading-tight max-w-5xl mx-auto">
+              Practice Makes Perfect
+              <br />
+              <span class="text-green-400 golden-shimmer">But Practice Safely</span>
+            </h1>
+            <!-- Value Proposition Subheading -->
+            <p class="text-xl lg:text-2xl text-green-200/90 font-medium mb-10 max-w-4xl mx-auto leading-relaxed">
+              When you're learning to help people heal, every conversation matters. Practice with our AI clients first.
+            </p>
+            <!-- Social Proof -->
+            <div class="flex items-center justify-center gap-6 text-green-300/80 text-base mb-6">
+              <span class="text-yellow-400 text-lg">⭐⭐⭐⭐⭐</span>
+              <span class="font-medium">Loved by therapy schools everywhere</span>
+              <span class="hidden sm:inline text-green-400">•</span>
+              <span class="hidden sm:inline font-medium">Your secrets stay safe</span>
+            </div>
+          </div>
+
+          <!-- Two-column layout: Description/Buttons LEFT + Visual RIGHT -->
+          <div class="max-w-5xl mx-auto w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12 lg:mb-20 w-full items-center">
+              <!-- Left column: Benefits and CTA -->
+              <div class="flex flex-col items-center text-center lg:text-left lg:items-start">
+                <!-- Key Benefits List -->
+                <ul class="space-y-6 mb-10 text-green-100 max-w-md">
+                  <li class="flex items-start gap-4">
+                    <span class="text-green-400 text-xl flex-shrink-0 mt-1">💝</span>
+                    <span class="text-base leading-relaxed">Learn from clients who won't judge your mistakes</span>
+                  </li>
+                  <li class="flex items-start gap-4">
+                    <span class="text-green-400 text-xl flex-shrink-0 mt-1">🌱</span>
+                    <span class="text-base leading-relaxed">Try that new approach you read about in a safe space</span>
+                  </li>
+                  <li class="flex items-start gap-4">
+                    <span class="text-green-400 text-xl flex-shrink-0 mt-1">🪞</span>
+                    <span class="text-base leading-relaxed">See your blind spots before they hurt someone real</span>
+                  </li>
+                  <li class="flex items-start gap-4">
+                    <span class="text-green-400 text-xl flex-shrink-0 mt-1">💪</span>
+                    <span class="text-base leading-relaxed">Walk into your first tough session feeling ready</span>
+                  </li>
+                </ul>
+
+                <!-- Urgency-Driven CTA -->
+                <div class="flex flex-col items-center space-y-6">
+                  <!-- Primary CTA with urgency -->
+                  <Button
+                    size="lg"
+                    class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-gray-900 px-8 py-4 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                  >
+                    Try it free (we believe in you) →
+                  </Button>
+
+                  <!-- Risk Reversal -->
+                  <div class="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      class="px-6 py-3 text-sm font-semibold rounded-full border-2 border-green-400 text-green-300 hover:bg-green-400/10 transition-all duration-300"
+                    >
+                      See how it works
+                    </Button>
+                    <div class="flex flex-col items-center text-center">
+                      <span class="text-xs text-green-300/70">No pressure</span>
+                      <span class="text-xs text-green-300/70">Made for people who care</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right column: Therapy Visual -->
+              <div class="flex justify-center items-center">
+                <div class="relative w-48 h-48 lg:w-56 lg:h-56">
+                  <div class="absolute inset-0 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-2xl border border-green-500/30 overflow-hidden">
+                    <!-- Mental Health Therapy Image -->
+                    <img
+                      src="/images/features/mental-health-therapy.jpg"
+                      alt="Professional mental health therapy session showing a therapist and client in a comfortable, safe counseling environment"
+                      class="w-full h-full object-cover rounded-xl"
+                      loading="lazy"
+                    />
+                    <!-- Subtle overlay to maintain visual coherence -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-green-400/10 to-emerald-500/10 pointer-events-none"></div>
+                  </div>
+                  <!-- Floating particles around the image -->
+                  <div class="absolute -top-2 -left-2 w-3 h-3 bg-green-400/60 rounded-full animate-pulse"></div>
+                  <div class="absolute -bottom-3 -right-3 w-4 h-4 bg-emerald-400/50 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
+                  <div class="absolute top-1/4 -right-4 w-2 h-2 bg-green-300/40 rounded-full animate-pulse" style="animation-delay: 2s;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Proof Stats -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 mb-12 lg:mb-16">
+            {heroStats.map((stat) => (
+              <div class="text-center p-6 rounded-2xl border border-green-600/30 hover:border-green-400/50 transition-all duration-500 stat-card">
+                <div class="text-2xl lg:text-3xl font-bold text-green-400 mb-2 organic-counter">
+                  {stat.value}
+                </div>
+                <div class="text-xs lg:text-sm text-green-200/80 tracking-wide">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <!-- Testimonials Section -->
+          <div class="max-w-6xl mx-auto py-16">
+            <h3 class="text-2xl lg:text-3xl font-bold text-center text-green-100 mb-16">
+              Here's what people are saying (and we're pretty proud of it)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {testimonials.map((testimonial) => (
+                <div class="p-8 rounded-2xl border border-green-600/30 hover:border-green-400/50 transition-all duration-300 bg-black/20 backdrop-blur-sm">
+                  <div class="flex gap-1 mb-6">
+                    {Array.from({length: testimonial.rating}).map((_) => (
+                      <span class="text-green-400 text-lg">⭐</span>
+                    ))}
+                  </div>
+                  <p class="text-base text-green-100 mb-6 italic leading-relaxed">"{testimonial.text}"</p>
+                  <div class="text-green-300">
+                    <div class="font-semibold text-base">{testimonial.author}</div>
+                    <div class="text-sm text-green-300/70">{testimonial.role}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Separator -->
+    <div class="py-16">
+      <div class="mx-auto max-w-3xl border-t border-green-500/30"></div>
+    </div>
+
+    <!-- Security Section -->
+    <section class="py-20 lg:py-24 relative z-10">
+      <div class="container mx-auto px-6 lg:px-8 relative">
+        <div class="max-w-7xl mx-auto">
+          <!-- Section Header -->
+          <div class="text-center mb-20">
+            <div class="mb-8">
+              <Badge class="inline-flex items-center gap-3 px-6 py-3 text-base bg-blue-500/20 border border-blue-400/40 text-blue-200 rounded-full">
+                <span class="text-blue-400 text-lg">🛡️</span>
+                Military-Grade Security
+              </Badge>
+            </div>
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-8">
+              Your Data Remains
+              <span class="text-blue-400 golden-shimmer">
+                Your Data
+              </span>
+            </h2>
+            <p class="text-base lg:text-lg text-green-100/90 leading-relaxed max-w-4xl mx-auto">
+              We don't just meet HIPAA standards—we obliterate them. Your training sessions are protected by the same encryption that guards state secrets.
+            </p>
+          </div>
+
+          <!-- Security Features Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <!-- Zero-Knowledge Encryption -->
+            <Card class="border border-blue-600/30 hover:border-blue-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+              <CardHeader class="pb-4 relative">
+                <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-blue-400">
+                  🔐
+                </div>
+                <CardTitle class="text-base font-bold text-blue-100 tracking-wide mb-3">
+                  Zero-Knowledge Protection
+                </CardTitle>
+                <div class="text-sm text-blue-400/90 font-medium bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+                  Even we can't see your sessions
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription class="text-sm text-blue-200/80 leading-relaxed">
+                  Think of it like a safety deposit box where even the bank employees can't see inside. Your training conversations are encrypted before they ever leave your device. We literally cannot read them, even if we wanted to.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <!-- Military-Level Encryption -->
+            <Card class="border border-blue-600/30 hover:border-blue-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+              <CardHeader class="pb-4 relative">
+                <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-blue-400">
+                  🎖️
+                </div>
+                <CardTitle class="text-base font-bold text-blue-100 tracking-wide mb-3">
+                  Military-Grade Encryption
+                </CardTitle>
+                <div class="text-sm text-blue-400/90 font-medium bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+                  Same tech that protects state secrets
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription class="text-blue-200/80 leading-relaxed">
+                  We use AES-256 encryption—the gold standard trusted by governments worldwide. If someone intercepted your data, it would take longer than the age of the universe to crack it.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <!-- FHE -->
+            <Card class="border border-blue-600/30 hover:border-blue-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+              <CardHeader class="pb-4 relative">
+                <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-blue-400">
+                  🧬
+                </div>
+                <CardTitle class="text-base font-bold text-blue-100 tracking-wide mb-3">
+                  Our Favorite: FHE
+                </CardTitle>
+                <div class="text-sm text-blue-400/90 font-medium bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+                  Computing on invisible data
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription class="text-blue-200/80 leading-relaxed">
+                  Fully Homomorphic Encryption lets our AI analyze your sessions while they stay completely encrypted. It's like having a conversation through a one-way mirror that only shows insights, never the actual words.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+
+          <!-- Trust Statement -->
+          <div class="text-center">
+            <div class="bg-blue-500/10 border border-blue-400/30 rounded-3xl p-8 lg:p-12 max-w-4xl mx-auto">
+              <div class="text-6xl mb-6 text-blue-400">🏛️</div>
+              <h3 class="text-lg lg:text-xl font-bold text-blue-100 mb-4">
+                Beyond HIPAA. Beyond Compliance.
+              </h3>
+              <p class="text-base text-blue-200/90 mb-6 leading-relaxed">
+                While others worry about meeting minimum standards, we've built a fortress. Your students practice in complete privacy, your institution stays protected, and you sleep soundly knowing that every conversation is locked away tighter than Fort Knox.
+              </p>
+              <div class="flex items-center justify-center gap-6 text-blue-300/80 text-sm">
+                <span class="flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  SOC 2 Type II Certified
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  FERPA Compliant
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  Zero Data Retention
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Separator -->
+    <div class="py-8">
+      <div class="mx-auto max-w-2xl border-t border-blue-500/30"></div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="py-12 lg:py-16 relative z-10">
+      <div class="container mx-auto px-4 relative">
+        <div class="max-w-4xl mx-auto text-center mb-12">
+          <h2 class="text-2xl lg:text-4xl font-bold text-white mb-8">
+            Why This Actually
+            <span class="text-green-400 golden-shimmer">
+              Helps
+            </span>
+          </h2>
+          <p class="text-base text-green-100/90">
+            Because learning to heal people is hard enough without the fear of messing up
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature) => (
+            <Card class={`border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card`}>
+              <CardHeader class="pb-4 relative">
+                <div class={`text-5xl mb-4 group-hover:scale-110 transition-transform duration-700`}>
+                  {feature.icon}
+                </div>
+                <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
+                  {feature.title}
+                </CardTitle>
+                <!-- Benefit highlight -->
+                <div class="text-sm text-green-400/90 font-medium bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                  {feature.benefit}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription class="text-sm text-green-200/80 leading-relaxed">
+                  {feature.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Separator -->
+    <div class="py-8">
+      <div class="mx-auto max-w-2xl border-t border-green-500/30"></div>
+    </div>
+
+    <!-- Final CTA Section -->
+    <section class="py-20 lg:py-24 relative z-10">
+      <div class="relative container mx-auto px-6 lg:px-8 text-center">
+        <div class="max-w-6xl mx-auto">
+          <div class="rounded-3xl border border-green-500/40 p-16 lg:p-20 bg-black/20 backdrop-blur-sm">
+            <!-- AI ornament -->
+            <div class="flex justify-center mb-8">
+              <div class="text-6xl text-green-400">🤖</div>
+            </div>
+            
+            <!-- Urgency Badge -->
+            <div class="mb-6">
+              <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full">
+                <span class="animate-pulse w-2 h-2 bg-red-400 rounded-full"></span>
+                We can only onboard a few programs at a time
+              </Badge>
+            </div>
+
+            <h2 class="text-2xl lg:text-4xl font-bold text-green-100 mb-8">
+              Ready to Give Your Students
+              <br />
+              <span class="text-green-400 golden-shimmer">Something Better?</span>
+            </h2>
+            
+            <p class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed">
+              Your future therapists deserve to feel confident and prepared. Let's help them get there together.
+            </p>
+
+            <!-- Risk-Free Guarantee -->
+            <div class="bg-green-500/10 border border-green-400/30 rounded-2xl p-6 mb-8">
+              <h4 class="text-sm font-bold text-green-200 mb-2">💛 Our Promise to You</h4>
+              <p class="text-sm text-green-200/80">Try it with your program for 30 days. If your students aren't more confident, we'll refund every penny.</p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6">
+              <Button size="lg" class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-gray-900 px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300 w-auto">
+                Let's talk about your program →
+              </Button>
+              <Button size="lg" class="bg-transparent border-2 border-green-400 text-green-300 hover:bg-green-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300 w-auto">
+                Watch a quick demo
+              </Button>
+            </div>
+
+            <!-- Final social proof -->
+            <p class="text-xs text-green-300/70">
+              💛 Loved by therapy schools everywhere • 🔒 Your data stays safe • 🎓 Made by therapists, for therapists
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Organic Particles */
+  .particles-container {
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: float-organic 12s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  .particle-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 15s;
+  }
+
+  .particle-2 {
+    top: 40%;
+    right: 20%;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+
+  .particle-3 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 6s;
+    animation-duration: 12s;
+  }
+
+  .particle-4 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 9s;
+    animation-duration: 20s;
+  }
+
+  .particle-5 {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 12s;
+    animation-duration: 16s;
+  }
+
+  @keyframes float-organic {
+    0%, 100% { 
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.6;
+    }
+    25% { 
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.8;
+    }
+    50% { 
+      transform: translateY(-10px) translateX(-15px) scale(0.9);
+      opacity: 0.4;
+    }
+    75% { 
+      transform: translateY(20px) translateX(10px) scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  /* Text Effects - removed glow */
+  .golden-shimmer {
+    background: linear-gradient(45deg, #10b981, #059669, #047857);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Card Effects - removed glow */
+  .organic-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .organic-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    animation: organic-pulse 4s ease-in-out infinite;
+    transform: scale(0);
+  }
+
+  .organic-card:hover::before {
+    transform: scale(1);
+  }
+
+  @keyframes organic-pulse {
+    0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+    50% { transform: scale(1) rotate(180deg); opacity: 1; }
+  }
+
+  /* Stats Counter */
+  .organic-counter {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+    animation: organic-count 2s ease-out;
+  }
+
+  @keyframes organic-count {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .stat-card {
+    animation: organic-fade-in 1s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .stat-card:nth-child(1) { animation-delay: 0.1s; }
+  .stat-card:nth-child(2) { animation-delay: 0.2s; }
+  .stat-card:nth-child(3) { animation-delay: 0.3s; }
+  .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes organic-fade-in {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Breathing Animation */
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .particle {
+      width: 3px;
+      height: 3px;
+    }
+  }
+</style> 

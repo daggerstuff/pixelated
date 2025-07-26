@@ -1,0 +1,919 @@
+---
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/Checkbox'
+import { IconFilter, IconX } from '@/components/ui/icons'
+
+import { cn } from '@/lib/utils'
+
+export interface AdvancedFilterOptions {
+  // Time filters
+  timeRange?: {
+    startDate?: Date
+    endDate?: Date
+    presetRange?: 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom'
+  }
+
+  // Emotion filters
+  emotions?: {
+    types?: string[]
+    minIntensity?: number
+    maxIntensity?: number
+    dimensionalRanges?: {
+      valence?: [number, number]
+      arousal?: [number, number]
+      dominance?: [number, number]
+    }
+  }
+
+  // Pattern filters
+  patterns?: {
+    types?: string[]
+    minStrength?: number
+    minConfidence?: number
+    categories?: string[]
+  }
+
+  // Visualization filters
+  visualization?: {
+    groupBy?: 'session' | 'day' | 'week' | 'month'
+    smoothing?: number
+    showRawData?: boolean
+    showTrendlines?: boolean
+    showConfidenceIntervals?: boolean
+    showAnnotations?: boolean
+  }
+
+  // Additional metadata filters
+  metadata?: Record<string, any>
+}
+
+interface Props {
+  options?: AdvancedFilterOptions
+  availableEmotionTypes?: string[]
+  availablePatternTypes?: string[]
+  availablePatternCategories?: string[]
+  className?: string
+  compact?: boolean
+}
+
+const {
+  availableEmotionTypes = [],
+  availablePatternTypes = [],
+  availablePatternCategories = [],
+  className = '',
+  compact = false,
+} = Astro.props
+---
+
+<div
+  class={cn(
+    'bg-card border rounded-md shadow-sm overflow-hidden',
+    compact ? 'p-2' : 'p-4',
+    className,
+  )}
+  id="advanced-filtering-component"
+>
+  <div class="space-y-4">
+    <!-- Tab Navigation -->
+    <div class="flex border-b">
+      <button
+        class="tab-button px-3 py-2 border-b-2 border-primary"
+        data-tab="time"
+      >
+        Time Range
+      </button>
+      <button
+        class="tab-button px-3 py-2 border-b-2 border-transparent"
+        data-tab="emotions"
+      >
+        Emotions
+      </button>
+      <button
+        class="tab-button px-3 py-2 border-b-2 border-transparent"
+        data-tab="patterns"
+      >
+        Patterns
+      </button>
+      <button
+        class="tab-button px-3 py-2 border-b-2 border-transparent"
+        data-tab="visualization"
+      >
+        Visualization
+      </button>
+    </div>
+
+    <!-- Filter Sections -->
+    <div id="filter-sections">
+      <!-- Time Filters -->
+      <div class="filter-section space-y-4" data-section="time">
+        <div class="space-y-2">
+          <Label>Time Range</Label>
+          <Select>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Last 24 hours</SelectItem>
+              <SelectItem value="week">Last 7 days</SelectItem>
+              <SelectItem value="month">Last 30 days</SelectItem>
+              <SelectItem value="quarter">Last 90 days</SelectItem>
+              <SelectItem value="year">Last 365 days</SelectItem>
+              <SelectItem value="custom">Custom range</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div id="custom-date-range" class="grid grid-cols-2 gap-4 hidden">
+          <div class="space-y-2">
+            <Label htmlFor="start-date">Start Date</Label>
+            <Input id="start-date" type="date" />
+          </div>
+          <div class="space-y-2">
+            <Label htmlFor="end-date">End Date</Label>
+            <Input id="end-date" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Emotions Filters -->
+      <div class="filter-section space-y-4 hidden" data-section="emotions">
+        <div class="space-y-2">
+          <Label>Emotion Types</Label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
+            {
+              availableEmotionTypes.map((type: string) => (
+                <div class="flex items-center space-x-2">
+                  <Checkbox
+                    id={`emotion-${type}`}
+                    value={type}
+                    className="emotion-type-checkbox"
+                  />
+                  <Label htmlFor={`emotion-${type}`} className="cursor-pointer">
+                    {type}
+                  </Label>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <Label>Intensity Range</Label>
+            <span class="text-xs text-gray-500" id="intensity-range-display">
+              0.0 - 1.0
+            </span>
+          </div>
+          <div class="pt-2 px-2">
+            <Slider
+              id="intensity-range-slider"
+              data-min="0"
+              data-max="1"
+              data-start="0"
+              data-end="1"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <Label>Dimensional Ranges</Label>
+
+          <div class="p-2 border rounded-md space-y-3">
+            <div class="space-y-1">
+              <div class="flex justify-between">
+                <Label>Valence (Negative - Positive)</Label>
+                <span class="text-xs text-gray-500" id="valence-range-display">
+                  -1.0 - 1.0
+                </span>
+              </div>
+              <div class="pt-1 px-2">
+                <Slider
+                  id="valence-range-slider"
+                  data-min="-1"
+                  data-max="1"
+                  data-start="-1"
+                  data-end="1"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex justify-between">
+                <Label>Arousal (Calm - Excited)</Label>
+                <span class="text-xs text-gray-500" id="arousal-range-display">
+                  -1.0 - 1.0
+                </span>
+              </div>
+              <div class="pt-1 px-2">
+                <Slider
+                  id="arousal-range-slider"
+                  data-min="-1"
+                  data-max="1"
+                  data-start="-1"
+                  data-end="1"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex justify-between">
+                <Label>Dominance (Submissive - Dominant)</Label>
+                <span
+                  class="text-xs text-gray-500"
+                  id="dominance-range-display"
+                >
+                  -1.0 - 1.0
+                </span>
+              </div>
+              <div class="pt-1 px-2">
+                <Slider
+                  id="dominance-range-slider"
+                  data-min="-1"
+                  data-max="1"
+                  data-start="-1"
+                  data-end="1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patterns Filters -->
+      <div class="filter-section space-y-4 hidden" data-section="patterns">
+        <div class="space-y-2">
+          <Label>Pattern Types</Label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+            {
+              availablePatternTypes.map((type: string) => (
+                <div class="flex items-center space-x-2">
+                  <Checkbox
+                    id={`pattern-${type}`}
+                    value={type}
+                    className="pattern-type-checkbox"
+                  />
+                  <Label htmlFor={`pattern-${type}`} className="cursor-pointer">
+                    {type}
+                  </Label>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <Label>Minimum Strength</Label>
+            <span class="text-xs text-gray-500" id="strength-display">
+              0.0
+            </span>
+          </div>
+          <div class="pt-2 px-2">
+            <Slider
+              id="strength-slider"
+              data-min="0"
+              data-max="1"
+              data-value="0"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <Label>Minimum Confidence</Label>
+            <span class="text-xs text-gray-500" id="confidence-display">
+              0.0
+            </span>
+          </div>
+          <div class="pt-2 px-2">
+            <Slider
+              id="confidence-slider"
+              data-min="0"
+              data-max="1"
+              data-value="0"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <Label>Pattern Categories</Label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+            {
+              availablePatternCategories.map((category: string) => (
+              availablePatternCategories.map((category: string) => (
+                <div class="flex items-center space-x-2">
+                  <Checkbox
+                    id={`category-${category}`}
+                    value={category}
+                    className="pattern-category-checkbox"
+                  />
+                  <Label
+                    htmlFor={`category-${category}`}
+                    className="cursor-pointer"
+                  >
+                    {category}
+                  </Label>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Visualization Filters -->
+      <div class="filter-section space-y-4 hidden" data-section="visualization">
+        <div class="space-y-2">
+          <Label>Group By</Label>
+          <Select>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="session">Session</SelectItem>
+              <SelectItem value="day">Day</SelectItem>
+              <SelectItem value="week">Week</SelectItem>
+              <SelectItem value="month">Month</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <Label>Smoothing</Label>
+            <span class="text-xs text-gray-500" id="smoothing-display">
+              0
+            </span>
+          </div>
+          <div class="pt-2 px-2">
+            <Slider
+              id="smoothing-slider"
+              data-min="0"
+              data-max="10"
+              data-value="0"
+              data-step="1"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <Label htmlFor="show-raw-data">Show Raw Data</Label>
+            <Switch id="show-raw-data" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <Label htmlFor="show-trendlines">Show Trendlines</Label>
+            <Switch id="show-trendlines" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <Label htmlFor="show-confidence-intervals"
+              >Show Confidence Intervals</Label
+            >
+            <Switch id="show-confidence-intervals" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <Label htmlFor="show-annotations">Show Annotations</Label>
+            <Switch id="show-annotations" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-between pt-2">
+      <Button variant="outline" size="sm" id="reset-filters">
+        <IconX className="mr-1 h-4 w-4" />
+        Reset
+      </Button>
+      <Button id="apply-filters">
+        <IconFilter className="mr-1 h-4 w-4" />
+        Apply Filters
+      </Button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // We need to initialize the component when it loads
+  document.addEventListener('DOMContentLoaded', initializeAdvancedFiltering)
+
+  function initializeAdvancedFiltering() {
+    const component = document.getElementById('advanced-filtering-component')
+    if (!component) return
+
+    // Properly typed options object to track the current filter state
+    const options: {
+      timeRange: {
+        startDate?: Date
+        endDate?: Date
+        presetRange?: string
+      }
+      emotions: {
+        types?: string[]
+        minIntensity?: number | undefined
+        maxIntensity?: number | undefined
+        dimensionalRanges?: {
+          valence?: [number, number]
+          arousal?: [number, number]
+          dominance?: [number, number]
+        }
+      }
+      patterns: {
+        types?: string[]
+        minStrength?: number
+        minConfidence?: number
+        categories?: string[]
+      }
+      visualization: {
+        groupBy?: string
+        smoothing?: number
+        showRawData?: boolean
+        showTrendlines?: boolean
+        showConfidenceIntervals?: boolean
+        showAnnotations?: boolean
+      }
+    } = {
+      timeRange: {},
+      emotions: {
+        dimensionalRanges: {},
+      },
+      patterns: {},
+      visualization: {},
+    }
+
+    // Elements
+    const tabButtons = component.querySelectorAll('.tab-button')
+    const filterSections = component.querySelectorAll('.filter-section')
+    const timeRangeSelect = component.querySelector(
+      '#time-range-select',
+    ) as HTMLElement
+    const customDateRange = component.querySelector(
+      '#custom-date-range',
+    ) as HTMLElement
+    const startDateInput = component.querySelector(
+      '#start-date',
+    ) as HTMLInputElement
+    const endDateInput = component.querySelector(
+      '#end-date',
+    ) as HTMLInputElement
+    const emotionTypeCheckboxes = component.querySelectorAll(
+      '.emotion-type-checkbox',
+    )
+    const intensityRangeSlider = component.querySelector(
+      '#intensity-range-slider',
+    ) as HTMLElement
+    const intensityRangeDisplay = component.querySelector(
+      '#intensity-range-display',
+    ) as HTMLElement
+    const valenceRangeSlider = component.querySelector(
+      '#valence-range-slider',
+    ) as HTMLElement
+    const valenceRangeDisplay = component.querySelector(
+      '#valence-range-display',
+    ) as HTMLElement
+    const arousalRangeSlider = component.querySelector(
+      '#arousal-range-slider',
+    ) as HTMLElement
+    const arousalRangeDisplay = component.querySelector(
+      '#arousal-range-display',
+    ) as HTMLElement
+    const dominanceRangeSlider = component.querySelector(
+      '#dominance-range-slider',
+    ) as HTMLElement
+    const dominanceRangeDisplay = component.querySelector(
+      '#dominance-range-display',
+    ) as HTMLElement
+    const patternTypeCheckboxes = component.querySelectorAll(
+      '.pattern-type-checkbox',
+    )
+    const strengthSlider = component.querySelector(
+      '#strength-slider',
+    ) as HTMLElement
+    const strengthDisplay = component.querySelector(
+      '#strength-display',
+    ) as HTMLElement
+    const confidenceSlider = component.querySelector(
+      '#confidence-slider',
+    ) as HTMLElement
+    const confidenceDisplay = component.querySelector(
+      '#confidence-display',
+    ) as HTMLElement
+    const patternCategoryCheckboxes = component.querySelectorAll(
+      '.pattern-category-checkbox',
+    )
+    const groupBySelect = component.querySelector(
+      '#group-by-select',
+    ) as HTMLElement
+    const smoothingSlider = component.querySelector(
+      '#smoothing-slider',
+    ) as HTMLElement
+    const smoothingDisplay = component.querySelector(
+      '#smoothing-display',
+    ) as HTMLElement
+    const showRawDataSwitch = component.querySelector(
+      '#show-raw-data',
+    ) as HTMLElement
+    const showTrendlinesSwitch = component.querySelector(
+      '#show-trendlines',
+    ) as HTMLElement
+    const showConfidenceIntervalsSwitch = component.querySelector(
+      '#show-confidence-intervals',
+    ) as HTMLElement
+    const showAnnotationsSwitch = component.querySelector(
+      '#show-annotations',
+    ) as HTMLElement
+    const resetButton = component.querySelector(
+      '#reset-filters',
+    ) as HTMLButtonElement
+    const applyButton = component.querySelector(
+      '#apply-filters',
+    ) as HTMLButtonElement
+
+    // Tab switching
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const tab = button.getAttribute('data-tab')
+
+        // Update active tab button
+        tabButtons.forEach((btn) => {
+          btn.classList.remove('border-primary')
+          btn.classList.add('border-transparent')
+        })
+        button.classList.remove('border-transparent')
+        button.classList.add('border-primary')
+
+        // Show active section
+        filterSections.forEach((section) => {
+          if (section.getAttribute('data-section') === tab) {
+            section.classList.remove('hidden')
+          } else {
+            section.classList.add('hidden')
+          }
+        })
+      })
+    })
+
+    // Time range select
+    if (timeRangeSelect) {
+      ;(timeRangeSelect as any).addEventListener(
+        'valueChange',
+        (e: { detail: string }) => {
+          const value = e.detail
+          options.timeRange.presetRange = value
+
+          if (value === 'custom') {
+            customDateRange.classList.remove('hidden')
+          } else {
+            customDateRange.classList.add('hidden')
+
+            // Calculate dates based on preset
+            const today = new Date()
+            let startDate: Date | undefined
+
+            switch (value) {
+              case 'day':
+                startDate = new Date(today)
+                startDate.setDate(today.getDate() - 1)
+                break
+              case 'week':
+                startDate = new Date(today)
+                startDate.setDate(today.getDate() - 7)
+                break
+              case 'month':
+                startDate = new Date(today)
+                startDate.setMonth(today.getMonth() - 1)
+                break
+              case 'quarter':
+                startDate = new Date(today)
+                startDate.setMonth(today.getMonth() - 3)
+                break
+              case 'year':
+                startDate = new Date(today)
+                startDate.setFullYear(today.getFullYear() - 1)
+                break
+            }
+
+            if (startDate) {
+              options.timeRange.startDate = startDate
+              options.timeRange.endDate = today
+            }
+          }
+        },
+      )
+    }
+
+    // Date inputs
+    startDateInput?.addEventListener('change', () => {
+      options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
+    })
+
+    endDateInput?.addEventListener('change', () => {
+      options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
+    })
+
+    // Initialize sliders
+    initializeSlider(
+      intensityRangeSlider,
+      intensityRangeDisplay, // display is still used here for textContent
+      (values) => {
+        if (values.length === 2) {
+          const [min, max] = values
+          options.emotions.minIntensity = min
+          options.emotions.maxIntensity = max
+          if (intensityRangeDisplay) intensityRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
+        }
+      },
+    )
+
+    initializeSlider(
+      valenceRangeSlider,
+      valenceRangeDisplay, // display is still used here for textContent
+      (values) => {
+        if (values.length === 2) {
+          const [min, max] = values
+          if (!options.emotions.dimensionalRanges) {
+            options.emotions.dimensionalRanges = {}
+          }
+          options.emotions.dimensionalRanges.valence = [min, max]
+          if (valenceRangeDisplay) valenceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
+        }
+      },
+    )
+
+    initializeSlider(
+      arousalRangeSlider,
+      arousalRangeDisplay, // display is still used here for textContent
+      (values) => {
+        if (values.length === 2) {
+          const [min, max] = values
+          if (!options.emotions.dimensionalRanges) {
+            options.emotions.dimensionalRanges = {}
+          }
+          options.emotions.dimensionalRanges.arousal = [min, max]
+          if (arousalRangeDisplay) arousalRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
+        }
+      },
+    )
+
+    initializeSlider(
+      dominanceRangeSlider,
+      dominanceRangeDisplay, // display is still used here for textContent
+      (values) => {
+        if (values.length === 2) {
+          const [min, max] = values
+          if (!options.emotions.dimensionalRanges) {
+            options.emotions.dimensionalRanges = {}
+          }
+          options.emotions.dimensionalRanges.dominance = [min, max]
+          if (dominanceRangeDisplay) dominanceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
+        }
+      },
+    )
+
+    initializeSlider(
+      strengthSlider,
+      strengthDisplay, // display is still used here for textContent
+      (values) => {
+        if (values.length === 1) {
+          const [value] = values
+          options.patterns.minStrength = value
+          if (strengthDisplay) strengthDisplay.textContent = value.toFixed(1)
+        }
+      },
+      // 1, // precision removed
+      true,
+    )
+
+    initializeSlider(
+      confidenceSlider,
+      confidenceDisplay, // display is still used here for textContent
+      (values) => {
+        if (values.length === 1) {
+          const [value] = values
+          options.patterns.minConfidence = value
+          if (confidenceDisplay) confidenceDisplay.textContent = value.toFixed(1)
+        }
+      },
+      // 1, // precision removed
+      true,
+    )
+
+    initializeSlider(
+      smoothingSlider,
+      smoothingDisplay, // display is still used here for textContent
+      (values) => {
+        if (values.length === 1) {
+          const [value] = values
+          options.visualization.smoothing = value
+          if (smoothingDisplay) smoothingDisplay.textContent = String(value)
+        }
+      },
+      // 0, // precision removed
+      true,
+    )
+
+    // Initialize checkbox collections
+    emotionTypeCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', (e) => {
+        const target = e.target as HTMLInputElement
+        updateCheckboxArray(target, 'emotions', 'types')
+      })
+    })
+
+    patternTypeCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', (e) => {
+        const target = e.target as HTMLInputElement
+        updateCheckboxArray(target, 'patterns', 'types')
+      })
+    })
+
+    patternCategoryCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', (e) => {
+        const target = e.target as HTMLInputElement
+        updateCheckboxArray(target, 'patterns', 'categories')
+      })
+    })
+
+    // Initialize switches
+    initializeSwitch(showRawDataSwitch, (checked: boolean) => {
+      options.visualization.showRawData = checked
+    })
+
+    initializeSwitch(showTrendlinesSwitch, (checked: boolean) => {
+      options.visualization.showTrendlines = checked
+    })
+
+    initializeSwitch(showConfidenceIntervalsSwitch, (checked: boolean) => {
+      options.visualization.showConfidenceIntervals = checked
+    })
+
+    initializeSwitch(showAnnotationsSwitch, (checked: boolean) => {
+      options.visualization.showAnnotations = checked
+    })
+
+    // Group by select
+    if (groupBySelect) {
+      ;(groupBySelect as any).addEventListener(
+        'valueChange',
+        (e: { detail: string }) => {
+          options.visualization.groupBy = e.detail
+        },
+      )
+    }
+
+    // Reset button
+    resetButton?.addEventListener('click', () => {
+      // Reset the options object
+      options.timeRange = {}
+      options.emotions = { dimensionalRanges: {} }
+      options.patterns = {}
+      options.visualization = {}
+
+      // Reset UI elements
+      // This would require resetting all the UI elements to their default state
+      // For brevity, we're not implementing the full reset here
+
+      // Dispatch change event
+      dispatchOptionsChange(options)
+    })
+
+    // Apply button
+    applyButton?.addEventListener('click', () => {
+      dispatchApplyEvent()
+    })
+
+    // Helper for slider initialization
+    function initializeSlider(
+      slider: HTMLElement | null,
+      _display: HTMLElement | null, // Marked as unused, but kept for signature clarity if needed later
+      onChange: (values: number[]) => void,
+      singleValue = false,
+    ) {
+      if (!slider) return
+
+      
+      
+      
+
+      let initialValues: number[]
+      if (singleValue) {
+        const value = parseFloat(slider.getAttribute('data-value') || '0')
+        initialValues = [value]
+      } else {
+        const start = parseFloat(slider.getAttribute('data-start') || '0')
+        const end = parseFloat(slider.getAttribute('data-end') || '1')
+        initialValues = [start, end]
+      }
+
+      // Initialize slider with values
+      // Note: This is a placeholder for the actual slider initialization
+      // which would depend on the slider component's API
+
+      // For demonstration, we'll just simulate the change event
+      onChange(initialValues)
+
+      // Add event listener for value changes
+      slider.addEventListener('sliderValueChange', (e: any) => {
+        onChange(e.detail.values)
+      })
+    }
+
+    // Helper for switch initialization
+    function initializeSwitch(
+      switchEl: HTMLElement | null,
+      onChange: (checked: boolean) => void,
+    ) {
+      if (!switchEl) return
+
+      // Initialize with default state
+      onChange(false)
+
+      // Add event listener for changes
+      switchEl.addEventListener('checkedChange', (e: any) => {
+        onChange(e.detail)
+      })
+    }
+
+    // Helper for checkbox array updates
+    function updateCheckboxArray(
+      checkbox: HTMLInputElement,
+      category: 'emotions' | 'patterns' | 'visualization' | 'timeRange',
+      key: string,
+    ) {
+      const value = checkbox.value
+      const checked = checkbox.checked
+
+      // Ensure the property exists and is an array
+      if (!options[category][key as keyof (typeof options)[typeof category]]) {
+        ;(options[category] as any)[key] = [] as string[]
+      }
+
+      const values = (options[category] as any)[key] as string[]
+
+      if (checked) {
+        // Add to array if not already present
+        if (!values.includes(value)) {
+          values.push(value)
+        }
+      } else {
+        // Remove from array
+        ;(options[category] as any)[key] = values.filter(
+          (item) => item !== value,
+        )
+      }
+
+      // Dispatch change event
+      dispatchOptionsChange(options)
+    }
+
+    // Dispatch options change event
+    function dispatchOptionsChange(filterOptions: typeof options) {
+      if (!component) return
+
+      const event = new CustomEvent('advancedFilterOptionsChange', {
+        detail: { options: filterOptions },
+        bubbles: true,
+      })
+      component.dispatchEvent(event)
+    }
+
+    // Dispatch apply event
+    function dispatchApplyEvent() {
+      if (!component) return
+
+      const event = new CustomEvent('advancedFilterApply', {
+        bubbles: true,
+      })
+      component.dispatchEvent(event)
+    }
+  }
+</script>
+
+<style>
+  /* Any component-specific styles can go here */
+  .filter-section {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .tab-button {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .tab-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+</style>

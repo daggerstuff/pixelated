@@ -1,0 +1,434 @@
+---
+// AccessRequestsLog.astro - Tracks all access requests and provides compliance reporting
+import { Icon } from 'astro-icon/components'
+
+// Sample compliance metrics
+const complianceMetrics = {
+  averageResponseTime: '2.3 days',
+  timely30DayResponseRate: '94%',
+  totalRequests: {
+    current: 39,
+    previous: 32,
+    change: '+22%',
+  },
+  requestTypes: [
+    { type: 'Data Access', count: 18, percentage: 46 },
+    { type: 'Data Export', count: 13, percentage: 33 },
+    { type: 'Correction', count: 8, percentage: 21 },
+  ],
+}
+
+// Sample audit log entries
+const auditLogEntries = [
+  {
+    date: '2025-06-19T14:32:00Z',
+    requestId: 'REQ-2025-1235',
+    action: 'request_processed',
+    user: 'Dr. Smith',
+    details: 'Data export request processed and fulfilled',
+  },
+  {
+    date: '2025-06-18T09:15:00Z',
+    requestId: 'REQ-2025-1237',
+    action: 'request_viewed',
+    user: 'Admin Johnson',
+    details: 'Request details viewed by administrator',
+  },
+  {
+    date: '2025-06-17T16:08:00Z',
+    requestId: 'REQ-2025-1240',
+    action: 'request_created',
+    user: 'System',
+    details: 'New correction request created via patient portal',
+  },
+  {
+    date: '2025-06-17T11:22:00Z',
+    requestId: 'REQ-2025-1238',
+    action: 'request_updated',
+    user: 'Dr. Garcia',
+    details: 'Priority changed from low to medium',
+  },
+  {
+    date: '2025-06-16T13:45:00Z',
+    requestId: 'REQ-2025-1236',
+    action: 'request_processed',
+    user: 'Dr. Williams',
+    details: 'Correction request processed and fulfilled',
+  },
+]
+
+// Format date
+const formatDate = (dateString: string): string => {
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+// Action badge style
+const getActionBadgeClass = (action: string): string => {
+  switch (action) {
+    case 'request_created':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+    case 'request_processed':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    case 'request_viewed':
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700/50 dark:text-gray-300'
+    case 'request_updated':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+  }
+}
+
+// Format action label
+const formatActionLabel = (action: string): string => {
+  return action
+    .split('_')
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+---
+
+<div class="space-y-8">
+  <!-- Compliance Metrics -->
+  <div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+      Compliance Metrics
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Metrics Cards -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Average Response Time
+        </p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+          {complianceMetrics.averageResponseTime}
+        </p>
+        <div class="flex items-center mt-4 text-green-500 dark:text-green-400">
+          <Icon name="trending-down" class="w-4 h-4 mr-1" />
+          <span class="text-sm font-medium">-12% from previous month</span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          30-Day Response Rate
+        </p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+          {complianceMetrics.timely30DayResponseRate}
+        </p>
+        <div class="flex items-center mt-4 text-green-500 dark:text-green-400">
+          <Icon name="trending-up" class="w-4 h-4 mr-1" />
+          <span class="text-sm font-medium">+3% from previous month</span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Total Requests
+        </p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+          {complianceMetrics.totalRequests.current}
+        </p>
+        <div class="flex items-center mt-4 text-green-500 dark:text-green-400">
+          <Icon name="trending-up" class="w-4 h-4 mr-1" />
+          <span class="text-sm font-medium"
+            >{complianceMetrics.totalRequests.change} from previous month</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Type Distribution -->
+    <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+      <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">
+        Request Type Distribution
+      </h4>
+
+      <div class="space-y-3">
+        {
+          complianceMetrics.requestTypes.map((type) => (
+            <div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {type.type}
+                </span>
+                <span class="text-sm text-gray-700 dark:text-gray-300">
+                  {type.count} ({type.percentage}%)
+                </span>
+              </div>
+              <div class="mt-1 w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div
+                  class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500"
+                  style={`width: ${type.percentage}%`}
+                />
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit Log -->
+  <div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+      Access Request Audit Log
+    </h3>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              >
+                Timestamp
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              >
+                Request ID
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              >
+                Action
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              >
+                User
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              >
+                Details
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700"
+          >
+            {
+              auditLogEntries.map((entry) => (
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {formatDate(entry.date)}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    {entry.requestId}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <span
+                      class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getActionBadgeClass(entry.action)}`}
+                    >
+                      {formatActionLabel(entry.action)}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {entry.user}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    {entry.details}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Controls -->
+  <div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+      Compliance Reports
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Report Generation -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">
+          Generate Report
+        </h4>
+
+        <form class="space-y-4">
+          <div>
+            <label
+              for="report-type"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Report Type
+            </label>
+            <select
+              id="report-type"
+              class="block w-full py-2 pl-3 pr-10 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value="hipaa-compliance">HIPAA Compliance Summary</option>
+              <option value="access-request-audit">Access Request Audit</option>
+              <option value="response-time">Response Time Analysis</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                for="start-date"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Start Date
+              </label>
+              <input
+                type="date"
+                id="start-date"
+                class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+            <div>
+              <label
+                for="end-date"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                End Date
+              </label>
+              <input
+                type="date"
+                id="end-date"
+                class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="report-format"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Format
+            </label>
+            <select
+              id="report-format"
+              class="block w-full py-2 pl-3 pr-10 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value="pdf">PDF</option>
+              <option value="csv">CSV</option>
+              <option value="json">JSON</option>
+            </select>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex justify-center items-center dark:bg-blue-700 dark:hover:bg-blue-600"
+            >
+              <Icon name="download" class="h-5 w-5 mr-2" />
+              Generate Report
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Recent Reports -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">
+          Recent Reports
+        </h4>
+
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+          <li class="py-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  HIPAA Compliance Summary
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Generated on Jun 15, 2025
+                </p>
+              </div>
+              <button
+                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                <Icon name="download" class="h-5 w-5" />
+              </button>
+            </div>
+          </li>
+          <li class="py-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  Q2 Access Request Audit
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Generated on Jun 10, 2025
+                </p>
+              </div>
+              <button
+                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                <Icon name="download" class="h-5 w-5" />
+              </button>
+            </div>
+          </li>
+          <li class="py-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  Response Time Analysis
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Generated on Jun 5, 2025
+                </p>
+              </div>
+              <button
+                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                <Icon name="download" class="h-5 w-5" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIPAA Compliance Information -->
+  <div
+    class="bg-blue-50 border-l-4 border-blue-400 p-4 dark:bg-blue-900/20 dark:border-blue-500"
+  >
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <Icon name="info-circle" class="h-5 w-5 text-blue-400" />
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+          HIPAA Documentation Requirements
+        </h3>
+        <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+          <p>
+            HIPAA requires maintaining comprehensive documentation of all
+            patient data access requests and their resolution. Records must be
+            kept for at least 6 years and should include request details,
+            processing timeline, and fulfillment method. Regular compliance
+            reports should be generated and reviewed to ensure adherence to
+            regulations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

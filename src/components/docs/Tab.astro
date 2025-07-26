@@ -1,0 +1,61 @@
+---
+interface Props {
+  title: string
+  active?: boolean
+  className?: string
+}
+
+const { title, active = false, className } = Astro.props
+---
+
+<button
+  class={`tab ${active ? 'tab-active' : ''} ${className || ''}`}
+  role="tab"
+  aria-selected={active}
+>
+  {title}
+</button>
+
+<style>
+  .tab {
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+    transition: all 0.2s ease;
+  }
+
+  .tab:hover {
+    color: #374151;
+    background-color: #f9fafb;
+  }
+
+  .tab-active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+  }
+
+  .tab:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+
+  /* Dark mode support */
+  :global(.dark) .tab {
+    color: #9ca3af;
+  }
+
+  :global(.dark) .tab:hover {
+    color: #d1d5db;
+    background-color: #1f2937;
+  }
+
+  :global(.dark) .tab-active {
+    color: #60a5fa;
+    border-bottom-color: #60a5fa;
+  }
+</style>

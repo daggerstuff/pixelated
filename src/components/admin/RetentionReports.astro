@@ -1,0 +1,564 @@
+---
+// RetentionReports.astro
+// Component for generating and exporting data retention compliance reports
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  title?: string
+}
+
+const { title = 'Data Retention Compliance Reports' } = Astro.props
+
+// Sample report types
+const reportTypes = [
+  {
+    id: 'compliance-summary',
+    name: 'Compliance Summary',
+    description:
+      'Overview of data retention compliance across all data categories',
+    format: ['PDF', 'CSV', 'JSON'],
+    frequency: 'Monthly',
+    lastGenerated: '2025-07-01',
+  },
+  {
+    id: 'retention-details',
+    name: 'Retention Policy Details',
+    description:
+      'Detailed breakdown of all data retention policies and their compliance status',
+    format: ['PDF', 'CSV', 'XLSX'],
+    frequency: 'Quarterly',
+    lastGenerated: '2025-06-15',
+  },
+  {
+    id: 'archiving-report',
+    name: 'Archiving Activity',
+    description:
+      'Report on all archiving operations performed within a specified time period',
+    format: ['PDF', 'CSV'],
+    frequency: 'Monthly',
+    lastGenerated: '2025-07-01',
+  },
+  {
+    id: 'destruction-audit',
+    name: 'Data Destruction Audit',
+    description:
+      'Comprehensive audit of all data destruction activities with compliance verification',
+    format: ['PDF', 'CSV', 'XLSX'],
+    frequency: 'Quarterly',
+    lastGenerated: '2025-06-15',
+  },
+  {
+    id: 'hipaa-compliance',
+    name: 'HIPAA Compliance',
+    description:
+      'Specialized report focusing on HIPAA compliance aspects of data retention',
+    format: ['PDF'],
+    frequency: 'Annually',
+    lastGenerated: '2025-01-15',
+  },
+]
+
+// Sample schedule data
+const schedules = [
+  {
+    id: 'schedule-001',
+    name: 'Monthly Compliance Summary',
+    reportType: 'compliance-summary',
+    format: 'PDF',
+    frequency: 'Monthly',
+    day: '1st',
+    recipients: ['admin@example.com', 'compliance@example.com'],
+    status: 'active',
+  },
+  {
+    id: 'schedule-002',
+    name: 'Quarterly Retention Audit',
+    reportType: 'retention-details',
+    format: 'XLSX',
+    frequency: 'Quarterly',
+    day: '15th',
+    recipients: [
+      'admin@example.com',
+      'compliance@example.com',
+      'ceo@example.com',
+    ],
+    status: 'active',
+  },
+]
+
+// Format badge styling
+const getFormatBadge = (format: string) => {
+  switch (format.toLowerCase()) {
+    case 'pdf':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+    case 'csv':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+    case 'xlsx':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+    case 'json':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+  }
+}
+
+// Get status badge styling
+const getStatusBadge = (status: string) => {
+  switch (status) {
+    case 'active':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+    case 'inactive':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+  }
+}
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+  <div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      {title}
+    </h2>
+
+    <div class="mb-8">
+      <p class="text-gray-600 dark:text-gray-300 mb-4">
+        Generate comprehensive reports for data retention compliance auditing
+        and regulatory purposes. Schedule automated report generation and
+        distribution to key stakeholders.
+      </p>
+
+      <div class="flex flex-wrap gap-4 mb-6">
+        <div
+          class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="file-text"
+            class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"
+          />
+          <span class="text-blue-700 dark:text-blue-300 text-sm"
+            >Customizable reports</span
+          >
+        </div>
+
+        <div
+          class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="calendar"
+            class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2"
+          />
+          <span class="text-purple-700 dark:text-purple-300 text-sm"
+            >Automated scheduling</span
+          >
+        </div>
+
+        <div
+          class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="mail"
+            class="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
+          />
+          <span class="text-green-700 dark:text-green-300 text-sm"
+            >Email distribution</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Generation Section -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+          Available Reports
+        </h3>
+        <button
+          type="button"
+          class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
+        >
+          <Icon name="plus" class="w-4 h-4 mr-1" />
+          Create Custom Report
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 mb-6">
+        {
+          reportTypes.map((report) => (
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="flex-1">
+                  <h4 class="text-base font-medium text-gray-900 dark:text-white">
+                    {report.name}
+                  </h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {report.description}
+                  </p>
+                  <div class="flex flex-wrap gap-1 mt-2">
+                    {report.format.map((format) => (
+                      <span
+                        class={`px-2 py-0.5 rounded-full text-xs font-medium ${getFormatBadge(format)}`}
+                      >
+                        {format}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div class="flex flex-col">
+                  <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <div class="flex items-center gap-1">
+                      <Icon name="calendar" class="w-4 h-4" />
+                      <span>
+                        {report.frequency} | Last: {report.lastGenerated}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      class="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+                    >
+                      Generate Now
+                    </button>
+                    <button
+                      type="button"
+                      class="px-3 py-1 text-xs font-medium bg-gray-200 text-gray-800 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                    >
+                      Schedule
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Scheduled Reports Section -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+          Scheduled Reports
+        </h3>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table
+          class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
+        >
+          <thead
+            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+          >
+            <tr>
+              <th scope="col" class="py-3 px-4">Report Name</th>
+              <th scope="col" class="py-3 px-4">Type</th>
+              <th scope="col" class="py-3 px-4">Format</th>
+              <th scope="col" class="py-3 px-4">Frequency</th>
+              <th scope="col" class="py-3 px-4">Recipients</th>
+              <th scope="col" class="py-3 px-4">Status</th>
+              <th scope="col" class="py-3 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              schedules.map((schedule) => (
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    {schedule.name}
+                  </td>
+                  <td class="py-3 px-4">
+                    {schedule.reportType
+                      .replace(/-/g, ' ')
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </td>
+                  <td class="py-3 px-4">
+                    <span
+                      class={`px-2 py-0.5 rounded-full text-xs font-medium ${getFormatBadge(schedule.format)}`}
+                    >
+                      {schedule.format}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4">
+                    {schedule.frequency} ({schedule.day})
+                  </td>
+                  <td class="py-3 px-4">
+                    <div class="flex flex-wrap gap-1">
+                      {schedule.recipients.map((recipient, index) =>
+                        index < 2 ? (
+                          <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                            {recipient}
+                          </span>
+                        ) : index === 2 ? (
+                          <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                            +{schedule.recipients.length - 2} more
+                          </span>
+                        ) : null,
+                      )}
+                    </div>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span
+                      class={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(schedule.status)}`}
+                    >
+                      {schedule.status.charAt(0).toUpperCase() +
+                        schedule.status.slice(1)}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <div class="flex space-x-2">
+                      <button
+                        type="button"
+                        class="text-blue-600 dark:text-blue-500 hover:underline"
+                        aria-label="Edit schedule"
+                      >
+                        <Icon name="pencil" class="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        class="text-red-600 dark:text-red-500 hover:underline"
+                        aria-label="Delete schedule"
+                      >
+                        <Icon name="trash" class="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Custom Report Generator -->
+    <div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+        Custom Report Generator
+      </h3>
+
+      <div
+        class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5"
+      >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Report Title
+            </label>
+            <input
+              type="text"
+              id="report-title"
+              placeholder="Enter report title"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Report Type
+            </label>
+            <select
+              id="report-type"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value="">Select a report type</option>
+              <option value="compliance-summary">Compliance Summary</option>
+              <option value="retention-details">Retention Policy Details</option
+              >
+              <option value="archiving-report">Archiving Activity</option>
+              <option value="destruction-audit">Data Destruction Audit</option>
+              <option value="hipaa-compliance">HIPAA Compliance</option>
+              <option value="custom">Custom Report</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Date Range
+            </label>
+            <div class="flex space-x-2">
+              <input
+                type="date"
+                id="date-from"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+              <input
+                type="date"
+                id="date-to"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Format
+            </label>
+            <select
+              id="report-format"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value="pdf">PDF</option>
+              <option value="csv">CSV</option>
+              <option value="xlsx">Excel (XLSX)</option>
+              <option value="json">JSON</option>
+            </select>
+          </div>
+
+          <div class="mb-4 md:col-span-2">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Data Categories to Include
+            </label>
+            <div class="flex flex-wrap gap-3">
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="include-patient-records"
+                  checked
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label
+                  for="include-patient-records"
+                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  Patient Records
+                </label>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="include-mental-health"
+                  checked
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label
+                  for="include-mental-health"
+                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  Mental Health Data
+                </label>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="include-chat-logs"
+                  checked
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label
+                  for="include-chat-logs"
+                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  Chat Logs
+                </label>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="include-emotion-analysis"
+                  checked
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label
+                  for="include-emotion-analysis"
+                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  Emotion Analysis
+                </label>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="include-consent-records"
+                  checked
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label
+                  for="include-consent-records"
+                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  Consent Records
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 mt-6">
+          <button
+            id="generate-report-btn"
+            type="button"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600"
+          >
+            Generate Report
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Generate report button handler
+    const generateReportBtn = document.getElementById('generate-report-btn')
+    if (generateReportBtn) {
+      generateReportBtn.addEventListener('click', () => {
+        const title =
+          (document.getElementById('report-title') as HTMLInputElement)
+            ?.value || 'Untitled Report'
+        const format = (
+          document.getElementById('report-format') as HTMLSelectElement
+        )?.value
+
+        // For demonstration, just show an alert
+        alert(
+          `Generating "${title}" report in ${format.toUpperCase()} format. In a production environment, this would create and download the report.`,
+        )
+      })
+    }
+
+    // Predefined report generation buttons
+    const generateNowButtons = document.querySelectorAll(
+      'button:not(#generate-report-btn)',
+    )
+    generateNowButtons.forEach((button) => {
+      if (button.textContent?.trim() === 'Generate Now') {
+        button.addEventListener('click', (e) => {
+          const reportElement = (e.currentTarget as HTMLElement).closest(
+            'div[class*="border"]',
+          )
+          const reportTitle = reportElement?.querySelector('h4')?.textContent
+
+          // For demonstration, just show an alert
+          alert(
+            `Generating "${reportTitle}" report. In a production environment, this would create and download the report.`,
+          )
+        })
+      }
+    })
+  })
+</script>

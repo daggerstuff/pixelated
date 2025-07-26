@@ -1,0 +1,106 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import RealUserMonitoringComponent from '@/components/monitoring/RealUserMonitoring.astro'
+import { getMonitoringConfig } from '@/lib/monitoring/config'
+
+// Get monitoring configuration
+const config = getMonitoringConfig()
+---
+
+<DashboardLayout title="Real User Monitoring | Admin Dashboard">
+  <div class="container px-4 py-8 mx-auto">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Real User Monitoring
+      </h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        Monitor actual user experiences across devices, browsers, and regions.
+      </p>
+    </header>
+
+    <div class="mb-8">
+      <RealUserMonitoringComponent
+        title="Performance Overview"
+        description="Core Web Vitals and performance metrics across all users"
+        refreshInterval={30000}
+      />
+    </div>
+
+    <div class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">
+        Understanding Real User Monitoring
+      </h2>
+
+      <div class="prose dark:prose-invert max-w-none">
+        <p>
+          Real User Monitoring (RUM) collects performance data from actual users
+          of your application. Unlike synthetic testing, RUM provides insights
+          into real-world experiences across different:
+        </p>
+
+        <ul class="list-disc ml-6 mt-2 mb-4">
+          <li>Device types and capabilities</li>
+          <li>Network conditions</li>
+          <li>Geographic locations</li>
+          <li>Browsers and operating systems</li>
+        </ul>
+
+        <h3 class="text-lg font-medium mt-4 mb-2">Key Benefits</h3>
+
+        <ol class="list-decimal ml-6 mb-4">
+          <li>
+            <strong>Real-world data:</strong> See how your site performs for actual
+            users
+          </li>
+          <li>
+            <strong>Prioritize improvements:</strong> Focus on fixing issues affecting
+            the most users
+          </li>
+          <li>
+            <strong>Track business impact:</strong> Understand how performance affects
+            conversion and engagement
+          </li>
+          <li>
+            <strong>Catch regional issues:</strong> Identify problems in specific
+            locations or networks
+          </li>
+        </ol>
+
+        <h3 class="text-lg font-medium mt-4 mb-2">Using This Dashboard</h3>
+
+        <p>
+          The dashboard above shows key metrics from the Web Vitals initiative
+          and other important performance indicators. Values are color-coded
+          based on the performance budgets defined in our testing framework:
+        </p>
+
+        <ul class="mt-2">
+          <li>
+            <span class="text-green-500 font-medium">Green:</span> Good - Meeting
+            performance targets
+          </li>
+          <li>
+            <span class="text-yellow-500 font-medium">Yellow:</span> Needs Improvement
+            - Under acceptable limits but could be better
+          </li>
+          <li>
+            <span class="text-red-500 font-medium">Red:</span> Poor - Exceeding acceptable
+            limits, requires attention
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    {
+      config.grafana.enableRUM && (
+        <div class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          <p>
+            Data is collected using Grafana Faro Web SDK with a sampling rate of{' '}
+            {config.grafana.rumSamplingRate * 100}%. Configuration can be
+            adjusted in the monitoring settings.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</DashboardLayout>

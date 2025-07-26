@@ -1,0 +1,71 @@
+name: Build
+
+permissions:
+  contents: read
+  security-events: write
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: 22.16.0
+  PNPM_VERSION: 10.13.1
+  NODE_ENV: production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: get-pnpm-store-path
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4.2.3
+        with:
+          path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Lint and Type Check
+        run: pnpm run lint; pnpm run typecheck
+
+      - name: Run Tests
+        run: pnpm run test
+
+      - name: Build
+        run: pnpm build
+        timeout-minutes: 10
+        env:
+          DISABLE_WEB_FONTS: 'true'
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Deploy Application
+        run: echo "Deployment step goes here. This could trigger another workflow or run deployment scripts."
+        # This step would typically involve commands like:
+        # - `pnpm run deploy` (if a custom deploy script exists)
+        # - `az webapp deploy` (for Azure)
+        # - `aws amplify publish` (for AWS Amplify)
+        # - `fly deploy` (for Fly.io)
+        # The actual deployment command would depend on the target environment and existing setup.

@@ -1,0 +1,440 @@
+---
+// DataRetentionSystem.astro
+// Component for managing data retention policies under HIPAA compliance
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  title?: string
+}
+
+const { title = 'Data Retention Policy Management' } = Astro.props
+
+// Sample data categories for retention policies
+const dataCategories = [
+  {
+    id: 'patient-records',
+    name: 'Patient Records',
+    description: 'Basic patient demographic and account information',
+    currentPolicy: '7 years after last visit',
+    legalMinimum: '6 years (HIPAA)',
+    recommendedPolicy: '7 years after last visit',
+    status: 'compliant',
+  },
+  {
+    id: 'mental-health-data',
+    name: 'Mental Health Data',
+    description: 'Therapy notes, assessments, and treatment plans',
+    currentPolicy: 'Indefinite',
+    legalMinimum: 'Varies by state (5-10 years)',
+    recommendedPolicy: '10 years after last visit',
+    status: 'review',
+  },
+  {
+    id: 'chat-logs',
+    name: 'Chat Logs',
+    description: 'Patient-provider and AI assistant conversations',
+    currentPolicy: '3 years after creation',
+    legalMinimum: '6 years (HIPAA)',
+    recommendedPolicy: '6 years after creation',
+    status: 'non-compliant',
+  },
+  {
+    id: 'emotion-analysis',
+    name: 'Emotion Analysis Data',
+    description: 'Emotional state assessments and patterns',
+    currentPolicy: '2 years after creation',
+    legalMinimum: 'Not explicitly defined',
+    recommendedPolicy: '2 years after creation or anonymization',
+    status: 'compliant',
+  },
+  {
+    id: 'consent-records',
+    name: 'Consent Records',
+    description: 'Patient consent for treatment and data usage',
+    currentPolicy: 'Indefinite',
+    legalMinimum: '6 years after expiration (HIPAA)',
+    recommendedPolicy: 'Indefinite',
+    status: 'compliant',
+  },
+]
+
+// Get status badge styling
+const getStatusBadge = (status: string): string => {
+  switch (status) {
+    case 'compliant':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+    case 'non-compliant':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+    case 'review':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+  }
+}
+
+// Sample archiving actions
+const archivingActions = [
+  {
+    name: 'Automated Monthly Archive',
+    status: 'active',
+    lastRun: '2025-07-01',
+    nextRun: '2025-08-01',
+  },
+  {
+    name: 'Quarterly Data Review',
+    status: 'pending',
+    lastRun: '2025-04-15',
+    nextRun: '2025-07-15',
+  },
+  {
+    name: 'Annual Secure Destruction',
+    status: 'active',
+    lastRun: '2025-01-10',
+    nextRun: '2026-01-10',
+  },
+]
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+  <div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      {title}
+    </h2>
+
+    <div class="mb-8">
+      <p class="text-gray-600 dark:text-gray-300 mb-4">
+        Manage data retention policies in compliance with HIPAA regulations and
+        state laws. Configure when data should be archived and when it should be
+        securely destroyed.
+      </p>
+
+      <div class="flex flex-wrap gap-4 mb-6">
+        <div
+          class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="calendar"
+            class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"
+          />
+          <span class="text-blue-700 dark:text-blue-300 text-sm"
+            >Configurable retention periods</span
+          >
+        </div>
+
+        <div
+          class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="archive"
+            class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2"
+          />
+          <span class="text-purple-700 dark:text-purple-300 text-sm"
+            >Automated archiving</span
+          >
+        </div>
+
+        <div
+          class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg flex items-center"
+        >
+          <Icon
+            name="trash"
+            class="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
+          />
+          <span class="text-green-700 dark:text-green-300 text-sm"
+            >Secure destruction</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Retention Policies -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+          Data Category Retention Policies
+        </h3>
+        <button
+          type="button"
+          class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
+        >
+          <Icon name="plus" class="w-4 h-4 mr-1" />
+          Add Policy
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table
+          class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
+        >
+          <thead
+            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+          >
+            <tr>
+              <th scope="col" class="py-3 px-4">Data Category</th>
+              <th scope="col" class="py-3 px-4">Current Policy</th>
+              <th scope="col" class="py-3 px-4">Legal Minimum</th>
+              <th scope="col" class="py-3 px-4">Recommended</th>
+              <th scope="col" class="py-3 px-4">Status</th>
+              <th scope="col" class="py-3 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              dataCategories.map((category) => (
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    <div>
+                      <div>{category.name}</div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        {category.description}
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3 px-4">{category.currentPolicy}</td>
+                  <td class="py-3 px-4">{category.legalMinimum}</td>
+                  <td class="py-3 px-4">{category.recommendedPolicy}</td>
+                  <td class="py-3 px-4">
+                    <span
+                      class={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(category.status)}`}
+                    >
+                      {category.status.charAt(0).toUpperCase() +
+                        category.status.slice(1)}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <div class="flex space-x-2">
+                      <button
+                        type="button"
+                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        aria-label="Edit policy"
+                      >
+                        <Icon name="pencil" class="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        class="font-medium text-gray-600 dark:text-gray-500 hover:underline"
+                        aria-label="Archive now"
+                      >
+                        <Icon name="archive" class="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Archiving and Destruction Actions -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+          Automated Retention Actions
+        </h3>
+        <button
+          type="button"
+          class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
+        >
+          <Icon name="plus" class="w-4 h-4 mr-1" />
+          Schedule Action
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {
+          archivingActions.map((action) => (
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-medium text-gray-900 dark:text-white">
+                  {action.name}
+                </h4>
+                <span
+                  class={`px-2 py-1 rounded-full text-xs font-medium ${
+                    action.status === 'active'
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                  }`}
+                >
+                  {action.status.charAt(0).toUpperCase() +
+                    action.status.slice(1)}
+                </span>
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                <div class="flex items-center">
+                  <span class="w-28">Last run:</span>
+                  <span class="text-gray-700 dark:text-gray-300">
+                    {action.lastRun}
+                  </span>
+                </div>
+                <div class="flex items-center">
+                  <span class="w-28">Next scheduled:</span>
+                  <span class="text-gray-700 dark:text-gray-300">
+                    {action.nextRun}
+                  </span>
+                </div>
+              </div>
+              <div class="flex space-x-2 mt-2">
+                <button
+                  type="button"
+                  class="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+                >
+                  Run Now
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1 text-xs font-medium bg-gray-200 text-gray-800 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                >
+                  Configure
+                </button>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Data Destruction Configuration -->
+    <div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+        Secure Data Destruction Configuration
+      </h3>
+
+      <div
+        class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5"
+      >
+        <div class="mb-4">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            Destruction Method
+          </label>
+          <select
+            id="destruction-method"
+            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="crypto-erase">Cryptographic Erasure (Default)</option
+            >
+            <option value="data-overwrite"
+              >Data Overwriting (DoD 5220.22-M)</option
+            >
+            <option value="physical">Physical Media Destruction</option>
+            <option value="combined">Combined Approach</option>
+          </select>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Cryptographic Erasure securely destroys encryption keys, making the
+            encrypted data unrecoverable.
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            Destruction Verification
+          </label>
+          <div class="flex items-center">
+            <input
+              id="verification-checkbox"
+              type="checkbox"
+              checked
+              class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
+            />
+            <label
+              for="verification-checkbox"
+              class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+            >
+              Require administrative approval and verification for all data
+              destruction operations
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            Documentation Retention
+          </label>
+          <select
+            id="documentation-retention"
+            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="3-years">3 Years</option>
+            <option value="5-years">5 Years</option>
+            <option value="7-years" selected>7 Years</option>
+            <option value="10-years">10 Years</option>
+            <option value="indefinite">Indefinite</option>
+          </select>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            How long to keep records of data destruction operations for
+            compliance and audit purposes.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 mt-6">
+          <button
+            type="button"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600"
+          >
+            Save Configuration
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize the data retention form
+  document.addEventListener('DOMContentLoaded', () => {
+    // Destruction method change handler
+    const destructionMethodSelect =
+      document.getElementById('destruction-method')
+
+    if (destructionMethodSelect) {
+      destructionMethodSelect.addEventListener('change', (e) => {
+        const method = (e.target as HTMLSelectElement)
+          .value as keyof typeof descriptions
+
+        // In a real implementation, we would update the description based on the selected method
+        const descriptions = {
+          'crypto-erase':
+            'Cryptographic Erasure securely destroys encryption keys, making the encrypted data unrecoverable.',
+          'data-overwrite':
+            'Data Overwriting replaces data with random patterns multiple times according to DoD standards.',
+          'physical':
+            'Physical destruction ensures storage media is physically destroyed and unable to be read.',
+          'combined':
+            'Combined approach uses multiple methods to ensure data is completely unrecoverable.',
+        }
+
+        const descriptionElement = destructionMethodSelect.nextElementSibling
+        if (descriptionElement && descriptions[method]) {
+          descriptionElement.textContent = descriptions[method]
+        }
+      })
+    }
+
+    // Add form submission handler
+    const saveButton = document.querySelector(
+      'button[type="button"]:first-of-type',
+    )
+    if (saveButton) {
+      saveButton.addEventListener('click', () => {
+        // For demonstration purposes, just show an alert
+        alert(
+          'Settings saved. In a production environment, this would update your data retention configuration.',
+        )
+      })
+    }
+  })
+</script>

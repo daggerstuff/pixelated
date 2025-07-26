@@ -1,0 +1,305 @@
+---
+interface Props {
+  title?: string
+  initialTodos?: TodoItem[]
+}
+
+interface TodoItem {
+  id: string
+  text: string
+  completed: boolean
+}
+
+const { title = 'Todo List', initialTodos = [] } = Astro.props
+---
+
+<div class="todo-container">
+  <h2>{title}</h2>
+
+  <div class="todo-input-container">
+    <input
+      type="text"
+      id="todo-input"
+      placeholder="Add a new task..."
+      class="todo-input"
+    />
+    <button id="add-todo-btn" class="todo-button add-button">Add</button>
+  </div>
+
+  <ul id="todo-list" class="todo-list">
+    {
+      initialTodos.map((todo: TodoItem) => (
+        <li
+          class={`todo-item ${todo.completed ? 'completed' : ''}`}
+          data-id={todo['id']}
+        >
+          <span class="todo-text">{todo.text}</span>
+          <div class="todo-actions">
+            <button class="todo-button complete-button">
+              {todo.completed ? '↩️' : '✓'}
+            </button>
+            <button class="todo-button delete-button">×</button>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .todo-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background-color: var(--color-bg-secondary, #f8f9fa);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary, #333);
+  }
+
+  .todo-input-container {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
+  .todo-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px 0 0 4px;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .todo-button {
+    background-color: var(--color-accent, #4a7dff);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .todo-button:hover {
+    background-color: var(--color-accent-dark, #3a6ae6);
+  }
+
+  .add-button {
+    border-radius: 0 4px 4px 0;
+  }
+
+  .todo-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+    transition: background-color 0.2s;
+  }
+
+  .todo-item:hover {
+    background-color: var(--color-bg-hover, #f1f3f5);
+  }
+
+  .todo-item.completed .todo-text {
+    text-decoration: line-through;
+    color: var(--color-text-muted, #888);
+  }
+
+  .todo-text {
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .todo-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .complete-button,
+  .delete-button {
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .complete-button {
+    background-color: var(--color-success, #28a745);
+  }
+
+  .delete-button {
+    background-color: var(--color-danger, #dc3545);
+  }
+</style>
+
+<script>
+  // Wait for client-side hydration
+  document.addEventListener('astro:page-load', () => {
+    const todoInput = document.getElementById('todo-input') as HTMLInputElement
+    const addButton = document.getElementById('add-todo-btn')
+    const todoList = document.getElementById('todo-list')
+
+    // Define TodoItem interface for client-side code
+    interface TodoItem {
+      id: string
+      text: string
+      completed: boolean
+    }
+
+    // Load todos from localStorage
+    const loadTodos = (): TodoItem[] => {
+      try {
+        const savedTodos = localStorage.getItem('todos')
+        return savedTodos ? JSON.parse(savedTodos) : []
+      } catch (err) {
+        console.error('Error loading todos:', err)
+        return []
+      }
+    }
+
+    // Save todos to localStorage
+    const saveTodos = (todos: TodoItem[]): void => {
+      try {
+        localStorage.setItem('todos', JSON.stringify(todos))
+      } catch (err) {
+        console.error('Error saving todos:', err)
+      }
+    }
+
+    // Generate a unique ID for each todo
+    const generateId = (): string => {
+      return Date.now().toString(36) + Math.random().toString(36).substring(2)
+    }
+
+    // Add a new todo
+    const addTodo = (): void => {
+      const text = todoInput.value.trim()
+      if (!text) return
+
+      const newTodo: TodoItem = {
+        id: generateId(),
+        text,
+        completed: false,
+      }
+
+      // Add to DOM
+      const li = createTodoElement(newTodo)
+      todoList?.appendChild(li)
+
+      // Save to storage
+      const todos = loadTodos()
+      todos.push(newTodo)
+      saveTodos(todos)
+
+      // Clear input
+      todoInput.value = ''
+      todoInput.focus()
+    }
+
+    // Create a todo list item element
+    const createTodoElement = (todo: TodoItem): HTMLLIElement => {
+      const li = document.createElement('li')
+      li.className = `todo-item ${todo.completed ? 'completed' : ''}`
+      li.dataset.id = todo.id
+
+      const span = document.createElement('span')
+      span.className = 'todo-text'
+      span.textContent = todo.text
+
+      const actionsDiv = document.createElement('div')
+      actionsDiv.className = 'todo-actions'
+
+      const completeBtn = document.createElement('button')
+      completeBtn.className = 'todo-button complete-button'
+      completeBtn.textContent = todo.completed ? '↩️' : '✓'
+      completeBtn.addEventListener('click', () => toggleTodoComplete(todo.id))
+
+      const deleteBtn = document.createElement('button')
+      deleteBtn.className = 'todo-button delete-button'
+      deleteBtn.textContent = '×'
+      deleteBtn.addEventListener('click', () => deleteTodo(todo.id))
+
+      actionsDiv.appendChild(completeBtn)
+      actionsDiv.appendChild(deleteBtn)
+
+      li.appendChild(span)
+      li.appendChild(actionsDiv)
+
+      return li
+    }
+
+    // Toggle todo completion status
+    const toggleTodoComplete = (id: string): void => {
+      const todos = loadTodos()
+      const todoIndex = todos.findIndex((t: TodoItem) => t.id === id)
+
+      if (todoIndex !== -1 && todos[todoIndex]) {
+        todos[todoIndex].completed = !todos[todoIndex].completed
+        saveTodos(todos)
+
+        // Update UI
+        const li = todoList?.querySelector(`li[data-id="${id}"]`)
+        if (li && todos[todoIndex]) {
+          li.classList.toggle('completed')
+          const completeBtn = li.querySelector('.complete-button')
+          if (completeBtn) {
+            completeBtn.textContent = todos[todoIndex].completed ? '↩️' : '✓'
+          }
+        }
+      }
+    }
+
+    // Delete a todo
+    const deleteTodo = (id: string): void => {
+      const todos = loadTodos()
+      const filteredTodos = todos.filter((t: TodoItem) => t.id !== id)
+      saveTodos(filteredTodos)
+
+      // Update UI
+      const li = todoList?.querySelector(`li[data-id="${id}"]`)
+      if (li) {
+        li.classList.add('fade-out')
+        setTimeout(() => {
+          li.remove()
+        }, 300)
+      }
+    }
+
+    // Initial render of saved todos
+    const renderSavedTodos = (): void => {
+      const todos = loadTodos()
+      if (todoList) {
+        todoList.innerHTML = '' // Clear any existing todos
+
+        todos.forEach((todo: TodoItem) => {
+          const li = createTodoElement(todo)
+          todoList.appendChild(li)
+        })
+      }
+    }
+
+    // Event listeners
+    addButton?.addEventListener('click', addTodo)
+
+    todoInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        addTodo()
+      }
+    })
+
+    // Initialize
+    renderSavedTodos()
+  })
+</script>

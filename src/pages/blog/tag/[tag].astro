@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PostCard from '@/components/blog/PostCard.astro';
+import type { CollectionEntry } from 'astro:content'
+
+// Add prerender directive to generate static HTML during build
+export const prerender = true
+
+export async function getStaticPaths() {
+  const allBlogPosts = await getCollection(
+    'blog',
+    ({ data }: CollectionEntry<'blog'>['data']) => {
+      return import.meta.env.PROD ? data.pubDate <= new Date() : true
+    },
+  )
+
+  // Get all unique tags
+  const allTags = [
+    ...new Set(
+      allBlogPosts.flatMap(
+        (post: CollectionEntry<'blog'>) => post.data?.tags ?? [],
+      ),
+    ),
+  ]
+
+  // Create a path for each tag
+  return allTags.map((tag) => ({
+    params: { tag },
+    props: { tag },
+  }))
+}
+
+const { tag } = Astro.props
+
+// Get all posts with this tag
+const allBlogPosts = await getCollection(
+  'blog',
+  ({ data }: CollectionEntry<'blog'>['data']) => {
+    return import.meta.env.PROD ? data.pubDate <= new Date() : true
+  },
+)
+
+// Sort by date (newest first)
+const posts: CollectionEntry<'blog'>[] = allBlogPosts
+  .filter((post: CollectionEntry<'blog'>) => post.data.tags?.includes(tag))
+  .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => {
+    return (
+      new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+    )
+  })
+
+// Create page title and description
+const title = `#${tag} | Blog`
+const description = `Articles tagged with #${tag} - Explore insights and guides on this topic.`
+---
+
+<BaseLayout {title} {description}>
+  <div class="max-w-6xl mx-auto py-12 px-4">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-white">Tagged: #{tag}</h1>
+      <p class="text-lg text-slate-400 mt-2">{posts.length} post{posts.length !== 1 ? 's' : ''} found</p>
+    </div>
+    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        posts.map((post) => (
+          <PostCard post={post} />
+        ))
+      }
+    </ul>
+    <div class="mt-12 text-center">
+      <a
+        href="/blog"
+        class="inline-block rounded-lg bg-slate-700/50 px-5 py-3 text-sm font-medium text-slate-200 hover:bg-slate-700/80 focus:outline-none focus:ring-2 focus:ring-green-400/70 transition-colors"
+      >
+        Back to All Articles
+      </a>
+    </div>
+  </div>
+</BaseLayout>

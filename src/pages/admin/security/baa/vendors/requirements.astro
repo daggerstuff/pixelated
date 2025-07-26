@@ -1,0 +1,629 @@
+---
+import AdminLayout from '../../../../../layouts/AdminLayout.astro'
+import { ComplianceVerificationService } from '../../../../../lib/security/baa/ComplianceVerificationService'
+import {
+  BusinessAssociateType,
+  ComplianceLevel,
+  ServiceCategory,
+  VerificationMethod,
+} from '../../../../../lib/security/baa/types'
+
+// Initialize service
+const verificationService = new ComplianceVerificationService()
+
+// Initialize with default requirements if empty
+if (verificationService.getAllRequirements().length === 0) {
+  verificationService.initializeDefaultRequirements()
+}
+
+// Get all requirements
+const requirements = verificationService.getAllRequirements()
+
+// Generate options for select fields
+const associateTypeOptions = Object.values(BusinessAssociateType).map(
+  (type) => ({
+    value: type,
+    label: type
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase()),
+  }),
+)
+
+const serviceCategoryOptions = Object.values(ServiceCategory).map(
+  (category) => ({
+    value: category,
+    label: category
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase()),
+  }),
+)
+
+const complianceLevelOptions = Object.values(ComplianceLevel).map((level) => ({
+  value: level,
+  label: level
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase()),
+}))
+
+const verificationMethodOptions = Object.values(VerificationMethod).map(
+  (method) => ({
+    value: method,
+    label: method
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase()),
+  }),
+)
+
+const frequencyOptions = [
+  { value: 'once', label: 'Once' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+  { value: 'semi_annually', label: 'Semi-Annually' },
+  { value: 'annually', label: 'Annually' },
+  { value: 'biannually', label: 'Biannually' },
+]
+---
+
+<AdminLayout
+  title="Compliance Requirements"
+  description="Manage HIPAA compliance requirements for vendors"
+>
+  <div class="px-6 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <a
+          href="/admin/security/baa/vendors"
+          class="text-indigo-600 hover:text-indigo-900 mr-4"
+        >
+          &larr; Back to Vendors
+        </a>
+        <h1 class="text-2xl font-bold text-gray-800">
+          Compliance Requirements
+        </h1>
+      </div>
+      <button
+        id="add-requirement-btn"
+        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+      >
+        Add New Requirement
+      </button>
+    </div>
+
+    <!-- Requirements Overview Card -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">Requirements Overview</h2>
+      <p class="text-gray-600 mb-4">
+        Compliance requirements define the criteria vendors must meet to achieve
+        specific compliance levels. These requirements help ensure your business
+        associates handle PHI in accordance with HIPAA regulations.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
+          <h3 class="font-medium text-gray-800 mb-1">Total Requirements</h3>
+          <p class="text-3xl font-bold text-indigo-600">
+            {requirements.length}
+          </p>
+        </div>
+        <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
+          <h3 class="font-medium text-gray-800 mb-1">Required</h3>
+          <p class="text-3xl font-bold text-amber-600">
+            {requirements.filter((r) => r.isRequired).length}
+          </p>
+        </div>
+        <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
+          <h3 class="font-medium text-gray-800 mb-1">Optional</h3>
+          <p class="text-3xl font-bold text-cyan-600">
+            {requirements.filter((r) => !r.isRequired).length}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requirements Table -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold">Compliance Requirements</h2>
+      </div>
+
+      {
+        requirements.length === 0 ? (
+          <div class="p-6 text-center text-gray-500">
+            No compliance requirements defined yet. Click "Add New Requirement"
+            to create your first requirement.
+          </div>
+        ) : (
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Requirement
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Description
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Applies To
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Required Level
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Verification
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {requirements.map((req) => (
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">
+                        {req.name}
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        Frequency: {req.frequency.replace(/_/g, ' ')}
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                      <div class="max-w-md truncate">{req.description}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-xs text-gray-500 mb-1">Types:</div>
+                      <div class="flex flex-wrap gap-1">
+                        {req.applicableTypes.map((type) => (
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {type.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {(() => {
+                        switch (req.minimumComplianceLevel) {
+                          case ComplianceLevel.HIPAA_CERTIFIED:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                HIPAA Certified
+                              </span>
+                            )
+                          case ComplianceLevel.THIRD_PARTY_VERIFIED:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                                Third Party Verified
+                              </span>
+                            )
+                          case ComplianceLevel.SELF_ATTESTED:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Self Attested
+                              </span>
+                            )
+                          default:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {req.minimumComplianceLevel.replace(/_/g, ' ')}
+                              </span>
+                            )
+                        }
+                      })()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                      {req.verificationMethod.replace(/_/g, ' ')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {req.isRequired ? (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Required
+                        </span>
+                      ) : (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          Optional
+                        </span>
+                      )}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        data-req-id={req.id}
+                        class="edit-requirement text-indigo-600 hover:text-indigo-900 mr-3"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        data-req-id={req.id}
+                        class="delete-requirement text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Best Practices Card -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <h2 class="text-lg font-semibold mb-4">
+        Compliance Requirement Best Practices
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-medium text-gray-800 mb-2">
+            Creating Effective Requirements
+          </h3>
+          <ul class="list-disc list-inside text-gray-600 space-y-1">
+            <li>
+              Focus on specific, measurable criteria that directly relate to PHI
+              protection
+            </li>
+            <li>
+              Tailor requirements based on the type of business associate and
+              services provided
+            </li>
+            <li>
+              Consider the risk level associated with the vendor's access to PHI
+            </li>
+            <li>
+              Align requirements with recognized security frameworks (NIST,
+              HITRUST, etc.)
+            </li>
+            <li>
+              Specify clear documentation that provides evidence of compliance
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-800 mb-2">Verification Methods</h3>
+          <ul class="list-disc list-inside text-gray-600 space-y-1">
+            <li>
+              <span class="font-medium">Self-Assessment:</span> The vendor completes
+              a questionnaire about their practices
+            </li>
+            <li>
+              <span class="font-medium">Documentation Review:</span> Evaluating policies,
+              procedures, and other written evidence
+            </li>
+            <li>
+              <span class="font-medium">Third-Party Audit:</span> Independent verification
+              by qualified security assessors
+            </li>
+            <li>
+              <span class="font-medium">Certification Validation:</span> Verifying
+              industry-recognized certifications
+            </li>
+            <li>
+              <span class="font-medium">Onsite Assessment:</span> Direct observation
+              of security controls at vendor locations
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<!-- Add Requirement Modal (would use a proper component in production) -->
+<div
+  id="add-requirement-modal"
+  class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50"
+>
+  <div
+    class="bg-white rounded-lg max-w-3xl w-full max-h-screen overflow-y-auto p-6"
+  >
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold">Add New Compliance Requirement</h2>
+      <button id="close-modal" class="text-gray-400 hover:text-gray-500">
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form id="requirement-form" class="space-y-4">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-1"
+          >Requirement Name*</label
+        >
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="e.g., Security Risk Assessment"
+        />
+      </div>
+
+      <div>
+        <label
+          for="description"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Description*</label
+        >
+        <textarea
+          id="description"
+          name="description"
+          required
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="Describe what this requirement involves and why it's important..."
+        ></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Applicable Business Associate Types*</label
+        >
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {
+            associateTypeOptions.map((option) => (
+              <label class="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  name="applicableTypes"
+                  value={option.value}
+                  class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                />
+                <span class="ml-2 text-sm text-gray-700">{option.label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Applicable Service Categories*</label
+        >
+        <div class="grid grid-cols-2 gap-2">
+          {
+            serviceCategoryOptions.map((option) => (
+              <label class="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  name="applicableCategories"
+                  value={option.value}
+                  class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                />
+                <span class="ml-2 text-sm text-gray-700">{option.label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <label
+          for="requiredDocuments"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Required Documents*</label
+        >
+        <input
+          type="text"
+          id="requiredDocuments"
+          name="requiredDocuments"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="Comma-separated list of required documents (e.g., SOC 2 Report, Security Policy)"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            for="minimumComplianceLevel"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Minimum Compliance Level*</label
+          >
+          <select
+            id="minimumComplianceLevel"
+            name="minimumComplianceLevel"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            {
+              complianceLevelOptions.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="verificationMethod"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Verification Method*</label
+          >
+          <select
+            id="verificationMethod"
+            name="verificationMethod"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            {
+              verificationMethodOptions.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="frequency"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Verification Frequency*</label
+          >
+          <select
+            id="frequency"
+            name="frequency"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            {
+              frequencyOptions.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3"
+            >Requirement Status*</label
+          >
+          <div class="flex space-x-4">
+            <label class="inline-flex items-center">
+              <input
+                type="radio"
+                name="isRequired"
+                value="true"
+                checked
+                class="text-indigo-600 focus:ring-indigo-500"
+              />
+              <span class="ml-2 text-sm text-gray-700">Required</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input
+                type="radio"
+                name="isRequired"
+                value="false"
+                class="text-indigo-600 focus:ring-indigo-500"
+              />
+              <span class="ml-2 text-sm text-gray-700">Optional</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <button
+          type="button"
+          id="cancel-button"
+          class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Save Requirement
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('add-requirement-modal')
+    const addButton = document.getElementById('add-requirement-btn')
+    const closeButton = document.getElementById('close-modal')
+    const cancelButton = document.getElementById('cancel-button')
+    const requirementForm = document.getElementById('requirement-form')
+
+    // Open modal
+    addButton?.addEventListener('click', () => {
+      modal?.classList.remove('hidden')
+    })
+
+    // Close modal functions
+    const closeModal = () => {
+      modal?.classList.add('hidden')
+    }
+
+    closeButton?.addEventListener('click', closeModal)
+    cancelButton?.addEventListener('click', closeModal)
+
+    // Close when clicking outside the modal content
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal()
+      }
+    })
+
+    // Form submission
+    requirementForm?.addEventListener('submit', (e) => {
+      e.preventDefault()
+
+      // In a real implementation, this would save the requirement via API
+      alert('Requirement would be saved here with a real backend API.')
+
+      closeModal()
+      // In practice, we would show a success message and reload/update the page
+      window.location.reload()
+    })
+
+    // Handle edit buttons
+    const editButtons = document.querySelectorAll('.edit-requirement')
+    editButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const reqId = (e.target as HTMLElement).getAttribute('data-req-id')
+        // In a real implementation, this would open the modal with the requirement data
+        alert(
+          `In a production environment, this would open the edit form for requirement ID: ${reqId}`,
+        )
+      })
+    })
+
+    // Handle delete buttons
+    const deleteButtons = document.querySelectorAll('.delete-requirement')
+    deleteButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const reqId = (e.target as HTMLElement).getAttribute('data-req-id')
+        if (
+          reqId &&
+          confirm(
+            'Are you sure you want to delete this requirement? This action cannot be undone.',
+          )
+        ) {
+          // In a real implementation, this would delete the requirement via API
+          alert(`Delete requirement ${reqId}`)
+          // Then reload the page
+          window.location.reload()
+        }
+      })
+    })
+  })
+</script>

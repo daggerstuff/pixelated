@@ -1,0 +1,143 @@
+---
+/**
+ * LiveRegionSystem.astro
+ *
+ * A comprehensive system for ARIA live regions to announce dynamic content changes
+ * to users of assistive technologies like screen readers.
+ *
+ * This component creates four specialized live regions:
+ * - Status: For general status updates (polite)
+ * - Alert: For important notifications that need immediate attention (assertive)
+ * - Log: For sequential information updates (polite)
+ * - Progress: For progress updates (polite)
+ *
+ * Usage:
+ * 1. Include this component once in your base layout
+ * 2. Use the related utility functions to send announcements to the appropriate region
+ */
+
+// No props needed, this is a global system component
+---
+
+<div class="live-region-system">
+  <!-- Status announcements (polite) -->
+  <div
+    id="status-live-region"
+    aria-live="polite"
+    aria-atomic="true"
+    class="sr-only live-region"
+  >
+  </div>
+
+  <!-- Alert announcements (assertive) -->
+  <div
+    id="alert-live-region"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    class="sr-only live-region"
+  >
+  </div>
+
+  <!-- Log announcements (polite, not atomic) -->
+  <div
+    id="log-live-region"
+    aria-live="polite"
+    aria-atomic="false"
+    class="sr-only live-region"
+  >
+  </div>
+
+  <!-- Progress announcements (polite) -->
+  <div
+    id="progress-live-region"
+    aria-live="polite"
+    aria-atomic="true"
+    class="sr-only live-region"
+  >
+  </div>
+</div>
+
+<style>
+  .live-region-system {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>
+
+<script>
+  // Global utility functions for Astro components
+  // These are exposed to the global window object for use in Astro components
+
+  // Define the LiveRegionSystem namespace
+  window.LiveRegionSystem = {
+    /**
+     * Announce a status message (polite)
+     */
+    announceStatus: (message: string, clearDelay: number = 5000) => {
+      const region = document.getElementById('status-live-region')
+      if (!region) return
+
+      region.textContent = message
+
+      if (clearDelay > 0) {
+        setTimeout(() => {
+          region.textContent = ''
+        }, clearDelay)
+      }
+    },
+
+    /**
+     * Announce an alert message (assertive)
+     */
+    announceAlert: (message: string, clearDelay: number = 7000) => {
+      const region = document.getElementById('alert-live-region')
+      if (!region) return
+
+      region.textContent = message
+
+      if (clearDelay > 0) {
+        setTimeout(() => {
+          region.textContent = ''
+        }, clearDelay)
+      }
+    },
+
+    /**
+     * Add a log message (polite, accumulative)
+     */
+    log: (message: string, clear: boolean = false) => {
+      const region = document.getElementById('log-live-region')
+      if (!region) return
+
+      if (clear) {
+        region.textContent = message
+      } else {
+        // Add new line if there's already content
+        if (region.textContent) {
+          region.textContent += '\n' + message
+        } else {
+          region.textContent = message
+        }
+      }
+    },
+
+    /**
+     * Announce a progress update (polite)
+     */
+    announceProgress: (value: string | number, max: string | number, label: string) => {
+      const region = document.getElementById('progress-live-region')
+      if (!region) return
+
+      const percent = Math.round((Number(value) / Number(max)) * 100)
+      region.textContent = `${label}: ${percent}% (${value} of ${max})`
+    },
+  }
+</script>

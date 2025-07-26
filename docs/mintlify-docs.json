@@ -1,0 +1,336 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "willow",
+  "name": "Pixelated Empathy Documentation",
+  "colors": {
+    "primary": "#006AD4",
+    "light": "#007FFF",
+    "dark": "#006AD4"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Tutorial",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": ["introduction", "quickstart", "project-status"]
+          },
+          {
+            "group": "Setup",
+            "pages": ["development", "development-setup"]
+          },
+          {
+            "group": "Essentials",
+            "pages": [
+              "essentials/navigation",
+              "essentials/markdown",
+              "essentials/code",
+              "essentials/images",
+              "essentials/reusable-snippets",
+              "essentials/settings"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Architecture",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["architecture", "infrastructure", "documentation-index"]
+          },
+          {
+            "group": "Core Systems",
+            "pages": ["architecture/ai-system", "component-library"]
+          },
+          {
+            "group": "Technical Diagrams",
+            "pages": [
+              {
+                "group": "Design Decisions",
+                "pages": ["architecture/decisions/index"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Development",
+        "groups": [
+          {
+            "group": "Guidelines",
+            "pages": [
+              "guides/development",
+              "guides/best-practices",
+              "code-splitting"
+            ]
+          },
+          {
+            "group": "Services",
+            "pages": [
+              {
+                "group": "Authentication",
+                "pages": ["server-auth", "auth-types"]
+              },
+              {
+                "group": "Data Storage",
+                "pages": [
+                  "redis-service",
+                  "redis-configuration",
+                  "redis-error-handling"
+                ]
+              },
+              {
+                "group": "Notifications",
+                "pages": ["notification-service", "email-service", "websocket"]
+              }
+            ]
+          },
+          {
+            "group": "Advanced Features",
+            "pages": [
+              {
+                "group": "Analytics",
+                "pages": [
+                  "analytics-service",
+                  "analytics-optimizations",
+                  "rum-documentation"
+                ]
+              },
+              {
+                "group": "AI & ML",
+                "pages": ["text-analysis", "advanced-systems/machine-learning"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Testing",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["testing/overview", "testing/best-practices"]
+          },
+          {
+            "group": "Test Types",
+            "pages": [
+              "component-testing",
+              "integration-testing",
+              "performance-testing",
+              "testing/browser-compatibility-testing"
+            ]
+          },
+          {
+            "group": "Testing Tools",
+            "pages": [
+              "testing/setup-guides",
+              "testing/execution",
+              "testing/debugging",
+              "testing/coverage",
+              "redis-testing"
+            ]
+          },
+          {
+            "group": "Test Patterns",
+            "pages": ["testing/patterns", "testing/integration-test-plan"]
+          }
+        ]
+      },
+      {
+        "tab": "Deployment & Operations",
+        "groups": [
+          {
+            "group": "Deployment",
+            "pages": ["deployment", "devops", "vercel-push"]
+          },
+          {
+            "group": "Monitoring",
+            "pages": ["health-check", "rum-documentation"]
+          },
+          {
+            "group": "Migration & Maintenance",
+            "pages": [
+              "redis-migration",
+              "operations/backup-recovery",
+              "operations/scaling"
+            ]
+          },
+          {
+            "group": "Infrastructure",
+            "pages": [
+              "infrastructure",
+              "operations/cloud-resources",
+              "operations/networking"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Security",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["SECURITY", "security-implementation"]
+          },
+          {
+            "group": "Security Protocols",
+            "pages": [
+              "protocols/authentication",
+              "protocols/authorization",
+              "protocols/encryption"
+            ]
+          },
+          {
+            "group": "Compliance",
+            "pages": ["compliance/gdpr", "compliance/hipaa", "compliance/soc2"]
+          },
+          {
+            "group": "Security Analysis",
+            "pages": [
+              "security-analysis/penetration-test-results",
+              "security-analysis/security-best-practices",
+              "security/vulnerability-management"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Integrations",
+        "groups": [
+          {
+            "group": "Third-Party Services",
+            "pages": ["providers", "integrations/convex"]
+          },
+          {
+            "group": "API Integrations",
+            "pages": [
+              "integrations/openai",
+              "integrations/anthropic",
+              "integrations/supabase"
+            ]
+          },
+          {
+            "group": "External Tools",
+            "pages": [
+              "integrations/analytics-tools",
+              "integrations/monitoring-tools",
+              "integrations/ci-cd"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["api-reference/introduction", "api"]
+          },
+          {
+            "group": "Core Endpoints",
+            "pages": [
+              "api-reference/endpoint/get",
+              "api-reference/endpoint/create",
+              "api-reference/endpoint/delete",
+              "api-reference/endpoint/webhook"
+            ]
+          },
+          {
+            "group": "API Services",
+            "pages": [
+              "api/authentication",
+              "api/data-services",
+              "api/ai-services",
+              "api/analytics"
+            ]
+          },
+          {
+            "group": "API Specifications",
+            "pages": [
+              {
+                "group": "Schema",
+                "pages": [
+                  "api/schema/users",
+                  "api/schema/content",
+                  "api/schema/analytics"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Accessibility",
+        "groups": [
+          {
+            "group": "Guidelines",
+            "pages": [
+              "accessibility/standards",
+              "accessibility/checklist",
+              "accessibility/testing"
+            ]
+          },
+          {
+            "group": "Implementation",
+            "pages": [
+              "accessibility/keyboard-navigation",
+              "accessibility/screen-readers",
+              "accessibility/color-contrast"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "GitHub Repository",
+          "href": "https://github.com/vivirox/gradiant",
+          "icon": "github"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://discord.gg/gradiant",
+          "icon": "discord"
+        },
+        {
+          "anchor": "Project Status",
+          "href": "https://pixelatedempathy.com/project-status",
+          "icon": "chart-line"
+        },
+        {
+          "anchor": "Roadmap",
+          "href": "https://pixelatedempathy.com/roadmap",
+          "icon": "map"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@pixelatedempathy.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://pixelatedempathy.com/dashboard"
+    }
+  },
+  "footer": {
+    "socials": {
+      "twitter": "https://twitter.com/gradiantascent",
+      "github": "https://github.com/vivirox/gradiant",
+      "linkedin": "https://linkedin.com/company/gradiantascent"
+    }
+  }
+}

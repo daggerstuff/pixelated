@@ -1,0 +1,113 @@
+---
+export const prerender = false // Enable SSR for this page
+
+import Layout from '@/layouts/AuthLayout.astro'
+import { AuthService } from '@/services/auth.service'
+
+// Get query parameters
+const token = Astro.url.searchParams.get('token')
+const type = Astro.url.searchParams.get('type')
+const email = Astro.url.searchParams.get('email')
+
+// Handle different auth callback types
+if (token && type) {
+  // Store the token temporarily in a server-side session
+  if (type === 'recovery' && email) {
+    // For password reset flow
+    try {
+      // Redirect to the reset password page with proper parameters
+      // We'll handle the token verification there
+      const resetUrl = new URL('/reset-password-confirm', Astro.url.origin)
+
+      // Create response with cookies
+      const headers = new Headers()
+
+      // Set cookie with the token that will be used by the reset-password-confirm page
+      headers.append(
+        'Set-Cookie',
+        `auth_recovery_token=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`,
+      )
+
+      // Set cookie for the email as well
+      if (email) {
+        headers.append(
+          'Set-Cookie',
+          `auth_recovery_email=${email}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`,
+        )
+      }
+
+      headers.append('Location', resetUrl.toString())
+
+      return new Response(null, {
+        status: 302,
+        headers,
+      })
+    } catch (err) {
+      console.error('Error handling recovery token:', err)
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/reset-password?error=invalid_token' },
+      })
+    }
+  } else {
+    // Handle other auth types like signup confirmation, email change, etc.
+    try {
+      // For other auth types, we can verify the token here
+      // and redirect accordingly
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/dashboard' },
+      })
+    } catch (err) {
+      console.error('Error handling auth token:', err)
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/?error=auth_error' },
+      })
+    }
+  }
+}
+
+// Default redirect if no valid parameters are found
+return new Response(null, {
+  status: 302,
+  headers: { Location: '/' },
+})
+---
+
+<Layout
+  title="Authenticating..."
+  description="Processing your request"
+  transitionMode="zoom"
+>
+  <div class="text-center">
+    <div class="mb-6">
+      <div
+        class="inline-block w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
+      >
+      </div>
+    </div>
+    <h1 class="text-2xl font-bold mb-4">Processing Your Request</h1>
+    <p class="text-gray-400">
+      Please wait while we authenticate your request...
+    </p>
+  </div>
+</Layout>
+
+<script>
+  import { toast } from '@/components/ui/toast'
+
+  // Show toast notification when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    toast.info('Verifying authentication...', {
+      duration: 3000,
+    })
+
+    // Add a timeout to show processing
+    setTimeout(() => {
+      toast.success('Authentication successful! Redirecting...', {
+        duration: 2000,
+      })
+    }, 1500)
+  })
+</script>

@@ -1,0 +1,309 @@
+---
+export const prerender = false
+// data-retention.astro
+// Admin page for managing data retention policies and archiving
+import AdminLayout from '../../components/admin/AdminLayout.astro'
+import DataRetentionSystem from '../../components/admin/DataRetentionSystem.astro'
+import RetentionAuditLogs from '../../components/admin/RetentionAuditLogs.astro'
+import RetentionReports from '../../components/admin/RetentionReports.astro'
+import { Icon } from 'astro-icon/components'
+
+// Page configuration
+const title = 'Data Retention Management'
+const description =
+  'Manage data retention policies, archiving, and secure destruction for HIPAA compliance'
+
+// Compliance status summary data
+const statusData = {
+  compliant: 12,
+  review: 3,
+  nonCompliant: 1,
+  totalPolicies: 16,
+}
+
+// Quick stats
+const quickStats = [
+  {
+    id: 'archived-records',
+    label: 'Records Archived',
+    value: '287,412',
+    change: '+24%',
+    trend: 'up',
+    icon: 'archive',
+  },
+  {
+    id: 'scheduled-actions',
+    label: 'Scheduled Actions',
+    value: '8',
+    change: '+2',
+    trend: 'up',
+    icon: 'calendar',
+  },
+  {
+    id: 'destroyed-records',
+    label: 'Records Destroyed',
+    value: '15,943',
+    change: '+12%',
+    trend: 'up',
+    icon: 'trash',
+  },
+  {
+    id: 'policy-compliance',
+    label: 'Policy Compliance',
+    value: '94%',
+    change: '+5%',
+    trend: 'up',
+    icon: 'shield-check',
+  },
+]
+
+// Get trend class for styling
+const getTrendClass = (trend: string) => {
+  return trend === 'up'
+    ? 'text-green-500 dark:text-green-400'
+    : 'text-red-500 dark:text-red-400'
+}
+
+// Calculate compliance percentage
+const compliancePercentage = Math.round(
+  (statusData.compliant / statusData.totalPolicies) * 100,
+)
+---
+
+<AdminLayout {title} {description} activeItem="data-retention">
+  <div class="space-y-6">
+    <!-- Header Section -->
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    >
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          {title}
+        </h1>
+        <p class="mt-1 text-gray-500 dark:text-gray-400">
+          Manage retention policies and automated archiving for patient data
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
+        >
+          <Icon name="plus" class="w-5 h-5 mr-2" />
+          New Policy
+        </button>
+
+        <button
+          type="button"
+          class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
+        >
+          <Icon name="refresh" class="w-5 h-5 mr-2" />
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Compliance Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <!-- Compliance Status Card -->
+      <div
+        class="md:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-5"
+      >
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          Compliance Status
+        </h3>
+
+        <div class="flex items-center mb-4">
+          <div
+            class="relative w-full h-4 bg-gray-200 rounded-full dark:bg-gray-700"
+          >
+            <div
+              class="h-4 bg-blue-600 rounded-full dark:bg-blue-500"
+              style={`width: ${compliancePercentage}%`}
+            >
+            </div>
+          </div>
+          <span
+            class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300"
+            >{compliancePercentage}%</span
+          >
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+              {statusData.compliant}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              Compliant
+            </div>
+          </div>
+          <div>
+            <div
+              class="text-2xl font-bold text-yellow-600 dark:text-yellow-400"
+            >
+              {statusData.review}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              Review Needed
+            </div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-red-600 dark:text-red-400">
+              {statusData.nonCompliant}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              Non-Compliant
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats Cards -->
+      <div
+        class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+      >
+        {
+          quickStats.map((stat) => (
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {stat.label}
+                  </p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                    {stat.value}
+                  </p>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/20">
+                  <Icon
+                    name={stat.icon}
+                    class="w-6 h-6 text-blue-600 dark:text-blue-400"
+                  />
+                </div>
+              </div>
+              <div
+                class={`flex items-center mt-4 ${getTrendClass(stat.trend)}`}
+              >
+                <Icon
+                  name={stat.trend === 'up' ? 'trending-up' : 'trending-down'}
+                  class="w-4 h-4 mr-1"
+                />
+                <span class="text-sm font-medium">
+                  {stat.change} from last month
+                </span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex space-x-2 px-4" aria-label="Tabs">
+          <button
+            id="tab-policies"
+            type="button"
+            class="py-4 px-1 border-b-2 border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 font-medium text-sm"
+            aria-selected="true"
+          >
+            Retention Policies
+          </button>
+          <button
+            id="tab-audit"
+            type="button"
+            class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600 font-medium text-sm"
+            aria-selected="false"
+          >
+            Archiving Audit
+          </button>
+          <button
+            id="tab-exports"
+            type="button"
+            class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600 font-medium text-sm"
+            aria-selected="false"
+          >
+            Export Reports
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="p-4">
+        <!-- Retention Policies Panel (Default Active) -->
+        <div id="panel-policies" class="block">
+          <DataRetentionSystem />
+        </div>
+
+        <!-- Archiving Audit Panel (Initially Hidden) -->
+        <div id="panel-audit" class="hidden">
+          <RetentionAuditLogs />
+        </div>
+
+        <!-- Export Reports Panel (Initially Hidden) -->
+        <div id="panel-exports" class="hidden">
+          <RetentionReports />
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Tab functionality
+    const tabs = document.querySelectorAll('[id^="tab-"]')
+    const panels = document.querySelectorAll('[id^="panel-"]')
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        // Toggle tabs
+        tabs.forEach((t) => {
+          t.classList.remove(
+            'border-blue-500',
+            'text-blue-600',
+            'dark:text-blue-400',
+            'dark:border-blue-400',
+          )
+          t.classList.add(
+            'border-transparent',
+            'text-gray-500',
+            'hover:text-gray-700',
+            'hover:border-gray-300',
+            'dark:text-gray-400',
+            'dark:hover:text-gray-300',
+            'dark:hover:border-gray-600',
+          )
+          t.setAttribute('aria-selected', 'false')
+        })
+
+        tab.classList.remove(
+          'border-transparent',
+          'text-gray-500',
+          'hover:text-gray-700',
+          'hover:border-gray-300',
+          'dark:text-gray-400',
+          'dark:hover:text-gray-300',
+          'dark:hover:border-gray-600',
+        )
+        tab.classList.add(
+          'border-blue-500',
+          'text-blue-600',
+          'dark:text-blue-400',
+          'dark:border-blue-400',
+        )
+        tab.setAttribute('aria-selected', 'true')
+
+        // Toggle panels
+        const tabName = tab.id.replace('tab-', '')
+        panels.forEach((panel) => {
+          panel.classList.add('hidden')
+        })
+        document.getElementById(`panel-${tabName}`)?.classList.remove('hidden')
+      })
+    })
+  })
+</script>

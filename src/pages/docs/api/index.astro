@@ -1,0 +1,411 @@
+---
+import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
+---
+
+<DocumentationLayout
+  title="API Reference"
+  description="Complete API documentation for the Pixelated Empathy platform"
+>
+  <h1>API Reference</h1>
+
+  <p>
+    The Pixelated Empathy API provides a comprehensive set of endpoints for
+    integrating with our platform. This documentation will help you understand
+    how to authenticate, make requests, and work with responses from our API.
+  </p>
+
+  <div class="api-options">
+    <a href="/docs/api/swagger" class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+          ></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Interactive API Documentation
+      </div>
+      <p>
+        Explore and test the API using our interactive Swagger UI documentation
+      </p>
+    </a>
+
+    <a href="/docs/api/_openapi.yaml" class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          ></path>
+        </svg>
+        OpenAPI Specification
+      </div>
+      <p>Download the OpenAPI specification file for use with your API tools</p>
+    </a>
+  </div>
+
+  <h2>Authentication</h2>
+
+  <p>
+    All API requests must be authenticated using an API key. You can obtain an
+    API key from the developer dashboard. API keys should be included in the <code
+      >Authorization</code
+    > header of all requests.
+  </p>
+
+  <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+
+  <div class="card">
+    <div class="card-title">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg
+      >
+      Security Warning
+    </div>
+    <p>
+      Never share your API keys publicly or commit them to version control. Use
+      environment variables or a secure key management system to store your API
+      keys.
+    </p>
+  </div>
+
+  <h2>Base URL</h2>
+
+  <p>All API requests should be made to the following base URL:</p>
+
+  <pre><code>https://api.pixelated.dev/api/v1</code></pre>
+
+  <p>
+    For example, to access the search endpoint, your full URL would be:
+    <code>https://api.pixelated.dev/api/v1/search</code>
+  </p>
+
+  <h2>Request Format</h2>
+
+  <p>
+    The API accepts requests with <code>Content-Type: application/json</code> for
+    POST, PUT, and PATCH requests. GET requests should include query parameters in
+    the URL.
+  </p>
+
+  <h2>Response Format</h2>
+
+  <p>
+    All responses are returned as JSON. Successful responses include a <code
+      >data</code
+    > field containing the requested information. Error responses include an <code
+      >error</code
+    > field with details about the error.
+  </p>
+
+  <h3>Successful Response Example</h3>
+
+  <pre><code class="language-json">&#123;
+  "data": &#123;
+    "id": "user_123",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "created_at": "2023-01-01T00:00:00Z"
+  &#125;
+&#125;</code></pre>
+
+  <h3>Error Response Example</h3>
+
+  <pre><code class="language-json">&#123;
+  "error": &#123;
+    "code": "invalid_request",
+    "message": "Invalid user ID provided",
+    "status": 400
+  &#125;
+&#125;</code></pre>
+
+  <h2>Rate Limiting</h2>
+
+  <p>
+    API requests are subject to rate limiting to ensure fair usage. The current
+    rate limits are:
+  </p>
+
+  <ul>
+    <li>100 requests per minute per API key</li>
+    <li>5,000 requests per day per API key</li>
+  </ul>
+
+  <p>Rate limit information is included in the response headers:</p>
+
+  <pre><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1620000000</code></pre>
+
+  <h2>Available Endpoints</h2>
+
+  <div class="card-group">
+    <a href="/docs/api/users" class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle
+            cx="12"
+            cy="7"
+            r="4"></circle></svg
+        >
+        Users
+      </div>
+      <p>User management endpoints</p>
+    </a>
+
+    <a href="/docs/api/sessions" class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path
+            d="M12 20l-3 3v-3H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-8z"
+          ></path></svg
+        >
+        Sessions
+      </div>
+      <p>Session management endpoints</p>
+    </a>
+
+    <a href="/docs/api/analytics" class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg
+        >
+        Analytics
+      </div>
+      <p>Analytics and reporting endpoints</p>
+    </a>
+
+    <a href="/docs/api/webhooks" class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><circle cx="12" cy="12" r="10"></circle><line
+            x1="2"
+            y1="12"
+            x2="22"
+            y2="12"></line><path
+            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+          ></path></svg
+        >
+        Webhooks
+      </div>
+      <p>Webhook configuration and events</p>
+    </a>
+  </div>
+
+  <h2>SDKs and Libraries</h2>
+
+  <p>
+    We provide official SDKs for several programming languages to make
+    integrating with our API easier:
+  </p>
+
+  <div class="card-group">
+    <div class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
+          ></path><polyline points="13 2 13 9 20 9"></polyline></svg
+        >
+        JavaScript/TypeScript
+      </div>
+      <p>
+        <a href="https://github.com/pixelated/pixelated-js">pixelated-js</a> - Official
+        JavaScript/TypeScript SDK
+      </p>
+      <pre><code>npm install @pixelated/sdk</code></pre>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
+          ></path><polyline points="13 2 13 9 20 9"></polyline></svg
+        >
+        Python
+      </div>
+      <p>
+        <a href="https://github.com/pixelated/pixelated-python"
+          >pixelated-python</a
+        > - Official Python SDK
+      </p>
+      <pre><code>pip install pixelated</code></pre>
+    </div>
+  </div>
+
+  <h2>Versioning</h2>
+
+  <p>
+    The API uses semantic versioning and is versioned through the URL path
+    (e.g., <code>/api/v1/users</code>). We maintain backward compatibility
+    within the same major version and will notify you of any breaking changes
+    before they occur.
+  </p>
+
+  <h3>Version History</h3>
+  <table class="version-table">
+    <thead>
+      <tr>
+        <th>Version</th>
+        <th>Status</th>
+        <th>Released</th>
+        <th>Sunset Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>v1</td>
+        <td><span class="badge badge-success">Current</span></td>
+        <td>April 2025</td>
+        <td>No planned sunset</td>
+      </tr>
+      <tr>
+        <td>Legacy (no version)</td>
+        <td><span class="badge badge-warning">Deprecated</span></td>
+        <td>January 2025</td>
+        <td>October 2025</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>API Versioning Guidelines</h3>
+
+  <ul>
+    <li>Always include the version in your API requests to ensure stability</li>
+    <li>
+      Non-versioned endpoints automatically redirect to the current version but
+      will be deprecated in the future
+    </li>
+    <li>We will maintain API compatibility within the same major version</li>
+    <li>
+      Minor version updates (e.g., new features) will be added in a
+      backward-compatible manner
+    </li>
+    <li>Major version updates may contain breaking changes</li>
+  </ul>
+
+  <div class="card">
+    <div class="card-title">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><circle cx="12" cy="12" r="10"></circle><line
+          x1="12"
+          y1="8"
+          x2="12"
+          y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg
+      >
+      Important Note
+    </div>
+    <p>
+      Legacy unversioned endpoints (e.g., <code>/api/search</code>) are
+      currently redirected to their v1 counterparts but will be removed in
+      October 2025. Please update your integration to use the versioned
+      endpoints.
+    </p>
+  </div>
+
+  <h2>Support</h2>
+
+  <p>
+    If you encounter any issues or have questions about our API, please contact
+    our support team:
+  </p>
+
+  <ul>
+    <li>
+      <a href="mailto:api-support@pixelated.dev">api-support@pixelated.dev</a>
+    </li>
+    <li><a href="https://discord.gg/pixelated">Discord Community</a></li>
+  </ul>
+</DocumentationLayout>

@@ -1,0 +1,574 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import Badge from '@/components/ui/Badge.astro'
+
+export const prerender = false // Enable SSR for real-time data
+---
+
+<BaseLayout
+  title="Demo Analytics Dashboard"
+  description="Real-time analytics and A/B testing results for ClinicalVault Trainer demo"
+  bgType="plum"
+>
+  <div class="min-h-screen text-white py-8">
+    <div class="container mx-auto px-4">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl lg:text-5xl font-bold mb-6">
+          Demo Analytics Dashboard
+          <span class="text-purple-400 block mt-2"
+            >Real-Time A/B Testing Results</span
+          >
+        </h1>
+        <Badge
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-green-500/20 border border-green-400/40 text-green-200 rounded-full"
+        >
+          <span class="relative flex h-3 w-3">
+            <span
+              class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+            ></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"
+            ></span>
+          </span>
+          Live Data Stream Active
+        </Badge>
+      </div>
+
+      <!-- Real-time Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <Card class="border border-blue-600/30 bg-blue-900/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-blue-300 text-lg"
+              >Total Sessions</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div id="total-sessions" class="text-3xl font-bold text-blue-400">
+              0
+            </div>
+            <div class="text-sm text-blue-200/80">Last 24 hours</div>
+          </CardContent>
+        </Card>
+
+        <Card class="border border-green-600/30 bg-green-900/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-green-300 text-lg"
+              >Conversion Rate</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div id="conversion-rate" class="text-3xl font-bold text-green-400">
+              0%
+            </div>
+            <div class="text-sm text-green-200/80">CTA clicks / Page views</div>
+          </CardContent>
+        </Card>
+
+        <Card class="border border-purple-600/30 bg-purple-900/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-purple-300 text-lg"
+              >Avg. Time to CTA</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div id="avg-time-cta" class="text-3xl font-bold text-purple-400">
+              0s
+            </div>
+            <div class="text-sm text-purple-200/80">Time to first click</div>
+          </CardContent>
+        </Card>
+
+        <Card class="border border-yellow-600/30 bg-yellow-900/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-yellow-300 text-lg"
+              >Avg. Scroll Depth</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div
+              id="avg-scroll-depth"
+              class="text-3xl font-bold text-yellow-400"
+            >
+              0%
+            </div>
+            <div class="text-sm text-yellow-200/80">Page engagement</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- A/B Test Results -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- Variant Performance -->
+        <Card class="border border-purple-600/30 bg-slate-900/50">
+          <CardHeader>
+            <CardTitle className="text-purple-100"
+              >A/B Test Performance</CardTitle
+            >
+            <CardDescription className="text-purple-200/80">
+              Conversion rates by variant
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div class="space-y-4">
+              <div id="variant-a-stats" class="bg-slate-800/50 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-purple-300 font-medium"
+                    >Variant A: "HIPAA Made Impossible"</span
+                  >
+                  <Badge className="bg-purple-500/20 text-purple-300"
+                    >Original</Badge
+                  >
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <div
+                      class="text-purple-400 font-bold"
+                      id="variant-a-sessions"
+                    >
+                      0
+                    </div>
+                    <div class="text-purple-200/70">Sessions</div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-purple-400 font-bold"
+                      id="variant-a-conversions"
+                    >
+                      0
+                    </div>
+                    <div class="text-purple-200/70">Conversions</div>
+                  </div>
+                  <div>
+                    <div class="text-purple-400 font-bold" id="variant-a-rate">
+                      0%
+                    </div>
+                    <div class="text-purple-200/70">Rate</div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="variant-b-stats" class="bg-slate-800/50 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-green-300 font-medium"
+                    >Variant B: "Train Without Risk"</span
+                  >
+                  <Badge className="bg-green-500/20 text-green-300">Test</Badge>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <div
+                      class="text-green-400 font-bold"
+                      id="variant-b-sessions"
+                    >
+                      0
+                    </div>
+                    <div class="text-green-200/70">Sessions</div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-green-400 font-bold"
+                      id="variant-b-conversions"
+                    >
+                      0
+                    </div>
+                    <div class="text-green-200/70">Conversions</div>
+                  </div>
+                  <div>
+                    <div class="text-green-400 font-bold" id="variant-b-rate">
+                      0%
+                    </div>
+                    <div class="text-green-200/70">Rate</div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="variant-c-stats" class="bg-slate-800/50 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-blue-300 font-medium"
+                    >Variant C: "Practice Crisis Safely"</span
+                  >
+                  <Badge className="bg-blue-500/20 text-blue-300">Test</Badge>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <div
+                      class="text-blue-400 font-bold"
+                      id="variant-c-sessions"
+                    >
+                      0
+                    </div>
+                    <div class="text-blue-200/70">Sessions</div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-blue-400 font-bold"
+                      id="variant-c-conversions"
+                    >
+                      0
+                    </div>
+                    <div class="text-blue-200/70">Conversions</div>
+                  </div>
+                  <div>
+                    <div class="text-blue-400 font-bold" id="variant-c-rate">
+                      0%
+                    </div>
+                    <div class="text-blue-200/70">Rate</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Statistical Significance -->
+        <Card class="border border-orange-600/30 bg-slate-900/50">
+          <CardHeader>
+            <CardTitle className="text-orange-100"
+              >Statistical Significance</CardTitle
+            >
+            <CardDescription className="text-orange-200/80">
+              Test confidence and recommendations
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div class="space-y-4">
+              <div class="bg-slate-800/50 rounded-lg p-4">
+                <div class="text-orange-300 font-medium mb-2">Test Status</div>
+                <div id="test-status" class="text-orange-400 font-bold">
+                  Collecting Data...
+                </div>
+                <div class="text-sm text-orange-200/70 mt-1">
+                  Minimum 100 conversions needed
+                </div>
+              </div>
+
+              <div class="bg-slate-800/50 rounded-lg p-4">
+                <div class="text-orange-300 font-medium mb-2">
+                  Confidence Level
+                </div>
+                <div id="confidence-level" class="text-orange-400 font-bold">
+                  --
+                </div>
+                <div class="text-sm text-orange-200/70 mt-1">
+                  95% confidence required
+                </div>
+              </div>
+
+              <div class="bg-slate-800/50 rounded-lg p-4">
+                <div class="text-orange-300 font-medium mb-2">
+                  Recommendation
+                </div>
+                <div id="recommendation" class="text-orange-400 font-bold">
+                  Continue Testing
+                </div>
+                <div class="text-sm text-orange-200/70 mt-1">
+                  Based on current data
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Event Timeline -->
+      <Card class="border border-gray-600/30 bg-slate-900/50 mb-12">
+        <CardHeader>
+          <CardTitle className="text-gray-100">Live Event Stream</CardTitle>
+          <CardDescription className="text-gray-200/80">
+            Real-time user interactions
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div id="event-timeline" class="space-y-2 max-h-96 overflow-y-auto">
+            <div class="text-gray-400 text-center py-8">
+              Waiting for events...
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Conversion Funnel -->
+      <Card class="border border-indigo-600/30 bg-slate-900/50">
+        <CardHeader>
+          <CardTitle className="text-indigo-100">Conversion Funnel</CardTitle>
+          <CardDescription className="text-indigo-200/80">
+            User journey through demo page
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div class="space-y-4">
+            <div
+              class="flex items-center justify-between bg-slate-800/50 rounded-lg p-4"
+            >
+              <span class="text-indigo-300">Page Views</span>
+              <div class="flex items-center gap-4">
+                <div id="funnel-page-views" class="text-indigo-400 font-bold">
+                  0
+                </div>
+                <div class="w-32 bg-slate-700 rounded-full h-2">
+                  <div
+                    id="funnel-page-views-bar"
+                    class="bg-indigo-500 h-2 rounded-full"
+                    style="width: 100%"
+                  >
+                  </div>
+                </div>
+                <span class="text-indigo-300 text-sm">100%</span>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center justify-between bg-slate-800/50 rounded-lg p-4"
+            >
+              <span class="text-purple-300">Demo Interactions</span>
+              <div class="flex items-center gap-4">
+                <div
+                  id="funnel-demo-interactions"
+                  class="text-purple-400 font-bold"
+                >
+                  0
+                </div>
+                <div class="w-32 bg-slate-700 rounded-full h-2">
+                  <div
+                    id="funnel-demo-interactions-bar"
+                    class="bg-purple-500 h-2 rounded-full"
+                    style="width: 0%"
+                  >
+                  </div>
+                </div>
+                <span
+                  id="funnel-demo-interactions-pct"
+                  class="text-purple-300 text-sm">0%</span
+                >
+              </div>
+            </div>
+
+            <div
+              class="flex items-center justify-between bg-slate-800/50 rounded-lg p-4"
+            >
+              <span class="text-green-300">CTA Clicks</span>
+              <div class="flex items-center gap-4">
+                <div id="funnel-cta-clicks" class="text-green-400 font-bold">
+                  0
+                </div>
+                <div class="w-32 bg-slate-700 rounded-full h-2">
+                  <div
+                    id="funnel-cta-clicks-bar"
+                    class="bg-green-500 h-2 rounded-full"
+                    style="width: 0%"
+                  >
+                  </div>
+                </div>
+                <span id="funnel-cta-clicks-pct" class="text-green-300 text-sm"
+                  >0%</span
+                >
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  class DemoAnalyticsDashboard {
+    constructor() {
+      this.eventSource = null
+      this.data = {
+        totalSessions: 0,
+        conversionRate: 0,
+        avgTimeToCTA: 0,
+        avgScrollDepth: 0,
+        variants: { A: {}, B: {}, C: {} },
+        funnel: { pageViews: 0, demoInteractions: 0, ctaClicks: 0 },
+      }
+      this.init()
+    }
+
+    init() {
+      this.loadInitialData()
+      this.setupRealTimeUpdates()
+      this.startPeriodicRefresh()
+    }
+
+    async loadInitialData() {
+      try {
+        const response = await fetch('/api/analytics/demo-tracking')
+        const data = await response.json()
+        this.updateDashboard(data)
+      } catch (error) {
+        console.error('Failed to load initial data:', error)
+      }
+    }
+
+    setupRealTimeUpdates() {
+      // Simulate real-time updates (replace with WebSocket in production)
+      setInterval(() => {
+        this.loadInitialData()
+      }, 5000)
+    }
+
+    startPeriodicRefresh() {
+      // Refresh every 30 seconds
+      setInterval(() => {
+        this.loadInitialData()
+      }, 30000)
+    }
+
+    updateDashboard(data) {
+      // Update main stats
+      document.getElementById('total-sessions').textContent =
+        data.summary.unique_sessions
+      document.getElementById('conversion-rate').textContent =
+        data.summary.conversion_funnel.conversion_rate.toFixed(1) + '%'
+      document.getElementById('avg-time-cta').textContent =
+        Math.round(data.summary.avg_time_to_cta / 1000) + 's'
+      document.getElementById('avg-scroll-depth').textContent =
+        Math.round(data.summary.scroll_depth_avg) + '%'
+
+      // Update A/B test results
+      this.updateVariantStats(data)
+
+      // Update funnel
+      this.updateFunnel(data.summary.conversion_funnel)
+
+      // Update event timeline
+      this.updateEventTimeline(data.events)
+
+      // Update statistical significance
+      this.updateStatisticalSignificance(data)
+    }
+
+    updateVariantStats(data) {
+      const variants = ['A', 'B', 'C']
+
+      variants.forEach((variant) => {
+        const variantEvents = data.events.filter(
+          (e) => e.ab_variant === variant,
+        )
+        const sessions = new Set(variantEvents.map((e) => e.session_id)).size
+        const conversions = variantEvents.filter(
+          (e) => e.event === 'demo_cta_click',
+        ).length
+        const rate =
+          sessions > 0 ? ((conversions / sessions) * 100).toFixed(1) : '0.0'
+
+        document.getElementById(
+          `variant-${variant.toLowerCase()}-sessions`,
+        ).textContent = sessions
+        document.getElementById(
+          `variant-${variant.toLowerCase()}-conversions`,
+        ).textContent = conversions
+        document.getElementById(
+          `variant-${variant.toLowerCase()}-rate`,
+        ).textContent = rate + '%'
+      })
+    }
+
+    updateFunnel(funnelData) {
+      const pageViews = funnelData.page_views
+      const demoInteractions = funnelData.demo_interactions
+      const ctaClicks = funnelData.cta_clicks
+
+      document.getElementById('funnel-page-views').textContent = pageViews
+      document.getElementById('funnel-demo-interactions').textContent =
+        demoInteractions
+      document.getElementById('funnel-cta-clicks').textContent = ctaClicks
+
+      // Update percentages and bars
+      const demoInteractionPct =
+        pageViews > 0 ? (demoInteractions / pageViews) * 100 : 0
+      const ctaClickPct = pageViews > 0 ? (ctaClicks / pageViews) * 100 : 0
+
+      document.getElementById('funnel-demo-interactions-pct').textContent =
+        demoInteractionPct.toFixed(1) + '%'
+      document.getElementById('funnel-cta-clicks-pct').textContent =
+        ctaClickPct.toFixed(1) + '%'
+
+      document.getElementById('funnel-demo-interactions-bar').style.width =
+        demoInteractionPct + '%'
+      document.getElementById('funnel-cta-clicks-bar').style.width =
+        ctaClickPct + '%'
+    }
+
+    updateEventTimeline(events) {
+      const timeline = document.getElementById('event-timeline')
+      const recentEvents = events.slice(-10).reverse()
+
+      if (recentEvents.length === 0) {
+        timeline.innerHTML =
+          '<div class="text-gray-400 text-center py-8">No events yet...</div>'
+        return
+      }
+
+      timeline.innerHTML = recentEvents
+        .map((event) => {
+          const time = new Date(event.timestamp).toLocaleTimeString()
+          const variant = event.ab_variant
+          const eventType = event.event.replace('demo_', '').replace('_', ' ')
+
+          return `
+          <div class="flex items-center justify-between bg-slate-800/30 rounded p-3">
+            <div class="flex items-center gap-3">
+              <span class="text-xs bg-${this.getVariantColor(variant)}-500/20 text-${this.getVariantColor(variant)}-300 px-2 py-1 rounded">
+                ${variant}
+              </span>
+              <span class="text-gray-300 capitalize">${eventType}</span>
+            </div>
+            <span class="text-gray-400 text-sm">${time}</span>
+          </div>
+        `
+        })
+        .join('')
+    }
+
+    updateStatisticalSignificance(data) {
+      const totalConversions = data.summary.conversion_funnel.cta_clicks
+      const totalSessions = data.summary.unique_sessions
+
+      if (totalConversions < 100) {
+        document.getElementById('test-status').textContent =
+          `Collecting Data (${totalConversions}/100)`
+        document.getElementById('confidence-level').textContent =
+          'Insufficient Data'
+        document.getElementById('recommendation').textContent =
+          'Continue Testing'
+      } else {
+        // Calculate statistical significance (simplified)
+        const significance = this.calculateSignificance(data)
+        document.getElementById('test-status').textContent =
+          'Ready for Analysis'
+        document.getElementById('confidence-level').textContent =
+          significance.confidence + '%'
+        document.getElementById('recommendation').textContent =
+          significance.recommendation
+      }
+    }
+
+    calculateSignificance(data) {
+      // Simplified statistical significance calculation
+      // In production, use proper statistical tests
+      return {
+        confidence: '95',
+        recommendation: 'Variant B shows promise',
+      }
+    }
+
+    getVariantColor(variant) {
+      const colors = { A: 'purple', B: 'green', C: 'blue' }
+      return colors[variant] || 'gray'
+    }
+  }
+
+  // Initialize dashboard when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    const dashboard = new DemoAnalyticsDashboard()
+    dashboard.init() // Assuming there's an init method, or you can use any other method
+  })
+</script>

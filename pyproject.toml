@@ -1,0 +1,130 @@
+[project]
+name = "pixel"
+version = "0.1.0"
+description = "Pixelated Empathy - AI-powered bias detection and mental health platform"
+authors = [
+  { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
+]
+requires-python = ">=3.11"
+dependencies = [
+  "flask",
+  "flask-cors",
+  "pandas",
+  "numpy",
+  "scikit-learn",
+  "pyjwt",
+  "werkzeug",
+  "fairlearn",
+  "shap>=0.41.0",
+  "lime",
+  "transformers",
+  "spacy",
+  "nltk",
+  "evaluate",
+  "cryptography",
+  "requests",
+  "python-dotenv",
+  "numba>=0.56.0",
+  "faiss-cpu>=1.11.0",
+  "sentence-transformers>=5.0.0",
+  "pytest>=8.4.1",
+  "pytest-asyncio>=1.0.0",
+  "flake8>=7.3.0",
+  "matplotlib>=3.10.3",
+  "mypy>=1.16.1",
+  "psutil>=7.0.0",
+  "chardet>=5.2.0",
+  "hatch>=1.14.1",
+  "pydub>=0.25.1",
+  "sourcery>=1.37.0",
+  "hatch>=1.14.1",
+  "torch",
+  "torchvision",
+  "torchaudio",
+  "hatch",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "coverage"]
+dev = ["black", "ruff", "mypy", "pyright"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+mypy_path = "stubs"
+files = ["src", "tests", "ai", "api"]
+show_error_codes = true
+
+[tool.pyright]
+include = ["src", "tests", "ai", "api"]
+exclude = ["node_modules", "stubs", "venv", "env", "build", "dist"]
+extraPaths = ["stubs"]
+typeCheckingMode = "basic"
+reportMissingTypeStubs = false
+reportMissingImports = false
+reportMissingModuleSource = false
+reportPrivateUsage = false
+pythonVersion = "3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+exclude = ["node_modules", "stubs", "venv", "env", "build", "dist"]
+select = [
+  "E",
+  "F",
+  "W",
+  "I",
+  "N",
+  "UP",
+  "B",
+  "A",
+  "C4",
+  "DTZ",
+  "PIE",
+  "PT",
+  "Q",
+  "RET",
+  "SIM",
+  "T20",
+  "TID",
+  "ARG",
+  "PL",
+  "RUF",
+]
+ignore = ["E501"]
+
+[tool.ruff.isort]
+known-first-party = ["ai", "src", "api"]
+combine-as-imports = true
+force-single-line = false
+
+[tool.black]
+target-version = ["py311"]
+line-length = 100
+skip-string-normalization = false
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["src", "ai", "api"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.uv.workspace]
+members = ["pixel"]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[tool.uv.sources.pytorch-cpu]
+url = "https://download.pytorch.org/whl/cpu"

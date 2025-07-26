@@ -1,0 +1,93 @@
+---
+export const prerender = false
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { PrivacyDashboard } from '@/components/analytics/PrivacyDashboard'
+import AnalyticsDashboard from '@/components/chat/AnalyticsDashboardReact'
+import { ConversionDashboard } from '@/components/analytics/ConversionDashboard'
+import { requirePageAuth } from '@/lib/auth/serverAuth'
+import type { AstroGlobal } from 'astro'
+
+// Protect this route - only authenticated users can access analytics
+await requirePageAuth(Astro as AstroGlobal)
+
+// Default analytics configuration
+const defaultConfig = {
+  securityLevel: 'maximum' as const,
+  encryptionEnabled: true,
+  scenario: 'analytics',
+}
+---
+
+<BaseLayout
+  title="Analytics Dashboard"
+  description="View and manage analytics data"
+>
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8">Analytics Dashboard</h1>
+
+    <div class="grid gap-8 md:grid-cols-[350px,1fr]">
+      {/* Privacy Controls Sidebar */}
+      <div class="space-y-4">
+        <PrivacyDashboard client:load />
+
+        <div class="bg-card rounded-lg border p-4">
+          <h3 class="text-lg font-semibold mb-3">Analytics Sections</h3>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="/analytics"
+                class="flex items-center py-2 px-3 bg-primary/10 text-primary rounded-md"
+              >
+                <span class="text-sm font-medium">Usage Analytics</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/analytics/conversions"
+                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+              >
+                <span class="text-sm font-medium">Conversion Tracking</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/admin/performance-dashboard"
+                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+              >
+                <span class="text-sm font-medium">Performance Metrics</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Main Analytics Content */}
+      <div class="space-y-8">
+        <div class="bg-card rounded-lg border p-6">
+          <h2 class="text-2xl font-semibold mb-4">Usage Analytics</h2>
+          <AnalyticsDashboard
+            client:load
+            messages={[]}
+            securityLevel={defaultConfig.securityLevel}
+            encryptionEnabled={defaultConfig.encryptionEnabled}
+            scenario={defaultConfig.scenario}
+          />
+        </div>
+
+        <div class="bg-card rounded-lg border p-6">
+          <h2 class="text-2xl font-semibold mb-4">Conversion Overview</h2>
+          <p class="text-muted-foreground mb-4">
+            Quick summary of recent conversion metrics. For detailed analysis,
+            visit the
+            <a
+              href="/analytics/conversions"
+              class="text-primary hover:underline"
+              >Conversion Tracking Dashboard</a
+            >.
+          </p>
+          <ConversionDashboard client:load />
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

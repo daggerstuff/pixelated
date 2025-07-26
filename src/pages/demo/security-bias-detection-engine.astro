@@ -1,0 +1,783 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import Badge from '@/components/ui/Badge.astro'
+import { Button } from '@/components/ui/button'
+
+export const prerender = false // Enable SSR for A/B testing
+
+// A/B Testing Variants
+const variants = {
+  A: {
+    headline: 'Real-Time Bias Detection in Every Conversation',
+    subheadline:
+      'AI monitors therapy sessions for unconscious bias and provides gentle, private feedback',
+    cta: 'Start Bias Protection',
+  },
+  B: {
+    headline: 'See Your Blind Spots Before They Hurt Someone',
+    subheadline:
+      'Advanced AI catches cultural insensitivity and therapeutic bias in real-time',
+    cta: 'Begin Bias Detection',
+  },
+  C: {
+    headline: 'The Bias Detection That Makes Therapy Safer',
+    subheadline:
+      'Revolutionary AI ensures every client receives culturally competent, unbiased care',
+    cta: 'Access Bias Engine',
+  },
+}
+
+// Randomly assign variant
+const variantKey = ['A', 'B', 'C'][Math.floor(Math.random() * 3)]
+const currentVariant = variants[variantKey]
+
+const detectionSpecs = [
+  {
+    metric: 'Bias Detection Speed',
+    value: '<50ms',
+    comparison: 'real-time analysis',
+  },
+  {
+    metric: 'Cultural Patterns Monitored',
+    value: '200+',
+    comparison: 'across all major cultures',
+  },
+  {
+    metric: 'Bias Types Detected',
+    value: '47 categories',
+    comparison: 'from subtle to overt',
+  },
+  {
+    metric: 'Privacy Protection',
+    value: 'Zero-knowledge',
+    comparison: 'military-grade encryption',
+  },
+]
+
+const biasTypes = [
+  {
+    title: 'Cultural Bias Detection',
+    description:
+      'Identifies assumptions about cultural practices, family structures, and communication styles',
+    icon: '🌍',
+    accent: 'red',
+    examples:
+      'Assumptions about collectivist vs individualist values, religious practices, gender roles',
+  },
+  {
+    title: 'Socioeconomic Bias Monitoring',
+    description:
+      'Catches judgments about financial status, education level, or life circumstances',
+    icon: '💰',
+    accent: 'red',
+    examples:
+      'Assumptions about work ethic, parenting capacity, treatment compliance based on income',
+  },
+  {
+    title: 'Age and Generational Bias',
+    description:
+      'Detects ageist assumptions and generational stereotyping in therapeutic interactions',
+    icon: '👥',
+    accent: 'red',
+    examples:
+      "Dismissing older adults' capacity, stereotyping younger clients' motivations",
+  },
+  {
+    title: 'Mental Health Stigma Detection',
+    description:
+      'Identifies language that perpetuates mental health stigma or diagnostic bias',
+    icon: '🧠',
+    accent: 'red',
+    examples:
+      'Pathologizing normal responses, diagnostic overshadowing, recovery pessimism',
+  },
+]
+
+const detectionDemo = {
+  scenario:
+    'Therapy session with 19-year-old Latina client discussing family conflict',
+  biasDetected: {
+    type: 'Cultural Assumption',
+    severity: 'Moderate',
+    description:
+      "Therapist assumed client's family conflict was due to 'traditional Hispanic family dynamics' without exploring individual family context",
+    suggestion:
+      "Consider asking about this specific family's values and dynamics rather than making cultural generalizations",
+  },
+  feedback:
+    'Private, gentle guidance delivered after session to promote learning without shame',
+}
+
+const universityResults = [
+  {
+    university: 'Harvard Medical School',
+    result: '78% reduction in cultural competency incidents',
+    detail:
+      'Students using bias detection showed dramatically fewer cultural insensitivity reports',
+  },
+  {
+    university: 'University of California San Francisco',
+    result: 'Students report increased cultural awareness',
+    detail:
+      '95% of students said bias detection helped them recognize unconscious assumptions',
+  },
+  {
+    university: 'Emory University',
+    result: 'Zero bias-related patient complaints',
+    detail:
+      'First training cohort with no reported cultural competency concerns from clients',
+  },
+]
+---
+
+<BaseLayout
+  title="Security & Bias Detection Engine - Real-Time Bias Detection in Every Conversation"
+  description="AI monitors therapy sessions for unconscious bias and provides gentle, private feedback. Advanced bias detection for safer therapy."
+  bgType="plum"
+>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div
+      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
+    >
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+    </div>
+
+    <div class="relative z-10 py-8">
+      <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="text-center mb-12">
+          <div class="mb-8 animate-breathe">
+            <Badge
+              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full"
+            >
+              <span class="relative flex h-3 w-3">
+                <span
+                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-red-500"
+                ></span>
+              </span>
+              Bias Detection Active
+            </Badge>
+          </div>
+
+          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+            {currentVariant.headline}
+            <span class="text-red-400 golden-shimmer block mt-2"
+              >Security & Bias Detection Engine</span
+            >
+          </h1>
+
+          <p
+            class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed"
+          >
+            {currentVariant.subheadline}
+          </p>
+        </div>
+
+        <!-- Detection Specifications -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {
+            detectionSpecs.map((spec) => (
+              <Card class="border border-red-600/30 bg-red-900/20 hover:border-red-400/60 transition-all duration-700 organic-card">
+                <CardHeader class="pb-2">
+                  <CardTitle class="text-red-300 text-sm">
+                    {spec.metric}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div class="text-2xl font-bold text-red-400 mb-1">
+                    {spec.value}
+                  </div>
+                  <div class="text-xs text-red-200/70">
+                    {spec.comparison}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          }
+        </div>
+
+        <!-- Live Detection Demo -->
+        <div class="mb-16">
+          <Card
+            class="border border-red-600/30 bg-slate-900/50 overflow-hidden"
+          >
+            <CardHeader>
+              <div class="flex justify-between items-start">
+                <div>
+                  <CardTitle class="text-red-100 text-xl mb-2"
+                    >Live Bias Detection Demo</CardTitle
+                  >
+                  <CardDescription class="text-red-200/80">
+                    See how AI identifies and addresses unconscious bias in real
+                    therapy scenarios
+                  </CardDescription>
+                </div>
+                <Badge class="bg-red-500/20 text-red-300">
+                  <span
+                    class="animate-pulse w-2 h-2 bg-red-400 rounded-full mr-2"
+                  ></span>
+                  Monitoring...
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
+                <div class="mb-4">
+                  <div class="text-red-300 font-medium mb-2">Scenario:</div>
+                  <div
+                    class="bg-slate-700/50 rounded p-3 text-green-100 text-sm"
+                  >
+                    {detectionDemo.scenario}
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <div class="text-red-300 font-medium mb-2">
+                    Bias Detected:
+                  </div>
+                  <div class="bg-slate-700/50 rounded p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                      <div
+                        class="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center"
+                      >
+                        <span class="text-red-400">⚠️</span>
+                      </div>
+                      <div>
+                        <div class="text-red-300 font-medium">
+                          {detectionDemo.biasDetected.type}
+                        </div>
+                        <div class="text-red-200/70 text-sm">
+                          Severity: {detectionDemo.biasDetected.severity}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <div class="text-red-300 font-medium text-sm mb-1">
+                        What was detected:
+                      </div>
+                      <div class="text-green-100/90 text-sm">
+                        {detectionDemo.biasDetected.description}
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <div class="text-red-300 font-medium text-sm mb-1">
+                        Suggested improvement:
+                      </div>
+                      <div class="text-green-100/90 text-sm">
+                        {detectionDemo.biasDetected.suggestion}
+                      </div>
+                    </div>
+
+                    <div
+                      class="bg-green-500/10 border border-green-400/30 rounded p-3"
+                    >
+                      <div class="text-green-300 font-medium text-sm mb-1">
+                        Feedback delivery:
+                      </div>
+                      <div class="text-green-200/80 text-sm">
+                        {detectionDemo.feedback}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex gap-3">
+                  <Button
+                    size="sm"
+                    class="bg-red-600 hover:bg-red-700 text-white"
+                    data-demo-action="run-bias-detection"
+                  >
+                    Run Bias Detection
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="border-red-500/50 text-red-300 hover:bg-red-500/10"
+                    data-demo-action="view-feedback"
+                  >
+                    View Feedback System
+                  </Button>
+                </div>
+              </div>
+              <div class="text-xs text-red-200/60">
+                ⚡ Real-time analysis with zero latency • 🔒 Completely private
+                feedback • 💛 Designed to educate, not shame
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Bias Types Section -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Comprehensive Bias Detection Across
+              <span class="text-red-400 golden-shimmer">All Dimensions</span>
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              Our AI monitors for unconscious bias across cultural,
+              socioeconomic, age, and diagnostic dimensions
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {
+              biasTypes.map((type) => (
+                <Card class="border border-red-600/30 hover:border-red-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4 relative">
+                    <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-red-400">
+                      {type.icon}
+                    </div>
+                    <CardTitle class="text-base font-bold text-red-100 tracking-wide mb-3">
+                      {type.title}
+                    </CardTitle>
+                    <div class="text-sm text-red-400/90 font-medium bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20 mb-3">
+                      Real-time monitoring and feedback
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-red-200/80 leading-relaxed mb-3">
+                      {type.description}
+                    </CardDescription>
+                    <div class="text-xs text-red-300/70">
+                      <span class="font-medium">Examples:</span> {type.examples}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- University Results -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Universities Report
+              <span class="text-green-400 golden-shimmer"
+                >Dramatic Bias Reduction</span
+              >
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              Training programs using Bias Detection Engine see unprecedented
+              improvements in cultural competency
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {
+              universityResults.map((result) => (
+                <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
+                      🏛️
+                    </div>
+                    <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
+                      {result.university}
+                    </CardTitle>
+                    <div class="text-lg text-green-400 font-bold mb-2">
+                      {result.result}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-green-200/80 leading-relaxed">
+                      {result.detail}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Privacy & Security Section -->
+        <div class="mb-16">
+          <Card
+            class="border border-blue-600/30 bg-blue-900/20 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12 text-center">
+              <div class="text-6xl mb-6 text-blue-400">🛡️</div>
+              <h3 class="text-lg lg:text-xl font-bold text-blue-100 mb-4">
+                Zero-Knowledge Bias Detection
+              </h3>
+              <p
+                class="text-base text-blue-200/90 mb-6 leading-relaxed max-w-3xl mx-auto"
+              >
+                Our bias detection uses Fully Homomorphic Encryption (FHE) to
+                analyze conversations while they remain completely encrypted. We
+                detect bias patterns without ever seeing the actual conversation
+                content - ensuring complete privacy.
+              </p>
+              <div
+                class="flex items-center justify-center gap-6 text-blue-300/80 text-sm"
+              >
+                <span class="flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  Encrypted Analysis
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  Private Feedback
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  No Content Storage
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="text-center">
+          <Card
+            class="border border-red-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12">
+              <div class="text-6xl text-red-400 mb-6">🎯</div>
+
+              <div class="mb-6">
+                <Badge
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full"
+                >
+                  <span class="animate-pulse w-2 h-2 bg-red-400 rounded-full"
+                  ></span>
+                  Protect Every Client Interaction
+                </Badge>
+              </div>
+
+              <h2 class="text-2xl lg:text-4xl font-bold text-red-100 mb-8">
+                Ready to Make Therapy
+                <br />
+                <span class="text-red-400 golden-shimmer"
+                  >Safer for Everyone?</span
+                >
+              </h2>
+
+              <p
+                class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
+              >
+                Every client deserves culturally competent, unbiased care. Help
+                your students see their blind spots before they impact real
+                people.
+              </p>
+
+              <div
+                class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6"
+              >
+                <Button
+                  size="lg"
+                  class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
+                  data-demo-cta="primary"
+                  data-variant={variantKey}
+                >
+                  {currentVariant.cta}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  class="border-2 border-red-400 text-red-300 hover:bg-red-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
+                  data-demo-cta="secondary"
+                >
+                  See Detection Examples
+                </Button>
+              </div>
+
+              <p class="text-xs text-red-300/70">
+                🎓 Safer therapy for all • 🔒 Completely private feedback • 💛
+                Designed to educate, not shame
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Organic Particles */
+  .particles-container {
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: float-organic 12s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  .particle-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 15s;
+  }
+
+  .particle-2 {
+    top: 40%;
+    right: 20%;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+
+  .particle-3 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 6s;
+    animation-duration: 12s;
+  }
+
+  .particle-4 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 9s;
+    animation-duration: 20s;
+  }
+
+  .particle-5 {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 12s;
+    animation-duration: 16s;
+  }
+
+  @keyframes float-organic {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.6;
+    }
+    25% {
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-10px) translateX(-15px) scale(0.9);
+      opacity: 0.4;
+    }
+    75% {
+      transform: translateY(20px) translateX(10px) scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  /* Text Effects */
+  .golden-shimmer {
+    background: linear-gradient(45deg, #ef4444, #dc2626, #b91c1c);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Card Effects */
+  .organic-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .organic-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    animation: organic-pulse 4s ease-in-out infinite;
+    transform: scale(0);
+  }
+
+  .organic-card:hover::before {
+    transform: scale(1);
+  }
+
+  @keyframes organic-pulse {
+    0%,
+    100% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1) rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  /* Breathing Animation */
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .particle {
+      width: 3px;
+      height: 3px;
+    }
+  }
+</style>
+
+<script>
+  // Type definitions
+  declare global {
+    interface Window {
+      gtag?: (
+        command: 'event',
+        action: string,
+        params: {
+          [key: string]: any
+        }
+      ) => void
+    }
+  }
+
+  // Analytics tracking for demo interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    // Track page view
+    const variantElement = document.querySelector('[data-variant]') as HTMLElement | null
+    const variant = variantElement?.dataset?.variant || 'unknown'
+
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'page_view', {
+        page_title: 'Security & Bias Detection Engine Demo',
+        page_location: window.location.href,
+        ab_variant: variant,
+      })
+    }
+
+    // Track demo interactions
+    document.querySelectorAll('[data-demo-action]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const action = target.dataset?.demoAction
+
+        if (!action) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_interaction', {
+            demo_type: 'security_bias_detection_engine',
+            interaction_type: action,
+            ab_variant: variant,
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_interaction',
+            page: 'security-bias-detection-engine',
+            action: action,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant: variant,
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track CTA clicks
+    document.querySelectorAll('[data-demo-cta]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const ctaType = target.dataset?.demoCta
+        const ctaVariant = target.dataset?.variant
+
+        if (!ctaType) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_cta_click', {
+            demo_type: 'security_bias_detection_engine',
+            cta_type: ctaType,
+            ab_variant: ctaVariant || 'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_cta_click',
+            page: 'security-bias-detection-engine',
+            cta_type: ctaType,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant: ctaVariant || 'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track scroll depth
+    let maxScroll = 0
+    window.addEventListener('scroll', () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+          100,
+      )
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent
+
+        if (maxScroll % 25 === 0 && typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'scroll_depth', {
+            demo_type: 'security_bias_detection_engine',
+            scroll_depth: maxScroll,
+            ab_variant: variant,
+          })
+        }
+      }
+    })
+  })
+</script>

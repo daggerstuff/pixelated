@@ -1,0 +1,144 @@
+---
+import type { SecurityLevel } from '@/hooks/useSecurity'
+import type { Message } from '@/types/chat'
+
+export interface Props {
+  messages: Message[]
+  securityLevel: SecurityLevel
+  encryptionEnabled: boolean
+  scenario: string
+  title?: string
+  description?: string
+}
+
+const {
+  messages,
+  securityLevel,
+  encryptionEnabled,
+  scenario,
+  title = 'Analytics Dashboard',
+  description = 'Real-time analytics for therapeutic conversation analysis.',
+} = Astro.props
+
+// Serialize messages for client-side use
+const serializedMessages = JSON.stringify(messages)
+---
+
+<div class="w-full transition-colors duration-300">
+  {title && <h2 class="text-lg font-medium mb-2 text-purple-300">{title}</h2>}
+  {description && <p class="mb-4 text-sm text-purple-300/70">{description}</p>}
+
+  {/* Use dynamic import to ensure the component is only loaded when needed */}
+  <div
+    id="analytics-dashboard-container"
+    data-securitylevel={securityLevel}
+    data-encryptionenabled={String(encryptionEnabled)}
+    data-scenario={scenario}
+    data-messages={serializedMessages}
+  >
+    <div class="analytics-loading-placeholder">
+      <div class="p-4 bg-black bg-opacity-30 rounded-lg text-center">
+        <div class="text-purple-400 animate-pulse">
+          Loading analytics dashboard...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Client-side code to dynamically load the React component
+  import type { Message } from '@/types/chat'
+  import type { SecurityLevel } from '@/hooks/useSecurity'
+
+  // Function to parse messages from a JSON string
+  function parseMessageData(jsonString: string): Message[] {
+    try {
+      return JSON.parse(jsonString || '[]')
+    } catch (error) {
+      console.error('Error parsing message data:', error)
+      return []
+    }
+  }
+
+  // Set up the analytics dashboard when the page loads
+  document.addEventListener('astro:page-load', async () => {
+    const container = document.getElementById('analytics-dashboard-container')
+    if (!container) return
+
+    const securityLevel = container.dataset['securitylevel'] as SecurityLevel
+    const encryptionEnabled = container.dataset['encryptionenabled'] === 'true'
+    const scenario = container.dataset['scenario'] || ''
+    const messagesData = container.dataset['messages'] || '[]'
+
+    try {
+      // Dynamically import the React component only when needed
+      const { default: AnalyticsDashboardReact } = await import(
+        './AnalyticsDashboardReact'
+      )
+
+      // Parse message data
+      const messages = parseMessageData(messagesData)
+
+      // Create props for the React component
+      const props = {
+        messages,
+        securityLevel,
+        encryptionEnabled,
+        scenario,
+      }
+
+      // Custom element approach for hydrating the React component
+      class AnalyticsDashboard extends HTMLElement {
+        connectedCallback() {
+          // Import React to render the component
+          import('react').then((React) => {
+            import('react-dom/client').then((ReactDOM) => {
+              const root = ReactDOM.createRoot(this)
+              root.render(React.createElement(AnalyticsDashboardReact, props))
+            })
+          })
+        }
+      }
+
+      // Define the custom element if not already defined
+      if (!customElements.get('analytics-dashboard')) {
+        customElements.define('analytics-dashboard', AnalyticsDashboard)
+      }
+
+      // Replace the placeholder with the custom element
+      const dashboardElement = document.createElement('analytics-dashboard')
+      container.innerHTML = ''
+      container.appendChild(dashboardElement)
+    } catch (error) {
+      console.error('Error loading analytics dashboard:', error)
+      container.innerHTML = `
+        <div class="p-4 bg-red-900 bg-opacity-20 rounded-lg text-center">
+          <div class="text-red-400">Failed to load analytics dashboard</div>
+        </div>
+      `
+    }
+  })
+</script>
+
+<style>
+  /* Ensure smooth dark mode transitions */
+  :root {
+    --transition-duration: 300ms;
+  }
+
+  .transition-colors {
+    transition:
+      background-color var(--transition-duration) ease-in-out,
+      color var(--transition-duration) ease-in-out,
+      border-color var(--transition-duration) ease-in-out;
+  }
+
+  /* Loading placeholder */
+  .analytics-loading-placeholder {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>

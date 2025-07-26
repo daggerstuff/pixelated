@@ -1,0 +1,420 @@
+---
+// BackupSecurityManager.astro
+// Main component for the backup security admin interface
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import BackupConfigurationTab from './backup/BackupConfigurationTab'
+import BackupStatusTab from './backup/BackupStatusTab'
+import BackupRecoveryTab from './backup/BackupRecoveryTab'
+import BackupReportTab from './backup/BackupReportTab'
+
+// Import all types from the backup-types.ts file
+import {
+  BackupType,
+  BackupStatus,
+  RecoveryTestStatus,
+  StorageLocation,
+  TestEnvironmentType,
+} from '../../lib/security/backup/backup-types'
+
+// Don't import the BackupSecurityManager class as we're not using it now
+
+// Define interfaces needed for components - these don't need to match the backend exactly
+// as we're only using them for the UI components
+interface Backup {
+  id: string
+  type: BackupType
+  timestamp: string
+  size: number
+  location: StorageLocation
+  status: BackupStatus
+  retentionDate: string
+}
+
+interface RecoveryTest {
+  id: string
+  backupId: string
+  testDate: string
+  status: RecoveryTestStatus
+  timeTaken: number
+  environment: TestEnvironmentType
+  verificationResults: Array<{
+    testCase: string
+    passed: boolean
+    details: Record<string, unknown>
+  }>
+  issues?: Array<{
+    type: string
+    description: string
+    severity: 'low' | 'medium' | 'high' | 'critical'
+  }>
+}
+
+interface BackupConfig {
+  backupTypes: {
+    [BackupType.FULL]: {
+      schedule: string
+      retention: number
+    }
+    [BackupType.DIFFERENTIAL]: {
+      schedule: string
+      retention: number
+    }
+    [BackupType.TRANSACTION]: {
+      schedule: string
+      retention: number
+    }
+  }
+  storageLocations: {
+    [StorageLocation.PRIMARY]: {
+      provider: string
+      bucket: string
+      region?: string
+    }
+    [StorageLocation.SECONDARY]: {
+      provider: string
+      bucket: string
+    }
+  }
+  encryption: {
+    algorithm: string
+    keyRotationDays: number
+  }
+  recoveryTesting: {
+    enabled: boolean
+    schedule: string
+    environment: {
+      type: TestEnvironmentType
+      config: Record<string, unknown>
+    }
+  }
+}
+
+// Define component prop types to match the expected props by the child components
+export interface BackupConfigurationTabProps {
+  config: BackupConfig
+  onUpdateConfig(config: BackupConfig): void
+}
+
+export interface BackupStatusTabProps {
+  backups: Backup[]
+  onCreateBackup(type: BackupType): Promise<Backup>
+  onVerifyBackup(backupId: string): Promise<boolean>
+}
+
+export interface BackupRecoveryTabProps {
+  backups: Backup[]
+  recoveryTests: RecoveryTest[]
+  onStartRecoveryTest(
+    backupId: string,
+    environmentType: TestEnvironmentType,
+  ): Promise<RecoveryTest>
+  onScheduleRecoveryTests(): Promise<void>
+}
+
+export interface BackupReportTabProps {
+  backups: Backup[]
+  recoveryTests: RecoveryTest[]
+}
+
+// This would be replaced with real data in production
+// Here we're showing mock data for UI development
+const mockBackups: Backup[] = [
+  {
+    id: 'backup-1',
+    type: BackupType.FULL,
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
+    size: 1024 * 1024 * 50, // 50 MB
+    location: StorageLocation.PRIMARY,
+    status: BackupStatus.VERIFIED,
+    retentionDate: new Date(
+      Date.now() + 365 * 24 * 60 * 60 * 1000,
+    ).toISOString(), // 1 year
+  },
+  {
+    id: 'backup-2',
+    type: BackupType.DIFFERENTIAL,
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+    size: 1024 * 1024 * 10, // 10 MB
+    location: StorageLocation.PRIMARY,
+    status: BackupStatus.COMPLETED,
+    retentionDate: new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000,
+    ).toISOString(), // 30 days
+  },
+  {
+    id: 'backup-3',
+    type: BackupType.TRANSACTION,
+    timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+    size: 1024 * 1024 * 2, // 2 MB
+    location: StorageLocation.PRIMARY,
+    status: BackupStatus.COMPLETED,
+    retentionDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+  },
+]
+
+const mockRecoveryTests: RecoveryTest[] = [
+  {
+    id: 'test-1',
+    backupId: 'backup-1',
+    testDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+    status: RecoveryTestStatus.PASSED,
+    timeTaken: 2 * 60 * 1000, // 2 minutes
+    environment: TestEnvironmentType.SANDBOX,
+    verificationResults: [
+      {
+        testCase: 'Full Backup Basic Verification',
+        passed: true,
+        details: {
+          description:
+            'Verifies core system functionality after full backup restoration',
+          stepResults: [
+            {
+              step: 'hash-verification',
+              passed: true,
+              actual: '123abc',
+              expected: '123abc',
+            },
+            {
+              step: 'query-verification',
+              passed: true,
+              actual: 1250,
+              details: { query: 'SELECT COUNT(*) FROM users' },
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'test-2',
+    backupId: 'backup-2',
+    testDate: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
+    status: RecoveryTestStatus.FAILED,
+    timeTaken: 3 * 60 * 1000, // 3 minutes
+    environment: TestEnvironmentType.SANDBOX,
+    verificationResults: [
+      {
+        testCase: 'Differential Backup Verification',
+        passed: false,
+        details: {
+          description: 'Verifies changes since last full backup',
+          stepResults: [
+            {
+              step: 'query-verification',
+              passed: false,
+              actual: null,
+              details: { error: 'Database connection timeout' },
+            },
+          ],
+        },
+      },
+    ],
+    issues: [
+      {
+        type: 'verification_failed',
+        description:
+          'Verification failed for test case: Differential Backup Verification',
+        severity: 'high',
+      },
+    ],
+  },
+]
+
+const mockBackupConfig: BackupConfig = {
+  backupTypes: {
+    [BackupType.FULL]: {
+      schedule: '0 0 * * 0', // Weekly on Sunday
+      retention: 365, // 1 year
+    },
+    [BackupType.DIFFERENTIAL]: {
+      schedule: '0 0 * * 1-6', // Daily at midnight
+      retention: 30, // 30 days
+    },
+    [BackupType.TRANSACTION]: {
+      schedule: '0 * * * *', // Hourly
+      retention: 7, // 7 days
+    },
+  },
+  storageLocations: {
+    [StorageLocation.PRIMARY]: {
+      provider: 'aws-s3',
+      bucket: 'primary-backup-bucket',
+      region: 'us-west-2',
+    },
+    [StorageLocation.SECONDARY]: {
+      provider: 'google-cloud-storage',
+      bucket: 'secondary-backup-bucket',
+    },
+  },
+  encryption: {
+    algorithm: 'AES-256-GCM',
+    keyRotationDays: 90,
+  },
+  recoveryTesting: {
+    enabled: true,
+    schedule: '0 2 * * 1', // Every Monday at 2 AM
+    environment: {
+      type: TestEnvironmentType.SANDBOX,
+      config: {},
+    },
+  },
+}
+
+// Handler functions for UI interactions
+// In a production environment, these would call the actual backup manager APIs
+const handleCreateBackup = async (type: BackupType): Promise<Backup> => {
+  // In production this would call backupManager.createBackup(type)
+  console.log(`Creating ${type} backup`)
+  return mockBackups[0] || {
+    id: 'default-backup',
+    type: BackupType.FULL,
+    timestamp: new Date().toISOString(),
+    size: 0,
+    location: StorageLocation.PRIMARY,
+    status: BackupStatus.PENDING,
+    retentionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+  }
+}
+
+const handleVerifyBackup = async (backupId: string): Promise<boolean> => {
+  // In production this would call backupManager.verifyBackup(backupId)
+  console.log(`Verifying backup ${backupId}`)
+  return true // Mock return
+}
+
+const handleStartRecoveryTest = async (
+  backupId: string,
+  environmentType: TestEnvironmentType,
+): Promise<RecoveryTest> => {
+  // In production this would call backupManager.testRecovery(backupId, environmentType)
+  console.log(
+    `Testing recovery for backup ${backupId} in ${environmentType} environment`,
+  )
+
+  // Create a simulated test result
+  const testResult: RecoveryTest = {
+    id: `test-${Date.now()}`,
+    backupId,
+    testDate: new Date().toISOString(),
+    status:
+      Math.random() > 0.2
+        ? RecoveryTestStatus.PASSED
+        : RecoveryTestStatus.FAILED,
+    timeTaken: Math.floor(Math.random() * 120000) + 30000, // 30s to 2.5m
+    environment: environmentType,
+    verificationResults: [
+      {
+        testCase: 'Basic Recovery Test',
+        passed: Math.random() > 0.2,
+        details: {
+          description: 'Verifies that backup can be restored correctly',
+        },
+      },
+    ],
+  }
+
+  // If the test failed, add some issues
+  if (testResult.status === RecoveryTestStatus.FAILED) {
+    testResult.issues = [
+      {
+        type: 'verification_failed',
+        description: 'Verification failed for test case: Basic Recovery Test',
+        severity: 'high',
+      },
+    ]
+  }
+
+  return testResult
+}
+
+const handleScheduleRecoveryTests = async (): Promise<void> => {
+  // In production this would call backupManager.scheduleRecoveryTests()
+  console.log('Scheduling automated recovery tests')
+}
+
+const handleUpdateConfig = (config: BackupConfig): void => {
+  // In production this would update the backup manager configuration
+  console.log('Updating backup configuration', config)
+}
+---
+
+<div class="container mx-auto p-0">
+  <div id="backup-alert" class="hidden mb-4"></div>
+
+  <Tabs defaultValue="status" client:load>
+    <TabsList className="mb-4">
+      <TabsTrigger value="status">Backup Status</TabsTrigger>
+      <TabsTrigger value="config">Configuration</TabsTrigger>
+      <TabsTrigger value="recovery">Recovery Testing</TabsTrigger>
+      <TabsTrigger value="reports">Reports</TabsTrigger>
+    </TabsList>
+
+    <TabsContent value="status" className="space-y-4">
+      <BackupStatusTab
+        backups={mockBackups}
+        onCreateBackup={handleCreateBackup}
+        onVerifyBackup={handleVerifyBackup}
+        client:load
+      />
+    </TabsContent>
+
+    <TabsContent value="config" className="space-y-4">
+      <BackupConfigurationTab
+        config={mockBackupConfig}
+        onUpdateConfig={(config: any) => handleUpdateConfig(config)}
+        client:load
+      />
+    </TabsContent>
+
+    <TabsContent value="recovery" className="space-y-4">
+      <BackupRecoveryTab
+        backups={mockBackups}
+        recoveryTests={mockRecoveryTests}
+        onStartRecoveryTest={handleStartRecoveryTest}
+        onScheduleRecoveryTests={handleScheduleRecoveryTests}
+        client:load
+      />
+    </TabsContent>
+
+    <TabsContent value="reports" className="space-y-4">
+      <BackupReportTab
+        backups={mockBackups}
+        recoveryTests={mockRecoveryTests}
+        client:load
+      />
+    </TabsContent>
+  </Tabs>
+</div>
+
+<script>
+  // Client-side initialization and event handlers
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize alert system for backup notifications
+    const alertContainer = document.getElementById('backup-alert')
+
+    if (alertContainer) {
+      // Example of showing an alert
+      // In production, this would be triggered by server events or status changes
+      /*
+      alertContainer.classList.remove('hidden');
+      alertContainer.innerHTML = `
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-amber-700">
+                Automated backup verification is in progress. Results will be available shortly.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+      */
+    }
+  })
+</script>

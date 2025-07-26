@@ -1,0 +1,653 @@
+---
+export const prerender = false
+import { requirePermission } from '@/lib/access-control'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+// Check if user has admin permission
+const checkPermission = requirePermission('read:admin')
+const permissionResponse = await checkPermission({
+  cookies: Astro.cookies,
+  redirect: Astro.redirect,
+})
+
+// If permission check returned a response, return i
+if (permissionResponse) {
+  return permissionResponse
+}
+
+// Get the current user
+---
+
+<BaseLayout title="High-Risk Crisis Detections">
+  <main class="admin-container">
+    <div class="admin-header">
+      <h1>High-Risk Crisis Detections</h1>
+      <p>
+        Review and manage high-risk crisis detections identified by the AI
+        system.
+      </p>
+    </div>
+
+    <div class="admin-actions">
+      <a href="/admin" class="btn btn-secondary">Back to Admin Dashboard</a>
+      <div class="action-buttons">
+        <button id="refresh-btn" class="btn btn-primary">Refresh Data</button>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Important:</strong> High-risk detections require immediate attention.
+      Review each case carefully and follow the crisis response protocol.
+    </div>
+
+    <div class="data-table-container">
+      <div class="table-header">
+        <h2>Crisis Detections</h2>
+        <div class="pagination">
+          <button id="prev-page" class="btn btn-sm btn-outline" disabled
+            >Previous</button
+          >
+          <span id="page-info">Page 1</span>
+          <button id="next-page" class="btn btn-sm btn-outline">Next</button>
+        </div>
+      </div>
+
+      <table class="data-table" id="crisis-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Risk Level</th>
+            <th>Crisis Type</th>
+            <th>Confidence</th>
+            <th>Text</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="7" class="loading-row">Loading data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Crisis Details Modal -->
+    <div id="crisis-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Crisis Detection Details</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="crisis-details">
+            <div class="detail-row">
+              <strong>Date:</strong>
+              <span id="detail-date"></span>
+            </div>
+            <div class="detail-row">
+              <strong>User ID:</strong>
+              <span id="detail-user"></span>
+            </div>
+            <div class="detail-row">
+              <strong>Risk Level:</strong>
+              <span id="detail-risk"></span>
+            </div>
+            <div class="detail-row">
+              <strong>Crisis Type:</strong>
+              <span id="detail-type"></span>
+            </div>
+            <div class="detail-row">
+              <strong>Confidence:</strong>
+              <span id="detail-confidence"></span>
+            </div>
+            <div class="detail-row">
+              <strong>Model:</strong>
+              <span id="detail-model"></span>
+            </div>
+            <div class="detail-row full-width">
+              <strong>Text:</strong>
+              <div id="detail-text" class="detail-text"></div>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button id="mark-reviewed-btn" class="btn btn-primary"
+              >Mark as Reviewed</button
+            >
+            <button id="escalate-btn" class="btn btn-danger">Escalate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  // Pagination state
+  let currentPage = 0
+  const pageSize = 10
+  let totalItems = 0
+
+  // Define the crisis detection type
+  interface CrisisDetection {
+    id: string
+    createdAt: string
+    userId: string
+    riskLevel: string
+    crisisType: string | null
+    confidence: number
+    text: string
+    modelId: string
+  }
+
+  let crisisData: CrisisDetection[] = []
+
+  // Fetch high-risk crisis detections
+  async function fetchCrisisDetections(page = 0) {
+    try {
+      const offset = page * pageSize
+      const response = await fetch(
+        `/api/ai/high-risk-detections?limit=${pageSize}&offset=${offset}`,
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch crisis detections')
+      }
+
+      const data = await response.json()
+      totalItems = data.total || data.detections.length
+      return data.detections
+    } catch (error) {
+      console.error('Error fetching crisis detections:', error)
+      return []
+    }
+  }
+
+  // Format date for display
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleString()
+  }
+
+  // Truncate text for table display
+  function truncateText(text: string, maxLength = 100): string {
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + '...'
+  }
+
+  // Get color class based on risk level
+  function getRiskLevelClass(riskLevel: string): string {
+    switch (riskLevel.toLowerCase()) {
+      case 'critical':
+        return 'risk-critical'
+      case 'high':
+        return 'risk-high'
+      case 'medium':
+        return 'risk-medium'
+      case 'low':
+        return 'risk-low'
+      default:
+        return ''
+    }
+  }
+
+  // Update the table with the fetched data
+  async function updateTable() {
+    const detections = await fetchCrisisDetections(currentPage)
+    crisisData = detections as CrisisDetection[]
+
+    const tableBody = document.querySelector('#crisis-table tbody')
+    if (!tableBody) return
+
+    if (!detections || detections.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty-row">No high-risk crisis detections found</td>
+        </tr>
+      `
+      return
+    }
+
+    tableBody.innerHTML = ''
+
+    detections.forEach((detection: CrisisDetection, index: number) => {
+      const row = document.createElement('tr')
+
+      const riskClass = getRiskLevelClass(detection.riskLevel)
+
+      row.innerHTML = `
+        <td>${formatDate(detection.createdAt)}</td>
+        <td>${detection.userId}</td>
+        <td><span class="risk-badge ${riskClass}">${detection.riskLevel}</span></td>
+        <td>${detection.crisisType || 'Unspecified'}</td>
+        <td>${(detection.confidence * 100).toFixed(1)}%</td>
+        <td class="text-cell">${truncateText(detection.text)}</td>
+        <td>
+          <button class="btn btn-sm btn-outline view-details" data-index="${index}">View Details</button>
+        </td>
+      `
+
+      tableBody.appendChild(row)
+    })
+
+    // Update pagination
+    updatePagination()
+
+    // Add event listeners to view details buttons
+    document.querySelectorAll('.view-details').forEach((button) => {
+      button.addEventListener('click', () => {
+        const index = parseInt(button.getAttribute('data-index') || '0')
+        showCrisisDetails(index)
+      })
+    })
+  }
+
+  // Update pagination controls
+  function updatePagination() {
+    const pageInfo = document.getElementById('page-info')
+    const prevButton = document.getElementById(
+      'prev-page',
+    ) as HTMLButtonElement | null
+    const nextButton = document.getElementById(
+      'next-page',
+    ) as HTMLButtonElement | null
+
+    if (!pageInfo || !prevButton || !nextButton) return
+
+    const totalPages = Math.ceil(totalItems / pageSize)
+    pageInfo.textContent = `Page ${currentPage + 1} of ${totalPages || 1}`
+
+    prevButton.disabled = currentPage <= 0
+    nextButton.disabled = currentPage >= totalPages - 1 || totalPages === 0
+  }
+
+  // Show crisis details in modal
+  function showCrisisDetails(index: number) {
+    const detection = crisisData[index]
+    if (!detection) return
+
+    // Update modal content
+    const detailDate = document.getElementById('detail-date')
+    const detailUser = document.getElementById('detail-user')
+    const detailRisk = document.getElementById('detail-risk')
+    const detailType = document.getElementById('detail-type')
+    const detailConfidence = document.getElementById('detail-confidence')
+    const detailModel = document.getElementById('detail-model')
+    const detailText = document.getElementById('detail-text')
+
+    if (detailDate) detailDate.textContent = formatDate(detection.createdAt)
+    if (detailUser) detailUser.textContent = detection.userId
+    if (detailRisk) {
+      detailRisk.textContent = detection.riskLevel
+      detailRisk.className = getRiskLevelClass(detection.riskLevel)
+    }
+    if (detailType)
+      detailType.textContent = detection.crisisType || 'Unspecified'
+    if (detailConfidence)
+      detailConfidence.textContent = `${(detection.confidence * 100).toFixed(1)}%`
+    if (detailModel) detailModel.textContent = detection.modelId
+    if (detailText) detailText.textContent = detection.text
+
+    // Show modal
+    const modal = document.getElementById('crisis-modal')
+    if (modal) modal.style.display = 'block'
+  }
+
+  // Close modal
+  function closeModal() {
+    const modal = document.getElementById('crisis-modal')
+    if (modal) modal.style.display = 'none'
+  }
+
+  // Initialize the page
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initial table load
+    updateTable()
+
+    // Refresh button
+    const refreshBtn = document.getElementById('refresh-btn')
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        updateTable()
+      })
+    }
+
+    // Pagination buttons
+    const prevButton = document.getElementById('prev-page')
+    const nextButton = document.getElementById('next-page')
+
+    if (prevButton) {
+      prevButton.addEventListener('click', () => {
+        if (currentPage > 0) {
+          currentPage--
+          updateTable()
+        }
+      })
+    }
+
+    if (nextButton) {
+      nextButton.addEventListener('click', () => {
+        currentPage++
+        updateTable()
+      })
+    }
+
+    // Modal close button
+    const closeBtn = document.querySelector('.close-btn')
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal)
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      const modal = document.getElementById('crisis-modal')
+      if (event.target === modal) {
+        closeModal()
+      }
+    })
+
+    // Mock action buttons in modal
+    const markReviewedBtn = document.getElementById('mark-reviewed-btn')
+    const escalateBtn = document.getElementById('escalate-btn')
+
+    if (markReviewedBtn) {
+      markReviewedBtn.addEventListener('click', () => {
+        alert(
+          'Crisis marked as reviewed. This would update the status in a real implementation.',
+        )
+        closeModal()
+      })
+    }
+
+    if (escalateBtn) {
+      escalateBtn.addEventListener('click', () => {
+        alert(
+          'Crisis escalated to emergency response team. This would trigger notifications in a real implementation.',
+        )
+        closeModal()
+      })
+    }
+  })
+</script>
+
+<style>
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .admin-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-sm {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+
+  .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #2563eb;
+  }
+
+  .btn-danger {
+    background-color: #ef4444;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background-color: #dc2626;
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #333;
+  }
+
+  .btn-outline:hover {
+    background-color: #f5f5f5;
+  }
+
+  .alert {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+
+  .alert-warning {
+    background-color: #fff7ed;
+    border-left: 4px solid #f97316;
+    color: #9a3412;
+  }
+
+  .data-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .table-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+
+  .data-table th {
+    font-weight: 600;
+    color: #666;
+  }
+
+  .text-cell {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .loading-row,
+  .empty-row {
+    text-align: center;
+    color: #666;
+    padding: 2rem 0;
+  }
+
+  .risk-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+
+  .risk-critical {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+
+  .risk-high {
+    background-color: #fef3c7;
+    color: #b45309;
+  }
+
+  .risk-medium {
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
+
+  .risk-low {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(_0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: white;
+    margin: 10% auto;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(_0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .detail-row {
+    margin-bottom: 1rem;
+    display: flex;
+  }
+
+  .detail-row strong {
+    width: 120px;
+    display: inline-block;
+  }
+
+  .detail-row.full-width {
+    display: block;
+  }
+
+  .detail-text {
+    margin-top: 0.5rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 4px;
+    white-space: pre-wrap;
+  }
+
+  .modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 768px) {
+    .admin-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .table-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .data-table {
+      display: block;
+      overflow-x: auto;
+    }
+
+    .modal-content {
+      width: 95%;
+      margin: 5% auto;
+    }
+  }
+</style>

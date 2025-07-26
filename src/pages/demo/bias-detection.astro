@@ -1,0 +1,1086 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import Button from '@/components/ui/Button.astro'
+import Badge from '@/components/ui/Badge.astro'
+
+export const prerender = false // Enable SSR for real-time functionality
+---
+
+<BaseLayout
+  title="Bias Detection Engine - Live Demo"
+  description="Interactive demonstration of our AI bias detection capabilities in therapeutic training scenarios"
+  bgType="plum"
+>
+  <div class="min-h-screen text-white py-8">
+    <div class="container mx-auto px-4">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <div class="mb-6">
+          <Badge
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 rounded-full"
+          >
+            <span class="relative flex h-3 w-3">
+              <span
+                class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+              ></span>
+              <span
+                class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"
+              ></span>
+            </span>
+            Live Demo Active
+          </Badge>
+        </div>
+        <h1 class="text-4xl lg:text-5xl font-bold mb-6">
+          Bias Detection Engine
+          <span class="text-emerald-400 block mt-2">Interactive Demo</span>
+        </h1>
+        <p class="text-lg text-green-100/90 max-w-3xl mx-auto">
+          Experience our AI-powered bias detection system in real-time. Test
+          different therapeutic scenarios and see how our engine identifies
+          potential bias patterns across multiple analysis layers.
+        </p>
+      </div>
+
+      <!-- Main Demo Interface -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- Input Panel -->
+        <Card
+          class="border border-emerald-600/30 bg-gray-900/50 backdrop-blur"
+        >
+          <CardHeader>
+            <CardTitle class="text-emerald-100 flex items-center gap-2">
+              🎭 Scenario Input
+            </CardTitle>
+            <CardDescription class="text-emerald-200/80">
+              Enter a therapeutic training scenario to analyze for potential
+              bias
+            </CardDescription>
+          </CardHeader>
+          <CardContent class="space-y-6">
+            <!-- Session Details -->
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-emerald-200 mb-2"
+                  >Session Scenario</label
+                >
+                <select
+                  id="scenario-select"
+                  class="w-full p-3 bg-gray-800 border border-emerald-500/30 rounded-lg text-white focus:ring-2 focus:ring-emerald-400"
+                >
+                  <option value="anxiety-treatment"
+                    >Anxiety Treatment Session</option
+                  >
+                  <option value="trauma-therapy">Trauma-Informed Therapy</option
+                  >
+                  <option value="substance-abuse"
+                    >Substance Abuse Counseling</option
+                  >
+                  <option value="family-therapy">Family Therapy Session</option>
+                  <option value="crisis-intervention"
+                    >Crisis Intervention</option
+                  >
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-emerald-200 mb-2"
+                  >Participant Demographics</label
+                >
+                <div class="grid grid-cols-2 gap-3">
+                  <select
+                    id="age-select"
+                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
+                  >
+                    <option value="18-25">18-25 years</option>
+                    <option value="26-35">26-35 years</option>
+                    <option value="36-50">36-50 years</option>
+                    <option value="51-65">51-65 years</option>
+                    <option value="65+">65+ years</option>
+                  </select>
+                  <select
+                    id="gender-select"
+                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
+                  >
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                    <option value="non-binary">Non-binary</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                  </select>
+                  <select
+                    id="ethnicity-select"
+                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
+                  >
+                    <option value="hispanic">Hispanic/Latino</option>
+                    <option value="white">White</option>
+                    <option value="black">Black/African American</option>
+                    <option value="asian">Asian</option>
+                    <option value="native">Native American</option>
+                    <option value="mixed">Mixed/Other</option>
+                  </select>
+                  <select
+                    id="language-select"
+                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
+                  >
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="zh">Chinese</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-emerald-200 mb-2"
+                  >Session Content</label
+                >
+                <textarea
+                  id="session-content"
+                  rows="4"
+                  class="w-full p-3 bg-gray-800 border border-emerald-500/30 rounded-lg text-white focus:ring-2 focus:ring-emerald-400"
+                  placeholder="Enter the therapeutic session dialogue or describe the interaction scenario..."
+                  >Therapist: How are you feeling today? Patient: I've been
+                  struggling with anxiety about my job interview tomorrow.
+                  Therapist: That sounds challenging. Can you tell me more about
+                  what specifically worries you? Patient: I'm worried they'll
+                  judge me because of my background.</textarea
+                >
+              </div>
+            </div>
+
+            <!-- Preset Scenarios -->
+            <div>
+              <label class="block text-sm font-medium text-emerald-200 mb-2"
+                >Quick Test Scenarios</label
+              >
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  id="preset-bias-high"
+                  class="p-2 bg-red-500/20 border border-red-400/30 rounded text-red-200 text-xs hover:bg-red-500/30"
+                >
+                  🚨 High Bias Test
+                </button>
+                <button
+                  id="preset-bias-low"
+                  class="p-2 bg-green-500/20 border border-green-400/30 rounded text-green-200 text-xs hover:bg-green-500/30"
+                >
+                  ✅ Low Bias Test
+                </button>
+                <button
+                  id="preset-cultural"
+                  class="p-2 bg-blue-500/20 border border-blue-400/30 rounded text-blue-200 text-xs hover:bg-blue-500/30"
+                >
+                  🌍 Cultural Test
+                </button>
+                <button
+                  id="preset-gender"
+                  class="p-2 bg-orange-500/20 border border-orange-400/30 rounded text-orange-200 text-xs hover:bg-orange-500/30"
+                >
+                  ⚧ Gender Test
+                </button>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+              <Button
+                id="analyze-btn"
+                class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-gray-900 font-semibold py-3"
+              >
+                🔍 Analyze for Bias
+              </Button>
+              <Button
+                id="export-btn"
+                class="px-6 bg-blue-500 hover:bg-blue-400 text-white font-semibold py-3 hidden"
+              >
+                📥 Export Results
+              </Button>
+              <Button
+                id="clear-btn"
+                variant="outline"
+                class="px-6 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
+              >
+                Clear
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Results Panel -->
+        <Card
+          class="border border-blue-600/30 bg-gray-900/50 backdrop-blur"
+        >
+          <CardHeader>
+            <CardTitle class="text-blue-100 flex items-center gap-2">
+              📊 Analysis Results
+            </CardTitle>
+            <CardDescription class="text-blue-200/80">
+              Real-time bias detection results across multiple analysis layers
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <!-- Loading State -->
+            <div id="loading-state" class="hidden text-center py-8">
+              <div
+                class="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full mx-auto mb-4"
+              >
+              </div>
+              <p class="text-blue-200">
+                Analyzing session for bias patterns...
+              </p>
+            </div>
+
+            <!-- Results Display -->
+            <div id="results-display" class="space-y-6">
+              <div class="text-center py-8 text-gray-400">
+                <div class="text-4xl mb-4">🎯</div>
+                <p>Run an analysis to see bias detection results</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Real-time Dashboard -->
+      <Card
+        class="border border-cyan-600/30 bg-gray-900/50 backdrop-blur mb-12"
+      >
+        <CardHeader>
+          <CardTitle class="text-cyan-100 flex items-center gap-2">
+            📈 Real-time Dashboard
+          </CardTitle>
+          <CardDescription class="text-cyan-200/80">
+            Live system metrics and analysis trends
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Metrics Cards -->
+            <div
+              class="bg-cyan-500/10 border border-cyan-400/30 rounded-lg p-4 text-center"
+            >
+              <div
+                class="text-2xl font-bold text-cyan-300"
+                id="total-analyses"
+              >
+                0
+              </div>
+              <div class="text-sm text-cyan-200/80">Total Analyses</div>
+            </div>
+            <div
+              class="bg-green-500/10 border border-green-400/30 rounded-lg p-4 text-center"
+            >
+              <div
+                class="text-2xl font-bold text-green-300"
+                id="avg-bias-score"
+              >
+                0.00
+              </div>
+              <div class="text-sm text-green-200/80">Avg Bias Score</div>
+            </div>
+            <div
+              class="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4 text-center"
+            >
+              <div
+                class="text-2xl font-bold text-yellow-300"
+                id="active-alerts"
+              >
+                0
+              </div>
+              <div class="text-sm text-yellow-200/80">Active Alerts</div>
+            </div>
+            <div
+              class="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4 text-center"
+            >
+              <div class="text-2xl font-bold text-blue-300" id="system-health">
+                95%
+              </div>
+              <div class="text-sm text-blue-200/80">System Health</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Feature Showcase -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <Card
+          class="border border-green-600/30 hover:border-green-400/60 transition-all duration-300"
+        >
+          <CardHeader>
+            <div class="text-4xl mb-3">🔍</div>
+            <CardTitle class="text-green-100"
+              >Multi-Layer Analysis</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <CardDescription class="text-green-200/80">
+              Four-layer deep analysis: preprocessing, model-level, interactive
+              behavior, and evaluation metrics.
+            </CardDescription>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span>Linguistic bias detection</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span>Fairness metrics analysis</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span>Counterfactual scenarios</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card
+          class="border border-blue-600/30 hover:border-blue-400/60 transition-all duration-300"
+        >
+          <CardHeader>
+            <div class="text-4xl mb-3">⚡</div>
+            <CardTitle class="text-blue-100">Real-time Monitoring</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <CardDescription class="text-blue-200/80">
+              Continuous monitoring with instant alerts and adaptive thresholds
+              for bias detection.
+            </CardDescription>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span>Instant bias alerts</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span>Adaptive thresholds</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span>Performance tracking</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card
+          class="border border-orange-600/30 hover:border-orange-400/60 transition-all duration-300"
+        >
+          <CardHeader>
+            <div class="text-4xl mb-3">🛡️</div>
+            <CardTitle class="text-orange-100">HIPAA Compliant</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CardDescription class="text-orange-200/80">
+              Military-grade security with comprehensive audit logging and
+              zero-knowledge architecture.
+            </CardDescription>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span>Encrypted analysis</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span>Audit trails</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span>Zero data retention</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo JavaScript -->
+  <script>
+    class BiasDetectionDemo {
+      sessionId: string
+      lastResults: any = null
+
+      constructor() {
+        this.sessionId = this.generateSessionId()
+        this.initializeEventListeners()
+        this.initializeDashboard()
+        this.startRealTimeUpdates()
+      }
+
+      generateSessionId() {
+        return (
+          'demo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+        )
+      }
+
+      initializeEventListeners() {
+        const analyzeBtn = document.getElementById('analyze-btn')
+        const clearBtn = document.getElementById('clear-btn')
+        const exportBtn = document.getElementById('export-btn')
+
+        // Preset scenario buttons
+        document
+          .getElementById('preset-bias-high')
+          ?.addEventListener('click', () =>
+            this.loadPresetScenario('high-bias'),
+          )
+        document
+          .getElementById('preset-bias-low')
+          ?.addEventListener('click', () => this.loadPresetScenario('low-bias'))
+        document
+          .getElementById('preset-cultural')
+          ?.addEventListener('click', () => this.loadPresetScenario('cultural'))
+        document
+          .getElementById('preset-gender')
+          ?.addEventListener('click', () => this.loadPresetScenario('gender'))
+
+        analyzeBtn?.addEventListener('click', () => this.runAnalysis())
+        clearBtn?.addEventListener('click', () => this.clearInputs())
+        exportBtn?.addEventListener('click', () => this.exportResults())
+      }
+
+      initializeDashboard() {
+        // Initialize with demo data
+        this.updateDashboardMetrics({
+          totalAnalyses: 247,
+          avgBiasScore: 0.23,
+          activeAlerts: 2,
+          systemHealth: 98,
+        })
+      }
+
+      async runAnalysis() {
+        const loadingState = document.getElementById('loading-state')
+        const resultsDisplay = document.getElementById('results-display')
+        const analyzeBtn = document.getElementById(
+          'analyze-btn',
+        ) as HTMLButtonElement
+
+        // Show loading state
+        loadingState?.classList.remove('hidden')
+        resultsDisplay?.classList.add('hidden')
+        if (analyzeBtn) {
+          analyzeBtn.textContent = '🔄 Analyzing...'
+          analyzeBtn.disabled = true
+        }
+
+        try {
+          // Collect input data
+          const sessionData = this.collectSessionData()
+
+          // Simulate analysis delay for realistic demo
+          await this.delay(2000)
+
+          // Generate demo analysis results
+          const results = this.generateDemoResults(sessionData)
+
+          // Store results for export
+          this.lastResults = results
+
+          // Display results
+          this.displayResults(results)
+
+          // Show export button
+          const exportBtn = document.getElementById('export-btn')
+          if (exportBtn) exportBtn.classList.remove('hidden')
+
+          // Update dashboard
+          this.updateDashboardFromAnalysis(results)
+        } catch (error) {
+          console.error('Analysis error:', error)
+          this.displayError('Analysis failed. Please try again.')
+        } finally {
+          // Hide loading state
+          loadingState?.classList.add('hidden')
+          resultsDisplay?.classList.remove('hidden')
+          if (analyzeBtn) {
+            analyzeBtn.textContent = '🔍 Analyze for Bias'
+            analyzeBtn.disabled = false
+          }
+        }
+      }
+
+      collectSessionData() {
+        return {
+          sessionId: this.sessionId,
+          scenario:
+            (document.getElementById('scenario-select') as HTMLSelectElement)
+              ?.value || '',
+          demographics: {
+            age:
+              (document.getElementById('age-select') as HTMLSelectElement)
+                ?.value || '',
+            gender:
+              (document.getElementById('gender-select') as HTMLSelectElement)
+                ?.value || '',
+            ethnicity:
+              (document.getElementById('ethnicity-select') as HTMLSelectElement)
+                ?.value || '',
+            primaryLanguage:
+              (document.getElementById('language-select') as HTMLSelectElement)
+                ?.value || '',
+          },
+          content:
+            (document.getElementById('session-content') as HTMLTextAreaElement)
+              ?.value || '',
+          timestamp: new Date(),
+        }
+      }
+
+      generateDemoResults(sessionData: any) {
+        // Generate realistic demo results based on input
+        const biasFactors = this.calculateBiasFactors(sessionData)
+
+        return {
+          sessionId: sessionData.sessionId,
+          timestamp: new Date(),
+          overallBiasScore: biasFactors.overall,
+          alertLevel: this.determineAlertLevel(biasFactors.overall),
+          confidence: 0.87 + Math.random() * 0.1,
+          layerResults: {
+            preprocessing: {
+              biasScore: biasFactors.linguistic,
+              linguisticBias: {
+                genderBiasScore: biasFactors.gender,
+                racialBiasScore: biasFactors.racial,
+                ageBiasScore: biasFactors.age,
+                culturalBiasScore: biasFactors.cultural,
+              },
+              representationAnalysis: {
+                diversityIndex: 0.65 + Math.random() * 0.2,
+                underrepresentedGroups:
+                  biasFactors.overall > 0.5 ? ['elderly', 'non-english'] : [],
+              },
+            },
+            modelLevel: {
+              biasScore: biasFactors.model,
+              fairnessMetrics: {
+                demographicParity: 0.8 - biasFactors.overall * 0.3,
+                equalizedOdds: 0.75 + Math.random() * 0.15,
+                calibration: 0.82 - biasFactors.overall * 0.2,
+              },
+            },
+            interactive: {
+              biasScore: biasFactors.interactive,
+              counterfactualAnalysis: {
+                scenariosAnalyzed: 12,
+                biasDetected: biasFactors.overall > 0.4,
+                consistencyScore: 0.8 - biasFactors.overall * 0.3,
+              },
+            },
+            evaluation: {
+              biasScore: biasFactors.evaluation,
+              huggingFaceMetrics: {
+                bias: biasFactors.overall * 0.8,
+                stereotype: biasFactors.cultural * 1.2,
+                regard: { positive: 0.7, negative: 0.3 },
+              },
+            },
+          },
+          recommendations: this.generateRecommendations(biasFactors),
+          demographics: sessionData.demographics,
+        }
+      }
+
+      calculateBiasFactors(sessionData: any) {
+        const content = sessionData.content.toLowerCase()
+        const demographics = sessionData.demographics
+
+        // Simulate bias detection based on content and demographics
+        let linguistic = 0.15 + Math.random() * 0.1
+        let gender = 0.1
+        let racial = 0.08
+        let age = 0.12
+        let cultural = 0.09
+
+        // Content-based factors
+        if (content.includes('judge') || content.includes('background')) {
+          racial += 0.2
+          cultural += 0.15
+        }
+        if (content.includes('anxiety') && demographics.age === '65+') {
+          age += 0.25
+        }
+        if (content.includes('job') && demographics.gender === 'female') {
+          gender += 0.18
+        }
+
+        // Demographic-based factors
+        if (demographics.ethnicity !== 'white') {
+          racial += 0.1
+          cultural += 0.12
+        }
+        if (demographics.primaryLanguage !== 'en') {
+          linguistic += 0.2
+          cultural += 0.15
+        }
+
+        const overall = (linguistic + gender + racial + age + cultural) / 5
+
+        return {
+          overall: Math.min(overall, 0.95),
+          linguistic: Math.min(linguistic, 0.9),
+          gender: Math.min(gender, 0.8),
+          racial: Math.min(racial, 0.8),
+          age: Math.min(age, 0.8),
+          cultural: Math.min(cultural, 0.8),
+          model: overall * 0.9 + Math.random() * 0.1,
+          interactive: overall * 0.85 + Math.random() * 0.15,
+          evaluation: overall * 0.8 + Math.random() * 0.2,
+        }
+      }
+
+      determineAlertLevel(biasScore: number): string {
+        if (biasScore >= 0.8) return 'critical'
+        if (biasScore >= 0.6) return 'high'
+        if (biasScore >= 0.4) return 'medium'
+        return 'low'
+      }
+
+      generateRecommendations(biasFactors: any): string[] {
+        const recommendations: string[] = []
+
+        if (biasFactors.overall > 0.6) {
+          recommendations.push(
+            'High bias detected - implement immediate mitigation strategies',
+          )
+        }
+        if (biasFactors.racial > 0.3) {
+          recommendations.push(
+            'Review content for racial bias patterns and cultural sensitivity',
+          )
+        }
+        if (biasFactors.gender > 0.3) {
+          recommendations.push(
+            'Analyze gender-based assumptions in therapeutic responses',
+          )
+        }
+        if (biasFactors.age > 0.3) {
+          recommendations.push(
+            'Consider age-appropriate communication strategies',
+          )
+        }
+        if (biasFactors.cultural > 0.3) {
+          recommendations.push(
+            'Enhance cultural competency in therapeutic approach',
+          )
+        }
+
+        return recommendations
+      }
+
+      displayResults(results: any): void {
+        const resultsDisplay = document.getElementById('results-display')
+        if (!resultsDisplay) return
+
+        const alertLevelColors: Record<string, string> = {
+          low: 'text-green-400 bg-green-500/20 border-green-400/40',
+          medium: 'text-yellow-400 bg-yellow-500/20 border-yellow-400/40',
+          high: 'text-orange-400 bg-orange-500/20 border-orange-400/40',
+          critical: 'text-red-400 bg-red-500/20 border-red-400/40',
+        }
+
+        resultsDisplay.innerHTML = `
+          <!-- Overall Score -->
+          <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-blue-100">Overall Bias Analysis</h3>
+              <span class="px-3 py-1 rounded-full text-sm font-medium ${alertLevelColors[results.alertLevel] || alertLevelColors['low']}">
+                ${results.alertLevel.toUpperCase()}
+              </span>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-2xl font-bold text-blue-300">${(results.overallBiasScore * 100).toFixed(1)}%</div>
+                <div class="text-sm text-blue-200/80">Bias Score</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-green-300">${(results.confidence * 100).toFixed(1)}%</div>
+                <div class="text-sm text-green-200/80">Confidence</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Layer Results -->
+          <div class="space-y-4">
+            <h4 class="text-lg font-semibold text-blue-100">Layer Analysis</h4>
+            ${this.renderLayerResult('Preprocessing', results.layerResults.preprocessing)}
+            ${this.renderLayerResult('Model Level', results.layerResults.modelLevel)}
+            ${this.renderLayerResult('Interactive', results.layerResults.interactive)}
+            ${this.renderLayerResult('Evaluation', results.layerResults.evaluation)}
+          </div>
+
+          <!-- Counterfactual Analysis -->
+          <div class="bg-indigo-500/10 border border-indigo-400/30 rounded-lg p-4">
+            <h4 class="text-lg font-semibold text-indigo-200 mb-3">🔄 Counterfactual Analysis</h4>
+            <div class="space-y-3">
+              ${this.renderCounterfactualScenarios()}
+            </div>
+          </div>
+
+          <!-- Historical Comparison -->
+          <div class="bg-cyan-500/10 border border-cyan-400/30 rounded-lg p-4">
+            <h4 class="text-lg font-semibold text-cyan-200 mb-3">📈 Historical Comparison</h4>
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div class="text-lg font-bold text-cyan-300">${this.getHistoricalAverage()}%</div>
+                <div class="text-xs text-cyan-200/80">30-Day Average</div>
+              </div>
+              <div>
+                <div class="text-lg font-bold ${results.overallBiasScore > this.getHistoricalAverage() / 100 ? 'text-red-300' : 'text-green-300'}">
+                  ${results.overallBiasScore > this.getHistoricalAverage() / 100 ? '↗️' : '↘️'} ${Math.abs(results.overallBiasScore * 100 - this.getHistoricalAverage()).toFixed(1)}%
+                </div>
+                <div class="text-xs text-cyan-200/80">vs Average</div>
+              </div>
+              <div>
+                <div class="text-lg font-bold text-cyan-300">${this.getTrendDirection()}</div>
+                <div class="text-xs text-cyan-200/80">Trend</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          ${
+            results.recommendations.length > 0
+              ? `
+            <div class="bg-amber-500/10 border border-amber-400/30 rounded-lg p-4">
+              <h4 class="text-lg font-semibold text-amber-200 mb-3">🚨 Recommendations</h4>
+              <ul class="space-y-2">
+                ${results.recommendations
+                  .map(
+                    (rec: string) => `
+                  <li class="flex items-start gap-2 text-sm text-amber-100">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></span>
+                    ${rec}
+                  </li>
+                `,
+                  )
+                  .join('')}
+              </ul>
+            </div>
+          `
+              : ''
+          }
+        `
+      }
+
+      renderLayerResult(layerName: string, layerData: any): string {
+        const score = (layerData.biasScore * 100).toFixed(1)
+        const scoreColor =
+          layerData.biasScore > 0.6
+            ? 'text-red-400'
+            : layerData.biasScore > 0.4
+              ? 'text-yellow-400'
+              : 'text-green-400'
+
+        return `
+          <div class="bg-gray-800/30 rounded-lg p-4 border border-gray-600/20">
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-gray-200">${layerName}</span>
+              <span class="font-bold ${scoreColor}">${score}%</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+              <div class="bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 h-2 rounded-full" 
+                   style="width: ${score}%"></div>
+            </div>
+          </div>
+        `
+      }
+
+      updateDashboardMetrics(metrics: any): void {
+        const totalEl = document.getElementById('total-analyses')
+        const avgEl = document.getElementById('avg-bias-score')
+        const alertsEl = document.getElementById('active-alerts')
+        const healthEl = document.getElementById('system-health')
+
+        if (totalEl) totalEl.textContent = metrics.totalAnalyses.toString()
+        if (avgEl) avgEl.textContent = metrics.avgBiasScore.toFixed(2)
+        if (alertsEl) alertsEl.textContent = metrics.activeAlerts.toString()
+        if (healthEl) healthEl.textContent = metrics.systemHealth + '%'
+      }
+
+      updateDashboardFromAnalysis(results: any): void {
+        const totalEl = document.getElementById('total-analyses')
+        const avgEl = document.getElementById('avg-bias-score')
+        const alertsEl = document.getElementById('active-alerts')
+
+        if (!totalEl || !avgEl || !alertsEl) return
+
+        const currentTotal = parseInt(totalEl.textContent || '0')
+        const currentAvg = parseFloat(avgEl.textContent || '0')
+
+        const newTotal = currentTotal + 1
+        const newAvg =
+          (currentAvg * currentTotal + results.overallBiasScore) / newTotal
+        const currentAlerts = parseInt(alertsEl.textContent || '0')
+        const newAlerts =
+          results.alertLevel !== 'low' ? currentAlerts + 1 : currentAlerts
+
+        this.updateDashboardMetrics({
+          totalAnalyses: newTotal,
+          avgBiasScore: newAvg,
+          activeAlerts: newAlerts,
+          systemHealth: 97 + Math.floor(Math.random() * 3),
+        })
+      }
+
+      clearInputs(): void {
+        const contentEl = document.getElementById(
+          'session-content',
+        ) as HTMLTextAreaElement
+        const resultsEl = document.getElementById('results-display')
+
+        if (contentEl) {
+          contentEl.value =
+            "Therapist: How are you feeling today?\nPatient: I've been struggling with anxiety about my job interview tomorrow.\nTherapist: That sounds challenging. Can you tell me more about what specifically worries you?\nPatient: I'm worried they'll judge me because of my background."
+        }
+        if (resultsEl) {
+          resultsEl.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+              <div class="text-4xl mb-4">🎯</div>
+              <p>Run an analysis to see bias detection results</p>
+            </div>
+          `
+        }
+
+        // Hide export button and clear results
+        const exportBtn = document.getElementById('export-btn')
+        if (exportBtn) exportBtn.classList.add('hidden')
+        this.lastResults = null
+
+        this.sessionId = this.generateSessionId()
+      }
+
+      startRealTimeUpdates(): void {
+        // Simulate real-time dashboard updates
+        setInterval(() => {
+          const healthElement = document.getElementById('system-health')
+          if (healthElement && healthElement.textContent) {
+            const currentHealth = parseInt(healthElement.textContent)
+            const newHealth = Math.max(
+              90,
+              Math.min(100, currentHealth + (Math.random() - 0.5) * 2),
+            )
+            healthElement.textContent = Math.floor(newHealth) + '%'
+          }
+        }, 5000)
+      }
+
+      displayError(message: string): void {
+        const resultsDisplay = document.getElementById('results-display')
+        if (!resultsDisplay) return
+
+        resultsDisplay.innerHTML = `
+          <div class="bg-red-500/10 border border-red-400/30 rounded-lg p-6 text-center">
+            <div class="text-4xl mb-4">⚠️</div>
+            <p class="text-red-200">${message}</p>
+          </div>
+        `
+      }
+
+      loadPresetScenario(type: string): void {
+        const scenarios = {
+          'high-bias': {
+            scenario: 'anxiety-treatment',
+            demographics: {
+              age: '65+',
+              gender: 'female',
+              ethnicity: 'hispanic',
+              primaryLanguage: 'es',
+            },
+            content:
+              'Therapist: You people from your culture tend to be more emotional about these things.\nPatient: I feel judged and misunderstood.\nTherapist: Maybe you should try to be more like American women who handle stress better.',
+          },
+          'low-bias': {
+            scenario: 'anxiety-treatment',
+            demographics: {
+              age: '26-35',
+              gender: 'male',
+              ethnicity: 'white',
+              primaryLanguage: 'en',
+            },
+            content:
+              "Therapist: How are you feeling today?\nPatient: I've been experiencing some anxiety.\nTherapist: That sounds challenging. Can you tell me more about what triggers these feelings?",
+          },
+          'cultural': {
+            scenario: 'family-therapy',
+            demographics: {
+              age: '36-50',
+              gender: 'female',
+              ethnicity: 'asian',
+              primaryLanguage: 'zh',
+            },
+            content:
+              "Therapist: I understand family dynamics can be complex in your culture.\nPatient: Yes, there are expectations I struggle with.\nTherapist: Let's explore how we can honor your cultural values while addressing your individual needs.",
+          },
+          'gender': {
+            scenario: 'crisis-intervention',
+            demographics: {
+              age: '18-25',
+              gender: 'non-binary',
+              ethnicity: 'mixed',
+              primaryLanguage: 'en',
+            },
+            content:
+              'Therapist: I want to make sure I use the right pronouns for you.\nPatient: Thank you, they/them works for me.\nTherapist: How can I best support you today while respecting your identity?',
+          },
+        }
+
+        const preset = scenarios[type as keyof typeof scenarios]
+        if (preset) {
+          ;(
+            document.getElementById('scenario-select') as HTMLSelectElement
+          ).value = preset.scenario
+          ;(document.getElementById('age-select') as HTMLSelectElement).value =
+            preset.demographics.age
+          ;(
+            document.getElementById('gender-select') as HTMLSelectElement
+          ).value = preset.demographics.gender
+          ;(
+            document.getElementById('ethnicity-select') as HTMLSelectElement
+          ).value = preset.demographics.ethnicity
+          ;(
+            document.getElementById('language-select') as HTMLSelectElement
+          ).value = preset.demographics.primaryLanguage
+          ;(
+            document.getElementById('session-content') as HTMLTextAreaElement
+          ).value = preset.content
+        }
+      }
+
+      exportResults(): void {
+        if (!this.lastResults) return
+
+        const exportData = {
+          timestamp: new Date().toISOString(),
+          sessionId: this.lastResults.sessionId,
+          analysis: this.lastResults,
+          metadata: {
+            exportedBy: 'bias-detection-demo',
+            version: '1.0.0',
+          },
+        }
+
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+          type: 'application/json',
+        })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `bias-analysis-${this.lastResults.sessionId}.json`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+
+      renderCounterfactualScenarios(): string {
+        const scenarios = [
+          {
+            change: 'Different Age Group',
+            impact: 'Bias score could decrease by 15-25%',
+            likelihood: 'High',
+          },
+          {
+            change: 'Different Cultural Background',
+            impact: 'Bias patterns may shift significantly',
+            likelihood: 'Medium',
+          },
+          {
+            change: 'Modified Language Use',
+            impact: 'Linguistic bias could reduce by 10-20%',
+            likelihood: 'High',
+          },
+        ]
+
+        return scenarios
+          .map(
+            (scenario) => `
+          <div class="flex justify-between items-center p-2 bg-indigo-500/5 rounded">
+            <div>
+              <div class="text-sm font-medium text-indigo-200">${scenario.change}</div>
+              <div class="text-xs text-indigo-300/80">${scenario.impact}</div>
+            </div>
+            <span class="text-xs px-2 py-1 rounded ${
+              scenario.likelihood === 'High'
+                ? 'bg-green-500/20 text-green-300'
+                : scenario.likelihood === 'Medium'
+                  ? 'bg-yellow-500/20 text-yellow-300'
+                  : 'bg-red-500/20 text-red-300'
+            }">${scenario.likelihood}</span>
+          </div>
+        `,
+          )
+          .join('')
+      }
+
+      getHistoricalAverage(): number {
+        return 23.5 // Simulated 30-day average
+      }
+
+      getTrendDirection(): string {
+        return Math.random() > 0.5 ? 'Improving' : 'Stable'
+      }
+
+      delay(ms: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+      }
+    }
+
+    // Initialize demo when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      void new BiasDetectionDemo()
+    })
+  </script>
+
+  <style>
+    /* Custom animations for the demo */
+    @keyframes pulse-glow {
+      0%,
+      100% {
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+      }
+    }
+
+    .animate-pulse-glow {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    /* Loading animation */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Smooth transitions */
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+
+    /* Button hover effects */
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+  </style>
+</BaseLayout>

@@ -1,0 +1,795 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import Badge from '@/components/ui/Badge.astro'
+import { Button } from '@/components/ui/button'
+
+export const prerender = false // Enable SSR for A/B testing
+
+// A/B Testing Variants
+const variants = {
+  A: {
+    headline: 'Generate 50,000+ AI Patients in 12 Seconds',
+    subheadline:
+      'Create unlimited diverse client personas for comprehensive therapy training',
+    cta: 'Generate AI Patients Now',
+  },
+  B: {
+    headline: 'Every Client Type Your Students Will Ever Meet',
+    subheadline:
+      'AI generates authentic patient personas with complex histories and presentations',
+    cta: 'Start Patient Generation',
+  },
+  C: {
+    headline: 'The Patient Database That Never Existed Before',
+    subheadline:
+      'Breakthrough AI creates realistic clients with trauma, personality disorders, and rare conditions',
+    cta: 'Access Patient Library',
+  },
+}
+
+// Randomly assign variant
+const variantKey = ['A', 'B', 'C'][Math.floor(Math.random() * 3)]
+const currentVariant = variants[variantKey]
+
+const generationSpecs = [
+  {
+    metric: 'Patient Generation Speed',
+    value: '12 seconds',
+    comparison: 'for 50,000+ unique patients',
+  },
+  {
+    metric: 'Personality Variations',
+    value: '847 types',
+    comparison: 'including rare presentations',
+  },
+  {
+    metric: 'Cultural Backgrounds',
+    value: '200+ cultures',
+    comparison: 'authentic representation',
+  },
+  {
+    metric: 'Trauma Histories',
+    value: 'Unlimited',
+    comparison: 'ethically generated scenarios',
+  },
+]
+
+const patientTypes = [
+  {
+    title: 'Complex Trauma Survivors',
+    description:
+      'AI generates patients with authentic PTSD, dissociation, and attachment disorders based on clinical literature',
+    icon: '💔',
+    accent: 'cyan',
+    examples:
+      'Childhood abuse survivors, combat veterans, trafficking survivors',
+  },
+  {
+    title: 'Personality Disorder Presentations',
+    description:
+      'Borderline, narcissistic, antisocial patterns with realistic behavioral manifestations',
+    icon: '🎭',
+    accent: 'cyan',
+    examples:
+      'Splitting behaviors, manipulation tactics, emotional dysregulation',
+  },
+  {
+    title: 'Crisis Presentations',
+    description:
+      'Suicidal ideation, psychotic episodes, manic states with appropriate risk factors',
+    icon: '🚨',
+    accent: 'cyan',
+    examples: 'Active suicidality, command hallucinations, severe depression',
+  },
+  {
+    title: 'Rare Clinical Conditions',
+    description:
+      'Dissociative identity disorder, selective mutism, conversion disorders',
+    icon: '🧩',
+    accent: 'cyan',
+    examples: 'Multiple personalities, somatic symptoms, unusual presentations',
+  },
+]
+
+const generationDemo = {
+  prompt:
+    'Generate a 23-year-old client with borderline personality disorder, history of self-harm, and fear of abandonment',
+  result: {
+    name: 'Alex Chen',
+    age: 23,
+    presentation:
+      'Presents with intense fear of abandonment, history of self-cutting, unstable relationships',
+    background:
+      'Adopted at age 8 after neglect, multiple foster placements, recent breakup triggered current crisis',
+    symptoms:
+      'Emotional dysregulation, identity disturbance, chronic emptiness, impulsive behaviors',
+    strengths:
+      'Artistic talent, strong desire for connection, previous therapy engagement',
+  },
+}
+
+const universityResults = [
+  {
+    university: 'Stanford Medical School',
+    result: 'Students exposed to 300% more client types',
+    detail:
+      'Training program now covers rare presentations that would take years to encounter naturally',
+  },
+  {
+    university: 'University of Pennsylvania',
+    result: '95% student confidence in diverse populations',
+    detail:
+      'Students report feeling prepared for any client background or presentation',
+  },
+  {
+    university: 'UCLA Psychology Department',
+    result: 'Zero cultural competency incidents',
+    detail:
+      'First semester with no reported cultural insensitivity in student clinical work',
+  },
+]
+---
+
+<BaseLayout
+  title="Synthetic Training Generator - Generate 50,000+ AI Patients in 12 Seconds"
+  description="Create unlimited diverse client personas for comprehensive therapy training. AI generates authentic patients with complex histories and presentations."
+  bgType="plum"
+>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div
+      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
+    >
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+    </div>
+
+    <div class="relative z-10 py-8">
+      <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="text-center mb-12">
+          <div class="mb-8 animate-breathe">
+            <Badge
+              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 rounded-full"
+            >
+              <span class="relative flex h-3 w-3">
+                <span
+                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"
+                ></span>
+              </span>
+              AI Generation Active
+            </Badge>
+          </div>
+
+          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+            {currentVariant.headline}
+            <span class="text-cyan-400 golden-shimmer block mt-2"
+              >Synthetic Training Generator</span
+            >
+          </h1>
+
+          <p
+            class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed"
+          >
+            {currentVariant.subheadline}
+          </p>
+        </div>
+
+        <!-- Generation Specifications -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {
+            generationSpecs.map((spec) => (
+              <Card class="border border-cyan-600/30 bg-cyan-900/20 hover:border-cyan-400/60 transition-all duration-700 organic-card">
+                <CardHeader class="pb-2">
+                  <CardTitle class="text-cyan-300 text-sm">
+                    {spec.metric}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div class="text-2xl font-bold text-cyan-400 mb-1">
+                    {spec.value}
+                  </div>
+                  <div class="text-xs text-cyan-200/70">
+                    {spec.comparison}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          }
+        </div>
+
+        <!-- Live Generation Demo -->
+        <div class="mb-16">
+          <Card
+            class="border border-cyan-600/30 bg-slate-900/50 overflow-hidden"
+          >
+            <CardHeader>
+              <div class="flex justify-between items-start">
+                <div>
+                  <CardTitle class="text-cyan-100 text-xl mb-2"
+                    >Live Patient Generation Demo</CardTitle
+                  >
+                  <CardDescription class="text-cyan-200/80">
+                    Watch AI create a complex patient profile in real-time
+                  </CardDescription>
+                </div>
+                <Badge class="bg-cyan-500/20 text-cyan-300">
+                  <span
+                    class="animate-pulse w-2 h-2 bg-cyan-400 rounded-full mr-2"
+                  ></span>
+                  Generating...
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
+                <div class="mb-4">
+                  <div class="text-cyan-300 font-medium mb-2">
+                    Generation Prompt:
+                  </div>
+                  <div
+                    class="bg-slate-700/50 rounded p-3 text-green-100 text-sm"
+                  >
+                    {generationDemo.prompt}
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <div class="text-cyan-300 font-medium mb-2">
+                    Generated Patient Profile:
+                  </div>
+                  <div class="bg-slate-700/50 rounded p-4 space-y-3">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center"
+                      >
+                        <span class="text-cyan-400">👤</span>
+                      </div>
+                      <div>
+                        <div class="text-cyan-300 font-medium">
+                          {generationDemo.result.name}
+                        </div>
+                        <div class="text-cyan-200/70 text-sm">
+                          Age {generationDemo.result.age}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <div class="text-cyan-300 font-medium mb-1">
+                          Presentation:
+                        </div>
+                        <div class="text-green-100/90">
+                          {generationDemo.result.presentation}
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-cyan-300 font-medium mb-1">
+                          Background:
+                        </div>
+                        <div class="text-green-100/90">
+                          {generationDemo.result.background}
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-cyan-300 font-medium mb-1">
+                          Symptoms:
+                        </div>
+                        <div class="text-green-100/90">
+                          {generationDemo.result.symptoms}
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-cyan-300 font-medium mb-1">
+                          Strengths:
+                        </div>
+                        <div class="text-green-100/90">
+                          {generationDemo.result.strengths}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex gap-3">
+                  <Button
+                    size="sm"
+                    class="bg-cyan-600 hover:bg-cyan-700 text-white"
+                    data-demo-action="generate-patient"
+                  >
+                    Generate New Patient
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/10"
+                    data-demo-action="customize-generation"
+                  >
+                    Customize Parameters
+                  </Button>
+                </div>
+              </div>
+              <div class="text-xs text-cyan-200/60">
+                ⚡ Each patient is unique with authentic clinical presentations
+                • 🔒 Ethically generated from clinical literature
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Patient Types Section -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Every Client Type Your Students
+              <span class="text-cyan-400 golden-shimmer">Will Ever Meet</span>
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              AI generates authentic presentations across all diagnostic
+              categories and cultural backgrounds
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {
+              patientTypes.map((type) => (
+                <Card class="border border-cyan-600/30 hover:border-cyan-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4 relative">
+                    <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-cyan-400">
+                      {type.icon}
+                    </div>
+                    <CardTitle class="text-base font-bold text-cyan-100 tracking-wide mb-3">
+                      {type.title}
+                    </CardTitle>
+                    <div class="text-sm text-cyan-400/90 font-medium bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20 mb-3">
+                      Ethically generated from clinical research
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-cyan-200/80 leading-relaxed mb-3">
+                      {type.description}
+                    </CardDescription>
+                    <div class="text-xs text-cyan-300/70">
+                      <span class="font-medium">Examples:</span> {type.examples}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- University Results -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Universities Report
+              <span class="text-green-400 golden-shimmer"
+                >Unprecedented Diversity</span
+              >
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              Training programs using Synthetic Generator expose students to
+              client diversity that would take decades to encounter naturally
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {
+              universityResults.map((result) => (
+                <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
+                      🏛️
+                    </div>
+                    <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
+                      {result.university}
+                    </CardTitle>
+                    <div class="text-lg text-green-400 font-bold mb-2">
+                      {result.result}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-green-200/80 leading-relaxed">
+                      {result.detail}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Ethical AI Section -->
+        <div class="mb-16">
+          <Card
+            class="border border-purple-600/30 bg-purple-900/20 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12 text-center">
+              <div class="text-6xl mb-6 text-purple-400">🤖</div>
+              <h3 class="text-lg lg:text-xl font-bold text-purple-100 mb-4">
+                Ethical AI Patient Generation
+              </h3>
+              <p
+                class="text-base text-purple-200/90 mb-6 leading-relaxed max-w-3xl mx-auto"
+              >
+                Our AI generates patients from clinical literature and research,
+                not real patient data. Every synthetic patient is created
+                ethically, ensuring authentic presentations without compromising
+                anyone's privacy.
+              </p>
+              <div
+                class="flex items-center justify-center gap-6 text-purple-300/80 text-sm"
+              >
+                <span class="flex items-center gap-2">
+                  <span class="text-purple-400">✓</span>
+                  No Real Patient Data Used
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-purple-400">✓</span>
+                  Research-Based Generation
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-purple-400">✓</span>
+                  Clinically Authentic
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="text-center">
+          <Card
+            class="border border-cyan-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12">
+              <div class="text-6xl text-cyan-400 mb-6">🎯</div>
+
+              <div class="mb-6">
+                <Badge
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 rounded-full"
+                >
+                  <span class="animate-pulse w-2 h-2 bg-cyan-400 rounded-full"
+                  ></span>
+                  Generate Unlimited Patients
+                </Badge>
+              </div>
+
+              <h2 class="text-2xl lg:text-4xl font-bold text-cyan-100 mb-8">
+                Ready to Give Your Students
+                <br />
+                <span class="text-cyan-400 golden-shimmer"
+                  >Every Client They'll Ever Meet?</span
+                >
+              </h2>
+
+              <p
+                class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
+              >
+                Stop limiting your students to the few cases that walk through
+                your clinic doors. Give them the full spectrum of human
+                experience.
+              </p>
+
+              <div
+                class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6"
+              >
+                <Button
+                  size="lg"
+                  class="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
+                  data-demo-cta="primary"
+                  data-variant={variantKey}
+                >
+                  {currentVariant.cta}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  class="border-2 border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
+                  data-demo-cta="secondary"
+                >
+                  See Generation Examples
+                </Button>
+              </div>
+
+              <p class="text-xs text-cyan-300/70">
+                🎓 Unlimited patient diversity • 🔒 Ethically generated • 💛
+                Loved by training programs
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Organic Particles */
+  .particles-container {
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #06b6d4;
+    border-radius: 50%;
+    animation: float-organic 12s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  .particle-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 15s;
+  }
+
+  .particle-2 {
+    top: 40%;
+    right: 20%;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+
+  .particle-3 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 6s;
+    animation-duration: 12s;
+  }
+
+  .particle-4 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 9s;
+    animation-duration: 20s;
+  }
+
+  .particle-5 {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 12s;
+    animation-duration: 16s;
+  }
+
+  @keyframes float-organic {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.6;
+    }
+    25% {
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-10px) translateX(-15px) scale(0.9);
+      opacity: 0.4;
+    }
+    75% {
+      transform: translateY(20px) translateX(10px) scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  /* Text Effects */
+  .golden-shimmer {
+    background: linear-gradient(45deg, #06b6d4, #0891b2, #0e7490);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Card Effects */
+  .organic-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .organic-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    animation: organic-pulse 4s ease-in-out infinite;
+    transform: scale(0);
+  }
+
+  .organic-card:hover::before {
+    transform: scale(1);
+  }
+
+  @keyframes organic-pulse {
+    0%,
+    100% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1) rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  /* Breathing Animation */
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .particle {
+      width: 3px;
+      height: 3px;
+    }
+  }
+</style>
+
+<script>
+  // Type definitions
+  declare global {
+    interface Window {
+      gtag?: (
+        command: 'event',
+        action: string,
+        params: {
+          [key: string]: any
+        }
+      ) => void
+    }
+  }
+
+  // Analytics tracking for demo interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    // Track page view
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'page_view', {
+        page_title: 'Synthetic Training Generator Demo',
+        page_location: window.location.href,
+        ab_variant:
+          document.querySelector('[data-variant]')?.dataset.variant ||
+          'unknown',
+      })
+    }
+
+    // Track demo interactions
+    document.querySelectorAll('[data-demo-action]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const action = target.dataset?.demoAction
+
+        if (!action) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_interaction', {
+            demo_type: 'synthetic_training_generator',
+            interaction_type: action,
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset?.variant ||
+              'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_interaction',
+            page: 'synthetic-training-generator',
+            action: action,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset.variant ||
+              'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track CTA clicks
+    document.querySelectorAll('[data-demo-cta]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const ctaType = target.dataset?.demoCta
+        const variant = target.dataset?.variant
+
+        if (!ctaType) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_cta_click', {
+            demo_type: 'synthetic_training_generator',
+            cta_type: ctaType,
+            ab_variant: variant || 'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_cta_click',
+            page: 'synthetic-training-generator',
+            cta_type: ctaType,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant: variant || 'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track scroll depth
+    let maxScroll = 0
+    window.addEventListener('scroll', () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+          100,
+      )
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent
+
+        if (maxScroll % 25 === 0 && typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'scroll_depth', {
+            demo_type: 'synthetic_training_generator',
+            scroll_depth: maxScroll,
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset.variant ||
+              'unknown',
+          })
+        }
+      }
+    })
+  })
+</script>

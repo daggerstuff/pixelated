@@ -1,0 +1,57 @@
+Session:
+  type: object
+  required:
+    - id
+    - userId
+    - token
+    - expiresAt
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique session identifier
+    userId:
+      type: string
+      format: uuid
+      description: ID of the user this session belongs to
+    token:
+      type: string
+      description: JWT token for authentication
+    expiresAt:
+      type: string
+      format: date-time
+      description: When this session expires
+    device:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [browser, mobile, desktop]
+          description: Type of device used
+        name:
+          type: string
+          description: Device name (e.g. Chrome on Windows)
+        os:
+          type: string
+          description: Operating system
+        ip:
+          type: string
+          format: ipv4
+          description: IP address
+        userAgent:
+          type: string
+          description: User agent string
+    lastActivity:
+      type: string
+      format: date-time
+      description: Last time this session was used
+    revokedAt:
+      type: string
+      format: date-time
+      description: When this session was revoked (if applicable)
+    metadata:
+      type: object
+      description: Additional session metadata
+      additionalProperties: true
+    allOf:
+      - $ref: ./common.yaml#/Timestamp'

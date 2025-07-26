@@ -1,0 +1,222 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import LiveRegionDemoReact from '@/components/accessibility/LiveRegionDemo'
+
+// Define demo sections
+const sections = [
+  {
+    title: 'Status Announcements',
+    description: 'Use for non-critical updates',
+    examples: [
+      { label: 'Simple Status', message: 'Operation completed successfully' },
+      {
+        label: 'Data Update',
+        message: 'Data refreshed. 5 new items available',
+      },
+      { label: 'Settings Change', message: 'Dark mode enabled' },
+    ],
+  },
+  {
+    title: 'Alert Announcements',
+    description: 'Use for important information requiring immediate attention',
+    examples: [
+      { label: 'Error Alert', message: 'Error: Connection lost' },
+      {
+        label: 'Warning Alert',
+        message: 'Warning: Session will expire in 2 minutes',
+      },
+      {
+        label: 'Security Alert',
+        message: 'Security alert: New login detected',
+      },
+    ],
+  },
+  {
+    title: 'Log Messages',
+    description: 'Use for sequential information that builds up',
+    examples: [
+      { label: 'Add Log Entry', message: 'User profile updated' },
+      { label: 'Add Another Entry', message: 'Password changed successfully' },
+      { label: 'Clear Log', message: 'Starting new session', clear: true },
+    ],
+  },
+]
+---
+
+<BaseLayout title="Live Region Demo">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-center">Live Region System Demo</h1>
+
+    <p class="mb-8 text-lg text-center">
+      This page demonstrates the Live Region System for screen reader
+      announcements. Click the buttons below to trigger various types of
+      announcements.
+      <br />
+      <span class="text-amber-600 dark:text-amber-400">
+        You'll need a screen reader enabled to hear the announcements.
+      </span>
+    </p>
+
+    <div class="grid gap-10 mb-10">
+      {
+        sections.map((section) => (
+          <section class="border border-border/40 rounded-lg p-6 bg-card/50">
+            <h2 class="text-xl font-semibold mb-3">{section.title}</h2>
+            <p class="mb-5 text-gray-600 dark:text-gray-300">
+              {section.description}
+            </p>
+
+            <div class="grid gap-3">
+              {section.examples.map((example) => (
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <button
+                    class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-md"
+                    onclick={`window.LiveRegionSystem.${
+                      section.title.startsWith('Status')
+                        ? 'announceStatus'
+                        : section.title.startsWith('Alert')
+                          ? 'announceAlert'
+                          : 'log'
+                    }
+                    ('${example.message}'${example.clear ? ', true' : ''})`}
+                  >
+                    {example.label}
+                  </button>
+                  <span class="text-sm opacity-80">"{example.message}"</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+
+      <section class="border border-border/40 rounded-lg p-6 bg-card/50">
+        <h2 class="text-xl font-semibold mb-3">Progress Announcements</h2>
+        <p class="mb-5 text-gray-600 dark:text-gray-300">
+          Use for tracking progress of operations
+        </p>
+
+        <div class="mb-5">
+          <button
+            id="progress-demo"
+            class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-md mb-3"
+          >
+            Start Progress Demo
+          </button>
+
+          <div
+            class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden"
+          >
+            <div
+              id="progress-bar"
+              class="bg-purple-600 h-4 rounded-full w-0 transition-all duration-500"
+            >
+            </div>
+          </div>
+          <div class="mt-2 text-sm text-center" id="progress-text">0%</div>
+        </div>
+      </section>
+    </div>
+
+    <section class="border border-border/40 rounded-lg p-6 bg-card/50 mb-8">
+      <h2 class="text-xl font-semibold mb-3">React Component Example</h2>
+      <p class="mb-5 text-gray-600 dark:text-gray-300">
+        Using the LiveRegionProvider React context
+      </p>
+
+      <LiveRegionDemoReact client:load />
+    </section>
+
+    <div class="prose dark:prose-invert max-w-none">
+      <h2>How It Works</h2>
+      <p>
+        The Live Region System provides a standardized way to announce dynamic
+        content changes to users of assistive technologies. It works by using
+        ARIA live regions with different politeness levels and properties.
+      </p>
+
+      <h3>Implementation</h3>
+      <ul>
+        <li>
+          <strong>Astro Component:</strong> Automatically included in BaseLayout
+        </li>
+        <li><strong>React Context:</strong> For React components</li>
+        <li>
+          <strong>Utility Functions:</strong> For use in any JavaScript/TypeScript
+          file
+        </li>
+      </ul>
+
+      <h3>Learn More</h3>
+      <p>
+        Check out the <a href="/docs/accessibility/live-regions"
+          >Live Region System documentation</a
+        >
+        for detailed information on implementation, best practices, and examples.
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  // Progress demo functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const progressButton = document.getElementById('progress-demo')
+    const progressBar = document.getElementById('progress-bar')
+    const progressText = document.getElementById('progress-text')
+
+    if (progressButton && progressBar && progressText) {
+      let isRunning = false
+
+      progressButton.addEventListener('click', () => {
+        if (isRunning) return
+        isRunning = true
+
+        let progress = 0
+        progressBar.style.width = '0%'
+        progressText.textContent = '0%'
+        progressButton.disabled = true
+        progressButton.textContent = 'Progress Running...'
+
+        // Announce start
+        if (window.LiveRegionSystem) {
+          window.LiveRegionSystem.announceStatus('Starting process...')
+        }
+
+        const interval = setInterval(() => {
+          progress += 10
+
+          // Update visual indicators
+          progressBar.style.width = `${progress}%`
+          progressText.textContent = `${progress}%`
+
+          // Announce progress
+          if (window.LiveRegionSystem) {
+            window.LiveRegionSystem.announceProgress(progress, 100, 'Process')
+          }
+
+          if (progress >= 100) {
+            clearInterval(interval)
+            if (window.LiveRegionSystem) {
+              window.LiveRegionSystem.announceStatus(
+                'Process completed successfully',
+              )
+            }
+            progressButton.disabled = false
+            progressButton.textContent = 'Start Progress Demo'
+            isRunning = false
+          }
+        }, 1000)
+      })
+    }
+  })
+</script>
+
+<!-- TypeScript declarations moved to types file to prevent empty chunk generation -->
+
+<style>
+  button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+</style>

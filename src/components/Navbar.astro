@@ -1,0 +1,380 @@
+---
+// Enhanced Navbar component with active state indicators and improved accessibility
+import ThemeSwitcher from './ThemeSwitcher.astro'
+
+// Define navigation items
+const navItems = [
+  { href: '/features', label: 'Features' },
+  { href: '/about', label: 'About' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/therapy-chat', label: 'Demo' },
+]
+
+// Get the current URL path
+const currentPath = Astro.url.pathname
+
+// Function to determine if a nav item is active
+const isActive = (href: string) => {
+  // For the homepage
+  if (href === '/' && currentPath === '/') {
+    return true
+  }
+  // For other pages
+  if (href !== '/' && currentPath.startsWith(href)) {
+    return true
+  }
+  return false
+}
+---
+
+<!-- Skip to main content link for keyboard users -->
+<a
+  href="#main-content"
+  class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white dark:bg-gray-950 p-4 z-50 rounded shadow"
+>
+  Skip to main content
+</a>
+
+<header
+  class="sticky top-0 z-40 bg-white/50 dark:bg-gray-950/50 backdrop-blur-xl w-full border-b border-gray-200 dark:border-gray-800"
+  role="banner"
+>
+  <div class="flex items-center justify-between h-16 px-6 sm:px-8 lg:px-12">
+    <div class="flex items-center ml-2 sm:ml-4">
+      <a href="/" class="flex items-center" aria-label="Go to homepage">
+        <div class="w-8 h-8 mr-3">
+          <!-- Logo SVG with proper ARIA -->
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-8 h-8"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M12 2L4 6v12l8 4 8-4V6l-8-4z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+            <path
+              d="M12 6v4m0 4v4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+            <path
+              d="M8 8v8m8-8v8"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <span class="text-lg font-bold tracking-wide navbar-brand brand-title"
+          >PIXELATED EMPATHY</span
+        >
+      </a>
+    </div>
+
+    <div class="hidden md:flex md:items-center md:space-x-6">
+      <nav aria-label="Main navigation">
+        <ul class="flex items-center space-x-8" role="menubar">
+          {
+            navItems.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <li role="none">
+                  <a
+                    href={item.href}
+                    class:list={[
+                      'relative py-2 transition-colors',
+                      active
+                        ? 'text-teal-600 font-medium'
+                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white',
+                    ]}
+                    aria-current={active ? 'page' : undefined}
+                    role="menuitem"
+                  >
+                    {item.label}
+                    {active && (
+                      <span
+                        class="absolute -bottom-1.5 left-0 w-full h-0.5 bg-teal-600 rounded-full"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </a>
+                </li>
+              )
+            })
+          }
+        </ul>
+      </nav>
+      <div class="flex items-center space-x-3">
+        <ThemeSwitcher />
+        <a
+          href="/login"
+          class:list={[
+            'inline-flex items-center justify-center rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-500',
+            isActive('/login')
+              ? 'text-teal-600 font-medium'
+              : 'text-gray-700 dark:text-gray-300 dark:hover:text-white hover:text-gray-900',
+          ]}
+          aria-current={isActive('/login') ? 'page' : undefined}
+        >
+          Log in
+        </a>
+        <a
+          href="/signup"
+          class:list={[
+            'inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
+            isActive('/signup')
+              ? 'bg-teal-700'
+              : 'bg-teal-600 hover:bg-teal-700',
+          ]}
+          aria-current={isActive('/signup') ? 'page' : undefined}
+        >
+          Sign up
+        </a>
+      </div>
+    </div>
+
+    <div class="flex md:hidden">
+      <ThemeSwitcher />
+      <button
+        id="mobile-menu-button"
+        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+        aria-label="Open main menu"
+      >
+        <span class="sr-only">Open main menu</span>
+        <!-- Icon when menu is closed -->
+        <svg
+          class="block h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <!-- Icon when menu is open -->
+        <svg
+          class="hidden h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div
+    id="mobile-menu"
+    class="md:hidden hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Mobile navigation menu"
+  >
+    <div class="px-4 pt-2 pb-3 space-y-1">
+      <nav aria-label="Mobile navigation">
+        <ul class="space-y-3" role="menu">
+          {
+            navItems.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <li role="none">
+                  <a
+                    href={item.href}
+                    class:list={[
+                      'block py-2 transition-colors',
+                      active
+                        ? 'text-teal-600 font-medium border-l-2 border-teal-600 pl-3'
+                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
+                    ]}
+                    aria-current={active ? 'page' : undefined}
+                    role="menuitem"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              )
+            })
+          }
+          <li
+            role="none"
+            class="pt-2 border-t border-gray-200 dark:border-gray-800"
+          >
+            <a
+              href="/login"
+              class:list={[
+                'block py-2 transition-colors',
+                isActive('/login')
+                  ? 'text-teal-600 font-medium border-l-2 border-teal-600 pl-3'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
+              ]}
+              aria-current={isActive('/login') ? 'page' : undefined}
+              role="menuitem"
+            >
+              Log in
+            </a>
+          </li>
+          <li role="none">
+            <a
+              href="/signup"
+              class:list={[
+                'block py-2 transition-colors',
+                isActive('/signup')
+                  ? 'text-teal-600 font-medium border-l-2 border-teal-600 pl-3'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
+              ]}
+              aria-current={isActive('/signup') ? 'page' : undefined}
+              role="menuitem"
+            >
+              Sign up
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Handle mobile menu toggle
+  document.addEventListener('astro:page-load', () => {
+    const button = document.getElementById('mobile-menu-button')
+    const menu = document.getElementById('mobile-menu')
+    const menuIcons = button?.querySelectorAll('svg')
+
+    if (!button || !menu || !menuIcons) return
+
+    const toggleMenu = () => {
+      const isExpanded = button.getAttribute('aria-expanded') === 'true'
+      button.setAttribute('aria-expanded', (!isExpanded).toString())
+      menu.classList.toggle('hidden')
+      menuIcons[0]?.classList.toggle('hidden')
+      menuIcons[1]?.classList.toggle('hidden')
+
+      if (!isExpanded) {
+        // Focus first menu item when opening
+        const firstMenuItem = menu.querySelector('a')
+        firstMenuItem?.focus()
+      }
+    }
+
+    // Toggle menu on button click
+    button.addEventListener('click', toggleMenu)
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (
+        e.key === 'Escape' &&
+        button.getAttribute('aria-expanded') === 'true'
+      ) {
+        toggleMenu()
+        button.focus()
+      }
+    })
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (
+        button.getAttribute('aria-expanded') === 'true' &&
+        !menu.contains(e.target as Node) &&
+        !button.contains(e.target as Node)
+      ) {
+        toggleMenu()
+      }
+    })
+
+    // Trap focus within mobile menu when open
+    menu.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return
+
+      const focusableElements = menu.querySelectorAll(
+        'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      )
+      const firstFocusable = focusableElements[0] as HTMLElement
+      const lastFocusable = focusableElements[
+        focusableElements.length - 1
+      ] as HTMLElement
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          e.preventDefault()
+          lastFocusable.focus()
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          e.preventDefault()
+          firstFocusable.focus()
+        }
+      }
+    })
+  })
+</script>
+
+<style>
+  .navbar-brand {
+    font-family: 'Inter', 'SF Pro Display', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.025em !important;
+    font-size: 1.125rem !important;
+  }
+
+  @media (max-width: 640px) {
+    .navbar-brand {
+      font-size: 1rem !important;
+    }
+  }
+</style>
+
+<style>
+  /* Smooth transitions for active state indicators */
+  a span {
+    transition: width 0.2s ease;
+  }
+
+  /* Enhanced focus styles for accessibility */
+  a:focus-visible {
+    outline: 2px solid theme('colors.teal.500');
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* Animation for mobile menu */
+  #mobile-menu {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+    transform-origin: top;
+  }
+
+  #mobile-menu.hidden {
+    opacity: 0;
+    transform: scaleY(0);
+    display: none;
+  }
+
+  #mobile-menu:not(.hidden) {
+    opacity: 1;
+    transform: scaleY(1);
+    display: block;
+  }
+</style>

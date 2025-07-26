@@ -1,0 +1,55 @@
+---
+// Latex component for rendering LaTeX mathematical expressions
+export interface Props {
+  class?: string
+  inline?: boolean
+}
+
+const { class: className, inline = false } = Astro.props
+const content = await Astro.slots.render('default')
+---
+
+<span
+  class={`latex-container ${inline ? 'latex-inline' : 'latex-block'} ${className || ''}`}
+  data-latex={content}
+>
+  <slot />
+</span>
+
+<style>
+  .latex-container {
+    @apply font-mono text-sm;
+  }
+
+  .latex-inline {
+    @apply inline;
+  }
+
+  .latex-block {
+    @apply block my-4 p-4 bg-gray-50 border border-gray-200 rounded-lg text-center dark:bg-gray-800 dark:border-gray-700;
+  }
+
+  .latex-container {
+    font-family:
+      'Computer Modern', 'Latin Modern Math', 'Times New Roman', serif;
+  }
+</style>
+
+<script>
+  // This script will run on the client side to potentially render LaTeX
+  // For now, we'll just display the raw LaTeX content
+  // In a production environment, you might want to integrate with KaTeX or MathJax
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const latexElements = document.querySelectorAll('.latex-container')
+
+    latexElements.forEach((element) => {
+      // For now, just style the LaTeX content
+      // In the future, you could integrate with a LaTeX rendering library
+      const content = element.textContent
+      if (content) {
+        element.innerHTML = `<code>${content}</code>`
+      }
+    })
+  })
+</script>

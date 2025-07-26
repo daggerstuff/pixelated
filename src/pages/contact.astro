@@ -1,0 +1,474 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Button from '../components/ui/Button.astro'
+---
+
+<BaseLayout
+  title="Contact Us | Pixelated Empathy"
+  description="Get in touch with the Pixelated Empathy team for inquiries, partnerships, or support."
+>
+  <div class="max-w-4xl mx-auto py-12 px-4">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-white">Contact Us</h1>
+      <p class="text-lg text-slate-400 mt-2">We'd love to hear from you</p>
+    </div>
+    <div class="max-w-2xl mx-auto w-full">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 text-slate-300">
+        <div>
+          <h2 class="text-2xl font-semibold mb-4 text-white">Get in Touch</h2>
+          <p class="mb-4">
+            Have questions about our technology, interested in partnerships, or
+            just want to say hello? We'd love to hear from you.
+          </p>
+          <div class="space-y-2">
+            <p>
+              <strong>Email:</strong>
+              <a
+                href="mailto:info@pixelatedempathy.com"
+                class="text-green-400 hover:underline"
+                >info@pixelatedempathy.com</a
+              >
+            </p>
+            <p><strong>Location:</strong> USA (sadly)</p>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-2xl font-semibold mb-4 text-white">Connect With Us</h2>
+          <p class="mb-4">
+            Follow us on social media to stay updated with our latest
+            developments, research insights, and community events.
+          </p>
+          <div class="flex space-x-4">
+            <a
+              href="https://twitter.com/pixelatedempathy"
+              class="text-slate-300 hover:text-green-400 transition-colors">Twitter</a
+            >
+            <a
+              href="https://www.linkedin.com/company/pixelated-empathy"
+              class="text-slate-300 hover:text-green-400 transition-colors">LinkedIn</a
+            >
+            <a
+              href="https://github.com/nochadisfaction/pixelated"
+              class="text-slate-300 hover:text-green-400 transition-colors">GitHub</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <form
+        id="contact-form"
+        class="space-y-6 bg-white p-6 rounded-lg shadow-sm"
+        novalidate
+      >
+        <h2 class="text-xl font-semibold mb-4">Send Us a Message</h2>
+
+        <!-- Error message display -->
+        <div
+          id="error-message"
+          class="hidden p-4 bg-red-50 border border-red-200 text-red-800 rounded-md"
+          role="alert"
+        >
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p id="error-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              for="name"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Name <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              maxlength="100"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-colors"
+              placeholder="Your full name"
+            />
+            <div class="text-red-600 text-sm mt-1 hidden" id="name-error"></div>
+          </div>
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Email <span class="text-red-500">*</span></label
+            >
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              maxlength="100"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-colors"
+              placeholder="your.email@example.com"
+            />
+            <div class="text-red-600 text-sm mt-1 hidden" id="email-error">
+            </div>
+          </div>
+        </div>
+        <div>
+          <label
+            for="subject"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Subject <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            id="subject"
+            name="subject"
+            required
+            maxlength="200"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-colors"
+            placeholder="What is this about?"
+          />
+          <div class="text-red-600 text-sm mt-1 hidden" id="subject-error">
+          </div>
+        </div>
+        <div>
+          <label
+            for="message"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Message <span class="text-red-500">*</span></label
+          >
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            required
+            maxlength="2000"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-colors resize-vertical"
+            placeholder="Tell us more about your inquiry..."></textarea>
+          <div class="flex justify-between items-center mt-1">
+            <div class="text-red-600 text-sm hidden" id="message-error"></div>
+            <div class="text-sm text-gray-500">
+              <span id="message-count">0</span>/2000 characters
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <Button
+            type="submit"
+            variant="default"
+            size="lg"
+            class="w-full md:w-auto min-w-32"
+            id="submit-button"
+          >
+            <span id="submit-text">Send Message</span>
+            <svg
+              id="loading-spinner"
+              class="hidden animate-spin -mr-1 ml-3 h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </Button>
+
+          <div class="text-sm text-gray-500 hidden md:block">
+            * Required fields
+          </div>
+        </div>
+      </form>
+
+      <!-- Success message -->
+      <div
+        id="success-message"
+        class="hidden mt-6 p-6 bg-green-50 border border-green-200 text-green-800 rounded-md"
+        role="alert"
+      >
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-green-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-green-800">
+              Message sent successfully!
+            </h3>
+            <p class="mt-1 text-sm text-green-700" id="success-text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </StandardLayout>
+</BaseLayout>
+
+<script>
+  // Form elements
+  const form = document.getElementById('contact-form') as HTMLFormElement
+  const submitButton = document.getElementById(
+    'submit-button',
+  ) as HTMLButtonElement
+  const submitText = document.getElementById('submit-text') as HTMLSpanElement
+  const loadingSpinner = document.getElementById(
+    'loading-spinner',
+  ) as HTMLElement
+  const successMessage = document.getElementById(
+    'success-message',
+  ) as HTMLElement
+  const errorMessage = document.getElementById('error-message') as HTMLElement
+  const errorText = document.getElementById('error-text') as HTMLElement
+
+  // Form inputs
+  const nameInput = document.getElementById('name') as HTMLInputElement
+  const emailInput = document.getElementById('email') as HTMLInputElement
+  const subjectInput = document.getElementById('subject') as HTMLInputElement
+  const messageInput = document.getElementById('message') as HTMLTextAreaElement
+  const messageCount = document.getElementById('message-count') as HTMLElement
+
+  // Error displays
+  const nameError = document.getElementById('name-error') as HTMLElement
+  const emailError = document.getElementById('email-error') as HTMLElement
+  const subjectError = document.getElementById('subject-error') as HTMLElement
+  const messageError = document.getElementById('message-error') as HTMLElement
+
+  // Character counter for message
+  messageInput?.addEventListener('input', () => {
+    const length = messageInput.value.length
+    messageCount.textContent = length.toString()
+
+    if (length > 2000) {
+      messageCount.parentElement?.classList.add('text-red-500')
+      messageCount.parentElement?.classList.remove('text-gray-500')
+    } else {
+      messageCount.parentElement?.classList.remove('text-red-500')
+      messageCount.parentElement?.classList.add('text-gray-500')
+    }
+  })
+
+  // Validation functions
+  function validateName(name: string): string | null {
+    if (!name.trim()) return 'Name is required'
+    if (name.length < 2) return 'Name must be at least 2 characters'
+    if (name.length > 100) return 'Name must not exceed 100 characters'
+    if (!/^[a-zA-Z\s\-']+$/.test(name))
+      return 'Name contains invalid characters'
+    return null
+  }
+
+  function validateEmail(email: string): string | null {
+    if (!email.trim()) return 'Email is required'
+    if (email.length > 100) return 'Email must not exceed 100 characters'
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) return 'Please enter a valid email address'
+    return null
+  }
+
+  function validateSubject(subject: string): string | null {
+    if (!subject.trim()) return 'Subject is required'
+    if (subject.length < 3) return 'Subject must be at least 3 characters'
+    if (subject.length > 200) return 'Subject must not exceed 200 characters'
+    return null
+  }
+
+  function validateMessage(message: string): string | null {
+    if (!message.trim()) return 'Message is required'
+    if (message.length < 10) return 'Message must be at least 10 characters'
+    if (message.length > 2000) return 'Message must not exceed 2000 characters'
+    return null
+  }
+
+  // Show field error
+  function showFieldError(
+    input: HTMLElement,
+    errorElement: HTMLElement,
+    message: string,
+  ) {
+    input.classList.add('border-red-500')
+    input.classList.remove('border-gray-300')
+    errorElement.textContent = message
+    errorElement.classList.remove('hidden')
+  }
+
+  // Clear field error
+  function clearFieldError(input: HTMLElement, errorElement: HTMLElement) {
+    input.classList.remove('border-red-500')
+    input.classList.add('border-gray-300')
+    errorElement.classList.add('hidden')
+  }
+
+  // Show general error
+  function showError(message: string) {
+    errorText.textContent = message
+    errorMessage.classList.remove('hidden')
+    errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  // Hide messages
+  function hideMessages() {
+    errorMessage.classList.add('hidden')
+    successMessage.classList.add('hidden')
+  }
+
+  // Set loading state
+  function setLoading(loading: boolean) {
+    if (loading) {
+      submitButton.disabled = true
+      submitText.textContent = 'Sending...'
+      loadingSpinner.classList.remove('hidden')
+      submitButton.classList.add('opacity-75', 'cursor-not-allowed')
+    } else {
+      submitButton.disabled = false
+      submitText.textContent = 'Send Message'
+      loadingSpinner.classList.add('hidden')
+      submitButton.classList.remove('opacity-75', 'cursor-not-allowed')
+    }
+  }
+
+  // Form submission
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    hideMessages()
+
+    // Validate all fields
+    const nameValidation = validateName(nameInput.value)
+    const emailValidation = validateEmail(emailInput.value)
+    const subjectValidation = validateSubject(subjectInput.value)
+    const messageValidation = validateMessage(messageInput.value)
+
+    // Clear previous errors
+    clearFieldError(nameInput, nameError)
+    clearFieldError(emailInput, emailError)
+    clearFieldError(subjectInput, subjectError)
+    clearFieldError(messageInput, messageError)
+
+    // Show field errors
+    let hasErrors = false
+    if (nameValidation) {
+      showFieldError(nameInput, nameError, nameValidation)
+      hasErrors = true
+    }
+    if (emailValidation) {
+      showFieldError(emailInput, emailError, emailValidation)
+      hasErrors = true
+    }
+    if (subjectValidation) {
+      showFieldError(subjectInput, subjectError, subjectValidation)
+      hasErrors = true
+    }
+    if (messageValidation) {
+      showFieldError(messageInput, messageError, messageValidation)
+      hasErrors = true
+    }
+
+    if (hasErrors) {
+      showError('Please correct the errors above and try again.')
+      return
+    }
+
+    // Submit form
+    setLoading(true)
+
+    try {
+      const formData = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim().toLowerCase(),
+        subject: subjectInput.value.trim(),
+        message: messageInput.value.trim(),
+      }
+
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Show success message
+        document.getElementById('success-text')!.textContent = result.message
+        successMessage.classList.remove('hidden')
+        form.classList.add('hidden')
+        successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      } else {
+        showError(
+          result.message || 'An error occurred while sending your message.',
+        )
+      }
+    } catch (error) {
+      console.error('Contact form submission error:', error)
+      showError('Network error: Please check your connection and try again.')
+    } finally {
+      setLoading(false)
+    }
+  })
+
+  // Real-time validation
+  nameInput?.addEventListener('blur', () => {
+    const error = validateName(nameInput.value)
+    if (error) {
+      showFieldError(nameInput, nameError, error)
+    } else {
+      clearFieldError(nameInput, nameError)
+    }
+  })
+
+  emailInput?.addEventListener('blur', () => {
+    const error = validateEmail(emailInput.value)
+    if (error) {
+      showFieldError(emailInput, emailError, error)
+    } else {
+      clearFieldError(emailInput, emailError)
+    }
+  })
+
+  subjectInput?.addEventListener('blur', () => {
+    const error = validateSubject(subjectInput.value)
+    if (error) {
+      showFieldError(subjectInput, subjectError, error)
+    } else {
+      clearFieldError(subjectInput, subjectError)
+    }
+  })
+
+  messageInput?.addEventListener('blur', () => {
+    const error = validateMessage(messageInput.value)
+    if (error) {
+      showFieldError(messageInput, messageError, error)
+    } else {
+      clearFieldError(messageInput, messageError)
+    }
+  })
+</script>

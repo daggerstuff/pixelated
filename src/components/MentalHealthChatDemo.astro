@@ -1,0 +1,56 @@
+---
+import { MentalHealthChatDemo as MentalHealthChatDemoComponent } from './MentalHealthChatDemo'
+
+export interface Props {
+  conversationId?: string
+  title?: string
+  description?: string
+  initialConfig?: {
+    enableAnalysis?: boolean
+    confidenceThreshold?: number
+    interventionThreshold?: number
+    analysisMinLength?: number
+    enableCrisisDetection?: boolean
+  }
+}
+
+const {
+  conversationId = 'astro-demo',
+  title = 'Mental Health Support Chat',
+  description = 'Production-grade mental health analysis and therapeutic response system.',
+  initialConfig = {},
+} = Astro.props
+---
+
+<div class="w-full max-w-6xl mx-auto transition-colors duration-300">
+  {
+    title && (
+      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+        {title}
+      </h2>
+    )
+  }
+  {
+    description && (
+      <p class="mb-6 text-gray-600 dark:text-gray-400">{description}</p>
+    )
+  }
+
+  <MentalHealthChatDemoComponent
+    client:only="react"
+  />
+</div>
+
+<style>
+  /* Ensure smooth dark mode transitions */
+  :root {
+    --transition-duration: 300ms;
+  }
+
+  .transition-colors {
+    transition:
+      background-color var(--transition-duration) ease-in-out,
+      color var(--transition-duration) ease-in-out,
+      border-color var(--transition-duration) ease-in-out;
+  }
+</style>

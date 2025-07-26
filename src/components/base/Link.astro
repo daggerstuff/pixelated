@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+export interface Props extends HTMLAttributes<'a'> {
+  href?: string
+  external?: boolean
+}
+
+const {
+  href,
+  external = false,
+  class: className,
+  ...rest
+} = Astro.props
+
+const isExternal = external || (href && href.startsWith('http'))
+---
+
+<a
+  class:list={[
+    'op-60 no-underline hover:op-100',
+    className,
+  ]}
+  {href}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
+  {...rest}
+>
+  <slot />
+</a>

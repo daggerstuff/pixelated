@@ -1,0 +1,143 @@
+---
+import { getCollection } from 'astro:content'
+import { formatDate } from '@/lib/utils'
+import type { CollectionEntry } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { ViewTransitions } from 'astro:transitions'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const posts = await getCollection(
+    'blog',
+    ({ data }: { data: { draft?: boolean; tags: string[]; pubDate: Date } }) =>
+      !data.draft,
+  )
+  const tags = [
+    ...new Set(
+      posts.flatMap((post: CollectionEntry<'blog'>) => post.data.tags),
+    ),
+  ]
+
+  return tags.map((tag) => ({
+    params: { tag },
+    props: {
+      posts: posts
+        .filter((post: CollectionEntry<'blog'>) => post.data.tags.includes(tag))
+        .sort(
+          (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) =>
+            b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+        ),
+    },
+  }))
+}
+
+interface Props {
+  posts: CollectionEntry<'blog'>[]
+}
+
+const { tag } = Astro.params
+const { posts } = Astro.props as Props
+
+// Group posts by year
+const postsByYear = posts.reduce(
+  (acc, post) => {
+    const year = post.data.pubDate.getFullYear()
+    acc[year] = acc[year] || []
+    acc[year].push(post)
+    return acc
+  },
+  {} as Record<number, CollectionEntry<'blog'>[]>,
+)
+
+// Get years in descending order
+const years = Object.keys(postsByYear)
+  .map(Number)
+  .sort((a, b) => b - a)
+
+// Format post date in Antfu style: "MM-DD"
+const formatPostDate = (date: Date) => {
+  return date
+    .toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+    })
+    .replace('/', '-')
+}
+---
+
+<BaseLayout
+  title={`Posts tagged with "${tag}"`}
+  description={`All blog posts tagged with ${tag}`}
+  bgType="rose"
+>
+  <ViewTransitions />
+
+  <main class="max-w-3xl mx-auto px-4 py-12">
+    <header class="mb-8">
+      <div class="flex items-center gap-2 mb-2 text-sm">
+        <a href="/blog" class="hover:text-primary transition-colors">Blog</a>
+        <span>/</span>
+        <span>Tag</span>
+        <span>/</span>
+        <span class="font-medium text-primary">{tag}</span>
+      </div>
+      <h1 class="text-3xl font-bold">Posts tagged with "{tag}"</h1>
+    </header>
+
+    <div class="space-y-12">
+      {
+        years.map((year) => (
+          <div>
+            <h2 class="text-xl font-semibold mb-4 border-b pb-1">{year}</h2>
+            <ul class="space-y-3">
+              {postsByYear[year].map(
+                (post: {
+                  slug: any
+                  data: { pubDate: Date; title: unknown; readingTime: unknown }
+                }) => (
+                  <li>
+                    <a
+                      href={`/blog/${post.slug}`}
+                      class="group grid grid-cols-[80px_1fr] gap-4 items-baseline"
+                    >
+                      <span class="text-sm font-mono text-gray-500 dark:text-gray-400">
+                        {formatPostDate(post.data.pubDate)}
+                      </span>
+                      <span class="group-hover:text-primary transition-colors">
+                        {post.data.title}
+                        {post.data.readingTime && (
+                          <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                            · {post.data.readingTime} min
+                          </span>
+                        )}
+                      </span>
+                    </a>
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-12">
+      <a
+        href="/blog"
+        class="inline-flex items-center text-sm hover:text-primary transition-colors"
+      >
+        ← Back to all posts
+      </a>
+    </div>
+  </main>
+
+  <style>
+    /* Antfu-like font styles */
+    :global(body) {
+      font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+        Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+  </style>
+</BaseLayout>

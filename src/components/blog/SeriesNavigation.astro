@@ -1,0 +1,49 @@
+---
+export interface Props {
+  series: string
+  current: string
+  next?: {
+    title: string
+    url: string
+  }
+  previous?: {
+    title: string
+    url: string
+  }
+}
+
+const { series, current, next, previous } = Astro.props
+---
+
+<div class="bg-gray-50 border border-gray-200 rounded-lg p-6 my-6">
+  <div class="mb-4">
+    <h3 class="text-xl font-bold mb-1">{series} Series</h3>
+    <p class="text-gray-600">Currently reading: {current}</p>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-4">
+    {
+      previous && (
+        <a
+          href={previous.url}
+          class="flex-1 bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition"
+        >
+          <div class="text-sm text-gray-500 mb-1">Previous</div>
+          <div class="font-medium">{previous.title}</div>
+        </a>
+      )
+    }
+
+    {
+      next && (
+        <a
+          href={next.url}
+          class="flex-1 bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition"
+        >
+          <div class="text-sm text-gray-500 mb-1">Next</div>
+          <div class="font-medium">{next.title}</div>
+        </a>
+      )
+    }
+  </div>
+</div>

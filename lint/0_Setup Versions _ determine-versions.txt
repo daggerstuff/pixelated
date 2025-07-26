@@ -1,0 +1,252 @@
+﻿2025-06-04T21:51:13.4455781Z Current runner version: '2.325.0'
+2025-06-04T21:51:13.4480554Z ##[group]Runner Image Provisioner
+2025-06-04T21:51:13.4481549Z Hosted Compute Agent
+2025-06-04T21:51:13.4482050Z Version: 20250508.323
+2025-06-04T21:51:13.4482708Z Commit: 81b259f29879f73b4213d199e42d8c3465dae986
+2025-06-04T21:51:13.4483356Z Build Date: 2025-05-08T19:40:08Z
+2025-06-04T21:51:13.4483935Z ##[endgroup]
+2025-06-04T21:51:13.4484495Z ##[group]Operating System
+2025-06-04T21:51:13.4485071Z Ubuntu
+2025-06-04T21:51:13.4485544Z 24.04.2
+2025-06-04T21:51:13.4486035Z LTS
+2025-06-04T21:51:13.4486497Z ##[endgroup]
+2025-06-04T21:51:13.4486944Z ##[group]Runner Image
+2025-06-04T21:51:13.4487545Z Image: ubuntu-24.04
+2025-06-04T21:51:13.4488016Z Version: 20250511.1.0
+2025-06-04T21:51:13.4488995Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250511.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-06-04T21:51:13.4490503Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250511.1
+2025-06-04T21:51:13.4491575Z ##[endgroup]
+2025-06-04T21:51:13.4492530Z ##[group]GITHUB_TOKEN Permissions
+2025-06-04T21:51:13.4494243Z Metadata: read
+2025-06-04T21:51:13.4494850Z ##[endgroup]
+2025-06-04T21:51:13.4496898Z Secret source: Actions
+2025-06-04T21:51:13.4497572Z Prepare workflow directory
+2025-06-04T21:51:13.4825148Z Prepare all required actions
+2025-06-04T21:51:13.4864280Z Getting action download info
+2025-06-04T21:51:13.7541960Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-06-04T21:51:13.7542973Z Version: 4.2.2
+2025-06-04T21:51:13.7543921Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-06-04T21:51:13.7545500Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-06-04T21:51:13.7546221Z ##[endgroup]
+2025-06-04T21:51:13.8904143Z Complete job name: Setup Versions / determine-versions
+2025-06-04T21:51:13.9694842Z ##[group]Run actions/checkout@v4
+2025-06-04T21:51:13.9695639Z with:
+2025-06-04T21:51:13.9696059Z   repository: nochadisfaction/pixelated
+2025-06-04T21:51:13.9696749Z   token: ***
+2025-06-04T21:51:13.9697118Z   ssh-strict: true
+2025-06-04T21:51:13.9697511Z   ssh-user: git
+2025-06-04T21:51:13.9697905Z   persist-credentials: true
+2025-06-04T21:51:13.9698341Z   clean: true
+2025-06-04T21:51:13.9698731Z   sparse-checkout-cone-mode: true
+2025-06-04T21:51:13.9699195Z   fetch-depth: 1
+2025-06-04T21:51:13.9699570Z   fetch-tags: false
+2025-06-04T21:51:13.9699949Z   show-progress: true
+2025-06-04T21:51:13.9700364Z   lfs: false
+2025-06-04T21:51:13.9700713Z   submodules: false
+2025-06-04T21:51:13.9701106Z   set-safe-directory: true
+2025-06-04T21:51:13.9701946Z ##[endgroup]
+2025-06-04T21:51:14.0771749Z Syncing repository: nochadisfaction/pixelated
+2025-06-04T21:51:14.0773570Z ##[group]Getting Git version info
+2025-06-04T21:51:14.0774324Z Working directory is '/home/runner/work/pixelated/pixelated'
+2025-06-04T21:51:14.0775238Z [command]/usr/bin/git version
+2025-06-04T21:51:14.0830614Z git version 2.49.0
+2025-06-04T21:51:14.0855840Z ##[endgroup]
+2025-06-04T21:51:14.0869656Z Temporarily overriding HOME='/home/runner/work/_temp/561cb335-6dab-4312-8411-622b0d0d5090' before making global git config changes
+2025-06-04T21:51:14.0872060Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-04T21:51:14.0875246Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pixelated/pixelated
+2025-06-04T21:51:14.0909560Z Deleting the contents of '/home/runner/work/pixelated/pixelated'
+2025-06-04T21:51:14.0913340Z ##[group]Initializing the repository
+2025-06-04T21:51:14.0917003Z [command]/usr/bin/git init /home/runner/work/pixelated/pixelated
+2025-06-04T21:51:14.0981915Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-06-04T21:51:14.0983149Z hint: is subject to change. To configure the initial branch name to use in all
+2025-06-04T21:51:14.0984057Z hint: of your new repositories, which will suppress this warning, call:
+2025-06-04T21:51:14.0984702Z hint:
+2025-06-04T21:51:14.0985172Z hint: 	git config --global init.defaultBranch <name>
+2025-06-04T21:51:14.0986668Z hint:
+2025-06-04T21:51:14.0987511Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-06-04T21:51:14.0988901Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-06-04T21:51:14.0989717Z hint:
+2025-06-04T21:51:14.0990099Z hint: 	git branch -m <name>
+2025-06-04T21:51:14.0990848Z Initialized empty Git repository in /home/runner/work/pixelated/pixelated/.git/
+2025-06-04T21:51:14.0997295Z [command]/usr/bin/git remote add origin https://github.com/nochadisfaction/pixelated
+2025-06-04T21:51:14.1030740Z ##[endgroup]
+2025-06-04T21:51:14.1031693Z ##[group]Disabling automatic garbage collection
+2025-06-04T21:51:14.1034718Z [command]/usr/bin/git config --local gc.auto 0
+2025-06-04T21:51:14.1062433Z ##[endgroup]
+2025-06-04T21:51:14.1063136Z ##[group]Setting up auth
+2025-06-04T21:51:14.1069065Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-04T21:51:14.1097982Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-04T21:51:14.1391043Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-04T21:51:14.1421789Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-04T21:51:14.1643017Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-06-04T21:51:14.1679590Z ##[endgroup]
+2025-06-04T21:51:14.1680805Z ##[group]Fetching the repository
+2025-06-04T21:51:14.1690613Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +eee88bf9c2234d2ab50d5d867568ad2a7638a9ac:refs/remotes/pull/2/merge
+2025-06-04T21:51:23.6555008Z From https://github.com/nochadisfaction/pixelated
+2025-06-04T21:51:23.6556472Z  * [new ref]             eee88bf9c2234d2ab50d5d867568ad2a7638a9ac -> pull/2/merge
+2025-06-04T21:51:23.6583775Z ##[endgroup]
+2025-06-04T21:51:23.6585497Z ##[group]Determining the checkout info
+2025-06-04T21:51:23.6587393Z ##[endgroup]
+2025-06-04T21:51:23.6591759Z [command]/usr/bin/git sparse-checkout disable
+2025-06-04T21:51:23.6636375Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-06-04T21:51:23.6666569Z ##[group]Checking out the ref
+2025-06-04T21:51:23.6670749Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/2/merge
+2025-06-04T21:51:24.9264119Z Updating files:   8% (6941/83443)
+2025-06-04T21:51:24.9896504Z Updating files:   9% (7510/83443)
+2025-06-04T21:51:25.0815051Z Updating files:  10% (8345/83443)
+2025-06-04T21:51:25.1365272Z Updating files:  11% (9179/83443)
+2025-06-04T21:51:25.1763214Z Updating files:  12% (10014/83443)
+2025-06-04T21:51:25.2222734Z Updating files:  13% (10848/83443)
+2025-06-04T21:51:25.2868230Z Updating files:  14% (11683/83443)
+2025-06-04T21:51:25.3955266Z Updating files:  15% (12517/83443)
+2025-06-04T21:51:25.4922661Z Updating files:  16% (13351/83443)
+2025-06-04T21:51:25.6253372Z Updating files:  17% (14186/83443)
+2025-06-04T21:51:25.6964905Z Updating files:  18% (15020/83443)
+2025-06-04T21:51:25.7492021Z Updating files:  19% (15855/83443)
+2025-06-04T21:51:25.7665099Z Updating files:  19% (16546/83443)
+2025-06-04T21:51:25.8430237Z Updating files:  20% (16689/83443)
+2025-06-04T21:51:25.9257749Z Updating files:  21% (17524/83443)
+2025-06-04T21:51:26.0120017Z Updating files:  22% (18358/83443)
+2025-06-04T21:51:26.1055283Z Updating files:  23% (19192/83443)
+2025-06-04T21:51:26.1849524Z Updating files:  24% (20027/83443)
+2025-06-04T21:51:26.2919428Z Updating files:  25% (20861/83443)
+2025-06-04T21:51:26.3640729Z Updating files:  26% (21696/83443)
+2025-06-04T21:51:26.4462691Z Updating files:  27% (22530/83443)
+2025-06-04T21:51:26.5071339Z Updating files:  28% (23365/83443)
+2025-06-04T21:51:26.5976496Z Updating files:  29% (24199/83443)
+2025-06-04T21:51:26.6661684Z Updating files:  30% (25033/83443)
+2025-06-04T21:51:26.7294326Z Updating files:  31% (25868/83443)
+2025-06-04T21:51:26.7490121Z Updating files:  32% (26702/83443)
+2025-06-04T21:51:26.7732275Z Updating files:  32% (27080/83443)
+2025-06-04T21:51:26.8701402Z Updating files:  33% (27537/83443)
+2025-06-04T21:51:26.8985115Z Updating files:  34% (28371/83443)
+2025-06-04T21:51:26.9269460Z Updating files:  35% (29206/83443)
+2025-06-04T21:51:26.9553294Z Updating files:  36% (30040/83443)
+2025-06-04T21:51:26.9829623Z Updating files:  37% (30874/83443)
+2025-06-04T21:51:27.0101758Z Updating files:  38% (31709/83443)
+2025-06-04T21:51:27.0368702Z Updating files:  39% (32543/83443)
+2025-06-04T21:51:27.0639296Z Updating files:  40% (33378/83443)
+2025-06-04T21:51:27.0925664Z Updating files:  41% (34212/83443)
+2025-06-04T21:51:27.1199221Z Updating files:  42% (35047/83443)
+2025-06-04T21:51:27.1481085Z Updating files:  43% (35881/83443)
+2025-06-04T21:51:27.1763723Z Updating files:  44% (36715/83443)
+2025-06-04T21:51:27.2056753Z Updating files:  45% (37550/83443)
+2025-06-04T21:51:27.2345424Z Updating files:  46% (38384/83443)
+2025-06-04T21:51:27.2627837Z Updating files:  47% (39219/83443)
+2025-06-04T21:51:27.2913680Z Updating files:  48% (40053/83443)
+2025-06-04T21:51:27.3190960Z Updating files:  49% (40888/83443)
+2025-06-04T21:51:27.3475860Z Updating files:  50% (41722/83443)
+2025-06-04T21:51:27.3755637Z Updating files:  51% (42556/83443)
+2025-06-04T21:51:27.4034528Z Updating files:  52% (43391/83443)
+2025-06-04T21:51:27.4310101Z Updating files:  53% (44225/83443)
+2025-06-04T21:51:27.4590175Z Updating files:  54% (45060/83443)
+2025-06-04T21:51:27.4870481Z Updating files:  55% (45894/83443)
+2025-06-04T21:51:27.5158267Z Updating files:  56% (46729/83443)
+2025-06-04T21:51:27.5441755Z Updating files:  57% (47563/83443)
+2025-06-04T21:51:27.5723486Z Updating files:  58% (48397/83443)
+2025-06-04T21:51:27.5998121Z Updating files:  59% (49232/83443)
+2025-06-04T21:51:27.6280457Z Updating files:  60% (50066/83443)
+2025-06-04T21:51:27.6556139Z Updating files:  61% (50901/83443)
+2025-06-04T21:51:27.6834580Z Updating files:  62% (51735/83443)
+2025-06-04T21:51:27.7117710Z Updating files:  63% (52570/83443)
+2025-06-04T21:51:27.7408350Z Updating files:  64% (53404/83443)
+2025-06-04T21:51:27.7490232Z Updating files:  65% (54238/83443)
+2025-06-04T21:51:27.7795814Z Updating files:  65% (54469/83443)
+2025-06-04T21:51:27.8796738Z Updating files:  66% (55073/83443)
+2025-06-04T21:51:27.9638922Z Updating files:  67% (55907/83443)
+2025-06-04T21:51:28.0407278Z Updating files:  68% (56742/83443)
+2025-06-04T21:51:28.0865709Z Updating files:  69% (57576/83443)
+2025-06-04T21:51:28.1752738Z Updating files:  70% (58411/83443)
+2025-06-04T21:51:28.2574135Z Updating files:  71% (59245/83443)
+2025-06-04T21:51:28.3694291Z Updating files:  72% (60079/83443)
+2025-06-04T21:51:28.4637256Z Updating files:  73% (60914/83443)
+2025-06-04T21:51:28.5465133Z Updating files:  74% (61748/83443)
+2025-06-04T21:51:28.6313919Z Updating files:  75% (62583/83443)
+2025-06-04T21:51:28.7409418Z Updating files:  76% (63417/83443)
+2025-06-04T21:51:28.7490263Z Updating files:  77% (64252/83443)
+2025-06-04T21:51:28.8214465Z Updating files:  77% (64302/83443)
+2025-06-04T21:51:28.9492209Z Updating files:  78% (65086/83443)
+2025-06-04T21:51:29.0374319Z Updating files:  79% (65920/83443)
+2025-06-04T21:51:29.1156833Z Updating files:  80% (66755/83443)
+2025-06-04T21:51:29.2265740Z Updating files:  81% (67589/83443)
+2025-06-04T21:51:29.2928711Z Updating files:  82% (68424/83443)
+2025-06-04T21:51:29.3588335Z Updating files:  83% (69258/83443)
+2025-06-04T21:51:29.4424450Z Updating files:  84% (70093/83443)
+2025-06-04T21:51:29.5362271Z Updating files:  85% (70927/83443)
+2025-06-04T21:51:29.6218154Z Updating files:  86% (71761/83443)
+2025-06-04T21:51:29.7279589Z Updating files:  87% (72596/83443)
+2025-06-04T21:51:29.7491456Z Updating files:  88% (73430/83443)
+2025-06-04T21:51:29.8108370Z Updating files:  88% (73695/83443)
+2025-06-04T21:51:29.8732110Z Updating files:  89% (74265/83443)
+2025-06-04T21:51:29.9294729Z Updating files:  90% (75099/83443)
+2025-06-04T21:51:29.9911806Z Updating files:  91% (75934/83443)
+2025-06-04T21:51:30.0780610Z Updating files:  92% (76768/83443)
+2025-06-04T21:51:30.1706083Z Updating files:  93% (77602/83443)
+2025-06-04T21:51:30.3108600Z Updating files:  94% (78437/83443)
+2025-06-04T21:51:30.3869875Z Updating files:  95% (79271/83443)
+2025-06-04T21:51:30.4645669Z Updating files:  96% (80106/83443)
+2025-06-04T21:51:30.5032075Z Updating files:  97% (80940/83443)
+2025-06-04T21:51:30.6442253Z Updating files:  98% (81775/83443)
+2025-06-04T21:51:30.6984310Z Updating files:  99% (82609/83443)
+2025-06-04T21:51:30.6985153Z Updating files: 100% (83443/83443)
+2025-06-04T21:51:30.6985671Z Updating files: 100% (83443/83443), done.
+2025-06-04T21:51:30.8074594Z Note: switching to 'refs/remotes/pull/2/merge'.
+2025-06-04T21:51:30.8075494Z 
+2025-06-04T21:51:30.8075897Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-06-04T21:51:30.8076905Z changes and commit them, and you can discard any commits you make in this
+2025-06-04T21:51:30.8077905Z state without impacting any branches by switching back to a branch.
+2025-06-04T21:51:30.8078453Z 
+2025-06-04T21:51:30.8078765Z If you want to create a new branch to retain commits you create, you may
+2025-06-04T21:51:30.8079311Z do so (now or later) by using -c with the switch command. Example:
+2025-06-04T21:51:30.8079603Z 
+2025-06-04T21:51:30.8079721Z   git switch -c <new-branch-name>
+2025-06-04T21:51:30.8079917Z 
+2025-06-04T21:51:30.8080022Z Or undo this operation with:
+2025-06-04T21:51:30.8080204Z 
+2025-06-04T21:51:30.8080300Z   git switch -
+2025-06-04T21:51:30.8080432Z 
+2025-06-04T21:51:30.8080913Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-06-04T21:51:30.8081638Z 
+2025-06-04T21:51:30.8082068Z HEAD is now at eee88bf9c Merge a7ab312bee181441b3edbb4a374fb42bff08c442 into a01b55b8ccd924680002ffc57ed60baa1f256fdc
+2025-06-04T21:51:30.9922464Z ##[endgroup]
+2025-06-04T21:51:30.9967385Z [command]/usr/bin/git log -1 --format=%H
+2025-06-04T21:51:30.9992303Z eee88bf9c2234d2ab50d5d867568ad2a7638a9ac
+2025-06-04T21:51:31.0177827Z ##[group]Run NODE_VERSION=$(cat .nvmrc | tr -d '[:space:]')
+2025-06-04T21:51:31.0178278Z [36;1mNODE_VERSION=$(cat .nvmrc | tr -d '[:space:]')[0m
+2025-06-04T21:51:31.0178652Z [36;1mecho "node-version=${NODE_VERSION}" >> $GITHUB_OUTPUT[0m
+2025-06-04T21:51:31.0178997Z [36;1mecho "Node.js version: ${NODE_VERSION}"[0m
+2025-06-04T21:51:31.0355689Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:51:31.0355992Z ##[endgroup]
+2025-06-04T21:51:31.0469658Z Node.js version: 22.x
+2025-06-04T21:51:31.0520011Z ##[group]Run PNPM_VERSION=$(jq -r '.packageManager | select(startswith("pnpm@")) | split("@")[1]' package.json)
+2025-06-04T21:51:31.0520748Z [36;1mPNPM_VERSION=$(jq -r '.packageManager | select(startswith("pnpm@")) | split("@")[1]' package.json)[0m
+2025-06-04T21:51:31.0521823Z [36;1mecho "pnpm-version=${PNPM_VERSION}" >> $GITHUB_OUTPUT[0m
+2025-06-04T21:51:31.0522151Z [36;1mecho "pnpm version: ${PNPM_VERSION}"[0m
+2025-06-04T21:51:31.0573914Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:51:31.0574143Z ##[endgroup]
+2025-06-04T21:51:31.0682806Z pnpm version: 10.11.0
+2025-06-04T21:51:31.0713234Z ##[group]Run # For now, hardcoded but could read from a file
+2025-06-04T21:51:31.0713890Z [36;1m# For now, hardcoded but could read from a file[0m
+2025-06-04T21:51:31.0714310Z [36;1mPYTHON_VERSION="3.12"[0m
+2025-06-04T21:51:31.0714729Z [36;1mecho "python-version=${PYTHON_VERSION}" >> $GITHUB_OUTPUT[0m
+2025-06-04T21:51:31.0715171Z [36;1mecho "Python version: ${PYTHON_VERSION}"[0m
+2025-06-04T21:51:31.0765359Z shell: /usr/bin/bash -e {0}
+2025-06-04T21:51:31.0765581Z ##[endgroup]
+2025-06-04T21:51:31.0831845Z Python version: 3.12
+2025-06-04T21:51:31.0973808Z Post job cleanup.
+2025-06-04T21:51:31.1905982Z [command]/usr/bin/git version
+2025-06-04T21:51:31.1943100Z git version 2.49.0
+2025-06-04T21:51:31.1987726Z Temporarily overriding HOME='/home/runner/work/_temp/9932e699-65af-40ff-8348-9ecf1956f696' before making global git config changes
+2025-06-04T21:51:31.1988969Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-04T21:51:31.2002132Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pixelated/pixelated
+2025-06-04T21:51:31.2042170Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-04T21:51:31.2074939Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-04T21:51:31.2380619Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-04T21:51:31.2404583Z http.https://github.com/.extraheader
+2025-06-04T21:51:31.2416410Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-06-04T21:51:31.2446663Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-04T21:51:31.2853769Z Evaluate and set job outputs
+2025-06-04T21:51:31.2861870Z Set output 'node-version'
+2025-06-04T21:51:31.2863585Z Set output 'pnpm-version'
+2025-06-04T21:51:31.2864191Z Set output 'python-version'
+2025-06-04T21:51:31.2864876Z Cleaning up orphan processes

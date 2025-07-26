@@ -1,0 +1,75 @@
+---
+import { ensureTrailingSlash, getUrl } from '~/utils/common'
+import { UI } from '~/config'
+import type { Tabs } from '~/types'
+
+interface Props {
+  subtitle?: string
+}
+
+const { subtitle } = Astro.props
+
+let tabs: Tabs
+if (
+  !UI.tabbedLayoutTabs ||
+  (Array.isArray(UI.tabbedLayoutTabs) && UI.tabbedLayoutTabs.length === 0)
+) {
+  throw new Error('`UI.tabbedLayoutTabs` is not configured.')
+} else {
+  tabs = UI.tabbedLayoutTabs
+}
+
+const currentPath = ensureTrailingSlash(Astro.url.pathname)
+---
+
+<nav id="nav-tabs" class="prose mx-auto mb-8" aria-label="Page sections">
+  <div
+    u-flex="~ gap-3 lt-sm:(col wrap gap-1)"
+    class="mb-0 text-3xl select-none"
+    role="tablist"
+  >
+    {
+      tabs.map((tab) => (
+        <a
+          class:list={{
+            'link': true,
+            'op-transition!': true,
+            'active': currentPath === getUrl(ensureTrailingSlash(tab.path)),
+            'inactive': currentPath !== getUrl(ensureTrailingSlash(tab.path)),
+          }}
+          href={getUrl(ensureTrailingSlash(tab.path))}
+          role="tab"
+          aria-current={
+            currentPath === getUrl(ensureTrailingSlash(tab.path))
+              ? 'page'
+              : false
+          }
+        >
+          {tab.title}
+        </a>
+      ))
+    }
+  </div>
+  {subtitle && <p class="mt-4! op-50 italic">{subtitle}</p>}
+</nav>
+<div class="prose mx-auto">
+  <slot />
+</div>
+
+<style>
+  .link {
+    border-style: none !important;
+  }
+
+  .active {
+    opacity: 1;
+  }
+
+  .inactive {
+    opacity: 0.2;
+  }
+
+  .inactive:hover {
+    opacity: 0.5;
+  }
+</style>

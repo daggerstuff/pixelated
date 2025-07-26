@@ -1,0 +1,348 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+// Set prerender to true to ensure this page is statically generated during build
+export const prerender = true
+---
+
+<BaseLayout
+  title="Privacy Policy | Pixelated Empathy"
+  description="Privacy Policy for Pixelated Empathy's secure AI therapy services"
+  showNavBar={true}
+  showFooter={true}
+  bgPattern={true}
+  usePlumAnimation={false}
+  centered={false}
+>
+  <div class="max-w-3xl mx-auto px-4 py-8">
+    <h1
+      class="text-4xl font-bold text-center mb-8"
+      style="color: #4a9a95 !important;"
+    >
+      Privacy Policy
+    </h1>
+
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-sm italic mb-6 text-center">
+        Last updated: April 10, 2025
+      </p>
+
+      <p>
+        At Pixelated Empathy, the privacy and security of your information is
+        our highest priority. We've engineered our systems from the ground up
+        with privacy-by-design principles and cutting-edge encryption
+        technology. This Privacy Policy details how we collect, use, protect,
+        and handle your personal information and protected health information
+        (PHI) when you use our services.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        HIPAA Compliance Commitment
+      </h2>
+      <p>
+        Pixelated Empathy is fully committed to compliance with the Health
+        Insurance Portability and Accountability Act (HIPAA) and all related
+        regulations. As a healthcare technology provider, we implement all
+        required administrative, physical, and technical safeguards to protect
+        the confidentiality, integrity, and availability of PHI.
+      </p>
+      <p>
+        For healthcare providers using our platform, we execute Business
+        Associate Agreements (BAAs) that clearly outline our respective
+        responsibilities regarding the protection of PHI. Our entire platform is
+        subjected to regular third-party HIPAA compliance audits to ensure we
+        meet or exceed all statutory requirements.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Information We Collect
+      </h2>
+      <p>We collect information that you provide directly to us, including:</p>
+      <ul class="list-disc pl-5 my-4">
+        <li>Account information (name, email, professional credentials)</li>
+        <li>Authentication credentials (securely stored)</li>
+        <li>Therapy session content and communications</li>
+        <li>Billing and payment information</li>
+        <li>Usage data and platform analytics</li>
+        <li>Technical information about your devices and connection</li>
+      </ul>
+      <p>
+        For healthcare providers, we may collect protected health information
+        (PHI) about your clients. This information is always encrypted using our
+        advanced security measures described below.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Advanced Security Architecture
+      </h2>
+      <p>Our platform implements multiple layers of security and encryption:</p>
+      <ul class="list-disc pl-5 my-4">
+        <li>
+          <strong>Fully Homomorphic Encryption (FHE):</strong> The cornerstone of
+          our security architecture, FHE allows our AI systems to analyze and process
+          your data while it remains fully encrypted. This means your sensitive information
+          is never exposed in an unencrypted form, even during processing.
+        </li>
+        <li>
+          <strong>Client-Side Encryption:</strong> All data is encrypted on your
+          device before transmission to our servers, ensuring data is protected from
+          the moment it leaves your device.
+        </li>
+        <li>
+          <strong>End-to-End Encryption:</strong> Communications between users are
+          encrypted end-to-end, meaning only the intended recipients can decrypt
+          and view the content.
+        </li>
+        <li>
+          <strong>HIPAA-Compliant Data Storage:</strong> All stored data uses AES-256-GCM
+          encryption with secure key management and regular key rotation.
+        </li>
+        <li>
+          <strong>Zero-Knowledge Architecture:</strong> Our systems are designed
+          so that we technically cannot access your unencrypted data, even if compelled
+          to do so.
+        </li>
+      </ul>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        How We Use Your Information
+      </h2>
+      <p>We use the information we collect to:</p>
+      <ul class="list-disc pl-5 my-4">
+        <li>Provide, maintain, and improve our services</li>
+        <li>Process transactions and send related information</li>
+        <li>Authenticate users and protect against unauthorized access</li>
+        <li>Generate anonymized, aggregated analytics about service usage</li>
+        <li>Comply with legal obligations, including HIPAA requirements</li>
+        <li>Detect and prevent security incidents and fraudulent activity</li>
+        <li>
+          Send technical notices, updates, security alerts, and administrative
+          messages
+        </li>
+        <li>Respond to your comments, questions, and requests</li>
+        <li>
+          Develop new products and services that may be of interest to you
+        </li>
+      </ul>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Information Sharing and Disclosure
+      </h2>
+      <p>
+        Due to our zero-knowledge encryption architecture, we technically cannot
+        access your data in a decrypted form. We do not sell, trade, or
+        otherwise transfer your personally identifiable information or PHI to
+        outside parties except in the following limited circumstances:
+      </p>
+      <ul class="list-disc pl-5 my-4">
+        <li>
+          <strong>With Your Explicit Consent:</strong> We will share your information
+          with third parties only when you have authorized us to do so.
+        </li>
+        <li>
+          <strong>Service Providers:</strong> We may share information with trusted
+          third parties who assist us in operating our website, conducting our business,
+          or providing services to you, as long as these parties agree to keep this
+          information confidential and secure. All such parties sign BAAs when they
+          may encounter PHI.
+        </li>
+        <li>
+          <strong>Legal Requirements:</strong> We may disclose information when required
+          by law, such as in response to a subpoena, court order, or other legal
+          process. However, due to our encryption architecture, we may only be able
+          to provide encrypted data that cannot be decrypted without your keys.
+        </li>
+        <li>
+          <strong>Business Transfers:</strong> If Pixelated Empathy is involved in
+          a merger, acquisition, or sale of all or a portion of its assets, you will
+          be notified via email and/or prominent notice on our website of any change
+          in ownership or uses of your information, as well as any choices you may
+          have regarding your information.
+        </li>
+      </ul>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Data Retention and Deletion
+      </h2>
+      <p>
+        We retain your information for as long as necessary to provide our
+        services and fulfill the purposes outlined in this Privacy Policy,
+        unless a longer retention period is required or permitted by law. For
+        PHI, we follow HIPAA-mandated retention periods.
+      </p>
+      <p>
+        When you delete your account, we initiate a secure deletion process that
+        permanently removes your personal data from our systems within 30 days.
+        Due to our encryption architecture, deleted data cannot be recovered
+        once this process is complete.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Your Rights and Choices
+      </h2>
+      <p>
+        Depending on your location, you may have certain rights regarding your
+        personal information:
+      </p>
+      <ul class="list-disc pl-5 my-4">
+        <li>
+          <strong>Access and Portability:</strong> You can access and export your
+          data at any time through your account settings.
+        </li>
+        <li>
+          <strong>Correction:</strong> You can update or correct your personal information
+          through your account settings.
+        </li>
+        <li>
+          <strong>Deletion:</strong> You can request deletion of your account and
+          personal information.
+        </li>
+        <li>
+          <strong>Objection and Restriction:</strong> You can object to or request
+          restriction of processing of your personal information.
+        </li>
+        <li>
+          <strong>Consent Withdrawal:</strong> You can withdraw consent for processing
+          where consent is the basis for processing.
+        </li>
+      </ul>
+      <p>
+        For healthcare providers, we have implemented tools to help you fulfill
+        data subject access requests from your clients in compliance with
+        applicable regulations.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Security Incident Response
+      </h2>
+      <p>
+        In the unlikely event of a security breach, we maintain a comprehensive
+        Security Incident Response Plan that includes:
+      </p>
+      <ul class="list-disc pl-5 my-4">
+        <li>Prompt notification to affected users as required by law</li>
+        <li>Thorough investigation and remediation of the incident</li>
+        <li>Coordination with law enforcement when appropriate</li>
+        <li>Implementation of measures to prevent similar incidents</li>
+      </ul>
+      <p>
+        For breaches involving PHI, we follow all HIPAA Breach Notification Rule
+        requirements, including notifications to affected individuals, the
+        Department of Health and Human Services, and, when required, the media.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        International Data Transfers
+      </h2>
+      <p>
+        Pixelated Empathy is based in the United States and the information we
+        collect is governed by U.S. law. If you are accessing our services from
+        outside the United States, please be aware that information collected
+        through our platform may be transferred to, processed, stored, and used
+        in the U.S. and other jurisdictions.
+      </p>
+      <p>
+        For users in the European Economic Area (EEA), United Kingdom, or
+        Switzerland, we comply with applicable data protection laws when
+        transferring your personal information outside these regions. Our
+        homomorphic encryption technology provides additional protection for
+        such transfers, as transferred data remains encrypted and inaccessible
+        to unauthorized parties.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Children's Privacy
+      </h2>
+      <p>
+        Our services are not directed to individuals under the age of 18. We do
+        not knowingly collect personal information from children. If you are a
+        parent or guardian and believe that your child has provided us with
+        personal information, please contact us so that we can delete such
+        information.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Changes to This Privacy Policy
+      </h2>
+      <p>
+        We may update this Privacy Policy from time to time to reflect changes
+        in our practices or for other operational, legal, or regulatory reasons.
+        When we make material changes to this Privacy Policy, we will notify you
+        by email, through our application, or by posting a notice on our website
+        prior to the changes becoming effective. Your continued use of our
+        services after any changes to this Privacy Policy constitutes your
+        acceptance of the revised Privacy Policy.
+      </p>
+
+      <h2
+        class="text-2xl font-semibold mt-8 mb-4"
+        style="color: #4a9a95 !important;"
+      >
+        Contact Us
+      </h2>
+      <p>
+        If you have any questions, concerns, or requests regarding this Privacy
+        Policy or our privacy practices, please contact our Data Protection
+        Officer at:
+      </p>
+      <p class="text-center mt-4">
+        Email: <a
+          href="mailto:privacy@pixelatedempathy.com"
+          class="text-gray-400 hover:text-gray-300"
+          >privacy@pixelatedempathy.com</a
+        ><br />
+        Phone: +1-800-123-4567<br />
+        Address: 123 Encryption Way, Suite 256<br />
+        Secure City, CA 94000<br />
+        United States
+      </p>
+      <p class="mt-4">
+        For HIPAA-related inquiries, please contact our HIPAA Privacy Officer at
+        <a
+          href="mailto:hipaa@pixelatedempathy.com"
+          class="text-gray-400 hover:text-gray-300"
+          >hipaa@pixelatedempathy.com</a
+        >.
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .text-gradient {
+    color: #4a9a95;
+  }
+</style>

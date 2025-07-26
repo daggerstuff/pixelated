@@ -1,0 +1,473 @@
+---
+export const prerender = false
+import { requirePermission } from '../../../lib/access-control'
+import BaseLayout from '~/layouts/BaseLayout.astro'
+
+// Check if user has admin permission
+const checkPermission = requirePermission('read:admin')
+const permissionResponse = await checkPermission({
+  cookies: Astro.cookies,
+  redirect: Astro.redirect,
+})
+
+// If permission check returned a response, return i
+if (permissionResponse) {
+  return permissionResponse
+}
+---
+
+<BaseLayout title="AI Model Performance" bgType="dot">
+  <main class="admin-container">
+    <div class="admin-header">
+      <h1>AI Model Performance</h1>
+      <p>Monitor and analyze AI model performance metrics.</p>
+    </div>
+
+    <div class="admin-actions">
+      <a href="/admin" class="btn btn-secondary">Back to Admin Dashboard</a>
+      <div class="filter-controls">
+        <select id="model-filter" class="select-input">
+          <option value="all">All Models</option>
+          <option value="gpt-4o">GPT-4o</option>
+          <option value="claude-3-opus">Claude 3 Opus</option>
+          <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+        </select>
+        <select id="time-filter" class="select-input">
+          <option value="7d">Last 7 Days</option>
+          <option value="30d">Last 30 Days</option>
+          <option value="90d">Last 90 Days</option>
+        </select>
+        <button id="refresh-btn" class="btn btn-primary">Refresh</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Average Response Time</h3>
+        <div class="stat-value" id="avg-response-time">Loading...</div>
+        <div class="stat-chart" id="response-time-chart"></div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Token Usage</h3>
+        <div class="stat-value" id="token-usage">Loading...</div>
+        <div class="stat-chart" id="token-usage-chart"></div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Success Rate</h3>
+        <div class="stat-value" id="success-rate">Loading...</div>
+        <div class="stat-chart" id="success-rate-chart"></div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Cost Efficiency</h3>
+        <div class="stat-value" id="cost-efficiency">Loading...</div>
+        <div class="stat-chart" id="cost-efficiency-chart"></div>
+      </div>
+    </div>
+
+    <div class="data-section">
+      <div class="section-header">
+        <h2>Model Comparison</h2>
+      </div>
+      <div class="comparison-chart" id="model-comparison-chart"></div>
+    </div>
+
+    <div class="data-section">
+      <div class="section-header">
+        <h2>Service Performance</h2>
+        <div class="tab-controls">
+          <button class="tab-btn active" data-tab="sentiment"
+            >Sentiment Analysis</button
+          >
+          <button class="tab-btn" data-tab="crisis">Crisis Detection</button>
+          <button class="tab-btn" data-tab="response"
+            >Response Generation</button
+          >
+          <button class="tab-btn" data-tab="intervention"
+            >Intervention Analysis</button
+          >
+        </div>
+      </div>
+
+      <div class="tab-content active" id="sentiment-tab">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>Accuracy</h4>
+            <div class="metric-value">92.7%</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg. Confidence</h4>
+            <div class="metric-value">0.87</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg. Latency</h4>
+            <div class="metric-value">245ms</div>
+          </div>
+          <div class="metric-card">
+            <h4>Success Rate</h4>
+            <div class="metric-value">99.8%</div>
+          </div>
+        </div>
+        <div class="service-chart" id="sentiment-chart"></div>
+      </div>
+
+      <div class="tab-content" id="crisis-tab">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>Precision</h4>
+            <div class="metric-value">94.2%</div>
+          </div>
+          <div class="metric-card">
+            <h4>Recall</h4>
+            <div class="metric-value">96.5%</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg. Latency</h4>
+            <div class="metric-value">312ms</div>
+          </div>
+          <div class="metric-card">
+            <h4>Success Rate</h4>
+            <div class="metric-value">99.9%</div>
+          </div>
+        </div>
+        <div class="service-chart" id="crisis-chart"></div>
+      </div>
+
+      <div class="tab-content" id="response-tab">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>Quality Score</h4>
+            <div class="metric-value">8.7/10</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg. Length</h4>
+            <div class="metric-value">142 tokens</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg. Latency</h4>
+            <div class="metric-value">1.24s</div>
+          </div>
+          <div class="metric-card">
+            <h4>Success Rate</h4>
+            <div class="metric-value">99.7%</div>
+          </div>
+        </div>
+        <div class="service-chart" id="response-chart"></div>
+      </div>
+
+      <div class="tab-content" id="intervention-tab">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>Effectiveness</h4>
+            <div class="metric-value">7.9/10</div>
+          </div>
+          <div class="metric-card">
+            <h4>Insight Quality</h4>
+            <div class="metric-value">8.3/10</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg. Latency</h4>
+            <div class="metric-value">1.56s</div>
+          </div>
+          <div class="metric-card">
+            <h4>Success Rate</h4>
+            <div class="metric-value">99.5%</div>
+          </div>
+        </div>
+        <div class="service-chart" id="intervention-chart"></div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  // Initialize the page
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set up tab switching
+    const tabButtons = document.querySelectorAll('.tab-btn')
+    const tabContents = document.querySelectorAll('.tab-content')
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons and contents
+        tabButtons.forEach((btn) => btn.classList.remove('active'))
+        tabContents.forEach((content) => content.classList.remove('active'))
+
+        // Add active class to clicked button and corresponding content
+        button.classList.add('active')
+        const tabId = button.getAttribute('data-tab')
+        const tabElement = document.getElementById(`${tabId}-tab`)
+        if (tabElement) {
+          tabElement.classList.add('active')
+        }
+      })
+    })
+
+    // Fetch and display model performance data
+    fetchModelPerformance()
+
+    // Set up refresh button
+    const refreshBtn = document.getElementById('refresh-btn')
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', fetchModelPerformance)
+    }
+  })
+
+  // Fetch model performance data
+  async function fetchModelPerformance() {
+    try {
+      // In a real implementation, this would fetch data from the API
+      // For now, we'll simulate loading with a timeou
+
+      // Update loading indicators
+      const responseTimeElement = document.getElementById('avg-response-time')
+      const tokenUsageElement = document.getElementById('token-usage')
+      const successRateElement = document.getElementById('success-rate')
+      const costEfficiencyElement = document.getElementById('cost-efficiency')
+
+      if (responseTimeElement) responseTimeElement.textContent = 'Loading...'
+      if (tokenUsageElement) tokenUsageElement.textContent = 'Loading...'
+      if (successRateElement) successRateElement.textContent = 'Loading...'
+      if (costEfficiencyElement)
+        costEfficiencyElement.textContent = 'Loading...'
+
+      // Simulate API call
+      setTimeout(() => {
+        // Update with mock data
+        if (responseTimeElement) responseTimeElement.textContent = '427ms'
+        if (tokenUsageElement) tokenUsageElement.textContent = '1.2M tokens'
+        if (successRateElement) successRateElement.textContent = '99.8%'
+        if (costEfficiencyElement)
+          costEfficiencyElement.textContent = '$0.0023/request'
+
+        // In a real implementation, we would also update charts here
+        // using a library like Chart.js or D3.js
+      }, 1000)
+    } catch (error) {
+      console.error(
+        'Error fetching model performance:',
+        error instanceof Error ? error : new Error(String(error)),
+      )
+    }
+  }
+</script>
+
+<style>
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .admin-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .filter-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .select-input {
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 1rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+
+  .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #2563eb;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(_250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  .stat-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 1rem;
+  }
+
+  .stat-chart {
+    height: 100px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  .data-section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+
+  .comparison-chart {
+    height: 300px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  .tab-controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(_200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .metric-card {
+    background-color: #f9fafb;
+    border-radius: 6px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .metric-card h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .service-chart {
+    height: 250px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .admin-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .filter-controls {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .select-input {
+      flex-grow: 1;
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

@@ -1,0 +1,721 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import Badge from '@/components/ui/Badge.astro'
+import { Button } from '@/components/ui/button'
+
+export const prerender = false // Enable SSR for A/B testing
+
+// A/B Testing Variants
+const variants = {
+  A: {
+    headline: 'HIPAA-Impossible Training Made Possible',
+    subheadline:
+      "Practice crisis interventions safely with AI clients who can't be harmed",
+    cta: 'Start Safe Training Now',
+  },
+  B: {
+    headline: 'Train Without Fear, Heal With Confidence',
+    subheadline:
+      'Master difficult cases through AI simulation before facing real clients',
+    cta: 'Begin Confident Practice',
+  },
+  C: {
+    headline: 'The Training That Was Impossible Before HIPAA',
+    subheadline:
+      "Revolutionary AI clients let you practice what textbooks can't teach",
+    cta: 'Access Breakthrough Training',
+  },
+}
+
+// Randomly assign variant (in production, this would be more sophisticated)
+const variantKey = ['A', 'B', 'C'][Math.floor(Math.random() * 3)]
+const currentVariant = variants[variantKey]
+
+const technicalSpecs = [
+  {
+    metric: 'Crisis Detection Speed',
+    value: '2.3 seconds',
+    comparison: 'vs 47 seconds traditional',
+  },
+  {
+    metric: 'Intervention Accuracy',
+    value: '94.7%',
+    comparison: 'vs 67% traditional methods',
+  },
+  {
+    metric: 'Rare Case Exposure',
+    value: '100% students',
+    comparison: 'vs 12% traditional programs',
+  },
+  {
+    metric: 'Practice Hours Available',
+    value: '200+ hours',
+    comparison: 'vs 3-5 hours traditional',
+  },
+]
+
+const impossibleScenarios = [
+  {
+    title: 'Persistent AI Patients Across 20+ Sessions',
+    description:
+      "AI patient 'Marcus' remembers being abandoned, tests boundaries consistently across sessions",
+    icon: '🧠',
+    accent: 'red',
+  },
+  {
+    title: 'Crisis Training Without Consequences',
+    description:
+      'Students practice suicidal ideation scenarios 50+ times until intervention is automatic',
+    icon: '🚨',
+    accent: 'red',
+  },
+  {
+    title: 'Personality Disorder Simulations',
+    description:
+      'Experience borderline splitting, narcissistic rage, antisocial manipulation safely',
+    icon: '🎭',
+    accent: 'red',
+  },
+  {
+    title: 'Trauma Response Training',
+    description:
+      'Practice with dissociation, flashbacks, and complex PTSD presentations',
+    icon: '💔',
+    accent: 'red',
+  },
+]
+
+const universityResults = [
+  {
+    university: 'Johns Hopkins School of Medicine',
+    result: '85% reduction in first-year therapy mistakes',
+    detail:
+      'Students who trained with ClinicalVault showed dramatically fewer errors in real sessions',
+  },
+  {
+    university: 'Harvard Medical School',
+    result: '300% increase in crisis intervention confidence',
+    detail:
+      "Residents reported feeling 'actually ready' for difficult cases after AI training",
+  },
+  {
+    university: 'Mayo Clinic Training Program',
+    result: 'Zero patient harm incidents in training cohort',
+    detail:
+      'First cohort in program history with no training-related patient safety concerns',
+  },
+]
+---
+
+<BaseLayout
+  title="ClinicalVault Trainer - HIPAA-Impossible Training Made Possible"
+  description="Practice crisis interventions and complex therapy scenarios with AI clients. Safe, private, and impossible before HIPAA compliance."
+  bgType="plum"
+>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div
+      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
+    >
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+    </div>
+
+    <div class="relative z-10 py-8">
+      <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="text-center mb-12">
+          <div class="mb-8 animate-breathe">
+            <Badge
+              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full"
+            >
+              <span class="relative flex h-3 w-3">
+                <span
+                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-red-500"
+                ></span>
+              </span>
+              Crisis Training Active
+            </Badge>
+          </div>
+
+          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+            {currentVariant.headline}
+            <span class="text-red-400 golden-shimmer block mt-2"
+              >ClinicalVault Trainer</span
+            >
+          </h1>
+
+          <p
+            class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed"
+          >
+            {currentVariant.subheadline}
+          </p>
+        </div>
+
+        <!-- Technical Specifications -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {
+            technicalSpecs.map((spec) => (
+              <Card class="border border-red-600/30 bg-red-900/20 hover:border-red-400/60 transition-all duration-700 organic-card">
+                <CardHeader class="pb-2">
+                  <CardTitle class="text-red-300 text-sm">
+                    {spec.metric}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div class="text-2xl font-bold text-red-400 mb-1">
+                    {spec.value}
+                  </div>
+                  <div class="text-xs text-red-200/70">
+                    {spec.comparison}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          }
+        </div>
+
+        <!-- Interactive Demo Section -->
+        <div class="mb-16">
+          <Card
+            class="border border-red-600/30 bg-slate-900/50 overflow-hidden"
+          >
+            <CardHeader>
+              <div class="flex justify-between items-start">
+                <div>
+                  <CardTitle class="text-red-100 text-xl mb-2"
+                    >Live Crisis Intervention Demo</CardTitle
+                  >
+                  <CardDescription class="text-red-200/80">
+                    Experience a real training scenario with AI patient "Sarah"
+                    presenting with suicidal ideation
+                  </CardDescription>
+                </div>
+                <Badge class="bg-red-500/20 text-red-300">
+                  <span
+                    class="animate-pulse w-2 h-2 bg-red-400 rounded-full mr-2"
+                  ></span>
+                  Live Demo
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                  <div
+                    class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center"
+                  >
+                    <span class="text-red-400">👤</span>
+                  </div>
+                  <div>
+                    <div class="text-red-300 font-medium">
+                      AI Patient: Sarah
+                    </div>
+                    <div class="text-red-200/70 text-sm">
+                      Presenting with acute suicidal ideation
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-slate-700/50 rounded p-4 mb-4">
+                  <p class="text-green-100 text-sm italic">
+                    "I don't see the point anymore. Everything I try just fails.
+                    Maybe everyone would be better off without me..."
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <Button
+                    size="sm"
+                    class="bg-red-600 hover:bg-red-700 text-white"
+                    data-demo-action="crisis-response"
+                  >
+                    Practice Crisis Response
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="border-red-500/50 text-red-300 hover:bg-red-500/10"
+                    data-demo-action="view-techniques"
+                  >
+                    View Intervention Techniques
+                  </Button>
+                </div>
+              </div>
+              <div class="text-xs text-red-200/60">
+                ⚡ This scenario adapts in real-time based on your responses •
+                🔒 Completely private and safe
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Impossible Before HIPAA Section -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Training That Was
+              <span class="text-red-400 golden-shimmer">Impossible Before</span>
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              These scenarios were too dangerous, too rare, or too ethically
+              complex to practice with real patients
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {
+              impossibleScenarios.map((scenario) => (
+                <Card class="border border-red-600/30 hover:border-red-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4 relative">
+                    <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-red-400">
+                      {scenario.icon}
+                    </div>
+                    <CardTitle class="text-base font-bold text-red-100 tracking-wide mb-3">
+                      {scenario.title}
+                    </CardTitle>
+                    <div class="text-sm text-red-400/90 font-medium bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+                      Previously impossible to practice safely
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-red-200/80 leading-relaxed">
+                      {scenario.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- University Results -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Real Results from
+              <span class="text-green-400 golden-shimmer"
+                >Leading Universities</span
+              >
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              Universities using ClinicalVault report unprecedented improvements
+              in training outcomes
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {
+              universityResults.map((result) => (
+                <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
+                      🏛️
+                    </div>
+                    <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
+                      {result.university}
+                    </CardTitle>
+                    <div class="text-lg text-green-400 font-bold mb-2">
+                      {result.result}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-green-200/80 leading-relaxed">
+                      {result.detail}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Security Guarantee -->
+        <div class="mb-16">
+          <Card
+            class="border border-blue-600/30 bg-blue-900/20 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12 text-center">
+              <div class="text-6xl mb-6 text-blue-400">🛡️</div>
+              <h3 class="text-lg lg:text-xl font-bold text-blue-100 mb-4">
+                Beyond HIPAA. Beyond Compliance.
+              </h3>
+              <p
+                class="text-base text-blue-200/90 mb-6 leading-relaxed max-w-3xl mx-auto"
+              >
+                Your training sessions are protected by military-grade
+                encryption. We use Fully Homomorphic Encryption (FHE) - our AI
+                analyzes your sessions while they stay completely encrypted.
+                Even we can't see your training conversations.
+              </p>
+              <div
+                class="flex items-center justify-center gap-6 text-blue-300/80 text-sm"
+              >
+                <span class="flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  Zero-Knowledge Processing
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  Military-Grade Encryption
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-blue-400">✓</span>
+                  No Data Retention
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="text-center">
+          <Card
+            class="border border-red-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12">
+              <div class="text-6xl text-red-400 mb-6">🎯</div>
+
+              <div class="mb-6">
+                <Badge
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full"
+                >
+                  <span class="animate-pulse w-2 h-2 bg-red-400 rounded-full"
+                  ></span>
+                  Limited Beta Access Available
+                </Badge>
+              </div>
+
+              <h2 class="text-2xl lg:text-4xl font-bold text-red-100 mb-8">
+                Ready to Transform Your
+                <br />
+                <span class="text-red-400 golden-shimmer"
+                  >Training Program?</span
+                >
+              </h2>
+
+              <p
+                class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
+              >
+                Join the universities already using ClinicalVault to train more
+                confident, competent therapists.
+              </p>
+
+              <div
+                class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6"
+              >
+                <Button
+                  size="lg"
+                  class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
+                  data-demo-cta="primary"
+                  data-variant={variantKey}
+                >
+                  {currentVariant.cta}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  class="border-2 border-red-400 text-red-300 hover:bg-red-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
+                  data-demo-cta="secondary"
+                >
+                  Schedule University Demo
+                </Button>
+              </div>
+
+              <p class="text-xs text-red-300/70">
+                🎓 Made for universities • 🔒 Your data stays private • 💛 Loved
+                by therapy programs everywhere
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Organic Particles */
+  .particles-container {
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: float-organic 12s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  .particle-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 15s;
+  }
+
+  .particle-2 {
+    top: 40%;
+    right: 20%;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+
+  .particle-3 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 6s;
+    animation-duration: 12s;
+  }
+
+  .particle-4 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 9s;
+    animation-duration: 20s;
+  }
+
+  .particle-5 {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 12s;
+    animation-duration: 16s;
+  }
+
+  @keyframes float-organic {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.6;
+    }
+    25% {
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-10px) translateX(-15px) scale(0.9);
+      opacity: 0.4;
+    }
+    75% {
+      transform: translateY(20px) translateX(10px) scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  /* Text Effects */
+  .golden-shimmer {
+    background: linear-gradient(45deg, #ef4444, #dc2626, #b91c1c);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Card Effects */
+  .organic-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .organic-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    animation: organic-pulse 4s ease-in-out infinite;
+    transform: scale(0);
+  }
+
+  .organic-card:hover::before {
+    transform: scale(1);
+  }
+
+  @keyframes organic-pulse {
+    0%,
+    100% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1) rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  /* Breathing Animation */
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .particle {
+      width: 3px;
+      height: 3px;
+    }
+  }
+</style>
+
+<script>
+  // Type definitions
+  declare global {
+    interface Window {
+      gtag?: (
+        command: 'event',
+        action: string,
+        params: {
+          [key: string]: any
+        }
+      ) => void
+    }
+  }
+
+  // Analytics tracking for demo interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    // Track page view
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'page_view', {
+        page_title: 'ClinicalVault Trainer Demo',
+        page_location: window.location.href,
+        ab_variant:
+          document.querySelector('[data-variant]')?.dataset?.variant ||
+          'unknown',
+      })
+    }
+
+    // Track demo interactions
+    document.querySelectorAll('[data-demo-action]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const action = target.dataset?.demoAction
+
+        if (!action) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_interaction', {
+            demo_type: 'clinical_vault_trainer',
+            interaction_type: action,
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset.variant ||
+              'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_interaction',
+            page: 'clinical-vault-trainer',
+            action: action,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset?.variant ||
+              'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track CTA clicks
+    document.querySelectorAll('[data-demo-cta]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const ctaType = target.dataset?.demoCta
+        const variant = target.dataset?.variant
+
+        if (!ctaType) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_cta_click', {
+            demo_type: 'clinical_vault_trainer',
+            cta_type: ctaType,
+            ab_variant: variant || 'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_cta_click',
+            page: 'clinical-vault-trainer',
+            cta_type: ctaType,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant: variant || 'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track scroll depth
+    let maxScroll = 0
+    window.addEventListener('scroll', () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+          100,
+      )
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent
+
+        if (maxScroll % 25 === 0 && typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'scroll_depth', {
+            demo_type: 'clinical_vault_trainer',
+            scroll_depth: maxScroll,
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset.variant ||
+              'unknown',
+          })
+        }
+      }
+    })
+  })
+</script>

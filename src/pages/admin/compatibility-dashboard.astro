@@ -1,0 +1,426 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Card from '@/components/ui/Card.astro'
+import { Chart } from 'chart.js/auto'
+
+// This data would normally come from a database or API endpoint
+// It represents aggregated data collected by the polyfill analytics
+const mockPolyfillData = {
+  topPolyfills: [
+    { name: 'IntersectionObserver', usagePercentage: 12.4 },
+    { name: 'ResizeObserver', usagePercentage: 8.7 },
+    { name: 'Promise', usagePercentage: 3.2 },
+    { name: 'fetch', usagePercentage: 2.8 },
+    { name: 'CustomElements', usagePercentage: 15.9 },
+    { name: 'WebAnimations', usagePercentage: 22.3 },
+  ],
+  browserUsage: [
+    { name: 'Chrome', percentage: 68.2 },
+    { name: 'Safari', percentage: 15.4 },
+    { name: 'Firefox', percentage: 4.7 },
+    { name: 'Edge', percentage: 8.1 },
+    { name: 'Samsung Internet', percentage: 2.1 },
+    { name: 'Other', percentage: 1.5 },
+  ],
+  polyfillUsageTrend: [
+    { date: '2025-03-01', percentage: 18.2 },
+    { date: '2025-03-08', percentage: 17.8 },
+    { date: '2025-03-15', percentage: 17.4 },
+    { date: '2025-03-22', percentage: 17.1 },
+    { date: '2025-03-29', percentage: 16.9 },
+    { date: '2025-04-05', percentage: 16.6 },
+    { date: '2025-04-12', percentage: 16.2 },
+  ],
+  deviceTypes: [
+    { type: 'Desktop', percentage: 62.4 },
+    { type: 'Mobile', percentage: 32.8 },
+    { type: 'Tablet', percentage: 4.8 },
+  ],
+  recentReports: [
+    {
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1',
+      polyfills: ['WebAnimations', 'ResizeObserver'],
+      timestamp: '2025-04-12T15:23:45Z',
+    },
+    {
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15',
+      polyfills: ['CustomElements', 'WebAnimations'],
+      timestamp: '2025-04-12T15:20:12Z',
+    },
+    {
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      polyfills: [],
+      timestamp: '2025-04-12T15:18:33Z',
+    },
+  ],
+}
+
+// Function to parse user agent into a more readable format
+function parseUserAgent(ua: string): string {
+  let browser = 'Unknown'
+  let device = 'Unknown'
+
+  if (ua.includes('Chrome')) browser = 'Chrome'
+  else if (ua.includes('Firefox')) browser = 'Firefox'
+  else if (ua.includes('Safari')) browser = 'Safari'
+  else if (ua.includes('Edge')) browser = 'Edge'
+
+  if (ua.includes('iPhone')) device = 'iPhone'
+  else if (ua.includes('iPad')) device = 'iPad'
+  else if (ua.includes('Android')) device = 'Android'
+  else if (ua.includes('Windows')) device = 'Windows'
+  else if (ua.includes('Mac OS X')) device = 'Mac'
+
+  return `${browser} on ${device}`
+}
+
+// Function to format date for display
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return date.toLocaleString()
+}
+---
+
+<BaseLayout
+  title="Browser Compatibility Dashboard"
+  description="Monitor browser compatibility and polyfill usage"
+  showNavBar={true}
+  showFooter={true}
+  centered={false}
+  contentClass="pt-20 pb-10 px-4 flex-grow"
+>
+  <div class="container mx-auto max-w-7xl">
+    <h1 class="text-3xl font-bold mb-8 text-center">
+      Browser Compatibility Dashboard
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Polyfill Usage Overview Card -->
+      <Card title="Polyfill Usage Overview">
+        <div class="p-4">
+          <canvas id="polyfillUsageChart" height="250"></canvas>
+        </div>
+      </Card>
+
+      <!-- Browser Distribution Card -->
+      <Card title="Browser Distribution">
+        <div class="p-4">
+          <canvas id="browserDistributionChart" height="250"></canvas>
+        </div>
+      </Card>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Polyfill Usage Trend Card -->
+      <Card title="Polyfill Usage Trend">
+        <div class="p-4">
+          <canvas id="polyfillTrendChart" height="250"></canvas>
+        </div>
+      </Card>
+
+      <!-- Device Type Distribution Card -->
+      <Card title="Device Type Distribution">
+        <div class="p-4">
+          <canvas id="deviceTypeChart" height="250"></canvas>
+        </div>
+      </Card>
+    </div>
+
+    <!-- Recent Polyfill Reports Card -->
+    <Card title="Recent Polyfill Reports">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >Browser/Device</th
+              >
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >Polyfills Used</th
+              >
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >Timestamp</th
+              >
+            </tr>
+          </thead>
+          <tbody
+            class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            {
+              mockPolyfillData.recentReports.map((report) => (
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {parseUserAgent(report.userAgent)}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {report.polyfills.length > 0
+                      ? report.polyfills.join(', ')
+                      : 'None'}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {formatDate(report.timestamp)}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </Card>
+
+    <div class="mt-8 text-center">
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Data is updated daily. Last updated: 2025-04-12 23:59:59 UTC
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import type { ChartConfiguration, TooltipCallbacks } from 'chart.js'
+  import { Chart } from 'chart.js/auto'
+
+  // Initialize charts once the page has loaded
+  document.addEventListener('astro:page-load', () => {
+    setupCharts()
+  })
+
+  function setupCharts() {
+    // Polyfill Usage Overview Chart
+    const polyfillUsageCanvas = document.getElementById(
+      'polyfillUsageChart',
+    ) as HTMLCanvasElement
+    if (polyfillUsageCanvas) {
+      const polyfillUsageCtx = polyfillUsageCanvas.getContext('2d')
+      if (polyfillUsageCtx) {
+        void new Chart(polyfillUsageCtx, {
+          type: 'bar',
+          data: {
+            labels: [
+              'IntersectionObserver',
+              'ResizeObserver',
+              'Promise',
+              'fetch',
+              'CustomElements',
+              'WebAnimations',
+            ],
+            datasets: [
+              {
+                label: 'Usage Percentage',
+                data: [12.4, 8.7, 3.2, 2.8, 15.9, 22.3],
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.5)',
+                  'rgba(54, 162, 235, 0.5)',
+                  'rgba(255, 206, 86, 0.5)',
+                  'rgba(75, 192, 192, 0.5)',
+                  'rgba(153, 102, 255, 0.5)',
+                  'rgba(255, 159, 64, 0.5)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context: any) {
+                    return `${context.raw}% of users`
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Percentage of Users',
+                },
+              },
+            },
+          },
+        })
+      }
+    }
+
+    // Browser Distribution Chart
+    const browserDistributionCanvas = document.getElementById(
+      'browserDistributionChart',
+    ) as HTMLCanvasElement
+    if (browserDistributionCanvas) {
+      const browserDistributionCtx = browserDistributionCanvas.getContext('2d')
+      if (browserDistributionCtx) {
+        void new Chart(browserDistributionCtx, {
+          type: 'doughnut',
+          data: {
+            labels: [
+              'Chrome',
+              'Safari',
+              'Firefox',
+              'Edge',
+              'Samsung Internet',
+              'Other',
+            ],
+            datasets: [
+              {
+                data: [68.2, 15.4, 4.7, 8.1, 2.1, 1.5],
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.5)',
+                  'rgba(54, 162, 235, 0.5)',
+                  'rgba(255, 206, 86, 0.5)',
+                  'rgba(75, 192, 192, 0.5)',
+                  'rgba(153, 102, 255, 0.5)',
+                  'rgba(255, 159, 64, 0.5)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context: any) {
+                    return `${context.label}: ${context.raw}%`
+                  },
+                },
+              },
+            },
+          },
+        })
+      }
+    }
+
+    // Polyfill Usage Trend Chart
+    const polyfillTrendCanvas = document.getElementById(
+      'polyfillTrendChart',
+    ) as HTMLCanvasElement
+    if (polyfillTrendCanvas) {
+      const polyfillTrendCtx = polyfillTrendCanvas.getContext('2d')
+      if (polyfillTrendCtx) {
+        void new Chart(polyfillTrendCtx, {
+          type: 'line',
+          data: {
+            labels: [
+              '2025-03-01',
+              '2025-03-08',
+              '2025-03-15',
+              '2025-03-22',
+              '2025-03-29',
+              '2025-04-05',
+              '2025-04-12',
+            ],
+            datasets: [
+              {
+                label: 'Polyfill Usage',
+                data: [18.2, 17.8, 17.4, 17.1, 16.9, 16.6, 16.2],
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context: any) {
+                    return `${context.raw}% of sessions`
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                title: {
+                  display: true,
+                  text: 'Percentage of Sessions',
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Week',
+                },
+              },
+            },
+          },
+        })
+      }
+    }
+
+    // Device Type Chart
+    const deviceTypeCanvas = document.getElementById(
+      'deviceTypeChart',
+    ) as HTMLCanvasElement
+    if (deviceTypeCanvas) {
+      const deviceTypeCtx = deviceTypeCanvas.getContext('2d')
+      if (deviceTypeCtx) {
+        void new Chart(deviceTypeCtx, {
+          type: 'pie',
+          data: {
+            labels: ['Desktop', 'Mobile', 'Tablet'],
+            datasets: [
+              {
+                data: [62.4, 32.8, 4.8],
+                backgroundColor: [
+                  'rgba(54, 162, 235, 0.5)',
+                  'rgba(255, 99, 132, 0.5)',
+                  'rgba(255, 206, 86, 0.5)',
+                ],
+                borderColor: [
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(255, 206, 86, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context: any) {
+                    return `${context.label}: ${context.raw}%`
+                  },
+                },
+              },
+            },
+          },
+        })
+      }
+    }
+  }
+</script>

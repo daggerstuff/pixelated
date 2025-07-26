@@ -1,0 +1,306 @@
+---
+export const prerender = false
+// patient-rights.astro
+// Admin page for managing patient data access rights and requests
+import AdminLayout from '../../components/admin/AdminLayout.astro'
+import PatientRightsSystem from '../../components/admin/PatientRightsSystem.astro'
+import AccessRequestsLog from '../../components/admin/AccessRequestsLog.astro'
+import DataDeletionLog from '../../components/admin/DataDeletionLog.astro'
+import { Icon } from 'astro-icon/components'
+
+// Page configuration
+const title = 'Patient Rights Management'
+const description =
+  'Manage patient access requests, data deletion, and HIPAA compliance for patient rights'
+
+// Compliance status summary data
+const statusData = {
+  fulfilled: 29,
+  pending: 8,
+  overdue: 2,
+  totalRequests: 39,
+}
+
+// Quick stats
+const quickStats = [
+  {
+    id: 'access-requests',
+    label: 'Access Requests',
+    value: '32',
+    change: '+15%',
+    trend: 'up',
+    icon: 'document-search',
+  },
+  {
+    id: 'deletion-requests',
+    label: 'Deletion Requests',
+    value: '7',
+    change: '+3',
+    trend: 'up',
+    icon: 'trash',
+  },
+  {
+    id: 'avg-response',
+    label: 'Avg. Response Time',
+    value: '2.3 days',
+    change: '-12%',
+    trend: 'down',
+    icon: 'clock',
+  },
+  {
+    id: 'compliance-rate',
+    label: 'Compliance Rate',
+    value: '95%',
+    change: '+2%',
+    trend: 'up',
+    icon: 'shield-check',
+  },
+]
+
+// Get trend class for styling
+const getTrendClass = (trend: string) => {
+  return trend === 'up'
+    ? 'text-green-500 dark:text-green-400'
+    : 'text-red-500 dark:text-red-400'
+}
+
+// Calculate fulfillment percentage
+const fulfillmentPercentage = Math.round(
+  (statusData.fulfilled / statusData.totalRequests) * 100,
+)
+---
+
+<AdminLayout {title} {description} activeItem="patient-rights">
+  <div class="space-y-6">
+    <!-- Header Section -->
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    >
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          {title}
+        </h1>
+        <p class="mt-1 text-gray-500 dark:text-gray-400">
+          Manage patient data rights and access requests in compliance with
+          HIPAA regulations
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
+        >
+          <Icon name="plus" class="w-5 h-5 mr-2" />
+          New Request
+        </button>
+
+        <button
+          type="button"
+          class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
+        >
+          <Icon name="refresh" class="w-5 h-5 mr-2" />
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Compliance Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <!-- Fulfillment Status Card -->
+      <div
+        class="md:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-5"
+      >
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          Request Fulfillment Status
+        </h3>
+
+        <div class="flex items-center mb-4">
+          <div
+            class="relative w-full h-4 bg-gray-200 rounded-full dark:bg-gray-700"
+          >
+            <div
+              class="h-4 bg-blue-600 rounded-full dark:bg-blue-500"
+              style={`width: ${fulfillmentPercentage}%`}
+            >
+            </div>
+          </div>
+          <span
+            class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300"
+            >{fulfillmentPercentage}%</span
+          >
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+              {statusData.fulfilled}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              Fulfilled
+            </div>
+          </div>
+          <div>
+            <div
+              class="text-2xl font-bold text-yellow-600 dark:text-yellow-400"
+            >
+              {statusData.pending}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">Pending</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-red-600 dark:text-red-400">
+              {statusData.overdue}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">Overdue</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats Cards -->
+      <div
+        class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4"
+      >
+        {
+          quickStats.map((stat) => (
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {stat.label}
+                  </p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                    {stat.value}
+                  </p>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/20">
+                  <Icon
+                    name={stat.icon}
+                    class="w-6 h-6 text-blue-600 dark:text-blue-400"
+                  />
+                </div>
+              </div>
+              <div
+                class={`flex items-center mt-4 ${getTrendClass(stat.trend)}`}
+              >
+                <Icon
+                  name={stat.trend === 'up' ? 'trending-up' : 'trending-down'}
+                  class="w-4 h-4 mr-1"
+                />
+                <span class="text-sm font-medium">
+                  {stat.change} from last month
+                </span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex space-x-2 px-4" aria-label="Tabs">
+          <button
+            id="tab-requests"
+            type="button"
+            class="py-4 px-1 border-b-2 border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 font-medium text-sm"
+            aria-selected="true"
+          >
+            Access Requests
+          </button>
+          <button
+            id="tab-deletions"
+            type="button"
+            class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600 font-medium text-sm"
+            aria-selected="false"
+          >
+            Deletion Requests
+          </button>
+          <button
+            id="tab-compliance"
+            type="button"
+            class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600 font-medium text-sm"
+            aria-selected="false"
+          >
+            Compliance Reports
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="p-4">
+        <!-- Access Requests Panel (Default Active) -->
+        <div id="panel-requests" class="block">
+          <PatientRightsSystem />
+        </div>
+
+        <!-- Deletion Requests Panel (Initially Hidden) -->
+        <div id="panel-deletions" class="hidden">
+          <DataDeletionLog />
+        </div>
+
+        <!-- Compliance Reports Panel (Initially Hidden) -->
+        <div id="panel-compliance" class="hidden">
+          <AccessRequestsLog />
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Tab functionality
+    const tabs = document.querySelectorAll('[id^="tab-"]')
+    const panels = document.querySelectorAll('[id^="panel-"]')
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        // Toggle tabs
+        tabs.forEach((t) => {
+          t.classList.remove(
+            'border-blue-500',
+            'text-blue-600',
+            'dark:text-blue-400',
+            'dark:border-blue-400',
+          )
+          t.classList.add(
+            'border-transparent',
+            'text-gray-500',
+            'hover:text-gray-700',
+            'hover:border-gray-300',
+            'dark:text-gray-400',
+            'dark:hover:text-gray-300',
+            'dark:hover:border-gray-600',
+          )
+          t.setAttribute('aria-selected', 'false')
+        })
+
+        tab.classList.remove(
+          'border-transparent',
+          'text-gray-500',
+          'hover:text-gray-700',
+          'hover:border-gray-300',
+          'dark:text-gray-400',
+          'dark:hover:text-gray-300',
+          'dark:hover:border-gray-600',
+        )
+        tab.classList.add(
+          'border-blue-500',
+          'text-blue-600',
+          'dark:text-blue-400',
+          'dark:border-blue-400',
+        )
+        tab.setAttribute('aria-selected', 'true')
+
+        // Toggle panels
+        const tabName = tab.id.replace('tab-', '')
+        panels.forEach((panel) => {
+          panel.classList.add('hidden')
+        })
+        document.getElementById(`panel-${tabName}`)?.classList.remove('hidden')
+      })
+    })
+  })
+</script>

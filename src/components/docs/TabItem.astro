@@ -1,0 +1,40 @@
+---
+interface Props {
+  title: string
+  active?: boolean
+  className?: string
+}
+
+const { active = false, className } = Astro.props
+---
+
+<div
+  class={`tab-item ${active ? 'tab-item-active' : ''} ${className || ''}`}
+  role="tabpanel"
+  aria-hidden={!active}
+>
+  <slot />
+</div>
+
+<style>
+  .tab-item {
+    display: none;
+    padding: 1rem 0;
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  .tab-item-active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

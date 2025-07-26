@@ -1,0 +1,73 @@
+@startuml Infrastructure Architecture
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v16.0/dist
+!include AWSPuml/AWSCommon.puml
+!include AWSPuml/ApplicationIntegration/APIGateway.puml
+!include AWSPuml/Compute/ECS.puml
+!include AWSPuml/Compute/Fargate.puml
+!include AWSPuml/NetworkingContentDelivery/ELBApplicationLoadBalancer.puml
+!include AWSPuml/SecurityIdentityCompliance/Cognito.puml
+!include AWSPuml/SecurityIdentityCompliance/WAF.puml
+!include AWSPuml/SecurityIdentityCompliance/Shield.puml
+!include AWSPuml/SecurityIdentityCompliance/GuardDuty.puml
+!include AWSPuml/Database/Aurora.puml
+!include AWSPuml/Storage/S3.puml
+!include AWSPuml/Analytics/OpenSearch.puml
+!include AWSPuml/ManagementGovernance/CloudWatch.puml
+!include AWSPuml/ApplicationIntegration/SNS.puml
+!include AWSPuml/DeveloperTools/CodeDeploy.puml
+
+title Infrastructure Architecture
+
+' Define VPC
+rectangle "VPC" {
+  ' Public Subnets
+  rectangle "Public Subnet 1" {
+    ELBApplicationLoadBalancer(alb, "Application Load Balancer", "")
+    WAF(waf, "WAF", "")
+    Shield(shield, "Shield", "")
+  }
+
+  ' Private Subnets
+  rectangle "Private Subnet 1" {
+    ECS(ecs, "ECS Cluster", "")
+    Fargate(fargate, "Fargate Tasks", "")
+    Aurora(aurora, "Aurora Database", "")
+  }
+
+  ' Monitoring & Security
+  rectangle "Monitoring & Security" {
+    CloudWatch(cloudwatch, "CloudWatch", "")
+    GuardDuty(guardduty, "GuardDuty", "")
+    OpenSearch(opensearch, "OpenSearch", "")
+  }
+
+  ' Deployment
+  rectangle "Deployment" {
+    CodeDeploy(codedeploy, "CodeDeploy", "")
+    SNS(sns, "SNS", "")
+  }
+}
+
+' External Services
+rectangle "External Services" {
+  S3(s3, "S3 Buckets", "")
+  Cognito(cognito, "Cognito", "")
+}
+
+' Define relationships
+Users --> alb
+alb --> waf
+waf --> shield
+alb --> fargate
+fargate --> aurora
+fargate --> s3
+fargate --> cognito
+fargate --> opensearch
+codedeploy --> fargate
+codedeploy --> sns
+cloudwatch --> sns
+guardduty --> sns
+opensearch --> cloudwatch
+
+@enduml 

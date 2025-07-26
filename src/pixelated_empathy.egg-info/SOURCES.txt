@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+src/lib/ai/bias-detection/start-python-service.py
+src/lib/ai/bias-detection/python/bias_detection_service.py
+src/lib/ai/bias-detection/python-service/bias_detection_service.py
+src/lib/ai/bias-detection/python-service/test_bias_detection_service.py
+src/pixelated_empathy.egg-info/PKG-INFO
+src/pixelated_empathy.egg-info/SOURCES.txt
+src/pixelated_empathy.egg-info/dependency_links.txt
+src/pixelated_empathy.egg-info/requires.txt
+src/pixelated_empathy.egg-info/top_level.txt

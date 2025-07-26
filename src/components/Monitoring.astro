@@ -1,0 +1,30 @@
+---
+import { getMonitoringConfig } from '../lib/monitoring/config'
+
+const config = getMonitoringConfig()
+---
+
+<script>
+  import { MonitoringService } from '../lib/monitoring/service'
+
+  // Initialize monitoring service when the component mounts
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const monitoringService = MonitoringService.getInstance()
+      await monitoringService.initialize()
+    } catch (error) {
+      console.error('Failed to initialize monitoring service:', error)
+    }
+  })
+</script>
+
+{/* Add Grafana Faro Web SDK if RUM is enabled */}
+{
+  config.grafana.enableRUM && (
+    <script
+      src="https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js"
+      async
+      is:inline
+    />
+  )
+}

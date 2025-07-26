@@ -1,0 +1,29 @@
+name: GitHub Backup to Dropbox
+
+permissions: read-all
+
+on:
+  schedule:
+    - cron: 0 0 * * 0
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Backup GitHub to Dropbox
+        uses: chyroc/github2dropbox@v0.4.0
+        with:
+          DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+          ENABLE_REPO: true
+          ENABLE_STAR: true
+          ENABLE_FOLLOWER: true
+          ENABLE_FOLLOWING: true
+          ENABLE_GIST: true
+          ENABLE_ISSUE: true
+          ENABLE_ISSUE_COMMENT: true
+          ENABLE_REPO_GIT: true
+          DROPBOX_PATH: GitHub-Backup

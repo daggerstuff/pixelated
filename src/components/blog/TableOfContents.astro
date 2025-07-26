@@ -1,0 +1,104 @@
+---
+// This component will be rendered client-side to generate a table of contents
+// from the headings in the blog pos
+// export interface Props {}
+---
+
+<div class="toc-container">
+  <h2 class="toc-title">Table of Contents</h2>
+  <ul class="toc-list" id="toc">
+    <!-- JavaScript will populate this list -->
+  </ul>
+</div>
+
+<script>
+  // Function to generate the table of contents
+  function generateTableOfContents() {
+    const headings = document.querySelectorAll('h2, h3, h4')
+    const tocList = document.getElementById('toc')
+
+    if (!tocList) return
+
+    headings.forEach((heading) => {
+      // Create an ID for the heading if it doesn't have one
+      if (!heading.id) {
+        heading.id =
+          heading.textConten
+            ?.toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .replace(/\s+/g, '-') || ''
+      }
+
+      // Create list item
+      const listItem = document.createElement('li')
+      listItem.className = `toc-item toc-${heading.tagName.toLowerCase()}`
+
+      // Create link
+      const link = document.createElement('a')
+      link.href = `#${heading.id}`
+      link.textContent = heading.textConten
+
+      // Add click event to smooth scroll
+      link.addEventListener('click', (e) => {
+        e.preventDefault()
+        document.querySelector(`#${heading.id}`)?.scrollIntoView({
+          behavior: 'smooth',
+        })
+      })
+
+      listItem.appendChild(link)
+      tocList.appendChild(listItem)
+    })
+  }
+
+  // Run after the DOM is fully loaded
+  document.addEventListener('DOMContentLoaded', generateTableOfContents)
+</script>
+
+<style>
+  .toc-container {
+    background-color: var(--color-bg-secondary, #f8f9fa);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .toc-title {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary, #333);
+  }
+
+  .toc-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .toc-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .toc-item a {
+    color: var(--color-primary, #3b82f6);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: inline-block;
+  }
+
+  .toc-item a:hover {
+    color: var(--color-primary-dark, #2563eb);
+    text-decoration: underline;
+  }
+
+  /* Indentation for different heading levels */
+  .toc-h3 {
+    padding-left: 1.5rem;
+  }
+
+  .toc-h4 {
+    padding-left: 3rem;
+  }
+</style>

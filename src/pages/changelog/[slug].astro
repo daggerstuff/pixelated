@@ -1,0 +1,80 @@
+---
+import { getCollection, render } from 'astro:content'
+import type { CollectionEntry } from 'astro:content'
+import type { PostSchema } from '@/content/schema'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Toc from '@/components/toc/Toc.astro'
+import ShareLink from '@/components/widgets/ShareLink.astro'
+import Warning from '@/components/base/Warning.astro'
+import { formatDate } from '@/utils/datetime'
+import { FEATURES } from '@/config'
+
+// Set prerender to true to generate static pages at build time
+export const prerender = true
+
+export async function getStaticPaths() {
+  const posts = await getCollection('changelog')
+  return posts.map((post: CollectionEntry<'changelog'>) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }))
+}
+
+const { post } = Astro.props as { post: CollectionEntry<'changelog'> }
+const { data: frontmatter } = post as { data: PostSchema }
+const { Content, headings } = await render(post)
+const { share, toc } = FEATURES
+
+// Format dates
+const pubDate =
+  frontmatter.pubDate instanceof Date
+    ? frontmatter.pubDate.toISOString()
+    : undefined
+const updatedDate =
+  frontmatter.lastModDate instanceof Date
+    ? frontmatter.lastModDate.toISOString()
+    : undefined
+
+// Warning message for unpublished posts
+const UNPUBLISHED_WARNING = `This article is not yet available.
+Please check back later.`
+---
+
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+>
+  <article class="max-w-3xl mx-auto py-12 px-4 prose prose-invert">
+    <header class="not-prose mb-8">
+      <h1 class="text-4xl font-bold text-white mb-2">{frontmatter.title}</h1>
+      {
+        pubDate && (
+          <p class="text-slate-400 text-sm">
+            <time datetime={pubDate}>{formatDate(pubDate)}</time>
+            {updatedDate && (
+              <time datetime={updatedDate}>
+                | Updated: {formatDate(updatedDate)}
+              </time>
+            )}
+          </p>
+        )
+      }
+      {
+        frontmatter.pubDate && new Date(frontmatter.pubDate) > new Date() && (
+          <Warning rawHTMLString={UNPUBLISHED_WARNING} />
+        )
+      }
+    </header>
+
+    {Array.isArray(toc) && toc[0] && frontmatter.toc && <Toc {headings} />}
+    <Content />
+
+    <footer class="not-prose mt-12">
+      {
+        Array.isArray(share) && share[0] && frontmatter.share && (
+          <ShareLink config={share[1]} />
+        )
+      }
+    </footer>
+  </article>
+</BaseLayout>

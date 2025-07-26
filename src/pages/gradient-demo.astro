@@ -1,0 +1,126 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Background from '@/components/backgrounds/Background.astro'
+import { Icon } from 'astro-icon/components'
+
+// Color scheme options for the demo
+const colorSchemes = [
+  { id: 'default', name: 'Default', description: 'Teal and purple gradient' },
+  { id: 'purple', name: 'Purple', description: 'Vibrant purple tones' },
+  { id: 'blue', name: 'Blue', description: 'Calming blue gradient' },
+  { id: 'green', name: 'Green', description: 'Fresh green tones' },
+  { id: 'sunset', name: 'Sunset', description: 'Warm orange and red' },
+]
+// Get the selected color scheme from URL params or default to 'default'
+const colorScheme = Astro.url.searchParams.get('colorScheme') || 'blue'
+const selectedScheme =
+  colorSchemes.find((scheme) => scheme.id === colorScheme) || colorSchemes[0]
+---
+
+<BaseLayout
+  title="Animated Gradient Background Demo"
+  description="Showcase of beautiful animated gradient backgrounds"
+>
+  <!-- Apply the animated background with the selected color scheme -->
+  <Background type="particle" colorScheme="blue" />
+
+  <main
+    class="relative min-h-screen flex flex-col items-center justify-center py-12 px-4"
+  >
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+      <h1 class="text-5xl md:text-6xl font-bold mb-8">
+        Animated Gradient Background
+      </h1>
+
+      <p class="text-xl md:text-2xl mb-12">
+        A beautiful, animated gradient background with smooth transitions and
+        subtle motion effects.
+      </p>
+
+      <!-- Color scheme selector -->
+      <div class="mb-16">
+        <h2 class="text-2xl font-semibold mb-6">Select a Color Scheme</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {
+            colorSchemes.map((scheme) => (
+              <a
+                href={`?colorScheme=${scheme.id}`}
+                class={`p-4 rounded-lg transition-all duration-300 flex flex-col items-center justify-center ${
+                  selectedScheme.id === scheme.id
+                    ? 'bg-white/20 shadow-lg scale-105 border border-white/30'
+                    : 'bg-white/10 hover:bg-white/15 hover:scale-105'
+                }`}
+              >
+                <div
+                  class="w-16 h-16 rounded-full mb-3"
+                  style={`background: linear-gradient(135deg, var(--color-${scheme.id}-1), var(--color-${scheme.id}-2))`}
+                />
+                <h3 class="text-lg font-medium">{scheme.name}</h3>
+                <p class="text-sm opacity-80">{scheme.description}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Call to action -->
+      <div class="mt-12">
+        <a
+          href="/features"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-300 font-medium"
+        >
+          <Icon name="lucide:arrow-left" class="w-5 h-5" />
+          Back to Features
+        </a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  /* Define color variables for the demo circles */
+  :root {
+    --color-default-1: #4a9a95;
+    --color-default-2: #8b5cf6;
+    --color-purple-1: #8b5cf6;
+    --color-purple-2: #c084fc;
+    --color-blue-1: #3b82f6;
+    --color-blue-2: #93c5fd;
+    --color-green-1: #10b981;
+    --color-green-2: #6ee7b7;
+    --color-sunset-1: #f59e0b;
+    --color-sunset-2: #ef4444;
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) {
+    --color-default-1: #3e817d;
+    --color-default-2: #7c3aed;
+    --color-purple-1: #7c3aed;
+    --color-purple-2: #a855f7;
+    --color-blue-1: #2563eb;
+    --color-blue-2: #60a5fa;
+    --color-green-1: #059669;
+    --color-green-2: #34d399;
+    --color-sunset-1: #d97706;
+    --color-sunset-2: #dc2626;
+  }
+
+  /* Add a glass effect to the content container */
+  main {
+    position: relative;
+  }
+
+  main::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.2);
+    z-index: -1;
+    border-radius: 1rem;
+    margin: 2rem;
+  }
+</style>

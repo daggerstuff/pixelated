@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sourcebot-dev/sourcebot/main/schemas/v3/index.json",
+  "connections": {
+    "pixel-gitlab": {
+      "type": "git",
+      "url": "file:///root/pixel"
+    }
+  }
+}

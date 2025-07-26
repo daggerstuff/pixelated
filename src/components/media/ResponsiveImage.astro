@@ -1,0 +1,181 @@
+---
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
+
+export interface Props {
+  src: string | ImageMetadata
+  alt: string
+  width?: number
+  height?: number
+  class?: string
+  wrapperClass?: string
+  loading?: 'eager' | 'lazy'
+  decoding?: 'async' | 'sync' | 'auto'
+  quality?: number
+  format?: 'webp' | 'avif' | 'jpg' | 'png'
+  breakpoints?: number[]
+  blurUp?: boolean
+  sizes?: string
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  class: className = '',
+  wrapperClass = '',
+  loading = 'lazy',
+  decoding = 'async',
+  quality = 80,
+  format = 'webp',
+  breakpoints = [640, 768, 1024, 1280, 1536, 1920],
+  blurUp = true,
+  sizes = '(min-width: 1536px) 1536px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, (min-width: 640px) 640px, 100vw',
+} = Astro.props
+
+// If src is a string (remote URL), we use the img tag with srcset
+const isRemoteImage =
+  typeof src === 'string' && (src.startsWith('http') || src.startsWith('//'))
+
+// Calculate aspect ratio if both width and height are provided
+const aspectRatio = width && height ? width / height : undefined
+---
+
+{
+  isRemoteImage ? (
+    <div class={`responsive-image-wrapper ${wrapperClass}`}>
+      <picture>
+        {format === 'avif' && (
+          <source
+            type="image/avif"
+            srcset={breakpoints
+              .map(
+                (bp: number) =>
+                  `${src}?w=${bp}&format=avif&q=${quality} ${bp}w`,
+              )
+              .join(', ')}
+            sizes={sizes}
+          />
+        )}
+        {(format === 'webp' || format === 'avif') && (
+          <source
+            type="image/webp"
+            srcset={breakpoints
+              .map(
+                (bp: number) =>
+                  `${src}?w=${bp}&format=webp&q=${quality} ${bp}w`,
+              )
+              .join(', ')}
+            sizes={sizes}
+          />
+        )}
+        <img
+          src={`${src}?w=${width || breakpoints[3]}&format=${format === 'avif' || format === 'webp' ? 'jpg' : format}&q=${quality}`}
+          srcset={breakpoints
+            .map(
+              (bp: number) =>
+                `${src}?w=${bp}&format=${format === 'avif' || format === 'webp' ? 'jpg' : format}&q=${quality} ${bp}w`,
+            )
+            .join(', ')}
+          alt={alt}
+          width={width}
+          height={height}
+          loading={loading}
+          decoding={decoding}
+          class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
+          style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
+        />
+      </picture>
+
+      {blurUp && (
+        <div class="blur-placeholder" aria-hidden="true">
+          <img
+            src={`${src}?w=20&format=webp&q=30`}
+            alt=""
+            width="20"
+            aria-hidden="true"
+            style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
+          />
+        </div>
+      )}
+    </div>
+  ) : (
+    <div class={`responsive-image-wrapper ${wrapperClass}`}>
+      {typeof src !== 'string' && (
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          loading={loading}
+          decoding={decoding}
+          class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
+        />
+      )}
+    </div>
+  )
+}
+
+<style>
+  .responsive-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .responsive-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .blur-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .blur-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(20px);
+    transform: scale(1.1);
+  }
+
+  /* Blur-up animation */
+  .blur-up {
+    opacity: 0;
+    transition: opacity 300ms ease-in;
+  }
+
+  .blur-up.loaded {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Handle blur-up loading effect
+  document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.blur-up')
+
+    images.forEach((img) => {
+      if (img instanceof HTMLImageElement) {
+        if (img.complete) {
+          img.classList.add('loaded')
+        } else {
+          img.addEventListener('load', () => {
+            img.classList.add('loaded')
+          })
+        }
+      }
+    })
+  })
+</script>

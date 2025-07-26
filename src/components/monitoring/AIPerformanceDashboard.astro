@@ -1,0 +1,698 @@
+---
+// Performance monitoring types and stub
+type AIOperationType =
+  | 'emotion-detection'
+  | 'pattern-recognition'
+  | 'documentation-generation'
+  | 'summary-generation'
+  | 'recommendation-generation'
+  | 'time-series-analysis'
+  | 'trend-detection'
+  | 'risk-assessment'
+  | 'custom'
+
+const aiPerformanceMonitor = {
+  getAllMetrics: () => [],
+}
+
+interface Props {
+  title?: string
+  description?: string
+  refreshInterval?: number
+  operationTypes?: AIOperationType[]
+}
+
+const {
+  title = 'AI Performance Metrics',
+  description = 'Monitor AI processing time, token usage, and performance across the application',
+  refreshInterval = 30000,
+  operationTypes,
+} = Astro.props
+
+const defaultOperationTypes: AIOperationType[] = [
+  'emotion-detection',
+  'pattern-recognition',
+  'documentation-generation',
+  'summary-generation',
+  'recommendation-generation',
+]
+
+const showOperationTypes = operationTypes || defaultOperationTypes
+const allMetrics = aiPerformanceMonitor.getAllMetrics()
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          {title}
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {description}
+        </p>
+      </div>
+      <button
+        id="refresh-button"
+        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          ></path>
+        </svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Total Operations
+        </h3>
+        <p
+          id="total-operations"
+          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          {allMetrics.length || 0}
+        </p>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Avg. Processing Time
+        </h3>
+        <p
+          id="avg-processing-time"
+          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          {
+            allMetrics.length > 0
+              ? `${Math.round(allMetrics.reduce((sum: number, m: any) => sum + m.processingTimeMs, 0) / allMetrics.length)}ms`
+              : '0ms'
+          }
+        </p>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Avg. Token Usage
+        </h3>
+        <p
+          id="avg-token-usage"
+          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          {
+            allMetrics.length > 0
+              ? Math.round(
+                  allMetrics.reduce(
+                    (sum: number, m: any) => sum + m.totalTokens,
+                    0,
+                  ) / allMetrics.length,
+                )
+              : '0'
+          }
+        </p>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Success Rate
+        </h3>
+        <p
+          id="success-rate"
+          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          {
+            allMetrics.length > 0
+              ? `${Math.round((allMetrics.filter((m: any) => m.success).length / allMetrics.length) * 100)}%`
+              : '0%'
+          }
+        </p>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div>
+        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+          Processing Time by Operation Type
+        </h3>
+        <div class="h-80">
+          <canvas id="processing-time-chart"></canvas>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+          Token Usage by Operation Type
+        </h3>
+        <div class="h-80">
+          <canvas id="token-usage-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operation Type Tabs -->
+    <div class="mb-6">
+      <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex space-x-8" aria-label="Tabs">
+          <button
+            id="tab-all"
+            class="border-green-500 text-green-600 dark:text-green-500 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button"
+            data-tab="all"
+          >
+            All Operations
+          </button>
+          {
+            showOperationTypes.map((opType: string) => (
+              <button
+                id={`tab-${opType}`}
+                class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button"
+                data-tab={opType}
+              >
+                {opType
+                  .split('-')
+                  .map(
+                    (word: string) =>
+                      word.charAt(0).toUpperCase() + word.slice(1),
+                  )
+                  .join(' ')}
+              </button>
+            ))
+          }
+        </nav>
+      </div>
+    </div>
+
+    <!-- Recent Operations Table -->
+    <div>
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+        Recent Operations
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Operation Type
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Processing Time
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Tokens (In/Out)
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Status
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Timestamp
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="operations-table-body"
+            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            <!-- Table rows will be inserted here by JavaScript -->
+            {
+              allMetrics.length === 0 && (
+                <tr>
+                  <td
+                    colspan="5"
+                    class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    No operations recorded yet
+                  </td>
+                </tr>
+              )
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script
+  define:vars={{
+    refreshInterval,
+    operationTypes,
+    defaultOperationTypes,
+    showOperationTypes,
+  }}
+>
+  // Chart.js must be loaded separately via CDN or from elsewhere
+  let processingTimeChart
+  let tokenUsageChart
+  let currentTab = 'all'
+
+  // Generate random colors for chart
+  function getRandomColor(index, operation) {
+    const colorMappings = {
+      'emotion-detection': {
+        bg: 'rgba(59, 130, 246, 0.2)',
+        border: 'rgb(59, 130, 246)',
+      },
+      'pattern-recognition': {
+        bg: 'rgba(16, 185, 129, 0.2)',
+        border: 'rgb(16, 185, 129)',
+      },
+      'documentation-generation': {
+        bg: 'rgba(249, 115, 22, 0.2)',
+        border: 'rgb(249, 115, 22)',
+      },
+      'summary-generation': {
+        bg: 'rgba(139, 92, 246, 0.2)',
+        border: 'rgb(139, 92, 246)',
+      },
+      'recommendation-generation': {
+        bg: 'rgba(236, 72, 153, 0.2)',
+        border: 'rgb(236, 72, 153)',
+      },
+      'time-series-analysis': {
+        bg: 'rgba(245, 158, 11, 0.2)',
+        border: 'rgb(245, 158, 11)',
+      },
+      'trend-detection': {
+        bg: 'rgba(6, 182, 212, 0.2)',
+        border: 'rgb(6, 182, 212)',
+      },
+      'risk-assessment': {
+        bg: 'rgba(220, 38, 38, 0.2)',
+        border: 'rgb(220, 38, 38)',
+      },
+      'custom': { bg: 'rgba(75, 85, 99, 0.2)', border: 'rgb(75, 85, 99)' },
+    }
+
+    if (operation && colorMappings[operation]) {
+      return colorMappings[operation]
+    }
+
+    // Fallback colors if operation not in mapping
+    const backgroundColors = [
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(255, 206, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+    ]
+
+    const borderColors = [
+      'rgba(255, 99, 132, 1)',
+      'rgba(54, 162, 235, 1)',
+      'rgba(255, 206, 86, 1)',
+      'rgba(75, 192, 192, 1)',
+      'rgba(153, 102, 255, 1)',
+      'rgba(255, 159, 64, 1)',
+    ]
+
+    return {
+      bg: backgroundColors[index % backgroundColors.length],
+      border: borderColors[index % borderColors.length],
+    }
+  }
+
+  // Fetch metrics from the performance monitor
+  function fetchMetrics() {
+    // In a real implementation, this would fetch from an API
+    // For demonstration, we'll generate random data
+    return {
+      allMetrics: generateRandomMetrics(),
+      averageProcessingTime: Math.floor(Math.random() * 500) + 100, // 100-600ms
+      averageTokenUsage: Math.floor(Math.random() * 1500) + 500, // 500-2000 tokens
+      successRate: Math.floor(Math.random() * 10) + 90, // 90-100%
+    }
+  }
+
+  // Generate random metrics for demonstration
+  function generateRandomMetrics() {
+    const metrics = []
+    const operationTypes = [...showOperationTypes, 'custom']
+    const now = new Date()
+
+    for (let i = 0; i < 20; i++) {
+      const operationType =
+        operationTypes[Math.floor(Math.random() * operationTypes.length)]
+      const startTime = new Date(now.getTime() - Math.random() * 3600000) // Last hour
+      const processingTimeMs = Math.floor(Math.random() * 1000) + 50 // 50-1050ms
+      const endTime = new Date(startTime.getTime() + processingTimeMs)
+      const inputTokens = Math.floor(Math.random() * 500) + 100
+      const outputTokens = Math.floor(Math.random() * 1000) + 200
+
+      metrics.push({
+        operationId: `op-${i}`,
+        operationType,
+        processingTimeMs,
+        inputTokens,
+        outputTokens,
+        totalTokens: inputTokens + outputTokens,
+        success: Math.random() > 0.1, // 90% success rate
+        startTime,
+        endTime,
+        metadata: {},
+        errorMessage: Math.random() > 0.9 ? 'Sample error message' : undefined,
+      })
+    }
+
+    return metrics
+  }
+
+  // Update summary statistics
+  function updateSummaryStats(data) {
+    document.getElementById('total-operations').textContent =
+      data.allMetrics.length
+    document.getElementById('avg-processing-time').textContent =
+      `${data.averageProcessingTime}ms`
+    document.getElementById('avg-token-usage').textContent =
+      data.averageTokenUsage
+    document.getElementById('success-rate').textContent = `${data.successRate}%`
+  }
+
+  // Update the operations table
+  function updateOperationsTable(metrics) {
+    const tableBody = document.getElementById('operations-table-body')
+    if (!tableBody) return
+
+    tableBody.innerHTML = ''
+
+    if (metrics.length === 0) {
+      const row = document.createElement('tr')
+      row.innerHTML = `
+        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+          No operations recorded
+        </td>
+      `
+      tableBody.appendChild(row)
+      return
+    }
+
+    // Sort metrics by timestamp (newest first)
+    metrics.sort((a, b) => b.endTime - a.endTime)
+
+    // Filter metrics based on selected tab
+    const filteredMetrics =
+      currentTab === 'all'
+        ? metrics
+        : metrics.filter((m) => m.operationType === currentTab)
+
+    // Take last 10 operations
+    const recentMetrics = filteredMetrics.slice(0, 10)
+
+    recentMetrics.forEach((m) => {
+      const row = document.createElement('tr')
+      row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700'
+
+      const formattedType = m.operationType
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+
+      const formattedTime = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: true,
+      }).format(m.endTime)
+
+      row.innerHTML = `
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+          ${formattedType}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          ${m.processingTimeMs}ms
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          ${m.inputTokens} / ${m.outputTokens}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+          ${
+            m.success
+              ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Success</span>'
+              : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">Failed</span>'
+          }
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          ${formattedTime}
+        </td>
+      `
+      tableBody.appendChild(row)
+    })
+  }
+
+  // Update processing time chart
+  function updateProcessingTimeChart(metrics) {
+    if (!window.Chart) {
+      console.warn('Chart.js not loaded')
+      return
+    }
+
+    // Group metrics by operation type and calculate average processing time
+    const operationTypes = [...new Set(metrics.map((m) => m.operationType))]
+    const processingTimes = operationTypes.map((type) => {
+      const typeMetrics = metrics.filter((m) => m.operationType === type)
+      return (
+        typeMetrics.reduce((sum, m) => sum + m.processingTimeMs, 0) /
+        typeMetrics.length
+      )
+    })
+
+    const formattedLabels = operationTypes.map((type) =>
+      type
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' '),
+    )
+
+    const ctx = document.getElementById('processing-time-chart')
+    if (!ctx) return
+
+    if (processingTimeChart) {
+      processingTimeChart.destroy()
+    }
+
+    const backgroundColors = operationTypes.map(
+      (op, i) => getRandomColor(i, op).bg,
+    )
+    const borderColors = operationTypes.map(
+      (op, i) => getRandomColor(i, op).border,
+    )
+
+    processingTimeChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: formattedLabels,
+        datasets: [
+          {
+            label: 'Average Processing Time (ms)',
+            data: processingTimes,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Milliseconds',
+            },
+          },
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    })
+  }
+
+  // Update token usage chart
+  function updateTokenUsageChart(metrics) {
+    if (!window.Chart) {
+      console.warn('Chart.js not loaded')
+      return
+    }
+
+    // Group metrics by operation type and calculate average token usage
+    const operationTypes = [...new Set(metrics.map((m) => m.operationType))]
+
+    const inputTokens = operationTypes.map((type) => {
+      const typeMetrics = metrics.filter((m) => m.operationType === type)
+      return (
+        typeMetrics.reduce((sum, m) => sum + m.inputTokens, 0) /
+        typeMetrics.length
+      )
+    })
+
+    const outputTokens = operationTypes.map((type) => {
+      const typeMetrics = metrics.filter((m) => m.operationType === type)
+      return (
+        typeMetrics.reduce((sum, m) => sum + m.outputTokens, 0) /
+        typeMetrics.length
+      )
+    })
+
+    const formattedLabels = operationTypes.map((type) =>
+      type
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' '),
+    )
+
+    const ctx = document.getElementById('token-usage-chart')
+    if (!ctx) return
+
+    if (tokenUsageChart) {
+      tokenUsageChart.destroy()
+    }
+
+    tokenUsageChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: formattedLabels,
+        datasets: [
+          {
+            label: 'Input Tokens',
+            data: inputTokens,
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgb(59, 130, 246)',
+            borderWidth: 1,
+          },
+          {
+            label: 'Output Tokens',
+            data: outputTokens,
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+            borderColor: 'rgb(16, 185, 129)',
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Tokens',
+            },
+          },
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    })
+  }
+
+  // Update dashboard with latest metrics
+  function updateDashboard() {
+    try {
+      const data = fetchMetrics()
+
+      // Update summary statistics
+      updateSummaryStats(data)
+
+      // Update operations table
+      updateOperationsTable(data.allMetrics)
+
+      // Update charts if Chart.js is available
+      if (window.Chart) {
+        updateProcessingTimeChart(data.allMetrics)
+        updateTokenUsageChart(data.allMetrics)
+      } else {
+        console.warn('Chart.js is not loaded. Loading from CDN...')
+
+        // Dynamically load Chart.js from CDN if not available
+        const script = document.createElement('script')
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js'
+        script.onload = () => {
+          updateProcessingTimeChart(data.allMetrics)
+          updateTokenUsageChart(data.allMetrics)
+        }
+        document.head.appendChild(script)
+      }
+    } catch (error) {
+      console.error('Error updating dashboard:', error)
+    }
+  }
+
+  // Set up tab functionality
+  function setupTabs() {
+    const tabButtons = document.querySelectorAll('.tab-button')
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        // Update active tab
+        tabButtons.forEach((btn) => {
+          btn.classList.remove(
+            'border-green-500',
+            'text-green-600',
+            'dark:text-green-500',
+          )
+          btn.classList.add('border-transparent', 'text-gray-500')
+        })
+
+        button.classList.remove('border-transparent', 'text-gray-500')
+        button.classList.add(
+          'border-green-500',
+          'text-green-600',
+          'dark:text-green-500',
+        )
+
+        // Update current tab and refresh data
+        currentTab = button.dataset.tab
+        updateDashboard()
+      })
+    })
+  }
+
+  // Initialize dashboard
+  document.addEventListener('DOMContentLoaded', () => {
+    setupTabs()
+    updateDashboard()
+
+    // Set up refresh button click handler
+    const refreshButton = document.getElementById('refresh-button')
+    if (refreshButton) {
+      refreshButton.addEventListener('click', updateDashboard)
+    }
+
+    // Set up auto-refresh interval
+    setInterval(updateDashboard, refreshInterval)
+  })
+
+  // Listen for theme changes to update chart colors
+  document.addEventListener('astro:after-swap', () => {
+    if (processingTimeChart) processingTimeChart.destroy()
+    if (tokenUsageChart) tokenUsageChart.destroy()
+
+    processingTimeChart = null
+    tokenUsageChart = null
+
+    updateDashboard()
+  })
+</script>

@@ -1,0 +1,849 @@
+---
+interface TodoItem {
+  id: string
+  text: string
+  completed: boolean
+  category?: string
+  dueDate?: string
+  priority?: 'low' | 'medium' | 'high'
+  createdAt?: string
+}
+
+interface Props {
+  title?: string
+  initialTodos?: TodoItem[]
+  storageKey?: string
+}
+
+const {
+  title = 'Todo List',
+  initialTodos = [],
+  storageKey = 'enhanced-todos',
+} = Astro.props
+---
+
+<div class="todo-container">
+  <div class="todo-header">
+    <h2 id="todo-title">{title}</h2>
+    <div class="filter-controls">
+      <div class="filter-buttons" role="group" aria-label="Filter todos">
+        <button data-filter="all" class="active" aria-pressed="true">
+          All
+        </button>
+        <button data-filter="active" aria-pressed="false"> Active </button>
+        <button data-filter="completed" aria-pressed="false">
+          Completed
+        </button>
+      </div>
+
+      <div class="category-filter" style="display: none;">
+        <label for="category-select" class="sr-only">Filter by category</label>
+        <select id="category-select" aria-label="Filter by category">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button
+    id="add-todo-btn"
+    class="add-todo-button"
+    aria-expanded="false"
+    aria-controls="todo-form"
+  >
+    + Add Task
+  </button>
+
+  <form id="todo-form" class="todo-form" style="display: none;">
+    <div class="form-group">
+      <label for="todo-input" class="sr-only">Task description</label>
+      <input
+        type="text"
+        id="todo-input"
+        placeholder="What needs to be done?"
+        required
+        aria-required="true"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="todo-category">Category</label>
+        <input
+          type="text"
+          id="todo-category"
+          placeholder="Category"
+          list="existing-categories"
+        />
+        <datalist id="existing-categories"></datalist>
+      </div>
+
+      <div class="form-group">
+        <label for="todo-priority">Priority</label>
+        <select id="todo-priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="todo-due-date">Due Date</label>
+        <input type="date" id="todo-due-date" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Add Task</button>
+      <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button
+      >
+    </div>
+  </form>
+
+  <ul id="todo-list" class="todo-list" aria-labelledby="todo-title">
+    {
+      initialTodos.map((todo: TodoItem) => (
+        <li
+          class={`todo-item ${todo.completed ? 'completed' : ''} priority-${todo.priority || 'medium'}`}
+          data-id={todo.id}
+          data-completed={todo.completed.toString()}
+          data-category={todo.category || ''}
+          data-priority={todo.priority || 'medium'}
+          data-due-date={todo.dueDate || ''}
+        >
+          <div class="todo-item-main">
+            <div class="todo-checkbox">
+              <input
+                type="checkbox"
+                id={`todo-${todo.id}`}
+                checked={todo.completed}
+                aria-label={`Mark "${todo.text}" as ${todo.completed ? 'incomplete' : 'complete'}`}
+              />
+              <label
+                for={`todo-${todo.id}`}
+                class={todo.completed ? 'completed' : ''}
+              >
+                {todo.text}
+              </label>
+            </div>
+            <button class="delete-button" aria-label={`Delete "${todo.text}"`}>
+              ×
+            </button>
+          </div>
+
+          {(todo.category || todo.dueDate || todo.priority) && (
+            <div class="todo-details">
+              {todo.category && (
+                <span class="todo-category">{todo.category}</span>
+              )}
+              {todo.priority && (
+                <span class="todo-priority">{todo.priority}</span>
+              )}
+              {todo.dueDate && (
+                <span class="todo-due-date">
+                  Due: {new Date(todo.dueDate).toLocaleDateString()}
+                </span>
+              )}
+            </div>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+
+  <div
+    id="empty-state"
+    class="empty-state"
+    role="status"
+    style={initialTodos.length > 0 ? 'display: none;' : ''}
+  >
+    <p>No tasks yet. Add your first task!</p>
+  </div>
+</div>
+
+<style>
+  .todo-container {
+    background-color: var(--color-bg-secondary, #f8f9fa);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .todo-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .todo-header h2 {
+    margin: 0 0 1rem;
+    color: var(--color-primary-600, #6d28d9);
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .filter-buttons {
+    display: flex;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .filter-buttons button {
+    background-color: var(--color-bg-light, #f1f3f5);
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-buttons button.active {
+    background-color: var(--color-primary-600, #6d28d9);
+    color: white;
+  }
+
+  .category-filter select {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-border, #ddd);
+    background-color: white;
+  }
+
+  .add-todo-button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--color-primary-500, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 1.5rem;
+  }
+
+  .add-todo-button:hover {
+    background-color: var(--color-primary-600, #6d28d9);
+  }
+
+  .todo-form {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted, #666);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  input[type='text'],
+  input[type='date'],
+  select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary-500, #7c3aed);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-600, #6d28d9);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-bg-light, #f1f3f5);
+    color: var(--color-text, #333);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-bg-hover, #e2e4e7);
+  }
+
+  .todo-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .todo-item {
+    background-color: white;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-left: 3px solid transparent;
+  }
+
+  .todo-item.priority-high {
+    border-left-color: var(--color-danger, #dc3545);
+  }
+
+  .todo-item.priority-medium {
+    border-left-color: var(--color-warning, #ffc107);
+  }
+
+  .todo-item.priority-low {
+    border-left-color: var(--color-success, #28a745);
+  }
+
+  .todo-item-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .todo-checkbox {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 0.5rem;
+  }
+
+  .todo-checkbox input[type='checkbox'] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+  }
+
+  .todo-checkbox label {
+    cursor: pointer;
+    word-break: break-word;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .todo-checkbox label.completed {
+    text-decoration: line-through;
+    color: var(--color-text-muted, #888);
+  }
+
+  .delete-button {
+    background-color: transparent;
+    color: var(--color-text-muted, #888);
+    border: none;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 0.5rem;
+  }
+
+  .delete-button:hover {
+    background-color: var(--color-danger, #dc3545);
+    color: white;
+  }
+
+  .todo-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border, #eee);
+    font-size: 0.75rem;
+  }
+
+  .todo-category,
+  .todo-priority,
+  .todo-due-date {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background-color: var(--color-bg-light, #f1f3f5);
+    color: var(--color-text-muted, #666);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-muted, #888);
+  }
+
+  @media (max-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .filter-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .todo-error-banner {
+    background: #ffeaea;
+    border: 1px solid #ffb3b3;
+    color: #b30000;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+</style>
+
+<script define:vars={{ initialTodos, storageKey }} is:inline>
+  document.addEventListener('astro:page-load', () => {
+    // DOM elements
+    const todoForm = document.getElementById('todo-form')
+    const todoInput = document.getElementById('todo-input')
+    const categoryInput = document.getElementById('todo-category')
+    const prioritySelect = document.getElementById('todo-priority')
+    const dueDateInput = document.getElementById('todo-due-date')
+    const todoList = document.getElementById('todo-list')
+    const emptyState = document.getElementById('empty-state')
+    const addTodoBtn = document.getElementById('add-todo-btn')
+    const cancelBtn = document.getElementById('cancel-btn')
+    const categorySelect = document.getElementById('category-select')
+    const existingCategories = document.getElementById('existing-categories')
+    const filterButtons = document.querySelectorAll('.filter-buttons button')
+    const categoryFilterContainer = document.querySelector('.category-filter')
+
+    let currentFilter = 'all'
+    let currentCategoryFilter = ''
+    let lastError = null
+    const MAX_TODO_LENGTH = 120
+    const errorBanner = document.createElement('div')
+    errorBanner.className = 'todo-error-banner'
+    errorBanner.style.display = 'none'
+    errorBanner.style.color = 'red'
+    errorBanner.style.marginBottom = '1rem'
+    document.querySelector('.todo-container').prepend(errorBanner)
+
+    function showError(msg) {
+      errorBanner.textContent = msg
+      errorBanner.style.display = 'block'
+      lastError = msg
+    }
+    function clearError() {
+      errorBanner.textContent = ''
+      errorBanner.style.display = 'none'
+      lastError = null
+    }
+
+    // TodoItem factory function for client-side code
+    function TodoItem(data) {
+      return {
+        id: data.id || generateId(),
+        text: data.text,
+        completed: data.completed || false,
+
+        ...(data.category && { category: data.category }),
+        priority: data.priority || 'medium',
+        ...(data.dueDate && { dueDate: data.dueDate }),
+        createdAt: data.createdAt || new Date().toISOString(),
+      }
+    }
+    // Load todos from localStorage or use initialTodos
+    const loadTodos = () => {
+      try {
+        let savedTodos = localStorage.getItem(storageKey)
+        // Migration: if new key is empty, check for old key and migrate
+        if (!savedTodos) {
+          const oldKey = 'enhanced-todos-astro'
+          const oldTodos = localStorage.getItem(oldKey)
+          if (oldTodos) {
+            localStorage.setItem(storageKey, oldTodos)
+            localStorage.removeItem(oldKey)
+            savedTodos = oldTodos
+          }
+        }
+        if (savedTodos) {
+          clearError()
+          return JSON.parse(savedTodos)
+        } else if (initialTodos.length > 0) {
+          const todos = initialTodos.map((todo) => {
+            return TodoItem({
+              ...todo,
+              createdAt: todo.createdAt || new Date().toISOString(),
+            })
+          })
+          saveTodos(todos)
+          clearError()
+          return todos
+        }
+        clearError()
+        return []
+      } catch (err) {
+        showError('Error loading todos. Local storage may be unavailable.')
+        return null
+      }
+    }
+
+    // Save todos to localStorage
+    const saveTodos = (todos) => {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(todos))
+        clearError()
+      } catch (err) {
+        showError(
+          'Error saving todos. Local storage may be full or unavailable.',
+        )
+      }
+    }
+
+    // Generate a unique ID for each todo
+    const generateId = () => {
+      return Date.now().toString(36) + Math.random().toString(36).substring(2)
+    }
+
+    // Create a todo element
+    const createTodoElement = (todo) => {
+      const li = document.createElement('li')
+      li.className = `todo-item ${todo.completed ? 'completed' : ''} priority-${todo.priority || 'medium'}`
+      li.dataset.id = todo.id
+      li.dataset.completed = todo.completed.toString()
+      li.dataset.category = todo.category || ''
+      li.dataset.priority = todo.priority || 'medium'
+      li.dataset.dueDate = todo.dueDate || ''
+
+      // Main content with checkbox and delete button
+      const mainDiv = document.createElement('div')
+      mainDiv.className = 'todo-item-main'
+
+      // Checkbox container
+      const checkboxDiv = document.createElement('div')
+      checkboxDiv.className = 'todo-checkbox'
+
+      const checkbox = document.createElement('input')
+      checkbox.type = 'checkbox'
+      checkbox.id = `todo-${todo.id}`
+      checkbox.checked = todo.completed
+      checkbox.setAttribute(
+        'aria-label',
+        `Mark "${todo.text}" as ${todo.completed ? 'incomplete' : 'complete'}`,
+      )
+      checkbox.addEventListener('change', () => toggleTodoComplete(todo.id))
+
+      const label = document.createElement('label')
+      label.htmlFor = `todo-${todo.id}`
+      label.textContent = todo.text
+      if (todo.completed) {
+        label.className = 'completed'
+      }
+
+      // Delete button
+      const deleteBtn = document.createElement('button')
+      deleteBtn.className = 'delete-button'
+      deleteBtn.innerHTML = '×'
+      deleteBtn.setAttribute('aria-label', `Delete "${todo.text}"`)
+      deleteBtn.addEventListener('click', () => deleteTodo(todo.id))
+
+      // Assemble the main section
+      checkboxDiv.appendChild(checkbox)
+      checkboxDiv.appendChild(label)
+      mainDiv.appendChild(checkboxDiv)
+      mainDiv.appendChild(deleteBtn)
+      li.appendChild(mainDiv)
+
+      // Details section (if needed)
+      if (todo.category || todo.dueDate || todo.priority) {
+        const detailsDiv = document.createElement('div')
+        detailsDiv.className = 'todo-details'
+
+        if (todo.category) {
+          const categorySpan = document.createElement('span')
+          categorySpan.className = 'todo-category'
+          categorySpan.textContent = todo.category
+          detailsDiv.appendChild(categorySpan)
+        }
+
+        if (todo.priority) {
+          const prioritySpan = document.createElement('span')
+          prioritySpan.className = 'todo-priority'
+          prioritySpan.textContent = todo.priority
+          detailsDiv.appendChild(prioritySpan)
+        }
+
+        if (todo.dueDate) {
+          const dueDateSpan = document.createElement('span')
+          dueDateSpan.className = 'todo-due-date'
+          dueDateSpan.textContent = `Due: ${new Date(todo.dueDate).toLocaleDateString()}`
+          detailsDiv.appendChild(dueDateSpan)
+        }
+
+        li.appendChild(detailsDiv)
+      }
+
+      return li
+    }
+
+    // Show/hide form
+    const toggleForm = (show) => {
+      todoForm.style.display = show ? 'block' : 'none'
+      addTodoBtn.style.display = show ? 'none' : 'block'
+      addTodoBtn.setAttribute('aria-expanded', show.toString())
+
+      if (show && todoInput) {
+        todoInput.focus()
+      }
+    }
+
+    // Add event listener for add button
+    addTodoBtn.addEventListener('click', () => {
+      toggleForm(true)
+    })
+
+    // Add event listener for cancel button
+    cancelBtn.addEventListener('click', () => {
+      resetForm()
+      toggleForm(false)
+    })
+
+    // Reset form fields
+    const resetForm = () => {
+      todoForm.reset()
+      prioritySelect.value = 'medium'
+    }
+
+    // Add a new todo
+    const addTodo = (e) => {
+      e.preventDefault()
+      clearError()
+      const text = todoInput.value.trim()
+      if (!text) return
+      if (text.length > MAX_TODO_LENGTH) {
+        showError(`Todo text must be at most ${MAX_TODO_LENGTH} characters.`)
+        return
+      }
+      const newTodo = TodoItem({
+        text,
+        category: categoryInput.value.trim() || undefined,
+        priority: prioritySelect.value,
+        dueDate: dueDateInput.value || undefined,
+      })
+      const todos = loadTodos()
+      if (!Array.isArray(todos)) {
+        showError('Cannot add todo: failed to load existing todos.')
+        return
+      }
+      todos.push(newTodo)
+      saveTodos(todos)
+      resetForm()
+      toggleForm(false)
+      renderTodos()
+      updateCategoryFilter()
+    }
+
+    // Delete a todo
+    const deleteTodo = (id) => {
+      const todos = loadTodos()
+      const updatedTodos = todos.filter((todo) => todo.id !== id)
+      saveTodos(updatedTodos)
+      renderTodos()
+      updateCategoryFilter()
+    }
+
+    // Toggle todo completion status
+    const toggleTodoComplete = (id) => {
+      const todos = loadTodos()
+      const updatedTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, completed: !todo.completed }
+        }
+        return todo
+      })
+      saveTodos(updatedTodos)
+      renderTodos()
+    }
+
+    // Update the filter buttons
+    const updateFilterButtons = () => {
+      filterButtons.forEach((button) => {
+        const filter = button.dataset.filter
+        button.classList.toggle('active', filter === currentFilter)
+        button.setAttribute(
+          'aria-pressed',
+          (filter === currentFilter).toString(),
+        )
+      })
+    }
+
+    // Get available categories from todos
+    const getCategories = (todos) => {
+      const categories = new Set()
+      todos.forEach((todo) => {
+        if (todo.category) {
+          categories.add(todo.category)
+        }
+      })
+      return Array.from(categories)
+    }
+
+    // Update category filter options
+    const updateCategoryFilter = () => {
+      const todos = loadTodos()
+      const categories = getCategories(todos)
+
+      // Clear existing options except the first one (All Categories)
+      while (categorySelect.options.length > 1) {
+        categorySelect.remove(1)
+      }
+
+      // Clear existing datalist options
+      existingCategories.innerHTML = ''
+
+      // Add new options
+      categories.forEach((category) => {
+        // For filter select
+        const option = document.createElement('option')
+        option.value = category
+        option.textContent = category
+        categorySelect.appendChild(option)
+
+        // For datalist
+        const dataOption = document.createElement('option')
+        dataOption.value = category
+        existingCategories.appendChild(dataOption)
+      })
+
+      // Show/hide category filter based on if there are categories
+      categoryFilterContainer.style.display =
+        categories.length > 0 ? 'block' : 'none'
+    }
+
+    // Filter todos based on current filters
+    const filterTodos = (todos) => {
+      return todos.filter((todo) => {
+        // Apply completion filter
+        if (currentFilter === 'active' && todo.completed) return false
+        if (currentFilter === 'completed' && !todo.completed) return false
+
+        // Apply category filter
+        if (currentCategoryFilter && todo.category !== currentCategoryFilter)
+          return false
+
+        return true
+      })
+    }
+
+    // Sort todos by priority, due date, etc.
+    const sortTodos = (todos) => {
+      return [...todos].sort((a, b) => {
+        // First sort by completion (incomplete first)
+        if (a.completed !== b.completed) {
+          return a.completed ? 1 : -1
+        }
+
+        // Then sort by priority
+        const priorityOrder = { high: 0, medium: 1, low: 2, undefined: 3 }
+        const aPriority = a.priority || 'undefined'
+        const bPriority = b.priority || 'undefined'
+
+        if (priorityOrder[aPriority] !== priorityOrder[bPriority]) {
+          return priorityOrder[aPriority] - priorityOrder[bPriority]
+        }
+
+        // Then sort by due date if available
+        if (a.dueDate && b.dueDate) {
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+        }
+
+        // Finally sort by creation date
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      })
+    }
+
+    // Render the todo list
+    const renderTodos = () => {
+      const todos = loadTodos()
+      if (todos === null) {
+        todoList.innerHTML = ''
+        emptyState.querySelector('p').textContent =
+          'Unable to load tasks. Local storage may be unavailable.'
+        emptyState.style.display = 'block'
+        return
+      }
+      const filteredTodos = filterTodos(todos)
+      const sortedTodos = sortTodos(filteredTodos)
+      todoList.innerHTML = ''
+      if (sortedTodos.length > 0) {
+        sortedTodos.forEach((todo) => {
+          todoList.appendChild(createTodoElement(todo))
+        })
+        emptyState.style.display = 'none'
+      } else {
+        emptyState.querySelector('p').textContent =
+          currentFilter !== 'all'
+            ? `No ${currentFilter} tasks found`
+            : 'No tasks yet. Add your first task!'
+        emptyState.style.display = 'block'
+      }
+    }
+
+    // Attach event listeners
+    todoForm.addEventListener('submit', addTodo)
+
+    // Filter button event listeners
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        currentFilter = button.dataset.filter
+        updateFilterButtons()
+        renderTodos()
+      })
+    })
+
+    // Category filter event listener
+    categorySelect.addEventListener('change', () => {
+      currentCategoryFilter = categorySelect.value
+      renderTodos()
+    })
+
+    // Initialize
+    toggleForm(false)
+    updateCategoryFilter()
+    renderTodos()
+  })
+</script>

@@ -1,0 +1,41 @@
+---
+import TreatmentForecastForm from '@/components/analytics/TreatmentForecastForm.tsx'
+---
+
+<html lang="en">
+  <head>
+    <title>Treatment Outcome Forecast</title>
+    <meta
+      name="description"
+      content="Forecast treatment outcomes using AI-powered analytics."
+    />
+  </head>
+  <body>
+    <main class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-8">
+      <h1 class="text-3xl font-bold mb-4 text-primary">
+        Treatment Outcome Forecast
+      </h1>
+      <p class="mb-6 text-gray-700">
+        Predict the likelihood of achieving specific treatment outcomes based on
+        your session and plan data. All predictions are AI-powered and for
+        clinical decision support only.
+      </p>
+      <TreatmentForecastForm client:load />
+    </main>
+  </body>
+</html>
+
+<style>
+  .input {
+    @apply border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary;
+  }
+  .btn {
+    @apply bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition;
+  }
+  .alert-error {
+    @apply bg-red-100 text-red-800 border border-red-300 rounded px-4 py-2;
+  }
+  .checkbox {
+    @apply form-checkbox h-5 w-5 text-primary;
+  }
+</style>

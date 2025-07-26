@@ -1,0 +1,107 @@
+---
+// Expandable component for collapsible content sections
+export interface Props {
+  title: string
+  defaultOpen?: boolean
+  class?: string
+}
+
+const { title, defaultOpen = false, class: className } = Astro.props
+---
+
+<details class={`expandable ${className || ''}`} open={defaultOpen}>
+  <summary class="expandable-trigger">
+    <span class="expandable-title">{title}</span>
+    <svg
+      class="expandable-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 6L8 10L12 6"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </summary>
+  <div class="expandable-content">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .expandable {
+    @apply border border-gray-200 rounded-lg mb-4 dark:border-gray-700;
+  }
+
+  .expandable-trigger {
+    @apply flex items-center justify-between w-full p-4 text-left bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors duration-200 dark:bg-gray-800 dark:hover:bg-gray-700;
+    list-style: none;
+  }
+
+  .expandable-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .expandable-trigger::marker {
+    display: none;
+  }
+
+  .expandable-title {
+    @apply font-medium text-gray-900 dark:text-gray-100;
+  }
+
+  .expandable-icon {
+    @apply text-gray-500 transition-transform duration-200 dark:text-gray-400;
+  }
+
+  .expandable[open] .expandable-icon {
+    @apply rotate-180;
+  }
+
+  .expandable-content {
+    @apply p-4 border-t border-gray-200 dark:border-gray-700;
+  }
+
+  .expandable-content :global(> *:first-child) {
+    @apply mt-0;
+  }
+
+  .expandable-content :global(> *:last-child) {
+    @apply mb-0;
+  }
+
+  /* Nested expandables */
+  .expandable-content .expandable {
+    @apply ml-4 border-l-2 border-gray-200 dark:border-gray-600;
+  }
+</style>
+
+<script>
+  // Add smooth animation for expand/collapse
+  document.addEventListener('DOMContentLoaded', () => {
+    const expandables = document.querySelectorAll('.expandable')
+
+    expandables.forEach((expandable) => {
+      const content = expandable.querySelector(
+        '.expandable-content',
+      ) as HTMLElement
+      if (!content) return
+
+      // Type assertion to HTMLDetailsElement which has the 'open' property
+      const detailsElement = expandable as HTMLDetailsElement
+
+      expandable.addEventListener('toggle', () => {
+        if (detailsElement.open) {
+          content.style.maxHeight = content.scrollHeight + 'px'
+        } else {
+          content.style.maxHeight = '0'
+        }
+      })
+    })
+  })
+</script>

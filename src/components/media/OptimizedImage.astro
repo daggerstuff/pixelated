@@ -1,0 +1,97 @@
+---
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
+
+export interface Props {
+  src: string | ImageMetadata
+  alt: string
+  width?: number
+  height?: number
+  class?: string
+  loading?: 'eager' | 'lazy'
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  class: className = '',
+  loading = 'lazy',
+} = Astro.props
+
+// Generate base64 LQIP for local images
+async function generateBase64Placeholder(src: string | ImageMetadata) {
+  // Optionally, return a transparent pixel or a static placeholder
+  // This disables sharp-based LQIP
+  return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+}
+
+const base64Placeholder = await generateBase64Placeholder(src)
+const aspectRatio = width && height ? width / height : undefined
+---
+
+<div
+  class={`optimized-image-wrapper ${className}`}
+  style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
+>
+  {
+    typeof src === 'string' ? (
+      <img
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        loading={loading}
+        class="optimized-image"
+        style={`background-size: cover; background-image: url(${base64Placeholder});`}
+      />
+    ) : (
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        loading={loading}
+        class="optimized-image"
+        style={`background-size: cover; background-image: url(${base64Placeholder});`}
+      />
+    )
+  }
+</div>
+
+<style>
+  .optimized-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    background-color: #f3f4f6;
+  }
+
+  .optimized-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+  }
+
+  .optimized-image.loaded {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Add loaded class when image is loaded
+  document.addEventListener('astro:page-load', () => {
+    const images = document.querySelectorAll('.optimized-image')
+    images.forEach((img) => {
+      if (img instanceof HTMLImageElement) {
+        if (img.complete) {
+          img.classList.add('loaded')
+        } else {
+          img.onload = () => img.classList.add('loaded')
+        }
+      }
+    })
+  })
+</script>

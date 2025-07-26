@@ -1,0 +1,147 @@
+---
+// DLPRulesManager.astro
+// Server component that displays the DLP Rules configuration interface
+
+import { dlpService } from '../../lib/security/dlp'
+import DLPRulesList from './dlp/DLPRulesList.astro'
+import DLPActivityLogs from './dlp/DLPActivityLogs.astro'
+import DLPRuleEditor from './dlp/DLPRuleEditor'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { AuditEventType } from '../../lib/audit'
+
+// Define the activity log type locally to match the expected interface
+interface DLPActivityLog {
+  id: string
+  timestamp: string
+  userId: string
+  action: string
+  eventType:
+    | typeof AuditEventType.DLP_ALLOWED
+    | typeof AuditEventType.DLP_BLOCKED
+  triggeredRules: string[]
+  destination?: string
+  reason?: string
+  allowed: boolean
+}
+
+// Get initial data
+const rules = dlpService.getRules()
+
+// Mock activity logs - in real app, would fetch from audit service
+const activityLogs: DLPActivityLog[] = [
+  {
+    id: 'log1',
+    timestamp: new Date().toISOString(),
+    userId: 'user123',
+    action: 'export patient data',
+    eventType: AuditEventType.DLP_ALLOWED,
+    triggeredRules: ['phi-detection'],
+    destination: 'file-export',
+    reason: undefined,
+    allowed: true,
+  },
+  {
+    id: 'log2',
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    userId: 'admin456',
+    action: 'bulk export',
+    eventType: AuditEventType.DLP_BLOCKED,
+    triggeredRules: ['large-data-volume'],
+    destination: 'api-request',
+    reason: 'Blocked by DLP rule: Large Data Volume Protection',
+    allowed: false,
+  },
+]
+---
+
+<div class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-6">DLP Rules Manager</h1>
+
+  <div id="dlp-alert" class="hidden mb-4"></div>
+
+  <Tabs defaultValue="rules" client:load>
+    <TabsList className="mb-4">
+      <TabsTrigger value="rules">Rules</TabsTrigger>
+      <TabsTrigger value="activity">Activity Logs</TabsTrigger>
+      <TabsTrigger value="editor">Rule Editor</TabsTrigger>
+    </TabsList>
+
+    <TabsContent value="rules" className="space-y-4">
+      <DLPRulesList {rules} />
+    </TabsContent>
+
+    <TabsContent value="activity" className="space-y-4">
+      <DLPActivityLogs logs={activityLogs} />
+    </TabsContent>
+
+    <TabsContent value="editor" className="space-y-4">
+      <DLPRuleEditor client:load />
+    </TabsContent>
+  </Tabs>
+</div>
+
+<script>
+  // Global alert handling for DLP components
+  window.showDLPAlert = (
+    type: 'success' | 'error' | 'warning',
+    message: string,
+  ) => {
+    const alertElement = document.getElementById('dlp-alert')
+    if (!alertElement) return
+
+    // Create alert content
+    const alertClass =
+      type === 'success'
+        ? 'bg-green-50 border-green-200 text-green-800'
+        : type === 'error'
+          ? 'bg-red-50 border-red-200 text-red-800'
+          : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+
+    alertElement.className = `flex p-4 mb-4 border rounded-lg ${alertClass}`
+    alertElement.innerHTML = `
+      <div class="flex-shrink-0">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      <div class="ml-3 text-sm">
+        <h3 class="font-medium">${type.charAt(0).toUpperCase() + type.slice(1)}</h3>
+        <div>${message}</div>
+      </div>
+    `
+
+    // Show the alert
+    alertElement.classList.remove('hidden')
+
+    // Hide after 3 seconds
+    setTimeout(() => {
+      alertElement.classList.add('hidden')
+    }, 3000)
+  }
+
+  // Set up event listeners for relevant actions
+  document.addEventListener('DOMContentLoaded', () => {
+    // Listen for custom events from the DLP components
+    document.addEventListener('dlp:rule-updated', ((e: CustomEvent<any>) => {
+      window.showDLPAlert(
+        'success',
+        `Rule "${e.detail.name}" ${e.detail.isActive ? 'enabled' : 'disabled'}`,
+      )
+    }) as EventListener)
+
+    document.addEventListener('dlp:rule-deleted', (() => {
+      window.showDLPAlert('success', 'Rule deleted successfully')
+    }) as EventListener)
+
+    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<any>) => {
+      window.showDLPAlert(
+        'success',
+        `Rule ${e.detail.isEditing ? 'updated' : 'added'} successfully`,
+      )
+    }) as EventListener)
+
+    document.addEventListener('dlp:error', ((e: CustomEvent<any>) => {
+      window.showDLPAlert('error', e.detail.message)
+    }) as EventListener)
+  })
+</script>

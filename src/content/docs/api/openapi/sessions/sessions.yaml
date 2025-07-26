@@ -1,0 +1,170 @@
+paths:
+  /sessions:
+    get:
+      summary: List sessions
+      description: Get a paginated list of user sessions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Items per page
+        - name: userId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by user ID (admin only)
+        - name: active
+          in: query
+          schema:
+            type: boolean
+          description: Filter by active/inactive sessions
+      responses:
+        200:
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../schemas/session.yaml#/Session
+                  pagination:
+                    $ref: ../schemas/common.yaml#/Pagination
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+  /sessions/{id}:
+    get:
+      summary: Get session
+      description: Get a single session by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Session ID
+      responses:
+        200:
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/session.yaml#/Session
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+    delete:
+      summary: Revoke session
+      description: Revoke a session (logout)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Session ID
+      responses:
+        204:
+          description: Session revoked successfully
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+  /sessions/current:
+    get:
+      summary: Get current session
+      description: Get details about the current session
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Current session details
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/session.yaml#/Session
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+    delete:
+      summary: Revoke current session
+      description: Revoke the current session (logout)
+      security:
+        - BearerAuth: []
+      responses:
+        204:
+          description: Session revoked successfully
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error

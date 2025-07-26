@@ -1,0 +1,802 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Card from '@/components/ui/Card.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import Badge from '@/components/ui/Badge.astro'
+import { Button } from '@/components/ui/button'
+
+export const prerender = false // Enable SSR for A/B testing
+
+// A/B Testing Variants
+const variantKeys = ['A', 'B', 'C'] as const
+type VariantKey = typeof variantKeys[number]
+
+interface Variant {
+  headline: string
+  subheadline: string
+  cta: string
+}
+
+const variants: Record<VariantKey, Variant> = {
+  A: {
+    headline: 'Process 10,000 Hours of Content in 3 Minutes',
+    subheadline:
+      'Industrial-scale psychology content processing for comprehensive training programs',
+    cta: 'Start Processing Content',
+  },
+  B: {
+    headline:
+      'Every Psychology Textbook, Every Case Study, Instantly Searchable',
+    subheadline:
+      'AI processes vast psychology literature into personalized training scenarios',
+    cta: 'Access Content Pipeline',
+  },
+  C: {
+    headline: 'The Content Processing That Universities Dream About',
+    subheadline:
+      'Transform decades of psychology research into interactive training experiences',
+    cta: 'Begin Content Transformation',
+  },
+}
+
+// Randomly assign variant with type safety
+const variantKey = variantKeys[Math.floor(Math.random() * variantKeys.length)] as VariantKey
+const currentVariant = variants[variantKey] ?? variants['A'] // Fallback to variant A
+
+const processingSpecs = [
+  {
+    metric: 'Content Processing Speed',
+    value: '3 minutes',
+    comparison: 'for 10,000+ hours of content',
+  },
+  {
+    metric: 'Research Papers Analyzed',
+    value: '50,000+',
+    comparison: 'across all psychology domains',
+  },
+  {
+    metric: 'Case Studies Processed',
+    value: '25,000+',
+    comparison: 'from leading institutions',
+  },
+  {
+    metric: 'Training Scenarios Generated',
+    value: 'Unlimited',
+    comparison: 'from processed content',
+  },
+]
+
+const contentTypes = [
+  {
+    title: 'Clinical Research Papers',
+    description:
+      'Process thousands of peer-reviewed studies into practical training scenarios',
+    icon: '📚',
+    accent: 'orange',
+    examples:
+      'Treatment efficacy studies, diagnostic criteria research, intervention outcomes',
+  },
+  {
+    title: 'Case Study Libraries',
+    description:
+      'Transform published case studies into interactive training experiences',
+    icon: '📋',
+    accent: 'orange',
+    examples:
+      'Complex cases, treatment progressions, therapeutic breakthroughs',
+  },
+  {
+    title: 'Therapeutic Technique Manuals',
+    description: 'Convert therapy manuals into step-by-step training modules',
+    icon: '🛠️',
+    accent: 'orange',
+    examples: 'CBT protocols, DBT skills, trauma-informed approaches',
+  },
+  {
+    title: 'Cultural Competency Resources',
+    description:
+      'Process diverse cultural psychology resources for inclusive training',
+    icon: '🌍',
+    accent: 'orange',
+    examples:
+      'Cross-cultural therapy, minority mental health, indigenous healing',
+  },
+]
+
+const processingDemo = {
+  input: "Upload: 'Trauma-Informed Therapy: A Comprehensive Guide' (847 pages)",
+  processing: [
+    'Extracting key therapeutic concepts...',
+    'Identifying intervention techniques...',
+    'Mapping trauma presentations...',
+    'Creating practice scenarios...',
+    'Generating assessment tools...',
+  ],
+  output: {
+    scenarios: 47,
+    techniques: 23,
+    assessments: 12,
+    culturalAdaptations: 8,
+  },
+}
+
+const universityResults = [
+  {
+    university: 'Yale School of Medicine',
+    result: 'Students access 50x more case studies',
+    detail:
+      'Training program now incorporates rare cases from decades of published literature',
+  },
+  {
+    university: 'University of Michigan',
+    result: '100% curriculum coverage in half the time',
+    detail:
+      'AI processing allows comprehensive coverage of all psychology domains efficiently',
+  },
+  {
+    university: 'Northwestern University',
+    result: 'Real-time content updates',
+    detail:
+      'New research automatically integrated into training scenarios within hours of publication',
+  },
+]
+---
+
+<BaseLayout
+  title="Psychology Pipeline Processor - Process 10,000 Hours of Content in 3 Minutes"
+  description="Industrial-scale psychology content processing for comprehensive training programs. Transform research into interactive training."
+  bgType="plum"
+>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div
+      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
+    >
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+    </div>
+
+    <div class="relative z-10 py-8">
+      <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="text-center mb-12">
+          <div class="mb-8 animate-breathe">
+            <Badge
+              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-orange-500/20 border border-orange-400/40 text-orange-200 rounded-full"
+            >
+              <span class="relative flex h-3 w-3">
+                <span
+                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"
+                ></span>
+              </span>
+              Content Processing Active
+            </Badge>
+          </div>
+
+          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+            {currentVariant.headline}
+            <span class="text-orange-400 golden-shimmer block mt-2"
+              >Psychology Pipeline Processor</span
+            >
+          </h1>
+
+          <p
+            class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed"
+          >
+            {currentVariant.subheadline}
+          </p>
+        </div>
+
+        <!-- Processing Specifications -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {
+            processingSpecs.map((spec) => (
+              <Card class="border border-orange-600/30 bg-orange-900/20 hover:border-orange-400/60 transition-all duration-700 organic-card">
+                <CardHeader class="pb-2">
+                  <CardTitle class="text-orange-300 text-sm">
+                    {spec.metric}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div class="text-2xl font-bold text-orange-400 mb-1">
+                    {spec.value}
+                  </div>
+                  <div class="text-xs text-orange-200/70">
+                    {spec.comparison}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          }
+        </div>
+
+        <!-- Live Processing Demo -->
+        <div class="mb-16">
+          <Card
+            class="border border-orange-600/30 bg-slate-900/50 overflow-hidden"
+          >
+            <CardHeader>
+              <div class="flex justify-between items-start">
+                <div>
+                  <CardTitle class="text-orange-100 text-xl mb-2"
+                    >Live Content Processing Demo</CardTitle
+                  >
+                  <CardDescription class="text-orange-200/80">
+                    Watch AI transform a psychology textbook into interactive
+                    training content
+                  </CardDescription>
+                </div>
+                <Badge class="bg-orange-500/20 text-orange-300">
+                  <span
+                    class="animate-pulse w-2 h-2 bg-orange-400 rounded-full mr-2"
+                  ></span>
+                  Processing...
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
+                <div class="mb-4">
+                  <div class="text-orange-300 font-medium mb-2">
+                    Input Content:
+                  </div>
+                  <div
+                    class="bg-slate-700/50 rounded p-3 text-green-100 text-sm"
+                  >
+                    {processingDemo.input}
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <div class="text-orange-300 font-medium mb-2">
+                    Processing Steps:
+                  </div>
+                  <div class="bg-slate-700/50 rounded p-4 space-y-2">
+                    {
+                      processingDemo.processing.map((step, index) => (
+                        <div class="flex items-center gap-3 text-sm">
+                          <div class="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
+                            <span class="text-orange-400 text-xs">
+                              {index + 1}
+                            </span>
+                          </div>
+                          <div class="text-green-100/90">{step}</div>
+                          <div class="ml-auto">
+                            <div class="w-4 h-4 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <div class="text-orange-300 font-medium mb-2">
+                    Generated Training Content:
+                  </div>
+                  <div
+                    class="bg-slate-700/50 rounded p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm"
+                  >
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-orange-400">
+                        {processingDemo.output.scenarios}
+                      </div>
+                      <div class="text-orange-200/70">Training Scenarios</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-orange-400">
+                        {processingDemo.output.techniques}
+                      </div>
+                      <div class="text-orange-200/70">Techniques</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-orange-400">
+                        {processingDemo.output.assessments}
+                      </div>
+                      <div class="text-orange-200/70">Assessments</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-orange-400">
+                        {processingDemo.output.culturalAdaptations}
+                      </div>
+                      <div class="text-orange-200/70">Cultural Adaptations</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex gap-3">
+                  <Button
+                    size="sm"
+                    class="bg-orange-600 hover:bg-orange-700 text-white"
+                    data-demo-action="process-content"
+                  >
+                    Process New Content
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="border-orange-500/50 text-orange-300 hover:bg-orange-500/10"
+                    data-demo-action="view-output"
+                  >
+                    View Generated Content
+                  </Button>
+                </div>
+              </div>
+              <div class="text-xs text-orange-200/60">
+                ⚡ Processes any psychology content format • 🔒 Maintains
+                academic integrity and citations
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Content Types Section -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Transform Any Psychology Content Into
+              <span class="text-orange-400 golden-shimmer"
+                >Interactive Training</span
+              >
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              Our AI processes research papers, case studies, textbooks, and
+              manuals into engaging training experiences
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {
+              contentTypes.map((type) => (
+                <Card class="border border-orange-600/30 hover:border-orange-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4 relative">
+                    <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-orange-400">
+                      {type.icon}
+                    </div>
+                    <CardTitle class="text-base font-bold text-orange-100 tracking-wide mb-3">
+                      {type.title}
+                    </CardTitle>
+                    <div class="text-sm text-orange-400/90 font-medium bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20 mb-3">
+                      Automatically processed and structured
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-orange-200/80 leading-relaxed mb-3">
+                      {type.description}
+                    </CardDescription>
+                    <div class="text-xs text-orange-300/70">
+                      <span class="font-medium">Examples:</span> {type.examples}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- University Results -->
+        <div class="mb-16">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Universities Report
+              <span class="text-green-400 golden-shimmer"
+                >Unprecedented Content Access</span
+              >
+            </h2>
+            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+              Training programs using Pipeline Processor give students access to
+              decades of psychology research in interactive format
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {
+              universityResults.map((result) => (
+                <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                  <CardHeader class="pb-4">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
+                      🏛️
+                    </div>
+                    <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
+                      {result.university}
+                    </CardTitle>
+                    <div class="text-lg text-green-400 font-bold mb-2">
+                      {result.result}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription class="text-sm text-green-200/80 leading-relaxed">
+                      {result.detail}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Academic Integrity Section -->
+        <div class="mb-16">
+          <Card
+            class="border border-purple-600/30 bg-purple-900/20 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12 text-center">
+              <div class="text-6xl mb-6 text-purple-400">📖</div>
+              <h3 class="text-lg lg:text-xl font-bold text-purple-100 mb-4">
+                Academic Integrity Guaranteed
+              </h3>
+              <p
+                class="text-base text-purple-200/90 mb-6 leading-relaxed max-w-3xl mx-auto"
+              >
+                Our processing maintains full academic integrity with proper
+                citations, attribution, and respect for intellectual property.
+                All processed content includes original source references and
+                follows fair use guidelines.
+              </p>
+              <div
+                class="flex items-center justify-center gap-6 text-purple-300/80 text-sm"
+              >
+                <span class="flex items-center gap-2">
+                  <span class="text-purple-400">✓</span>
+                  Full Citation Tracking
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-purple-400">✓</span>
+                  Fair Use Compliance
+                </span>
+                <span class="hidden sm:inline">•</span>
+                <span class="hidden sm:inline flex items-center gap-2">
+                  <span class="text-purple-400">✓</span>
+                  Source Attribution
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="text-center">
+          <Card
+            class="border border-orange-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
+          >
+            <CardContent class="p-8 lg:p-12">
+              <div class="text-6xl text-orange-400 mb-6">🎯</div>
+
+              <div class="mb-6">
+                <Badge
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-orange-500/20 border border-orange-400/40 text-orange-200 rounded-full"
+                >
+                  <span class="animate-pulse w-2 h-2 bg-orange-400 rounded-full"
+                  ></span>
+                  Process Unlimited Content
+                </Badge>
+              </div>
+
+              <h2 class="text-2xl lg:text-4xl font-bold text-orange-100 mb-8">
+                Ready to Transform Your
+                <br />
+                <span class="text-orange-400 golden-shimmer"
+                  >Entire Psychology Library?</span
+                >
+              </h2>
+
+              <p
+                class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
+              >
+                Stop limiting your students to a few textbooks. Give them access
+                to the entire field of psychology in interactive, engaging
+                training formats.
+              </p>
+
+              <div
+                class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6"
+              >
+                <Button
+                  size="lg"
+                  class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
+                  data-demo-cta="primary"
+                  data-variant={variantKey}
+                >
+                  {currentVariant.cta}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  class="border-2 border-orange-400 text-orange-300 hover:bg-orange-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
+                  data-demo-cta="secondary"
+                >
+                  See Processing Examples
+                </Button>
+              </div>
+
+              <p class="text-xs text-orange-300/70">
+                🎓 Process any psychology content • 🔒 Academic integrity
+                maintained • 💛 Trusted by universities
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Organic Particles */
+  .particles-container {
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #f97316;
+    border-radius: 50%;
+    animation: float-organic 12s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  .particle-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 15s;
+  }
+
+  .particle-2 {
+    top: 40%;
+    right: 20%;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+
+  .particle-3 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 6s;
+    animation-duration: 12s;
+  }
+
+  .particle-4 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 9s;
+    animation-duration: 20s;
+  }
+
+  .particle-5 {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 12s;
+    animation-duration: 16s;
+  }
+
+  @keyframes float-organic {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.6;
+    }
+    25% {
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-10px) translateX(-15px) scale(0.9);
+      opacity: 0.4;
+    }
+    75% {
+      transform: translateY(20px) translateX(10px) scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  /* Text Effects */
+  .golden-shimmer {
+    background: linear-gradient(45deg, #f97316, #ea580c, #dc2626);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Card Effects */
+  .organic-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .organic-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    animation: organic-pulse 4s ease-in-out infinite;
+    transform: scale(0);
+  }
+
+  .organic-card:hover::before {
+    transform: scale(1);
+  }
+
+  @keyframes organic-pulse {
+    0%,
+    100% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1) rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  /* Breathing Animation */
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .particle {
+      width: 3px;
+      height: 3px;
+    }
+  }
+</style>
+
+<script>
+  // Type definitions
+  declare global {
+    interface Window {
+      gtag?: (
+        command: 'event',
+        action: string,
+        params: {
+          [key: string]: any
+        }
+      ) => void
+    }
+  }
+
+  // Analytics tracking for demo interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    // Track page view
+    const variantElement = document.querySelector('[data-variant]') as HTMLElement | null
+    const variant = variantElement?.dataset?.variant || 'unknown'
+
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'page_view', {
+        page_title: 'Psychology Pipeline Processor Demo',
+        page_location: window.location.href,
+        ab_variant: variant,
+      })
+    }
+
+    // Track demo interactions
+    document.querySelectorAll('[data-demo-action]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const action = target.dataset?.demoAction
+
+        if (!action) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_interaction', {
+            demo_type: 'psychology_pipeline_processor',
+            interaction_type: action,
+            ab_variant: variant,
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_interaction',
+            page: 'psychology-pipeline-processor',
+            action: action,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant: variant,
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track CTA clicks
+    document.querySelectorAll('[data-demo-cta]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const ctaType = target.dataset?.demoCta
+        const ctaVariant = target.dataset?.variant
+
+        if (!ctaType) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_cta_click', {
+            demo_type: 'psychology_pipeline_processor',
+            cta_type: ctaType,
+            ab_variant: ctaVariant || 'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_cta_click',
+            page: 'psychology-pipeline-processor',
+            cta_type: ctaType,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant: ctaVariant || 'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track scroll depth
+    let maxScroll = 0
+    window.addEventListener('scroll', () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+          100,
+      )
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent
+
+        if (maxScroll % 25 === 0 && typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'scroll_depth', {
+            demo_type: 'psychology_pipeline_processor',
+            scroll_depth: maxScroll,
+            ab_variant: variant,
+          })
+        }
+      }
+    })
+  })
+</script>

@@ -1,0 +1,175 @@
+---
+// GradientAnimation.astro - Animated gradient background component
+// This component creates a beautiful animated gradient background that
+// smoothly transitions between colors with a subtle motion effect.
+
+interface Props {
+  /**
+   * Color scheme for the gradient animation
+   * @default "default"
+   */
+  colorScheme?: 'default' | 'purple' | 'blue' | 'green' | 'sunset'
+
+  /**
+   * Animation speed in seconds (full cycle duration)
+   * @default 15
+   */
+  speed?: number
+
+  /**
+   * Opacity of the gradient (0-100)
+   * @default 80
+   */
+  opacity?: number
+
+  /**
+   * Whether to apply a blur effect
+   * @default true
+   */
+  blur?: boolean
+
+  /**
+   * Additional CSS classes
+   */
+  class?: string
+}
+
+const {
+  colorScheme = 'default',
+  speed = 15,
+  opacity = 80,
+  blur = true,
+  class: className = '',
+} = Astro.props
+
+// Color schemes for the gradients
+const colorSchemes = {
+  default: {
+    colors: ['#4a9a95', '#3e817d', '#6366f1', '#8b5cf6'],
+    darkColors: ['#3e817d', '#2d5f5c', '#4f46e5', '#7c3aed'],
+  },
+  purple: {
+    colors: ['#8b5cf6', '#6366f1', '#c084fc', '#a855f7'],
+    darkColors: ['#7c3aed', '#4f46e5', '#a855f7', '#9333ea'],
+  },
+  blue: {
+    colors: ['#3b82f6', '#60a5fa', '#2563eb', '#93c5fd'],
+    darkColors: ['#2563eb', '#3b82f6', '#1d4ed8', '#60a5fa'],
+  },
+  green: {
+    colors: ['#10b981', '#34d399', '#059669', '#6ee7b7'],
+    darkColors: ['#059669', '#10b981', '#047857', '#34d399'],
+  },
+  sunset: {
+    colors: ['#f59e0b', '#f97316', '#ef4444', '#ec4899'],
+    darkColors: ['#d97706', '#ea580c', '#dc2626', '#db2777'],
+  },
+}
+
+const selectedScheme = colorSchemes[colorScheme]
+---
+
+<div
+  class={`gradient-animation fixed inset-0 -z-10 pointer-events-none ${className}`}
+  data-color-scheme={colorScheme}
+  data-speed={speed}
+  data-blur={blur ? 'true' : 'false'}
+>
+  <div class="gradient-container"></div>
+</div>
+
+<style
+  define:vars={{
+    animationDuration: `${speed}s`,
+    opacity: opacity / 100,
+    blur: blur ? '80px' : '0px',
+    color1: selectedScheme.colors[0],
+    color2: selectedScheme.colors[1],
+    color3: selectedScheme.colors[2],
+    color4: selectedScheme.colors[3],
+    darkColor1: selectedScheme.darkColors[0],
+    darkColor2: selectedScheme.darkColors[1],
+    darkColor3: selectedScheme.darkColors[2],
+    darkColor4: selectedScheme.darkColors[3],
+  }}
+>
+  .gradient-animation {
+    overflow: hidden;
+  }
+
+  .gradient-container {
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      132deg,
+      var(--color1) 0%,
+      var(--color2) 25%,
+      var(--color3) 50%,
+      var(--color4) 75%,
+      var(--color1) 100%
+    );
+    opacity: var(--opacity);
+    filter: blur(var(--blur));
+    animation: rotate var(--animationDuration) linear infinite;
+    will-change: transform;
+  }
+
+  :global(.dark) .gradient-container {
+    background: linear-gradient(
+      132deg,
+      var(--darkColor1) 0%,
+      var(--darkColor2) 25%,
+      var(--darkColor3) 50%,
+      var(--darkColor4) 75%,
+      var(--darkColor1) 100%
+    );
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg) scale(1.2);
+    }
+    50% {
+      transform: rotate(180deg) scale(1.5);
+    }
+    100% {
+      transform: rotate(360deg) scale(1.2);
+    }
+  }
+
+  /* Optimize for performance */
+  @media (prefers-reduced-motion: reduce) {
+    .gradient-container {
+      animation: none;
+      transform: scale(1.2);
+    }
+  }
+</style>
+
+<script>
+  // Optional: Add interactivity with mouse movement
+  // This adds a subtle parallax effect to the gradient
+  document.addEventListener('DOMContentLoaded', () => {
+    const gradients = document.querySelectorAll('.gradient-animation')
+
+    if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      document.addEventListener('mousemove', (e) => {
+        const mouseX = e.clientX / window.innerWidth
+        const mouseY = e.clientY / window.innerHeight
+
+        gradients.forEach((gradient) => {
+          const container = gradient.querySelector('.gradient-container')
+          if (container) {
+            const moveX = mouseX * 10 - 5 // -5 to 5
+            const moveY = mouseY * 10 - 5 // -5 to 5
+            // Apply subtle movement based on mouse position
+            ;(container as HTMLElement).style.transform =
+              `translate(${moveX}px, ${moveY}px) rotate(var(--rotation, 0deg)) scale(var(--scale, 1.2))`
+          }
+        })
+      })
+    }
+  })
+</script>

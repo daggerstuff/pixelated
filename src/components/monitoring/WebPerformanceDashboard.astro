@@ -1,0 +1,782 @@
+---
+import { getMonitoringConfig } from '@/lib/monitoring/config'
+import { getPerformanceIndicator } from '@/lib/monitoring/hooks'
+
+interface Props {
+  title: string
+  description: string
+  refreshInterval?: number
+}
+
+const { title, description, refreshInterval = 60000 } = Astro.props
+
+const config = getMonitoringConfig()
+
+const performanceBudgets = {
+  TTFB: { good: 300, needsImprovement: 600 },
+  FCP: { good: 1800, needsImprovement: 3000 },
+  LCP: { good: 2500, needsImprovement: 4000 },
+  CLS: { good: 0.1, needsImprovement: 0.25 },
+  FID: { good: 100, needsImprovement: 300 },
+  TTI: { good: 3800, needsImprovement: 7500 },
+  TBT: { good: 200, needsImprovement: 600 },
+  JSSize: { good: 500, needsImprovement: 1000 },
+  CSSSize: { good: 100, needsImprovement: 200 },
+  Requests: { good: 50, needsImprovement: 80 },
+}
+---
+
+<div
+  class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden performance-dashboard"
+>
+  <div
+    class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"
+  >
+    <div>
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+        {title}
+      </h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="last-updated" class="text-xs text-gray-500 dark:text-gray-400">
+        Last updated: Never
+      </span>
+      <button
+        id="refresh-button"
+        class="px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-200 rounded text-sm"
+      >
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="p-4">
+    <!-- Core Web Vitals Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">
+        Core Web Vitals
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- LCP Card -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+              LCP (Largest Contentful Paint)
+            </h4>
+            <span
+              id="lcp-indicator"
+              class="px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-gray-600"
+              >-</span
+            >
+          </div>
+          <p
+            id="lcp-value"
+            class="text-2xl font-bold text-gray-900 dark:text-white"
+          >
+            <span class="loading-placeholder">Loading...</span>
+          </p>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Target: &lt; 2.5s
+          </div>
+          <div
+            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full mt-2"
+          >
+            <div
+              id="lcp-bar"
+              class="h-2 bg-gray-500 rounded-full"
+              style="width: 0%"
+            >
+            </div>
+          </div>
+        </div>
+
+        <!-- FID Card -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+              FID (First Input Delay)
+            </h4>
+            <span
+              id="fid-indicator"
+              class="px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-gray-600"
+              >-</span
+            >
+          </div>
+          <p
+            id="fid-value"
+            class="text-2xl font-bold text-gray-900 dark:text-white"
+          >
+            <span class="loading-placeholder">Loading...</span>
+          </p>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Target: &lt; 100ms
+          </div>
+          <div
+            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full mt-2"
+          >
+            <div
+              id="fid-bar"
+              class="h-2 bg-gray-500 rounded-full"
+              style="width: 0%"
+            >
+            </div>
+          </div>
+        </div>
+
+        <!-- CLS Card -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+              CLS (Cumulative Layout Shift)
+            </h4>
+            <span
+              id="cls-indicator"
+              class="px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-gray-600"
+              >-</span
+            >
+          </div>
+          <p
+            id="cls-value"
+            class="text-2xl font-bold text-gray-900 dark:text-white"
+          >
+            <span class="loading-placeholder">Loading...</span>
+          </p>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Target: &lt; 0.1
+          </div>
+          <div
+            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full mt-2"
+          >
+            <div
+              id="cls-bar"
+              class="h-2 bg-gray-500 rounded-full"
+              style="width: 0%"
+            >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Metrics Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">
+        Loading & Interactivity
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- TTFB Card -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            TTFB
+          </h4>
+          <p
+            id="ttfb-value"
+            class="text-xl font-bold text-gray-900 dark:text-white"
+          >
+            <span class="loading-placeholder">Loading...</span>
+          </p>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Time to First Byte
+          </div>
+        </div>
+
+        <!-- FCP Card -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            FCP
+          </h4>
+          <p
+            id="fcp-value"
+            class="text-xl font-bold text-gray-900 dark:text-white"
+          >
+            <span class="loading-placeholder">Loading...</span>
+          </p>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            First Contentful Paint
+          </div>
+        </div>
+
+        <!-- TTI Card -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            TTI
+          </h4>
+          <p
+            id="tti-value"
+            class="text-xl font-bold text-gray-900 dark:text-white"
+          >
+            <span class="loading-placeholder">Loading...</span>
+          </p>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Time to Interactive
+          </div>
+        </div>
+
+        <!-- TBT Card -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            TBT
+          </h4>
+          <p
+            id="tbt-value"
+            class="text-xl font-bold text-gray-900 dark:text-white"
+          >
+            <span class="loading-placeholder">Loading...</span>
+          </p>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Total Blocking Time
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resource Metrics Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">
+        Resource Metrics
+      </h3>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Resource Size Chart -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
+            Resource Size Distribution
+          </h4>
+          <canvas id="resource-size-chart" height="220"></canvas>
+        </div>
+
+        <!-- Request Count Chart -->
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
+            Request Count by Type
+          </h4>
+          <canvas id="request-count-chart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Over Time Section -->
+    <div>
+      <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">
+        Performance Trend (Last 7 Days)
+      </h3>
+      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+        <canvas id="performance-trend-chart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script define:vars={{ refreshInterval, performanceBudgets }}>
+  // Chart instances
+  let resourceSizeChart
+  let requestCountChart
+  let performanceTrendChart
+
+  // Simulated data - in a real app, this would come from your analytics service
+  function getRandomMetrics() {
+    return {
+      coreVitals: {
+        lcp: {
+          value: Math.random() * 3000 + 1000, // 1000-4000ms
+        },
+        fid: {
+          value: Math.random() * 200 + 50, // 50-250ms
+        },
+        cls: {
+          value: Math.random() * 0.25, // 0-0.25
+        },
+      },
+      loading: {
+        ttfb: Math.random() * 500 + 100, // 100-600ms
+        fcp: Math.random() * 2000 + 800, // 800-2800ms
+        domComplete: Math.random() * 3000 + 1200, // 1200-4200ms
+      },
+      interactivity: {
+        tti: Math.random() * 4000 + 2000, // 2000-6000ms
+        tbt: Math.random() * 500 + 100, // 100-600ms
+      },
+      resources: {
+        js: Math.random() * 800 + 200, // 200-1000KB
+        css: Math.random() * 150 + 50, // 50-200KB
+        img: Math.random() * 1500 + 500, // 500-2000KB
+        fonts: Math.random() * 200 + 100, // 100-300KB
+        other: Math.random() * 400 + 100, // 100-500KB
+      },
+      requests: {
+        js: Math.floor(Math.random() * 15 + 5), // 5-20
+        css: Math.floor(Math.random() * 5 + 1), // 1-6
+        img: Math.floor(Math.random() * 30 + 10), // 10-40
+        fonts: Math.floor(Math.random() * 4 + 1), // 1-5
+        other: Math.floor(Math.random() * 10 + 5), // 5-15
+      },
+      trend: generateTrendData(),
+    }
+  }
+
+  function generateTrendData() {
+    const dates = []
+    const lcpData = []
+    const fidData = []
+    const clsData = []
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date()
+      date.setDate(date.getDate() - i)
+      dates.push(
+        date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      )
+
+      lcpData.push(Math.random() * 3000 + 1000)
+      fidData.push(Math.random() * 200 + 50)
+      clsData.push(Math.random() * 0.25)
+    }
+
+    return {
+      dates,
+      lcpData,
+      fidData,
+      clsData,
+    }
+  }
+
+  function getRatingInfo(metric, value) {
+    const budget = performanceBudgets[metric]
+    if (!budget)
+      return {
+        rating: 'unknown',
+        color: 'bg-gray-500',
+        textColor: 'text-gray-500',
+      }
+
+    if (value <= budget.good) {
+      return {
+        rating: 'good',
+        color: 'bg-green-500',
+        textColor: 'text-green-500',
+      }
+    } else if (value <= budget.needsImprovement) {
+      return {
+        rating: 'needs-improvement',
+        color: 'bg-yellow-500',
+        textColor: 'text-yellow-500',
+      }
+    } else {
+      return { rating: 'poor', color: 'bg-red-500', textColor: 'text-red-500' }
+    }
+  }
+
+  function formatMetricValue(metric, value) {
+    switch (metric) {
+      case 'CLS':
+        return value.toFixed(2)
+      case 'JSSize':
+      case 'CSSSize':
+        return `${value.toFixed(0)} KB`
+      case 'Requests':
+        return value.toFixed(0)
+      default:
+        return `${value.toFixed(0)} ms`
+    }
+  }
+
+  function updateCoreVitalMetric(id, value, metric) {
+    const valueElement = document.getElementById(`${id}-value`)
+    const barElement = document.getElementById(`${id}-bar`)
+    const indicatorElement = document.getElementById(`${id}-indicator`)
+
+    if (valueElement && barElement && indicatorElement) {
+      const { rating, color, textColor } = getRatingInfo(metric, value)
+
+      valueElement.textContent = formatMetricValue(metric, value)
+      valueElement.className = `text-2xl font-bold ${textColor}`
+
+      barElement.className = `h-2 ${color} rounded-full`
+
+      // Calculate width as percentage of target
+      let budget = performanceBudgets[metric]
+      let percentOfBudget = (value / budget.needsImprovement) * 100
+      percentOfBudget = Math.min(percentOfBudget, 100) // Cap at 100%
+      barElement.style.width = `${percentOfBudget}%`
+
+      indicatorElement.textContent = rating
+      indicatorElement.className = `px-2 py-1 text-xs rounded-full ${color} text-white`
+    }
+  }
+
+  function updateSimpleMetric(id, value) {
+    const element = document.getElementById(`${id}-value`)
+    if (element) {
+      element.textContent = `${value.toFixed(0)} ms`
+    }
+  }
+
+  function initResourceSizeChart(data) {
+    const ctx = document.getElementById('resource-size-chart').getContext('2d')
+
+    resourceSizeChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['JavaScript', 'CSS', 'Images', 'Fonts', 'Other'],
+        datasets: [
+          {
+            data: [
+              data.resources.js,
+              data.resources.css,
+              data.resources.img,
+              data.resources.fonts,
+              data.resources.other,
+            ],
+            backgroundColor: [
+              'rgba(255, 159, 64, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+            ],
+            borderColor: [
+              'rgb(255, 159, 64)',
+              'rgb(54, 162, 235)',
+              'rgb(255, 99, 132)',
+              'rgb(75, 192, 192)',
+              'rgb(153, 102, 255)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? '#e5e7eb'
+                : '#374151',
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.label || ''
+                const value = context.raw
+                return `${label}: ${value.toFixed(0)} KB`
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  function initRequestCountChart(data) {
+    const ctx = document.getElementById('request-count-chart').getContext('2d')
+
+    requestCountChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['JavaScript', 'CSS', 'Images', 'Fonts', 'Other'],
+        datasets: [
+          {
+            label: 'Request Count',
+            data: [
+              data.requests.js,
+              data.requests.css,
+              data.requests.img,
+              data.requests.fonts,
+              data.requests.other,
+            ],
+            backgroundColor: [
+              'rgba(255, 159, 64, 0.5)',
+              'rgba(54, 162, 235, 0.5)',
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(153, 102, 255, 0.5)',
+            ],
+            borderColor: [
+              'rgb(255, 159, 64)',
+              'rgb(54, 162, 235)',
+              'rgb(255, 99, 132)',
+              'rgb(75, 192, 192)',
+              'rgb(153, 102, 255)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? '#e5e7eb'
+                : '#374151',
+            },
+            grid: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+            },
+          },
+          x: {
+            ticks: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? '#e5e7eb'
+                : '#374151',
+            },
+            grid: {
+              display: false,
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      },
+    })
+  }
+
+  function initPerformanceTrendChart(data) {
+    const ctx = document
+      .getElementById('performance-trend-chart')
+      .getContext('2d')
+
+    performanceTrendChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.trend.dates,
+        datasets: [
+          {
+            label: 'LCP (ms)',
+            data: data.trend.lcpData,
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+            tension: 0.3,
+            fill: true,
+          },
+          {
+            label: 'FID (ms)',
+            data: data.trend.fidData,
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            tension: 0.3,
+            fill: true,
+          },
+          {
+            label: 'CLS (x100)',
+            data: data.trend.clsData.map((val) => val * 100), // Multiply by 100 to make visible on same scale
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.3,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? '#e5e7eb'
+                : '#374151',
+            },
+            grid: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+            },
+          },
+          x: {
+            ticks: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? '#e5e7eb'
+                : '#374151',
+            },
+            grid: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: document.querySelector('html').classList.contains('dark')
+                ? '#e5e7eb'
+                : '#374151',
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.dataset.label || ''
+                const value = context.raw
+                if (label.includes('CLS')) {
+                  return `${label}: ${(value / 100).toFixed(2)}`
+                }
+                return `${label}: ${value.toFixed(0)}`
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  function updateDashboard() {
+    const data = getRandomMetrics()
+    const lastUpdated = document.getElementById('last-updated')
+
+    // Update core web vitals
+    updateCoreVitalMetric('lcp', data.coreVitals.lcp.value, 'LCP')
+    updateCoreVitalMetric('fid', data.coreVitals.fid.value, 'FID')
+    updateCoreVitalMetric('cls', data.coreVitals.cls.value, 'CLS')
+
+    // Update additional metrics
+    updateSimpleMetric('ttfb', data.loading.ttfb)
+    updateSimpleMetric('fcp', data.loading.fcp)
+    updateSimpleMetric('tti', data.interactivity.tti)
+    updateSimpleMetric('tbt', data.interactivity.tbt)
+
+    // Update charts
+    if (resourceSizeChart) {
+      resourceSizeChart.data.datasets[0].data = [
+        data.resources.js,
+        data.resources.css,
+        data.resources.img,
+        data.resources.fonts,
+        data.resources.other,
+      ]
+      resourceSizeChart.update()
+    } else {
+      initResourceSizeChart(data)
+    }
+
+    if (requestCountChart) {
+      requestCountChart.data.datasets[0].data = [
+        data.requests.js,
+        data.requests.css,
+        data.requests.img,
+        data.requests.fonts,
+        data.requests.other,
+      ]
+      requestCountChart.update()
+    } else {
+      initRequestCountChart(data)
+    }
+
+    if (performanceTrendChart) {
+      performanceTrendChart.data.labels = data.trend.dates
+      performanceTrendChart.data.datasets[0].data = data.trend.lcpData
+      performanceTrendChart.data.datasets[1].data = data.trend.fidData
+      performanceTrendChart.data.datasets[2].data = data.trend.clsData.map(
+        (val) => val * 100,
+      )
+      performanceTrendChart.update()
+    } else {
+      initPerformanceTrendChart(data)
+    }
+
+    // Update last updated timestamp
+    if (lastUpdated) {
+      const now = new Date()
+      lastUpdated.textContent = `Last updated: ${now.toLocaleTimeString()}`
+    }
+  }
+
+  // Initialize dashboard when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    updateDashboard()
+
+    // Set up refresh button click handler
+    const refreshButton = document.getElementById('refresh-button')
+    if (refreshButton) {
+      refreshButton.addEventListener('click', updateDashboard)
+    }
+
+    // Set up auto-refresh interval
+    setInterval(updateDashboard, refreshInterval)
+  })
+
+  // Listen for theme changes to update chart colors
+  document.addEventListener('astro:after-swap', () => {
+    if (resourceSizeChart) resourceSizeChart.destroy()
+    if (requestCountChart) requestCountChart.destroy()
+    if (performanceTrendChart) performanceTrendChart.destroy()
+
+    resourceSizeChart = null
+    requestCountChart = null
+    performanceTrendChart = null
+
+    updateDashboard()
+  })
+</script>
+
+<style>
+  .performance-dashboard {
+    transition:
+      background-color 300ms ease-in-out,
+      color 300ms ease-in-out,
+      border-color 300ms ease-in-out;
+  }
+
+  .loading-placeholder {
+    animation: pulse 1.5s infinite;
+    color: #cbd5e0;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Theme-specific colors */
+  .text-green-500 {
+    color: #10b981;
+  }
+
+  .text-yellow-500 {
+    color: #f59e0b;
+  }
+
+  .text-red-500 {
+    color: #ef4444;
+  }
+
+  .text-gray-500 {
+    color: #6b7280;
+  }
+
+  .bg-green-500 {
+    background-color: #10b981;
+  }
+
+  .bg-yellow-500 {
+    background-color: #f59e0b;
+  }
+
+  .bg-red-500 {
+    background-color: #ef4444;
+  }
+
+  .bg-gray-500 {
+    background-color: #6b7280;
+  }
+</style>

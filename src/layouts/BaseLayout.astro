@@ -1,0 +1,42 @@
+---
+import Header from '@/components/layout/Header.astro';
+import Background from '@/components/backgrounds/Background.astro';
+// import { KonamiTrigger } from '@/components/ui/KonamiTrigger';
+import type { BgType } from '@/types';
+// A simple footer component could be added here as well.
+
+export interface Props {
+  title: string;
+  description?: string;
+  bgType?: BgType;
+}
+
+const { title, description, bgType } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | Pixelated Empathy</title>
+    <meta name="description" content={description ?? 'Transforming therapy education with AI.'} />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Background fixes CSS -->
+    <link rel="stylesheet" href="/css/background-fixes.css" />
+  </head>
+  <body class="bg-black text-slate-100 font-geist">
+    {bgType && <Background type={bgType} />}
+    <Header />
+    <main>
+      <slot />
+      <!-- <KonamiTrigger client:load /> -->
+    </main>
+    <!-- <Footer /> -->
+  </body>
+</html>

@@ -1,0 +1,1233 @@
+paths:
+  /users:
+    get:
+      summary: List users
+      description: Get a paginated list of users
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Items per page
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [user, admin, therapist]
+          description: Filter by role
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, suspended]
+          description: Filter by status
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../schemas/user.yaml#/User
+                  pagination:
+                    $ref: ../schemas/common.yaml#/Pagination
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+  /users/{id}:
+    get:
+      summary: Get user
+      description: Get a single user by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        200:
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/user.yaml#/User
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+    patch:
+      summary: Update user
+      description: Update a user's information
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: User's full name
+                role:
+                  type: string
+                  enum: [user, admin, therapist]
+                  description: User's role
+                preferences:
+                  type: object
+                  properties:
+                    theme:
+                      type: string
+                      enum: [light, dark, system]
+                    language:
+                      type: string
+                    timezone:
+                      type: string
+                    notifications:
+                      type: object
+                      properties:
+                        email:
+                          type: boolean
+                        push:
+                          type: boolean
+                        sms:
+                          type: boolean
+                status:
+                  type: string
+                  enum: [active, inactive, suspended]
+                  description: Account status
+      responses:
+        200:
+          description: Updated user details
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/user.yaml#/User
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+    delete:
+      summary: Delete user
+      description: Delete a user account
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        204:
+          description: User deleted successfully
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+  /users/devices:
+    get:
+      tags:
+        - Users
+        - Devices
+      summary: List authenticated devices
+      description: |
+        Retrieve a list of all devices registered for the authenticated user.
+        This includes both WebAuthn devices and trusted devices used for recovery.
+        Results can be filtered and paginated.
+      parameters:
+        - name: type
+          in: query
+          description: Filter by device type
+          schema:
+            type: string
+            enum: [webauthn, trusted, all]
+            default: all
+        - name: status
+          in: query
+          description: Filter by device status
+          schema:
+            type: string
+            enum: [active, disabled, locked]
+            default: active
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: perPage
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        200:
+          description: List of devices retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: ../schemas/device.yaml#/Device
+                  pagination:
+                    $ref: ../schemas/common.yaml#/Pagination
+              examples:
+                success:
+                  summary: Successful device list
+                  value:
+                    devices:
+                      - id: device_01H5NQJK8Y7X2W3V4U5T6R7S8Q
+                        name: Windows Hello Face Recognition
+                        type: webauthn
+                        status: active
+                        lastUsed: 2024-03-20T10:30:00Z
+                        createdAt: 2024-03-19T15:00:00Z
+                      - id: device_02H6MQJL9Z8Y3X4W5V6U7T8R9P
+                        name: YubiKey 5C
+                        type: webauthn
+                        status: active
+                        lastUsed: 2024-03-20T09:15:00Z
+                        createdAt: 2024-03-18T14:30:00Z
+                      - id: device_03H7NRKM0A9Z4Y5X6W7V8U9T0Q
+                        name: iPhone 13 Pro
+                        type: trusted
+                        status: active
+                        lastUsed: 2024-03-19T16:45:00Z
+                        createdAt: 2024-03-17T11:20:00Z
+                    pagination:
+                      total: 3
+                      page: 1
+                      perPage: 20
+                      totalPages: 1
+                filtered_webauthn:
+                  summary: WebAuthn devices only
+                  value:
+                    devices:
+                      - id: device_01H5NQJK8Y7X2W3V4U5T6R7S8Q
+                        name: Windows Hello Face Recognition
+                        type: webauthn
+                        status: active
+                        lastUsed: 2024-03-20T10:30:00Z
+                        createdAt: 2024-03-19T15:00:00Z
+                      - id: device_02H6MQJL9Z8Y3X4W5V6U7T8R9P
+                        name: YubiKey 5C
+                        type: webauthn
+                        status: active
+                        lastUsed: 2024-03-20T09:15:00Z
+                        createdAt: 2024-03-18T14:30:00Z
+                    pagination:
+                      total: 2
+                      page: 1
+                      perPage: 20
+                      totalPages: 1
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+  /users/devices/{deviceId}:
+    parameters:
+      - name: deviceId
+        in: path
+        required: true
+        description: ID of the device to manage
+        schema:
+          type: string
+    get:
+      tags:
+        - Users
+        - Devices
+      summary: Get device details
+      description: Retrieve detailed information about a specific device
+      responses:
+        200:
+          description: Device details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/device.yaml#/Device
+              examples:
+                webauthn_device:
+                  summary: WebAuthn device details
+                  value:
+                    id: device_01H5NQJK8Y7X2W3V4U5T6R7S8Q
+                    name: Windows Hello Face Recognition
+                    type: webauthn
+                    status: active
+                    lastUsed: 2024-03-20T10:30:00Z
+                    createdAt: 2024-03-19T15:00:00Z
+                    metadata:
+                      browser: Chrome
+                      platform: Windows
+                      version: 120.0.0.0
+                trusted_device:
+                  summary: Trusted device details
+                  value:
+                    id: device_03H7NRKM0A9Z4Y5X6W7V8U9T0Q
+                    name: iPhone 13 Pro
+                    type: trusted
+                    status: active
+                    lastUsed: 2024-03-19T16:45:00Z
+                    createdAt: 2024-03-17T11:20:00Z
+                    metadata:
+                      model: iPhone13,3
+                      os: iOS
+                      version: 17.3.1
+        404:
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                device_not_found:
+                  summary: Device not found
+                  value:
+                    code: DEVICE_NOT_FOUND
+                    message: Device not found
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+    patch:
+      tags:
+        - Users
+        - Devices
+      summary: Update device
+      description: Update device name or status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: New name for the device
+                status:
+                  type: string
+                  enum: [active, disabled]
+                  description: New status for the device
+            examples:
+              rename_device:
+                summary: Rename device
+                value:
+                  name: Work YubiKey
+              disable_device:
+                summary: Disable device
+                value:
+                  status: disabled
+      responses:
+        200:
+          description: Device updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/device.yaml#/Device
+              examples:
+                renamed_device:
+                  summary: Device renamed
+                  value:
+                    id: device_02H6MQJL9Z8Y3X4W5V6U7T8R9P
+                    name: Work YubiKey
+                    type: webauthn
+                    status: active
+                    lastUsed: 2024-03-20T09:15:00Z
+                    createdAt: 2024-03-18T14:30:00Z
+                disabled_device:
+                  summary: Device disabled
+                  value:
+                    id: device_02H6MQJL9Z8Y3X4W5V6U7T8R9P
+                    name: YubiKey 5C
+                    type: webauthn
+                    status: disabled
+                    lastUsed: 2024-03-20T09:15:00Z
+                    createdAt: 2024-03-18T14:30:00Z
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_name:
+                  summary: Invalid device name
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      name: Device name cannot be empty
+                invalid_status:
+                  summary: Invalid status
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      status: Status must be either 'active' or 'disabled'
+        404:
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                device_not_found:
+                  summary: Device not found
+                  value:
+                    code: DEVICE_NOT_FOUND
+                    message: Device not found
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+    delete:
+      tags:
+        - Users
+        - Devices
+      summary: Remove device
+      description: |
+        Remove a device from the user's account.
+        For security reasons, users cannot remove their last active device
+        or the device they're currently using.
+      responses:
+        204:
+          description: Device removed successfully
+        400:
+          description: Cannot remove device
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                last_device:
+                  summary: Cannot remove last device
+                  value:
+                    code: DEVICE_LAST_ACTIVE
+                    message: Cannot remove the last active device
+                current_device:
+                  summary: Cannot remove current device
+                  value:
+                    code: DEVICE_CURRENTLY_USED
+                    message: Cannot remove the device you're currently using
+        404:
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                device_not_found:
+                  summary: Device not found
+                  value:
+                    code: DEVICE_NOT_FOUND
+                    message: Device not found
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+  /users/profile:
+    get:
+      tags:
+        - Users
+        - Profile
+      summary: Get user profile
+      description: |
+        Retrieve the authenticated user's profile information.
+        This includes personal details, preferences, and account status.
+      responses:
+        200:
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/user.yaml#/User
+              examples:
+                complete_profile:
+                  summary: Complete user profile
+                  value:
+                    id: 123e4567-e89b-12d3-a456-426614174000
+                    email: user@example.com
+                    name: John Doe
+                    preferences:
+                      theme: dark
+                      notifications: true
+                      language: en-US
+                      timezone: America/New_York
+                      privacy:
+                        showEmail: false
+                        showActivity: true
+                    status: active
+                    emailVerified: true
+                    createdAt: 2024-03-19T15:00:00Z
+                    updatedAt: 2024-03-20T10:30:00Z
+                minimal_profile:
+                  summary: Minimal user profile
+                  value:
+                    id: 123e4567-e89b-12d3-a456-426614174001
+                    email: newuser@example.com
+                    name: Jane Smith
+                    preferences:
+                      theme: system
+                      notifications: true
+                      language: en-US
+                      timezone: UTC
+                      privacy:
+                        showEmail: false
+                        showActivity: false
+                    status: pending
+                    emailVerified: false
+                    createdAt: 2024-03-20T11:00:00Z
+                    updatedAt: 2024-03-20T11:00:00Z
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+    patch:
+      tags:
+        - Users
+        - Profile
+      summary: Update user profile
+      description: |
+        Update the authenticated user's profile information.
+        Supports partial updates of personal details and preferences.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: User's display name
+                preferences:
+                  type: object
+                  properties:
+                    theme:
+                      type: string
+                      enum: [light, dark, system]
+                    notifications:
+                      type: boolean
+                    language:
+                      type: string
+                      pattern: ^[a-z]{2}-[A-Z]{2}$
+                    timezone:
+                      type: string
+                    privacy:
+                      type: object
+                      properties:
+                        showEmail:
+                          type: boolean
+                        showActivity:
+                          type: boolean
+            examples:
+              update_name:
+                summary: Update display name
+                value:
+                  name: Johnny Doe
+              update_preferences:
+                summary: Update preferences
+                value:
+                  preferences:
+                    theme: dark
+                    notifications: true
+                    language: en-US
+                    timezone: America/New_York
+                    privacy:
+                      showEmail: false
+                      showActivity: true
+              update_mixed:
+                summary: Update name and preferences
+                value:
+                  name: Johnny Doe
+                  preferences:
+                    theme: dark
+                    notifications: true
+      responses:
+        200:
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/user.yaml#/User
+              examples:
+                name_updated:
+                  summary: Name updated
+                  value:
+                    id: 123e4567-e89b-12d3-a456-426614174000
+                    email: user@example.com
+                    name: Johnny Doe
+                    preferences:
+                      theme: light
+                      notifications: true
+                      language: en-US
+                      timezone: UTC
+                      privacy:
+                        showEmail: false
+                        showActivity: false
+                    status: active
+                    emailVerified: true
+                    createdAt: 2024-03-19T15:00:00Z
+                    updatedAt: 2024-03-20T11:30:00Z
+                preferences_updated:
+                  summary: Preferences updated
+                  value:
+                    id: 123e4567-e89b-12d3-a456-426614174000
+                    email: user@example.com
+                    name: John Doe
+                    preferences:
+                      theme: dark
+                      notifications: true
+                      language: en-US
+                      timezone: America/New_York
+                      privacy:
+                        showEmail: false
+                        showActivity: true
+                    status: active
+                    emailVerified: true
+                    createdAt: 2024-03-19T15:00:00Z
+                    updatedAt: 2024-03-20T11:30:00Z
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_name:
+                  summary: Invalid name format
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      name: Name must be between 2 and 50 characters
+                invalid_language:
+                  summary: Invalid language code
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      language: Language code must be in format 'xx-XX'
+                invalid_timezone:
+                  summary: Invalid timezone
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      timezone: Invalid timezone identifier
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+  /users/email:
+    post:
+      tags:
+        - Users
+        - Profile
+      summary: Change email address
+      description: |
+        Initiate email address change process.
+        Requires current password and sends verification to new email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newEmail
+                - password
+              properties:
+                newEmail:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+            examples:
+              change_email:
+                summary: Change email request
+                value:
+                  newEmail: newemail@example.com
+                  password: CurrentPass123!
+      responses:
+        202:
+          description: Email change initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  expiresIn:
+                    type: integer
+                    description: Seconds until verification link expires
+              examples:
+                success:
+                  summary: Verification email sent
+                  value:
+                    message: Verification email sent to newemail@example.com
+                    expiresIn: 3600
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_email:
+                  summary: Invalid email format
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      email: Invalid email format
+                email_exists:
+                  summary: Email already in use
+                  value:
+                    code: USER_EMAIL_EXISTS
+                    message: Email address is already registered
+        401:
+          description: Invalid password
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_password:
+                  summary: Incorrect password
+                  value:
+                    code: AUTH_INVALID_PASSWORD
+                    message: Current password is incorrect
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                rate_limited:
+                  summary: Too many email change attempts
+                  value:
+                    code: RATE_LIMIT_EXCEEDED
+                    message: Too many email change attempts. Please try again later.
+                    details:
+                      retryAfter: 3600
+                      maxAttempts: 3
+
+  /users/email/verify:
+    post:
+      tags:
+        - Users
+        - Profile
+      summary: Verify email change
+      description: |
+        Complete email address change process by verifying the token
+        sent to the new email address.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: Verification token from email
+            examples:
+              verify_email:
+                summary: Verify email change
+                value:
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        200:
+          description: Email changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: ../schemas/user.yaml#/User
+              examples:
+                success:
+                  summary: Email updated
+                  value:
+                    message: Email address updated successfully
+                    user:
+                      id: 123e4567-e89b-12d3-a456-426614174000
+                      email: newemail@example.com
+                      name: John Doe
+                      preferences:
+                        theme: dark
+                        notifications: true
+                      status: active
+                      emailVerified: true
+                      createdAt: 2024-03-19T15:00:00Z
+                      updatedAt: 2024-03-20T11:30:00Z
+        400:
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_token:
+                  summary: Invalid or expired token
+                  value:
+                    code: INVALID_TOKEN
+                    message: Invalid or expired verification token
+                token_expired:
+                  summary: Token expired
+                  value:
+                    code: TOKEN_EXPIRED
+                    message: Verification token has expired
+                    details:
+                      expiredAt: 2024-03-20T12:30:00Z
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+  /users/{userId}/profile-picture:
+    post:
+      tags:
+        - users
+      summary: Upload profile picture
+      description: |
+        Upload or update a user's profile picture. The image will be processed and stored in multiple sizes
+        for different use cases (thumbnail, display, original).
+
+        Supported formats: JPEG, PNG, WebP
+        Maximum file size: 5MB
+        Maximum dimensions: 2048x2048 pixels
+
+        The image will be automatically:
+        * Validated for format and content
+        * Resized to standard dimensions
+        * Optimized for web delivery
+        * Stored securely with access control
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The image file to upload
+            examples:
+              valid_upload:
+                summary: Valid profile picture upload
+                value:
+                  image: '@profile.jpg'
+              invalid_format:
+                summary: Invalid file format
+                value:
+                  image: '@document.pdf'
+              file_too_large:
+                summary: File exceeds size limit
+                value:
+                  image: '@large_image.jpg'
+      responses:
+        200:
+          description: Profile picture updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  urls:
+                    type: object
+                    properties:
+                      original:
+                        type: string
+                        format: uri
+                        description: URL to the original image
+                      display:
+                        type: string
+                        format: uri
+                        description: URL to the display size image (500x500)
+                      thumbnail:
+                        type: string
+                        format: uri
+                        description: URL to the thumbnail image (150x150)
+                  metadata:
+                    type: object
+                    properties:
+                      width:
+                        type: integer
+                        description: Original image width
+                      height:
+                        type: integer
+                        description: Original image height
+                      format:
+                        type: string
+                        description: Image format (jpeg, png, webp)
+                      size:
+                        type: integer
+                        description: File size in bytes
+              examples:
+                success:
+                  summary: Successful upload response
+                  value:
+                    urls:
+                      original: https://cdn.gradiant.dev/users/123/profile/original.jpg
+                      display: https://cdn.gradiant.dev/users/123/profile/display.jpg
+                      thumbnail: https://cdn.gradiant.dev/users/123/profile/thumbnail.jpg
+                    metadata:
+                      width: 1024
+                      height: 1024
+                      format: jpeg
+                      size: 524288
+        400:
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_format:
+                  summary: Invalid file format
+                  value:
+                    code: INVALID_FILE_FORMAT
+                    message: Only JPEG, PNG and WebP images are allowed
+                file_too_large:
+                  summary: File too large
+                  value:
+                    code: FILE_TOO_LARGE
+                    message: Image exceeds maximum size of 5MB
+                invalid_dimensions:
+                  summary: Invalid dimensions
+                  value:
+                    code: INVALID_DIMENSIONS
+                    message: Image dimensions exceed 2048x2048 pixels
+                malformed_image:
+                  summary: Malformed image data
+                  value:
+                    code: MALFORMED_IMAGE
+                    message: The uploaded file is not a valid image
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        413:
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        415:
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+    delete:
+      tags:
+        - users
+      summary: Remove profile picture
+      description: Remove the user's profile picture and revert to default avatar
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the user
+      responses:
+        204:
+          description: Profile picture removed successfully
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: Profile picture not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+    get:
+      tags:
+        - users
+      summary: Get profile picture URLs
+      description: Get URLs for different sizes of a user's profile picture
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the user
+      responses:
+        200:
+          description: Profile picture URLs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  urls:
+                    type: object
+                    properties:
+                      original:
+                        type: string
+                        format: uri
+                        description: URL to the original image
+                      display:
+                        type: string
+                        format: uri
+                        description: URL to the display size image (500x500)
+                      thumbnail:
+                        type: string
+                        format: uri
+                        description: URL to the thumbnail image (150x150)
+                  metadata:
+                    type: object
+                    properties:
+                      width:
+                        type: integer
+                        description: Original image width
+                      height:
+                        type: integer
+                        description: Original image height
+                      format:
+                        type: string
+                        description: Image format (jpeg, png, webp)
+                      size:
+                        type: integer
+                        description: File size in bytes
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: Last update timestamp
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: Profile picture not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error

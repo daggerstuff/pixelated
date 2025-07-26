@@ -1,0 +1,207 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "Core Web Vitals",
+      "type": "row",
+      "panels": [
+        {
+          "title": "Largest Contentful Paint (LCP)",
+          "type": "gauge",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_web_vitals_lcp_total[5m])",
+              "legendFormat": "LCP"
+            }
+          ],
+          "thresholds": {
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 2500, "color": "yellow" },
+              { "value": 4000, "color": "red" }
+            ]
+          }
+        },
+        {
+          "title": "First Input Delay (FID)",
+          "type": "gauge",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_web_vitals_fid_total[5m])",
+              "legendFormat": "FID"
+            }
+          ],
+          "thresholds": {
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 100, "color": "yellow" },
+              { "value": 300, "color": "red" }
+            ]
+          }
+        },
+        {
+          "title": "Cumulative Layout Shift (CLS)",
+          "type": "gauge",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_web_vitals_cls_total[5m])",
+              "legendFormat": "CLS"
+            }
+          ],
+          "thresholds": {
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 0.1, "color": "yellow" },
+              { "value": 0.25, "color": "red" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Error Tracking",
+      "type": "row",
+      "panels": [
+        {
+          "title": "Error Rate",
+          "type": "graph",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_errors_total[5m])",
+              "legendFormat": "Error Rate"
+            }
+          ],
+          "alert": {
+            "name": "High Error Rate",
+            "conditions": [
+              {
+                "evaluator": {
+                  "params": [0.01],
+                  "type": "gt"
+                },
+                "operator": {
+                  "type": "and"
+                },
+                "query": {
+                  "params": ["A", "5m", "now"]
+                },
+                "reducer": {
+                  "params": [],
+                  "type": "avg"
+                },
+                "type": "query"
+              }
+            ],
+            "frequency": "1m",
+            "handler": 1,
+            "notifications": []
+          }
+        },
+        {
+          "title": "Error Types",
+          "type": "table",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "topk(10, sum by (type) (faro_errors_total))",
+              "legendFormat": "Error Types"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Performance Metrics",
+      "type": "row",
+      "panels": [
+        {
+          "title": "Page Load Time",
+          "type": "graph",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_performance_navigation_total[5m])",
+              "legendFormat": "Load Time"
+            }
+          ]
+        },
+        {
+          "title": "Resource Load Times",
+          "type": "heatmap",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_performance_resource_total[5m])",
+              "legendFormat": "Resource Time"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "User Experience",
+      "type": "row",
+      "panels": [
+        {
+          "title": "Session Duration",
+          "type": "graph",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_session_duration_seconds_total[5m])",
+              "legendFormat": "Session Duration"
+            }
+          ]
+        },
+        {
+          "title": "User Interactions",
+          "type": "graph",
+          "datasource": "Grafana Cloud Frontend",
+          "targets": [
+            {
+              "expr": "rate(faro_user_interaction_total[5m])",
+              "legendFormat": "Interactions"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 27,
+  "style": "dark",
+  "tags": ["frontend", "monitoring"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Frontend Monitoring Dashboard",
+  "uid": "frontend-monitoring",
+  "version": 1
+}

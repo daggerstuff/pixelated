@@ -1,0 +1,26 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro'
+import TabbedLayout from '~/layouts/TabbedLayout.astro'
+import ListView from '~/components/views/ListView.astro'
+import type { BgType } from '~/types'
+
+const frontmatter = {
+  title: 'Astro Blog',
+  description: 'Example: fetching Astro Blog using @ascorbic/feed-loader',
+  subtitle: 'Example: fetching Astro Blog using @ascorbic/feed-loader',
+  bgType: false as const,
+  toc: true,
+  ogImage: false,
+}
+---
+
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  bgType={frontmatter.bgType}
+  ogImage={frontmatter.ogImage}
+>
+  <TabbedLayout subtitle={frontmatter.subtitle}>
+    <ListView pageToc={frontmatter.toc} collectionType="feeds" />
+  </TabbedLayout>
+</BaseLayout>

@@ -1,0 +1,63 @@
+---
+interface Props {
+  clientId: string
+  name: string
+  email: string
+  avatar: string
+}
+
+const { clientId, name, email, avatar } = Astro.props
+---
+
+<div
+  class="flex items-center justify-between bg-white rounded-lg shadow-sm p-6 mb-6"
+>
+  <div class="flex items-center">
+    <img
+      src={avatar}
+      alt={name}
+      class="w-16 h-16 rounded-full object-cover mr-4"
+    />
+    <div>
+      <h1 class="text-2xl font-bold">{name}</h1>
+      <p class="text-gray-600">{email}</p>
+      <div class="flex mt-2">
+        <a
+          href={`/client/${clientId}`}
+          class="text-sm text-purple-600 hover:text-purple-800 mr-4">Overview</a
+        >
+        <a
+          href={`/client/${clientId}/sessions`}
+          class="text-sm text-purple-600 hover:text-purple-800 mr-4">Sessions</a
+        >
+        <a
+          href={`/client/${clientId}/temporal-analysis`}
+          class="text-sm text-purple-600 hover:text-purple-800 mr-4 font-semibold"
+          >Temporal Analysis</a
+        >
+        <a
+          href={`/client/${clientId}/insights`}
+          class="text-sm text-purple-600 hover:text-purple-800">Insights</a
+        >
+      </div>
+    </div>
+  </div>
+  <div>
+    <a
+      href={`/client/${clientId}/notes`}
+      class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 mr-1"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+        ></path>
+      </svg>
+      Client Notes
+    </a>
+  </div>
+</div>

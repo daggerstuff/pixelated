@@ -1,0 +1,36 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PostCard from '@/components/blog/PostCard.astro';
+
+export const prerender = true;
+
+const allPosts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+const posts = allPosts.sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => 
+  new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+).slice(0, 10); // Show first 10 posts
+---
+
+<BaseLayout title="Blog" description="Thoughts, stories, and ideas from the Pixelated Empathy team.">
+  <div class="container mx-auto px-4 py-16">
+    <header class="text-center mb-12">
+      <h1 class="text-5xl font-bold tracking-tight">Pixelated Empathy Blog</h1>
+      <p class="mt-4 text-lg text-muted-foreground">Thoughts, stories, and ideas from our team.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {posts.map((post: CollectionEntry<'blog'>) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+
+    <div class="text-center mt-12">
+      <a href="/blog/page/1" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors">
+        View All Posts
+      </a>
+    </div>
+  </div>
+</BaseLayout>

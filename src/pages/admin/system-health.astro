@@ -1,0 +1,573 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro'
+---
+
+<AdminLayout
+  title="System Health Dashboard"
+  description="Monitor system health and API availability"
+>
+  <div class="p-4">
+    <h1 class="text-3xl font-bold mb-6">System Health Dashboard</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- API Health Status Card -->
+      <div class="card border rounded-lg overflow-hidden shadow-md">
+        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+          <h2 class="text-xl font-semibold flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            API Health Status
+          </h2>
+        </div>
+        <div class="card-body p-4">
+          <div id="api-status" class="flex items-center mb-2">
+            <div class="status-indicator w-4 h-4 rounded-full bg-gray-300 mr-2">
+            </div>
+            <span class="status-text">Checking API status...</span>
+          </div>
+          <div
+            id="api-response-time"
+            class="text-sm text-gray-600 dark:text-gray-400"
+          >
+            Response time: --
+          </div>
+          <div
+            id="api-last-check"
+            class="text-sm text-gray-600 dark:text-gray-400"
+          >
+            Last checked: --
+          </div>
+        </div>
+      </div>
+
+      <!-- Database Status Card -->
+      <div class="card border rounded-lg overflow-hidden shadow-md">
+        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+          <h2 class="text-xl font-semibold flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z"
+              ></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 7h16"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 11h16"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 14h8"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 17h8"></path>
+            </svg>
+            Database Status
+          </h2>
+        </div>
+        <div class="card-body p-4">
+          <div id="db-status" class="flex items-center mb-2">
+            <div class="status-indicator w-4 h-4 rounded-full bg-gray-300 mr-2">
+            </div>
+            <span class="status-text">Checking database status...</span>
+          </div>
+          <div id="db-details" class="text-sm text-gray-600 dark:text-gray-400">
+            Details: --
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Redis Status Card -->
+      <div class="card border rounded-lg overflow-hidden shadow-md">
+        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+          <h2 class="text-xl font-semibold flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+              ></path>
+            </svg>
+            Redis Cache Status
+          </h2>
+        </div>
+        <div class="card-body p-4">
+          <div id="redis-status" class="flex items-center mb-2">
+            <div class="status-indicator w-4 h-4 rounded-full bg-gray-300 mr-2">
+            </div>
+            <span class="status-text">Checking Redis status...</span>
+          </div>
+          <div
+            id="redis-details"
+            class="text-sm text-gray-600 dark:text-gray-400"
+          >
+            Details: --
+          </div>
+        </div>
+      </div>
+
+      <!-- System Resources Card -->
+      <div class="card border rounded-lg overflow-hidden shadow-md">
+        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+          <h2 class="text-xl font-semibold flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+              ></path>
+            </svg>
+            System Resources
+          </h2>
+        </div>
+        <div class="card-body p-4">
+          <div class="mb-2">
+            <div class="flex justify-between mb-1">
+              <span class="text-sm font-medium">Memory Usage</span>
+              <span id="memory-usage-percent" class="text-sm">--%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+              <div
+                id="memory-usage-bar"
+                class="bg-blue-600 h-2.5 rounded-full"
+                style="width: 0%"
+              >
+              </div>
+            </div>
+          </div>
+          <div
+            id="memory-details"
+            class="text-sm text-gray-600 dark:text-gray-400 mb-4"
+          >
+            Memory: -- / --
+          </div>
+          <div
+            id="cpu-info"
+            class="text-sm text-gray-600 dark:text-gray-400 mb-2"
+          >
+            CPU: --
+          </div>
+          <div
+            id="load-average"
+            class="text-sm text-gray-600 dark:text-gray-400"
+          >
+            Load Average: --
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Info Card -->
+    <div class="card border rounded-lg overflow-hidden shadow-md mb-8">
+      <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+        <h2 class="text-xl font-semibold flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          System Information
+        </h2>
+      </div>
+      <div class="card-body p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="font-medium mb-2">Operating System</h3>
+            <div
+              id="os-info"
+              class="text-sm text-gray-600 dark:text-gray-400 mb-4"
+            >
+              Platform: --<br />
+              Release: --<br />
+              Uptime: --
+            </div>
+          </div>
+          <div>
+            <h3 class="font-medium mb-2">Runtime</h3>
+            <div
+              id="runtime-info"
+              class="text-sm text-gray-600 dark:text-gray-400"
+            >
+              Node.js: --<br />
+              Process Memory: --<br />
+              Process Uptime: --
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Raw Health Check Response Card -->
+    <div class="card border rounded-lg overflow-hidden shadow-md">
+      <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+            Raw Health Check Response
+          </h2>
+          <button
+            id="refresh-btn"
+            class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              ></path>
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div class="card-body p-4">
+        <pre
+          id="raw-response"
+          class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-auto text-sm h-80 max-h-80">Loading health check data...</pre>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  // Health check polling
+  let healthCheckInterval: number
+  const HEALTH_CHECK_ENDPOINT = '/api/v1/health'
+  const HEALTH_CHECK_INTERVAL = 30000 // 30 seconds
+
+  // Initialize the dashboard
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initial health check
+    performHealthCheck()
+
+    // Setup interval for regular health checks
+    healthCheckInterval = window.setInterval(
+      performHealthCheck,
+      HEALTH_CHECK_INTERVAL,
+    )
+
+    // Setup refresh button
+    const refreshBtn = document.getElementById('refresh-btn')
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', performHealthCheck)
+    }
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (healthCheckInterval) {
+        clearInterval(healthCheckInterval)
+      }
+    })
+  })
+
+  // Perform health check and update the UI
+  async function performHealthCheck() {
+    try {
+      // Show loading state
+      updateStatusIndicator('api-status', 'loading', 'Checking API status...')
+
+      // Fetch health check data
+      const startTime = performance.now()
+      const response = await fetch(HEALTH_CHECK_ENDPOINT)
+      const endTime = performance.now()
+      const clientResponseTime = Math.round(endTime - startTime)
+
+      // Parse response
+      const healthData = await response.json()
+
+      // Update raw response
+      const rawResponseElem = document.getElementById('raw-response')
+      if (rawResponseElem) {
+        rawResponseElem.textContent = JSON.stringify(healthData, null, 2)
+      }
+
+      // Update UI components
+      updateApiStatus(healthData, clientResponseTime)
+      updateDatabaseStatus(healthData)
+      updateRedisStatus(healthData)
+      updateSystemInfo(healthData)
+    } catch (error) {
+      console.error('Health check failed:', error)
+      updateStatusIndicator('api-status', 'error', 'API health check failed')
+
+      const rawResponseElem = document.getElementById('raw-response')
+      if (rawResponseElem) {
+        rawResponseElem.textContent =
+          'Error fetching health check data: ' +
+          (error instanceof Error ? error.message : String(error))
+      }
+    }
+  }
+
+  // Update API status indicators
+  function updateApiStatus(healthData: any, clientResponseTime: number) {
+    const apiStatus = healthData.api?.status || 'unknown'
+    updateStatusIndicator('api-status', apiStatus, `API status: ${apiStatus}`)
+
+    const apiResponseTimeElem = document.getElementById('api-response-time')
+    if (apiResponseTimeElem) {
+      const serverResponseTime = healthData.api?.responseTimeMs || '--'
+      apiResponseTimeElem.textContent = `Response time: ${serverResponseTime}ms (server) / ${clientResponseTime}ms (client)`
+    }
+
+    const apiLastCheckElem = document.getElementById('api-last-check')
+    if (apiLastCheckElem) {
+      apiLastCheckElem.textContent = `Last checked: ${new Date().toLocaleTimeString()}`
+    }
+  }
+
+  // Update database status indicators
+  function updateDatabaseStatus(healthData: any) {
+    const dbStatus = healthData.supabase?.status || 'unknown'
+    updateStatusIndicator('db-status', dbStatus, `Database status: ${dbStatus}`)
+
+    const dbDetailsElem = document.getElementById('db-details')
+    if (dbDetailsElem) {
+      const details =
+        healthData.supabase?.message ||
+        healthData.supabase?.error ||
+        `Last updated: ${healthData.supabase?.timestamp || 'unknown'}`
+      dbDetailsElem.textContent = `Details: ${details}`
+    }
+  }
+
+  // Update Redis status indicators
+  function updateRedisStatus(healthData: any) {
+    const redisStatus = healthData.redis?.status || 'unknown'
+    updateStatusIndicator(
+      'redis-status',
+      redisStatus,
+      `Redis status: ${redisStatus}`,
+    )
+
+    const redisDetailsElem = document.getElementById('redis-details')
+    if (redisDetailsElem) {
+      const details =
+        healthData.redis?.details?.message ||
+        healthData.redis?.details?.error ||
+        'Cache service is available'
+      redisDetailsElem.textContent = `Details: ${details}`
+    }
+  }
+
+  // Update system information
+  function updateSystemInfo(healthData: any) {
+    if (!healthData.system) return
+
+    // Update memory usage
+    const memoryUsageElem = document.getElementById('memory-usage-percent')
+    const memoryUsageBar = document.getElementById('memory-usage-bar')
+    const memoryDetailsElem = document.getElementById('memory-details')
+
+    if (memoryUsageElem && memoryUsageBar && memoryDetailsElem) {
+      const usagePercent = healthData.system.memory?.usagePercent || 0
+      memoryUsageElem.textContent = `${usagePercent}%`
+      memoryUsageBar.style.width = `${usagePercent}%`
+
+      // Change color based on usage
+      if (usagePercent > 90) {
+        memoryUsageBar.classList.remove('bg-blue-600', 'bg-yellow-500')
+        memoryUsageBar.classList.add('bg-red-600')
+      } else if (usagePercent > 70) {
+        memoryUsageBar.classList.remove('bg-blue-600', 'bg-red-600')
+        memoryUsageBar.classList.add('bg-yellow-500')
+      } else {
+        memoryUsageBar.classList.remove('bg-yellow-500', 'bg-red-600')
+        memoryUsageBar.classList.add('bg-blue-600')
+      }
+
+      const total = healthData.system.memory?.total || '--'
+      const used = healthData.system.memory?.used || '--'
+      memoryDetailsElem.textContent = `Memory: ${used} / ${total}`
+    }
+
+    // Update CPU info
+    const cpuInfoElem = document.getElementById('cpu-info')
+    if (cpuInfoElem) {
+      const model = healthData.system.cpu?.model || '--'
+      const cores = healthData.system.cpu?.cores || '--'
+      cpuInfoElem.textContent = `CPU: ${model} (${cores} cores)`
+    }
+
+    // Update load average
+    const loadAvgElem = document.getElementById('load-average')
+    if (loadAvgElem) {
+      const loadAvg = healthData.system.cpu?.loadAverage || {}
+      loadAvgElem.textContent = `Load Average: ${loadAvg['1m'] || '--'} (1m), ${loadAvg['5m'] || '--'} (5m), ${loadAvg['15m'] || '--'} (15m)`
+    }
+
+    // Update OS info
+    const osInfoElem = document.getElementById('os-info')
+    if (osInfoElem) {
+      const platform = healthData.system.os?.platform || '--'
+      const release = healthData.system.os?.release || '--'
+      const uptime = healthData.system.os?.uptime || '--'
+      osInfoElem.innerHTML = `Platform: ${platform}<br>Release: ${release}<br>Uptime: ${uptime}`
+    }
+
+    // Update runtime info
+    const runtimeInfoElem = document.getElementById('runtime-info')
+    if (runtimeInfoElem) {
+      const nodeVersion = healthData.system.runtime?.nodeVersion || '--'
+      const processMemory =
+        healthData.system.runtime?.processMemory?.heapUsed || '--'
+      const processUptime = healthData.system.runtime?.processUptime || '--'
+      runtimeInfoElem.innerHTML = `Node.js: ${nodeVersion}<br>Process Memory: ${processMemory}<br>Process Uptime: ${processUptime}`
+    }
+  }
+
+  // Update status indicator with proper color and text
+  function updateStatusIndicator(
+    elementId: string,
+    status: string,
+    text: string,
+  ) {
+    const element = document.getElementById(elementId)
+    if (!element) return
+
+    const indicator = element.querySelector('.status-indicator')
+    const textSpan = element.querySelector('.status-text')
+
+    if (indicator && textSpan) {
+      // Remove existing classes
+      indicator.classList.remove(
+        'bg-gray-300',
+        'bg-green-500',
+        'bg-red-500',
+        'bg-yellow-500',
+        'animate-pulse',
+      )
+
+      // Apply appropriate class based on status
+      switch (status) {
+        case 'healthy':
+          indicator.classList.add('bg-green-500')
+          break
+        case 'unhealthy':
+          indicator.classList.add('bg-red-500')
+          break
+        case 'degraded':
+          indicator.classList.add('bg-yellow-500')
+          break
+        case 'loading':
+          indicator.classList.add('bg-gray-300', 'animate-pulse')
+          break
+        default:
+          indicator.classList.add('bg-gray-300')
+      }
+
+      // Update text
+      textSpan.textContent = text
+    }
+  }
+</script>
+
+<style>
+  .card {
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  #raw-response {
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+  }
+
+  .status-indicator {
+    transition: background-color 0.3s ease;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+</style>

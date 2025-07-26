@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { LoginForm } from '../components/auth/LoginForm.tsx'
+import { ClientRouter } from 'astro:transitions'
+
+// Get the redirect URL from the query parameters
+const redirectUrl = Astro.url.searchParams.get('redirect') || '/dashboard'
+
+// Check if the redirection is coming from the dashboard
+const isFromDashboard = redirectUrl.includes('/dashboard')
+
+// Set to server-rendered mode since we need access to request data
+export const prerender = false
+---
+
+<BaseLayout
+  title="Login | Pixelated Empathy"
+  description="Log in to your Pixelated Empathy account to access mental health resources and personal therapy chat."
+  bgType={false}
+  centered={true}
+  contentClass="pt-8 pb-8 px-4 flex-grow"
+  transitionMode="fade"
+  isLoginPage={true}
+  optimizeImages={true}
+>
+  <ClientRouter />
+  <div
+    class="w-full max-w-md mx-auto p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl"
+  >
+    <LoginForm client:load redirectTo={redirectUrl} showSignup={false} />
+
+    {
+      isFromDashboard && (
+        <div class="mt-6 p-4 border border-yellow-500/20 rounded-xl bg-yellow-500/5 text-sm">
+          <div class="flex items-center justify-center">
+            <div class="mr-3">
+              <svg
+                class="w-4 h-4 text-yellow-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div class="text-center">
+              <h3 class="text-sm font-medium text-white">Session Required</h3>
+              <p class="text-xs text-gray-400 mt-1">
+                You need to be logged in to access the dashboard.
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  /* Clean, minimal styling */
+
+  /* Responsive text adjustments */
+  @media (max-width: 640px) {
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>

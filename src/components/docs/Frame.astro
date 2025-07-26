@@ -1,0 +1,62 @@
+---
+interface Props {
+  title?: string
+  className?: string
+}
+
+const { title, className } = Astro.props
+---
+
+<div class={`frame ${className || ''}`}>
+  {title && <div class="frame-title">{title}</div>}
+  <div class="frame-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .frame {
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 8px;
+    margin: 1rem 0;
+    overflow: hidden;
+    background: var(--color-bg-secondary, #f9fafb);
+  }
+
+  .frame-title {
+    padding: 0.75rem 1rem;
+    background: var(--color-bg-primary, #ffffff);
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary, #6b7280);
+  }
+
+  .frame-content {
+    padding: 1rem;
+  }
+
+  .frame pre {
+    margin: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .frame code {
+    background: transparent;
+    padding: 0;
+  }
+
+  /* Dark mode support */
+  :global(.dark) .frame {
+    background: var(--color-bg-secondary-dark, #1f2937);
+    border-color: var(--color-border-dark, #374151);
+  }
+
+  :global(.dark) .frame-title {
+    background: var(--color-bg-primary-dark, #111827);
+    border-color: var(--color-border-dark, #374151);
+    color: var(--color-text-secondary-dark, #9ca3af);
+  }
+</style>

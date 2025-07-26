@@ -1,0 +1,79 @@
+---
+interface Session {
+  id: string
+  clientId: string
+  therapistId: string
+  startTime: string
+  status: string
+  title: string
+}
+
+interface Props {
+  sessions: Session[]
+  selectedSessionId: string
+}
+
+const { sessions, selectedSessionId } = Astro.props
+
+// Format date for display
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+---
+
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <div class="p-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold">Recent Sessions</h3>
+  </div>
+
+  {
+    sessions.length === 0 ? (
+      <div class="p-6 text-center text-gray-500">No sessions found</div>
+    ) : (
+      <ul>
+        {sessions.map((session) => (
+          <li
+            class={`border-b border-gray-100 last:border-0 ${selectedSessionId === session.id ? 'bg-purple-50' : ''}`}
+          >
+            <a
+              href={`/client/${session.clientId}/sessions/${session.id}`}
+              class="block px-4 py-3 hover:bg-gray-50 transition"
+            >
+              <div class="flex justify-between items-center">
+                <div>
+                  <h4 class="font-medium text-gray-900">{session.title}</h4>
+                  <div class="text-sm text-gray-500">
+                    {formatDate(session.startTime)}
+                  </div>
+                </div>
+                <div>
+                  <span
+                    class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    ${
+                      session.status === 'completed'
+                        ? 'bg-green-100 text-green-800'
+                        : session.status === 'scheduled'
+                          ? 'bg-blue-100 text-blue-800'
+                          : session.status === 'canceled'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {session.status}
+                  </span>
+                </div>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>

@@ -1,0 +1,22 @@
+{
+  "watchOptions": {
+    "ignoreInitial": true,
+    "followSymlinks": false,
+    "usePolling": true,
+    "interval": 300,
+    "ignored": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.astro/**",
+      "**/.vscode/**"
+    ],
+    "normalize": true
+  },
+  "server": {
+    "watch": {
+      "normalize": true,
+      "usePolling": true,
+      "interval": 300
+    }
+  }
+}

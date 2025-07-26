@@ -1,0 +1,191 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  // Define paginate helper (must be in scope for this function)
+  function paginate(data: any[], options: { pageSize: number }) {
+    const { pageSize } = options
+    const totalPages = Math.ceil(data.length / pageSize)
+    const pages = []
+    let i = 0
+    while (i !== totalPages) {
+      const start = i * pageSize
+      const end = start + pageSize
+      const isNotFirst = i !== 0
+      const isNotLast = i !== totalPages - 1
+      pages.push({
+        params: { page: (i + 1).toString() },
+        props: {
+          page: {
+            data: data.slice(start, end),
+            currentPage: i + 1,
+            lastPage: totalPages,
+            size: pageSize,
+            total: data.length,
+            url: {
+              current: `/blog/page/${i + 1}`,
+              prev: isNotFirst ? `/blog/page/${i}` : undefined,
+              next: isNotLast ? `/blog/page/${i + 2}` : undefined,
+            },
+          },
+        },
+      })
+      i++
+    }
+    return pages
+  }
+
+  // Get all blog posts
+  const posts = await getCollection('blog', (entry: any) => {
+    return import.meta.env.PROD ? !entry.data.draft : true
+  })
+
+  // Sort by date - newest first
+  const sortedPosts = posts.sort((postA: any, postB: any) => {
+    return postB.data.pubDate.valueOf() - postA.data.pubDate.valueOf()
+  })
+
+  // Generate pagination paths
+  return paginate(sortedPosts, { pageSize: 20 })
+}
+
+const { page } = Astro.props
+
+// Group posts by year
+const postsByYear: Record<string, any[]> = {}
+for (const post of page.data) {
+  const year = new Date(post.data.pubDate).getFullYear().toString()
+  if (!postsByYear[year]) {
+    postsByYear[year] = []
+  }
+  postsByYear[year].push(post)
+}
+
+// Get years in descending order
+const years = Object.keys(postsByYear).sort((yearA, yearB) => {
+  return parseInt(yearB) - parseInt(yearA)
+})
+
+// Format date function
+function formatPostDate(date: Date, readingTime?: number): string {
+  const monthDay = date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
+  return readingTime ? `${monthDay} · ${readingTime} min` : monthDay
+}
+
+const title = `Blog - Page ${page.currentPage}`
+const description = 'Articles about mental health, therapy, and technology'
+const bgType = 'rose'
+---
+
+<BaseLayout {title} {description} {bgType}>
+  <div class="max-w-prose mx-auto">
+    <h1 class="text-4xl font-bold mb-8">Blog</h1>
+
+    <!-- Performance Stats -->
+    <div class="mb-6 text-sm text-gray-500 dark:text-gray-400">
+      Showing {page.data.length} of {page.total} posts (Page {page.currentPage} of
+      {page.lastPage})
+    </div>
+
+    <div class="prose dark:prose-invert">
+      <!-- Posts by Year -->
+      {
+        years.map((year) => {
+          const yearPosts = postsByYear[year]
+          if (!yearPosts || yearPosts.length === 0) return null
+          return (
+            <div class="mb-8">
+              <h2 class="text-2xl mb-4">{year}</h2>
+              <ul class="space-y-3 list-none pl-0">
+                {yearPosts.map((post: any) => (
+                  <li class="flex justify-between items-baseline mb-2 leading-relaxed">
+                    <a
+                      href={`/blog/${post.slug}`}
+                      class="flex-1 text-primary hover:underline text-lg"
+                      transition:name={`post-title-${post.slug}`}
+                    >
+                      {post.data.title}
+                    </a>
+                    <span class="text-sm text-gray-500 dark:text-gray-400 op-80 ml-4">
+                      {formatPostDate(post.data.pubDate, post.data.readingTime)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        })
+      }
+
+      <!-- Pagination -->
+      <div class="mt-12 flex justify-center">
+        <div class="flex gap-2 items-center">
+          {
+            page.url.prev && (
+              <a
+                href={page.url.prev}
+                class="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              >
+                ← Previous
+              </a>
+            )
+          }
+          <span class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
+            Page {page.currentPage} of {page.lastPage}
+          </span>
+          {
+            page.url.next && (
+              <a
+                href={page.url.next}
+                class="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              >
+                Next →
+              </a>
+            )
+          }
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="mt-16">
+        <div class="flex justify-between items-center">
+          <div class="flex gap-2">
+            <a
+              href="/blog"
+              class="text-sm px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              all posts
+            </a>
+            <a
+              href="/blog/tags"
+              class="text-sm px-3 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              tags
+            </a>
+          </div>
+          <a
+            href="/rss.xml"
+            class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          >
+            RSS
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  li {
+    transition: transform 0.2s ease;
+  }
+  li:hover {
+    transform: translateX(4px);
+  }
+</style>
