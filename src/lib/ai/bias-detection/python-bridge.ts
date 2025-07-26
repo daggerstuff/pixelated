@@ -52,6 +52,30 @@ export class PythonBiasDetectionBridge {
   private authToken?: string | undefined
   private retryAttempts: number = 3
   private retryDelay: number = 1000 // ms
+  private requestQueue: Array<{
+    id: string
+    request: () => Promise<unknown>
+    resolve: (value: unknown) => void
+    reject: (error: Error) => void
+    priority: number
+  }> = []
+  private processingQueue = false
+  private maxConcurrentRequests = 5
+  private activeRequests = 0
+  private healthStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
+  private lastHealthCheck = new Date()
+  private healthCheckInterval = 30000 // 30 seconds
+  private consecutiveFailures = 0
+  private pendingRequests = new Map<string, Promise<unknown>>()
+  private metrics = {
+    totalRequests: 0,
+    successfulRequests: 0,
+    failedRequests: 0,
+    averageResponseTime: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    deduplicatedRequests: 0,
+  }
 
   constructor(
     public url: string = 'http://localhost:5000',
@@ -60,6 +84,12 @@ export class PythonBiasDetectionBridge {
     this.baseUrl = url.replace(/\/$/, '') // Remove trailing slash
     this.timeout = timeoutMs
     this.authToken = process.env['BIAS_DETECTION_AUTH_TOKEN']
+    
+    // Start queue processor
+    this.processQueue()
+    
+    // Start health monitoring
+    this.startHealthMonitoring()
   }
 
   async initialize(): Promise<void> {
@@ -86,7 +116,67 @@ export class PythonBiasDetectionBridge {
     }
   }
 
+  private async queueRequest<T>(
+    requestFn: () => Promise<T>,
+    priority: number = 1
+  ): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const id = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      this.requestQueue.push({
+        id,
+        request: requestFn as () => Promise<unknown>,
+        resolve: resolve as (value: unknown) => void,
+        reject,
+        priority,
+      })
+      
+      // Sort by priority (higher numbers = higher priority)
+      this.requestQueue.sort((a, b) => b.priority - a.priority)
+    })
+  }
+
+  private async processQueue(): Promise<void> {
+    if (this.processingQueue) return
+    this.processingQueue = true
+
+    while (this.requestQueue.length > 0 || this.activeRequests > 0) {
+      // Process requests up to the concurrent limit
+      while (this.requestQueue.length > 0 && this.activeRequests < this.maxConcurrentRequests) {
+        const queuedRequest = this.requestQueue.shift()!
+        this.activeRequests++
+
+        // Execute request asynchronously
+        queuedRequest.request()
+          .then(result => {
+            queuedRequest.resolve(result)
+          })
+          .catch(error => {
+            queuedRequest.reject(error)
+          })
+          .finally(() => {
+            this.activeRequests--
+          })
+      }
+
+      // Wait a bit before checking again
+      await new Promise(resolve => setTimeout(resolve, 10))
+    }
+
+    this.processingQueue = false
+  }
+
   private async makeRequest(
+    endpoint: string,
+    method: 'GET' | 'POST' = 'POST',
+    data?: unknown,
+    priority: number = 1,
+  ): Promise<unknown> {
+    return this.queueRequest(async () => {
+      return this.executeRequest(endpoint, method, data)
+    }, priority)
+  }
+
+  private async executeRequest(
     endpoint: string,
     method: 'GET' | 'POST' = 'POST',
     data?: unknown,
@@ -514,6 +604,53 @@ export class PythonBiasDetectionBridge {
   async analyze_session(
     sessionData: TherapeuticSession,
   ): Promise<PythonAnalysisResult> {
+    // Create a unique key for deduplication
+    const requestKey = this.generateRequestKey(sessionData)
+    
+    // Check if the same request is already pending
+    if (this.pendingRequests.has(requestKey)) {
+      logger.debug(`Deduplicating request for session: ${sessionData.sessionId}`)
+      this.metrics.deduplicatedRequests++
+      return this.pendingRequests.get(requestKey) as Promise<PythonAnalysisResult>
+    }
+
+    const requestPromise = this.executeAnalysis(sessionData)
+    this.pendingRequests.set(requestKey, requestPromise)
+    
+    try {
+      const result = await requestPromise
+      return result
+    } finally {
+      this.pendingRequests.delete(requestKey)
+    }
+  }
+
+  private generateRequestKey(sessionData: TherapeuticSession): string {
+    // Create a hash of the session data for deduplication
+    const keyData = {
+      sessionId: sessionData.sessionId,
+      demographics: sessionData.participantDemographics,
+      content: sessionData.content,
+      scenario: sessionData.scenario,
+    }
+    
+    const jsonString = JSON.stringify(keyData)
+    // Simple hash function (in production, use a proper hash library)
+    let hash = 0
+    for (let i = 0; i < jsonString.length; i++) {
+      const char = jsonString.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash // Convert to 32-bit integer
+    }
+    return `analysis_${Math.abs(hash).toString(36)}`
+  }
+
+  private async executeAnalysis(
+    sessionData: TherapeuticSession,
+  ): Promise<PythonAnalysisResult> {
+    const startTime = Date.now()
+    this.metrics.totalRequests++
+    
     try {
       // Convert TypeScript session format to Python service format
       // Validate that demographics are properly provided - don't mask missing data
@@ -600,17 +737,25 @@ export class PythonBiasDetectionBridge {
         session_id: sessionData.sessionId,
       }
 
+      const responseTime = Date.now() - startTime
+      this.updateMetrics(responseTime, true)
+      
       logger.info('Session analysis completed', {
         sessionId: sessionData.sessionId,
         biasScore: normalizedResult.overall_bias_score,
         alertLevel: normalizedResult.alert_level,
+        responseTime,
       })
 
       return normalizedResult
     } catch (error) {
+      const responseTime = Date.now() - startTime
+      this.updateMetrics(responseTime, false)
+      
       logger.error('Session analysis failed', {
         error,
         sessionId: sessionData?.sessionId,
+        responseTime,
       })
 
       // Return fallback analysis result instead of throwing
@@ -851,8 +996,82 @@ export class PythonBiasDetectionBridge {
     )
   }
 
+  private startHealthMonitoring(): void {
+    setInterval(async () => {
+      try {
+        const startTime = Date.now()
+        const response = await this.executeRequest('/health', 'GET')
+        const responseTime = Date.now() - startTime
+        
+        if (response && typeof response === 'object' && response !== null && 'status' in response && (response as { status: string }).status === 'healthy') {
+          this.consecutiveFailures = 0
+          this.healthStatus = responseTime > 5000 ? 'degraded' : 'healthy'
+        } else {
+          this.consecutiveFailures++
+          this.healthStatus = this.consecutiveFailures > 3 ? 'unhealthy' : 'degraded'
+        }
+        
+        this.lastHealthCheck = new Date()
+        
+        logger.debug('Health check completed', {
+          status: this.healthStatus,
+          responseTime,
+          consecutiveFailures: this.consecutiveFailures,
+        })
+      } catch (error) {
+        this.consecutiveFailures++
+        this.healthStatus = this.consecutiveFailures > 3 ? 'unhealthy' : 'degraded'
+        this.lastHealthCheck = new Date()
+        
+        logger.warn('Health check failed', {
+          error: error instanceof Error ? error.message : String(error),
+          consecutiveFailures: this.consecutiveFailures,
+          status: this.healthStatus,
+        })
+      }
+    }, this.healthCheckInterval)
+  }
+
+  private updateMetrics(responseTime: number, success: boolean): void {
+    if (success) {
+      this.metrics.successfulRequests++
+    } else {
+      this.metrics.failedRequests++
+    }
+    
+    // Update average response time using exponential moving average
+    const alpha = 0.1 // Smoothing factor
+    this.metrics.averageResponseTime = 
+      this.metrics.averageResponseTime * (1 - alpha) + responseTime * alpha
+  }
+
+  getMetrics(): typeof this.metrics {
+    return { ...this.metrics }
+  }
+
+  getHealthStatus(): {
+    status: 'healthy' | 'degraded' | 'unhealthy'
+    lastCheck: Date
+    consecutiveFailures: number
+    queueLength: number
+    activeRequests: number
+  } {
+    return {
+      status: this.healthStatus,
+      lastCheck: this.lastHealthCheck,
+      consecutiveFailures: this.consecutiveFailures,
+      queueLength: this.requestQueue.length,
+      activeRequests: this.activeRequests,
+    }
+  }
+
   async dispose(): Promise<void> {
+    // Clear the request queue
+    this.requestQueue.forEach(req => {
+      req.reject(new Error('Service is being disposed'))
+    })
+    this.requestQueue.length = 0
+    
     logger.info('PythonBiasDetectionBridge disposed')
-    // No active connections to close for HTTP client
   }
 }
