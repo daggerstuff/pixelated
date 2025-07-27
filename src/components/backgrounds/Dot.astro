@@ -9,42 +9,16 @@
 </bg-dot>
 
 <script type="module">
+  import loadP5 from '../../utils/loadP5.js';
+  
   // Only run on client-side to prevent SSR hydration mismatches
   if (typeof window === 'undefined') {
     console.warn('Dot background component requires browser environment');
   } else {
-    // Load p5 from CDN with centralized loading to prevent race conditions
+    // Use shared utility to load p5.js
     let p5;
-    
-    // Check if p5 is already loaded globally
-    if (window.p5) {
-      p5 = window.p5;
-    } else {
-      try {
-        // Try to import p5 from CDN
-        const p5Module = await import('https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js');
-        p5 = p5Module.default || window.p5;
-      } catch (error) {
-        console.warn('Failed to load p5 from CDN, trying fallback:', error);
-        // Fallback: load p5 via script tag
-        await new Promise((resolve, reject) => {
-          if (window.p5) {
-            p5 = window.p5;
-            resolve();
-            return;
-          }
-          
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js';
-          script.onload = () => {
-            p5 = window.p5;
-            resolve();
-          };
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-    }
+    loadP5().then((loadedP5) => {
+      p5 = loadedP5;
 
     if (!p5) {
       console.error('Failed to load p5.js library');
@@ -64,8 +38,8 @@
             const LENGTH = 10
             const SPACING = 15
 
-            const width = window.innerWidth
-            const height = window.innerHeight
+            let width = window.innerWidth
+            let height = window.innerHeight
 
             const existingPoints = new Set()
             const points = []
@@ -93,6 +67,15 @@
               p.createCanvas(width, height)
               p.background(BACKGROUND)
               p.frameRate(30)
+              addPoints()
+            }
+
+            p.windowResized = () => {
+              width = window.innerWidth
+              height = window.innerHeight
+              p.resizeCanvas(width, height)
+              existingPoints.clear()
+              points.length = 0
               addPoints()
             }
 
@@ -131,6 +114,8 @@
       }
 
       customElements.define('bg-dot', BgDotElement);
-    }
+    }).catch(error => {
+      console.error('Failed to load p5.js:', error);
+    });
   }
 </script>

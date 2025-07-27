@@ -9,57 +9,31 @@
 </bg-particle>
 
 <script type="module">
+  import loadP5 from '../../utils/loadP5.js';
+  
   // Only run on client-side to prevent SSR hydration mismatches
   if (typeof window === 'undefined') {
-    console.warn('Particle background component requires browser environment');
+    console.warn('Particle background component requires browser environment')
   } else {
-    // Load p5 from CDN with centralized loading to prevent race conditions
-    let p5;
-    
-    // Check if p5 is already loaded globally
-    if (window.p5) {
-      p5 = window.p5;
-    } else {
-      try {
-        // Try to import p5 from CDN
-        const p5Module = await import('https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js');
-        p5 = p5Module.default || window.p5;
-      } catch (error) {
-        console.warn('Failed to load p5 from CDN, trying fallback:', error);
-        // Fallback: load p5 via script tag
-        await new Promise((resolve, reject) => {
-          if (window.p5) {
-            p5 = window.p5;
-            resolve();
-            return;
+    // Use shared utility to load p5.js
+    let p5
+    loadP5().then(loadedP5 => {
+      p5 = loadedP5
+
+      if (!p5) {
+        console.error('Failed to load p5.js library')
+      } else {
+        // Particle: { x, y, velocity: { x, y } }
+
+        class BgParticleElement extends HTMLElement {
+          p5Instance = null
+
+          constructor() {
+            super()
+            this.p5Instance = null
           }
-          
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js';
-          script.onload = () => {
-            p5 = window.p5;
-            resolve();
-          };
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-    }
 
-    if (!p5) {
-      console.error('Failed to load p5.js library');
-    } else {
-      // Particle: { x, y, velocity: { x, y } }
-
-      class BgParticleElement extends HTMLElement {
-        p5Instance = null
-
-        constructor() {
-          super()
-          this.p5Instance = null
-        }
-
-        connectedCallback() {
+          connectedCallback() {
           const sketch = (p) => {
             const BACKGROUND = '#fff'
             const COLOR = '#88888825'
@@ -97,7 +71,7 @@
               if (particle.y > height + 20 || particle.y < -20) {
                 particle.velocity.y = -particle.velocity.y
               }
-        
+
               particle.x += particle.velocity.x
               particle.y += particle.velocity.y
             }
@@ -129,7 +103,10 @@
                   )
                   mouseParticle = createParticle()
                   mouseParticle.velocity = p.createVector(0, 0)
-                  particles.push(mouseParticle)
+                  // Limit interactive particles to prevent memory growth
+                  if (particles.length < 50) {
+                    particles.push(mouseParticle)
+                  }
                 }
               }
             }
@@ -167,7 +144,10 @@
         }
       }
 
-      customElements.define('bg-particle', BgParticleElement);
+      customElements.define('bg-particle', BgParticleElement)
     }
+  ).catch(error => {
+    console.error('Failed to load p5.js:', error)
+  })
   }
 </script>

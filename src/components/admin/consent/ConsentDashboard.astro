@@ -7,6 +7,12 @@ import CardTitle from '@/components/ui/CardTitle.astro';
 import Badge from '@/components/ui/Badge.astro'
 import { supabase } from '@/lib/supabase'
 import { Icon } from 'astro-icon/components'
+function formatDate(dateInput: any, options: any = {}) {
+  if (!dateInput) return '-';
+  const date = new Date(dateInput);
+  const defaultOptions = { year: 'numeric', month: 'long', day: 'numeric' } as any;
+  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options });
+}
 
 // Define interfaces for data structures
 interface ConsentType {
@@ -142,15 +148,7 @@ const withdrawalsByType: Record<string, number> = {};
   }
 });
 
-// Format date helper
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(date)
-}
+
 
 // Handle errors
 const hasErrors = Boolean(
@@ -316,7 +314,7 @@ const hasErrors = Boolean(
                       <p class="font-medium">{version.consent_types?.name || 'Unknown'}</p>
                       <p class="text-xs text-muted-foreground">
                         Version {version.version} • Effective:{' '}
-                        {formatDate(version.effective_date)}
+                        {formatDate(version.effective_date, { month: 'short' })}
                       </p>
                     </div>
                     <Badge variant="outline">Current</Badge>
@@ -420,7 +418,7 @@ const hasErrors = Boolean(
                     {consent.consent_versions?.consent_types?.name || 'Unknown'}
                   </Badge>
                   <span class="text-xs text-muted-foreground ml-2">
-                    Withdrawn on {formatDate(consent.withdrawal_date!)}
+                    Withdrawn on {formatDate(consent.withdrawal_date, { month: 'short' })}
                   </span>
                 </div>
               </div>

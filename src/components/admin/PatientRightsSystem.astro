@@ -2,6 +2,12 @@
 // PatientRightsSystem.astro
 // Component to manage patient data access rights and requests
 import { Icon } from 'astro-icon/components'
+function formatDate(dateInput: any, options: any = {}) {
+  if (!dateInput) return '-';
+  const date = new Date(dateInput);
+  const defaultOptions = { year: 'numeric', month: 'long', day: 'numeric' } as any;
+  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options });
+}
 
 // Sample data for access requests
 const accessRequests = [
@@ -77,18 +83,7 @@ const accessRequests = [
   },
 ]
 
-// Format date string to readable format
-const formatDate = (dateString: string | number | Date | null) => {
-  if (!dateString) return '-'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+
 
 // Get status badge class based on status
 const getStatusBadgeClass = (status: string): string => {
@@ -300,7 +295,7 @@ const getRequestTypeInfo = (type: string): { class: string; label: string } => {
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {formatDate(request.dateRequested)}
+                  {formatDate(request.dateRequested, { month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <span
@@ -311,7 +306,7 @@ const getRequestTypeInfo = (type: string): { class: string; label: string } => {
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {formatDate(request.dateProcessed)}
+                  {formatDate(request.dateProcessed, { month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div class="flex justify-end space-x-2">
