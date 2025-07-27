@@ -138,6 +138,7 @@ export default defineConfig({
         './src/hooks/useMentalHealthAnalysis.ts',
       ),
       '@': path.resolve(__dirname, 'src'),
+      '~': path.resolve(__dirname, 'src'),
     },
     conditions: ['node', 'import', 'module', 'default'],
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],

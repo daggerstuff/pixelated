@@ -21,3 +21,7 @@ export function getReadingTime(content) {
   const minutes = Math.ceil(words / wordsPerMinute);
   return `${minutes} min read`;
 }
+
+export function getUrl(...paths) {
+  return '/' + paths.filter(Boolean).join('/').replace(/\/+/g, '/');
+}
