@@ -7,21 +7,44 @@
 >
 </bg-particle>
 
-<script>
-  import p5 from 'p5'
-  import type { default as P5Instance } from 'p5'
-
-  interface Particle {
-    x: number
-    y: number
-    velocity: {
-      x: number
-      y: number
-    }
+<script type="module">
+  // Load p5 from CDN and wait for it to be available
+  let p5;
+  
+  try {
+    // Try to import p5 from CDN
+    const p5Module = await import('https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js');
+    p5 = p5Module.default || window.p5;
+  } catch (error) {
+    console.warn('Failed to load p5 from CDN, trying fallback:', error);
+    // Fallback: load p5 via script tag
+    await new Promise((resolve, reject) => {
+      if (window.p5) {
+        p5 = window.p5;
+        resolve();
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js';
+      script.onload = () => {
+        p5 = window.p5;
+        resolve();
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
   }
 
+  if (!p5) {
+    console.error('Failed to load p5.js library');
+    // Exit gracefully without using top-level return
+  } else {
+
+  // Particle: { x, y, velocity: { x, y } }
+
   class BgParticleElement extends HTMLElement {
-    p5Instance: P5Instance | null
+    p5Instance = null
 
     constructor() {
       super()
@@ -29,7 +52,7 @@
     }
 
     connectedCallback() {
-      const sketch = (p: P5Instance) => {
+      const sketch = (p) => {
         const BACKGROUND = '#fff'
         const COLOR = '#88888825'
         const VELOCITY = 0.8
@@ -39,7 +62,7 @@
 
         const width = window.innerWidth
         const height = window.innerHeight
-        const particles: Particle[] = []
+        const particles = []
 
         function createParticle() {
           const x = p.random(width)
@@ -52,13 +75,13 @@
           return { x, y, velocity }
         }
 
-        function drawParticle(particle: Particle) {
+        function drawParticle(particle) {
           p.noStroke()
           p.fill(COLOR)
           p.circle(particle.x, particle.y, 3)
         }
 
-        function updateParticle(particle: Particle) {
+        function updateParticle(particle) {
           // change dir if outside map
           if (particle.x > width + 20 || particle.x < -20) {
             particle.velocity.x = -particle.velocity.x
@@ -66,7 +89,7 @@
           if (particle.y > height + 20 || particle.y < -20) {
             particle.velocity.y = -particle.velocity.y
           }
-
+    
           particle.x += particle.velocity.x
           particle.y += particle.velocity.y
         }
@@ -137,4 +160,5 @@
   }
 
   customElements.define('bg-particle', BgParticleElement)
+  }
 </script>

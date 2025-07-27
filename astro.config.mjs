@@ -1,12 +1,12 @@
 import path from 'node:path';
 import process from 'node:process';
 import mdx from '@astrojs/mdx';
-import react from '@astrojs/react';
 import UnoCSS from '@unocss/astro';
 import { defineConfig, passthroughImageService } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 import icon from 'astro-icon';
 import sentry from '@sentry/astro';
+import spotlightjs from '@spotlightjs/astro';
 import markdoc from '@astrojs/markdoc';
 import node from '@astrojs/node'
 
@@ -86,7 +86,10 @@ export default defineConfig({
         borderRadius: '0.5rem',
       },
     }),
-    react(),
+    // react({
+    //   include: ['**/react/*', '**/components/**/*'],
+    //   experimentalReactChildren: true,
+    // }),
     mdx({
       components: path.resolve('./mdx-components.js'),
     }),
@@ -111,15 +114,19 @@ export default defineConfig({
       svgdir: './src/icons',
     }),
     markdoc(),
-    sentry({
-      dsn: process.env.SENTRY_DSN,
-      sourceMapsUploadOptions: {
-        project: process.env.SENTRY_PROJECT || 'pixel-astro',
-        org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      },
-      telemetry: false,
-    }),
+    ...(process.env.SENTRY_DSN ? [
+      sentry({
+        dsn: process.env.SENTRY_DSN,
+        sourceMapsUploadOptions: {
+          project: process.env.SENTRY_PROJECT || 'pixel-astro',
+          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+        },
+        telemetry: false,
+      }),
+      // Add Spotlight for development debugging (only when Sentry is enabled)
+      ...(process.env.NODE_ENV === 'development' ? [spotlightjs()] : [])
+    ] : []),
   ],
   markdown: {
     shikiConfig: {
@@ -133,6 +140,22 @@ export default defineConfig({
   server: {
     port: 4321,
     host: true,
+    watch: {
+      ignored: [
+        '**/ai/**',
+        '**/dataset/**', 
+        '**/MER2025/**',
+        '**/VideoChat2/**',
+        '**/*.py',
+        '**/*.pyc',
+        '**/__pycache__/**',
+        '**/venv/**',
+        '**/env/**',
+        '**/logs/**',
+        '**/tmp/**',
+        '**/temp/**'
+      ]
+    }
   },
   preview: {
     port: 4322,

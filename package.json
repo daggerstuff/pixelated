@@ -162,6 +162,7 @@
     "@sentry/cli": "^2.50.2",
     "@sentry/profiling-node": "^9.40.0",
     "@sentry/vite-plugin": "^3.6.1",
+    "@spotlightjs/astro": "^3.2.5",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.52.0",
     "@tailwindcss/vite": "^4.1.11",

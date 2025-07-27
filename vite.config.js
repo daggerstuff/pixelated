@@ -12,31 +12,61 @@ import middlewarePatchPlugin from './src/plugins/vite-plugin-middleware-patch'
 const cdnAssetMap = (() => {
   try {
     return JSON.parse(fs.readFileSync('./src/cdn-asset-map.json', 'utf-8'))
-  } catch {
+  } catch (error) {
+    console.warn('CDN asset map not found or invalid, using empty map:', error.message)
     return {}
   }
 })()
 
 export default defineConfig({
+  server: {
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/ai/**',
+        '**/dataset/**',
+        '**/MER2025/**',
+        '**/VideoChat2/**',
+        '**/.git/**',
+        '**/dist/**',
+        '**/build/**',
+        '**/*.py',
+        '**/*.pyc',
+        '**/__pycache__/**',
+        '**/venv/**',
+        '**/env/**',
+        '**/.env*',
+        '**/logs/**',
+        '**/tmp/**',
+        '**/temp/**'
+      ]
+    }
+  },
   plugins: [
     {
       name: 'cdn-asset-replacer',
       transform(code, id) {
-        if (
-          id.endsWith('.astro') ||
-          id.endsWith('.tsx') ||
-          id.endsWith('.jsx') ||
-          id.endsWith('.ts') ||
-          id.endsWith('.js')
-        ) {
-          Object.entries(cdnAssetMap).forEach(([localPath, cdnUrl]) => {
-            code = code.replace(
-              new RegExp(`(['"])${localPath.replace(/\//g, '\\/')}(['"])`, 'g'),
-              `$1${cdnUrl}$2`,
-            )
-          })
+        try {
+          if (
+            id.endsWith('.astro') ||
+            id.endsWith('.tsx') ||
+            id.endsWith('.jsx') ||
+            id.endsWith('.ts') ||
+            id.endsWith('.js')
+          ) {
+            Object.entries(cdnAssetMap).forEach(([localPath, cdnUrl]) => {
+              // Escape quotes in localPath for safe replacement
+              const quotedLocalPath1 = `"${localPath}"`;
+              const quotedLocalPath2 = `'${localPath}'`;
+              code = code.replaceAll(quotedLocalPath1, `"${cdnUrl}"`);
+              code = code.replaceAll(quotedLocalPath2, `'${cdnUrl}'`);
+            })
+          }
+          return code
+        } catch (error) {
+          console.warn(`CDN asset replacement failed for ${id}:`, error.message)
+          return code
         }
-        return code
       },
     },
     nodePolyfillPlugin(),
@@ -55,7 +85,7 @@ export default defineConfig({
         }
       },
     },
-    ...(process.env.SENTRY_AUTH_TOKEN
+    ...(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_DSN
       ? [
           sentryVitePlugin({
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
@@ -64,10 +94,6 @@ export default defineConfig({
           }),
         ]
       : []),
-    sentryVitePlugin({
-      org: 'pixelated-empathy-dq',
-      project: 'pixel-astro',
-    }),
   ],
   // Base URL for assets
   base:
@@ -115,12 +141,13 @@ export default defineConfig({
     },
     conditions: ['node', 'import', 'module', 'default'],
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
+    dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
   },
   build: {
     target: 'node22',
     minify: false,
     emptyOutDir: false,
-  sourcemap: true,
+    sourcemap: true,
     rollupOptions: {
       onwarn(warning, warn) {
         if (warning.code === 'SOURCEMAP_ERROR') {
