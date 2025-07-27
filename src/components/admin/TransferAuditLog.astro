@@ -2,6 +2,12 @@
 // TransferAuditLog.astro
 // Component for tracking and displaying data transfer audit logs
 import { Icon } from 'astro-icon/components'
+function formatDate(dateInput: any, options: any = {}) {
+  if (!dateInput) return '-';
+  const date = new Date(dateInput);
+  const defaultOptions = { year: 'numeric', month: 'long', day: 'numeric' } as any;
+  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options });
+}
 
 interface Props {
   title?: string
@@ -74,17 +80,7 @@ const auditLogEntries = [
   },
 ]
 
-// Format date for display
-const formatDate = (dateString: string | number | Date) => {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
-}
+
 
 // Get status class for color coding
 const getStatusClass = (status: string) => {
@@ -196,7 +192,7 @@ const getEncryptionClass = (verified: boolean) => {
             auditLogEntries.map((entry) => (
               <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td class="py-3 px-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                  {formatDate(entry.timestamp)}
+                  {formatDate(entry.timestamp, { month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </td>
                 <td class="py-3 px-4">{entry.patientId}</td>
                 <td class="py-3 px-4">{entry.initiatedBy}</td>
