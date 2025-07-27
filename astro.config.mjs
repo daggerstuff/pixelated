@@ -1,6 +1,7 @@
 import path from 'node:path';
 import process from 'node:process';
 import mdx from '@astrojs/mdx';
+import react from '@astrojs/react';
 import UnoCSS from '@unocss/astro';
 import { defineConfig, passthroughImageService } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
@@ -86,10 +87,10 @@ export default defineConfig({
         borderRadius: '0.5rem',
       },
     }),
-    // react({
-    //   include: ['**/react/*', '**/components/**/*'],
-    //   experimentalReactChildren: true,
-    // }),
+    react({
+      include: ['**/react/*', '**/components/**/*'],
+      experimentalReactChildren: true,
+    }),
     mdx({
       components: path.resolve('./mdx-components.js'),
     }),

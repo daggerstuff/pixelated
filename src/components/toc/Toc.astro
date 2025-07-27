@@ -150,8 +150,9 @@ const iconClasses = [
         this.#minH && this.#maxH
           ? this.#getElements(
               this.#getTocHeadingsSelector(this.#minH, this.#maxH),
+              true
             )
-          : this.#getElements('.toc-heading')
+          : this.#getElements('.toc-heading', true)
 
       // observe heading elements to trigger highlight change
       this.#observer = new IntersectionObserver(
@@ -202,7 +203,7 @@ const iconClasses = [
       return level ? parseInt(level, 10) : undefined
     }
 
-    #getElements = (selector: string, fromDocument = true) => {
+    #getElements = (selector: string, fromDocument = true): Element[] => {
       return fromDocument
         ? Array.from(document.querySelectorAll(selector))
         : Array.from(this.querySelectorAll(selector))
@@ -243,8 +244,8 @@ const iconClasses = [
     #getPreviousHeading = (
       headingMapToc: Map<Element, HTMLAnchorElement[]>,
       curHeading: Element,
-    ) => {
-      let prevHeading = null
+    ): Element | null => {
+      let prevHeading: Element | null = null
 
       for (const h of headingMapToc.keys()) {
         if (h === curHeading) return prevHeading

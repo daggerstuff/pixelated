@@ -10,7 +10,7 @@ export const SITE: Site = {
   base: '/',
   title: 'Pixelated Empathy',
   description: 'All your base are belong to us',
-  author: 'Vivi Ornitier',
+  author: 'Pixelated Empathy',
   lang: 'en',
   ogLocale: 'en_US',
   imageDomains: ['cdn.bsky.app'],
@@ -46,14 +46,14 @@ export const UI: Ui = {
   ],
   socialLinks: [
     {
-      link: 'https://github.com/vivirox',
-      title: 'AntfuStyle on Github',
+      link: 'https://github.com/nochadisfaction',
+      title: 'Cant Get No, Chadisfaction, on GitHub',
       displayMode: 'alwaysIcon',
       icon: 'i-uil-github-alt',
     },
     {
-      link: 'https://x.com/pixelated',
-      title: 'Vivi on Twitter',
+      link: 'https://twitter.com/empathypixel',
+      title: 'Pixelated Empathy on Twitter',
       displayMode: 'alwaysIcon',
       icon: 'i-ri-twitter-x-fill',
     },
@@ -116,7 +116,7 @@ export const FEATURES: Features = {
   share: [
     true,
     {
-      twitter: [true, '@GradiantAscent'],
+      twitter: [true, '@empathypixel'],
       mastodon: false,
       facebook: false,
       pinterest: false,
