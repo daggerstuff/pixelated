@@ -1,0 +1,3 @@
+[submodule "ai"]
+	path = ai
+	url = git@gitlab.com:pixelatedtech/pixel-ai.git
