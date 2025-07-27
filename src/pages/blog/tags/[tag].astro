@@ -1,9 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
-import { formatDate } from '@/lib/utils'
 import type { CollectionEntry } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { ViewTransitions } from 'astro:transitions'
 
 export const prerender = true
 
@@ -38,106 +36,99 @@ interface Props {
 
 const { tag } = Astro.params
 const { posts } = Astro.props as Props
-
-// Group posts by year
-const postsByYear = posts.reduce(
-  (acc, post) => {
-    const year = post.data.pubDate.getFullYear()
-    acc[year] = acc[year] || []
-    acc[year].push(post)
-    return acc
-  },
-  {} as Record<number, CollectionEntry<'blog'>[]>,
-)
-
-// Get years in descending order
-const years = Object.keys(postsByYear)
-  .map(Number)
-  .sort((a, b) => b - a)
-
-// Format post date in Antfu style: "MM-DD"
-const formatPostDate = (date: Date) => {
-  return date
-    .toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace('/', '-')
-}
 ---
 
 <BaseLayout
-  title={`Posts tagged with "${tag}"`}
+  title={`#${tag}`}
   description={`All blog posts tagged with ${tag}`}
-  bgType="rose"
 >
-  <ViewTransitions />
 
-  <main class="max-w-3xl mx-auto px-4 py-12">
-    <header class="mb-8">
-      <div class="flex items-center gap-2 mb-2 text-sm">
-        <a href="/blog" class="hover:text-primary transition-colors">Blog</a>
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <header class="mb-12">
+      <div class="flex items-center gap-2 mb-4 text-sm text-slate-400">
+        <a href="/blog" class="hover:text-green-400 transition-colors">Blog</a>
         <span>/</span>
-        <span>Tag</span>
+        <a href="/blog/tags" class="hover:text-green-400 transition-colors">Topics</a>
         <span>/</span>
-        <span class="font-medium text-primary">{tag}</span>
+        <span class="text-green-400">#{tag}</span>
       </div>
-      <h1 class="text-3xl font-bold">Posts tagged with "{tag}"</h1>
+      <h1 class="text-3xl font-bold mb-4">#{tag}</h1>
+      <p class="text-slate-400">
+        {posts.length} post{posts.length !== 1 ? 's' : ''} about {tag}
+      </p>
     </header>
 
-    <div class="space-y-12">
-      {
-        years.map((year) => (
-          <div>
-            <h2 class="text-xl font-semibold mb-4 border-b pb-1">{year}</h2>
-            <ul class="space-y-3">
-              {postsByYear[year].map(
-                (post: {
-                  slug: any
-                  data: { pubDate: Date; title: unknown; readingTime: unknown }
-                }) => (
-                  <li>
+    <div class="space-y-8">
+      {posts.map((post: CollectionEntry<'blog'>) => (
+        <article class="group">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+              {post.data.pubDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+              <span class="hidden sm:block mt-1">
+                {Math.ceil(post.body.split(/\s+/).length / 200)} min read
+              </span>
+            </div>
+
+            <div class="flex-1">
+              <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
+                <a href={`/blog/${post.slug}`} class="block">
+                  {post.data.title}
+                </a>
+              </h3>
+
+              <p class="text-slate-300 mb-3 leading-relaxed">
+                {post.data.description}
+              </p>
+
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-3">
+                  {post.data.tags.map((postTag: string) => (
                     <a
-                      href={`/blog/${post.slug}`}
-                      class="group grid grid-cols-[80px_1fr] gap-4 items-baseline"
+                      href={`/blog/tags/${postTag}`}
+                      class={`text-xs transition-colors ${
+                        postTag === tag
+                          ? 'text-green-400'
+                          : 'text-slate-400 hover:text-green-300'
+                      }`}
                     >
-                      <span class="text-sm font-mono text-gray-500 dark:text-gray-400">
-                        {formatPostDate(post.data.pubDate)}
-                      </span>
-                      <span class="group-hover:text-primary transition-colors">
-                        {post.data.title}
-                        {post.data.readingTime && (
-                          <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                            · {post.data.readingTime} min
-                          </span>
-                        )}
-                      </span>
+                      #{postTag}
                     </a>
-                  </li>
-                ),
+                  ))}
+                </div>
               )}
-            </ul>
+
+              <a
+                href={`/blog/${post.slug}`}
+                class="inline-flex items-center text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+              >
+                Read article
+                <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+              </a>
+            </div>
           </div>
-        ))
-      }
+        </article>
+      ))}
     </div>
 
-    <div class="mt-12">
-      <a
-        href="/blog"
-        class="inline-flex items-center text-sm hover:text-primary transition-colors"
-      >
-        ← Back to all posts
-      </a>
+    <div class="border-t border-slate-700 pt-8 mt-12">
+      <div class="flex flex-col sm:flex-row gap-4 justify-between">
+        <a
+          href="/blog/tags"
+          class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+        >
+          ← All topics
+        </a>
+        <a
+          href="/blog"
+          class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+        >
+          All posts →
+        </a>
+      </div>
     </div>
-  </main>
-
-  <style>
-    /* Antfu-like font styles */
-    :global(body) {
-      font-family:
-        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-        Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    }
-  </style>
+  </div>
 </BaseLayout>
