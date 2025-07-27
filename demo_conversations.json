@@ -1,0 +1,767 @@
+{
+  "conversations": [
+    {
+      "id": "dsm5_diagnostic_296.2x_4039",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'd like to go through some specific questions to better understand your symptoms. This will help me determine if what you're experiencing aligns with Major Depressive Disorder.",
+          "meta": {
+            "type": "diagnostic_introduction",
+            "disorder": "Major Depressive Disorder",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing depressed mood most of the day, nearly every day?",
+          "meta": {
+            "criterion_id": "A1",
+            "criterion_category": "core_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "Yes, I have been experiencing appears tearful to others. It's been really difficult for me.",
+          "meta": {
+            "criterion_id": "A1",
+            "symptom_example": "Appears tearful to others",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Can you tell me more about how this has been affecting your daily life?",
+          "meta": {
+            "technique": "functional_assessment",
+            "criterion_id": "A1",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's made it hard to maintain relationships. I feel like I can't function normally.",
+          "meta": {
+            "functional_impact": true,
+            "criterion_id": "A1",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing markedly diminished interest or pleasure in all, or almost all, activities?",
+          "meta": {
+            "criterion_id": "A2",
+            "criterion_category": "core_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "Yes, I have been experiencing loss of interest in hobbies. It's been really difficult for me.",
+          "meta": {
+            "criterion_id": "A2",
+            "symptom_example": "Loss of interest in hobbies",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Can you tell me more about how this has been affecting your daily life?",
+          "meta": {
+            "technique": "functional_assessment",
+            "criterion_id": "A2",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's made it hard to sleep. I feel like I can't function normally.",
+          "meta": {
+            "functional_impact": true,
+            "criterion_id": "A2",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing significant weight loss when not dieting or weight gain, or decrease or increase in appetite?",
+          "meta": {
+            "criterion_id": "A3",
+            "criterion_category": "physical_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "Yes, I have been experiencing decreased or increased appetite nearly every day. It's been really difficult for me.",
+          "meta": {
+            "criterion_id": "A3",
+            "symptom_example": "Decreased or increased appetite nearly every day",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Can you tell me more about how this has been affecting your daily life?",
+          "meta": {
+            "technique": "functional_assessment",
+            "criterion_id": "A3",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's made it hard to concentrate. I feel like I can't function normally.",
+          "meta": {
+            "functional_impact": true,
+            "criterion_id": "A3",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing insomnia or hypersomnia nearly every day?",
+          "meta": {
+            "criterion_id": "A4",
+            "criterion_category": "sleep_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "Yes, I have been experiencing sleeping too much. It's been really difficult for me.",
+          "meta": {
+            "criterion_id": "A4",
+            "symptom_example": "Sleeping too much",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Can you tell me more about how this has been affecting your daily life?",
+          "meta": {
+            "technique": "functional_assessment",
+            "criterion_id": "A4",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's made it hard to concentrate. I feel like I can't function normally.",
+          "meta": {
+            "functional_impact": true,
+            "criterion_id": "A4",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "How long have you been experiencing these symptoms? The diagnostic criteria specify 2 weeks.",
+          "meta": {
+            "assessment_type": "duration",
+            "duration_requirement": "2 weeks",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's been going on for 2 weeks, maybe even longer. It feels like it's getting worse.",
+          "meta": {
+            "duration_confirmation": true,
+            "severity_indication": "worsening",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Based on what you've shared, your symptoms align with the criteria for Major Depressive Disorder. This means we have a clear framework for understanding what you're going through and developing an effective treatment plan.",
+          "meta": {
+            "type": "diagnostic_summary",
+            "disorder": "Major Depressive Disorder",
+            "knowledge_source": "DSM-5"
+          }
+        }
+      ],
+      "context": {
+        "disorder": "Major Depressive Disorder",
+        "disorder_code": "296.2x",
+        "category": "depressive_disorders",
+        "conversation_type": "diagnostic_assessment",
+        "knowledge_source": "DSM-5",
+        "minimum_criteria": 5,
+        "duration_requirement": "2 weeks"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Apply DSM-5 diagnostic criteria systematically",
+          "Conduct structured diagnostic interviews",
+          "Assess symptom severity and functional impact"
+        ],
+        "clinical_focus": [
+          "Criterion-based assessment",
+          "Differential diagnosis",
+          "Functional impairment evaluation"
+        ],
+        "knowledge_integration": "DSM-5 diagnostic criteria"
+      }
+    },
+    {
+      "id": "dsm5_interview_296.2x_7150",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'm here to listen and understand what you've been going through. What's been on your mind lately?",
+          "meta": {
+            "type": "open_inquiry",
+            "style": "naturalistic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I've been really struggling with feeling sad, empty, or hopeless. It's affecting everything in my life.",
+          "meta": {
+            "symptom_presentation": "natural",
+            "primary_concern": true,
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "That sounds really challenging. I can hear how much this is impacting you. Can you help me understand what this experience is like for you?",
+          "meta": {
+            "technique": "empathic_reflection",
+            "purpose": "rapport_building",
+            "knowledge_source": "DSM-5"
+          }
+        }
+      ],
+      "context": {
+        "disorder": "Major Depressive Disorder",
+        "conversation_type": "clinical_interview",
+        "style": "naturalistic",
+        "knowledge_source": "DSM-5"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Explore clinical presentations naturally",
+          "Integrate diagnostic thinking with therapeutic rapport"
+        ],
+        "knowledge_integration": "DSM-5 clinical presentation"
+      }
+    },
+    {
+      "id": "dsm5_education_296.2x_7194",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "Based on our assessment, it appears you're experiencing Major Depressive Disorder. I'd like to help you understand what this means.",
+          "meta": {
+            "type": "psychoeducation_intro",
+            "disorder": "Major Depressive Disorder",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I've heard of that before, but I'm not really sure what it means. Is this something serious?",
+          "meta": {
+            "information_seeking": true,
+            "concern_expression": true,
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Major Depressive Disorder is a well-understood condition that approximately 7% in the united states. It's very treatable with proper support.",
+          "meta": {
+            "psychoeducation": true,
+            "prevalence_info": "Approximately 7% in the United States",
+            "normalization": true,
+            "knowledge_source": "DSM-5"
+          }
+        }
+      ],
+      "context": {
+        "disorder": "Major Depressive Disorder",
+        "conversation_type": "psychoeducation",
+        "knowledge_source": "DSM-5"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Provide accurate psychoeducation about disorders",
+          "Help clients understand their symptoms"
+        ],
+        "knowledge_integration": "DSM-5 disorder information"
+      }
+    },
+    {
+      "id": "dsm5_diagnostic_300.02_4080",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'd like to go through some specific questions to better understand your symptoms. This will help me determine if what you're experiencing aligns with Generalized Anxiety Disorder.",
+          "meta": {
+            "type": "diagnostic_introduction",
+            "disorder": "Generalized Anxiety Disorder",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing excessive anxiety and worry about a number of events or activities?",
+          "meta": {
+            "criterion_id": "A",
+            "criterion_category": "core_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "Yes, I have been experiencing concern about family safety. It's been really difficult for me.",
+          "meta": {
+            "criterion_id": "A",
+            "symptom_example": "Concern about family safety",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Can you tell me more about how this has been affecting your daily life?",
+          "meta": {
+            "technique": "functional_assessment",
+            "criterion_id": "A",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's made it hard to sleep. I feel like I can't function normally.",
+          "meta": {
+            "functional_impact": true,
+            "criterion_id": "A",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing difficulty controlling the worry?",
+          "meta": {
+            "criterion_id": "B",
+            "criterion_category": "control_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "Yes, I have been experiencing unable to stop worrying. It's been really difficult for me.",
+          "meta": {
+            "criterion_id": "B",
+            "symptom_example": "Unable to stop worrying",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Can you tell me more about how this has been affecting your daily life?",
+          "meta": {
+            "technique": "functional_assessment",
+            "criterion_id": "B",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's made it hard to maintain relationships. I feel like I can't function normally.",
+          "meta": {
+            "functional_impact": true,
+            "criterion_id": "B",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing restlessness or feeling keyed up or on edge?",
+          "meta": {
+            "criterion_id": "C1",
+            "criterion_category": "physical_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Have you been experiencing being easily fatigued?",
+          "meta": {
+            "criterion_id": "C2",
+            "criterion_category": "physical_symptoms",
+            "assessment_type": "systematic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "How long have you been experiencing these symptoms? The diagnostic criteria specify 6 months.",
+          "meta": {
+            "assessment_type": "duration",
+            "duration_requirement": "6 months",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "It's been going on for 6 months, maybe even longer. It feels like it's getting worse.",
+          "meta": {
+            "duration_confirmation": true,
+            "severity_indication": "worsening",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Based on what you've shared, your symptoms align with the criteria for Generalized Anxiety Disorder. This means we have a clear framework for understanding what you're going through and developing an effective treatment plan.",
+          "meta": {
+            "type": "diagnostic_summary",
+            "disorder": "Generalized Anxiety Disorder",
+            "knowledge_source": "DSM-5"
+          }
+        }
+      ],
+      "context": {
+        "disorder": "Generalized Anxiety Disorder",
+        "disorder_code": "300.02",
+        "category": "anxiety_disorders",
+        "conversation_type": "diagnostic_assessment",
+        "knowledge_source": "DSM-5",
+        "minimum_criteria": 3,
+        "duration_requirement": "6 months"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Apply DSM-5 diagnostic criteria systematically",
+          "Conduct structured diagnostic interviews",
+          "Assess symptom severity and functional impact"
+        ],
+        "clinical_focus": [
+          "Criterion-based assessment",
+          "Differential diagnosis",
+          "Functional impairment evaluation"
+        ],
+        "knowledge_integration": "DSM-5 diagnostic criteria"
+      }
+    },
+    {
+      "id": "dsm5_interview_300.02_2695",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'm here to listen and understand what you've been going through. What's been on your mind lately?",
+          "meta": {
+            "type": "open_inquiry",
+            "style": "naturalistic",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I've been really struggling with worry about work performance. It's affecting everything in my life.",
+          "meta": {
+            "symptom_presentation": "natural",
+            "primary_concern": true,
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "That sounds really challenging. I can hear how much this is impacting you. Can you help me understand what this experience is like for you?",
+          "meta": {
+            "technique": "empathic_reflection",
+            "purpose": "rapport_building",
+            "knowledge_source": "DSM-5"
+          }
+        }
+      ],
+      "context": {
+        "disorder": "Generalized Anxiety Disorder",
+        "conversation_type": "clinical_interview",
+        "style": "naturalistic",
+        "knowledge_source": "DSM-5"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Explore clinical presentations naturally",
+          "Integrate diagnostic thinking with therapeutic rapport"
+        ],
+        "knowledge_integration": "DSM-5 clinical presentation"
+      }
+    },
+    {
+      "id": "dsm5_education_300.02_8329",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "Based on our assessment, it appears you're experiencing Generalized Anxiety Disorder. I'd like to help you understand what this means.",
+          "meta": {
+            "type": "psychoeducation_intro",
+            "disorder": "Generalized Anxiety Disorder",
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I've heard of that before, but I'm not really sure what it means. Is this something serious?",
+          "meta": {
+            "information_seeking": true,
+            "concern_expression": true,
+            "knowledge_source": "DSM-5"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Generalized Anxiety Disorder is a well-understood condition that approximately 2.9% annually in the united states. It's very treatable with proper support.",
+          "meta": {
+            "psychoeducation": true,
+            "prevalence_info": "Approximately 2.9% annually in the United States",
+            "normalization": true,
+            "knowledge_source": "DSM-5"
+          }
+        }
+      ],
+      "context": {
+        "disorder": "Generalized Anxiety Disorder",
+        "conversation_type": "psychoeducation",
+        "knowledge_source": "DSM-5"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Provide accurate psychoeducation about disorders",
+          "Help clients understand their symptoms"
+        ],
+        "knowledge_integration": "DSM-5 disorder information"
+      }
+    },
+    {
+      "id": "big_five_exploration_openness_6488",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'd like to explore your openness to experience with you. This can help us understand your natural tendencies and how they might relate to what you're experiencing.",
+          "meta": {
+            "type": "personality_introduction",
+            "factor": "openness",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I'm not sure what that means exactly. How does my personality relate to my problems?",
+          "meta": {
+            "curiosity": true,
+            "knowledge_seeking": true,
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Well, people who score high on openness to experience tend to be creative and imaginative. This can be a strength, but sometimes it can also create challenges. How would you describe yourself in this area?",
+          "meta": {
+            "psychoeducation": true,
+            "trait_explanation": "Creative and imaginative",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I think I am pretty creative and imaginative in that way. Sometimes it helps me, but other times it makes things harder.",
+          "meta": {
+            "self_reflection": true,
+            "trait_acknowledgment": true,
+            "knowledge_source": "Big Five"
+          }
+        }
+      ],
+      "context": {
+        "personality_factor": "openness",
+        "conversation_type": "personality_exploration",
+        "knowledge_source": "Big Five"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Explore personality traits and patterns",
+          "Understand how personality affects functioning",
+          "Connect personality to therapeutic goals"
+        ],
+        "knowledge_integration": "Big Five personality factors"
+      }
+    },
+    {
+      "id": "big_five_assessment_openness_3570",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'd like to ask you some questions about your openness to experience. These questions will help me understand your personality style better.",
+          "meta": {
+            "type": "assessment_introduction",
+            "factor": "openness",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "How would you describe yourself when it comes to receptivity to inner world of imagination?",
+          "meta": {
+            "facet_assessment": "Fantasy",
+            "assessment_type": "open_ended",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I would say I'm someone who vivid imagination and fantasy life. It's just how I've always been.",
+          "meta": {
+            "facet_response": "Fantasy",
+            "characteristic": "Vivid imagination and fantasy life",
+            "knowledge_source": "Big Five"
+          }
+        }
+      ],
+      "context": {
+        "personality_factor": "openness",
+        "conversation_type": "personality_assessment",
+        "knowledge_source": "Big Five"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Conduct systematic personality assessment",
+          "Use personality insights for treatment planning"
+        ],
+        "knowledge_integration": "Big Five assessment methods"
+      }
+    },
+    {
+      "id": "big_five_exploration_conscientiousness_5434",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'd like to explore your conscientiousness with you. This can help us understand your natural tendencies and how they might relate to what you're experiencing.",
+          "meta": {
+            "type": "personality_introduction",
+            "factor": "conscientiousness",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I'm not sure what that means exactly. How does my personality relate to my problems?",
+          "meta": {
+            "curiosity": true,
+            "knowledge_seeking": true,
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "Well, people who score high on conscientiousness tend to be organized and responsible. This can be a strength, but sometimes it can also create challenges. How would you describe yourself in this area?",
+          "meta": {
+            "psychoeducation": true,
+            "trait_explanation": "Organized and responsible",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I think I am pretty organized and responsible in that way. Sometimes it helps me, but other times it makes things harder.",
+          "meta": {
+            "self_reflection": true,
+            "trait_acknowledgment": true,
+            "knowledge_source": "Big Five"
+          }
+        }
+      ],
+      "context": {
+        "personality_factor": "conscientiousness",
+        "conversation_type": "personality_exploration",
+        "knowledge_source": "Big Five"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Explore personality traits and patterns",
+          "Understand how personality affects functioning",
+          "Connect personality to therapeutic goals"
+        ],
+        "knowledge_integration": "Big Five personality factors"
+      }
+    },
+    {
+      "id": "big_five_assessment_conscientiousness_3943",
+      "messages": [
+        {
+          "role": "therapist",
+          "content": "I'd like to ask you some questions about your conscientiousness. These questions will help me understand your personality style better.",
+          "meta": {
+            "type": "assessment_introduction",
+            "factor": "conscientiousness",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "therapist",
+          "content": "How would you describe yourself when it comes to sense of personal efficacy and capability?",
+          "meta": {
+            "facet_assessment": "Competence",
+            "assessment_type": "open_ended",
+            "knowledge_source": "Big Five"
+          }
+        },
+        {
+          "role": "client",
+          "content": "I would say I'm someone who feels capable and effective. It's just how I've always been.",
+          "meta": {
+            "facet_response": "Competence",
+            "characteristic": "Feels capable and effective",
+            "knowledge_source": "Big Five"
+          }
+        }
+      ],
+      "context": {
+        "personality_factor": "conscientiousness",
+        "conversation_type": "personality_assessment",
+        "knowledge_source": "Big Five"
+      },
+      "source": "psychology_knowledge_converter",
+      "meta": {
+        "learning_objectives": [
+          "Conduct systematic personality assessment",
+          "Use personality insights for treatment planning"
+        ],
+        "knowledge_integration": "Big Five assessment methods"
+      }
+    }
+  ],
+  "metadata": {
+    "total_conversations": 10,
+    "knowledge_sources": [
+      "DSM-5",
+      "Big Five"
+    ],
+    "generated_at": "2025-07-27T06:26:22.782385",
+    "converter_version": "1.0"
+  }
+}
