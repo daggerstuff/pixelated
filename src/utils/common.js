@@ -1,7 +1,9 @@
-// Common utility functions used across multiple pages and components
+ // Date formatting and content reading time estimation utilities
 
 export function formatDate(dateInput, options = {}) {
-  if (!dateInput) return '-';
+  if (!dateInput) {
+    return '-';
+  }
   
   const date = new Date(dateInput);
   const defaultOptions = {
