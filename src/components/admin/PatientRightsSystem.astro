@@ -891,7 +891,7 @@ const complianceMetrics = {
           this.logAuditEvent('WEBSOCKET_CONNECTED', 'Real-time updates active')
         }
         
-        this.wsConnection.onerror = (error) => {
+        this.wsConnection.onerror = () => {
           console.warn('WebSocket connection failed, falling back to polling')
           this.setupPolling()
         }
