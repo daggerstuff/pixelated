@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState, useEffect, useCallback, useId } from 'react'
 import type {
   TreatmentPlan,

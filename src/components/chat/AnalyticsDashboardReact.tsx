@@ -1,5 +1,3 @@
-'use client'
-
 import type { SecurityLevel } from '../../hooks/useSecurity'
 import type { Message } from '../../types/chat'
 import { useEffect, useMemo, useState } from 'react'

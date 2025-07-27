@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import SearchBox from './ui/SearchBox'
 import type { SearchResult } from '../lib/search'

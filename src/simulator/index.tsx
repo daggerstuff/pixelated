@@ -1,5 +1,3 @@
-'use client'
-
 import React from '@/lib/esm-compat/react'
 import { useAnonymizedMetrics } from './hooks'
 

@@ -1,5 +1,3 @@
-'use client'
-
 import { motion } from 'framer-motion'
 // Replace Next.js font with @fontsource/inter
 import '@fontsource/inter'

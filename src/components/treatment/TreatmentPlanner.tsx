@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from 'react'
 import RecommendationDisplay from '../ai/RecommendationDisplay'
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'

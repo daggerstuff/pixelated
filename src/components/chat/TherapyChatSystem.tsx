@@ -1,5 +1,3 @@
-'use client'
-
 import type { Message } from '@/types/chat'
 import type { Scenario } from '@/types/scenarios'
 import { clientScenarios } from '@/data/scenarios'

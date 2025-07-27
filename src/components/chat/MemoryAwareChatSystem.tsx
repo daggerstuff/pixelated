@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { useChatWithMemory } from '@/hooks/useChatWithMemory'
 import { useAuth } from '@/hooks/useAuth'

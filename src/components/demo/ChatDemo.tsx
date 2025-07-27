@@ -1,5 +1,3 @@
-'use client'
-
 import type { AIMessage } from '../../lib/ai'
 import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
 import { useState, useCallback, useEffect, useRef } from 'react'

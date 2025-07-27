@@ -23,7 +23,7 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
-  sourcemap: true,
+    sourcemap: process.env.NODE_ENV === 'development',
   },
   vite: {
     build: {

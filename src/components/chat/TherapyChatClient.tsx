@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import type { Message } from '@/types/chat'
 import type { ChangeEvent } from 'react'

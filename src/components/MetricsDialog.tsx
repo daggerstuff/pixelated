@@ -1,5 +1,3 @@
-'use client'
-
 import { useAnonymizedMetrics } from '@/simulator'
 
 interface MetricsDialogProps {

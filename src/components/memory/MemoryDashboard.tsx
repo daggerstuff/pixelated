@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect, useCallback } from 'react'
 import { useMemory, useUserPreferences } from '@/hooks/useMemory'
 import { Button } from '@/components/ui/button'
