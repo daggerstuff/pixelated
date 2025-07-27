@@ -1,0 +1,207 @@
+{
+  "execution_summary": {
+    "start_time": "2025-07-27T09:28:20.528247",
+    "end_time": "2025-07-27T09:28:33.729029",
+    "total_duration": "0:00:13.200782",
+    "current_stage": "finalization",
+    "success": false
+  },
+  "dataset_metrics": {
+    "total_datasets": 13,
+    "completed_datasets": 0,
+    "failed_datasets": 13,
+    "completion_rate": 0.0
+  },
+  "conversation_metrics": {
+    "total_conversations": 0,
+    "accepted_conversations": 0,
+    "rejected_conversations": 0,
+    "acceptance_rate": 0.0
+  },
+  "quality_metrics": {
+    "average_quality_score": 0.0,
+    "quality_threshold": 0.6,
+    "quality_threshold_met": false
+  },
+  "performance_metrics": {
+    "processing_rate": 0.0,
+    "performance_score": 0.2,
+    "error_rate": 0.0,
+    "retry_count": 13
+  },
+  "dataset_performance": {},
+  "stage_timings": {
+    "initialization": 1753622900.5282514,
+    "dataset_registration": 1753622900.52835,
+    "quality_setup": 1753622900.5290966,
+    "loading_execution": 1753622900.5291915,
+    "quality_validation": 1753622900.6950216,
+    "error_recovery": 1753622900.6951408,
+    "finalization": 1753622913.72895
+  },
+  "error_log": [
+    {
+      "type": "error",
+      "context": "mental_health_counseling",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.549352"
+    },
+    {
+      "type": "error",
+      "context": "psychology_10k",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.569137"
+    },
+    {
+      "type": "error",
+      "context": "psych8k",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.578404"
+    },
+    {
+      "type": "error",
+      "context": "sonnet_orca",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.586819"
+    },
+    {
+      "type": "error",
+      "context": "addiction_counseling",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.597764"
+    },
+    {
+      "type": "error",
+      "context": "hercules_v6",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.607127"
+    },
+    {
+      "type": "error",
+      "context": "clinical_diagnosis_cot",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.618316"
+    },
+    {
+      "type": "error",
+      "context": "gutenberg_dpo",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.628325"
+    },
+    {
+      "type": "error",
+      "context": "neurodivergent_cot",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.639076"
+    },
+    {
+      "type": "error",
+      "context": "heartbreak_cot",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.655728"
+    },
+    {
+      "type": "error",
+      "context": "mens_mental_health_cot",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.666718"
+    },
+    {
+      "type": "error",
+      "context": "synthetic_dark_rp",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.680184"
+    },
+    {
+      "type": "error",
+      "context": "dan_remixed",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:20.694967"
+    },
+    {
+      "type": "error",
+      "context": "heartbreak_cot_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:21.697852"
+    },
+    {
+      "type": "error",
+      "context": "gutenberg_dpo_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:22.703379"
+    },
+    {
+      "type": "error",
+      "context": "sonnet_orca_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:23.706088"
+    },
+    {
+      "type": "error",
+      "context": "addiction_counseling_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:24.708805"
+    },
+    {
+      "type": "error",
+      "context": "mental_health_counseling_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:25.711238"
+    },
+    {
+      "type": "error",
+      "context": "mens_mental_health_cot_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:26.712913"
+    },
+    {
+      "type": "error",
+      "context": "psych8k_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:27.715614"
+    },
+    {
+      "type": "error",
+      "context": "synthetic_dark_rp_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:28.718113"
+    },
+    {
+      "type": "error",
+      "context": "dan_remixed_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:29.720793"
+    },
+    {
+      "type": "error",
+      "context": "neurodivergent_cot_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:30.722388"
+    },
+    {
+      "type": "error",
+      "context": "psychology_10k_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:31.723820"
+    },
+    {
+      "type": "error",
+      "context": "hercules_v6_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:32.726369"
+    },
+    {
+      "type": "error",
+      "context": "clinical_diagnosis_cot_recovery",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:33.728912"
+    }
+  ],
+  "configuration": {
+    "execution_mode": "sequential",
+    "max_concurrent_datasets": 1,
+    "quality_threshold": 0.6,
+    "error_tolerance": 0.15,
+    "retry_attempts": 2
+  }
+}

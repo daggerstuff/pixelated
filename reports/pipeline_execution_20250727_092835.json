@@ -1,0 +1,56 @@
+{
+  "execution_summary": {
+    "start_time": "2025-07-27T09:28:35.531413",
+    "end_time": "2025-07-27T09:28:35.545747",
+    "total_duration": "0:00:00.014334",
+    "current_stage": "finalization",
+    "success": true
+  },
+  "dataset_metrics": {
+    "total_datasets": 13,
+    "completed_datasets": 0,
+    "failed_datasets": 0,
+    "completion_rate": 0.0
+  },
+  "conversation_metrics": {
+    "total_conversations": 0,
+    "accepted_conversations": 0,
+    "rejected_conversations": 0,
+    "acceptance_rate": 0.0
+  },
+  "quality_metrics": {
+    "average_quality_score": 0.0,
+    "quality_threshold": 0.7,
+    "quality_threshold_met": false
+  },
+  "performance_metrics": {
+    "processing_rate": 0.0,
+    "performance_score": 0.2,
+    "error_rate": 0.0,
+    "retry_count": 0
+  },
+  "dataset_performance": {},
+  "stage_timings": {
+    "initialization": 1753622915.5314164,
+    "dataset_registration": 1753622915.531521,
+    "quality_setup": 1753622915.5320077,
+    "loading_execution": 1753622915.5320668,
+    "quality_validation": 1753622915.5455935,
+    "finalization": 1753622915.5456889
+  },
+  "error_log": [
+    {
+      "type": "error",
+      "context": "concurrent_loading",
+      "message": "",
+      "timestamp": "2025-07-27T09:28:35.545574"
+    }
+  ],
+  "configuration": {
+    "execution_mode": "concurrent",
+    "max_concurrent_datasets": 3,
+    "quality_threshold": 0.7,
+    "error_tolerance": 0.1,
+    "retry_attempts": 3
+  }
+}
