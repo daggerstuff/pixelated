@@ -1,0 +1,53 @@
+{
+  "balance_report": {
+    "dataset_id": "dataset_20250727_073117",
+    "total_items": 30,
+    "balance_score": 0.4708516081871345,
+    "strategy_used": "therapeutic_priority",
+    "distributions": {
+      "dsm5_categories": {
+        "category_name": "dsm5_categories",
+        "total_count": 38,
+        "percentage": 1.2666666666666666,
+        "target_percentage": 1.0,
+        "deviation": 0.06166666666666666,
+        "subcategories": {
+          "anxiety_disorders": 16,
+          "depressive_disorders": 8,
+          "trauma_stressor_related_disorders": 6,
+          "bipolar_related_disorders": 4,
+          "obsessive_compulsive_related_disorders": 2,
+          "neurodevelopmental_disorders": 2
+        }
+      },
+      "severity_levels": {
+        "category_name": "severity_levels",
+        "total_count": 30,
+        "percentage": 1.0,
+        "target_percentage": 0.9999999999999999,
+        "deviation": 0.06666666666666668,
+        "subcategories": {
+          "severe": 13,
+          "mild": 6,
+          "moderate": 9,
+          "crisis": 2
+        }
+      }
+    },
+    "recommendations": [
+      "Increase representation of personality disorders in dsm5 categories",
+      "Reduce over-representation of anxiety disorders in dsm5 categories",
+      "Increase representation of moderate in severity levels",
+      "Reduce over-representation of severe in severity levels"
+    ],
+    "metrics": {
+      "dsm5_categories_entropy": 2.2081965922770874,
+      "dsm5_categories_gini": 0.39473684210526316,
+      "dsm5_categories_variance": 0.04023157894736841,
+      "severity_levels_entropy": 1.768730050503787,
+      "severity_levels_gini": 0.3,
+      "severity_levels_variance": 0.0288888888888889
+    },
+    "generated_at": "2025-07-27T07:31:17.917242"
+  }
+}

@@ -1,0 +1,1033 @@
+{
+  "scenarios": [
+    {
+      "id": "scenario_20250727_063625_4402",
+      "scenario_type": "initial_assessment",
+      "severity_level": "mild",
+      "demographics": {
+        "age": 86,
+        "gender": "Non-binary",
+        "occupation": "volunteer",
+        "education_level": "Doctoral degree",
+        "relationship_status": "Married",
+        "living_situation": "alone",
+        "cultural_background": "Asian American",
+        "socioeconomic_status": "High income",
+        "insurance_type": "public",
+        "previous_therapy": true
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Generalized Anxiety Disorder",
+        "duration": "Several weeks",
+        "onset": "Worsening of previous symptoms",
+        "triggers": [
+          "Relationship conflicts",
+          "Loss of loved ones",
+          "Social interactions"
+        ],
+        "symptoms": [
+          "Worry about work performance",
+          "Concern about family safety",
+          "Unable to stop worrying",
+          "Worry interferes with concentration",
+          "Restlessness or feeling keyed up or on edge"
+        ],
+        "functional_impact": [
+          "Mild interference with daily activities"
+        ],
+        "previous_episodes": true,
+        "current_stressors": [
+          "Social isolation"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Generalized Anxiety Disorder diagnosis",
+          "Panic Disorder",
+          "Social Anxiety Disorder"
+        ],
+        "attachment_style": "disorganized_fearful_avoidant",
+        "defense_mechanisms": [
+          "Projection",
+          "Humor"
+        ],
+        "personality_profile": {
+          "openness": "low",
+          "conscientiousness": "low",
+          "extraversion": "high",
+          "agreeableness": "high",
+          "neuroticism": "average"
+        },
+        "psychodynamic_themes": [
+          "Attachment and relationship patterns",
+          "Self-esteem and identity issues"
+        ],
+        "risk_factors": [
+          "History of mental health treatment",
+          "History of previous episodes",
+          "Social isolation"
+        ],
+        "protective_factors": [
+          "Higher education level",
+          "Stable employment",
+          "Supportive relationship",
+          "Financial stability"
+        ],
+        "treatment_goals": [
+          "Reduce anxiety and worry",
+          "Learn relaxation and grounding techniques",
+          "Gradually face avoided situations",
+          "Improve overall functioning and quality of life"
+        ]
+      },
+      "session_context": {
+        "session_number": 1,
+        "setting": "hospital",
+        "modality": "group",
+        "duration": "90 minutes",
+        "referral_source": "family"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Geriatric considerations and potential medical comorbidities",
+        "Consider disorganized_fearful_avoidant attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Practice initial assessment and rapport building",
+        "Conduct comprehensive intake interview",
+        "Identify presenting problems and symptoms",
+        "Apply knowledge of Generalized Anxiety Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Age-specific developmental considerations",
+        "Multiple diagnostic considerations",
+        "Recurrent condition with treatment history"
+      ],
+      "created_at": "2025-07-27T06:36:25.988984"
+    },
+    {
+      "id": "scenario_20250727_063625_2030",
+      "scenario_type": "diagnostic_interview",
+      "severity_level": "moderate",
+      "demographics": {
+        "age": 49,
+        "gender": "Non-binary",
+        "occupation": "teacher",
+        "education_level": "Some college",
+        "relationship_status": "Divorced",
+        "living_situation": "with spouse/partner",
+        "cultural_background": "Asian American",
+        "socioeconomic_status": "Middle income",
+        "insurance_type": "employee assistance",
+        "previous_therapy": false
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Generalized Anxiety Disorder",
+        "duration": "2-6 months",
+        "onset": "First-time experience",
+        "triggers": [
+          "Work stress",
+          "Financial pressure",
+          "Recent relationship changes"
+        ],
+        "symptoms": [
+          "Worry about work performance",
+          "Concern about family safety",
+          "Unable to stop worrying",
+          "Worry interferes with concentration",
+          "Restlessness or feeling keyed up or on edge"
+        ],
+        "functional_impact": [
+          "Moderate impact on work/relationships",
+          "Some difficulty with daily tasks"
+        ],
+        "previous_episodes": false,
+        "current_stressors": [
+          "Work overload",
+          "Responsibility pressure",
+          "Time management"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Generalized Anxiety Disorder diagnosis",
+          "Panic Disorder",
+          "Social Anxiety Disorder"
+        ],
+        "attachment_style": "anxious_preoccupied",
+        "defense_mechanisms": [
+          "Splitting",
+          "Projection"
+        ],
+        "personality_profile": {
+          "openness": "average",
+          "conscientiousness": "high",
+          "extraversion": "low",
+          "agreeableness": "high",
+          "neuroticism": "average"
+        },
+        "psychodynamic_themes": [
+          "Loss and grief processing",
+          "Self-esteem and identity issues"
+        ],
+        "risk_factors": [
+          "Recent relationship disruption"
+        ],
+        "protective_factors": [
+          "Stable employment",
+          "Financial stability",
+          "Motivation for treatment",
+          "Insight into problems"
+        ],
+        "treatment_goals": [
+          "Reduce anxiety and worry",
+          "Learn relaxation and grounding techniques",
+          "Gradually face avoided situations",
+          "Improve overall functioning and quality of life"
+        ]
+      },
+      "session_context": {
+        "session_number": 6,
+        "setting": "hospital",
+        "modality": "individual",
+        "duration": "60 minutes",
+        "referral_source": "physician"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Consider anxious_preoccupied attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Apply diagnostic criteria systematically",
+        "Conduct differential diagnosis",
+        "Assess symptom severity and functional impact",
+        "Apply knowledge of Generalized Anxiety Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Multiple diagnostic considerations",
+        "Multiple concurrent stressors"
+      ],
+      "created_at": "2025-07-27T06:36:25.989162"
+    },
+    {
+      "id": "scenario_20250727_063625_7876",
+      "scenario_type": "therapeutic_session",
+      "severity_level": "severe",
+      "demographics": {
+        "age": 83,
+        "gender": "Female",
+        "occupation": "caregiver",
+        "education_level": "Doctoral degree",
+        "relationship_status": "Divorced",
+        "living_situation": "alone",
+        "cultural_background": "African American",
+        "socioeconomic_status": "Middle income",
+        "insurance_type": "self-pay",
+        "previous_therapy": true
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Bipolar I Disorder",
+        "duration": "Chronic",
+        "onset": "Sudden onset following stressful event",
+        "triggers": [
+          "Health concerns",
+          "Loss of loved ones",
+          "Recent relationship changes"
+        ],
+        "symptoms": [
+          "Criteria have been met for at least one manic episode"
+        ],
+        "functional_impact": [
+          "Significant impairment in functioning",
+          "Unable to work/maintain relationships"
+        ],
+        "previous_episodes": false,
+        "current_stressors": [
+          "Social isolation"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Bipolar I Disorder diagnosis"
+        ],
+        "attachment_style": "secure",
+        "defense_mechanisms": [
+          "Projection",
+          "Denial"
+        ],
+        "personality_profile": {
+          "openness": "average",
+          "conscientiousness": "average",
+          "extraversion": "low",
+          "agreeableness": "high",
+          "neuroticism": "average"
+        },
+        "psychodynamic_themes": [
+          "Self-esteem and identity issues",
+          "Loss and grief processing"
+        ],
+        "risk_factors": [
+          "History of mental health treatment",
+          "Chronic nature of symptoms",
+          "Social isolation",
+          "Recent relationship disruption"
+        ],
+        "protective_factors": [
+          "Higher education level",
+          "Stable employment",
+          "Financial stability",
+          "Motivation for treatment"
+        ],
+        "treatment_goals": [
+          "Improve overall functioning and quality of life",
+          "Enhance self-awareness and insight",
+          "Strengthen interpersonal relationships",
+          "Develop effective problem-solving skills"
+        ]
+      },
+      "session_context": {
+        "session_number": 12,
+        "setting": "university counseling",
+        "modality": "couples",
+        "duration": "60 minutes",
+        "referral_source": "court-ordered"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Geriatric considerations and potential medical comorbidities",
+        "Consider secure attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Apply knowledge of Bipolar I Disorder in clinical practice",
+        "Manage complex and severe symptom presentations"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Age-specific developmental considerations"
+      ],
+      "created_at": "2025-07-27T06:36:25.989307"
+    },
+    {
+      "id": "scenario_20250727_063625_3644",
+      "scenario_type": "crisis_intervention",
+      "severity_level": "crisis",
+      "demographics": {
+        "age": 51,
+        "gender": "Female",
+        "occupation": "manager",
+        "education_level": "Bachelor's degree",
+        "relationship_status": "In a relationship",
+        "living_situation": "with spouse/partner",
+        "cultural_background": "African American",
+        "socioeconomic_status": "Lower income",
+        "insurance_type": "employee assistance",
+        "previous_therapy": true
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Post-Traumatic Stress Disorder",
+        "duration": "Acute onset",
+        "onset": "Worsening of previous symptoms",
+        "triggers": [
+          "Work stress",
+          "Financial pressure",
+          "Parenting responsibilities"
+        ],
+        "symptoms": [
+          "Directly experiencing traumatic event",
+          "Witnessing traumatic event",
+          "Recurrent distressing memories",
+          "Recurrent distressing dreams",
+          "Avoidance of distressing memories",
+          "Avoidance of external reminders"
+        ],
+        "functional_impact": [
+          "Immediate safety concerns",
+          "Unable to function independently"
+        ],
+        "previous_episodes": true,
+        "current_stressors": [
+          "Work overload",
+          "Time management",
+          "Responsibility pressure"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Post-Traumatic Stress Disorder diagnosis"
+        ],
+        "attachment_style": "anxious_preoccupied",
+        "defense_mechanisms": [
+          "Denial",
+          "Sublimation"
+        ],
+        "personality_profile": {
+          "openness": "low",
+          "conscientiousness": "average",
+          "extraversion": "average",
+          "agreeableness": "high",
+          "neuroticism": "high"
+        },
+        "psychodynamic_themes": [
+          "Self-esteem and identity issues",
+          "Unconscious conflict resolution"
+        ],
+        "risk_factors": [
+          "Financial stress and limited resources",
+          "History of mental health treatment",
+          "History of previous episodes"
+        ],
+        "protective_factors": [
+          "Higher education level",
+          "Stable employment",
+          "Supportive relationship",
+          "Motivation for treatment"
+        ],
+        "treatment_goals": [
+          "Process traumatic experiences safely",
+          "Reduce trauma-related symptoms",
+          "Develop healthy coping mechanisms",
+          "Improve overall functioning and quality of life"
+        ]
+      },
+      "session_context": {
+        "session_number": 2,
+        "setting": "community mental health",
+        "modality": "group",
+        "duration": "90 minutes",
+        "referral_source": "self-referral",
+        "urgency_level": "high",
+        "safety_assessment_needed": true,
+        "crisis_type": "panic attack"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Consider anxious_preoccupied attachment patterns in therapy",
+        "High neuroticism may require emotion regulation focus"
+      ],
+      "learning_objectives": [
+        "Assess immediate safety and risk",
+        "Provide crisis stabilization",
+        "Develop safety planning",
+        "Apply knowledge of Post-Traumatic Stress Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Recurrent condition with treatment history",
+        "Multiple concurrent stressors",
+        "Limited resources and access barriers"
+      ],
+      "created_at": "2025-07-27T06:36:25.989466"
+    },
+    {
+      "id": "scenario_20250727_063625_9484",
+      "scenario_type": "follow_up_session",
+      "severity_level": "mild",
+      "demographics": {
+        "age": 39,
+        "gender": "Male",
+        "occupation": "manager",
+        "education_level": "Doctoral degree",
+        "relationship_status": "Single",
+        "living_situation": "with spouse/partner",
+        "cultural_background": "Native American",
+        "socioeconomic_status": "Middle income",
+        "insurance_type": "self-pay",
+        "previous_therapy": true
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Autism Spectrum Disorder",
+        "duration": "1-2 months",
+        "onset": "Gradual onset over time",
+        "triggers": [
+          "Parenting responsibilities",
+          "Financial pressure",
+          "Work stress"
+        ],
+        "symptoms": [
+          "Persistent deficits in social communication and social interaction",
+          "Restricted, repetitive patterns of behavior, interests, or activities"
+        ],
+        "functional_impact": [
+          "Mild interference with daily activities"
+        ],
+        "previous_episodes": true,
+        "current_stressors": [
+          "Responsibility pressure",
+          "Time management",
+          "Work overload"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Autism Spectrum Disorder diagnosis"
+        ],
+        "attachment_style": "disorganized_fearful_avoidant",
+        "defense_mechanisms": [
+          "Projection",
+          "Denial"
+        ],
+        "personality_profile": {
+          "openness": "low",
+          "conscientiousness": "average",
+          "extraversion": "average",
+          "agreeableness": "high",
+          "neuroticism": "low"
+        },
+        "psychodynamic_themes": [
+          "Attachment and relationship patterns",
+          "Unconscious conflict resolution"
+        ],
+        "risk_factors": [
+          "History of mental health treatment",
+          "History of previous episodes"
+        ],
+        "protective_factors": [
+          "Higher education level",
+          "Stable employment",
+          "Financial stability",
+          "Motivation for treatment"
+        ],
+        "treatment_goals": [
+          "Improve overall functioning and quality of life",
+          "Enhance self-awareness and insight",
+          "Strengthen interpersonal relationships",
+          "Develop effective problem-solving skills"
+        ]
+      },
+      "session_context": {
+        "session_number": 12,
+        "setting": "community mental health",
+        "modality": "couples",
+        "duration": "45 minutes",
+        "referral_source": "court-ordered"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Consider disorganized_fearful_avoidant attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Apply knowledge of Autism Spectrum Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Recurrent condition with treatment history",
+        "Multiple concurrent stressors"
+      ],
+      "created_at": "2025-07-27T06:36:25.989627"
+    },
+    {
+      "id": "scenario_20250727_063625_8520",
+      "scenario_type": "initial_assessment",
+      "severity_level": "moderate",
+      "demographics": {
+        "age": 20,
+        "gender": "Non-binary",
+        "occupation": "student",
+        "education_level": "Professional certification",
+        "relationship_status": "Single",
+        "living_situation": "with parents",
+        "cultural_background": "International student",
+        "socioeconomic_status": "Middle income",
+        "insurance_type": "employee assistance",
+        "previous_therapy": true
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Bipolar I Disorder",
+        "duration": "6 months",
+        "onset": "Worsening of previous symptoms",
+        "triggers": [
+          "Peer relationships",
+          "Academic pressure",
+          "Family expectations"
+        ],
+        "symptoms": [
+          "Criteria have been met for at least one manic episode"
+        ],
+        "functional_impact": [
+          "Moderate impact on work/relationships",
+          "Some difficulty with daily tasks"
+        ],
+        "previous_episodes": true,
+        "current_stressors": [
+          "Academic deadlines",
+          "Future uncertainty",
+          "Financial concerns"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Bipolar I Disorder diagnosis"
+        ],
+        "attachment_style": "dismissive_avoidant",
+        "defense_mechanisms": [
+          "Humor",
+          "Projection"
+        ],
+        "personality_profile": {
+          "openness": "low",
+          "conscientiousness": "low",
+          "extraversion": "low",
+          "agreeableness": "high",
+          "neuroticism": "average"
+        },
+        "psychodynamic_themes": [
+          "Control and autonomy conflicts",
+          "Unconscious conflict resolution"
+        ],
+        "risk_factors": [
+          "Young age and developmental transitions",
+          "History of mental health treatment",
+          "History of previous episodes"
+        ],
+        "protective_factors": [
+          "Stable employment",
+          "Financial stability",
+          "Motivation for treatment",
+          "Insight into problems"
+        ],
+        "treatment_goals": [
+          "Improve overall functioning and quality of life",
+          "Enhance self-awareness and insight",
+          "Strengthen interpersonal relationships",
+          "Develop effective problem-solving skills"
+        ]
+      },
+      "session_context": {
+        "session_number": 1,
+        "setting": "private practice",
+        "modality": "group",
+        "duration": "50 minutes",
+        "referral_source": "physician"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Consider dismissive_avoidant attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Practice initial assessment and rapport building",
+        "Conduct comprehensive intake interview",
+        "Identify presenting problems and symptoms",
+        "Apply knowledge of Bipolar I Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Recurrent condition with treatment history",
+        "Multiple concurrent stressors"
+      ],
+      "created_at": "2025-07-27T06:36:25.989791"
+    },
+    {
+      "id": "scenario_20250727_063625_6775",
+      "scenario_type": "diagnostic_interview",
+      "severity_level": "severe",
+      "demographics": {
+        "age": 52,
+        "gender": "Male",
+        "occupation": "engineer",
+        "education_level": "Professional certification",
+        "relationship_status": "Widowed",
+        "living_situation": "with family",
+        "cultural_background": "Middle Eastern",
+        "socioeconomic_status": "High income",
+        "insurance_type": "employee assistance",
+        "previous_therapy": true
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Post-Traumatic Stress Disorder",
+        "duration": "Over a year",
+        "onset": "Sudden onset following stressful event",
+        "triggers": [
+          "Parenting responsibilities",
+          "Financial pressure",
+          "Work stress"
+        ],
+        "symptoms": [
+          "Directly experiencing traumatic event",
+          "Witnessing traumatic event",
+          "Recurrent distressing memories",
+          "Recurrent distressing dreams",
+          "Avoidance of distressing memories",
+          "Avoidance of external reminders"
+        ],
+        "functional_impact": [
+          "Significant impairment in functioning",
+          "Unable to work/maintain relationships"
+        ],
+        "previous_episodes": true,
+        "current_stressors": [
+          "Family dynamics"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Post-Traumatic Stress Disorder diagnosis"
+        ],
+        "attachment_style": "anxious_preoccupied",
+        "defense_mechanisms": [
+          "Dissociation",
+          "Humor"
+        ],
+        "personality_profile": {
+          "openness": "high",
+          "conscientiousness": "high",
+          "extraversion": "low",
+          "agreeableness": "high",
+          "neuroticism": "high"
+        },
+        "psychodynamic_themes": [
+          "Loss and grief processing",
+          "Unconscious conflict resolution"
+        ],
+        "risk_factors": [
+          "History of mental health treatment",
+          "History of previous episodes"
+        ],
+        "protective_factors": [
+          "Stable employment",
+          "Family support system",
+          "Financial stability",
+          "Motivation for treatment"
+        ],
+        "treatment_goals": [
+          "Process traumatic experiences safely",
+          "Reduce trauma-related symptoms",
+          "Develop healthy coping mechanisms",
+          "Improve overall functioning and quality of life"
+        ]
+      },
+      "session_context": {
+        "session_number": 5,
+        "setting": "hospital",
+        "modality": "couples",
+        "duration": "60 minutes",
+        "referral_source": "self-referral"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Consider anxious_preoccupied attachment patterns in therapy",
+        "High neuroticism may require emotion regulation focus"
+      ],
+      "learning_objectives": [
+        "Apply diagnostic criteria systematically",
+        "Conduct differential diagnosis",
+        "Assess symptom severity and functional impact",
+        "Apply knowledge of Post-Traumatic Stress Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Recurrent condition with treatment history"
+      ],
+      "created_at": "2025-07-27T06:36:25.989918"
+    },
+    {
+      "id": "scenario_20250727_063625_6623",
+      "scenario_type": "therapeutic_session",
+      "severity_level": "crisis",
+      "demographics": {
+        "age": 79,
+        "gender": "Male",
+        "occupation": "part-time consultant",
+        "education_level": "Professional certification",
+        "relationship_status": "Single",
+        "living_situation": "assisted living",
+        "cultural_background": "Native American",
+        "socioeconomic_status": "High income",
+        "insurance_type": "public",
+        "previous_therapy": false
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Bipolar I Disorder",
+        "duration": "Current crisis",
+        "onset": "Gradual onset over time",
+        "triggers": [
+          "Retirement adjustment",
+          "Health concerns",
+          "Loss of loved ones"
+        ],
+        "symptoms": [
+          "Criteria have been met for at least one manic episode"
+        ],
+        "functional_impact": [
+          "Immediate safety concerns",
+          "Unable to function independently"
+        ],
+        "previous_episodes": false,
+        "current_stressors": []
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Bipolar I Disorder diagnosis"
+        ],
+        "attachment_style": "dismissive_avoidant",
+        "defense_mechanisms": [
+          "Projection",
+          "Dissociation"
+        ],
+        "personality_profile": {
+          "openness": "average",
+          "conscientiousness": "low",
+          "extraversion": "low",
+          "agreeableness": "high",
+          "neuroticism": "low"
+        },
+        "psychodynamic_themes": [
+          "Attachment and relationship patterns",
+          "Self-esteem and identity issues"
+        ],
+        "risk_factors": [],
+        "protective_factors": [
+          "Stable employment",
+          "Financial stability",
+          "Motivation for treatment",
+          "Insight into problems"
+        ],
+        "treatment_goals": [
+          "Improve overall functioning and quality of life",
+          "Enhance self-awareness and insight",
+          "Strengthen interpersonal relationships",
+          "Develop effective problem-solving skills"
+        ]
+      },
+      "session_context": {
+        "session_number": 4,
+        "setting": "hospital",
+        "modality": "group",
+        "duration": "60 minutes",
+        "referral_source": "physician"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Geriatric considerations and potential medical comorbidities",
+        "Consider dismissive_avoidant attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Apply knowledge of Bipolar I Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Age-specific developmental considerations"
+      ],
+      "created_at": "2025-07-27T06:36:25.990045"
+    },
+    {
+      "id": "scenario_20250727_063625_5630",
+      "scenario_type": "crisis_intervention",
+      "severity_level": "mild",
+      "demographics": {
+        "age": 21,
+        "gender": "Non-binary",
+        "occupation": "student",
+        "education_level": "Bachelor's degree",
+        "relationship_status": "Single",
+        "living_situation": "with parents",
+        "cultural_background": "Native American",
+        "socioeconomic_status": "Upper middle income",
+        "insurance_type": "employee assistance",
+        "previous_therapy": false
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Major Depressive Disorder",
+        "duration": "1-2 months",
+        "onset": "Sudden onset following stressful event",
+        "triggers": [
+          "Rejection",
+          "Failure experiences",
+          "Academic pressure"
+        ],
+        "symptoms": [
+          "Feeling sad, empty, or hopeless",
+          "Appears tearful to others",
+          "Loss of interest in hobbies",
+          "Withdrawal from social activities",
+          "Weight change of more than 5% in a month",
+          "Decreased or increased appetite nearly every day"
+        ],
+        "functional_impact": [
+          "Mild interference with daily activities"
+        ],
+        "previous_episodes": false,
+        "current_stressors": [
+          "Financial concerns",
+          "Future uncertainty",
+          "Academic deadlines"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Major Depressive Disorder diagnosis",
+          "Bipolar Disorder",
+          "Persistent Depressive Disorder"
+        ],
+        "attachment_style": "secure",
+        "defense_mechanisms": [
+          "Repression",
+          "Rationalization"
+        ],
+        "personality_profile": {
+          "openness": "high",
+          "conscientiousness": "average",
+          "extraversion": "average",
+          "agreeableness": "high",
+          "neuroticism": "average"
+        },
+        "psychodynamic_themes": [
+          "Attachment and relationship patterns",
+          "Unconscious conflict resolution"
+        ],
+        "risk_factors": [
+          "Young age and developmental transitions"
+        ],
+        "protective_factors": [
+          "Higher education level",
+          "Stable employment",
+          "Financial stability",
+          "Motivation for treatment"
+        ],
+        "treatment_goals": [
+          "Improve mood and reduce depressive symptoms",
+          "Increase engagement in meaningful activities",
+          "Develop coping strategies for negative thoughts",
+          "Improve overall functioning and quality of life"
+        ]
+      },
+      "session_context": {
+        "session_number": 9,
+        "setting": "university counseling",
+        "modality": "individual",
+        "duration": "60 minutes",
+        "referral_source": "physician",
+        "urgency_level": "high",
+        "safety_assessment_needed": true,
+        "crisis_type": "substance use"
+      },
+      "therapeutic_considerations": [
+        "Impaired work performance",
+        "Relationship difficulties",
+        "Consider cultural factors in assessment and treatment",
+        "Consider secure attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Assess immediate safety and risk",
+        "Provide crisis stabilization",
+        "Develop safety planning",
+        "Apply knowledge of Major Depressive Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Multiple diagnostic considerations",
+        "Multiple concurrent stressors"
+      ],
+      "created_at": "2025-07-27T06:36:25.990172"
+    },
+    {
+      "id": "scenario_20250727_063625_9698",
+      "scenario_type": "follow_up_session",
+      "severity_level": "moderate",
+      "demographics": {
+        "age": 46,
+        "gender": "Non-binary",
+        "occupation": "nurse",
+        "education_level": "Bachelor's degree",
+        "relationship_status": "Separated",
+        "living_situation": "alone",
+        "cultural_background": "Asian American",
+        "socioeconomic_status": "Upper middle income",
+        "insurance_type": "private",
+        "previous_therapy": false
+      },
+      "presenting_problem": {
+        "primary_concern": "Symptoms consistent with Post-Traumatic Stress Disorder",
+        "duration": "Several months",
+        "onset": "Gradual onset over time",
+        "triggers": [
+          "Financial pressure",
+          "Work stress",
+          "Recent relationship changes"
+        ],
+        "symptoms": [
+          "Directly experiencing traumatic event",
+          "Witnessing traumatic event",
+          "Recurrent distressing memories",
+          "Recurrent distressing dreams",
+          "Avoidance of distressing memories",
+          "Avoidance of external reminders"
+        ],
+        "functional_impact": [
+          "Moderate impact on work/relationships",
+          "Some difficulty with daily tasks"
+        ],
+        "previous_episodes": true,
+        "current_stressors": [
+          "Responsibility pressure",
+          "Work overload",
+          "Time management"
+        ]
+      },
+      "clinical_formulation": {
+        "dsm5_considerations": [
+          "Consider Post-Traumatic Stress Disorder diagnosis"
+        ],
+        "attachment_style": "disorganized_fearful_avoidant",
+        "defense_mechanisms": [
+          "Projection",
+          "Denial"
+        ],
+        "personality_profile": {
+          "openness": "low",
+          "conscientiousness": "average",
+          "extraversion": "average",
+          "agreeableness": "high",
+          "neuroticism": "low"
+        },
+        "psychodynamic_themes": [
+          "Attachment and relationship patterns",
+          "Control and autonomy conflicts"
+        ],
+        "risk_factors": [
+          "History of previous episodes",
+          "Social isolation",
+          "Recent relationship disruption"
+        ],
+        "protective_factors": [
+          "Higher education level",
+          "Stable employment",
+          "Good insurance coverage",
+          "Financial stability"
+        ],
+        "treatment_goals": [
+          "Process traumatic experiences safely",
+          "Reduce trauma-related symptoms",
+          "Develop healthy coping mechanisms",
+          "Improve overall functioning and quality of life"
+        ]
+      },
+      "session_context": {
+        "session_number": 11,
+        "setting": "community mental health",
+        "modality": "individual",
+        "duration": "45 minutes",
+        "referral_source": "family"
+      },
+      "therapeutic_considerations": [
+        "Consider cultural factors in assessment and treatment",
+        "Consider disorganized_fearful_avoidant attachment patterns in therapy"
+      ],
+      "learning_objectives": [
+        "Apply knowledge of Post-Traumatic Stress Disorder in clinical practice"
+      ],
+      "complexity_factors": [
+        "Cross-cultural considerations",
+        "Recurrent condition with treatment history",
+        "Multiple concurrent stressors"
+      ],
+      "created_at": "2025-07-27T06:36:25.990277"
+    }
+  ],
+  "metadata": {
+    "total_scenarios": 10,
+    "generated_at": "2025-07-27T06:36:25.992292",
+    "generator_version": "1.0"
+  }
+}
