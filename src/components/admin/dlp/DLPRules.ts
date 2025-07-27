@@ -13,7 +13,11 @@ function handleRuleDeleted(event: CustomEvent) {
   const { id, name } = event.detail;
   console.log(`Rule deleted: ${name} (${id})`);
 
-  // Check if there are no more rules
+  // Find and remove the deleted rule element
+  const ruleElement = document.querySelector(`[data-rule-id="${id}"]`);
+  ruleElement?.parentElement?.remove();
+
+  // Check if there are no more rules after removal
   const rulesList = document.querySelector('.rules-list .space-y-4');
   if (rulesList && rulesList.children.length === 0) {
     // Show the "No rules" message
@@ -91,6 +95,4 @@ window.addEventListener('unload', cleanup);
 // [DEBUG] Removed custom ImportMeta augmentation to resolve conflict with Vite's built-in types.
 
 // Export the cleanup function in case it's needed elsewhere
-if (import.meta.hot) {
-  import.meta.hot.dispose(cleanup);
-}
+// Note: HMR support removed to avoid TypeScript module configuration issues

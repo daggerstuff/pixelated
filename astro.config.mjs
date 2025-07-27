@@ -27,6 +27,7 @@ export default defineConfig({
   },
   vite: {
     build: {
+      sourcemap: process.env.NODE_ENV === 'development',
       rollupOptions: {
         external: [
           '@google-cloud/storage',

@@ -11,6 +11,12 @@ interface ImportMetaEnv {
   readonly SUPABASE_SERVICE_ROLE_KEY: string
   readonly SSR: boolean
 
+  // Sentry Environment Variables
+  readonly PUBLIC_SENTRY_DSN?: string
+  readonly PUBLIC_APP_VERSION?: string
+  readonly MODE?: string
+  readonly DEV?: boolean
+
   // Bias Detection Environment Variables
   readonly BIAS_DETECTION_SERVICE_URL?: string
   readonly BIAS_ALERT_SLACK_WEBHOOK?: string

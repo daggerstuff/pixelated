@@ -1,10 +1,7 @@
 /// <reference types="astro/client" />
 
-
-import "./src/env.d.ts"
-
 // Import types from React for HTML attributes (if needed in the future)
-// import type { AriaRole, CSSProperties } from 'react'
+import "./src/env.d.ts"
 
 // Ensure Astro recognizes HTML attributes
 declare namespace astroHTML.JSX {

@@ -1,4 +1,6 @@
+/// <reference types="astro/client" />
 import * as Sentry from '@sentry/browser'
+
 
 let sentryInitialised = false
 
