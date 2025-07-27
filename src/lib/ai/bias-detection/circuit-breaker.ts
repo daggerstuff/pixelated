@@ -15,6 +15,7 @@ export interface CircuitBreakerConfig {
   monitoringPeriod: number // Time window for failure counting (ms)
   successThreshold: number // Successes needed to close from half-open
   volumeThreshold: number // Minimum requests before considering failure rate
+  failureRateThreshold?: number // Failure rate threshold for opening circuit
 }
 
 export interface CircuitBreakerStats {
@@ -46,6 +47,7 @@ export class CircuitBreaker {
       monitoringPeriod: 300000, // 5 minutes
       successThreshold: 3,
       volumeThreshold: 10,
+      failureRateThreshold: 0.5,
       ...config,
     }
 
@@ -92,8 +94,7 @@ export class CircuitBreaker {
         logger.info('Circuit breaker CLOSED - service recovered')
       }
     } else if (this.state === 'CLOSED') {
-      // Reset failure count on success in closed state
-      this.failureCount = 0
+      // In CLOSED state, we rely on the request window for failure tracking
     }
 
     logger.debug('Circuit breaker recorded success', {
@@ -123,9 +124,9 @@ export class CircuitBreaker {
       const recentFailures = recentRequests.filter(r => !r.success).length
       const failureRate = recentRequests.length > 0 ? recentFailures / recentRequests.length : 0
 
-      if (recentRequests.length >= this.config.volumeThreshold &&
-          recentFailures >= this.config.failureThreshold &&
-          failureRate > 0.5) {
+    if (recentRequests.length >= this.config.volumeThreshold &&
+      recentFailures >= this.config.failureThreshold &&
+      failureRate > (this.config.failureRateThreshold ?? 0.5)) {
         this.state = 'OPEN'
         this.stateChangedAt = new Date()
         logger.warn('Circuit breaker OPENED due to failure threshold', {

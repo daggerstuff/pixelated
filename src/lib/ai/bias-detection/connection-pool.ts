@@ -30,6 +30,7 @@ export class ConnectionPool {
     reject: (error: Error) => void
   }> = []
   private config: ConnectionPoolConfig
+  private cleanupIntervalId?: ReturnType<typeof setInterval>
 
   constructor(config: Partial<ConnectionPoolConfig> = {}) {
     this.config = {
@@ -41,8 +42,8 @@ export class ConnectionPool {
       ...config,
     }
 
-    // Cleanup idle connections periodically
-    setInterval(() => this.cleanupIdleConnections(), 60000)
+  // Cleanup idle connections periodically
+  this.cleanupIntervalId = setInterval(() => this.cleanupIdleConnections(), 60000)
   }
 
   async acquireConnection(): Promise<PooledConnection> {
@@ -51,6 +52,7 @@ export class ConnectionPool {
       if (!connection.inUse) {
         connection.inUse = true
         connection.lastUsed = new Date()
+          connection.requests++
         return connection
       }
     }
@@ -58,6 +60,7 @@ export class ConnectionPool {
     // Create new connection if under limit
     if (this.connections.size < this.config.maxConnections) {
       const connection = this.createConnection()
+        connection.requests++
       this.connections.set(connection.id, connection)
       return connection
     }
@@ -85,6 +88,7 @@ export class ConnectionPool {
     if (this.queue.length > 0) {
       const { resolve } = this.queue.shift()!
       connection.inUse = true
+    connection.requests++
       resolve(connection)
     }
   }
@@ -128,19 +132,25 @@ export class ConnectionPool {
   }
 
   async dispose(): Promise<void> {
+    // Clear cleanup interval
+    if (this.cleanupIntervalId) {
+      clearInterval(this.cleanupIntervalId)
+      this.cleanupIntervalId = undefined
+    }
+
     // Abort all connections
     for (const connection of this.connections.values()) {
       connection.controller.abort()
     }
-    
+
     // Reject all queued requests
     this.queue.forEach(({ reject }) => {
       reject(new Error('Connection pool disposed'))
     })
-    
+
     this.connections.clear()
     this.queue.length = 0
-    
+
     logger.info('Connection pool disposed')
   }
 }
