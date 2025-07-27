@@ -140,3 +140,12 @@ pnpm-workspace.yaml
 .cursorindexingignore
 .cursorignore
 .amplify-hosting
+business-strategy
+demo_balance_report.json
+demo_client_scenarios.json
+demo_conversations.json
+demo_therapeutic_responses.json
+demo_validation_results.json
+CDN-SETUP.md
+ISSUE_BIAS_DETECTION_LAYER_WEIGHTS.md
+pixelated-empathy-agent.yaml

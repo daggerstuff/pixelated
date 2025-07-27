@@ -54,128 +54,142 @@ export async function getStaticPaths() {
 
 const { page } = Astro.props
 
-// Group posts by year
-const postsByYear: Record<string, any[]> = {}
-for (const post of page.data) {
-  const year = new Date(post.data.pubDate).getFullYear().toString()
-  if (!postsByYear[year]) {
-    postsByYear[year] = []
-  }
-  postsByYear[year].push(post)
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 }
 
-// Get years in descending order
-const years = Object.keys(postsByYear).sort((yearA, yearB) => {
-  return parseInt(yearB) - parseInt(yearA)
-})
-
-// Format date function
-function formatPostDate(date: Date, readingTime?: number): string {
-  const monthDay = date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  })
-  return readingTime ? `${monthDay} · ${readingTime} min` : monthDay
+function getReadingTime(content: string) {
+  const wordsPerMinute = 200;
+  const words = content.split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min read`;
 }
 
-const title = `Blog - Page ${page.currentPage}`
-const description = 'Articles about mental health, therapy, and technology'
-const bgType = 'rose'
+const title = page.currentPage === 1 ? 'All Posts' : `All Posts - Page ${page.currentPage}`
+const description = 'All articles about therapy, technology, and digital empathy'
 ---
 
-<BaseLayout {title} {description} {bgType}>
-  <div class="max-w-prose mx-auto">
-    <h1 class="text-4xl font-bold mb-8">Blog</h1>
+<BaseLayout {title} {description}>
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <header class="mb-12">
+      <div class="flex items-center gap-2 mb-4 text-sm text-slate-400">
+        <a href="/blog" class="hover:text-green-400 transition-colors">Blog</a>
+        <span>/</span>
+        <span class="text-green-400">All Posts</span>
+      </div>
+      <h1 class="text-3xl font-bold mb-4">All Posts</h1>
+      <p class="text-slate-400">
+        {page.total} articles about therapy, technology, and digital empathy
+      </p>
+    </header>
 
-    <!-- Performance Stats -->
-    <div class="mb-6 text-sm text-gray-500 dark:text-gray-400">
-      Showing {page.data.length} of {page.total} posts (Page {page.currentPage} of
-      {page.lastPage})
-    </div>
-
-    <div class="prose dark:prose-invert">
-      <!-- Posts by Year -->
-      {
-        years.map((year) => {
-          const yearPosts = postsByYear[year]
-          if (!yearPosts || yearPosts.length === 0) return null
-          return (
-            <div class="mb-8">
-              <h2 class="text-2xl mb-4">{year}</h2>
-              <ul class="space-y-3 list-none pl-0">
-                {yearPosts.map((post: any) => (
-                  <li class="flex justify-between items-baseline mb-2 leading-relaxed">
-                    <a
-                      href={`/blog/${post.slug}`}
-                      class="flex-1 text-primary hover:underline text-lg"
-                      transition:name={`post-title-${post.slug}`}
-                    >
-                      {post.data.title}
-                    </a>
-                    <span class="text-sm text-gray-500 dark:text-gray-400 op-80 ml-4">
-                      {formatPostDate(post.data.pubDate, post.data.readingTime)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+    <div class="space-y-8 mb-12">
+      {page.data.map((post: any) => (
+        <article class="group">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+              {formatDate(new Date(post.data.pubDate))}
+              <span class="hidden sm:block mt-1">
+                {getReadingTime(post.body)}
+              </span>
             </div>
-          )
-        })
-      }
 
-      <!-- Pagination -->
-      <div class="mt-12 flex justify-center">
-        <div class="flex gap-2 items-center">
-          {
-            page.url.prev && (
+            <div class="flex-1">
+              <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
+                <a href={`/blog/${post.slug}`} class="block">
+                  {post.data.title}
+                </a>
+              </h3>
+
+              <p class="text-slate-300 mb-3 leading-relaxed">
+                {post.data.description}
+              </p>
+
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-3">
+                  {post.data.tags.map((tag: string) => (
+                    <a
+                      href={`/blog/tags/${tag}`}
+                      class="text-xs text-green-400 hover:text-green-300 transition-colors"
+                    >
+                      #{tag}
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <a
+                href={`/blog/${post.slug}`}
+                class="inline-flex items-center text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+              >
+                Read article
+                <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+
+    <!-- Pagination -->
+    {(page.url.prev || page.url.next) && (
+      <div class="border-t border-slate-700 pt-8">
+        <div class="flex justify-between items-center">
+          <div>
+            {page.url.prev && (
               <a
                 href={page.url.prev}
-                class="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
               >
-                ← Previous
+                ← Previous page
               </a>
-            )
-          }
-          <span class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
+            )}
+          </div>
+
+          <span class="text-sm text-slate-400">
             Page {page.currentPage} of {page.lastPage}
           </span>
-          {
-            page.url.next && (
+
+          <div>
+            {page.url.next && (
               <a
                 href={page.url.next}
-                class="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
               >
-                Next →
+                Next page →
               </a>
-            )
-          }
+            )}
+          </div>
         </div>
       </div>
+    )}
 
-      <!-- Navigation -->
-      <div class="mt-16">
-        <div class="flex justify-between items-center">
-          <div class="flex gap-2">
-            <a
-              href="/blog"
-              class="text-sm px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            >
-              all posts
-            </a>
-            <a
-              href="/blog/tags"
-              class="text-sm px-3 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              tags
-            </a>
-          </div>
+    <!-- Navigation -->
+    <div class="border-t border-slate-700 pt-8 mt-8">
+      <div class="flex flex-col sm:flex-row gap-4 justify-between">
+        <div class="flex gap-4">
           <a
-            href="/rss.xml"
-            class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            href="/blog"
+            class="text-slate-400 hover:text-green-400 transition-colors"
           >
-            RSS
+            ← Blog home
+          </a>
+          <a
+            href="/blog/tags"
+            class="text-slate-400 hover:text-green-400 transition-colors"
+          >
+            All topics
           </a>
         </div>
+        <a
+          href="/rss.xml"
+          class="text-slate-400 hover:text-green-400 transition-colors"
+        >
+          RSS feed
+        </a>
       </div>
     </div>
   </div>

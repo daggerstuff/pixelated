@@ -2,8 +2,8 @@ Metadata-Version: 2.4
 Name: pixel
 Version: 0.1.0
 Summary: Pixelated Empathy - AI-powered bias detection and mental health platform
-Author-email: Pixelated Empathy Team <team@pixelatedempathy.com>
-Requires-Python: >=3.11
+Author-email: Pixelated Empathy Team <team@pixelatedempathy.com> 
+Requires-Python: '>=3.11'
 Requires-Dist: flask
 Requires-Dist: flask-cors
 Requires-Dist: pandas
@@ -34,19 +34,7 @@ Requires-Dist: chardet>=5.2.0
 Requires-Dist: hatch>=1.14.1
 Requires-Dist: pydub>=0.25.1
 Requires-Dist: sourcery>=1.37.0
-Requires-Dist: hatch>=1.14.1
 Requires-Dist: torch
 Requires-Dist: torchvision
 Requires-Dist: torchaudio
-Requires-Dist: hatch
-Provides-Extra: test
-Requires-Dist: pytest; extra == "test"
-Requires-Dist: pytest-cov; extra == "test"
-Requires-Dist: pytest-mock; extra == "test"
-Requires-Dist: pytest-asyncio; extra == "test"
-Requires-Dist: coverage; extra == "test"
-Provides-Extra: dev
-Requires-Dist: black; extra == "dev"
-Requires-Dist: ruff; extra == "dev"
-Requires-Dist: mypy; extra == "dev"
-Requires-Dist: pyright; extra == "dev"
+

@@ -1,36 +1,144 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import PostCard from '@/components/blog/PostCard.astro';
 
 export const prerender = true;
 
-const allPosts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) => {
+type BlogPost = CollectionEntry<'blog'>;
+
+const allPosts = await getCollection('blog', ({ data }: BlogPost) => {
   return import.meta.env.PROD ? !data.draft : true;
 });
 
-const posts = allPosts.sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => 
+const posts = allPosts.sort((a: BlogPost, b: BlogPost) =>
   new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-).slice(0, 10); // Show first 10 posts
+).slice(0, 6); // Show recent posts
+
+// Get all unique tags
+const allTags = [...new Set(allPosts.flatMap((post: BlogPost) => post.data.tags || []))];
+const topTags = allTags.slice(0, 6); // Show top 6 tags
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function getReadingTime(content: string) {
+  const wordsPerMinute = 200;
+  const words = content.split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min read`;
+}
 ---
 
-<BaseLayout title="Blog" description="Thoughts, stories, and ideas from the Pixelated Empathy team.">
-  <div class="container mx-auto px-4 py-16">
-    <header class="text-center mb-12">
-      <h1 class="text-5xl font-bold tracking-tight">Pixelated Empathy Blog</h1>
-      <p class="mt-4 text-lg text-muted-foreground">Thoughts, stories, and ideas from our team.</p>
+<BaseLayout title="Blog" description="Writing on therapy, technology, and digital empathy.">
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Hero Section -->
+    <header class="mb-16">
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+        Writing on therapy, technology, and digital empathy.
+      </h1>
+      <p class="text-lg text-slate-400 mb-6">
+        Welcome to our corner of the internet. We're sharing thoughts on creating meaningful therapeutic experiences through technology.
+      </p>
+      <a href="/about" class="text-green-400 hover:text-green-300 transition-colors font-medium">
+        More about us →
+      </a>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {posts.map((post: CollectionEntry<'blog'>) => (
-        <PostCard post={post} />
-      ))}
-    </div>
+    <!-- Recent Posts -->
+    <section class="mb-16">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold">Recent Posts</h2>
+        <a href="/blog/page/1" class="text-green-400 hover:text-green-300 transition-colors font-medium">
+          View all posts →
+        </a>
+      </div>
 
-    <div class="text-center mt-12">
-      <a href="/blog/page/1" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors">
-        View All Posts
-      </a>
-    </div>
+      <div class="space-y-8">
+        {posts.map((post: BlogPost) => (
+          <article class="group">
+            <div class="flex flex-col sm:flex-row gap-4">
+              <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+                {formatDate(new Date(post.data.pubDate))}
+                <span class="hidden sm:block mt-1">
+                  {getReadingTime(post.body)}
+                </span>
+              </div>
+
+              <div class="flex-1">
+                <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
+                  <a href={`/blog/${post.slug}`} class="block">
+                    {post.data.title}
+                  </a>
+                </h3>
+
+                <p class="text-slate-300 mb-3 leading-relaxed">
+                  {post.data.description}
+                </p>
+
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {post.data.tags.map((tag: string) => (
+                      <a
+                        href={`/blog/tags/${tag}`}
+                        class="text-xs text-green-400 hover:text-green-300 transition-colors"
+                      >
+                        #{tag}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                <a
+                  href={`/blog/${post.slug}`}
+                  class="inline-flex items-center mt-3 text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+                >
+                  Read article
+                  <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Explore Topics -->
+    <section>
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold">Explore Topics</h2>
+        <a href="/blog/tags" class="text-green-400 hover:text-green-300 transition-colors font-medium">
+          View all topics →
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {topTags.map((tag) => {
+          const tagPosts = allPosts.filter((post: BlogPost) => post.data.tags?.includes(tag));
+          return (
+            <a
+              href={`/blog/tags/${tag}`}
+              class="group block p-6 rounded-lg border border-slate-700 bg-slate-800/40 hover:border-green-400/50 hover:bg-slate-800/60 transition-all"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-lg group-hover:text-green-400 transition-colors">
+                  #{tag}
+                </h3>
+                <span class="text-sm text-slate-400">
+                  {tagPosts.length} post{tagPosts.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <p class="text-sm text-slate-400">
+                Explore articles about {tag}
+              </p>
+            </a>
+          );
+        })}
+      </div>
+    </section>
   </div>
 </BaseLayout>
