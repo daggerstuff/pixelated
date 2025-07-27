@@ -9,6 +9,7 @@ import CardHeader from '@/components/ui/CardHeader.astro';
 import CardTitle from '@/components/ui/CardTitle.astro';
 import SpinningGlobe from '@/components/widgets/SpinningGlobe.astro';
 import Badge from '@/components/ui/Badge.astro';
+import { Image } from 'astro:assets';
 
 export const prerender = true
 
@@ -129,9 +130,9 @@ const features = [
           <!-- Power Headlines with Value Proposition -->
           <div class="text-center mb-16">
             <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-8 leading-tight max-w-5xl mx-auto">
-              Practice Makes Perfect
+              The Art of Therapy.
               <br />
-              <span class="text-green-400 golden-shimmer">But Practice Safely</span>
+              <span class="text-green-400 golden-shimmer">The Science of Practice</span>
             </h1>
             <!-- Value Proposition Subheading -->
             <p class="text-xl lg:text-2xl text-green-200/90 font-medium mb-10 max-w-4xl mx-auto leading-relaxed">
@@ -150,9 +151,9 @@ const features = [
           <div class="max-w-5xl mx-auto w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12 lg:mb-20 w-full items-center">
               <!-- Left column: Benefits and CTA -->
-              <div class="flex flex-col items-center text-center lg:text-left lg:items-start">
-                <!-- Key Benefits List -->
-                <ul class="space-y-6 mb-10 text-green-100 max-w-md">
+              <div class="flex flex-col lg:items-start">
+                <!-- Key Benefits List - Keep left aligned with minimal spacing -->
+                <ul class="space-y-6 mb-10 text-green-100 max-w-md lg:mx-0 mx-auto pl-1">
                   <li class="flex items-start gap-4">
                     <span class="text-green-400 text-xl flex-shrink-0 mt-1">💝</span>
                     <span class="text-base leading-relaxed">Learn from clients who won't judge your mistakes</span>
@@ -171,8 +172,8 @@ const features = [
                   </li>
                 </ul>
 
-                <!-- Urgency-Driven CTA -->
-                <div class="flex flex-col items-center space-y-6">
+                <!-- Urgency-Driven CTA - Centered -->
+                <div class="flex flex-col items-center space-y-6 w-full">
                   <!-- Primary CTA with urgency -->
                   <Button
                     size="lg"
@@ -181,7 +182,7 @@ const features = [
                     Try it free (we believe in you) →
                   </Button>
 
-                  <!-- Risk Reversal -->
+                  <!-- Risk Reversal - Centered -->
                   <div class="flex flex-col sm:flex-row gap-4 items-center justify-center">
                     <Button
                       variant="outline"
@@ -200,12 +201,14 @@ const features = [
 
               <!-- Right column: Therapy Visual -->
               <div class="flex justify-center items-center">
-                <div class="relative w-48 h-48 lg:w-56 lg:h-56">
+                <div class="relative w-64 h-64 lg:w-80 lg:h-80">
                   <div class="absolute inset-0 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-2xl border border-green-500/30 overflow-hidden">
                     <!-- Mental Health Therapy Image -->
-                    <img
+                    <Image
                       src="/images/features/mental-health-therapy.jpg"
                       alt="Professional mental health therapy session showing a therapist and client in a comfortable, safe counseling environment"
+                      width={320}
+                      height={320}
                       class="w-full h-full object-cover rounded-xl"
                       loading="lazy"
                     />
@@ -236,8 +239,8 @@ const features = [
           </div>
 
           <!-- Testimonials Section -->
-          <div class="max-w-6xl mx-auto py-16">
-            <h3 class="text-2xl lg:text-3xl font-bold text-center text-green-100 mb-16">
+          <div class="max-w-6xl mx-auto py-8">
+            <h3 class="text-2xl lg:text-3xl font-bold text-center text-green-100 mb-8">
               Here's what people are saying (and we're pretty proud of it)
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -262,7 +265,7 @@ const features = [
     </section>
 
     <!-- Section Separator -->
-    <div class="py-16">
+    <div class="py-8">
       <div class="mx-auto max-w-3xl border-t border-green-500/30"></div>
     </div>
 
@@ -368,12 +371,12 @@ const features = [
                   SOC 2 Type II Certified
                 </span>
                 <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:inline flex items-center gap-2">
+                <span class="hidden sm:inline items-center gap-2">
                   <span class="text-blue-400">✓</span>
                   FERPA Compliant
                 </span>
                 <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:inline flex items-center gap-2">
+                <span class="hidden sm:inline items-center gap-2">
                   <span class="text-blue-400">✓</span>
                   Zero Data Retention
                 </span>

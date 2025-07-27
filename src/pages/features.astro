@@ -1,12 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Badge from '@/components/ui/Badge.astro';
-import { Button } from '@/components/ui/button'
-import Card from '@/components/ui/Card.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardDescription from '@/components/ui/CardDescription.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
+import Button from '@/components/ui/Button.astro';
 
 export const prerender = true
 
@@ -183,8 +178,8 @@ const secretSauce = [
         <!-- Hero Features Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
           {heroFeatures.map((feature) => (
-            <Card class={`border border-${feature.color}-600/30 hover:border-${feature.color}-400/60 rounded-3xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50`}>
-              <CardHeader class="pb-6">
+            <div class={`border border-${feature.color}-600/30 hover:border-${feature.color}-400/60 rounded-3xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50 p-6`}>
+              <div class="pb-6">
                 <div class="flex items-start justify-between mb-6">
                   <div class={`text-7xl group-hover:scale-110 transition-transform duration-700 text-${feature.color}-400`}>
                     {feature.icon}
@@ -194,18 +189,18 @@ const secretSauce = [
                     <div class={`text-xs text-${feature.color}-200/70`}>{feature.stats.small}</div>
                   </div>
                 </div>
-                
-                <CardTitle class={`text-2xl font-bold text-${feature.color}-100 tracking-wide mb-2`}>
+
+                <h3 class={`text-2xl font-bold text-${feature.color}-100 tracking-wide mb-2`}>
                   {feature.title}
-                </CardTitle>
-                
+                </h3>
+
                 <div class={`text-sm text-${feature.color}-400/90 font-medium bg-${feature.color}-500/10 px-4 py-2 rounded-full border border-${feature.color}-500/20 mb-4 inline-block`}>
                   {feature.subtitle}
                 </div>
-                
-                <CardDescription class={`text-base text-${feature.color}-200/80 leading-relaxed mb-6`}>
+
+                <p class={`text-base text-${feature.color}-200/80 leading-relaxed mb-6`}>
                   {feature.description}
-                </CardDescription>
+                </p>
                 
                 <!-- Before/After Comparison -->
                 <div class="bg-slate-800/50 rounded-lg p-4 mb-4">
@@ -226,16 +221,16 @@ const secretSauce = [
                     </div>
                   </div>
                 </div>
-              </CardHeader>
-              
-              <CardContent class="pt-0">
-                <Button 
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-bold py-3 rounded-full transform hover:scale-105 transition-all duration-300"
+              </div>
+
+              <div class="pt-0">
+                <Button
+                  class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-bold py-3 rounded-full transform hover:scale-105 transition-all duration-300"
                 >
                   Experience This Feature →
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
 
@@ -253,16 +248,16 @@ const secretSauce = [
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             {impossibleScenarios.map((scenario) => (
-              <Card class="border border-red-600/30 hover:border-red-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
-                <CardHeader class="pb-4">
+              <div class="border border-red-600/30 hover:border-red-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50 p-6">
+                <div class="pb-4">
                   <div class="flex items-center gap-4 mb-4">
                     <div class="text-5xl group-hover:scale-110 transition-transform duration-700 text-red-400">
                       {scenario.icon}
                     </div>
                     <div>
-                      <CardTitle class="text-lg font-bold text-red-100 mb-1">
+                      <h3 class="text-lg font-bold text-red-100 mb-1">
                         {scenario.scenario}
-                      </CardTitle>
+                      </h3>
                       <Badge class="bg-red-500/20 text-red-300 text-xs">
                         {scenario.danger}
                       </Badge>
@@ -286,8 +281,8 @@ const secretSauce = [
                       <div class="text-green-200/80 text-sm">{scenario.newWay}</div>
                     </div>
                   </div>
-                </CardHeader>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -306,27 +301,27 @@ const secretSauce = [
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {universityResults.map((result) => (
-              <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
-                <CardHeader class="pb-4">
+              <div class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50 p-6">
+                <div class="pb-4">
                   <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
                     🏛️
                   </div>
-                  <CardTitle class="text-lg font-bold text-green-100 tracking-wide mb-2">
+                  <h3 class="text-lg font-bold text-green-100 tracking-wide mb-2">
                     {result.university}
-                  </CardTitle>
+                  </h3>
                   <div class="text-2xl text-green-400 font-bold mb-4">
                     {result.result}
                   </div>
-                </CardHeader>
-                <CardContent>
+                </div>
+                <div>
                   <blockquote class="text-sm text-green-200/80 leading-relaxed mb-4 italic">
                     "{result.quote}"
                   </blockquote>
                   <div class="text-xs text-green-300/70">
                     — {result.person}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -347,34 +342,34 @@ const secretSauce = [
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {secretSauce.map((tech) => (
-              <Card class="border border-purple-600/30 hover:border-purple-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
-                <CardHeader class="pb-4">
+              <div class="border border-purple-600/30 hover:border-purple-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50 p-6">
+                <div class="pb-4">
                   <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-purple-400">
                     {tech.icon}
                   </div>
-                  <CardTitle class="text-lg font-bold text-purple-100 tracking-wide mb-2">
+                  <h3 class="text-lg font-bold text-purple-100 tracking-wide mb-2">
                     {tech.title}
-                  </CardTitle>
+                  </h3>
                   <div class="text-sm text-purple-400/90 font-medium bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20 mb-4 inline-block">
                     {tech.techLevel}
                   </div>
-                  <CardDescription class="text-sm text-purple-200/80 leading-relaxed mb-4">
+                  <p class="text-sm text-purple-200/80 leading-relaxed mb-4">
                     {tech.description}
-                  </CardDescription>
+                  </p>
                   <div class="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
                     <div class="text-purple-300 font-medium text-xs mb-1">Simple Analogy:</div>
                     <div class="text-purple-200/80 text-xs">{tech.analogy}</div>
                   </div>
-                </CardHeader>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
 
         <!-- Final CTA -->
         <div class="text-center">
-          <Card class="border border-green-500/40 bg-slate-900/50 rounded-3xl overflow-hidden">
-            <CardContent class="p-8 lg:p-12">
+          <div class="border border-green-500/40 bg-slate-900/50 rounded-3xl overflow-hidden p-8 lg:p-12">
+            <div>
               <div class="text-6xl text-green-400 mb-6">🚀</div>
               
               <h2 class="text-2xl lg:text-4xl font-bold text-green-100 mb-8">
@@ -389,17 +384,17 @@ const secretSauce = [
               </p>
 
               <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6">
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
+                <Button
+                  size="lg"
+                  class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
                   data-demo-link="/demo-hub"
                 >
                   Experience These Features →
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-2 border-green-400 text-green-300 hover:bg-green-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
+                <Button
+                  size="lg"
+                  variant="outline"
+                  class="border-2 border-green-400 text-green-300 hover:bg-green-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
                   data-contact-link="/contact"
                 >
                   Schedule University Demo
@@ -409,8 +404,8 @@ const secretSauce = [
               <p class="text-xs text-green-300/70">
                 🎓 Made for universities • 🔒 Completely private • 💛 Loved by therapy programs everywhere
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

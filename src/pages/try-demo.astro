@@ -8,7 +8,7 @@ import CardContent from '@/components/ui/CardContent.astro'
 import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
-import ClientFacingDemo from '@/components/demo/ClientFacingDemo.tsx'
+// import ClientFacingDemo from '@/components/demo/ClientFacingDemo.tsx'
 
 export const prerender = true
 
@@ -176,7 +176,10 @@ const benefits = [
           <div
             class="bg-slate-900/50 border border-purple-500/30 rounded-3xl p-8 lg:p-12"
           >
-            <ClientFacingDemo client:load />
+            <!-- <ClientFacingDemo client:load /> -->
+            <div class="text-center text-gray-400 py-12">
+              <p>Demo component temporarily disabled for debugging</p>
+            </div>
           </div>
         </div>
       </div>

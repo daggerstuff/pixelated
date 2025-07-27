@@ -7,12 +7,42 @@
 >
 </bg-dot>
 
-<script>
-  import p5 from 'p5'
-  import type { default as P5Instance } from 'p5'
+<script type="module">
+  // Load p5 from CDN and wait for it to be available
+  let p5;
+  
+  try {
+    // Try to import p5 from CDN
+    const p5Module = await import('https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js');
+    p5 = p5Module.default || window.p5;
+  } catch (error) {
+    console.warn('Failed to load p5 from CDN, trying fallback:', error);
+    // Fallback: load p5 via script tag
+    await new Promise((resolve, reject) => {
+      if (window.p5) {
+        p5 = window.p5;
+        resolve();
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js';
+      script.onload = () => {
+        p5 = window.p5;
+        resolve();
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  if (!p5) {
+    console.error('Failed to load p5.js library');
+    // Exit gracefully without using top-level return
+  } else {
 
   class BgDotElement extends HTMLElement {
-    p5Instance: P5Instance | null
+    p5Instance = null
 
     constructor() {
       super()
@@ -20,7 +50,7 @@
     }
 
     connectedCallback() {
-      const sketch = (p: P5Instance) => {
+      const sketch = (p) => {
         const BACKGROUND = '#fff'
         const SCALE = 200
         const LENGTH = 10
@@ -30,13 +60,13 @@
         const height = window.innerHeight
 
         const existingPoints = new Set()
-        const points: { x: number; y: number; opacity: number }[] = []
+        const points = []
 
-        function getForceOnPoint(x: number, y: number, z: number) {
+        function getForceOnPoint(x, y, z) {
           return (p.noise(x / SCALE, y / SCALE, z) - 0.5) * 2 * p.TWO_PI
         }
 
-        function getLength(x: number, y: number, t: number) {
+        function getLength(x, y, t) {
           return (p.noise(x / SCALE, y / SCALE, t * 2) + 0.5) * LENGTH
         }
 
@@ -93,4 +123,5 @@
   }
 
   customElements.define('bg-dot', BgDotElement)
+  }
 </script>
