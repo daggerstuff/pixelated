@@ -2,14 +2,14 @@
 // DLPRulesList.astro
 // Displays the list of DLP rules with toggle controls
 
-import Badge from '@/components/ui/Badge.astro';
-import Card from '@/components/ui/Card.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardDescription from '@/components/ui/CardDescription.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
-import { Switch } from '@/components/ui/switch'
-import Button from '@/components/ui/Button.astro'
+import Badge from '../../ui/Badge.astro';
+import Card from '../../ui/Card.astro';
+import CardContent from '../../ui/CardContent.astro';
+import CardDescription from '../../ui/CardDescription.astro';
+import CardHeader from '../../ui/CardHeader.astro';
+import CardTitle from '../../ui/CardTitle.astro';
+import { Switch } from '../../ui/switch'
+import Button from '../../ui/Button.astro'
 import { DLPAction, type DLPRule } from '../../../lib/security/dlp'
 import { dlpService } from '../../../lib/security/dlp'
 import { Trash2 } from 'lucide-react'
@@ -146,7 +146,7 @@ const getActionBadge = (action: DLPAction) => {
 
 <!-- Import the TypeScript file for client-side logic -->
 <script>
-  import './DLPRulesList.astro.ts';
+  import './DLPRules.ts';
   
   // Set up event listeners when the component mounts
   document.addEventListener('astro:mount', () => {
