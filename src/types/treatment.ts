@@ -23,15 +23,42 @@ export type TreatmentObjectiveStatus =
 // Treatment Objective
 export interface TreatmentObjective {
   id: string
-  goalId: string
-  userId: string
+  treatment_goal_id: string
   description: string
-  targetDate?: string | null
+  target_date: string | null
   status: TreatmentObjectiveStatus
   interventions: string[]
-  progressNotes?: string | null
-  createdAt: string
-  updatedAt: string
+  progress_notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+// Treatment Goal
+export interface TreatmentGoal {
+  id: string
+  treatment_plan_id: string
+  description: string
+  target_date: string | null
+  status: TreatmentGoalStatus
+  created_at: string
+  updated_at: string
+  objectives: TreatmentObjective[]
+}
+
+// Treatment Plan
+export interface TreatmentPlan {
+  id: string
+  client_id: string
+  therapist_id: string
+  title: string
+  diagnosis: string | null
+  start_date: string
+  end_date?: string | null
+  status: TreatmentPlanStatus
+  general_notes?: string | null
+  created_at: string
+  updated_at: string
+  goals: TreatmentGoal[]
 }
 
 export interface NewTreatmentObjectiveData {
@@ -43,18 +70,6 @@ export interface NewTreatmentObjectiveData {
 }
 
 // Treatment Goal
-export interface TreatmentGoal {
-  id: string
-  planId: string
-  userId: string
-  description: string
-  targetDate?: string | null
-  status: TreatmentGoalStatus
-  objectives: TreatmentObjective[]
-  createdAt: string
-  updatedAt: string
-}
-
 export interface NewTreatmentGoalData {
   description: string
   targetDate?: string | null
@@ -63,22 +78,6 @@ export interface NewTreatmentGoalData {
 }
 
 // Treatment Plan
-export interface TreatmentPlan {
-  id: string
-  userId: string
-  clientId?: string | null
-  therapistId?: string | null
-  title: string
-  diagnosis?: string | null
-  startDate: string
-  endDate?: string | null
-  status: TreatmentPlanStatus
-  generalNotes?: string | null
-  goals: TreatmentGoal[]
-  createdAt: string
-  updatedAt: string
-}
-
 export interface NewTreatmentPlanData {
   userId: string
   clientId?: string | null

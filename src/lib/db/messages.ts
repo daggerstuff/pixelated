@@ -1,6 +1,6 @@
 import type { Database } from '../../types/supabase'
 import { createAuditLog } from '../audit'
-import { supabase, supabaseAdmin } from '../supabase'
+import { mongoClient } from '../supabase'
 import { updateConversation } from './conversations'
 
 export type Message = Database['public']['Tables']['messages']['Row']
@@ -17,32 +17,24 @@ export async function getMessages(
   offset = 0,
 ): Promise<Message[]> {
   // First verify the user has access to this conversation
-  const { data: conversation, error: conversationError } = await supabase
-    .from('conversations')
-    .select('id')
-    .eq('id', conversationId)
-    .eq('user_id', userId)
-    .single()
+  const conversation = await mongoClient.db
+    .collection('conversations')
+    .findOne({ _id: conversationId, user_id: userId })
 
-  if (conversationError || !conversation) {
-    console.error('Error verifying conversation access:', conversationError)
+  if (!conversation) {
     throw new Error('Unauthorized access to conversation')
   }
 
   // Then get the messages
-  const { data, error } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1)
+  const messages = await mongoClient.db
+    .collection('messages')
+    .find({ conversation_id: conversationId })
+    .sort({ created_at: -1 })
+    .skip(offset)
+    .limit(limit)
+    .toArray()
 
-  if (error) {
-    console.error('Error fetching messages:', error)
-    throw new Error('Failed to fetch messages')
-  }
-
-  return data || []
+  return messages as Message[]
 }
 
 /**
@@ -54,28 +46,19 @@ export async function createMessage(
   request?: Request,
 ): Promise<Message> {
   // First verify the user has access to this conversation
-  const { data: conversation, error: conversationError } = await supabase
-    .from('conversations')
-    .select('id, user_id')
-    .eq('id', message.conversation_id)
-    .eq('user_id', userId)
-    .single()
+  const conversation = await mongoClient.db
+    .collection('conversations')
+    .findOne({ _id: message.conversation_id, user_id: userId })
 
-  if (conversationError || !conversation) {
-    console.error('Error verifying conversation access:', conversationError)
+  if (!conversation) {
     throw new Error('Unauthorized access to conversation')
   }
 
   // Create the message
-  const { data, error } = await supabase
-    .from('messages')
-    .insert(message)
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error creating message:', error)
-    throw new Error('Failed to create message')
+  const result = await mongoClient.db.collection('messages').insertOne(message)
+  const newMessage = {
+    ...message,
+    _id: result.insertedId,
   }
 
   // Update the conversation's last_message_at timestamp
@@ -90,7 +73,7 @@ export async function createMessage(
     action: 'message_created',
     resource: 'messages',
     metadata: {
-      messageId: data.id,
+      messageId: newMessage._id.toHexString(),
       conversationId: message.conversation_id,
       role: message.role,
       ipAddress: request?.headers.get('x-forwarded-for'),
@@ -98,7 +81,7 @@ export async function createMessage(
     },
   })
 
-  return data
+  return newMessage as Message
 }
 
 /**
@@ -112,29 +95,24 @@ export async function updateMessage(
   request?: Request,
 ): Promise<Message> {
   // First verify the user has access to this conversation
-  const { data: conversation, error: conversationError } = await supabase
-    .from('conversations')
-    .select('id')
-    .eq('id', conversationId)
-    .eq('user_id', userId)
-    .single()
+  const conversation = await mongoClient.db
+    .collection('conversations')
+    .findOne({ _id: conversationId, user_id: userId })
 
-  if (conversationError || !conversation) {
-    console.error('Error verifying conversation access:', conversationError)
+  if (!conversation) {
     throw new Error('Unauthorized access to conversation')
   }
 
   // Update the message
-  const { data, error } = await supabase
-    .from('messages')
-    .update(updates)
-    .eq('id', id)
-    .eq('conversation_id', conversationId)
-    .select()
-    .single()
+  const result = await mongoClient.db
+    .collection('messages')
+    .findOneAndUpdate(
+      { _id: id, conversation_id: conversationId },
+      { $set: updates },
+      { returnDocument: 'after' },
+    )
 
-  if (error) {
-    console.error('Error updating message:', error)
+  if (!result.value) {
     throw new Error('Failed to update message')
   }
 
@@ -152,7 +130,7 @@ export async function updateMessage(
     },
   })
 
-  return data
+  return result.value as Message
 }
 
 /**
@@ -181,16 +159,22 @@ export async function flagMessage(
  * Admin function to get all flagged messages (for staff/admin only)
  */
 export async function adminGetFlaggedMessages(): Promise<Message[]> {
-  const { data, error } = await supabaseAdmin
-    .from('messages')
-    .select('*, conversations(title, user_id)')
-    .eq('is_flagged', true)
-    .order('created_at', { ascending: false })
+  const messages = await mongoClient.db
+    .collection('messages')
+    .aggregate([
+      { $match: { is_flagged: true } },
+      {
+        $lookup: {
+          from: 'conversations',
+          localField: 'conversation_id',
+          foreignField: '_id',
+          as: 'conversations',
+        },
+      },
+      { $unwind: '$conversations' },
+      { $sort: { created_at: -1 } },
+    ])
+    .toArray()
 
-  if (error) {
-    console.error('Error fetching flagged messages:', error)
-    throw new Error('Failed to fetch flagged messages')
-  }
-
-  return data || []
+  return messages as Message[]
 }

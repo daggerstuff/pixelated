@@ -1,145 +1,118 @@
-export const prerender = false
+import { mongodb } from '~/config/mongodb.config.ts'
 
-import type { APIRoute } from 'astro'
-import type { APIContext } from 'astro'
-import { createClient } from '@supabase/supabase-js'
-import { getRedisHealth } from '../../lib/redis'
+interface HealthStatus {
+  status: 'healthy' | 'unhealthy' | 'degraded'
+  timestamp: string
+  services: Record<string, HealthStatusDetail>
+}
 
 interface HealthStatusDetail {
-  status: 'healthy' | 'unhealthy' | 'unknown' | 'degraded'
-  timestamp?: string
-  message?: string
-  error?: string
-  responseTimeMs?: number
+  status: 'healthy' | 'unhealthy' | 'degraded'
+  message: string
+  responseTime?: number
+  details?: Record<string, unknown>
 }
 
-interface OverallHealthStatus {
-  status: 'healthy' | 'unhealthy'
-  api: HealthStatusDetail
-  supabase?: HealthStatusDetail
-  redis?: HealthStatusDetail
+interface GETParams {
+  request: Request
+  context: never
 }
 
-/**
- * Health check API endpoint
- *
- * This endpoint checks and reports the health of system components:
- * 1. API service itself
- * 2. Supabase connection (if credentials available)
- * 3. Redis connection (if credentials available)
- */
-export const GET: APIRoute = async ({ request }: APIContext) => {
-  const startTime = performance.now()
-  const healthStatus: OverallHealthStatus = {
+export async function GET(_params: GETParams): Promise<Response> {
+  const startTime = Date.now()
+
+  const healthStatus: HealthStatus = {
     status: 'healthy',
-    api: {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-    },
+    timestamp: new Date().toISOString(),
+    services: {},
   }
 
-  // Get request info for debugging
-  const url = new URL(request.url)
-  const clientIp = request.headers.get('x-forwarded-for') || 'unknown'
-  const userAgent = request.headers.get('user-agent') || 'unknown'
-
-  console.info('Health check requested', {
-    path: url.pathname,
-    clientIp,
-    userAgent,
-  })
-
-  // If no Supabase credentials, return partial health status
-  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn(
-      'Health check: Missing Supabase credentials, skipping database check',
-    )
-    healthStatus.supabase = {
-      status: 'unknown',
-      message: 'No credentials available',
-    }
-  } else {
-    try {
-      // Check Supabase connection
-      healthStatus.supabase = await checkSupabaseConnection(
-        supabaseUrl,
-        supabaseAnonKey,
-      )
-    } catch (error) {
-      console.error('Error during Supabase health check:', error)
-      healthStatus.supabase = {
-        status: 'unhealthy',
-        error: error instanceof Error ? error.message : String(error),
-      }
-      // If a critical component fails, the overall status is unhealthy
-      healthStatus.status = 'unhealthy'
-    }
-  }
-
-  // Check Redis connection
   try {
-    healthStatus.redis = await getRedisHealth()
-    if (healthStatus.redis && healthStatus.redis.status === 'unhealthy') {
+    try {
+      healthStatus.services['mongodb'] = await checkMongoDBConnection()
+    } catch (error) {
+      healthStatus.services['mongodb'] = {
+        status: 'unhealthy',
+        message: 'MongoDB connection failed',
+        details: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      }
+    }
+
+    const serviceStatuses = Object.values(healthStatus.services).map(
+      (s) => s.status,
+    )
+
+    if (serviceStatuses.includes('unhealthy')) {
       healthStatus.status = 'unhealthy'
+    } else if (serviceStatuses.includes('degraded')) {
+      healthStatus.status = 'degraded'
     }
+
+    const responseTime = Date.now() - startTime
+
+    return new Response(
+      JSON.stringify({
+        ...healthStatus,
+        responseTime,
+      }),
+      {
+        status: healthStatus.status === 'healthy' ? 200 : 503,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+        },
+      },
+    )
   } catch (error) {
-    console.error('Error during Redis health check:', error)
-    healthStatus.redis = {
-      status: 'unhealthy',
-      error: error instanceof Error ? error.message : String(error),
-    }
-    healthStatus.status = 'unhealthy'
+    console.error('Health check error:', error)
+
+    return new Response(
+      JSON.stringify({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        message: 'Health check failed',
+        error: error instanceof Error ? error.message : String(error),
+        responseTime: Date.now() - startTime,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+        },
+      },
+    )
   }
-
-  // Calculate response time
-  const endTime = performance.now()
-  healthStatus.api.responseTimeMs = Math.round(endTime - startTime)
-
-  // Return the health status
-  return new Response(JSON.stringify(healthStatus, null, 2), {
-    status: healthStatus.status === 'healthy' ? 200 : 503,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-store, max-age=0',
-    },
-  })
 }
 
-/**
- * Check Supabase connection
- */
-async function checkSupabaseConnection(
-  supabaseUrl: string,
-  supabaseAnonKey: string,
-): Promise<HealthStatusDetail> {
-  // Create Supabase client if credentials are available
-  const supabase = createClient(supabaseUrl, supabaseAnonKey)
+async function checkMongoDBConnection(): Promise<HealthStatusDetail> {
+  const startTime = Date.now()
 
-  // Check connection by querying health table
   try {
-    const { error } = await supabase
-      .from('_health')
-      .select('status')
-      .limit(1)
-      .maybeSingle()
+    const db = await mongodb.connect()
 
-    if (error) {
-      throw new Error(`Supabase connection check failed: ${error.message}`)
-    }
+    // Test database connection with a simple ping
+    await db.admin().ping()
+
+    const responseTime = Date.now() - startTime
 
     return {
       status: 'healthy',
-      timestamp: new Date().toISOString(),
+      message: 'MongoDB connection successful',
+      responseTime,
     }
   } catch (error) {
-    console.error('Supabase health check failed:', error)
+    const responseTime = Date.now() - startTime
+
     return {
       status: 'unhealthy',
-      error: error instanceof Error ? error.message : String(error),
-      timestamp: new Date().toISOString(),
+      message: 'MongoDB connection failed',
+      responseTime,
+      details: {
+        error: error instanceof Error ? error.message : String(error),
+      },
     }
   }
 }

@@ -1,6 +1,8 @@
-import { supabase } from '@/lib/supabase'
-import { createAuditLog, AuditEventType } from '@/lib/audit'
+import { mongodb } from '@/config/mongodb.config'
+import { AuditEventType, createAuditLog } from '@/lib/audit'
 import { z } from 'zod'
+import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid'
 
 const RegisterSchema = z.object({
   email: z.string().email(),
@@ -8,26 +10,27 @@ const RegisterSchema = z.object({
   fullName: z.string().min(2),
 })
 
+/**
+ * Astro API route handler for user registration
+ * This export is automatically used by Astro's routing system
+ */
+
 export const POST = async ({ request }: { request: Request }) => {
   try {
     const body = await request.json()
     const { email, password, fullName } = RegisterSchema.parse(body)
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
-    })
+    // Connect to MongoDB
+    const db = await mongodb.connect()
+    const usersCollection = db.collection('users')
 
-    if (error) {
+    // Check if user already exists
+    const existingUser = await usersCollection.findOne({ email })
+    if (existingUser) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: error.message,
+          message: 'User with this email already exists',
         }),
         {
           status: 400,
@@ -38,36 +41,42 @@ export const POST = async ({ request }: { request: Request }) => {
       )
     }
 
-    if (data.user) {
-      // Create user profile
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        full_name: fullName,
-        role: 'user',
-      })
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12)
+    const userId = uuidv4()
 
-      if (profileError) {
-        // Log the error but don't fail the registration
-        console.error('Error creating user profile:', profileError)
-      }
-
-      // Log the registration for HIPAA compliance
-      await createAuditLog(
-        AuditEventType.REGISTER,
-        'auth.signup',
-        data.user.id,
-        'auth',
-        {
-          email: data.user.email,
-          timestamp: new Date().toISOString(),
-        },
-      )
+    // Create user
+    const newUser = {
+      id: userId,
+      email,
+      password: hashedPassword,
+      full_name: fullName,
+      role: 'user',
+      created_at: new Date(),
+      updated_at: new Date(),
+      email_verified: false,
+      verification_token: uuidv4(),
     }
+
+    await usersCollection.insertOne(newUser)
+
+    // Log the registration for HIPAA compliance
+    await createAuditLog(
+      AuditEventType.REGISTER,
+      'auth.signup',
+      userId,
+      'auth',
+      {
+        email: email,
+        timestamp: new Date().toISOString(),
+      },
+    )
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Registration successful. Please check your email for verification.',
+        message:
+          'Registration successful. Please check your email for verification.',
       }),
       {
         status: 200,

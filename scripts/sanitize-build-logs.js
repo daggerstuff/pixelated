@@ -29,7 +29,8 @@ const SENSITIVE_PATTERNS = [
   /(https?:\/\/)([^:@\s]+):([^:@\s]+)@([^\s]+)/gi,
 
   // Database connection strings
-  /(postgres:\/\/[^:]+):([^@]+)@([^\s]+)/gi,
+  /(mongodb:\/\/[^:]+):([^@]+)@([^\s]+)/gi,
+  /(mongodb\+srv:\/\/[^:]+):([^@]+)@([^\s]+)/gi,
   /(redis:\/\/[^:]+):([^@]+)@([^\s]+)/gi,
 
   // JWT tokens
@@ -147,7 +148,6 @@ async function sanitizeLogs() {
             `⚠️ Error applying regex pattern: ${regexError.message}`,
           )
           // Continue with next pattern
-          continue
         }
       }
 

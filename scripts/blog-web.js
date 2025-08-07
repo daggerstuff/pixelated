@@ -19,7 +19,8 @@ const __dirname = path.dirname(__filename)
 // Run blog publisher command
 function runBlogCommand(command) {
   try {
-    const result = execSync(`pnpm run blog-publisher -- ${command}`, {
+    let result
+    result = execSync(`pnpm run blog-publisher -- ${command}`, {
       encoding: 'utf8',
     })
     return { success: true, output: result }

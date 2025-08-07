@@ -23,7 +23,6 @@ const packagesToUpdate = [
 
 // Security-critical packages that should always be kept updated
 const securityCriticalPackages = [
-  '@supabase/supabase-js',
   'axios',
   'crypto-js',
   'jsonwebtoken',

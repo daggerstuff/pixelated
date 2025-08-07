@@ -389,15 +389,15 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
 
   // Update database status indicators
   function updateDatabaseStatus(healthData: any) {
-    const dbStatus = healthData.supabase?.status || 'unknown'
+    const dbStatus = healthData.mongodb?.status || 'unknown'
     updateStatusIndicator('db-status', dbStatus, `Database status: ${dbStatus}`)
 
     const dbDetailsElem = document.getElementById('db-details')
     if (dbDetailsElem) {
       const details =
-        healthData.supabase?.message ||
-        healthData.supabase?.error ||
-        `Last updated: ${healthData.supabase?.timestamp || 'unknown'}`
+        healthData.mongodb?.message ||
+        healthData.mongodb?.error ||
+        `Last updated: ${healthData.mongodb?.timestamp || 'unknown'}`
       dbDetailsElem.textContent = `Details: ${details}`
     }
   }

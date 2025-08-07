@@ -1,10 +1,10 @@
 /**
  * Security Breach Data Management
  *
- * Handles storage and retrieval of security breach data using Supabase
+ * Handles storage and retrieval of security breach data using MongoDB Atlas
  */
 
-import { createClient } from '@supabase/supabase-js'
+import mongodb from '@/config/mongodb.config'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { SecurityError } from '../security/errors'
 // Import shared types to avoid circular dependencies
@@ -12,22 +12,17 @@ import type { SecurityBreach, BreachSeverity } from './types'
 
 const logger = createBuildSafeLogger('breach-data')
 
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
-const supabaseKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+// Initialize MongoDB client
+const mongoUri = process.env.MONGODB_URI
+const mongoDbName = process.env.MONGODB_DB_NAME
 
-if (!supabaseUrl || !supabaseKey) {
+if (!mongoUri || !mongoDbName) {
   throw new Error(
-    'Missing required Supabase configuration for breach data management',
+    'Missing required MongoDB configuration for breach data management',
   )
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-})
+// MongoDB connection will be handled by the mongodb config singleton
 
 /**
  * Interface for breach data storage
@@ -93,13 +88,14 @@ function fromStoredBreach(stored: StoredBreach): SecurityBreach {
  */
 export async function createBreach(breach: SecurityBreach): Promise<void> {
   try {
-    const { error } = await supabase
-      .from('security_breaches')
-      .insert(toStoredBreach(breach))
-
-    if (error) {
-      throw error
-    }
+    const db = await mongodb.connect()
+    const collection = db.collection<StoredBreach>('security_breaches')
+    
+    await collection.insertOne({
+      ...toStoredBreach(breach),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
 
     logger.info('Security breach recorded', { breachId: breach.id })
   } catch (error) {
@@ -118,17 +114,15 @@ export async function createBreach(breach: SecurityBreach): Promise<void> {
  */
 export async function getBreachesSince(date: Date): Promise<SecurityBreach[]> {
   try {
-    const { data, error } = await supabase
-      .from('security_breaches')
-      .select('*')
-      .gte('timestamp', date.toISOString())
-      .order('timestamp', { ascending: false })
+    const db = await mongodb.connect()
+    const collection = db.collection<StoredBreach>('security_breaches')
+    
+    const data = await collection
+      .find({ timestamp: { $gte: date.toISOString() } })
+      .sort({ timestamp: -1 })
+      .toArray()
 
-    if (error) {
-      throw error
-    }
-
-    return (data as StoredBreach[]).map(fromStoredBreach)
+    return data.map(fromStoredBreach)
   } catch (error) {
     logger.error('Failed to retrieve security breaches', {
       error,
@@ -148,16 +142,21 @@ export async function updateRemediationStatus(
   status: 'pending' | 'in_progress' | 'completed',
 ): Promise<void> {
   try {
-    const { error } = await supabase
-      .from('security_breaches')
-      .update({
-        remediation_status: status,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', breachId)
+    const db = await mongodb.connect()
+    const collection = db.collection<StoredBreach>('security_breaches')
+    
+    const result = await collection.updateOne(
+      { id: breachId },
+      {
+        $set: {
+          remediation_status: status,
+          updated_at: new Date().toISOString(),
+        }
+      }
+    )
 
-    if (error) {
-      throw error
+    if (result.matchedCount === 0) {
+      throw new Error(`Breach with id ${breachId} not found`)
     }
 
     logger.info('Updated breach remediation status', { breachId, status })
@@ -176,20 +175,16 @@ export async function getBreachById(
   id: string,
 ): Promise<SecurityBreach | null> {
   try {
-    const { data, error } = await supabase
-      .from('security_breaches')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const db = await mongodb.connect()
+    const collection = db.collection<StoredBreach>('security_breaches')
+    
+    const data = await collection.findOne({ id })
 
-    if (error) {
-      throw error
-    }
     if (!data) {
       return null
     }
 
-    return fromStoredBreach(data as StoredBreach)
+    return fromStoredBreach(data)
   } catch (error) {
     logger.error('Failed to retrieve security breach', {
       error,
@@ -206,13 +201,13 @@ export async function getBreachById(
  */
 export async function deleteBreach(id: string): Promise<void> {
   try {
-    const { error } = await supabase
-      .from('security_breaches')
-      .delete()
-      .eq('id', id)
+    const db = await mongodb.connect()
+    const collection = db.collection<StoredBreach>('security_breaches')
+    
+    const result = await collection.deleteOne({ id })
 
-    if (error) {
-      throw error
+    if (result.deletedCount === 0) {
+      throw new Error(`Breach with id ${id} not found`)
     }
 
     logger.info('Deleted security breach record', { breachId: id })

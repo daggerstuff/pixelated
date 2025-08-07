@@ -1,5 +1,6 @@
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { supabase } from '../../supabase'
+import { randomBytes } from 'crypto'
+// Supabase import removed - migrated to MongoDB
 // Create our own audit logging service since the actual one has different signature
 class AuditLoggingService {
   private context: string
@@ -67,14 +68,7 @@ export interface DataExportResult {
   success: boolean
 }
 
-// Interface for the data bundle with typed properties
-interface PatientData {
-  profile?: PatientProfile
-  mentalHealth?: object
-  chatHistory?: object
-  consentRecords?: object
-  [key: string]: object | undefined
-}
+
 
 // Define the PatientProfile interface
 export interface PatientProfile {
@@ -523,7 +517,7 @@ async function processExportRequest(exportId: string): Promise<void> {
           format: format as ExportFormat,
           dataType: dataType,
           url: fileUrl,
-          size: Math.floor(Math.random() * 10000000), // Random size for simulation
+          size: Math.floor(randomBytes(4).readUInt32BE(0) / 429.4967296), // Cryptographically secure random size for simulation
           createdAt: new Date(),
         }
 
@@ -664,24 +658,12 @@ async function isAdminUser(userId: string): Promise<boolean> {
 export async function getDataExportRequest(
   id: string,
 ): Promise<DataExportRequest | null> {
+  // TODO: Replace with MongoDB implementation
   try {
-    const { data, error } = await supabase
-      .from('data_export_requests')
-      .select('*')
-      .eq('id', id)
-      .single()
-
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No data found
-        return null
-      }
-
-      logger.error('Failed to get data export request', { error, id })
-      throw new Error(`Failed to get data export request: ${error.message}`)
-    }
-
-    return data as DataExportRequest
+    const exportRequest = await mockDb.dataExport.findUnique({
+      where: { id },
+    })
+    return exportRequest as DataExportRequest
   } catch (error) {
     logger.error('Error in getDataExportRequest', {
       error: error instanceof Error ? error.message : String(error),
@@ -700,36 +682,29 @@ export async function getAllDataExportRequests(filters?: {
   dateRange?: { start: string; end: string }
 }): Promise<DataExportRequest[]> {
   try {
-    let query = supabase
-      .from('data_export_requests')
-      .select('*')
-      .order('dateRequested', { ascending: false })
+// TODO: Replace with MongoDB implementation
+    let allExports = await mockDb.dataExport.findUnique({ where: {} }) // This should be a findMany in real MongoDB code
 
-    // Apply filters if provided
+    // Apply filters manually (since mockDb is a stub)
+    let results = Array.isArray(allExports) ? allExports : [allExports]
     if (filters) {
       if (filters.status) {
-        query = query.eq('status', filters.status)
+        results = results.filter((r) => r.status === filters.status)
       }
-
       if (filters.patientId) {
-        query = query.eq('patientId', filters.patientId)
+        results = results.filter((r) => r.patientId === filters.patientId)
       }
-
       if (filters.dateRange) {
-        query = query
-          .gte('dateRequested', filters.dateRange.start)
-          .lte('dateRequested', filters.dateRange.end)
+        results = results.filter((r) => {
+          const created = new Date(r.createdAt)
+          return (
+            created >= new Date(filters.dateRange!.start) &&
+            created <= new Date(filters.dateRange!.end)
+          )
+        })
       }
     }
-
-    const { data, error } = await query
-
-    if (error) {
-      logger.error('Failed to get data export requests', { error, filters })
-      throw new Error(`Failed to get data export requests: ${error.message}`)
-    }
-
-    return data as DataExportRequest[]
+    return results as DataExportRequest[]
   } catch (error) {
     logger.error('Error in getAllDataExportRequests', {
       error: error instanceof Error ? error.message : String(error),
@@ -739,457 +714,25 @@ export async function getAllDataExportRequests(filters?: {
   }
 }
 
-/**
- * Fetch patient data based on the requested sections
- */
-async function _fetchPatientData(
-  patientId: string,
-  sections: string[],
-): Promise<PatientData> {
-  const patientData: PatientData = {}
 
-  try {
-    // Fetch profile data if requested
-    if (sections.includes('profile')) {
-      const { data, error } = await supabase
-        .from('patient_profiles')
-        .select('*')
-        .eq('patient_id', patientId)
-        .single()
 
-      if (error && error.code !== 'PGRST116') {
-        throw error
-      }
 
-      patientData.profile = data || {}
-    }
 
-    // Fetch mental health data if requested
-    if (sections.includes('mental-health')) {
-      // Fetch various mental health related tables
-      const [assessments, emotions, notes] = await Promise.all([
-        supabase
-          .from('patient_assessments')
-          .select('*')
-          .eq('patient_id', patientId),
-        supabase
-          .from('emotion_records')
-          .select('*')
-          .eq('patient_id', patientId),
-        supabase.from('clinical_notes').select('*').eq('patient_id', patientId),
-      ])
 
-      patientData.mentalHealth = {
-        assessments: assessments.data || [],
-        emotions: emotions.data || [],
-        notes: notes.data || [],
-      }
-    }
 
-    // Fetch chat history if requested
-    if (sections.includes('chat-history')) {
-      const { data, error } = await supabase
-        .from('patient_messages')
-        .select('*')
-        .eq('patient_id', patientId)
-        .order('timestamp', { ascending: true })
 
-      if (error) {
-        throw error
-      }
 
-      patientData.chatHistory = { messages: data || [] }
-    }
 
-    // Fetch consent records if requested
-    if (sections.includes('consent')) {
-      const { data, error } = await supabase
-        .from('patient_consents')
-        .select('*')
-        .eq('patient_id', patientId)
-        .order('timestamp', { ascending: false })
 
-      if (error) {
-        throw error
-      }
 
-      patientData.consentRecords = { consents: data || [] }
-    }
 
-    return patientData
-  } catch (error) {
-    logger.error('Error fetching patient data', {
-      error: error instanceof Error ? error.message : String(error),
-      patientId,
-      sections,
-    })
-    throw new Error(
-      `Failed to fetch patient data: ${error instanceof Error ? error.message : String(error)}`,
-    )
-  }
-}
 
-/**
- * Format patient data for export according to the specified format
- */
-async function _formatDataForExport(
-  data: PatientData,
-  format: string,
-): Promise<string | Buffer> {
-  try {
-    switch (format) {
-      case 'json':
-        return JSON.stringify(data, null, 2)
 
-      case 'csv':
-        // For CSV format, we need to flatten nested structures
-        // This is a simplified implementation
-        return convertToCSV(data)
 
-      case 'fhir':
-        // Convert to FHIR format
-        return convertToFHIR(data)
 
-      case 'ccd':
-        // Convert to CCD format
-        return convertToCCD(data)
 
-      case 'hl7':
-        // Convert to HL7 format
-        return convertToHL7(data)
 
-      default:
-        throw new Error(`Unsupported export format: ${format}`)
-    }
-  } catch (error) {
-    logger.error('Error formatting data for export', {
-      error: error instanceof Error ? error.message : String(error),
-      format,
-    })
-    throw new Error(
-      `Failed to format data for export: ${error instanceof Error ? error.message : String(error)}`,
-    )
-  }
-}
 
-/**
- * Convert data to CSV format
- */
-function convertToCSV(data: PatientData): string {
-  // This is a simplified implementation
-  let csv = ''
-
-  // Process each section
-  Object.entries(data).forEach(([section, sectionData]) => {
-    if (!sectionData) {
-      return
-    }
-
-    // Handle arrays (like messages, assessments, etc.)
-    if (Array.isArray(sectionData)) {
-      // Get headers from the first item
-      const headers = sectionData.length > 0 ? Object.keys(sectionData[0]) : []
-      csv += `# ${section}\n`
-      csv += headers.join(',') + '\n'
-
-      // Add each row
-      sectionData.forEach((item) => {
-        const row = headers.map((header) => {
-          const value = item[header]
-          // Quote strings and ensure no commas break the CSV
-          return typeof value === 'string'
-            ? `"${value.replace(/"/g, '""')}"`
-            : value
-        })
-        csv += row.join(',') + '\n'
-      })
-
-      csv += '\n'
-    }
-    // Handle objects
-    else if (typeof sectionData === 'object') {
-      csv += `# ${section}\n`
-      Object.entries(sectionData).forEach(([key, value]) => {
-        // Simple key-value format for objects
-        csv += `${key},"${typeof value === 'string' ? value.replace(/"/g, '""') : JSON.stringify(value)}"\n`
-      })
-      csv += '\n'
-    }
-  })
-
-  return csv
-}
-
-/**
- * Convert data to FHIR format (simplified)
- */
-function convertToFHIR(data: PatientData): string {
-  // In a real implementation, this would use a proper FHIR library
-  // This is a simplified example
-  interface FhirBundle {
-    resourceType: string
-    type: string
-    entry: Array<{
-      resource: {
-        resourceType: string
-        id: string
-        [key: string]: unknown
-      }
-    }>
-  }
-
-  const fhirBundle: FhirBundle = {
-    resourceType: 'Bundle',
-    type: 'collection',
-    entry: [],
-  }
-
-  // Add patient resource if profile exists
-  if (data.profile) {
-    const profile = data.profile as unknown as PatientProfile
-
-    fhirBundle.entry.push({
-      resource: {
-        resourceType: 'Patient',
-        id: profile.patient_id || 'unknown',
-        name: [
-          {
-            use: 'official',
-            family: profile.last_name || '',
-            given: [profile.first_name || ''],
-          },
-        ],
-        birthDate: profile.date_of_birth || '',
-        gender: profile.gender || 'unknown',
-      },
-    })
-  }
-
-  // Add other resources based on the data
-  // (simplified implementation)
-
-  return JSON.stringify(fhirBundle, null, 2)
-}
-
-/**
- * Convert data to CCD format (simplified)
- */
-function convertToCCD(data: PatientData): string {
-  // In a real implementation, this would use a proper CCD/CDA library
-  // This is a highly simplified example with just the XML structure
-  const profile = data.profile as unknown as PatientProfile
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-  <ClinicalDocument xmlns="urn:hl7-org:v3">
-    <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
-    <id root="2.16.840.1.113883.19.4" extension="${profile?.patient_id || 'unknown'}"/>
-    <title>Pixelated Empathy Mental Health Data Export</title>
-    <effectiveTime value="${new Date()
-      .toISOString()
-      .replace(/[-:T.]/g, '')
-      .slice(0, 14)}"/>
-    <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
-    <recordTarget>
-      <patientRole>
-        <id root="2.16.840.1.113883.19.5" extension="${profile?.patient_id || 'unknown'}"/>
-        <patient>
-          <name>
-            <given>${profile?.first_name || ''}</given>
-            <family>${profile?.last_name || ''}</family>
-          </name>
-          <administrativeGenderCode code="${profile?.gender || 'U'}" codeSystem="2.16.840.1.113883.5.1"/>
-          <birthTime value="${profile?.date_of_birth?.replace(/-/g, '') || ''}"/>
-        </patient>
-      </patientRole>
-    </recordTarget>
-    <!-- Additional structured content would go here based on the data sections -->
-  </ClinicalDocument>`
-}
-
-/**
- * Convert data to HL7 format (simplified)
- */
-function convertToHL7(data: PatientData): string {
-  // In a real implementation, this would use a proper HL7 library
-  // This is a highly simplified example of an HL7 message
-  const now = new Date()
-  const messageTimestamp = now
-    .toISOString()
-    .replace(/[-:T.]/g, '')
-    .slice(0, 14)
-
-  const profile = data.profile as unknown as PatientProfile
-
-  // Create a basic HL7 v2 message
-  return [
-    `MSH|^~\\&|GRADIANT|MENTAL_HEALTH|RECEIVING_SYSTEM|FACILITY|${messageTimestamp}||MDM^T02|MSG${now.getTime()}|P|2.5`,
-    `PID|1||${profile?.patient_id || 'UNKNOWN'}||${profile?.last_name || ''}^${profile?.first_name || ''}||${profile?.date_of_birth || ''}|${profile?.gender?.[0]?.toUpperCase() || 'U'}`,
-    `PV1|1|O|||||||||||||||||${profile?.patient_id || 'UNKNOWN'}`,
-    // Additional segments would be added based on the data
-    '',
-  ].join('\r')
-}
-
-/**
- * Generate an encrypted export file
- */
-async function _generateEncryptedExport(
-  data: string | Buffer,
-  request: DataExportRequestWithFormat,
-): Promise<Buffer> {
-  try {
-    // In a real implementation, this would use proper encryption
-    // For now, we'll just convert the data to a buffer
-    const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data)
-
-    logger.info('Export file generated with encryption', {
-      exportId: request.id,
-      format: request.dataFormat,
-      sizeInBytes: dataBuffer.length,
-    })
-
-    return dataBuffer
-  } catch (error) {
-    logger.error('Error generating encrypted export', {
-      error: error instanceof Error ? error.message : String(error),
-      exportId: request.id,
-    })
-    throw new Error(
-      `Failed to generate encrypted export: ${error instanceof Error ? error.message : String(error)}`,
-    )
-  }
-}
-
-/**
- * Store the export file and generate a download URL
- */
-async function _storeExportFile(
-  fileData: Buffer,
-  request: DataExportRequestWithFormat,
-): Promise<string> {
-  try {
-    // Determine file extension based on format
-    const fileExtension = getFileExtension(request.dataFormat)
-
-    // Generate a unique filename
-    const filename = `${request.patientId}/exports/${request.id}${fileExtension}`
-
-    // Store the file in Supabase Storage
-    const { error } = await supabase.storage
-      .from('patient-data-exports')
-      .upload(filename, fileData, {
-        contentType: getContentType(request.dataFormat),
-        upsert: true,
-      })
-
-    if (error) {
-      throw error
-    }
-
-    // Generate a signed URL for download (expires in 24 hours)
-    const { data: urlData, error: urlError } = await supabase.storage
-      .from('patient-data-exports')
-      .createSignedUrl(filename, 60 * 60 * 24)
-
-    if (urlError) {
-      throw urlError
-    }
-
-    logger.info('Export file stored successfully', {
-      exportId: request.id,
-      filename,
-      downloadUrl: urlData.signedUrl,
-    })
-
-    return urlData.signedUrl
-  } catch (error) {
-    logger.error('Error storing export file', {
-      error: error instanceof Error ? error.message : String(error),
-      exportId: request.id,
-    })
-    throw new Error(
-      `Failed to store export file: ${error instanceof Error ? error.message : String(error)}`,
-    )
-  }
-}
-
-/**
- * Get the appropriate file extension for the export format
- */
-function getFileExtension(format: string): string {
-  switch (format) {
-    case 'json':
-      return '.json'
-    case 'csv':
-      return '.csv'
-    case 'fhir':
-      return '.json'
-    case 'ccd':
-      return '.xml'
-    case 'hl7':
-      return '.hl7'
-    default:
-      return '.txt'
-  }
-}
-
-/**
- * Get the appropriate content type for the export format
- */
-function getContentType(format: string): string {
-  switch (format) {
-    case 'json':
-      return 'application/json'
-    case 'csv':
-      return 'text/csv'
-    case 'fhir':
-      return 'application/fhir+json'
-    case 'ccd':
-      return 'application/xml'
-    case 'hl7':
-      return 'application/hl7-v2'
-    default:
-      return 'text/plain'
-  }
-}
-
-/**
- * Send notification to the recipient about the available export
- */
-async function _sendExportNotification(
-  request: DataExportRequestWithFormat,
-  downloadUrl: string,
-): Promise<void> {
-  try {
-    // In a real implementation, this would send an email
-    // For now, we'll just log it
-    logger.info('Would send export notification email', {
-      to: request.recipientEmail,
-      subject: 'Patient Data Export Available',
-      patientId: request.patientId,
-      downloadUrl,
-    })
-
-    // Audit log the notification
-    auditLogger.log({
-      action: 'export_notification_sent',
-      resource: 'patient_data',
-      resourceId: request.patientId,
-      details: {
-        exportId: request.id,
-        recipientEmail: request.recipientEmail,
-      },
-    })
-  } catch (error) {
-    logger.error('Error sending export notification', {
-      error: error instanceof Error ? error.message : String(error),
-      exportId: request.id,
-      recipientEmail: request.recipientEmail,
-    })
-    // We don't throw here to avoid failing the entire process
-    // The export was successful, notification is secondary
-  }
-}
 
 /**
  * Interface for the parameters required to cancel an export request
@@ -1591,7 +1134,7 @@ const mockDb = {
   patient: {
     findUnique: (_params: MockDbFindParams): Promise<Patient | null> => {
       return Promise.resolve({
-        id: _params.where.id as string,
+        id: _params.where['id'] as string,
         name: 'Test Patient',
       })
     },
@@ -1605,13 +1148,13 @@ const mockDb = {
     update: (_params: MockDbUpdateParams<DataExport>): Promise<DataExport> => {
       return Promise.resolve({
         ..._params.data,
-        id: _params.where.id,
+        id: _params.where['id'],
       } as unknown as DataExport)
     },
     findUnique: (_params: MockDbFindParams): Promise<DataExport | null> => {
       return Promise.resolve({
-        id: _params.where.id as string,
-        patientId: process.env.PATIENT_ID || 'example-patient-id',
+        id: _params.where['id'] as string,
+        patientId: process.env['PATIENT_ID'] || 'example-patient-id',
         requestedBy: 'test-user-id',
         formats: ['json'],
         dataTypes: ['profile'],
@@ -1619,11 +1162,11 @@ const mockDb = {
         priority: 'normal',
         status: 'pending',
         createdAt: new Date(),
-        files: _params.include?.files
+        files: _params.include?.['files']
           ? [
               {
                 id: 'file-1',
-                exportId: _params.where.id as string,
+                exportId: _params.where['id'] as string,
                 format: 'json',
                 dataType: 'profile',
                 url: 'https://example.com/file.json',
@@ -1657,17 +1200,11 @@ const mockDb = {
   user: {
     findUnique: (_params: MockDbFindParams): Promise<User | null> => {
       return Promise.resolve({
-        id: _params.where.id as string,
+        id: _params.where['id'] as string,
         roles: [{ name: 'user' }],
       })
     },
   },
 }
 
-// Replace missing permissions module with a stub
-function _checkUserPermissionForPatient(
-  _userId: string,
-  _patientId: string,
-): Promise<boolean> {
-  return Promise.resolve(true) // Simplified stub
-}
+

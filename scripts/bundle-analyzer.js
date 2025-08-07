@@ -7,17 +7,8 @@
  * and performance bottlenecks in the production bundle.
  */
 
-import {
-  readFileSync,
-  writeFileSync,
-  existsSync,
-  readdirSync,
-  statSync,
-} from 'fs'
-import { join, extname, relative } from 'path'
-import { gzipSync } from 'zlib'
-import fs from 'fs/promises'
 import path from 'path'
+import fs from 'fs/promises'
 import { execSync } from 'child_process'
 
 class BundleAnalyzer {
@@ -187,7 +178,6 @@ class BundleAnalyzer {
       }
       const largeDeps = [
         '@tensorflow/tfjs',
-        '@supabase/supabase-js',
         'three',
         'framer-motion',
         '@aws-sdk/client-s3',

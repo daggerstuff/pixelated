@@ -1,10 +1,15 @@
-import { protectRoute } from '../../../../lib/auth/serverAuth'
+import { protectRoute } from '@/lib/auth/serverAuth'
 import {
-  updateUserSettings,
   getOrCreateUserSettings,
-} from '../../../../lib/db/user-settings'
+  updateUserSettings,
+} from '@/lib/db/user-settings'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { Json } from '../../../../types/supabase'
+
+// Replace Supabase Json type with MongoDB-compatible type
+type JsonValue = string | number | boolean | null | JsonObject | JsonValue[]
+interface JsonObject {
+  [key: string]: JsonValue
+}
 
 const logger = createBuildSafeLogger('preferences-api')
 
@@ -32,12 +37,13 @@ const DEFAULT_AI_PREFERENCES: AIPreferences = {
   aiSuggestions: true,
 }
 
-function validateAIPreferences(
-  input: unknown,
-): asserts input is typeof DEFAULT_AI_PREFERENCES {
+function validateAIPreferences(input: unknown): asserts input is AIPreferences {
   if (typeof input !== 'object' || input == null) {
     throw new Error('Invalid preferences object')
   }
+
+  const preferences = input as Record<string, unknown>
+
   if (
     ![
       'gemini-2-flash',
@@ -45,32 +51,44 @@ function validateAIPreferences(
       'claude-3-opus',
       'claude-3-sonnet',
       'claude-3-haiku',
-    ].includes(input.defaultModel)
+    ].includes(preferences['defaultModel'] as string)
   ) {
     throw new Error('Invalid defaultModel')
   }
-  if (!Array.isArray(input.preferredModels)) {
+  if (!Array.isArray(preferences['preferredModels'])) {
     throw new Error('preferredModels must be an array')
   }
-  if (!['concise', 'medium', 'detailed'].includes(input.responseLength)) {
+  if (
+    !['concise', 'medium', 'detailed'].includes(
+      preferences['responseLength'] as string,
+    )
+  ) {
     throw new Error('Invalid responseLength')
   }
-  if (!['supportive', 'balanced', 'direct'].includes(input.responseStyle)) {
+  if (
+    !['supportive', 'balanced', 'direct'].includes(
+      preferences['responseStyle'] as string,
+    )
+  ) {
     throw new Error('Invalid responseStyle')
   }
-  if (typeof input.enableSentimentAnalysis !== 'boolean') {
+  if (typeof preferences['enableSentimentAnalysis'] !== 'boolean') {
     throw new Error('Invalid enableSentimentAnalysis')
   }
-  if (typeof input.enableCrisisDetection !== 'boolean') {
+  if (typeof preferences['enableCrisisDetection'] !== 'boolean') {
     throw new Error('Invalid enableCrisisDetection')
   }
-  if (!['low', 'medium', 'high'].includes(input.crisisDetectionSensitivity)) {
+  if (
+    !['low', 'medium', 'high'].includes(
+      preferences['crisisDetectionSensitivity'] as string,
+    )
+  ) {
     throw new Error('Invalid crisisDetectionSensitivity')
   }
-  if (typeof input.saveAnalysisResults !== 'boolean') {
+  if (typeof preferences['saveAnalysisResults'] !== 'boolean') {
     throw new Error('Invalid saveAnalysisResults')
   }
-  if (typeof input.aiSuggestions !== 'boolean') {
+  if (typeof preferences['aiSuggestions'] !== 'boolean') {
     throw new Error('Invalid aiSuggestions')
   }
 }
@@ -82,7 +100,8 @@ export const GET = protectRoute()(async ({ locals }) => {
 
     // Extract AI preferences with type safety
     const preferences = (settings.preferences as Record<string, unknown>) || {}
-    const aiPrefs = (preferences.ai as AIPreferences) ?? DEFAULT_AI_PREFERENCES
+    const aiPrefs =
+      (preferences['ai'] as AIPreferences) ?? DEFAULT_AI_PREFERENCES
 
     return new Response(JSON.stringify({ preferences: aiPrefs }), {
       status: 200,
@@ -102,7 +121,9 @@ export const PUT = protectRoute()(async ({ request, locals }) => {
     const { user } = locals
     const body = await request.json()
     if (!body || typeof body.preferences !== 'object') {
-      throw new Error('Missing preferences')
+      return new Response(JSON.stringify({ error: 'Missing preferences' }), {
+        status: 400,
+      })
     }
     validateAIPreferences(body.preferences)
     const settings = await getOrCreateUserSettings(user.id, request)
@@ -117,7 +138,7 @@ export const PUT = protectRoute()(async ({ request, locals }) => {
 
     await updateUserSettings(
       user.id,
-      { preferences: newPrefs as unknown as Json },
+      { preferences: newPrefs as unknown as JsonValue },
       request,
     )
     logger.info('AI preferences updated', { userId: user.id })
@@ -151,7 +172,7 @@ export const DELETE = protectRoute()(async ({ locals, request }) => {
 
     await updateUserSettings(
       user.id,
-      { preferences: newPrefs as unknown as Json },
+      { preferences: newPrefs as unknown as JsonValue },
       request,
     )
     logger.info('AI preferences reset to defaults', { userId: user.id })

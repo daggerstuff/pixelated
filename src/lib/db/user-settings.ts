@@ -1,32 +1,58 @@
-import type { Database } from '../../types/supabase.js'
-import { logAuditEvent } from '../audit'
-import { supabase } from '../supabase.js'
+import { ObjectId } from 'mongodb'
+// MongoDB-based user settings types
 
-export type UserSettings = Database['public']['Tables']['user_settings']['Row']
-export type NewUserSettings =
-  Database['public']['Tables']['user_settings']['Insert']
-export type UpdateUserSettings =
-  Database['public']['Tables']['user_settings']['Update']
+export interface UserSettings {
+  _id?: ObjectId
+  user_id: string
+  theme: string
+  notifications_enabled: boolean
+  email_notifications: boolean
+  language: string
+  preferences: {
+    showWelcomeScreen: boolean
+    autoSave: boolean
+    fontSize: string
+    [key: string]: unknown
+  }
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface NewUserSettings {
+  user_id: string
+  theme: string
+  notifications_enabled: boolean
+  email_notifications: boolean
+  language: string
+  preferences: {
+    showWelcomeScreen: boolean
+    autoSave: boolean
+    fontSize: string
+    [key: string]: unknown
+  }
+}
+
+export interface UpdateUserSettings {
+  theme?: string
+  notifications_enabled?: boolean
+  email_notifications?: boolean
+  language?: string
+  preferences?: {
+    showWelcomeScreen?: boolean
+    autoSave?: boolean
+    fontSize?: string
+    [key: string]: unknown
+  }
+}
 
 /**
  * Get user settings
  */
 export async function getUserSettings(
-  userId: string,
+  _userId: string,
 ): Promise<UserSettings | null> {
-  const { data, error } = await supabase
-    .from('user_settings')
-    .select('*')
-    .eq('user_id', userId)
-    .single()
-
-  if (error && error?.code !== 'PGRST116') {
-    // PGRST116 is "no rows returned"
-    console.error('Error fetching user settings:', error)
-    throw new Error('Failed to fetch user settings')
-  }
-
-  return data
+  // TODO: Replace with MongoDB implementation
+  return null
 }
 
 /**
@@ -34,32 +60,10 @@ export async function getUserSettings(
  */
 export async function createUserSettings(
   settings: NewUserSettings,
-  request?: Request,
+  _request?: Request,
 ): Promise<UserSettings> {
-  const { data, error } = await supabase
-    .from('user_settings')
-    .insert(settings)
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error creating user settings:', error)
-    throw new Error('Failed to create user settings')
-  }
-
-  // Log the event for HIPAA compliance
-  await logAuditEvent(
-    'user_settings_created',
-    settings.user_id,
-    'user_settings',
-    data?.id,
-    {
-      ipAddress: request?.headers.get('x-forwarded-for'),
-      userAgent: request?.headers.get('user-agent'),
-    },
-  )
-
-  return data
+  // TODO: Replace with MongoDB implementation
+  return settings as UserSettings
 }
 
 /**
@@ -68,37 +72,10 @@ export async function createUserSettings(
 export async function updateUserSettings(
   userId: string,
   updates: UpdateUserSettings,
-  request?: Request,
+  _request?: Request,
 ): Promise<UserSettings> {
-  const { data, error } = await supabase
-    .from('user_settings')
-    .update({
-      ...updates,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('user_id', userId)
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error updating user settings:', error)
-    throw new Error('Failed to update user settings')
-  }
-
-  // Log the event for HIPAA compliance
-  await logAuditEvent(
-    'user_settings_updated',
-    userId,
-    'user_settings',
-    data?.id,
-    {
-      updates,
-      ipAddress: request?.headers.get('x-forwarded-for'),
-      userAgent: request?.headers.get('user-agent'),
-    },
-  )
-
-  return data
+  // TODO: Replace with MongoDB implementation
+  return { ...updates, user_id: userId } as UserSettings
 }
 
 /**

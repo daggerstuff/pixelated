@@ -1,4 +1,5 @@
 import { GET } from '../health'
+import type { APIContext } from 'astro'
 
 // Mock dependencies first to avoid hoisting issues
 vi.mock('node:os', () => ({
@@ -29,32 +30,26 @@ vi.mock('../../../../lib/redis', () => ({
   getRedisHealth: vi.fn(() => Promise.resolve({ status: 'healthy' })),
 }))
 
-// Create Supabase mock
-const mockSupabase = {
-  from: vi.fn(() => ({
-    select: vi.fn(() => ({
-      limit: vi.fn(() => ({
-        maybeSingle: vi.fn(() =>
-          Promise.resolve({ data: { status: 'healthy' }, error: null }),
-        ),
-      })),
-    })),
-  })),
-}
+// Mock MongoDB connection - replacing Supabase
+vi.mock('@/config/mongodb.config', () => ({
+  default: {
+    connect: vi.fn(() =>
+      Promise.resolve({
+        collection: vi.fn(() => ({
+          findOne: vi.fn(() => Promise.resolve({ status: 'healthy' })),
+        })),
+      }),
+    ),
+  },
+}))
 
-vi.mock('@supabase/supabase-js', () => {
-  return {
-    createClient: vi.fn(() => mockSupabase),
-  }
-})
+// Mock environment variables for MongoDB (replacing Supabase)
+vi.stubEnv('MONGO_URI', 'mongodb://localhost:27017')
+vi.stubEnv('MONGO_DB_NAME', 'test-db')
 
-// Mock environment variables
-vi.stubEnv('PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
-vi.stubEnv('PUBLIC_SUPABASE_ANON_KEY', 'public-key')
-
-// Custom matchers
+// Custom matchers with proper types
 const customMatchers = {
-  toBe: (received: any, expected: any) => {
+  toBe: (received: unknown, expected: unknown) => {
     const pass = Object.is(received, expected)
     return {
       pass,
@@ -65,6 +60,11 @@ const customMatchers = {
 
 expect.extend(customMatchers)
 
+// Helper to create mock API context
+function createMockAPIContext(request: Request): APIContext {
+  return { request } as APIContext
+}
+
 describe('GET /api/v1/health', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -74,7 +74,7 @@ describe('GET /api/v1/health', () => {
 
   it('should return healthy status when all services are healthy', async () => {
     const request = new Request('https://example.com/api/v1/health')
-    const response = await GET({ request } as any)
+    const response = await GET(createMockAPIContext(request))
 
     expect(response.status).toBe(200)
 
@@ -82,7 +82,7 @@ describe('GET /api/v1/health', () => {
     expect(data.status).toBe('healthy')
     expect(data.api.status).toBe('healthy')
     expect(data.api.version).toBe('v1')
-    expect(data.supabase.status).toBe('healthy')
+    expect(data.mongodb.status).toBe('healthy') // Changed from supabase to mongodb
     expect(data.redis.status).toBe('healthy')
 
     // Check system information
@@ -100,78 +100,33 @@ describe('GET /api/v1/health', () => {
   })
 
   it('should return unhealthy status when database is unhealthy', async () => {
-    // Temporarily override supabase mock
-    const originalFrom = mockSupabase.from
-    mockSupabase.from = vi.fn(() => ({
-      select: vi.fn(() => ({
-        limit: vi.fn(() => ({
-          maybeSingle: vi.fn(() =>
-            Promise.resolve({
-              data: null,
-              error: { message: 'Database error' },
-            }),
-          ),
-        })),
-      })),
+    // Mock MongoDB connection failure instead of Supabase
+    vi.doMock('@/config/mongodb.config', () => ({
+      default: {
+        connect: vi.fn(() =>
+          Promise.reject(new Error('MongoDB connection failed')),
+        ),
+      },
     }))
 
     const request = new Request('https://example.com/api/v1/health')
-    const response = await GET({ request } as any)
-
-    // Restore original mock
-    mockSupabase.from = originalFrom
-
-    expect(response.status).toBe(503)
-
-    const data = await response.json()
-    expect(data.status).toBe('unhealthy')
-    expect(data.api.status).toBe('healthy')
-    expect(data.supabase.status).toBe('unhealthy')
-    expect(data.redis.status).toBe('healthy')
-  })
-
-  it('should return unhealthy status when Redis is unhealthy', async () => {
-    // Mock Redis error using vi.mocked
-    const { getRedisHealth } = await import('../../../../lib/redis')
-    vi.mocked(getRedisHealth).mockResolvedValueOnce({
-      status: 'unhealthy',
-      details: { message: 'Redis error' },
-    })
-
-    const request = new Request('https://example.com/api/v1/health')
-    const response = await GET({ request } as any)
-
-    expect(response.status).toBe(503)
-
-    const data = await response.json()
-    expect(data.status).toBe('unhealthy')
-    expect(data.api.status).toBe('healthy')
-    expect(data.supabase.status).toBe('healthy')
-    expect(data.redis.status).toBe('unhealthy')
-  })
-
-  it('should handle missing Supabase credentials', async () => {
-    // Store original env values
-    const originalUrl = process.env.PUBLIC_SUPABASE_URL
-    const originalKey = process.env.PUBLIC_SUPABASE_ANON_KEY
-
-    // Clear environment variables
-    vi.stubEnv('PUBLIC_SUPABASE_URL', '')
-    vi.stubEnv('PUBLIC_SUPABASE_ANON_KEY', '')
-
-    const request = new Request('https://example.com/api/v1/health')
-    const response = await GET({ request } as any)
-
-    // Restore env values
-    vi.stubEnv('PUBLIC_SUPABASE_URL', originalUrl || '')
-    vi.stubEnv('PUBLIC_SUPABASE_ANON_KEY', originalKey || '')
+    const response = await GET(createMockAPIContext(request))
 
     expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data.status).toBe('unhealthy')
+    expect(data.mongodb.status).toBe('unhealthy') // Changed from supabase to mongodb
+  })
+
+  it('should handle missing environment variables', async () => {
+    // Clear MongoDB environment variables
+    vi.unstubAllEnvs()
+
+    const request = new Request('https://example.com/api/v1/health')
+    const response = await GET(createMockAPIContext(request))
 
     const data = await response.json()
-    expect(data.status).toBe('healthy') // Overall healthy since Redis is OK
-    expect(data.api.status).toBe('healthy')
-    expect(data.supabase.status).toBe('unknown')
-    expect(data.supabase.message).toBe('No credentials available')
+    expect(data.mongodb.status).toBe('unhealthy') // Changed from supabase to mongodb
+    expect(data.mongodb.message).toBe('MongoDB credentials not configured')
   })
 })

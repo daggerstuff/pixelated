@@ -113,8 +113,12 @@
         }
       }
 
-      customElements.define('bg-dot', BgDotElement);
-    }).catch(error => {
+      if (!customElements.get('bg-dot')) {
+        customElements.define('bg-dot', BgDotElement);
+      }
+    }
+    })
+    .catch(error => {
       console.error('Failed to load p5.js:', error);
     });
   }

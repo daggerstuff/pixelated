@@ -1,44 +1,41 @@
 ---
-// Note: This is a new header component created to address your feedback.
-// The original has been backed up to Header.astro.bak
-
+// Brutalist Dark Header - Mental Health Platform
 const navLinks = [
-  { name: 'Training Demos', href: '/demo-hub' },
+  { name: 'Demos', href: '/demo-hub' },
   { name: 'Features', href: '/features' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Dashboard', href: '/dashboard' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
 ];
-
-// A simple dark mode toggle placeholder component might be needed if not globally available
-// For example, using a component like 'accessible-astro-components/DarkMode'
 ---
 
-<header class="sticky top-0 z-50 w-full backdrop-blur-lg bg-black/30 border-b border-slate-300/10">
-  <div class="max-w-6xl mx-auto px-4">
+<header class="sticky top-0 z-50 w-full bg-black/95 backdrop-blur-sm border-b-2 border-gray-800">
+  <div class="brutalist-container">
     <div class="flex items-center justify-between h-16">
-      <!-- Site branding -->
+      <!-- Brutalist Branding -->
       <div class="flex items-center">
-        <a class="flex items-center gap-3 hover:opacity-80 transition-opacity" href="/">
-          <img
-            src="/favicon.svg"
-            alt="Pixelated Empathy Logo"
-            class="w-8 h-8 flex-shrink-0"
-          />
-          <span class="text-xl font-bold text-slate-100 font-geist tracking-tight whitespace-nowrap">
-            Pixelated Empathy
-          </span>
+        <a class="flex items-center gap-3 hover:opacity-90 transition-opacity" href="/">
+          <div class="w-8 h-8 bg-green-500 border-2 border-green-400 flex items-center justify-center font-bold text-black text-sm">
+            P
+          </div>
+          <div class="flex flex-col">
+            <span class="text-lg font-bold text-white tracking-tight">
+              PIXELATED EMPATHY
+            </span>
+            <span class="text-xs font-medium text-green-400 uppercase tracking-wider">
+              Therapy Training AI
+            </span>
+          </div>
         </a>
       </div>
 
-      <!-- Desktop navigation -->
-      <nav class="hidden md:flex items-center ml-auto">
-        <!-- Desktop menu links -->
-        <ul class="flex items-center space-x-8">
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center">
+        <ul class="flex items-center space-x-1">
           {navLinks.map(link => (
             <li>
               <a
                 href={link.href}
-                class="text-sm font-medium text-slate-300 hover:text-green-400 transition-colors duration-200 font-geist"
+                class="nav-link brutalist-button brutalist-button--outline text-sm px-4 py-2"
               >
                 {link.name}
               </a>
@@ -46,25 +43,22 @@ const navLinks = [
           ))}
         </ul>
 
-        <!-- Dark mode toggle -->
-        <div class="ml-8 flex items-center">
-          <button
-            id="theme-toggle"
-            class="p-2 text-slate-400 hover:text-green-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
-            aria-label="Toggle theme"
+        <!-- Primary CTA -->
+        <div class="ml-6">
+          <a
+            href="/contact"
+            class="brutalist-button brutalist-button--primary text-sm px-6 py-2"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-            </svg>
-          </button>
+            GET STARTED
+          </a>
         </div>
       </nav>
 
-      <!-- Mobile menu button -->
+      <!-- Mobile Menu Button -->
       <div class="md:hidden">
         <button
           id="mobile-menu-button"
-          class="p-2 text-slate-400 hover:text-green-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+          class="p-2 text-white hover:text-green-400 transition-colors"
           aria-label="Toggle mobile menu"
           aria-expanded="false"
         >
@@ -76,20 +70,56 @@ const navLinks = [
     </div>
   </div>
 
-  <!-- Mobile menu -->
-  <div id="mobile-menu" class="hidden md:hidden bg-black/95 backdrop-blur-lg border-b border-slate-300/10">
-    <div class="px-4 py-4 space-y-2">
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-black border-b-2 border-gray-800">
+    <div class="brutalist-container py-4 space-y-2">
       {navLinks.map(link => (
         <a
           href={link.href}
-          class="block px-3 py-2 text-base font-medium text-slate-300 hover:text-green-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200 font-geist"
+          class="block px-4 py-3 text-white hover:text-green-400 hover:bg-gray-900 transition-colors font-medium"
         >
           {link.name}
         </a>
       ))}
+      <div class="pt-2 border-t border-gray-800">
+        <a
+          href="/contact"
+          class="block brutalist-button brutalist-button--primary text-center py-3"
+        >
+          GET STARTED
+        </a>
+      </div>
     </div>
   </div>
 </header>
+
+<script is:inline>
+  // Mobile menu functionality
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
+
+      if (isOpen) {
+        mobileMenu.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+      } else {
+        mobileMenu.classList.remove('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+</script>
 
 <script is:inline>
   // Theme toggle functionality

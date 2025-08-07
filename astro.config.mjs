@@ -28,6 +28,7 @@ export default defineConfig({
   vite: {
     build: {
       sourcemap: process.env.NODE_ENV === 'development',
+      target: 'node22',
       rollupOptions: {
         external: [
           '@google-cloud/storage',
@@ -54,6 +55,10 @@ export default defineConfig({
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
       },
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
+      preserveSymlinks: false,
+      mainFields: ['module', 'main'],
+      conditions: ['import', 'module', 'browser', 'default'],
     },
     ssr: {
       external: [
@@ -78,23 +83,34 @@ export default defineConfig({
       ],
     },
     optimizeDeps: {
-      exclude: ['@aws-sdk/client-s3', '@aws-sdk/client-kms', 'sharp', 'canvas', 'puppeteer', 'playwright', '@sentry/profiling-node', 'pdfkit'],
+      exclude: [
+        '@aws-sdk/client-s3',
+        '@aws-sdk/client-kms',
+        'sharp',
+        'canvas',
+        'puppeteer',
+        'playwright',
+        '@sentry/profiling-node',
+        'pdfkit',
+        'recharts',
+        'lucide-react'
+      ],
     },
   },
   integrations: [
-    expressiveCode({
-      themes: ['github-dark', 'github-light'],
-      styleOverrides: {
-        borderRadius: '0.5rem',
-      },
-    }),
+    // expressiveCode({
+    //   themes: ['github-dark', 'github-light'],
+    //   styleOverrides: {
+    //     borderRadius: '0.5rem',
+    //   },
+    // }),
     react({
       include: ['**/react/*', '**/components/**/*'],
       experimentalReactChildren: true,
     }),
-    mdx({
-      components: path.resolve('./mdx-components.js'),
-    }),
+    // mdx({
+    //   components: path.resolve('./mdx-components.js'),
+    // }),
     UnoCSS({
       injectReset: true,
     }),
@@ -115,20 +131,20 @@ export default defineConfig({
       },
       svgdir: './src/icons',
     }),
-    markdoc(),
-    ...(process.env.SENTRY_DSN ? [
-      sentry({
-        dsn: process.env.SENTRY_DSN,
-        sourceMapsUploadOptions: {
-          project: process.env.SENTRY_PROJECT || 'pixel-astro',
-          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-        },
-        telemetry: false,
-      }),
-      // Add Spotlight for development debugging (only when Sentry is enabled)
-      ...(process.env.NODE_ENV === 'development' ? [spotlightjs()] : [])
-    ] : []),
+    // markdoc(),
+    // ...(process.env.SENTRY_DSN ? [
+    //   sentry({
+    //     dsn: process.env.SENTRY_DSN,
+    //     sourceMapsUploadOptions: {
+    //       project: process.env.SENTRY_PROJECT || 'pixel-astro',
+    //       org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+    //       authToken: process.env.SENTRY_AUTH_TOKEN,
+    //     },
+    //     telemetry: false,
+    //   }),
+    //   // Add Spotlight for development debugging (only when Sentry is enabled)
+    //   ...(process.env.NODE_ENV === 'development' ? [spotlightjs()] : [])
+    // ] : []),
   ],
   markdown: {
     shikiConfig: {

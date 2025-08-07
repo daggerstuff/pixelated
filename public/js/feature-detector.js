@@ -25,7 +25,6 @@
   // Polyfill map - defines which files to load for each feature
   const polyfillMap = {
     webgl: null, // WebGL can't be polyfilled
-    intersectionObserver: '/polyfills/intersection-observer.js',
     resizeObserver: '/polyfills/resize-observer-polyfill.js',
     customElements: '/polyfills/custom-elements.min.js',
     fetch: '/polyfills/fetch.umd.js',
@@ -75,7 +74,6 @@
         return false
       }
     })(),
-    intersectionObserver: 'IntersectionObserver' in window,
     resizeObserver: 'ResizeObserver' in window,
     customElements: 'customElements' in window,
     fetch: 'fetch' in window,

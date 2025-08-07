@@ -1,20 +1,41 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import mongodb from '@/config/mongodb.config'
+import { mongoAuthService } from '@/services/mongoAuth.service'
+import { ObjectId } from 'mongodb'
 import {
   azureADAuth,
   type AzureADUser,
   type AzureADAuthResult,
 } from './azure-ad'
-import { supabaseConfig } from '../../config/supabase.config'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-const logger = createBuildSafeLogger('azure-supabase-integration')
+const logger = createBuildSafeLogger('azure-mongodb-integration')
+
+// Utility to validate ObjectId strings
+function isValidObjectId(id: string): boolean {
+  if (typeof id !== 'string') {
+    return false;
+  }
+  // 24 hex chars or 12 bytes
+  return /^[a-fA-F0-9]{24}$/.test(id);
+}
+
+/**
+ * Utility to strictly validate Azure AD IDs (UUID or 32 hex chars)
+ */
+function isValidAzureId(id: string): boolean {
+  if (typeof id !== 'string') {
+    return false;
+  }
+  // UUID v4 or 32 hex chars
+  return /^[a-fA-F0-9]{32}$/.test(id) || /^[0-9a-fA-F-]{36}$/.test(id);
+}
 
 export interface IntegratedUser {
   id: string
   email: string
   name: string
   azureId: string
-  supabaseId: string
+  mongoId: string
   roles: string[]
   metadata: {
     azureAD: AzureADUser
@@ -31,27 +52,16 @@ export interface AuthSession {
 }
 
 /**
- * Azure AD + Supabase Integration Service
- * Manages authentication flow between Azure AD and Supabase
+ * Azure AD + MongoDB Integration Service
+ * Manages authentication flow between Azure AD and MongoDB Atlas
  */
-export class AzureSupabaseIntegration {
-  private supabase: SupabaseClient
-
+export class AzureMongoIntegration {
   constructor() {
-    this.supabase = createClient(
-      supabaseConfig.url,
-      supabaseConfig.serviceRoleKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      },
-    )
+    // MongoDB connection is handled by the mongodb config singleton
   }
 
   /**
-   * Authenticate user with Azure AD and create/update Supabase user
+   * Authenticate user with Azure AD and create/update MongoDB user
    */
   async authenticateWithAzureAD(
     code: string,
@@ -61,24 +71,24 @@ export class AzureSupabaseIntegration {
       // Authenticate with Azure AD
       const azureResult = await azureADAuth.authenticate(code, redirectUri)
 
-      // Create or update user in Supabase
-      const integratedUser = await this.createOrUpdateSupabaseUser(azureResult)
+      // Create or update user in MongoDB
+      const integratedUser = await this.createOrUpdateMongoUser(azureResult)
 
-      // Create Supabase session
-      const session = await this.createSupabaseSession(
+      // Create MongoDB session
+      const session = await this.createMongoSession(
         integratedUser,
         azureResult,
       )
 
-      logger.info('Azure AD + Supabase authentication successful', {
+      logger.info('Azure AD + MongoDB authentication successful', {
         azureId: azureResult.user.id,
-        supabaseId: integratedUser.supabaseId,
+        mongoId: integratedUser.mongoId,
         email: integratedUser.email,
       })
 
       return session
     } catch (error) {
-      logger.error('Azure AD + Supabase authentication failed', {
+      logger.error('Azure AD + MongoDB authentication failed', {
         error: error instanceof Error ? error.message : String(error),
       })
       throw error
@@ -86,88 +96,98 @@ export class AzureSupabaseIntegration {
   }
 
   /**
-   * Create or update user in Supabase based on Azure AD user
+   * Create or update user in MongoDB based on Azure AD user
    */
-  private async createOrUpdateSupabaseUser(
+  private async createOrUpdateMongoUser(
     azureResult: AzureADAuthResult,
   ): Promise<IntegratedUser> {
     const { user: azureUser } = azureResult
 
     try {
-      // Check if user already exists in Supabase
-      const { data: existingUser, error: fetchError } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('azure_id', azureUser.id)
-        .single()
+      const db = await mongodb.connect()
+      const usersCollection = db.collection('users')
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError
+      // Check if user already exists in MongoDB
+      // Validate azureUser.id is a string and matches expected format (UUID or Azure AD ID pattern)
+      // SECURITY: Validate Azure AD user id with explicit utility
+      const safeAzureId = isValidAzureId(azureUser.id) ? azureUser.id : '';
+      if (!safeAzureId) {
+        throw new Error('Invalid Azure AD user id');
       }
 
+      // SECURITY: Only a validated, locally-scoped value is used in the query. No user input is passed directly.
+      const queryAzureId = safeAzureId;
+      const existingUser = await usersCollection.findOne({
+        azure_id: queryAzureId,
+      });
+      
       const userData = {
-        email: azureUser.email,
-        name: azureUser.name,
-        azure_id: azureUser.id,
+        email: typeof azureUser.email === 'string' ? azureUser.email : '',
+        name: typeof azureUser.name === 'string' ? azureUser.name : '',
+        azure_id: safeAzureId,
         metadata: {
           azureAD: azureUser,
           lastLogin: new Date().toISOString(),
           provider: 'azure-ad' as const,
         },
-        updated_at: new Date().toISOString(),
+        updatedAt: new Date(),
       }
-
-      let supabaseUser
-
+      
+      let mongoUser
+      
       if (existingUser) {
-        // Update existing user
-        const { data, error } = await this.supabase
-          .from('users')
-          .update(userData)
-          .eq('id', existingUser.id)
-          .select()
-          .single()
-
-        if (error) {
-          throw error
+        // Validate _id is a valid ObjectId
+        // Strictly validate and convert _id to ObjectId
+        const rawMongoId = existingUser._id;
+        const safeMongoId = (rawMongoId && ObjectId.isValid(rawMongoId)) ? new ObjectId(rawMongoId) : null;
+        if (!safeMongoId) {
+          throw new Error('Invalid MongoDB user _id');
         }
-        supabaseUser = data
+        // SECURITY: Only a validated, locally-scoped ObjectId is used in the query. No user input is passed directly.
+        const queryMongoId = safeMongoId;
+        await usersCollection.updateOne(
+          { _id: queryMongoId },
+          { $set: userData }
+        );
+        // SECURITY: Only a validated, locally-scoped ObjectId is used in the query. No user input is passed directly.
+        mongoUser = await usersCollection.findOne({ _id: queryMongoId });
       } else {
         // Create new user
-        const { data, error } = await this.supabase
-          .from('users')
-          .insert({
-            ...userData,
-            created_at: new Date().toISOString(),
-          })
-          .select()
-          .single()
-
-        if (error) {
-          throw error
+        const insertResult = await usersCollection.insertOne({
+          ...userData,
+          createdAt: new Date(),
+          role: 'user', // Default role
+        })
+        // Validate insertedId is a valid ObjectId
+        // Strictly validate and convert insertedId to ObjectId
+        const rawInsertedId = insertResult.insertedId;
+        const safeInsertedId = (rawInsertedId && ObjectId.isValid(rawInsertedId)) ? new ObjectId(rawInsertedId) : null;
+        if (!safeInsertedId) {
+          throw new Error('Invalid insertedId for new MongoDB user');
         }
-        supabaseUser = data
+        // SECURITY: Only a validated, locally-scoped ObjectId is used in the query. No user input is passed directly.
+        const queryInsertedId = safeInsertedId;
+        mongoUser = await usersCollection.findOne({ _id: queryInsertedId });
       }
 
-      // Get user roles
-      const { data: userRoles } = await this.supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', supabaseUser.id)
+      if (!mongoUser) {
+        throw new Error('Failed to create or update user')
+      }
 
-      const roles = userRoles?.map((ur) => ur.role) || []
+      // Get user roles (for this example, we'll use the role field directly)
+      const roles = [mongoUser['role'] || 'user']
 
       return {
-        id: supabaseUser.id,
-        email: supabaseUser.email,
-        name: supabaseUser.name,
+        id: mongoUser._id.toString(),
+        email: mongoUser['email'],
+        name: mongoUser['name'],
         azureId: azureUser.id,
-        supabaseId: supabaseUser.id,
+        mongoId: mongoUser._id.toString(),
         roles,
-        metadata: supabaseUser.metadata,
+        metadata: mongoUser['metadata'],
       }
     } catch (error) {
-      logger.error('Error creating/updating Supabase user', {
+      logger.error('Error creating/updating MongoDB user', {
         azureId: azureUser.id,
         email: azureUser.email,
         error: error instanceof Error ? error.message : String(error),
@@ -177,44 +197,24 @@ export class AzureSupabaseIntegration {
   }
 
   /**
-   * Create Supabase session for the integrated user
+   * Create MongoDB session for the integrated user
    */
-  private async createSupabaseSession(
+  private async createMongoSession(
     user: IntegratedUser,
     azureResult: AzureADAuthResult,
   ): Promise<AuthSession> {
     try {
-      // Create a custom JWT token for Supabase
-      const customClaims = {
-        sub: user.supabaseId,
-        email: user.email,
-        azure_id: user.azureId,
-        roles: user.roles,
-        provider: 'azure-ad',
-      }
-
-      // Note: In a real implementation, you would use Supabase's admin API
-      // to create a proper session. This is a simplified version.
-      const { error } = await this.supabase.auth.admin.generateLink({
-        type: 'magiclink',
-        email: user.email,
-        options: {
-          data: customClaims,
-        },
-      })
-
-      if (error) {
-        throw error
-      }
-
+      // Create session using MongoDB auth service
+      const authResult = await mongoAuthService.signIn(user.email, 'azure-ad-placeholder')
+      
       return {
         user,
-        accessToken: azureResult.tokens.accessToken,
+        accessToken: authResult.accessToken,
         refreshToken: azureResult.tokens.refreshToken || '',
         expiresAt: azureResult.tokens.expiresAt,
       }
     } catch (error) {
-      logger.error('Error creating Supabase session', {
+      logger.error('Error creating MongoDB session', {
         userId: user.id,
         error: error instanceof Error ? error.message : String(error),
       })
@@ -233,41 +233,40 @@ export class AzureSupabaseIntegration {
       // Get updated user info
       const azureUser = await azureADAuth.getUserInfo(newTokens.accessToken)
 
-      // Update user in Supabase
-      const { data: supabaseUser, error } = await this.supabase
-        .from('users')
-        .update({
-          metadata: {
-            azureAD: azureUser,
-            lastLogin: new Date().toISOString(),
-            provider: 'azure-ad',
-          },
-          updated_at: new Date().toISOString(),
-        })
-        .eq('azure_id', azureUser.id)
-        .select()
-        .single()
+      // Update user in MongoDB
+      const db = await mongodb.connect()
+      const usersCollection = db.collection('users')
+      
+      const mongoUser = await usersCollection.findOneAndUpdate(
+        { azure_id: azureUser.id },
+        {
+          $set: {
+            metadata: {
+              azureAD: azureUser,
+              lastLogin: new Date().toISOString(),
+              provider: 'azure-ad',
+            },
+            updatedAt: new Date(),
+          }
+        },
+        { returnDocument: 'after' }
+      )
 
-      if (error) {
-        throw error
+      if (!mongoUser) {
+        throw new Error('User not found')
       }
 
       // Get user roles
-      const { data: userRoles } = await this.supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', supabaseUser.id)
-
-      const roles = userRoles?.map((ur) => ur.role) || []
+      const roles = [mongoUser['role'] || 'user']
 
       const integratedUser: IntegratedUser = {
-        id: supabaseUser.id,
-        email: supabaseUser.email,
-        name: supabaseUser.name,
+        id: mongoUser._id.toString(),
+        email: mongoUser['email'],
+        name: mongoUser['name'],
         azureId: azureUser.id,
-        supabaseId: supabaseUser.id,
+        mongoId: mongoUser._id.toString(),
         roles,
-        metadata: supabaseUser.metadata,
+        metadata: mongoUser['metadata'],
       }
 
       return {
@@ -285,23 +284,26 @@ export class AzureSupabaseIntegration {
   }
 
   /**
-   * Sign out user from both Azure AD and Supabase
+   * Sign out user from both Azure AD and MongoDB
    */
   async signOut(
     userId: string,
     postLogoutRedirectUri?: string,
   ): Promise<string> {
     try {
-      // Update last logout in Supabase
-      await this.supabase
-        .from('users')
-        .update({
-          metadata: {
-            lastLogout: new Date().toISOString(),
-          },
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', userId)
+      // Update last logout in MongoDB
+      const db = await mongodb.connect()
+      const usersCollection = db.collection('users')
+      
+      await usersCollection.updateOne(
+        { _id: isValidObjectId(userId) ? new ObjectId(userId) : undefined },
+        {
+          $set: {
+            'metadata.lastLogout': new Date().toISOString(),
+            updatedAt: new Date(),
+          }
+        }
+      )
 
       // Get Azure AD logout URL
       const logoutUrl = azureADAuth.getLogoutUrl(postLogoutRedirectUri)
@@ -319,39 +321,38 @@ export class AzureSupabaseIntegration {
   }
 
   /**
-   * Get user by Supabase ID
+   * Get user by MongoDB ID
+   */
+  /**
+   * Fetches a user by their MongoDB ObjectId.
+   * Validates the ObjectId before querying to prevent NoSQL injection.
    */
   async getUserById(userId: string): Promise<IntegratedUser | null> {
     try {
-      const { data: user, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single()
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          return null
-        }
-        throw error
+      if (!isValidObjectId(userId)) {
+        logger.warn('Attempted to fetch user with invalid ObjectId', { userId });
+        return null;
       }
-
+      const db = await mongodb.connect()
+      const usersCollection = db.collection('users')
+      
+      const user = await usersCollection.findOne({ _id: new ObjectId(userId) })
+  
+      if (!user) {
+        return null
+      }
+  
       // Get user roles
-      const { data: userRoles } = await this.supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-
-      const roles = userRoles?.map((ur) => ur.role) || []
-
+      const roles = [user['role'] || 'user']
+  
       return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        azureId: user.azure_id,
-        supabaseId: user.id,
+        id: user._id.toString(),
+        email: user['email'],
+        name: user['name'],
+        azureId: user['azure_id'],
+        mongoId: user._id.toString(),
         roles,
-        metadata: user.metadata,
+        metadata: user['metadata'],
       }
     } catch (error) {
       logger.error('Error getting user by ID', {
@@ -371,5 +372,5 @@ export class AzureSupabaseIntegration {
 }
 
 // Export singleton instance
-export const azureSupabaseIntegration = new AzureSupabaseIntegration()
-export default azureSupabaseIntegration
+export const azureMongoIntegration = new AzureMongoIntegration()
+export default azureMongoIntegration

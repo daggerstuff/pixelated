@@ -6,10 +6,35 @@ export default {
     './node_modules/@tailus/themer-**/dist/**/*.{js,ts}',
   ],
   darkMode: 'class',
+  important: true,
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter Variable', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Geist Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        geist: ['Geist Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'geist-sans': ['Geist Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'xs': ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.025em' }],
+        'sm': ['0.875rem', { lineHeight: '1.25rem', letterSpacing: '0.015em' }],
+        'base': ['1rem', { lineHeight: '1.5rem', letterSpacing: '0.01em' }],
+        'lg': ['1.125rem', { lineHeight: '1.75rem', letterSpacing: '0.005em' }],
+        'xl': ['1.25rem', { lineHeight: '1.75rem', letterSpacing: '0.005em' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem', letterSpacing: '0' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem', letterSpacing: '-0.01em' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.015em' }],
+        '5xl': ['3rem', { lineHeight: '1', letterSpacing: '-0.02em' }],
+        '6xl': ['3.75rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '7xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.03em' }],
+      },
+      fontWeight: {
+        light: '300',
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+        extrabold: '800',
+        black: '900',
       },
       colors: {
         primary: {
@@ -50,6 +75,62 @@ export default {
           800: '#86198f',
           900: '#701a75',
           950: '#4a044e',
+        },
+        // Professional dark charcoals
+        charcoal: {
+          50: '#f6f6f6',
+          100: '#e7e7e7',
+          200: '#d1d1d1',
+          300: '#b0b0b0',
+          400: '#888888',
+          500: '#6d6d6d',
+          600: '#5d5d5d',
+          700: '#4f4f4f',
+          800: '#454545',
+          900: '#3d3d3d',
+          950: '#1a1a1a',
+        },
+        // Confident blues with deeper variations
+        confident: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#1e40af', // Deeper confident blue
+          600: '#1d4ed8',
+          700: '#1e3a8a',
+          800: '#1e293b',
+          900: '#0f172a',
+          950: '#0c1420',
+        },
+        // Refined gold accents
+        gold: {
+          50: '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#d97706',
+          700: '#b45309',
+          800: '#92400e',
+          900: '#78350f',
+          950: '#451a03',
+        },
+        // Enhanced green palette for therapy/healing theme
+        healing: {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
+          950: '#052e16',
         },
         danger: {
           50: '#fef2f2',
@@ -116,6 +197,36 @@ export default {
           900: '#111827',
           950: '#030712',
         },
+      },
+      // Professional animation curves
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'out-back': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'in-out-back': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'professional': 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+      },
+      // Refined spacing scale
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+        '144': '36rem',
+      },
+      // Enhanced shadow system
+      boxShadow: {
+        'professional': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'professional-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        'professional-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        'professional-xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        'confident': '0 4px 14px 0 rgb(30, 64, 175, 0.15)',
+        'healing': '0 4px 14px 0 rgb(34, 197, 94, 0.15)',
+        'gold': '0 4px 14px 0 rgb(245, 158, 11, 0.15)',
+      },
+      // Professional border radius
+      borderRadius: {
+        'professional': '0.5rem',
+        'confident': '0.75rem',
+        'smooth': '1rem',
       },
     },
   },

@@ -1,9 +1,19 @@
-import { protectRoute } from '../../../lib/auth/serverAuth'
-import { testSecurityAlert } from '../../../lib/auth/supabase'
+import { protectRoute } from '@/lib/auth/serverAuth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { AuthAPIContext } from '../../../lib/auth/apiRouteTypes'
+import type { AuthAPIContext } from '@lib/auth/apiRouteTypes.ts'
 
 const logger = createBuildSafeLogger('security-admin')
+
+// Mock security alert function to replace Supabase dependency
+async function testSecurityAlert(
+  alertType: string,
+  userId: string,
+  metadata?: Record<string, unknown>,
+) {
+  logger.info('Testing security alert', { alertType, userId, metadata })
+  // TODO: Replace with actual security alert implementation
+  return { success: true, alertId: `test-${Date.now()}` }
+}
 
 export const POST = protectRoute({
   requiredRole: 'admin',
@@ -28,53 +38,51 @@ export const POST = protectRoute({
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
       )
     }
 
     // Test the security alert
-    const success = await testSecurityAlert(
-      alertType as 'suspicious_login' | 'password_reset' | 'account_locked',
-    )
+    const result = await testSecurityAlert(alertType, user.id, {
+      testMode: true,
+      triggeredBy: user.id,
+      timestamp: new Date().toISOString(),
+    })
 
-    if (!success) {
-      throw new Error('Failed to send test alert')
-    }
-
-    // Log the test
-    logger.info(`Security alert test initiated by admin`, {
-      userId: user.id,
+    logger.info('Security alert test completed', {
       alertType,
+      userId: user.id,
+      result,
     })
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Test ${alertType} alert sent successfully`,
+        message: `${alertType} alert test completed successfully`,
+        alertId: result.alertId,
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
     )
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
-
-    logger.error('Error testing security alert', {
-      error: errorMessage,
-      userId: locals.user?.id,
-    })
-
+    logger.error('Error testing security alert:', error)
     return new Response(
       JSON.stringify({
-        error: 'Internal server error',
-        message: errorMessage,
+        error: 'Failed to test security alert',
+        message: 'An error occurred while testing the security alert',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
     )
   }

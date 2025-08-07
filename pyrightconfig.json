@@ -1,11 +1,11 @@
 {
-  "include": ["src", "tests", "ai", "api", "pixel_voice"],
-  "exclude": ["node_modules", "stubs", "venv", "env", "build", "dist"],
+  "include": ["src", "tests", "ai"],
+  "exclude": ["**/node_modules/**", "**/stubs/**", "**/.venv/**", "**/.env", "**/build/**", "**/dist/**", "**/datasets/**"],
   "extraPaths": ["stubs"],
   "typeCheckingMode": "basic",
   "reportMissingTypeStubs": false,
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
   "reportPrivateUsage": false,
-  "pythonVersion": "3.13"
+  "pythonVersion": "3.11"
 }

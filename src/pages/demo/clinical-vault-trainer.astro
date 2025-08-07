@@ -1,12 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import Card from '@/components/ui/Card.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardDescription from '@/components/ui/CardDescription.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
-import Badge from '@/components/ui/Badge.astro'
-import { Button } from '@/components/ui/button'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false // Enable SSR for A/B testing
 
@@ -115,486 +111,258 @@ const universityResults = [
 <BaseLayout
   title="ClinicalVault Trainer - HIPAA-Impossible Training Made Possible"
   description="Practice crisis interventions and complex therapy scenarios with AI clients. Safe, private, and impossible before HIPAA compliance."
-  bgType="plum"
 >
-  <div class="relative min-h-screen text-white">
-    <!-- Floating Particles -->
-    <div
-      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
-    >
-      <div class="particle particle-1"></div>
-      <div class="particle particle-2"></div>
-      <div class="particle particle-3"></div>
-      <div class="particle particle-4"></div>
-      <div class="particle particle-5"></div>
+  <!-- Hero Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--blue"></div>
+          <span class="font-bold">CRISIS TRAINING ACTIVE</span>
+        </div>
+
+        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+          {currentVariant.headline}
+          <br />
+          <span class="text-red-400">CLINICALVAULT</span>
+        </h1>
+
+        <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+          {currentVariant.subheadline}
+        </p>
+      </div>
     </div>
+  </section>
 
-    <div class="relative z-10 py-8">
-      <div class="container mx-auto px-4">
-        <!-- Header -->
-        <div class="text-center mb-12">
-          <div class="mb-8 animate-breathe">
-            <Badge
-              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full"
-            >
-              <span class="relative flex h-3 w-3">
-                <span
-                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-full h-3 w-3 bg-red-500"
-                ></span>
-              </span>
-              Crisis Training Active
-            </Badge>
+  <!-- Technical Specifications -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="dashboard-grid">
+        {
+          technicalSpecs.map((spec) => (
+            <div class="metric-card hover-lift">
+              <div class="metric-value text-red-400">{spec.value}</div>
+              <div class="metric-label">{spec.metric}</div>
+              <div class="text-xs text-gray-400 mt-2">{spec.comparison}</div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Demo Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <BrutalistCard variant="elevated" class="max-w-4xl mx-auto">
+        <div class="space-y-6">
+          <div class="border-b border-gray-700 pb-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="brutalist-subheading text-2xl mb-2">🚨 LIVE CRISIS INTERVENTION DEMO</h3>
+                <p class="text-gray-400">
+                  Experience a real training scenario with AI patient "Sarah" presenting with suicidal ideation
+                </p>
+              </div>
+              <div class="status-indicator status-indicator--warning">
+                <div class="pulse-dot pulse-dot--blue"></div>
+                <span class="font-bold">LIVE DEMO</span>
+              </div>
+            </div>
           </div>
 
-          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
-            {currentVariant.headline}
-            <span class="text-red-400 golden-shimmer block mt-2"
-              >ClinicalVault Trainer</span
-            >
-          </h1>
-
-          <p
-            class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed"
-          >
-            {currentVariant.subheadline}
-          </p>
-        </div>
-
-        <!-- Technical Specifications -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {
-            technicalSpecs.map((spec) => (
-              <Card class="border border-red-600/30 bg-red-900/20 hover:border-red-400/60 transition-all duration-700 organic-card">
-                <CardHeader class="pb-2">
-                  <CardTitle class="text-red-300 text-sm">
-                    {spec.metric}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div class="text-2xl font-bold text-red-400 mb-1">
-                    {spec.value}
-                  </div>
-                  <div class="text-xs text-red-200/70">
-                    {spec.comparison}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          }
-        </div>
-
-        <!-- Interactive Demo Section -->
-        <div class="mb-16">
-          <Card
-            class="border border-red-600/30 bg-slate-900/50 overflow-hidden"
-          >
-            <CardHeader>
-              <div class="flex justify-between items-start">
+          <div class="chat-container">
+            <div class="chat-header">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                  <span class="text-red-400">👤</span>
+                </div>
                 <div>
-                  <CardTitle class="text-red-100 text-xl mb-2"
-                    >Live Crisis Intervention Demo</CardTitle
-                  >
-                  <CardDescription class="text-red-200/80">
-                    Experience a real training scenario with AI patient "Sarah"
-                    presenting with suicidal ideation
-                  </CardDescription>
-                </div>
-                <Badge class="bg-red-500/20 text-red-300">
-                  <span
-                    class="animate-pulse w-2 h-2 bg-red-400 rounded-full mr-2"
-                  ></span>
-                  Live Demo
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
-                <div class="flex items-center gap-3 mb-4">
-                  <div
-                    class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center"
-                  >
-                    <span class="text-red-400">👤</span>
-                  </div>
-                  <div>
-                    <div class="text-red-300 font-medium">
-                      AI Patient: Sarah
-                    </div>
-                    <div class="text-red-200/70 text-sm">
-                      Presenting with acute suicidal ideation
-                    </div>
-                  </div>
-                </div>
-                <div class="bg-slate-700/50 rounded p-4 mb-4">
-                  <p class="text-green-100 text-sm italic">
-                    "I don't see the point anymore. Everything I try just fails.
-                    Maybe everyone would be better off without me..."
-                  </p>
-                </div>
-                <div class="flex gap-3">
-                  <Button
-                    size="sm"
-                    class="bg-red-600 hover:bg-red-700 text-white"
-                    data-demo-action="crisis-response"
-                  >
-                    Practice Crisis Response
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    class="border-red-500/50 text-red-300 hover:bg-red-500/10"
-                    data-demo-action="view-techniques"
-                  >
-                    View Intervention Techniques
-                  </Button>
+                  <div class="text-red-300 font-medium">AI Patient: Sarah</div>
+                  <div class="text-red-200/70 text-sm">Presenting with acute suicidal ideation</div>
                 </div>
               </div>
-              <div class="text-xs text-red-200/60">
-                ⚡ This scenario adapts in real-time based on your responses •
-                🔒 Completely private and safe
+            </div>
+            
+            <div class="chat-messages">
+              <div class="message message--ai">
+                "I don't see the point anymore. Everything I try just fails. Maybe everyone would be better off without me..."
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
 
-        <!-- Impossible Before HIPAA Section -->
-        <div class="mb-16">
-          <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
-              Training That Was
-              <span class="text-red-400 golden-shimmer">Impossible Before</span>
-            </h2>
-            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
-              These scenarios were too dangerous, too rare, or too ethically
-              complex to practice with real patients
-            </p>
+            <div class="chat-input-area">
+              <div class="flex gap-3">
+                <BrutalistButton variant="primary" class="flex-1" data-demo-action="crisis-response">
+                  PRACTICE CRISIS RESPONSE
+                </BrutalistButton>
+                <BrutalistButton variant="outline" data-demo-action="view-techniques">
+                  VIEW TECHNIQUES
+                </BrutalistButton>
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {
-              impossibleScenarios.map((scenario) => (
-                <Card class="border border-red-600/30 hover:border-red-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
-                  <CardHeader class="pb-4 relative">
-                    <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-red-400">
-                      {scenario.icon}
-                    </div>
-                    <CardTitle class="text-base font-bold text-red-100 tracking-wide mb-3">
-                      {scenario.title}
-                    </CardTitle>
-                    <div class="text-sm text-red-400/90 font-medium bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
-                      Previously impossible to practice safely
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription class="text-sm text-red-200/80 leading-relaxed">
-                      {scenario.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))
-            }
+          <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+              <span>Adapts in real-time</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+              <span>Completely private and safe</span>
+            </div>
           </div>
         </div>
+      </BrutalistCard>
+    </div>
+  </section>
 
-        <!-- University Results -->
-        <div class="mb-16">
-          <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
-              Real Results from
-              <span class="text-green-400 golden-shimmer"
-                >Leading Universities</span
-              >
-            </h2>
-            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
-              Universities using ClinicalVault report unprecedented improvements
-              in training outcomes
-            </p>
-          </div>
+  <!-- Impossible Before HIPAA Section -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          TRAINING THAT WAS
+          <span class="text-red-400">IMPOSSIBLE BEFORE</span>
+        </h2>
+        <p class="text-lg text-gray-300 max-w-4xl mx-auto">
+          These scenarios were too dangerous, too rare, or too ethically complex to practice with real patients
+        </p>
+      </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {
-              universityResults.map((result) => (
-                <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
-                  <CardHeader class="pb-4">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
-                      🏛️
-                    </div>
-                    <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
-                      {result.university}
-                    </CardTitle>
-                    <div class="text-lg text-green-400 font-bold mb-2">
-                      {result.result}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription class="text-sm text-green-200/80 leading-relaxed">
-                      {result.detail}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))
-            }
+      <div class="brutalist-grid brutalist-grid--2">
+        {
+          impossibleScenarios.map((scenario) => (
+            <BrutalistCard hover={true}>
+              <div class="space-y-4">
+                <div class="text-5xl text-center">{scenario.icon}</div>
+                <div class="brutalist-badge brutalist-badge--danger text-center">
+                  PREVIOUSLY IMPOSSIBLE TO PRACTICE SAFELY
+                </div>
+                <h3 class="brutalist-subheading text-lg">{scenario.title}</h3>
+                <p class="text-gray-400 leading-relaxed">{scenario.description}</p>
+              </div>
+            </BrutalistCard>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- University Results -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          REAL RESULTS FROM
+          <br />
+          <span class="confidence-boost">LEADING UNIVERSITIES</span>
+        </h2>
+        <p class="text-lg text-gray-300 max-w-4xl mx-auto">
+          Universities using ClinicalVault report unprecedented improvements in training outcomes
+        </p>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--3">
+        {
+          universityResults.map((result) => (
+            <BrutalistCard hover={true}>
+              <div class="text-center space-y-4">
+                <div class="text-5xl">🏛️</div>
+                <h3 class="brutalist-subheading text-lg">{result.university}</h3>
+                <div class="text-2xl font-bold text-green-400">{result.result}</div>
+                <p class="text-gray-400 text-sm leading-relaxed">{result.detail}</p>
+              </div>
+            </BrutalistCard>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Security Guarantee -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <BrutalistCard variant="security" class="max-w-4xl mx-auto">
+        <div class="text-center space-y-6">
+          <div class="text-6xl">🛡️</div>
+          <h3 class="brutalist-subheading text-2xl">
+            BEYOND HIPAA. BEYOND COMPLIANCE.
+          </h3>
+          <p class="text-lg text-gray-300 leading-relaxed">
+            Your training sessions are protected by military-grade encryption. We use Fully Homomorphic Encryption (FHE) - our AI analyzes your sessions while they stay completely encrypted. Even we can't see your training conversations.
+          </p>
+          <div class="flex flex-wrap justify-center gap-6">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="font-medium">Zero-Knowledge Processing</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="font-medium">Military-Grade Encryption</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="font-medium">No Data Retention</span>
+            </div>
           </div>
         </div>
+      </BrutalistCard>
+    </div>
+  </section>
 
-        <!-- Security Guarantee -->
-        <div class="mb-16">
-          <Card
-            class="border border-blue-600/30 bg-blue-900/20 rounded-3xl overflow-hidden"
+  <!-- Final CTA -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="mental-health-safe max-w-4xl mx-auto text-center">
+        <div class="text-6xl mb-6">🎯</div>
+
+        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--blue"></div>
+          <span class="font-bold">LIMITED BETA ACCESS AVAILABLE</span>
+        </div>
+
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-8">
+          READY TO TRANSFORM YOUR
+          <br />
+          <span class="confidence-boost">TRAINING PROGRAM?</span>
+        </h2>
+
+        <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+          Join the universities already using ClinicalVault to train more confident, competent therapists.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <BrutalistButton 
+            href="/contact" 
+            variant="primary" 
+            size="lg"
+            data-demo-cta="primary"
+            data-variant={variantKey}
           >
-            <CardContent class="p-8 lg:p-12 text-center">
-              <div class="text-6xl mb-6 text-blue-400">🛡️</div>
-              <h3 class="text-lg lg:text-xl font-bold text-blue-100 mb-4">
-                Beyond HIPAA. Beyond Compliance.
-              </h3>
-              <p
-                class="text-base text-blue-200/90 mb-6 leading-relaxed max-w-3xl mx-auto"
-              >
-                Your training sessions are protected by military-grade
-                encryption. We use Fully Homomorphic Encryption (FHE) - our AI
-                analyzes your sessions while they stay completely encrypted.
-                Even we can't see your training conversations.
-              </p>
-              <div
-                class="flex items-center justify-center gap-6 text-blue-300/80 text-sm"
-              >
-                <span class="flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
-                  Zero-Knowledge Processing
-                </span>
-                <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:inline flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
-                  Military-Grade Encryption
-                </span>
-                <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:inline flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
-                  No Data Retention
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+            {currentVariant.cta}
+          </BrutalistButton>
+          <BrutalistButton 
+            href="/demo-hub" 
+            variant="secondary" 
+            size="lg"
+            data-demo-cta="secondary"
+          >
+            SCHEDULE UNIVERSITY DEMO
+          </BrutalistButton>
         </div>
 
-        <!-- Final CTA -->
-        <div class="text-center">
-          <Card
-            class="border border-red-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
-          >
-            <CardContent class="p-8 lg:p-12">
-              <div class="text-6xl text-red-400 mb-6">🎯</div>
-
-              <div class="mb-6">
-                <Badge
-                  class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full"
-                >
-                  <span class="animate-pulse w-2 h-2 bg-red-400 rounded-full"
-                  ></span>
-                  Limited Beta Access Available
-                </Badge>
-              </div>
-
-              <h2 class="text-2xl lg:text-4xl font-bold text-red-100 mb-8">
-                Ready to Transform Your
-                <br />
-                <span class="text-red-400 golden-shimmer"
-                  >Training Program?</span
-                >
-              </h2>
-
-              <p
-                class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
-              >
-                Join the universities already using ClinicalVault to train more
-                confident, competent therapists.
-              </p>
-
-              <div
-                class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6"
-              >
-                <Button
-                  size="lg"
-                  class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
-                  data-demo-cta="primary"
-                  data-variant={variantKey}
-                >
-                  {currentVariant.cta}
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  class="border-2 border-red-400 text-red-300 hover:bg-red-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
-                  data-demo-cta="secondary"
-                >
-                  Schedule University Demo
-                </Button>
-              </div>
-
-              <p class="text-xs text-red-300/70">
-                🎓 Made for universities • 🔒 Your data stays private • 💛 Loved
-                by therapy programs everywhere
-              </p>
-            </CardContent>
-          </Card>
+        <div class="flex flex-wrap justify-center gap-4">
+          <div class="brutalist-badge brutalist-badge--success">🎓 MADE FOR UNIVERSITIES</div>
+          <div class="brutalist-badge brutalist-badge--info">🔒 YOUR DATA STAYS PRIVATE</div>
+          <div class="brutalist-badge brutalist-badge--success">💛 LOVED BY THERAPY PROGRAMS</div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </BaseLayout>
 
-<style>
-  /* Organic Particles */
-  .particles-container {
-    overflow: hidden;
-  }
 
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #ef4444;
-    border-radius: 50%;
-    animation: float-organic 12s ease-in-out infinite;
-    opacity: 0.6;
-  }
-
-  .particle-1 {
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-    animation-duration: 15s;
-  }
-
-  .particle-2 {
-    top: 40%;
-    right: 20%;
-    animation-delay: 3s;
-    animation-duration: 18s;
-  }
-
-  .particle-3 {
-    bottom: 30%;
-    left: 25%;
-    animation-delay: 6s;
-    animation-duration: 12s;
-  }
-
-  .particle-4 {
-    top: 60%;
-    right: 40%;
-    animation-delay: 9s;
-    animation-duration: 20s;
-  }
-
-  .particle-5 {
-    bottom: 10%;
-    right: 10%;
-    animation-delay: 12s;
-    animation-duration: 16s;
-  }
-
-  @keyframes float-organic {
-    0%,
-    100% {
-      transform: translateY(0px) translateX(0px) scale(1);
-      opacity: 0.6;
-    }
-    25% {
-      transform: translateY(-30px) translateX(20px) scale(1.2);
-      opacity: 0.8;
-    }
-    50% {
-      transform: translateY(-10px) translateX(-15px) scale(0.9);
-      opacity: 0.4;
-    }
-    75% {
-      transform: translateY(20px) translateX(10px) scale(1.1);
-      opacity: 0.7;
-    }
-  }
-
-  /* Text Effects */
-  .golden-shimmer {
-    background: linear-gradient(45deg, #ef4444, #dc2626, #b91c1c);
-    background-size: 200% 200%;
-    animation: shimmer 3s ease-in-out infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  @keyframes shimmer {
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  /* Card Effects */
-  .organic-card {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .organic-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: transparent;
-    animation: organic-pulse 4s ease-in-out infinite;
-    transform: scale(0);
-  }
-
-  .organic-card:hover::before {
-    transform: scale(1);
-  }
-
-  @keyframes organic-pulse {
-    0%,
-    100% {
-      transform: scale(0) rotate(0deg);
-      opacity: 0;
-    }
-    50% {
-      transform: scale(1) rotate(180deg);
-      opacity: 1;
-    }
-  }
-
-  /* Breathing Animation */
-  .animate-breathe {
-    animation: breathe 3s ease-in-out infinite;
-  }
-
-  @keyframes breathe {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .particle {
-      width: 3px;
-      height: 3px;
-    }
-  }
-</style>
 
 <script>
   // Type definitions

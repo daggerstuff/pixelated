@@ -1,4 +1,4 @@
-import type { Session, User } from '@supabase/supabase-js'
+import type { Session, User } from '@/types/mongodb.types'
 
 export interface SessionData {
   user: User

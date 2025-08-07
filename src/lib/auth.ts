@@ -7,7 +7,7 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from './audit'
-import { supabase } from './supabase'
+import { mongoAuthService } from './supabase'
 // Note: This is an Astro project, Next.js types are not needed here
 // TODO: Replace with Astro-compatible types when implementing API auth
 
@@ -28,47 +28,36 @@ export async function getCurrentUser(
   cookies: APIContext['cookies'],
 ): Promise<AuthUser | null> {
   const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
-  const refreshToken = cookies.get(authConfig.cookies.refreshToken)?.value
 
-  if (!accessToken || !refreshToken) {
+  if (!accessToken) {
     return null
   }
 
   try {
-    // Set the session using the tokens
-    const { data, error } = await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    })
-
-    if (error || !data?.user) {
-      console.error('Session error:', error)
+    const decoded = await mongoAuthService.verifyAuthToken(accessToken)
+    if (!decoded) {
       return null
     }
 
-    // Get the user's profile
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', data.user.id)
-      .single()
+    // Assuming the decoded token contains the user ID
+    const userId = decoded.userId
 
-    // Return user with profile data
+    // Fetch user from the database
+    const user = await mongoAuthService.findUserById(userId)
+    if (!user) {
+      return null
+    }
+
     return {
-      id: data.user.id,
-      email: data.user.email || '',
-      role: (profileData?.role as AuthRole) || authConfig.roles.default,
-      fullName:
-        profileData?.['full_name'] || data.user.user_metadata?.['full_name'],
-      avatarUrl:
-        profileData?.['avatar_url'] || data.user.user_metadata?.['avatar_url'],
-      lastLogin: profileData?.last_login
-        ? new Date(profileData.last_login)
+      id: user._id.toString(),
+      email: user.email,
+      role: user.role as AuthRole,
+      fullName: user.profile?.firstName
+        ? `${user.profile.firstName} ${user.profile.lastName || ''}`.trim()
         : null,
-      metadata: {
-        ...data.user.user_metadata,
-        ...profileData?.metadata,
-      },
+      avatarUrl: user.profile?.avatarUrl,
+      lastLogin: user.lastLogin,
+      metadata: user.profile,
     }
   } catch (error) {
     console.error('Error getting current user:', error)

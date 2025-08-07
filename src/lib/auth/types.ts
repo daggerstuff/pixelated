@@ -1,10 +1,7 @@
-import type {
-  Session as SupabaseSession,
-  User as SupabaseUser,
-} from '@supabase/supabase-js'
+// Removed Supabase types, using custom AuthUser and SessionData instead
 
-export type User = SupabaseUser
-export type Session = SupabaseSession
+// type User = SupabaseUser
+// type Session = SupabaseSession
 
 export interface SessionData {
   sessionId: string

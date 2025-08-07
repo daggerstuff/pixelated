@@ -11,7 +11,7 @@ permissions:
 # Environment variables can be defined here
 env:
   NODE_VERSION: 22.16.0
-  PNPM_VERSION: 10.13.1
+  PNPM_VERSION: 
   NODE_ENV: production
 
 jobs:

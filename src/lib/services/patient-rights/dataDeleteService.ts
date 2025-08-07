@@ -1,5 +1,5 @@
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { supabase } from '../../supabase'
+import { mongoClient } from '../../supabase'
 import { getAuditLogger } from '../../security/audit.logging'
 import { generateId } from '../../utils/ids'
 
@@ -65,18 +65,9 @@ export async function createDataDeletionRequest(
     }
 
     // Insert into database
-    const { data, error } = await supabase
-      .from('data_deletion_requests')
-      .insert(deletionRequest)
-      .select()
-      .single()
-
-    if (error) {
-      logger.error('Failed to create data deletion request', { error, params })
-      throw new Error(
-        `Failed to create data deletion request: ${error.message}`,
-      )
-    }
+    const result = await mongoClient.db
+      .collection('data_deletion_requests')
+      .insertOne(deletionRequest)
 
     // Log the action for audit purposes
     auditLogger.log({
@@ -92,7 +83,7 @@ export async function createDataDeletionRequest(
       },
     })
 
-    return data as DataDeletionRequest
+    return deletionRequest
   } catch (error) {
     logger.error('Error in createDataDeletionRequest', {
       error: error instanceof Error ? error.message : String(error),
@@ -109,23 +100,11 @@ export async function getDataDeletionRequest(
   id: string,
 ): Promise<DataDeletionRequest | null> {
   try {
-    const { data, error } = await supabase
-      .from('data_deletion_requests')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const request = await mongoClient.db
+      .collection('data_deletion_requests')
+      .findOne({ id })
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No data found
-        return null
-      }
-
-      logger.error('Failed to get data deletion request', { error, id })
-      throw new Error(`Failed to get data deletion request: ${error.message}`)
-    }
-
-    return data as DataDeletionRequest
+    return request as DataDeletionRequest | null
   } catch (error) {
     logger.error('Error in getDataDeletionRequest', {
       error: error instanceof Error ? error.message : String(error),
@@ -144,34 +123,26 @@ export async function getAllDataDeletionRequests(filters?: {
   dataScope?: 'all' | 'specific'
 }): Promise<DataDeletionRequest[]> {
   try {
-    let query = supabase
-      .from('data_deletion_requests')
-      .select('*')
-      .order('dateRequested', { ascending: false })
-
-    // Apply filters if provided
+    const query = mongoClient.db.collection('data_deletion_requests')
+    const filter: any = {}
     if (filters) {
       if (filters.status) {
-        query = query.eq('status', filters.status)
+        filter.status = filters.status
       }
-
       if (filters.patientId) {
-        query = query.eq('patientId', filters.patientId)
+        filter.patientId = filters.patientId
       }
-
       if (filters.dataScope) {
-        query = query.eq('dataScope', filters.dataScope)
+        filter.dataScope = filters.dataScope
       }
     }
 
-    const { data, error } = await query
+    const requests = await query
+      .find(filter)
+      .sort({ dateRequested: -1 })
+      .toArray()
 
-    if (error) {
-      logger.error('Failed to get data deletion requests', { error, filters })
-      throw new Error(`Failed to get data deletion requests: ${error.message}`)
-    }
-
-    return data as DataDeletionRequest[]
+    return requests as DataDeletionRequest[]
   } catch (error) {
     logger.error('Error in getAllDataDeletionRequests', {
       error: error instanceof Error ? error.message : String(error),
@@ -200,22 +171,20 @@ export async function updateDataDeletionRequest(
     }
 
     // Update the request in the database
-    const { data, error } = await supabase
-      .from('data_deletion_requests')
-      .update(updateData)
-      .eq('id', params.id)
-      .select()
-      .single()
-
-    if (error) {
-      logger.error('Failed to update data deletion request', { error, params })
-      throw new Error(
-        `Failed to update data deletion request: ${error.message}`,
+    const result = await mongoClient.db
+      .collection('data_deletion_requests')
+      .findOneAndUpdate(
+        { id: params.id },
+        { $set: updateData },
+        { returnDocument: 'after' },
       )
+
+    if (!result.value) {
+      throw new Error('Failed to update data deletion request')
     }
 
     // Get the full request data for audit logging
-    const updatedRequest = data as DataDeletionRequest
+    const updatedRequest = result.value as DataDeletionRequest
 
     // Log the action for audit purposes
     auditLogger.log({
@@ -325,17 +294,35 @@ async function executeDataDeletion(
  * Delete all data for a patient
  */
 async function deleteAllPatientData(patientId: string): Promise<void> {
-  // Start a transaction to ensure all or nothing deletion
-  const { error } = await supabase.rpc('delete_all_patient_data', {
-    p_patient_id: patientId,
-  })
+  const collections = [
+    'patient_profiles',
+    'patient_demographics',
+    'therapy_sessions',
+    'session_notes',
+    'patient_assessments',
+    'assessment_results',
+    'emotion_records',
+    'emotion_tracking_data',
+    'clinical_notes',
+    'therapist_observations',
+    'patient_messages',
+    'communication_logs',
+    'patient_uploads',
+    'media_files',
+  ]
 
-  if (error) {
-    logger.error('Error in deleteAllPatientData transaction', {
-      error,
-      patientId,
+  const session = mongoClient.client.startSession()
+
+  try {
+    await session.withTransaction(async () => {
+      for (const collection of collections) {
+        await mongoClient.db
+          .collection(collection)
+          .deleteMany({ patient_id: patientId }, { session })
+      }
     })
-    throw new Error(`Failed to delete all patient data: ${error.message}`)
+  } finally {
+    await session.endSession()
   }
 }
 
@@ -369,19 +356,9 @@ async function deleteSpecificPatientData(
 
     // Delete from each table for this category
     for (const table of tables) {
-      const { error } = await supabase
-        .from(table)
-        .delete()
-        .eq('patient_id', patientId)
-
-      if (error) {
-        // Log but continue with other tables
-        logger.error(`Error deleting from ${table}`, {
-          error,
-          patientId,
-          category,
-        })
-      }
+      await mongoClient.db
+        .collection(table)
+        .deleteMany({ patient_id: patientId })
     }
   }
 }

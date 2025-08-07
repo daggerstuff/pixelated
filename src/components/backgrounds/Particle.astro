@@ -144,10 +144,13 @@
         }
       }
 
-      customElements.define('bg-particle', BgParticleElement)
+      if (!customElements.get('bg-particle')) {
+        customElements.define('bg-particle', BgParticleElement)
+      }
     }
-  ).catch(error => {
-    console.error('Failed to load p5.js:', error)
-  })
+    })
+    .catch(error => {
+      console.error('Failed to load p5.js:', error)
+    });
   }
 </script>

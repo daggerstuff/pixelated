@@ -5,7 +5,7 @@ FROM node:${NODE_VERSION}-slim AS base
 
 LABEL org.opencontainers.image.description="Astro"
 
-ARG PNPM_VERSION=10.13.1
+ARG PNPM_VERSION=10.14.0
 RUN npm install -g pnpm@$PNPM_VERSION
 
 RUN apt-get update -qq && \

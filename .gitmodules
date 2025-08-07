@@ -1,3 +1,4 @@
 [submodule "ai"]
 	path = ai
-	url = git@gitlab.com:pixelatedtech/pixel-ai.git
+	url = ssh://git@git.pixelatedempathy.tech/chad/ai.git
+	ignore = all

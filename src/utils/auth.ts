@@ -1,48 +1,154 @@
-import { createClient } from '@supabase/supabase-js'
+import { ObjectId } from 'mongodb'
 
-interface AuthInfo {
+export interface User {
+  _id?: ObjectId
+  id?: string
+  email: string
+  password?: string // hashed password
+  role: 'admin' | 'user' | 'therapist'
+  profile?: {
+    firstName?: string
+    lastName?: string
+    avatarUrl?: string
+    bio?: string
+  }
+  emailVerified: boolean
+  emailVerificationToken?: string
+  passwordResetToken?: string
+  passwordResetExpires?: Date
+  lastLogin?: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Session {
+  _id?: ObjectId
+  userId: ObjectId
+  token: string
+  expiresAt: Date
+  createdAt: Date
+  ipAddress?: string
+  userAgent?: string
+}
+
+export interface Todo {
+  _id?: ObjectId
+  id?: string
+  name: string
+  description?: string
+  completed: boolean
+  userId?: ObjectId // For user-specific todos
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface AIMetrics {
+  _id?: ObjectId
+  id?: string
+  userId: ObjectId
+  sessionId: string
+  modelName: string
+  requestType: string
+  tokensUsed: number
+  responseTime: number
+  timestamp: Date
+  metadata?: Record<string, any>
+}
+
+export interface BiasDetection {
+  _id?: ObjectId
+  id?: string
+  userId: ObjectId
+  sessionId: string
+  detectedBias: string
+  biasType: string
+  confidence: number
+  contextSnippet: string
+  correctionSuggestion?: string
+  timestamp: Date
+}
+
+export interface TreatmentPlan {
+  _id?: ObjectId
+  id?: string
+  userId: ObjectId
+  therapistId: ObjectId
+  title: string
+  description: string
+  goals: string[]
+  interventions: string[]
+  status: 'active' | 'completed' | 'paused'
+  startDate: Date
+  endDate?: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CrisisSessionFlag {
+  _id?: ObjectId
+  id?: string
+  userId: ObjectId
+  sessionId: string
+  flagType: 'suicide_risk' | 'self_harm' | 'crisis'
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  description: string
+  resolved: boolean
+  resolvedAt?: Date
+  resolvedBy?: ObjectId
+  createdAt: Date
+}
+
+export interface ConsentManagement {
+  _id?: ObjectId
+  id?: string
+  userId: ObjectId
+  consentType: string
+  granted: boolean
+  version: string
+  grantedAt?: Date
+  revokedAt?: Date
+  ipAddress?: string
+}
+
+// This is a placeholder for what the decoded token might look like.
+// You should adjust this based on your actual token verification logic.
+export interface AuthInfo {
   userId: string
-  role: string
+  role: 'admin' | 'user' | 'therapist'
   session: string
 }
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!,
-)
-
 /**
- * Verify and decode the auth token
- * @param authHeader The Authorization header value
- * @returns The decoded auth context
- * @throws Error if token is invalid
+ * Verify and decode the auth token.
+ * This is a placeholder function. You should implement your actual
+ * token verification logic here, e.g., using a library like 'jsonwebtoken'.
+ * @param authHeader The Authorization header from the request.
+ * @returns The decoded auth context.
+ * @throws Error if token is invalid.
  */
-export async function verifyAuthToken(authHeader: string): Promise<AuthInfo> {
-  if (!authHeader.startsWith('Bearer ')) {
-    throw new Error('Invalid token format')
+export async function verifyAuthToken(
+  authHeader: string | null,
+): Promise<AuthInfo> {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('Invalid or missing authorization token')
   }
 
   const token = authHeader.split(' ')[1]
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser(token)
 
-  if (error || !user) {
-    throw new Error('Invalid token')
+  // Here you would typically verify the token against a secret,
+  // check its expiration, and decode it to get user information.
+  // For this example, we'll return a mock AuthInfo object.
+  // Replace this with your actual implementation.
+
+  // Example of what you might get from a decoded JWT
+  const decodedPayload = {
+    userId: 'mock-user-id',
+    role: 'user' as const,
   }
 
-  // Get user's role from profiles table
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
   return {
-    userId: user.id,
-    role: profile?.role || 'user',
+    userId: decodedPayload.userId,
+    role: decodedPayload.role,
     session: token,
   }
 }

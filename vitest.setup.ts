@@ -26,8 +26,9 @@ vi.mock('astro:env/server', () => ({
     'AS3JAAIjcDFlOGQ0YWIzOGYxYmU0MDU3YTlmZGFmYjI1NjQ1OGUwZHAxMA',
   NODE_ENV: 'test',
   DATABASE_URL:
-    process.env['DATABASE_URL'] ||
-    'postgresql://postgres:I7iOlqwkCiIDVoNQ@db.dihivzkwbwpkpebichlk.supabase.co:5432/postgres',
+    process.env['DATABASE_URL'] || 'mongodb://localhost:27017/pixelated_test',
+  MONGODB_URI:
+    process.env['MONGODB_URI'] || 'mongodb://localhost:27017/pixelated_test',
 }))
 
 // Mock Redis service for tests that don't need real Redis

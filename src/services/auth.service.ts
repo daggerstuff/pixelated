@@ -1,7 +1,9 @@
-import type { User } from '@supabase/supabase-js'
+import type { User } from '@/types/mongodb.types'
 import type { AuthUser, Provider } from '../types/auth'
 import { createSecureToken, verifySecureToken } from '../lib/security'
-import { supabase } from '../lib/supabase'
+import { MongoAuthService } from './mongoAuth.service'
+
+const authService = new MongoAuthService()
 
 /**
  * Sign in with email and password
@@ -11,16 +13,12 @@ import { supabase } from '../lib/supabase'
  */
 export async function signInWithEmail(email: string, password: string) {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { user, token } = await authService.signIn(email, password)
 
-    if (error) {
-      throw error
+    return {
+      user: mapToAuthUser(user),
+      session: { access_token: token, refresh_token: token },
     }
-    const user = data.user ? mapToAuthUser(data.user) : null
-    return { user, session: data.session }
   } catch (error) {
     console.error('Error signing in:', error)
     throw error
@@ -34,15 +32,10 @@ export async function signInWithEmail(email: string, password: string) {
  */
 export async function signInWithOAuth(provider: Provider, redirectTo?: string) {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: redirectTo ? { redirectTo } : {},
-    })
-
-    if (error) {
-      throw error
-    }
-    return data
+    // This would need to be implemented based on your OAuth setup
+    throw new Error(
+      'OAuth sign in not implemented yet. Please implement based on your OAuth provider.',
+    )
   } catch (error) {
     console.error('Error signing in with OAuth:', error)
     throw error
@@ -62,17 +55,16 @@ export async function signUp(
   metadata?: { fullName?: string },
 ) {
   try {
-    const signUpData = metadata
-      ? { email, password, options: { data: metadata } }
-      : { email, password }
+    const user = await authService.createUser(email, password)
+    const { user: signedInUser, token } = await authService.signIn(
+      email,
+      password,
+    )
 
-    const { data, error } = await supabase.auth.signUp(signUpData)
-
-    if (error) {
-      throw error
+    return {
+      user: mapToAuthUser(signedInUser),
+      session: { access_token: token, refresh_token: token },
     }
-    const user = data.user ? mapToAuthUser(data.user) : null
-    return { user, session: data.session }
   } catch (error) {
     console.error('Error signing up:', error)
     throw error
@@ -82,12 +74,9 @@ export async function signUp(
 /**
  * Sign out the current user
  */
-export async function signOut() {
+export async function signOut(token: string) {
   try {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      throw error
-    }
+    await authService.signOut(token)
     return true
   } catch (error) {
     console.error('Error signing out:', error)
@@ -96,17 +85,19 @@ export async function signOut() {
 }
 
 /**
- * Get the current user
+ * Get the current user by token
  * @returns Current authenticated user or null
  */
-export async function getCurrentUser() {
+export async function getCurrentUser(authHeader: string) {
   try {
-    const { data } = await supabase.auth.getUser()
-    if (!data.user) {
+    const authInfo = await authService.verifyAuthToken(authHeader)
+    const user = await authService.getUserById(authInfo.userId)
+
+    if (!user) {
       return null
     }
 
-    return mapToAuthUser(data.user)
+    return mapToAuthUser(user)
   } catch (error) {
     console.error('Error getting current user:', error)
     return null
@@ -120,19 +111,10 @@ export async function getCurrentUser() {
  */
 export async function resetPassword(email: string, redirectTo?: string) {
   try {
-    // Set the redirectTo to our auth-callback page which will handle the token securely
-    const authCallbackUrl = redirectTo
-      ? `${new URL('/auth-callback', new URL(redirectTo).origin).toString()}`
-      : `${new URL('/auth-callback', new URL(window.location.origin).origin).toString()}`
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: authCallbackUrl,
-    })
-
-    if (error) {
-      throw error
-    }
-    return true
+    // For MongoDB implementation, you'd need to implement email sending
+    throw new Error(
+      'Password reset not implemented yet. Please implement email sending logic.',
+    )
   } catch (error) {
     console.error('Error resetting password:', error)
     throw error
@@ -141,17 +123,17 @@ export async function resetPassword(email: string, redirectTo?: string) {
 
 /**
  * Update user password
- * @param password New password
+ * @param userId User ID
+ * @param currentPassword Current password
+ * @param newPassword New password
  */
-export async function updatePassword(password: string) {
+export async function updatePassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+) {
   try {
-    const { error } = await supabase.auth.updateUser({
-      password,
-    })
-
-    if (error) {
-      throw error
-    }
+    await authService.changePassword(userId, currentPassword, newPassword)
     return true
   } catch (error) {
     console.error('Error updating password:', error)
@@ -189,8 +171,8 @@ export function verifyAuthToken(token: string, purpose: string) {
 }
 
 /**
- * Map Supabase user to AuthUser
- * @param user Supabase user
+ * Map MongoDB user to AuthUser
+ * @param user MongoDB user
  * @returns AuthUser object
  */
 export function mapToAuthUser(user: User): AuthUser | null {
@@ -199,18 +181,18 @@ export function mapToAuthUser(user: User): AuthUser | null {
   }
 
   return {
-    id: user.id,
+    id: user._id?.toString() || '',
     email: user.email,
-    name: user.user_metadata?.['fullName'] || '',
-    image: user.user_metadata?.['avatarUrl'] || '',
-    role: user.app_metadata?.['role'] || 'guest',
-    fullName: user.user_metadata?.['fullName'] || '',
-    roles: user.app_metadata?.['roles'] || [],
-    emailVerified: !!user.email_confirmed_at,
-    createdAt: user.created_at,
-    lastSignIn: user.last_sign_in_at,
-    avatarUrl: user.user_metadata?.['avatarUrl'] || '',
-    metadata: user.user_metadata || {},
+    name: user.metadata?.fullName || user.fullName || '',
+    image: user.metadata?.avatarUrl || user.avatarUrl || '',
+    role: user.role || 'user',
+    fullName: user.metadata?.fullName || user.fullName || '',
+    roles: [user.role],
+    emailVerified: user.emailVerified || false,
+    createdAt: user.createdAt?.toISOString() || new Date().toISOString(),
+    lastSignIn: user.lastLogin?.toISOString() || null,
+    avatarUrl: user.metadata?.avatarUrl || user.avatarUrl || '',
+    metadata: user.metadata || {},
   }
 }
 
@@ -229,36 +211,14 @@ export async function updateProfile(
   },
 ) {
   try {
-    // Create update object
-    const updates: {
-      data: Record<string, unknown>
-    } = {
-      data: {},
-    }
-
-    // Add profile data to updates
-    if (profile.fullName) {
-      updates.data['fullName'] = profile.fullName
-    }
-
-    if (profile.avatarUrl) {
-      updates.data['avatarUrl'] = profile.avatarUrl
-    }
-
-    if (profile.metadata && Object.keys(profile.metadata).length > 0) {
-      updates.data = {
-        ...updates.data,
-        ...profile.metadata,
-      }
-    }
-
-    // Update the user metadata
-    const { error } = await supabase.auth.admin.updateUserById(userId, {
-      user_metadata: updates.data,
+    const updatedUser = await authService.updateUser(userId, {
+      fullName: profile.fullName,
+      avatarUrl: profile.avatarUrl,
+      metadata: profile.metadata,
     })
 
-    if (error) {
-      throw error
+    if (!updatedUser) {
+      throw new Error('Failed to update profile')
     }
 
     return { success: true }
@@ -269,7 +229,7 @@ export async function updateProfile(
 }
 
 /**
- * Verify a one-time password
+ * Verify a one-time password (placeholder for MongoDB implementation)
  * @param params OTP verification parameters
  * @returns Auth response
  */
@@ -280,52 +240,15 @@ export async function verifyOtp(params: {
   type?: 'email' | 'sms' | 'recovery' | 'email_change'
 }) {
   try {
-    // Create proper parameters based on OTP type
-    if (params.type === 'sms') {
-      // For SMS, we need phone and token
-      if (!params.phone) {
-        throw new Error('Phone is required for SMS verification')
-      }
-
-      const { data, error } = await supabase.auth.verifyOtp({
-        phone: params.phone,
-        token: params.token,
-        type: 'sms',
-      })
-
-      if (error) {
-        throw error
-      }
-
-      return {
-        success: true,
-        user: data?.user ? mapToAuthUser(data.user) : null,
-        session: data?.session || null,
-      }
-    } else {
-      // For email-based verification types
-      if (!params.email) {
-        throw new Error('Email is required for email verification')
-      }
-
-      const { data, error } = await supabase.auth.verifyOtp({
-        email: params.email,
-        token: params.token,
-        type: params.type || 'recovery',
-      })
-
-      if (error) {
-        throw error
-      }
-
-      return {
-        success: true,
-        user: data?.user ? mapToAuthUser(data.user) : null,
-        session: data?.session || null,
-      }
-    }
+    // This would need to be implemented based on your OTP system
+    throw new Error(
+      'OTP verification not implemented yet. Please implement based on your OTP provider.',
+    )
   } catch (error) {
     console.error('Error verifying OTP:', error)
     return { success: false, error }
   }
 }
+
+// Export the auth service class for direct use
+export { MongoAuthService as AuthService }

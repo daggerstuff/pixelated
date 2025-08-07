@@ -1,0 +1,11 @@
+{
+  "context_servers": {
+    "mcp-server-byterover": {
+      "settings": {
+        "source": "extension",
+        "memory_workspace_key": "pk-br-d31ed9fd-567f-4bdf-a6ee-bfbe802fdd3b",
+        "user_email": "chad@gemcity.xyz"
+      }
+    }
+  }
+}

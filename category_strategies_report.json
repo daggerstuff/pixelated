@@ -1,0 +1,62 @@
+{
+  "strategy_manager_info": {
+    "total_strategies": 2,
+    "supported_categories": [
+      "mental_health",
+      "reasoning_cot"
+    ],
+    "report_timestamp": "2025-08-01T12:01:32.889066"
+  },
+  "registered_strategies": {
+    "mental_health": {
+      "strategy_name": "general_balanced",
+      "complexity_level": "simple",
+      "quality_thresholds": {
+        "min_quality_score": 0.6,
+        "min_coherence_score": 0.6,
+        "min_authenticity_score": 0.7,
+        "min_therapeutic_accuracy": 0.8
+      },
+      "processing_parameters": {
+        "batch_size": 100,
+        "max_workers": 4,
+        "enable_caching": true
+      },
+      "validation_settings": {
+        "strict_validation": false,
+        "require_therapeutic_context": false,
+        "validate_clinical_accuracy": false
+      },
+      "error_handling": {
+        "continue_on_error": true,
+        "max_error_rate": 0.1,
+        "retry_failed_items": true
+      }
+    },
+    "reasoning_cot": {
+      "strategy_name": "reasoning_specialized",
+      "complexity_level": "complex",
+      "quality_thresholds": {
+        "min_quality_score": 0.7,
+        "min_coherence_score": 0.8,
+        "min_authenticity_score": 0.7,
+        "min_therapeutic_accuracy": 0.8
+      },
+      "processing_parameters": {
+        "batch_size": 50,
+        "max_workers": 4,
+        "enable_caching": true
+      },
+      "validation_settings": {
+        "strict_validation": true,
+        "require_therapeutic_context": false,
+        "validate_clinical_accuracy": false
+      },
+      "error_handling": {
+        "continue_on_error": true,
+        "max_error_rate": 0.1,
+        "retry_failed_items": true
+      }
+    }
+  }
+}

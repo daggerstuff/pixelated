@@ -161,20 +161,12 @@ if [ ! -z "$KEY_VAULT_NAME" ] && [ "$KEY_VAULT_NAME" != "null" ]; then
             --output none
     fi
     
-    # Store Supabase secrets
-    if [ ! -z "$SUPABASE_URL" ]; then
+    # Store MongoDB connection string
+    if [ ! -z "$MONGODB_URI" ]; then
         az keyvault secret set \
             --vault-name "$KEY_VAULT_NAME" \
-            --name "supabase-url" \
-            --value "$SUPABASE_URL" \
-            --output none
-    fi
-    
-    if [ ! -z "$SUPABASE_ANON_KEY" ]; then
-        az keyvault secret set \
-            --vault-name "$KEY_VAULT_NAME" \
-            --name "supabase-anon-key" \
-            --value "$SUPABASE_ANON_KEY" \
+            --name "mongodb-uri" \
+            --value "$MONGODB_URI" \
             --output none
     fi
     

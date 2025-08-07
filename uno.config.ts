@@ -35,6 +35,16 @@ export default defineConfig({
     presetIcons({
       scale: 1.2,
       warn: true,
+      collections: {
+        ri: () => import('@iconify-json/ri/icons.json').then(i => i.default),
+        uil: () => import('@iconify-json/uil/icons.json').then(i => i.default),
+        lucide: () => import('@iconify-json/lucide/icons.json').then(i => i.default),
+        //        ph: () => import('@iconify-json/ph/icons.json').then(i => i.default),
+        bx: () => import('@iconify-json/bx/icons.json').then(i => i.default),
+        carbon: () => import('@iconify-json/carbon/icons.json').then(i => i.default),
+        'fa-solid': () => import('@iconify-json/fa-solid/icons.json').then(i => i.default),
+        'grommet-icons': () => import('@iconify-json/grommet-icons/icons.json').then(i => i.default),
+      },
     }),
     presetTypography(),
   ],

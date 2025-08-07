@@ -103,7 +103,6 @@ temp/
 # Editor directories and files
 .vscode/
 !.vscode/extensions.json
-.idea
 *.suo
 *.ntvs*
 *.njsproj
@@ -121,3 +120,8 @@ deploy/
 # Development only files
 .gitpod/
 .devcontainer/
+
+/scripts/deploy-app-to-oracle.sh
+/scripts/deploy-oracle-automated.sh
+/scripts/deploy-oracle-cloud.sh
+/scripts/deployment-memory-manager.sh

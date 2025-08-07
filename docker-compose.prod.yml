@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  pixelated-empathy:
+    image: pixelated-empathy:latest
+    container_name: pixelated-empathy
+    restart: unless-stopped
+    ports:
+      - "80:4321"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=4321
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4321/api/health/simple"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    networks:
+      - pixelated-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pixelated.rule=Host(`pixelatedempathy.com`)"
+      - "traefik.http.routers.pixelated.entrypoints=websecure"
+      - "traefik.http.routers.pixelated.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pixelated.loadbalancer.server.port=4321"
+
+networks:
+  pixelated-network:
+    driver: bridge

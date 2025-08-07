@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro'
-import { createAuditLog } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session'
-import { supabase } from '../../../lib/db/supabase'
+import mongodb from '../../../config/mongodb.config'
 
 export const GET: APIRoute = async ({ request, url }) => {
   try {
@@ -19,51 +18,52 @@ export const GET: APIRoute = async ({ request, url }) => {
     const { user } = session
 
     // Get query parameters
-    const period = url.searchParams.get('period') || 'weekly'
-    const startDate = url.searchParams.get('startDate')
-      ? new Date(url.searchParams.get('startDate')!)
-      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Default to last 30 days
-    const endDate = url.searchParams.get('endDate')
-      ? new Date(url.searchParams.get('endDate')!)
-      : new Date()
-    const model = url.searchParams.get('model') || undefined
-    const limit = Number.parseInt(url.searchParams.get('limit') || '100', 10)
+    const searchParams = new URL(request.url).searchParams
+    const timeRange = searchParams.get('timeRange') || '24h'
+    const modelType = searchParams.get('modelType') || 'all'
 
-    // Log the analytics request
-    await createAuditLog({
-      userId: user.id,
-      action: 'ai.performance.metrics.request',
-      resource: 'ai',
-      metadata: {
-        period,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        model,
-        limit,
-      },
-    })
-
-    // Build the query
-    const { data: results, error } = await supabase
-      .rpc('get_ai_metrics', {
-        p_period: period,
-        p_start_date: startDate.toISOString(),
-        p_end_date: endDate.toISOString(),
-        p_model: model,
-        p_limit: limit,
-      })
-      .then((response) => response.data)
-
-    if (error) {
-      throw error
+    // Calculate time bounds
+    const now = new Date()
+    let startTime: Date
+    switch (timeRange) {
+      case '1h':
+        startTime = new Date(now.getTime() - 60 * 60 * 1000)
+        break
+      case '24h':
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        break
+      case '7d':
+        startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        break
+      case '30d':
+        startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        break
+      default:
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000)
     }
+
+    const db = await mongodb.connect()
+
+    // Query AI performance metrics from MongoDB
+    const metricsCollection = db.collection('ai_performance_metrics')
+
+    const query: any = {
+      timestamp: { $gte: startTime, $lte: now },
+    }
+
+    if (modelType !== 'all') {
+      query.model_type = modelType
+    }
+
+    const results = await metricsCollection.find(query).toArray()
 
     // Process and format the results
     const metrics =
       results?.map(
         (row: {
-          date_trunc: string
-          model: string
+          _id: string
+          timestamp: Date
+          model_type: string
           request_count: number
           success_count: number
           cached_count: number
@@ -75,8 +75,8 @@ export const GET: APIRoute = async ({ request, url }) => {
           max_latency: number
           min_latency: number
         }) => ({
-          date: row.date_trunc,
-          model: row.model,
+          date: row.timestamp,
+          model: row.model_type,
           requestCount: Number(row.request_count),
           latency: {
             avg: Number(row.avg_latency),
@@ -96,32 +96,57 @@ export const GET: APIRoute = async ({ request, url }) => {
       ) ?? []
 
     // Get model breakdown
-    const { data: modelBreakdown, error: modelBreakdownError } = await supabase
-      .rpc('get_ai_model_breakdown', {
-        p_start_date: startDate.toISOString(),
-        p_end_date: endDate.toISOString(),
-      })
-      .then((response) => response.data)
+    const modelBreakdown = results.reduce((acc: any, row: any) => {
+      const {
+        model_type,
+        request_count,
+        success_count,
+        cached_count,
+        optimized_count,
+        total_tokens,
+      } = row
 
-    if (modelBreakdownError) {
-      throw modelBreakdownError
-    }
+      const existingModel = acc.find((item: any) => item.model === model_type)
+
+      if (existingModel) {
+        existingModel.requestCount += request_count
+        existingModel.totalTokens += total_tokens
+        existingModel.successCount += success_count
+        existingModel.cachedCount += cached_count
+        existingModel.optimizedCount += optimized_count
+      } else {
+        acc.push({
+          model: model_type,
+          requestCount: request_count,
+          totalTokens: total_tokens,
+          successCount: success_count,
+          cachedCount: cached_count,
+          optimizedCount: optimized_count,
+        })
+      }
+
+      return acc
+    }, [])
 
     // Get error breakdown
-    const { data: errorBreakdown, error: errorBreakdownError } = await supabase
-      .rpc('get_ai_error_breakdown', {
-        p_start_date: startDate.toISOString(),
-        p_end_date: endDate.toISOString(),
-      })
-      .then((response) => response.data)
+    const errorBreakdown = results.reduce((acc: any, row: any) => {
+      const { error_code } = row
 
-    if (errorBreakdownError) {
-      throw errorBreakdownError
-    }
+      const existingError = acc.find(
+        (item: any) => item.errorCode === error_code,
+      )
 
-    if (errorBreakdownError) {
-      throw errorBreakdownError
-    }
+      if (existingError) {
+        existingError.count += 1
+      } else {
+        acc.push({
+          errorCode: error_code,
+          count: 1,
+        })
+      }
+
+      return acc
+    }, [])
 
     // Return the metrics
     return new Response(
@@ -149,12 +174,10 @@ export const GET: APIRoute = async ({ request, url }) => {
             }),
           ) ?? [],
         errorBreakdown:
-          errorBreakdown?.map(
-            (row: { error_code: string; error_count: number }) => ({
-              errorCode: row.error_code,
-              count: Number(row.error_count),
-            }),
-          ) ?? [],
+          errorBreakdown?.map((row: { errorCode: string; count: number }) => ({
+            errorCode: row.errorCode,
+            count: Number(row.count),
+          })) ?? [],
       }),
       {
         status: 200,

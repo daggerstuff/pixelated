@@ -5,8 +5,9 @@ import CardHeader from '@/components/ui/CardHeader.astro';
 import CardContent from '@/components/ui/CardContent.astro';
 import CardTitle from '@/components/ui/CardTitle.astro';
 import Badge from '@/components/ui/Badge.astro'
-import { supabase } from '@/lib/supabase'
+import mongodb from '@/config/mongodb.config'
 import { Icon } from 'astro-icon/components'
+
 function formatDate(dateInput: any, options: any = {}) {
   if (!dateInput) return '-';
   const date = new Date(dateInput);
@@ -69,26 +70,66 @@ interface ConsentVersionResponse {
 }
 
 // Fetch data with proper typing
-const { data: activeConsents, error: activeConsentsError } = await supabase
-  .from('user_consents')
-  .select('id, consent_version_id, consent_versions(consent_type_id, consent_types(name))')
-  .eq('is_active', true) as { data: ActiveConsentResponse[] | null, error: any }
+const db = mongodb.db;
 
-const { data: withdrawnConsents, error: withdrawnConsentsError } = await supabase
-  .from('user_consents')
-  .select('id, withdrawal_date, withdrawal_reason, consent_version_id, consent_versions(consent_type_id, consent_types(name))')
-  .eq('is_active', false)
-  .not('withdrawal_date', 'is', null) as { data: WithdrawnConsentResponse[] | null, error: any }
+const activeConsents = await db.collection('user_consents').aggregate([
+  { $match: { is_active: true } },
+  {
+    $lookup: {
+      from: 'consent_versions',
+      localField: 'consent_version_id',
+      foreignField: '_id',
+      as: 'consent_versions'
+    }
+  },
+  { $unwind: '$consent_versions' },
+  {
+    $lookup: {
+      from: 'consent_types',
+      localField: 'consent_versions.consent_type_id',
+      foreignField: '_id',
+      as: 'consent_versions.consent_types'
+    }
+  },
+  { $unwind: '$consent_versions.consent_types' }
+]).toArray();
 
-const { data: consentTypes, error: consentTypesError } = await supabase
-  .from('consent_types')
-  .select('id, name, scope, is_active') as { data: ConsentType[] | null, error: any }
+const withdrawnConsents = await db.collection('user_consents').aggregate([
+  { $match: { is_active: false, withdrawal_date: { $ne: null } } },
+    {
+    $lookup: {
+      from: 'consent_versions',
+      localField: 'consent_version_id',
+      foreignField: '_id',
+      as: 'consent_versions'
+    }
+  },
+  { $unwind: '$consent_versions' },
+  {
+    $lookup: {
+      from: 'consent_types',
+      localField: 'consent_versions.consent_type_id',
+      foreignField: '_id',
+      as: 'consent_versions.consent_types'
+    }
+  },
+  { $unwind: '$consent_versions.consent_types' }
+]).toArray();
 
-const { data: consentVersions, error: consentVersionsError } = await supabase
-  .from('consent_versions')
-  .select('id, version, consent_type_id, consent_types(name), is_current, effective_date')
-  .order('consent_type_id', { ascending: true })
-  .order('effective_date', { ascending: false }) as { data: ConsentVersionResponse[] | null, error: any }
+const consentTypes = await db.collection('consent_types').find().toArray();
+
+const consentVersions = await db.collection('consent_versions').aggregate([
+  {
+    $lookup: {
+      from: 'consent_types',
+      localField: 'consent_type_id',
+      foreignField: '_id',
+      as: 'consent_types'
+    }
+  },
+  { $unwind: '$consent_types' },
+  { $sort: { 'consent_types.name': 1, effective_date: -1 } }
+]).toArray();
 
 // Type for consent version with joined data from consent_types
 interface ConsentVersionWithTypeName {
@@ -150,13 +191,7 @@ const withdrawalsByType: Record<string, number> = {};
 
 
 
-// Handle errors
-const hasErrors = Boolean(
-  activeConsentsError ||
-  withdrawnConsentsError ||
-  consentTypesError ||
-  consentVersionsError
-)
+
 ---
 
 <div class="space-y-6">
@@ -180,22 +215,7 @@ const hasErrors = Boolean(
     </div>
   </div>
 
-  {
-    hasErrors && (
-      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <Icon name="tabler:alert-triangle" class="h-5 w-5 text-red-500" />
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-700">
-              Error loading consent data. Please try refreshing the page.
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  
 
   <!-- Dashboard Stats Cards -->
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

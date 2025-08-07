@@ -30,13 +30,14 @@ export enum AuditEventType {
   CREATE = 'create', // Creating new PHI
   MODIFY = 'modify', // Modifying existing PHI
   DELETE = 'delete', // Deleting PHI
-  EXPORT = 'export', // Exporting/downloading PHI
-  SHARE = 'share', // Sharing PHI with another user/system
+  // Exporting/downloading PHI
+  // Sharing PHI with another user/system
   LOGIN = 'login', // User login
   LOGOUT = 'logout', // User logout
+  REGISTER = 'register', // User registration
   SYSTEM = 'system', // System level events
   SECURITY = 'security', // Security related events
-  ADMIN = 'admin', // Administrative actions
+  // Administrative actions
   CONSENT = 'consent', // Patient consent operations
   AI_OPERATION = 'ai', // AI operations on PHI
   DLP_ALLOWED = 'dlp_allowed', // DLP allowed transmission of content (possibly after redaction)

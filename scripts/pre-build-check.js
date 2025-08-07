@@ -105,17 +105,15 @@ Object.entries(varGroups).forEach(([baseVar, variants]) => {
       let mockValue
 
       switch (baseVar) {
-        case 'SUPABASE_URL':
-          mockValue = 'https://mock-supabase-project.supabase.co'
+        case 'MONGODB_URI':
+          mockValue = 'mongodb://localhost:27017/pixelated_dev'
           break
-        case 'SUPABASE_ANON_KEY':
-          mockValue = 'eyJhbGcfDummy.SupabaseDummyAnonKey.Sig123'
+        case 'MONGODB_DATABASE':
+          mockValue = 'pixelated_dev'
           break
-        case 'SUPABASE_SERVICE_ROLE_KEY':
-          mockValue = 'eyJhbGcfDummy.SupabaseDummyServiceKey.Sig456'
-          break
-        case 'SENTRY_AUTH_TOKEN':
-          mockValue = 'your_auth_token_here'
+        // Removed Supabase environment variables - using MongoDB now
+        case 'REDIS_URL':
+          mockValue = 'redis://localhost:6379'
           break
       }
 

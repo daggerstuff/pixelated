@@ -1,5 +1,5 @@
-import { createAuditLog } from '../../audit'
-import { initializeAITables } from './schema'
+import { createAuditLog, AuditEventType } from '../../audit'
+import { initializeAICollections } from './schema'
 
 /**
  * Initialize the AI database tables
@@ -10,12 +10,16 @@ export async function initializeAIDatabase() {
     console.log('Initializing AI database tables...')
 
     // Initialize tables
-    await initializeAITables()
+    await initializeAICollections()
 
     // Log successful initialization
-    await createAuditLog('system', 'system.ai.database.initialize', 'ai', {
-      timestamp: new Date().toISOString(),
-    })
+    await createAuditLog(
+      AuditEventType.SYSTEM,
+      'system.ai.database.initialize',
+      'system',
+      'ai',
+      { timestamp: new Date().toISOString() },
+    )
 
     console.log('AI database tables initialized successfully')
     return true
@@ -27,8 +31,9 @@ export async function initializeAIDatabase() {
 
     // Log initialization failure
     await createAuditLog(
-      'system',
+      AuditEventType.SYSTEM,
       'system.ai.database.initialize.error',
+      'system',
       'ai',
       {
         error: error instanceof Error ? error?.message : String(error),

@@ -190,6 +190,119 @@
     flex-direction: column !important;
     gap: 0.75rem !important;
   }
+
+  /* Fix icon alignment in feature cards */
+  .text-5xl,
+  .text-6xl,
+  .text-7xl {
+    text-align: center !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Ensure emoji icons are centered */
+  [class*="text-"][class*="xl"] {
+    text-align: center !important;
+  }
+
+  /* Fix "Our Promise to You" section */
+  .bg-green-500\/10 h4 {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Fix final CTA section buttons */
+  .flex.flex-col.sm\\:flex-row {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .flex.flex-col.sm\\:flex-row > * {
+    width: 100% !important;
+    max-width: 280px !important;
+    text-align: center !important;
+  }
+
+  /* Fix footer social proof text */
+  .text-xs.text-green-300\/70 {
+    text-align: center !important;
+    line-height: 1.6 !important;
+    padding: 0 1rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Improve final CTA section spacing */
+  .rounded-3xl.border.border-green-500\/40 {
+    padding: 2rem 1rem !important;
+    margin: 0 1rem !important;
+  }
+
+  /* Fix button text wrapping */
+  .rounded-full {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Improve social proof text in hero section */
+  .flex.items-center.justify-center.gap-6 {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    text-align: center !important;
+  }
+
+  .flex.items-center.justify-center.gap-6 > span {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Hide separators on mobile */
+  .hidden.sm\\:inline {
+    display: none !important;
+  }
+
+  /* Fix robot emoji section */
+  .text-6xl.text-green-400 {
+    text-align: center !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+
+  /* Improve urgency badge */
+  .inline-flex.items-center.gap-2 {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  /* Fix site footer on mobile */
+  .site-footer {
+    padding: 2rem 0 1rem 0 !important;
+  }
+
+  .site-footer .container {
+    padding: 0 1rem !important;
+  }
+
+  .footer-links {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .footer-link {
+    font-size: 0.875rem !important;
+  }
+
+  /* Fix copyright text */
+  .theme-text-secondary {
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+  }
 }
 
 /* Background and theme fixes */

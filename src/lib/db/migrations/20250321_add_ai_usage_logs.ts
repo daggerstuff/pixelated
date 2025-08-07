@@ -1,54 +1,46 @@
-import postgres from 'postgres'
+import { Db, MongoClient } from 'mongodb'
 
-// Initialize client
-const sql = postgres(process.env.DATABASE_URL || '')
+// Initialize MongoDB client
+const client = new MongoClient(
+  process.env['DATABASE_URL'] || process.env['MONGODB_URI'] || '',
+)
 
-export async function up() {
-  await sql.unsafe`
-    CREATE TABLE IF NOT EXISTS ai_usage_logs (
-      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-      user_id UUID REFERENCES auth.users(id),
-      model VARCHAR(255) NOT NULL,
-      input_tokens INTEGER NOT NULL DEFAULT 0,
-      output_tokens INTEGER NOT NULL DEFAULT 0,
-      total_tokens INTEGER NOT NULL DEFAULT 0,
-      cost NUMERIC(10,4) NOT NULL DEFAULT 0
-    );
+export async function up(): Promise<void> {
+  try {
+    await client.connect()
+    const db: Db = client.db()
 
-    CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_user_id ON ai_usage_logs(user_id);
-    CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_created_at ON ai_usage_logs(created_at);
-    CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_model ON ai_usage_logs(model);
+    // Create ai_usage_logs collection
+    const collection = db.collection('ai_usage_logs')
 
-    -- Add RLS policies
-    ALTER TABLE ai_usage_logs ENABLE ROW LEVEL SECURITY;
+    // Create indexes for performance
+    await collection.createIndex({ user_id: 1 })
+    await collection.createIndex({ created_at: -1 })
+    await collection.createIndex({ model: 1 })
+    await collection.createIndex({ user_id: 1, created_at: -1 })
 
-    -- Users can view their own usage logs
-    CREATE POLICY "Users can view their own usage logs"
-      ON ai_usage_logs
-      FOR SELECT
-      USING (auth.uid() = user_id);
-
-    -- Service role can manage all usage logs
-    CREATE POLICY "Service role can manage usage logs"
-      ON ai_usage_logs
-      FOR ALL
-      USING (auth.jwt() ? 'service_role');
-
-    -- Admins can view all usage logs
-    CREATE POLICY "Admins can view all usage logs"
-      ON ai_usage_logs
-      FOR SELECT
-      USING (auth.jwt() ? 'is_admin');
-  `
-
-  console.log('Created ai_usage_logs table')
+    console.log('✅ Created ai_usage_logs collection with indexes')
+  } catch (error) {
+    console.error('❌ Migration failed:', error)
+    throw error
+  } finally {
+    await client.close()
+  }
 }
 
-export async function down() {
-  await sql.unsafe`
-    DROP TABLE IF EXISTS ai_usage_logs CASCADE;
-  `
+export async function down(): Promise<void> {
+  try {
+    await client.connect()
+    const db: Db = client.db()
 
-  console.log('Dropped ai_usage_logs table')
+    // Drop the collection
+    await db.collection('ai_usage_logs').drop()
+
+    console.log('✅ Dropped ai_usage_logs collection')
+  } catch (error) {
+    console.error('❌ Rollback failed:', error)
+    throw error
+  } finally {
+    await client.close()
+  }
 }

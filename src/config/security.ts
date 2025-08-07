@@ -23,20 +23,6 @@ export interface CSPConfig {
 }
 
 /**
- * Get project-specific URLs from environment variables
- * These should be set in your .env file for security
- */
-function getProjectUrls() {
-  const supabaseUrl =
-    import.meta.env['PUBLIC_SUPABASE_URL'] || 'https://your-project.supabase.co'
-  // Vercel KV doesn't need URL configuration in CSP
-
-  return {
-    supabase: supabaseUrl.replace('https://', ''),
-  }
-}
-
-/**
  * Production CSP configuration with strict security policies
  * Each domain is specifically allowed based on application needs
  */
@@ -95,15 +81,6 @@ export const cspConfig: CSPConfig = {
     'https://accounts.google.com',
     // External APIs
     'https://api.github.com',
-    // Database connections (dynamically added from environment)
-    ...(function () {
-      const urls = getProjectUrls()
-      return [`https://${urls.supabase}`]
-    })(),
-    // WebSocket connections
-    'wss://realtime.supabase.co',
-    'wss://localhost:8082', // Development WebSocket
-    'wss://localhost:8083', // Development WebSocket
   ],
 
   'font-src': [

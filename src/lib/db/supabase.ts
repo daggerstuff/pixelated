@@ -1,12 +1,13 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import mongodb from '@/config/mongodb.config'
+import { mongoAuthService } from '@/services/mongoAuth.service'
 
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+const mongoUri = process.env.MONGODB_URI
+const mongoDbName = process.env.MONGODB_DB_NAME
 
 // Create mock client for builds
 function createMockClient() {
   console.warn(
-    'Using mock Supabase client in db module. This should not be used in production.',
+    'Using mock MongoDB client in db module. This should not be used in production.',
   )
   return {
     auth: {
@@ -27,8 +28,11 @@ function createMockClient() {
   }
 }
 
-// Use real client if credentials are available, otherwise use mock
-export const supabase =
-  supabaseUrl && supabaseKey
-    ? createClient(supabaseUrl, supabaseKey)
-    : (createMockClient() as unknown as SupabaseClient)
+// Use MongoDB client if credentials are available, otherwise use mock
+export const mongoClient =
+  mongoUri && mongoDbName
+    ? mongodb
+    : (createMockClient() as any)
+
+// Export MongoDB auth service as main auth interface
+export const authService = mongoAuthService

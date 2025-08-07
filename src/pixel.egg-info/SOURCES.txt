@@ -8,6 +8,7 @@ src/lib/ai/bias-detection/python-service/test_bias_detection_service.py
 src/pixel.egg-info/PKG-INFO
 src/pixel.egg-info/SOURCES.txt
 src/pixel.egg-info/dependency_links.txt
+src/pixel.egg-info/entry_points.txt
 src/pixel.egg-info/requires.txt
 src/pixel.egg-info/top_level.txt
 tests/test_audio_quality_control.py

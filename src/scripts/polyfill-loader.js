@@ -91,27 +91,30 @@ async function loadEnhancementPolyfills() {
   const polyfillsToLoad = []
 
   // For modern DOM APIs
-  if (!features.IntersectionObserver()) {
-    polyfillsToLoad.push(loadScript('/polyfills/intersection-observer.js'))
-    loadedPolyfills.push('IntersectionObserver')
+  if (!('IntersectionObserver' in window)) {
+    // Removed due to security concerns with the polyfill
+    // polyfillsToLoad.push(loadScript('/polyfills/intersection-observer.js'));
+    // For now, we'll not load any polyfill and let the code handle the absence gracefully
+    console.warn('IntersectionObserver is not supported in this browser. Some features may not work correctly.');
   }
 
-  if (!features.ResizeObserver()) {
+  // Load ResizeObserver polyfill only if needed
+  if (!('ResizeObserver' in window)) {
     polyfillsToLoad.push(loadScript('/polyfills/resize-observer-polyfill.js'))
     loadedPolyfills.push('ResizeObserver')
   }
 
-  if (!features.CustomElements()) {
+  if (!('customElements' in window)) {
     polyfillsToLoad.push(loadScript('/polyfills/custom-elements.min.js'))
     loadedPolyfills.push('CustomElements')
   }
 
-  if (!features.WebAnimations()) {
+  if (!('animate' in Element.prototype)) {
     polyfillsToLoad.push(loadScript('/polyfills/web-animations.min.js'))
     loadedPolyfills.push('WebAnimations')
   }
 
-  if (!features.ObjectFromEntries()) {
+  if (!('fromEntries' in Object)) {
     polyfillsToLoad.push(loadScript('/polyfills/object-fromentries.js'))
     loadedPolyfills.push('ObjectFromEntries')
   }

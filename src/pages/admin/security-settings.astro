@@ -54,22 +54,6 @@ if (authResponse) {
       <div class="security-actions">
         <h2>Security Actions</h2>
         <div class="action-buttons">
-          <button id="test-supabase-alerts" class="action-button">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              ><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg
-            >
-            Test Supabase Alerts
-          </button>
-
           <button id="sync-security-settings" class="action-button">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -81,8 +65,7 @@ if (authResponse) {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              ><path
-                d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c-2.5 0-4.5-2-4.5-4.5S9.5 12 12 12s4.5 2 4.5 4.5S14.5 21 12 21z"
+              ><path d="M23 4v6h-6M1 20v-6h6m-2-5a8 8 0 0 1 13 0 8 8 0 0 1-6 1"
               ></path></svg
             >
             Sync Security Settings
@@ -136,30 +119,6 @@ if (authResponse) {
 <script>
   // Client-side functionality
   document.addEventListener('DOMContentLoaded', () => {
-    // Test Supabase Alerts button
-    const testAlertsButton = document.getElementById('test-supabase-alerts')
-    testAlertsButton?.addEventListener('click', async () => {
-      try {
-        const response = await fetch('/api/admin/test-security-alert', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ alertType: 'suspicious_login' }),
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to test security alerts')
-        }
-
-        alert('Security alert test sent successfully!')
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'An unknown error occurred'
-        alert(`Error: ${errorMessage}`)
-      }
-    })
-
     // Sync Security Settings button
     const syncSettingsButton = document.getElementById('sync-security-settings')
     syncSettingsButton?.addEventListener('click', async () => {

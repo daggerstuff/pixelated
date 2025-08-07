@@ -1,8 +1,9 @@
-import { supabase } from '../../supabase'
+import { mongoClient } from '../../supabase'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createAuditLog, AuditEventType } from '../../audit'
 
 const logger = createBuildSafeLogger('crisis-session-flagging')
+
 
 export interface FlagSessionRequest {
   userId: string
@@ -107,32 +108,34 @@ export class CrisisSessionFlaggingService {
         throw new Error('Confidence must be between 0 and 1')
       }
 
-      // Insert crisis session flag
-      const { data: flagData, error: flagError } = await supabase
-        .from('crisis_session_flags')
-        .insert({
-          user_id: request.userId,
-          session_id: request.sessionId,
-          crisis_id: request.crisisId,
-          reason: request.reason,
-          severity: request.severity,
-          confidence: request.confidence,
-          detected_risks: request.detectedRisks,
-          text_sample: request.textSample,
-          routing_decision: request.routingDecision,
-          metadata: request.metadata || {},
-          status: 'pending',
-        })
-        .select()
-        .single()
+      // Insert crisis session flag into MongoDB
+      const insertResult = await db.collection('crisis_session_flags').insertOne({
+        user_id: request.userId,
+        session_id: request.sessionId,
+        crisis_id: request.crisisId,
+        reason: request.reason,
+        severity: request.severity,
+        confidence: request.confidence,
+        detected_risks: request.detectedRisks,
+        text_sample: request.textSample,
+        routing_decision: request.routingDecision,
+        metadata: request.metadata || {},
+        status: 'pending',
+        flagged_at: request.timestamp,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
 
-      if (flagError) {
-        logger.error('Failed to insert crisis session flag', {
-          error: flagError,
-          userId: request.userId,
-          sessionId: request.sessionId,
-        })
-        throw new Error(`Failed to flag session: ${flagError.message}`)
+      if (!insertResult.insertedId) {
+        throw new Error('Failed to insert crisis session flag')
+      }
+
+      const flagData = await db
+        .collection('crisis_session_flags')
+        .findOne({ _id: insertResult.insertedId })
+
+      if (!flagData) {
+        throw new Error('Failed to retrieve inserted crisis session flag')
       }
 
       // Create audit log
@@ -210,7 +213,7 @@ export class CrisisSessionFlaggingService {
         updateData.metadata = request.metadata
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await mongoClient
         .from('crisis_session_flags')
         .update(updateData)
         .eq('id', request.flagId)
@@ -248,7 +251,7 @@ export class CrisisSessionFlaggingService {
     includeResolved: boolean = false,
   ): Promise<CrisisSessionFlag[]> {
     try {
-      let query = supabase
+      let query = mongoClient
         .from('crisis_session_flags')
         .select('*')
         .eq('user_id', userId)
@@ -285,7 +288,7 @@ export class CrisisSessionFlaggingService {
     userId: string,
   ): Promise<UserSessionStatus | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await mongoClient
         .from('user_session_status')
         .select('*')
         .eq('user_id', userId)
@@ -320,7 +323,7 @@ export class CrisisSessionFlaggingService {
     limit: number = 50,
   ): Promise<CrisisSessionFlag[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await mongoClient
         .from('crisis_session_flags')
         .select('*')
         .in('status', ['pending', 'under_review'])

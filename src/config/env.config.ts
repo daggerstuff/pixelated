@@ -247,17 +247,9 @@ export const config = {
 
   redis: {
     url: (): string | undefined =>
-      env().UPSTASH_REDIS_REST_URL || env().REDIS_URL,
+      env().REDIS_URL || env().UPSTASH_REDIS_REST_URL,
     token: (): string | undefined =>
       env().UPSTASH_REDIS_REST_TOKEN || env().REDIS_TOKEN,
-  },
-
-  supabase: {
-    url: (): string | undefined => env().SUPABASE_URL,
-    key: (): string | undefined => env().SUPABASE_KEY,
-    anonKey: (): string | undefined => env().SUPABASE_ANON_KEY,
-    serviceRoleKey: (): string | undefined => env().SUPABASE_SERVICE_ROLE_KEY,
-    jwtSecret: (): string | undefined => env().SUPABASE_JWT_SECRET,
   },
 
   ai: {
@@ -329,8 +321,6 @@ export const config = {
 
   client: {
     apiUrl: (): string | undefined => env().VITE_API_URL,
-    supabaseUrl: (): string | undefined => env().VITE_SUPABASE_URL,
-    supabaseAnonKey: (): string | undefined => env().VITE_SUPABASE_ANON_KEY,
   },
 
   notifications: {

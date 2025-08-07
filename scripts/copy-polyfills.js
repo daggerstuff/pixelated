@@ -41,14 +41,6 @@ const polyfills = [
   {
     src: path.join(
       nodeModulesDir,
-      'intersection-observer',
-      'intersection-observer.js',
-    ),
-    dest: path.join(polyfillsDestDir, 'intersection-observer.js'),
-  },
-  {
-    src: path.join(
-      nodeModulesDir,
       'resize-observer-polyfill',
       'dist',
       'ResizeObserver.js',
@@ -80,6 +72,7 @@ const polyfills = [
 ]
 
 // Add our custom Buffer polyfill to be copied
+/*
 const customPolyfills = [
   {
     src: './src/buffer-polyfill.js',
@@ -90,6 +83,7 @@ const customPolyfills = [
     dest: './public/polyfills/client-entry.js',
   },
 ]
+*/
 
 // Create minimal polyfills for features not available as standalone packages
 const minimalPolyfills = [

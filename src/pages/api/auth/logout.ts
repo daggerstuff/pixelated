@@ -1,23 +1,19 @@
-import { supabase } from '@/lib/supabase'
+import { MongoAuthService } from '@/services/mongoAuth.service'
 import { createAuditLog, AuditEventType } from '@/lib/audit'
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ cookies }: { request: Request; cookies: any }) => {
   try {
-    const { error } = await supabase.auth.signOut()
+    const authService = new MongoAuthService()
 
-    if (error) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: error.message,
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
+    // Get the auth token from cookies
+    const token = cookies.get('auth-token')?.value
+
+    if (token) {
+      // Invalidate the session
+      await authService.signOut(token)
+
+      // Clear the auth cookie
+      cookies.delete('auth-token', { path: '/' })
     }
 
     // Log the sign out for HIPAA compliance
@@ -34,7 +30,7 @@ export const POST = async ({ request }: { request: Request }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Successfully logged out',
+        message: 'Logged out successfully',
       }),
       {
         status: 200,
@@ -44,10 +40,11 @@ export const POST = async ({ request }: { request: Request }) => {
       },
     )
   } catch (error) {
+    console.error('Logout error:', error)
     return new Response(
       JSON.stringify({
         success: false,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: 'Logout failed',
       }),
       {
         status: 500,

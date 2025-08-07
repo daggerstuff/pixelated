@@ -1,4 +1,3 @@
-import type { Database } from '../../types/supabase'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
@@ -114,30 +113,9 @@ export class SecurityMonitoringService {
         timestamp: event.timestamp,
       })
 
-      // Store the security event in the Supabase database
-      const { supabase } = await import('../supabase')
-
-      const { error } = await supabase.from('security_events').insert({
-        type: event.type,
-        severity: event.severity,
-        user_id: event.userId || null,
-        ip_address: event.ip || null,
-        user_agent: event.userAgent || null,
-        metadata: event.metadata,
-        created_at: event.timestamp.toISOString(),
-      })
-
-      if (error) {
-        logger.error('Failed to store security event in database', {
-          error: error.message,
-          details: error.details,
-          hint: error.hint,
-        })
-
-        // If this fails, store in Redis as a fallback
-        await this.storeEventInRedis(event)
-      }
-
+      // TODO: Implement MongoDB insert for security events
+      // If this fails, store in Redis as a fallback
+      await this.storeEventInRedis(event)
       return Promise.resolve()
     } catch (error) {
       logger.error('Failed to track security event', {
@@ -155,7 +133,9 @@ export class SecurityMonitoringService {
       const { redis } = await import('../services/redis')
 
       // Create a unique key for the event
-      const eventKey = `security:event:${Date.now()}:${Math.random().toString(36).substring(2, 15)}`
+      const crypto = await import('crypto')
+      const randomStr = crypto.randomBytes(12).toString('hex')
+      const eventKey = `security:event:${Date.now()}:${randomStr}`
 
       // Store the event as JSON
       await redis.set(
@@ -192,48 +172,6 @@ export class SecurityMonitoringService {
     }
   }
 
-  /**
-   * Lock an account
-   */
-  private async lockAccount(
-    userId: string,
-    event: SecurityEvent,
-  ): Promise<void> {
-    const now = new Date()
-    this.lockedAccounts.set(userId, now)
-
-    try {
-      // Create account lockout event
-      await this.trackSecurityEvent({
-        type: SecurityEventType.ACCESS_DENIED,
-        userId,
-        ip: event.ip,
-        userAgent: event.userAgent,
-        metadata: {
-          failedAttempts: this.failedLogins.get(userId)?.count,
-          lockoutDuration: this.config.accountLockoutDuration,
-        },
-        severity: SecurityEventSeverity.HIGH,
-        timestamp: now,
-      })
-
-      // Reset failed login counter
-      this.failedLogins.delete(userId)
-
-      // Log account lockout
-      logger.warn(`Account locked: ${userId}`, {
-        userId,
-        duration: this.config.accountLockoutDuration,
-        until: new Date(
-          now.getTime() + this.config.accountLockoutDuration * 1000,
-        ),
-      })
-    } catch (error) {
-      throw new DatabaseError(
-        `Failed to update user lock status: ${error instanceof Error ? error.message : String(error)}`,
-      )
-    }
-  }
 
   /**
    * Check if an account is locked
@@ -260,78 +198,20 @@ export class SecurityMonitoringService {
    * Get security events for a user
    */
   public async getUserSecurityEvents(
-    userId: string,
     limit = 100,
   ): Promise<SecurityEvent[]> {
-    const { supabase } = await import('../supabase')
-
-    try {
-      const { data, error } = await supabase
-        .from('security_events')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(limit)
-
-      if (error) {
-        throw error
-      }
-
-      return (data || []).map(
-        (row: Database['public']['Tables']['security_events']['Row']) => ({
-          type: row.type as SecurityEventType,
-          userId: row.user_id || undefined,
-          ip: row.ip_address || undefined,
-          userAgent: row.user_agent || undefined,
-          metadata: row.metadata,
-          severity: row.severity as SecurityEventSeverity,
-          timestamp: new Date(row.created_at),
-        }),
-      )
-    } catch (error) {
-      throw new DatabaseError(
-        `Failed to get user security events: ${error instanceof Error ? error.message : String(error)}`,
-      )
-    }
+    // TODO: Implement MongoDB query for user security events
+    return []
   }
 
   /**
    * Get security events by type
    */
   public async getSecurityEventsByType(
-    type: SecurityEventType,
     limit = 100,
   ): Promise<SecurityEvent[]> {
-    const { supabase } = await import('../supabase')
-
-    try {
-      const { data, error } = await supabase
-        .from('security_events')
-        .select('*')
-        .eq('type', type)
-        .order('created_at', { ascending: false })
-        .limit(limit)
-
-      if (error) {
-        throw error
-      }
-
-      return (data || []).map(
-        (row: Database['public']['Tables']['security_events']['Row']) => ({
-          type: row.type as SecurityEventType,
-          userId: row.user_id || undefined,
-          ip: row.ip_address || undefined,
-          userAgent: row.user_agent || undefined,
-          metadata: row.metadata,
-          severity: row.severity as SecurityEventSeverity,
-          timestamp: new Date(row.created_at),
-        }),
-      )
-    } catch (error) {
-      throw new DatabaseError(
-        `Failed to get security events by type: ${error instanceof Error ? error.message : String(error)}`,
-      )
-    }
+    // TODO: Implement MongoDB query for security events by type
+    return []
   }
 
   /**

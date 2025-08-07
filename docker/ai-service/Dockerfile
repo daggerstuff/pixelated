@@ -13,7 +13,7 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
-ARG PNPM_VERSION=10.12.3
+ARG PNPM_VERSION=
 RUN npm install -g pnpm@$PNPM_VERSION
 
 WORKDIR /app

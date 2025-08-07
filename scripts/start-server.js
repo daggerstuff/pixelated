@@ -9,7 +9,7 @@ const projectRoot = path.resolve(__dirname, '..')
 
 // Configuration
 const HOST = process.env.HOST || '0.0.0.0'
-const PORT = process.env.PORT || process.env.WEBSITES_PORT || 3000
+const PORT = process.env.PORT || process.env.WEBSITES_PORT || 4321
 
 console.log('🚀 Starting Pixelated Astro Server...')
 console.log(`📍 Host: ${HOST}`)
@@ -58,7 +58,16 @@ async function startServer() {
 
     // Start the server using the correct port for Azure App Service
     // Always use process.env.PORT or process.env.WEBSITES_PORT if set
-    const effectivePort = process.env.PORT || process.env.WEBSITES_PORT || PORT || 3000;
+    const effectivePort = process.env.PORT || process.env.WEBSITES_PORT || PORT || 4321;
+    // Handle listen errors such as address already in use
+    server.on('error', error => {
+      if (error.code === 'EADDRINUSE') {
+        console.warn(`⚠️ Port ${effectivePort} already in use, assuming server is already running`)
+      } else {
+        console.error('❌ Server encountered error:', error)
+        process.exit(1)
+      }
+    })
     server.listen(effectivePort, HOST, () => {
       console.log(`✅ Server started successfully!`)
       console.log(`🌐 Local: http://localhost:${effectivePort}`)

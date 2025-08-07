@@ -1,13 +1,9 @@
 ---
 // Try Demo Page - Interactive Client-Facing Demo
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import Badge from '@/components/ui/Badge.astro'
-import { Button } from '@/components/ui/button'
-import Card from '@/components/ui/Card.astro'
-import CardContent from '@/components/ui/CardContent.astro'
-import CardDescription from '@/components/ui/CardDescription.astro'
-import CardHeader from '@/components/ui/CardHeader.astro'
-import CardTitle from '@/components/ui/CardTitle.astro'
+import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 // import ClientFacingDemo from '@/components/demo/ClientFacingDemo.tsx'
 
 export const prerender = true
@@ -75,432 +71,194 @@ const benefits = [
 <BaseLayout
   title="Try Demo - Pixelated Empathy"
   description="Experience our AI-powered psychology training data pipeline. Upload content, see validation scores, and test category balancing in real-time."
-  bgType="plum"
 >
-  <div class="relative min-h-screen text-white">
-    <!-- Floating Particles -->
-    <div
-      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
-    >
-      <div class="particle particle-1"></div>
-      <div class="particle particle-2"></div>
-      <div class="particle particle-3"></div>
-      <div class="particle particle-4"></div>
-      <div class="particle particle-5"></div>
+  <!-- Hero Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <!-- Status Badge -->
+        <div class="status-indicator status-indicator--online inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--green"></div>
+          <span class="font-bold">INTERACTIVE DEMO ENVIRONMENT</span>
+        </div>
+
+        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+          SEE HOW IT
+          <br />
+          <span class="confidence-boost">WORKS</span>
+        </h1>
+        
+        <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+          Experience our complete AI-powered training data pipeline. Upload psychology content, see real validation scores, and test category balancing.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+          <div class="brutalist-badge brutalist-badge--success">🔒 SAFE DEMO</div>
+          <div class="brutalist-badge brutalist-badge--info">⚡ REAL-TIME</div>
+          <div class="brutalist-badge brutalist-badge--warning">📊 LIVE RESULTS</div>
+          <div class="brutalist-badge brutalist-badge--success">🛡️ PRIVATE</div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Hero Section -->
-    <section class="relative py-6 lg:py-8 z-10 hero-section">
-      <div class="relative container mx-auto px-4 max-w-6xl">
-        <div class="w-full max-w-none">
-          <!-- Status Badge -->
-          <div class="mb-8 animate-breathe text-center">
-            <Badge
-              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-purple-500/20 border border-purple-400/40 text-purple-200 rounded-full"
-            >
-              <span class="relative flex h-3 w-3">
-                <span
-                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-full h-3 w-3 bg-purple-500"
-                ></span>
-              </span>
-              Interactive Demo Environment
-            </Badge>
-          </div>
-
-          <!-- Power Headlines -->
-          <div class="text-center mb-16">
-            <h1
-              class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-wide mb-4 leading-tight max-w-6xl mx-auto"
-            >
-              See How It Works
-              <br />
-              <span class="text-purple-400 golden-shimmer">Try It Yourself</span
-              >
-            </h1>
-            <p
-              class="text-base lg:text-lg text-purple-200/90 font-medium mb-6 max-w-4xl mx-auto"
-            >
-              Experience our complete AI-powered training data pipeline. Upload
-              psychology content, see real validation scores, and test category
-              balancing.
-            </p>
-            <div
-              class="flex items-center justify-center gap-4 text-purple-300/80 text-xs"
-            >
-              <span>🔒</span>
-              <span>Completely safe demo environment</span>
-              <span class="hidden sm:inline">•</span>
-              <span class="hidden sm:inline">No data stored or shared</span>
+  <!-- Demo Stats -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="dashboard-grid">
+        {
+          demoStats.map((stat) => (
+            <div class="metric-card hover-lift">
+              <div class="metric-value">{stat.value}</div>
+              <div class="metric-label">{stat.label}</div>
             </div>
-          </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
 
-          <!-- Demo Stats -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 mb-16">
-            {
-              demoStats.map((stat) => (
-                <div class="text-center p-6 rounded-2xl border border-purple-600/30 hover:border-purple-400/50 transition-all duration-500 stat-card">
-                  <div class="text-2xl lg:text-3xl font-bold text-purple-400 mb-2 organic-counter">
-                    {stat.value}
-                  </div>
-                  <div class="text-xs lg:text-sm text-purple-200/80 tracking-wide">
-                    {stat.label}
-                  </div>
+  <!-- Interactive Demo Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          INTERACTIVE
+          <span class="text-green-400">DEMO</span>
+        </h2>
+        <p class="text-lg text-gray-300">
+          Follow the 4-step process below. Use our sample data or upload your own psychology content to see how our AI validates and processes training materials.
+        </p>
+      </div>
+
+      <BrutalistCard variant="elevated" class="max-w-4xl mx-auto">
+        <div class="text-center py-12">
+          <div class="text-6xl mb-6">🚀</div>
+          <h3 class="brutalist-subheading text-2xl mb-4">DEMO ENVIRONMENT</h3>
+          <p class="text-gray-400 mb-8">
+            Interactive demo component will be activated here
+          </p>
+          <BrutalistButton variant="primary" size="lg">
+            LAUNCH INTERACTIVE DEMO →
+          </BrutalistButton>
+        </div>
+      </BrutalistCard>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          WHAT YOU'LL
+          <span class="confidence-boost">EXPERIENCE</span>
+        </h2>
+        <p class="text-lg text-gray-300">
+          This demo gives you hands-on experience with our complete training data pipeline
+        </p>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--2">
+        {
+          benefits.map((benefit) => (
+            <BrutalistCard hover={true}>
+              <div class="text-center">
+                <div class="text-5xl mb-6">{benefit.icon}</div>
+                <h3 class="brutalist-subheading text-xl mb-4">{benefit.title}</h3>
+                <p class="text-gray-400 leading-relaxed">{benefit.description}</p>
+              </div>
+            </BrutalistCard>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          PROGRAM DIRECTORS
+          <span class="text-blue-400">TESTIMONIALS</span>
+        </h2>
+        <p class="text-lg text-gray-300">
+          Universities using our demo to evaluate their training programs
+        </p>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--3">
+        {
+          testimonials.map((testimonial) => (
+            <BrutalistCard hover={true}>
+              <div class="space-y-4">
+                <div class="flex gap-1">
+                  {Array.from({ length: testimonial.rating }).map((_) => (
+                    <span class="text-green-400">⭐</span>
+                  ))}
                 </div>
-              ))
-            }
-          </div>
-        </div>
+                <blockquote class="text-gray-300 italic">
+                  "{testimonial.text}"
+                </blockquote>
+                <div class="border-t border-gray-700 pt-4">
+                  <div class="font-bold text-green-400">{testimonial.author}</div>
+                  <div class="text-sm text-gray-400">{testimonial.role}</div>
+                </div>
+              </div>
+            </BrutalistCard>
+          ))
+        }
       </div>
-    </section>
-
-    <!-- Interactive Demo Section -->
-    <section class="py-12 lg:py-16 relative z-10">
-      <div class="container mx-auto px-4 relative">
-        <div class="max-w-7xl mx-auto">
-          <!-- Demo Introduction -->
-          <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6">
-              Interactive Demo
-            </h2>
-            <p class="text-base text-purple-100/90 max-w-3xl mx-auto">
-              Follow the 4-step process below. Use our sample data or upload
-              your own psychology content to see how our AI validates and
-              processes training materials.
-            </p>
-          </div>
-
-          <!-- React Demo Component -->
-          <div
-            class="bg-slate-900/50 border border-purple-500/30 rounded-3xl p-8 lg:p-12"
-          >
-            <!-- <ClientFacingDemo client:load /> -->
-            <div class="text-center text-gray-400 py-12">
-              <p>Demo component temporarily disabled for debugging</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Section Separator -->
-    <div class="py-8">
-      <div class="mx-auto max-w-2xl border-t border-purple-500/30"></div>
     </div>
+  </section>
 
-    <!-- Benefits Section -->
-    <section class="py-12 lg:py-16 relative z-10">
-      <div class="container mx-auto px-4 relative">
-        <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6">
-              What You'll Experience
-            </h2>
-            <p class="text-base text-purple-100/90">
-              This demo gives you hands-on experience with our complete training
-              data pipeline
+  <!-- CTA Section -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="mental-health-safe max-w-4xl mx-auto text-center">
+        <div class="status-indicator status-indicator--online inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--green"></div>
+          <span class="font-bold">DEMO COMPLETE - READY FOR THE REAL THING?</span>
+        </div>
+        
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+          READY TO TRANSFORM
+          <br />
+          <span class="confidence-boost">YOUR TRAINING PROGRAM?</span>
+        </h2>
+        
+        <p class="text-xl text-gray-300 mb-8">
+          You've seen how it works. Now let's discuss how we can customize this for your specific program needs.
+        </p>
+
+        <!-- Program-focused CTA -->
+        <BrutalistCard variant="therapy" class="mb-8">
+          <div class="text-center">
+            <h4 class="brutalist-subheading text-lg mb-3">🎓 FOR PROGRAM DIRECTORS</h4>
+            <p class="text-gray-400">
+              Schedule a personalized demo with your actual curriculum content. See exactly how we can improve your training outcomes.
             </p>
           </div>
+        </BrutalistCard>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {
-              benefits.map((benefit) => (
-                <Card class="border border-purple-600/30 hover:border-purple-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
-                  <CardHeader class="pb-4 relative">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700">
-                      {benefit.icon}
-                    </div>
-                    <CardTitle class="text-lg font-bold text-purple-100 tracking-wide mb-3">
-                      {benefit.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription class="text-sm text-purple-200/80 leading-relaxed">
-                      {benefit.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))
-            }
-          </div>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <BrutalistButton href="/contact" variant="primary" size="lg">
+            SCHEDULE PROGRAM DEMO →
+          </BrutalistButton>
+          <BrutalistButton href="/demo-hub" variant="secondary" size="lg">
+            JOIN BETA PROGRAM
+          </BrutalistButton>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4">
+          <div class="brutalist-badge brutalist-badge--success">🏛️ TRUSTED BY 50+ UNIVERSITIES</div>
+          <div class="brutalist-badge brutalist-badge--info">🔒 HIPAA++ COMPLIANT</div>
+          <div class="brutalist-badge brutalist-badge--success">🎯 MADE BY THERAPISTS</div>
         </div>
       </div>
-    </section>
-
-    <!-- Section Separator -->
-    <div class="py-8">
-      <div class="mx-auto max-w-2xl border-t border-purple-500/30"></div>
     </div>
-
-    <!-- Social Proof Section -->
-    <section class="py-12 lg:py-16 relative z-10">
-      <div class="container mx-auto px-4 relative">
-        <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6">
-              What Program Directors Say
-            </h2>
-            <p class="text-base text-purple-100/90">
-              Universities using our demo to evaluate their training programs
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {
-              testimonials.map((testimonial) => (
-                <Card class="bg-slate-800/50 border border-purple-600/30 hover:border-purple-400/50 transition-all duration-300">
-                  <CardContent class="p-6">
-                    <div class="flex gap-1 mb-4">
-                      {Array.from({ length: testimonial.rating }).map((_) => (
-                        <span class="text-purple-400">⭐</span>
-                      ))}
-                    </div>
-                    <p class="text-sm text-purple-100 mb-4 italic">
-                      "{testimonial.text}"
-                    </p>
-                    <div class="text-purple-300">
-                      <div class="font-semibold text-sm">
-                        {testimonial.author}
-                      </div>
-                      <div class="text-xs text-purple-300/70">
-                        {testimonial.role}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            }
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Section Separator -->
-    <div class="py-8">
-      <div class="mx-auto max-w-2xl border-t border-purple-500/30"></div>
-    </div>
-
-    <!-- CTA Section -->
-    <section class="py-12 lg:py-16 relative z-10">
-      <div class="relative container mx-auto px-4 text-center">
-        <div class="max-w-5xl mx-auto">
-          <div
-            class="rounded-3xl border border-purple-500/40 p-12 lg:p-16 bg-slate-900/30"
-          >
-            <!-- Demo completion badge -->
-            <div class="mb-6">
-              <Badge
-                class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-green-500/20 border border-green-400/40 text-green-200 rounded-full"
-              >
-                <span class="text-green-400">✓</span>
-                Demo Complete - Ready for the Real Thing?
-              </Badge>
-            </div>
-
-            <h2 class="text-2xl lg:text-4xl font-bold text-purple-100 mb-8">
-              Ready to Transform
-              <br />
-              <span class="text-purple-400 golden-shimmer"
-                >Your Training Program?</span
-              >
-            </h2>
-
-            <p
-              class="text-base lg:text-lg text-purple-200/90 mb-8 leading-relaxed"
-            >
-              You've seen how it works. Now let's discuss how we can customize
-              this for your specific program needs.
-            </p>
-
-            <!-- Program-focused CTA -->
-            <div
-              class="bg-purple-500/10 border border-purple-400/30 rounded-2xl p-6 mb-8"
-            >
-              <h4 class="text-sm font-bold text-purple-200 mb-2">
-                🎓 For Program Directors
-              </h4>
-              <p class="text-sm text-purple-200/80">
-                Schedule a personalized demo with your actual curriculum
-                content. See exactly how we can improve your training outcomes.
-              </p>
-            </div>
-
-            <div
-              class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6"
-            >
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300 w-auto"
-              >
-                Schedule Program Demo →
-              </Button>
-              <Button
-                size="lg"
-                className="bg-transparent border-2 border-purple-400 text-purple-300 hover:bg-purple-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300 w-auto"
-              >
-                Join Beta Program
-              </Button>
-            </div>
-
-            <!-- Final trust signals -->
-            <p class="text-xs text-purple-300/70">
-              🏛️ Trusted by 50+ universities • 🔒 HIPAA++ compliant • 🎯 Made by
-              therapists, for therapists
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
+  </section>
 </BaseLayout>
 
-<style>
-  /* Organic Particles */
-  .particles-container {
-    overflow: hidden;
-  }
 
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #a855f7;
-    border-radius: 50%;
-    animation: float-organic 12s ease-in-out infinite;
-    opacity: 0.6;
-  }
-
-  .particle-1 {
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-    animation-duration: 15s;
-  }
-
-  .particle-2 {
-    top: 40%;
-    right: 20%;
-    animation-delay: 3s;
-    animation-duration: 18s;
-  }
-
-  .particle-3 {
-    bottom: 30%;
-    left: 25%;
-    animation-delay: 6s;
-    animation-duration: 12s;
-  }
-
-  .particle-4 {
-    top: 60%;
-    right: 40%;
-    animation-delay: 9s;
-    animation-duration: 20s;
-  }
-
-  .particle-5 {
-    bottom: 10%;
-    left: 50%;
-    animation-delay: 12s;
-    animation-duration: 14s;
-  }
-
-  @keyframes float-organic {
-    0%,
-    100% {
-      transform: translate(0, 0) rotate(0deg);
-    }
-    25% {
-      transform: translate(20px, -30px) rotate(90deg);
-    }
-    50% {
-      transform: translate(-20px, 30px) rotate(180deg);
-    }
-    75% {
-      transform: translate(30px, -20px) rotate(270deg);
-    }
-  }
-
-  /* Shimmer Effect */
-  .golden-shimmer {
-    background: linear-gradient(
-      120deg,
-      #e6d4ff 20%,
-      #bca5ff 40%,
-      #ffffff 50%,
-      #bca5ff 60%,
-      #e6d4ff 80%
-    );
-    background-size: 200% auto;
-    color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
-    animation: shimmer 4s linear infinite;
-  }
-
-  @keyframes shimmer {
-    to {
-      background-position: -200% center;
-    }
-  }
-
-  /* Breathe Animation */
-  .animate-breathe {
-    animation: breathe 4s ease-in-out infinite;
-  }
-
-  @keyframes breathe {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 0.8;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 1;
-    }
-  }
-
-  /* Organic Card Hover */
-  .organic-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(168, 85, 247, 0.15);
-  }
-
-  /* Stat Card Hover */
-  .stat-card {
-    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-
-  .stat-card:hover {
-    transform: translateY(-8px) rotate(-2deg);
-    box-shadow: 0 10px 20px rgba(168, 85, 247, 0.1);
-  }
-
-  /* Organic Counter */
-  .organic-counter {
-    transition: transform 0.6s ease-out;
-  }
-
-  .stat-card:hover .organic-counter {
-    transform: scale(1.1);
-  }
-
-  /* Hero Section Animation */
-  .hero-section {
-    animation: fadeIn 1s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-</style>

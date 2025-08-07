@@ -34,7 +34,7 @@ jobs:
         id: set-versions
         run: |
           echo "node-version=22.16.0" >> $GITHUB_OUTPUT
-          echo "pnpm-version=10.13.1" >> $GITHUB_OUTPUT
+          echo "pnpm-version=" >> $GITHUB_OUTPUT
 
   lint:
     name: Lint

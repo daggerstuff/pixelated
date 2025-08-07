@@ -1,12 +1,13 @@
 // API route implementation for user profile endpoints
-import { protectRoute } from '../../../../lib/auth/serverAuth'
-import { supabase } from '../../../../lib/supabase'
+import { protectRoute } from '@/lib/auth/serverAuth'
+import { MongoAuthService } from '@/services/mongoAuth.service'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { AuthAPIContext } from '../../../../lib/auth/apiRouteTypes'
+import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 
 export const prerender = false
 
-// Initialize logger with correct object format
+// Initialize services
+const authService = new MongoAuthService()
 const logger = createBuildSafeLogger('profile-api')
 
 // GET endpoint for profile data
@@ -17,21 +18,17 @@ export const GET = protectRoute({
   try {
     const { user } = locals
 
-    // Get user profile from database
-    const { data: profileData, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single()
+    // Get user profile from MongoDB
+    const userProfile = await authService.getUserById(user.id)
 
-    if (error) {
-      logger.error(`Error fetching profile for user ${user.id}:`, { error })
+    if (!userProfile) {
+      logger.error(`Profile not found for user ${user.id}`)
       return new Response(
         JSON.stringify({
-          error: 'Failed to retrieve profile data',
+          error: 'Profile not found',
         }),
         {
-          status: 500,
+          status: 404,
           headers: { 'Content-Type': 'application/json' },
         },
       )
@@ -41,15 +38,15 @@ export const GET = protectRoute({
     return new Response(
       JSON.stringify({
         profile: {
-          id: profileData.id,
-          fullName: profileData.full_name,
-          avatarUrl: profileData.avatar_url,
-          email: user.email,
-          role: user.role,
-          lastLogin: profileData.last_login,
-          createdAt: profileData.created_at,
-          updatedAt: profileData.updated_at,
-          preferences: profileData.preferences || {},
+          id: userProfile._id.toString(),
+          fullName: userProfile.fullName || userProfile.email.split('@')[0],
+          avatarUrl: userProfile.avatarUrl || null,
+          email: userProfile.email,
+          role: userProfile.role,
+          lastLogin: userProfile.lastLogin || userProfile.updatedAt,
+          createdAt: userProfile.createdAt,
+          updatedAt: userProfile.updatedAt,
+          preferences: userProfile.preferences || {},
         },
       }),
       {
@@ -84,27 +81,22 @@ export const PUT = protectRoute({
     const { fullName, avatarUrl, preferences } = data
     const updates: Record<string, unknown> = {}
 
-    // Only include fields that were provided
+    // Only include fields that were provided - using bracket notation for type safety
     if (fullName !== undefined) {
-      updates.full_name = fullName
+      updates['fullName'] = fullName
     }
     if (avatarUrl !== undefined) {
-      updates.avatar_url = avatarUrl
+      updates['avatarUrl'] = avatarUrl
     }
     if (preferences !== undefined) {
-      updates.preferences = preferences
+      updates['preferences'] = preferences
     }
 
-    // Update profile in database
-    const { data: profileData, error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id)
-      .select()
-      .single()
+    // Update profile in MongoDB
+    const updatedUser = await authService.updateUser(user.id, updates)
 
-    if (error) {
-      logger.error(`Error updating profile for user ${user.id}:`, { error })
+    if (!updatedUser) {
+      logger.error(`Error updating profile for user ${user.id}`)
       return new Response(
         JSON.stringify({
           error: 'Failed to update profile',
@@ -120,17 +112,16 @@ export const PUT = protectRoute({
     return new Response(
       JSON.stringify({
         profile: {
-          id: profileData.id,
-          fullName: profileData.full_name,
-          avatarUrl: profileData.avatar_url,
-          email: user.email,
-          role: user.role,
-          lastLogin: profileData.last_login,
-          createdAt: profileData.created_at,
-          updatedAt: profileData.updated_at,
-          preferences: profileData.preferences || {},
+          id: updatedUser._id.toString(),
+          fullName: updatedUser.fullName || updatedUser.email.split('@')[0],
+          avatarUrl: updatedUser.avatarUrl || null,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          lastLogin: updatedUser.lastLogin || updatedUser.updatedAt,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
+          preferences: updatedUser.preferences || {},
         },
-        message: 'Profile updated successfully',
       }),
       {
         status: 200,
@@ -138,7 +129,7 @@ export const PUT = protectRoute({
       },
     )
   } catch (error: unknown) {
-    logger.error('Unexpected error in profile API:', { error })
+    logger.error('Unexpected error updating profile:', { error })
     return new Response(
       JSON.stringify({
         error: 'An unexpected error occurred',

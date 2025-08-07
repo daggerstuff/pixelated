@@ -1,120 +1,86 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import Card from '@/components/ui/Card.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardDescription from '@/components/ui/CardDescription.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
-import Button from '@/components/ui/Button.astro'
-import Badge from '@/components/ui/Badge.astro'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
-export const prerender = false // Enable SSR for real-time functionality
+export const prerender = false
 ---
 
 <BaseLayout
   title="Bias Detection Engine - Live Demo"
   description="Interactive demonstration of our AI bias detection capabilities in therapeutic training scenarios"
-  bgType="plum"
 >
-  <div class="min-h-screen text-white py-8">
-    <div class="container mx-auto px-4">
-      <!-- Header -->
+  <!-- Hero Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
       <div class="text-center mb-12">
-        <div class="mb-6">
-          <Badge
-            class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 rounded-full"
-          >
-            <span class="relative flex h-3 w-3">
-              <span
-                class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
-              ></span>
-              <span
-                class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"
-              ></span>
-            </span>
-            Live Demo Active
-          </Badge>
+        <div class="status-indicator status-indicator--online inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--green"></div>
+          <span class="font-bold">LIVE DEMO ACTIVE</span>
         </div>
-        <h1 class="text-4xl lg:text-5xl font-bold mb-6">
-          Bias Detection Engine
-          <span class="text-emerald-400 block mt-2">Interactive Demo</span>
+        
+        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+          BIAS DETECTION
+          <br />
+          <span class="text-red-400">ENGINE</span>
         </h1>
-        <p class="text-lg text-green-100/90 max-w-3xl mx-auto">
-          Experience our AI-powered bias detection system in real-time. Test
-          different therapeutic scenarios and see how our engine identifies
-          potential bias patterns across multiple analysis layers.
+        
+        <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+          Experience real-time bias detection across 200+ cultural patterns. Test therapeutic scenarios and see instant feedback.
         </p>
-      </div>
 
-      <!-- Main Demo Interface -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+          <div class="brutalist-badge brutalist-badge--danger">⚠ BIAS ALERTS</div>
+          <div class="brutalist-badge brutalist-badge--info">⚡ REAL-TIME</div>
+          <div class="brutalist-badge brutalist-badge--success">🔒 ENCRYPTED</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Demo Interface -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="brutalist-grid brutalist-grid--2 max-w-6xl mx-auto">
         <!-- Input Panel -->
-        <Card
-          class="border border-emerald-600/30 bg-gray-900/50 backdrop-blur"
-        >
-          <CardHeader>
-            <CardTitle class="text-emerald-100 flex items-center gap-2">
-              🎭 Scenario Input
-            </CardTitle>
-            <CardDescription class="text-emerald-200/80">
-              Enter a therapeutic training scenario to analyze for potential
-              bias
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-6">
+        <BrutalistCard variant="elevated">
+          <div class="space-y-6">
+            <div class="border-b border-gray-700 pb-4">
+              <h3 class="brutalist-subheading text-xl mb-2">🎭 SCENARIO INPUT</h3>
+              <p class="text-gray-400 text-sm">Enter therapeutic scenario to analyze for bias</p>
+            </div>
+
             <!-- Session Details -->
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-emerald-200 mb-2"
-                  >Session Scenario</label
-                >
-                <select
-                  id="scenario-select"
-                  class="w-full p-3 bg-gray-800 border border-emerald-500/30 rounded-lg text-white focus:ring-2 focus:ring-emerald-400"
-                >
-                  <option value="anxiety-treatment"
-                    >Anxiety Treatment Session</option
-                  >
-                  <option value="trauma-therapy">Trauma-Informed Therapy</option
-                  >
-                  <option value="substance-abuse"
-                    >Substance Abuse Counseling</option
-                  >
-                  <option value="family-therapy">Family Therapy Session</option>
-                  <option value="crisis-intervention"
-                    >Crisis Intervention</option
-                  >
+                <label class="form-label">Session Type</label>
+                <select id="scenario-select" class="form-input">
+                  <option value="anxiety-treatment">Anxiety Treatment</option>
+                  <option value="trauma-therapy">Trauma Therapy</option>
+                  <option value="substance-abuse">Substance Abuse</option>
+                  <option value="family-therapy">Family Therapy</option>
+                  <option value="crisis-intervention">Crisis Intervention</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-emerald-200 mb-2"
-                  >Participant Demographics</label
-                >
-                <div class="grid grid-cols-2 gap-3">
-                  <select
-                    id="age-select"
-                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
-                  >
+                <label class="form-label">Demographics</label>
+                <div class="brutalist-grid brutalist-grid--2">
+                  <select id="age-select" class="form-input">
                     <option value="18-25">18-25 years</option>
                     <option value="26-35">26-35 years</option>
                     <option value="36-50">36-50 years</option>
                     <option value="51-65">51-65 years</option>
                     <option value="65+">65+ years</option>
                   </select>
-                  <select
-                    id="gender-select"
-                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
-                  >
+                  <select id="gender-select" class="form-input">
                     <option value="female">Female</option>
                     <option value="male">Male</option>
                     <option value="non-binary">Non-binary</option>
                     <option value="prefer-not-to-say">Prefer not to say</option>
                   </select>
-                  <select
-                    id="ethnicity-select"
-                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
-                  >
+                  <select id="ethnicity-select" class="form-input">
                     <option value="hispanic">Hispanic/Latino</option>
                     <option value="white">White</option>
                     <option value="black">Black/African American</option>
@@ -122,10 +88,7 @@ export const prerender = false // Enable SSR for real-time functionality
                     <option value="native">Native American</option>
                     <option value="mixed">Mixed/Other</option>
                   </select>
-                  <select
-                    id="language-select"
-                    class="p-2 bg-gray-800 border border-emerald-500/30 rounded text-white text-sm"
-                  >
+                  <select id="language-select" class="form-input">
                     <option value="en">English</option>
                     <option value="es">Spanish</option>
                     <option value="fr">French</option>
@@ -136,270 +99,226 @@ export const prerender = false // Enable SSR for real-time functionality
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-emerald-200 mb-2"
-                  >Session Content</label
-                >
+                <label class="form-label">Session Content</label>
                 <textarea
                   id="session-content"
                   rows="4"
-                  class="w-full p-3 bg-gray-800 border border-emerald-500/30 rounded-lg text-white focus:ring-2 focus:ring-emerald-400"
-                  placeholder="Enter the therapeutic session dialogue or describe the interaction scenario..."
-                  >Therapist: How are you feeling today? Patient: I've been
-                  struggling with anxiety about my job interview tomorrow.
-                  Therapist: That sounds challenging. Can you tell me more about
-                  what specifically worries you? Patient: I'm worried they'll
-                  judge me because of my background.</textarea
-                >
+                  class="form-input form-textarea"
+                  placeholder="Enter therapeutic dialogue..."
+                >Therapist: How are you feeling today? Patient: I've been struggling with anxiety about my job interview tomorrow. Therapist: That sounds challenging. Can you tell me more about what specifically worries you? Patient: I'm worried they'll judge me because of my background.</textarea>
               </div>
             </div>
 
             <!-- Preset Scenarios -->
             <div>
-              <label class="block text-sm font-medium text-emerald-200 mb-2"
-                >Quick Test Scenarios</label
-              >
-              <div class="grid grid-cols-2 gap-2">
-                <button
-                  id="preset-bias-high"
-                  class="p-2 bg-red-500/20 border border-red-400/30 rounded text-red-200 text-xs hover:bg-red-500/30"
-                >
-                  🚨 High Bias Test
+              <label class="form-label">Quick Tests</label>
+              <div class="brutalist-grid brutalist-grid--2">
+                <button id="preset-bias-high" class="brutalist-button brutalist-button--outline text-sm">
+                  🚨 HIGH BIAS
                 </button>
-                <button
-                  id="preset-bias-low"
-                  class="p-2 bg-green-500/20 border border-green-400/30 rounded text-green-200 text-xs hover:bg-green-500/30"
-                >
-                  ✅ Low Bias Test
+                <button id="preset-bias-low" class="brutalist-button brutalist-button--outline text-sm">
+                  ✅ LOW BIAS
                 </button>
-                <button
-                  id="preset-cultural"
-                  class="p-2 bg-blue-500/20 border border-blue-400/30 rounded text-blue-200 text-xs hover:bg-blue-500/30"
-                >
-                  🌍 Cultural Test
+                <button id="preset-cultural" class="brutalist-button brutalist-button--outline text-sm">
+                  🌍 CULTURAL
                 </button>
-                <button
-                  id="preset-gender"
-                  class="p-2 bg-orange-500/20 border border-orange-400/30 rounded text-orange-200 text-xs hover:bg-orange-500/30"
-                >
-                  ⚧ Gender Test
+                <button id="preset-gender" class="brutalist-button brutalist-button--outline text-sm">
+                  ⚧ GENDER
                 </button>
               </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="flex gap-3">
-              <Button
-                id="analyze-btn"
-                class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-gray-900 font-semibold py-3"
-              >
-                🔍 Analyze for Bias
-              </Button>
-              <Button
-                id="export-btn"
-                class="px-6 bg-blue-500 hover:bg-blue-400 text-white font-semibold py-3 hidden"
-              >
-                📥 Export Results
-              </Button>
-              <Button
-                id="clear-btn"
-                variant="outline"
-                class="px-6 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
-              >
-                Clear
-              </Button>
+              <BrutalistButton id="analyze-btn" variant="primary" class="flex-1">
+                🔍 ANALYZE FOR BIAS
+              </BrutalistButton>
+              <BrutalistButton id="export-btn" variant="secondary" class="hidden">
+                📥 EXPORT
+              </BrutalistButton>
+              <BrutalistButton id="clear-btn" variant="outline">
+                CLEAR
+              </BrutalistButton>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </BrutalistCard>
 
         <!-- Results Panel -->
-        <Card
-          class="border border-blue-600/30 bg-gray-900/50 backdrop-blur"
-        >
-          <CardHeader>
-            <CardTitle class="text-blue-100 flex items-center gap-2">
-              📊 Analysis Results
-            </CardTitle>
-            <CardDescription class="text-blue-200/80">
-              Real-time bias detection results across multiple analysis layers
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+        <BrutalistCard variant="elevated">
+          <div class="space-y-6">
+            <div class="border-b border-gray-700 pb-4">
+              <h3 class="brutalist-subheading text-xl mb-2">📊 ANALYSIS RESULTS</h3>
+              <p class="text-gray-400 text-sm">Real-time bias detection across multiple layers</p>
+            </div>
+
             <!-- Loading State -->
             <div id="loading-state" class="hidden text-center py-8">
-              <div
-                class="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full mx-auto mb-4"
-              >
-              </div>
-              <p class="text-blue-200">
-                Analyzing session for bias patterns...
-              </p>
+              <div class="loading-skeleton w-8 h-8 rounded-full mx-auto mb-4"></div>
+              <p class="text-blue-400 font-bold">ANALYZING BIAS PATTERNS...</p>
             </div>
 
             <!-- Results Display -->
-            <div id="results-display" class="space-y-6">
+            <div id="results-display">
               <div class="text-center py-8 text-gray-400">
                 <div class="text-4xl mb-4">🎯</div>
-                <p>Run an analysis to see bias detection results</p>
+                <p class="font-bold">RUN ANALYSIS TO SEE RESULTS</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <!-- Real-time Dashboard -->
-      <Card
-        class="border border-cyan-600/30 bg-gray-900/50 backdrop-blur mb-12"
-      >
-        <CardHeader>
-          <CardTitle class="text-cyan-100 flex items-center gap-2">
-            📈 Real-time Dashboard
-          </CardTitle>
-          <CardDescription class="text-cyan-200/80">
-            Live system metrics and analysis trends
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Metrics Cards -->
-            <div
-              class="bg-cyan-500/10 border border-cyan-400/30 rounded-lg p-4 text-center"
-            >
-              <div
-                class="text-2xl font-bold text-cyan-300"
-                id="total-analyses"
-              >
-                0
-              </div>
-              <div class="text-sm text-cyan-200/80">Total Analyses</div>
-            </div>
-            <div
-              class="bg-green-500/10 border border-green-400/30 rounded-lg p-4 text-center"
-            >
-              <div
-                class="text-2xl font-bold text-green-300"
-                id="avg-bias-score"
-              >
-                0.00
-              </div>
-              <div class="text-sm text-green-200/80">Avg Bias Score</div>
-            </div>
-            <div
-              class="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4 text-center"
-            >
-              <div
-                class="text-2xl font-bold text-yellow-300"
-                id="active-alerts"
-              >
-                0
-              </div>
-              <div class="text-sm text-yellow-200/80">Active Alerts</div>
-            </div>
-            <div
-              class="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4 text-center"
-            >
-              <div class="text-2xl font-bold text-blue-300" id="system-health">
-                95%
-              </div>
-              <div class="text-sm text-blue-200/80">System Health</div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </BrutalistCard>
+      </div>
+    </div>
+  </section>
 
-      <!-- Feature Showcase -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <Card
-          class="border border-green-600/30 hover:border-green-400/60 transition-all duration-300"
-        >
-          <CardHeader>
-            <div class="text-4xl mb-3">🔍</div>
-            <CardTitle class="text-green-100"
-              >Multi-Layer Analysis</CardTitle
-            >
-          </CardHeader>
-          <CardContent>
-            <CardDescription class="text-green-200/80">
-              Four-layer deep analysis: preprocessing, model-level, interactive
-              behavior, and evaluation metrics.
-            </CardDescription>
-            <div class="mt-4 space-y-2">
-              <div class="flex items-center gap-2 text-sm">
+  <!-- Real-time Dashboard -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          REAL-TIME
+          <span class="confidence-boost">DASHBOARD</span>
+        </h2>
+        <p class="text-lg text-gray-300">Live system metrics and analysis trends</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="metric-card">
+          <div class="metric-value" id="total-analyses">0</div>
+          <div class="metric-label">Total Analyses</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="avg-bias-score">0.00</div>
+          <div class="metric-label">Avg Bias Score</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="active-alerts">0</div>
+          <div class="metric-label">Active Alerts</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="system-health">95%</div>
+          <div class="metric-label">System Health</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Showcase -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          DETECTION
+          <span class="text-blue-400">CAPABILITIES</span>
+        </h2>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--3">
+        <BrutalistCard hover={true}>
+          <div class="text-center">
+            <div class="text-4xl mb-4">🔍</div>
+            <h3 class="brutalist-subheading text-lg mb-3">MULTI-LAYER ANALYSIS</h3>
+            <p class="text-gray-400 text-sm mb-4">
+              Four-layer deep analysis: preprocessing, model-level, interactive behavior, evaluation metrics.
+            </p>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                 <span>Linguistic bias detection</span>
               </div>
-              <div class="flex items-center gap-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                 <span>Fairness metrics analysis</span>
               </div>
-              <div class="flex items-center gap-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                 <span>Counterfactual scenarios</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </BrutalistCard>
 
-        <Card
-          class="border border-blue-600/30 hover:border-blue-400/60 transition-all duration-300"
-        >
-          <CardHeader>
-            <div class="text-4xl mb-3">⚡</div>
-            <CardTitle class="text-blue-100">Real-time Monitoring</CardTitle
-            >
-          </CardHeader>
-          <CardContent>
-            <CardDescription class="text-blue-200/80">
-              Continuous monitoring with instant alerts and adaptive thresholds
-              for bias detection.
-            </CardDescription>
-            <div class="mt-4 space-y-2">
-              <div class="flex items-center gap-2 text-sm">
+        <BrutalistCard hover={true}>
+          <div class="text-center">
+            <div class="text-4xl mb-4">⚡</div>
+            <h3 class="brutalist-subheading text-lg mb-3">REAL-TIME MONITORING</h3>
+            <p class="text-gray-400 text-sm mb-4">
+              Continuous monitoring with instant alerts and adaptive thresholds.
+            </p>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
                 <span>Instant bias alerts</span>
               </div>
-              <div class="flex items-center gap-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
                 <span>Adaptive thresholds</span>
               </div>
-              <div class="flex items-center gap-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
                 <span>Performance tracking</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </BrutalistCard>
 
-        <Card
-          class="border border-orange-600/30 hover:border-orange-400/60 transition-all duration-300"
-        >
-          <CardHeader>
-            <div class="text-4xl mb-3">🛡️</div>
-            <CardTitle class="text-orange-100">HIPAA Compliant</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription class="text-orange-200/80">
-              Military-grade security with comprehensive audit logging and
-              zero-knowledge architecture.
-            </CardDescription>
-            <div class="mt-4 space-y-2">
-              <div class="flex items-center gap-2 text-sm">
+        <BrutalistCard hover={true}>
+          <div class="text-center">
+            <div class="text-4xl mb-4">🛡️</div>
+            <h3 class="brutalist-subheading text-lg mb-3">HIPAA COMPLIANT</h3>
+            <p class="text-gray-400 text-sm mb-4">
+              Military-grade security with comprehensive audit logging.
+            </p>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
                 <span>Encrypted analysis</span>
               </div>
-              <div class="flex items-center gap-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
                 <span>Audit trails</span>
               </div>
-              <div class="flex items-center gap-2 text-sm">
+              <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
                 <span>Zero data retention</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </BrutalistCard>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="mental-health-safe max-w-4xl mx-auto text-center">
+        <div class="text-5xl mb-6">🚀</div>
+        
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+          ELIMINATE BIAS
+          <br />
+          <span class="confidence-boost">FROM YOUR TRAINING</span>
+        </h2>
+        
+        <p class="text-xl text-gray-300 mb-8">
+          78% reduction in cultural competency incidents. Real-time detection across all therapeutic interactions.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <BrutalistButton href="/contact" variant="primary" size="lg">
+            IMPLEMENT IN PROGRAM →
+          </BrutalistButton>
+          <BrutalistButton href="/demo-hub" variant="secondary" size="lg">
+            TRY OTHER DEMOS
+          </BrutalistButton>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+
+
 
   <!-- Demo JavaScript -->
   <script>

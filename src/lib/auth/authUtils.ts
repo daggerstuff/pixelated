@@ -1,5 +1,5 @@
 import type { AuthUser } from './types'
-import { createClient } from '@supabase/supabase-js'
+import { getSession } from './session'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
@@ -11,27 +11,16 @@ const logger = createBuildSafeLogger('auth-utils')
  * @returns True if the user is authenticated, false otherwise
  */
 export async function isAuthenticated(
-  request?: Request | AstroCookies,
+  request?: Request,
 ): Promise<boolean> {
   try {
-    const supabase = createClient(
-      import.meta.env.PUBLIC_SUPABASE_URL,
-      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
-    )
-
-    // Even though we're not using request parameter yet,
-    // we can log it for debugging and future implementation
-    if (request) {
-      logger.info('Authentication request received')
-    }
-
-    const { data, error } = await supabase.auth.getSession()
-
-    if (error || !data?.session) {
+    if (!request) {
+      logger.info('No request provided for authentication check')
       return false
     }
-
-    return true
+    // Use MongoDB-based session retrieval
+    const sessionData = await getSession(request)
+    return sessionData !== null
   } catch (error) {
     logger.error('Error checking authentication:', {
       error: error instanceof Error ? error.message : String(error),

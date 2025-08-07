@@ -1,55 +1,94 @@
 ---
 const currentYear = new Date().getFullYear()
+
+const footerLinks = [
+  { name: 'Privacy Policy', href: '/privacy' },
+  { name: 'Terms of Service', href: '/terms' },
+  { name: 'Security', href: '/security' },
+  { name: 'Contact', href: '/contact' },
+]
+
+const socialLinks = [
+  { name: 'GitHub', href: '#', icon: 'github' },
+  { name: 'LinkedIn', href: '#', icon: 'linkedin' },
+  { name: 'Twitter', href: '#', icon: 'twitter' },
+]
 ---
 
-<footer class="site-footer">
-  <div class="container mx-auto px-4 text-center">
-    <p class="theme-text-secondary">
-      &copy; {currentYear} Pixelated Empathy. All rights reserved.
-    </p>
-    <div class="footer-links">
-      <a
-        href="/privacy"
-        class="footer-link theme-text-muted hover:theme-text-accent"
-        >Privacy Policy</a
-      >
-      <a
-        href="/terms"
-        class="footer-link theme-text-muted hover:theme-text-accent"
-        >Terms of Service</a
-      >
-      <a
-        href="/contact"
-        class="footer-link theme-text-muted hover:theme-text-accent">Contact</a
-      >
+<footer class="bg-black border-t-2 border-gray-800 mt-auto">
+  <div class="brutalist-container">
+    <!-- Main Footer Content -->
+    <div class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Brand Section -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-green-500 border-2 border-green-400 flex items-center justify-center font-bold text-black text-sm">
+            P
+          </div>
+          <span class="text-lg font-bold text-white">PIXELATED EMPATHY</span>
+        </div>
+        <p class="text-gray-400 text-sm max-w-xs">
+          AI-powered therapy training platform for mental health professionals. Safe, secure, effective.
+        </p>
+        <div class="status-indicator status-indicator--online">
+          <div class="pulse-dot pulse-dot--green"></div>
+          <span>Platform Online</span>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="space-y-4">
+        <h3 class="brutalist-caption text-white">Quick Links</h3>
+        <ul class="space-y-2">
+          {footerLinks.map(link => (
+            <li>
+              <a
+                href={link.href}
+                class="text-gray-400 hover:text-green-400 transition-colors text-sm font-medium"
+              >
+                {link.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="space-y-4">
+        <h3 class="brutalist-caption text-white">Get in Touch</h3>
+        <div class="space-y-2 text-sm">
+          <p class="text-gray-400">
+            <span class="font-medium text-white">Email:</span> hello@pixelatedempathy.com
+          </p>
+          <p class="text-gray-400">
+            <span class="font-medium text-white">Support:</span> Available 24/7
+          </p>
+        </div>
+        <!-- Social Links -->
+        <div class="flex gap-3 pt-2">
+          {socialLinks.map(social => (
+            <a
+              href={social.href}
+              class="w-8 h-8 bg-gray-800 border border-gray-700 hover:border-green-400 hover:bg-gray-700 transition-all flex items-center justify-center text-gray-400 hover:text-green-400"
+              aria-label={social.name}
+            >
+              <span class="text-xs font-bold">{social.icon.charAt(0).toUpperCase()}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="py-6 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-gray-500 text-sm">
+        &copy; {currentYear} Pixelated Empathy. All rights reserved.
+      </p>
+      <div class="flex items-center gap-4 text-xs text-gray-500">
+        <span class="brutalist-badge brutalist-badge--success">HIPAA Compliant</span>
+        <span class="brutalist-badge brutalist-badge--info">SOC 2 Certified</span>
+        <span class="brutalist-badge brutalist-badge--success">Zero Knowledge</span>
+      </div>
     </div>
   </div>
 </footer>
-
-<style>
-  .site-footer {
-    width: 100%;
-    padding: 3rem 0 2rem 0;
-    background-color: transparent;
-    position: relative;
-    z-index: 2;
-    margin-top: auto;
-  }
-
-  .footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-top: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .footer-link {
-    color: var(--c-text-lighter);
-    text-decoration: none;
-  }
-
-  .footer-link:hover {
-    text-decoration: underline;
-  }
-</style>

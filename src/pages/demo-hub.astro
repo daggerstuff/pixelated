@@ -1,606 +1,267 @@
 ---
+// Brutalist Demo Hub - Showcase Platform Capabilities
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import Badge from '@/components/ui/Badge.astro';
-import Button from '@/components/ui/Button.astro';
+import BrutalistChatDemo from '@/components/chat/BrutalistChatDemo'
 
-export const prerender = true
-
-const demoOptions = [
+const demos = [
   {
-    title: 'ClinicalVault Trainer',
-    subtitle: 'HIPAA-Impossible Training Made Possible',
-    description:
-      "Practice crisis interventions and complex therapy scenarios with AI clients who can't be harmed. Experience training that was literally impossible before HIPAA compliance.",
-    icon: '🚨',
-    color: 'red',
-    link: '/demo/clinical-vault-trainer',
-    features: [
-      'Crisis intervention practice',
-      'Persistent AI patients across 20+ sessions',
-      'Zero real-world risk',
-      '94.7% intervention accuracy',
-    ],
-    bestFor: 'Students who need to practice high-risk scenarios safely',
-    time: '5-10 minutes',
+    title: "Crisis Intervention Training",
+    description: "Practice with suicidal clients, psychotic episodes, and trauma responses in a safe environment.",
+    status: "ACTIVE",
+    difficulty: "HIGH",
+    href: "/demo/crisis-intervention",
+    icon: "⚠",
+    stats: { sessions: "2.5K+", accuracy: "94%" }
   },
   {
-    title: 'Synthetic Training Generator',
-    subtitle: 'Generate 50,000+ AI Patients in 12 Seconds',
-    description:
-      'Create unlimited diverse client personas for comprehensive therapy training. Every client type your students will ever meet, generated ethically from clinical research.',
-    icon: '🤖',
-    color: 'cyan',
-    link: '/demo/synthetic-training-generator',
-    features: [
-      '50,000+ unique patients in seconds',
-      '847 personality variations',
-      '200+ cultural backgrounds',
-      'Unlimited trauma histories',
-    ],
-    bestFor: 'Programs needing diverse client exposure',
-    time: '3-5 minutes',
+    title: "Bias Detection Engine",
+    description: "Real-time cultural bias detection across 200+ patterns with immediate feedback.",
+    status: "ACTIVE", 
+    difficulty: "MEDIUM",
+    href: "/demo/bias-detection",
+    icon: "⚡",
+    stats: { patterns: "200+", reduction: "78%" }
   },
   {
-    title: 'Psychology Pipeline Processor',
-    subtitle: 'Process 10,000 Hours of Content in 3 Minutes',
-    description:
-      'Transform any psychology research, textbooks, or case studies into interactive training experiences. Industrial-scale content processing for comprehensive programs.',
-    icon: '📚',
-    color: 'orange',
-    link: '/demo/psychology-pipeline-processor',
-    features: [
-      'Process 10,000+ hours in 3 minutes',
-      '50,000+ research papers analyzed',
-      '25,000+ case studies processed',
-      'Unlimited training scenarios generated',
-    ],
-    bestFor: 'Universities with extensive content libraries',
-    time: '4-7 minutes',
+    title: "Personality Disorders Simulator",
+    description: "Experience rare and complex personality presentations from borderline to narcissistic.",
+    status: "ACTIVE",
+    difficulty: "HIGH", 
+    href: "/demo/personality-disorders",
+    icon: "🧠",
+    stats: { personas: "50K+", coverage: "100%" }
   },
   {
-    title: 'Security & Bias Detection Engine',
-    subtitle: 'Real-Time Bias Detection in Every Conversation',
-    description:
-      'AI monitors therapy sessions for unconscious bias and provides gentle, private feedback. See your blind spots before they impact real clients.',
-    icon: '🛡️',
-    color: 'red',
-    link: '/demo/security-bias-detection-engine',
-    features: [
-      'Real-time bias detection (<50ms)',
-      '200+ cultural patterns monitored',
-      '47 bias categories detected',
-      'Zero-knowledge privacy protection',
-    ],
-    bestFor: 'Programs prioritizing cultural competency',
-    time: '6-8 minutes',
+    title: "Cultural Competency Lab",
+    description: "Navigate diverse cultural contexts and learn appropriate therapeutic approaches.",
+    status: "ACTIVE",
+    difficulty: "MEDIUM",
+    href: "/demo/cultural-competency", 
+    icon: "🌍",
+    stats: { cultures: "150+", competency: "89%" }
   },
+  {
+    title: "Trauma-Informed Care",
+    description: "Practice trauma-sensitive approaches with complex PTSD and dissociative presentations.",
+    status: "ACTIVE",
+    difficulty: "HIGH",
+    href: "/demo/trauma-care",
+    icon: "🛡️", 
+    stats: { scenarios: "1K+", safety: "100%" }
+  },
+  {
+    title: "Diagnostic Accuracy Trainer",
+    description: "Sharpen diagnostic skills with challenging cases and differential diagnosis practice.",
+    status: "ACTIVE",
+    difficulty: "HIGH",
+    href: "/demo/diagnostic-training",
+    icon: "🎯",
+    stats: { accuracy: "85%", speed: "300%" }
+  }
 ]
 
-const universityStats = [
-  { value: '15+', label: 'Universities Using' },
-  { value: '2,500+', label: 'Students Trained' },
-  { value: '85%', label: 'Improvement Rate' },
-  { value: 'Zero', label: 'Patient Harm Incidents' },
-]
+const liveDemo = {
+  title: "Live Chat Simulation",
+  description: "Experience our AI training system with a real-time therapy session simulation.",
+  status: "LIVE"
+}
 ---
 
 <BaseLayout
-  title="Demo Hub - Choose Your Training Revolution"
-  description="Explore our AI-powered therapy training demos. Choose your own adventure through revolutionary training technologies."
-  bgType="plum"
+  title="Demo Hub - Experience AI Therapy Training"
+  description="Try our AI-powered therapy training simulations. Practice crisis interventions, bias detection, and complex client scenarios safely."
 >
-  <div class="relative min-h-screen text-white">
-    <!-- Floating Particles -->
-    <div
-      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
-    >
-      <div class="particle particle-1"></div>
-      <div class="particle particle-2"></div>
-      <div class="particle particle-3"></div>
-      <div class="particle particle-4"></div>
-      <div class="particle particle-5"></div>
-    </div>
-
-    <div class="relative z-10 py-8">
-      <div class="container mx-auto px-4">
-        <!-- Header -->
-        <div class="text-center mb-16">
-          <div class="mb-8 animate-breathe">
-            <Badge
-              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-purple-500/20 border border-purple-400/40 text-purple-200 rounded-full"
-            >
-              <span class="relative flex h-3 w-3">
-                <span
-                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-full h-3 w-3 bg-purple-500"
-                ></span>
-              </span>
-              4 Revolutionary Demos Available
-            </Badge>
-          </div>
-
-          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
-            Choose Your Training
-            <span class="text-purple-400 golden-shimmer block mt-2"
-              >Revolution</span
-            >
-          </h1>
-
-          <p
-            class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed"
-          >
-            Experience the future of therapy training. Each demo showcases
-            breakthrough AI technology that was impossible before HIPAA
-            compliance. Pick your adventure below.
-          </p>
-
-          <!-- University Stats -->
-          <div
-            class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12 max-w-4xl mx-auto"
-          >
-            {
-              universityStats.map((stat) => (
-                <div class="text-center p-4 rounded-2xl border border-purple-600/30 hover:border-purple-400/50 transition-all duration-500 organic-card">
-                  <div class="text-2xl lg:text-3xl font-bold text-purple-400 mb-2">
-                    {stat.value}
-                  </div>
-                  <div class="text-xs lg:text-sm text-purple-200/80 tracking-wide">
-                    {stat.label}
-                  </div>
-                </div>
-              ))
-            }
-          </div>
+  <!-- Hero Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-16">
+        <div class="status-indicator status-indicator--online inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--green"></div>
+          <span class="font-bold">ALL SYSTEMS OPERATIONAL</span>
         </div>
+        
+        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+          EXPERIENCE THE
+          <br />
+          <span class="confidence-boost">TRAINING REVOLUTION</span>
+        </h1>
+        
+        <p class="text-xl text-gray-300 mb-8 max-w-4xl mx-auto">
+          Try our AI-powered therapy training simulations. Each demo represents years of development and thousands of hours of clinical expertise.
+        </p>
 
-        <!-- Demo Selection Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {
-            demoOptions.map((demo) => (
-              <div
-                class={`border border-${demo.color}-600/30 hover:border-${demo.color}-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50 p-6`}
-              >
-                <div class="pb-4">
-                  <div class="flex items-start justify-between mb-4">
-                    <div
-                      class={`text-6xl group-hover:scale-110 transition-transform duration-700 text-${demo.color}-400`}
-                    >
-                      {demo.icon}
-                    </div>
-                    <div class="text-right">
-                      <Badge
-                        class={`bg-${demo.color}-500/20 text-${demo.color}-300 text-xs`}
-                      >
-                        {demo.time}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <h3
-                    class={`text-xl font-bold text-${demo.color}-100 tracking-wide mb-2`}
-                  >
-                    {demo.title}
-                  </h3>
-
-                  <div
-                    class={`text-sm text-${demo.color}-400/90 font-medium bg-${demo.color}-500/10 px-3 py-1 rounded-full border border-${demo.color}-500/20 mb-4 inline-block`}
-                  >
-                    {demo.subtitle}
-                  </div>
-
-                  <p
-                    class={`text-sm text-${demo.color}-200/80 leading-relaxed mb-4`}
-                  >
-                    {demo.description}
-                  </p>
-
-                  <div class="mb-4">
-                    <div
-                      class={`text-${demo.color}-300 font-medium text-sm mb-2`}
-                    >
-                      Key Features:
-                    </div>
-                    <ul class="space-y-1">
-                      {demo.features.map((feature) => (
-                        <li
-                          class={`flex items-center gap-2 text-xs text-${demo.color}-200/70`}
-                        >
-                          <span class={`text-${demo.color}-400`}>✓</span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div class="mb-6">
-                    <div
-                      class={`text-${demo.color}-300 font-medium text-sm mb-1`}
-                    >
-                      Best for:
-                    </div>
-                    <div class={`text-xs text-${demo.color}-200/70`}>
-                      {demo.bestFor}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="pt-0">
-                  <Button
-                    class={`w-full bg-gradient-to-r from-${demo.color}-500 to-${demo.color}-600 hover:from-${demo.color}-400 hover:to-${demo.color}-500 text-white font-bold py-3 rounded-full transform hover:scale-105 transition-all duration-300`}
-                    data-demo-link={demo.link}
-                  >
-                    Experience {demo.title} →
-                  </Button>
-                </div>
-              </div>
-            ))
-          }
-        </div>
-
-        <!-- Why These Demos Matter -->
-        <div class="mb-16">
-          <div
-            class="border border-green-600/30 bg-green-900/20 rounded-3xl overflow-hidden p-8 lg:p-12"
-          >
-            <div class="text-center">
-              <div class="text-6xl mb-6 text-green-400">🎓</div>
-              <h2 class="text-2xl lg:text-3xl font-bold text-green-100 mb-6">
-                Why These Demos Will Transform Your Program
-              </h2>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                <div>
-                  <div class="text-green-400 font-bold mb-2">
-                    🚫 The Old Way
-                  </div>
-                  <ul class="text-sm text-green-200/80 space-y-1">
-                    <li>• Limited to walk-in clients</li>
-                    <li>• Rare cases take years to encounter</li>
-                    <li>• Risk of harming vulnerable patients</li>
-                    <li>• Supervision bottlenecks</li>
-                    <li>• Cultural bias goes undetected</li>
-                  </ul>
-                </div>
-                <div>
-                  <div class="text-green-400 font-bold mb-2">
-                    ✨ The New Way
-                  </div>
-                  <ul class="text-sm text-green-200/80 space-y-1">
-                    <li>• Unlimited client diversity</li>
-                    <li>• Practice rare cases immediately</li>
-                    <li>• Zero risk to real patients</li>
-                    <li>• 24/7 training availability</li>
-                    <li>• Real-time bias detection</li>
-                  </ul>
-                </div>
-                <div>
-                  <div class="text-green-400 font-bold mb-2">
-                    📈 The Results
-                  </div>
-                  <ul class="text-sm text-green-200/80 space-y-1">
-                    <li>• 85% improvement in diagnostic accuracy</li>
-                    <li>• 300% faster skill acquisition</li>
-                    <li>• Zero training-related harm incidents</li>
-                    <li>• 95% student confidence increase</li>
-                    <li>• 78% reduction in bias incidents</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+          <div class="brutalist-badge brutalist-badge--success">
+            🎯 ZERO RISK TRAINING
           </div>
-        </div>
-
-        <!-- Security Guarantee -->
-        <div class="mb-16">
-          <div
-            class="border border-blue-600/30 bg-blue-900/20 rounded-3xl overflow-hidden p-8 lg:p-12"
-          >
-            <div class="text-center">
-              <div class="text-6xl mb-6 text-blue-400">🛡️</div>
-              <h3 class="text-lg lg:text-xl font-bold text-blue-100 mb-4">
-                Every Demo Protected by Military-Grade Security
-              </h3>
-              <p
-                class="text-base text-blue-200/90 mb-6 leading-relaxed max-w-3xl mx-auto"
-              >
-                All demos use Fully Homomorphic Encryption (FHE) - our AI
-                analyzes your interactions while they stay completely encrypted.
-                Even we can't see your demo sessions. Your exploration is
-                completely private.
-              </p>
-              <div
-                class="flex items-center justify-center gap-6 text-blue-300/80 text-sm"
-              >
-                <span class="flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
-                  Zero-Knowledge Processing
-                </span>
-                <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
-                  No Session Storage
-                </span>
-                <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
-                  Complete Privacy
-                </span>
-              </div>
-            </div>
+          <div class="brutalist-badge brutalist-badge--info">
+            🔒 FULLY ENCRYPTED
           </div>
-        </div>
-
-        <!-- Final CTA -->
-        <div class="text-center">
-          <div
-            class="border border-purple-500/40 bg-slate-900/50 rounded-3xl overflow-hidden p-8 lg:p-12"
-          >
-            <div>
-              <div class="text-6xl text-purple-400 mb-6">🚀</div>
-
-              <h2 class="text-2xl lg:text-4xl font-bold text-purple-100 mb-8">
-                Ready to Experience the
-                <br />
-                <span class="text-purple-400 golden-shimmer"
-                  >Future of Therapy Training?</span
-                >
-              </h2>
-
-              <p
-                class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
-              >
-                Each demo takes just a few minutes but will show you training
-                capabilities that didn't exist before. Pick the one that
-                interests you most, or try them all.
-              </p>
-
-              <div
-                class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6"
-              >
-                <Button
-                  size="lg"
-                  class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
-                  data-scroll-to="demo-grid"
-                >
-                  Choose Your Demo Above ↑
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  class="border-2 border-purple-400 text-purple-300 hover:bg-purple-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
-                  data-contact-link="/contact"
-                >
-                  Schedule University Demo
-                </Button>
-              </div>
-
-              <p class="text-xs text-purple-300/70">
-                🎓 Made for universities • 🔒 Completely private • 💛 Loved by
-                therapy programs everywhere
-              </p>
-            </div>
+          <div class="brutalist-badge brutalist-badge--warning">
+            ⚡ REAL-TIME FEEDBACK
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- Live Demo Section -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <div class="status-indicator status-indicator--processing inline-flex mb-4">
+          <div class="pulse-dot pulse-dot--blue"></div>
+          <span class="font-bold">{liveDemo.status} DEMONSTRATION</span>
+        </div>
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          {liveDemo.title}
+        </h2>
+        <p class="text-lg text-gray-300 max-w-3xl mx-auto mb-8">
+          {liveDemo.description}
+        </p>
+      </div>
+
+      <!-- Live Chat Demo -->
+      <div>
+        <BrutalistChatDemo client:load />
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Grid Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+          SPECIALIZED
+          <br />
+          <span class="text-blue-400">TRAINING MODULES</span>
+        </h2>
+        <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+          Each module targets specific therapeutic competencies with measurable outcomes.
+        </p>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--3">
+        {demos.map((demo) => (
+          <div class="brutalist-card hover-lift group">
+            <!-- Demo Header -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-3xl">{demo.icon}</div>
+              <div class="flex gap-2">
+                <div class={`brutalist-badge ${
+                  demo.status === 'ACTIVE' ? 'brutalist-badge--success' : 'brutalist-badge--warning'
+                } text-xs`}>
+                  {demo.status}
+                </div>
+                <div class={`brutalist-badge ${
+                  demo.difficulty === 'HIGH' ? 'brutalist-badge--danger' :
+                  demo.difficulty === 'MEDIUM' ? 'brutalist-badge--warning' : 'brutalist-badge--info'
+                } text-xs`}>
+                  {demo.difficulty}
+                </div>
+              </div>
+            </div>
+
+            <!-- Demo Content -->
+            <h3 class="brutalist-subheading text-lg mb-3">{demo.title}</h3>
+            <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+              {demo.description}
+            </p>
+
+            <!-- Demo Stats -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              {Object.entries(demo.stats).map(([key, value]) => (
+                <div class="text-center">
+                  <div class="text-lg font-bold text-green-400">{value}</div>
+                  <div class="text-xs text-gray-500 uppercase tracking-wide">{key}</div>
+                </div>
+              ))}
+            </div>
+
+            <!-- Demo Action -->
+            <a
+              href={demo.href}
+              class="brutalist-button brutalist-button--primary w-full text-center group-hover:scale-105 transition-transform"
+            >
+              LAUNCH DEMO →
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Performance Metrics Section -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+          MEASURABLE
+          <br />
+          <span class="confidence-boost">OUTCOMES</span>
+        </h2>
+        <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+          Every training session generates actionable data to track your progress.
+        </p>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--4">
+        <div class="metric-card">
+          <div class="metric-value">85%</div>
+          <div class="metric-label">Diagnostic Accuracy</div>
+          <div class="text-xs text-gray-500 mt-2">Average improvement</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">300%</div>
+          <div class="metric-label">Skill Acquisition</div>
+          <div class="text-xs text-gray-500 mt-2">Faster than traditional</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">78%</div>
+          <div class="metric-label">Bias Reduction</div>
+          <div class="text-xs text-gray-500 mt-2">Cultural competency</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">0</div>
+          <div class="metric-label">Patient Harm</div>
+          <div class="text-xs text-gray-500 mt-2">Perfect safety record</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="mental-health-safe max-w-4xl mx-auto text-center">
+        <div class="text-5xl mb-6 text-green-400">🚀</div>
+        
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+          READY TO TRANSFORM
+          <br />
+          <span class="confidence-boost">YOUR TRAINING?</span>
+        </h2>
+        
+        <p class="text-xl text-gray-300 mb-8">
+          Join 15+ universities and 2,500+ students who've revolutionized their therapy education.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <a href="/contact" class="brutalist-button brutalist-button--primary text-lg px-8 py-4">
+            START YOUR PROGRAM →
+          </a>
+          <a href="/features" class="brutalist-button brutalist-button--secondary text-lg px-8 py-4">
+            VIEW ALL FEATURES
+          </a>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 text-sm">
+          <span class="brutalist-badge brutalist-badge--success">✓ 30-DAY GUARANTEE</span>
+          <span class="brutalist-badge brutalist-badge--info">✓ FULL SUPPORT</span>
+          <span class="brutalist-badge brutalist-badge--warning">✓ CUSTOM INTEGRATION</span>
+        </div>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
-
-<style>
-  /* Organic Particles */
-  .particles-container {
-    overflow: hidden;
-  }
-
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #a855f7;
-    border-radius: 50%;
-    animation: float-organic 12s ease-in-out infinite;
-    opacity: 0.6;
-  }
-
-  .particle-1 {
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-    animation-duration: 15s;
-  }
-
-  .particle-2 {
-    top: 40%;
-    right: 20%;
-    animation-delay: 3s;
-    animation-duration: 18s;
-  }
-
-  .particle-3 {
-    bottom: 30%;
-    left: 25%;
-    animation-delay: 6s;
-    animation-duration: 12s;
-  }
-
-  .particle-4 {
-    top: 60%;
-    right: 40%;
-    animation-delay: 9s;
-    animation-duration: 20s;
-  }
-
-  .particle-5 {
-    bottom: 10%;
-    right: 10%;
-    animation-delay: 12s;
-    animation-duration: 16s;
-  }
-
-  @keyframes float-organic {
-    0%,
-    100% {
-      transform: translateY(0px) translateX(0px) scale(1);
-      opacity: 0.6;
-    }
-    25% {
-      transform: translateY(-30px) translateX(20px) scale(1.2);
-      opacity: 0.8;
-    }
-    50% {
-      transform: translateY(-10px) translateX(-15px) scale(0.9);
-      opacity: 0.4;
-    }
-    75% {
-      transform: translateY(20px) translateX(10px) scale(1.1);
-      opacity: 0.7;
-    }
-  }
-
-  /* Text Effects */
-  .golden-shimmer {
-    background: linear-gradient(45deg, #a855f7, #9333ea, #7c3aed);
-    background-size: 200% 200%;
-    animation: shimmer 3s ease-in-out infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  @keyframes shimmer {
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  /* Card Effects */
-  .organic-card {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .organic-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: transparent;
-    animation: organic-pulse 4s ease-in-out infinite;
-    transform: scale(0);
-  }
-
-  .organic-card:hover::before {
-    transform: scale(1);
-  }
-
-  @keyframes organic-pulse {
-    0%,
-    100% {
-      transform: scale(0) rotate(0deg);
-      opacity: 0;
-    }
-    50% {
-      transform: scale(1) rotate(180deg);
-      opacity: 1;
-    }
-  }
-
-  /* Breathing Animation */
-  .animate-breathe {
-    animation: breathe 3s ease-in-out infinite;
-  }
-
-  @keyframes breathe {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
-  }
-
-  /* Demo Grid Reference */
-  .demo-grid {
-    scroll-margin-top: 2rem;
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .particle {
-      width: 3px;
-      height: 3px;
-    }
-  }
-</style>
-
-<script>
-  declare const gtag: Function;
-  // Add demo grid class for smooth scrolling reference
-  document.addEventListener('DOMContentLoaded', () => {
-    const demoGrid = document.querySelector(
-      '.grid.grid-cols-1.lg\\:grid-cols-2',
-    )
-    if (demoGrid) {
-      demoGrid.classList.add('demo-grid')
-    }
-
-    // Handle demo navigation
-    document.querySelectorAll('[data-demo-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        const link = target.dataset['demoLink'];
-        if (link) {
-          window.location.href = link
-        }
-      })
-    })
-
-    // Handle scroll to demo grid
-    document.querySelectorAll('[data-scroll-to]').forEach((button) => {
-      button.addEventListener('click', (e) => {
-        const eventTarget = e.target as HTMLElement;
-        const target = eventTarget.dataset['scrollTo'];
-        if (target === 'demo-grid') {
-          const element = document.querySelector('.demo-grid')
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth' })
-          }
-        }
-      })
-    })
-
-    // Handle contact navigation
-    document.querySelectorAll('[data-contact-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        const link = target.dataset['contactLink'];
-        if (link) {
-          window.location.href = link
-        }
-      })
-    })
-
-    // Track demo hub interactions
-    document.querySelectorAll('button[data-demo-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
-        if (typeof gtag !== 'undefined') {
-          const target = e.target as HTMLElement;
-          gtag('event', 'demo_hub_interaction', {
-            demo_selected: target.textContent,
-            page_location: window.location.href,
-          })
-        }
-      })
-    })
-  })
-</script>

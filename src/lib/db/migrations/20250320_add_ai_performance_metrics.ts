@@ -1,7 +1,7 @@
 import postgres from 'postgres'
 
 // Initialize client
-const sql = postgres(process.env.DATABASE_URL || '')
+const sql = postgres(process.env['DATABASE_URL'] || '')
 
 export async function up() {
   await sql.unsafe`

@@ -12,8 +12,8 @@ export function preloadAuthResources() {
   // Preconnect to auth providers
   const connectDomains = [
     'accounts.google.com',
-    'api.supabase.com',
-    'identity.supabase.com',
+    'api.mongodb.com',
+    'cloud.mongodb.com',
   ]
 
   connectDomains.forEach((domain) => {

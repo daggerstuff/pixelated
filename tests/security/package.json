@@ -6,9 +6,9 @@
   "private": true,
   "engines": {
     "node": "22.x",
-    "pnpm": "10.11.0"
+    "pnpm": ""
   },
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@",
   "scripts": {
     "test": "node --loader ts-node/esm run-security-tests.ts",
     "start": "./run-security-tests.sh",

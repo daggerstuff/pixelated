@@ -1,15 +1,19 @@
-import { supabase } from '@/lib/supabase'
-import { createAuditLog, AuditEventType } from '@/lib/audit'
+import { mongoAuthService } from '@/services/mongoAuth.service'
+import { AuditEventType, createAuditLog } from '@/lib/audit'
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({
+  request,
+}: {
+  request: Request
+}): Promise<Response> => {
   try {
-    const { data, error } = await supabase.auth.refreshSession()
-
-    if (error) {
+    // Get the authorization header
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: error.message,
+          message: 'No access token provided',
         }),
         {
           status: 401,
@@ -20,11 +24,12 @@ export const POST = async ({ request }: { request: Request }) => {
       )
     }
 
-    if (!data.session) {
+    const accessToken = authHeader.split(' ')[1]
+    if (!accessToken) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: 'No session found',
+          message: 'Invalid access token format',
         }),
         {
           status: 401,
@@ -34,16 +39,22 @@ export const POST = async ({ request }: { request: Request }) => {
         },
       )
     }
+
+    const {
+      user,
+      session,
+      accessToken: newAccessToken,
+    } = await mongoAuthService.refreshSession(accessToken)
 
     // Log the session refresh for HIPAA compliance
     await createAuditLog(
-      AuditEventType.SESSION,
+      AuditEventType.LOGIN,
       'auth.session.refresh',
-      data.user?.id || 'system',
+      user._id.toString(),
       'auth',
       {
-        userId: data.user?.id,
-        email: data.user?.email,
+        userId: user._id.toString(),
+        email: user.email,
         timestamp: new Date().toISOString(),
       },
     )
@@ -51,7 +62,9 @@ export const POST = async ({ request }: { request: Request }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        session: data.session,
+        user,
+        session,
+        accessToken: newAccessToken,
       }),
       {
         status: 200,
@@ -67,7 +80,7 @@ export const POST = async ({ request }: { request: Request }) => {
         message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
-        status: 500,
+        status: 401,
         headers: {
           'Content-Type': 'application/json',
         },

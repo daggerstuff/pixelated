@@ -1,17 +1,43 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Button from '../components/ui/Button.astro'
+import Badge from '../components/ui/Badge.astro'
 ---
 
 <BaseLayout
   title="Contact Us | Pixelated Empathy"
-  description="Get in touch with the Pixelated Empathy team for inquiries, partnerships, or support."
+  description="Connect with the team revolutionizing therapy education. Schedule university partnerships, demos, or discuss custom implementations."
+  bgType="plum"
 >
-  <div class="max-w-4xl mx-auto py-12 px-4">
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-bold text-white">Contact Us</h1>
-      <p class="text-lg text-slate-400 mt-2">We'd love to hear from you</p>
+  <div class="relative min-h-screen text-white">
+    <!-- Floating Particles -->
+    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
     </div>
+
+    <div class="relative z-10 py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <!-- Enhanced Header -->
+        <div class="text-center mb-16">
+          <div class="mb-8">
+            <Badge class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-confident-500/20 border border-confident-400/40 text-confident-200 rounded-full">
+              <span class="text-confident-400">💼</span>
+              Elite Partnership Inquiries Welcome
+            </Badge>
+          </div>
+          <h1 class="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+            Let's Transform
+            <span class="text-healing-400 golden-shimmer block mt-2">Your Program Together</span>
+          </h1>
+          <p class="text-xl text-healing-200/90 font-medium mb-8 max-w-4xl mx-auto leading-relaxed">
+            Ready to join the universities revolutionizing therapy education? Let's discuss how we can customize our breakthrough technology for your specific needs.
+          </p>
+        </div>
+
+        <!-- Contact Options Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
     <div class="max-w-2xl mx-auto w-full">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 text-slate-300">
         <div>
@@ -229,7 +255,6 @@ import Button from '../components/ui/Button.astro'
         </div>
       </div>
     </div>
-  </StandardLayout>
 </BaseLayout>
 
 <script>

@@ -134,6 +134,7 @@ export default defineConfig({
       'zlib': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'net': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'tls': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
+      '@lib': path.resolve(__dirname, 'src/lib'),
       '@/hooks/useMentalHealthAnalysis': path.resolve(
         './src/hooks/useMentalHealthAnalysis.ts',
       ),

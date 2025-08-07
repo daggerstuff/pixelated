@@ -1,4 +1,3 @@
-# build output
 /dist/
 /.output
 /.astro
@@ -7,7 +6,6 @@
 node_modules/
 *.node
 
-# logs
 /npm-debug.log*
 /yarn-debug.log*
 /yarn-error.log*
@@ -15,7 +13,6 @@ node_modules/
 /browser-compatibility/
 /build-errors.md
 
-# environment variables and credentials
 /.env
 /.env.production
 /.env.local
@@ -28,12 +25,9 @@ node_modules/
 /hipaa-security-report.json
 /phi-scan-results.json
 /secrets.*.json
-.gdrive-server-credentials.json
 
-# macOS-specific files
 /.DS_Store*
 
-# IDE files
 /.vscode/
 /.idea/
 /*.iml
@@ -42,91 +36,55 @@ node_modules/
 /.goose/
 /.vscode-insiders/
 
-# test coverage
 /coverage/
 
-# Playwright
 /test-results/
 /playwright-report/
 /playwright/.cache/
 
-# AWS
-/.aws-sam/
-/build-aws/
-
-# TypeScript
 /*.tsbuildinfo
 
-# Cache
 /.cache
 /.temp
 /.tmp
 
-# Misc
-/*.log*
-/.DS_Store*
+/*.log
 /Thumbs.db*
 
-# local archive
 /.local
 /tools/
 /security-reports/
 
 /tests/security/node_modules/
 
-# Security and credential reports
 /security-report.md
 /secret-scan-report.md
 /credential-scan-results.json
 
-# Python environments (prevent heavy ML environments from being committed)
 **/venv/
 **/.venv/
 **/env/
 **/conda_env/
 **/__pycache__/
-src/lib/ai/bias-detection/bias_detection_env/
 
-# Sentry
 .sentryclirc
 
-# Large
 .amazonq/
 .cursor/
-.zencoder/
-.github/insructions/
 
-.gitpod.yml
 .goosehints
-.sourcebot
 azure.yaml
 performance-results/
-.vercel
-mcp-servers.json
-package.json.bak
 test_pixel_logs
-.cursorrules
 security-scan-artifacts
-test_pixel_logs
 .mypy_cache
 .pytest_cache
-.github/copilot-instructions.md
-.github/instructions
-LogFiles/
-app-logs-detailed.zip.env.encryption.key
 
-.env.prod.gpg
-mcp-sourcebot-config.json
-pixelatedcr.azurecr.io_pixelated-web_latest.json
 security-baseline.json
 
 __azurite_db_blob_extent__.json
 __azurite_db_blob__.json
 
-# amplify
-.amplify
-amplify_outputs*
-amplifyconfiguration*
 .plandex-v2
 .gooseignore
 .madgerc
@@ -137,15 +95,142 @@ amplifyconfiguration*
 .endgame
 packages
 pnpm-workspace.yaml
-.cursorindexingignore
-.cursorignore
-.amplify-hosting
-business-strategy
-demo_balance_report.json
-demo_client_scenarios.json
-demo_conversations.json
-demo_therapeutic_responses.json
-demo_validation_results.json
-CDN-SETUP.md
 ISSUE_BIAS_DETECTION_LAYER_WEIGHTS.md
-pixelated-empathy-agent.yaml
+
+
+
+.direnv
+.envrc
+
+*~
+
+### Python ###
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+*.manifest
+*.spec
+
+pip-log.txt
+pip-delete-this-directory.txt
+
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+instance/
+.webassets-cache
+
+.scrapy
+
+docs/_build/
+
+.pybuilder/
+target/
+
+.ipynb_checkpoints
+
+profile_default/
+ipython_config.py
+
+.pdm.toml
+
+celerybeat-schedule
+celerybeat.pid
+
+*.sage.py
+
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+/site
+
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+.pyre/
+
+.pytype/
+
+cython_debug/
+
+.ruff_cache/
+
+pyrightconfig.json
+
+.vscode/*
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/*.code-snippets
+
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+.history
+.ionide
+
+business-strategy
+examples
+
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+/ai/
+/.scannerwork/
+src/lib/db/migrations
+/src/lib/db/migrations/
+/pixelated.git/

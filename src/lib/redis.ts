@@ -5,53 +5,39 @@
 
 import Redis from 'ioredis'
 
-
-// Lazy load config to avoid initialization order issues
-const getConfig = async () => {
-  try {
-    const configModule = await import('../config/env.config')
-    return configModule.config
-  } catch {
-    return null
-  }
-}
-
-// Determine if we're in a production environment (lazy)
-const isProduction = () => {
-  const config = getConfig()
-  return config?.isProduction() ?? false
-}
-
-// Get Redis credentials from environment (lazy)
+// Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
-  const config = getConfig()
   return {
-    restUrl: config?.redis.url(),
-    restToken: config?.redis.token(),
+    restUrl: process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL,
+    restToken: process.env.UPSTASH_REDIS_REST_TOKEN,
+    url: process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL,
   }
+}
+
+// Determine if we're in a production environment
+const isProduction = () => {
+  return process.env.NODE_ENV === 'production'
 }
 
 // Create a mock Redis client for development
 function createMockRedisClient() {
   const message = isProduction()
     ? 'CRITICAL: Using mock Redis client in production. This should never happen.'
-    : 'Using mock Redis client for development. This should not be used in production.'
+    : 'Using mock Redis client for development. Redis operations will be mocked.'
 
   console.warn(message)
 
+  // Return a mock client with basic Redis operations
   return {
-    get: async (_key: string) => null,
-    set: async (_key: string, _value: unknown, _options?: unknown) => 'OK',
-    del: async (_key: string) => 1,
-    incr: async (_key: string) => 1,
-    exists: async (_key: string) => 0,
-    expire: async (_key: string, _seconds: number) => 1,
-    hset: async (_key: string, _field: string, _value: unknown) => 1,
-    hget: async (_key: string, _field: string) => null,
-    hgetall: async (_key: string) => ({}),
-    hdel: async (_key: string, _field: string) => 1,
+    get: async () => null,
+    set: async () => 'OK',
+    del: async () => 1,
+    exists: async () => 0,
+    expire: async () => 1,
     ping: async () => 'PONG',
-    disconnect: async () => {},
+    quit: async () => 'OK',
+    disconnect: () => {},
+    status: 'ready',
   }
 }
 
@@ -66,9 +52,9 @@ function createRedisClient() {
   if (hasValidCredentials) {
     // Initialize ioredis client with credentials
     return new Redis(restUrl, {
-          password: restToken,
-          // Add any additional options here if needed
-        });
+      password: restToken,
+      // Add any additional options here if needed
+    })
   } else {
     // Log appropriate warnings in production
     if (isProduction()) {
