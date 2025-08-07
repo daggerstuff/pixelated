@@ -234,3 +234,4 @@ dev-debug.log
 src/lib/db/migrations
 /src/lib/db/migrations/
 /pixelated.git/
+memAgent/cipher.yml
