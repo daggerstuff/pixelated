@@ -44,8 +44,10 @@ try:
 
     # Note: FairAdaBoost was removed in newer AIF360 versions
     FairAdaBoost = None  # Deprecated/removed from AIF360
-    from aif360.algorithms.postprocessing import (CalibratedEqOddsPostprocessing,
-                                                  EqOddsPostprocessing)
+    from aif360.algorithms.postprocessing import (
+        CalibratedEqOddsPostprocessing,
+        EqOddsPostprocessing,
+    )
 
     AIF360_AVAILABLE = True
 except ImportError as e:
@@ -55,13 +57,15 @@ except ImportError as e:
 
 # Microsoft Fairlearn
 try:
-    from fairlearn.metrics import (demographic_parity_difference,
-                                   demographic_parity_ratio,
-                                   equalized_odds_difference,
-                                   equalized_odds_ratio, selection_rate)
+    from fairlearn.metrics import (
+        demographic_parity_difference,
+        demographic_parity_ratio,
+        equalized_odds_difference,
+        equalized_odds_ratio,
+        selection_rate,
+    )
     from fairlearn.postprocessing import ThresholdOptimizer
-    from fairlearn.reductions import (DemographicParity, EqualizedOdds,
-                                      ExponentiatedGradient)
+    from fairlearn.reductions import DemographicParity, EqualizedOdds, ExponentiatedGradient
 
     FAIRLEARN_AVAILABLE = True
 except ImportError as e:
