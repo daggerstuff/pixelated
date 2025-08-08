@@ -1,0 +1,57 @@
+---
+// Static, lightweight session preview card for hero split
+---
+
+<div class="session-preview">
+  <div class="session-preview__header">
+    <div class="status-indicator status-indicator--online">
+      <span class="pulse-dot pulse-dot--green"></span>
+      <strong>LIVE PREVIEW</strong>
+    </div>
+    <span class="chip chip--info">HIPAA SECURE</span>
+  </div>
+
+  <div class="session-preview__messages">
+    <div class="message message--ai">
+      Hello, I'm here to help. What brings you in today?
+    </div>
+    <div class="message message--user">
+      I've been feeling overwhelmed and can't focus at work.
+    </div>
+    <div class="message message--ai">
+      Thank you for sharing that. When did you first notice this change?
+    </div>
+  </div>
+
+  <div class="session-preview__footer">
+    <div class="input-stub">Type your response…</div>
+    <button class="brutalist-button brutalist-button--primary">Send</button>
+  </div>
+</div>
+
+<style>
+  .session-preview { 
+    background: var(--bg-secondary); 
+    border: 2px solid var(--border-primary); 
+    border-radius: var(--radius-lg); 
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+  .session-preview__header { 
+    display:flex; justify-content:space-between; align-items:center; 
+    padding: var(--space-4); background: var(--bg-tertiary); border-bottom:1px solid var(--border-primary);
+  }
+  .session-preview__messages { 
+    display:flex; flex-direction:column; gap: var(--space-3); padding: var(--space-4); min-height: 180px;
+  }
+  .session-preview__footer { 
+    display:flex; gap: var(--space-3); align-items:center; border-top:1px solid var(--border-primary); padding: var(--space-3) var(--space-4);
+  }
+  .input-stub { flex:1; background: var(--bg-elevated); color: var(--text-muted); border:1px solid var(--border-primary); padding: var(--space-3); border-radius: var(--radius-md); font-size: var(--text-sm); }
+
+  /* Lightweight message bubbles */
+  .message { max-width: 85%; padding: 0.75rem 1rem; border:1px solid var(--border-primary); border-radius: var(--radius-md); }
+  .message--ai { background: var(--bg-elevated); color: var(--text-secondary); }
+  .message--user { background: rgb(34 197 94 / 0.08); color: var(--text-primary); border-color: var(--accent-primary); align-self: flex-end; }
+</style>
+

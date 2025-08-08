@@ -2,12 +2,36 @@
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
 import type {
   TherapeuticSession as SessionData,
-  BiasDetectionConfig,
   BiasMetricsConfig,
   BiasAlertConfig,
   BiasReportConfig,
   BiasExplanationConfig,
 } from '../types'
+
+// Local type for engine config (matches mockConfig structure)
+type EngineConfig = {
+  pythonServiceUrl: string
+  pythonServiceTimeout: number
+  thresholds: {
+    warningLevel: number
+    highLevel: number
+    criticalLevel: number
+  }
+  layerWeights: {
+    preprocessing: number
+    modelLevel: number
+    interactive: number
+    evaluation: number
+  }
+  evaluationMetrics: string[]
+  metricsConfig: BiasMetricsConfig
+  alertConfig: BiasAlertConfig
+  reportConfig: BiasReportConfig
+  explanationConfig: BiasExplanationConfig
+  hipaaCompliant: boolean
+  dataMaskingEnabled: boolean
+  auditLogging: boolean
+}
 
 // Mock fetch globally for Python service calls
 global.fetch = vi.fn().mockImplementation((url: string | URL) => {
@@ -168,7 +192,7 @@ vi.mock('../python-service/bias_detection_service.py', () => ({
 
 describe('BiasDetectionEngine', () => {
   let biasEngine: BiasDetectionEngine
-  let mockConfig: BiasDetectionConfig
+  let mockConfig: EngineConfig
   let mockSessionData: SessionData
 
   beforeEach(() => {
@@ -1012,7 +1036,7 @@ describe('BiasDetectionEngine', () => {
         dataMaskingEnabled: false,
         auditLogging: false,
         // Missing layerWeights, should use defaults
-      } as Partial<BiasDetectionConfig>
+      } as Partial<EngineConfig>
 
       const engineWithDefaults = new BiasDetectionEngine(incompleteConfig)
       await engineWithDefaults.initialize()
@@ -1169,9 +1193,9 @@ describe('BiasDetectionEngine', () => {
         fixtureScenarios.elderlyPatient,
       )
 
-      expect(result.demographics).toBeDefined()
-      expect(result.demographics.age).toBeDefined()
-      expect(result.demographics.gender).toBeDefined()
+  expect(result.demographics).toBeDefined()
+  expect(result.demographics?.['age']).toBeDefined()
+  expect(result.demographics?.['gender']).toBeDefined()
       expect(result.layerResults).toBeDefined()
       expect(result.recommendations).toBeDefined()
     })

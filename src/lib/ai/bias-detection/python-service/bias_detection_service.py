@@ -14,6 +14,7 @@ HIPAA Compliant with encryption, audit logging, and secure data handling.
 """
 
 import asyncio
+import base64
 import hashlib
 import json
 import logging
@@ -27,12 +28,8 @@ from functools import wraps
 from typing import Any
 
 import jwt
-
-# Core ML libraries
 import numpy as np
 import pandas as pd
-
-# Flask and web framework
 from flask import Flask, Response, g, jsonify, request
 from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
@@ -47,10 +44,8 @@ try:
 
     # Note: FairAdaBoost was removed in newer AIF360 versions
     FairAdaBoost = None  # Deprecated/removed from AIF360
-    from aif360.algorithms.postprocessing import (
-        CalibratedEqOddsPostprocessing,
-        EqOddsPostprocessing,
-    )
+    from aif360.algorithms.postprocessing import (CalibratedEqOddsPostprocessing,
+                                                  EqOddsPostprocessing)
 
     AIF360_AVAILABLE = True
 except ImportError as e:
@@ -60,19 +55,13 @@ except ImportError as e:
 
 # Microsoft Fairlearn
 try:
-    from fairlearn.metrics import (
-        demographic_parity_difference,
-        demographic_parity_ratio,
-        equalized_odds_difference,
-        equalized_odds_ratio,
-        selection_rate,
-    )
+    from fairlearn.metrics import (demographic_parity_difference,
+                                   demographic_parity_ratio,
+                                   equalized_odds_difference,
+                                   equalized_odds_ratio, selection_rate)
     from fairlearn.postprocessing import ThresholdOptimizer
-    from fairlearn.reductions import (
-        DemographicParity,
-        EqualizedOdds,
-        ExponentiatedGradient,
-    )
+    from fairlearn.reductions import (DemographicParity, EqualizedOdds,
+                                      ExponentiatedGradient)
 
     FAIRLEARN_AVAILABLE = True
 except ImportError as e:
@@ -129,8 +118,6 @@ try:
 except ImportError as e:
     VISUALIZATION_AVAILABLE = False
     logging.warning(f"Visualization libraries not available: {e}")
-
-import base64
 
 # Security and encryption
 from cryptography.fernet import Fernet

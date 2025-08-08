@@ -1,3 +1,6 @@
+// IMPORTANT: Import Sentry instrumentation at the very top
+import '../../../../instrument.mjs'
+
 // AI Services Placeholder
 // TODO: Implement full AI services after pulling changes from other branch
 

@@ -1,9 +1,31 @@
 import { useState } from 'react'
 
+interface Entity {
+  text: string
+  type: string
+  confidence: number
+}
+
+interface Concept {
+  concept: string
+  relevance: number
+}
+
+interface RiskFactor {
+  factor: string
+  severity: 'High' | 'Moderate' | 'Low'
+}
+
+interface AnalysisResults {
+  entities: Entity[]
+  concepts: Concept[]
+  riskFactors: RiskFactor[]
+}
+
 export default function KnowledgeParsingDemo() {
-  const [inputText, setInputText] = useState('Patient presents with symptoms of anxiety and depression following recent job loss. Reports difficulty sleeping and decreased appetite.')
+  const [inputText, setInputText] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [results, setResults] = useState<any>(null)
+  const [results, setResults] = useState<AnalysisResults | null>(null)
 
   const analyze = async () => {
     setIsAnalyzing(true)
@@ -39,10 +61,11 @@ export default function KnowledgeParsingDemo() {
       <div className="space-y-6">
         {/* Input Section */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-2">
+          <label htmlFor="clinical-text" className="block text-sm font-medium text-slate-200 mb-2">
             Clinical Text to Analyze
           </label>
           <textarea
+            id="clinical-text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             className="w-full h-32 p-4 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
@@ -64,8 +87,8 @@ export default function KnowledgeParsingDemo() {
             <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
               <h3 className="text-lg font-semibold text-white mb-4">Extracted Entities</h3>
               <div className="space-y-3">
-                {results.entities.map((entity: any, index: number) => (
-                  <div key={index} className="flex justify-between items-center">
+                {results.entities.map((entity: Entity) => (
+                  <div key={`${entity.text}-${entity.type}`} className="flex justify-between items-center">
                     <div>
                       <div className="text-white font-medium">{entity.text}</div>
                       <div className="text-xs text-slate-400">{entity.type}</div>
@@ -82,8 +105,8 @@ export default function KnowledgeParsingDemo() {
             <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
               <h3 className="text-lg font-semibold text-white mb-4">Clinical Concepts</h3>
               <div className="space-y-3">
-                {results.concepts.map((concept: any, index: number) => (
-                  <div key={index} className="flex justify-between items-center">
+                {results.concepts.map((concept: Concept) => (
+                  <div key={concept.concept} className="flex justify-between items-center">
                     <div className="text-white">{concept.concept}</div>
                     <div className="text-orange-400 font-mono text-sm">
                       {(concept.relevance * 100).toFixed(0)}%
@@ -97,8 +120,8 @@ export default function KnowledgeParsingDemo() {
             <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
               <h3 className="text-lg font-semibold text-white mb-4">Risk Assessment</h3>
               <div className="space-y-3">
-                {results.riskFactors.map((risk: any, index: number) => (
-                  <div key={index}>
+                {results.riskFactors.map((risk: RiskFactor) => (
+                  <div key={risk.factor}>
                     <div className="text-white font-medium">{risk.factor}</div>
                     <div className={`text-xs ${
                       risk.severity === 'High' ? 'text-red-400' :

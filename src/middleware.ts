@@ -1,3 +1,6 @@
+// IMPORTANT: Import instrument.mjs at the very top to initialize Sentry
+import '../instrument.mjs'
+
 import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server'
 import { generateCspNonce } from './lib/middleware/csp'
 import { sequence } from 'astro/middleware'

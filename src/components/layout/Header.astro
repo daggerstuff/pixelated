@@ -8,13 +8,13 @@ const navLinks = [
 ];
 ---
 
-<header class="sticky top-0 z-50 w-full bg-black/95 backdrop-blur-sm border-b-2 border-gray-800">
+<header class="fixed top-0 z-50 w-full bg-black/70 supports-[backdrop-filter]:backdrop-blur border-b border-gray-800">
   <div class="brutalist-container">
-    <div class="flex items-center justify-between h-16">
+    <div class="flex items-center justify-between h-14">
       <!-- Brutalist Branding -->
       <div class="flex items-center">
         <a class="flex items-center gap-3 hover:opacity-90 transition-opacity" href="/">
-          <div class="w-8 h-8 bg-green-500 border-2 border-green-400 flex items-center justify-center font-bold text-black text-sm">
+          <div class="w-8 h-8 flex items-center justify-center font-bold text-black text-sm" style="background-color: var(--accent-primary); border: 2px solid var(--accent-primary);">
             P
           </div>
           <div class="flex flex-col">
@@ -35,7 +35,7 @@ const navLinks = [
             <li>
               <a
                 href={link.href}
-                class="nav-link brutalist-button brutalist-button--outline text-sm px-4 py-2"
+                class="nav-link text-sm px-3 py-2 text-gray-400 hover:text-white transition-colors"
               >
                 {link.name}
               </a>
@@ -47,7 +47,7 @@ const navLinks = [
         <div class="ml-6">
           <a
             href="/contact"
-            class="brutalist-button brutalist-button--primary text-sm px-6 py-2"
+            class="brutalist-button brutalist-button--primary text-sm px-5 py-2 rounded-full"
           >
             GET STARTED
           </a>
@@ -71,12 +71,12 @@ const navLinks = [
   </div>
 
   <!-- Mobile Menu -->
-  <div id="mobile-menu" class="hidden md:hidden bg-black border-b-2 border-gray-800">
+  <div id="mobile-menu" class="hidden md:hidden fixed top-14 left-0 right-0 bg-black border-b-2 border-gray-800 z-40">
     <div class="brutalist-container py-4 space-y-2">
       {navLinks.map(link => (
         <a
           href={link.href}
-          class="block px-4 py-3 text-white hover:text-green-400 hover:bg-gray-900 transition-colors font-medium"
+          class="block px-4 py-3 text-gray-200 hover:text-white hover:bg-gray-900 transition-colors"
         >
           {link.name}
         </a>
@@ -121,54 +121,4 @@ const navLinks = [
   }
 </script>
 
-<script is:inline>
-  // Theme toggle functionality
-  const themeToggle = document.getElementById('theme-toggle');
-  const html = document.documentElement;
 
-  const applyTheme = (theme) => {
-    if (theme === 'dark') {
-      html.classList.add('dark');
-    } else {
-      html.classList.remove('dark');
-    }
-  };
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const isDark = html.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
-      applyTheme(isDark ? 'light' : 'dark');
-    });
-  }
-
-  // Apply theme on initial load
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  applyTheme(savedTheme);
-
-  // Mobile menu functionality
-  const mobileMenuButton = document.getElementById('mobile-menu-button');
-  const mobileMenu = document.getElementById('mobile-menu');
-
-  if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', () => {
-      const isOpen = !mobileMenu.classList.contains('hidden');
-
-      if (isOpen) {
-        mobileMenu.classList.add('hidden');
-        mobileMenuButton.setAttribute('aria-expanded', 'false');
-      } else {
-        mobileMenu.classList.remove('hidden');
-        mobileMenuButton.setAttribute('aria-expanded', 'true');
-      }
-    });
-
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
-        mobileMenu.classList.add('hidden');
-        mobileMenuButton.setAttribute('aria-expanded', 'false');
-      }
-    });
-  }
-</script>

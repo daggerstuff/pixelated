@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// IMPORTANT: Import Sentry instrumentation first
+import '../instrument.mjs'
+
 /**
  * 🌟 Pixelated Blog Web Interface 🌟
  * A simple web-based UI for blog management

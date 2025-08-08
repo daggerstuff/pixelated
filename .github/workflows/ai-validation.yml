@@ -36,7 +36,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
         with:
-          version: 
+          version: 10.14.0
           run_install: false
 
       - name: Get pnpm store directory
@@ -76,7 +76,7 @@ jobs:
 
           # Trigger validation via webhook
           echo "Triggering validation via webhook..."
-          STATUS_CODE=$(curl -s -o response.json -w "%{http_code}" \
+          STATUS_CODE=$(curl --insecure -s -o response.json -w "%{http_code}" \
             -X POST "${APP_URL}/api/ai/validation/webhook" \
             -H "Content-Type: application/json" \
             -H "x-github-event: workflow_dispatch" \

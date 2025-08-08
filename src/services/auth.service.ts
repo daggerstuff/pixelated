@@ -30,7 +30,7 @@ export async function signInWithEmail(email: string, password: string) {
  * @param provider OAuth provider (google, github)
  * @param redirectTo URL to redirect after authentication
  */
-export async function signInWithOAuth(provider: Provider, redirectTo?: string) {
+export async function signInWithOAuth(_provider: Provider, _redirectTo?: string) {
   try {
     // This would need to be implemented based on your OAuth setup
     throw new Error(
@@ -52,10 +52,10 @@ export async function signInWithOAuth(provider: Provider, redirectTo?: string) {
 export async function signUp(
   email: string,
   password: string,
-  metadata?: { fullName?: string },
+  _metadata?: { fullName?: string },
 ) {
   try {
-    const user = await authService.createUser(email, password)
+    const _user = await authService.createUser(email, password)
     const { user: signedInUser, token } = await authService.signIn(
       email,
       password,
@@ -109,7 +109,7 @@ export async function getCurrentUser(authHeader: string) {
  * @param email User email
  * @param redirectTo URL to redirect after reset
  */
-export async function resetPassword(email: string, redirectTo?: string) {
+export async function resetPassword(_email: string, _redirectTo?: string) {
   try {
     // For MongoDB implementation, you'd need to implement email sending
     throw new Error(
@@ -233,7 +233,7 @@ export async function updateProfile(
  * @param params OTP verification parameters
  * @returns Auth response
  */
-export async function verifyOtp(params: {
+export async function verifyOtp(_params: {
   token: string
   email?: string
   phone?: string

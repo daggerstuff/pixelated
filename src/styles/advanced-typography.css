@@ -1,0 +1,418 @@
+/* Advanced Typography System - Sophisticated Mental Health Design */
+
+/* Import Variable Fonts for Maximum Flexibility */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+
+:root {
+  /* Advanced Font Stack - Context-Aware Typography */
+  --font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  --font-numeric: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-therapeutic: 'Inter Variable', system-ui, sans-serif; /* Softer for therapeutic content */
+
+  /* Fluid Type Scale - Responsive & Sophisticated */
+  --text-scale-ratio: 1.25; /* Perfect fourth - pleasing to the eye */
+  
+  /* Fluid typography sizes that scale naturally */
+  --text-xs: clamp(0.694rem, 0.67rem + 0.12vw, 0.75rem);
+  --text-sm: clamp(0.833rem, 0.804rem + 0.145vw, 0.9rem);
+  --text-base: clamp(1rem, 0.967rem + 0.165vw, 1.08rem);
+  --text-lg: clamp(1.2rem, 1.16rem + 0.2vw, 1.3rem);
+  --text-xl: clamp(1.44rem, 1.392rem + 0.24vw, 1.56rem);
+  --text-2xl: clamp(1.728rem, 1.67rem + 0.29vw, 1.872rem);
+  --text-3xl: clamp(2.074rem, 2.004rem + 0.35vw, 2.246rem);
+  --text-4xl: clamp(2.488rem, 2.405rem + 0.415vw, 2.696rem);
+  --text-5xl: clamp(2.986rem, 2.886rem + 0.5vw, 3.235rem);
+  --text-6xl: clamp(3.583rem, 3.463rem + 0.6vw, 3.882rem);
+
+  /* Advanced Letter Spacing - Optical Corrections */
+  --letter-tight: -0.025em;   /* For large headings */
+  --letter-normal: 0em;       /* Body text */
+  --letter-wide: 0.025em;     /* Small text for legibility */
+  --letter-wider: 0.05em;     /* Labels and captions */
+  --letter-widest: 0.1em;     /* Buttons and tags */
+
+  /* Sophisticated Line Heights - Reading Optimization */
+  --leading-none: 1;          /* Tight headers */
+  --leading-tight: 1.25;      /* Display text */
+  --leading-snug: 1.375;      /* Headings */
+  --leading-normal: 1.5;      /* Body text - optimal reading */
+  --leading-relaxed: 1.625;   /* Therapeutic content */
+  --leading-loose: 2;         /* Spacious content */
+
+  /* Contextual Font Weights - Semantic Meaning */
+  --weight-hairline: 100;
+  --weight-thin: 200;
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --weight-black: 900;
+
+  /* Advanced Color Palette - Sophisticated Therapeutic Colors */
+  --text-primary: #f8fafc;        /* Pure white - highest contrast */
+  --text-secondary: #e2e8f0;      /* Soft white - secondary content */
+  --text-tertiary: #cbd5e1;       /* Muted - supporting text */
+  --text-quaternary: #94a3b8;     /* Subtle - captions and labels */
+  --text-therapeutic: #a7f3d0;    /* Gentle green - therapeutic content */
+  --text-empathic: #bfdbfe;       /* Soft blue - empathic communication */
+  --text-focus: #fbbf24;          /* Warm amber - attention without anxiety */
+  --text-crisis: #fb7185;         /* Gentle pink-red - urgent but not harsh */
+
+  /* Contextual Text Colors */
+  --text-body-primary: var(--text-secondary);
+  --text-body-secondary: var(--text-tertiary);
+  --text-heading-primary: var(--text-primary);
+  --text-heading-secondary: var(--text-secondary);
+  --text-interactive: var(--text-empathic);
+  --text-success: var(--text-therapeutic);
+  --text-warning: var(--text-focus);
+  --text-danger: var(--text-crisis);
+}
+
+/* Base Typography Setup - Advanced Rendering */
+html {
+  /* Improved text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  /* Better font feature settings */
+  font-variant-ligatures: common-ligatures;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  font-feature-settings: "liga" 1, "kern" 1, "onum" 1, "pnum" 1;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--letter-normal);
+  color: var(--text-body-primary);
+  font-weight: var(--weight-normal);
+  
+  /* Improve text contrast and readability */
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Advanced Heading System - Semantic & Beautiful */
+.heading-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-black);
+  line-height: var(--leading-none);
+  letter-spacing: var(--letter-tight);
+  color: var(--text-heading-primary);
+  
+  /* Advanced text effects */
+  background: linear-gradient(135deg, var(--text-primary), var(--text-therapeutic));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  /* Improve performance */
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.heading-primary {
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  font-weight: var(--weight-extrabold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--letter-tight);
+  color: var(--text-heading-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+.heading-secondary {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--letter-tight);
+  color: var(--text-heading-secondary);
+  margin: 0 0 1.25rem 0;
+}
+
+.heading-tertiary {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--letter-normal);
+  color: var(--text-heading-secondary);
+  margin: 0 0 1rem 0;
+}
+
+.heading-quaternary {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--letter-normal);
+  color: var(--text-heading-secondary);
+  margin: 0 0 0.75rem 0;
+}
+
+/* Sophisticated Body Text - Reading Optimized */
+.text-body-large {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-normal);
+  color: var(--text-body-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+.text-body {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-normal);
+  color: var(--text-body-primary);
+  margin: 0 0 1.25rem 0;
+}
+
+.text-body-small {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-normal);
+  color: var(--text-body-secondary);
+  margin: 0 0 1rem 0;
+}
+
+/* Therapeutic Content Typography - Calming & Readable */
+.text-therapeutic {
+  font-family: var(--font-therapeutic);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-normal);
+  color: var(--text-therapeutic);
+  letter-spacing: var(--letter-wide);
+  
+  /* Slightly softer appearance */
+  opacity: 0.95;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Advanced Label System - Contextual & Smart */
+.label-primary {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--letter-wider);
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.label-secondary {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--letter-widest);
+  text-transform: uppercase;
+  color: var(--text-quaternary);
+  margin: 0 0 0.25rem 0;
+}
+
+/* Monospace & Code Typography - Technical Excellence */
+.text-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--letter-normal);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  
+  /* Better code readability */
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Numeric Typography - Data & Metrics */
+.text-numeric {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: var(--letter-normal);
+}
+
+.text-metric {
+  font-family: var(--font-numeric);
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-none);
+  color: var(--text-therapeutic);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--letter-tight);
+}
+
+/* Interactive Text - Links & Buttons */
+.text-interactive {
+  color: var(--text-interactive);
+  text-decoration: none;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--letter-normal);
+  
+  /* Smooth interactions */
+  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer;
+}
+
+.text-interactive:hover {
+  color: var(--text-primary);
+  text-shadow: 0 0 8px rgba(191, 219, 254, 0.4);
+}
+
+.text-interactive:focus {
+  outline: 2px solid var(--text-interactive);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Status & Semantic Typography */
+.text-success {
+  color: var(--text-success);
+  font-weight: var(--weight-medium);
+}
+
+.text-warning {
+  color: var(--text-warning);
+  font-weight: var(--weight-medium);
+}
+
+.text-danger {
+  color: var(--text-danger);
+  font-weight: var(--weight-medium);
+}
+
+/* Advanced Utility Classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--text-primary), var(--text-therapeutic));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, var(--text-empathic), var(--text-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-shadow-soft {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-shadow-glow {
+  text-shadow: 0 0 10px currentColor;
+  opacity: 0.9;
+}
+
+/* Responsive Typography Adjustments */
+@media (max-width: 768px) {
+  .heading-display,
+  .heading-primary {
+    font-size: var(--text-4xl);
+  }
+  
+  .heading-secondary {
+    font-size: var(--text-2xl);
+  }
+  
+  .text-body-large {
+    font-size: var(--text-base);
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    /* Slightly larger base font on mobile for accessibility */
+    font-size: 16px;
+  }
+  
+  .text-therapeutic {
+    line-height: var(--leading-loose);
+  }
+}
+
+/* Advanced Accessibility Features */
+@media (prefers-reduced-motion: reduce) {
+  .text-interactive {
+    transition: none;
+  }
+  
+  .text-gradient,
+  .text-gradient-blue {
+    background: none;
+    -webkit-text-fill-color: var(--text-primary);
+    color: var(--text-primary);
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #f0f0f0;
+    --text-tertiary: #d0d0d0;
+    --text-quaternary: #b0b0b0;
+  }
+  
+  .text-mono {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+  
+  .text-mono {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* Print Styles - Professional Output */
+@media print {
+  body {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000000;
+  }
+  
+  .heading-primary,
+  .heading-secondary,
+  .heading-tertiary,
+  .heading-quaternary {
+    color: #000000;
+    font-weight: bold;
+  }
+  
+  .text-gradient,
+  .text-gradient-blue {
+    background: none;
+    -webkit-text-fill-color: #000000;
+    color: #000000;
+  }
+}
+
+/* Selection Styles - Brand Consistency */
+::selection {
+  background: rgba(167, 243, 208, 0.2);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: rgba(167, 243, 208, 0.2);
+  color: var(--text-primary);
+}

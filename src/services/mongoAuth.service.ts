@@ -17,8 +17,8 @@ interface AuthResult {
 }
 
 export class MongoAuthService {
-  private readonly JWT_SECRET = process.env['JWT_SECRET'] || 'your-secret-key'
-  private readonly JWT_EXPIRES_IN = process.env['JWT_EXPIRES_IN'] || '7d'
+  private readonly JWT_SECRET: string = process.env['JWT_SECRET'] || 'your-secret-key'
+  private readonly JWT_EXPIRES_IN: string = process.env['JWT_EXPIRES_IN'] || '7d'
   private readonly SALT_ROUNDS = 12
 
   async createUser(
@@ -48,7 +48,7 @@ export class MongoAuthService {
       updatedAt: new Date(),
     }
 
-    const result = await usersCollection.insertOne(newUser)
+    const result = await usersCollection.insertOne(newUser as User)
     const user = await usersCollection.findOne({ _id: result.insertedId })
 
     if (!user) {
@@ -165,7 +165,7 @@ export class MongoAuthService {
         session: updatedSession!,
         accessToken: newAccessToken,
       }
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Failed to refresh session')
     }
   }
@@ -173,7 +173,7 @@ export class MongoAuthService {
   async verifyAuthToken(token: string): Promise<AuthTokenPayload> {
     try {
       return this.verifyToken(token) as AuthTokenPayload
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Invalid token')
     }
   }
@@ -213,7 +213,8 @@ export class MongoAuthService {
   }
 
   private generateToken(payload: AuthTokenPayload): string {
-    return jwt.sign(payload, this.JWT_SECRET, {
+    // Using any to bypass the complex type inference issue
+    return (jwt.sign as any)(payload, this.JWT_SECRET, {
       expiresIn: this.JWT_EXPIRES_IN,
     })
   }

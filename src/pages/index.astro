@@ -2,12 +2,16 @@
 // Brutalist Dark Homepage - Mental Health AI Training Platform
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { Image } from 'astro:assets';
+import LogoWall from '@/components/marketing/LogoWall.astro'
+import HeroTabs from '@/components/marketing/HeroTabs.astro'
+import HowItWorks from '@/components/marketing/HowItWorks.astro'
+
 
 export const prerender = true
 
 const heroStats = [
   { value: "15+", label: "Universities", subtitle: "Harvard, Johns Hopkins, Mayo" },
-  { value: "2,500+", label: "Students", subtitle: "85% improvement rate" }, 
+  { value: "2,500+", label: "Students", subtitle: "85% improvement rate" },
   { value: "50K+", label: "AI Personas", subtitle: "Complete clinical spectrum" },
   { value: "0", label: "Patient Harm", subtitle: "Perfect safety record" }
 ]
@@ -20,7 +24,7 @@ const testimonials = [
   },
   {
     text: "I had no idea I was being dismissive until the AI caught it. Humbling but grateful.",
-    author: "Mike T.", 
+    author: "Mike T.",
     role: "Therapist in Training"
   },
   {
@@ -32,280 +36,165 @@ const testimonials = [
 
 const features = [
   {
-    title: "Crisis Training Without Risk",
-    description: "Practice suicidal clients, psychotic episodes, trauma responses. Build expertise in impossible scenarios.",
-    icon: "⚠",
-    metric: "300% faster competency"
+    title: "Red‑team role‑play engine",
+    description: "Adversarial AI clients that escalate, resist, and test clinical boundaries — safely.",
+    tag: "Built for failure"
   },
   {
-    title: "Real-Time Bias Detection", 
-    description: "AI catches cultural biases across 200+ patterns before they impact real clients.",
-    icon: "⚡",
-    metric: "78% bias reduction"
+    title: "Bias spike alerts",
+    description: "Inline flags when power, culture, or language choices drift. Shows the exact phrase and better alternatives.",
+    tag: "Real‑time"
   },
   {
-    title: "50,000+ Client Types",
-    description: "Rare disorders to complex PTSD. Full spectrum of human psychology, instantly accessible.",
-    icon: "🧠",
-    metric: "Complete exposure"
+    title: "Failure replay timeline",
+    description: "Scrubbable transcript with model‑rated decision points and what to try next session.",
+    tag: "Post‑session coach"
   },
   {
-    title: "Measurable Excellence",
-    description: "Track accuracy, speed, confidence. Graduate with documented, verifiable expertise.",
-    icon: "📊",
-    metric: "85% accuracy boost"
+    title: "Edge‑case personas",
+    description: "50k+ symptom mixes across age, culture, socioeconomic context, and comorbidities.",
+    tag: "Coverage, not averages"
   },
   {
-    title: "Military-Grade Privacy",
-    description: "Zero-knowledge encryption. Even we can't see your sessions. Learn without career risk.",
-    icon: "🔒",
-    metric: "Complete safety"
+    title: "Competency ledger",
+    description: "Objective evidence of growth: accuracy, empathy, speed, and risk routing — exportable for grading.",
+    tag: "Auditable"
   },
   {
-    title: "Elite Differentiation",
-    description: "Join exclusive group trained on impossible scenarios. Immediately recognizable skills.",
-    icon: "🏆",
-    metric: "Premium positioning"
+    title: "Zero‑retention privacy",
+    description: "End‑to‑end encryption and ephemeral processing. We can’t read or keep your sessions.",
+    tag: "Program‑safe"
   }
 ]
 ---
+
 
 <BaseLayout
   title="Pixelated Empathy - AI Therapist Training Platform"
   description="Safe AI role-play training for therapists. Practice with difficult client personas, get bias detection feedback, and build confidence without real-world risk."
 >
-  <!-- Hero Section -->
-  <section class="brutalist-section min-h-screen flex items-center">
+  <!-- Hero Section (single column, restrained) -->
+  <section class="brutalist-section pt-16 md:pt-24 pb-8">
     <div class="brutalist-container w-full">
-      <!-- Status Badge -->
-      <div class="text-center mb-8">
-        <div class="status-indicator status-indicator--online inline-flex">
-          <div class="pulse-dot pulse-dot--green"></div>
-          <span class="font-bold">AI TRAINING ACTIVE</span>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div class="max-w-4xl">
+          <div class="brutalist-caption mb-3">Simulation training for therapists</div>
+          <h1 class="brutalist-heading text-5xl md:text-7xl lg:text-8xl tracking-tight mb-6">
+            Practice the hard conversations
+            <br />
+            <span class="text-accent">without risk</span>
+          </h1>
+          <p class="text-lg md:text-xl text-gray-300 max-w-2xl">
+            Role‑play crises, get bias cues in session, and graduate with measurable competency.
+          </p>
+          <div class="mt-8 flex items-center gap-5">
+            <a href="/demo-hub" class="brutalist-button brutalist-button--primary px-8 py-3">Get started</a>
+            <a href="/features" class="text-gray-400 hover:text-white text-base">Explore features →</a>
+          </div>
+        </div>
+        <div>
+          <HeroTabs />
         </div>
       </div>
 
-      <!-- Main Hero Content -->
-      <div class="text-center mb-16">
-        <h1 class="brutalist-heading text-5xl md:text-7xl lg:text-8xl mb-8 max-w-6xl mx-auto">
-          MASTER THERAPY
-          <br />
-          <span class="confidence-boost">WITHOUT RISK</span>
-        </h1>
-        
-        <p class="text-xl md:text-2xl text-gray-300 font-semibold mb-6 max-w-4xl mx-auto">
-          Safe AI training for mental health professionals. Practice impossible scenarios.
-        </p>
-        
-        <p class="text-lg text-gray-400 mb-12 max-w-3xl mx-auto">
-          15+ universities, 2,500+ students, zero patient harm. The future of therapy education.
-        </p>
-
-        <!-- Trust Indicators -->
-        <div class="flex flex-wrap justify-center gap-6 mb-12 text-sm">
-          <div class="brutalist-badge brutalist-badge--success">
-            ⭐ HARVARD TRUSTED
-          </div>
-          <div class="brutalist-badge brutalist-badge--info">
-            🔒 HIPAA++ SECURE
-          </div>
-          <div class="brutalist-badge brutalist-badge--success">
-            🎯 ZERO HARM RECORD
-          </div>
-        </div>
-
-        <!-- Primary CTAs -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-          <a href="/demo-hub" class="brutalist-button brutalist-button--primary text-lg px-8 py-4">
-            START TRAINING NOW →
-          </a>
-          <a href="/features" class="brutalist-button brutalist-button--secondary text-lg px-8 py-4">
-            VIEW CAPABILITIES
-          </a>
-        </div>
+      <div class="mt-16">
+        <LogoWall />
       </div>
 
       <!-- Stats Grid -->
-      <div class="brutalist-grid brutalist-grid--4 mb-16">
+      <div class="brutalist-grid brutalist-grid--4 mb-12">
         {heroStats.map((stat) => (
-          <div class="metric-card hover-lift">
-            <div class="metric-value">{stat.value}</div>
+          <div class="metric-card hover-lift stat-card">
+            <div class="metric-value organic-counter">{stat.value}</div>
             <div class="metric-label">{stat.label}</div>
-            <div class="text-xs text-gray-500 mt-2">{stat.subtitle}</div>
+            <div class="text-xs text-gray-500 mt-1">{stat.subtitle}</div>
           </div>
         ))}
       </div>
 
-      <!-- Testimonials -->
-      <div class="max-w-5xl mx-auto">
-        <h3 class="brutalist-subheading text-2xl md:text-3xl text-center mb-8">
-          WHAT INSTITUTIONS SAY
-        </h3>
-        <div class="brutalist-grid brutalist-grid--3">
-          {testimonials.map((testimonial) => (
-            <div class="brutalist-card hover-lift">
-              <p class="text-gray-300 mb-4 italic">"{testimonial.text}"</p>
-              <div class="border-t border-gray-700 pt-4">
-                <div class="font-bold text-white">{testimonial.author}</div>
-                <div class="text-sm text-gray-400">{testimonial.role}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+      <!-- Trust stripe -->
+      <div class="mt-4 border-t border-gray-800 pt-4 flex items-center justify-between text-sm">
+        <span class="text-gray-400">Privacy‑first. Zero‑retention. Audit support.</span>
+        <a href="/trust" class="text-accent hover:underline">Trust Center →</a>
       </div>
     </div>
   </section>
 
-  <!-- Security Section -->
-  <section class="brutalist-section bg-gray-900/50">
-    <div class="brutalist-container">
-      <div class="text-center mb-16">
-        <div class="status-indicator status-indicator--info inline-flex mb-6">
-          <span class="font-bold">🔒 MILITARY-GRADE SECURITY</span>
-        </div>
-        <h2 class="brutalist-heading text-4xl md:text-6xl mb-6">
-          YOUR DATA STAYS
-          <br />
-          <span class="text-blue-400">YOUR DATA</span>
-        </h2>
-        <p class="text-xl text-gray-300 max-w-4xl mx-auto">
-          We don't just meet HIPAA—we obliterate it. Same encryption that guards state secrets.
-        </p>
-      </div>
-
-      <!-- Security Features -->
-      <div class="brutalist-grid brutalist-grid--3 mb-16">
-        <div class="brutalist-card hover-lift">
-          <div class="text-4xl mb-4 text-blue-400 text-center">🔐</div>
-          <h3 class="brutalist-subheading text-lg mb-3 text-center">ZERO-KNOWLEDGE</h3>
-          <div class="brutalist-badge brutalist-badge--info mb-4 mx-auto">
-            Even we can't see sessions
-          </div>
-          <p class="text-gray-400 text-sm">
-            Like a safety deposit box where bank employees can't see inside. Encrypted before leaving your device.
-          </p>
-        </div>
-
-        <div class="brutalist-card hover-lift">
-          <div class="text-4xl mb-4 text-blue-400 text-center">🎖️</div>
-          <h3 class="brutalist-subheading text-lg mb-3 text-center">MILITARY-GRADE</h3>
-          <div class="brutalist-badge brutalist-badge--info mb-4 mx-auto">
-            State secret protection
-          </div>
-          <p class="text-gray-400 text-sm">
-            AES-256 encryption. Would take longer than universe age to crack intercepted data.
-          </p>
-        </div>
-
-        <div class="brutalist-card hover-lift">
-          <div class="text-4xl mb-4 text-blue-400 text-center">🧬</div>
-          <h3 class="brutalist-subheading text-lg mb-3 text-center">FHE COMPUTING</h3>
-          <div class="brutalist-badge brutalist-badge--info mb-4 mx-auto">
-            Computing on invisible data
-          </div>
-          <p class="text-gray-400 text-sm">
-            AI analyzes encrypted sessions. One-way mirror showing insights, never actual words.
-          </p>
-        </div>
-      </div>
-
-      <!-- Trust Statement -->
-      <div class="mental-health-safe max-w-4xl mx-auto text-center">
-        <div class="text-5xl mb-6 text-blue-400">🏛️</div>
-        <h3 class="brutalist-subheading text-xl mb-4">
-          BEYOND HIPAA. BEYOND COMPLIANCE.
-        </h3>
-        <p class="text-gray-300 mb-6">
-          While others meet minimum standards, we built a fortress. Complete privacy, institutional protection, Fort Knox security.
-        </p>
-        <div class="flex flex-wrap justify-center gap-4 text-sm">
-          <span class="brutalist-badge brutalist-badge--info">SOC 2 TYPE II</span>
-          <span class="brutalist-badge brutalist-badge--info">FERPA COMPLIANT</span>
-          <span class="brutalist-badge brutalist-badge--success">ZERO RETENTION</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Section -->
+  <!-- Security Section (calm, enterprise) -->
   <section class="brutalist-section">
     <div class="brutalist-container">
-      <div class="text-center mb-16">
-        <h2 class="brutalist-heading text-4xl md:text-6xl mb-6">
-          MEASURABLE
-          <br />
-          <span class="confidence-boost">EXCELLENCE</span>
-        </h2>
-        <p class="text-xl text-gray-300 mb-4">
-          We don't just improve training—we revolutionize outcomes
-        </p>
-        <p class="text-gray-400">
-          Each capability delivers verifiable improvements in clinical competency
-        </p>
+      <div class="mb-10">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">Security and privacy by design</h2>
+        <p class="text-gray-300 max-w-3xl">Zero‑knowledge architecture, strong encryption, and institutional controls. Built for programs that can’t compromise.</p>
       </div>
 
       <div class="brutalist-grid brutalist-grid--3">
-        {features.map((feature) => (
-          <div class="brutalist-card hover-lift">
-            <div class="text-4xl mb-4 text-center">{feature.icon}</div>
-            <h3 class="brutalist-subheading text-lg mb-3 text-center">{feature.title}</h3>
-            <div class="brutalist-badge brutalist-badge--success mb-4 mx-auto">
-              {feature.metric}
-            </div>
-            <p class="text-gray-400 text-sm leading-relaxed">
-              {feature.description}
-            </p>
-          </div>
-        ))}
+        <div class="brutalist-card">
+          <h3 class="brutalist-subheading text-lg mb-2">Zero‑knowledge</h3>
+          <p class="text-gray-400 text-sm">End‑to‑end encryption. We cannot read your sessions.</p>
+          <a href="/trust" class="mt-3 inline-block text-sm text-accent hover:underline">Learn more →</a>
+        </div>
+        <div class="brutalist-card">
+          <h3 class="brutalist-subheading text-lg mb-2">Compliance</h3>
+          <p class="text-gray-400 text-sm">HIPAA, FERPA, SOC 2 practices; audit logging on request.</p>
+          <a href="/trust" class="mt-3 inline-block text-sm text-accent hover:underline">View Trust Center →</a>
+        </div>
+        <div class="brutalist-card">
+          <h3 class="brutalist-subheading text-lg mb-2">No data retention</h3>
+          <p class="text-gray-400 text-sm">Training data isn’t used for models without explicit consent.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Final CTA Section -->
-  <section class="brutalist-section bg-gray-900/50">
+  <HowItWorks />
+
+  <!-- Capabilities Section (editorial mosaic) -->
+  <section class="brutalist-section">
     <div class="brutalist-container">
-      <div class="mental-health-safe max-w-5xl mx-auto text-center">
-        <div class="text-5xl mb-6 text-green-400">🤖</div>
-        
-        <div class="brutalist-badge brutalist-badge--warning mb-6 mx-auto">
-          👑 ELITE PARTNERSHIP - LIMITED AVAILABILITY
+      <div class="mb-10 flex items-end justify-between gap-6 flex-wrap">
+        <div>
+          <div class="brutalist-caption mb-2">What actually feels different</div>
+          <h2 class="brutalist-heading text-4xl md:text-6xl">Training capabilities</h2>
         </div>
+        <a href="/features" class="text-sm text-accent hover:underline">Full feature list →</a>
+      </div>
 
-        <h2 class="brutalist-heading text-4xl md:text-6xl mb-8">
-          TRANSFORM YOUR PROGRAM
-          <br />
-          <span class="confidence-boost">INTO GOLD STANDARD</span>
-        </h2>
-        
-        <p class="text-xl text-gray-300 mb-8">
-          Join exclusive institutions setting new benchmarks. Graduate students with impossible-to-teach skills.
-        </p>
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+        {features.map((f, i) => (
+          <div class={`group relative p-5 border border-gray-800 bg-gradient-to-b from-gray-900/60 to-black ${
+            i % 5 === 0 ? 'md:col-span-3' : i % 5 === 1 ? 'md:col-span-3' : i % 5 === 2 ? 'md:col-span-2' : i % 5 === 3 ? 'md:col-span-4' : 'md:col-span-2'
+          }`}>
+            <div class="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: radial-gradient(600px circle at var(--x,50%) var(--y,50%), rgba(16,185,129,0.1), transparent 40%);"></div>
+            <h3 class="font-semibold text-xl leading-tight mb-2">{f.title}</h3>
+            <p class="text-gray-400 text-sm leading-relaxed max-w-prose">{f.description}</p>
+            <div class="mt-4 inline-flex text-xs tracking-wide uppercase text-green-400">{f.tag}</div>
+          </div>
+        ))}
+      </div>
 
-        <!-- Guarantee Box -->
-        <div class="bg-green-500/10 border-2 border-green-400 p-6 mb-8 max-w-2xl mx-auto">
-          <h4 class="brutalist-subheading text-lg mb-3 flex items-center justify-center gap-2">
-            <span class="text-yellow-400">🏆</span>
-            EXCELLENCE GUARANTEE
-          </h4>
-          <p class="text-gray-300 text-sm">
-            85% diagnostic accuracy improvement + 300% faster skill acquisition in 90 days, or we work until achieved at no cost.
-          </p>
-        </div>
-        
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <a href="/contact" class="brutalist-button brutalist-button--primary text-lg px-8 py-4">
-            SCHEDULE PARTNERSHIP →
-          </a>
-          <a href="/case-studies" class="brutalist-button brutalist-button--secondary text-lg px-8 py-4">
-            VIEW CASE STUDIES
-          </a>
-        </div>
+      <script is:inline>
+        // pointer-follow highlight for mosaic cards
+        document.querySelectorAll('[class*="group"]').forEach((el) => {
+          el.addEventListener('pointermove', (e) => {
+            const rect = el.getBoundingClientRect();
+            el.style.setProperty('--x', `${e.clientX - rect.left}px`);
+            el.style.setProperty('--y', `${e.clientY - rect.top}px`);
+          });
+        });
+      </script>
+    </div>
+  </section>
 
-        <!-- Final Trust Signals -->
-        <div class="flex flex-wrap justify-center gap-4 text-sm">
-          <span class="brutalist-badge brutalist-badge--warning">🏛️ TOP-TIER UNIVERSITIES</span>
-          <span class="brutalist-badge brutalist-badge--info">🛡️ ZERO-KNOWLEDGE SECURITY</span>
-          <span class="brutalist-badge brutalist-badge--success">⚡ BUILT BY THERAPISTS</span>
+  <!-- Final CTA (quiet, decisive) -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="brutalist-heading text-4xl md:text-6xl mb-6">Bring safe AI practice to your program</h2>
+        <p class="text-xl text-gray-300 mb-8">Launch simulation training in days, not months.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/contact" class="brutalist-button brutalist-button--primary text-lg px-8 py-4">Get started</a>
+          <a href="/case-studies" class="brutalist-button brutalist-button--secondary text-lg px-8 py-4">View case studies</a>
         </div>
       </div>
     </div>
@@ -364,19 +253,19 @@ const features = [
   }
 
   @keyframes float-organic {
-    0%, 100% { 
+    0%, 100% {
       transform: translateY(0px) translateX(0px) scale(1);
       opacity: 0.6;
     }
-    25% { 
+    25% {
       transform: translateY(-30px) translateX(20px) scale(1.2);
       opacity: 0.8;
     }
-    50% { 
+    50% {
       transform: translateY(-10px) translateX(-15px) scale(0.9);
       opacity: 0.4;
     }
-    75% { 
+    75% {
       transform: translateY(20px) translateX(10px) scale(1.1);
       opacity: 0.7;
     }
@@ -468,4 +357,4 @@ const features = [
       height: 3px;
     }
   }
-</style> 
+</style>

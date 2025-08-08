@@ -131,8 +131,14 @@ export class AIMetricsDAO {
     ]
 
     const result = await collection.aggregate(pipeline).toArray()
+    const stats = result[0] as {
+      totalRequests: number
+      totalTokens: number
+      averageResponseTime: number
+    } | undefined
+    
     return (
-      result[0] || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
+      stats || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
     )
   }
 }
@@ -262,7 +268,7 @@ export class CrisisSessionFlagDAO {
 
   async findActiveFlags(userId?: string): Promise<CrisisSessionFlag[]> {
     const collection = await this.getCollection()
-    const filter: any = { resolved: false }
+    const filter: { resolved: boolean; userId?: ObjectId } = { resolved: false }
     if (userId) {
       filter.userId = new ObjectId(userId)
     }

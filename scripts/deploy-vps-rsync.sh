@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-VPS_HOST=${1:-"208.117.84.253"}
+VPS_HOST=${1:-"209.208.79.191"}
 VPS_USER=${2:-"root"}
 VPS_PORT=${3:-"22"}
 SSH_KEY=${4:-""}

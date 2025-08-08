@@ -186,8 +186,8 @@ export class BiasDetectionAuditLogger {
         action,
         resource,
         details: this.sanitizeDetails(details, action.sensitivityLevel),
-        ipAddress: request.ipAddress,
-        userAgent: request.userAgent,
+        ipAddress: request?.ipAddress || 'unknown',
+        userAgent: request?.userAgent || 'unknown',
         success,
         ...(resourceId && { resourceId }),
         ...(sessionId && { sessionId }),
@@ -273,7 +273,7 @@ export class BiasDetectionAuditLogger {
   async logBiasAnalysis(
     user: UserContext,
     sessionId: string,
-    demographics: ParticipantDemographics,
+    demographics: ParticipantDemographics | undefined,
     biasScore: number,
     alertLevel: string,
     request: { ipAddress: string; userAgent: string },
@@ -493,8 +493,12 @@ export class BiasDetectionAuditLogger {
   }
 
   private anonymizeDemographics(
-    demographics: ParticipantDemographics,
+    demographics: ParticipantDemographics | undefined,
   ): Partial<ParticipantDemographics> {
+    if (!demographics) {
+      return {}
+    }
+    
     const result: Partial<ParticipantDemographics> = {
       age: demographics.age,
       gender: demographics.gender,

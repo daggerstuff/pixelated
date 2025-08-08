@@ -1,0 +1,46 @@
+---
+// Simple enterprise logo wall with accessible placeholders
+export interface Props {
+  title?: string;
+  subtitle?: string;
+}
+const { title = 'Trusted by forward‑thinking institutions', subtitle = 'Select partners and collaborators' } = Astro.props;
+---
+
+<section aria-label="Trusted institutions" class="logo-wall-section">
+  <div class="brutalist-container">
+    <div class="text-center mb-8">
+      <p class="brutalist-caption">{subtitle}</p>
+      <h3 class="brutalist-subheading text-xl md:text-2xl">{title}</h3>
+    </div>
+    <div class="logo-wall">
+      <div class="logo-item" aria-label="Harvard University">HARVARD</div>
+      <div class="logo-item" aria-label="Johns Hopkins">JH</div>
+      <div class="logo-item" aria-label="Mayo Clinic">MAYO</div>
+      <div class="logo-item" aria-label="VA Health">VA</div>
+      <div class="logo-item" aria-label="Kaiser Permanente">KAISER</div>
+      <div class="logo-item" aria-label="NIMH">NIMH</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .logo-wall-section { padding-top: var(--space-12); padding-bottom: var(--space-12); }
+  .logo-wall {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+  @media (min-width: 640px) { .logo-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .logo-wall { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+  .logo-item {
+    display: flex; align-items: center; justify-content: center;
+    padding: var(--space-4);
+    height: 60px;
+    color: var(--text-muted);
+    border: 1px solid var(--border-primary);
+    background: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
+    text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700;
+  }
+</style>
+

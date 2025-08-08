@@ -1,9 +1,28 @@
 import { useState } from 'react'
 
+interface ScenarioType {
+  id: string
+  label: string
+  icon: string
+}
+
+interface GeneratedScenario {
+  client: {
+    name: string
+    age: string
+    occupation: string
+    presenting: string
+  }
+  background: string
+  symptoms: string[]
+  formulation: string
+  treatment: string[]
+}
+
 export default function ScenarioGenerationDemo() {
   const [selectedType, setSelectedType] = useState('anxiety')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [scenario, setScenario] = useState<any>(null)
+  const [scenario, setScenario] = useState<GeneratedScenario | null>(null)
 
   const scenarioTypes = [
     { id: 'anxiety', label: 'Anxiety Disorder', icon: '😰' },
@@ -74,10 +93,10 @@ export default function ScenarioGenerationDemo() {
       <div className="space-y-6">
         {/* Scenario Type Selection */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-3">
+          <label htmlFor="scenario-type" className="block text-sm font-medium text-slate-200 mb-3">
             Select Scenario Type
           </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div id="scenario-type" className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {scenarioTypes.map((type) => (
               <button
                 key={type.id}
@@ -136,8 +155,8 @@ export default function ScenarioGenerationDemo() {
                 <div>
                   <div className="text-green-400 font-medium mb-2">Key Symptoms</div>
                   <ul className="space-y-1">
-                    {scenario.symptoms.map((symptom: string, index: number) => (
-                      <li key={index} className="text-slate-300 text-sm flex items-start gap-2">
+                    {scenario.symptoms.map((symptom: string) => (
+                      <li key={symptom} className="text-slate-300 text-sm flex items-start gap-2">
                         <span className="text-green-400 text-xs mt-1">•</span>
                         {symptom}
                       </li>
@@ -156,7 +175,7 @@ export default function ScenarioGenerationDemo() {
               <h3 className="text-lg font-semibold text-white mb-4">Suggested Treatment Approach</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {scenario.treatment.map((treatment: string, index: number) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-slate-700/30 rounded-lg">
+                  <div key={`treatment-${index}-${treatment.slice(0, 20)}`} className="flex items-start gap-3 p-3 bg-slate-700/30 rounded-lg">
                     <span className="text-cyan-400 font-bold text-sm">{index + 1}</span>
                     <span className="text-slate-300 text-sm">{treatment}</span>
                   </div>

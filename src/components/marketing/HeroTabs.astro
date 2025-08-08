@@ -1,0 +1,96 @@
+---
+// HeroTabs.astro — inspired by Teton-style rotating tabs with a thin loader
+// No external assets; uses simple content blocks so it works out of the box.
+// Accepts optional items via props later; for now, internal items are fine.
+---
+
+<div class="w-full">
+  <div class="flex gap-2 mb-3">
+    <button class="hero-tab px-3 py-1.5 text-sm rounded-full border border-gray-700 text-gray-300 data-[active=true]:text-black data-[active=true]:bg-[color:var(--accent-primary)]" data-index="0" data-active="true">Role‑play</button>
+    <button class="hero-tab px-3 py-1.5 text-sm rounded-full border border-gray-700 text-gray-300" data-index="1">Bias</button>
+    <button class="hero-tab px-3 py-1.5 text-sm rounded-full border border-gray-700 text-gray-300" data-index="2">Debrief</button>
+  </div>
+
+  <div class="relative overflow-hidden rounded-lg border border-gray-800 bg-gray-900/40">
+    <!-- loader -->
+    <div class="absolute left-0 top-0 h-0.5 bg-[color:var(--accent-primary)] transition-all duration-[4000ms] ease-linear" id="loader" style="width: 0%"></div>
+
+    <div class="p-5 min-h-[240px] grid" id="panels">
+      <!-- Panel 0 -->
+      <div class="panel" data-index="0" style="display: grid">
+        <div class="text-xs tracking-widest text-gray-400 uppercase mb-3">Crisis role‑play</div>
+        <div class="space-y-3">
+          <div class="rounded-md px-3 py-2 bg-gray-800/70 text-gray-100 w-fit">I’m not sleeping and I think my boss is out to get me.</div>
+          <div class="rounded-md px-3 py-2 bg-teal-500/10 text-[color:var(--accent-primary)] w-fit">Thanks for sharing. When did this start to feel unmanageable?</div>
+          <div class="rounded-md px-3 py-2 bg-gray-800/70 text-gray-100 w-fit">Last week. I skipped meds after a fight with my partner.</div>
+        </div>
+      </div>
+
+      <!-- Panel 1 -->
+      <div class="panel" data-index="1" style="display: none">
+        <div class="text-xs tracking-widest text-gray-400 uppercase mb-3">Bias detection</div>
+        <ul class="text-sm text-gray-300 space-y-2">
+          <li class="flex items-start gap-2"><span class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent-primary)]"></span> Interruptions decreased after prompt: maintain 2‑sec pause.</li>
+          <li class="flex items-start gap-2"><span class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent-primary)]"></span> Consider non‑pathologizing language for cultural context.</li>
+          <li class="flex items-start gap-2"><span class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent-primary)]"></span> Reflect back affect before exploring solutions.</li>
+        </ul>
+      </div>
+
+      <!-- Panel 2 -->
+      <div class="panel" data-index="2" style="display: none">
+        <div class="text-xs tracking-widest text-gray-400 uppercase mb-3">Debrief metrics</div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="rounded-md border border-gray-800 p-3">
+            <div class="text-2xl font-semibold text-white">+82%</div>
+            <div class="text-xs text-gray-400">diagnostic accuracy</div>
+          </div>
+          <div class="rounded-md border border-gray-800 p-3">
+            <div class="text-2xl font-semibold text-white">3.1×</div>
+            <div class="text-xs text-gray-400">faster skill gain</div>
+          </div>
+          <div class="rounded-md border border-gray-800 p-3">
+            <div class="text-2xl font-semibold text-white">0</div>
+            <div class="text-xs text-gray-400">patient harm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  const tabs = Array.from(document.querySelectorAll('.hero-tab'));
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  const loader = document.getElementById('loader');
+  let active = 0;
+  let timer;
+
+  function setActive(i) {
+    active = i;
+    tabs.forEach((t, idx) => t.setAttribute('data-active', idx === i ? 'true' : 'false'));
+    panels.forEach((p, idx) => (p.style.display = idx === i ? 'grid' : 'none'));
+    loader.style.transition = 'none';
+    loader.style.width = '0%';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        loader.style.transition = 'width 4000ms linear';
+        loader.style.width = '100%';
+      });
+    });
+  }
+
+  function next() {
+    setActive((active + 1) % panels.length);
+  }
+
+  function start() {
+    clearInterval(timer);
+    timer = setInterval(next, 4000);
+  }
+
+  tabs.forEach((t, idx) => t.addEventListener('click', () => { setActive(idx); start(); }));
+
+  setActive(0);
+  start();
+</script>
+

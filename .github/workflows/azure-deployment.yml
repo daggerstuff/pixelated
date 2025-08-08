@@ -16,7 +16,7 @@ on:
 
 env:
   NODE_VERSION: 22.16.0
-  PNPM_VERSION: 
+  PNPM_VERSION: 10.14.0
   AZURE_RESOURCE_GROUP: pixelated-rg
   AZURE_LOCATION: eastus
   AZURE_APP_NAME: pixelated
@@ -136,9 +136,9 @@ jobs:
         uses: azure/arm-deploy@v1
         with:
           scope: resourcegroup
-          subscriptionId: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-          template: deploy/azure/main.bicep
+          template: infra/main.bicep
           parameters: |
             appName=${{ env.AZURE_APP_NAME }}
             environment=${{ needs.build.outputs.environment }}

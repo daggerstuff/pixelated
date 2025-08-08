@@ -1,21 +1,37 @@
+// Types used by BiasDetectionEngine and tests
+
+
+export interface BiasThresholdsConfig {
+  warningLevel: number
+  highLevel: number
+  criticalLevel: number
+}
+
+export interface BiasLayerWeights {
+  preprocessing: number
+  modelLevel: number
+  interactive: number
+  evaluation: number
+}
+
+export interface BiasMetricsConfig {
 /**
  * Type definitions for the Pixelated Empathy Bias Detection Engine
  */
 
-export interface BiasDetectionConfig {
   // Python service configuration
-  pythonServiceUrl: string
-  pythonServiceTimeout: number
+  pythonServiceUrl?: string
+  pythonServiceTimeout?: number
 
   // Detection thresholds
-  thresholds: {
+  thresholds?: {
     warningLevel: number // 0.3 - Bias score above which warnings are issued
     highLevel: number // 0.6 - Bias score indicating high bias
     criticalLevel: number // 0.8 - Bias score requiring immediate action
   }
 
   // Layer-specific weights for overall bias scoring
-  layerWeights: {
+  layerWeights?: {
     preprocessing: number // Weight for preprocessing layer (default: 0.2)
     modelLevel: number // Weight for model-level analysis (default: 0.3)
     interactive: number // Weight for interactive analysis (default: 0.2)
@@ -23,22 +39,40 @@ export interface BiasDetectionConfig {
   }
 
   // Evaluation metrics to compute
-  evaluationMetrics: string[]
+  evaluationMetrics?: string[]
 
   // Configuration for different components
-  metricsConfig: BiasMetricsConfig
-  alertConfig: BiasAlertConfig
-  reportConfig: BiasReportConfig
-  explanationConfig: BiasExplanationConfig
+  metricsConfig?: BiasMetricsConfig
+  alertConfig?: BiasAlertConfig
+  reportConfig?: BiasReportConfig
+  explanationConfig?: BiasExplanationConfig
   pythonServiceConfig?: PythonServiceConfig
   cacheConfig?: CacheConfig
   securityConfig?: SecurityConfig
   performanceConfig?: PerformanceConfig
 
   // HIPAA compliance settings
-  hipaaCompliant: boolean
-  dataMaskingEnabled: boolean
-  auditLogging: boolean
+  hipaaCompliant?: boolean
+  dataMaskingEnabled?: boolean
+  auditLogging?: boolean
+}
+export interface BiasDetectionConfig {
+  pythonServiceUrl?: string
+  pythonServiceTimeout?: number
+  thresholds?: BiasThresholdsConfig
+  layerWeights?: BiasLayerWeights
+  evaluationMetrics?: string[]
+  metricsConfig?: BiasMetricsConfig
+  alertConfig?: BiasAlertConfig
+  reportConfig?: BiasReportConfig
+  explanationConfig?: BiasExplanationConfig
+  pythonServiceConfig?: PythonServiceConfig
+  cacheConfig?: CacheConfig
+  securityConfig?: SecurityConfig
+  performanceConfig?: PerformanceConfig
+  hipaaCompliant?: boolean
+  dataMaskingEnabled?: boolean
+  auditLogging?: boolean
 }
 
 export interface BiasMetricsConfig {

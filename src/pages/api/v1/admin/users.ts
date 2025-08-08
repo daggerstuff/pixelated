@@ -1,6 +1,6 @@
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { createResourceAuditLog } from '../../../../lib/audit'
+import { createResourceAuditLog, AuditEventType } from '../../../../lib/audit'
 import type { AuthAPIContext } from '../../../../lib/auth/apiRouteTypes'
 
 export const prerender = false
@@ -38,16 +38,15 @@ export const GET = protectRoute({
 
     // TODO: Replace with actual database implementation
     // For now, return empty result to prevent build errors
-    const data = []
+    const data: Array<{ id: string; email: string; role: string; createdAt: string }> = []
     const count = 0
 
-    await createResourceAuditLog({
-      userId: admin.id,
-      action: 'users.list',
-      resourceType: 'admin',
-      resourceId: 'users',
-      metadata: { page, limit, role, search, count },
-    })
+    await createResourceAuditLog(
+      AuditEventType.SYSTEM,
+      admin.id,
+      { id: 'users', type: 'admin' },
+      { page, limit, role, search, count, offset },
+    )
 
     return new Response(
       JSON.stringify({
@@ -117,13 +116,12 @@ export const PATCH = protectRoute({
     // For now, return success to prevent build errors
     const updatedUser = { id: userId, ...updates }
 
-    await createResourceAuditLog({
-      userId: admin.id,
-      action: 'users.update',
-      resourceType: 'user',
-      resourceId: userId,
-      metadata: { updates, updatedBy: admin.id },
-    })
+    await createResourceAuditLog(
+      AuditEventType.MODIFY,
+      admin.id,
+      { id: userId, type: 'user' },
+      { updates, updatedBy: admin.id },
+    )
 
     return new Response(
       JSON.stringify({

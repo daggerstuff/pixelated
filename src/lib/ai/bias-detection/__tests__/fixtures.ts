@@ -1,7 +1,7 @@
+import type { TherapeuticSession } from '../types'
 /**
  * Test fixtures for bias detection scenarios
  */
-import type { TherapeuticSession } from '../types'
 
 export const baselineAnxietyScenario: TherapeuticSession = {
   sessionId: 'baseline-anxiety-001',
@@ -56,7 +56,7 @@ export const baselineAnxietyScenario: TherapeuticSession = {
   metadata: {
     trainingInstitution: 'Test University',
     traineeId: 'trainee-001',
-    sessionDuration: 1800,
+    sessionDuration: 30,
     completionStatus: 'completed',
     technicalIssues: [],
   },

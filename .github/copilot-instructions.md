@@ -353,4 +353,8 @@ pnpm performance:test
 pnpm security:check
 ```
 
-This document should be updated as the project evolves and new practices are established.
+This document should be updated as the project evolves and new practices are established.[byterover-mcp]
+
+# important 
+always use byterover-retrive-knowledge tool to get the related context before any tasks 
+always use byterover-store-knowledge to store all the critical informations after sucessful tasks

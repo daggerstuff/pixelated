@@ -1,3 +1,6 @@
+// IMPORTANT: Import Sentry instrumentation at the very top
+import '../../../../instrument.mjs'
+
 // Placeholder Bias Detection Service
 // TODO: Implement full bias detection after pulling changes from other branch
 

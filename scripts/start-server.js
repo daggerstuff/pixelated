@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// IMPORTANT: Import Sentry instrumentation first
+import '../instrument.mjs'
+
 import { createServer } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'

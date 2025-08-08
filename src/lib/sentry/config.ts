@@ -6,7 +6,7 @@
  */
 
 export const SENTRY_CONFIG = {
-  dsn: import.meta.env['PUBLIC_SENTRY_DSN'],
+  dsn: import.meta.env['PUBLIC_SENTRY_DSN'] || "https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032",
 
   environment: import.meta.env.MODE || 'production',
   release: import.meta.env['PUBLIC_APP_VERSION'] || '0.0.1',

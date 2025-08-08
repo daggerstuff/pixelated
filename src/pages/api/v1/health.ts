@@ -2,18 +2,12 @@ import type { APIRoute } from 'astro'
 import os from 'node:os'
 import { performance } from 'node:perf_hooks'
 
-// A placeholder for RedisHealth type if it's not defined elsewhere
-interface RedisHealth {
-  status: 'healthy' | 'unhealthy'
-  // other properties could be here
-}
-
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request: _request }) => {
   const startTime = performance.now()
   const mongoUri = import.meta.env.MONGO_URI
   const mongoDbName = import.meta.env.MONGO_DB_NAME
 
-  const healthStatus: Record<string, any> = {
+  const healthStatus: Record<string, unknown> = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
   }
@@ -53,7 +47,11 @@ export const GET: APIRoute = async ({ request }) => {
 
   // Overall status check
   const hasUnhealthyComponents = Object.values(healthStatus).some(
-    (component: any) => component?.status === 'unhealthy',
+    (component: unknown) => 
+      typeof component === 'object' && 
+      component !== null && 
+      'status' in component && 
+      component.status === 'unhealthy',
   )
 
   if (hasUnhealthyComponents) {

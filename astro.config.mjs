@@ -132,19 +132,17 @@ export default defineConfig({
       svgdir: './src/icons',
     }),
     // markdoc(),
-    // ...(process.env.SENTRY_DSN ? [
-    //   sentry({
-    //     dsn: process.env.SENTRY_DSN,
-    //     sourceMapsUploadOptions: {
-    //       project: process.env.SENTRY_PROJECT || 'pixel-astro',
-    //       org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-    //       authToken: process.env.SENTRY_AUTH_TOKEN,
-    //     },
-    //     telemetry: false,
-    //   }),
-    //   // Add Spotlight for development debugging (only when Sentry is enabled)
-    //   ...(process.env.NODE_ENV === 'development' ? [spotlightjs()] : [])
-    // ] : []),
+    ...(process.env.SENTRY_DSN || true ? [
+      sentry({
+        sourceMapsUploadOptions: {
+          project: process.env.SENTRY_PROJECT || 'pixel-astro',
+          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+        },
+      }),
+      // Add Spotlight for development debugging (only when Sentry is enabled)
+      ...(process.env.NODE_ENV === 'development' ? [spotlightjs()] : [])
+    ] : []),
   ],
   markdown: {
     shikiConfig: {
