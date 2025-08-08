@@ -1,4 +1,8 @@
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
+
+// Allow CI to skip performance-heavy tests
+const SKIP_PERF = process.env['SKIP_PERFORMANCE_TESTS'] === 'true'
+const ddescribe = SKIP_PERF ? describe.skip : describe
 import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 
 // Performance testing utilities
@@ -265,7 +269,7 @@ vi.mock('../BiasAlertSystem', () => ({
   BiasAlertSystem: vi.fn().mockImplementation(() => mockAlertSystem),
 }))
 
-describe('BiasDetectionEngine Performance Benchmarks', () => {
+ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
   let biasEngine: BiasDetectionEngine
   let mockConfig: BiasDetectionConfig
   let mockSessionData: TherapeuticSession

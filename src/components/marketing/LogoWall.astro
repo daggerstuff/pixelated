@@ -13,13 +13,25 @@ const { title = 'Trusted by forward‑thinking institutions', subtitle = 'Select
       <p class="brutalist-caption">{subtitle}</p>
       <h3 class="brutalist-subheading text-xl md:text-2xl">{title}</h3>
     </div>
-    <div class="logo-wall">
-      <div class="logo-item" aria-label="Harvard University">HARVARD</div>
-      <div class="logo-item" aria-label="Johns Hopkins">JH</div>
-      <div class="logo-item" aria-label="Mayo Clinic">MAYO</div>
-      <div class="logo-item" aria-label="VA Health">VA</div>
-      <div class="logo-item" aria-label="Kaiser Permanente">KAISER</div>
-      <div class="logo-item" aria-label="NIMH">NIMH</div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center justify-items-center">
+      <div class="group flex items-center justify-center w-24 h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Harvard University">
+        <span class="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">HARVARD</span>
+      </div>
+      <div class="group flex items-center justify-center w-24 h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Johns Hopkins">
+        <span class="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">JOHNS<br/>HOPKINS</span>
+      </div>
+      <div class="group flex items-center justify-center w-24 h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Mayo Clinic">
+        <span class="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">MAYO</span>
+      </div>
+      <div class="group flex items-center justify-center w-24 h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="VA Health">
+        <span class="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">VA</span>
+      </div>
+      <div class="group flex items-center justify-center w-24 h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Kaiser Permanente">
+        <span class="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">KAISER</span>
+      </div>
+      <div class="group flex items-center justify-center w-24 h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="NIMH">
+        <span class="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">NIMH</span>
+      </div>
     </div>
   </div>
 </section>

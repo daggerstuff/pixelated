@@ -45,6 +45,11 @@ export default defineConfig({
       NODE_ENV: 'test',
       DISABLE_WEB_FONTS: 'true',
       PUBLIC_SITE_URL: 'http://localhost:4321',
+  // Disable auth and provide safe dummy Clerk vars for local/CI testing
+  DISABLE_AUTH: 'true',
+  CLERK_PUBLISHABLE_KEY: 'pk_test_dummy',
+  PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_dummy',
+  CLERK_SECRET_KEY: 'sk_test_dummy',
     },
   },
 })

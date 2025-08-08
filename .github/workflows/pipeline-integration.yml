@@ -1,0 +1,397 @@
+name: Integrated Pipeline Orchestration
+
+permissions:
+  contents: read
+  actions: write
+  checks: write
+  pull-requests: write
+  security-events: write
+  id-token: write
+
+on:
+  workflow_call:
+    inputs:
+      pipeline_strategy:
+        required: true
+        type: string
+      risk_level:
+        required: true
+        type: string
+      complexity_score:
+        required: true
+        type: string
+      deployment_strategy:
+        required: true
+        type: string
+    outputs:
+      integration_status:
+        description: "Overall integration status"
+        value: ${{ jobs.integration-summary.outputs.status }}
+
+env:
+  NODE_VERSION: 22.16.0
+  PNPM_VERSION: 10.14.0
+
+jobs:
+  # Quality Gates Integration
+  quality-gates-integration:
+    name: Quality Gates Integration
+    runs-on: ubuntu-latest
+    outputs:
+      quality_score: ${{ steps.quality-gates.outputs.quality_score }}
+      gate_status: ${{ steps.quality-gates.outputs.gate_status }}
+      
+    steps:
+      - name: Run ML Quality Gates
+        id: quality-gates
+        uses: ./.github/workflows/ml-quality-gates.yml
+        with:
+          risk_level: ${{ inputs.risk_level }}
+          complexity_score: ${{ inputs.complexity_score }}
+          change_type: ${{ inputs.pipeline_strategy }}
+
+      - name: Quality Gates Summary
+        run: |
+          echo "## 🎯 Quality Gates Integration" >> $GITHUB_STEP_SUMMARY
+          echo "**Quality Score:** ${{ steps.quality-gates.outputs.quality_score }}/100" >> $GITHUB_STEP_SUMMARY
+          echo "**Risk Assessment:** ${{ steps.quality-gates.outputs.risk_assessment }}" >> $GITHUB_STEP_SUMMARY
+
+  # Demo Pages Validation (if applicable)
+  demo-pages-validation:
+    name: Demo Pages Validation
+    runs-on: ubuntu-latest
+    needs: quality-gates-integration
+    if: contains(inputs.pipeline_strategy, 'demo') || inputs.pipeline_strategy == 'demo-focused'
+    outputs:
+      demo_status: ${{ steps.demo-validation.outputs.demo_validation_status }}
+      
+    steps:
+      - name: Run Demo Pages CI
+        id: demo-validation
+        uses: ./.github/workflows/demo-pages-ci.yml
+        with:
+          risk_level: ${{ inputs.risk_level }}
+          test_strategy: ${{ inputs.pipeline_strategy }}
+
+      - name: Demo Validation Summary
+        run: |
+          echo "## 🎨 Demo Pages Validation" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ steps.demo-validation.outputs.demo_validation_status }}" >> $GITHUB_STEP_SUMMARY
+
+  # Security and Compliance Validation
+  security-compliance-validation:
+    name: Security & Compliance
+    runs-on: ubuntu-latest
+    needs: quality-gates-integration
+    if: inputs.risk_level == 'high' || inputs.risk_level == 'critical' || contains(inputs.pipeline_strategy, 'security')
+    outputs:
+      security_status: ${{ steps.security-validation.outputs.security_status }}
+      compliance_status: ${{ steps.security-validation.outputs.compliance_status }}
+      
+    steps:
+      - name: Run Security & Compliance Pipeline
+        id: security-validation
+        uses: ./.github/workflows/security-compliance-ci.yml
+        with:
+          risk_level: ${{ inputs.risk_level }}
+          complexity_score: ${{ inputs.complexity_score }}
+
+      - name: Security Validation Summary
+        run: |
+          echo "## 🛡️ Security & Compliance Validation" >> $GITHUB_STEP_SUMMARY
+          echo "**Security Status:** ${{ steps.security-validation.outputs.security_status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Compliance Status:** ${{ steps.security-validation.outputs.compliance_status }}" >> $GITHUB_STEP_SUMMARY
+
+  # Infrastructure Validation
+  infrastructure-validation:
+    name: Infrastructure Validation
+    runs-on: ubuntu-latest
+    needs: quality-gates-integration
+    if: contains(inputs.pipeline_strategy, 'infrastructure') || inputs.pipeline_strategy == 'full-suite'
+    outputs:
+      infrastructure_status: ${{ steps.infra-validation.outputs.infrastructure_status }}
+      
+    steps:
+      - name: Run Infrastructure Pipeline
+        id: infra-validation
+        uses: ./.github/workflows/infrastructure-ci.yml
+        with:
+          deployment_strategy: ${{ inputs.deployment_strategy }}
+
+      - name: Infrastructure Validation Summary
+        run: |
+          echo "## 🏗️ Infrastructure Validation" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ steps.infra-validation.outputs.infrastructure_status }}" >> $GITHUB_STEP_SUMMARY
+
+  # Cross-Pipeline Dependency Analysis
+  dependency-analysis:
+    name: Cross-Pipeline Dependency Analysis
+    runs-on: ubuntu-latest
+    needs: [quality-gates-integration, demo-pages-validation, security-compliance-validation, infrastructure-validation]
+    if: always()
+    outputs:
+      dependency_status: ${{ steps.analyze-dependencies.outputs.status }}
+      
+    steps:
+      - name: Analyze Pipeline Dependencies
+        id: analyze-dependencies
+        run: |
+          echo "🔗 Analyzing cross-pipeline dependencies..."
+          
+          # Collect pipeline statuses
+          QUALITY_STATUS="${{ needs.quality-gates-integration.result }}"
+          DEMO_STATUS="${{ needs.demo-pages-validation.result }}"
+          SECURITY_STATUS="${{ needs.security-compliance-validation.result }}"
+          INFRA_STATUS="${{ needs.infrastructure-validation.result }}"
+          
+          echo "Pipeline Status Summary:"
+          echo "- Quality Gates: $QUALITY_STATUS"
+          echo "- Demo Pages: $DEMO_STATUS"
+          echo "- Security & Compliance: $SECURITY_STATUS"
+          echo "- Infrastructure: $INFRA_STATUS"
+          
+          # Analyze dependencies
+          DEPENDENCY_ISSUES=()
+          
+          # Critical dependencies
+          if [[ "$SECURITY_STATUS" == "failure" ]] && [[ "${{ inputs.risk_level }}" == "high" || "${{ inputs.risk_level }}" == "critical" ]]; then
+            DEPENDENCY_ISSUES+=("Security validation failed for high-risk change")
+          fi
+          
+          if [[ "$QUALITY_STATUS" == "failure" ]]; then
+            DEPENDENCY_ISSUES+=("Quality gates failed - blocking all downstream processes")
+          fi
+          
+          if [[ "$INFRA_STATUS" == "failure" ]] && [[ "${{ inputs.deployment_strategy }}" != "standard" ]]; then
+            DEPENDENCY_ISSUES+=("Infrastructure validation failed for advanced deployment strategy")
+          fi
+          
+          # Determine overall dependency status
+          if [[ ${#DEPENDENCY_ISSUES[@]} -eq 0 ]]; then
+            DEPENDENCY_STATUS="success"
+            echo "✅ All pipeline dependencies satisfied"
+          else
+            DEPENDENCY_STATUS="failure"
+            echo "❌ Pipeline dependency issues detected:"
+            for issue in "${DEPENDENCY_ISSUES[@]}"; do
+              echo "  - $issue"
+            done
+          fi
+          
+          echo "status=$DEPENDENCY_STATUS" >> $GITHUB_OUTPUT
+
+      - name: Generate Dependency Report
+        run: |
+          echo "## 🔗 Cross-Pipeline Dependency Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ steps.analyze-dependencies.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.analyze-dependencies.outputs.status }}" == "success" ]]; then
+            echo "✅ All pipeline dependencies satisfied" >> $GITHUB_STEP_SUMMARY
+            echo "Ready to proceed with deployment phase" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Pipeline dependency issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "Manual review required before proceeding" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Deployment Readiness Assessment
+  deployment-readiness:
+    name: Deployment Readiness Assessment
+    runs-on: ubuntu-latest
+    needs: [quality-gates-integration, demo-pages-validation, security-compliance-validation, infrastructure-validation, dependency-analysis]
+    if: always()
+    outputs:
+      deployment_ready: ${{ steps.assess-readiness.outputs.ready }}
+      deployment_recommendation: ${{ steps.assess-readiness.outputs.recommendation }}
+      
+    steps:
+      - name: Assess Deployment Readiness
+        id: assess-readiness
+        run: |
+          echo "🚀 Assessing deployment readiness..."
+          
+          # Collect all pipeline results
+          QUALITY_SCORE="${{ needs.quality-gates-integration.outputs.quality_score }}"
+          DEMO_STATUS="${{ needs.demo-pages-validation.outputs.demo_status }}"
+          SECURITY_STATUS="${{ needs.security-compliance-validation.outputs.security_status }}"
+          INFRA_STATUS="${{ needs.infrastructure-validation.outputs.infrastructure_status }}"
+          DEPENDENCY_STATUS="${{ needs.dependency-analysis.outputs.dependency_status }}"
+          
+          # Deployment readiness criteria
+          READY="true"
+          RECOMMENDATION="proceed"
+          BLOCKING_ISSUES=()
+          
+          # Quality score threshold
+          if [[ -n "$QUALITY_SCORE" ]] && [[ $QUALITY_SCORE -lt 70 ]]; then
+            READY="false"
+            BLOCKING_ISSUES+=("Quality score below threshold ($QUALITY_SCORE/100)")
+          fi
+          
+          # Critical pipeline failures
+          if [[ "$SECURITY_STATUS" == "failure" ]] && [[ "${{ inputs.risk_level }}" == "high" || "${{ inputs.risk_level }}" == "critical" ]]; then
+            READY="false"
+            BLOCKING_ISSUES+=("Security validation failed for high-risk change")
+          fi
+          
+          if [[ "$DEPENDENCY_STATUS" == "failure" ]]; then
+            READY="false"
+            BLOCKING_ISSUES+=("Pipeline dependency issues detected")
+          fi
+          
+          # Warning conditions
+          WARNING_CONDITIONS=()
+          if [[ "$DEMO_STATUS" == "failure" ]] && [[ "${{ inputs.pipeline_strategy }}" == "demo-focused" ]]; then
+            WARNING_CONDITIONS+=("Demo validation failed for demo-focused change")
+          fi
+          
+          if [[ "$INFRA_STATUS" == "warning" ]]; then
+            WARNING_CONDITIONS+=("Infrastructure validation completed with warnings")
+          fi
+          
+          # Determine recommendation
+          if [[ "$READY" == "false" ]]; then
+            RECOMMENDATION="block"
+          elif [[ ${#WARNING_CONDITIONS[@]} -gt 0 ]]; then
+            RECOMMENDATION="proceed-with-caution"
+          else
+            RECOMMENDATION="proceed"
+          fi
+          
+          echo "Deployment Ready: $READY"
+          echo "Recommendation: $RECOMMENDATION"
+          
+          if [[ ${#BLOCKING_ISSUES[@]} -gt 0 ]]; then
+            echo "Blocking Issues:"
+            for issue in "${BLOCKING_ISSUES[@]}"; do
+              echo "  - $issue"
+            done
+          fi
+          
+          if [[ ${#WARNING_CONDITIONS[@]} -gt 0 ]]; then
+            echo "Warning Conditions:"
+            for warning in "${WARNING_CONDITIONS[@]}"; do
+              echo "  - $warning"
+            done
+          fi
+          
+          echo "ready=$READY" >> $GITHUB_OUTPUT
+          echo "recommendation=$RECOMMENDATION" >> $GITHUB_OUTPUT
+
+      - name: Generate Deployment Readiness Report
+        run: |
+          echo "## 🚀 Deployment Readiness Assessment" >> $GITHUB_STEP_SUMMARY
+          echo "**Ready for Deployment:** ${{ steps.assess-readiness.outputs.ready }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Recommendation:** ${{ steps.assess-readiness.outputs.recommendation }}" >> $GITHUB_STEP_SUMMARY
+          
+          case "${{ steps.assess-readiness.outputs.recommendation }}" in
+            "proceed")
+              echo "✅ **All systems go!** Ready for deployment." >> $GITHUB_STEP_SUMMARY
+              ;;
+            "proceed-with-caution")
+              echo "⚠️ **Proceed with caution.** Some warnings detected." >> $GITHUB_STEP_SUMMARY
+              ;;
+            "block")
+              echo "❌ **Deployment blocked.** Critical issues must be resolved." >> $GITHUB_STEP_SUMMARY
+              ;;
+          esac
+
+  # Trigger Deployment (if ready)
+  trigger-deployment:
+    name: Trigger Deployment
+    runs-on: ubuntu-latest
+    needs: deployment-readiness
+    if: needs.deployment-readiness.outputs.deployment_ready == 'true'
+    
+    steps:
+      - name: Trigger Canary Deployment
+        if: inputs.deployment_strategy == 'canary'
+        uses: ./.github/workflows/canary-deployment.yml
+        with:
+          environment: production
+          canary_percentage: 10
+          rollback_threshold: 5
+
+      - name: Trigger Blue-Green Deployment
+        if: inputs.deployment_strategy == 'blue-green'
+        run: |
+          echo "🔄 Triggering Blue-Green deployment..."
+          # In a real implementation, this would trigger blue-green deployment
+          echo "Blue-Green deployment initiated"
+
+      - name: Trigger Standard Deployment
+        if: inputs.deployment_strategy == 'standard'
+        run: |
+          echo "📦 Triggering standard deployment..."
+          # In a real implementation, this would trigger standard deployment
+          echo "Standard deployment initiated"
+
+  # Integration Summary
+  integration-summary:
+    name: Integration Summary
+    runs-on: ubuntu-latest
+    needs: [quality-gates-integration, demo-pages-validation, security-compliance-validation, infrastructure-validation, dependency-analysis, deployment-readiness, trigger-deployment]
+    if: always()
+    outputs:
+      status: ${{ steps.summary.outputs.status }}
+      
+    steps:
+      - name: Generate Integration Summary
+        id: summary
+        run: |
+          # Collect all pipeline results
+          QUALITY_STATUS="${{ needs.quality-gates-integration.result }}"
+          DEMO_STATUS="${{ needs.demo-pages-validation.result }}"
+          SECURITY_STATUS="${{ needs.security-compliance-validation.result }}"
+          INFRA_STATUS="${{ needs.infrastructure-validation.result }}"
+          DEPENDENCY_STATUS="${{ needs.dependency-analysis.result }}"
+          READINESS_STATUS="${{ needs.deployment-readiness.result }}"
+          DEPLOYMENT_STATUS="${{ needs.trigger-deployment.result }}"
+          
+          echo "## 🎯 Integrated Pipeline Orchestration Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Pipeline Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Quality Gates | $QUALITY_STATUS |" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "$DEMO_STATUS" != "skipped" ]]; then
+            echo "| Demo Pages Validation | $DEMO_STATUS |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "$SECURITY_STATUS" != "skipped" ]]; then
+            echo "| Security & Compliance | $SECURITY_STATUS |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "$INFRA_STATUS" != "skipped" ]]; then
+            echo "| Infrastructure | $INFRA_STATUS |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "| Dependency Analysis | $DEPENDENCY_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployment Readiness | $READINESS_STATUS |" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "$DEPLOYMENT_STATUS" != "skipped" ]]; then
+            echo "| Deployment | $DEPLOYMENT_STATUS |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Determine overall status
+          OVERALL_STATUS="success"
+          
+          if [[ "$QUALITY_STATUS" == "failure" ]] || [[ "$DEPENDENCY_STATUS" == "failure" ]] || [[ "$READINESS_STATUS" == "failure" ]]; then
+            OVERALL_STATUS="failure"
+          elif [[ "$SECURITY_STATUS" == "failure" ]] && [[ "${{ inputs.risk_level }}" == "high" || "${{ inputs.risk_level }}" == "critical" ]]; then
+            OVERALL_STATUS="failure"
+          elif [[ "$DEMO_STATUS" == "failure" ]] && [[ "${{ inputs.pipeline_strategy }}" == "demo-focused" ]]; then
+            OVERALL_STATUS="failure"
+          elif [[ "$INFRA_STATUS" == "failure" ]] && [[ "${{ inputs.deployment_strategy }}" != "standard" ]]; then
+            OVERALL_STATUS="failure"
+          elif [[ "$DEPLOYMENT_STATUS" == "failure" ]]; then
+            OVERALL_STATUS="failure"
+          fi
+          
+          echo "status=$OVERALL_STATUS" >> $GITHUB_OUTPUT
+          
+          if [[ "$OVERALL_STATUS" == "success" ]]; then
+            echo "## ✅ Integration completed successfully!" >> $GITHUB_STEP_SUMMARY
+            echo "🎉 All pipeline components executed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Integration failed" >> $GITHUB_STEP_SUMMARY
+            echo "🚨 One or more critical pipeline components failed" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -12,8 +12,10 @@ import os
 import tempfile
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
+# Top-level imports for tests (avoid import-inside-function warnings)
+import jwt
 import pandas as pd
 import pytest
 
@@ -26,6 +28,7 @@ from bias_detection_service import (
     SessionData,
     app,
 )
+from werkzeug.exceptions import Unauthorized
 
 
 class TestBiasDetectionConfig(unittest.TestCase):
@@ -35,9 +38,7 @@ class TestBiasDetectionConfig(unittest.TestCase):
         """Test default configuration values"""
         config = BiasDetectionConfig()
 
-        assert config.warning_threshold == 0.3
-        assert config.high_threshold == 0.6
-        assert config.critical_threshold == 0.8
+        self._extracted_from_test_custom_config_5(config, 0.3, 0.6, 0.8)
         assert config.enable_hipaa_compliance
         assert config.enable_audit_logging
         assert config.enable_encryption
@@ -70,11 +71,15 @@ class TestBiasDetectionConfig(unittest.TestCase):
             enable_hipaa_compliance=False,
         )
 
-        assert config.warning_threshold == 0.4
-        assert config.high_threshold == 0.7
-        assert config.critical_threshold == 0.9
+        self._extracted_from_test_custom_config_5(config, 0.4, 0.7, 0.9)
         assert config.layer_weights == custom_weights
         assert not config.enable_hipaa_compliance
+
+    # TODO Rename this here and in `test_default_config` and `test_custom_config`
+    def _extracted_from_test_custom_config_5(self, config, arg1, arg2, arg3):
+        assert config.warning_threshold == arg1
+        assert config.high_threshold == arg2
+        assert config.critical_threshold == arg3
 
 
 class TestSessionData(unittest.TestCase):
@@ -110,11 +115,9 @@ class TestSessionData(unittest.TestCase):
             transcripts=[],
             metadata={},
         )
-
         assert session_data.timestamp is not None
         # Verify timestamp is in ISO format
-        if session_data.timestamp is not None:
-            datetime.fromisoformat(session_data.timestamp)
+        datetime.fromisoformat(session_data.timestamp)
 
 
 class TestSecurityManager(unittest.TestCase):
@@ -161,13 +164,10 @@ class TestSecurityManager(unittest.TestCase):
     @patch("jwt.decode")
     def test_verify_jwt_token_invalid(self, mock_jwt_decode):
         """Test JWT token verification with invalid token"""
-        import jwt
-        from werkzeug.exceptions import Unauthorized
-
         mock_jwt_decode.side_effect = jwt.InvalidTokenError("Invalid token")
 
         token = "invalid.jwt.token"
-        with self.assertRaises(Unauthorized):
+        with pytest.raises(Unauthorized):
             self.security_manager.verify_jwt_token(token)
 
 
@@ -270,17 +270,17 @@ class TestBiasDetectionService(unittest.TestCase):
     def test_calculate_entropy(self):
         """Test entropy calculation"""
         # Test balanced distribution (high entropy)
-        balanced_values = [25, 25, 25, 25]
+        balanced_values = [25.0, 25.0, 25.0, 25.0]
         entropy = self.service._calculate_entropy(balanced_values)
         assert entropy > 1.3  # Should be close to log(4) ≈ 1.386
 
         # Test unbalanced distribution (low entropy)
-        unbalanced_values = [90, 5, 3, 2]
+        unbalanced_values = [90.0, 5.0, 3.0, 2.0]
         entropy = self.service._calculate_entropy(unbalanced_values)
         assert entropy < 1.0
 
         # Test empty values
-        empty_values = []
+        empty_values: list[float] = []
         entropy = self.service._calculate_entropy(empty_values)
         assert entropy == 0.0
 
@@ -336,7 +336,7 @@ class TestBiasDetectionService(unittest.TestCase):
 
         # Should be weighted average based on config weights
         expected_score = (0.3 * 0.25) + (0.5 * 0.30) + (0.2 * 0.20) + (0.4 * 0.25)
-        self.assertAlmostEqual(overall_score, expected_score, places=2)
+        assert overall_score == pytest.approx(expected_score, abs=1e-2)
 
     def test_determine_alert_level(self):
         """Test alert level determination"""
@@ -348,21 +348,24 @@ class TestBiasDetectionService(unittest.TestCase):
 
     def test_calculate_confidence(self):
         """Test confidence calculation"""
+        self._extracted_from_test_calculate_confidence_4(
+            "bias_score", 0.5, 0.8
+        )
+        self._extracted_from_test_calculate_confidence_4(
+            "error", "Failed to analyze", 0.5
+        )
+
+    # TODO Rename this here and in `test_calculate_confidence`
+    def _extracted_from_test_calculate_confidence_4(self, arg0, arg1, arg2):
         # All layers successful
         successful_results = [
             {"layer": "preprocessing", "bias_score": 0.3},
-            {"layer": "model_level", "bias_score": 0.5},
+            {"layer": "model_level", arg0: arg1},
         ]
-        confidence = self.service._calculate_confidence(successful_results)
-        assert confidence == 0.8
+        result = self.service._calculate_confidence(successful_results)
+        assert result == arg2
 
-        # Some layers with errors
-        mixed_results = [
-            {"layer": "preprocessing", "bias_score": 0.3},
-            {"layer": "model_level", "error": "Failed to analyze"},
-        ]
-        confidence = self.service._calculate_confidence(mixed_results)
-        assert confidence == 0.5
+        return result
 
     def test_generate_recommendations(self):
         """Test recommendation generation"""
@@ -378,7 +381,7 @@ class TestBiasDetectionService(unittest.TestCase):
         assert "Retrain model" in recommendations
         # Should include critical-level recommendations
         critical_recs = [r for r in recommendations if "CRITICAL" in r]
-        assert len(critical_recs) > 0
+        assert critical_recs
 
     @pytest.mark.asyncio
     async def test_analyze_session_full(self):
@@ -421,13 +424,13 @@ class TestBiasDetectionService(unittest.TestCase):
     def test_create_synthetic_dataset(self):
         """Test synthetic dataset creation for ML analysis"""
         dataset = self.service._create_synthetic_dataset(self.test_session_data)
-
-        if dataset is not None:  # Only test if dataset creation succeeds
-            assert "df" in dataset
-            assert "label_names" in dataset
-            assert "protected_attributes" in dataset
-            assert isinstance(dataset["df"], pd.DataFrame)
-            assert len(dataset["df"]) > 0
+        # Ensure dataset created and validate structure
+        assert dataset is not None
+        assert "df" in dataset
+        assert "label_names" in dataset
+        assert "protected_attributes" in dataset
+        assert isinstance(dataset["df"], pd.DataFrame)
+        assert len(dataset["df"]) > 0
 
 
 class TestFlaskEndpoints(unittest.TestCase):
@@ -444,14 +447,11 @@ class TestFlaskEndpoints(unittest.TestCase):
 
     def test_health_check(self):
         """Test health check endpoint"""
-        response = self.client.get("/health")
-        assert response.status_code == 200
-
-        data = response.get_json()
+        data = self._extracted_from_test_404_endpoint_3("/health", 200)
         assert data["status"] == "healthy"
-        assert "components" in data
-        assert "timestamp" in data
-        assert "version" in data
+        self._extracted_from_test_dashboard_endpoint_8(
+            "components", data, "timestamp", "version"
+        )
 
     def test_analyze_endpoint_valid_data(self):
         """Test analyze endpoint with valid data"""
@@ -501,13 +501,10 @@ class TestFlaskEndpoints(unittest.TestCase):
 
     def test_dashboard_endpoint(self):
         """Test dashboard data endpoint"""
-        response = self.client.get("/dashboard")
-        assert response.status_code == 200
-
-        data = response.get_json()
-        assert "summary" in data
-        assert "trends" in data
-        assert "demographics" in data
+        data = self._extracted_from_test_404_endpoint_3("/dashboard", 200)
+        self._extracted_from_test_dashboard_endpoint_8(
+            "summary", data, "trends", "demographics"
+        )
 
     def test_export_endpoint_json(self):
         """Test export endpoint with JSON format"""
@@ -528,14 +525,23 @@ class TestFlaskEndpoints(unittest.TestCase):
         assert response.status_code == 200
         assert response.mimetype == "text/csv"
 
+    def _extracted_from_test_dashboard_endpoint_8(self, arg0, data, arg2, arg3):
+        assert arg0 in data
+        assert arg2 in data
+        assert arg3 in data
+
+    # TODO Rename this here and in `test_health_check`, `test_dashboard_endpoint` and `test_404_endpoint`
     def test_404_endpoint(self):
         """Test 404 error handling"""
-        response = self.client.get("/nonexistent")
-        assert response.status_code == 404
-
-        data = response.get_json()
+        data = self._extracted_from_test_404_endpoint_3("/nonexistent", 404)
         assert "error" in data
         assert data["error"] == "Endpoint not found"
+
+    # TODO Rename this here and in `test_health_check`, `test_dashboard_endpoint` and `test_404_endpoint`
+    def _extracted_from_test_404_endpoint_3(self, arg0, arg1):
+        response = self.client.get(arg0)
+        assert response.status_code == arg1
+        return response.get_json()
 
 
 # Helper class for async mocking

@@ -145,7 +145,7 @@ export const defaultCdnConfig: CdnConfig = {
   },
   security: {
     contentSecurityPolicy:
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.pixelatedempathy.com; style-src 'self' 'unsafe-inline' https://cdn.pixelatedempathy.com; img-src 'self' data: https://cdn.pixelatedempathy.com; font-src 'self' https://cdn.pixelatedempathy.com; connect-src 'self' https://api.pixelatedempathy.com;",
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.pixelatedempathy.com; style-src 'self' 'unsafe-inline' https://cdn.pixelatedempathy.com; img-src 'self' data: blob: https://cdn.pixelatedempathy.com https://images.unsplash.com https://plus.unsplash.com; font-src 'self' https://cdn.pixelatedempathy.com; connect-src 'self' https://api.pixelatedempathy.com;",
     hstsMaxAge: 31536000, // 1 year
     nosniff: true,
     frameOptions: 'DENY',

@@ -36,7 +36,7 @@ export class AnalyticsService {
     this.wsClients = new Map()
     this.retentionDays = options.retentionDays || 90 // Default 90 days retention
     this.batchSize = options.batchSize || 100
-    this.redisClient = redis as RedisClient // Safe because we control the Redis client implementation
+    this.redisClient = redis as unknown as RedisClient // Safe because we control the Redis client implementation
   }
 
   /**
@@ -320,3 +320,8 @@ export class AnalyticsService {
     }
   }
 }
+
+// Re-export commonly used types and enums for consumers
+export { EventType } from './analytics-types'
+export { EventPriority } from './analytics-types'
+export type { EventData } from './analytics-types'

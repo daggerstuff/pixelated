@@ -4,9 +4,10 @@ test.describe('Browser Compatibility Tests', () => {
   test('homepage loads correctly', async ({ page }) => {
     await page.goto('/')
     await expect(page).toHaveTitle(/Pixelated Empathy/)
-    await expect(
-      page.getByRole('heading', { name: 'Practice Makes Perfect But' }),
-    ).toBeVisible()
+  // Assert main hero heading contains expected phrase
+  const heroHeading = page.getByRole('heading', { level: 1 })
+  await expect(heroHeading).toBeVisible()
+  await expect(heroHeading).toContainText(/Practice the hard conversations/i)
   })
 
   test('navigation works across browsers', async ({ page }) => {
@@ -36,7 +37,7 @@ test.describe('Browser Compatibility Tests', () => {
     await page.goto('/')
 
     // Check for basic interactive elements
-    const buttons = page.locator('button')
+    const buttons = page.locator('button:visible')
     const buttonCount = await buttons.count()
 
     if (buttonCount > 0) {

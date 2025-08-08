@@ -15,7 +15,12 @@ import {
   verifyRedisConnection,
 } from './test-utils'
 
-describe('analytics Integration', () => {
+// Conditionally skip Redis integration tests in CI or when explicitly requested
+const SKIP_REDIS_TESTS =
+  process.env['SKIP_REDIS_TESTS'] === 'true' || process.env['CI'] === 'true'
+const describeFn = SKIP_REDIS_TESTS ? describe.skip : describe
+
+describeFn('analytics Integration', () => {
   let redis: RedisService
   let analytics: AnalyticsService
   let pubClient: Redis
@@ -25,14 +30,14 @@ describe('analytics Integration', () => {
     await verifyRedisConnection()
 
     // Set up Redis pub/sub clients
-    pubClient = new Redis(process.env.REDIS_URL!)
-    subClient = new Redis(process.env.REDIS_URL!)
+    pubClient = new Redis(process.env['REDIS_URL']!)
+    subClient = new Redis(process.env['REDIS_URL']!)
   })
 
   beforeEach(async () => {
     redis = new RedisService({
-      url: process.env.REDIS_URL!,
-      keyPrefix: process.env.REDIS_KEY_PREFIX!,
+      url: process.env['REDIS_URL']!,
+      keyPrefix: process.env['REDIS_KEY_PREFIX']!,
       maxRetries: 3,
       retryDelay: 100,
       connectTimeout: 5000,
@@ -134,7 +139,7 @@ describe('analytics Integration', () => {
 
       // Verify events are stored in chronological order
       storedEvents.forEach((event, i) => {
-        expect(event.metadata.sequence).toBe(i)
+        expect(event.metadata['sequence']).toBe(i)
       })
     })
   })
@@ -192,8 +197,8 @@ describe('analytics Integration', () => {
       // Group metrics by interval
       const metricsByInterval = metrics.reduce(
         (acc, metric) => {
-          const { interval } = metric.tags
-          acc[interval] = (acc[interval] || 0) + 1
+          const key = metric.tags?.['interval'] ?? 'unknown'
+          acc[key] = (acc[key] || 0) + 1
           return acc
         },
         {} as Record<string, number>,

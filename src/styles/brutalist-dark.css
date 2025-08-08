@@ -1,11 +1,14 @@
 /* Brutalist Dark Mode Design System for Mental Health Platform */
 
 :root {
-  /* Core Brutalist Colors - Dark Mode */
+  /* Core Brutalist Colors - Enhanced Dark Mode */
   --bg-primary: #0a0a0a;
   --bg-secondary: #111111;
   --bg-tertiary: #1a1a1a;
   --bg-elevated: #222222;
+  --bg-glass: rgba(17, 17, 17, 0.8);
+  --bg-gradient-primary: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  --bg-gradient-secondary: linear-gradient(135deg, #111111 0%, #222222 100%);
 
   /* Text Colors */
   --text-primary: #ffffff;
@@ -13,21 +16,48 @@
   --text-muted: #a3a3a3;
   --text-subtle: #737373;
 
-  /* Accent Colors - Mental Health Friendly */
+  /* Enhanced Accent Colors - Mental Health Friendly */
   --accent-primary: #0d9488;    /* Deeper teal */
   --accent-secondary: #3b82f6;  /* Confident blue */
+  --accent-tertiary: #8b5cf6;   /* Sophisticated purple (minimal use) */
   --accent-warning: #f59e0b;    /* Warm amber */
   --accent-danger: #ef4444;     /* Clear red */
+  --accent-success: #10b981;    /* Success green */
 
-  /* Brutalist Borders */
+  /* Gradient Accents - Enterprise Polish */
+  --gradient-primary: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #06b6d4 100%);
+  --gradient-secondary: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%);
+  --gradient-cool: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0d9488 100%);
+
+  /* Brutalist Borders - Enhanced */
   --border-primary: #333333;
   --border-secondary: #404040;
   --border-accent: #0d9488;
+  --border-glow: rgba(13, 148, 136, 0.3);
 
-  /* Shadows - Minimal but Present */
+  /* Enhanced Shadows & Effects */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6);
+  --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.15);
+  --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.15);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.3);
+
+  /* Glass Effects */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(17, 17, 17, 0.8);
+  --glass-backdrop: blur(12px);
+
+  /* Mesh Gradients - Enterprise Visual Elements */
+  --mesh-gradient-1: radial-gradient(circle at 20% 80%, rgba(13, 148, 136, 0.15) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                      radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+
+  --mesh-gradient-2: radial-gradient(circle at 60% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 20% 60%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
 
   /* Typography Scale */
   --text-xs: 0.75rem;
@@ -708,6 +738,284 @@ body {
   .message {
     max-width: 90%;
   }
+}
+
+/* ========================================
+   ENTERPRISE ENHANCEMENTS
+   Modern, Unique, Sophisticated Elements
+   ======================================== */
+
+/* Glass Morphism Cards - Enterprise Polish */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+/* Mesh Background Overlays */
+.mesh-bg-1 {
+  background: var(--mesh-gradient-1);
+  position: relative;
+}
+
+.mesh-bg-2 {
+  background: var(--mesh-gradient-2);
+  position: relative;
+}
+
+/* Gradient Text Effects - Enterprise Branding */
+.gradient-text-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.gradient-text-secondary {
+  background: var(--gradient-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+/* Enhanced Buttons with Modern Effects */
+.brutalist-button--enhanced {
+  position: relative;
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  font-weight: 600;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.brutalist-button--enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.brutalist-button--enhanced:hover::before {
+  left: 100%;
+}
+
+.brutalist-button--enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Floating Elements - Modern Visual Interest */
+.floating-element {
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-element--delayed {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Sophisticated Card Variants */
+.enterprise-card {
+  background: var(--bg-gradient-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.enterprise-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+}
+
+.enterprise-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent-primary);
+}
+
+/* Modern Status Indicators */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+
+.status-dot--online {
+  background: var(--accent-success);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.status-dot--processing {
+  background: var(--accent-warning);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  animation: pulse-glow 2s infinite;
+}
+
+.status-dot--offline {
+  background: var(--text-subtle);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+  }
+}
+
+/* Enterprise Data Visualization */
+.metric-card--enhanced {
+  background: var(--bg-gradient-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.metric-card--enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-cool);
+}
+
+.metric-card--enhanced:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.metric-value--large {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
+/* Modern Navigation Elements */
+.nav-pill {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 50px;
+  padding: var(--space-2) var(--space-4);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav-pill:hover {
+  background: var(--accent-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.nav-pill--active {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+/* Sophisticated Form Elements */
+.form-field--enhanced {
+  position: relative;
+}
+
+.form-field--enhanced input,
+.form-field--enhanced textarea {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  transition: all var(--transition-normal);
+  width: 100%;
+}
+
+.form-field--enhanced input:focus,
+.form-field--enhanced textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-glow);
+  background: var(--bg-tertiary);
+}
+
+.form-field--enhanced label {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  pointer-events: none;
+}
+
+.form-field--enhanced input:focus + label,
+.form-field--enhanced input:not(:placeholder-shown) + label,
+.form-field--enhanced textarea:focus + label,
+.form-field--enhanced textarea:not(:placeholder-shown) + label {
+  top: -var(--space-2);
+  left: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--accent-primary);
+  background: var(--bg-primary);
+  padding: 0 var(--space-2);
 }
 
 /* Dark Mode Specific Adjustments */

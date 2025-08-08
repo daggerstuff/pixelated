@@ -1,5 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="a" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#9775fa;stop-opacity:1"/><stop offset="100%" style="stop-color:#845ef7;stop-opacity:1"/></linearGradient><linearGradient id="b" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#ffa94d;stop-opacity:1"/><stop offset="100%" style="stop-color:#fd7e14;stop-opacity:1"/></linearGradient></defs><path fill="#f8f9fa" d="M0 0h1200v800H0z"/><text x="600" y="50" fill="#212529" font-family="Arial, sans-serif" font-size="36" font-weight="bold" text-anchor="middle">
-    Edge Case Generator: Never Be Caught Off-Guard
-  </text><circle cx="600" cy="300" r="80" fill="url(#a)" opacity=".9"/><text x="600" y="290" fill="#fff" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">AI</text><text x="600" y="315" fill="#fff" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">EDGE CASE</text><text x="600" y="330" fill="#fff" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">GENERATOR</text><circle cx="200" cy="150" r="50" fill="url(#b)" opacity=".8"/><text x="200" y="160" fill="#fff" font-family="Arial, sans-serif" font-size="18" text-anchor="middle">⚡</text><text x="200" y="220" fill="#495057" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">CRISIS COMBINATIONS</text><text x="200" y="240" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Multiple presenting issues</text><text x="200" y="255" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">in complex configurations</text><circle cx="1000" cy="150" r="50" fill="url(#b)" opacity=".8"/><text x="1000" y="160" fill="#fff" font-family="Arial, sans-serif" font-size="18" text-anchor="middle">🌍</text><text x="1000" y="220" fill="#495057" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">CULTURAL INTERSECTIONS</text><text x="1000" y="240" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Unique demographic and</text><text x="1000" y="255" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">cultural factor combinations</text><circle cx="200" cy="450" r="50" fill="url(#b)" opacity=".8"/><text x="200" y="460" fill="#fff" font-family="Arial, sans-serif" font-size="18" text-anchor="middle">💎</text><text x="200" y="520" fill="#495057" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">RARE PRESENTATIONS</text><text x="200" y="540" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Low-incidence conditions</text><text x="200" y="555" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">once-in-career encounters</text><circle cx="1000" cy="450" r="50" fill="url(#b)" opacity=".8"/><text x="1000" y="460" fill="#fff" font-family="Arial, sans-serif" font-size="18" text-anchor="middle">⚖️</text><text x="1000" y="520" fill="#495057" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">ETHICAL DILEMMAS</text><text x="1000" y="540" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Challenging situations that</text><text x="1000" y="555" fill="#6c757d" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">test professional boundaries</text><path stroke="#9775fa" stroke-width="3" d="m250 150 270 100m430-100L680 250M250 450l270-100m430 100L680 350" opacity=".6"/><rect width="600" height="120" x="300" y="650" fill="#fff" stroke="#9775fa" stroke-width="2" rx="10"/><text x="600" y="680" fill="#495057" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle">
-    Edge Case Generator Impact
-  </text><text x="320" y="710" fill="#495057" font-family="Arial, sans-serif" font-size="14">• Generate scenarios therapists might encounter once in 20+ year careers</text><text x="320" y="730" fill="#495057" font-family="Arial, sans-serif" font-size="14">• Combine multiple factors: culture, age, trauma, substance use, personality</text><text x="320" y="750" fill="#495057" font-family="Arial, sans-serif" font-size="14">• Practice ethical decision-making in complex, high-stakes situations</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="a" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"/><stop offset="100%" style="stop-color:#dc2626;stop-opacity:1"/></linearGradient><linearGradient id="b" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#10b981;stop-opacity:1"/><stop offset="100%" style="stop-color:#059669;stop-opacity:1"/></linearGradient><linearGradient id="c" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#1f2937;stop-opacity:1"/><stop offset="100%" style="stop-color:#111827;stop-opacity:1"/></linearGradient></defs><path fill="url(#c)" d="M0 0h1200v800H0z"/><text x="600" y="50" fill="#f9fafb" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle">Red-Team Role-Play Engine</text><text x="600" y="80" fill="#9ca3af" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Adversarial AI clients that test clinical boundaries safely</text>
+
+<!-- Central AI Brain -->
+<circle cx="600" cy="300" r="90" fill="url(#a)" opacity=".9"/>
+<text x="600" y="285" fill="#fff" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">🧠 AI</text>
+<text x="600" y="305" fill="#fff" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">RED TEAM</text>
+<text x="600" y="325" fill="#fff" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">ENGINE</text>
+
+<!-- Challenging Scenarios -->
+<rect x="150" y="120" width="180" height="100" fill="#374151" stroke="#ef4444" stroke-width="2" rx="8"/>
+<text x="240" y="145" fill="#ef4444" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">ESCALATION</text>
+<text x="240" y="165" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Client becomes hostile</text>
+<text x="240" y="180" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Tests boundaries</text>
+<text x="240" y="195" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Refuses cooperation</text>
+
+<rect x="870" y="120" width="180" height="100" fill="#374151" stroke="#ef4444" stroke-width="2" rx="8"/>
+<text x="960" y="145" fill="#ef4444" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">RESISTANCE</text>
+<text x="960" y="165" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Denies problems</text>
+<text x="960" y="180" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Challenges expertise</text>
+<text x="960" y="195" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Manipulative behavior</text>
+
+<rect x="150" y="480" width="180" height="100" fill="#374151" stroke="#ef4444" stroke-width="2" rx="8"/>
+<text x="240" y="505" fill="#ef4444" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">CRISIS</text>
+<text x="240" y="525" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Suicidal ideation</text>
+<text x="240" y="540" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Psychotic episodes</text>
+<text x="240" y="555" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Trauma responses</text>
+
+<rect x="870" y="480" width="180" height="100" fill="#374151" stroke="#ef4444" stroke-width="2" rx="8"/>
+<text x="960" y="505" fill="#ef4444" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">BOUNDARIES</text>
+<text x="960" y="525" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Inappropriate requests</text>
+<text x="960" y="540" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Dual relationships</text>
+<text x="960" y="555" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Ethical dilemmas</text>
+
+<!-- Connection lines -->
+<path stroke="#10b981" stroke-width="3" d="m330 170 180 80m360-80L690 250M330 530l180-80m360 80L690 350" opacity=".7"/>
+
+<!-- Safe Practice Zone -->
+<rect width="500" height="80" x="350" y="650" fill="#065f46" stroke="#10b981" stroke-width="2" rx="10"/>
+<text x="600" y="675" fill="#10b981" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle">SAFE PRACTICE ENVIRONMENT</text>
+<text x="600" y="695" fill="#d1fae5" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">No real clients harmed • Unlimited retries • Immediate feedback</text>
+<text x="600" y="715" fill="#d1fae5" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Build confidence through controlled adversarial training</text></svg>

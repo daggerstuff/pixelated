@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="a" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1"/><stop offset="100%" style="stop-color:#d97706;stop-opacity:1"/></linearGradient><linearGradient id="b" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#10b981;stop-opacity:1"/><stop offset="100%" style="stop-color:#059669;stop-opacity:1"/></linearGradient><linearGradient id="c" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#1f2937;stop-opacity:1"/><stop offset="100%" style="stop-color:#111827;stop-opacity:1"/></linearGradient></defs><path fill="url(#c)" d="M0 0h1200v800H0z"/><text x="600" y="50" fill="#f9fafb" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle">Real-Time Bias Detection</text><text x="600" y="80" fill="#9ca3af" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Inline flags when power, culture, or language choices drift</text>
+
+<!-- Chat Interface -->
+<rect x="200" y="120" width="800" height="500" fill="#374151" stroke="#6b7280" stroke-width="2" rx="12"/>
+
+<!-- Chat Messages -->
+<rect x="220" y="150" width="600" height="60" fill="#4b5563" rx="8"/>
+<text x="240" y="175" fill="#d1d5db" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Therapist:</text>
+<text x="240" y="195" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12">"You people always have these kinds of problems with authority."</text>
+
+<!-- Bias Alert -->
+<rect x="840" y="150" width="140" height="60" fill="#dc2626" stroke="#ef4444" stroke-width="2" rx="8"/>
+<text x="910" y="170" fill="#fff" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">⚠️ BIAS ALERT</text>
+<text x="910" y="185" fill="#fecaca" font-family="Arial, sans-serif" font-size="10" text-anchor="middle">Cultural</text>
+<text x="910" y="200" fill="#fecaca" font-family="Arial, sans-serif" font-size="10" text-anchor="middle">Generalization</text>
+
+<!-- Better Alternative -->
+<rect x="220" y="240" width="760" height="80" fill="#065f46" stroke="#10b981" stroke-width="2" rx="8"/>
+<text x="240" y="265" fill="#10b981" font-family="Arial, sans-serif" font-size="14" font-weight="bold">💡 Better approach:</text>
+<text x="240" y="285" fill="#d1fae5" font-family="Arial, sans-serif" font-size="12">"I'm noticing some frustration with authority figures.</text>
+<text x="240" y="305" fill="#d1fae5" font-family="Arial, sans-serif" font-size="12">Can you tell me more about your specific experiences?"</text>
+
+<!-- Another Example -->
+<rect x="220" y="350" width="600" height="60" fill="#4b5563" rx="8"/>
+<text x="240" y="375" fill="#d1d5db" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Therapist:</text>
+<text x="240" y="395" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12">"Have you tried just thinking more positively about this?"</text>
+
+<!-- Another Alert -->
+<rect x="840" y="350" width="140" height="60" fill="#dc2626" stroke="#ef4444" stroke-width="2" rx="8"/>
+<text x="910" y="370" fill="#fff" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">⚠️ BIAS ALERT</text>
+<text x="910" y="385" fill="#fecaca" font-family="Arial, sans-serif" font-size="10" text-anchor="middle">Minimizing</text>
+<text x="910" y="400" fill="#fecaca" font-family="Arial, sans-serif" font-size="10" text-anchor="middle">Experience</text>
+
+<!-- Another Better Alternative -->
+<rect x="220" y="440" width="760" height="80" fill="#065f46" stroke="#10b981" stroke-width="2" rx="8"/>
+<text x="240" y="465" fill="#10b981" font-family="Arial, sans-serif" font-size="14" font-weight="bold">💡 Better approach:</text>
+<text x="240" y="485" fill="#d1fae5" font-family="Arial, sans-serif" font-size="12">"It sounds like you're dealing with something really difficult.</text>
+<text x="240" y="505" fill="#d1fae5" font-family="Arial, sans-serif" font-size="12">What has been most challenging about this situation?"</text>
+
+<!-- Detection Stats -->
+<rect x="200" y="650" width="800" height="100" fill="#065f46" stroke="#10b981" stroke-width="2" rx="10"/>
+<text x="600" y="680" fill="#10b981" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle">REAL-TIME ANALYSIS</text>
+<text x="220" y="705" fill="#d1fae5" font-family="Arial, sans-serif" font-size="14">• 200+ bias patterns detected across cultural, gender, and socioeconomic contexts</text>
+<text x="220" y="725" fill="#d1fae5" font-family="Arial, sans-serif" font-size="14">• Instant feedback with specific alternative phrasings</text>
+<text x="220" y="745" fill="#d1fae5" font-family="Arial, sans-serif" font-size="14">• Learn to recognize and correct unconscious biases in real-time</text></svg>

@@ -72,8 +72,13 @@ const liveDemo = {
   description="Try our AI-powered therapy training simulations. Practice crisis interventions, bias detection, and complex client scenarios safely."
 >
   <!-- Hero Section -->
-  <section class="brutalist-section">
-    <div class="brutalist-container">
+  <section class="brutalist-section mesh-bg-1 relative overflow-hidden">
+    <!-- Floating Background Elements -->
+    <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-teal-500/10 to-blue-500/10 floating-element"></div>
+    <div class="absolute top-40 right-20 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 floating-element--delayed"></div>
+    <div class="absolute bottom-20 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-green-500/10 to-teal-500/10 floating-element"></div>
+
+    <div class="brutalist-container relative z-10">
       <div class="text-center mb-16">
         <div class="status-indicator status-indicator--online inline-flex mb-6">
           <div class="pulse-dot pulse-dot--green"></div>
@@ -81,9 +86,9 @@ const liveDemo = {
         </div>
         
         <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
-          EXPERIENCE THE
+          <span class="gradient-text-primary">EXPERIENCE THE</span>
           <br />
-          <span class="confidence-boost">TRAINING REVOLUTION</span>
+          <span class="gradient-text-secondary">TRAINING REVOLUTION</span>
         </h1>
         
         <p class="text-xl text-gray-300 mb-8 max-w-4xl mx-auto">
@@ -91,14 +96,23 @@ const liveDemo = {
         </p>
 
         <div class="flex flex-wrap justify-center gap-4 mb-12">
-          <div class="brutalist-badge brutalist-badge--success">
-            🎯 ZERO RISK TRAINING
+          <div class="nav-pill bg-gradient-to-r from-green-500 to-teal-500 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            ZERO RISK TRAINING
           </div>
-          <div class="brutalist-badge brutalist-badge--info">
-            🔒 FULLY ENCRYPTED
+          <div class="nav-pill bg-gradient-to-r from-teal-500 to-blue-500 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            FULLY ENCRYPTED
           </div>
-          <div class="brutalist-badge brutalist-badge--warning">
-            ⚡ REAL-TIME FEEDBACK
+          <div class="nav-pill bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            REAL-TIME FEEDBACK
           </div>
         </div>
       </div>

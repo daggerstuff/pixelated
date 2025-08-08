@@ -1,16 +1,18 @@
 import { GET } from '../health'
-import type { APIContext } from 'astro'
 
 // Mock dependencies first to avoid hoisting issues
-vi.mock('node:os', () => ({
-  totalmem: vi.fn(() => 16000000000), // 16GB
-  freemem: vi.fn(() => 8000000000), // 8GB
-  cpus: vi.fn(() => Array(8).fill({ model: 'Intel(R) Core(TM) i7-10700K' })),
-  loadavg: vi.fn(() => [1.5, 1.2, 0.9]),
-  platform: vi.fn(() => 'linux'),
-  release: vi.fn(() => '5.10.0-15-amd64'),
-  uptime: vi.fn(() => 86400), // 1 day
-}))
+vi.mock('node:os', () => {
+  const mock = {
+    totalmem: vi.fn(() => 16000000000), // 16GB
+    freemem: vi.fn(() => 8000000000), // 8GB
+    cpus: vi.fn(() => Array(8).fill({ model: 'Intel(R) Core(TM) i7-10700K' })),
+    loadavg: vi.fn(() => [1.5, 1.2, 0.9]),
+    platform: vi.fn(() => 'linux'),
+    release: vi.fn(() => '5.10.0-15-amd64'),
+    uptime: vi.fn(() => 86400), // 1 day
+  }
+  return { ...mock, default: mock }
+})
 
 // Mock process with current Node version to avoid version mismatch errors
 const nodeVersionMock = process.version
@@ -61,8 +63,8 @@ const customMatchers = {
 expect.extend(customMatchers)
 
 // Helper to create mock API context
-function createMockAPIContext(request: Request): APIContext {
-  return { request } as APIContext
+function createMockAPIContext(request: Request): { request: Request } {
+  return { request }
 }
 
 describe('GET /api/v1/health', () => {

@@ -38,32 +38,38 @@ const features = [
   {
     title: "Red‑team role‑play engine",
     description: "Adversarial AI clients that escalate, resist, and test clinical boundaries — safely.",
-    tag: "Built for failure"
+    tag: "Built for failure",
+    image: "/images/features/red-team.jpg"
   },
   {
     title: "Bias spike alerts",
     description: "Inline flags when power, culture, or language choices drift. Shows the exact phrase and better alternatives.",
-    tag: "Real‑time"
+    tag: "Real‑time",
+    image: "/images/features/bias-spike.jpg"
   },
   {
     title: "Failure replay timeline",
     description: "Scrubbable transcript with model‑rated decision points and what to try next session.",
-    tag: "Post‑session coach"
+    tag: "Post‑session coach",
+    image: "/images/features/failure-replay.jpg?v=2"
   },
   {
     title: "Edge‑case personas",
     description: "50k+ symptom mixes across age, culture, socioeconomic context, and comorbidities.",
-    tag: "Coverage, not averages"
+    tag: "Coverage, not averages",
+    image: "/images/features/edge-case.jpg?v=2"
   },
   {
     title: "Competency ledger",
     description: "Objective evidence of growth: accuracy, empathy, speed, and risk routing — exportable for grading.",
-    tag: "Auditable"
+    tag: "Auditable",
+    image: "/images/features/competency.jpg"
   },
   {
     title: "Zero‑retention privacy",
     description: "End‑to‑end encryption and ephemeral processing. We can’t read or keep your sessions.",
-    tag: "Program‑safe"
+    tag: "Program‑safe",
+    image: "/images/features/zero-retention.jpg"
   }
 ]
 ---
@@ -73,27 +79,54 @@ const features = [
   title="Pixelated Empathy - AI Therapist Training Platform"
   description="Safe AI role-play training for therapists. Practice with difficult client personas, get bias detection feedback, and build confidence without real-world risk."
 >
-  <!-- Hero Section (single column, restrained) -->
-  <section class="brutalist-section pt-16 md:pt-24 pb-8">
-    <div class="brutalist-container w-full">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-        <div class="max-w-4xl">
-          <div class="brutalist-caption mb-3">Simulation training for therapists</div>
-          <h1 class="brutalist-heading text-5xl md:text-7xl lg:text-8xl tracking-tight mb-6">
+  <!-- Enhanced Hero Section with Modern Visual Elements -->
+  <section class="brutalist-section pt-20 md:pt-24 pb-16 mesh-bg-1 relative overflow-hidden min-h-screen flex items-center">
+    <!-- Floating Background Elements -->
+    <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-teal-500/10 to-blue-500/10 floating-element"></div>
+    <div class="absolute top-40 right-20 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 floating-element--delayed"></div>
+    <div class="absolute bottom-20 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-green-500/10 to-teal-500/10 floating-element"></div>
+
+    <div class="brutalist-container w-full relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="max-w-lg lg:max-w-xl pr-0 lg:pr-8">
+          <!-- Enhanced Status Indicator -->
+          <div class="inline-flex items-center gap-3 mb-6 nav-pill nav-pill--active">
+            <div class="status-dot status-dot--online"></div>
+            <span class="font-semibold">Live AI Training Platform</span>
+          </div>
+
+          <h1 class="brutalist-heading text-3xl md:text-4xl lg:text-5xl tracking-tight mb-6 leading-tight">
             Practice the hard conversations
             <br />
-            <span class="text-accent">without risk</span>
+            <span class="gradient-text-primary">without risk</span>
           </h1>
-          <p class="text-lg md:text-xl text-gray-300 max-w-2xl">
-            Role‑play crises, get bias cues in session, and graduate with measurable competency.
+
+          <p class="text-lg md:text-xl text-gray-300 max-w-lg mb-8">
+            Role‑play crises, get bias cues in session, and graduate with measurable competency using enterprise-grade AI simulation.
           </p>
-          <div class="mt-8 flex items-center gap-5">
-            <a href="/demo-hub" class="brutalist-button brutalist-button--primary px-8 py-3">Get started</a>
-            <a href="/features" class="text-gray-400 hover:text-white text-base">Explore features →</a>
+
+          <!-- Enhanced CTA Buttons -->
+          <div class="flex flex-col sm:flex-row items-start gap-4">
+            <a href="/demo-hub" class="brutalist-button brutalist-button--enhanced px-8 py-4 text-lg font-semibold">
+              Start Training →
+            </a>
+            <a href="/features" class="nav-pill px-8 py-4 text-lg font-semibold hover:bg-transparent hover:text-teal-400 transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Explore features
+            </a>
           </div>
         </div>
-        <div>
-          <HeroTabs />
+
+        <!-- Enhanced Hero Visual -->
+        <div class="relative">
+          <div class="glass-card p-6">
+            <HeroTabs />
+          </div>
+          <!-- Decorative Elements -->
+          <div class="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full opacity-60"></div>
+          <div class="absolute -bottom-4 -left-4 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-40"></div>
         </div>
       </div>
 
@@ -101,13 +134,17 @@ const features = [
         <LogoWall />
       </div>
 
-      <!-- Stats Grid -->
-      <div class="brutalist-grid brutalist-grid--4 mb-12">
-        {heroStats.map((stat) => (
-          <div class="metric-card hover-lift stat-card">
-            <div class="metric-value organic-counter">{stat.value}</div>
-            <div class="metric-label">{stat.label}</div>
-            <div class="text-xs text-gray-500 mt-1">{stat.subtitle}</div>
+      <!-- Enhanced Stats Grid with Modern Metrics -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {heroStats.map((stat, index) => (
+          <div class="metric-card--enhanced group">
+            <div class="metric-value--large organic-counter">{stat.value}</div>
+            <div class="font-semibold text-white mb-1">{stat.label}</div>
+            <div class="text-sm text-gray-400">{stat.subtitle}</div>
+            <!-- Status indicator for each metric -->
+            <div class="absolute top-4 right-4">
+              <div class={`status-dot ${index === 0 ? 'status-dot--online' : index === 1 ? 'status-dot--processing' : 'status-dot--online'}`}></div>
+            </div>
           </div>
         ))}
       </div>
@@ -121,28 +158,69 @@ const features = [
   </section>
 
   <!-- Security Section (calm, enterprise) -->
-  <section class="brutalist-section">
+  <section class="brutalist-section mesh-bg-2 relative">
     <div class="brutalist-container">
-      <div class="mb-10">
-        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">Security and privacy by design</h2>
+      <div class="mb-12 text-center">
+        <div class="inline-flex items-center gap-2 nav-pill mb-6">
+          <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+          <span class="font-semibold">Enterprise Security</span>
+        </div>
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+          Security and <span class="gradient-text-primary">privacy by design</span>
+        </h2>
         <p class="text-gray-300 max-w-3xl">Zero‑knowledge architecture, strong encryption, and institutional controls. Built for programs that can’t compromise.</p>
       </div>
 
-      <div class="brutalist-grid brutalist-grid--3">
-        <div class="brutalist-card">
-          <h3 class="brutalist-subheading text-lg mb-2">Zero‑knowledge</h3>
-          <p class="text-gray-400 text-sm">End‑to‑end encryption. We cannot read your sessions.</p>
-          <a href="/trust" class="mt-3 inline-block text-sm text-accent hover:underline">Learn more →</a>
-        </div>
-        <div class="brutalist-card">
-          <h3 class="brutalist-subheading text-lg mb-2">Compliance</h3>
-          <p class="text-gray-400 text-sm">HIPAA, FERPA, SOC 2 practices; audit logging on request.</p>
-          <a href="/trust" class="mt-3 inline-block text-sm text-accent hover:underline">View Trust Center →</a>
-        </div>
-        <div class="brutalist-card">
-          <h3 class="brutalist-subheading text-lg mb-2">No data retention</h3>
-          <p class="text-gray-400 text-sm">Training data isn’t used for models without explicit consent.</p>
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Zero‑knowledge: media card -->
+        <a href="/trust" class="relative group rounded-2xl overflow-hidden aspect-[16/10] ring-1 ring-white/5 hover:ring-white/15 transition">
+          <img src="/images/features/mental-health-therapy.jpg" alt="Zero‑knowledge privacy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+          <div class="absolute top-3 left-3 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold ring-1 ring-emerald-400/30">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              Zero‑knowledge
+            </span>
+          </div>
+          <div class="absolute bottom-0 p-5">
+            <h3 class="text-white text-xl font-semibold">We can’t read your sessions</h3>
+            <p class="text-gray-300 text-sm mt-1">End‑to‑end encryption; keys you control.</p>
+          </div>
+        </a>
+
+        <!-- Compliance: media card -->
+        <a href="/trust" class="relative group rounded-2xl overflow-hidden aspect-[16/10] ring-1 ring-white/5 hover:ring-white/15 transition">
+          <img src="/images/features/competency.jpg" alt="Compliance and audits" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+          <div class="absolute top-3 left-3 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/20 text-blue-200 text-xs font-semibold ring-1 ring-blue-400/30">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Compliance
+            </span>
+          </div>
+          <div class="absolute bottom-0 p-5">
+            <h3 class="text-white text-xl font-semibold">HIPAA, FERPA, SOC 2</h3>
+            <p class="text-gray-300 text-sm mt-1">Audit logging on request; exportable evidence.</p>
+          </div>
+        </a>
+
+        <!-- No data retention: media card -->
+        <a href="/trust" class="relative group rounded-2xl overflow-hidden aspect-[16/10] ring-1 ring-white/5 hover:ring-white/15 transition">
+          <img src="/images/features/zero-retention.jpg" alt="No data retention" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+          <div class="absolute top-3 left-3 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-teal-500/20 text-teal-200 text-xs font-semibold ring-1 ring-teal-400/30">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              No data retention
+            </span>
+          </div>
+          <div class="absolute bottom-0 p-5">
+            <h3 class="text-white text-xl font-semibold">Training data stays out</h3>
+            <p class="text-gray-300 text-sm mt-1">Never used for models without explicit consent.</p>
+          </div>
+        </a>
       </div>
     </div>
   </section>
@@ -150,25 +228,42 @@ const features = [
   <HowItWorks />
 
   <!-- Capabilities Section (editorial mosaic) -->
-  <section class="brutalist-section">
+  <section class="brutalist-section py-20">
     <div class="brutalist-container">
-      <div class="mb-10 flex items-end justify-between gap-6 flex-wrap">
+      <div class="mb-16 flex items-end justify-between gap-6 flex-wrap">
         <div>
-          <div class="brutalist-caption mb-2">What actually feels different</div>
-          <h2 class="brutalist-heading text-4xl md:text-6xl">Training capabilities</h2>
+          <div class="brutalist-caption mb-3 text-teal-400 font-medium">What actually feels different</div>
+          <h2 class="brutalist-heading text-3xl md:text-4xl lg:text-5xl leading-tight">Training capabilities</h2>
         </div>
-        <a href="/features" class="text-sm text-accent hover:underline">Full feature list →</a>
+        <a href="/features" class="text-sm text-accent hover:underline transition-colors">Full feature list →</a>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {features.map((f, i) => (
-          <div class={`group relative p-5 border border-gray-800 bg-gradient-to-b from-gray-900/60 to-black ${
-            i % 5 === 0 ? 'md:col-span-3' : i % 5 === 1 ? 'md:col-span-3' : i % 5 === 2 ? 'md:col-span-2' : i % 5 === 3 ? 'md:col-span-4' : 'md:col-span-2'
-          }`}>
+          <div class="group relative overflow-hidden rounded-xl border border-gray-800 bg-gradient-to-b from-gray-900/60 to-black hover:border-teal-500/30 transition-all duration-300">
             <div class="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: radial-gradient(600px circle at var(--x,50%) var(--y,50%), rgba(16,185,129,0.1), transparent 40%);"></div>
-            <h3 class="font-semibold text-xl leading-tight mb-2">{f.title}</h3>
-            <p class="text-gray-400 text-sm leading-relaxed max-w-prose">{f.description}</p>
-            <div class="mt-4 inline-flex text-xs tracking-wide uppercase text-green-400">{f.tag}</div>
+
+            {f.image && (
+              <div class="relative h-40 overflow-hidden">
+                <img
+                  src={f.image}
+                  alt={f.title}
+                  class="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity duration-300"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+              </div>
+            )}
+
+            <div class="relative p-6 min-h-[160px] flex flex-col justify-between">
+              <div class="flex-1">
+                <h3 class="font-semibold text-xl leading-tight mb-3 text-white">{f.title}</h3>
+                <p class="text-gray-300 text-sm leading-relaxed mb-4">{f.description}</p>
+              </div>
+              <div class="inline-flex items-center gap-2 text-xs tracking-wide uppercase text-teal-400 font-medium mt-auto">
+                <span class="w-1.5 h-1.5 bg-teal-400 rounded-full"></span>
+                {f.tag}
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -187,14 +282,14 @@ const features = [
   </section>
 
   <!-- Final CTA (quiet, decisive) -->
-  <section class="brutalist-section">
+  <section class="brutalist-section py-24">
     <div class="brutalist-container">
       <div class="max-w-4xl mx-auto text-center">
-        <h2 class="brutalist-heading text-4xl md:text-6xl mb-6">Bring safe AI practice to your program</h2>
-        <p class="text-xl text-gray-300 mb-8">Launch simulation training in days, not months.</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/contact" class="brutalist-button brutalist-button--primary text-lg px-8 py-4">Get started</a>
-          <a href="/case-studies" class="brutalist-button brutalist-button--secondary text-lg px-8 py-4">View case studies</a>
+        <h2 class="brutalist-heading text-3xl md:text-4xl lg:text-5xl mb-6 leading-tight">Bring safe AI practice to your program</h2>
+        <p class="text-xl text-gray-300 mb-10 leading-relaxed">Launch simulation training in days, not months.</p>
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+          <a href="/contact" class="brutalist-button brutalist-button--primary text-lg px-10 py-4 font-semibold">Get started</a>
+          <a href="/case-studies" class="brutalist-button brutalist-button--secondary text-lg px-10 py-4 font-semibold">View case studies</a>
         </div>
       </div>
     </div>

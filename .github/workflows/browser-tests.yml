@@ -15,6 +15,10 @@ env:
   NODE_VERSION: 22.16.0
   PNPM_VERSION: 10.14.0
   NODE_ENV: test
+  DISABLE_AUTH: 'true'
+  CLERK_PUBLISHABLE_KEY: pk_test_dummy
+  PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+  CLERK_SECRET_KEY: sk_test_dummy
 
 jobs:
   browser-tests:
@@ -60,6 +64,10 @@ jobs:
           NODE_ENV: test
           SKIP_KEYSTATIC: 'true'
           SKIP_MSW: 'true'
+          DISABLE_AUTH: 'true'
+          CLERK_PUBLISHABLE_KEY: pk_test_dummy
+          PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+          CLERK_SECRET_KEY: sk_test_dummy
 
       - name: Upload test results
         if: always()
@@ -118,6 +126,10 @@ jobs:
           PUBLIC_SITE_URL: http://localhost:4321
           SKIP_KEYSTATIC: 'true'
           SKIP_MSW: 'true'
+          DISABLE_AUTH: 'true'
+          CLERK_PUBLISHABLE_KEY: pk_test_dummy
+          PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+          CLERK_SECRET_KEY: sk_test_dummy
         id: visual-tests
 
       - name: Upload visual test results

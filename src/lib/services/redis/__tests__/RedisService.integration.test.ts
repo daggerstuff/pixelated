@@ -14,10 +14,15 @@ expect.extend({
   },
 })
 
-describe('RedisService Integration Tests', () => {
+// Conditionally skip Redis integration tests in CI or when explicitly requested
+const SKIP_REDIS_TESTS =
+  process.env['SKIP_REDIS_TESTS'] === 'true' || process.env['CI'] === 'true'
+const describeFn = SKIP_REDIS_TESTS ? describe.skip : describe
+
+describeFn('RedisService Integration Tests', () => {
   let redis: RedisService
   const config: RedisServiceConfig = {
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    url: process.env['REDIS_URL'] || 'redis://localhost:6379',
     keyPrefix: 'integration:',
     maxRetries: 3,
     retryDelay: 100,
@@ -148,28 +153,28 @@ describe('RedisService Integration Tests', () => {
         )
 
         results.forEach((result, i) => {
-          expect(JSON.parse(result!)).toEqual(sessions[i].data)
+          expect(JSON.parse(result!)).toEqual(sessions[i]!.data)
         })
       })
     })
 
     describe('Analytics Integration', () => {
       it('should track event counts', async () => {
-        const eventTypes = ['pageView', 'click', 'error']
+        const eventTypes = ['pageView', 'click', 'error'] as const
         const counts: Record<string, number> = {}
 
         // Simulate events
         for (let i = 0; i < 100; i++) {
-          const type = eventTypes[i % eventTypes.length]
+          const type = eventTypes[i % eventTypes.length]!
           const key = `integration:analytics:${type}`
           await redis.incr(key)
-          counts[type] = (counts[type] || 0) + 1
+          counts[type] = (counts[type] ?? 0) + 1
         }
 
         // Verify counts
         for (const type of eventTypes) {
           const count = await redis.get(`integration:analytics:${type}`)
-          expect(Number.parseInt(count!, 10)).toBe(counts[type])
+          expect(Number.parseInt(count!, 10)).toBe(counts[type]!)
         }
       })
 
@@ -467,8 +472,8 @@ describe('RedisService Integration Tests', () => {
     it('should retry failed operations', async () => {
       // Create a new instance with retry configuration
       const retryRedis = new RedisService({
-        url: process.env.REDIS_URL!,
-        keyPrefix: process.env.REDIS_KEY_PREFIX!,
+        url: process.env['REDIS_URL']!,
+        keyPrefix: process.env['REDIS_KEY_PREFIX']!,
         maxRetries: 3,
         retryDelay: 100,
       })

@@ -17,5 +17,11 @@ const clerkAuthMiddleware = clerkMiddleware((auth, context) => {
   return undefined
 })
 
+// Allow disabling auth in tests/CI to avoid external dependencies
+const AUTH_DISABLED =
+  process.env['DISABLE_AUTH'] === 'true' || process.env['NODE_ENV'] === 'test'
+
 // Single, clean middleware sequence
-export const onRequest = sequence(generateCspNonce, clerkAuthMiddleware)
+export const onRequest = AUTH_DISABLED
+  ? sequence(generateCspNonce)
+  : sequence(generateCspNonce, clerkAuthMiddleware)

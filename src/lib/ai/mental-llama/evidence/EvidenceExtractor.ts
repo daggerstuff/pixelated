@@ -643,7 +643,56 @@ export class EvidenceExtractor {
         max_tokens: 600,
       })
 
-      return parseSemanticEvidenceResponse(response.content)
+      // Parse using utils parser (shared EvidenceItem shape)
+      const parsed = parseSemanticEvidenceResponse(response.content)
+
+      // Map shared EvidenceItem -> extractor EvidenceItem
+      const mapped: EvidenceItem[] = parsed.map((item) => {
+        // clinicalRelevance mapping: prefer categorical where possible
+        // If numeric present, bucket into categories; otherwise default to 'supportive'
+        let clinical: EvidenceItem['clinicalRelevance'] | undefined
+        if (typeof item.clinicalRelevance === 'number') {
+          const v = item.clinicalRelevance
+          if (v >= 0.95) {
+            clinical = 'critical'
+          } else if (v >= 0.7) {
+                   clinical = 'significant'
+                 } else if (v >= 0.4) {
+                          clinical = 'supportive'
+                        } else {
+                          clinical = 'contextual'
+                        }
+        } else {
+          // no numeric, let it be undefined and rely on ranking by confidence
+          clinical = undefined
+        }
+
+        // severity mapping to relevance/intensity
+        const relevance: EvidenceItem['relevance'] =
+          item.severity === 'high'
+            ? 'high'
+            : item.severity === 'moderate'
+              ? 'medium'
+              : 'low'
+
+        return {
+          text: item.content,
+          type: 'direct_quote',
+          confidence: item.confidence ?? 0.5,
+          relevance,
+          category: item.source || `${category}_semantic`,
+          clinicalRelevance: clinical,
+          metadata: {
+            semanticRationale:
+              (item.context &&
+                (item.context as Record<string, unknown>)['semanticRationale']) as
+                | string
+                | undefined,
+          },
+        }
+      })
+
+      return mapped
     } catch (error) {
       logger.error('Semantic evidence extraction failed', { error })
       return []

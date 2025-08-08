@@ -11,43 +11,72 @@ export const prerender = false
   title="Bias Detection Engine - Live Demo"
   description="Interactive demonstration of our AI bias detection capabilities in therapeutic training scenarios"
 >
-  <!-- Hero Section -->
-  <section class="brutalist-section">
-    <div class="brutalist-container">
+  <!-- Enhanced Hero Section with Modern Visual Elements -->
+  <section class="brutalist-section mesh-bg-1 relative overflow-hidden">
+    <!-- Floating Background Elements -->
+    <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-red-500/10 to-orange-500/10 floating-element"></div>
+    <div class="absolute top-40 right-20 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 floating-element--delayed"></div>
+    <div class="absolute bottom-20 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-teal-500/10 to-green-500/10 floating-element"></div>
+
+    <div class="brutalist-container relative z-10">
       <div class="text-center mb-12">
-        <div class="status-indicator status-indicator--online inline-flex mb-6">
-          <div class="pulse-dot pulse-dot--green"></div>
-          <span class="font-bold">LIVE DEMO ACTIVE</span>
+        <!-- Enhanced Status Indicator -->
+        <div class="inline-flex items-center gap-3 mb-8 nav-pill nav-pill--active">
+          <div class="status-dot status-dot--processing"></div>
+          <span class="font-bold">AI BIAS DETECTION ACTIVE</span>
         </div>
-        
+
         <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
-          BIAS DETECTION
+          <span class="gradient-text-secondary">BIAS DETECTION</span>
           <br />
-          <span class="text-red-400">ENGINE</span>
+          <span class="gradient-text-primary">ENGINE</span>
         </h1>
-        
+
         <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
-          Experience real-time bias detection across 200+ cultural patterns. Test therapeutic scenarios and see instant feedback.
+          Experience real-time bias detection across <span class="gradient-text-primary font-bold">200+ cultural patterns</span>.
+          Test therapeutic scenarios and see instant feedback with enterprise-grade AI.
         </p>
 
+        <!-- Enhanced Badge System -->
         <div class="flex flex-wrap justify-center gap-4 mb-12">
-          <div class="brutalist-badge brutalist-badge--danger">⚠ BIAS ALERTS</div>
-          <div class="brutalist-badge brutalist-badge--info">⚡ REAL-TIME</div>
-          <div class="brutalist-badge brutalist-badge--success">🔒 ENCRYPTED</div>
+          <div class="nav-pill bg-gradient-to-r from-red-500 to-orange-500 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            BIAS ALERTS
+          </div>
+          <div class="nav-pill bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            REAL-TIME
+          </div>
+          <div class="nav-pill bg-gradient-to-r from-teal-500 to-green-500 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            ENCRYPTED
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Main Demo Interface -->
-  <section class="brutalist-section bg-gray-900/50">
+  <!-- Enhanced Main Demo Interface -->
+  <section class="brutalist-section bg-gray-900/50 mesh-bg-2">
     <div class="brutalist-container">
-      <div class="brutalist-grid brutalist-grid--2 max-w-6xl mx-auto">
-        <!-- Input Panel -->
-        <BrutalistCard variant="elevated">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        <!-- Enhanced Input Panel -->
+        <div class="glass-card">
           <div class="space-y-6">
             <div class="border-b border-gray-700 pb-4">
-              <h3 class="brutalist-subheading text-xl mb-2">🎭 SCENARIO INPUT</h3>
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                </div>
+                <h3 class="brutalist-subheading text-xl">SCENARIO INPUT</h3>
               <p class="text-gray-400 text-sm">Enter therapeutic scenario to analyze for bias</p>
             </div>
 

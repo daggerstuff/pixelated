@@ -15,7 +15,9 @@ HIPAA Compliant with encryption, audit logging, and secure data handling.
 
 import asyncio
 import base64
+import csv
 import hashlib
+import io
 import json
 import logging
 import os
@@ -23,7 +25,7 @@ import sys
 import time
 import traceback
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 from typing import Any
 
@@ -35,54 +37,37 @@ from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
 from werkzeug.exceptions import Unauthorized
 
-# IBM AIF360
+# IBM AIF360 (import only what we use)
 try:
-    from aif360.algorithms.inprocessing import AdversarialDebiasing
-    from aif360.algorithms.preprocessing import DisparateImpactRemover, Reweighing
-    from aif360.datasets import BinaryLabelDataset, StandardDataset
-    from aif360.metrics import BinaryLabelDatasetMetric, ClassificationMetric
-
-    # Note: FairAdaBoost was removed in newer AIF360 versions
-    FairAdaBoost = None  # Deprecated/removed from AIF360
-    from aif360.algorithms.postprocessing import (
-        CalibratedEqOddsPostprocessing,
-        EqOddsPostprocessing,
-    )
+    from aif360.datasets import BinaryLabelDataset
+    from aif360.metrics import BinaryLabelDatasetMetric
 
     AIF360_AVAILABLE = True
 except ImportError as e:
     AIF360_AVAILABLE = False
-    FairAdaBoost = None
     logging.warning(f"AIF360 not available: {e}")
 
-# Microsoft Fairlearn
+# Microsoft Fairlearn (import only what we use)
 try:
     from fairlearn.metrics import (
         demographic_parity_difference,
-        demographic_parity_ratio,
         equalized_odds_difference,
-        equalized_odds_ratio,
-        selection_rate,
     )
-    from fairlearn.postprocessing import ThresholdOptimizer
-    from fairlearn.reductions import DemographicParity, EqualizedOdds, ExponentiatedGradient
 
     FAIRLEARN_AVAILABLE = True
 except ImportError as e:
     FAIRLEARN_AVAILABLE = False
     logging.warning(f"Fairlearn not available: {e}")
 
-# Hugging Face evaluate
+# Hugging Face tooling
 try:
-    import evaluate
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
     from transformers.pipelines import pipeline
 
     HF_EVALUATE_AVAILABLE = True
 except ImportError as e:
     HF_EVALUATE_AVAILABLE = False
     pipeline = None
-    logging.warning(f"Hugging Face evaluate not available: {e}")
+    logging.warning(f"Hugging Face pipeline not available: {e}")
 
 # NLP libraries
 try:
@@ -96,27 +81,22 @@ except ImportError as e:
     NLP_AVAILABLE = False
     logging.warning(f"NLP libraries not available: {e}")
 
-# Model interpretability
+# Model interpretability (feature flag only; avoid heavy imports until needed)
 try:
-    import lime
-    import shap
-    from lime.lime_text import LimeTextExplainer
+    import importlib.util as _importlib_util
 
-    INTERPRETABILITY_AVAILABLE = True
-except ImportError as e:
+    INTERPRETABILITY_AVAILABLE = (
+        _importlib_util.find_spec("shap") is not None
+        and _importlib_util.find_spec("lime") is not None
+    )
+except Exception:
     INTERPRETABILITY_AVAILABLE = False
-    logging.warning(f"Interpretability libraries not available: {e}")
 
 # Visualization and data processing
 try:
     import matplotlib
 
     matplotlib.use("Agg")  # Use non-interactive backend
-    import matplotlib.pyplot as plt
-    import plotly.express as px
-    import plotly.graph_objs as go
-    import seaborn as sns
-    from plotly.subplots import make_subplots
 
     VISUALIZATION_AVAILABLE = True
 except ImportError as e:
@@ -200,7 +180,7 @@ class SessionData:
 
     def __post_init__(self):
         if self.timestamp is None:
-            self.timestamp = datetime.now().isoformat()
+            self.timestamp = datetime.now(timezone.utc).isoformat()
 
 
 class SecurityManager:
@@ -263,7 +243,7 @@ class AuditLogger:
     ):
         """Log audit event with encryption for sensitive data"""
         audit_entry = {
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "session_id_hash": self.security_manager.hash_session_id(session_id),
             "user_id": user_id,
@@ -361,7 +341,7 @@ class BiasDetectionService:
 
             result = {
                 "session_id": session_data.session_id,
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "overall_bias_score": overall_score,
                 "layer_results": {
                     "preprocessing": preprocessing_result,
@@ -1063,7 +1043,7 @@ class BiasDetectionService:
             logger.error(f"Failed to create synthetic dataset: {e}")
             return None
 
-    async def _run_interpretability_analysis(self, session_data: SessionData) -> dict[str, Any]:
+    async def _run_interpretability_analysis(self, _session_data: SessionData) -> dict[str, Any]:
         """Run model interpretability analysis using SHAP/LIME"""
         try:
             if not INTERPRETABILITY_AVAILABLE:
@@ -1117,7 +1097,7 @@ class BiasDetectionService:
             logger.error(f"Response consistency analysis failed: {e}")
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _analyze_interaction_patterns(self, session_data: SessionData) -> dict[str, Any]:
+    def _analyze_interaction_patterns(self, _session_data: SessionData) -> dict[str, Any]:
         """Analyze interaction patterns for bias"""
         try:
             # Placeholder analysis
@@ -1152,7 +1132,7 @@ class BiasDetectionService:
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _analyze_engagement_levels(self, session_data: SessionData) -> dict[str, Any]:
+    def _analyze_engagement_levels(self, _session_data: SessionData) -> dict[str, Any]:
         """Analyze engagement level patterns for bias"""
         try:
             # Placeholder analysis
@@ -1183,7 +1163,7 @@ class BiasDetectionService:
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    async def _run_hf_evaluate_analysis(self, session_data: SessionData) -> dict[str, Any]:
+    async def _run_hf_evaluate_analysis(self, _session_data: SessionData) -> dict[str, Any]:
         """Run Hugging Face evaluate analysis"""
         try:
             if not HF_EVALUATE_AVAILABLE:
@@ -1201,7 +1181,7 @@ class BiasDetectionService:
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _analyze_performance_disparities(self, session_data: SessionData) -> dict[str, Any]:
+    def _analyze_performance_disparities(self, _session_data: SessionData) -> dict[str, Any]:
         """Analyze performance disparities across groups"""
         try:
             # Placeholder analysis
@@ -1317,9 +1297,7 @@ class BiasDetectionService:
             return "critical"
         if bias_score >= self.config.high_threshold:
             return "high"
-        if bias_score >= self.config.warning_threshold:
-            return "warning"
-        return "low"
+        return "warning" if bias_score >= self.config.warning_threshold else "low"
 
 
 # Initialize service
@@ -1359,7 +1337,7 @@ def health_check():
     return jsonify(
         {
             "status": "healthy",
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "version": "1.0.0",
             "components": {
                 "aif360": AIF360_AVAILABLE,
@@ -1480,7 +1458,7 @@ def export_data():
                 }
             ],
             "metadata": {
-                "export_timestamp": datetime.now().isoformat(),
+                "export_timestamp": datetime.now(timezone.utc).isoformat(),
                 "format": export_format,
                 "total_records": 1,
             },
@@ -1488,8 +1466,6 @@ def export_data():
 
         if export_format == "csv":
             # Convert to CSV format
-            import csv
-            import io
 
             output = io.StringIO()
             writer = csv.DictWriter(
@@ -1513,12 +1489,12 @@ def export_data():
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(_error):
     return jsonify({"error": "Endpoint not found"}), 404
 
 
 @app.errorhandler(500)
-def internal_error(error):
+def internal_error(_error):
     return jsonify({"error": "Internal server error"}), 500
 
 

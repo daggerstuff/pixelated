@@ -28,7 +28,7 @@ on:
 env:
   NODE_VERSION: 22.16.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 
+  PNPM_VERSION: 10.14.0
 
 jobs:
   security-scan:
@@ -173,8 +173,8 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           POSTGRES_DB: test_db
         options: >-
           --health-cmd pg_isready
@@ -237,8 +237,8 @@ jobs:
           echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/test_db" >> .env.test
           echo "REDIS_URL=redis://localhost:6379" >> .env.test
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
 
       - name: Run unit tests
         run: pnpm test:unit --coverage
@@ -325,8 +325,8 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           POSTGRES_DB: test_db
         options: >-
           --health-cmd pg_isready
@@ -390,8 +390,8 @@ jobs:
           fi
           echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/test_db" >> .env.test
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
@@ -548,16 +548,6 @@ jobs:
         run: |
           docker build -t bias-detection-engine:${{ github.sha }} .
           docker tag bias-detection-engine:${{ github.sha }} bias-detection-engine:latest
-
-      - name: Configure AWS credentials
-        if: github.ref == 'refs/heads/master'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
 
       - name: Deploy to staging
         if: github.ref == 'refs/heads/develop'

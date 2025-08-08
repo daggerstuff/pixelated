@@ -9,7 +9,7 @@ permissions: read-all
 
 env:
   NODE_VERSION: 22.16.0
-  PNPM_VERSION: 
+  PNPM_VERSION: 10.14.0
   NODE_ENV: production
 
 jobs:
@@ -17,6 +17,8 @@ jobs:
     name: Production Health Check
     runs-on: ubuntu-latest
     # Only run for scheduled runs or when explicitly selecting production
+    env:
+      BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,14 +52,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Resolve APP_URL (Production)
+        id: resolve-app-url-prod
+        run: |
+          BASE_URL="${{ vars.APP_URL }}"
+          if [ -z "$BASE_URL" ]; then
+            BASE_URL="${{ secrets.APP_URL }}"
+          fi
+          if [ -z "$BASE_URL" ]; then
+            echo "::error::APP_URL is not set. Define repository/environment variable 'APP_URL' or secret 'APP_URL' for Production."
+            exit 1
+          fi
+          echo "Using BASE_URL: $BASE_URL"
+          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
+
       - name: Run health checks
         id: health-check
         run: |
-          echo "🏥 Running PRODUCTION health checks against ${{ vars.APP_URL }}"
+          echo "🏥 Running PRODUCTION health checks against $BASE_URL"
           echo "ℹ️  Production failures will trigger alerts and notifications"
 
           # Basic endpoint check
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.APP_URL }})
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
           echo "HTTP Status: $HTTP_STATUS"
 
           if [[ "$HTTP_STATUS" != "200" ]]; then
@@ -67,7 +83,7 @@ jobs:
           fi
 
           # API health check (using the simple health endpoint)
-          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.APP_URL }}/api/health)
+          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health")
           echo "API Status: $API_STATUS"
 
           # Only warn but don't fail if API health check fails
@@ -106,10 +122,10 @@ jobs:
         if: steps.health-check.outputs.status == 'passing'
         run: |
           pnpm exec playwright install --with-deps chromium
-          echo "Running Playwright tests against PRODUCTION: ${{ vars.APP_URL }}"
+          echo "Running Playwright tests against PRODUCTION: $BASE_URL"
 
           # Run tests and store exit code to determine if any tests failed
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL=${{ vars.APP_URL }} \
+          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
             pnpm exec playwright test --config=temp-playwright.config.js --reporter=list || true
 
           echo "✅ PRODUCTION monitoring tests completed"
@@ -132,7 +148,7 @@ jobs:
           slack-message: |
             🚨 *PRODUCTION MONITORING FAILED*
             Environment: Production (Critical Alert)
-            URL: ${{ vars.APP_URL }}
+            URL: ${{ env.BASE_URL }}
             Time: $(date)
             ${{ steps.run-tests.outputs.status == 'failure' && '⚠️ One or more monitoring tests failed. Check the GitHub Action for details.' || '' }}
 
@@ -143,6 +159,8 @@ jobs:
     name: Staging Health Check
     runs-on: ubuntu-latest
     # Only run when explicitly selecting staging
+    env:
+      BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -176,14 +194,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Resolve APP_URL (Staging)
+        id: resolve-app-url-staging
+        run: |
+          BASE_URL="${{ vars.APP_URL }}"
+          if [ -z "$BASE_URL" ]; then
+            BASE_URL="${{ secrets.APP_URL }}"
+          fi
+          if [ -z "$BASE_URL" ]; then
+            BASE_URL="https://pixelatedempathy.com"
+            echo "::notice::APP_URL not set for Staging; defaulting to $BASE_URL"
+          fi
+          echo "Using BASE_URL: $BASE_URL"
+          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
+
       - name: Run health checks
         id: health-check
         run: |
-          echo "🏥 Running STAGING health checks against ${{ vars.APP_URL }}"
+          echo "🏥 Running STAGING health checks against $BASE_URL"
           echo "ℹ️  Staging failures will warn but not trigger critical alerts"
 
           # Basic endpoint check
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.APP_URL }})
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
           echo "HTTP Status: $HTTP_STATUS"
 
           if [[ "$HTTP_STATUS" != "200" ]]; then
@@ -196,7 +228,7 @@ jobs:
           fi
 
           # API health check (using the simple health endpoint)
-          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.APP_URL }}/api/health)
+          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health")
           echo "API Status: $API_STATUS"
 
           # Only warn but don't fail if API health check fails
@@ -238,10 +270,10 @@ jobs:
         if: steps.health-check.outputs.status == 'passing'
         run: |
           pnpm exec playwright install --with-deps chromium
-          echo "Running Playwright tests against STAGING: ${{ vars.APP_URL }}"
+          echo "Running Playwright tests against STAGING: $BASE_URL"
 
           # Run tests and store exit code to determine if any tests failed
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL=${{ vars.APP_URL }} \
+          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
             pnpm exec playwright test --config=temp-playwright.config.js --reporter=list || true
 
           echo "✅ STAGING monitoring tests completed"
@@ -261,6 +293,8 @@ jobs:
     name: Preview Health Check
     runs-on: ubuntu-latest
     # Only run when explicitly selecting preview
+    env:
+      BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -294,15 +328,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Resolve APP_URL (Preview)
+        id: resolve-app-url-preview
+        run: |
+          BASE_URL="${{ vars.APP_URL }}"
+          if [ -z "$BASE_URL" ]; then
+            BASE_URL="${{ secrets.APP_URL }}"
+          fi
+          if [ -z "$BASE_URL" ]; then
+            BASE_URL="https://pixelatedempathy.com"
+            echo "::notice::APP_URL not set for Preview; defaulting to $BASE_URL"
+          fi
+          echo "Using BASE_URL: $BASE_URL"
+          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
+
       - name: Run health checks
         id: health-check
         run: |
-          echo "🏥 Running PREVIEW health checks against ${{ vars.APP_URL }}"
+          echo "🏥 Running PREVIEW health checks against $BASE_URL"
           echo "ℹ️  Preview failures will warn but not trigger alerts - this is expected for preview builds"
           echo "ℹ️  Preview sites may be temporarily unavailable during deployments or restarts"
 
           # Basic endpoint check
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.APP_URL }})
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
           echo "HTTP Status: $HTTP_STATUS"
 
           if [[ "$HTTP_STATUS" != "200" ]]; then
@@ -316,7 +364,7 @@ jobs:
           fi
 
           # API health check (using the simple health endpoint)
-          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.APP_URL }}/api/health)
+          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health")
           echo "API Status: $API_STATUS"
 
           # Only warn but don't fail if API health check fails
@@ -359,11 +407,11 @@ jobs:
         if: steps.health-check.outputs.status == 'passing'
         run: |
           pnpm exec playwright install --with-deps chromium
-          echo "Running Playwright tests against PREVIEW: ${{ vars.APP_URL }}"
+          echo "Running Playwright tests against PREVIEW: $BASE_URL"
           echo "Note: Preview test failures are informational and do not indicate production issues"
 
           # Run tests and store exit code to determine if any tests failed
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL=${{ vars.APP_URL }} \
+          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
             pnpm exec playwright test --config=temp-playwright.config.js > playwright-output.log 2>&1
           TEST_EXIT_CODE=$?
 
@@ -396,24 +444,40 @@ jobs:
     # Only run performance checks for production
     permissions:
       contents: read
+    env:
+      BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Validate APP_URL for Performance
+        run: |
+          if [ -z "${{ env.BASE_URL }}" ]; then
+            echo "::notice::APP_URL not configured; skipping Lighthouse performance checks."
+            echo "SKIP_LIGHTHOUSE=true" >> $GITHUB_ENV
+          else
+            echo "SKIP_LIGHTHOUSE=false" >> $GITHUB_ENV
+          fi
+
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v11
+        if: env.SKIP_LIGHTHOUSE == 'false'
         with:
           urls: |
-            ${{ vars.APP_URL }}
-            ${{ vars.APP_URL }}/login
-            ${{ vars.APP_URL }}/dashboard
+            ${{ env.BASE_URL }}
+            ${{ env.BASE_URL }}/login
+            ${{ env.BASE_URL }}/dashboard
           configPath: ./.github/lighthouse-config.json
           uploadArtifacts: true
           temporaryPublicStorage: true
 
       - name: Check for critical performance issues
-        run: |
-          echo "Analyzing performance metrics for PRODUCTION..."
+        if: env.SKIP_LIGHTHOUSE == 'false'
+        run: echo "Analyzing performance metrics for PRODUCTION..."
+
+      - name: Skip notice
+        if: env.SKIP_LIGHTHOUSE == 'true'
+        run: echo "Skipping Lighthouse run due to missing APP_URL. Configure repository/environment variable 'APP_URL' to enable."
 
       - name: Notify performance issues
         if: failure()
