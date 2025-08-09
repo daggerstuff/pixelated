@@ -1,7 +1,12 @@
 import { MongoAuthService } from '@/services/mongoAuth.service'
 import { createAuditLog, AuditEventType } from '@/lib/audit'
 
-export const POST = async ({ cookies }: { request: Request; cookies: any }) => {
+type CookieStore = {
+  get(name: string): { value: string } | undefined
+  delete(name: string, options?: { path?: string }): void
+}
+
+export const POST = async ({ cookies }: { cookies: CookieStore }) => {
   try {
     const authService = new MongoAuthService()
 

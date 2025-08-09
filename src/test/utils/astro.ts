@@ -17,6 +17,7 @@ export async function renderAstro<Props extends Record<string, unknown>>(
   slotContent?: string,
 ): Promise<{
   astroContainer: HTMLDivElement
+  container: HTMLDivElement
   html: string
   querySelector: (selector: string) => Element | null
   querySelectorAll: (selector: string) => NodeListOf<Element>
@@ -29,6 +30,7 @@ export async function renderAstro<Props extends Record<string, unknown>>(
   // Return a testing-friendly interface
   return {
     astroContainer: container,
+    container,
     html,
     querySelector: (selector: string) => container.querySelector(selector),
     querySelectorAll: (selector: string) =>

@@ -92,6 +92,7 @@ export interface BiasAnalysisResults {
 }
 
 export interface PresetScenario {
+  [x: string]: any
   id: string
   name: string
   description: string

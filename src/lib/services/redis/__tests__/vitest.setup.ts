@@ -21,10 +21,4 @@ declare global {
   }
 }
 
-// Extend Vi.Assertion interface
-declare module 'vitest' {
-  interface Assertion extends CustomMatchers {}
-  interface AsymmetricMatchersContaining extends CustomMatchers {}
-}
-
 export {}

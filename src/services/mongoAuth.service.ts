@@ -46,6 +46,8 @@ export class MongoAuthService {
       emailVerified: false,
       createdAt: new Date(),
       updatedAt: new Date(),
+      id: '',
+      profile: undefined
     }
 
     const result = await usersCollection.insertOne(newUser as User)
@@ -165,7 +167,7 @@ export class MongoAuthService {
         session: updatedSession!,
         accessToken: newAccessToken,
       }
-    } catch (_error) {
+  } catch {
       throw new Error('Failed to refresh session')
     }
   }
@@ -173,7 +175,7 @@ export class MongoAuthService {
   async verifyAuthToken(token: string): Promise<AuthTokenPayload> {
     try {
       return this.verifyToken(token) as AuthTokenPayload
-    } catch (_error) {
+  } catch {
       throw new Error('Invalid token')
     }
   }
@@ -213,9 +215,13 @@ export class MongoAuthService {
   }
 
   private generateToken(payload: AuthTokenPayload): string {
-    // Using any to bypass the complex type inference issue
-    return (jwt.sign as any)(payload, this.JWT_SECRET, {
-      expiresIn: this.JWT_EXPIRES_IN,
+    // Narrow cast through unknown to avoid any
+    return (jwt.sign as unknown as (
+      payload: string | object | Buffer,
+      secretOrPrivateKey: jwt.Secret,
+      options?: jwt.SignOptions,
+    ) => string)(payload, this.JWT_SECRET, {
+      expiresIn: this.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     })
   }
 

@@ -100,7 +100,13 @@ jobs:
       - name: Build application
         run: |
           export NODE_ENV=production
-          export ASTRO_CONFIG_FILE=astro.config.azure.mjs
+          # Use Azure-specific Astro config if present; otherwise fallback to default
+          if [ -f astro.config.azure.mjs ]; then
+            export ASTRO_CONFIG_FILE=astro.config.azure.mjs
+            echo "Using astro.config.azure.mjs"
+          else
+            echo "astro.config.azure.mjs not found; using default astro.config.mjs"
+          fi
           export AZURE_DEPLOYMENT_TYPE=server
           pnpm build
 
@@ -112,6 +118,7 @@ jobs:
             dist/
             package.json
             astro.config.azure.mjs
+          if-no-files-found: ignore
           retention-days: 1
 
   # Deploy Infrastructure
@@ -133,6 +140,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy Bicep template
+        id: bicep
         uses: azure/arm-deploy@v1
         with:
           scope: resourcegroup
@@ -140,70 +148,59 @@ jobs:
           resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
           template: infra/main.bicep
           parameters: |
-            appName=${{ env.AZURE_APP_NAME }}
-            environment=${{ needs.build.outputs.environment }}
+            # Parameters must match infra/main.bicep
+            environmentName=${{ needs.build.outputs.environment }}
             location=${{ env.AZURE_LOCATION }}
-            enableAzureOpenAI=true
-            enableStorage=true
-            enableMonitoring=true
-            githubRepoUrl=${{ github.server_url }}/${{ github.repository }}
+            # resourcePrefix and createdDate have sensible defaults in the template
           failOnStdErr: false
 
       - name: Get deployment outputs
         id: deployment
         run: |
-          OUTPUTS=$(az deployment group show \
-            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --name $(az deployment group list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv) \
-            --query 'properties.outputs' -o json)
+          OUTPUTS='${{ steps.bicep.outputs.deploymentOutputs }}'
+          echo "Raw deployment outputs: $OUTPUTS"
 
-
-          echo "outputs=$OUTPUTS" >> $GITHUB_OUTPUT
-
-
-          # Extract specific outputs
-          APP_SERVICE_URL=$(echo "$OUTPUTS" | jq -r '.appServiceUrl.value')
-          CONTAINER_REGISTRY=$(echo "$OUTPUTS" | jq -r '.containerRegistryLoginServer.value')
+          # Extract specific outputs (must exist in infra/main.bicep)
           KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value')
 
-
-          echo "app-service-url=$APP_SERVICE_URL" >> $GITHUB_OUTPUT
-          echo "container-registry=$CONTAINER_REGISTRY" >> $GITHUB_OUTPUT
           echo "key-vault-name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
 
       - name: Store secrets in Key Vault
+        env:
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
         run: |
           # Store Azure OpenAI secrets
-          if [[ -n "${{ secrets.AZURE_OPENAI_API_KEY }}" ]]; then
+          if [[ -n "$AZURE_OPENAI_API_KEY" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
               --name "azure-openai-api-key" \
-              --value "${{ secrets.AZURE_OPENAI_API_KEY }}"
+              --value "$AZURE_OPENAI_API_KEY"
           fi
 
 
-          if [[ -n "${{ secrets.AZURE_OPENAI_ENDPOINT }}" ]]; then
+          if [[ -n "$AZURE_OPENAI_ENDPOINT" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
               --name "azure-openai-endpoint" \
-              --value "${{ secrets.AZURE_OPENAI_ENDPOINT }}"
+              --value "$AZURE_OPENAI_ENDPOINT"
           fi
 
 
           # Store Supabase secrets
-          if [[ -n "${{ secrets.SUPABASE_URL }}" ]]; then
+          if [[ -n "$SUPABASE_URL" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
               --name "supabase-url" \
-              --value "${{ secrets.SUPABASE_URL }}"
+              --value "$SUPABASE_URL"
           fi
 
 
-          if [[ -n "${{ secrets.SUPABASE_ANON_KEY }}" ]]; then
+          if [[ -n "$SUPABASE_ANON_KEY" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
               --name "supabase-anon-key" \
-              --value "${{ secrets.SUPABASE_ANON_KEY }}"
+              --value "$SUPABASE_ANON_KEY"
           fi
 
   # Build and Push Docker Image

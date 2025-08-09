@@ -107,7 +107,7 @@ jobs:
           # Get validation history and results
           STATUS_CODE=$(curl -s -o validation_history.json -w "%{http_code}" \
             "${APP_URL}/api/ai/validation/history?limit=1" \
-            -H "Authorization: Bearer ${{ secrets.VALIDATION_API_TOKEN }}")
+            -H "Authorization: Bearer $VALIDATION_API_TOKEN")
 
           if [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
             echo "success=true" >> "$GITHUB_OUTPUT"

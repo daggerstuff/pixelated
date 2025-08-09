@@ -23,24 +23,24 @@ on:
     outputs:
       security_score:
         description: "Overall security score"
-        value: ${{ jobs.security-summary.outputs.security_score }}
+        value: ${{ jobs.security_summary.outputs.security_score }}
       compliance_status:
         description: "Compliance validation status"
-        value: ${{ jobs.compliance-summary.outputs.status }}
+        value: ${{ jobs.compliance_summary.outputs.status }}
 
 env:
-  NODE_VERSION: 22.16.0
-  PYTHON_VERSION: 3.11
-  PNPM_VERSION: 
+  NODE_VERSION: '22.16.0'
+  PYTHON_VERSION: '3.11'
+  PNPM_VERSION: '10.14.0'
 
 jobs:
   # Advanced Threat Detection
-  threat-detection:
+  threat_detection:
     name: Advanced Threat Detection
     runs-on: ubuntu-latest
     outputs:
-      threat_level: ${{ steps.detect-threats.outputs.threat_level }}
-      threats_found: ${{ steps.detect-threats.outputs.threats_found }}
+      threat_level: ${{ steps.detect_threats.outputs.threat_level }}
+      threats_found: ${{ steps.detect_threats.outputs.threats_found }}
       
     steps:
       - name: Checkout code
@@ -59,7 +59,7 @@ jobs:
           pip install requests beautifulsoup4 lxml
 
       - name: Advanced Threat Detection
-        id: detect-threats
+        id: detect_threats
         run: |
           echo "🔍 Running advanced threat detection..."
           
@@ -192,32 +192,32 @@ jobs:
       - name: Generate Threat Detection Report
         run: |
           echo "## 🔍 Advanced Threat Detection Report" >> $GITHUB_STEP_SUMMARY
-          echo "**Threat Level:** ${{ steps.detect-threats.outputs.threat_level }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Threat Level:** ${{ steps.detect_threats.outputs.threat_level }}" >> $GITHUB_STEP_SUMMARY
           
-          if [[ "${{ steps.detect-threats.outputs.threat_level }}" == "low" ]]; then
+          if [[ "${{ steps.detect_threats.outputs.threat_level }}" == "low" ]]; then
             echo "✅ No significant threats detected" >> $GITHUB_STEP_SUMMARY
           else
             echo "**Threats Detected:**" >> $GITHUB_STEP_SUMMARY
-            echo '${{ steps.detect-threats.outputs.threats_found }}' | jq -r '.[]' | while read threat; do
+            echo '${{ steps.detect_threats.outputs.threats_found }}' | jq -r '.[]' | while read threat; do
               echo "- ⚠️ $threat" >> $GITHUB_STEP_SUMMARY
             done
           fi
 
   # HIPAA Compliance Deep Scan
-  hipaa-deep-scan:
+  hipaa_deep_scan:
     name: HIPAA Compliance Deep Scan
     runs-on: ubuntu-latest
-    if: inputs.compliance_level == 'hipaa' || inputs.compliance_level == 'enterprise'
+    if: ${{ inputs.compliance_level == 'hipaa' || inputs.compliance_level == 'enterprise' }}
     outputs:
-      hipaa_score: ${{ steps.hipaa-scan.outputs.score }}
-      violations: ${{ steps.hipaa-scan.outputs.violations }}
+      hipaa_score: ${{ steps.hipaa_scan.outputs.score }}
+      violations: ${{ steps.hipaa_scan.outputs.violations }}
       
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
       - name: HIPAA Compliance Deep Scan
-        id: hipaa-scan
+        id: hipaa_scan
         run: |
           echo "🏥 Running HIPAA compliance deep scan..."
           
@@ -315,35 +315,35 @@ jobs:
       - name: Generate HIPAA Compliance Report
         run: |
           echo "## 🏥 HIPAA Compliance Deep Scan Report" >> $GITHUB_STEP_SUMMARY
-          echo "**Compliance Score:** ${{ steps.hipaa-scan.outputs.score }}/100" >> $GITHUB_STEP_SUMMARY
+          echo "**Compliance Score:** ${{ steps.hipaa_scan.outputs.score }}/100" >> $GITHUB_STEP_SUMMARY
           
-          if [[ "${{ steps.hipaa-scan.outputs.score }}" -ge "90" ]]; then
+          if [[ "${{ steps.hipaa_scan.outputs.score }}" -ge "90" ]]; then
             echo "✅ **Excellent HIPAA compliance!**" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ steps.hipaa-scan.outputs.score }}" -ge "80" ]]; then
+          elif [[ "${{ steps.hipaa_scan.outputs.score }}" -ge "80" ]]; then
             echo "⚠️ **Good HIPAA compliance with minor issues**" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **HIPAA compliance issues require attention**" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "**Violations:**" >> $GITHUB_STEP_SUMMARY
-          echo '${{ steps.hipaa-scan.outputs.violations }}' | jq -r '.[]' | while read violation; do
+          echo '${{ steps.hipaa_scan.outputs.violations }}' | jq -r '.[]' | while read violation; do
             echo "- $violation" >> $GITHUB_STEP_SUMMARY
           done
 
   # Mental Health Data Protection Audit
-  mental-health-data-audit:
+  mental_health_data_audit:
     name: Mental Health Data Protection Audit
     runs-on: ubuntu-latest
     outputs:
-      protection_score: ${{ steps.data-audit.outputs.score }}
-      recommendations: ${{ steps.data-audit.outputs.recommendations }}
+      protection_score: ${{ steps.data_audit.outputs.score }}
+      recommendations: ${{ steps.data_audit.outputs.recommendations }}
       
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
       - name: Mental Health Data Protection Audit
-        id: data-audit
+        id: data_audit
         run: |
           echo "🧠 Auditing mental health data protection..."
           
@@ -408,39 +408,39 @@ jobs:
       - name: Generate Data Protection Report
         run: |
           echo "## 🧠 Mental Health Data Protection Audit" >> $GITHUB_STEP_SUMMARY
-          echo "**Protection Score:** ${{ steps.data-audit.outputs.score }}/100" >> $GITHUB_STEP_SUMMARY
+          echo "**Protection Score:** ${{ steps.data_audit.outputs.score }}/100" >> $GITHUB_STEP_SUMMARY
           
-          if [[ "${{ steps.data-audit.outputs.score }}" -ge "90" ]]; then
+          if [[ "${{ steps.data_audit.outputs.score }}" -ge "90" ]]; then
             echo "✅ **Excellent data protection measures!**" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ steps.data-audit.outputs.score }}" -ge "75" ]]; then
+          elif [[ "${{ steps.data_audit.outputs.score }}" -ge "75" ]]; then
             echo "⚠️ **Good data protection with room for improvement**" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Data protection requires significant enhancement**" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "**Recommendations:**" >> $GITHUB_STEP_SUMMARY
-          echo '${{ steps.data-audit.outputs.recommendations }}' | jq -r '.[]' | while read rec; do
+          echo '${{ steps.data_audit.outputs.recommendations }}' | jq -r '.[]' | while read rec; do
             echo "- $rec" >> $GITHUB_STEP_SUMMARY
           done
 
   # Security Policy Enforcement
-  security-policy-enforcement:
+  security_policy_enforcement:
     name: Security Policy Enforcement
     runs-on: ubuntu-latest
-    needs: [threat-detection, hipaa-deep-scan, mental-health-data-audit]
-    if: always()
+    needs: [threat_detection, hipaa_deep_scan, mental_health_data_audit]
+    if: ${{ always() }}
     outputs:
-      enforcement_status: ${{ steps.enforce-policies.outputs.status }}
+      enforcement_status: ${{ steps.enforce_policies.outputs.status }}
       
     steps:
       - name: Enforce Security Policies
-        id: enforce-policies
+        id: enforce_policies
         run: |
           echo "🛡️ Enforcing security policies..."
           
-          THREAT_LEVEL="${{ needs.threat-detection.outputs.threat_level }}"
-          HIPAA_SCORE="${{ needs.hipaa-deep-scan.outputs.score }}"
-          PROTECTION_SCORE="${{ needs.mental-health-data-audit.outputs.protection_score }}"
+          THREAT_LEVEL="${{ needs.threat_detection.outputs.threat_level }}"
+          HIPAA_SCORE="${{ needs.hipaa_deep_scan.outputs.hipaa_score }}"
+          PROTECTION_SCORE="${{ needs.mental_health_data_audit.outputs.protection_score }}"
           ENVIRONMENT="${{ inputs.environment }}"
           COMPLIANCE_LEVEL="${{ inputs.compliance_level }}"
           
@@ -499,11 +499,11 @@ jobs:
       - name: Generate Policy Enforcement Report
         run: |
           echo "## 🛡️ Security Policy Enforcement" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** ${{ steps.enforce-policies.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ steps.enforce_policies.outputs.status }}" >> $GITHUB_STEP_SUMMARY
           echo "**Environment:** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
           echo "**Compliance Level:** ${{ inputs.compliance_level }}" >> $GITHUB_STEP_SUMMARY
           
-          case "${{ steps.enforce-policies.outputs.status }}" in
+          case "${{ steps.enforce_policies.outputs.status }}" in
             "passed")
               echo "✅ **All security policies satisfied**" >> $GITHUB_STEP_SUMMARY
               ;;
@@ -516,22 +516,22 @@ jobs:
           esac
 
   # Security Summary
-  security-summary:
+  security_summary:
     name: Security Summary
     runs-on: ubuntu-latest
-    needs: [threat-detection, hipaa-deep-scan, mental-health-data-audit, security-policy-enforcement]
-    if: always()
+    needs: [threat_detection, hipaa_deep_scan, mental_health_data_audit, security_policy_enforcement]
+    if: ${{ always() }}
     outputs:
-      security_score: ${{ steps.calculate-score.outputs.score }}
+      security_score: ${{ steps.calculate_score.outputs.score }}
       
     steps:
       - name: Calculate Overall Security Score
-        id: calculate-score
+        id: calculate_score
         run: |
-          THREAT_LEVEL="${{ needs.threat-detection.outputs.threat_level }}"
-          HIPAA_SCORE="${{ needs.hipaa-deep-scan.outputs.score }}"
-          PROTECTION_SCORE="${{ needs.mental-health-data-audit.outputs.protection_score }}"
-          ENFORCEMENT_STATUS="${{ needs.security-policy-enforcement.outputs.enforcement_status }}"
+          THREAT_LEVEL="${{ needs.threat_detection.outputs.threat_level }}"
+          HIPAA_SCORE="${{ needs.hipaa_deep_scan.outputs.hipaa_score }}"
+          PROTECTION_SCORE="${{ needs.mental_health_data_audit.outputs.protection_score }}"
+          ENFORCEMENT_STATUS="${{ needs.security_policy_enforcement.outputs.enforcement_status }}"
           
           # Base security score calculation
           SECURITY_SCORE=100
@@ -579,21 +579,21 @@ jobs:
           echo "**Policy Enforcement:** $ENFORCEMENT_STATUS" >> $GITHUB_STEP_SUMMARY
 
   # Compliance Summary
-  compliance-summary:
+  compliance_summary:
     name: Compliance Summary
     runs-on: ubuntu-latest
-    needs: [hipaa-deep-scan, mental-health-data-audit, security-policy-enforcement]
-    if: always()
+    needs: [hipaa_deep_scan, mental_health_data_audit, security_policy_enforcement]
+    if: ${{ always() }}
     outputs:
-      status: ${{ steps.compliance-status.outputs.status }}
+      status: ${{ steps.compliance_status.outputs.status }}
       
     steps:
       - name: Determine Compliance Status
-        id: compliance-status
+        id: compliance_status
         run: |
-          HIPAA_SCORE="${{ needs.hipaa-deep-scan.outputs.score }}"
-          PROTECTION_SCORE="${{ needs.mental-health-data-audit.outputs.protection_score }}"
-          ENFORCEMENT_STATUS="${{ needs.security-policy-enforcement.outputs.enforcement_status }}"
+          HIPAA_SCORE="${{ needs.hipaa_deep_scan.outputs.hipaa_score }}"
+          PROTECTION_SCORE="${{ needs.mental_health_data_audit.outputs.protection_score }}"
+          ENFORCEMENT_STATUS="${{ needs.security_policy_enforcement.outputs.enforcement_status }}"
           COMPLIANCE_LEVEL="${{ inputs.compliance_level }}"
           
           # Determine overall compliance status

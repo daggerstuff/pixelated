@@ -2,7 +2,6 @@
  * Unit tests for Educational Context Recognition System
  */
 
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import {
   EducationalContextRecognizer,
   createEducationalContextRecognizer,
@@ -66,6 +65,11 @@ describe('EducationalContextRecognizer', () => {
 
         for (const query of queries) {
           const result = await recognizer.recognizeEducationalContext(query)
+          if (!result.isEducational) {
+            // Log actual result for debugging
+            // eslint-disable-next-line no-console
+            console.log('DEBUG FAIL: Definition question result:', result)
+          }
           expect(result.isEducational).toBe(true)
           expect(result.educationalType).toBe(EducationalType.DEFINITION)
           expect(result.confidence).toBeGreaterThan(0.5)
@@ -82,6 +86,11 @@ describe('EducationalContextRecognizer', () => {
 
         for (const query of queries) {
           const result = await recognizer.recognizeEducationalContext(query)
+          if (!result.isEducational) {
+            // Log actual result for debugging
+            // eslint-disable-next-line no-console
+            console.log('DEBUG FAIL: Explanation question result:', result)
+          }
           expect(result.isEducational).toBe(true)
           expect(result.educationalType).toBe(EducationalType.EXPLANATION)
           expect(result.confidence).toBeGreaterThan(0.5)
@@ -98,6 +107,11 @@ describe('EducationalContextRecognizer', () => {
 
         for (const query of queries) {
           const result = await recognizer.recognizeEducationalContext(query)
+          if (!result.isEducational) {
+            // Log actual result for debugging
+            // eslint-disable-next-line no-console
+            console.log('DEBUG FAIL: Comparison question result:', result)
+          }
           expect(result.isEducational).toBe(true)
           expect(result.educationalType).toBe(EducationalType.COMPARISON)
           expect(result.confidence).toBeGreaterThan(0.5)
@@ -114,6 +128,11 @@ describe('EducationalContextRecognizer', () => {
 
         for (const query of queries) {
           const result = await recognizer.recognizeEducationalContext(query)
+          if (!result.isEducational) {
+            // Log actual result for debugging
+            // eslint-disable-next-line no-console
+            console.log('DEBUG FAIL: Symptom question result:', result)
+          }
           expect(result.isEducational).toBe(true)
           expect(result.educationalType).toBe(EducationalType.SYMPTOMS)
           expect(result.confidence).toBeGreaterThan(0.5)
@@ -138,6 +157,11 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(
             test.query,
           )
+          if (result.topicArea !== test.expectedTopic) {
+            // Log actual topic area for debugging
+            // eslint-disable-next-line no-console
+            console.log('DEBUG FAIL: Topic mapping result:', { query: test.query, actual: result.topicArea, expected: test.expectedTopic, result })
+          }
           expect(result.topicArea).toBe(test.expectedTopic)
         }
       })
@@ -176,7 +200,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -240,7 +264,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -255,7 +279,7 @@ describe('EducationalContextRecognizer', () => {
         )
 
         // Verify that user context was passed to AI
-        const callArgs = (mockAIService.createChatCompletion as Mock).mock
+        const callArgs = (mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mock
           .calls[0]
         const systemMessage = callArgs[0][0].content
         expect(systemMessage).toContain('Education Level: graduate')
@@ -295,7 +319,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -305,7 +329,7 @@ describe('EducationalContextRecognizer', () => {
           conversationHistory,
         )
 
-        const callArgs = (mockAIService.createChatCompletion as Mock).mock
+        const callArgs = (mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mock
           .calls[0]
         const userMessage = callArgs[0][1].content
         expect(userMessage).toContain('Previous context:')
@@ -346,7 +370,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -389,7 +413,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -431,7 +455,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -450,7 +474,7 @@ describe('EducationalContextRecognizer', () => {
 
     describe('error handling', () => {
       it('should handle AI service errors gracefully', async () => {
-        ;(mockAIService.createChatCompletion as Mock).mockRejectedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockRejectedValue(
           new Error('AI service error'),
         )
 
@@ -475,7 +499,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           malformedResponse,
         )
 
@@ -514,7 +538,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -550,7 +574,7 @@ describe('EducationalContextRecognizer', () => {
           ],
         }
 
-        ;(mockAIService.createChatCompletion as Mock).mockResolvedValue(
+        ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mockResolvedValue(
           aiResponse,
         )
 
@@ -598,17 +622,19 @@ describe('EducationalContextRecognizer', () => {
         ],
       }))
 
-      ;(mockAIService.createChatCompletion as Mock)
+      ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce(aiResponses[0])
         .mockResolvedValueOnce(aiResponses[1])
         .mockResolvedValueOnce(aiResponses[2])
 
       const results = await recognizer.recognizeBatch(queries)
 
+      expect(results).toBeDefined()
+      expect(Array.isArray(results)).toBe(true)
       expect(results).toHaveLength(3)
-      expect(results[0].educationalType).toBe(EducationalType.DEFINITION)
-      expect(results[1].educationalType).toBe(EducationalType.EXPLANATION)
-      expect(results[2].educationalType).toBe(EducationalType.SYMPTOMS)
+      expect(results[0]?.educationalType).toBe(EducationalType.DEFINITION)
+      expect(results[1]?.educationalType).toBe(EducationalType.EXPLANATION)
+      expect(results[2]?.educationalType).toBe(EducationalType.SYMPTOMS)
     })
   })
 

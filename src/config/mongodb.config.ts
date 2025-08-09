@@ -13,13 +13,13 @@ interface MongoConfig {
     heartbeatFrequencyMS?: number
     retryWrites?: boolean
     retryReads?: boolean
-    compressors?: string[]
+    compressors?: ('zlib' | 'none' | 'snappy' | 'zstd')[]
     directConnection?: boolean
   }
 }
 
 class MongoDB {
-  [x: string]: any
+  [x: string]: unknown
   private static instance: MongoDB
   private client: MongoClient | null = null
   private db: Db | null = null
@@ -27,8 +27,8 @@ class MongoDB {
 
   private constructor() {
     this.config = {
-      uri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
-      dbName: process.env.MONGODB_DB_NAME || 'pixelated_empathy',
+  uri: process.env['MONGODB_URI'] || 'mongodb://localhost:27017',
+  dbName: process.env['MONGODB_DB_NAME'] || 'pixelated_empathy',
       options: {
         // Connection pool settings
         maxPoolSize: 10,
@@ -46,7 +46,7 @@ class MongoDB {
         retryReads: true,
 
         // Compression for better performance
-        compressors: ['zlib'],
+  compressors: ['zlib'],
       },
     }
   }
@@ -97,7 +97,7 @@ class MongoDB {
       if (!this.db) {
         await this.connect()
       }
-      await this.db.admin().ping()
+  await this.db!.admin().ping()
       return true
     } catch (error) {
       console.error('MongoDB health check failed:', error)

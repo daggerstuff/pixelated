@@ -52,7 +52,7 @@ export interface AIMetrics {
   tokensUsed: number
   responseTime: number
   timestamp: Date
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface BiasDetection {
@@ -149,6 +149,6 @@ export async function verifyAuthToken(
   return {
     userId: decodedPayload.userId,
     role: decodedPayload.role,
-    session: token,
+    session: token ?? '',
   }
 }

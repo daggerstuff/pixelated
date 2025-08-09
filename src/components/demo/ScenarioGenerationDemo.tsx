@@ -1,11 +1,5 @@
 import { useState } from 'react'
 
-interface ScenarioType {
-  id: string
-  label: string
-  icon: string
-}
-
 interface GeneratedScenario {
   client: {
     name: string
@@ -41,7 +35,7 @@ export default function ScenarioGenerationDemo() {
       anxiety: {
         client: {
           name: 'Sarah Martinez',
-          age: 28,
+          age: '28',
           occupation: 'Marketing Manager',
           presenting: 'Generalized anxiety with panic attacks'
         },
@@ -63,7 +57,7 @@ export default function ScenarioGenerationDemo() {
       depression: {
         client: {
           name: 'Michael Chen',
-          age: 35,
+          age: '35',
           occupation: 'Software Developer',
           presenting: 'Major depressive episode'
         },

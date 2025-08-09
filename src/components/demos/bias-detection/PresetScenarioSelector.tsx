@@ -150,7 +150,7 @@ export const PresetScenarioSelector: React.FC<PresetScenarioSelectorProps> = ({
               }
             }}
             tabIndex={disabled ? -1 : 0}
-            aria-label={`Select scenario: ${scenario.title}`}
+            aria-label={`Select scenario: ${scenario['title']}`}
             aria-disabled={disabled}
             onMouseEnter={() => setPreviewScenario(scenario)}
             onMouseLeave={() => setPreviewScenario(null)}
@@ -223,8 +223,8 @@ export const PresetScenarioSelector: React.FC<PresetScenarioSelectorProps> = ({
               <ul className="text-xs text-gray-600 space-y-1">
                 {scenario.learningObjectives
                   .slice(0, 2)
-                  .map((objective, index) => (
-                    <li key={index} className="flex items-start">
+                  .map((objective) => (
+                    <li key={objective} className="flex items-start">
                       <span className="text-blue-500 mr-1">•</span>
                       {objective}
                     </li>
@@ -331,8 +331,8 @@ export const PresetScenarioSelector: React.FC<PresetScenarioSelectorProps> = ({
                 </h4>
                 <ul className="text-sm text-gray-600 space-y-1">
                   {previewScenario.learningObjectives.map(
-                    (objective, index) => (
-                      <li key={index} className="flex items-start">
+                    (objective) => (
+                      <li key={objective} className="flex items-start">
                         <span className="text-blue-500 mr-2">•</span>
                         {objective}
                       </li>

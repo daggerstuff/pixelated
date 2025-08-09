@@ -51,7 +51,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "coverage"]
-dev = ["black", "ruff", "mypy", "pyright"]
+dev = ["black", "isort", "ruff", "mypy", "pyright"]
 
 [project.scripts]
 process-priority-5 = "ai.scripts.process_priority_5:main"
@@ -119,6 +119,13 @@ force-single-line = false
 target-version = ["py311"]
 line-length = 100
 skip-string-normalization = false
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["ai", "src", "api"]
+combine_as_imports = true
+force_single_line = false
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"

@@ -450,33 +450,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate APP_URL for Performance
+      - name: Resolve APP_URL (Performance)
+        id: resolve-perf
         run: |
-          if [ -z "${{ env.BASE_URL }}" ]; then
+          BASE_URL_INITIAL="${{ env.BASE_URL }}"
+          if [ -z "$BASE_URL_INITIAL" ]; then
+            BASE_URL_INITIAL="${{ secrets.APP_URL }}"
+          fi
+          if [ -z "$BASE_URL_INITIAL" ]; then
             echo "::notice::APP_URL not configured; skipping Lighthouse performance checks."
-            echo "SKIP_LIGHTHOUSE=true" >> $GITHUB_ENV
+            echo "skip_lhci=true" >> $GITHUB_OUTPUT
           else
-            echo "SKIP_LIGHTHOUSE=false" >> $GITHUB_ENV
+            echo "Using BASE_URL for Lighthouse: $BASE_URL_INITIAL"
+            echo "BASE_URL=$BASE_URL_INITIAL" >> $GITHUB_ENV
+            echo "skip_lhci=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v11
-        if: env.SKIP_LIGHTHOUSE == 'false'
+        id: lhci
+        uses: treosh/lighthouse-ci-action@v12
+        if: steps.resolve-perf.outputs.skip_lhci == 'false'
         with:
           urls: |
             ${{ env.BASE_URL }}
             ${{ env.BASE_URL }}/login
             ${{ env.BASE_URL }}/dashboard
           configPath: ./.github/lighthouse-config.json
+          budgetPath: ./.github/lighthouse-budget.json
           uploadArtifacts: true
           temporaryPublicStorage: true
 
       - name: Check for critical performance issues
-        if: env.SKIP_LIGHTHOUSE == 'false'
+        if: steps.resolve-perf.outputs.skip_lhci == 'false'
         run: echo "Analyzing performance metrics for PRODUCTION..."
 
       - name: Skip notice
-        if: env.SKIP_LIGHTHOUSE == 'true'
+        if: steps.resolve-perf.outputs.skip_lhci == 'true'
         run: echo "Skipping Lighthouse run due to missing APP_URL. Configure repository/environment variable 'APP_URL' to enable."
 
       - name: Notify performance issues
@@ -489,6 +498,9 @@ jobs:
             ⚠️ *Performance Issues Detected in PRODUCTION*
             Check the Lighthouse report for details.
             Time: $(date)
+
+            Report links (if available):
+            ${{ steps.lhci.outputs.links }}
 
             This affects production performance and should be reviewed.
         continue-on-error: true

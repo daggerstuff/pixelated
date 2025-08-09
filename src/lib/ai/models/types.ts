@@ -1,5 +1,13 @@
-// AI Models Types - Phase 5.0 Reconstruction Stub
-// TODO: Replace with actual AI infrastructure types
+/**
+ * AI Models Types - Phase 5.0 Reconstruction Stub
+ * TODO: Replace with actual AI infrastructure types
+ */
+
+export interface AIService {
+  getModelInfo: (...args: any[]) => any
+  createChatCompletion: (...args: any[]) => any
+  createChatStream: (...args: any[]) => any
+}
 
 export interface AIModel {
   id: string

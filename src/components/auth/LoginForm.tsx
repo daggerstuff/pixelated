@@ -140,14 +140,14 @@ export function LoginForm({
           try {
             localStorage.setItem(STORAGE_KEY_EMAIL, email)
             localStorage.setItem(STORAGE_KEY_REMEMBER, 'true')
-          } catch (_e) {
+          } catch {
             // Silent fail for private browsing mode
           }
         } else {
           try {
             localStorage.removeItem(STORAGE_KEY_EMAIL)
             localStorage.removeItem(STORAGE_KEY_REMEMBER)
-          } catch (_e) {
+          } catch {
             // Silent fail for private browsing mode
           }
         }

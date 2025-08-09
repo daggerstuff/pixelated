@@ -1,12 +1,3 @@
+// This file intentionally left minimal. Custom matchers are declared in `src/test/setup.ts`.
+// Keeping this declaration file to ensure Vitest types are included for the test environment.
 /// <reference types="vitest" />
-
-interface CustomMatchers<R = unknown> {
-  toBeInTheDocument(): R
-  toHaveAttribute(name: string, value?: string): R
-  toHaveClass(...classNames: string[]): R
-}
-
-declare module 'vitest' {
-  interface Assertion<T = unknown> extends CustomMatchers<T> {}
-  interface AsymmetricMatchersContaining extends CustomMatchers {}
-}

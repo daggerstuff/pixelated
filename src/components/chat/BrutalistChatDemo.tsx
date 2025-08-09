@@ -42,7 +42,9 @@ const BrutalistChatDemo: React.FC = () => {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || !sessionActive) return;
+    if (!inputValue.trim() || !sessionActive) {
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -66,7 +68,8 @@ const BrutalistChatDemo: React.FC = () => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: responses[Math.floor(Math.random() * responses.length)],
+        // Assert non-undefined since responses has fixed non-empty items
+        content: responses[Math.floor(Math.random() * responses.length)]!,
         timestamp: new Date(),
         metadata: {
           biasDetected: Math.random() > 0.7,
@@ -171,8 +174,8 @@ const BrutalistChatDemo: React.FC = () => {
                   <div className="text-xs">
                     <strong>Suggestions:</strong>
                     <ul className="list-disc list-inside mt-1">
-                      {message.metadata.suggestions?.map((suggestion, idx) => (
-                        <li key={idx}>{suggestion}</li>
+                      {message.metadata.suggestions?.map((suggestion) => (
+                        <li key={suggestion}>{suggestion}</li>
                       ))}
                     </ul>
                   </div>
@@ -272,7 +275,7 @@ const BrutalistChatDemo: React.FC = () => {
           <div className="metric-label">Avg Confidence</div>
         </div>
         <div className="metric-card">
-          <div className="metric-value">{Math.floor((Date.now() - messages[0].timestamp.getTime()) / 60000)}</div>
+          <div className="metric-value">{Math.floor((Date.now() - (messages[0]?.timestamp?.getTime() ?? Date.now())) / 60000)}</div>
           <div className="metric-label">Minutes</div>
         </div>
       </div>

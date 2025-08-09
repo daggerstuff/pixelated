@@ -1,88 +1,59 @@
-'use strict'
-var __assign =
-  (this && this.__assign) ||
-  function () {
-    __assign =
-      Object.assign ||
-      function (t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-          s = arguments[i]
-          for (var p in s)
-            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p]
-        }
-        return t
-      }
-    return __assign.apply(this, arguments)
-  }
-var __spreadArray =
-  (this && this.__spreadArray) ||
-  function (to, from, pack) {
-    if (pack || arguments.length === 2)
-      for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-          if (!ar) ar = Array.prototype.slice.call(from, 0, i)
-          ar[i] = from[i]
-        }
-      }
-    return to.concat(ar || Array.prototype.slice.call(from))
-  }
-Object.defineProperty(exports, '__esModule', { value: true })
 import React, { useState } from 'react'
 
 // Helper function for string concatenation
 const formatStorageLocation = (type, bucket) => {
-  if (type === 's3') return `s3://${bucket}`
-  if (type === 'azure') return `Azure: ${bucket}`
-  if (type === 'gcp') return `GCS: ${bucket}`
-  return ''
+  switch (type) {
+    case 's3':
+      return `s3://${bucket}`
+    case 'azure':
+      return `Azure: ${bucket}`
+    case 'gcp':
+      return `GCS: ${bucket}`
+    default:
+      return ''
+  }
 }
 
-const BackupLocationTab = function () {
-  var _a = useState([
-      {
-        id: '1',
-        name: 'Local Storage',
-        type: 'local',
-        path: '/var/backups/pixelated',
-        credentialsValid: true,
-        isDefault: true,
-        status: 'active',
-        lastSync: '2025-03-15T14:30:00Z',
-      },
-      {
-        id: '2',
-        name: 'AWS S3 Backup',
-        type: 's3',
-        bucket: 'pixelated-backups',
-        region: 'us-west-2',
-        credentialsValid: true,
-        isDefault: false,
-        status: 'active',
-        lastSync: '2025-03-15T14:30:00Z',
-      },
-    ]),
-    locations = _a[0],
-    setLocations = _a[1]
-  var _b = useState(false),
-    isAddingLocation = _b[0],
-    setIsAddingLocation = _b[1]
-  var _c = useState(false),
-    isFormLoading = _c[0],
-    setIsFormLoading = _c[1]
-  var _d = useState({
+export default function BackupLocationTab() {
+  const [locations, setLocations] = useState([
+    {
+      id: '1',
+      name: 'Local Storage',
       type: 'local',
-      name: '',
-      path: '',
-      bucket: '',
-      region: '',
+      path: '/var/backups/pixelated',
+      credentialsValid: true,
+      isDefault: true,
+      status: 'active',
+      lastSync: '2025-03-15T14:30:00Z',
+    },
+    {
+      id: '2',
+      name: 'AWS S3 Backup',
+      type: 's3',
+      bucket: 'pixelated-backups',
+      region: 'us-west-2',
+      credentialsValid: true,
       isDefault: false,
-    }),
-    newLocation = _d[0],
-    setNewLocation = _d[1]
-  var handleAddLocation = function () {
+      status: 'active',
+      lastSync: '2025-03-15T14:30:00Z',
+    },
+  ])
+  const [isAddingLocation, setIsAddingLocation] = useState(false)
+  const [isFormLoading, setIsFormLoading] = useState(false)
+  const [newLocation, setNewLocation] = useState({
+    type: 'local',
+    name: '',
+    path: '',
+    bucket: '',
+    region: '',
+    isDefault: false,
+  })
+
+  const handleAddLocation = () => {
     setIsAddingLocation(true)
   }
-  var handleCancelAdd = function () {
+
+  const handleCancelAdd = () => {
     setIsAddingLocation(false)
     setNewLocation({
       type: 'local',
@@ -93,61 +64,52 @@ const BackupLocationTab = function () {
       isDefault: false,
     })
   }
-  var handleInputChange = function (e) {
-    var _a, _b
-    var _c = e.target,
-      name = _c.name,
-      value = _c.value,
-      type = _c.type
+
+  const handleInputChange = (e) => {
+    const { name, value, type } = e.target
     if (type === 'checkbox') {
-      var target = e.target
-      setNewLocation(
-        __assign(
-          __assign({}, newLocation),
-          ((_a = {}), (_a[name] = target.checked), _a),
-        ),
-      )
+      const { checked } = e.target
+      setNewLocation({
+        ...newLocation,
+        [name]: checked,
+      })
     } else {
-      setNewLocation(
-        __assign(
-          __assign({}, newLocation),
-          ((_b = {}), (_b[name] = value), _b),
-        ),
-      )
+      setNewLocation({
+        ...newLocation,
+        [name]: value,
+      })
     }
   }
-  var handleSubmit = function (e) {
+
+  const handleSubmit = (e) => {
     e.preventDefault()
     setIsFormLoading(true)
     // Simulate API call
-    setTimeout(function () {
-      var id = Math.random().toString(36).substring(7)
+    setTimeout(() => {
+      const id = Math.random().toString(36).substring(7)
       // Handle default location changes
-      var updatedLocations = __spreadArray([], locations, true)
-      if (newLocation.isDefault) {
-        updatedLocations = updatedLocations.map(function (loc) {
-          return __assign(__assign({}, loc), { isDefault: false })
-        })
-      }
-      var createdLocation = {
-        id: id,
-        name: newLocation.name || 'New Location',
-        type: newLocation.type,
-        path: newLocation.path,
-        bucket: newLocation.bucket,
-        region: newLocation.region,
-        credentialsValid: true,
-        isDefault: newLocation.isDefault || false,
-        status: 'active',
-        lastSync: new Date().toISOString(),
-      }
-      setLocations(
-        __spreadArray(
-          __spreadArray([], updatedLocations, true),
-          [createdLocation],
-          false,
-        ),
-      )
+      setLocations((prev) => {
+        let updatedLocations = [...prev]
+        if (newLocation.isDefault) {
+          updatedLocations = updatedLocations.map((loc) => ({
+            ...loc,
+            isDefault: false,
+          }))
+        }
+        const createdLocation = {
+          id,
+          name: newLocation.name || 'New Location',
+          type: newLocation.type,
+          path: newLocation.path,
+          bucket: newLocation.bucket,
+          region: newLocation.region,
+          credentialsValid: true,
+          isDefault: newLocation.isDefault || false,
+          status: 'active',
+          lastSync: new Date().toISOString(),
+        }
+        return [...updatedLocations, createdLocation]
+      })
       setIsAddingLocation(false)
       setIsFormLoading(false)
       setNewLocation({
@@ -160,56 +122,50 @@ const BackupLocationTab = function () {
       })
     }, 1000)
   }
-  var setDefaultLocation = function (id) {
-    setLocations(
-      locations.map(function (location) {
-        return __assign(__assign({}, location), {
-          isDefault: location.id === id,
-        })
-      }),
+
+  const setDefaultLocation = (id) => {
+    setLocations((prev) =>
+      prev.map((location) => ({
+        ...location,
+        isDefault: location.id === id,
+      })),
     )
   }
-  var removeLocation = function (id) {
+
+  const removeLocation = (id) => {
     // Don't allow removing the default location
-    var locationToRemove = locations.find(function (loc) {
-      return loc.id === id
-    })
-    if (
-      locationToRemove === null || locationToRemove === void 0
-        ? void 0
-        : locationToRemove.isDefault
-    ) {
+    const locationToRemove = locations.find((loc) => loc.id === id)
+    if (locationToRemove?.isDefault) {
       return
     }
-    setLocations(
-      locations.filter(function (location) {
-        return location.id !== id
-      }),
-    )
+    setLocations((prev) => prev.filter((location) => location.id !== id))
   }
-  var testConnection = function (id) {
-    setLocations(
-      locations.map(function (location) {
-        return location.id === id
-          ? __assign(__assign({}, location), { status: 'configuring' })
-          : location
-      }),
+
+  const testConnection = (id) => {
+    setLocations((prev) =>
+      prev.map((location) =>
+        location.id === id
+          ? { ...location, status: 'configuring' }
+          : location,
+      ),
     )
     // Simulate testing connection
-    setTimeout(function () {
-      setLocations(
-        locations.map(function (location) {
-          return location.id === id
-            ? __assign(__assign({}, location), {
+    setTimeout(() => {
+      setLocations((prev) =>
+        prev.map((location) =>
+          location.id === id
+            ? {
+                ...location,
                 status: 'active',
                 credentialsValid: true,
                 lastSync: new Date().toISOString(),
-              })
-            : location
-        }),
+              }
+            : location,
+        ),
       )
     }, 2000)
   }
+
   return (
     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -436,10 +392,10 @@ const BackupLocationTab = function () {
                 newLocation.type === 'azure' ||
                 newLocation.type === 'gcp') && (
                 <>
-                  <div className="sm:col-span-4">
+           <div className="sm:col-span-4">
                     <label
-                      htmlFor="bucket"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+             htmlFor="bucket"
+             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Bucket Name
                     </label>
@@ -556,4 +512,3 @@ const BackupLocationTab = function () {
     </div>
   )
 }
-export default BackupLocationTab

@@ -49,10 +49,7 @@ except ImportError as e:
 
 # Microsoft Fairlearn (import only what we use)
 try:
-    from fairlearn.metrics import (
-        demographic_parity_difference,
-        equalized_odds_difference,
-    )
+    from fairlearn.metrics import demographic_parity_difference, equalized_odds_difference
 
     FAIRLEARN_AVAILABLE = True
 except ImportError as e:

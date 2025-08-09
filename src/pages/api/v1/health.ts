@@ -2,65 +2,74 @@
 import os from 'node:os'
 import { performance } from 'node:perf_hooks'
 
+type HealthState = 'healthy' | 'unhealthy'
+type ComponentStatus = { status: HealthState; [key: string]: unknown }
+interface HealthStatus {
+  status: HealthState
+  timestamp: string
+  system?: Record<string, unknown>
+  mongodb?: ComponentStatus
+  responseTime?: string
+  // Allow future components
+  [key: string]: unknown
+}
+
+function isComponentStatus(v: unknown): v is ComponentStatus {
+  return typeof v === 'object' && v !== null && 'status' in (v as Record<string, unknown>)
+}
+
 export const GET = async ({ request: _request }: { request: Request }) => {
   const startTime = performance.now()
-  const mongoUri = (import.meta as any).env?.['MONGO_URI']
-  const mongoDbName = (import.meta as any).env?.['MONGO_DB_NAME']
+  const mongoUri = process.env['MONGO_URI']
+  const mongoDbName = process.env['MONGO_DB_NAME']
 
-  const healthStatus: Record<string, unknown> = {
+  const healthStatus: HealthStatus = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
   }
 
   // System health
-  ;(healthStatus as any)['system'] = getSystemInformation()
+  healthStatus.system = getSystemInformation()
 
   // Database health checks
   if (!mongoUri || !mongoDbName) {
     console.warn(
       'Health check: Missing MongoDB credentials, skipping database check',
     )
-  ;(healthStatus as any)['mongodb'] = {
+    healthStatus.mongodb = {
       status: 'unhealthy',
       message: 'MongoDB credentials not configured',
     }
-  ;(healthStatus as any)['status'] = 'unhealthy'
+    healthStatus.status = 'unhealthy'
   } else {
     try {
       // This would be a real check against the database
       // For now, we'll assume it's healthy if configured
-  ;(healthStatus as any)['mongodb'] = {
+      healthStatus.mongodb = {
         status: 'healthy',
         type: 'mongodb',
       }
     } catch (error) {
-  ;(healthStatus as any)['mongodb'] = {
+      healthStatus.mongodb = {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : 'Unknown error',
       }
-  ;(healthStatus as any)['status'] = 'unhealthy'
+      healthStatus.status = 'unhealthy'
     }
   }
 
-  // You might have other checks like Redis, etc.
-  // const redisInfo = healthStatus.redis as RedisHealth; // This line was in the original, suggesting a Redis check exists
-
   // Overall status check
   const hasUnhealthyComponents = Object.values(healthStatus).some(
-    (component: unknown) => 
-      typeof component === 'object' && 
-      component !== null && 
-      'status' in component && 
-      component.status === 'unhealthy',
+    (component) => isComponentStatus(component) && component.status === 'unhealthy',
   )
 
   if (hasUnhealthyComponents) {
-  ;(healthStatus as any)['status'] = 'unhealthy'
+    healthStatus.status = 'unhealthy'
   }
 
   // Response time
   const responseTime = Math.round((performance.now() - startTime) * 100) / 100
-  ;(healthStatus as any)['responseTime'] = `${responseTime}ms`
+  healthStatus.responseTime = `${responseTime}ms`
 
   // Always return 200 to avoid failing health probes while conveying status in body
   return new Response(JSON.stringify(healthStatus, null, 2), {
@@ -84,7 +93,7 @@ function getSystemInformation(): Record<string, unknown> {
 
   // Get CPU information
   const cpuInfo = os.cpus()
-  const cpuModel = cpuInfo && cpuInfo.length > 0 && cpuInfo[0] && (cpuInfo[0] as any).model ? (cpuInfo[0] as any).model : 'Unknown'
+  const cpuModel = cpuInfo?.[0]?.model ?? 'Unknown'
   const cpuCores = cpuInfo ? cpuInfo.length : 0
   const loadAverage = os.loadavg() || [0, 0, 0]
 
@@ -109,9 +118,9 @@ function getSystemInformation(): Record<string, unknown> {
       model: cpuModel,
       cores: cpuCores,
       loadAverage: {
-  '1m': Number(loadAverage[0] || 0).toFixed(2),
-  '5m': Number(loadAverage[1] || 0).toFixed(2),
-  '15m': Number(loadAverage[2] || 0).toFixed(2),
+        '1m': Number(loadAverage[0] || 0).toFixed(2),
+        '5m': Number(loadAverage[1] || 0).toFixed(2),
+        '15m': Number(loadAverage[2] || 0).toFixed(2),
       },
     },
     os: {

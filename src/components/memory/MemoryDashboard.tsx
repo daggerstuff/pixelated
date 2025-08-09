@@ -19,14 +19,7 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import {
   Dialog,
@@ -35,7 +28,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  useDialog,
 } from '@/components/ui/dialog'
 import {
   AlertDialog,
@@ -89,7 +82,7 @@ export function MemoryDashboard({
   const [, setIsSearching] = useState(false)
 
   // New memory form
-  const [, setIsAddModalOpen] = useState(false)
+  const addDialog = useDialog(false)
   const [newMemoryContent, setNewMemoryContent] = useState('')
   const [newMemoryCategory, setNewMemoryCategory] = useState('general')
   const [newMemoryTags, setNewMemoryTags] = useState('')
@@ -126,9 +119,9 @@ export function MemoryDashboard({
       setNewMemoryContent('')
       setNewMemoryCategory('general')
       setNewMemoryTags('')
-      setIsAddModalOpen(false)
+  addDialog.close()
       toast.success('Memory added successfully')
-    } catch (_error) {
+  } catch {
       toast.error('Failed to add memory')
     }
   }
@@ -143,7 +136,7 @@ export function MemoryDashboard({
       setEditingMemory(null)
       setEditContent('')
       toast.success('Memory updated successfully')
-    } catch (_error) {
+  } catch {
       toast.error('Failed to update memory')
     }
   }
@@ -152,7 +145,7 @@ export function MemoryDashboard({
     try {
       await memory.deleteMemory(memoryId)
       toast.success('Memory deleted successfully')
-    } catch (_error) {
+  } catch {
       toast.error('Failed to delete memory')
     }
   }
@@ -272,13 +265,11 @@ export function MemoryDashboard({
                     ))}
                   </SelectContent>
                 </Select>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Memory
-                    </Button>
-                  </DialogTrigger>
+                <Button onClick={addDialog.open}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Memory
+                </Button>
+                <Dialog open={addDialog.isOpen} onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Add New Memory</DialogTitle>
@@ -341,6 +332,7 @@ export function MemoryDashboard({
                           setNewMemoryContent('')
                           setNewMemoryCategory('general')
                           setNewMemoryTags('')
+                          addDialog.close()
                         }}
                       >
                         Cancel
@@ -377,17 +369,18 @@ export function MemoryDashboard({
                   </p>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Content</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Tags</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <div className="relative w-full overflow-auto">
+                  <table className="w-full text-sm">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Content</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Tags</TableHead>
+                        <TableHead>Created</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                     {filteredMemories.map((mem) => (
                       <TableRow key={mem.id}>
                         <TableCell className="max-w-md">
@@ -402,7 +395,7 @@ export function MemoryDashboard({
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {mem.metadata?.tags?.slice(0, 3).map((tag) => (
+                            {mem.metadata?.tags?.slice(0, 3).map((tag: string) => (
                               <Badge
                                 key={tag}
                                 variant="outline"
@@ -423,59 +416,20 @@ export function MemoryDashboard({
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => {
-                                    setEditingMemory(mem)
-                                    setEditContent(mem.content)
-                                  }}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Edit Memory</DialogTitle>
-                                  <DialogDescription>
-                                    Update the content of this memory.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <Textarea
-                                  value={editContent}
-                                  onChange={(e) =>
-                                    setEditContent(e.target.value)
-                                  }
-                                  rows={4}
-                                  placeholder="Memory content..."
-                                />
-                                <DialogFooter>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      setEditingMemory(null)
-                                      setEditContent('')
-                                    }}
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button onClick={handleEditMemory}>
-                                    Save Changes
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setEditingMemory(mem)
+                                setEditContent(mem.content)
+                              }}
+                              aria-label="Edit"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
                             <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                              <AlertDialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md text-destructive hover:bg-accent">
+                                <Trash2 className="h-4 w-4" />
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
@@ -504,11 +458,41 @@ export function MemoryDashboard({
                         </TableCell>
                       </TableRow>
                     ))}
-                  </TableBody>
-                </Table>
+                    </TableBody>
+                  </table>
+                </div>
               )}
             </CardContent>
           </Card>
+          {/* Centralized Edit Dialog */}
+          <Dialog open={!!editingMemory} onOpenChange={(open) => !open && setEditingMemory(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Memory</DialogTitle>
+                <DialogDescription>
+                  Update the content of this memory.
+                </DialogDescription>
+              </DialogHeader>
+              <Textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={4}
+                placeholder="Memory content..."
+              />
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditingMemory(null)
+                    setEditContent('')
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleEditMemory}>Save Changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
@@ -568,7 +552,7 @@ export function MemoryDashboard({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {Object.entries(memory.stats.categoryCounts).map(
+                  {(Object.entries(memory.stats.categoryCounts) as Array<[string, number]>).map(
                     ([category, count]) => (
                       <div
                         key={category}

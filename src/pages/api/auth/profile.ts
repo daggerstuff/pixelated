@@ -7,7 +7,7 @@ import { verifyAuthToken } from '@/utils/auth'
  * GET /api/auth/profile - Get current user profile
  * PUT /api/auth/profile - Update user profile
  */
-export const GET = async ({ request }) => {
+export const GET = async ({ request }: { request: Request }) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -20,7 +20,7 @@ export const GET = async ({ request }) => {
       )
     }
 
-    const { userId } = await verifyAuthToken()
+  const { userId } = await verifyAuthToken(authHeader)
     const user = await mongoAuthService.getUserById(userId)
 
     if (!user) {
@@ -33,10 +33,10 @@ export const GET = async ({ request }) => {
     return new Response(
       JSON.stringify({
         user: {
-          id: user._id?.toString() || user.id,
+          id: user._id?.toString(),
           email: user.email,
           role: user.role,
-          profile: user.profile,
+          preferences: user.preferences,
           emailVerified: user.emailVerified,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt,
@@ -61,7 +61,7 @@ export const GET = async ({ request }) => {
   }
 }
 
-export const PUT = async ({ request }) => {
+export const PUT = async ({ request }: { request: Request }) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -74,17 +74,17 @@ export const PUT = async ({ request }) => {
       )
     }
 
-    const { userId } = await verifyAuthToken()
+  const { userId } = await verifyAuthToken(authHeader)
     const updates = await request.json()
 
     // Only allow updating profile fields
-    const allowedFields = ['profile']
+  const allowedFields = ['preferences']
     const safeUpdates = Object.keys(updates)
       .filter((key) => allowedFields.includes(key))
-      .reduce((obj, key) => {
+      .reduce<Record<string, unknown>>((obj, key) => {
         obj[key] = updates[key]
         return obj
-      }, {} as any)
+      }, {})
 
     if (Object.keys(safeUpdates).length === 0) {
       return new Response(
@@ -109,10 +109,10 @@ export const PUT = async ({ request }) => {
       JSON.stringify({
         success: true,
         user: {
-          id: updatedUser._id?.toString() || updatedUser.id,
+          id: updatedUser._id?.toString(),
           email: updatedUser.email,
           role: updatedUser.role,
-          profile: updatedUser.profile,
+          preferences: updatedUser.preferences,
           emailVerified: updatedUser.emailVerified,
           updatedAt: updatedUser.updatedAt,
         },

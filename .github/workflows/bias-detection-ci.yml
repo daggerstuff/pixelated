@@ -173,9 +173,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_USER: postgres
           POSTGRES_DB: test_db
+          POSTGRES_HOST_AUTH_METHOD: trust
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -234,11 +234,10 @@ jobs:
           else
             touch .env.test
           fi
-          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/test_db" >> .env.test
+          echo "DATABASE_URL=postgresql://${POSTGRES_USER}@localhost:5432/test_db" >> .env.test
           echo "REDIS_URL=redis://localhost:6379" >> .env.test
         env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_USER: postgres
 
       - name: Run unit tests
         run: pnpm test:unit --coverage
@@ -325,9 +324,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_USER: postgres
           POSTGRES_DB: test_db
+          POSTGRES_HOST_AUTH_METHOD: trust
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -388,10 +387,9 @@ jobs:
           else
             touch .env.test
           fi
-          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/test_db" >> .env.test
+          echo "DATABASE_URL=postgresql://${POSTGRES_USER}@localhost:5432/test_db" >> .env.test
         env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_USER: postgres
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps

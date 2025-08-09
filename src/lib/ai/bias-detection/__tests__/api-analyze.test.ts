@@ -99,7 +99,7 @@ let POST: PostHandler, GET: GetHandler
 beforeEach(async () => {
   if (!POST || !GET) {
     const module = await import('../../../../pages/api/bias-detection/analyze')
-    POST = module.POST as PostHandler
+    POST = module.POST as unknown as PostHandler
     GET = module.GET as GetHandler
   }
 })
@@ -407,6 +407,11 @@ describe('Session Analysis API Endpoint', () => {
 
       const response = await POST({ request })
 
+      if (response.status !== 401) {
+        // Log actual response for debugging
+        // eslint-disable-next-line no-console
+        console.log('DEBUG FAIL: Missing authorization response:', response)
+      }
       expect(response.status).toBe(401)
 
       const responseData = await response.json()
@@ -432,6 +437,11 @@ describe('Session Analysis API Endpoint', () => {
 
       const response = await POST({ request })
 
+      if (response.status !== 401) {
+        // Log actual response for debugging
+        // eslint-disable-next-line no-console
+        console.log('DEBUG FAIL: Invalid authorization token response:', response)
+      }
       expect(response.status).toBe(401)
 
       const responseData = await response.json()
@@ -467,6 +477,11 @@ describe('Session Analysis API Endpoint', () => {
 
       const response = await POST({ request })
 
+      if (response.status !== 400) {
+        // Log actual response for debugging
+        // eslint-disable-next-line no-console
+        console.log('DEBUG FAIL: Validation error response:', response)
+      }
       expect(response.status).toBe(400)
 
       const responseData = await response.json()
@@ -486,6 +501,11 @@ describe('Session Analysis API Endpoint', () => {
 
       const response = await POST({ request })
 
+      if (response.status !== 400) {
+        // Log actual response for debugging
+        // eslint-disable-next-line no-console
+        console.log('DEBUG FAIL: Missing required fields response:', response)
+      }
       expect(response.status).toBe(400)
 
       const responseData = await response.json()

@@ -202,7 +202,7 @@ export const isCI = (): boolean =>
  * Validates that a string is a well-formed URL (http, https, ws, wss, etc).
  * Returns true if valid, false otherwise.
  */
-function validateUrl(value: string): value is Url {
+export function validateUrl(value: string): value is Url {
   try {
     // Only allow http(s) and ws(s) protocols for safety
     const url = new URL(value)

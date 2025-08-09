@@ -37,28 +37,21 @@ export default function PipelineOverview() {
         <div className="flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {steps.map((step, index) => (
-              <div
+              <button
                 key={step.title}
-                className={`p-4 rounded-lg cursor-pointer transition-all ${
+                type="button"
+                className={`text-left p-4 rounded-lg cursor-pointer transition-all ${
                   activeStep === index
                     ? 'bg-blue-600/20 border-2 border-blue-400'
                     : 'bg-slate-700/50 border border-slate-600/50 hover:bg-slate-600/50'
                 }`}
                 onClick={() => setActiveStep(index)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    setActiveStep(index)
-                  }
-                }}
-                tabIndex={0}
-                role="button"
                 aria-pressed={activeStep === index}
               >
                 <div className="text-2xl mb-2">{step.icon}</div>
                 <h3 className="font-semibold text-white text-sm mb-1">{step.title}</h3>
                 <p className="text-xs text-slate-300">{step.description}</p>
-              </div>
+              </button>
             ))}
           </div>
 

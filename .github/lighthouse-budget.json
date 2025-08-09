@@ -1,0 +1,29 @@
+[
+  {
+    "path": "/",
+    "resourceSizes": [
+      { "resourceType": "document", "budget": 25 },
+      { "resourceType": "script", "budget": 300 },
+      { "resourceType": "stylesheet", "budget": 150 },
+      { "resourceType": "image", "budget": 600 },
+      { "resourceType": "font", "budget": 200 },
+      { "resourceType": "media", "budget": 0 },
+      { "resourceType": "other", "budget": 50 },
+      { "resourceType": "total", "budget": 1600 }
+    ],
+    "timings": [
+      { "metric": "interactive", "budget": 3500 },
+      { "metric": "first-contentful-paint", "budget": 2000 },
+      { "metric": "largest-contentful-paint", "budget": 3000 },
+      { "metric": "total-blocking-time", "budget": 300 },
+      { "metric": "cumulative-layout-shift", "budget": 0.1 }
+    ]
+  },
+  {
+    "path": "/dashboard",
+    "resourceSizes": [
+      { "resourceType": "script", "budget": 400 },
+      { "resourceType": "total", "budget": 2000 }
+    ]
+  }
+]

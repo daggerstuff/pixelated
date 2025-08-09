@@ -7,7 +7,7 @@ import { verifyAuthToken } from '@/utils/auth'
  * GET /api/todos - Get all todos for authenticated user
  * POST /api/todos - Create a new todo
  */
-export const GET = async ({ request }) => {
+export const GET = async ({ request }: { request: Request }) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -18,9 +18,9 @@ export const GET = async ({ request }) => {
           headers: { 'Content-Type': 'application/json' },
         },
       )
-    }
+  }
 
-    const { userId } = await verifyAuthToken()
+  const { userId } = await verifyAuthToken(authHeader)
     const todos = await todoDAO.findAll(userId)
 
     return new Response(JSON.stringify({ todos }), {
@@ -41,7 +41,7 @@ export const GET = async ({ request }) => {
   }
 }
 
-export const POST = async ({ request }) => {
+export const POST = async ({ request }: { request: Request }) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -52,9 +52,9 @@ export const POST = async ({ request }) => {
           headers: { 'Content-Type': 'application/json' },
         },
       )
-    }
+  }
 
-    const { userId } = await verifyAuthToken()
+  const { userId } = await verifyAuthToken(authHeader)
     const { name, description, completed = false } = await request.json()
 
     if (!name) {
@@ -68,7 +68,8 @@ export const POST = async ({ request }) => {
       name,
       description,
       completed,
-      userId: userId as any, // Convert string to ObjectId in DAO
+      // DAO converts string to ObjectId; cast through unknown to satisfy types without using any
+      userId: userId as unknown as import('mongodb').ObjectId,
     })
 
     return new Response(JSON.stringify({ success: true, todo }), {

@@ -1,6 +1,8 @@
 import { ObjectId } from 'mongodb'
 
 export interface User {
+  id: string
+  profile: unknown
   _id: ObjectId
   email: string
   password: string
@@ -44,7 +46,7 @@ export interface AIMetrics {
   tokensUsed: number
   responseTime: number
   timestamp: Date
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface BiasDetection {

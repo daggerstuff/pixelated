@@ -7,7 +7,8 @@ import '@testing-library/jest-dom'
 
 // Add type declarations for DOM testing matchers
 declare module 'vitest' {
-  interface Assertion<T = unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  interface Assertion<T = any> {
     toBeInTheDocument(): T
     toHaveAttribute(attr: string, value?: string): T
     toHaveClass(...classNames: string[]): T
@@ -56,18 +57,18 @@ global.ResizeObserver = class ResizeObserver {
 }
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  root = null
+global.IntersectionObserver = class MockIntersectionObserver {
+  root: Element | Document | null = null
   rootMargin = '0px'
-  thresholds = [0]
+  thresholds: ReadonlyArray<number> = [0]
 
   observe() {}
   unobserve() {}
   disconnect() {}
-  takeRecords() {
+  takeRecords(): IntersectionObserverEntry[] {
     return []
   }
-} as any
+} as unknown as typeof IntersectionObserver
 
 // Mock localStorage
 const localStorageMock = {
