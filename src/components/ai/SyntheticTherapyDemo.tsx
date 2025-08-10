@@ -35,6 +35,29 @@ import {
 } from 'lucide-react'
 import { DisorderCategory } from '@/lib/ai/mental-arena/types'
 
+/**
+ * Generate cryptographically secure random integer within a range
+ * @param min - Minimum value (inclusive)
+ * @param max - Maximum value (inclusive)
+ * @returns Secure random integer
+ */
+function getSecureRandomInt(min: number, max: number): number {
+  const range = max - min + 1
+  const array = new Uint32Array(1)
+  crypto.getRandomValues(array)
+  return min + (array[0]! % range)
+}
+
+/**
+ * Generate cryptographically secure random boolean
+ * @returns Secure random boolean
+ */
+function getSecureRandomBoolean(): boolean {
+  const array = new Uint8Array(1)
+  crypto.getRandomValues(array)
+  return array[0]! >= 128
+}
+
 interface SyntheticConversation {
   patientText: string
   therapistText: string
@@ -79,14 +102,14 @@ export default function SyntheticTherapyDemo() {
         },
         body: JSON.stringify({
           type: 'therapy_conversation',
-          difficulty: params.disorders.length > 1 ? 'moderate' : 'basic',
+          difficulty: config.disorders.length > 1 ? 'moderate' : 'basic',
           clientProfile: {
-            disorders: params.disorders,
-            sessionNumber: Math.floor(Math.random() * 10) + 1,
-            presenting_concerns: params.disorders.map(d => `Primary concern related to ${d}`),
+            disorders: config.disorders,
+            sessionNumber: getSecureRandomInt(1, 10),
+            presenting_concerns: config.disorders.map(d => `Primary concern related to ${d}`),
             demographics: {
-              age: Math.floor(Math.random() * 40) + 20,
-              gender: Math.random() > 0.5 ? 'female' : 'male'
+              age: getSecureRandomInt(20, 59),
+              gender: getSecureRandomBoolean() ? 'female' : 'male'
             }
           },
           therapeuticFramework: 'CBT', // Default to CBT
@@ -116,11 +139,7 @@ export default function SyntheticTherapyDemo() {
           manifestations: symptom.indicators,
           cognitions: symptom.cognitivePatterns || []
         })),
-        decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map((symptom: any) => ({
-          name: symptom.name,
-          confidence: symptom.confidence,
-          reasoning: symptom.assessment
-        })),
+        decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map((symptom: any) => symptom.name),
         sessionSummary: scenarioResult.analysis.clinicalSummary
       }]
 
@@ -181,8 +200,6 @@ export default function SyntheticTherapyDemo() {
 
       setConversations(mockConversations)
       setSelectedConversationIndex(0)
-    } catch (error) {
-      console.error('Failed to generate conversations:', error)
     } finally {
       setLoading(false)
     }
@@ -496,7 +513,7 @@ export default function SyntheticTherapyDemo() {
                                     {symptom}
                                   </Badge>
                                 )
-                              },
+                              }
                             )}
                           </div>
                         </div>
