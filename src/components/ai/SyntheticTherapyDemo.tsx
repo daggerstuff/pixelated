@@ -140,7 +140,8 @@ export default function SyntheticTherapyDemo() {
           cognitions: symptom.cognitivePatterns || []
         })),
         decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map((symptom: any) => symptom.name),
-        sessionSummary: scenarioResult.analysis.clinicalSummary
+        sessionSummary: scenarioResult.analysis.clinicalSummary,
+        accuracyScore: scenarioResult.analysis.accuracyScore || 0.8
       }]
 
       setConversations(apiConversations)

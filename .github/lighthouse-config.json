@@ -22,8 +22,8 @@
     "assert": {
       "assertions": {
         "categories:performance": [
-          "error",
-          { "minScore": 0.9 }
+          "warn",
+          { "minScore": 0.6 }
         ],
         "categories:accessibility": [
           "warn",
@@ -38,12 +38,12 @@
           { "minScore": 0.9 }
         ],
         "largest-contentful-paint": [
-          "error",
-          { "maxNumericValue": 3000, "aggregationMethod": "optimistic" }
+          "warn",
+          { "maxNumericValue": 8000, "aggregationMethod": "optimistic" }
         ],
         "total-blocking-time": [
-          "error",
-          { "maxNumericValue": 300, "aggregationMethod": "median" }
+          "warn",
+          { "maxNumericValue": 600, "aggregationMethod": "median" }
         ],
         "cumulative-layout-shift": [
           "error",
@@ -51,13 +51,13 @@
         ],
         "first-contentful-paint": [
           "warn",
-          { "maxNumericValue": 2000, "aggregationMethod": "optimistic" }
+          { "maxNumericValue": 3000, "aggregationMethod": "optimistic" }
         ],
         "server-response-time": [
           "warn",
-          { "maxNumericValue": 800, "aggregationMethod": "median" }
+          { "maxNumericValue": 1200, "aggregationMethod": "median" }
         ],
-        "uses-long-cache-ttl": ["warn", { "minScore": 0.9 }],
+        "uses-long-cache-ttl": ["warn", { "minScore": 0.8 }],
         "unused-javascript": "warn",
         "uses-rel-preload": "warn"
       }

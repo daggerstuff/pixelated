@@ -71,7 +71,7 @@ export default function PsychologyFrameworksDemo() {
       
       // Auto-select first framework if available
       if (result.frameworks.length > 0) {
-        setSelectedFramework(result.frameworks[0])
+        setSelectedFramework(result.frameworks[0] || null)
       }
 
     } catch (error) {
@@ -138,7 +138,7 @@ export default function PsychologyFrameworksDemo() {
       setFrameworks(demoFrameworks)
       setCategories(['Cognitive-Behavioral', 'Mindfulness-Based', 'Psychodynamic', 'Humanistic'])
       if (demoFrameworks.length > 0) {
-        setSelectedFramework(demoFrameworks[0])
+        setSelectedFramework(demoFrameworks[0] || null)
       }
     } finally {
       setLoading(false)

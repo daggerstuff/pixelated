@@ -315,17 +315,24 @@ export class EducationalContextRecognizer {
     let bestMatch = { type: EducationalType.DEFINITION, confidence: 0 }
     let topicArea = TopicArea.GENERAL_MENTAL_HEALTH
 
-    // Check educational patterns
-    for (const [type, patterns] of Object.entries(this.educationalPatterns)) {
-      for (const pattern of patterns) {
-        if (pattern.test(query)) {
-          const confidence = 0.7 // Base confidence for pattern match
-          if (confidence > bestMatch.confidence) {
-            bestMatch = { type: type as EducationalType, confidence }
-          }
-        }
-      }
-    }
+   // Prioritize symptom pattern over definition if both match
+   let matchedTypes: { type: EducationalType; confidence: number }[] = []
+   for (const [type, patterns] of Object.entries(this.educationalPatterns)) {
+     for (const pattern of patterns) {
+       if (pattern.test(query)) {
+         const confidence = 0.7 // Base confidence for pattern match
+         matchedTypes.push({ type: type as EducationalType, confidence })
+       }
+     }
+   }
+   // If symptoms matched, use it; else use highest confidence
+   const symptomMatch = matchedTypes.find(mt => mt.type === EducationalType.SYMPTOMS)
+   if (symptomMatch) {
+     bestMatch = symptomMatch
+   } else if (matchedTypes.length > 0) {
+     // Use highest confidence match
+     bestMatch = matchedTypes.reduce((a, b) => (a.confidence > b.confidence ? a : b))
+   }
 
     // Determine topic area
     for (const [topic, keywords] of Object.entries(this.topicKeywords)) {
@@ -622,10 +629,13 @@ Adapt complexity and resource recommendations accordingly.`
 
     // Adjust based on user's knowledge level
     if (knowledge === 'none' || education === 'high_school') {
-      return complexity === 'advanced' ? 'intermediate' : complexity
+      if (complexity === 'advanced') return 'intermediate'
+      if (complexity === 'intermediate') return 'basic'
+      return complexity
     }
     if (knowledge === 'advanced' || education === 'graduate') {
-      return complexity === 'basic' ? 'intermediate' : complexity
+      if (complexity === 'basic') return 'intermediate'
+      return complexity
     }
 
     return complexity
@@ -637,29 +647,41 @@ Adapt complexity and resource recommendations accordingly.`
   ): ResourceType[] {
     const learningStyle = userProfile.preferredLearningStyle
 
+    let adapted = [...resources]
     if (learningStyle === 'visual') {
-      return [
-        ResourceType.INFOGRAPHICS,
-        ResourceType.EDUCATIONAL_VIDEOS,
-        ...resources,
-      ].slice(0, 5)
+      // Always include infographics and educational videos for visual learners
+      if (!adapted.includes(ResourceType.INFOGRAPHICS)) {
+        adapted.unshift(ResourceType.INFOGRAPHICS)
+      }
+      if (!adapted.includes(ResourceType.EDUCATIONAL_VIDEOS)) {
+        adapted.unshift(ResourceType.EDUCATIONAL_VIDEOS)
+      }
+      // Remove duplicates
+      adapted = Array.from(new Set(adapted))
+      return adapted.slice(0, 5)
     }
     if (learningStyle === 'auditory') {
-      return [
-        ResourceType.PODCASTS,
-        ResourceType.EDUCATIONAL_VIDEOS,
-        ...resources,
-      ].slice(0, 5)
+      if (!adapted.includes(ResourceType.PODCASTS)) {
+        adapted.unshift(ResourceType.PODCASTS)
+      }
+      if (!adapted.includes(ResourceType.EDUCATIONAL_VIDEOS)) {
+        adapted.unshift(ResourceType.EDUCATIONAL_VIDEOS)
+      }
+      adapted = Array.from(new Set(adapted))
+      return adapted.slice(0, 5)
     }
     if (learningStyle === 'reading') {
-      return [
-        ResourceType.BOOKS,
-        ResourceType.SCIENTIFIC_ARTICLES,
-        ...resources,
-      ].slice(0, 5)
+      if (!adapted.includes(ResourceType.BOOKS)) {
+        adapted.unshift(ResourceType.BOOKS)
+      }
+      if (!adapted.includes(ResourceType.SCIENTIFIC_ARTICLES)) {
+        adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
+      }
+      adapted = Array.from(new Set(adapted))
+      return adapted.slice(0, 5)
     }
 
-    return resources
+    return adapted
   }
 
   private generateNextSteps(result: EducationalContextResult): string[] {

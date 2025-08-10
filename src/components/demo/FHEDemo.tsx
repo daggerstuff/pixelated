@@ -75,29 +75,31 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="md:col-span-2 space-y-2">
-          <label htmlFor="plaintext-message" className="text-sm font-medium">Plaintext Message</label>
-          <textarea
-            id="plaintext-message"
-            className="w-full min-h-[120px] rounded border bg-background p-3"
-            value={plainText}
-            onChange={(e) => setPlainText(e.target.value)}
-            placeholder="Type text to process under FHE"
-          />
+          <label className="text-sm font-medium">
+            Plaintext Message
+            <textarea
+              className="w-full min-h-[120px] rounded border bg-background p-3 mt-1"
+              value={plainText}
+              onChange={(e) => setPlainText(e.target.value)}
+              placeholder="Type text to process under FHE"
+            />
+          </label>
         </div>
         <div className="space-y-2">
-          <label htmlFor="operation-select" className="text-sm font-medium">Operation</label>
-          <select
-            id="operation-select"
-            className="w-full rounded border bg-background p-2"
-            value={operation}
-            onChange={(e) => setOperation(e.target.value as any)}
-          >
-            {operations.map((op) => (
-              <option key={op.value} value={op.value}>
-                {op.label}
-              </option>
-            ))}
-          </select>
+          <label className="text-sm font-medium">
+            Operation
+            <select
+              className="w-full rounded border bg-background p-2 mt-1"
+              value={operation}
+              onChange={(e) => setOperation(e.target.value as any)}
+            >
+              {operations.map((op) => (
+                <option key={op.value} value={op.value}>
+                  {op.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <button
             className="mt-4 w-full rounded bg-blue-600 py-2 text-white disabled:opacity-60"

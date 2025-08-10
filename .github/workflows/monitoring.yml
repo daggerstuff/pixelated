@@ -140,20 +140,31 @@ jobs:
           retention-days: 30
 
       - name: Notify failure
-        if: failure()
+        if: failure() && secrets.SLACK_WEBHOOK != ''
         uses: slackapi/slack-github-action@v1.25.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         with:
-          slack-message: |
-            🚨 *PRODUCTION MONITORING FAILED*
-            Environment: Production (Critical Alert)
-            URL: ${{ env.BASE_URL }}
-            Time: $(date)
-            ${{ steps.run-tests.outputs.status == 'failure' && '⚠️ One or more monitoring tests failed. Check the GitHub Action for details.' || '' }}
-
-            This is a PRODUCTION failure requiring immediate attention.
+          payload: |
+            {
+              "text": "🚨 *PRODUCTION MONITORING FAILED*",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚨 *PRODUCTION MONITORING FAILED*\n\n*Environment:* Production (Critical Alert)\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis is a PRODUCTION failure requiring immediate attention.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
+                  }
+                }
+              ]
+            }
         continue-on-error: true
+
+      - name: Log notification skip
+        if: failure() && secrets.SLACK_WEBHOOK == ''
+        run: |
+          echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
+          echo "::warning::Production monitoring failed but no notification was sent"
 
   health-check-staging:
     name: Staging Health Check
@@ -529,18 +540,28 @@ jobs:
         run: echo "Skipping Lighthouse run due to missing APP_URL or no healthy URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to enable."
 
       - name: Notify performance issues
-        if: failure()
+        if: failure() && secrets.SLACK_WEBHOOK != ''
         uses: slackapi/slack-github-action@v1.25.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         with:
-          slack-message: |
-            ⚠️ *Performance Issues Detected in PRODUCTION*
-            Check the Lighthouse report for details.
-            Time: $(date)
-
-            Report links (if available):
-            ${{ steps.lhci.outputs.links }}
-
-            This affects production performance and should be reviewed.
+          payload: |
+            {
+              "text": "⚠️ *Performance Issues Detected in PRODUCTION*",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "⚠️ *Performance Issues Detected in PRODUCTION*\n\n*Environment:* Production\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis affects production performance and should be reviewed.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
+                  }
+                }
+              ]
+            }
         continue-on-error: true
+
+      - name: Log performance notification skip
+        if: failure() && secrets.SLACK_WEBHOOK == ''
+        run: |
+          echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
+          echo "::warning::Performance issues detected but no notification was sent"
