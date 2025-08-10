@@ -132,14 +132,22 @@ export default function SyntheticTherapyDemo() {
       const apiConversations: SyntheticConversation[] = [{
         patientText: scenarioResult.scenario.clientStatement,
         therapistText: scenarioResult.scenario.therapistResponse,
-        encodedSymptoms: scenarioResult.scenario.symptoms.map((symptom: any) => ({
+        encodedSymptoms: scenarioResult.scenario.symptoms.map((symptom: unknown) => ({
+          // @ts-expect-error: type from API
           name: symptom.name,
+          // @ts-expect-error: type from API
           severity: symptom.severity / 10, // Convert 1-10 to 0-1
+          // @ts-expect-error: type from API
           duration: symptom.duration,
+          // @ts-expect-error: type from API
           manifestations: symptom.indicators,
+          // @ts-expect-error: type from API
           cognitions: symptom.cognitivePatterns || []
         })),
-        decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map((symptom: any) => symptom.name),
+        decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map((symptom: unknown) =>
+          // @ts-expect-error: type from API
+          symptom.name
+        ),
         sessionSummary: scenarioResult.analysis.clinicalSummary,
         accuracyScore: scenarioResult.analysis.accuracyScore || 0.8
       }]

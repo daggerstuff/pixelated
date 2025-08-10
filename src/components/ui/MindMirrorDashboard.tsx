@@ -1,19 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Brain, 
-  Heart, 
-  Zap, 
-  Shield, 
-  Eye, 
+import {
+  Brain,
+  Heart,
+  Zap,
+  Shield,
+  Eye,
   Sparkles,
-  Activity,
-  TrendingUp,
-  AlertTriangle,
-  User
+  TrendingUp
 } from 'lucide-react'
 
 // Archetype definitions inspired by Mind-Mirror

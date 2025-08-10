@@ -20,7 +20,7 @@ import {
   Share2,
   History
 } from 'lucide-react'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '../../lib/api-client'
 
 interface Entity {
   text: string

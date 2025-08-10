@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { AlertTriangle, Heart, Brain, Shield, Zap, Activity, Sparkles, User, Bot } from 'lucide-react'
+import { AlertTriangle, Heart, Brain, Shield, Zap, Sparkles } from 'lucide-react'
 import MindMirrorDashboard, { type MindMirrorAnalysis } from '@/components/ui/MindMirrorDashboard'
 import BrainVisualization from '@/components/ui/BrainVisualization'
 // import {
@@ -115,12 +115,12 @@ interface ChatMessage {
   isProcessing?: boolean
   riskLevel?: 'low' | 'medium' | 'high' | 'critical'
   needsIntervention?: boolean
-  apiResponse?: any // Add type if available
+  apiResponse?: unknown // Add type if available
   metadata?: {
     responseType?: string
     confidence?: number
-    copingStrategies?: any
-    resources?: any
+    copingStrategies?: unknown
+    resources?: unknown
     processingTime?: number
   }
 }

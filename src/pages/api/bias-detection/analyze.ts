@@ -33,10 +33,10 @@ export const POST = async ({ request }: { request: Request }) => {
     const start = Date.now()
 
     // Parse request body
-    let body: any
+    let body: unknown
     try {
       body = await request.json()
-    } catch (_err) {
+    } catch {
       return new Response(
         JSON.stringify({ success: false, error: 'Bad Request', message: 'Invalid JSON' }),
         { status: 400, headers: { 'Content-Type': 'application/json', 'X-Processing-Time': `${Date.now() - start}`, 'X-Cache': 'MISS' } },
