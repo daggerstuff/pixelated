@@ -32,14 +32,16 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
   className = ""
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(undefined)
   const timeRef = useRef(0)
 
   // Generate brain regions based on mood vector
   const brainRegions = useMemo((): BrainRegion[] => {
-    if (!moodVector) return []
+    if (!moodVector) {
+      return []
+    }
 
-    const baseRegions = [
+    return [
       // Frontal Cortex - Cognitive Clarity
       {
         id: 'frontal',
@@ -107,16 +109,19 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
       }
     ]
 
-    return baseRegions
   }, [moodVector])
 
   // Animation function
   const animate = () => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    if (!canvas) {
+      return
+    }
 
     const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    if (!ctx) {
+      return
+    }
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -138,7 +143,9 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
     // Draw neural connections
     brainRegions.forEach((region, i) => {
       brainRegions.forEach((otherRegion, j) => {
-        if (i >= j) return
+        if (i >= j) {
+          return
+        }
 
         const distance = Math.sqrt(
           Math.pow(region.x - otherRegion.x, 2) +
@@ -206,7 +213,9 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    if (!canvas) {
+      return
+    }
 
     // Set canvas size
     canvas.width = 300
@@ -223,10 +232,18 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
   }, [brainRegions])
 
   const getActivityLevel = (activity: number) => {
-    if (activity > 0.8) return { label: 'Very High', color: 'bg-red-500' }
-    if (activity > 0.6) return { label: 'High', color: 'bg-orange-500' }
-    if (activity > 0.4) return { label: 'Moderate', color: 'bg-yellow-500' }
-    if (activity > 0.2) return { label: 'Low', color: 'bg-blue-500' }
+    if (activity > 0.8) {
+      return { label: 'Very High', color: 'bg-red-500' }
+    }
+    if (activity > 0.6) {
+      return { label: 'High', color: 'bg-orange-500' }
+    }
+    if (activity > 0.4) {
+      return { label: 'Moderate', color: 'bg-yellow-500' }
+    }
+    if (activity > 0.2) {
+      return { label: 'Low', color: 'bg-blue-500' }
+    }
     return { label: 'Very Low', color: 'bg-gray-500' }
   }
 

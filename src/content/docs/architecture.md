@@ -52,7 +52,8 @@ Pixelated Empathy is built on a modern, secure, and scalable architecture that c
 
 
 
-- Supabase Auth integration
+- MongoDB Atlas integration
+- Azure AD authentication
 - JWT token management
 - Role-based access control
 - Session handling
@@ -68,7 +69,9 @@ Pixelated Empathy is built on a modern, secure, and scalable architecture that c
 
 ## Database Design
 
-### Supabase Schema
+### MongoDB Atlas Schema
+
+The application uses MongoDB Atlas as the primary database with the following collections:
 
 ```sql
 -- Core Tables
@@ -101,7 +104,7 @@ created_at TIMESTAMPTZ DEFAULT NOW()
 ## Security Architecture
 
   ### 1. Authentication Flow
-  - User registration/login via Supabase Auth
+  - User registration/login via Azure AD and JWT authentication
   - JWT token generation and validation
   - Secure session management
 

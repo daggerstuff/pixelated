@@ -40,7 +40,7 @@ This document outlines the disaster recovery procedures for the Pixelated Astro 
 
 1. **Check Database Connection**
 
-   - Verify Supabase status at [Supabase Status](https://status.supabase.com)
+   - Verify MongoDB Atlas status at [MongoDB Status](https://status.cloud.mongodb.com/)
    - Run health check against the API endpoint manually:
      ```bash
      curl -v https://app.gradiantastro.com/api/health
@@ -51,17 +51,14 @@ This document outlines the disaster recovery procedures for the Pixelated Astro 
    - If database corruption is suspected, restore from the latest backup:
 
      ```bash
-     # List available backups
-     aws s3 ls s3://[BACKUP_BUCKET]/database-backups/ --profile gradiant
+     # List available backups in MongoDB Atlas
+     # Use Atlas CLI or web interface
 
      # Download the latest backup
-     aws s3 cp s3://[BACKUP_BUCKET]/database-backups/[LATEST_BACKUP] ./backup.sql.gz --profile gradiant
+     # mongorestore command for local restoration
+     mongorestore --uri="mongodb+srv://username:password@cluster.mongodb.net/dbname" /path/to/backup
 
-     # Decompress the backup
-     gunzip backup.sql.gz
-
-     # Restore the database
-     PGPASSWORD=[PASSWORD] psql -h [HOST] -U [USER] -d [DATABASE] < backup.sql
+     # Or use Atlas automated backup restoration via web interface
      ```
 
 ### API Issues

@@ -1,5 +1,6 @@
-import type { CrisisDetectionResult } from '../../../lib/db/ai/types'
+import type { CrisisDetectionResult } from '../../../lib/ai/crisis/types'
 import { useCallback, useState, useRef } from 'react'
+import crypto from 'crypto'
 
 interface UseCrisisDetectionOptions {
   apiEndpoint?: string
@@ -115,16 +116,16 @@ function generateCrisisAnalytics(results: CrisisDetectionResult[]): CrisisAnalyt
 
   // Calculate crisis types
   const crisisTypes = results
-    .filter(r => r.crisisDetected && r.crisisType)
+    .filter(r => r.isCrisis && r.category)
     .reduce((acc, result) => {
-      const type = result.crisisType!
+      const type = result.category!
       acc[type] = (acc[type] || 0) + 1
       return acc
     }, {} as { [key: string]: number })
 
   // Generate temporal patterns
   const temporalPatterns = []
-  const crisisRatio = results.filter(r => r.crisisDetected).length / results.length
+  const crisisRatio = results.filter(r => r.isCrisis).length / results.length
   const highRiskRatio = results.filter(r => r.riskLevel === 'high' || r.riskLevel === 'critical').length / results.length
 
   if (crisisRatio > 0.3) {
@@ -199,7 +200,7 @@ export function useCrisisDetection({
   const monitoringIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Calculate metrics
-  const crisisCount = results.filter(r => r.crisisDetected).length
+  const crisisCount = results.filter(r => r.isCrisis).length
   const highRiskCount = results.filter(r => r.riskLevel === 'high' || r.riskLevel === 'critical').length
   
   const averageRiskLevel = results.length > 0
@@ -260,13 +261,13 @@ export function useCrisisDetection({
     } else if (result.riskLevel === 'high') {
       level = 'danger'
       message = 'HIGH RISK: Crisis detected, urgent attention needed'
-    } else if (result.crisisDetected) {
+    } else if (result.isCrisis) {
       level = 'warning'
       message = 'Crisis indicator detected, monitoring recommended'
     }
 
     return {
-      id: `alert-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      id: `alert-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`,
       timestamp: new Date(),
       level,
       message,
@@ -342,7 +343,7 @@ export function useCrisisDetection({
           setProgress(100)
 
           // Handle crisis detection
-          if (data.crisisDetected && onCrisisDetected) {
+          if (data.isCrisis && onCrisisDetected) {
             onCrisisDetected(data)
           }
 
@@ -375,7 +376,8 @@ export function useCrisisDetection({
 
           retries++
           // Exponential backoff with jitter
-          const delay = Math.min(1000 * Math.pow(2, retries) + Math.random() * 1000, 10000)
+          const secureJitter = parseInt(crypto.randomBytes(2).toString('hex'), 16) % 1000
+          const delay = Math.min(1000 * Math.pow(2, retries) + secureJitter, 10000)
           await new Promise((resolve) => setTimeout(resolve, delay))
         } finally {
           if (retries === maxRetries - 1) {
@@ -417,7 +419,7 @@ export function useCrisisDetection({
 
           // Process alerts
           chunkResults.forEach(result => {
-            if (result.crisisDetected && onCrisisDetected) {
+            if (result.isCrisis && onCrisisDetected) {
               onCrisisDetected(result)
             }
 
@@ -492,7 +494,7 @@ export function useCrisisDetection({
             setResults(prev => [...prev, data])
 
             // Handle crisis detection
-            if (data.crisisDetected && onCrisisDetected) {
+            if (data.isCrisis && onCrisisDetected) {
               onCrisisDetected(data)
             }
 

@@ -42,14 +42,20 @@ export interface CoreEnvironmentVariables {
 
 /** Database-related environment variables */
 export interface DatabaseEnvironmentVariables {
+  readonly MONGODB_URI?: DatabaseUrl | undefined
+  readonly MONGODB_DB_NAME?: string | undefined
+  readonly MONGODB_USERNAME?: string | undefined
+  readonly MONGODB_PASSWORD?: ApiKey | undefined
+  readonly MONGODB_CLUSTER?: string | undefined
+  
+  // Legacy database support
   readonly DATABASE_URL?: DatabaseUrl | undefined
-  readonly SUPABASE_URL?: Url | undefined
-  readonly SUPABASE_ANON_KEY?: ApiKey | undefined
-  readonly SUPABASE_SERVICE_ROLE_KEY?: ApiKey | undefined
 }
 
 /** Authentication environment variables */
 export interface AuthEnvironmentVariables {
+  readonly JWT_SECRET?: ApiKey | undefined
+  readonly JWT_EXPIRES_IN?: string | undefined
   readonly AUTH_SECRET?: ApiKey | undefined
   readonly GITHUB_CLIENT_ID?: string | undefined
   readonly GITHUB_CLIENT_SECRET?: ApiKey | undefined

@@ -8,12 +8,53 @@ import {
   useCrisisDetection,
   useSentimentAnalysis,
 } from '../ai'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { 
+  Shield, 
+  Activity, 
+  TrendingUp, 
+  Clock, 
+  AlertTriangle,
+  CheckCircle,
+  Brain,
+  Heart,
+  BarChart3,
+  MessageSquare,
+  Download,
+  History
+} from 'lucide-react'
+import { apiClient } from '@/lib/api-client'
 import React from 'react'
 
 interface ChatDemoProps {
   className?: string
   onCrisisAlert?: (crisis: CrisisDetectionResult) => void
   maxMessages?: number
+}
+
+interface ConversationMetrics {
+  messageCount: number
+  avgResponseTime: number
+  sentimentTrend: Array<{ timestamp: number; sentiment: number }>
+  riskLevel: 'low' | 'moderate' | 'high'
+  interventionCount: number
+  userEngagement: number
+  sessionDuration: number
+  confidenceScore: number
+}
+
+interface SessionAnalytics {
+  startTime: number
+  totalMessages: number
+  crisisDetections: number
+  interventionSuccess: number
+  userSatisfaction?: number
+  therapyFrameworks: string[]
+  keyTopics: string[]
 }
 
 /**
@@ -231,7 +272,7 @@ export function ChatDemo({
             .filter((m) => m.role !== 'system' && m.content !== undefined)
             .slice(-maxMessages) // Limit message history
             .map((m) => ({
-              role: m.role,
+              role: m.role as 'user' | 'assistant' | 'system',
               content: m.content || '',
               name: m.name || '',
             }))}
@@ -392,7 +433,7 @@ export function ChatDemo({
                           <ul className="text-xs text-gray-600 space-y-1">
                             {crisisResult.suggestedActions
                               .slice(0, 2)
-                              .map((action) => (
+                              .map((action: string) => (
                                 <li key={action} className="flex items-start">
                                   <span className="mr-1">•</span>
                                   <span>{action}</span>
@@ -431,12 +472,12 @@ export class ChatDemoErrorBoundary extends React.Component<
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ChatDemo Error:', error, errorInfo)
     // Log to monitoring service in production
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
@@ -461,7 +502,7 @@ export class ChatDemoErrorBoundary extends React.Component<
         )
       )
     }
-
+  
     return this.props.children
   }
 }

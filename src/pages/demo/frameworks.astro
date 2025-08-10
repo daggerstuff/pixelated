@@ -1,0 +1,127 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo'
+---
+
+<BaseLayout
+  title="Therapeutic Frameworks Browser - Evidence-Based Practice"
+  description="Interactive browser for evidence-based therapeutic frameworks and techniques. Explore CBT, DBT, ACT, and more with detailed clinical information."
+>
+  <main class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div class="container mx-auto px-4 py-12">
+      <!-- Hero Section -->
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 bg-purple-600/10 border border-purple-500/20 rounded-full px-4 py-2 mb-6">
+          <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+          <span class="text-purple-400 font-medium text-sm">THERAPEUTIC FRAMEWORKS</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+          Evidence-Based
+          <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent block">
+            Therapeutic Frameworks
+          </span>
+        </h1>
+        
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
+          Comprehensive interactive browser for evidence-based therapeutic frameworks and techniques. 
+          Explore detailed clinical information, research evidence, and practical applications for CBT, DBT, ACT, and more.
+        </p>
+        
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+          <div class="bg-purple-600/20 border border-purple-500/30 rounded-lg px-4 py-2 text-purple-300">
+            <span class="font-semibold">5+</span> Major Frameworks
+          </div>
+          <div class="bg-pink-600/20 border border-pink-500/30 rounded-lg px-4 py-2 text-pink-300">
+            <span class="font-semibold">200+</span> Techniques
+          </div>
+          <div class="bg-blue-600/20 border border-blue-500/30 rounded-lg px-4 py-2 text-blue-300">
+            <span class="font-semibold">Evidence</span> Levels
+          </div>
+          <div class="bg-green-600/20 border border-green-500/30 rounded-lg px-4 py-2 text-green-300">
+            <span class="font-semibold">Clinical</span> Applications
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo Component -->
+      <PsychologyFrameworksDemo client:load />
+      
+      <!-- Framework Information -->
+      <div class="mt-16 max-w-6xl mx-auto">
+        <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
+          <h2 class="text-2xl font-bold text-white mb-6 text-center">Included Therapeutic Frameworks</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-blue-900/30 border border-blue-500/20 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-blue-400 mb-3">Cognitive Behavioral Therapy (CBT)</h3>
+              <p class="text-gray-300 text-sm mb-4">
+                Evidence-based approach focusing on identifying and changing dysfunctional thought patterns and behaviors.
+              </p>
+              <div class="text-xs text-blue-300">
+                <strong>Evidence Level:</strong> Strong • <strong>Applications:</strong> Depression, Anxiety, PTSD
+              </div>
+            </div>
+            
+            <div class="bg-green-900/30 border border-green-500/20 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-green-400 mb-3">Dialectical Behavior Therapy (DBT)</h3>
+              <p class="text-gray-300 text-sm mb-4">
+                Comprehensive treatment incorporating mindfulness, distress tolerance, emotion regulation, and interpersonal skills.
+              </p>
+              <div class="text-xs text-green-300">
+                <strong>Evidence Level:</strong> Strong • <strong>Applications:</strong> BPD, Self-harm, Emotional dysregulation
+              </div>
+            </div>
+            
+            <div class="bg-purple-900/30 border border-purple-500/20 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-purple-400 mb-3">Acceptance & Commitment Therapy (ACT)</h3>
+              <p class="text-gray-300 text-sm mb-4">
+                Third-wave therapy focusing on psychological flexibility, mindfulness, and values-based action.
+              </p>
+              <div class="text-xs text-purple-300">
+                <strong>Evidence Level:</strong> Moderate • <strong>Applications:</strong> Chronic pain, Anxiety, Workplace stress
+              </div>
+            </div>
+            
+            <div class="bg-orange-900/30 border border-orange-500/20 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-orange-400 mb-3">Psychodynamic Therapy</h3>
+              <p class="text-gray-300 text-sm mb-4">
+                Insight-oriented approach exploring unconscious processes and early life experiences.
+              </p>
+              <div class="text-xs text-orange-300">
+                <strong>Evidence Level:</strong> Moderate • <strong>Applications:</strong> Personality disorders, Complex trauma
+              </div>
+            </div>
+            
+            <div class="bg-teal-900/30 border border-teal-500/20 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-teal-400 mb-3">Humanistic Therapy</h3>
+              <p class="text-gray-300 text-sm mb-4">
+                Client-centered approach emphasizing personal growth, self-actualization, and therapeutic relationship.
+              </p>
+              <div class="text-xs text-teal-300">
+                <strong>Evidence Level:</strong> Moderate • <strong>Applications:</strong> Self-esteem, Personal growth
+              </div>
+            </div>
+            
+            <div class="bg-red-900/30 border border-red-500/20 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-red-400 mb-3">Trauma-Informed Care</h3>
+              <p class="text-gray-300 text-sm mb-4">
+                Comprehensive approach recognizing and responding to the impact of traumatic stress.
+              </p>
+              <div class="text-xs text-red-300">
+                <strong>Evidence Level:</strong> Strong • <strong>Applications:</strong> PTSD, Complex trauma, Crisis intervention
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 p-6 bg-purple-950/30 border border-purple-500/20 rounded-lg">
+            <p class="text-purple-200 text-center">
+              <strong>Educational Resource:</strong> This framework browser provides evidence-based information 
+              for educational and training purposes. All content is derived from peer-reviewed research and clinical practice guidelines.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

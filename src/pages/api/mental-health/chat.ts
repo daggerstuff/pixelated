@@ -278,7 +278,10 @@ const CRISIS_RESOURCES = {
 }
 
 function generateSessionId(): string {
-  return `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  // Use cryptographically secure random bytes for session ID
+  const crypto = require('crypto');
+  const secureRandom = crypto.randomBytes(6).toString('hex');
+  return `chat_${Date.now()}_${secureRandom}`;
 }
 
 function analyzeSentiment(message: string): number {
@@ -289,38 +292,57 @@ function analyzeSentiment(message: string): number {
   let score = 0
   
   words.forEach(word => {
-    if (positiveWords.some(pos => word.includes(pos))) score += 1
-    if (negativeWords.some(neg => word.includes(neg))) score -= 1
+    if (positiveWords.some(pos => word.includes(pos))) { score += 1; }
+    if (negativeWords.some(neg => word.includes(neg))) { score -= 1; }
   })
   
   return Math.max(-1, Math.min(1, score / words.length * 10))
 }
 
 function assessRisk(message: string, userContext?: ChatRequest['userContext']): ChatResponse['riskAssessment'] {
-  let crisisLevel: ChatResponse['riskAssessment']['crisisLevel'] = 'none'
+  let crisisLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent' = 'none'
   let suicidalIdeation = false
   let selfHarmIndicators = false
   let immediateAction = false
   const recommendedActions: string[] = []
 
-  // Check for suicidal ideation
-  if (CRISIS_PATTERNS.suicidal.some(pattern => pattern.test(message))) {
-    suicidalIdeation = true
-    crisisLevel = 'high'
+  // Defensive: limit message length to prevent ReDoS risk
+  const safeMessage = typeof message === 'string' ? message.slice(0, 500) : '';
+  const lowerSafeMessage = safeMessage.toLowerCase();
+  
+  // Check for suicidal ideation (ReDoS-safe: use includes)
+  if (
+    CRISIS_PATTERNS.suicidal.some(pattern => {
+      // Convert regex to string and match as phrase
+      const phrase = pattern.source.replace(/\\\w\b|\W/g, '').toLowerCase();
+      return lowerSafeMessage.includes(phrase);
+    })
+  ) {
+    suicidalIdeation = true;
+    crisisLevel = 'high';
   }
 
-  // Check for self-harm indicators
-  if (CRISIS_PATTERNS.selfHarm.some(pattern => pattern.test(message))) {
-    selfHarmIndicators = true
-    if (crisisLevel === 'none') crisisLevel = 'moderate'
+  // Check for self-harm indicators (ReDoS-safe: use includes)
+  if (
+    CRISIS_PATTERNS.selfHarm.some(pattern => {
+      const phrase = pattern.source.replace(/\\\w\b|\W/g, '').toLowerCase();
+      return lowerSafeMessage.includes(phrase);
+    })
+  ) {
+    selfHarmIndicators = true;
+    if (crisisLevel === 'none') { crisisLevel = 'moderate'; }
   }
 
-  // Check for immediate intent
-  if (CRISIS_PATTERNS.immediate.some(pattern => pattern.test(message))) {
-    if (suicidalIdeation || selfHarmIndicators) {
-      crisisLevel = 'imminent'
-      immediateAction = true
-    }
+  // Check for immediate intent (ReDoS-safe: use includes)
+  if (
+    CRISIS_PATTERNS.immediate.some(pattern => {
+      const phrase = pattern.source.replace(/\\\w\b|\W/g, '').toLowerCase();
+      return lowerSafeMessage.includes(phrase);
+    }) &&
+    (suicidalIdeation || selfHarmIndicators)
+  ) {
+    crisisLevel = 'imminent';
+    immediateAction = true;
   }
 
   // Consider user context
@@ -377,26 +399,26 @@ function determineStressLevel(message: string): 'low' | 'moderate' | 'high' | 'c
   return 'moderate' // Default
 }
 
-function generateResponse(message: string, analysis: ChatResponse['analysis'], riskAssessment?: ChatResponse['riskAssessment']): ChatResponse['response'] {
-  let responseMessage: string
-  let responseType: ChatResponse['response']['type']
+function generateResponse(_message: string, analysis: ChatResponse['analysis'], riskAssessment?: ChatResponse['riskAssessment']): ChatResponse['response'] {
+  let responseMessage: string;
+  let responseType: ChatResponse['response']['type'];
   
   // Crisis response
   if (riskAssessment?.crisisLevel === 'imminent') {
-    responseMessage = "I'm very concerned about what you've shared. Your safety is the most important thing right now. Please reach out for immediate help by calling 988 (National Suicide Prevention Lifeline) or going to your nearest emergency room. You don't have to go through this alone."
-    responseType = 'crisis_intervention'
+    responseMessage = "I'm very concerned about what you've shared. Your safety is the most important thing right now. Please reach out for immediate help by calling 988 (National Suicide Prevention Lifeline) or going to your nearest emergency room. You don't have to go through this alone.";
+    responseType = 'crisis_intervention';
   } else if (riskAssessment?.crisisLevel === 'high') {
-    responseMessage = "Thank you for sharing something so difficult with me. I'm concerned about how you're feeling. Please consider reaching out to a mental health professional or calling 988 for support. In the meantime, let's work on some coping strategies together."
-    responseType = 'crisis_intervention'
+    responseMessage = "Thank you for sharing something so difficult with me. I'm concerned about how you're feeling. Please consider reaching out to a mental health professional or calling 988 for support. In the meantime, let's work on some coping strategies together.";
+    responseType = 'crisis_intervention';
   } else if (analysis.stressLevel === 'high') {
-    responseMessage = "It sounds like you're going through a really challenging time right now. That level of stress can feel overwhelming. Let's focus on some immediate coping strategies that might help you feel more grounded."
-    responseType = 'coping_strategy'
+    responseMessage = "It sounds like you're going through a really challenging time right now. That level of stress can feel overwhelming. Let's focus on some immediate coping strategies that might help you feel more grounded.";
+    responseType = 'coping_strategy';
   } else if (analysis.stressLevel === 'moderate') {
-    responseMessage = "I hear that you're dealing with some stress and difficult feelings. It's completely normal to have ups and downs. Would you like to explore what's contributing to these feelings or work on some coping strategies?"
-    responseType = 'supportive'
+    responseMessage = "I hear that you're dealing with some stress and difficult feelings. It's completely normal to have ups and downs. Would you like to explore what's contributing to these feelings or work on some coping strategies?";
+    responseType = 'supportive';
   } else {
-    responseMessage = "Thank you for sharing with me. It sounds like you're managing things relatively well. Is there anything specific you'd like to talk about or work on today?"
-    responseType = 'supportive'
+    responseMessage = "Thank you for sharing with me. It sounds like you're managing things relatively well. Is there anything specific you'd like to talk about or work on today?";
+    responseType = 'supportive';
   }
   
   return {
@@ -404,11 +426,11 @@ function generateResponse(message: string, analysis: ChatResponse['analysis'], r
     type: responseType,
     confidence: 0.85,
     sessionId: generateSessionId()
-  }
+  };
 }
 
 function extractKeyTopics(message: string): string[] {
-  const topics = []
+  const topics: string[] = []
   const lowerMessage = message.toLowerCase()
   
   const topicKeywords = {
@@ -475,13 +497,13 @@ export const POST = async ({ request }: { request: Request }) => {
 
     // Coping strategies
     const copingStrategies = options.includeCopingStrategies ? {
-      immediate: COPING_STRATEGIES.immediate.filter(strategy => 
-        analysis.stressLevel === 'high' || riskAssessment?.crisisLevel !== 'none'
-      ).slice(0, 2),
-      shortTerm: COPING_STRATEGIES.shortTerm.filter(strategy => 
+      immediate: (COPING_STRATEGIES['immediate'] ?? []).filter(
+         () => analysis.stressLevel === 'high' || riskAssessment?.crisisLevel !== 'none'
+       ).slice(0, 2),
+      shortTerm: (COPING_STRATEGIES['shortTerm'] ?? []).filter(strategy =>
         strategy.suitability.some(suit => keyTopics.includes(suit))
       ).slice(0, 2),
-      longTerm: COPING_STRATEGIES.longTerm.slice(0, 1)
+      longTerm: (COPING_STRATEGIES['longTerm'] ?? []).slice(0, 1)
     } : undefined
 
     // Resources (only if high risk or crisis)
@@ -502,9 +524,9 @@ export const POST = async ({ request }: { request: Request }) => {
     const processingTime = Date.now() - startTime
     const flags: string[] = []
     
-    if (riskAssessment?.immediateAction) flags.push('IMMEDIATE_ACTION_REQUIRED')
-    if (riskAssessment?.crisisLevel === 'high' || riskAssessment?.crisisLevel === 'imminent') flags.push('HIGH_RISK')
-    if (analysis.stressLevel === 'high') flags.push('HIGH_STRESS')
+    if (riskAssessment?.immediateAction) { flags.push('IMMEDIATE_ACTION_REQUIRED'); }
+    if (riskAssessment?.crisisLevel === 'high' || riskAssessment?.crisisLevel === 'imminent') { flags.push('HIGH_RISK'); }
+    if (analysis.stressLevel === 'high') { flags.push('HIGH_STRESS'); }
 
     const chatResponse: ChatResponse = {
       response,

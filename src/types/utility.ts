@@ -241,9 +241,11 @@ export type PaginatedResponse<T> = ApiResponse<T[]> & {
 export type EnvironmentVariables = {
   readonly NODE_ENV: 'development' | 'production' | 'test'
   readonly PUBLIC_SITE_URL: string
-  readonly DATABASE_URL?: string
-  readonly SUPABASE_URL?: string
-  readonly SUPABASE_ANON_KEY?: string
+  readonly MONGODB_URI?: string
+  readonly MONGODB_DB_NAME?: string
+  readonly MONGODB_USERNAME?: string
+  readonly MONGODB_PASSWORD?: string
+  readonly MONGODB_CLUSTER?: string
 }
 
 // ============================================================================

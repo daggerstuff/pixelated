@@ -15,6 +15,9 @@
 /* Import advanced animation sequences */
 @import './advanced-animations.css';
 
+/* Import Mind Mirror UI enhancements */
+@import './mind-mirror.css';
+
 :root {
   --c-bg: #050505;
   --c-scrollbar: #111;

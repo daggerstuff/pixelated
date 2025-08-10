@@ -1,6 +1,5 @@
 // Core AI Types
 export * from './types/CognitiveModel'
-export * from './types/MentalHealthAnalysis'
 export * from './types/TherapeuticGoals'
 export * from './models/types'
 
@@ -19,12 +18,8 @@ export * from './datasets/prepare-fine-tuning'
 export * from './datasets/merge-datasets'
 
 // Mental Health AI
-export type {
-  MentalHealthAnalysis,
-  CrisisDetectionResult,
-  SentimentAnalysisResult,
-  TherapeuticResponse,
-} from './types/MentalHealthAnalysis'
+export type { AIMessage } from './types'
+export type { CrisisDetectionResult } from './crisis/types'
 
 // Re-export common AI utilities
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
@@ -59,6 +54,19 @@ export interface AIService {
 }
 
 // Mock AI Service implementation
+import crypto from 'crypto'
+
+/**
+ * Generates a cryptographically secure random float between 0 (inclusive) and 1 (exclusive).
+ * Uses Node.js crypto.randomBytes for secure randomness.
+ */
+function secureRandomFloat(): number {
+  const buf = crypto.randomBytes(4)
+  const uint = buf.readUInt32BE(0)
+  // Divide by 2^32 to ensure the result is in [0, 1)
+  return uint / 2 ** 32
+}
+
 class MockAIService implements AIService {
   private initialized = false
 
@@ -89,7 +97,7 @@ class MockAIService implements AIService {
 
     // Mock processing
     await new Promise((resolve) =>
-      setTimeout(resolve, 100 + Math.random() * 200),
+      setTimeout(resolve, 100 + secureRandomFloat() * 200),
     )
 
     return {
@@ -97,7 +105,7 @@ class MockAIService implements AIService {
       input: text,
       options,
       result: `Processed: ${text.substring(0, 50)}...`,
-      confidence: 0.85 + Math.random() * 0.15,
+      confidence: 0.85 + secureRandomFloat() * 0.15,
     }
   }
 

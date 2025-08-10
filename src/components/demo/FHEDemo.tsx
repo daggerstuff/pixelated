@@ -75,8 +75,9 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="md:col-span-2 space-y-2">
-          <label className="text-sm font-medium">Plaintext Message</label>
+          <label htmlFor="plaintext-message" className="text-sm font-medium">Plaintext Message</label>
           <textarea
+            id="plaintext-message"
             className="w-full min-h-[120px] rounded border bg-background p-3"
             value={plainText}
             onChange={(e) => setPlainText(e.target.value)}
@@ -84,8 +85,9 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Operation</label>
+          <label htmlFor="operation-select" className="text-sm font-medium">Operation</label>
           <select
+            id="operation-select"
             className="w-full rounded border bg-background p-2"
             value={operation}
             onChange={(e) => setOperation(e.target.value as any)}

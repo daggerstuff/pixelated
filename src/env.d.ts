@@ -6,9 +6,10 @@ declare module 'astro' {
 }
 
 interface ImportMetaEnv {
-  readonly PUBLIC_SUPABASE_URL: string
-  readonly PUBLIC_SUPABASE_ANON_KEY: string
-  readonly SUPABASE_SERVICE_ROLE_KEY: string
+  readonly PUBLIC_MONGODB_CLUSTER: string
+  readonly MONGODB_URI: string
+  readonly MONGODB_DB_NAME: string
+  readonly JWT_SECRET: string
   readonly SSR: boolean
 
   // Sentry Environment Variables

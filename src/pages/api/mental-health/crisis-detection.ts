@@ -281,7 +281,7 @@ function detectCrisisIndicators(content: string): {
   indicators: Array<{ type: string, severity: 'high' | 'moderate' | 'low', matches: string[] }>
   timeline: 'no_timeline' | 'vague' | 'within_weeks' | 'within_days' | 'within_hours'
 } {
-  const indicators = []
+  const indicators: { type: string; severity: 'high' | 'moderate' | 'low'; matches: string[] }[] = []
   let timeline: 'no_timeline' | 'vague' | 'within_weeks' | 'within_days' | 'within_hours' = 'no_timeline'
 
   // Check each crisis indicator category
@@ -431,13 +431,6 @@ export const POST = async ({ request }: { request: Request }) => {
       })
     }
 
-    const options = {
-      sensitivityLevel: 'standard',
-      includeTreatmentSuggestions: true,
-      includeResourceRecommendations: true,
-      enableImmediateNotifications: true,
-      ...body.options
-    }
 
     // Detect crisis indicators
     const { indicators, timeline } = detectCrisisIndicators(body.content)

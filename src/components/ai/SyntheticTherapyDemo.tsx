@@ -45,7 +45,7 @@ function getSecureRandomInt(min: number, max: number): number {
   const range = max - min + 1
   const array = new Uint32Array(1)
   crypto.getRandomValues(array)
-  return min + (array[0]! % range)
+  return min + ((array[0] ?? 0) % range)
 }
 
 /**
@@ -55,7 +55,7 @@ function getSecureRandomInt(min: number, max: number): number {
 function getSecureRandomBoolean(): boolean {
   const array = new Uint8Array(1)
   crypto.getRandomValues(array)
-  return array[0]! >= 128
+  return (array[0] ?? 0) >= 128
 }
 
 interface SyntheticConversation {
@@ -144,10 +144,9 @@ export default function SyntheticTherapyDemo() {
       }]
 
       setConversations(apiConversations)
-
     } catch (error) {
-      console.error('Failed to generate conversations:', error)
-      
+      console.error('Failed to generate conversations:', error);
+
       // Fallback to mock data on API failure
       const mockConversations: SyntheticConversation[] = [
         {
@@ -196,12 +195,12 @@ export default function SyntheticTherapyDemo() {
             "Session Summary:\n\nPatient presented with excessive worry, restlessness, fatigue.\nTherapist identified: anxiety, insomnia, fatigue.\n\nSymptom detection accuracy: 67%\n\nThe conversation covered the patient's experiences with excessive worry, fatigue.\nThe therapist may have missed: restlessness.\n\nThis simulated interaction demonstrates the importance of thorough assessment and active listening in the therapeutic relationship.",
           accuracyScore: 0.67,
         },
-      ]
+      ];
 
-      setConversations(mockConversations)
-      setSelectedConversationIndex(0)
+      setConversations(mockConversations);
+      setSelectedConversationIndex(0);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 

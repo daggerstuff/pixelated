@@ -1,18 +1,19 @@
 import React from 'react'
-import EnhancedMentalHealthChat from './ui/EnhancedMentalHealthChat'
+import { MentalHealthChatDemo } from './MentalHealthChatDemo'
 
 interface MindMirrorDemoProps {
   className?: string
 }
 
-export const MindMirrorDemo: React.FC<MindMirrorDemoProps> = ({ 
-  className = "" 
+export const MindMirrorDemo: React.FC<MindMirrorDemoProps> = ({
+  className = ""
 }) => {
   return (
     <div className={`w-full ${className}`}>
-      <EnhancedMentalHealthChat 
-        showBrainViz={true}
+      <MentalHealthChatDemo
         showAnalysisPanel={true}
+        showSettingsPanel={false}
+        initialTab="analysis"
       />
     </div>
   )

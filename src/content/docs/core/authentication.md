@@ -181,14 +181,13 @@ try {
 
 ### Frontend Setup
 
-1. Initialize Supabase Client:
+1. Initialize MongoDB Auth Service:
 
 ```typescript
+import { mongoAuthService } from '@/services/mongoAuth.service'
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY,
-)
+// Create auth session
+const session = await mongoAuthService.signIn(email, password)
 ```
 
 2. Create Auth Context:

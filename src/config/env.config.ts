@@ -25,7 +25,14 @@ const envSchema = z.object({
   // Notification worker configuration
   NOTIFICATION_WS_PORT: z.string().transform(Number).default('8082'),
 
-  // Database
+  // Database - MongoDB Atlas
+  MONGODB_URI: z.string().optional(),
+  MONGODB_DB_NAME: z.string().optional(),
+  MONGODB_USERNAME: z.string().optional(),
+  MONGODB_PASSWORD: z.string().optional(),
+  MONGODB_CLUSTER: z.string().optional(),
+  
+  // Legacy database (PostgreSQL) - kept for migration purposes
   POSTGRES_URL: z.string().optional(),
   POSTGRES_PRISMA_URL: z.string().optional(),
   POSTGRES_URL_NON_POOLING: z.string().optional(),
@@ -36,12 +43,9 @@ const envSchema = z.object({
   REDIS_URL: z.string().optional(),
   REDIS_TOKEN: z.string().optional(),
 
-  // Authentication
-  SUPABASE_URL: z.string().url().optional(),
-  SUPABASE_KEY: z.string().optional(),
-  SUPABASE_ANON_KEY: z.string().optional(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
-  SUPABASE_JWT_SECRET: z.string().optional(),
+  // Authentication - JWT based
+  JWT_SECRET: z.string().optional(),
+  JWT_EXPIRES_IN: z.string().default('24h'),
 
   // APIs
   OPENAI_API_KEY: z.string().optional(),
@@ -111,8 +115,7 @@ const envSchema = z.object({
 
   // Client-side variables (exposed to the browser)
   VITE_API_URL: z.string().url().optional(),
-  VITE_SUPABASE_URL: z.string().url().optional(),
-  VITE_SUPABASE_ANON_KEY: z.string().optional(),
+  VITE_MONGODB_CLUSTER: z.string().optional(),
 
   // Notification configuration
   VAPID_PUBLIC_KEY: z.string().optional(),
@@ -147,10 +150,9 @@ const envSchema = z.object({
 
 function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
   const secretKeys = [
-    'SUPABASE_KEY',
-    'SUPABASE_ANON_KEY',
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'SUPABASE_JWT_SECRET',
+    'MONGODB_PASSWORD',
+    'MONGODB_URI',
+    'JWT_SECRET',
     'OPENAI_API_KEY',
     'TOGETHER_API_KEY',
     'GOOGLE_API_KEY',
@@ -240,9 +242,21 @@ export const config = {
   },
 
   database: {
+    mongoUri: (): string | undefined => env().MONGODB_URI,
+    mongoDbName: (): string | undefined => env().MONGODB_DB_NAME,
+    mongoUsername: (): string | undefined => env().MONGODB_USERNAME,
+    mongoPassword: (): string | undefined => env().MONGODB_PASSWORD,
+    mongoCluster: (): string | undefined => env().MONGODB_CLUSTER,
+    
+    // Legacy PostgreSQL support
     url: (): string | undefined => env().POSTGRES_URL,
     prismaUrl: (): string | undefined => env().POSTGRES_PRISMA_URL,
     nonPoolingUrl: (): string | undefined => env().POSTGRES_URL_NON_POOLING,
+  },
+
+  auth: {
+    jwtSecret: (): string | undefined => env().JWT_SECRET,
+    jwtExpiresIn: (): string => env().JWT_EXPIRES_IN,
   },
 
   redis: {
@@ -321,6 +335,7 @@ export const config = {
 
   client: {
     apiUrl: (): string | undefined => env().VITE_API_URL,
+    mongoCluster: (): string | undefined => env().VITE_MONGODB_CLUSTER,
   },
 
   notifications: {

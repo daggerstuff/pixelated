@@ -11,7 +11,9 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { AlertTriangle, Heart, Brain, Shield, Zap } from 'lucide-react'
+import { AlertTriangle, Heart, Brain, Shield, Zap, Activity, Sparkles, User, Bot } from 'lucide-react'
+import MindMirrorDashboard, { type MindMirrorAnalysis } from '@/components/ui/MindMirrorDashboard'
+import BrainVisualization from '@/components/ui/BrainVisualization'
 // import {
 //   MentalHealthInsights,
 //   MentalHealthHistoryChart,
@@ -108,11 +110,19 @@ interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
-  timestamp: number
+  timestamp: string
   mentalHealthAnalysis?: MentalHealthAnalysisResult
   isProcessing?: boolean
   riskLevel?: 'low' | 'medium' | 'high' | 'critical'
   needsIntervention?: boolean
+  apiResponse?: any // Add type if available
+  metadata?: {
+    responseType?: string
+    confidence?: number
+    copingStrategies?: any
+    resources?: any
+    processingTime?: number
+  }
 }
 
 // Helper function to convert MentalHealthAnalysisResult to EnhancedMentalHealthAnalysis
@@ -199,6 +209,12 @@ const enhanceAnalysisArray = (
  * Production-grade Mental Health Chat Demo Component
  * Showcases real MentalLLaMA integration with clinical-grade analysis
  */
+function generateSecureRandomString(length: number): string {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => byte.toString(36)).join('');
+}
+
 export const MentalHealthChatDemo = memo(function MentalHealthChatDemo() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -212,7 +228,7 @@ export const MentalHealthChatDemo = memo(function MentalHealthChatDemo() {
 🚨 **Crisis Detection**: Automatic identification of urgent situations with immediate resources
 
 How are you feeling today? I'm here to listen and help.`,
-      timestamp: Date.now(),
+      timestamp: new Date().toISOString(),
     },
   ])
 
@@ -228,7 +244,59 @@ How are you feeling today? I'm here to listen and help.`,
     enableCrisisDetection: true,
     confidenceThreshold: 0.6,
     interventionThreshold: 0.7,
+    enableMindMirrorUI: true,
+    showBrainVisualization: true,
   })
+  const [currentMindMirrorAnalysis, setCurrentMindMirrorAnalysis] = useState<MindMirrorAnalysis | null>(null)
+
+  // Convert existing analysis to Mind-Mirror format
+  const convertToMindMirrorAnalysis = useCallback((analysis: EnhancedMentalHealthAnalysis): MindMirrorAnalysis => {
+    // Map mental health categories to archetypes
+    const categoryToArchetype = {
+      'depression': 'wounded_healer',
+      'anxiety': 'shadow_strategist',
+      'stress': 'rebel_spirit',
+      'anger': 'rebel_spirit',
+      'social_isolation': 'inner_child',
+      'bipolar_disorder': 'visionary',
+      'ocd': 'shadow_strategist',
+      'eating_disorder': 'wounded_healer',
+      'social_anxiety': 'inner_child',
+      'panic_disorder': 'wounded_healer',
+      'low': 'wise_elder',
+      'medium': 'caregiver',
+      'high': 'wounded_healer',
+      'critical': 'wounded_healer'
+    }
+
+    const archetype = categoryToArchetype[analysis.category as keyof typeof categoryToArchetype] || 'visionary'
+
+    return {
+      archetype: {
+        main_archetype: archetype,
+        confidence: analysis.confidence,
+        color: "#45B7D1",
+        description: analysis.explanation
+      },
+      mood_vector: {
+        emotional_intensity: analysis.riskLevel === 'high' ? 0.8 : analysis.riskLevel === 'medium' ? 0.6 : 0.4,
+        cognitive_clarity: analysis.confidence,
+        energy_level: analysis.category === 'stress' ? 0.3 : 0.6,
+        social_connection: analysis.category === 'social_isolation' ? 0.2 : 0.7,
+        coherence_index: analysis.confidence,
+        urgency_score: analysis.riskLevel === 'high' ? 0.9 : analysis.riskLevel === 'medium' ? 0.6 : 0.3
+      },
+      timestamp: analysis.timestamp,
+      session_id: "chat_session",
+      insights: analysis.supportingEvidence || [],
+      recommendations: [
+        "Continue monitoring your mental health patterns",
+        "Consider professional support if symptoms persist",
+        "Practice self-care and stress management techniques"
+      ]
+    }
+  }, [])
+
   const [sessionStats, setSessionStats] = useState({
     totalMessages: 0,
     analysisCount: 0,
@@ -323,7 +391,7 @@ How are you feeling today? I'm here to listen and help.`,
         })(),
         role: 'user',
         content: input,
-        timestamp: Date.now(),
+        timestamp: new Date().toISOString(),
         isProcessing: true,
       }
 
@@ -374,14 +442,14 @@ How are you feeling today? I'm here to listen and help.`,
 
           // Convert API response to our analysis format
           const analysisResult: MentalHealthAnalysisResult = {
-            category: chatResult.analysis.emotionalState,
+            mentalHealthCategory: chatResult.analysis.emotionalState,
             confidence: chatResult.analysis.concernSeverity / 10, // Convert 1-10 to 0-1
             supportingEvidence: chatResult.analysis.keyTopics,
-            isCrisis: chatResult.riskAssessment?.crisisLevel === 'imminent' || 
+            isCrisis: chatResult.riskAssessment?.crisisLevel === 'imminent' ||
                      chatResult.riskAssessment?.crisisLevel === 'high',
             hasMentalHealthIssue: chatResult.analysis.stressLevel !== 'low',
-            summary: `Stress level: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : chatResult.analysis.sentimentScore < 0 ? 'negative' : 'neutral'}`,
-            expertGuided: true
+            explanation: `Stress level: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : chatResult.analysis.sentimentScore < 0 ? 'negative' : 'neutral'}`,
+            timestamp: new Date().toISOString()
           }
 
           // Update message with analysis results
@@ -401,6 +469,29 @@ How are you feeling today? I'm here to listen and help.`,
                 : m,
             ),
           )
+
+          // Convert to Mind-Mirror format if enabled
+          if (settings.enableMindMirrorUI) {
+            const enhancedAnalysis: EnhancedMentalHealthAnalysis = {
+              timestamp: Date.now(),
+              category: chatResult.riskAssessment?.crisisLevel === 'imminent' ? 'critical' :
+                       chatResult.riskAssessment?.crisisLevel === 'high' ? 'high' :
+                       chatResult.riskAssessment?.crisisLevel === 'moderate' ? 'medium' : 'low',
+              explanation: analysisResult.explanation,
+              expertGuided: true,
+              scores: {},
+              summary: `Stress: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : 'negative'}`,
+              hasMentalHealthIssue: analysisResult.hasMentalHealthIssue,
+              confidence: analysisResult.confidence,
+              supportingEvidence: analysisResult.supportingEvidence || [],
+              riskLevel: chatResult.riskAssessment?.crisisLevel === 'imminent' ? 'high' :
+                        chatResult.riskAssessment?.crisisLevel === 'high' ? 'high' :
+                        chatResult.riskAssessment?.crisisLevel === 'moderate' ? 'medium' : 'low'
+            }
+
+            const mindMirrorAnalysis = convertToMindMirrorAnalysis(enhancedAnalysis)
+            setCurrentMindMirrorAnalysis(mindMirrorAnalysis)
+          }
 
           // Update session statistics
           setSessionStats((prev) => ({
@@ -422,10 +513,10 @@ How are you feeling today? I'm here to listen and help.`,
           // Add assistant response using the API response
           const timeoutId = window.setTimeout(() => {
             const assistantMessage: ChatMessage = {
-              id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+              id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
               role: 'assistant',
               content: chatResult.response.message,
-              timestamp: Date.now(),
+              timestamp: new Date().toISOString(),
               // Include API metadata for enhanced display
               metadata: {
                 responseType: chatResult.response.type,
@@ -452,10 +543,10 @@ How are you feeling today? I'm here to listen and help.`,
           // Generate a basic response for demo purposes
           const timeoutId = window.setTimeout(() => {
             const assistantMessage: ChatMessage = {
-              id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+              id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
               role: 'assistant',
               content: "I'm here to listen and support you. Could you tell me more about what's on your mind?",
-              timestamp: Date.now(),
+              timestamp: new Date().toISOString(),
             }
             setMessages((prev) => [...prev, assistantMessage])
           }, 1500)
@@ -472,10 +563,10 @@ How are you feeling today? I'm here to listen and help.`,
         // Generate a basic response
         const timeoutId = window.setTimeout(() => {
           const assistantMessage: ChatMessage = {
-            id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+            id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
             role: 'assistant',
             content: getDemoResponse(userMessage.content),
-            timestamp: Date.now(),
+            timestamp: new Date().toISOString(),
           }
           setMessages((prev) => [...prev, assistantMessage])
         }, 1000)
@@ -626,10 +717,10 @@ It sounds like you're dealing with some challenges. What's been the most difficu
       )
 
       const assistantMessage: ChatMessage = {
-        id: `intervention_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+        id: `intervention_${Date.now()}_${generateSecureRandomString(9)}`,
         role: 'assistant',
         content: `💡 **Therapeutic Intervention**\n\n${intervention}`,
-        timestamp: Date.now(),
+        timestamp: new Date().toISOString(),
       }
 
       setMessages((prev) => [...prev, assistantMessage])
@@ -652,19 +743,19 @@ It sounds like you're dealing with some challenges. What's been the most difficu
       <div
         className={`flex-1 ${settings.showAnalysisPanel ? 'md:max-w-[65%]' : 'w-full'}`}
       >
-        <Card className="h-[700px] flex flex-col shadow-lg">
-          <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-purple-50">
+        <Card className="h-[700px] flex flex-col shadow-lg border-0 overflow-hidden">
+          <div className="p-4 border-b bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                  <Brain className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    MentalLLaMA Chat
+                  <h2 className="text-xl font-bold text-gray-900">
+                    🧠 MentalLLaMA Chat
                   </h2>
                   <p className="text-sm text-gray-600">
-                    Production-Grade Mental Health Analysis
+                    {settings.enableMindMirrorUI ? 'Enhanced Mind Mirror Analysis' : 'Production-Grade Mental Health Analysis'}
                   </p>
                 </div>
               </div>
@@ -865,8 +956,30 @@ It sounds like you're dealing with some challenges. What's been the most difficu
       {/* Enhanced Analysis Panel */}
       {settings.showAnalysisPanel && (
         <div className="md:w-[35%] space-y-4">
-          <Tabs defaultValue="insights" className="w-full">
-            <TabsList className="w-full grid grid-cols-4">
+          {/* Mind-Mirror Brain Visualization */}
+          {settings.enableMindMirrorUI && settings.showBrainVisualization && (
+            <BrainVisualization
+              moodVector={currentMindMirrorAnalysis?.mood_vector}
+              archetype={currentMindMirrorAnalysis?.archetype.main_archetype}
+            />
+          )}
+
+          {/* Mind-Mirror Dashboard */}
+          {settings.enableMindMirrorUI && (
+            <MindMirrorDashboard
+              analysis={currentMindMirrorAnalysis || undefined}
+              isAnalyzing={processing}
+            />
+          )}
+
+          <Tabs defaultValue={settings.enableMindMirrorUI ? "mindmirror" : "insights"} className="w-full">
+            <TabsList className={`w-full grid ${settings.enableMindMirrorUI ? 'grid-cols-5' : 'grid-cols-4'}`}>
+              {settings.enableMindMirrorUI && (
+                <TabsTrigger value="mindmirror" className="text-xs">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Mirror
+                </TabsTrigger>
+              )}
               <TabsTrigger value="insights" className="text-xs">
                 <Brain className="w-3 h-3 mr-1" />
                 Insights
@@ -883,6 +996,48 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 Settings
               </TabsTrigger>
             </TabsList>
+
+            {/* Mind-Mirror Tab Content */}
+            {settings.enableMindMirrorUI && (
+              <TabsContent value="mindmirror" className="mt-4 space-y-4">
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border-0 shadow-md">
+                  <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    Mind Mirror Analysis
+                  </h3>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Real-time psychological archetype detection and mood analysis
+                  </p>
+
+                  {currentMindMirrorAnalysis ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium">Current Archetype</span>
+                        <Badge variant="outline" className="text-xs">
+                          {currentMindMirrorAnalysis.archetype.main_archetype.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium">Confidence</span>
+                        <span className="text-xs font-bold">
+                          {Math.round(currentMindMirrorAnalysis.archetype.confidence * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium">Urgency Score</span>
+                        <Badge variant={currentMindMirrorAnalysis.mood_vector.urgency_score > 0.7 ? "destructive" : "outline"}>
+                          {Math.round(currentMindMirrorAnalysis.mood_vector.urgency_score * 100)}%
+                        </Badge>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500 italic">
+                      Send a message to see Mind Mirror analysis
+                    </p>
+                  )}
+                </div>
+              </TabsContent>
+            )}
 
             <TabsContent value="insights" className="mt-4 space-y-4">
               {/* Real-time Insights */}
@@ -1155,6 +1310,42 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                         />
                       </label>
                     </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="flex flex-col gap-1">
+                        <span className="text-sm">🧠 Mind Mirror UI</span>
+                        <span className="font-normal text-xs text-muted-foreground">
+                          Enable enhanced archetype detection and brain visualization
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={settings.enableMindMirrorUI}
+                          onChange={() =>
+                            handleToggleSetting('enableMindMirrorUI')
+                          }
+                          disabled={!settings.showAnalysisPanel}
+                          className="mt-2"
+                        />
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="flex flex-col gap-1">
+                        <span className="text-sm">Brain Visualization</span>
+                        <span className="font-normal text-xs text-muted-foreground">
+                          Show 3D neural activity mapping
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={settings.showBrainVisualization}
+                          onChange={() =>
+                            handleToggleSetting('showBrainVisualization')
+                          }
+                          disabled={!settings.enableMindMirrorUI}
+                          className="mt-2"
+                        />
+                      </label>
+                    </div>
                   </div>
 
                   <div className="pt-4 border-t space-y-3">
@@ -1173,7 +1364,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                         max="1.0"
                         step="0.1"
                         value={settings.confidenceThreshold}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        onChange={(e) =>
                           setSettings((prev) => ({
                             ...prev,
                             confidenceThreshold: parseFloat(e.target.value),
@@ -1194,7 +1385,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                         max="1.0"
                         step="0.1"
                         value={settings.interventionThreshold}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        onChange={(e) =>
                           setSettings((prev) => ({
                             ...prev,
                             interventionThreshold: parseFloat(e.target.value),

@@ -13,16 +13,16 @@ date: '2025-04-14'
 
 ## Overview
 
-This document outlines how to set up comprehensive database performance monitoring for our Supabase PostgreSQL database. The monitoring system collects metrics on connection counts, query performance, resource utilization, and other critical performance indicators.
+This document outlines how to set up comprehensive database performance monitoring for our MongoDB Atlas database. The monitoring system collects metrics on connection counts, query performance, resource utilization, and other critical performance indicators.
 
 ## Architecture
 
 Our database monitoring architecture combines several tools:
 
 1. **Prometheus**: For metrics collection and storage
-2. **Postgres Exporter**: For extracting PostgreSQL-specific metrics
+2. **MongoDB Exporter**: For extracting MongoDB-specific metrics
 3. **Grafana**: For visualization and alerting
-4. **CloudWatch (AWS)**: For log aggregation and additional metrics
+4. **MongoDB Atlas Monitoring**: Built-in Atlas monitoring tools
 
 ## Metrics Collected
 

@@ -14,6 +14,7 @@ export interface ChatContainerProps {
   className?: string
   inputPlaceholder?: string
   disabled?: boolean
+  onRetry?: () => Promise<void>
 }
 
 export function ChatContainer({

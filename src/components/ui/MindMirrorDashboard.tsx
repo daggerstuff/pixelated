@@ -109,13 +109,17 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   const [activeTab, setActiveTab] = useState("overview")
   
   const archetypeInfo = useMemo(() => {
-    if (!analysis?.archetype) return null
+    if (!analysis?.archetype) {
+      return null
+    }
     const archetypeKey = analysis.archetype.main_archetype.toLowerCase().replace(' ', '_')
     return ARCHETYPES[archetypeKey as keyof typeof ARCHETYPES] || null
   }, [analysis?.archetype])
 
   const moodMetrics = useMemo(() => {
-    if (!analysis?.mood_vector) return []
+    if (!analysis?.mood_vector) {
+      return []
+    }
     
     const { mood_vector } = analysis
     return [

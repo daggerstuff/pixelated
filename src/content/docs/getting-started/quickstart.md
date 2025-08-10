@@ -153,13 +153,13 @@ Access session management features:
 
 1. **Database Connection Issues**
 
-   - Verify Supabase credentials
+   - Verify MongoDB Atlas credentials
    - Check network connectivity
    - Ensure proper environment variables
 
 2. **API Authentication Errors**
 
-   - Verify API keys
+   - Verify JWT secret
    - Check token expiration
    - Ensure proper CORS configuration
 

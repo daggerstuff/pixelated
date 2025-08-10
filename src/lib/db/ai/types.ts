@@ -1,5 +1,5 @@
-import type { Json } from '../../../types/supabase'
-import type { User } from '../../auth/types'
+import type { Json } from '../../../types/json'
+import type { User } from '../../auth/index'
 
 /**
  * Base interface for all AI analysis results
@@ -29,6 +29,7 @@ export interface SentimentAnalysisResult extends BaseAnalysisResult {
   score: number
   confidence: number
   metadata: Json | null
+  emotions?: Record<string, number>
 }
 
 /**

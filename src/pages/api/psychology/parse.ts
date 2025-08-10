@@ -172,9 +172,10 @@ function identifyFrameworks(content: string, entities: ParseResponse['entities']
 function generateSummary(content: string, entities: ParseResponse['entities']): string {
   const conditionCount = entities.conditions.length
   const treatmentCount = entities.treatments.length
+  const wordCount = content.split(/\s+/).length
 
   if (conditionCount === 0 && treatmentCount === 0) {
-    return 'This content appears to be general psychological material without specific clinical focus.'
+    return `This content appears to be general psychological material without specific clinical focus. (Word count: ${wordCount})`
   }
 
   let summary = `Clinical content analysis reveals `
@@ -198,6 +199,8 @@ function generateSummary(content: string, entities: ParseResponse['entities']): 
   if (entities.symptoms.length > 0) {
     summary += `Key symptoms identified: ${entities.symptoms.slice(0, 3).join(', ')}. `
   }
+
+  summary += `(Word count: ${wordCount})`
 
   return summary
 }
