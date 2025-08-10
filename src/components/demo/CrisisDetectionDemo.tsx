@@ -20,7 +20,7 @@ import {
   TrendingUp,
   AlertCircle
 } from 'lucide-react'
-import { apiClient, APIError } from '@/lib/api-client'
+import { apiClient, APIError } from '../../lib/api-client'
 
 interface CrisisAssessment {
   riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent'

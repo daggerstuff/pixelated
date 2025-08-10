@@ -227,9 +227,11 @@ export class EducationalContextRecognizer {
     try {
       // Quick pattern-based screening
       const patternResult = this.performPatternBasedRecognition(userQuery)
+      logger.info('Pattern-based recognition result', { patternResult, userProfile, conversationHistory })
 
       // If pattern confidence is very low, skip AI analysis
       if (patternResult.confidence < 0.3) {
+        logger.info('Pattern confidence too low, skipping AI analysis', { confidence: patternResult.confidence })
         return patternResult
       }
 
@@ -241,7 +243,9 @@ export class EducationalContextRecognizer {
           userProfile,
           conversationHistory,
         )
+        logger.info('AI analysis result', { aiResult })
       } catch (aiError) {
+        logger.error('AI analysis error', { aiError })
         // If the AI produces no content (e.g., not mocked), treat as unavailable and
         // return the reliable pattern-based result to avoid degrading correctness
         return patternResult
@@ -250,11 +254,14 @@ export class EducationalContextRecognizer {
       // If AI returned a malformed/low-confidence response, surface AI fallback result
       // (tests expect raw fallback with confidence 0.1 for malformed JSON)
       if (!aiResult.isEducational || aiResult.confidence < 0.2) {
+        logger.warn('AI result not educational or low confidence', { aiResult })
         return aiResult
       }
 
       // Combine results for better accuracy when AI is confident
-      return this.combineResults(patternResult, aiResult, userProfile)
+      const combined = this.combineResults(patternResult, aiResult, userProfile)
+      logger.info('Combined result', { combined })
+      return combined
     } catch (error) {
       logger.error('Error recognizing educational context:', {
         error: String(error),
@@ -418,6 +425,7 @@ Adapt complexity and resource recommendations accordingly.`
    */
   private parseAIResponse(content: string): EducationalContextResult {
     try {
+      logger.info('Raw AI response content', { content })
       const jsonMatch =
         content.match(/```json\n([\s\S]*?)\n```/) ||
         content.match(/```\n([\s\S]*?)\n```/) ||
@@ -425,7 +433,9 @@ Adapt complexity and resource recommendations accordingly.`
 
       // Use captured group when available to avoid backticks, fall back to full match
       const jsonStr = jsonMatch ? jsonMatch[1] || jsonMatch[0] : content
+      logger.info('Extracted JSON string from AI response', { jsonStr })
       const parsed = JSON.parse(jsonStr)
+      logger.info('Parsed AI response JSON', { parsed })
 
       return {
         isEducational: Boolean(parsed.isEducational),
@@ -465,6 +475,7 @@ Adapt complexity and resource recommendations accordingly.`
     } catch (error) {
       logger.error('Error parsing AI response:', {
         message: error instanceof Error ? error.message : String(error),
+        content,
       })
 
       // Return fallback result
@@ -624,20 +635,40 @@ Adapt complexity and resource recommendations accordingly.`
     complexity: 'basic' | 'intermediate' | 'advanced',
     userProfile: UserProfile,
   ): 'basic' | 'intermediate' | 'advanced' {
+    logger.info('Adapting complexity to user', { complexity, userProfile })
     const knowledge = userProfile.priorMentalHealthKnowledge
     const education = userProfile.educationLevel
 
     // Adjust based on user's knowledge level
     if (knowledge === 'none' || education === 'high_school') {
-      if (complexity === 'advanced') return 'intermediate'
-      if (complexity === 'intermediate') return 'basic'
+      if (complexity === 'advanced') {
+        logger.info('Downgrading advanced to intermediate for low knowledge/education')
+        return 'intermediate'
+      }
+      if (complexity === 'intermediate') {
+        logger.info('Downgrading intermediate to basic for low knowledge/education')
+        return 'basic'
+      }
       return complexity
     }
-    if (knowledge === 'advanced' || education === 'graduate') {
-      if (complexity === 'basic') return 'intermediate'
+    // Aggressively upgrade for advanced/professional users
+    if (
+      knowledge === 'advanced' ||
+      education === 'graduate' ||
+      education === 'professional'
+    ) {
+      if (complexity === 'basic') {
+        logger.info('Upgrading basic to advanced for advanced/professional user')
+        return 'advanced'
+      }
+      if (complexity === 'intermediate') {
+        logger.info('Upgrading intermediate to advanced for advanced/professional user')
+        return 'advanced'
+      }
       return complexity
     }
 
+    logger.info('No adaptation needed for complexity', { complexity })
     return complexity
   }
 
@@ -645,42 +676,57 @@ Adapt complexity and resource recommendations accordingly.`
     resources: ResourceType[],
     userProfile: UserProfile,
   ): ResourceType[] {
+    logger.info('Adapting resources to user', { resources, userProfile })
     const learningStyle = userProfile.preferredLearningStyle
 
     let adapted = [...resources]
     if (learningStyle === 'visual') {
       // Always include infographics and educational videos for visual learners
       if (!adapted.includes(ResourceType.INFOGRAPHICS)) {
+        logger.info('Adding infographics for visual learner')
         adapted.unshift(ResourceType.INFOGRAPHICS)
       }
       if (!adapted.includes(ResourceType.EDUCATIONAL_VIDEOS)) {
+        logger.info('Adding educational videos for visual learner')
         adapted.unshift(ResourceType.EDUCATIONAL_VIDEOS)
+      }
+      // If resources are empty, ensure infographics is present
+      if (adapted.length === 0) {
+        adapted = [ResourceType.INFOGRAPHICS]
       }
       // Remove duplicates
       adapted = Array.from(new Set(adapted))
+      logger.info('Adapted resources for visual learner', { adapted })
       return adapted.slice(0, 5)
     }
     if (learningStyle === 'auditory') {
       if (!adapted.includes(ResourceType.PODCASTS)) {
+        logger.info('Adding podcasts for auditory learner')
         adapted.unshift(ResourceType.PODCASTS)
       }
       if (!adapted.includes(ResourceType.EDUCATIONAL_VIDEOS)) {
+        logger.info('Adding educational videos for auditory learner')
         adapted.unshift(ResourceType.EDUCATIONAL_VIDEOS)
       }
       adapted = Array.from(new Set(adapted))
+      logger.info('Adapted resources for auditory learner', { adapted })
       return adapted.slice(0, 5)
     }
     if (learningStyle === 'reading') {
       if (!adapted.includes(ResourceType.BOOKS)) {
+        logger.info('Adding books for reading learner')
         adapted.unshift(ResourceType.BOOKS)
       }
       if (!adapted.includes(ResourceType.SCIENTIFIC_ARTICLES)) {
+        logger.info('Adding scientific articles for reading learner')
         adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
       }
       adapted = Array.from(new Set(adapted))
+      logger.info('Adapted resources for reading learner', { adapted })
       return adapted.slice(0, 5)
     }
 
+    logger.info('No adaptation needed for resources', { adapted })
     return adapted
   }
 

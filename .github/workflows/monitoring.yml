@@ -535,12 +535,21 @@ jobs:
         if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
         run: echo "Analyzing performance metrics for PRODUCTION..."
 
+      - name: Set Slack enabled output (performance)
+        id: set-slack-enabled-perf
+        run: |
+          if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
+            echo "slack_enabled=true" >> $GITHUB_OUTPUT
+          else
+            echo "slack_enabled=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Skip notice
         if: steps.resolve-perf.outputs.skip_lhci == 'true' || steps.build-urls.outputs.skip_lhci_urls == 'true'
         run: echo "Skipping Lighthouse run due to missing APP_URL or no healthy URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to enable."
 
       - name: Notify performance issues
-        if: failure() && secrets.SLACK_WEBHOOK != ''
+        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
         uses: slackapi/slack-github-action@v1.25.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
@@ -561,7 +570,7 @@ jobs:
         continue-on-error: true
 
       - name: Log performance notification skip
-        if: failure() && secrets.SLACK_WEBHOOK == ''
+        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'false'
         run: |
           echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
           echo "::warning::Performance issues detected but no notification was sent"

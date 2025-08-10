@@ -142,7 +142,7 @@ export default defineConfig({
       '~': path.resolve(__dirname, 'src'),
     },
     conditions: ['node', 'import', 'module', 'default'],
-  extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.json'],
+    extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.json'],
     dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
   },
   build: {

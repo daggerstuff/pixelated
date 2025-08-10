@@ -37,8 +37,7 @@ FROM base AS build
 
 COPY --chown=astro:astro package.json pnpm-lock.yaml ./
 
-COPY --chown=astro:astro scripts ./scripts/
-
+# Copy all source files first to ensure proper dependency resolution
 COPY --chown=astro:astro . .
 
 RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \

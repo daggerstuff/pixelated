@@ -56,7 +56,7 @@ build-frontend:
     # Manually clone the repository via SSH
     - git clone git@gitlab.com:pixelatedtech/pixelated.git .
     - ls -la
-    - docker build --no-cache -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+    - docker build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
     - docker push $CONTAINER_IMAGE
     - docker push $CONTAINER_IMAGE_LATEST
     - echo "✅ Frontend container pushed to GitLab Container Registry"

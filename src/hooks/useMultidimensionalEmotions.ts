@@ -467,7 +467,9 @@ function sampleData(data: EmotionData[], targetCount: number): EmotionData[] {
   for (let i = 0; i < targetCount; i++) {
     const index = Math.min(Math.floor(i * stride), data.length - 1)
     const entry = data[index]
-    if (entry) result.push(entry)
+    if (entry) {
+      result.push(entry)
+    }
   }
 
   return result
