@@ -18,26 +18,30 @@ const socialLinks = [
 <footer class="bg-black border-t-2 border-gray-800 mt-auto">
   <div class="brutalist-container">
     <!-- Main Footer Content -->
-    <div class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8 items-start justify-items-center md:justify-items-start">
       <!-- Brand Section -->
       <div class="space-y-4">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-green-500 border-2 border-green-400 flex items-center justify-center font-bold text-black text-sm">
-            P
-          </div>
+          <img
+            src="/apple-touch-icon.png"
+            alt="Pixelated Empathy Logo"
+            class="w-8 h-8 rounded-lg"
+          />
           <span class="text-lg font-bold text-white">PIXELATED EMPATHY</span>
         </div>
-        <p class="text-gray-400 text-sm max-w-xs">
+        <p class="text-gray-400 text-sm max-w-xs mb-4">
           AI-powered therapy training platform for mental health professionals. Safe, secure, effective.
         </p>
-        <div class="status-indicator status-indicator--online">
-          <div class="pulse-dot pulse-dot--green"></div>
-          <span>Platform Online</span>
+        <div class="text-center">
+          <div class="status-indicator status-indicator--online inline-flex">
+            <div class="pulse-dot pulse-dot--green"></div>
+            <span>Platform Online</span>
+          </div>
         </div>
       </div>
 
       <!-- Quick Links -->
-      <div class="space-y-4">
+      <div class="space-y-4 text-center md:text-left">
         <h3 class="brutalist-caption text-white">Quick Links</h3>
         <ul class="space-y-2">
           {footerLinks.map(link => (

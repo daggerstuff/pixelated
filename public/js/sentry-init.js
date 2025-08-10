@@ -7,7 +7,13 @@ if (SENTRY_DSN && window.Sentry) {
   try {
     window.Sentry.init({
       dsn: SENTRY_DSN,
-      // Add any other Sentry options here
+      tracesSampleRate: Number(
+        (window.__ENV && window.__ENV.PUBLIC_SENTRY_TRACES_SAMPLE_RATE) ?? (location.hostname === 'localhost' ? 1.0 : 0.1)
+      ),
+      profilesSampleRate: Number(
+        (window.__ENV && window.__ENV.PUBLIC_SENTRY_PROFILES_SAMPLE_RATE) ?? (location.hostname === 'localhost' ? 0.2 : 0.05)
+      ),
+      debug: Boolean(window.__ENV && window.__ENV.PUBLIC_SENTRY_DEBUG === '1'),
     })
     console.log('Sentry initialized successfully')
   } catch (err) {

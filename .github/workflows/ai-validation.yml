@@ -15,11 +15,22 @@ on:
     types:
       - completed
 
+  # Allow manual runs for debugging
+  workflow_dispatch:
+    inputs:
+      ENV_NAME:
+        description: "Target environment (staging|production)"
+        required: false
+        default: "staging"
+
 jobs:
   validate-ai-models:
     name: AI Model Validation
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    env:
+      # Wire manual input into ENV_NAME if provided; the setup step still defaults to staging when unset
+      ENV_NAME: ${{ inputs.ENV_NAME }}
 
     steps:
       - name: Checkout code
@@ -56,8 +67,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Install system tools (jq, bc)
+        run: |
+          sudo apt-get update
+          # Ensure TLS root certs and openssl are present for curl/openssl diagnostics
+          sudo apt-get install -y jq bc ca-certificates openssl
+          sudo update-ca-certificates || true
+
       - name: Set environment variables
         run: |
+          # Default environment if not provided
+          if [[ -z "${ENV_NAME}" ]]; then
+            echo "ENV_NAME=staging" >> $GITHUB_ENV
+          fi
+
           # Set environment-specific URLs (add more as needed)
           if [[ "$ENV_NAME" == "production" ]]; then
             echo "APP_URL=https://pixelatedempathy.com" >> $GITHUB_ENV
@@ -76,14 +99,40 @@ jobs:
 
           # Trigger validation via webhook
           echo "Triggering validation via webhook..."
-          STATUS_CODE=$(curl --insecure -s -o response.json -w "%{http_code}" \
-            -X POST "${APP_URL}/api/ai/validation/webhook" \
-            -H "Content-Type: application/json" \
-            -H "x-github-event: workflow_dispatch" \
-            -H "x-hub-signature-256: ${WEBHOOK_TOKEN}" \
-            -d '{"action":"validate","environment":"'"${ENV_NAME}"'"}')
+          # Disable 'exit on error' just for this call to capture curl failures without aborting the step
+          set +e
+          STATUS_CODE=$(
+            curl --insecure --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS \
+              -o response.json -w "%{http_code}" \
+              -X POST "${APP_URL}/api/ai/validation/webhook" \
+              -H "Content-Type: application/json" \
+              -H "x-github-event: workflow_dispatch" \
+              -H "x-hub-signature-256: ${WEBHOOK_TOKEN}" \
+              -d '{"action":"validate","environment":"'"${ENV_NAME}"'"}')
+          CURL_EXIT=$?
+          set -e
 
-          if [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
+          if [[ ${CURL_EXIT} -ne 0 ]]; then
+            echo "success=false" >> "$GITHUB_OUTPUT"
+            echo "Validation trigger request failed (curl exit ${CURL_EXIT})."
+            # Show verbose diagnostics on TLS/connection errors
+            echo "Diagnosing with curl --verbose (redacting body)..."
+            set +e
+            curl --insecure --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
+              -X POST "${APP_URL}/api/ai/validation/webhook" \
+              -H "Content-Type: application/json" \
+              -H "x-github-event: workflow_dispatch" \
+              -H "x-hub-signature-256: REDACTED" \
+              -d '{"action":"validate","environment":"REDACTED"}' || true
+            echo "Attempting TLS 1.3 as fallback (verbosity, redacted body)..."
+            curl --insecure --http1.1 -4 --tlsv1.3 --max-time 15 -v -o /dev/null \
+              -X POST "${APP_URL}/api/ai/validation/webhook" \
+              -H "Content-Type: application/json" \
+              -H "x-github-event: workflow_dispatch" \
+              -H "x-hub-signature-256: REDACTED" \
+              -d '{"action":"validate","environment":"REDACTED"}' || true
+            set -e
+          elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
             echo "success=true" >> "$GITHUB_OUTPUT"
             echo "Validation triggered successfully (HTTP ${STATUS_CODE})"
             cat response.json
@@ -103,13 +152,27 @@ jobs:
       - name: Fetch validation results
         if: steps.validation.outputs.success == 'true'
         id: results
+        env:
+          VALIDATION_API_TOKEN: ${{ secrets.VALIDATION_API_TOKEN }}
         run: |
           # Get validation history and results
-          STATUS_CODE=$(curl -s -o validation_history.json -w "%{http_code}" \
+          set +e
+          STATUS_CODE=$(curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS -o validation_history.json -w "%{http_code}" \
             "${APP_URL}/api/ai/validation/history?limit=1" \
             -H "Authorization: Bearer $VALIDATION_API_TOKEN")
+          CURL_EXIT=$?
+          set -e
 
-          if [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
+          if [[ ${CURL_EXIT} -ne 0 ]]; then
+            echo "success=false" >> "$GITHUB_OUTPUT"
+            echo "Failed to fetch validation results (curl exit ${CURL_EXIT})"
+            echo "Diagnosing fetch with curl --verbose (redacted token)..."
+            set +e
+            curl --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
+              "${APP_URL}/api/ai/validation/history?limit=1" \
+              -H "Authorization: Bearer REDACTED" || true
+            set -e
+          elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
             echo "success=true" >> "$GITHUB_OUTPUT"
             # Extract success rate and last run info
             PASS_RATE=$(jq -r '.history[0].passedCount / .history[0].resultsCount * 100' validation_history.json)

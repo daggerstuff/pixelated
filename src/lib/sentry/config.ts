@@ -11,15 +11,20 @@ export const SENTRY_CONFIG = {
   environment: import.meta.env.MODE || 'production',
   release: import.meta.env['PUBLIC_APP_VERSION'] || '0.0.1',
 
-  tracesSampleRate: import.meta.env.DEV ? 1.0 : 0.1,
-  profilesSampleRate: import.meta.env.DEV ? 1.0 : 0.1,
+  tracesSampleRate: Number(
+    import.meta.env['PUBLIC_SENTRY_TRACES_SAMPLE_RATE'] ?? (import.meta.env.DEV ? 1.0 : 0.1)
+  ),
+  profilesSampleRate: Number(
+    import.meta.env['PUBLIC_SENTRY_PROFILES_SAMPLE_RATE'] ?? (import.meta.env.DEV ? 0.2 : 0.05)
+  ),
 
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 
   sendDefaultPii: true,
 
-  debug: import.meta.env.DEV,
+  // Only enable debug logs when explicitly requested
+  debug: import.meta.env['PUBLIC_SENTRY_DEBUG'] === '1',
 
   tags: {
     app: 'pixelated-empathy',

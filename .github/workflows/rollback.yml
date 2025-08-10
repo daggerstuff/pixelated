@@ -11,7 +11,7 @@ permissions: read-all # Set restrictive default at workflow level
 # Environment variables can be defined here
 env:
   NODE_VERSION: 22.16.0
-  PNPM_VERSION: 
+  PNPM_VERSION: 10.14.0
   NODE_ENV: production
 
 jobs:
@@ -70,13 +70,14 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
 
       - name: Get pnpm store directory
+        id: pnpm-store
         shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
         with:
-          path: ${{ env.STORE_PATH }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -86,15 +87,6 @@ jobs:
 
       - name: Build application
         run: pnpm build
-
-      - name: Deploy rollback to AWS
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-        run: |
-          # Deploy to AWS instead of Cloudflare
-          ./scripts/deploy-aws.sh
 
       - name: Create rollback tag
         run: |
@@ -157,13 +149,14 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
 
       - name: Get pnpm store directory
+        id: pnpm-store
         shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
         with:
-          path: ${{ env.STORE_PATH }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -173,15 +166,6 @@ jobs:
 
       - name: Build application
         run: pnpm build
-
-      - name: Deploy rollback to AWS
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-        run: |
-          # Deploy to AWS instead of Cloudflare
-          ./scripts/deploy-aws.sh
 
       - name: Create rollback tag
         run: |

@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro'
+import BaseLayout from '../../layouts/BaseLayout.astro'
 import { ComparativeProgressDisplay } from '../../components/analytics/ComparativeProgressDisplay'
 import Alert from '../../components/ui/Alert.astro'
 
@@ -18,11 +18,17 @@ const description =
   'Compare your progress against anonymized benchmarks and gain insights into your therapeutic journey.'
 ---
 
-<Layout {title} {description}>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Breadcrumbs -->
-    <nav class="mb-6" aria-label="Breadcrumb">
-      <ol class="flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
+<BaseLayout
+  title={title}
+  description={description}
+  bgType="plum"
+>
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="max-w-7xl mx-auto">
+        <!-- Breadcrumbs -->
+        <nav class="mb-6" aria-label="Breadcrumb">
+          <ol class="flex space-x-2 text-sm text-gray-400">
         <li>
           <a href="/" class="hover:text-gray-700 dark:hover:text-gray-300"
             >Home</a
@@ -106,8 +112,9 @@ const description =
             <strong>Treatment Adherence:</strong> Measures consistency in following
             treatment plans (higher scores indicate improvement)
           </li>
-        </ul>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-</Layout>
+  </section>
+</BaseLayout>

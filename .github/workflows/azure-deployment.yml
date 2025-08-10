@@ -31,6 +31,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set environment
         id: set-env
         run: |
@@ -126,6 +127,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+    outputs:
+      registry-name: ${{ steps.deployment.outputs.registry-name }}
+      registry-login-server: ${{ steps.deployment.outputs.registry-login-server }}
     # environment: azure-infrastructure
 
     steps:
@@ -148,10 +152,8 @@ jobs:
           resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
           template: infra/main.bicep
           parameters: |
-            # Parameters must match infra/main.bicep
             environmentName=${{ needs.build.outputs.environment }}
             location=${{ env.AZURE_LOCATION }}
-            # resourcePrefix and createdDate have sensible defaults in the template
           failOnStdErr: false
 
       - name: Get deployment outputs
@@ -162,13 +164,19 @@ jobs:
 
           # Extract specific outputs (must exist in infra/main.bicep)
           KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value')
+          REGISTRY_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value // empty')
+          REGISTRY_LOGIN_SERVER=$(echo "$OUTPUTS" | jq -r '.AZURE_CONTAINER_REGISTRY_ENDPOINT.value // empty')
 
           echo "key-vault-name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
+          echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
+          echo "registry-login-server=$REGISTRY_LOGIN_SERVER" >> $GITHUB_OUTPUT
 
       - name: Store secrets in Key Vault
         env:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
         run: |
           # Store Azure OpenAI secrets
           if [[ -n "$AZURE_OPENAI_API_KEY" ]]; then
@@ -178,7 +186,6 @@ jobs:
               --value "$AZURE_OPENAI_API_KEY"
           fi
 
-
           if [[ -n "$AZURE_OPENAI_ENDPOINT" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
@@ -186,28 +193,26 @@ jobs:
               --value "$AZURE_OPENAI_ENDPOINT"
           fi
 
-
-          # Store Supabase secrets
-          if [[ -n "$SUPABASE_URL" ]]; then
+          # Store MongoDB Atlas secrets
+          if [[ -n "$MONGODB_URI" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
-              --name "supabase-url" \
-              --value "$SUPABASE_URL"
+              --name "mongodb-uri" \
+              --value "$MONGODB_URI"
           fi
 
-
-          if [[ -n "$SUPABASE_ANON_KEY" ]]; then
+          if [[ -n "$MONGODB_DB_NAME" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
-              --name "supabase-anon-key" \
-              --value "$SUPABASE_ANON_KEY"
+              --name "mongodb-db-name" \
+              --value "$MONGODB_DB_NAME"
           fi
 
   # Build and Push Docker Image
   docker-build:
     runs-on: ubuntu-latest
     needs: [build, deploy-infrastructure]
-    if: always() && needs.build.result == 'success'
+    if: ${{ always() && needs.build.result == 'success' }}
 
     steps:
       - name: Checkout code
@@ -228,9 +233,22 @@ jobs:
       - name: Get container registry details
         id: acr
         run: |
-          REGISTRY_NAME=$(az acr list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
-          LOGIN_SERVER=$(az acr show --name $REGISTRY_NAME --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query 'loginServer' -o tsv)
+          REGISTRY_NAME="${{ needs.deploy-infrastructure.outputs.registry-name }}"
+          LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
 
+          # Fallback to discovery if not provided by infra job (e.g., infra skipped)
+          if [[ -z "$REGISTRY_NAME" ]]; then
+            REGISTRY_NAME=$(az acr list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
+          fi
+
+          if [[ -z "$REGISTRY_NAME" ]]; then
+            echo "No Azure Container Registry found or provided in resource group '${{ env.AZURE_RESOURCE_GROUP }}'. Ensure infrastructure has been deployed."
+            exit 1
+          fi
+
+          if [[ -z "$LOGIN_SERVER" ]]; then
+            LOGIN_SERVER=$(az acr show --name "$REGISTRY_NAME" --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query 'loginServer' -o tsv)
+          fi
 
           echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
           echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
@@ -243,11 +261,9 @@ jobs:
         run: |
           IMAGE_TAG="${{ needs.build.outputs.environment }}-${{ github.sha }}"
 
-
           docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG .
           docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }} .
           docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:latest .
-
 
           docker push ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG
           docker push ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
@@ -257,7 +273,7 @@ jobs:
   deploy-app-service:
     runs-on: ubuntu-latest
     needs: [build, deploy-infrastructure, docker-build]
-    if: always() && needs.docker-build.result == 'success'
+    if: ${{ always() && needs.docker-build.result == 'success' }}
     environment: azure-${{ needs.build.outputs.environment }}
 
     steps:
@@ -272,9 +288,17 @@ jobs:
         id: details
         run: |
           APP_SERVICE_NAME=$(az webapp list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
-          REGISTRY_NAME=$(az acr list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
-          LOGIN_SERVER=$(az acr show --name $REGISTRY_NAME --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query 'loginServer' -o tsv)
-
+          # Prefer registry login server from infra outputs
+          LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
+          if [[ -z "$LOGIN_SERVER" ]]; then
+            REGISTRY_NAME=$(az acr list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
+            if [[ -n "$REGISTRY_NAME" ]]; then
+              LOGIN_SERVER=$(az acr show --name "$REGISTRY_NAME" --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query 'loginServer' -o tsv)
+            else
+              echo "No Azure Container Registry found or provided in resource group '${{ env.AZURE_RESOURCE_GROUP }}'."
+              exit 1
+            fi
+          fi
 
           echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
           echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
@@ -287,7 +311,11 @@ jobs:
           images: ${{ steps.details.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
 
       - name: Configure App Service settings
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
         run: |
+          # Base settings
           az webapp config appsettings set \
             --name ${{ steps.details.outputs.app-service-name }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
@@ -297,11 +325,32 @@ jobs:
               WEBSITES_PORT=3000 \
               WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
 
+          # MongoDB settings (apply only if provided)
+          if [[ -n "$MONGODB_URI" ]]; then
+            az webapp config appsettings set \
+              --name ${{ steps.details.outputs.app-service-name }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --slot ${{ needs.build.outputs.environment == 'production' && 'production' || 'staging' }} \
+              --settings \
+                MONGODB_URI="$MONGODB_URI" \
+                MONGO_URI="$MONGODB_URI"
+          fi
+
+          if [[ -n "$MONGODB_DB_NAME" ]]; then
+            az webapp config appsettings set \
+              --name ${{ steps.details.outputs.app-service-name }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --slot ${{ needs.build.outputs.environment == 'production' && 'production' || 'staging' }} \
+              --settings \
+                MONGODB_DB_NAME="$MONGODB_DB_NAME" \
+                MONGO_DB_NAME="$MONGODB_DB_NAME"
+          fi
+
   # Post-deployment tests
   post-deployment-tests:
     runs-on: ubuntu-latest
     needs: [build, deploy-app-service]
-    if: always() && needs.deploy-app-service.result == 'success'
+    if: ${{ always() && needs.deploy-app-service.result == 'success' }}
 
     steps:
       - name: Azure Login
@@ -317,13 +366,11 @@ jobs:
           APP_SERVICE_NAME=$(az webapp list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
           SLOT_NAME=${{ needs.build.outputs.environment == 'production' && 'production' || 'staging' }}
 
-
           if [[ "$SLOT_NAME" == "production" ]]; then
             APP_URL="https://$(az webapp show --name $APP_SERVICE_NAME --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query 'defaultHostName' -o tsv)"
           else
             APP_URL="https://$(az webapp deployment slot show --name $APP_SERVICE_NAME --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --slot $SLOT_NAME --query 'defaultHostName' -o tsv)"
           fi
-
 
           echo "app-url=$APP_URL" >> $GITHUB_OUTPUT
 
@@ -331,10 +378,8 @@ jobs:
         run: |
           echo "Testing application health at: ${{ steps.app-url.outputs.app-url }}"
 
-
           # Wait for application to be ready
           sleep 60
-
 
           # Health check
           response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }}/api/health)
@@ -344,7 +389,6 @@ jobs:
             echo "❌ Health check failed with status: $response"
             exit 1
           fi
-
 
           # Basic functionality test
           response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }})

@@ -48,11 +48,14 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      - name: Install dependencies
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install project dependencies
         run: uv pip sync pyproject.toml
 
-      - name: Install pip-audit
-        run: uv pip install pip-audit
+      - name: Install pip-audit in venv
+        run: uv pip install --upgrade pip pip-audit
 
       - name: Run pip-audit
-        run: pip-audit
+        run: uv run pip-audit

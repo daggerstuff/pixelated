@@ -332,100 +332,144 @@ How are you feeling today? I'm here to listen and help.`,
       setMessages((prev) => [...prev, userMessage])
       setInput('')
 
-      // Perform production-grade analysis if service is available
-      if (mentalHealthService?.isInitialized && mentalHealthService.adapter) {
-        logger.info('Performing production-grade mental health analysis...')
+      // Perform production-grade analysis using our new backend API
+      if (settings.enableAnalysis) {
+        logger.info('Performing production-grade mental health analysis via API...')
 
-        const routingContext: RoutingContext = {
-          userId,
-          sessionId,
+        try {
+          // Call our new mental health chat API
+          const response = await fetch('/api/mental-health/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: userMessage.content,
+              sessionId,
+              userContext: {
+                userId,
+                previousMessages: messages.slice(-3).map(m => ({
+                  id: m.id,
+                  message: m.content,
+                  timestamp: new Date(m.timestamp).toISOString(),
+                  role: m.role,
+                })),
+                riskLevel: sessionStats.riskTrend === 'critical' ? 'high' : 
+                           sessionStats.riskTrend === 'declining' ? 'moderate' : 'low'
+              },
+              options: {
+                includeRiskAssessment: true,
+                includeCopingStrategies: true,
+                enableCrisisDetection: true,
+                responseStyle: 'therapeutic'
+              }
+            })
+          })
+
+          if (!response.ok) {
+            throw new Error(`API request failed: ${response.status}`)
+          }
+
+          const chatResult = await response.json()
+
+          // Convert API response to our analysis format
+          const analysisResult: MentalHealthAnalysisResult = {
+            category: chatResult.analysis.emotionalState,
+            confidence: chatResult.analysis.concernSeverity / 10, // Convert 1-10 to 0-1
+            supportingEvidence: chatResult.analysis.keyTopics,
+            isCrisis: chatResult.riskAssessment?.crisisLevel === 'imminent' || 
+                     chatResult.riskAssessment?.crisisLevel === 'high',
+            hasMentalHealthIssue: chatResult.analysis.stressLevel !== 'low',
+            summary: `Stress level: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : chatResult.analysis.sentimentScore < 0 ? 'negative' : 'neutral'}`,
+            expertGuided: true
+          }
+
+          // Update message with analysis results
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === userMessage.id
+                ? {
+                    ...m,
+                    mentalHealthAnalysis: analysisResult,
+                    isProcessing: false,
+                    riskLevel: chatResult.riskAssessment?.crisisLevel === 'imminent' ? 'critical' :
+                              chatResult.riskAssessment?.crisisLevel === 'high' ? 'high' :
+                              chatResult.riskAssessment?.crisisLevel === 'moderate' ? 'medium' : 'low',
+                    needsIntervention: chatResult.riskAssessment?.immediateAction || false,
+                    apiResponse: chatResult // Store full API response for detailed analysis
+                  }
+                : m,
+            ),
+          )
+
+          // Update session statistics
+          setSessionStats((prev) => ({
+            ...prev,
+            totalMessages: prev.totalMessages + 1,
+            analysisCount: prev.analysisCount + 1,
+            averageConfidence:
+              (prev.averageConfidence * prev.analysisCount +
+                analysisResult.confidence) /
+              (prev.analysisCount + 1),
+            riskTrend: chatResult.riskAssessment?.crisisLevel === 'imminent' ? 'critical' :
+                      chatResult.riskAssessment?.crisisLevel === 'high' ? 'declining' :
+                      chatResult.analysis.stressLevel === 'low' ? 'improving' : 'stable',
+            interventionsTriggered: chatResult.riskAssessment?.immediateAction
+              ? prev.interventionsTriggered + 1
+              : prev.interventionsTriggered,
+          }))
+
+          // Add assistant response using the API response
+          const timeoutId = window.setTimeout(() => {
+            const assistantMessage: ChatMessage = {
+              id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+              role: 'assistant',
+              content: chatResult.response.message,
+              timestamp: Date.now(),
+              // Include API metadata for enhanced display
+              metadata: {
+                responseType: chatResult.response.type,
+                confidence: chatResult.response.confidence,
+                copingStrategies: chatResult.copingStrategies,
+                resources: chatResult.resources,
+                processingTime: chatResult.metadata.processingTime
+              }
+            }
+            setMessages((prev) => [...prev, assistantMessage])
+          }, 1500)
+          timeoutRefs.current.push(timeoutId)
+
+        } catch (error) {
+          logger.error('Failed to call mental health chat API', { error })
+          
+          // Fallback to demo mode on API failure
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === userMessage.id ? { ...m, isProcessing: false } : m,
+            ),
+          )
+
+          // Generate a basic response for demo purposes
+          const timeoutId = window.setTimeout(() => {
+            const assistantMessage: ChatMessage = {
+              id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+              role: 'assistant',
+              content: "I'm here to listen and support you. Could you tell me more about what's on your mind?",
+              timestamp: Date.now(),
+            }
+            setMessages((prev) => [...prev, assistantMessage])
+          }, 1500)
+          timeoutRefs.current.push(timeoutId)
         }
-
-        // Use the production MentalLLaMA adapter with proper typing
-        const analysisResult = await (
-          mentalHealthService.adapter as unknown as {
-            analyzeMentalHealth: (params: {
-              content: string
-              route: string
-              context: RoutingContext
-            }) => Promise<MentalHealthAnalysisResult>
-          }
-        ).analyzeMentalHealth({
-          content: userMessage.content,
-          route: 'auto_route',
-          context: routingContext,
-        })
-
-        // Update message with analysis results
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === userMessage.id
-              ? {
-                  ...m,
-                  mentalHealthAnalysis: analysisResult,
-                  isProcessing: false,
-                  riskLevel: analysisResult.isCrisis
-                    ? 'critical'
-                    : analysisResult.confidence > 0.7
-                      ? 'high'
-                      : analysisResult.confidence > 0.4
-                        ? 'medium'
-                        : 'low',
-                  needsIntervention:
-                    analysisResult.isCrisis ||
-                    analysisResult.confidence > settings.interventionThreshold,
-                }
-              : m,
-          ),
-        )
-
-        // Update session statistics
-        setSessionStats((prev) => ({
-          ...prev,
-          totalMessages: prev.totalMessages + 1,
-          analysisCount: prev.analysisCount + 1,
-          averageConfidence:
-            (prev.averageConfidence * prev.analysisCount +
-              analysisResult.confidence) /
-            (prev.analysisCount + 1),
-          riskTrend: analysisResult.isCrisis
-            ? 'critical'
-            : analysisResult.confidence > 0.7
-              ? 'declining'
-              : analysisResult.confidence < 0.3
-                ? 'improving'
-                : 'stable',
-          interventionsTriggered: analysisResult.isCrisis
-            ? prev.interventionsTriggered + 1
-            : prev.interventionsTriggered,
-        }))
-
-        // Generate appropriate therapeutic response
-        const responseContent =
-          await generateTherapeuticResponse(analysisResult)
-
-        // Add assistant response
-        const timeoutId = window.setTimeout(() => {
-          const assistantMessage: ChatMessage = {
-            id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-            role: 'assistant',
-            content: responseContent,
-            timestamp: Date.now(),
-          }
-          setMessages((prev) => [...prev, assistantMessage])
-        }, 1500)
-        timeoutRefs.current.push(timeoutId)
       } else {
-        // Fallback for demo mode
-        logger.warn('MentalLLaMA service not available, using demo mode')
-
+        // Analysis disabled - simple response
         setMessages((prev) =>
           prev.map((m) =>
             m.id === userMessage.id ? { ...m, isProcessing: false } : m,
           ),
         )
 
-        // Generate a basic response for demo purposes
+        // Generate a basic response
         const timeoutId = window.setTimeout(() => {
           const assistantMessage: ChatMessage = {
             id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,

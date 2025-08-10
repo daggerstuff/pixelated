@@ -1,0 +1,40 @@
+model_list:
+  # Primary: Qwen3-Coder via Ollama (host)
+  - model_name: qwen3-coder
+    litellm_params:
+      model: ollama/qwen3-coder:latest
+      api_base: http://172.17.0.1:11434
+      num_ctx: 8192
+      temperature: 0.2
+      format: null
+
+  # Alt sizes you can pull later
+  - model_name: qwen2.5-coder-1.5b
+    litellm_params:
+      model: ollama/qwen2.5-coder:1.5b
+      api_base: http://172.17.0.1:11434
+      num_ctx: 8192
+      temperature: 0.2
+
+  - model_name: qwen2.5-coder-14b
+    litellm_params:
+      model: ollama/qwen2.5-coder:14b
+      api_base: http://172.17.0.1:11434
+      num_ctx: 8192
+      temperature: 0.2
+
+
+litellm_settings:
+  # Enable OpenAI-compatible server behavior
+  drop_params: false
+  telemetry: false
+  set_verbose: false
+
+server_settings:
+  # OpenAI compatible server
+  enable_public_endpoints: false
+  # API keys: using single master key from env
+  master_key: ${LITELLM_MASTER_KEY}
+  # Logging
+  request_logging: true
+  response_logging: minimal

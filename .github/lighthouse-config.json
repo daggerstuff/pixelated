@@ -3,7 +3,6 @@
     "collect": {
       "numberOfRuns": 3,
       "settings": {
-        "preset": "mobile",
         "formFactor": "mobile",
         "throttlingMethod": "simulate",
         "throttling": {

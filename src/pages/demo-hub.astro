@@ -5,59 +5,59 @@ import BrutalistChatDemo from '@/components/chat/BrutalistChatDemo'
 
 const demos = [
   {
-    title: "Crisis Intervention Training",
-    description: "Practice with suicidal clients, psychotic episodes, and trauma responses in a safe environment.",
-    status: "ACTIVE",
-    difficulty: "HIGH",
-    href: "/demo/crisis-intervention",
-    icon: "⚠",
-    stats: { sessions: "2.5K+", accuracy: "94%" }
-  },
-  {
     title: "Bias Detection Engine",
-    description: "Real-time cultural bias detection across 200+ patterns with immediate feedback.",
-    status: "ACTIVE", 
+    description: "Interactive, client-side demo showcasing multi-layer cultural bias analysis.",
+    status: "ACTIVE",
     difficulty: "MEDIUM",
     href: "/demo/bias-detection",
     icon: "⚡",
-    stats: { patterns: "200+", reduction: "78%" }
+    stats: { layers: "4", patterns: "200+" },
   },
   {
-    title: "Personality Disorders Simulator",
-    description: "Experience rare and complex personality presentations from borderline to narcissistic.",
+    title: "Psychology Pipeline",
+    description: "End-to-end pipeline overview with knowledge parsing and scenario generation demos.",
     status: "ACTIVE",
-    difficulty: "HIGH", 
-    href: "/demo/personality-disorders",
+    difficulty: "HIGH",
+    href: "/demo/psychology-pipeline",
     icon: "🧠",
-    stats: { personas: "50K+", coverage: "100%" }
+    stats: { modules: "3", latency: "<500ms" },
   },
   {
-    title: "Cultural Competency Lab",
-    description: "Navigate diverse cultural contexts and learn appropriate therapeutic approaches.",
+    title: "FHE (Encrypted Analysis)",
+    description: "Explore Fully Homomorphic Encryption capabilities in an interactive demo.",
     status: "ACTIVE",
     difficulty: "MEDIUM",
-    href: "/demo/cultural-competency", 
-    icon: "🌍",
-    stats: { cultures: "150+", competency: "89%" }
+    href: "/demo/fhe",
+    icon: "🔐",
+    stats: { privacy: "100%", mode: "client" },
   },
   {
-    title: "Trauma-Informed Care",
-    description: "Practice trauma-sensitive approaches with complex PTSD and dissociative presentations.",
+    title: "Emotion Visualization",
+    description: "Visual demo of emotion metrics and dimensional analysis.",
     status: "ACTIVE",
-    difficulty: "HIGH",
-    href: "/demo/trauma-care",
-    icon: "🛡️", 
-    stats: { scenarios: "1K+", safety: "100%" }
+    difficulty: "LOW",
+    href: "/demo/emotion-visualization",
+    icon: "📈",
+    stats: { dims: "x/y", charts: "multiple" },
   },
   {
-    title: "Diagnostic Accuracy Trainer",
-    description: "Sharpen diagnostic skills with challenging cases and differential diagnosis practice.",
+    title: "Mental Health Chat",
+    description: "Production-grade chat with MentalLLaMA analysis (falls back to demo mode locally).",
     status: "ACTIVE",
-    difficulty: "HIGH",
-    href: "/demo/diagnostic-training",
-    icon: "🎯",
-    stats: { accuracy: "85%", speed: "300%" }
-  }
+    difficulty: "MEDIUM",
+    href: "/mental-health-demo",
+    icon: "�",
+    stats: { analysis: "real-time", crisis: "on" },
+  },
+  {
+    title: "Search Demo",
+    description: "Privacy-first in-browser full-text search using FlexSearch.",
+    status: "ACTIVE",
+    difficulty: "LOW",
+    href: "/search-demo",
+    icon: "🔎",
+    stats: { serverCalls: "0", latency: "ms" },
+  },
 ]
 
 const liveDemo = {
@@ -159,7 +159,7 @@ const liveDemo = {
       <div class="brutalist-grid brutalist-grid--3">
         {demos.map((demo) => (
           <div class="brutalist-card hover-lift group">
-            <!-- Demo Header -->
+            {/* Demo Header */}
             <div class="flex items-center justify-between mb-4">
               <div class="text-3xl">{demo.icon}</div>
               <div class="flex gap-2">
@@ -177,13 +177,13 @@ const liveDemo = {
               </div>
             </div>
 
-            <!-- Demo Content -->
+            {/* Demo Content */}
             <h3 class="brutalist-subheading text-lg mb-3">{demo.title}</h3>
             <p class="text-gray-400 text-sm mb-6 leading-relaxed">
               {demo.description}
             </p>
 
-            <!-- Demo Stats -->
+            {/* Demo Stats */}
             <div class="grid grid-cols-2 gap-4 mb-6">
               {Object.entries(demo.stats).map(([key, value]) => (
                 <div class="text-center">
@@ -193,7 +193,7 @@ const liveDemo = {
               ))}
             </div>
 
-            <!-- Demo Action -->
+            {/* Demo Action */}
             <a
               href={demo.href}
               class="brutalist-button brutalist-button--primary w-full text-center group-hover:scale-105 transition-transform"

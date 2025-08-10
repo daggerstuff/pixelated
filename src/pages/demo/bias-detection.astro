@@ -2,7 +2,6 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
-import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false
 ---
@@ -157,17 +156,27 @@ export const prerender = false
               </div>
             </div>
 
+            <!-- Export Options (hidden until results) -->
+            <div id="export-controls" class="hidden mb-3 flex items-center gap-3">
+              <label for="export-format" class="text-sm text-gray-300">Export format</label>
+              <select id="export-format" class="form-input !py-1 !px-2 !h-8 w-32">
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+                <option value="txt">Text</option>
+              </select>
+            </div>
+
             <!-- Action Buttons -->
             <div class="flex gap-3">
-              <BrutalistButton id="analyze-btn" variant="primary" class="flex-1">
+              <button id="analyze-btn" class="brutalist-button brutalist-button--primary flex-1">
                 🔍 ANALYZE FOR BIAS
-              </BrutalistButton>
-              <BrutalistButton id="export-btn" variant="secondary" class="hidden">
+              </button>
+              <button id="export-btn" class="brutalist-button brutalist-button--secondary hidden">
                 📥 EXPORT
-              </BrutalistButton>
-              <BrutalistButton id="clear-btn" variant="outline">
+              </button>
+              <button id="clear-btn" class="brutalist-button brutalist-button--outline">
                 CLEAR
-              </BrutalistButton>
+              </button>
             </div>
           </div>
         </BrutalistCard>
@@ -184,10 +193,11 @@ export const prerender = false
             <div id="loading-state" class="hidden text-center py-8">
               <div class="loading-skeleton w-8 h-8 rounded-full mx-auto mb-4"></div>
               <p class="text-blue-400 font-bold">ANALYZING BIAS PATTERNS...</p>
+              <ul id="progress-log" class="mt-4 text-left max-w-prose mx-auto space-y-1 text-sm text-blue-200/80"></ul>
             </div>
 
             <!-- Results Display -->
-            <div id="results-display">
+            <div id="results-display" aria-live="polite" aria-busy="false">
               <div class="text-center py-8 text-gray-400">
                 <div class="text-4xl mb-4">🎯</div>
                 <p class="font-bold">RUN ANALYSIS TO SEE RESULTS</p>
@@ -354,6 +364,8 @@ export const prerender = false
     class BiasDetectionDemo {
       sessionId: string
       lastResults: any = null
+  lastCounterfactualScenarios: any[] = []
+  lastHistoricalComparison: any = null
 
       constructor() {
         this.sessionId = this.generateSessionId()
@@ -391,7 +403,11 @@ export const prerender = false
 
         analyzeBtn?.addEventListener('click', () => this.runAnalysis())
         clearBtn?.addEventListener('click', () => this.clearInputs())
-        exportBtn?.addEventListener('click', () => this.exportResults())
+        exportBtn?.addEventListener('click', () => {
+          const formatSel = document.getElementById('export-format') as HTMLSelectElement | null
+          const fmt = (formatSel?.value || 'json') as 'json' | 'csv' | 'txt'
+          return this.exportResults(fmt)
+        })
       }
 
       initializeDashboard() {
@@ -422,15 +438,41 @@ export const prerender = false
         try {
           // Collect input data
           const sessionData = this.collectSessionData()
+          // Basic validation and a11y busy state
+          const validationError = (!sessionData?.content || sessionData.content.trim().length < 10)
+            ? 'Please enter at least 10 characters of session content.'
+            : (!sessionData?.demographics?.age || !sessionData?.demographics?.gender || !sessionData?.demographics?.ethnicity || !sessionData?.demographics?.primaryLanguage)
+              ? 'Please select age, gender, ethnicity, and language.'
+              : null
+          if (validationError) {
+            this.displayError(validationError)
+            return
+          }
+          resultsDisplay?.setAttribute('aria-busy', 'true')
+          // Call real demo API
+          const resp = await fetch('/api/demos/bias-detection/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sessionData),
+          })
 
-          // Simulate analysis delay for realistic demo
-          await this.delay(2000)
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}))
+            throw new Error(err.error || 'Analysis request failed')
+          }
 
-          // Generate demo analysis results
-          const results = this.generateDemoResults(sessionData)
+          const data = await resp.json()
 
-          // Store results for export
+          if (!data?.analysis) {
+            throw new Error('Invalid response from analysis API')
+          }
+
+          const results = data.analysis
+
+          // Persist related components if provided
           this.lastResults = results
+          this.lastCounterfactualScenarios = data.counterfactualScenarios || []
+          this.lastHistoricalComparison = data.historicalComparison || null
 
           // Display results
           this.displayResults(results)
@@ -438,6 +480,8 @@ export const prerender = false
           // Show export button
           const exportBtn = document.getElementById('export-btn')
           if (exportBtn) exportBtn.classList.remove('hidden')
+          const exportControls = document.getElementById('export-controls')
+          if (exportControls) exportControls.classList.remove('hidden')
 
           // Update dashboard
           this.updateDashboardFromAnalysis(results)
@@ -452,6 +496,7 @@ export const prerender = false
             analyzeBtn.textContent = '🔍 Analyze for Bias'
             analyzeBtn.disabled = false
           }
+          resultsDisplay?.setAttribute('aria-busy', 'false')
         }
       }
 
@@ -482,147 +527,7 @@ export const prerender = false
         }
       }
 
-      generateDemoResults(sessionData: any) {
-        // Generate realistic demo results based on input
-        const biasFactors = this.calculateBiasFactors(sessionData)
-
-        return {
-          sessionId: sessionData.sessionId,
-          timestamp: new Date(),
-          overallBiasScore: biasFactors.overall,
-          alertLevel: this.determineAlertLevel(biasFactors.overall),
-          confidence: 0.87 + Math.random() * 0.1,
-          layerResults: {
-            preprocessing: {
-              biasScore: biasFactors.linguistic,
-              linguisticBias: {
-                genderBiasScore: biasFactors.gender,
-                racialBiasScore: biasFactors.racial,
-                ageBiasScore: biasFactors.age,
-                culturalBiasScore: biasFactors.cultural,
-              },
-              representationAnalysis: {
-                diversityIndex: 0.65 + Math.random() * 0.2,
-                underrepresentedGroups:
-                  biasFactors.overall > 0.5 ? ['elderly', 'non-english'] : [],
-              },
-            },
-            modelLevel: {
-              biasScore: biasFactors.model,
-              fairnessMetrics: {
-                demographicParity: 0.8 - biasFactors.overall * 0.3,
-                equalizedOdds: 0.75 + Math.random() * 0.15,
-                calibration: 0.82 - biasFactors.overall * 0.2,
-              },
-            },
-            interactive: {
-              biasScore: biasFactors.interactive,
-              counterfactualAnalysis: {
-                scenariosAnalyzed: 12,
-                biasDetected: biasFactors.overall > 0.4,
-                consistencyScore: 0.8 - biasFactors.overall * 0.3,
-              },
-            },
-            evaluation: {
-              biasScore: biasFactors.evaluation,
-              huggingFaceMetrics: {
-                bias: biasFactors.overall * 0.8,
-                stereotype: biasFactors.cultural * 1.2,
-                regard: { positive: 0.7, negative: 0.3 },
-              },
-            },
-          },
-          recommendations: this.generateRecommendations(biasFactors),
-          demographics: sessionData.demographics,
-        }
-      }
-
-      calculateBiasFactors(sessionData: any) {
-        const content = sessionData.content.toLowerCase()
-        const demographics = sessionData.demographics
-
-        // Simulate bias detection based on content and demographics
-        let linguistic = 0.15 + Math.random() * 0.1
-        let gender = 0.1
-        let racial = 0.08
-        let age = 0.12
-        let cultural = 0.09
-
-        // Content-based factors
-        if (content.includes('judge') || content.includes('background')) {
-          racial += 0.2
-          cultural += 0.15
-        }
-        if (content.includes('anxiety') && demographics.age === '65+') {
-          age += 0.25
-        }
-        if (content.includes('job') && demographics.gender === 'female') {
-          gender += 0.18
-        }
-
-        // Demographic-based factors
-        if (demographics.ethnicity !== 'white') {
-          racial += 0.1
-          cultural += 0.12
-        }
-        if (demographics.primaryLanguage !== 'en') {
-          linguistic += 0.2
-          cultural += 0.15
-        }
-
-        const overall = (linguistic + gender + racial + age + cultural) / 5
-
-        return {
-          overall: Math.min(overall, 0.95),
-          linguistic: Math.min(linguistic, 0.9),
-          gender: Math.min(gender, 0.8),
-          racial: Math.min(racial, 0.8),
-          age: Math.min(age, 0.8),
-          cultural: Math.min(cultural, 0.8),
-          model: overall * 0.9 + Math.random() * 0.1,
-          interactive: overall * 0.85 + Math.random() * 0.15,
-          evaluation: overall * 0.8 + Math.random() * 0.2,
-        }
-      }
-
-      determineAlertLevel(biasScore: number): string {
-        if (biasScore >= 0.8) return 'critical'
-        if (biasScore >= 0.6) return 'high'
-        if (biasScore >= 0.4) return 'medium'
-        return 'low'
-      }
-
-      generateRecommendations(biasFactors: any): string[] {
-        const recommendations: string[] = []
-
-        if (biasFactors.overall > 0.6) {
-          recommendations.push(
-            'High bias detected - implement immediate mitigation strategies',
-          )
-        }
-        if (biasFactors.racial > 0.3) {
-          recommendations.push(
-            'Review content for racial bias patterns and cultural sensitivity',
-          )
-        }
-        if (biasFactors.gender > 0.3) {
-          recommendations.push(
-            'Analyze gender-based assumptions in therapeutic responses',
-          )
-        }
-        if (biasFactors.age > 0.3) {
-          recommendations.push(
-            'Consider age-appropriate communication strategies',
-          )
-        }
-        if (biasFactors.cultural > 0.3) {
-          recommendations.push(
-            'Enhance cultural competency in therapeutic approach',
-          )
-        }
-
-        return recommendations
-      }
+  // Removed local simulation methods; analysis now comes from API
 
       displayResults(results: any): void {
         const resultsDisplay = document.getElementById('results-display')
@@ -665,11 +570,11 @@ export const prerender = false
             ${this.renderLayerResult('Evaluation', results.layerResults.evaluation)}
           </div>
 
-          <!-- Counterfactual Analysis -->
+      <!-- Counterfactual Analysis -->
           <div class="bg-indigo-500/10 border border-indigo-400/30 rounded-lg p-4">
             <h4 class="text-lg font-semibold text-indigo-200 mb-3">🔄 Counterfactual Analysis</h4>
             <div class="space-y-3">
-              ${this.renderCounterfactualScenarios()}
+        ${this.renderCounterfactualScenarios()}
             </div>
           </div>
 
@@ -796,11 +701,16 @@ export const prerender = false
               <p>Run an analysis to see bias detection results</p>
             </div>
           `
+          resultsEl.setAttribute('aria-busy', 'false')
         }
 
         // Hide export button and clear results
-        const exportBtn = document.getElementById('export-btn')
-        if (exportBtn) exportBtn.classList.add('hidden')
+  const exportBtn = document.getElementById('export-btn')
+  if (exportBtn) exportBtn.classList.add('hidden')
+  const exportControls = document.getElementById('export-controls')
+  if (exportControls) exportControls.classList.add('hidden')
+  const progressLog = document.getElementById('progress-log')
+  if (progressLog) progressLog.innerHTML = ''
         this.lastResults = null
 
         this.sessionId = this.generateSessionId()
@@ -833,136 +743,98 @@ export const prerender = false
         `
       }
 
-      loadPresetScenario(type: string): void {
-        const scenarios = {
-          'high-bias': {
-            scenario: 'anxiety-treatment',
-            demographics: {
-              age: '65+',
-              gender: 'female',
-              ethnicity: 'hispanic',
-              primaryLanguage: 'es',
-            },
-            content:
-              'Therapist: You people from your culture tend to be more emotional about these things.\nPatient: I feel judged and misunderstood.\nTherapist: Maybe you should try to be more like American women who handle stress better.',
-          },
-          'low-bias': {
-            scenario: 'anxiety-treatment',
-            demographics: {
-              age: '26-35',
-              gender: 'male',
-              ethnicity: 'white',
-              primaryLanguage: 'en',
-            },
-            content:
-              "Therapist: How are you feeling today?\nPatient: I've been experiencing some anxiety.\nTherapist: That sounds challenging. Can you tell me more about what triggers these feelings?",
-          },
-          'cultural': {
-            scenario: 'family-therapy',
-            demographics: {
-              age: '36-50',
-              gender: 'female',
-              ethnicity: 'asian',
-              primaryLanguage: 'zh',
-            },
-            content:
-              "Therapist: I understand family dynamics can be complex in your culture.\nPatient: Yes, there are expectations I struggle with.\nTherapist: Let's explore how we can honor your cultural values while addressing your individual needs.",
-          },
-          'gender': {
-            scenario: 'crisis-intervention',
-            demographics: {
-              age: '18-25',
-              gender: 'non-binary',
-              ethnicity: 'mixed',
-              primaryLanguage: 'en',
-            },
-            content:
-              'Therapist: I want to make sure I use the right pronouns for you.\nPatient: Thank you, they/them works for me.\nTherapist: How can I best support you today while respecting your identity?',
-          },
+      async loadPresetScenario(type: string): Promise<void> {
+        const idMap: Record<string, string> = {
+          'high-bias': 'high-bias-cultural',
+          'low-bias': 'low-bias-inclusive',
+          cultural: 'high-bias-cultural',
+          gender: 'medium-bias-gender',
         }
 
-        const preset = scenarios[type as keyof typeof scenarios]
-        if (preset) {
-          ;(
-            document.getElementById('scenario-select') as HTMLSelectElement
-          ).value = preset.scenario
-          ;(document.getElementById('age-select') as HTMLSelectElement).value =
-            preset.demographics.age
-          ;(
-            document.getElementById('gender-select') as HTMLSelectElement
-          ).value = preset.demographics.gender
-          ;(
-            document.getElementById('ethnicity-select') as HTMLSelectElement
-          ).value = preset.demographics.ethnicity
-          ;(
-            document.getElementById('language-select') as HTMLSelectElement
-          ).value = preset.demographics.primaryLanguage
-          ;(
-            document.getElementById('session-content') as HTMLTextAreaElement
-          ).value = preset.content
+        const id = idMap[type] || 'low-bias-inclusive'
+        try {
+          const resp = await fetch(`/api/demos/bias-detection/presets?id=${encodeURIComponent(id)}`)
+          if (!resp.ok) throw new Error('Failed to load preset')
+          const data = await resp.json()
+          const preset = data?.preset
+          if (!preset) throw new Error('Preset not found')
+
+          ;(document.getElementById('scenario-select') as HTMLSelectElement).value = preset.scenario
+          ;(document.getElementById('age-select') as HTMLSelectElement).value = preset.demographics.age
+          ;(document.getElementById('gender-select') as HTMLSelectElement).value = preset.demographics.gender
+          ;(document.getElementById('ethnicity-select') as HTMLSelectElement).value = preset.demographics.ethnicity
+          ;(document.getElementById('language-select') as HTMLSelectElement).value = preset.demographics.primaryLanguage
+          ;(document.getElementById('session-content') as HTMLTextAreaElement).value = preset.content
+        } catch (e) {
+          console.warn('Using fallback preset due to error:', e)
         }
       }
 
-      exportResults(): void {
+  async exportResults(format: 'json' | 'csv' | 'txt' = 'json'): Promise<void> {
         if (!this.lastResults) return
 
-        const exportData = {
-          timestamp: new Date().toISOString(),
-          sessionId: this.lastResults.sessionId,
-          analysis: this.lastResults,
-          metadata: {
-            exportedBy: 'bias-detection-demo',
-            version: '1.0.0',
-          },
-        }
+        try {
+          const resp = await fetch('/api/demos/bias-detection/export', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              analysisResults: this.lastResults,
+              counterfactualScenarios: this.lastCounterfactualScenarios,
+              historicalComparison: this.lastHistoricalComparison,
+              format,
+            }),
+          })
 
-        const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-          type: 'application/json',
-        })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `bias-analysis-${this.lastResults.sessionId}.json`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}))
+            throw new Error(err.error || 'Export failed')
+          }
+
+          const blob = await resp.blob()
+          const disposition = resp.headers.get('Content-Disposition') || ''
+          const filenameMatch = disposition.match(/filename="?([^";]+)"?/)
+          const filename = filenameMatch?.[1] || `bias-analysis-${this.lastResults.sessionId}.json`
+
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = filename
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        } catch (error) {
+          console.error('Export error:', error)
+          this.displayError('Export failed. Please try again.')
+        }
       }
 
       renderCounterfactualScenarios(): string {
-        const scenarios = [
-          {
-            change: 'Different Age Group',
-            impact: 'Bias score could decrease by 15-25%',
-            likelihood: 'High',
-          },
-          {
-            change: 'Different Cultural Background',
-            impact: 'Bias patterns may shift significantly',
-            likelihood: 'Medium',
-          },
-          {
-            change: 'Modified Language Use',
-            impact: 'Linguistic bias could reduce by 10-20%',
-            likelihood: 'High',
-          },
-        ]
+        const scenarios = Array.isArray(this.lastCounterfactualScenarios)
+          ? this.lastCounterfactualScenarios
+          : []
+
+        if (scenarios.length === 0) {
+          return `
+            <div class="text-sm text-indigo-300/80">No counterfactual scenarios available. Run an analysis first.</div>
+          `
+        }
 
         return scenarios
           .map(
-            (scenario) => `
+            (scenario: any) => `
           <div class="flex justify-between items-center p-2 bg-indigo-500/5 rounded">
             <div>
               <div class="text-sm font-medium text-indigo-200">${scenario.change}</div>
               <div class="text-xs text-indigo-300/80">${scenario.impact}</div>
             </div>
             <span class="text-xs px-2 py-1 rounded ${
-              scenario.likelihood === 'High'
+              scenario.likelihood === 'high'
                 ? 'bg-green-500/20 text-green-300'
-                : scenario.likelihood === 'Medium'
+                : scenario.likelihood === 'medium'
                   ? 'bg-yellow-500/20 text-yellow-300'
                   : 'bg-red-500/20 text-red-300'
-            }">${scenario.likelihood}</span>
+            }">${(scenario.likelihood || '').toString().toUpperCase()}</span>
           </div>
         `,
           )
@@ -970,11 +842,17 @@ export const prerender = false
       }
 
       getHistoricalAverage(): number {
-        return 23.5 // Simulated 30-day average
+        if (this.lastHistoricalComparison?.thirtyDayAverage != null) {
+          return Math.round(this.lastHistoricalComparison.thirtyDayAverage * 1000) / 10
+        }
+        return 23.5
       }
 
       getTrendDirection(): string {
-        return Math.random() > 0.5 ? 'Improving' : 'Stable'
+        if (this.lastHistoricalComparison?.trendDirection) {
+          return this.lastHistoricalComparison.trendDirection
+        }
+        return 'Stable →'
       }
 
       delay(ms: number): Promise<void> {

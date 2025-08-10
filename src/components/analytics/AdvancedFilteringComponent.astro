@@ -1,4 +1,4 @@
----
+--
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,57 +16,6 @@ import { Checkbox } from '@/components/ui/Checkbox'
 import { IconFilter, IconX } from '@/components/ui/icons'
 
 import { cn } from '@/lib/utils'
-
-export interface AdvancedFilterOptions {
-  // Time filters
-  timeRange?: {
-    startDate?: Date
-    endDate?: Date
-    presetRange?: 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom'
-  }
-
-  // Emotion filters
-  emotions?: {
-    types?: string[]
-    minIntensity?: number
-    maxIntensity?: number
-    dimensionalRanges?: {
-      valence?: [number, number]
-      arousal?: [number, number]
-      dominance?: [number, number]
-    }
-  }
-
-  // Pattern filters
-  patterns?: {
-    types?: string[]
-    minStrength?: number
-    minConfidence?: number
-    categories?: string[]
-  }
-
-  // Visualization filters
-  visualization?: {
-    groupBy?: 'session' | 'day' | 'week' | 'month'
-    smoothing?: number
-    showRawData?: boolean
-    showTrendlines?: boolean
-    showConfidenceIntervals?: boolean
-    showAnnotations?: boolean
-  }
-
-  // Additional metadata filters
-  metadata?: Record<string, any>
-}
-
-interface Props {
-  options?: AdvancedFilterOptions
-  availableEmotionTypes?: string[]
-  availablePatternTypes?: string[]
-  availablePatternCategories?: string[]
-  className?: string
-  compact?: boolean
-}
 
 const {
   availableEmotionTypes = [],
@@ -120,8 +69,8 @@ const {
       <div class="filter-section space-y-4" data-section="time">
         <div class="space-y-2">
           <Label>Time Range</Label>
-          <Select>
-            <SelectTrigger className="w-full">
+          <Select id="time-range-select">
+            <SelectTrigger class="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -152,20 +101,18 @@ const {
         <div class="space-y-2">
           <Label>Emotion Types</Label>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-            {
-              availableEmotionTypes.map((type: string) => (
-                <div class="flex items-center space-x-2">
-                  <Checkbox
-                    id={`emotion-${type}`}
-                    value={type}
-                    className="emotion-type-checkbox"
-                  />
-                  <Label htmlFor={`emotion-${type}`} className="cursor-pointer">
-                    {type}
-                  </Label>
-                </div>
-              ))
-            }
+            {availableEmotionTypes.map((type) => (
+              <div class="flex items-center space-x-2">
+                <Checkbox
+                  id={`emotion-${type}`}
+                  value={type}
+                  class="emotion-type-checkbox"
+                />
+                <Label htmlFor={`emotion-${type}`} class="cursor-pointer">
+                  {type}
+                </Label>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -262,9 +209,9 @@ const {
                   <Checkbox
                     id={`pattern-${type}`}
                     value={type}
-                    className="pattern-type-checkbox"
+                    class="pattern-type-checkbox"
                   />
-                  <Label htmlFor={`pattern-${type}`} className="cursor-pointer">
+                  <Label htmlFor={`pattern-${type}`} class="cursor-pointer">
                     {type}
                   </Label>
                 </div>
@@ -312,16 +259,15 @@ const {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
             {
               availablePatternCategories.map((category: string) => (
-              availablePatternCategories.map((category: string) => (
                 <div class="flex items-center space-x-2">
                   <Checkbox
                     id={`category-${category}`}
                     value={category}
-                    className="pattern-category-checkbox"
+                    class="pattern-category-checkbox"
                   />
                   <Label
                     htmlFor={`category-${category}`}
-                    className="cursor-pointer"
+                    class="cursor-pointer"
                   >
                     {category}
                   </Label>
@@ -337,7 +283,7 @@ const {
         <div class="space-y-2">
           <Label>Group By</Label>
           <Select>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="group-by-select" class="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -396,11 +342,11 @@ const {
     <!-- Action Buttons -->
     <div class="flex justify-between pt-2">
       <Button variant="outline" size="sm" id="reset-filters">
-        <IconX className="mr-1 h-4 w-4" />
+        <IconX class="mr-1 h-4 w-4" />
         Reset
       </Button>
       <Button id="apply-filters">
-        <IconFilter className="mr-1 h-4 w-4" />
+        <IconFilter class="mr-1 h-4 w-4" />
         Apply Filters
       </Button>
     </div>
@@ -415,38 +361,8 @@ const {
     const component = document.getElementById('advanced-filtering-component')
     if (!component) return
 
-    // Properly typed options object to track the current filter state
-    const options: {
-      timeRange: {
-        startDate?: Date
-        endDate?: Date
-        presetRange?: string
-      }
-      emotions: {
-        types?: string[]
-        minIntensity?: number | undefined
-        maxIntensity?: number | undefined
-        dimensionalRanges?: {
-          valence?: [number, number]
-          arousal?: [number, number]
-          dominance?: [number, number]
-        }
-      }
-      patterns: {
-        types?: string[]
-        minStrength?: number
-        minConfidence?: number
-        categories?: string[]
-      }
-      visualization: {
-        groupBy?: string
-        smoothing?: number
-        showRawData?: boolean
-        showTrendlines?: boolean
-        showConfidenceIntervals?: boolean
-        showAnnotations?: boolean
-      }
-    } = {
+    // JS object to track the current filter state
+    const options = {
       timeRange: {},
       emotions: {
         dimensionalRanges: {},
@@ -458,90 +374,34 @@ const {
     // Elements
     const tabButtons = component.querySelectorAll('.tab-button')
     const filterSections = component.querySelectorAll('.filter-section')
-    const timeRangeSelect = component.querySelector(
-      '#time-range-select',
-    ) as HTMLElement
-    const customDateRange = component.querySelector(
-      '#custom-date-range',
-    ) as HTMLElement
-    const startDateInput = component.querySelector(
-      '#start-date',
-    ) as HTMLInputElement
-    const endDateInput = component.querySelector(
-      '#end-date',
-    ) as HTMLInputElement
-    const emotionTypeCheckboxes = component.querySelectorAll(
-      '.emotion-type-checkbox',
-    )
-    const intensityRangeSlider = component.querySelector(
-      '#intensity-range-slider',
-    ) as HTMLElement
-    const intensityRangeDisplay = component.querySelector(
-      '#intensity-range-display',
-    ) as HTMLElement
-    const valenceRangeSlider = component.querySelector(
-      '#valence-range-slider',
-    ) as HTMLElement
-    const valenceRangeDisplay = component.querySelector(
-      '#valence-range-display',
-    ) as HTMLElement
-    const arousalRangeSlider = component.querySelector(
-      '#arousal-range-slider',
-    ) as HTMLElement
-    const arousalRangeDisplay = component.querySelector(
-      '#arousal-range-display',
-    ) as HTMLElement
-    const dominanceRangeSlider = component.querySelector(
-      '#dominance-range-slider',
-    ) as HTMLElement
-    const dominanceRangeDisplay = component.querySelector(
-      '#dominance-range-display',
-    ) as HTMLElement
-    const patternTypeCheckboxes = component.querySelectorAll(
-      '.pattern-type-checkbox',
-    )
-    const strengthSlider = component.querySelector(
-      '#strength-slider',
-    ) as HTMLElement
-    const strengthDisplay = component.querySelector(
-      '#strength-display',
-    ) as HTMLElement
-    const confidenceSlider = component.querySelector(
-      '#confidence-slider',
-    ) as HTMLElement
-    const confidenceDisplay = component.querySelector(
-      '#confidence-display',
-    ) as HTMLElement
-    const patternCategoryCheckboxes = component.querySelectorAll(
-      '.pattern-category-checkbox',
-    )
-    const groupBySelect = component.querySelector(
-      '#group-by-select',
-    ) as HTMLElement
-    const smoothingSlider = component.querySelector(
-      '#smoothing-slider',
-    ) as HTMLElement
-    const smoothingDisplay = component.querySelector(
-      '#smoothing-display',
-    ) as HTMLElement
-    const showRawDataSwitch = component.querySelector(
-      '#show-raw-data',
-    ) as HTMLElement
-    const showTrendlinesSwitch = component.querySelector(
-      '#show-trendlines',
-    ) as HTMLElement
-    const showConfidenceIntervalsSwitch = component.querySelector(
-      '#show-confidence-intervals',
-    ) as HTMLElement
-    const showAnnotationsSwitch = component.querySelector(
-      '#show-annotations',
-    ) as HTMLElement
-    const resetButton = component.querySelector(
-      '#reset-filters',
-    ) as HTMLButtonElement
-    const applyButton = component.querySelector(
-      '#apply-filters',
-    ) as HTMLButtonElement
+    const timeRangeSelect = component.querySelector('#time-range-select')
+    const customDateRange = component.querySelector('#custom-date-range')
+    const startDateInput = component.querySelector('#start-date')
+    const endDateInput = component.querySelector('#end-date')
+    const emotionTypeCheckboxes = component.querySelectorAll('.emotion-type-checkbox')
+    const intensityRangeSlider = component.querySelector('#intensity-range-slider')
+    const intensityRangeDisplay = component.querySelector('#intensity-range-display')
+    const valenceRangeSlider = component.querySelector('#valence-range-slider')
+    const valenceRangeDisplay = component.querySelector('#valence-range-display')
+    const arousalRangeSlider = component.querySelector('#arousal-range-slider')
+    const arousalRangeDisplay = component.querySelector('#arousal-range-display')
+    const dominanceRangeSlider = component.querySelector('#dominance-range-slider')
+    const dominanceRangeDisplay = component.querySelector('#dominance-range-display')
+    const patternTypeCheckboxes = component.querySelectorAll('.pattern-type-checkbox')
+    const strengthSlider = component.querySelector('#strength-slider')
+    const strengthDisplay = component.querySelector('#strength-display')
+    const confidenceSlider = component.querySelector('#confidence-slider')
+    const confidenceDisplay = component.querySelector('#confidence-display')
+    const patternCategoryCheckboxes = component.querySelectorAll('.pattern-category-checkbox')
+    const groupBySelect = component.querySelector('#group-by-select')
+    const smoothingSlider = component.querySelector('#smoothing-slider')
+    const smoothingDisplay = component.querySelector('#smoothing-display')
+    const showRawDataSwitch = component.querySelector('#show-raw-data')
+    const showTrendlinesSwitch = component.querySelector('#show-trendlines')
+    const showConfidenceIntervalsSwitch = component.querySelector('#show-confidence-intervals')
+    const showAnnotationsSwitch = component.querySelector('#show-annotations')
+    const resetButton = component.querySelector('#reset-filters')
+    const applyButton = component.querySelector('#apply-filters')
 
     // Tab switching
     tabButtons.forEach((button) => {
@@ -569,9 +429,9 @@ const {
 
     // Time range select
     if (timeRangeSelect) {
-      ;(timeRangeSelect as any).addEventListener(
+      timeRangeSelect.addEventListener(
         'valueChange',
-        (e: { detail: string }) => {
+        (e) => {
           const value = e.detail
           options.timeRange.presetRange = value
 
@@ -582,7 +442,7 @@ const {
 
             // Calculate dates based on preset
             const today = new Date()
-            let startDate: Date | undefined
+            let startDate
 
             switch (value) {
               case 'day':
@@ -617,18 +477,22 @@ const {
     }
 
     // Date inputs
-    startDateInput?.addEventListener('change', () => {
-      options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
-    })
+    if (startDateInput) {
+      startDateInput.addEventListener('change', () => {
+        options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
+      })
+    }
 
-    endDateInput?.addEventListener('change', () => {
-      options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
-    })
+    if (endDateInput) {
+      endDateInput.addEventListener('change', () => {
+        options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
+      })
+    }
 
     // Initialize sliders
     initializeSlider(
       intensityRangeSlider,
-      intensityRangeDisplay, // display is still used here for textContent
+      intensityRangeDisplay,
       (values) => {
         if (values.length === 2) {
           const [min, max] = values
@@ -641,7 +505,7 @@ const {
 
     initializeSlider(
       valenceRangeSlider,
-      valenceRangeDisplay, // display is still used here for textContent
+      valenceRangeDisplay,
       (values) => {
         if (values.length === 2) {
           const [min, max] = values
@@ -656,7 +520,7 @@ const {
 
     initializeSlider(
       arousalRangeSlider,
-      arousalRangeDisplay, // display is still used here for textContent
+      arousalRangeDisplay,
       (values) => {
         if (values.length === 2) {
           const [min, max] = values
@@ -671,7 +535,7 @@ const {
 
     initializeSlider(
       dominanceRangeSlider,
-      dominanceRangeDisplay, // display is still used here for textContent
+      dominanceRangeDisplay,
       (values) => {
         if (values.length === 2) {
           const [min, max] = values
@@ -686,7 +550,7 @@ const {
 
     initializeSlider(
       strengthSlider,
-      strengthDisplay, // display is still used here for textContent
+      strengthDisplay,
       (values) => {
         if (values.length === 1) {
           const [value] = values
@@ -694,13 +558,12 @@ const {
           if (strengthDisplay) strengthDisplay.textContent = value.toFixed(1)
         }
       },
-      // 1, // precision removed
       true,
     )
 
     initializeSlider(
       confidenceSlider,
-      confidenceDisplay, // display is still used here for textContent
+      confidenceDisplay,
       (values) => {
         if (values.length === 1) {
           const [value] = values
@@ -708,13 +571,12 @@ const {
           if (confidenceDisplay) confidenceDisplay.textContent = value.toFixed(1)
         }
       },
-      // 1, // precision removed
       true,
     )
 
     initializeSlider(
       smoothingSlider,
-      smoothingDisplay, // display is still used here for textContent
+      smoothingDisplay,
       (values) => {
         if (values.length === 1) {
           const [value] = values
@@ -722,94 +584,93 @@ const {
           if (smoothingDisplay) smoothingDisplay.textContent = String(value)
         }
       },
-      // 0, // precision removed
       true,
     )
 
     // Initialize checkbox collections
     emotionTypeCheckboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', (e) => {
-        const target = e.target as HTMLInputElement
+        const target = e.target
         updateCheckboxArray(target, 'emotions', 'types')
       })
     })
 
     patternTypeCheckboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', (e) => {
-        const target = e.target as HTMLInputElement
+        const target = e.target
         updateCheckboxArray(target, 'patterns', 'types')
       })
     })
 
     patternCategoryCheckboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', (e) => {
-        const target = e.target as HTMLInputElement
+        const target = e.target
         updateCheckboxArray(target, 'patterns', 'categories')
       })
     })
 
     // Initialize switches
-    initializeSwitch(showRawDataSwitch, (checked: boolean) => {
+    initializeSwitch(showRawDataSwitch, (checked) => {
       options.visualization.showRawData = checked
     })
 
-    initializeSwitch(showTrendlinesSwitch, (checked: boolean) => {
+    initializeSwitch(showTrendlinesSwitch, (checked) => {
       options.visualization.showTrendlines = checked
     })
 
-    initializeSwitch(showConfidenceIntervalsSwitch, (checked: boolean) => {
+    initializeSwitch(showConfidenceIntervalsSwitch, (checked) => {
       options.visualization.showConfidenceIntervals = checked
     })
 
-    initializeSwitch(showAnnotationsSwitch, (checked: boolean) => {
+    initializeSwitch(showAnnotationsSwitch, (checked) => {
       options.visualization.showAnnotations = checked
     })
 
     // Group by select
     if (groupBySelect) {
-      ;(groupBySelect as any).addEventListener(
+      groupBySelect.addEventListener(
         'valueChange',
-        (e: { detail: string }) => {
+        (e) => {
           options.visualization.groupBy = e.detail
         },
       )
     }
 
     // Reset button
-    resetButton?.addEventListener('click', () => {
-      // Reset the options object
-      options.timeRange = {}
-      options.emotions = { dimensionalRanges: {} }
-      options.patterns = {}
-      options.visualization = {}
+    if (resetButton) {
+      resetButton.addEventListener('click', () => {
+        // Reset the options object
+        options.timeRange = {}
+        options.emotions = { dimensionalRanges: {} }
+        options.patterns = {}
+        options.visualization = {}
 
-      // Reset UI elements
-      // This would require resetting all the UI elements to their default state
-      // For brevity, we're not implementing the full reset here
+        // Reset UI elements
+        // This would require resetting all the UI elements to their default state
+        // For brevity, we're not implementing the full reset here
 
-      // Dispatch change event
-      dispatchOptionsChange(options)
-    })
+        // Dispatch change event
+        dispatchOptionsChange(options)
+      })
+    }
 
     // Apply button
-    applyButton?.addEventListener('click', () => {
-      dispatchApplyEvent()
-    })
+    if (applyButton) {
+      applyButton.addEventListener('click', () => {
+        dispatchApplyEvent()
+      })
+    }
 
     // Helper for slider initialization
     function initializeSlider(
-      slider: HTMLElement | null,
-      _display: HTMLElement | null, // Marked as unused, but kept for signature clarity if needed later
-      onChange: (values: number[]) => void,
+      slider,
+      _display,
+      onChange,
       singleValue = false,
     ) {
       if (!slider) return
 
-      
-      
-      
-
-      let initialValues: number[]
+      let initialValues
       if (singleValue) {
         const value = parseFloat(slider.getAttribute('data-value') || '0')
         initialValues = [value]
@@ -819,23 +680,19 @@ const {
         initialValues = [start, end]
       }
 
-      // Initialize slider with values
-      // Note: This is a placeholder for the actual slider initialization
-      // which would depend on the slider component's API
-
       // For demonstration, we'll just simulate the change event
       onChange(initialValues)
 
       // Add event listener for value changes
-      slider.addEventListener('sliderValueChange', (e: any) => {
+      slider.addEventListener('sliderValueChange', (e) => {
         onChange(e.detail.values)
       })
     }
 
     // Helper for switch initialization
     function initializeSwitch(
-      switchEl: HTMLElement | null,
-      onChange: (checked: boolean) => void,
+      switchEl,
+      onChange,
     ) {
       if (!switchEl) return
 
@@ -843,26 +700,26 @@ const {
       onChange(false)
 
       // Add event listener for changes
-      switchEl.addEventListener('checkedChange', (e: any) => {
+      switchEl.addEventListener('checkedChange', (e) => {
         onChange(e.detail)
       })
     }
 
     // Helper for checkbox array updates
     function updateCheckboxArray(
-      checkbox: HTMLInputElement,
-      category: 'emotions' | 'patterns' | 'visualization' | 'timeRange',
-      key: string,
+      checkbox,
+      category,
+      key,
     ) {
       const value = checkbox.value
       const checked = checkbox.checked
 
       // Ensure the property exists and is an array
-      if (!options[category][key as keyof (typeof options)[typeof category]]) {
-        ;(options[category] as any)[key] = [] as string[]
+      if (!options[category][key]) {
+        options[category][key] = []
       }
 
-      const values = (options[category] as any)[key] as string[]
+      const values = options[category][key]
 
       if (checked) {
         // Add to array if not already present
@@ -871,7 +728,7 @@ const {
         }
       } else {
         // Remove from array
-        ;(options[category] as any)[key] = values.filter(
+        options[category][key] = values.filter(
           (item) => item !== value,
         )
       }
@@ -881,7 +738,7 @@ const {
     }
 
     // Dispatch options change event
-    function dispatchOptionsChange(filterOptions: typeof options) {
+    function dispatchOptionsChange(filterOptions) {
       if (!component) return
 
       const event = new CustomEvent('advancedFilterOptionsChange', {

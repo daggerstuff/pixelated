@@ -198,7 +198,11 @@ jobs:
           execSync(\`echo 'security_impact=\${analysis.securityFiles.length > 0}' >> \$GITHUB_OUTPUT\`);
           execSync(\`echo 'demo_pages_changed=\${analysis.demoPages.length > 0}' >> \$GITHUB_OUTPUT\`);
           execSync(\`echo 'infrastructure_changed=\${analysis.infrastructureFiles.length > 0}' >> \$GITHUB_OUTPUT\`);
-          execSync(\`echo 'affected_components=' + JSON.stringify(Object.keys(analysis).filter(k => analysis[k].length > 0)) + ' >> \$GITHUB_OUTPUT\`);
+          // Write complex JSON safely without shell parsing issues
+          const affectedComponents = JSON.stringify(
+            Object.keys(analysis).filter(k => analysis[k].length > 0)
+          );
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `affected_components=${affectedComponents}\n`, { encoding: 'utf8' });
           "
         env:
           FORCE_PIPELINE: ${{ github.event.inputs.force_pipeline }}

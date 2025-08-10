@@ -1,0 +1,21 @@
+[Unit]
+Description=Claude Code Open Router
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Run as root since your current config and key live under /root
+User=root
+WorkingDirectory=/root
+Environment=HOME=/root
+ExecStart=/usr/bin/env bash -lc 'cco start'
+Restart=always
+RestartSec=3
+TimeoutStartSec=30
+KillSignal=SIGINT
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

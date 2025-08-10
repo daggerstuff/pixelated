@@ -39,37 +39,37 @@ const features = [
     title: "Red‑team role‑play engine",
     description: "Adversarial AI clients that escalate, resist, and test clinical boundaries — safely.",
     tag: "Built for failure",
-    image: "/images/features/red-team.jpg"
+    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?q=80&w=1600&auto=format&fit=crop"
   },
   {
     title: "Bias spike alerts",
     description: "Inline flags when power, culture, or language choices drift. Shows the exact phrase and better alternatives.",
     tag: "Real‑time",
-    image: "/images/features/bias-spike.jpg"
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1600&auto=format&fit=crop"
   },
   {
     title: "Failure replay timeline",
     description: "Scrubbable transcript with model‑rated decision points and what to try next session.",
     tag: "Post‑session coach",
-    image: "/images/features/failure-replay.jpg?v=2"
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop"
   },
   {
     title: "Edge‑case personas",
     description: "50k+ symptom mixes across age, culture, socioeconomic context, and comorbidities.",
     tag: "Coverage, not averages",
-    image: "/images/features/edge-case.jpg?v=2"
+    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1600&auto=format&fit=crop"
   },
   {
     title: "Competency ledger",
     description: "Objective evidence of growth: accuracy, empathy, speed, and risk routing — exportable for grading.",
     tag: "Auditable",
-    image: "/images/features/competency.jpg"
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1600&auto=format&fit=crop"
   },
   {
     title: "Zero‑retention privacy",
     description: "End‑to‑end encryption and ephemeral processing. We can’t read or keep your sessions.",
     tag: "Program‑safe",
-    image: "/images/features/zero-retention.jpg"
+    image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1600&auto=format&fit=crop"
   }
 ]
 ---
@@ -78,6 +78,7 @@ const features = [
 <BaseLayout
   title="Pixelated Empathy - AI Therapist Training Platform"
   description="Safe AI role-play training for therapists. Practice with difficult client personas, get bias detection feedback, and build confidence without real-world risk."
+  bgType="plum"
 >
   <!-- Enhanced Hero Section with Modern Visual Elements -->
   <section class="brutalist-section pt-20 md:pt-24 pb-16 mesh-bg-1 relative overflow-hidden min-h-screen flex items-center">
@@ -88,26 +89,31 @@ const features = [
 
     <div class="brutalist-container w-full relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-        <div class="max-w-lg lg:max-w-xl pr-0 lg:pr-8">
+        <div class="max-w-lg lg:max-w-xl pr-0 lg:pr-8 mx-auto text-center flex flex-col justify-center">
           <!-- Enhanced Status Indicator -->
-          <div class="inline-flex items-center gap-3 mb-6 nav-pill nav-pill--active">
+          <div class="inline-flex items-center gap-3 mb-6 nav-pill nav-pill--active w-fit mx-auto">
             <div class="status-dot status-dot--online"></div>
             <span class="font-semibold">Live AI Training Platform</span>
           </div>
 
-          <h1 class="brutalist-heading text-3xl md:text-4xl lg:text-5xl tracking-tight mb-6 leading-tight">
-            Practice the hard conversations
-            <br />
-            <span class="gradient-text-primary">without risk</span>
-          </h1>
+          <!-- Focused Tagline Treatment -->
+          <div class="mb-8">
+            <h1 class="brutalist-heading text-3xl md:text-4xl lg:text-5xl tracking-tight leading-tight">
+              <span class="block text-white/90 font-semibold mb-1">The Art of Therapy.</span>
+              <span class="block gradient-text-primary font-black text-4xl md:text-5xl lg:text-6xl tracking-tighter">The Science of Practice.</span>
+            </h1>
+          </div>
 
-          <p class="text-lg md:text-xl text-gray-300 max-w-lg mb-8">
+          <p class="text-lg md:text-xl text-gray-300 max-w-lg mb-8 mx-auto">
             Role‑play crises, get bias cues in session, and graduate with measurable competency using enterprise-grade AI simulation.
           </p>
 
           <!-- Enhanced CTA Buttons -->
-          <div class="flex flex-col sm:flex-row items-start gap-4">
-            <a href="/demo-hub" class="brutalist-button brutalist-button--enhanced px-8 py-4 text-lg font-semibold">
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="/demo-hub" class="nav-pill px-8 py-4 text-lg font-semibold text-white hover:bg-teal-600 transition-colors flex items-center gap-2" style="background: #14b8a6;">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
               Start Training →
             </a>
             <a href="/features" class="nav-pill px-8 py-4 text-lg font-semibold hover:bg-transparent hover:text-teal-400 transition-colors flex items-center gap-2">
@@ -141,7 +147,7 @@ const features = [
             <div class="metric-value--large organic-counter">{stat.value}</div>
             <div class="font-semibold text-white mb-1">{stat.label}</div>
             <div class="text-sm text-gray-400">{stat.subtitle}</div>
-            <!-- Status indicator for each metric -->
+            {/* Status indicator for each metric */}
             <div class="absolute top-4 right-4">
               <div class={`status-dot ${index === 0 ? 'status-dot--online' : index === 1 ? 'status-dot--processing' : 'status-dot--online'}`}></div>
             </div>
@@ -176,7 +182,7 @@ const features = [
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Zero‑knowledge: media card -->
         <a href="/trust" class="relative group rounded-2xl overflow-hidden aspect-[16/10] ring-1 ring-white/5 hover:ring-white/15 transition">
-          <img src="/images/features/red-team.jpg" alt="Zero‑knowledge privacy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
+          <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=1600&auto=format&fit=crop" alt="Zero‑knowledge privacy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
           <div class="absolute top-3 left-3 flex items-center gap-2">
             <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold ring-1 ring-emerald-400/30">
@@ -192,7 +198,7 @@ const features = [
 
         <!-- Compliance: media card -->
         <a href="/trust" class="relative group rounded-2xl overflow-hidden aspect-[16/10] ring-1 ring-white/5 hover:ring-white/15 transition">
-          <img src="/images/features/competency.jpg" alt="Compliance and audits" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1600&auto=format&fit=crop" alt="Compliance and audits" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
           <div class="absolute top-3 left-3 flex items-center gap-2">
             <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/20 text-blue-200 text-xs font-semibold ring-1 ring-blue-400/30">
@@ -208,7 +214,7 @@ const features = [
 
         <!-- No data retention: media card -->
         <a href="/trust" class="relative group rounded-2xl overflow-hidden aspect-[16/10] ring-1 ring-white/5 hover:ring-white/15 transition">
-          <img src="/images/features/zero-retention.jpg" alt="No data retention" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
+          <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=1600&auto=format&fit=crop" alt="No data retention" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" decoding="async" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
           <div class="absolute top-3 left-3 flex items-center gap-2">
             <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-teal-500/20 text-teal-200 text-xs font-semibold ring-1 ring-teal-400/30">
@@ -248,9 +254,9 @@ const features = [
                 <img
                   src={f.image}
                   alt={f.title}
-                  class="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity duration-300"
+                  class="w-full h-full object-cover brightness-[1.05] contrast-[1.05] transition-transform duration-700 group-hover:scale-[1.03]"
                 />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               </div>
             )}
 

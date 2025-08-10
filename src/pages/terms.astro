@@ -8,21 +8,16 @@ export const prerender = true
 <BaseLayout
   title="Terms of Service | Pixelated Empathy"
   description="Terms of Service for Pixelated Empathy's secure AI therapy platform"
-  showNavBar={true}
-  showFooter={true}
-  bgPattern={true}
-  usePlumAnimation={false}
-  centered={false}
+  bgType="plum"
 >
-  <div class="max-w-3xl mx-auto px-4 py-8">
-    <h1
-      class="text-4xl font-bold text-center mb-8"
-      style="color: #4a9a95 !important;"
-    >
-      Terms of Service
-    </h1>
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="brutalist-heading text-4xl md:text-5xl text-center mb-8">
+          Terms of Service
+        </h1>
 
-    <div class="prose prose-lg dark:prose-invert mx-auto">
+        <div class="prose prose-lg dark:prose-invert mx-auto text-gray-300">
       <p class="text-sm italic mb-6 text-center">
         Last updated: March 15, 2025
       </p>
@@ -565,8 +560,9 @@ export const prerender = true
         By using our services, you acknowledge that you have read and understood
         these Terms and agree to be bound by them.
       </p>
+      </div>
     </div>
-  </div>
+  </section>
 </BaseLayout>
 
 <style>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardHeader,
@@ -7,20 +7,20 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/components/ui/select';
 import {
   BackupType,
   BackupStatus,
   RecoveryTestStatus,
-} from '../../../lib/security/backup/backup-types'
+} from '../../../lib/security/backup/backup-types';
 
 interface Backup {
   id: string

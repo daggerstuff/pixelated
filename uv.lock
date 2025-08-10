@@ -2169,6 +2169,7 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "black" },
+    { name = "isort" },
     { name = "mypy" },
     { name = "pyright" },
     { name = "ruff" },
@@ -2196,6 +2197,7 @@ requires-dist = [
     { name = "flask-cors" },
     { name = "hatch", specifier = ">=1.14.1" },
     { name = "isort", specifier = ">=6.0.1" },
+    { name = "isort", marker = "extra == 'dev'" },
     { name = "lime" },
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "mypy", specifier = ">=1.16.1" },

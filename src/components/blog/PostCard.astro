@@ -25,7 +25,7 @@ function getReadingTime(content: string) {
 ---
 
 {variant === 'minimal' ? (
-  <!-- Minimal variant for blog index -->
+  // Minimal variant for blog index
   <article class="group">
     <div class="flex flex-col sm:flex-row gap-4">
       <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
@@ -34,18 +34,15 @@ function getReadingTime(content: string) {
           {getReadingTime(post.body)}
         </span>
       </div>
-
       <div class="flex-1">
         <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
           <a href={`/blog/${post.slug}`} class="block">
             {post.data.title}
           </a>
         </h3>
-
         <p class="text-slate-300 mb-3 leading-relaxed">
           {post.data.description}
         </p>
-
         {post.data.tags && post.data.tags.length > 0 && (
           <div class="flex flex-wrap gap-2 mb-3">
             {post.data.tags.map((tag: string) => (
@@ -58,7 +55,6 @@ function getReadingTime(content: string) {
             ))}
           </div>
         )}
-
         <a
           href={`/blog/${post.slug}`}
           class="inline-flex items-center text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
@@ -70,7 +66,7 @@ function getReadingTime(content: string) {
     </div>
   </article>
 ) : (
-  <!-- Default card variant -->
+  // Default card variant
   <li class="transition-all duration-300">
     <a href={`/blog/${post.slug}`} class="group block rounded-xl border border-slate-700 bg-slate-800/40 backdrop-blur-md shadow-lg hover:border-green-400/70 hover:shadow-green-400/10 transition-all overflow-hidden focus:outline-none focus:ring-2 focus:ring-green-400/70 hover:scale-[1.03] duration-200">
       {post.data.image?.url && (

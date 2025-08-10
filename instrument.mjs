@@ -24,8 +24,8 @@ Sentry.init({
   // Release tracking
   release: process.env.npm_package_version || '0.0.1',
 
-  // Debug mode for development
-  debug: process.env.NODE_ENV === 'development',
+  // Debug mode only when explicitly enabled to avoid console spam
+  debug: process.env.SENTRY_DEBUG === '1',
 
   // Enhanced error filtering
   beforeSend(event) {

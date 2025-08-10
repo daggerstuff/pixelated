@@ -1,3 +1,7 @@
+---
+type: "agent_requested"
+description: "Example description"
+---
 # Clean Code: Optimized Guidelines for Augment
 
 ## Core Principles

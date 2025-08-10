@@ -35,7 +35,7 @@
     return { ctx, dpi }
   }
 
-  function polar2cart(x = 0, y = 0, r = 0, theta = 0): [number, number] {
+  function polar2cart(x = 0, y = 0, r = 0, theta = 0) {
     const dx = r * Math.cos(theta)
     const dy = r * Math.sin(theta)
 
@@ -71,7 +71,7 @@
         if (nx < -100 || nx > width + 100 || ny < -100 || ny > height + 100)
           return
 
-        // otherwise continue drawing
+        // otherwise continue drawring
         const rad1 = rad + random() * R15
         const rad2 = rad - random() * R15
         const rate = counter.value <= THRESHOLD ? 0.8 : 0.5

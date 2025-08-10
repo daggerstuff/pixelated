@@ -1,23 +1,29 @@
 ---
-import Layout from '../layouts/Layout.astro'
+import BaseLayout from '../layouts/BaseLayout.astro'
 
 // Set prerender to true to ensure this page is statically generated during build
 export const prerender = true
 ---
 
-<Layout title="Accessibility Statement | Pixelated Empathy">
-  <main class="container mx-auto px-4 py-8 max-w-3xl">
-    <h1 class="text-4xl font-bold mb-6">Accessibility Statement</h1>
+<BaseLayout
+  title="Accessibility Statement | Pixelated Empathy"
+  description="Our commitment to accessibility and inclusive design for all users"
+  bgType="plum"
+>
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="brutalist-heading text-4xl md:text-5xl mb-6">Accessibility Statement</h1>
 
-    <div class="prose prose-lg dark:prose-invert">
-      <p>
-        At Pixelated Empathy, we are committed to ensuring digital accessibility
-        for people with disabilities. We are continually improving the user
-        experience for everyone, and applying the relevant accessibility
-        standards.
-      </p>
+        <div class="prose prose-lg dark:prose-invert text-gray-300">
+          <p>
+            At Pixelated Empathy, we are committed to ensuring digital accessibility
+            for people with disabilities. We are continually improving the user
+            experience for everyone, and applying the relevant accessibility
+            standards.
+          </p>
 
-      <h2 class="text-2xl font-semibold mt-8 mb-4">Conformance Status</h2>
+          <h2 class="text-2xl font-semibold mt-8 mb-4 text-white">Conformance Status</h2>
       <p>
         The Web Content Accessibility Guidelines (WCAG) defines requirements for
         designers and developers to improve accessibility for people with
@@ -27,9 +33,9 @@ export const prerender = true
         not fully conform to the accessibility standard.
       </p>
 
-      <h2 class="text-2xl font-semibold mt-8 mb-4">
-        Compatibility with Browsers and Assistive Technology
-      </h2>
+          <h2 class="text-2xl font-semibold mt-8 mb-4 text-white">
+            Compatibility with Browsers and Assistive Technology
+          </h2>
       <p>
         Pixelated Empathy is designed to be compatible with the following
         assistive technologies:
@@ -41,7 +47,7 @@ export const prerender = true
         <li>Keyboard-only navigation</li>
       </ul>
 
-      <h2 class="text-2xl font-semibold mt-8 mb-4">Technical Specifications</h2>
+          <h2 class="text-2xl font-semibold mt-8 mb-4 text-white">Technical Specifications</h2>
       <p>
         Accessibility of Pixelated Empathy relies on the following technologies
         to work with the particular combination of web browser and any assistive
@@ -54,7 +60,7 @@ export const prerender = true
         <li>JavaScript</li>
       </ul>
 
-      <h2 class="text-2xl font-semibold mt-8 mb-4">Assessment Approach</h2>
+          <h2 class="text-2xl font-semibold mt-8 mb-4 text-white">Assessment Approach</h2>
       <p>
         Pixelated Empathy has assessed the accessibility of our platform by the
         following approaches:
@@ -66,7 +72,7 @@ export const prerender = true
         <li>User testing</li>
       </ul>
 
-      <h2 class="text-2xl font-semibold mt-8 mb-4">Feedback</h2>
+          <h2 class="text-2xl font-semibold mt-8 mb-4 text-white">Feedback</h2>
       <p>
         We welcome your feedback on the accessibility of Pixelated Empathy.
         Please let us know if you encounter accessibility barriers on our
@@ -80,7 +86,9 @@ export const prerender = true
         </li>
         <li>Phone: +1-800-123-4567</li>
       </ul>
-      <p>We try to respond to feedback within 5 business days.</p>
+          <p>We try to respond to feedback within 5 business days.</p>
+        </div>
+      </div>
     </div>
-  </main>
-</Layout>
+  </section>
+</BaseLayout>

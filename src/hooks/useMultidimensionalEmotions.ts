@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { fetchJSONWithRetry } from '@/lib/net/fetchWithRetry'
 
 export interface EmotionData {
   timestamp: number
@@ -205,7 +206,7 @@ class EmotionDataCache {
   }
 
   // Set custom TTL for specific client data
-  setTTL(clientId: string, ttl: number): void {
+  setTTL(_clientId: string, ttl: number): void {
     // In a more advanced implementation, we could have client-specific TTLs
     this.ttl = ttl
   }
@@ -327,18 +328,23 @@ export function useMultidimensionalEmotions(
         })
 
         // Fetch data from API with pagination support
-        const response = await fetch(`/api/emotions/dimensional?${params}`, {
-          signal: abortControllerRef.current.signal,
-          headers: {
-            'Content-Type': 'application/json',
+        const result = await fetchJSONWithRetry<EmotionApiResponse>(
+          `/api/emotions/dimensional?${params}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer demo-token',
+            },
+            // pass external abort controller; helper composes signals and adds per-attempt timeout
+            signal: abortControllerRef.current.signal,
           },
-        })
-
-        if (!response.ok) {
-          throw new Error(`Error fetching emotion data: ${response.statusText}`)
-        }
-
-        const result: EmotionApiResponse = await response.json()
+          {
+            retries: 2,
+            timeout: 8000,
+            minDelay: 300,
+            maxDelay: 1500,
+          },
+        )
 
         // Transform API response to our format
         const emotionData: EmotionData[] = result.data.map((item) => ({
@@ -460,7 +466,8 @@ function sampleData(data: EmotionData[], targetCount: number): EmotionData[] {
 
   for (let i = 0; i < targetCount; i++) {
     const index = Math.min(Math.floor(i * stride), data.length - 1)
-    result.push(data[index])
+    const entry = data[index]
+    if (entry) result.push(entry)
   }
 
   return result

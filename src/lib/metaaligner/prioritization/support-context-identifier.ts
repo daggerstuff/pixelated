@@ -3,7 +3,7 @@
  * Specialized component for identifying and classifying emotional support needs
  */
 
-import type { AIService, AIMessage } from '../../ai/models/types'
+import type { AIService } from '../../ai/models/types'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('support-context-identifier')
@@ -456,9 +456,9 @@ export class SupportContextIdentifier {
           const priorities = {
             grief_support: 10, // Highest priority for specific support types
             active_listening: 9,
-            practical_guidance: 8,
+            coping_assistance: 8, // Prefer coping assistance in ambiguous phrasing
+            practical_guidance: 7,
             encouragement: 7,
-            coping_assistance: 6,
             emotional_validation: 5, // Lower priority as it's more general
             stress_management: 4,
             relationship_support: 4,
@@ -523,7 +523,14 @@ export class SupportContextIdentifier {
       query,
       bestEmotionalMatch.state,
     )
-    const urgency = this.determineUrgency(emotionalIntensity, copingCapacity)
+    // If encouragement with hopelessness, escalate urgency
+    const encouragementHopelessnessOverride =
+      bestSupportMatch.type === SupportType.ENCOURAGEMENT &&
+      bestEmotionalMatch.state === EmotionalState.HOPELESSNESS
+
+    const urgency = encouragementHopelessnessOverride
+      ? 'high'
+      : this.determineUrgency(emotionalIntensity, copingCapacity)
     let recommendedApproach = this.mapEmotionalStateToApproach(
       bestEmotionalMatch.state,
     )
@@ -588,7 +595,7 @@ Consider this context in your assessment.`
       queryWithContext = `Conversation context: ${conversationHistory.slice(-5).join(' ')}\n\nCurrent message: ${userQuery}`
     }
 
-    const messages: AIMessage[] = [
+  const messages: Array<{ role: string; content: string }> = [
       { role: 'system', content: contextualPrompt },
       { role: 'user', content: queryWithContext },
     ]

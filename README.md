@@ -138,52 +138,7 @@ Join our exclusive beta program:
 
 ---
 
-## 🔍 Memory Layer Integration with Cipher
-
-We use [Cipher](https://github.com/campfirein/cipher) as a persistent memory layer for AI coding agents and chat history.
-
-### 1. Install Dependency
-```bash
-pnpm add @byterover/cipher
-```
-
-### 2. Configure Environment
-Copy `.env.example` to `.env` and set:
-```bash
-OPENAI_API_KEY=your_openai_api_key
-# (Optional) Configure vector store for embeddings
-VECTOR_STORE_TYPE=qdrant
-VECTOR_STORE_URL=http://localhost:6333
-```
-
-### 3. Cipher Agent Configuration
-Edit or use the provided config at `memAgent/cipher.yml`. Default is:
-```yaml
-llm:
-  provider: openai
-  model: gpt-4-turbo
-  apiKey: ${OPENAI_API_KEY}
-# embedding and MCP server settings
-```
-
-### 4. Usage
-- Start CLI:
-  ```bash
-  pnpm cipher
-  ```
-- Run HTTP API server:
-  ```bash
-  pnpm cipher:api
-  ```
-- Run MCP server:
-  ```bash
-  pnpm cipher:mcp
-  ```
-- Start Web UI:
-  ```bash
-  pnpm cipher:ui
-  ```
----
+ 
 
 ## 💬 Connect
 

@@ -18,14 +18,14 @@
  * - Optimized chart rendering for different screen sizes
  */
 
-import type React from 'react'
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Alert } from '@/components/ui/alert'
+import type React from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert } from '@/components/ui/alert';
 import {
   XAxis,
   YAxis,
@@ -46,7 +46,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from 'recharts'
+} from 'recharts';
 import {
   AlertTriangle,
   Users,
@@ -68,11 +68,11 @@ import {
   AlertCircle,
   Info,
   CheckCircle,
-} from 'lucide-react'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { BiasDashboardData, BiasAnalysisResult, DashboardRecommendation } from '@/lib/ai/bias-detection'
+} from 'lucide-react';
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger';
+import type { BiasDashboardData, BiasAnalysisResult, DashboardRecommendation } from '@/lib/ai/bias-detection';
 
-const logger = createBuildSafeLogger('bias-dashboard')
+const logger = createBuildSafeLogger('bias-dashboard');
 
 interface BiasDashboardProps {
   className?: string

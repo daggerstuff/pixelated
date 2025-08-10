@@ -1,0 +1,26 @@
+services:
+  litellm:
+    build:
+      context: .
+      dockerfile: ./litellm.Dockerfile
+    container_name: litellm
+    platform: "linux/amd64"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      LITELLM_LOG: "info"
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      LITELLM_CONFIG: "/app/config.yaml"
+    volumes:
+      - ./litellm.config.yaml:/app/config.yaml:ro
+    command:
+      - "--config"
+      - "/app/config.yaml"
+      - "--port"
+      - "8080"
+    ports:
+      - "0.0.0.0:8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+

@@ -140,8 +140,10 @@ export default defineConfig({
           authToken: process.env.SENTRY_AUTH_TOKEN,
         },
       }),
-      // Add Spotlight for development debugging (only when Sentry is enabled)
-      ...(process.env.NODE_ENV === 'development' ? [spotlightjs()] : [])
+      // Add Spotlight for development debugging when explicitly enabled
+      ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1'
+        ? [spotlightjs()]
+        : [])
     ] : []),
   ],
   markdown: {

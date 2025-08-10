@@ -1,73 +1,14 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import SearchDemo from '../components/SearchDemo.astro'
-
-const title = 'Search Functionality Demo'
-const description =
-  'Try our powerful FlexSearch integration with this interactive demo.'
+import SearchDemo from '@/components/SearchDemo.astro'
 ---
 
-<BaseLayout {title} {description}>
-  <section class="container mx-auto py-8 px-4">
-    <div class="max-w-5xl mx-auto">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">{title}</h1>
-
-      <div class="prose dark:prose-invert max-w-none mb-8">
-        <p class="text-xl text-center">
-          Our platform includes powerful search capabilities using FlexSearch, a
-          full-text search library that runs entirely in the browser.
-        </p>
-
-        <div
-          class="bg-blue-50 dark:bg-blue-950 p-4 rounded-md border border-blue-200 dark:border-blue-800 my-6"
-        >
-          <p class="font-medium text-blue-800 dark:text-blue-300">
-            <span class="font-bold">Privacy First:</span> All search operations happen
-            directly in your browser, ensuring your search queries never leave your
-            device.
-          </p>
-        </div>
-      </div>
-
-      <SearchDemo
-        title="Interactive Search Demo"
-        description="Try searching for topics like 'mental health', 'analytics', 'privacy', or 'security' to see the search in action."
-        className="mb-12"
-      />
-
-      <div class="mt-12 prose dark:prose-invert max-w-none">
-        <h2 class="text-2xl font-bold">How Our Search Works</h2>
-        <p>
-          We've implemented a highly optimized search experience that
-          prioritizes both performance and privacy:
-        </p>
-
-        <div class="grid md:grid-cols-2 gap-6 mt-6">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-            <h3 class="text-xl font-semibold mb-3 text-primary">
-              Fast & Efficient
-            </h3>
-            <ul class="space-y-2">
-              <li>Optimized index generation for instant results</li>
-              <li>Fuzzy matching for typo tolerance</li>
-              <li>Contextual relevance algorithms</li>
-              <li>Handles large datasets with minimal performance impact</li>
-            </ul>
-          </div>
-
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-            <h3 class="text-xl font-semibold mb-3 text-primary">
-              Privacy-Focused
-            </h3>
-            <ul class="space-y-2">
-              <li>100% client-side search operations</li>
-              <li>No tracking of search queries</li>
-              <li>Zero server requests for each search</li>
-              <li>Content pre-indexed during page load</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+<BaseLayout title="Search Demo | Pixelated Empathy">
+  <div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6">Search Demo</h1>
+    <p class="text-muted-foreground mb-8">
+      Try our client-side search powered by FlexSearch and backed by the /api/v1/search endpoint.
+    </p>
+    <SearchDemo client:load />
+  </div>
 </BaseLayout>

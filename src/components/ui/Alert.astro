@@ -90,9 +90,10 @@ const classes = cn(baseClasses, variantClasses[variant], className);
   )}
 </div>
 
-{dismissible && (
-  <script>
-    // Client-side dismiss functionality
+
+<script is:inline>
+  // Client-side dismiss functionality for all alerts
+  document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.alert-dismiss').forEach(button => {
       button.addEventListener('click', () => {
         const alert = button.closest('[role="alert"]');
@@ -101,5 +102,5 @@ const classes = cn(baseClasses, variantClasses[variant], className);
         }
       });
     });
-  </script>
-)}
+  });
+</script>

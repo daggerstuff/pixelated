@@ -1,0 +1,4 @@
+# Global Python constraints for CI across services
+# Keep these versions aligned with ubuntu-latest wheels
+numpy==2.0.*
+pandas==2.2.3

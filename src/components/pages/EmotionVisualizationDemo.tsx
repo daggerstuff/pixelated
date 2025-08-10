@@ -44,7 +44,7 @@ const EmotionVisualizationDemo: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 shadow-sm py-4">
         <div className="container mx-auto px-4">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -150,14 +150,19 @@ const EmotionVisualizationDemo: React.FC = () => {
 
           {/* 3D Visualization */}
           <div className="col-span-1 md:col-span-3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div style={{ height: '600px' }}>
+            <div
+              style={{ height: '600px' }}
+              aria-busy={isLoading}
+              aria-live="polite"
+              aria-describedby={error ? 'emotion-error' : undefined}
+            >
               <MultidimensionalEmotionChart
                 emotionData={data}
                 isLoading={isLoading}
               />
 
               {error && (
-                <p className="text-red-500 mt-2">
+                <p id="emotion-error" className="text-red-500 mt-2">
                   Error loading emotion data: {error.message}
                 </p>
               )}

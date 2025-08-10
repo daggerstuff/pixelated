@@ -17,6 +17,13 @@ export class TherapeuticProgressService {
     appLogger.info('TherapeuticProgressService initialized')
   }
 
+  private nextTimestamp(prevIso?: string): string {
+    const now = Date.now()
+    const prev = prevIso ? Date.parse(prevIso) : 0
+    const ts = now <= prev ? prev + 1 : now
+    return new Date(ts).toISOString()
+  }
+
   /**
    * Adds a new insight to the patient's therapeutic progress.
    * @param profile The patient's profile.
@@ -71,7 +78,7 @@ export class TherapeuticProgressService {
         ...profile.cognitiveModel,
         therapeuticProgress: updatedProgress,
       },
-      lastUpdatedAt: new Date().toISOString(),
+      lastUpdatedAt: this.nextTimestamp(profile.lastUpdatedAt),
     }
   }
 
@@ -143,7 +150,7 @@ export class TherapeuticProgressService {
         ...profile.cognitiveModel,
         coreBeliefs: updatedCoreBeliefs,
       },
-      lastUpdatedAt: new Date().toISOString(),
+      lastUpdatedAt: this.nextTimestamp(profile.lastUpdatedAt),
     }
   }
 
@@ -233,7 +240,7 @@ export class TherapeuticProgressService {
         ...profile.cognitiveModel,
         therapeuticProgress: updatedProgress,
       },
-      lastUpdatedAt: new Date().toISOString(),
+      lastUpdatedAt: this.nextTimestamp(profile.lastUpdatedAt),
     }
   }
 

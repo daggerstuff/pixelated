@@ -1,37 +1,81 @@
-import React, { useState, useEffect, forwardRef } from 'react'
-import type { ReactNode } from 'react'
-import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
+import React, { useState, useEffect, forwardRef } from 'react';
+import type { ReactNode } from 'react';
+import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp';
+
 /**
  * Workaround: Inline minimal UI components due to persistent import/alias resolution errors.
  * Remove these and restore imports when tooling is fixed.
  */
-const Card = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="rounded-lg border bg-card text-card-foreground shadow-sm" {...props}>{children}</div>
-);
-const CardHeader = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="flex flex-col space-y-1.5 p-6" {...props}>{children}</div>
-);
-const CardTitle = ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <h3 className="text-2xl font-semibold leading-none tracking-tight" {...props}>{children}</h3>
-);
-const CardDescription = ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <p className="text-sm text-muted-foreground" {...props}>{children}</p>
-);
-const CardContent = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="p-6 pt-0" {...props}>{children}</div>
+const Card = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className="rounded-lg border bg-card text-card-foreground shadow-sm"
+    {...props}
+  >
+    {children}
+  </div>
 );
 
-const Switch = ({ checked, onCheckedChange, id }: { checked: boolean, onCheckedChange: (checked: boolean) => void, id: string }) => (
+const CardHeader = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className="flex flex-col space-y-1.5 p-6" {...props}>
+    {children}
+  </div>
+);
+
+const CardTitle = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <h3 className="text-2xl font-semibold leading-none tracking-tight" {...props}>
+    {children}
+  </h3>
+);
+
+const CardDescription = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p className="text-sm text-muted-foreground" {...props}>
+    {children}
+  </p>
+);
+
+const CardContent = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className="p-6 pt-0" {...props}>
+    {children}
+  </div>
+);
+
+const Switch = ({
+  checked,
+  onCheckedChange,
+  id,
+}: {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  id: string;
+}) => (
   <input
     type="checkbox"
     id={id}
     checked={checked}
-    onChange={e => onCheckedChange(e.target.checked)}
+    onChange={(e) => onCheckedChange(e.target.checked)}
     className="peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary peer-unchecked:bg-input bg-input"
   />
 );
 
-const Button = ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+const Button = ({
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
     {...props}
@@ -39,15 +83,16 @@ const Button = ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonEle
     {children}
   </button>
 );
+
 /**
  * Workaround: Inline Input component due to persistent import/alias resolution error.
  * Remove this and restore import when tooling is fixed.
  */
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  className?: string
-  type?: string
-}
- 
+  className?: string;
+  type?: string;
+};
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => (
     <input
@@ -60,8 +105,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       {...props}
     />
   )
-)
-Input.displayName = 'Input'
+);
+Input.displayName = 'Input';
 
 // Create an inline Label component
 interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {

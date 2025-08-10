@@ -71,8 +71,65 @@ export default function SyntheticTherapyDemo() {
   const handleGenerateConversations = async () => {
     setLoading(true)
     try {
-      // In a real implementation, this would call the backend API
-      // For demo purposes, mock with realistic sample data
+      // Call our new psychology scenario generation API
+      const response = await fetch('/api/psychology/generate-scenario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'therapy_conversation',
+          difficulty: params.disorders.length > 1 ? 'moderate' : 'basic',
+          clientProfile: {
+            disorders: params.disorders,
+            sessionNumber: Math.floor(Math.random() * 10) + 1,
+            presenting_concerns: params.disorders.map(d => `Primary concern related to ${d}`),
+            demographics: {
+              age: Math.floor(Math.random() * 40) + 20,
+              gender: Math.random() > 0.5 ? 'female' : 'male'
+            }
+          },
+          therapeuticFramework: 'CBT', // Default to CBT
+          options: {
+            includeSymptoms: true,
+            includeAnalysis: true,
+            realistic: true,
+            evidenceBased: true
+          }
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`)
+      }
+
+      const scenarioResult = await response.json()
+
+      // Transform API response to match our conversation format
+      const apiConversations: SyntheticConversation[] = [{
+        patientText: scenarioResult.scenario.clientStatement,
+        therapistText: scenarioResult.scenario.therapistResponse,
+        encodedSymptoms: scenarioResult.scenario.symptoms.map((symptom: any) => ({
+          name: symptom.name,
+          severity: symptom.severity / 10, // Convert 1-10 to 0-1
+          duration: symptom.duration,
+          manifestations: symptom.indicators,
+          cognitions: symptom.cognitivePatterns || []
+        })),
+        decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map((symptom: any) => ({
+          name: symptom.name,
+          confidence: symptom.confidence,
+          reasoning: symptom.assessment
+        })),
+        sessionSummary: scenarioResult.analysis.clinicalSummary
+      }]
+
+      setConversations(apiConversations)
+
+    } catch (error) {
+      console.error('Failed to generate conversations:', error)
+      
+      // Fallback to mock data on API failure
       const mockConversations: SyntheticConversation[] = [
         {
           patientText:

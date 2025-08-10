@@ -1,18 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
 // Helper function for string concatenation
 const formatStorageLocation = (type, bucket) => {
   switch (type) {
     case 's3':
-      return `s3://${bucket}`
+      return `s3://${bucket}`;
     case 'azure':
-      return `Azure: ${bucket}`
+      return `Azure: ${bucket}`;
     case 'gcp':
-      return `GCS: ${bucket}`
+      return `GCS: ${bucket}`;
     default:
-      return ''
+      return '';
   }
-}
+};
 
 export default function BackupLocationTab() {
   const [locations, setLocations] = useState([
@@ -37,9 +37,9 @@ export default function BackupLocationTab() {
       status: 'active',
       lastSync: '2025-03-15T14:30:00Z',
     },
-  ])
-  const [isAddingLocation, setIsAddingLocation] = useState(false)
-  const [isFormLoading, setIsFormLoading] = useState(false)
+  ]);
+  const [isAddingLocation, setIsAddingLocation] = useState(false);
+  const [isFormLoading, setIsFormLoading] = useState(false);
   const [newLocation, setNewLocation] = useState({
     type: 'local',
     name: '',
@@ -47,14 +47,14 @@ export default function BackupLocationTab() {
     bucket: '',
     region: '',
     isDefault: false,
-  })
+  });
 
   const handleAddLocation = () => {
-    setIsAddingLocation(true)
-  }
+    setIsAddingLocation(true);
+  };
 
   const handleCancelAdd = () => {
-    setIsAddingLocation(false)
+    setIsAddingLocation(false);
     setNewLocation({
       type: 'local',
       name: '',
@@ -62,39 +62,39 @@ export default function BackupLocationTab() {
       bucket: '',
       region: '',
       isDefault: false,
-    })
-  }
+    });
+  };
 
   const handleInputChange = (e) => {
-    const { name, value, type } = e.target
+    const { name, value, type } = e.target;
     if (type === 'checkbox') {
-      const { checked } = e.target
+      const { checked } = e.target;
       setNewLocation({
         ...newLocation,
         [name]: checked,
-      })
+      });
     } else {
       setNewLocation({
         ...newLocation,
         [name]: value,
-      })
+      });
     }
-  }
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    setIsFormLoading(true)
+    e.preventDefault();
+    setIsFormLoading(true);
     // Simulate API call
     setTimeout(() => {
-      const id = Math.random().toString(36).substring(7)
+      const id = Math.random().toString(36).substring(7);
       // Handle default location changes
       setLocations((prev) => {
-        let updatedLocations = [...prev]
+        let updatedLocations = [...prev];
         if (newLocation.isDefault) {
           updatedLocations = updatedLocations.map((loc) => ({
             ...loc,
             isDefault: false,
-          }))
+          }));
         }
         const createdLocation = {
           id,
@@ -107,11 +107,11 @@ export default function BackupLocationTab() {
           isDefault: newLocation.isDefault || false,
           status: 'active',
           lastSync: new Date().toISOString(),
-        }
-        return [...updatedLocations, createdLocation]
-      })
-      setIsAddingLocation(false)
-      setIsFormLoading(false)
+        };
+        return [...updatedLocations, createdLocation];
+      });
+      setIsAddingLocation(false);
+      setIsFormLoading(false);
       setNewLocation({
         type: 'local',
         name: '',
@@ -119,9 +119,9 @@ export default function BackupLocationTab() {
         bucket: '',
         region: '',
         isDefault: false,
-      })
-    }, 1000)
-  }
+      });
+    }, 1000);
+  };
 
   const setDefaultLocation = (id) => {
     setLocations((prev) =>
@@ -129,17 +129,17 @@ export default function BackupLocationTab() {
         ...location,
         isDefault: location.id === id,
       })),
-    )
-  }
+    );
+  };
 
   const removeLocation = (id) => {
     // Don't allow removing the default location
-    const locationToRemove = locations.find((loc) => loc.id === id)
+    const locationToRemove = locations.find((loc) => loc.id === id);
     if (locationToRemove?.isDefault) {
-      return
+      return;
     }
-    setLocations((prev) => prev.filter((location) => location.id !== id))
-  }
+    setLocations((prev) => prev.filter((location) => location.id !== id));
+  };
 
   const testConnection = (id) => {
     setLocations((prev) =>
@@ -148,7 +148,7 @@ export default function BackupLocationTab() {
           ? { ...location, status: 'configuring' }
           : location,
       ),
-    )
+    );
     // Simulate testing connection
     setTimeout(() => {
       setLocations((prev) =>
@@ -162,9 +162,9 @@ export default function BackupLocationTab() {
               }
             : location,
         ),
-      )
-    }, 2000)
-  }
+      );
+    }, 2000);
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
@@ -510,5 +510,5 @@ export default function BackupLocationTab() {
         </div>
       )}
     </div>
-  )
+  );
 }

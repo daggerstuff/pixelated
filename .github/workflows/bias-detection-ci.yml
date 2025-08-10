@@ -287,8 +287,10 @@ jobs:
             exit 1
           fi
           cd src/lib/ai/bias-detection/python-service
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip setuptools wheel
+          # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
+          pip install --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
+          pip install -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
           pip install pytest pytest-cov pytest-asyncio httpx
 
       - name: Run Python linting
@@ -377,8 +379,10 @@ jobs:
       - name: Install Python ML dependencies
         run: |
           cd src/lib/ai/bias-detection/python-service
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip setuptools wheel
+          # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
+          pip install --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
+          pip install -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
 
       - name: Setup test database
         run: |
