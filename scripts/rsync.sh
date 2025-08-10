@@ -7,12 +7,12 @@ set -e
 
 # Configuration
 VPS_HOST=${1:-"209.208.79.191"}
-VPS_USER=${2:-"root"}
+VPS_USER=${2:-"vivi"}
 VPS_PORT=${3:-"22"}
 SSH_KEY=${4:-""}
 DOMAIN=${5:-"pixelatedempathy.com"}
 LOCAL_PROJECT_DIR="/home/vivi/pixelated"
-REMOTE_PROJECT_DIR="/root/pixelated"
+REMOTE_PROJECT_DIR="/home/vivi/pixelated"
 
 # Colors
 RED='\033[0;31m'
@@ -33,7 +33,7 @@ show_usage() {
     echo "Examples:"
     echo "  $0"
     echo "  $0 208.117.84.253 root 22"
-    echo "  $0 208.117.84.253 root 22 ~/.ssh/planet pixelatedempathy.com"
+    echo "  $0 208.117.84.253 root 22 ~/.ssh/atlanta pixelatedempathy.com"
     echo ""
     echo "This script syncs the entire project to VPS and sets up deployment"
     exit 1
@@ -76,12 +76,7 @@ dist/
 build/
 coverage/
 .cache/
-.vscode/
-.idea/
 *.log
-.env
-.env.local
-.env.production
 .DS_Store
 Thumbs.db
 __pycache__/
@@ -93,9 +88,6 @@ venv/
 .venv/
 ai/venv/
 ai/.venv/
-ai/models/
-ai/data/
-ai/checkpoints/
 ai/*.pt
 ai/*.pth
 ai/*.model
@@ -142,15 +134,42 @@ print_status "Setting up VPS environment..."
 
 # Update system
 print_status "Updating system packages..."
-apt-get update -y
+sudo apt-get update -y
+sudo apt-get upgrade -y
+
+# Install security basics
+print_status "Installing security packages (ufw, fail2ban, unattended-upgrades)..."
+sudo apt-get install -y ufw fail2ban unattended-upgrades
+
+# Configure UFW firewall
+print_status "Configuring UFW firewall rules..."
+sudo ufw allow $VPS_PORT/tcp    # Allow SSH
+sudo ufw allow 80/tcp           # Allow HTTP
+sudo ufw allow 443/tcp          # Allow HTTPS
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw --force enable
+
+# Enable and start fail2ban
+print_status "Enabling fail2ban for SSH brute-force protection..."
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+
+# SSH hardening reminder
+print_status "Review SSH configuration for security:"
+print_status "  - Disable root login (PermitRootLogin no)"
+print_status "  - Disable password authentication (PasswordAuthentication no)"
+print_status "  - Change SSH port if desired"
+print_status "  - Use key-based authentication only"
+print_status "  - Edit /etc/ssh/sshd_config and restart sshd: systemctl restart sshd"
 
 # Install Docker if not present
 if ! command -v docker &> /dev/null; then
     print_status "Installing Docker..."
-    curl -fsSL https://get.docker.com | sh
-    systemctl start docker
-    systemctl enable docker
-    usermod -aG docker $VPS_USER 2>/dev/null || true
+    curl -fsSL https://get.docker.com | sudo sh
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo usermod -aG docker $VPS_USER 2>/dev/null || true
 fi
 
 # Install Node.js if not present or wrong version
@@ -197,7 +216,7 @@ fi
 # Install Git if not present
 if ! command -v git &> /dev/null; then
     print_status "Installing Git..."
-    apt-get install -y git
+    sudo apt-get install -y git
 fi
 
 # Install Caddy if domain is configured
@@ -207,8 +226,8 @@ if [[ -n "$DOMAIN" ]] && ! command -v caddy &> /dev/null; then
     curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
     curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
     apt-get update
-    apt-get install -y caddy
-    systemctl enable caddy
+    sudo apt-get install -y caddy
+    sudo systemctl enable caddy
 fi
 
 print_status "✅ VPS environment setup complete"
@@ -302,6 +321,26 @@ docker build -t pixelated-empathy:latest .
 print_status "✅ Project setup complete"
 EOF
 
+# Archive old repo in root home (VPS)
+print_header "Archiving old repo in /root/pixelated on VPS..."
+$SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
+set -e
+
+print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
+print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
+
+if [ -d "/root/pixelated" ]; then
+    print_status "Stopping Caddy and Docker containers using /root/pixelated..."
+    sudo systemctl stop caddy || true
+    sudo docker stop pixelated-app || true
+    print_status "Archiving /root/pixelated to /root/pixelated-backup..."
+    sudo mv /root/pixelated /root/pixelated-backup
+    print_status "Archive complete."
+else
+    print_status "/root/pixelated does not exist, nothing to archive."
+fi
+EOF
+
 # Deploy the application
 print_header "Deploying application..."
 $SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
@@ -363,7 +402,7 @@ fi
 # Configure Caddy if domain is set
 if [[ -n "$DOMAIN" ]]; then
     print_status "Configuring Caddy for domain: $DOMAIN"
-    cat > /etc/caddy/Caddyfile << 'CADDY_EOF'
+    sudo tee /etc/caddy/Caddyfile > /dev/null << 'CADDY_EOF'
 $DOMAIN {
     reverse_proxy localhost:4321
 
@@ -404,10 +443,10 @@ CADDY_EOF
 
     # Test and reload Caddy
     print_status "Testing Caddy configuration..."
-    caddy validate --config /etc/caddy/Caddyfile
+    sudo caddy validate --config /etc/caddy/Caddyfile
 
     print_status "Starting Caddy..."
-    systemctl restart caddy
+    sudo systemctl restart caddy
 fi
 
 print_status "✅ Application deployment completed!"
