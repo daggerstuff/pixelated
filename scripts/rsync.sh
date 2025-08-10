@@ -46,7 +46,7 @@ print_status "Local dir: $LOCAL_PROJECT_DIR"
 print_status "Remote dir: $REMOTE_PROJECT_DIR"
 
 # Build SSH command
-SSH_CMD="ssh"
+SSH_CMD="ssh -t"
 RSYNC_SSH_OPTS=""
 if [[ -n "$SSH_KEY" ]]; then
     SSH_CMD="$SSH_CMD -i $SSH_KEY"
@@ -149,7 +149,6 @@ sudo ufw allow 443/tcp          # Allow HTTPS
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw --force enable
-
 # Enable and start fail2ban
 print_status "Enabling fail2ban for SSH brute-force protection..."
 sudo systemctl enable fail2ban
