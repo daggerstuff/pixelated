@@ -9,19 +9,14 @@ import {
   Activity, 
   Users, 
   Server, 
-  Database,
   Zap,
   AlertTriangle,
   CheckCircle,
   TrendingUp,
   BarChart3,
-  Settings,
   RefreshCw,
   Download,
-  Eye,
   Clock,
-  Brain,
-  Heart,
   Lock
 } from 'lucide-react'
 

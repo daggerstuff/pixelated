@@ -18,6 +18,12 @@ const cdnAssetMap = (() => {
   }
 })()
 
+console.log('Sentry ENV Check:');
+console.log('SENTRY_AUTH_TOKEN:', process.env.SENTRY_AUTH_TOKEN);
+console.log('SENTRY_DSN:', process.env.SENTRY_DSN);
+console.log('SENTRY_ORG:', process.env.SENTRY_ORG);
+console.log('SENTRY_PROJECT:', process.env.SENTRY_PROJECT);
+
 export default defineConfig({
   server: {
     watch: {

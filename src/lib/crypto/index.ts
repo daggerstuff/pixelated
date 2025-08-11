@@ -7,6 +7,7 @@ import {
   DecryptCommand,
   GenerateDataKeyCommand,
 } from '@aws-sdk/client-kms'
+import { logger, LogLevel } from '../../utils/logger'
 
 /**
  * HIPAA-compliant crypto module for encryption, key management, and key rotation
@@ -14,11 +15,7 @@ import {
  */
 
 // Initialize PHI audit logger with proper LogLevel enum
-const logger = getLogger({
-  level: LogLevel.INFO,
-  prefix: 'PHI-CRYPTO',
-  enableLogCollection: true,
-})
+logger.setLevel(LogLevel.INFO)
 
 // Log module access for HIPAA compliance
 logger.info('Crypto module initialized', {
@@ -103,7 +100,7 @@ class RedisStorageProvider implements StorageProvider {
   private client: RedisClientType
   private connected = false
 
-  constructor(private readonly redisUrl: string) {
+  constructor(redisUrl: string) {
     this.client = createClient({ url: redisUrl })
 
     this.client.on('error', (err) => {
@@ -385,7 +382,7 @@ export class KeyStorage {
 
   constructor(
     private readonly storageProvider: StorageProvider,
-    private readonly namespace: string = 'app',
+    namespace: string = 'app',
   ) {
     this.keyPrefix = `${namespace}:keys:`
   }

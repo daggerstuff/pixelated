@@ -21,17 +21,10 @@ node_modules/
 /.env.development
 /*.env.*
 !/.env.example
-/docs/security/credential-management.md
-/hipaa-security-report.json
-/phi-scan-results.json
 /secrets.*.json
 
 /.DS_Store*
-
-/.vscode/
-/.idea/
 /*.iml
-/.roo/
 /.cursor/
 /.goose/
 /.vscode-insiders/
@@ -69,21 +62,14 @@ node_modules/
 
 .sentryclirc
 
-.amazonq/
 .cursor/
 
 .goosehints
-azure.yaml
 performance-results/
 test_pixel_logs
 security-scan-artifacts
 .mypy_cache
 .pytest_cache
-
-security-baseline.json
-
-__azurite_db_blob_extent__.json
-__azurite_db_blob__.json
 
 .plandex-v2
 .gooseignore
@@ -95,11 +81,7 @@ __azurite_db_blob__.json
 .endgame
 packages
 pnpm-workspace.yaml
-ISSUE_BIAS_DETECTION_LAYER_WEIGHTS.md
 
-
-
-.direnv
 .envrc
 
 *~
@@ -195,15 +177,6 @@ cython_debug/
 
 .ruff_cache/
 
-pyrightconfig.json
-
-.vscode/*
-.vscode/settings.json
-.vscode/tasks.json
-.vscode/launch.json
-.vscode/extensions.json
-.vscode/*.code-snippets
-
 .history/
 
 # Built Visual Studio Code Extensions
@@ -212,7 +185,6 @@ pyrightconfig.json
 .history
 .ionide
 
-business-strategy
 examples
 
 logs
@@ -220,8 +192,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 dev-debug.log
-.idea
-.vscode
 *.suo
 *.ntvs*
 *.njsproj
@@ -231,6 +201,4 @@ dev-debug.log
 
 /ai/
 /.scannerwork/
-src/lib/db/migrations
-/src/lib/db/migrations/
 /pixelated.git/

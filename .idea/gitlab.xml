@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LanguageServerSettings">
+    <option name="workspaceSettings">
+      <WorkspaceSettings>
+        <option name="codeCompletion">
+          <CodeCompletion>
+            <option name="additionalLanguages">
+              <set>
+                <option value="Astro" />
+                <option value="Git Attributes File" />
+              </set>
+            </option>
+          </CodeCompletion>
+        </option>
+      </WorkspaceSettings>
+    </option>
+  </component>
+</project>

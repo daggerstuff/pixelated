@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Python" name="Python facet">
+      <configuration sdkName="Python 3.11 virtualenv at ~/pixelated/.venv" />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.amazonq" />
+      <excludeFolder url="file://$MODULE_DIR$/.astro" />
+      <excludeFolder url="file://$MODULE_DIR$/.cursor" />
+      <excludeFolder url="file://$MODULE_DIR$/.roo" />
+      <excludeFolder url="file://$MODULE_DIR$/.vscode" />
+      <excludeFolder url="file://$MODULE_DIR$/business-strategy" />
+      <excludeFolder url="file://$MODULE_DIR$/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/logs" />
+      <excludeFolder url="file://$MODULE_DIR$/pixel.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/.anima/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/.scannerwork/architecture/js" />
+      <excludeFolder url="file://$MODULE_DIR$/.scannerwork/ir" />
+      <excludeFolder url="file://$MODULE_DIR$/.scannerwork/ucfg2" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/.databricks" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/dataset_pipeline/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/dataset_pipeline/temp" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/pixel_ai.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/pixelated_ai.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/temp" />
+      <excludeFolder url="file://$MODULE_DIR$/cognee-mcp" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2019/dec" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2019/feb" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2019/mar" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2019/nov" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2019/oct" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2019/sep" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2020" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2021" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2022/Apr 22" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2022/Feb22" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2022/Jan 22" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2022/Jul 22" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2022/June 22" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2022/Mar 22" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data/raw data/2022/May 22" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/datasets-wendy/priority_4" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/datasets-wendy/priority_5" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Original Reddit Data" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/datasets-wendy" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/pixelated_empathy_ai.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/backups" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/Amod___mental_health_counseling_conversations" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/IEMOCAP_EMOTION_Recognition" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/dataset_pipeline" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/emotions" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/reddit_mental_health" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/samhog___psychology-10k" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/datasets/wesley7137___formatted_annotated_addiction_counseling_csv_sft" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/production_deployment/production_deployment/releases/pixelated_ai_v20250803_053213_q50_t2_f3/datasets" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/production_deployment/production_deployment/releases/pixelated_ai_v20250803_054129_q50_t2_f3/datasets" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/production_deployment/releases/pixelated_ai_v20250803_053213_q50_t2_f3/datasets" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/production_deployment/releases/pixelated_ai_v20250803_054129_q50_t2_f3/datasets" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/releases/pixelated_ai_v20250803_053213_q50_t2_f3/datasets" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/releases/pixelated_ai_v20250803_054129_q50_t2_f3/datasets" />
+      <excludeFolder url="file://$MODULE_DIR$/.zed" />
+    </content>
+    <orderEntry type="jdk" jdkName="uv (pixelated)" jdkType="Python SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="@types/7zip-min" level="application" />
+    <orderEntry type="library" name="Python 3.11 virtualenv at ~/pixelated/.venv interpreter library" level="application" />
+  </component>
+</module>

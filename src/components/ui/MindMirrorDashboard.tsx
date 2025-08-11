@@ -9,6 +9,7 @@ import {
   Shield,
   User
 } from 'lucide-react'
+import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
 
 // Archetype definitions inspired by Mind-Mirror
 export interface ArchetypeResult {
@@ -205,8 +206,8 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
 
       {/* Mood Metrics Grid */}
       <div className="grid grid-cols-2 gap-4">
-        {moodMetrics.map((metric, index) => (
-          <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow">
+        {moodMetrics.map((metric) => (
+          <Card key={metric.label} className="border-0 shadow-md hover:shadow-lg transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
                 <div className={`p-2 rounded-lg ${metric.bgColor}`}>
@@ -275,8 +276,8 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {analysis.insights?.map((insight, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                {analysis.insights?.map((insight) => (
+                  <div key={insight} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
                     <Sparkles className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
                     <p className="text-sm text-gray-700">{insight}</p>
                   </div>
@@ -298,8 +299,8 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {analysis.recommendations?.map((rec, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+                {analysis.recommendations?.map((rec) => (
+                  <div key={rec} className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
                     <Shield className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                     <p className="text-sm text-gray-700">{rec}</p>
                   </div>

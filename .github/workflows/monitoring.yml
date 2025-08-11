@@ -139,8 +139,17 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
+      - name: Set Slack enabled output (production)
+        id: set-slack-enabled-prod
+        run: |
+          if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
+            echo "slack_enabled=true" >> $GITHUB_OUTPUT
+          else
+            echo "slack_enabled=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Notify failure
-        if: failure() && secrets.SLACK_WEBHOOK != ''
+        if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
         uses: slackapi/slack-github-action@v1.25.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
@@ -161,7 +170,7 @@ jobs:
         continue-on-error: true
 
       - name: Log notification skip
-        if: failure() && secrets.SLACK_WEBHOOK == ''
+        if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'false'
         run: |
           echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
           echo "::warning::Production monitoring failed but no notification was sent"

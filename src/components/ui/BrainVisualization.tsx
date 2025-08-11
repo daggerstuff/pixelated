@@ -229,7 +229,7 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [brainRegions])
+  }, [brainRegions, animate])
 
   const getActivityLevel = (activity: number) => {
     if (activity > 0.8) {

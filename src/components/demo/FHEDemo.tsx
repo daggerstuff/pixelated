@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { fetchJSONWithRetry } from '@/lib/net'
+import { fetchJSONWithRetry } from '@/lib/net/fetchWithRetry'
 import type { FHEOperation } from '@/lib/fhe/types'
 
 interface Props {
@@ -22,7 +22,8 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
   const encryptLocally = useCallback(async (text: string) => {
     // Demo local "encryption" shim so we can send something that looks encrypted
     // The API/service will accept any string and process
-    return `test-fhe:v1:${btoa(unescape(encodeURIComponent(text)))}`
+    // Modern base64 encoding for UTF-8 strings (replaces deprecated unescape)
+    return `test-fhe:v1:${btoa(String.fromCharCode(...new TextEncoder().encode(text)))}`
   }, [])
 
   const handleProcess = useCallback(async () => {

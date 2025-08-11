@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/src/lib/db/migrations/20250321_add_ai_usage_logs.ts" value="14769e63-5611-4d0b-b845-9ca50fe672ae" />
+  </component>
+</project>

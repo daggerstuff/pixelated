@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -56,6 +56,7 @@ export default function CrisisDetectionDemo() {
   const [assessmentHistory, setAssessmentHistory] = useState<CrisisAssessment[]>([])
 
   // Real-time monitoring effect
+  const performCrisisAssessment = async (isRealTime: boolean = false) => {
   useEffect(() => {
     if (realTimeMonitoring && inputText.length > 50) {
       // Clear existing timeout
@@ -76,9 +77,7 @@ export default function CrisisDetectionDemo() {
         clearTimeout(typingTimeout)
       }
     }
-  }, [inputText, realTimeMonitoring])
-
-  const performCrisisAssessment = async (isRealTime: boolean = false) => {
+  }, [inputText, realTimeMonitoring, typingTimeout, performCrisisAssessment])
     if (!inputText.trim()) {
       setError('Please enter content to assess for crisis indicators')
       return
@@ -487,8 +486,7 @@ export default function CrisisDetectionDemo() {
               <CardContent>
                 <ul className="space-y-3">
                   {assessment.immediateActions.map((action, index) => (
-                    // TODO: Replace index with a unique key if available
-                    <li key={action + index} className="flex items-start gap-2">
+                    <li key={action} className="flex items-start gap-2">
                       <div className="w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
                         {index + 1}
                       </div>

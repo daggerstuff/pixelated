@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CIAidSettingsState">
+    <option name="defaultGitlabCIYamlPath" value=".gitlab-ci.yml" />
+    <option name="remotes">
+      <list>
+        <Remote>
+          <option name="apiUrl" value="" />
+          <option name="projectPath" value="pixelatedtech/pixelated" />
+        </Remote>
+      </list>
+    </option>
+    <option name="gitlabTemplatesProject" value="" />
+    <option name="gitlabTemplatesPath" value="" />
+  </component>
+</project>
