@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,7 +8,8 @@ import {
   Brain,
   User,
   Bot,
-  Sparkles
+  Sparkles,
+  Activity
 } from 'lucide-react'
 import MindMirrorDashboard, { type MindMirrorAnalysis } from './MindMirrorDashboard'
 import BrainVisualization from './BrainVisualization'
@@ -59,7 +59,34 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
   const energy_level = Math.min(0.9, (words.match(/energy|tired|excited|motivated|drive/g) || []).length * 0.2 + 0.5)
   const social_connection = Math.min(0.9, (words.match(/friend|family|people|together|alone/g) || []).length * 0.25 + 0.4)
   const coherence_index = (cognitive_clarity + energy_level) / 2
-  const urgency_score = words.includes("crisis") || words.includes("emergency") ? 0.9 : Math.random() * 0.3 + 0.1
+  // Use cryptographically secure random if available, otherwise use a deterministic value for demo
+  const getRandomValue = () => {
+    try {
+      const { crypto } = globalThis
+      if (crypto && typeof crypto.getRandomValues === 'function') {
+        const randomArray = crypto.getRandomValues(new Uint32Array(1))
+        if (Array.isArray(randomArray) && randomArray.length > 0) {
+          const randomValue = randomArray[0];
+          if (typeof randomValue === 'number' && Number.isInteger(randomValue)) {
+            // 0xFFFFFFFF is the max value for Uint32, so this normalizes to [0, 1)
+            return randomValue / (0xFFFFFFFF + 1);
+          } else {
+            console.warn('crypto.getRandomValues returned a non-integer value:', randomValue);
+            return 0; // fallback to 0 if unexpected value
+          }
+        } else {
+          console.warn('crypto.getRandomValues did not return a valid array:', randomArray);
+          return 0; // fallback to 0 if array is invalid
+        }
+      }
+    } catch (error) {
+      // Fallback if crypto is not available
+    }
+    // For demo purposes, use a deterministic value based on text length to avoid security warnings
+    // In production, ensure crypto.getRandomValues is available
+    return (text.length % 100) / 100 * 0.3
+  }
+  const urgency_score = words.includes("crisis") || words.includes("emergency") ? 0.9 : getRandomValue() + 0.1
 
   return {
     archetype: {
@@ -107,7 +134,7 @@ export const EnhancedMentalHealthChat: React.FC<EnhancedMentalHealthChatProps> =
   ])
   const [input, setInput] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [currentAnalysis, setCurrentAnalysis] = useState<MindMirrorAnalysis | null>(null)
+  const [currentAnalysis, setCurrentAnalysis] = useState<MindMirrorAnalysis | undefined>(undefined)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -119,7 +146,9 @@ export const EnhancedMentalHealthChat: React.FC<EnhancedMentalHealthChatProps> =
   }, [messages])
 
   const handleSend = useCallback(async () => {
-    if (!input.trim() || isAnalyzing) return
+    if (!input.trim() || isAnalyzing) {
+      return
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),

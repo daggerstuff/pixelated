@@ -1,3 +1,4 @@
+import React from 'react'
 import type { AIMessage } from '../../lib/ai'
 import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
 import { useState, useCallback, useEffect, useRef } from 'react'
@@ -8,27 +9,6 @@ import {
   useCrisisDetection,
   useSentimentAnalysis,
 } from '../ai'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Shield, 
-  Activity, 
-  TrendingUp, 
-  Clock, 
-  AlertTriangle,
-  CheckCircle,
-  Brain,
-  Heart,
-  BarChart3,
-  MessageSquare,
-  Download,
-  History
-} from 'lucide-react'
-import { apiClient } from '../../lib/api-client'
-import React from 'react'
 
 interface ChatDemoProps {
   className?: string
@@ -36,26 +16,6 @@ interface ChatDemoProps {
   maxMessages?: number
 }
 
-interface ConversationMetrics {
-  messageCount: number
-  avgResponseTime: number
-  sentimentTrend: Array<{ timestamp: number; sentiment: number }>
-  riskLevel: 'low' | 'moderate' | 'high'
-  interventionCount: number
-  userEngagement: number
-  sessionDuration: number
-  confidenceScore: number
-}
-
-interface SessionAnalytics {
-  startTime: number
-  totalMessages: number
-  crisisDetections: number
-  interventionSuccess: number
-  userSatisfaction?: number
-  therapyFrameworks: string[]
-  keyTopics: string[]
-}
 
 /**
  * Production-ready chat interface with AI analysis capabilities

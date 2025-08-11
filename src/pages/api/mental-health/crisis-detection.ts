@@ -312,8 +312,8 @@ function detectCrisisIndicators(content: string): {
   return { indicators, timeline }
 }
 
-function assessSuicidalIdeation(indicators: any[], timeline: string): CrisisAssessment['suicidalIdeation'] {
-  const suicidalIndicators = indicators.filter(ind => ind.type === 'suicidal')
+function assessSuicidalIdeation(indicators: unknown[], timeline: string): CrisisAssessment['suicidalIdeation'] {
+  const suicidalIndicators = (indicators as Array<{ type: string; severity: string; matches: string[] }>).filter(ind => ind.type === 'suicidal')
   
   if (suicidalIndicators.length === 0) {
     return {

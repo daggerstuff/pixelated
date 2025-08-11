@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { fetchJSONWithRetry } from '@/lib/net/fetchWithRetry'
+import { fetchJSONWithRetry } from '@/lib/net'
 import type { FHEOperation } from '@/lib/fhe/types'
 
 interface Props {
@@ -11,7 +11,7 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
   const [operation, setOperation] = useState<FHEOperation | 'word_count' | 'sentiment'>('word_count')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<unknown>(null)
 
   const operations = useMemo(() => [
     { value: 'word_count', label: 'Word Count' },
@@ -31,7 +31,7 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
     setResult(null)
     try {
       const encryptedData = await encryptLocally(plainText)
-      const json = await fetchJSONWithRetry<any>(
+      const json = await fetchJSONWithRetry<unknown>(
         '/api/fhe/process',
         {
           method: 'POST',
@@ -44,9 +44,13 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
         },
         { retries: 2, timeout: 8000 },
       )
-      setResult(json.result ?? json)
-    } catch (e: any) {
-      setError(e.message || 'Unknown error')
+      if (typeof json === 'object' && json !== null && 'result' in json) {
+        setResult((json as { result?: unknown }).result ?? json)
+      } else {
+        setResult(json)
+      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setIsLoading(false)
     }
@@ -60,8 +64,8 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
         retries: 2,
         timeout: 8000,
       })
-    } catch (e: any) {
-      setError(e.message || 'Failed to rotate keys')
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to rotate keys')
     } finally {
       setIsLoading(false)
     }
@@ -91,7 +95,7 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
             <select
               className="w-full rounded border bg-background p-2 mt-1"
               value={operation}
-              onChange={(e) => setOperation(e.target.value as any)}
+              onChange={(e) => setOperation(e.target.value as unknown as FHEOperation | 'word_count' | 'sentiment')}
             >
               {operations.map((op) => (
                 <option key={op.value} value={op.value}>

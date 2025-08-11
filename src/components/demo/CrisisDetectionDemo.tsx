@@ -20,7 +20,7 @@ import {
   TrendingUp,
   AlertCircle
 } from 'lucide-react'
-import { apiClient, APIError } from '../../lib/api-client'
+import { apiClient, APIError } from '@/lib/api-client'
 
 interface CrisisAssessment {
   riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent'
@@ -137,37 +137,40 @@ export default function CrisisDetectionDemo() {
                      result.assessment.selfHarm.frequency === 'occasional' ? 5 :
                      result.assessment.selfHarm.frequency === 'rare' ? 2 : 0
           },
-          hopelessness: { 
-            present: result.riskFactors.some((rf: any) => rf.factor.includes('hopelessness')), 
+          hopelessness: {
+            present: result.riskFactors.some((rf: unknown) => (rf as { factor: string }).factor.includes('hopelessness')),
             confidence: 0.7,
             severity: 6
           },
-          impulsivity: { 
-            present: result.assessment.agitation.present, 
+          impulsivity: {
+            present: result.assessment.agitation.present,
             confidence: result.assessment.agitation.controllable ? 0.4 : 0.8,
             severity: result.assessment.agitation.severity === 'severe' ? 9 :
                      result.assessment.agitation.severity === 'moderate' ? 6 : 3
           },
-          socialIsolation: { 
-            present: result.riskFactors.some((rf: any) => rf.factor.includes('isolation')), 
+          socialIsolation: {
+            present: result.riskFactors.some((rf: unknown) => (rf as { factor: string }).factor.includes('isolation')),
             confidence: 0.6,
             severity: 5
           },
-          substanceUse: { 
-            present: result.assessment.substanceUse.present, 
+          substanceUse: {
+            present: result.assessment.substanceUse.present,
             confidence: result.assessment.substanceUse.acute ? 0.9 : 0.5,
             severity: result.assessment.substanceUse.impairment === 'severe' ? 9 :
                      result.assessment.substanceUse.impairment === 'moderate' ? 6 : 3
           }
         },
-        protectiveFactors: result.protectiveFactors.map((pf: any) => pf.factor),
-        immediateActions: result.recommendations.immediate.map((action: any) => action.action),
-        emergencyResources: result.resources.crisis.map((resource: any) => ({
-          type: resource.name,
-          contact: resource.contact,
-          description: resource.specialization.join(', '),
-          available: resource.availability
-        })),
+        protectiveFactors: result.protectiveFactors.map((pf: unknown) => (pf as { factor: string }).factor),
+        immediateActions: result.recommendations.immediate.map((action: unknown) => (action as { action: string }).action),
+        emergencyResources: result.resources.crisis.map((resource: unknown) => {
+          const r = resource as { name: string; contact: string; specialization: string[]; availability: string }
+          return {
+            type: r.name,
+            contact: r.contact,
+            description: r.specialization.join(', '),
+            available: r.availability
+          }
+        }),
         confidenceLevel: result.metadata.confidenceScore / 100,
         timestamp: new Date().toISOString()
       }
@@ -484,7 +487,8 @@ export default function CrisisDetectionDemo() {
               <CardContent>
                 <ul className="space-y-3">
                   {assessment.immediateActions.map((action, index) => (
-                    <li key={index} className="flex items-start gap-2">
+                    // TODO: Replace index with a unique key if available
+                    <li key={action + index} className="flex items-start gap-2">
                       <div className="w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
                         {index + 1}
                       </div>
@@ -505,8 +509,8 @@ export default function CrisisDetectionDemo() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {assessment.emergencyResources.map((resource, index) => (
-                    <div key={index} className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  {assessment.emergencyResources.map((resource) => (
+                    <div key={resource.type + resource.contact} className="p-3 bg-red-50 border border-red-200 rounded-lg">
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="font-medium text-red-900">{resource.type}</h4>
                         <Badge variant="outline" className="text-xs bg-red-100 text-red-700">
@@ -534,8 +538,8 @@ export default function CrisisDetectionDemo() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {assessment.protectiveFactors.map((factor, index) => (
-                  <div key={index} className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                {assessment.protectiveFactors.map((factor) => (
+                  <div key={factor} className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
                     <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <span className="text-green-800">{factor}</span>
                   </div>

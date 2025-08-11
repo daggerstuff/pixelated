@@ -573,8 +573,8 @@ export default function EnterpriseAdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {userAnalytics?.mostUsedFeatures.map((feature, index) => (
-                    <div key={index} className="space-y-2">
+                  {userAnalytics?.mostUsedFeatures.map((feature) => (
+                    <div key={feature.feature} className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">{feature.feature}</span>
                         <span className="font-medium">{feature.usage}%</span>
@@ -598,11 +598,11 @@ export default function EnterpriseAdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {apiHealth?.endpoints.map((endpoint, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                {apiHealth?.endpoints.map((endpoint) => (
+                  <div key={endpoint.name + endpoint.url} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center gap-3">
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={getStatusColor(endpoint.status)}
                       >
                         {endpoint.status === 'healthy' && <CheckCircle className="w-3 h-3 mr-1" />}

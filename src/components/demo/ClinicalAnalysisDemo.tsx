@@ -358,8 +358,8 @@ export default function ClinicalAnalysisDemo() {
                       <div>
                         <h4 className="font-medium text-gray-900 mb-3">Risk Factors Identified</h4>
                         <ul className="space-y-2">
-                          {results.overallRisk.factors.map((factor, index) => (
-                            <li key={index} className="flex items-start gap-2">
+                          {results.overallRisk.factors.map((factor) => (
+                            <li key={factor} className="flex items-start gap-2">
                               <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
                               <span className="text-gray-700">{factor}</span>
                             </li>
@@ -380,8 +380,8 @@ export default function ClinicalAnalysisDemo() {
                           <div className="mt-4">
                             <h4 className="font-medium text-red-700 mb-2">Immediate Actions Required</h4>
                             <ul className="space-y-1">
-                              {results.overallRisk.immediateActions.map((action, index) => (
-                                <li key={index} className="text-sm text-red-600">• {action}</li>
+                              {results.overallRisk.immediateActions.map((action) => (
+                                <li key={action} className="text-sm text-red-600">• {action}</li>
                               ))}
                             </ul>
                           </div>
@@ -397,12 +397,12 @@ export default function ClinicalAnalysisDemo() {
                     </div>
 
                     <div className="space-y-3">
-                      {results.mentalHealthIndicators.map((indicator, index) => (
-                        <Card key={index} className={`border-l-4 ${
-                          indicator.present && indicator.confidence > 0.7 
-                            ? 'border-l-green-500' 
-                            : indicator.present 
-                              ? 'border-l-yellow-500' 
+                      {results.mentalHealthIndicators.map((indicator) => (
+                        <Card key={indicator.name} className={`border-l-4 ${
+                          indicator.present && indicator.confidence > 0.7
+                            ? 'border-l-green-500'
+                            : indicator.present
+                              ? 'border-l-yellow-500'
                               : 'border-l-gray-300'
                         }`}>
                           <CardContent className="p-4">
@@ -441,8 +441,8 @@ export default function ClinicalAnalysisDemo() {
                     </div>
 
                     <div className="space-y-4">
-                      {results.recommendations.map((rec, index) => (
-                        <Card key={index}>
+                      {results.recommendations.map((rec) => (
+                        <Card key={rec.description} >
                           <CardContent className="p-4">
                             <div className="flex items-start gap-3">
                               {getPriorityIcon(rec.priority)}
@@ -452,8 +452,8 @@ export default function ClinicalAnalysisDemo() {
                                   <Badge variant="outline" className="text-xs">
                                     {rec.type}
                                   </Badge>
-                                  <Badge 
-                                    variant="outline" 
+                                  <Badge
+                                    variant="outline"
                                     className={`text-xs ${
                                       rec.priority === 'urgent' ? 'border-red-200 text-red-700' :
                                       rec.priority === 'high' ? 'border-orange-200 text-orange-700' :

@@ -6,18 +6,16 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
-  Loader2, 
-  Brain, 
-  FileText, 
-  Tag, 
-  TrendingUp, 
+  Loader2,
+  Brain,
+  FileText,
+  Tag,
+  TrendingUp,
   Activity,
   Clock,
-  CheckCircle,
   AlertTriangle,
   BarChart3,
   Download,
-  Share2,
   History
 } from 'lucide-react'
 import { apiClient } from '../../lib/api-client'
@@ -393,8 +391,8 @@ export default function KnowledgeParsingDemo() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3">
-                  {results.entities.map((entity, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  {results.entities.map((entity) => (
+                    <div key={entity.text + entity.type} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center gap-3">
                         <Badge variant="outline">{entity.type}</Badge>
                         <span className="font-medium">{entity.text}</span>
@@ -420,8 +418,8 @@ export default function KnowledgeParsingDemo() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3">
-                  {results.concepts.map((concept, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  {results.concepts.map((concept) => (
+                    <div key={concept.concept} className="flex items-center justify-between p-3 border rounded-lg">
                       <span className="font-medium">{concept.concept}</span>
                       <div className="text-right">
                         <div className="text-sm font-medium">{(concept.relevance * 100).toFixed(1)}%</div>
@@ -444,11 +442,11 @@ export default function KnowledgeParsingDemo() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3">
-                  {results.riskFactors.map((risk, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  {results.riskFactors.map((risk) => (
+                    <div key={risk.factor} className="flex items-center justify-between p-3 border rounded-lg">
                       <span className="font-medium">{risk.factor}</span>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={
                           risk.severity === 'High' ? 'border-red-200 text-red-700 bg-red-50' :
                           risk.severity === 'Moderate' ? 'border-yellow-200 text-yellow-700 bg-yellow-50' :
@@ -475,8 +473,8 @@ export default function KnowledgeParsingDemo() {
               <CardContent>
                 {results.insights && results.insights.length > 0 ? (
                   <div className="grid gap-3">
-                    {results.insights.map((insight, index) => (
-                      <div key={index} className="p-4 border rounded-lg bg-blue-50">
+                    {results.insights.map((insight) => (
+                      <div key={insight.category + insight.insight} className="p-4 border rounded-lg bg-blue-50">
                         <div className="flex items-start justify-between mb-2">
                           <Badge variant="outline">{insight.category}</Badge>
                           <span className="text-sm text-gray-600">{(insight.confidence * 100).toFixed(1)}% confidence</span>

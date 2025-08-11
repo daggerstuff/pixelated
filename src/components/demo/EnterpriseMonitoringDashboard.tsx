@@ -14,7 +14,6 @@ import {
   Brain,
   Heart,
   BarChart3,
-  LineChart,
   PieChart
 } from 'lucide-react'
 

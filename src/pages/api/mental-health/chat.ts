@@ -71,7 +71,7 @@ export interface ChatMessage {
   timestamp: string
   role: 'user' | 'assistant'
   type?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface CopingStrategy {
@@ -277,9 +277,10 @@ const CRISIS_RESOURCES = {
   ]
 }
 
+import crypto from 'crypto';
+
 function generateSessionId(): string {
   // Use cryptographically secure random bytes for session ID
-  const crypto = require('crypto');
   const secureRandom = crypto.randomBytes(6).toString('hex');
   return `chat_${Date.now()}_${secureRandom}`;
 }

@@ -340,8 +340,8 @@ export default function PsychologyFrameworksDemo() {
                       <div>
                         <h4 className="font-medium text-gray-900 mb-2">Key Principles</h4>
                         <ul className="space-y-1">
-                          {selectedFramework.keyPrinciples.map((principle, index) => (
-                            <li key={index} className="flex items-start gap-2 text-gray-700">
+                          {selectedFramework.keyPrinciples.map((principle) => (
+                            <li key={principle} className="flex items-start gap-2 text-gray-700">
                               <Target className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                               {principle}
                             </li>
@@ -352,8 +352,8 @@ export default function PsychologyFrameworksDemo() {
                       <div>
                         <h4 className="font-medium text-gray-900 mb-2">Primary Conditions</h4>
                         <div className="flex flex-wrap gap-2">
-                          {selectedFramework.conditions.map((condition, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
+                          {selectedFramework.conditions.map((condition) => (
+                            <Badge key={condition} variant="outline" className="text-xs">
                               {condition}
                             </Badge>
                           ))}
@@ -365,8 +365,8 @@ export default function PsychologyFrameworksDemo() {
                       <div>
                         <h4 className="font-medium text-gray-900 mb-3">Core Techniques</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {selectedFramework.techniques.map((technique, index) => (
-                            <div key={index} className="p-3 bg-gray-50 rounded-lg border">
+                          {selectedFramework.techniques.map((technique) => (
+                            <div key={technique} className="p-3 bg-gray-50 rounded-lg border">
                               <div className="font-medium text-gray-900 text-sm">{technique}</div>
                             </div>
                           ))}
@@ -378,8 +378,8 @@ export default function PsychologyFrameworksDemo() {
                       <div>
                         <h4 className="font-medium text-gray-900 mb-3">Clinical Applications</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {selectedFramework.applications.map((application, index) => (
-                            <div key={index} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          {selectedFramework.applications.map((application) => (
+                            <div key={application} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                               <div className="flex items-center gap-2">
                                 <Users className="w-4 h-4 text-blue-600" />
                                 <span className="font-medium text-blue-900 text-sm">{application}</span>
