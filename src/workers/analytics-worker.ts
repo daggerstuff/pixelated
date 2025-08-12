@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { env, config } from '@/config/env.config'
+import { env } from '@/config/env.config'
 import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
 import { getLogger } from '@/lib/utils/logger'
 import { WebSocketServer } from 'ws'
@@ -19,7 +19,7 @@ function resolveWsPort(): number {
     const mocked = env as unknown as { ANALYTICS_WS_PORT?: string | number }
     if (typeof env === 'function') {
       // Real implementation
-      return (env() as any).ANALYTICS_WS_PORT ?? 8083
+      return (env() as { ANALYTICS_WS_PORT: number }).ANALYTICS_WS_PORT ?? 8083
     }
     // Mocked object path (tests)
     const val = mocked?.ANALYTICS_WS_PORT
@@ -45,16 +45,16 @@ async function startWorker() {
       processingInterval: PROCESSING_INTERVAL,
     })
     // If running under tests with a mocked class, prefer the first mock instance
-    const mockedInstances = (AnalyticsService as any)?.mock?.instances
+    const mockedInstances = (AnalyticsService as unknown as { mock?: { instances: AnalyticsService[] } })?.mock?.instances
     if (mockedInstances && mockedInstances.length > 0) {
-      analyticsService = mockedInstances[0] as AnalyticsService
+      analyticsService = mockedInstances[0]
     }
 
     // Initialize WebSocket server
     wss = new WebSocketServer({ port: WS_PORT })
 
     // Determine service reference (prefer mocked instance in tests)
-    const serviceRef: any = (AnalyticsService as any)?.mock?.instances?.[0] ?? analyticsService
+    const serviceRef = (AnalyticsService as unknown as { mock?: { instances: AnalyticsService[] } })?.mock?.instances?.[0] ?? analyticsService
 
     // Handle WebSocket connections
     wss.on('connection', async (ws) => {
@@ -94,14 +94,14 @@ async function startWorker() {
 
     // Expose an emit method on the mock instance if present (testing helper)
     // @ts-expect-error - tests may rely on .emit existing on the mocked server
-    if (typeof (wss as any).emit === 'function') {
+    if (typeof (wss as unknown as { emit?: (...args: unknown[]) => void }).emit === 'function') {
       // no-op: tests call mockWssInstance.emit('error', err) which triggers above handler
     }
 
     // Start event processing loop
     const processEvents = async () => {
       try {
-        await (analyticsService as any).processEvents()
+        await analyticsService.processEvents()
       } catch (error) {
         logger.error('Error processing analytics events:', error)
       }

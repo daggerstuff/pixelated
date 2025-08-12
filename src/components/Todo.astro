@@ -212,7 +212,7 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     const createTodoElement = (todo: TodoItem): HTMLLIElement => {
       const li = document.createElement('li')
       li.className = `todo-item ${todo.completed ? 'completed' : ''}`
-      li.dataset.id = todo.id
+      li.dataset['id'] = todo.id
 
       const span = document.createElement('span')
       span.className = 'todo-text'

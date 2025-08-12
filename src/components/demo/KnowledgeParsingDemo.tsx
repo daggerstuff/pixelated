@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
   Loader2,
   Brain,
-  FileText,
   Tag,
   TrendingUp,
   Activity,
@@ -18,7 +17,7 @@ import {
   Download,
   History
 } from 'lucide-react'
-import { apiClient } from '@/lib/api-client'
+
 
 interface Entity {
   text: string
@@ -92,7 +91,7 @@ export default function KnowledgeParsingDemo() {
         clearTimeout(realTimeTimeout.current)
       }
     }
-  }, [inputText, isRealTimeMode])
+  }, [inputText, isRealTimeMode, analyze])
 
   // Load analysis history from localStorage
   useEffect(() => {
@@ -107,7 +106,7 @@ export default function KnowledgeParsingDemo() {
   }, [])
 
   // Save to history
-  const saveToHistory = (text: string, result: AnalysisResults, processingTime: number) => {
+  const saveToHistory = useCallback((text: string, result: AnalysisResults, processingTime: number) => {
     const historyItem: AnalysisHistory = {
       id: Date.now().toString(),
       text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
@@ -118,9 +117,9 @@ export default function KnowledgeParsingDemo() {
     const newHistory = [historyItem, ...analysisHistory.slice(0, 9)] // Keep last 10
     setAnalysisHistory(newHistory)
     localStorage.setItem('knowledgeParsingHistory', JSON.stringify(newHistory))
-  }
+  }, [analysisHistory])
 
-  const analyze = async () => {
+  const analyze = useCallback(async () => {
     if (!inputText.trim()) {
       setError('Please enter some text to analyze')
       return
@@ -218,7 +217,7 @@ export default function KnowledgeParsingDemo() {
     } finally {
       setIsAnalyzing(false)
     }
-  }
+  }, [inputText, saveToHistory])
 
   const loadFromHistory = (historyItem: AnalysisHistory) => {
     setInputText(historyItem.text)
@@ -585,9 +584,9 @@ export default function KnowledgeParsingDemo() {
           <CardContent>
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {analysisHistory.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                <button
+                  key={item.id}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer w-full text-left"
                   onClick={() => loadFromHistory(item)}
                 >
                   <div>
@@ -601,7 +600,7 @@ export default function KnowledgeParsingDemo() {
                       {item.result.entities.length} entities
                     </Badge>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </CardContent>

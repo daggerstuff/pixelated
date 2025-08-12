@@ -1,8 +1,20 @@
 import { useRef, useEffect, useState, useMemo } from 'react'
-import * as THREE from 'three'
-import { Object3D, Sphere } from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// Dynamic imports for Three.js to reduce bundle size
+// import * as THREE from 'three'
+// import { Object3D, Sphere } from 'three'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { cn } from '../../lib/utils.js'
+
+// Dynamic Three.js imports to reduce bundle size
+async function loadThree() {
+  const THREE = await import('three')
+  return THREE
+}
+
+async function loadOrbitControls() {
+  const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls')
+  return { OrbitControls }
+}
 
 // Types for dimensional emotion data and patterns
 interface DimensionalEmotionMap {
@@ -31,14 +43,14 @@ interface MultidimensionalPattern {
   // Add more fields as needed
 }
 
-// Define Three.js types to fix TypeScript namespace errors
-type WebGLRenderer = typeof THREE.WebGLRenderer.prototype
-type Scene = typeof THREE.Scene.prototype
-type PerspectiveCamera = typeof THREE.PerspectiveCamera.prototype
-type Points = typeof THREE.Points.prototype
+// Define Three.js types to fix TypeScript namespace errors (using unknown for dynamic imports)
+type WebGLRenderer = unknown // typeof THREE.WebGLRenderer.prototype
+type Scene = unknown // typeof THREE.Scene.prototype
+type PerspectiveCamera = unknown // typeof THREE.PerspectiveCamera.prototype
+type Points = unknown // typeof THREE.Points.prototype
 
-type Frustum = typeof THREE.Frustum.prototype
-type Vector3 = typeof THREE.Vector3.prototype
+type Frustum = unknown // typeof THREE.Frustum.prototype
+type Vector3 = unknown // typeof THREE.Vector3.prototype
 
 interface MultidimensionalEmotionChartProps {
   dimensionalMaps: DimensionalEmotionMap[]
@@ -156,16 +168,21 @@ export default function MultidimensionalEmotionChart({
 
   // Initialize and set up the 3D scene
   useEffect(() => {
-    // Copy refs to local variables for cleanup
-    const initialContainer = containerRef.current
-    const initialRenderer = rendererRef.current
-    const initialControls = controlsRef.current
-    const initialScene = sceneRef.current
-    const initialObjectPool = objectPoolRef.current
+    const initScene = async () => {
+      // Dynamically load Three.js
+      const THREE = await loadThree()
+      const { OrbitControls } = await loadOrbitControls()
 
-    if (!initialContainer || !dimensionalMaps.length || isLoading) {
-      return
-    }
+      // Copy refs to local variables for cleanup
+      const initialContainer = containerRef.current
+      const _initialRenderer = rendererRef.current
+      const _initialControls = controlsRef.current
+      const _initialScene = sceneRef.current
+      const _initialObjectPool = objectPoolRef.current
+
+      if (!initialContainer || !dimensionalMaps.length || isLoading) {
+        return
+      }
 
     // Clean up any existing scene
     if (rendererRef.current) {
@@ -535,6 +552,10 @@ export default function MultidimensionalEmotionChart({
     }
 
     window.addEventListener('resize', handleResize)
+    } // End of initScene async function
+
+    // Call the async initialization function
+    initScene().catch(console.error)
 
     // Cleanup function
     return () => {

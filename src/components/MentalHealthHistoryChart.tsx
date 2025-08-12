@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+// Use lazy-loaded chart components to reduce bundle size
 import {
   LineChart,
   Line,
@@ -13,7 +14,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from 'recharts'
+} from '@/components/ui/LazyChart'
 
 interface MentalHealthHistoryChartProps {
   analysisHistory: Array<{
@@ -192,7 +193,7 @@ export function MentalHealthHistoryChart({
                   stroke: 'hsl(var(--muted-foreground))',
                   strokeWidth: 0.5,
                 }}
-                tickFormatter={(value) => `${Math.round(value * 100)}%`}
+                tickFormatter={(value: number) => `${Math.round(value * 100)}%`}
               />
               <Tooltip
                 contentStyle={{
@@ -205,7 +206,7 @@ export function MentalHealthHistoryChart({
                   `${Math.round(value * 100)}%`,
                   SCORE_LABELS[name as keyof typeof SCORE_LABELS] || name,
                 ]}
-                labelFormatter={(label) => `Session ${label}`}
+                labelFormatter={(label: string | number) => `Session ${label}`}
               />
               {Object.entries(SCORE_COLORS).map(([key, color]) => (
                 <Line
@@ -220,7 +221,7 @@ export function MentalHealthHistoryChart({
               ))}
               <Legend
                 wrapperStyle={{ fontSize: '10px' }}
-                formatter={(value) =>
+                formatter={(value: string) =>
                   SCORE_LABELS[value as keyof typeof SCORE_LABELS] || value
                 }
               />

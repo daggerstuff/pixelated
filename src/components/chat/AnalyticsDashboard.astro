@@ -72,9 +72,9 @@ const serializedMessages = JSON.stringify(messages)
     const messagesData = container.dataset['messages'] || '[]'
 
     try {
-      // Dynamically import the React component only when needed
-      const { default: AnalyticsDashboardReact } = await import(
-        './AnalyticsDashboardReact'
+      // Dynamically import the lazy-loaded React component only when needed
+      const { default: LazyAnalyticsDashboard } = await import(
+        './LazyAnalyticsDashboard'
       )
 
       // Parse message data
@@ -95,7 +95,7 @@ const serializedMessages = JSON.stringify(messages)
           import('react').then((React) => {
             import('react-dom/client').then((ReactDOM) => {
               const root = ReactDOM.createRoot(this)
-              root.render(React.createElement(AnalyticsDashboardReact, props))
+              root.render(React.createElement(LazyAnalyticsDashboard, props))
             })
           })
         }

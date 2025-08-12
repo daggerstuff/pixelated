@@ -19,13 +19,17 @@
  */
 
 import type React from 'react';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy } from 'react';
+
+// Lazy load the charts component to reduce initial bundle size
+// const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert } from '@/components/ui/alert';
+// Use lazy-loaded chart components to reduce bundle size
 import {
   XAxis,
   YAxis,
@@ -46,7 +50,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from 'recharts';
+} from '@/components/ui/LazyChart';
 import {
   AlertTriangle,
   Users,
@@ -2655,7 +2659,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="date"
-                      tickFormatter={(value) =>
+                      tickFormatter={(value: string | number) =>
                         new Date(value).toLocaleDateString()
                       }
                     />
@@ -2703,7 +2707,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
                         dataKey="date"
-                        tickFormatter={(value) =>
+                        tickFormatter={(value: string | number) =>
                           new Date(value).toLocaleDateString()
                         }
                       />
@@ -2734,7 +2738,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
                         dataKey="date"
-                        tickFormatter={(value) =>
+                        tickFormatter={(value: string | number) =>
                           new Date(value).toLocaleDateString()
                         }
                       />
@@ -2814,7 +2818,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }) => {
+                        label={({ name, percent }: { name: string; percent?: number }) => {
                           return `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
                         }}
                         animationDuration={1000}
@@ -2833,7 +2837,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         )}
                       </Pie>
                       <Tooltip
-                        content={({ active, payload }) => {
+                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number }> }) => {
                           if (active && payload && payload.length) {
                             return (
                               <div className="bg-white p-2 border rounded shadow">
@@ -2878,7 +2882,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         outerRadius={80}
                         fill="#82ca9d"
                         dataKey="value"
-                        label={({ name, percent }) => {
+                        label={({ name, percent }: { name: string; percent?: number }) => {
                           return `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
                         }}
                         animationDuration={1000}
@@ -2897,7 +2901,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         )}
                       </Pie>
                       <Tooltip
-                        content={({ active, payload }) => {
+                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number }> }) => {
                           if (active && payload && payload.length) {
                             return (
                               <div className="bg-white p-2 border rounded shadow">

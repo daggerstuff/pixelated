@@ -100,14 +100,14 @@ export default function ClinicalAnalysisDemo() {
           recommendations: apiResult.riskAssessment.recommendations,
           immediateActions: apiResult.riskAssessment.immediateActions
         },
-        mentalHealthIndicators: apiResult.indicators.map((indicator: any) => ({
+        mentalHealthIndicators: apiResult.indicators.map((indicator: { condition: string; present: boolean; confidence: number; severity: number; notes: string }) => ({
           name: indicator.condition,
           present: indicator.present,
           confidence: indicator.confidence,
           severity: indicator.severity,
           notes: indicator.notes
         })),
-        recommendations: apiResult.recommendations.map((rec: any) => ({
+        recommendations: apiResult.recommendations.map((rec: { type: string; priority: string; intervention: string; rationale: string; timeline: string }) => ({
           type: rec.type,
           priority: rec.priority,
           description: rec.intervention,

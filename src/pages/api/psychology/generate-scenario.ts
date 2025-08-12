@@ -159,7 +159,7 @@ function generateUniqueId(): string {
   return `scenario_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
-function selectClientProfile(difficulty: string, clientProfile?: Partial<GenerateScenarioRequest['clientProfile']>): any {
+function selectClientProfile(difficulty: string, clientProfile?: Partial<GenerateScenarioRequest['clientProfile']>): GenerateScenarioResponse['scenario']['clientProfile'] {
   const profiles = CLIENT_PROFILES[difficulty as keyof typeof CLIENT_PROFILES] || CLIENT_PROFILES.beginner
   const baseProfile = profiles[Math.floor(Math.random() * profiles.length)]
   
@@ -169,7 +169,7 @@ function selectClientProfile(difficulty: string, clientProfile?: Partial<Generat
   }
 }
 
-function generateSessionContext(difficulty: string): any {
+function generateSessionContext(difficulty: string): GenerateScenarioResponse['scenario']['sessionContext'] {
   const sessionNumbers = {
     beginner: Math.floor(Math.random() * 3) + 1, // 1-3
     intermediate: Math.floor(Math.random() * 5) + 3, // 3-7
@@ -220,7 +220,7 @@ function generateGoals(difficulty: string): string[] {
   return goals.slice(0, Math.floor(Math.random() * 2) + 2) // 2-3 goals
 }
 
-function generateInterventions(framework: string, difficulty: string): any[] {
+function generateInterventions(framework: string, difficulty: string): Array<{ technique: string; rationale: string; implementation: string; expectedOutcome: string }> {
   const frameworkData = THERAPEUTIC_FRAMEWORKS_DETAILED[framework as keyof typeof THERAPEUTIC_FRAMEWORKS_DETAILED] || THERAPEUTIC_FRAMEWORKS_DETAILED.CBT
   
   const numInterventions = difficulty === 'beginner' ? 2 : difficulty === 'intermediate' ? 3 : 4
@@ -228,7 +228,7 @@ function generateInterventions(framework: string, difficulty: string): any[] {
   return frameworkData.interventions.slice(0, numInterventions)
 }
 
-function generateAssessmentCriteria(framework: string): any[] {
+function generateAssessmentCriteria(framework: string): Array<{ category: string; criteria: string[]; weight: number }> {
   const frameworkData = THERAPEUTIC_FRAMEWORKS_DETAILED[framework as keyof typeof THERAPEUTIC_FRAMEWORKS_DETAILED] || THERAPEUTIC_FRAMEWORKS_DETAILED.CBT
   
   return [

@@ -94,7 +94,7 @@ export const rehypePlugins: RehypePlugins = [
         }
 
         return {
-          'u-i-carbon-arrow-up-right': true,
+          'u-i-lucide-external-link': true,
           'className': ['new-tab-icon'],
           'aria-hidden': 'true',
         }

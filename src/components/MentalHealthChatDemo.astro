@@ -15,10 +15,10 @@ export interface Props {
 }
 
 const {
-  conversationId = 'astro-demo',
+  conversationId: _conversationId = 'astro-demo',
   title = 'Mental Health Support Chat',
   description = 'Production-grade mental health analysis and therapeutic response system.',
-  initialConfig = {},
+  initialConfig: _initialConfig = {},
 } = Astro.props
 ---
 

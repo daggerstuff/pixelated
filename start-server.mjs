@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-// IMPORTANT: Import Sentry instrumentation at the very top
-import './instrument.mjs'
-
 // Import Astro's production server
 import { createServer } from 'node:http'
 import { handler as ssrHandler } from './dist/server/entry.mjs'

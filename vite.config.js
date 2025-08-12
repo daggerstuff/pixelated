@@ -61,7 +61,6 @@ export default defineConfig({
             id.endsWith('.js')
           ) {
             Object.entries(cdnAssetMap).forEach(([localPath, cdnUrl]) => {
-              // Escape quotes in localPath for safe replacement
               const quotedLocalPath1 = `"${localPath}"`;
               const quotedLocalPath2 = `'${localPath}'`;
               code = code.replaceAll(quotedLocalPath1, `"${cdnUrl}"`);
@@ -95,13 +94,12 @@ export default defineConfig({
       ? [
           sentryVitePlugin({
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-            project: process.env.SENTRY_PROJECT || 'pixelated',
+            project: process.env.SENTRY_PROJECT || 'pixel-astro',
             authToken: process.env.SENTRY_AUTH_TOKEN,
           }),
         ]
       : []),
   ],
-  // Base URL for assets
   base:
     process.env.NODE_ENV === 'production'
       ? process.env.CDN_BASE_URL || '/'
@@ -239,8 +237,12 @@ export default defineConfig({
             'astro-internal:middleware',
           ],
           react: ['react', 'react-dom', 'react/jsx-runtime'],
-          three: [/three/, /OrbitControls/],
-          chart: [/chart\.js/, /Line\.js$/, /generateCategoricalChart/],
+          three: [/three/, /OrbitControls/, /@react-three/],
+          tensorflow: [/@tensorflow/],
+          mongodb: [/mongodb/],
+          recharts: [/recharts/],
+          chartjs: [/chart\.js/],
+          charts: [/Line\.js$/, /generateCategoricalChart/, /CartesianChart/, /AreaChart/, /BarChart/],
           fhe: [/fhe/],
           emotionViz: [
             /MultidimensionalEmotionChart/,

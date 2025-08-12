@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+// Use lazy-loaded chart components to reduce bundle size
 import {
   LineChart,
   Line,
@@ -8,7 +9,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts'
+} from '@/components/ui/LazyChart'
 import { cn } from '@/lib/utils'
 
 // Define types for our component

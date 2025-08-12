@@ -5,6 +5,8 @@
  * across both client and server environments.
  */
 
+import type { Event } from '@sentry/browser'
+
 export const SENTRY_CONFIG = {
   dsn: import.meta.env['PUBLIC_SENTRY_DSN'] || "https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032",
 
@@ -33,7 +35,7 @@ export const SENTRY_CONFIG = {
   },
 } as const
 
-export function beforeSend(event: unknown): unknown | null {
+export function beforeSend(event: Event): Event | null {
   if (import.meta.env.DEV) {
     console.log('Sentry event:', event)
   }
@@ -41,7 +43,7 @@ export function beforeSend(event: unknown): unknown | null {
   return event
 }
 
-export function initSentry(additionalConfig: Record<string, unknown> = {}) {
+export function initSentry(additionalConfig: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     ...SENTRY_CONFIG,
     beforeSend,

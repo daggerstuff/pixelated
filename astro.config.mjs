@@ -23,12 +23,13 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
-    sourcemap: process.env.NODE_ENV === 'development',
+    sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
   },
   vite: {
     build: {
-      sourcemap: process.env.NODE_ENV === 'development',
+      sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
       target: 'node22',
+      chunkSizeWarningLimit: 1500, // Increase limit for large bundles like FHE
       rollupOptions: {
         external: [
           '@google-cloud/storage',
@@ -41,7 +42,16 @@ export default defineConfig({
           'mysql2',
           'sqlite3',
           'better-sqlite3',
-          'pdfkit'
+          'pdfkit',
+          // Performance optimization: externalize heavy libraries
+          '@tensorflow/tfjs',
+          '@tensorflow/tfjs-layers',
+          'three',
+          '@react-three/fiber',
+          '@react-three/drei',
+          'mongodb',
+          'recharts',
+          'chart.js'
         ]
       }
     },
@@ -79,7 +89,16 @@ export default defineConfig({
         'canvas',
         'puppeteer',
         'playwright',
-        '@sentry/profiling-node'
+        '@sentry/profiling-node',
+        // Performance optimization: externalize heavy libraries
+        '@tensorflow/tfjs',
+        '@tensorflow/tfjs-layers',
+        'three',
+        '@react-three/fiber',
+        '@react-three/drei',
+        'mongodb',
+        'recharts',
+        'chart.js'
       ],
     },
     optimizeDeps: {
@@ -93,7 +112,16 @@ export default defineConfig({
         '@sentry/profiling-node',
         'pdfkit',
         'recharts',
-        'lucide-react'
+        'lucide-react',
+        // Performance optimization: exclude heavy libraries from optimization
+        '@tensorflow/tfjs',
+        '@tensorflow/tfjs-layers',
+        'three',
+        '@react-three/fiber',
+        '@react-three/drei',
+        'mongodb',
+        'recharts',
+        'chart.js'
       ],
     },
   },
@@ -134,10 +162,14 @@ export default defineConfig({
     // markdoc(),
     ...(process.env.SENTRY_DSN || true ? [
       sentry({
-        sourceMapsUploadOptions: {
+        sourceMapsUploadOptions: process.env.SENTRY_AUTH_TOKEN ? {
           project: process.env.SENTRY_PROJECT || 'pixel-astro',
           org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
           authToken: process.env.SENTRY_AUTH_TOKEN,
+          telemetry: false,
+        } : {
+          enabled: false,
+          telemetry: false,
         },
       }),
       // Add Spotlight for development debugging when explicitly enabled

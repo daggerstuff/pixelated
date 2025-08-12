@@ -1,18 +1,18 @@
 /// <reference types="astro/client" />
 import * as Sentry from '@sentry/browser'
-import { initSentry } from '@/lib/sentry/config'
 
+import { initSentry } from '@/lib/sentry/config'
 
 let sentryInitialised = false
 
 if (!sentryInitialised) {
-  Sentry.init(
-    initSentry({
-      // Remove Spotlight from default integrations to avoid noisy dev warnings
-      integrations: (defaultIntegrations = []) =>
-        defaultIntegrations.filter((i: any) => i && i.name !== 'Spotlight'),
-    }) as any
-  )
+  const sentryConfig = initSentry({
+    // Remove Spotlight from default integrations to avoid noisy dev warnings
+    integrations: (defaultIntegrations: Array<{ name?: string }> = []) =>
+      defaultIntegrations.filter((integration) => integration && integration.name !== 'Spotlight'),
+  })
+
+  Sentry.init(sentryConfig)
   sentryInitialised = true
 }
 

@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from 'react'
+  import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -14,7 +14,6 @@ import {
   Brain,
   FileText,
   CheckCircle,
-  XCircle,
   Zap,
   Activity,
   TrendingUp,
@@ -55,30 +54,7 @@ export default function CrisisDetectionDemo() {
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null)
   const [assessmentHistory, setAssessmentHistory] = useState<CrisisAssessment[]>([])
 
-  // Real-time monitoring effect
-  useEffect(() => {
-    if (realTimeMonitoring && inputText.length > 50) {
-      // Clear existing timeout
-      if (typingTimeout) {
-        clearTimeout(typingTimeout)
-      }
-
-      // Set new timeout for real-time analysis
-      const timeout = setTimeout(() => {
-        performCrisisAssessment(true) // Silent assessment
-      }, 2000) // Wait 2 seconds after user stops typing
-
-      setTypingTimeout(timeout)
-    }
-
-    return () => {
-      if (typingTimeout) {
-        clearTimeout(typingTimeout)
-      }
-    }
-  }, [inputText, realTimeMonitoring, typingTimeout])
-
-  const performCrisisAssessment = async (isRealTime: boolean = false) => {
+  const performCrisisAssessment = useCallback(async (isRealTime: boolean = false) => {
     if (!inputText.trim()) {
       setError('Please enter content to assess for crisis indicators')
       return
@@ -117,8 +93,8 @@ export default function CrisisDetectionDemo() {
                   result.assessment.overallRisk === 'moderate' ? 0.6 :
                   result.assessment.overallRisk === 'low' ? 0.3 : 0.1,
         crisisIndicators: {
-          suicidalIdeation: { 
-            present: result.assessment.suicidalIdeation.present, 
+          suicidalIdeation: {
+            present: result.assessment.suicidalIdeation.present,
             confidence: result.assessment.suicidalIdeation.severity === 'with_intent' ? 0.95 :
                        result.assessment.suicidalIdeation.severity === 'with_plan' ? 0.85 :
                        result.assessment.suicidalIdeation.severity === 'active' ? 0.75 :
@@ -128,8 +104,8 @@ export default function CrisisDetectionDemo() {
                      result.assessment.suicidalIdeation.severity === 'active' ? 7 :
                      result.assessment.suicidalIdeation.severity === 'passive' ? 4 : 0
           },
-          selfHarm: { 
-            present: result.assessment.selfHarm.present, 
+          selfHarm: {
+            present: result.assessment.selfHarm.present,
             confidence: result.assessment.selfHarm.risk === 'high' ? 0.9 :
                        result.assessment.selfHarm.risk === 'moderate' ? 0.6 : 0.3,
             severity: result.assessment.selfHarm.frequency === 'daily' ? 10 :
@@ -190,13 +166,13 @@ export default function CrisisDetectionDemo() {
 
     } catch (error) {
       console.error('Crisis assessment failed:', error)
-      
+
       if (error instanceof APIError) {
         setError(`Assessment failed: ${error.message}`)
       } else {
         setError('Assessment failed. Please try again.')
       }
-      
+
       // Fallback to demo data for demonstration
       if (!isRealTime) {
         const demoAssessment: CrisisAssessment = {
@@ -250,7 +226,30 @@ export default function CrisisDetectionDemo() {
         setAssessing(false)
       }
     }
-  }
+  }, [inputText, assessmentHistory])
+
+  // Real-time monitoring effect
+  useEffect(() => {
+    if (realTimeMonitoring && inputText.length > 50) {
+      // Clear existing timeout
+      if (typingTimeout) {
+        clearTimeout(typingTimeout)
+      }
+
+      // Set new timeout for real-time analysis
+      const timeout = setTimeout(() => {
+        performCrisisAssessment(true) // Silent assessment
+      }, 2000) // Wait 2 seconds after user stops typing
+
+      setTypingTimeout(timeout)
+    }
+
+    return () => {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout)
+      }
+    }
+  }, [inputText, realTimeMonitoring, typingTimeout, performCrisisAssessment])
 
   const getRiskLevelColor = (level: string) => {
     switch (level) {

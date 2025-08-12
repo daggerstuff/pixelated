@@ -1,8 +1,27 @@
 import type { SecurityLevel } from '../../hooks/useSecurity'
 import type { Message } from '../../types/chat'
 import { useEffect, useMemo, useState } from 'react'
-import { fheService } from '../../lib/fhe'
-import { AnalyticsType, fheAnalytics } from '../../lib/fhe/analytics'
+// Dynamic imports for FHE to reduce bundle size
+// import { fheService } from '../../lib/fhe'
+// import { AnalyticsType, fheAnalytics } from '../../lib/fhe/analytics'
+
+// Dynamic FHE imports
+async function loadFHE() {
+  const [fheService, fheAnalytics] = await Promise.all([
+    import('../../lib/fhe').then(m => m.fheService),
+    import('../../lib/fhe/analytics').then(m => ({ AnalyticsType: m.AnalyticsType, fheAnalytics: m.fheAnalytics }))
+  ]);
+  return { fheService, ...fheAnalytics };
+}
+
+// Temporary type definition for AnalyticsType
+enum AnalyticsType {
+  SENTIMENT_TREND = 'sentiment_trend',
+  TOPIC_CLUSTERING = 'topic_clustering',
+  RISK_ASSESSMENT = 'risk_assessment',
+  INTERVENTION_EFFECTIVENESS = 'intervention_effectiveness',
+  EMOTIONAL_PATTERNS = 'emotional_patterns',
+}
 import {
   IconAlertTriangle,
   IconBarChart,
@@ -93,6 +112,9 @@ export default function AnalyticsDashboard({
   useEffect(() => {
     const initFHE = async () => {
       try {
+        // Dynamically load FHE services
+        const { fheService, fheAnalytics } = await loadFHE();
+
         const encryptionMode =
           securityLevel === 'maximum'
             ? EncryptionMode.FHE
@@ -137,6 +159,9 @@ export default function AnalyticsDashboard({
     setError(null)
 
     try {
+      // Dynamically load FHE analytics
+      const { fheAnalytics } = await loadFHE();
+
       // Create configuration based on security level
       const config = {
         encryptResults: securityLevel === 'maximum', // Keep results encrypted for maximum security

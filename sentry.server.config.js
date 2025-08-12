@@ -2,9 +2,8 @@ import * as Sentry from '@sentry/astro'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN || "https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032",
+  dsn: process.env.SENTRY_DSN || 'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032',
 
-  // Allow overriding sample rates to control noise
   tracesSampleRate: Number(
     process.env.SENTRY_TRACES_SAMPLE_RATE ?? (process.env.NODE_ENV === 'development' ? 1.0 : 0.1)
   ),
@@ -16,7 +15,6 @@ Sentry.init({
 
   sendDefaultPii: true,
 
-  // Gate debug logs behind an explicit flag to avoid noisy console output
   debug: process.env.SENTRY_DEBUG === '1',
 
   environment: process.env.NODE_ENV || 'production',
@@ -42,7 +40,7 @@ Sentry.init({
   initialScope: {
     tags: {
       component: 'astro-server',
-      platform: 'aws',
+      platform: 'self-hosted',
     },
     context: {
       app: {

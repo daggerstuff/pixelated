@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { fetchJSONWithRetry } from '@/lib/net/fetchWithRetry'
+import { fetchJSONWithRetry } from '@/lib/net'
 import type { FHEOperation } from '@/lib/fhe/types'
 
 interface Props {

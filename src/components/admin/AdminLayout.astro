@@ -22,7 +22,7 @@ const {
 
 // Verify authentication and admin role
 const isLoggedIn = await isAuthenticated()
-const user = isLoggedIn ? await getUser() : null
+const user = isLoggedIn ? await getUser(Astro.request) : null
 const isAdmin = isLoggedIn && user && (await hasAdminRole(user))
 
 // If not authenticated or not an admin, redirect to login page

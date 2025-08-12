@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { fetchJSONWithRetry } from '@/lib/net/fetchWithRetry'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { fetchJSONWithRetry } from '@/lib/net'
 
 export interface EmotionData {
   timestamp: number

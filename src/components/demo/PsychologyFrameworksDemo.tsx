@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -48,7 +48,7 @@ export default function PsychologyFrameworksDemo() {
   // Filter frameworks when search/filter criteria change
   useEffect(() => {
     filterFrameworks()
-  }, [frameworks, searchTerm, selectedCategory, selectedCondition])
+  }, [filterFrameworks])
 
   const loadFrameworks = async () => {
     setLoading(true)
@@ -145,7 +145,7 @@ export default function PsychologyFrameworksDemo() {
     }
   }
 
-  const filterFrameworks = () => {
+  const filterFrameworks = useCallback(() => {
     let filtered = frameworks
 
     // Filter by search term
@@ -171,7 +171,7 @@ export default function PsychologyFrameworksDemo() {
     }
 
     setFilteredFrameworks(filtered)
-  }
+  }, [frameworks, searchTerm, selectedCategory, selectedCondition])
 
   const getUniqueConditions = () => {
     const allConditions = frameworks.flatMap(fw => fw.conditions)

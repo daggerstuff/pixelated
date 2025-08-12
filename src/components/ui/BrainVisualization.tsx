@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Brain, Activity, Zap } from 'lucide-react'
@@ -112,7 +112,7 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
   }, [moodVector])
 
   // Animation function
-  const animate = () => {
+  const animate = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) {
       return
@@ -209,7 +209,7 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
     })
 
     animationRef.current = requestAnimationFrame(animate)
-  }
+  }, [brainRegions])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -229,7 +229,7 @@ export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [brainRegions, animate])
+  }, [animate])
 
   const getActivityLevel = (activity: number) => {
     if (activity > 0.8) {

@@ -4,8 +4,9 @@ import type {
   Scenario,
 } from '../types'
 import { TherapeuticTechnique, FeedbackType } from '../types'
-import * as tf from '@tensorflow/tfjs'
-import { loadLayersModel } from '@tensorflow/tfjs-layers'
+// TensorFlow.js imports moved to dynamic imports to reduce bundle size
+// import * as tf from '@tensorflow/tfjs'
+// import { loadLayersModel } from '@tensorflow/tfjs-layers'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createMentalLLaMAFromEnv } from '../../lib/ai/mental-llama'
 import { createTogetherAIService } from '../../lib/ai/services/together'
@@ -20,6 +21,17 @@ interface MentalHealthInsights {
 }
 
 const logger = createBuildSafeLogger('default')
+
+// Dynamic TensorFlow.js imports to reduce bundle size
+async function loadTensorFlow() {
+  const tf = await import('@tensorflow/tfjs')
+  return tf
+}
+
+async function loadTensorFlowLayers() {
+  const { loadLayersModel } = await import('@tensorflow/tfjs-layers')
+  return { loadLayersModel }
+}
 
 /**
  * Service for processing real-time audio and generating therapeutic feedback
@@ -65,7 +77,7 @@ export class FeedbackService implements FeedbackServiceInterface {
   private detectedKeywords: Map<string, number> = new Map() // Maps keywords to frequency
   private detectedTechniques: Map<TherapeuticTechnique, number> = new Map()
   // Remove unused clientResponsePredictions
-  private techniqueModel: tf.LayersModel | null = null
+  private techniqueModel: unknown | null = null // tf.LayersModel | null = null
   private isModelLoaded = false
   private modelLoadingPromise: Promise<void> | null = null
   private mentalLLaMAAdapter: MentalLLaMAAdapter | null = null
@@ -685,6 +697,9 @@ export class FeedbackService implements FeedbackServiceInterface {
     }
 
     try {
+      // Dynamically load TensorFlow.js
+      const tf = await loadTensorFlow()
+
       // Create a feature tensor from current emotional state
       // and speech patterns
       const features = tf.tensor2d([
@@ -698,7 +713,7 @@ export class FeedbackService implements FeedbackServiceInterface {
       ])
 
       // Run inference
-      const prediction = this.techniqueModel.predict(features) as tf.Tensor
+      const prediction = this.techniqueModel.predict(features) as unknown // tf.Tensor
       const predictionData = await prediction.data()
 
       // Clean up tensors
@@ -916,6 +931,9 @@ export class FeedbackService implements FeedbackServiceInterface {
       try {
         logger.info('Loading technique analysis model...')
 
+        // Dynamically load TensorFlow.js layers
+        const { loadLayersModel } = await loadTensorFlowLayers()
+
         // Load the therapeutic technique detection model
         this.techniqueModel = await loadLayersModel(
           '/models/technique-detection/model.json',
@@ -929,39 +947,50 @@ export class FeedbackService implements FeedbackServiceInterface {
         })
 
         // Create fallback models if loading fails
-        this.createFallbackModels()
+        await this.createFallbackModels()
       }
     })()
 
     await this.modelLoadingPromise
   }
 
-  private createFallbackModels(): void {
+  private async createFallbackModels(): Promise<void> {
     // Create simple fallback models for degraded operation
     logger.warn('Creating fallback models for degraded operation')
 
-    // Simple sequential model for technique detection
-    const techniqueModel = tf.sequential()
-    techniqueModel.add(
-      tf.layers.dense({
-        inputShape: [5],
-        units: 16,
-        activation: 'relu',
-      }),
-    )
-    techniqueModel.add(
-      tf.layers.dense({
-        units: 8,
-        activation: 'softmax',
-      }),
-    )
-    techniqueModel.compile({
-      optimizer: 'adam',
-      loss: 'categoricalCrossentropy',
-    })
-    this.techniqueModel = techniqueModel
+    try {
+      // Dynamically load TensorFlow.js
+      const tf = await loadTensorFlow()
 
-    this.isModelLoaded = true
+      // Simple sequential model for technique detection
+      const techniqueModel = tf.sequential()
+      techniqueModel.add(
+        tf.layers.dense({
+          inputShape: [5],
+          units: 16,
+          activation: 'relu',
+        }),
+      )
+      techniqueModel.add(
+        tf.layers.dense({
+          units: 8,
+          activation: 'softmax',
+        }),
+      )
+      techniqueModel.compile({
+        optimizer: 'adam',
+        loss: 'categoricalCrossentropy',
+      })
+      this.techniqueModel = techniqueModel
+
+      this.isModelLoaded = true
+    } catch (error) {
+      logger.error('Failed to create fallback models', {
+        error: error instanceof Error ? error.message : String(error),
+      })
+      // Set model to null if even fallback creation fails
+      this.techniqueModel = null
+    }
   }
 
   private async ensureModelsLoaded(): Promise<void> {

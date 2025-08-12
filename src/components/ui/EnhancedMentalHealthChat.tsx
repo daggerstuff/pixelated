@@ -79,7 +79,7 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
           return 0; // fallback to 0 if array is invalid
         }
       }
-    } catch (error) {
+    } catch {
       // Fallback if crypto is not available
     }
     // For demo purposes, use a deterministic value based on text length to avoid security warnings

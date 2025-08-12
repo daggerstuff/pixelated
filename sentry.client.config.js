@@ -7,10 +7,9 @@ import {
 import { initSentry } from './src/lib/sentry/config'
 
 const sentryConfig = initSentry({
-  // Remove the auto Spotlight integration (prevents noisy warnings if sidecar isn't running)
-  integrations: (defaultIntegrations = []) => {
+  integrations: (defaultIntegrations) => {
     const withoutSpotlight = defaultIntegrations.filter(
-      (i) => i && i.name !== 'Spotlight'
+      (integration) => integration && integration.name !== 'Spotlight'
     )
     return [
       ...withoutSpotlight,
@@ -29,6 +28,7 @@ const sentryConfig = initSentry({
   initialScope: {
     tags: {
       component: 'astro-client',
+      platform: 'self-hosted',
     },
   },
 })

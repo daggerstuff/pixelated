@@ -171,11 +171,11 @@ export default function MentalHealthChatDemoReact({
       // Update user message with analysis
       if (processedMessage.mentalHealthAnalysis) {
         setMessages((prev: ChatMessage[]) =>
-          prev.map((m: ChatMessage) =>
+          prev.map((m: ChatMessage): ChatMessage =>
             m.id === userMessage.id
               ? {
                   ...m,
-                  mentalHealthAnalysis: processedMessage.mentalHealthAnalysis,
+                  mentalHealthAnalysis: processedMessage.mentalHealthAnalysis || undefined,
                 }
               : m,
           ),

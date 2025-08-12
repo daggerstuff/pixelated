@@ -5,7 +5,7 @@ import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
 // Import this component dynamically for code splitting
-const AnalyticsDashboardReact = lazy(() => import('./AnalyticsDashboardReact'))
+const LazyAnalyticsDashboard = lazy(() => import('./LazyAnalyticsDashboard'))
 import { ChatContainer } from './ChatContainer'
 import { MentalHealthInsights } from '@/components/MentalHealthInsights'
 import {
@@ -717,7 +717,7 @@ function ProfessionalTherapistWorkspace() {
       {showAnalytics && (
         <div className="mt-4">
           <Suspense fallback={<LoadingAnalytics />}>
-            <AnalyticsDashboardReact
+            <LazyAnalyticsDashboard
               messages={messages}
               securityLevel="standard"
               encryptionEnabled={false}
