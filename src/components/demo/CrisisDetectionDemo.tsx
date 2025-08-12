@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+  import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -56,7 +56,6 @@ export default function CrisisDetectionDemo() {
   const [assessmentHistory, setAssessmentHistory] = useState<CrisisAssessment[]>([])
 
   // Real-time monitoring effect
-  const performCrisisAssessment = async (isRealTime: boolean = false) => {
   useEffect(() => {
     if (realTimeMonitoring && inputText.length > 50) {
       // Clear existing timeout
@@ -77,7 +76,9 @@ export default function CrisisDetectionDemo() {
         clearTimeout(typingTimeout)
       }
     }
-  }, [inputText, realTimeMonitoring, typingTimeout, performCrisisAssessment])
+  }, [inputText, realTimeMonitoring, typingTimeout])
+
+  const performCrisisAssessment = async (isRealTime: boolean = false) => {
     if (!inputText.trim()) {
       setError('Please enter content to assess for crisis indicators')
       return

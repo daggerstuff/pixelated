@@ -438,6 +438,10 @@ $DOMAIN {
         reverse_proxy localhost:4321
     }
 }
+
+goat.pixelatedempathy.tech {
+    reverse_proxy localhost:11434
+}
 CADDY_EOF
 
     # Test and reload Caddy

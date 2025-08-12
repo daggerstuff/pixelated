@@ -1,22 +1,51 @@
 import { v4 as uuidv4, validate as validateUUID } from 'uuid'
+import { BiasDetectionEngine } from '../../../src/lib/ai/bias-detection/BiasDetectionEngine'
+import { SessionData } from '../../../src/lib/ai/bias-detection/types'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-let requestCounts: Record<string, number> = {}
+// Rate limiting storage
+let requestCounts: Record<string, { count: number; resetTime: number }> = {}
 
-function rateLimit(ip: string, limit = 60) {
-  requestCounts[ip] = (requestCounts[ip] || 0) + 1
-  return requestCounts[ip] > limit
+function rateLimit(ip: string, limit = 60): boolean {
+  const now = Date.now()
+  const windowMs = 60 * 1000 // 1 minute
+
+  if (!requestCounts[ip] || now > requestCounts[ip].resetTime) {
+    requestCounts[ip] = { count: 1, resetTime: now + windowMs }
+    return false
+  }
+
+  requestCounts[ip].count++
+  return requestCounts[ip].count > limit
 }
 
 function resetRateLimits() {
   requestCounts = {}
 }
 
+// Export for testing
+export { resetRateLimits }
+
 function validateSession(session: any): { valid: boolean; message?: string } {
-  if (!session || typeof session !== 'object') return { valid: false, message: 'Missing session object' }
-  if (!session.sessionId || !validateUUID(session.sessionId)) return { valid: false, message: 'Invalid sessionId' }
-  if (!session.timestamp || !session.participantDemographics || !session.scenario || !session.content) {
-    return { valid: false, message: 'Missing required fields' }
+  if (!session || typeof session !== 'object') {
+    return { valid: false, message: 'Missing session object' }
   }
+
+  if (!session.sessionId) {
+    return { valid: false, message: 'Missing sessionId' }
+  }
+
+  if (!validateUUID(session.sessionId)) {
+    return { valid: false, message: 'Invalid sessionId format' }
+  }
+
+  const requiredFields = ['timestamp', 'participantDemographics', 'scenario', 'content']
+  for (const field of requiredFields) {
+    if (!session[field]) {
+      return { valid: false, message: `Missing required field: ${field}` }
+    }
+  }
+
   return { valid: true }
 }
 
@@ -82,14 +111,18 @@ export async function POST(context: any) {
   }
 
   const session = body.session
+  console.log('DEBUG: Validating session:', JSON.stringify(session, null, 2))
   const validation = validateSession(session)
+  console.log('DEBUG: Validation result:', validation)
   if (!validation.valid) {
+    console.log('DEBUG: Returning 400 for validation error')
     return buildResponse({
       success: false,
       error: 'Bad Request',
       message: `Invalid request format: ${validation.message}`,
     }, 400)
   }
+  console.log('DEBUG: Validation passed, continuing...')
 
   // Simulate cache logic
   const cacheHit = false

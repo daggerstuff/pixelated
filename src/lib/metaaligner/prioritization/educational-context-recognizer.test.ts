@@ -204,9 +204,20 @@ describe('EducationalContextRecognizer', () => {
           aiResponse,
         )
 
+        // First test the pattern manually to debug
+        const testPattern = /\b(?:what is|what are|define|definition of|meaning of)\b/i
+        const testQuery = 'what is depression?'
+        const manualTest = testPattern.test(testQuery)
+        console.log('Manual pattern test:', { testQuery, pattern: testPattern.toString(), matches: manualTest })
+
         const result = await recognizer.recognizeEducationalContext(
           'What is depression?',
         )
+
+        // First check if the pattern-based recognition is working
+        if (!result.isEducational) {
+          throw new Error(`Pattern recognition failed. Manual test: ${manualTest}. Result: ${JSON.stringify(result)}`)
+        }
 
         expect(result.isEducational).toBe(true)
         expect(result.confidence).toBeGreaterThan(0.8)

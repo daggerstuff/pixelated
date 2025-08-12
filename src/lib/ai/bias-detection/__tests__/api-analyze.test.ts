@@ -95,12 +95,17 @@ type PostHandler = (context: APIContext) => Promise<MockResponse>
 type GetHandler = (context: APIContext) => Promise<MockResponse>
 
 // Import the actual handlers - using dynamic import inside test functions
-let POST: PostHandler, GET: GetHandler
+let POST: PostHandler, GET: GetHandler, resetRateLimits: () => void
 beforeEach(async () => {
   if (!POST || !GET) {
     const module = await import('../../../../pages/api/bias-detection/analyze')
     POST = module.POST as unknown as PostHandler
     GET = module.GET as GetHandler
+    resetRateLimits = module.resetRateLimits
+  }
+  // Reset rate limits before each test
+  if (resetRateLimits) {
+    resetRateLimits()
   }
 })
 

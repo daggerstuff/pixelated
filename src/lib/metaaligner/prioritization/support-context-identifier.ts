@@ -206,10 +206,10 @@ export class SupportContextIdentifier {
       /\b(?:just need someone|need understanding|need empathy)\b/i,
     ],
     coping_assistance: [
-      /\b(?:how do I|how can I|help me|what should I do|cope with|deal with|handle)\b/i,
-      /\b(?:strategies|coping|manage|get through)\b/i,
-      /\b(?:don't know how to|what should I do)\b/i,
-      /\b(?:need help|can't handle|struggling with)\b/i,
+      /\b(?:how do I cope|how can I cope|coping strategies|coping mechanisms)\b/i,
+      /\b(?:strategies for|ways to manage|help me manage)\b/i,
+      /\b(?:don't know how to cope|struggling to cope)\b/i,
+      /\b(?:need help coping|can't handle this|overwhelmed and need)\b/i,
     ],
     encouragement: [
       /\b(?:need hope|give up|motivation|strength|keep going|hang in there)\b/i,
@@ -225,11 +225,11 @@ export class SupportContextIdentifier {
       /\b(?:no advice needed|just want to talk)\b/i,
     ],
     practical_guidance: [
-      /\b(?:what steps|what should I|how to|advice|guidance)\b/i,
-      /\b(?:what do I do about|need direction|need guidance)\b/i,
-      /\b(?:relationship problems|what should I take)\b/i,
-      /\b(?:what steps should I take|how should I deal with)\b/i,
-      /\b(?:what should I do|need advice|need guidance)\b/i,
+      /\b(?:what steps should I take|what specific steps|step by step approach)\b/i,
+      /\b(?:what should I do about|what action should I take|what's the best way to)\b/i,
+      /\b(?:how should I deal with|how should I handle|how to approach)\b/i,
+      /\b(?:need direction|need guidance|need advice|need recommendations)\b/i,
+      /\b(?:practical advice|actionable steps|concrete steps)\b/i,
     ],
     grief_support: [
       /\b(?:grieving|grief|loss|lost|death|died|passed away)\b/i,
@@ -456,8 +456,8 @@ export class SupportContextIdentifier {
           const priorities = {
             grief_support: 10, // Highest priority for specific support types
             active_listening: 9,
-            coping_assistance: 8, // Prefer coping assistance in ambiguous phrasing
-            practical_guidance: 7,
+            practical_guidance: 8, // Prefer practical guidance for specific action requests
+            coping_assistance: 7, // General coping help
             encouragement: 7,
             emotional_validation: 5, // Lower priority as it's more general
             stress_management: 4,
