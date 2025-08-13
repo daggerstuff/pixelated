@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../../../lib/logging/build-safe-logger'
 import { createProductionEnhancedRecommendationService } from '../../../../lib/ai/services/EnhancedRecommendationFactory'
 import { validateRequestBody } from '../../../../lib/validation'
 import type { ValidationErrorDetails } from '../../../../lib/validation'

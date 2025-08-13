@@ -10,8 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import {
-  Popover,
+import Popover, {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
@@ -22,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/Checkbox'
+import { Checkbox } from '@/components/ui/checkbox'
 import { IconFilter, IconX } from '@/components/ui/icons'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
@@ -278,7 +277,7 @@ export function AdvancedFilteringComponent({
                     <Checkbox
                       id={`emotion-${type}`}
                       checked={(options.emotions?.types || []).includes(type)}
-                      onCheckedChange={() =>
+                      onChange={() =>
                         handleArrayToggle('emotions', 'types', type)
                       }
                     />
@@ -562,7 +561,7 @@ export function AdvancedFilteringComponent({
                     <Checkbox
                       id={`pattern-${type}`}
                       checked={(options.patterns?.types || []).includes(type)}
-                      onCheckedChange={() =>
+                      onChange={() =>
                         handleArrayToggle('patterns', 'types', type)
                       }
                     />
@@ -629,7 +628,7 @@ export function AdvancedFilteringComponent({
                         checked={(options.patterns?.categories || []).includes(
                           category,
                         )}
-                        onCheckedChange={() =>
+                        onChange={() =>
                           handleArrayToggle('patterns', 'categories', category)
                         }
                       />

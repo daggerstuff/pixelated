@@ -81,7 +81,7 @@ describe('MultidimensionalEmotionMapper', () => {
       // The fixed version now returns the first key of a dummy vector in this case.
       // Let's get the dummy vector's first key to make the test robust.
       const dummyEmotions = mapper['getDummyEmotionVector']()
-      const firstDummyKey = Object.keys(dummyEmotions)[0] as keyof EmotionVector
+      const firstDummyKey = Object.keys(dummyEmotions)[0]! as keyof EmotionVector
       expect(mapper['findPrimaryEmotion'](emotions)).toBe(firstDummyKey)
     })
 

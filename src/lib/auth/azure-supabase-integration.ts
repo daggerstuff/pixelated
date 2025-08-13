@@ -6,7 +6,7 @@ import {
   type AzureADUser,
   type AzureADAuthResult,
 } from './azure-ad'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('azure-mongodb-integration')
 
@@ -56,9 +56,7 @@ export interface AuthSession {
  * Manages authentication flow between Azure AD and MongoDB Atlas
  */
 export class AzureMongoIntegration {
-  constructor() {
-    // MongoDB connection is handled by the mongodb config singleton
-  }
+  // MongoDB connection is handled by the mongodb config singleton
 
   /**
    * Authenticate user with Azure AD and create/update MongoDB user

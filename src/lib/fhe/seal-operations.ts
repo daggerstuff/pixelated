@@ -4,7 +4,7 @@
  * Provides high-level functions for performing homomorphic operations with SEAL
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SealService } from './seal-service'
 import type { SealCipherText, SealPlainText } from './seal-service'
 import { SealResourceScope } from './seal-memory'

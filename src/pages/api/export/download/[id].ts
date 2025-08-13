@@ -3,7 +3,7 @@ export const prerender = false
 import type { APIRoute } from 'astro'
 
 import { getSession } from '../../../../lib/auth/session'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../../../lib/logging/build-safe-logger'
 
 // Type for export results
 interface ExportResult {

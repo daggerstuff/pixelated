@@ -10,7 +10,7 @@
 import type { ChatMessage } from '../../types/chat'
 // Import only the EncryptionMode from fhe types
 import { EncryptionMode } from '../fhe/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { createSignedVerificationToken } from '../security/verification'
 import { generateId } from '../utils/index'
 import PDFDocument from 'pdfkit'

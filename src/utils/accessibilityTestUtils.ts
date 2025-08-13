@@ -605,30 +605,35 @@ export async function checkHeadingHierarchy(page: Page): Promise<{
   }
 
   // Check if the first heading is h1
-  if (headings[0].level !== 1) {
-    issues.push({
-      type: 'heading-hierarchy',
-      description: `Page should start with an h1, but starts with h${headings[0].level}`,
-      element: `<h${headings[0].level} id="${headings[0].id}">${headings[0].text}</h${headings[0].level}>`,
-    })
-  }
-
-  // Check for skipped levels
-  let previousLevel = headings[0].level
-
-  for (let i = 1; i < headings.length; i++) {
-    const heading = headings[i]
-
-    // Can't skip levels (e.g., h1 to h3)
-    if (heading.level > previousLevel + 1) {
+  if (headings.length > 0) {
+    const firstHeading = headings[0]
+    if (firstHeading && firstHeading.level !== 1) {
       issues.push({
         type: 'heading-hierarchy',
-        description: `Heading level skipped from h${previousLevel} to h${heading.level}`,
-        element: `<h${heading.level} id="${heading.id}">${heading.text}</h${heading.level}>`,
+        description: `Page should start with an h1, but starts with h${firstHeading.level}`,
+        element: `<h${firstHeading.level} id="${firstHeading.id}">${firstHeading.text}</h${firstHeading.level}>`,
       })
     }
 
-    previousLevel = heading.level
+    // Check for skipped levels
+    let previousLevel = firstHeading?.level ?? 1
+
+    for (let i = 1; i < headings.length; i++) {
+      const heading = headings[i]
+
+      if (heading) {
+        // Can't skip levels (e.g., h1 to h3)
+        if (heading.level > previousLevel + 1) {
+          issues.push({
+            type: 'heading-hierarchy',
+            description: `Heading level skipped from h${previousLevel} to h${heading.level}`,
+            element: `<h${heading.level} id="${heading.id}">${heading.text}</h${heading.level}>`,
+          })
+        }
+
+        previousLevel = heading.level
+      }
+    }
   }
 
   return {
@@ -641,7 +646,7 @@ export async function checkHeadingHierarchy(page: Page): Promise<{
 function parseRgb(color: string): [number, number, number] | null {
   // Handle 'rgb(r, g, b)' format
   const rgbMatch = color.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i)
-  if (rgbMatch) {
+  if (rgbMatch && rgbMatch[1] && rgbMatch[2] && rgbMatch[3]) {
     return [
       parseInt(rgbMatch[1], 10),
       parseInt(rgbMatch[2], 10),
@@ -653,7 +658,7 @@ function parseRgb(color: string): [number, number, number] | null {
   const rgbaMatch = color.match(
     /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9.]+)\s*\)/i,
   )
-  if (rgbaMatch) {
+  if (rgbaMatch && rgbaMatch[1] && rgbaMatch[2] && rgbaMatch[3]) {
     return [
       parseInt(rgbaMatch[1], 10),
       parseInt(rgbaMatch[2], 10),
@@ -687,10 +692,17 @@ function calculateRelativeLuminance([r, g, b]: [
   number,
 ]): number {
   // Convert RGB to relative luminance
-  const [R, G, B] = [r, g, b].map((val) => {
-    val /= 255
-    return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4)
+  const relativeLuminanceValues = [r, g, b].map((val) => {
+    const normalizedVal = val / 255
+    return normalizedVal <= 0.03928 ? normalizedVal / 12.92 : Math.pow((normalizedVal + 0.055) / 1.055, 2.4)
   })
+
+  const [R, G, B] = relativeLuminanceValues
+  
+  // Ensure we have valid values
+  if (R === undefined || G === undefined || B === undefined) {
+    return 0
+  }
 
   // Formula based on WCAG 2.0
   return 0.2126 * R + 0.7152 * G + 0.0722 * B

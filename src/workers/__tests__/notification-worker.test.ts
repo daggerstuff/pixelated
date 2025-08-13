@@ -1,7 +1,7 @@
 import { env } from '@/config/env.config'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
 import { WebSocketServer } from '@/lib/services/notification/WebSocketServer'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 // Extend the WebSocketServer interface for testing
 declare module '@/lib/services/notification/WebSocketServer' {
   interface WebSocketServer {

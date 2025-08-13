@@ -2,7 +2,7 @@ import type { CompatibilityIssue } from '@/types/testing.ts'
 import { EmailService } from '../email/EmailService'
 
 /* Debug: Validate logger import */
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('compatibility-service')
 if (!logger || typeof logger.info !== 'function') {

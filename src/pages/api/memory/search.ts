@@ -1,15 +1,15 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { isAuthenticated } from '@/lib/auth'
-import { MemoryService } from '@/lib/memory'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { getCurrentUser } from '../../../lib/auth'
+import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const GET = async ({ request }: { request: Request }) => {
+export const GET = async ({ request, cookies }) => {
   try {
     // Authenticate request
-    const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    const user = await getCurrentUser(cookies)
+    if (!user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -27,8 +27,8 @@ export const GET = async ({ request }: { request: Request }) => {
     // Parse query parameters
     const url = new URL(request.url)
     const query = url.searchParams.get('q')
-    const limit = parseInt(url.searchParams.get('limit') || '50', 10)
-    const offset = parseInt(url.searchParams.get('offset') || '0', 10)
+    let limit = parseInt(url.searchParams.get('limit') || '50', 10)
+    let offset = parseInt(url.searchParams.get('offset') || '0', 10)
 
     if (!query) {
       return new Response(
@@ -45,10 +45,18 @@ export const GET = async ({ request }: { request: Request }) => {
       )
     }
 
+    // Validate limit and offset
+    if (isNaN(limit) || limit < 1 || limit > 100) {
+      limit = 50
+    }
+    if (isNaN(offset) || offset < 0) {
+      offset = 0
+    }
+
     // Search memories
     const result = await memoryService.searchMemories(
       query,
-      authResult.user?.id,
+      user.id,
       {
         limit,
         offset,

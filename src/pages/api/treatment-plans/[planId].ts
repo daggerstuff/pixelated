@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import type { TreatmentPlan } from '@/types/treatment'
 
 export const prerender = false

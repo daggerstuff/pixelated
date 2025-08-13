@@ -4,7 +4,7 @@
  * Manages the initialization and configuration of the Microsoft SEAL library
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SealSchemeType } from './seal-types'
 import type {
   SealContextOptions,

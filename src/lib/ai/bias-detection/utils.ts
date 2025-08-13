@@ -121,3 +121,146 @@ export function validateExampleSession() {
     throw error
   }
 }
+
+/**
+ * Check if a value is within a specified range
+ */
+export function isWithinRange(value: number, min: number, max: number): boolean {
+  return value >= min && value <= max
+}
+
+/**
+ * Calculate percentage change between two values
+ */
+export function calculatePercentageChange(oldValue: number, newValue: number): number {
+  if (oldValue === 0) {
+    return newValue === 0 ? 0 : 100
+  }
+  return ((newValue - oldValue) / oldValue) * 100
+}
+
+/**
+ * Generate analysis summary from bias detection results
+ */
+export function generateAnalysisSummary(results: any): string {
+  if (!results || typeof results !== 'object') {
+    return 'No analysis results available'
+  }
+
+  const summary: string[] = []
+  
+  if (results.overallBiasScore !== undefined) {
+    summary.push(`Overall bias score: ${results.overallBiasScore.toFixed(2)}`)
+  }
+  
+  if (results.detectedBiases && Array.isArray(results.detectedBiases)) {
+    summary.push(`Detected biases: ${results.detectedBiases.length}`)
+  }
+  
+  if (results.riskLevel) {
+    summary.push(`Risk level: ${results.riskLevel}`)
+  }
+
+  return summary.length > 0 ? summary.join(', ') : 'Analysis completed'
+}
+
+/**
+ * Deep clone an object
+ */
+export function deepClone<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+  
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as unknown as T
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepClone(item)) as unknown as T
+  }
+  
+  const cloned = {} as T
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      cloned[key] = deepClone(obj[key])
+    }
+  }
+  
+  return cloned
+}
+
+/**
+ * Debounce function to limit function calls
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null
+  
+  return (...args: Parameters<T>) => {
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+    
+    timeout = setTimeout(() => {
+      func(...args)
+    }, wait)
+  }
+}
+
+/**
+ * Retry function with exponential backoff
+ */
+export async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      
+      if (attempt === maxRetries) {
+        throw lastError
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+  }
+  
+  throw lastError!
+}
+
+/**
+ * Format bias score for display
+ */
+export function formatBiasScore(score: number): string {
+  if (typeof score !== 'number' || isNaN(score)) {
+    return 'N/A'
+  }
+  
+  return score.toFixed(2)
+}
+
+/**
+ * Format timestamp for display
+ */
+export function formatTimestamp(timestamp: Date | string | number): string {
+  try {
+    const date = new Date(timestamp)
+    if (isNaN(date.getTime())) {
+      return 'Invalid date'
+    }
+    
+    return date.toLocaleString()
+  } catch (error) {
+    return 'Invalid date'
+  }
+}

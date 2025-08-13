@@ -19,10 +19,11 @@
  */
 
 import type React from 'react';
-import { useState, useEffect, useCallback, useRef, lazy } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
+// Note: Removing lazy import as it's currently commented out
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -2430,7 +2431,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           variant="error"
           title="High Priority Bias Alerts"
           description={`${filteredAlerts.filter((alert) => alert.level === 'critical' || alert.level === 'high').length} critical or high-priority bias issues require immediate attention.`}
-          icon={<AlertTriangle className="h-4 w-4" />}
+                   icon={<AlertTriangle className="h-4 w-4" />}
         />
       )}
 
@@ -2837,7 +2838,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         )}
                       </Pie>
                       <Tooltip
-                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number }> }) => {
+                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number; percent?: number }> }) => {
                           if (active && payload && payload.length) {
                             return (
                               <div className="bg-white p-2 border rounded shadow">
@@ -2847,7 +2848,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 <p>Count: {payload[0]?.value}</p>
                                 <p>
                                   Percentage:{' '}
-                                  {payload[0]?.payload?.percent ? (payload[0].payload.percent * 100).toFixed(1) : 0}
+                                  {payload[0]?.percent ? (payload[0].percent * 100).toFixed(1) : 0}
                                   %
                                 </p>
                               </div>
@@ -2901,7 +2902,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         )}
                       </Pie>
                       <Tooltip
-                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number }> }) => {
+                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number; percent?: number }> }) => {
                           if (active && payload && payload.length) {
                             return (
                               <div className="bg-white p-2 border rounded shadow">
@@ -2911,7 +2912,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 <p>Count: {payload[0]?.value}</p>
                                 <p>
                                   Percentage:{' '}
-                                  {payload[0]?.payload?.percent ? (payload[0].payload.percent * 100).toFixed(1) : 0}
+                                  {payload[0]?.percent ? (payload[0].percent * 100).toFixed(1) : 0}
                                   %
                                 </p>
                               </div>

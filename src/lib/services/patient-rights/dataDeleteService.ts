@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { mongoClient } from '../../supabase'
 import { getAuditLogger } from '../../security/audit.logging'
 import { generateId } from '../../utils/ids'
@@ -65,7 +65,7 @@ export async function createDataDeletionRequest(
     }
 
     // Insert into database
-    const result = await mongoClient.db
+    const _result = await mongoClient.db
       .collection('data_deletion_requests')
       .insertOne(deletionRequest)
 

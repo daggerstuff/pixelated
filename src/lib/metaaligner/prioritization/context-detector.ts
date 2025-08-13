@@ -8,7 +8,7 @@ import { ContextType, type AlignmentContext } from '../core/objectives'
 import { CrisisDetectionService } from '../../ai/services/crisis-detection'
 import { EducationalContextRecognizer } from './educational-context-recognizer'
 import type { AIService, AIMessage } from '../../ai/models/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('context-detector')
 

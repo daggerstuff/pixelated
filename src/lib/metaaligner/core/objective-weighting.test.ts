@@ -105,9 +105,9 @@ describe('ObjectiveWeightingEngine', () => {
       const expectedWeight = 1.0 / 3.0
 
       expect(result.strategy).toBe(WeightingStrategy.STATIC)
-      expect(result.weights.correctness).toBeCloseTo(expectedWeight, 5)
-      expect(result.weights.empathy).toBeCloseTo(expectedWeight, 5)
-      expect(result.weights.safety).toBeCloseTo(expectedWeight, 5)
+      expect(result.weights['correctness']!).toBeCloseTo(expectedWeight, 5)
+      expect(result.weights['empathy']!).toBeCloseTo(expectedWeight, 5)
+      expect(result.weights['safety']!).toBeCloseTo(expectedWeight, 5)
     })
 
     test('should adjust weights based on context when using CONTEXTUAL strategy', () => {
@@ -124,8 +124,12 @@ describe('ObjectiveWeightingEngine', () => {
 
       expect(result.strategy).toBe(WeightingStrategy.CONTEXTUAL)
       // In crisis context, safety and empathy should get higher weights
-      expect(result.weights.safety).toBeGreaterThan(result.weights.correctness)
-      expect(result.weights.empathy).toBeGreaterThan(result.weights.correctness)
+      expect(result.weights['safety']!).toBeGreaterThan(
+        result.weights['correctness']!,
+      )
+      expect(result.weights['empathy']!).toBeGreaterThan(
+        result.weights['correctness']!,
+      )
     })
 
     test('should normalize weights to sum to 1', () => {
@@ -224,7 +228,7 @@ describe('ObjectiveWeightingEngine', () => {
       const empathySafetyRatioInitial =
         initialWeights.empathy! / initialWeights.safety!
       const empathySafetyRatioFinal =
-        result.weights.empathy! / result.weights.safety!
+        result.weights['empathy']! / result.weights['safety']!
       expect(empathySafetyRatioFinal).toBeCloseTo(
         empathySafetyRatioInitial * (1.5 / 0.8),
         1,
@@ -233,7 +237,7 @@ describe('ObjectiveWeightingEngine', () => {
       const correctnessSafetyRatioInitial =
         initialWeights.correctness! / initialWeights.safety!
       const correctnessSafetyRatioFinal =
-        result.weights.correctness! / result.weights.safety!
+        result.weights['correctness']! / result.weights['safety']!
       // Correctness boost (1+0.5) = 1.5; Safety reduction 0.8
       expect(correctnessSafetyRatioFinal).toBeCloseTo(
         correctnessSafetyRatioInitial * (1.5 / 0.8),
@@ -296,8 +300,8 @@ describe('ObjectiveWeightingEngine', () => {
       const baseWeight = 1.0 / 3.0
 
       // Safety and empathy should get priority in crisis context
-      expect(result.weights.safety).toBeGreaterThan(baseWeight)
-      expect(result.weights.empathy).toBeGreaterThan(baseWeight)
+      expect(result.weights['safety']!).toBeGreaterThan(baseWeight)
+      expect(result.weights['empathy']!).toBeGreaterThan(baseWeight)
     })
   })
 })

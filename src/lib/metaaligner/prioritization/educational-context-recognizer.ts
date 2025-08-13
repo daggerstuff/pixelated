@@ -4,7 +4,7 @@
  */
 
 import type { AIService } from '../../ai/models/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('educational-context-recognizer')
 
@@ -292,8 +292,8 @@ export class EducationalContextRecognizer {
     // Adapt complexity based on education level
     if (userProfile.educationLevel === 'graduate') {
       adapted.complexity = 'advanced'
-    } else if (userProfile.educationLevel === 'high_school' && result.complexity === 'advanced') {
-      adapted.complexity = 'intermediate'
+    } else if (userProfile.educationLevel === 'high_school') {
+      adapted.complexity = result.complexity === 'advanced' ? 'intermediate' : 'basic'
     }
 
     // Adapt resources based on learning style
@@ -370,7 +370,7 @@ export class EducationalContextRecognizer {
    }
    // If symptoms matched, use it; else use highest confidence
    const symptomMatch = matchedTypes.find(mt => mt.type === EducationalType.SYMPTOMS)
-   if (symptomMatch) {
+    if (symptomMatch) {
      bestMatch = symptomMatch
    } else if (matchedTypes.length > 0) {
      // Use highest confidence match
@@ -453,7 +453,11 @@ Adapt complexity and resource recommendations accordingly.`
     if (!content || content.trim() === '') {
       throw new Error('Empty AI response')
     }
-    return this.parseAIResponse(content)
+    const result = this.parseAIResponse(content)
+    // Apply adaptation after AI parse if user profile provided
+    return userProfile && this.adaptToUserLevel
+      ? this.adaptResultToUserProfile(result, userProfile)
+      : result
   }
 
   /**
@@ -651,13 +655,6 @@ Adapt complexity and resource recommendations accordingly.`
     }
 
     return objectives
-  }
-
-  private generateBasicObjective(
-    type: EducationalType,
-    topic: TopicArea,
-  ): string {
-    return `Understand ${type.replace('_', ' ')} related to ${topic.replace('_', ' ')}`
   }
 
   private getBasicResources(type: EducationalType): ResourceType[] {

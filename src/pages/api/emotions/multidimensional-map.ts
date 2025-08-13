@@ -1,6 +1,6 @@
 export const prerender = false
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
 import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'

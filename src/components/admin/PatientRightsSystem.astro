@@ -795,7 +795,7 @@ const complianceMetrics = {
       Object.entries(elements).forEach(([key, element]) => {
         if (element) {
           const eventType = key === 'search' ? 'input' : 'change'
-          element.addEventListener(eventType, (e) => {
+          element.addEventListener(eventType, (e: Event) => {
             const target = e.target as HTMLInputElement | HTMLSelectElement;
             this._filters[key as keyof FilterState] = target.value;
             

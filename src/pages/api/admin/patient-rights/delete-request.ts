@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { createDataDeletionRequest } from '../../../../lib/services/patient-rights/dataDeleteService'
 

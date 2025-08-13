@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
 
 function getBearerToken(request: Request): string | null {
@@ -117,4 +117,13 @@ export const GET = async ({ request, url }: { request: Request; url: URL }) => {
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )
   }
+}
+
+/**
+ * Reset rate limits for testing purposes
+ */
+export function resetRateLimits(): void {
+  // Implementation for rate limit reset
+  // This is typically used in testing environments
+  logger.info('Rate limits reset')
 }

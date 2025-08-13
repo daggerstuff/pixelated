@@ -292,7 +292,7 @@ describe('EducationalContextRecognizer', () => {
         // Verify that user context was passed to AI
         const callArgs = (mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mock
           .calls[0]
-        const systemMessage = callArgs[0][0].content
+        const systemMessage = callArgs?.[0]?.[0]?.content
         expect(systemMessage).toContain('Education Level: graduate')
         expect(systemMessage).toContain(
           'Prior Mental Health Knowledge: intermediate',
@@ -342,7 +342,7 @@ describe('EducationalContextRecognizer', () => {
 
         const callArgs = (mockAIService.createChatCompletion as ReturnType<typeof vi.fn>).mock
           .calls[0]
-        const userMessage = callArgs[0][1].content
+        const userMessage = callArgs?.[0]?.[1]?.content
         expect(userMessage).toContain('Previous context:')
         expect(userMessage).toContain('Now I want to understand more')
       })

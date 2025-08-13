@@ -7,7 +7,7 @@
 
 import { jobQueue, JobStatus, type Job } from './queue'
 import { BiasDetectionEngine } from '../ai/bias-detection/BiasDetectionEngine'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { TherapeuticSession, BiasReport } from '../ai/bias-detection/types'
 
 const logger = createBuildSafeLogger('JobsWorker')

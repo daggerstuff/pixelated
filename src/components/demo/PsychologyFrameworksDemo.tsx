@@ -40,6 +40,34 @@ export default function PsychologyFrameworksDemo() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedCondition, setSelectedCondition] = useState<string>('all')
 
+  const filterFrameworks = useCallback(() => {
+    let filtered = frameworks
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(fw =>
+        fw.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        fw.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        fw.techniques.some(t => t.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        fw.conditions.some(c => c.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    }
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(fw => fw.category === selectedCategory)
+    }
+
+    // Filter by condition
+    if (selectedCondition !== 'all') {
+      filtered = filtered.filter(fw => 
+        fw.conditions.some(c => c.toLowerCase().includes(selectedCondition.toLowerCase()))
+      )
+    }
+
+    setFilteredFrameworks(filtered)
+  }, [frameworks, searchTerm, selectedCategory, selectedCondition])
+
   // Load frameworks on component mount
   useEffect(() => {
     loadFrameworks()
@@ -144,34 +172,6 @@ export default function PsychologyFrameworksDemo() {
       setLoading(false)
     }
   }
-
-  const filterFrameworks = useCallback(() => {
-    let filtered = frameworks
-
-    // Filter by search term
-    if (searchTerm.trim()) {
-      filtered = filtered.filter(fw =>
-        fw.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fw.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fw.techniques.some(t => t.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        fw.conditions.some(c => c.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
-    }
-
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(fw => fw.category === selectedCategory)
-    }
-
-    // Filter by condition
-    if (selectedCondition !== 'all') {
-      filtered = filtered.filter(fw => 
-        fw.conditions.some(c => c.toLowerCase().includes(selectedCondition.toLowerCase()))
-      )
-    }
-
-    setFilteredFrameworks(filtered)
-  }, [frameworks, searchTerm, selectedCategory, selectedCondition])
 
   const getUniqueConditions = () => {
     const allConditions = frameworks.flatMap(fw => fw.conditions)

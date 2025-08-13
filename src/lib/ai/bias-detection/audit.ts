@@ -5,7 +5,7 @@
  * HIPAA compliance and maintain detailed records of all system interactions.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   AuditLogEntry,
   AuditAction,

@@ -3,7 +3,7 @@
  * Analyzes multidimensional emotion patterns and trends over time
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type {
   EmotionAnalysis,
   DimensionalMap,

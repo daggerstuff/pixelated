@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { validationRunner } from '../../../../lib/ai/validation/ContinuousValidationRunner'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../../../lib/logging/build-safe-logger'
 import { getSession } from '../../../../lib/auth/session'
 import { verifySecureToken } from '../../../../lib/security'
 import {

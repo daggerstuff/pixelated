@@ -30,12 +30,12 @@ import {
   isWithinRange,
   calculatePercentageChange,
   generateAnalysisSummary,
-} from './utils'
+} from '../utils'
 import type {
   ParticipantDemographics,
   TherapeuticSession,
   BiasAnalysisResult,
-} from './types'
+} from '../types'
 
 // Mock logger
 vi.mock('../../utils/logger', () => ({

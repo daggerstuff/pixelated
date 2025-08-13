@@ -266,7 +266,7 @@ const tabletImage = tabletSrc ? getImageAttributes(tabletSrc) : null
                 const bgImage = style.backgroundImage
 
                 if (bgImage && bgImage.includes('url("data:image')) {
-                  const actualImage = image.dataset.src
+                  const actualImage = image.dataset['src']
                   if (actualImage) {
                     image.style.backgroundImage = `url(${actualImage})`
                   }

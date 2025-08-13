@@ -283,56 +283,6 @@ const handleVerifyBackup = async (backupId: string): Promise<boolean> => {
   return true // Mock return
 }
 
-const handleStartRecoveryTest = async (
-  backupId: string,
-  environmentType: TestEnvironmentType,
-): Promise<RecoveryTest> => {
-  // In production this would call backupManager.testRecovery(backupId, environmentType)
-  console.log(
-    `Testing recovery for backup ${backupId} in ${environmentType} environment`,
-  )
-
-  // Create a simulated test result
-  const testResult: RecoveryTest = {
-    id: `test-${Date.now()}`,
-    backupId,
-    testDate: new Date().toISOString(),
-    status:
-      Math.random() > 0.2
-        ? RecoveryTestStatus.PASSED
-        : RecoveryTestStatus.FAILED,
-    timeTaken: Math.floor(Math.random() * 120000) + 30000, // 30s to 2.5m
-    environment: environmentType,
-    verificationResults: [
-      {
-        testCase: 'Basic Recovery Test',
-        passed: Math.random() > 0.2,
-        details: {
-          description: 'Verifies that backup can be restored correctly',
-        },
-      },
-    ],
-  }
-
-  // If the test failed, add some issues
-  if (testResult.status === RecoveryTestStatus.FAILED) {
-    testResult.issues = [
-      {
-        type: 'verification_failed',
-        description: 'Verification failed for test case: Basic Recovery Test',
-        severity: 'high',
-      },
-    ]
-  }
-
-  return testResult
-}
-
-const handleScheduleRecoveryTests = async (): Promise<void> => {
-  // In production this would call backupManager.scheduleRecoveryTests()
-  console.log('Scheduling automated recovery tests')
-}
-
 const handleUpdateConfig = (config: BackupConfig): void => {
   // In production this would update the backup manager configuration
   console.log('Updating backup configuration', config)
@@ -370,9 +320,7 @@ const handleUpdateConfig = (config: BackupConfig): void => {
     <TabsContent value="recovery" className="space-y-4">
       <BackupRecoveryTab
         backups={mockBackups}
-        recoveryTests={mockRecoveryTests}
-        onStartRecoveryTest={handleStartRecoveryTest}
-        onScheduleRecoveryTests={handleScheduleRecoveryTests}
+        recoveryHistory={mockRecoveryTests}
         client:load
       />
     </TabsContent>

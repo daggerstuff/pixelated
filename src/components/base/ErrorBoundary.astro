@@ -7,8 +7,23 @@ const { fallback = 'Something went wrong. Please try refreshing the page.' } =
   Astro.props
 ---
 
+<error-boundary>
+  <slot />
+  <div slot="fallback" class="error-fallback">
+    <p>{fallback}</p>
+  </div>
+</error-boundary>
+
 <style>
   error-boundary {
     display: contents;
+  }
+  
+  .error-fallback {
+    padding: 1rem;
+    border: 1px solid #ef4444;
+    border-radius: 0.5rem;
+    background-color: #fef2f2;
+    color: #dc2626;
   }
 </style>

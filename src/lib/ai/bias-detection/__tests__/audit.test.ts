@@ -9,7 +9,7 @@ import {
   logDataExport,
   type AuditStorage,
   type AuditLogFilters,
-} from './audit'
+} from '../audit'
 import type {
   AuditLogEntry,
   AuditAction,
@@ -17,7 +17,7 @@ import type {
   ParticipantDemographics,
   ConfigurationUpdate,
   RetentionPolicy,
-} from './types'
+} from '../types'
 
 // Mock logger
 vi.mock('../../utils/logger', () => ({

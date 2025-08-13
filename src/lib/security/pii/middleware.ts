@@ -11,7 +11,7 @@
 
 import type { APIContext } from 'astro'
 import { defineMiddleware } from 'astro/middleware'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { NextRequest } from 'next/server'
 import type { PIIType } from '.'
 import { NextResponse } from 'next/server'

@@ -1,0 +1,524 @@
+#!/bin/bash
+set -e
+
+# Pixelated Empathy - Environment Manager Script
+# ==============================================
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
+
+# Configuration
+PROJECT_NAME="pixelated-empathy"
+CONFIG_DIR="config"
+ENVIRONMENTS_DIR="$CONFIG_DIR/environments"
+ENV_FILE=".env"
+ENV_TEMPLATE=".env.example"
+
+# Functions
+log_info() {
+    echo -e "${BLUE}[ENV-MANAGER]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+log_env() {
+    echo -e "${PURPLE}[ENV]${NC} $1"
+}
+
+check_prerequisites() {
+    log_info "Checking environment management prerequisites..."
+    
+    # Check if config directory exists
+    if [ ! -d "$CONFIG_DIR" ]; then
+        log_error "Configuration directory not found: $CONFIG_DIR"
+        exit 1
+    fi
+    
+    # Check if environments directory exists
+    if [ ! -d "$ENVIRONMENTS_DIR" ]; then
+        log_error "Environments directory not found: $ENVIRONMENTS_DIR"
+        exit 1
+    fi
+    
+    # Check for jq (JSON processor)
+    if ! command -v jq &> /dev/null; then
+        log_warning "jq is not installed. Some features may not work properly."
+        log_info "Install jq with: sudo apt-get install jq (Ubuntu/Debian) or brew install jq (macOS)"
+    fi
+    
+    log_success "Prerequisites check completed"
+}
+
+list_environments() {
+    log_info "Available environments:"
+    
+    if [ ! -d "$ENVIRONMENTS_DIR" ]; then
+        log_error "Environments directory not found"
+        return 1
+    fi
+    
+    local count=0
+    for env_file in "$ENVIRONMENTS_DIR"/*.json; do
+        if [ -f "$env_file" ]; then
+            local env_name=$(basename "$env_file" .json)
+            local env_display_name=""
+            
+            if command -v jq &> /dev/null; then
+                env_display_name=$(jq -r '.name // .environment' "$env_file" 2>/dev/null || echo "$env_name")
+            else
+                env_display_name="$env_name"
+            fi
+            
+            echo "  • $env_name ($env_display_name)"
+            count=$((count + 1))
+        fi
+    done
+    
+    if [ $count -eq 0 ]; then
+        log_warning "No environment configurations found"
+    else
+        log_success "Found $count environment configurations"
+    fi
+}
+
+validate_environment() {
+    local env_name="$1"
+    local env_file="$ENVIRONMENTS_DIR/$env_name.json"
+    
+    log_info "Validating environment: $env_name"
+    
+    if [ ! -f "$env_file" ]; then
+        log_error "Environment configuration not found: $env_file"
+        return 1
+    fi
+    
+    # Validate JSON syntax
+    if command -v jq &> /dev/null; then
+        if ! jq empty "$env_file" 2>/dev/null; then
+            log_error "Invalid JSON syntax in $env_file"
+            return 1
+        fi
+        
+        # Check required fields
+        local required_fields=("environment" "database" "api" "auth")
+        for field in "${required_fields[@]}"; do
+            if ! jq -e ".$field" "$env_file" >/dev/null 2>&1; then
+                log_warning "Missing required field: $field"
+            fi
+        done
+        
+        log_success "Environment configuration is valid"
+    else
+        log_warning "Cannot validate JSON without jq. Skipping validation."
+    fi
+}
+
+generate_env_file() {
+    local env_name="$1"
+    local env_file="$ENVIRONMENTS_DIR/$env_name.json"
+    local output_file="${2:-$ENV_FILE}"
+    
+    log_info "Generating .env file for environment: $env_name"
+    
+    if [ ! -f "$env_file" ]; then
+        log_error "Environment configuration not found: $env_file"
+        return 1
+    fi
+    
+    # Create backup of existing .env file
+    if [ -f "$output_file" ]; then
+        local backup_file="${output_file}.backup.$(date +%Y%m%d_%H%M%S)"
+        cp "$output_file" "$backup_file"
+        log_info "Backed up existing .env to: $backup_file"
+    fi
+    
+    # Generate .env file header
+    cat > "$output_file" << EOF
+# Environment Configuration for $PROJECT_NAME
+# Generated on: $(date)
+# Environment: $env_name
+# DO NOT COMMIT THIS FILE TO VERSION CONTROL
+
+EOF
+    
+    if command -v jq &> /dev/null; then
+        # Extract environment variables from JSON
+        log_info "Extracting environment variables..."
+        
+        # Basic environment info
+        echo "NODE_ENV=$env_name" >> "$output_file"
+        echo "ENVIRONMENT=$env_name" >> "$output_file"
+        echo "" >> "$output_file"
+        
+        # Database configuration
+        echo "# Database Configuration" >> "$output_file"
+        jq -r '.database | to_entries[] | select(.key != "pool" and .key != "migrations" and .key != "backup") | "DB_" + (.key | ascii_upcase) + "=" + (.value | tostring)' "$env_file" >> "$output_file" 2>/dev/null || true
+        echo "" >> "$output_file"
+        
+        # Redis configuration
+        echo "# Redis Configuration" >> "$output_file"
+        jq -r '.redis | to_entries[] | select(.key != "sentinel") | "REDIS_" + (.key | ascii_upcase) + "=" + (.value | tostring)' "$env_file" >> "$output_file" 2>/dev/null || true
+        echo "" >> "$output_file"
+        
+        # API configuration
+        echo "# API Configuration" >> "$output_file"
+        jq -r '.api | to_entries[] | select(.key != "cors" and .key != "rate_limiting") | "API_" + (.key | ascii_upcase) + "=" + (.value | tostring)' "$env_file" >> "$output_file" 2>/dev/null || true
+        echo "" >> "$output_file"
+        
+        # Auth configuration placeholders
+        echo "# Authentication Configuration" >> "$output_file"
+        echo "JWT_SECRET=\${JWT_SECRET_$(echo $env_name | tr '[:lower:]' '[:upper:]')}" >> "$output_file"
+        echo "SESSION_SECRET=\${SESSION_SECRET_$(echo $env_name | tr '[:lower:]' '[:upper:]')}" >> "$output_file"
+        echo "CSRF_SECRET=\${CSRF_SECRET_$(echo $env_name | tr '[:lower:]' '[:upper:]')}" >> "$output_file"
+        echo "" >> "$output_file"
+        
+        # AI service configuration
+        echo "# AI Services Configuration" >> "$output_file"
+        echo "OPENAI_API_KEY=\${OPENAI_API_KEY_$(echo $env_name | tr '[:lower:]' '[:upper:]')}" >> "$output_file"
+        echo "ANTHROPIC_API_KEY=\${ANTHROPIC_API_KEY_$(echo $env_name | tr '[:lower:]' '[:upper:]')}" >> "$output_file"
+        echo "" >> "$output_file"
+        
+        # Monitoring configuration
+        echo "# Monitoring Configuration" >> "$output_file"
+        if jq -e '.monitoring.sentry.enabled' "$env_file" >/dev/null 2>&1; then
+            echo "SENTRY_DSN=\${SENTRY_DSN_$(echo $env_name | tr '[:lower:]' '[:upper:]')}" >> "$output_file"
+        fi
+        if jq -e '.monitoring.datadog.enabled' "$env_file" >/dev/null 2>&1; then
+            echo "DATADOG_API_KEY=\${DATADOG_API_KEY}" >> "$output_file"
+        fi
+        echo "" >> "$output_file"
+        
+        log_success ".env file generated: $output_file"
+    else
+        log_error "Cannot generate .env file without jq"
+        return 1
+    fi
+}
+
+switch_environment() {
+    local env_name="$1"
+    
+    log_env "Switching to environment: $env_name"
+    
+    # Validate environment first
+    if ! validate_environment "$env_name"; then
+        log_error "Cannot switch to invalid environment"
+        return 1
+    fi
+    
+    # Generate .env file
+    if generate_env_file "$env_name"; then
+        log_success "Successfully switched to environment: $env_name"
+        
+        # Show current environment info
+        show_current_environment
+    else
+        log_error "Failed to switch environment"
+        return 1
+    fi
+}
+
+show_current_environment() {
+    log_info "Current environment information:"
+    
+    if [ -f "$ENV_FILE" ]; then
+        local current_env=$(grep "^ENVIRONMENT=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2 || echo "unknown")
+        local node_env=$(grep "^NODE_ENV=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2 || echo "unknown")
+        
+        echo "  Environment: $current_env"
+        echo "  Node Environment: $node_env"
+        
+        # Show database info if available
+        local db_host=$(grep "^DB_HOST=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2 || echo "not set")
+        local db_name=$(grep "^DB_NAME=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2 || echo "not set")
+        
+        echo "  Database Host: $db_host"
+        echo "  Database Name: $db_name"
+        
+        # Show API info
+        local api_port=$(grep "^API_PORT=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2 || echo "not set")
+        echo "  API Port: $api_port"
+        
+    else
+        log_warning "No .env file found. Run 'switch' command to set up environment."
+    fi
+}
+
+compare_environments() {
+    local env1="$1"
+    local env2="$2"
+    
+    log_info "Comparing environments: $env1 vs $env2"
+    
+    local env1_file="$ENVIRONMENTS_DIR/$env1.json"
+    local env2_file="$ENVIRONMENTS_DIR/$env2.json"
+    
+    if [ ! -f "$env1_file" ]; then
+        log_error "Environment not found: $env1"
+        return 1
+    fi
+    
+    if [ ! -f "$env2_file" ]; then
+        log_error "Environment not found: $env2"
+        return 1
+    fi
+    
+    if command -v jq &> /dev/null; then
+        echo "Configuration differences:"
+        echo "========================"
+        
+        # Compare key sections
+        local sections=("database" "redis" "api" "auth" "monitoring" "features" "security")
+        
+        for section in "${sections[@]}"; do
+            echo ""
+            echo "[$section]"
+            echo "----------"
+            
+            local keys1=$(jq -r ".$section | keys[]" "$env1_file" 2>/dev/null || echo "")
+            local keys2=$(jq -r ".$section | keys[]" "$env2_file" 2>/dev/null || echo "")
+            
+            # Get unique keys from both environments
+            local all_keys=$(echo -e "$keys1\n$keys2" | sort -u)
+            
+            while IFS= read -r key; do
+                if [ -n "$key" ]; then
+                    local val1=$(jq -r ".$section.$key // \"N/A\"" "$env1_file" 2>/dev/null)
+                    local val2=$(jq -r ".$section.$key // \"N/A\"" "$env2_file" 2>/dev/null)
+                    
+                    if [ "$val1" != "$val2" ]; then
+                        echo "  $key:"
+                        echo "    $env1: $val1"
+                        echo "    $env2: $val2"
+                    fi
+                fi
+            done <<< "$all_keys"
+        done
+        
+    else
+        log_error "Cannot compare environments without jq"
+        return 1
+    fi
+}
+
+create_environment_template() {
+    local env_name="$1"
+    local template_file="$ENVIRONMENTS_DIR/$env_name.json"
+    
+    log_info "Creating environment template: $env_name"
+    
+    if [ -f "$template_file" ]; then
+        log_warning "Environment already exists: $env_name"
+        read -p "Overwrite existing environment? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Operation cancelled"
+            return 0
+        fi
+    fi
+    
+    # Create basic template
+    cat > "$template_file" << 'EOF'
+{
+  "environment": "ENVIRONMENT_NAME",
+  "name": "Pixelated Empathy - ENVIRONMENT_NAME",
+  "version": "1.0.0",
+  "debug": false,
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "console": true,
+    "file": true,
+    "path": "logs/ENVIRONMENT_NAME.log"
+  },
+  "database": {
+    "type": "postgresql",
+    "host": "${DB_HOST}",
+    "port": 5432,
+    "name": "pixelated_ENVIRONMENT_NAME",
+    "username": "${DB_USERNAME}",
+    "password": "${DB_PASSWORD}",
+    "ssl": true,
+    "pool": {
+      "min": 2,
+      "max": 10,
+      "idle_timeout": 30000
+    }
+  },
+  "redis": {
+    "host": "${REDIS_HOST}",
+    "port": 6379,
+    "password": "${REDIS_PASSWORD}",
+    "database": 0,
+    "key_prefix": "pixelated:ENVIRONMENT_NAME:",
+    "ttl": 3600
+  },
+  "api": {
+    "host": "0.0.0.0",
+    "port": 3000,
+    "cors": {
+      "enabled": true,
+      "origins": ["https://ENVIRONMENT_NAME.pixelated-empathy.com"],
+      "credentials": true
+    },
+    "rate_limiting": {
+      "enabled": true,
+      "requests_per_minute": 100
+    },
+    "timeout": 30000
+  },
+  "auth": {
+    "jwt": {
+      "secret": "${JWT_SECRET}",
+      "expires_in": "1h",
+      "refresh_expires_in": "7d"
+    },
+    "session": {
+      "secret": "${SESSION_SECRET}",
+      "max_age": 3600000,
+      "secure": true
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "health_check": {
+      "enabled": true,
+      "path": "/health"
+    }
+  },
+  "features": {
+    "user_registration": true,
+    "email_verification": true,
+    "password_reset": true,
+    "ai_chat": true,
+    "maintenance_mode": false
+  },
+  "security": {
+    "csrf": {
+      "enabled": true,
+      "secret": "${CSRF_SECRET}"
+    },
+    "helmet": {
+      "enabled": true,
+      "content_security_policy": true
+    }
+  }
+}
+EOF
+    
+    # Replace placeholders
+    sed -i "s/ENVIRONMENT_NAME/$env_name/g" "$template_file"
+    
+    log_success "Environment template created: $template_file"
+    log_info "Edit the template to customize configuration for your environment"
+}
+
+show_help() {
+    echo "Pixelated Empathy Environment Manager"
+    echo ""
+    echo "Usage: $0 [COMMAND] [OPTIONS]"
+    echo ""
+    echo "Commands:"
+    echo "  list                    List available environments"
+    echo "  validate <env>          Validate environment configuration"
+    echo "  switch <env>            Switch to specified environment"
+    echo "  current                 Show current environment information"
+    echo "  generate <env> [file]   Generate .env file for environment"
+    echo "  compare <env1> <env2>   Compare two environments"
+    echo "  create <env>            Create new environment template"
+    echo "  help                    Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0 list                           # List all environments"
+    echo "  $0 switch development             # Switch to development environment"
+    echo "  $0 validate production            # Validate production config"
+    echo "  $0 generate staging .env.staging  # Generate staging .env file"
+    echo "  $0 compare development production  # Compare dev and prod configs"
+    echo "  $0 create testing                 # Create new testing environment"
+}
+
+# Main execution
+main() {
+    local command=${1:-help}
+    
+    case $command in
+        "list")
+            check_prerequisites
+            list_environments
+            ;;
+        "validate")
+            if [ -z "$2" ]; then
+                log_error "Environment name required"
+                show_help
+                exit 1
+            fi
+            check_prerequisites
+            validate_environment "$2"
+            ;;
+        "switch")
+            if [ -z "$2" ]; then
+                log_error "Environment name required"
+                show_help
+                exit 1
+            fi
+            check_prerequisites
+            switch_environment "$2"
+            ;;
+        "current")
+            show_current_environment
+            ;;
+        "generate")
+            if [ -z "$2" ]; then
+                log_error "Environment name required"
+                show_help
+                exit 1
+            fi
+            check_prerequisites
+            generate_env_file "$2" "$3"
+            ;;
+        "compare")
+            if [ -z "$2" ] || [ -z "$3" ]; then
+                log_error "Two environment names required"
+                show_help
+                exit 1
+            fi
+            check_prerequisites
+            compare_environments "$2" "$3"
+            ;;
+        "create")
+            if [ -z "$2" ]; then
+                log_error "Environment name required"
+                show_help
+                exit 1
+            fi
+            check_prerequisites
+            create_environment_template "$2"
+            ;;
+        "help"|"-h"|"--help")
+            show_help
+            ;;
+        *)
+            log_error "Unknown command: $command"
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+# Run main function with all arguments
+main "$@"

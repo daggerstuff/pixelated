@@ -107,7 +107,6 @@ export function useResponseGeneration({
   maxTokens = 2048,
   responseType = 'general',
   streamingEnabled = true,
-  _contextWindow = 4096,
   systemPrompt,
   onError,
   onComplete,

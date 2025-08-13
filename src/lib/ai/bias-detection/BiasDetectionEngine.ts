@@ -73,7 +73,7 @@ function validateWeights(w: BiasLayerWeights) {
 
 // Minimal interfaces for mocked systems (in tests they’re replaced by vi.mock)
 class PythonBiasDetectionBridge {
-  constructor() {}
+  // Remove empty constructor - not needed
   async initialize() {}
   async checkHealth() { return { status: 'healthy', message: 'Service is running' } }
   async runPreprocessingAnalysis(_s: SessionData): Promise<PreprocessingResult> {
@@ -235,7 +235,7 @@ export class BiasDetectionEngine {
     if (!input) { return undefined }
     if (!this.config.hipaaCompliant && !this.config.dataMaskingEnabled) { return input }
     // Drop known PII-looking fields; keep coarse fields
-    const { social_security, phone_number, email, ...rest } = input as any
+    const { social_security: _social_security, phone_number: _phone_number, email: _email, ...rest } = input as any
     return rest
   }
 
@@ -332,7 +332,11 @@ export class BiasDetectionEngine {
     // Trigger monitoring callbacks for high/critical alerts
     if (alertLevel === 'high' || alertLevel === 'critical') {
       this.monitoringCallbacks.forEach((cb) => {
-        try { cb({ level: alertLevel, sessionId: session.sessionId }) } catch {}
+        try { 
+          cb({ level: alertLevel, sessionId: session.sessionId }) 
+        } catch {
+          // Ignore callback errors to prevent system failures
+        }
       })
     }
 

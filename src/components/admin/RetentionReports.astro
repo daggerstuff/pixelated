@@ -547,7 +547,7 @@ const getStatusBadge = (status: string) => {
     )
     generateNowButtons.forEach((button) => {
       if (button.textContent?.trim() === 'Generate Now') {
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', (e: Event) => {
           const reportElement = (e.currentTarget as HTMLElement).closest(
             'div[class*="border"]',
           )

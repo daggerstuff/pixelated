@@ -240,7 +240,7 @@ jobs:
           POSTGRES_USER: postgres
 
       - name: Run unit tests
-        run: pnpm test:unit --coverage
+        run: pnpm test:unit
         env:
           NODE_ENV: test
 

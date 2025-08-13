@@ -80,7 +80,7 @@ export function getAriaProps(props: ButtonProps) {
 
 // Class name helpers
 export function getButtonClassName(props: ButtonProps): string {
-  const classes = []
+  const classes: string[] = []
 
   if (props.fullWidth) {
     classes.push('w-full')

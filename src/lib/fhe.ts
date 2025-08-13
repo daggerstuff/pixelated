@@ -4,7 +4,8 @@
  */
 
 import SEAL from 'node-seal'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from './logging/build-safe-logger'
+import type { FHEOperation, FHEOperationResult } from './fhe/types'
 
 const logger = createBuildSafeLogger('default')
 
@@ -18,7 +19,6 @@ type SecretKey = ReturnType<KeyGenerator['secretKey']>
 type BatchEncoder = ReturnType<SealInstance['BatchEncoder']>
 type Encryptor = ReturnType<SealInstance['Encryptor']>
 type Decryptor = ReturnType<SealInstance['Decryptor']>
-type Evaluator = ReturnType<SealInstance['Evaluator']>
 type PlainText = ReturnType<SealInstance['PlainText']>
 type CipherText = ReturnType<SealInstance['CipherText']>
 
@@ -54,7 +54,7 @@ export class RealFHEService implements FHEService {
   private encryptor: Encryptor | null = null
   private decryptor: Decryptor | null = null
   private encoder: BatchEncoder | null = null
-  private evaluator: Evaluator | null = null
+  // Removed unused evaluator property
   private isInitialized = false
   private encryptionMode: EncryptionMode = 'secure'
   private config: EncryptionConfig = {
@@ -126,9 +126,7 @@ export class RealFHEService implements FHEService {
         this.context as SEALContext,
         this.secretKey as SecretKey,
       ) as Decryptor
-      this.evaluator = (this.seal as SealInstance).Evaluator(
-        this.context as SEALContext,
-      ) as Evaluator
+      // Removed unused evaluator assignment
 
       this.isInitialized = true
       logger.info('FHE service initialized successfully')
@@ -165,7 +163,7 @@ export class RealFHEService implements FHEService {
     for (let i = 0; i < bytes.length; i += 4) {
       let value = 0
       for (let j = 0; j < 4 && i + j < bytes.length; j++) {
-        value |= bytes[i + j] << (8 * j)
+        value |= (bytes[i + j] ?? 0) << (8 * j)
       }
       result[i / 4] = value
     }
@@ -177,7 +175,7 @@ export class RealFHEService implements FHEService {
     const bytes = new Uint8Array(array.length * 4)
 
     for (let i = 0; i < array.length; i++) {
-      const value = array[i]
+      const value = array[i] ?? 0
       for (let j = 0; j < 4; j++) {
         bytes[i * 4 + j] = (value >> (8 * j)) & 0xff
       }
@@ -284,6 +282,77 @@ export class RealFHEService implements FHEService {
       return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
     } catch (error) {
       logger.error('Hash generation failed', {
+        error: error instanceof Error ? error.message : String(error),
+      })
+      throw error
+    }
+  }
+
+  async processEncrypted(
+    encryptedData: string,
+    operation: FHEOperation | string,
+    params?: Record<string, unknown>,
+  ): Promise<FHEOperationResult<string>> {
+    try {
+      logger.info('Processing encrypted data', { operation, params })
+
+      // For now, implement a basic passthrough that simulates processing
+      // In a real implementation, this would perform homomorphic operations
+      const result = encryptedData // Placeholder for actual FHE operations
+
+      return {
+        success: true,
+        result,
+        operation: operation as FHEOperation,
+        metadata: {
+          timestamp: Date.now(),
+          params,
+        },
+      }
+    } catch (error) {
+      logger.error('Processing encrypted data failed', {
+        operation,
+        error: error instanceof Error ? error.message : String(error),
+      })
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        operation: operation as FHEOperation,
+        metadata: {
+          timestamp: Date.now(),
+          params,
+        },
+      }
+    }
+  }
+
+  async rotateKeys(): Promise<void> {
+    try {
+      logger.info('Rotating FHE keys')
+
+      if (!this.isInitialized || !this.context || !this.seal) {
+        throw new Error('FHE service is not initialized')
+      }
+
+      // Generate new key pair
+      const keyGen = (this.seal as SealInstance).KeyGenerator(this.context)
+      this.secretKey = keyGen.secretKey()
+      this.publicKey = keyGen.createPublicKey()
+
+      // Recreate encryptor and decryptor with new keys
+      this.encryptor = (this.seal as SealInstance).Encryptor(
+        this.context,
+        this.publicKey,
+      )
+      this.decryptor = (this.seal as SealInstance).Decryptor(
+        this.context,
+        this.secretKey,
+      )
+
+      logger.info('Key rotation completed successfully')
+    } catch (error) {
+      logger.error('Key rotation failed', {
         error: error instanceof Error ? error.message : String(error),
       })
       throw error

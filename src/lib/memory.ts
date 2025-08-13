@@ -18,6 +18,45 @@ export interface ListMemoriesOptions {
 export class MemoryService {
   private memories: Memory[] = [];
 
+  async createMemory(content: string, metadata: { userId: string; [key: string]: any }): Promise<Memory> {
+    const memory: Memory = {
+      id: Math.random().toString(36).substr(2, 9),
+      userId: metadata.userId,
+      content,
+      createdAt: new Date(),
+    };
+    this.memories.push(memory);
+    return memory;
+  }
+
+  async updateMemory(memoryId: string, content: string, metadata: { userId: string; [key: string]: any }): Promise<Memory | null> {
+    const index = this.memories.findIndex(m => m.id === memoryId && m.userId === metadata.userId);
+    if (index === -1) {
+      return null;
+    }
+    this.memories[index] = {
+      ...this.memories[index],
+      content,
+    };
+    return this.memories[index];
+  }
+
+  async deleteMemory(memoryId: string, userId: string): Promise<boolean> {
+    const index = this.memories.findIndex(m => m.id === memoryId && m.userId === userId);
+    if (index === -1) {
+      return false;
+    }
+    this.memories.splice(index, 1);
+    return true;
+  }
+
+  async searchMemories(query: string, metadata: { userId: string; [key: string]: any }): Promise<Memory[]> {
+    return this.memories.filter(m => 
+      m.userId === metadata.userId && 
+      m.content.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+
   async listMemories(
     userId: string,
     options: ListMemoriesOptions = {}

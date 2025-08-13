@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.36.177.2456",
-      "templateHash": "8557656098764970963"
+      "version": "0.37.4.10188",
+      "templateHash": "1656168078977238796"
     }
   },
   "parameters": {
@@ -24,7 +24,7 @@
     },
     "resourcePrefix": {
       "type": "string",
-      "defaultValue": "pixel",
+      "defaultValue": "pixelated",
       "metadata": {
         "description": "Prefix for resource names"
       }
@@ -38,26 +38,38 @@
     }
   },
   "variables": {
-    "resourceToken": "[uniqueString(subscription().id, resourceGroup().id, parameters('environmentName'))]",
+    "uniqueSuffix": "[take(uniqueString(subscription().id, resourceGroup().id), 6)]",
+    "baseName": "[format('{0}-{1}', parameters('resourcePrefix'), parameters('environmentName'))]",
+    "uniqueBaseName": "[format('{0}{1}{2}', parameters('resourcePrefix'), parameters('environmentName'), variables('uniqueSuffix'))]",
     "commonTags": {
       "Environment": "[parameters('environmentName')]",
       "Project": "PixelatedEmpathy",
       "ManagedBy": "AzureDevOps",
-      "CreatedDate": "[parameters('createdDate')]"
+      "CreatedDate": "[parameters('createdDate')]",
+      "azd-env-name": "[parameters('environmentName')]"
     }
   },
   "resources": [
     {
+      "type": "Microsoft.Resources/tags",
+      "apiVersion": "2021-04-01",
+      "name": "default",
+      "properties": {
+        "tags": {
+          "azd-env-name": "[parameters('environmentName')]",
+          "Environment": "[parameters('environmentName')]",
+          "Project": "PixelatedEmpathy",
+          "ManagedBy": "AzureDevOps",
+          "CreatedDate": "[parameters('createdDate')]"
+        }
+      }
+    },
+    {
       "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2015-11-01-preview",
-      "name": "[format('{0}-log-{1}', parameters('resourcePrefix'), variables('resourceToken'))]",
+      "apiVersion": "2022-10-01",
+      "name": "[format('{0}-logs', variables('baseName'))]",
       "location": "[parameters('location')]",
-      "tags": {
-        "Environment": "[parameters('environmentName')]",
-        "Project": "PixelatedEmpathy",
-        "ManagedBy": "AzureDevOps",
-        "CreatedDate": "[parameters('createdDate')]"
-      },
+      "tags": "[variables('commonTags')]",
       "properties": {
         "sku": {
           "name": "PerGB2018"
@@ -71,36 +83,26 @@
     {
       "type": "Microsoft.Insights/components",
       "apiVersion": "2020-02-02",
-      "name": "[format('{0}-ai-{1}', parameters('resourcePrefix'), variables('resourceToken'))]",
+      "name": "[format('{0}-insights', variables('baseName'))]",
       "location": "[parameters('location')]",
       "kind": "web",
-      "tags": {
-        "Environment": "[parameters('environmentName')]",
-        "Project": "PixelatedEmpathy",
-        "ManagedBy": "AzureDevOps",
-        "CreatedDate": "[parameters('createdDate')]"
-      },
+      "tags": "[variables('commonTags')]",
       "properties": {
         "Application_Type": "web",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-log-{1}', parameters('resourcePrefix'), variables('resourceToken')))]",
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', variables('baseName')))]",
         "DisableIpMasking": false,
         "DisableLocalAuth": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-log-{1}', parameters('resourcePrefix'), variables('resourceToken')))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', variables('baseName')))]"
       ]
     },
     {
       "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2015-06-01",
-      "name": "[format('{0}-kv-{1}', parameters('resourcePrefix'), variables('resourceToken'))]",
+      "apiVersion": "2023-02-01",
+      "name": "[format('{0}-vault', variables('baseName'))]",
       "location": "[parameters('location')]",
-      "tags": {
-        "Environment": "[parameters('environmentName')]",
-        "Project": "PixelatedEmpathy",
-        "ManagedBy": "AzureDevOps",
-        "CreatedDate": "[parameters('createdDate')]"
-      },
+      "tags": "[variables('commonTags')]",
       "properties": {
         "tenantId": "[subscription().tenantId]",
         "sku": {
@@ -121,164 +123,110 @@
     },
     {
       "type": "Microsoft.ContainerRegistry/registries",
-      "apiVersion": "2017-10-01",
-      "name": "pixelatedcr",
+      "apiVersion": "2023-07-01",
+      "name": "[variables('uniqueBaseName')]",
       "location": "[parameters('location')]",
-      "tags": {
-        "Environment": "[parameters('environmentName')]",
-        "Project": "PixelatedEmpathy",
-        "ManagedBy": "AzureDevOps",
-        "CreatedDate": "[parameters('createdDate')]"
-      },
+      "tags": "[variables('commonTags')]",
       "sku": {
         "name": "Standard"
       },
       "properties": {
-        "adminUserEnabled": false,
+        "adminUserEnabled": true,
         "publicNetworkAccess": "Enabled",
         "dataEndpointEnabled": false
       }
     },
     {
       "type": "Microsoft.App/managedEnvironments",
-      "apiVersion": "2022-01-01-preview",
-      "name": "[format('{0}-env-{1}', parameters('resourcePrefix'), variables('resourceToken'))]",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}-apps-env', variables('baseName'))]",
       "location": "[parameters('location')]",
-      "tags": {
-        "Environment": "[parameters('environmentName')]",
-        "Project": "PixelatedEmpathy",
-        "ManagedBy": "AzureDevOps",
-        "CreatedDate": "[parameters('createdDate')]"
-      },
+      "tags": "[variables('commonTags')]",
       "properties": {
         "appLogsConfiguration": {
           "destination": "log-analytics",
           "logAnalyticsConfiguration": {
-            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-log-{1}', parameters('resourcePrefix'), variables('resourceToken'))), '2015-11-01-preview').customerId]",
-            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-log-{1}', parameters('resourcePrefix'), variables('resourceToken'))), '2015-11-01-preview').primarySharedKey]"
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', variables('baseName'))), '2022-10-01').customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', variables('baseName'))), '2022-10-01').primarySharedKey]"
           }
         },
         "zoneRedundant": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-log-{1}', parameters('resourcePrefix'), variables('resourceToken')))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', variables('baseName')))]"
       ]
     },
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "apiVersion": "2015-08-31-preview",
-      "name": "[format('{0}-uid', parameters('resourcePrefix'))]",
+      "apiVersion": "2023-01-31",
+      "name": "[format('{0}-identity', variables('baseName'))]",
       "location": "[parameters('location')]",
-      "tags": {
-        "Environment": "[parameters('environmentName')]",
-        "Project": "PixelatedEmpathy",
-        "ManagedBy": "AzureDevOps",
-        "CreatedDate": "[parameters('createdDate')]"
-      }
+      "tags": "[variables('commonTags')]"
     },
     {
-      "type": "Microsoft.App/containerApps",
-      "apiVersion": "2022-01-01-preview",
-      "name": "[format('{0}-{1}', parameters('resourcePrefix'), variables('resourceToken'))]",
-      "location": "[parameters('location')]",
-      "identity": {
-        "type": "UserAssigned",
-        "userAssignedIdentities": {
-          "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uid', parameters('resourcePrefix'))))]": {}
-        }
-      },
-      "tags": {
-        "Environment": "[parameters('environmentName')]",
-        "Project": "PixelatedEmpathy",
-        "ManagedBy": "AzureDevOps",
-        "CreatedDate": "[parameters('createdDate')]",
-        "azd-service-name": "[parameters('resourcePrefix')]",
-        "azd-env-name": "[parameters('environmentName')]"
-      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "acrPullRoleAssignment",
       "properties": {
-        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', format('{0}-env-{1}', parameters('resourcePrefix'), variables('resourceToken')))]",
-        "configuration": {
-          "registries": [
-            {
-              "server": "[reference(resourceId('Microsoft.ContainerRegistry/registries', 'pixelatedcr'), '2017-10-01').loginServer]",
-              "identity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uid', parameters('resourcePrefix')))]"
-            }
-          ],
-          "secrets": [],
-          "ingress": {
-            "external": true,
-            "targetPort": 4321,
-            "transport": "auto",
-            "allowInsecure": false,
-            "corsPolicy": {
-              "allowedOrigins": [
-                "*"
-              ],
-              "allowedMethods": [
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-              ],
-              "allowedHeaders": [
-                "*"
-              ],
-              "exposeHeaders": [
-                "*"
-              ],
-              "maxAge": 86400
-            }
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "containerRegistryName": {
+            "value": "[variables('uniqueBaseName')]"
+          },
+          "userIdentityName": {
+            "value": "[format('{0}-identity', variables('baseName'))]"
           }
         },
         "template": {
-          "containers": [
-            {
-              "name": "[parameters('resourcePrefix')]",
-              "image": "[format('{0}/{1}:latest', reference(resourceId('Microsoft.ContainerRegistry/registries', 'pixelatedcr'), '2017-10-01').loginServer, parameters('resourcePrefix'))]",
-              "resources": {
-                "cpu": "[json('1.0')]",
-                "memory": "2Gi"
-              },
-              "env": [
-                {
-                  "name": "ENVIRONMENT",
-                  "value": "[parameters('environmentName')]"
-                },
-                {
-                  "name": "PORT",
-                  "value": "4321"
-                }
-              ]
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.37.4.10188",
+              "templateHash": "12370280901714161274"
             }
-          ],
-          "scale": {
-            "minReplicas": 1,
-            "maxReplicas": 3,
-            "rules": [
-              {
-                "name": "http-scaling",
-                "http": {
-                  "metadata": {
-                    "concurrentRequests": "30"
-                  }
-                }
+          },
+          "parameters": {
+            "containerRegistryName": {
+              "type": "string"
+            },
+            "userIdentityName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.ContainerRegistry/registries/{0}', parameters('containerRegistryName'))]",
+              "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userIdentityName')), '7f951dda-4ed3-4680-a7ca-43fe172d538d', resourceId('Microsoft.ContainerRegistry/registries', parameters('containerRegistryName')))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userIdentityName')), '2023-01-31').principalId]",
+                "principalType": "ServicePrincipal"
               }
-            ]
-          }
+            }
+          ]
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.App/managedEnvironments', format('{0}-env-{1}', parameters('resourcePrefix'), variables('resourceToken')))]",
-        "[resourceId('Microsoft.ContainerRegistry/registries', 'pixelatedcr')]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uid', parameters('resourcePrefix')))]"
+        "[resourceId('Microsoft.ContainerRegistry/registries', variables('uniqueBaseName'))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('baseName')))]"
       ]
     }
   ],
   "outputs": {
-    "containerAppUrl": {
+    "containerAppEnvironmentId": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.App/containerApps', format('{0}-{1}', parameters('resourcePrefix'), variables('resourceToken'))), '2022-01-01-preview').configuration.ingress.fqdn]"
+      "value": "[resourceId('Microsoft.App/managedEnvironments', format('{0}-apps-env', variables('baseName')))]"
+    },
+    "containerAppEnvironmentName": {
+      "type": "string",
+      "value": "[format('{0}-apps-env', variables('baseName'))]"
     },
     "RESOURCE_GROUP_ID": {
       "type": "string",
@@ -286,23 +234,35 @@
     },
     "AZURE_CONTAINER_REGISTRY_ENDPOINT": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', 'pixelatedcr'), '2017-10-01').loginServer]"
+      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', variables('uniqueBaseName')), '2023-07-01').loginServer]"
     },
     "keyVaultName": {
       "type": "string",
-      "value": "[format('{0}-kv-{1}', parameters('resourcePrefix'), variables('resourceToken'))]"
+      "value": "[format('{0}-vault', variables('baseName'))]"
     },
     "appInsightsName": {
       "type": "string",
-      "value": "[format('{0}-ai-{1}', parameters('resourcePrefix'), variables('resourceToken'))]"
+      "value": "[format('{0}-insights', variables('baseName'))]"
     },
     "logAnalyticsName": {
       "type": "string",
-      "value": "[format('{0}-log-{1}', parameters('resourcePrefix'), variables('resourceToken'))]"
+      "value": "[format('{0}-logs', variables('baseName'))]"
     },
     "containerRegistryName": {
       "type": "string",
-      "value": "pixelatedcr"
+      "value": "[variables('uniqueBaseName')]"
+    },
+    "userIdentityId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('baseName')))]"
+    },
+    "userIdentityName": {
+      "type": "string",
+      "value": "[format('{0}-identity', variables('baseName'))]"
+    },
+    "userIdentityClientId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('baseName'))), '2023-01-31').clientId]"
     }
   }
 }

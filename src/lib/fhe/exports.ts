@@ -5,7 +5,7 @@
 // FHE service entry point - exports all required types and functions
 // for use in the application
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { FHEAnalyticsService } from './analytics'
 // Main FHE service instance
 // Import core services

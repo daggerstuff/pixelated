@@ -1,5 +1,5 @@
 import { ContactService } from '@/lib/services/contact/ContactService'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 
 // Create a scoped logger for this endpoint
 const logger = createBuildSafeLogger('api/contact')

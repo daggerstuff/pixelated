@@ -2,7 +2,7 @@
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/base/Footer.astro';
 import Background from '@/components/backgrounds/Background.astro';
-import { KonamiTrigger } from '@/components/ui/KonamiTrigger';import type { BgType } from '@/types';
+import type { BgType } from '@/types';
 // Import brutalist dark theme
 import '@/styles/brutalist-dark.css';
 import '@/styles/mobile-layout-fixes.css';
@@ -26,11 +26,17 @@ const { title, description, bgType } = Astro.props
     <title>{title} | Pixelated Empathy</title>
     <meta name="description" content={description ?? 'AI-powered therapy training platform for mental health professionals.'} />
     
-    <!-- Fonts -->
+    <!-- Fonts: preload primary and swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="preload" as="style" />
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" /></noscript>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      @font-face { font-family: 'Geist Sans'; font-display: swap; src: local('Geist Sans'); }
+      @font-face { font-family: 'JetBrains Mono'; font-display: swap; src: local('JetBrains Mono'); }
+    </style>
     
     <!-- Theme Meta -->
     <meta name="color-scheme" content="dark" />

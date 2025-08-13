@@ -3,7 +3,7 @@
  */
 type APIRoute = (context: { request: Request }) => Promise<Response> | Response;
 
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger';
+import { createBuildSafeLogger } from '../../../../../lib/logging/build-safe-logger';
 import { isAuthenticated } from '../../../lib/auth';
 import { DocumentationSystem } from '../../../lib/documentation/DocumentationSystem';
 import { AIRepository } from '../../../lib/db/ai/repository';

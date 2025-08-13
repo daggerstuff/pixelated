@@ -1,5 +1,5 @@
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
 
 const logger = createBuildSafeLogger('bias-detection-api')

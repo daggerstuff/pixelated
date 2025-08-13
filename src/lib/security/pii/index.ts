@@ -11,7 +11,7 @@
 
 import { fheService } from '../../fhe'
 import { FHEOperation } from '../../fhe/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -405,10 +405,13 @@ class PIIDetectionService {
             .flat()
             .map((p) => p.source),
         },
-      ); {
+      );
+
+      // Return encrypted result
+      return {
         data: { hasPII: 'false', confidence: '0', types: '' },
         metadata: { operation: FHEOperation.ANALYZE, timestamp: Date.now() },
-      }
+      };
 
       // Parse the result
       // In a real FHE implementation, this would decrypt the result

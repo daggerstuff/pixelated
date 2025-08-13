@@ -7,7 +7,7 @@
  */
 
 /* Supabase import removed - migrate to MongoDB */
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type {
   ConsentType,
   ConsentVersion,

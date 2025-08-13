@@ -6,7 +6,7 @@
  */
 
 import { mockFHEService } from './mock/mock-fhe-service'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { nanoid } from 'nanoid'
 import type {
   PatternRecognitionOps,

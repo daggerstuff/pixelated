@@ -4,7 +4,7 @@
  * Main service for FHE operations using Microsoft SEAL
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { EncryptionMode } from './types'
 import { FHEOperation } from './types'
 import {

@@ -5,7 +5,7 @@
  * It uses the Web Crypto API in browsers, with some fallbacks for older browsers.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('crypto-polyfill')
 

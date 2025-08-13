@@ -11,7 +11,7 @@
  * - Audit logging of all backup/restore operations
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { logAuditEvent, AuditEventType } from '../../audit'
 import { dlpService } from '../dlp'
 import { RecoveryTestingManager } from './recovery-testing'

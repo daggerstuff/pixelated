@@ -7,7 +7,7 @@ import { getSession } from '../../../lib/auth/session'
 import { validateRequestBody } from '../../../lib/validation/index'
 import { CompletionRequestSchema } from '../../../lib/validation/schemas'
 import { applyRateLimit } from '../../../lib/api/rate-limit'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('ai-completion')

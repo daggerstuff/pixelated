@@ -21,56 +21,12 @@ interface ConsentType {
   name: string
   scope: string
   is_active: boolean
-}
-
-// Base types for database tables
-interface ConsentType {
-  id: string
-  name: string
-  scope: string
-  is_active: boolean
   created_at?: string
   updated_at?: string
 }
 
-// Fetch consent statistics
-interface ActiveConsentResponse {
-  id: string
-  consent_version_id: string
-  consent_versions: {
-    consent_type_id: string
-    consent_types: {
-      name: string
-    }
-  }
-}
-
-interface WithdrawnConsentResponse {
-  id: string
-  withdrawal_date: string
-  withdrawal_reason: string | null
-  consent_version_id: string
-  consent_versions: {
-    consent_type_id: string
-    consent_types: {
-      name: string
-    }
-  }
-}
-
-interface ConsentVersionResponse {
-  id: string
-  version: string
-  consent_type_id: string
-  consent_types: {
-    name: string
-  }
-  is_current: boolean
-  effective_date: string
-}
-
 // Fetch data with proper typing
-const db = mongodb.db;
+const db = await mongodb.connect();
 
 const activeConsents = await db.collection('user_consents').aggregate([
   { $match: { is_active: true } },
@@ -285,20 +241,20 @@ const withdrawalsByType: Record<string, number> = {};
         <div class="space-y-4">
           {
             consentTypes &&
-              consentTypes.map((type: ConsentType) => (
+              consentTypes.map((type) => (
                 <div class="flex items-center justify-between border-b pb-2">
                   <div>
-                    <p class="font-medium">{type.name}</p>
+                    <p class="font-medium">{type['name']}</p>
                     <p class="text-xs text-muted-foreground">
-                      Scope: {type.scope}
+                      Scope: {type['scope']}
                     </p>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <Badge variant={type.is_active ? 'default' : 'secondary'}>
-                      {type.is_active ? 'Active' : 'Inactive'}
+                    <Badge variant={type['is_active'] ? 'default' : 'secondary'}>
+                      {type['is_active'] ? 'Active' : 'Inactive'}
                     </Badge>
                     <span class="text-sm font-medium">
-                      {consentsByType[type.name] || 0} active
+                      {consentsByType[type['name']] || 0} active
                     </span>
                   </div>
                 </div>

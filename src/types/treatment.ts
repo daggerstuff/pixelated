@@ -23,41 +23,41 @@ export type TreatmentObjectiveStatus =
 // Treatment Objective
 export interface TreatmentObjective {
   id: string
-  treatment_goal_id: string
+  treatmentGoalId: string
   description: string
-  target_date: string | null
+  targetDate: string | null
   status: TreatmentObjectiveStatus
   interventions: string[]
-  progress_notes: string | null
-  created_at: string
-  updated_at: string
+  progressNotes: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 // Treatment Goal
 export interface TreatmentGoal {
   id: string
-  treatment_plan_id: string
+  treatmentPlanId: string
   description: string
-  target_date: string | null
+  targetDate: string | null
   status: TreatmentGoalStatus
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
   objectives: TreatmentObjective[]
 }
 
 // Treatment Plan
 export interface TreatmentPlan {
   id: string
-  client_id: string
-  therapist_id: string
+  clientId: string
+  therapistId: string
   title: string
   diagnosis: string | null
-  start_date: string
-  end_date?: string | null
+  startDate: string
+  endDate?: string | null
   status: TreatmentPlanStatus
-  general_notes?: string | null
-  created_at: string
-  updated_at: string
+  generalNotes?: string | null
+  createdAt: string
+  updatedAt: string
   goals: TreatmentGoal[]
 }
 

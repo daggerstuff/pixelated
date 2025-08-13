@@ -493,14 +493,15 @@ export const ObjectiveBalancer = {
       weights,
       normalizedScores,
       aggregationMethod: method,
-      evaluationContext:
-        (evaluationResults[Object.keys(evaluationResults)[0]]?.metadata
-          ?.contextFactors[0] as unknown) || ({} as AlignmentContext),
+      evaluationContext: {
+        userQuery: '',
+        detectedContext: ContextType.GENERAL,
+      },
       timestamp: new Date(),
-    }
-  }
+    };
+  },
 
-  private static extractScores(
+  extractScores(
     evaluationResults: Record<string, ObjectiveEvaluationResult>,
   ): Record<string, number> {
     const scores: Record<string, number> = {};
@@ -512,7 +513,7 @@ export const ObjectiveBalancer = {
     return scores;
   },
 
-  private static normalizeScores(
+  normalizeScores(
     scores: Record<string, number>,
     method: NormalizationMethod,
   ): Record<string, number> {
@@ -529,9 +530,9 @@ export const ObjectiveBalancer = {
       case NormalizationMethod.SIGMOID:
         return this.sigmoidNormalize(scores);
     }
-  }
+  },
 
-  private static minMaxNormalize(
+  minMaxNormalize(
     scores: Record<string, number>,
   ): Record<string, number> {
     const values = Object.values(scores)
@@ -549,9 +550,9 @@ export const ObjectiveBalancer = {
     }
 
     return normalized
-  }
+  },
 
-  private static zScoreNormalize(
+  zScoreNormalize(
     scores: Record<string, number>,
   ): Record<string, number> {
     const values = Object.values(scores)
@@ -571,9 +572,9 @@ export const ObjectiveBalancer = {
     }
 
     return normalized
-  }
+  },
 
-  private static sigmoidNormalize(
+  sigmoidNormalize(
     scores: Record<string, number>,
   ): Record<string, number> {
     const normalized: Record<string, number> = {}
@@ -583,9 +584,9 @@ export const ObjectiveBalancer = {
     }
 
     return normalized
-  }
+  },
 
-  private static aggregateScores(
+  aggregateScores(
     scores: Record<string, number>,
     weights: Record<string, number>,
     method: AggregationMethod,
@@ -606,9 +607,9 @@ export const ObjectiveBalancer = {
       default:
         return this.weightedAverage(scores, weights)
     }
-  }
+  },
 
-  private static weightedAverage(
+  weightedAverage(
     scores: Record<string, number>,
     weights: Record<string, number>,
   ): number {
@@ -622,9 +623,9 @@ export const ObjectiveBalancer = {
     }
 
     return totalWeight > 0 ? weightedSum / totalWeight : 0
-  }
+  },
 
-  private static weightedSum(
+  weightedSum(
     scores: Record<string, number>,
     weights: Record<string, number>,
   ): number {
@@ -636,9 +637,9 @@ export const ObjectiveBalancer = {
     }
 
     return sum
-  }
+  },
 
-  private static harmonicMean(
+  harmonicMean(
     scores: Record<string, number>,
     weights: Record<string, number>,
   ): number {
@@ -654,9 +655,9 @@ export const ObjectiveBalancer = {
     }
 
     return totalWeight > 0 && weightedSum > 0 ? totalWeight / weightedSum : 0
-  }
+  },
 
-  private static geometricMean(
+  geometricMean(
     scores: Record<string, number>,
     weights: Record<string, number>,
   ): number {

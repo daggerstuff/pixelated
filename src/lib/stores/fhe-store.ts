@@ -10,7 +10,7 @@ import type {
 import { FHEOperation } from '../fhe/types'
 import { create } from 'zustand'
 import { getFHEService, FHEImplementation } from '../fhe/fhe-factory'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { KeyRotationService } from '../fhe/key-rotation'
 import { SealSchemeType } from '../fhe/seal-types'
 import type { SealContextOptions } from '../fhe/seal-types'
@@ -72,6 +72,12 @@ export const useFHEStore = create<FHEState>()((set, get) => {
 
   // Initialize key rotation service
   const keyRotationService = KeyRotationService.getInstance()
+
+  // Listen for key rotation events to keep store in sync
+  keyRotationService.on('key-rotated', ({ keyId }) => {
+    set({ keyId })
+    logger.info('Key rotation event received, updated keyId', { keyId })
+  })
 
   const store: FHEState = {
     // Initial state
@@ -221,8 +227,8 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         const encryptedData =
           typeof encryptedMessage === 'string' &&
           encryptedMessage.startsWith('{')
-            ? (JSON.parse(encryptedMessage) as EncryptedData<unknown>)
-            : (encryptedMessage as EncryptedData<unknown>)
+            ? (isEncryptedData(JSON.parse(encryptedMessage)) ? JSON.parse(encryptedMessage) : { id: '', data: null, dataType: 'object' })
+            : (isEncryptedData(encryptedMessage) ? encryptedMessage : { id: '', data: null, dataType: 'object' })
 
         // Perform decryption
         const decrypted = await fheService.decrypt(encryptedData)
@@ -291,8 +297,8 @@ export const useFHEStore = create<FHEState>()((set, get) => {
           const encryptedData =
             typeof encryptedMessage === 'string' &&
             encryptedMessage.startsWith('{')
-              ? (JSON.parse(encryptedMessage) as EncryptedData<unknown>)
-              : (encryptedMessage as EncryptedData<unknown>)
+              ? (isEncryptedData(JSON.parse(encryptedMessage)) ? JSON.parse(encryptedMessage) : { id: '', data: null, dataType: 'object' })
+              : (isEncryptedData(encryptedMessage) ? encryptedMessage : { id: '', data: null, dataType: 'object' })
 
           let processedData: unknown
           switch (operation) {
@@ -323,9 +329,9 @@ export const useFHEStore = create<FHEState>()((set, get) => {
           result = {
             success: true,
             result: JSON.stringify(processedData),
-            operationType: operation,
+            operationType: String(operation),
             timestamp: Date.now(),
-          } as HomomorphicOperationResult
+          }
         }
 
         const endTime = performance.now()

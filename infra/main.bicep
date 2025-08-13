@@ -1,3 +1,5 @@
+targetScope = 'resourceGroup'
+
 @description('Environment name (e.g., production, staging, development)')
 param environmentName string
 
@@ -5,13 +7,17 @@ param environmentName string
 param location string = resourceGroup().location
 
 @description('Prefix for resource names')
-param resourcePrefix string = 'pixel'
+param resourcePrefix string = 'pixelated'
 
 @description('Current timestamp for resource creation')
 param createdDate string = utcNow('yyyy-MM-dd')
 
-// Generate a unique suffix for resources
-var resourceToken = uniqueString(subscription().id, resourceGroup().id, environmentName)
+// Generate a shorter unique suffix for resources that require global uniqueness
+var uniqueSuffix = take(uniqueString(subscription().id, resourceGroup().id), 6)
+
+// Base names for resources (more readable)
+var baseName = '${resourcePrefix}-${environmentName}'
+var shortBaseName = '${take(resourcePrefix, 8)}${take(environmentName, 4)}${uniqueSuffix}' // For resources with strict length limits
 
 // Tags applied to all resources
 var commonTags = {
@@ -19,10 +25,25 @@ var commonTags = {
   Project: 'PixelatedEmpathy'
   ManagedBy: 'AzureDevOps'
   CreatedDate: createdDate
+  'azd-env-name': environmentName
+}
+
+// Tag the resource group with azd-env-name
+resource resourceGroupTags 'Microsoft.Resources/tags@2021-04-01' = {
+  name: 'default'
+  properties: {
+    tags: {
+      'azd-env-name': environmentName
+      Environment: environmentName
+      Project: 'PixelatedEmpathy'
+      ManagedBy: 'AzureDevOps'
+      CreatedDate: createdDate
+    }
+  }
 }
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
-  name: '${resourcePrefix}-log-${resourceToken}'
+  name: '${baseName}-logs'
   location: location
   tags: commonTags
   properties: {
@@ -37,7 +58,7 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: '${resourcePrefix}-ai-${resourceToken}'
+  name: '${baseName}-insights'
   location: location
   kind: 'web'
   tags: commonTags
@@ -50,7 +71,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: '${resourcePrefix}-kv-${resourceToken}'
+  name: shortBaseName  // Must be ≤24 chars, no hyphens
   location: location
   tags: commonTags
   properties: {
@@ -72,8 +93,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   }
 }
 
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: 'pixelatedcr'
+resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
+  name: 'pixeltech'  // Custom name as requested
   location: location
   tags: commonTags
   sku: {
@@ -87,7 +108,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 }
 
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: 'pixel-env-${resourceToken}'  // Matches pipeline expectation pattern
+  name: '${baseName}-apps-env'
   location: location
   tags: commonTags
   properties: {
@@ -124,7 +145,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
 
 // User Identity for Container Apps to pull from ACR
 resource userIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: '${resourcePrefix}-uid'
+  name: '${baseName}-identity'
   location: location
   tags: commonTags
 }

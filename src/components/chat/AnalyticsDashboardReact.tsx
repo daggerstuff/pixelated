@@ -145,7 +145,7 @@ export default function AnalyticsDashboard({
       return crypto.randomUUID()
     } catch (error) {
       console.error('Failed to generate UUID:', error)
-      return `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      return `id-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
     }
   }
 

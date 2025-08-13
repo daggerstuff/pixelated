@@ -1,5 +1,5 @@
 import type { NotificationService } from './NotificationService'
-import * as logger from '@/lib/logging/build-safe-logger'
+import * as logger from '../../../logging/build-safe-logger'
 import type { WebSocket } from 'ws'
 import { WebSocketServer as WSServer } from 'ws'
 import type { IncomingMessage } from 'http'

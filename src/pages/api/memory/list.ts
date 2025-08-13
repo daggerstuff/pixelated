@@ -1,7 +1,6 @@
-// import type { APIRoute } from 'astro' // Removed due to missing export
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getCurrentUser } from '@/lib/auth'
-import { MemoryService } from '@/lib/memory'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { getCurrentUser } from '../../../lib/auth'
+import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
@@ -55,7 +54,7 @@ export const GET = async ({ request }: { request: Request }) => {
       {
         limit,
         offset,
-  sortBy: sortBy as keyof import('@/lib/memory').Memory,
+  sortBy: sortBy as keyof import('../../../lib/memory').Memory,
         sortOrder,
       },
     )

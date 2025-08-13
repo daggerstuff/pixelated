@@ -16,18 +16,14 @@ export const prerender = false
 <BaseLayout
   title="Login | Pixelated Empathy"
   description="Log in to your Pixelated Empathy account to access mental health resources and personal therapy chat."
-  bgType={false}
-  centered={true}
-  contentClass="pt-8 pb-8 px-4 flex-grow"
-  transitionMode="fade"
-  isLoginPage={true}
-  optimizeImages={true}
+  bgType={undefined}
 >
   <ClientRouter />
   <div
     class="w-full max-w-md mx-auto p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl"
   >
-    <LoginForm client:load redirectTo={redirectUrl} showSignup={false} />
+    <link rel="preload" as="image" href="/apple-touch-icon.png" fetchpriority="high" />
+    <LoginForm client:idle redirectTo={redirectUrl} showSignup={false} />
 
     {
       isFromDashboard && (
@@ -63,6 +59,12 @@ export const prerender = false
 
 <style>
   /* Clean, minimal styling */
+  /* Critical CSS for first paint (auth container and headings) */
+  .auth-form-container { max-width: 28rem; margin: 0 auto; }
+  .text-gradient { background: linear-gradient(90deg, #fff, #9ae6b4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .form-input { width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #fff; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.625rem 1rem; border-radius: 0.75rem; }
+  .btn-primary { background: #22c55e; color: #000; }
 
   /* Responsive text adjustments */
   @media (max-width: 640px) {

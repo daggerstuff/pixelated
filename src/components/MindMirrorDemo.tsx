@@ -1,5 +1,5 @@
 import React from 'react'
-import { MentalHealthChatDemo } from './MentalHealthChatDemo'
+import MentalHealthChatDemo from './MentalHealthChatDemo'
 
 interface MindMirrorDemoProps {
   className?: string

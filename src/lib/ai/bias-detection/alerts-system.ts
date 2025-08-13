@@ -5,7 +5,14 @@
  * Extracted from BiasDetectionEngine.ts for better separation of concerns.
  */
 
-import { getLogger } from '@/lib/logging'
+import { EmotionalEvent } from '../../emotional-analysis/types'
+import { EmotionalContext } from '../../emotional-analysis/context-analyzer'
+import { createSecureWebSocket, SecureWebSocketConfig } from '../../websocket/secure-websocket'
+import { AlertConfig, AlertSeverity, AlertType } from './types'
+import { MetricsCollector } from './metrics-collector'
+import { BiasDetectionEngine } from './index'
+import { AuditLogger } from './audit'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { PythonBiasDetectionBridge } from './python-bridge'
 import { performanceMonitor } from './performance-monitor'
 import type { BiasAnalysisResult } from './types'
@@ -22,7 +29,7 @@ import type {
   TimeRange as _TimeRange,
 } from './bias-detection-interfaces'
 
-const logger = getLogger({ prefix: 'alerts' })
+const logger = createBuildSafeLogger('bias-alerts')
 
 // Define proper types for the alert system
 interface AlertSystemConfig {

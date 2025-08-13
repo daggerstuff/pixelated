@@ -8,7 +8,7 @@ draft: false
 toc: true
 ---
 
-# AI Development Guide
+## AI Development Guide
 
 This guide provides comprehensive information for developers working with the AI components in the application.
 

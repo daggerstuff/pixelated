@@ -73,8 +73,9 @@ export function processVersion(
   let versionType: 'major' | 'minor' | 'patch' | 'pre'
 
   for (let i = parts.length - 1; i >= 0; i--) {
-    if (parts[i] !== '.') {
-      const num = +parts[i]
+    const part = parts[i]
+    if (part && part !== '.') {
+      const num = +part
       if (!Number.isNaN(num) && num > 0) {
         highlightedIndex = i
         break

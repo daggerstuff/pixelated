@@ -6,7 +6,7 @@
  */
 
 import { detectAndRedactPHI } from './phiDetection'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { AuditEventType, logAuditEvent, type AuditDetails } from '../audit'
 
 const logger = createBuildSafeLogger('dlp-service')

@@ -16,6 +16,7 @@ export interface Props {
   breakpoints?: number[]
   blurUp?: boolean
   sizes?: string
+  priority?: boolean
 }
 
 const {
@@ -32,6 +33,7 @@ const {
   breakpoints = [640, 768, 1024, 1280, 1536, 1920],
   blurUp = true,
   sizes = '(min-width: 1536px) 1536px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, (min-width: 640px) 640px, 100vw',
+  priority = false,
 } = Astro.props
 
 // If src is a string (remote URL), we use the img tag with srcset
@@ -81,8 +83,9 @@ const aspectRatio = width && height ? width / height : undefined
           alt={alt}
           width={width}
           height={height}
-          loading={loading}
+          loading={priority ? 'eager' : loading}
           decoding={decoding}
+          fetchpriority={priority ? 'high' : undefined}
           class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
           style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
         />
@@ -108,8 +111,9 @@ const aspectRatio = width && height ? width / height : undefined
           alt={alt}
           width={width}
           height={height}
-          loading={loading}
+          loading={priority ? 'eager' : loading}
           decoding={decoding}
+          fetchpriority={priority ? 'high' : undefined}
           class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
         />
       )}

@@ -128,7 +128,7 @@ jobs:
 
           # Run tests and store exit code to determine if any tests failed
           NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js --reporter=list || true
+            pnpm exec playwright test --config=temp-playwright.config.js || true
 
           echo "✅ PRODUCTION monitoring tests completed"
           echo "status=success" >> $GITHUB_OUTPUT
@@ -139,6 +139,7 @@ jobs:
         with:
           name: playwright-test-results-production
           path: playwright-report/
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Set Slack enabled output (production)
@@ -295,7 +296,7 @@ jobs:
 
           # Run tests and store exit code to determine if any tests failed
           NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js --reporter=list || true
+            pnpm exec playwright test --config=temp-playwright.config.js || true
 
           echo "✅ STAGING monitoring tests completed"
           echo "status=success" >> $GITHUB_OUTPUT
@@ -306,6 +307,7 @@ jobs:
         with:
           name: playwright-test-results-staging
           path: playwright-report/
+          if-no-files-found: warn
           retention-days: 30
 
       # No Slack notification for staging failures - they're non-critical
@@ -496,7 +498,7 @@ jobs:
             echo "skip_lhci=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Probe Lighthouse URLs
+      - name: Probe Lighthouse URLs (wait for healthy)
         id: build-urls
         if: steps.resolve-perf.outputs.skip_lhci == 'false'
         run: |
@@ -504,12 +506,22 @@ jobs:
           CANDIDATES=(
             "${BASE_URL}"
             "${BASE_URL}/login"
-            "${BASE_URL}/dashboard"
+            "${BASE_URL}/dashboard?perf=1"
           )
 
           OK_URLS=()
           for u in "${CANDIDATES[@]}"; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" "$u")
+            # wait until healthy or timeout
+            ATTEMPTS=0
+            code=000
+            until [ "$code" = "200" ] || [ $ATTEMPTS -ge 15 ]; do
+              code=$(curl -s -o /dev/null -w "%{http_code}" "$u")
+              if [ "$code" != "200" ]; then
+                echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/15"
+                sleep 5
+              fi
+              ATTEMPTS=$((ATTEMPTS+1))
+            done
             echo "Probing $u -> HTTP $code"
             if [ "$code" = "200" ]; then
               OK_URLS+=("$u")

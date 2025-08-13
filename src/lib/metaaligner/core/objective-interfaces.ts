@@ -146,6 +146,7 @@ export interface ObjectiveEvaluationResult {
   score: number
   criteriaScores: Record<string, number>
   confidence: number
+  explanation?: string
   metadata: EvaluationMetadata
 }
 
@@ -290,7 +291,7 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
       errors.push({
         field: 'weight',
         message: 'Weight must be between 0 and 1',
-        code: 'INVALID_WEIGHT',
+        code: 'INVALID_WEIGHT_RANGE',
       })
     }
 
@@ -312,10 +313,10 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
       this.criteria.length > 0 &&
       Math.abs(totalCriteriaWeight - 1.0) > 0.001
     ) {
-      warnings.push({
+      errors.push({
         field: 'criteria',
         message: `Criteria weights sum to ${totalCriteriaWeight}, should sum to 1.0`,
-        code: 'CRITERIA_WEIGHT_SUM',
+        code: 'INVALID_CRITERIA_WEIGHTS',
       })
     }
 

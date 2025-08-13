@@ -9,7 +9,7 @@
 
 import { EncryptionMode, FHEOperation } from './types'
 import type { HomomorphicOperationResult } from './types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { SealOperations } from './seal-operations'
 import { SealSchemeType } from './seal-types'
 import type { SealContextOptions } from './seal-types'
@@ -292,7 +292,7 @@ export class HomomorphicOperations {
         return {
           success: true,
           result,
-          operationType: operation,
+          operationType: String(operation),
           timestamp: Date.now(),
           metadata,
         }
@@ -312,10 +312,10 @@ export class HomomorphicOperations {
         success: false,
         error: error instanceof Error ? error.message : String(error),
         result: undefined,
-        operationType: operation,
+        operationType: String(operation),
         timestamp: Date.now(),
         metadata: {
-          operation,
+          operation: String(operation),
           timestamp: Date.now(),
           error: true,
         },
@@ -507,7 +507,7 @@ export class HomomorphicOperations {
     return {
       success: true,
       result: simulatedEncrypted,
-      operationType: operation,
+      operationType: String(operation),
       timestamp: Date.now(),
       metadata,
     }

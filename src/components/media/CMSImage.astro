@@ -14,6 +14,7 @@ export interface Props {
   focalPoint?: string
   sizes?: string
   breakpoints?: number[]
+  priority?: boolean
 }
 
 const {
@@ -31,6 +32,7 @@ const {
   focalPoint = 'center',
   sizes = '(min-width: 1536px) 1536px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, (min-width: 640px) 640px, 100vw',
   breakpoints = [320, 640, 768, 1024, 1280, 1536, 1920],
+  priority = false,
 } = Astro.props
 
 // Parse aspect ratio if provided (e.g., "16:9" -> 16/9)
@@ -96,7 +98,8 @@ const generateSrcSet = (format: string) => {
       {alt}
       width={computedWidth}
       height={computedHeight}
-      {loading}
+      loading={priority ? 'eager' : loading}
+      fetchpriority={priority ? 'high' : undefined}
       class={`cms-image ${className} ${placeholder ? 'blur-up' : ''}`}
       style={`object-position: ${focalPoint};`}
     />

@@ -1,7 +1,7 @@
 import { config as env } from '@/config/env.config'
 import { redis } from '@/lib/services/redis'
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger.ts'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger.ts'
 
 // Service-scoped logger
 const logger = createBuildSafeLogger('EmailService')

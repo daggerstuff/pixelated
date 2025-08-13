@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 // TODO: Implement WebSocketService or use existing WebSocket implementation
 // import { WebSocketService } from './WebSocketService'
 

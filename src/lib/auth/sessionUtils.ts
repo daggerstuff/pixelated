@@ -1,6 +1,6 @@
 import type { AuthUser } from './types'
 import { getSession } from './session'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('session-utils')
 

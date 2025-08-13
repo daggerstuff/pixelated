@@ -124,7 +124,7 @@ function generateCrisisAnalytics(results: CrisisDetectionResult[]): CrisisAnalyt
     }, {} as { [key: string]: number })
 
   // Generate temporal patterns
-  const temporalPatterns = []
+  const temporalPatterns: string[] = []
   const crisisRatio = results.filter(r => r.isCrisis).length / results.length
   const highRiskRatio = results.filter(r => r.riskLevel === 'high' || r.riskLevel === 'critical').length / results.length
 
@@ -136,7 +136,7 @@ function generateCrisisAnalytics(results: CrisisDetectionResult[]): CrisisAnalyt
   }
 
   // Generate recommendations
-  const recommendations = []
+  const recommendations: string[] = []
   if (crisisRatio > 0.1) {
     recommendations.push('Implement immediate monitoring protocols')
     recommendations.push('Consider professional intervention')
@@ -146,7 +146,7 @@ function generateCrisisAnalytics(results: CrisisDetectionResult[]): CrisisAnalyt
   }
 
   // Generate intervention suggestions
-  const interventionSuggestions = []
+  const interventionSuggestions: string[] = []
   if (Object.keys(crisisTypes).includes('self-harm')) {
     interventionSuggestions.push('Suicide prevention protocol activation')
   }

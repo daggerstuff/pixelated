@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { getSession } from '../../../lib/auth/session'
 
 const logger = createBuildSafeLogger('api:patient-rights:update-export')

@@ -8,7 +8,7 @@ import type {
   ServiceCategory,
 } from './types'
 import { generateId } from '../../utils/ids'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 // Initialize logger for PHI audit logging
 const logger = createBuildSafeLogger('phi-audit')

@@ -43,21 +43,13 @@ export const getAllTestScenarios = () => {
  * systematic differences in treatment quality based on patient demographics.
  */
 export const getBiasTestScenarios = () => {
-  const {
+  return {
     ageBiasYoungPatient,
-import {
-  ageBiasYoungPatient,
-  genderBiasFemalePatient,
-  racialBiasMinorityPatient,
-  socioeconomicBiasLowIncomePatient,
-  ageBiasElderlyPatient,
-} from './demographic-bias-scenarios'
-
-  return [
-    ageBiasYoungPatient, // Favorable bias - still bias
-    ageBiasElderlyPatient, // Unfavorable bias
-    // Additional bias scenarios can be added as they're implemented and exported
-  ]
+    genderBiasFemalePatient,
+    racialBiasMinorityPatient,
+    socioeconomicBiasLowIncomePatient,
+    ageBiasElderlyPatient,
+  }
 }
 
 /**

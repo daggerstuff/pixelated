@@ -18,11 +18,11 @@ const MIN_PASSWORD_LENGTH = 32
 const ITERATIONS = 100000
 
 async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
-  if (!process.env.ENCRYPTION_KEY) {
+  if (!process.env['ENCRYPTION_KEY']) {
     throw new Error('ENCRYPTION_KEY environment variable is required')
   }
 
-  if (process.env.ENCRYPTION_KEY.length < MIN_PASSWORD_LENGTH) {
+  if (process.env['ENCRYPTION_KEY'].length < MIN_PASSWORD_LENGTH) {
     throw new Error(
       `Encryption key must be at least ${MIN_PASSWORD_LENGTH} characters long`,
     )
@@ -32,7 +32,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   const encoder = new TextEncoder()
   const keyMaterial = await webcrypto.subtle.importKey(
     'raw',
-    encoder.encode(process.env.ENCRYPTION_KEY),
+    encoder.encode(process.env['ENCRYPTION_KEY']),
     'PBKDF2',
     false,
     ['deriveBits', 'deriveKey'],
@@ -105,10 +105,10 @@ export async function encrypt(data: unknown): Promise<string> {
 
     // Convert to base64 for storage/transmission
     const result: EncryptedData = {
-      iv: Buffer.from(iv).toString('base64'),
-      data: Buffer.from(encryptedData).toString('base64'),
-      tag: Buffer.from(tag).toString('base64'),
-      salt: Buffer.from(salt).toString('base64'),
+      iv: Buffer.from(Array.from(iv)).toString('base64'),
+      data: Buffer.from(Array.from(encryptedData)).toString('base64'),
+      tag: Buffer.from(Array.from(tag)).toString('base64'),
+      salt: Buffer.from(Array.from(salt)).toString('base64'),
     }
 
     return JSON.stringify(result)
@@ -141,7 +141,7 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
     }
 
     // Derive decryption key
-    const key = await deriveKey(saltArray)
+    const key = await deriveKey(new Uint8Array(saltArray))
 
     // Combine encrypted data and tag
     const encryptedWithTag = new Uint8Array(dataArray.length + tagArray.length)
@@ -152,7 +152,7 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
     const decrypted = await webcrypto.subtle.decrypt(
       {
         name: ALGORITHM,
-        iv: ivArray,
+        iv: new Uint8Array(ivArray),
         tagLength: TAG_LENGTH * 8,
       },
       key,
@@ -170,5 +170,5 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
 // Utility method to generate a secure encryption key
 export function generateSecureKey(): string {
   const key = webcrypto.getRandomValues(new Uint8Array(KEY_LENGTH))
-  return Buffer.from(key).toString('base64')
+  return Buffer.from(Array.from(key)).toString('base64')
 }

@@ -215,7 +215,17 @@ function generateSecureRandomString(length: number): string {
   return Array.from(array, (byte) => byte.toString(36)).join('');
 }
 
-export const MentalHealthChatDemo = memo(function MentalHealthChatDemo() {
+interface MentalHealthChatDemoProps {
+  showAnalysisPanel?: boolean
+  showSettingsPanel?: boolean
+  initialTab?: string
+}
+
+export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
+  showAnalysisPanel = true,
+  showSettingsPanel = true,
+  initialTab = 'analysis'
+}: MentalHealthChatDemoProps = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome_msg',
@@ -240,7 +250,7 @@ How are you feeling today? I'm here to listen and help.`,
   const [settings, setSettings] = useState({
     enableAnalysis: true,
     useExpertGuidance: true,
-    showAnalysisPanel: true,
+    showAnalysisPanel: showAnalysisPanel,
     enableCrisisDetection: true,
     confidenceThreshold: 0.6,
     interventionThreshold: 0.7,
@@ -972,7 +982,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             />
           )}
 
-          <Tabs defaultValue={settings.enableMindMirrorUI ? "mindmirror" : "insights"} className="w-full">
+          <Tabs defaultValue={initialTab} className="w-full">
             <TabsList className={`w-full grid ${settings.enableMindMirrorUI ? 'grid-cols-5' : 'grid-cols-4'}`}>
               {settings.enableMindMirrorUI && (
                 <TabsTrigger value="mindmirror" className="text-xs">
@@ -992,9 +1002,11 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 <Zap className="w-3 h-3 mr-1" />
                 Stats
               </TabsTrigger>
-              <TabsTrigger value="settings" className="text-xs">
-                Settings
-              </TabsTrigger>
+              {showSettingsPanel && (
+                <TabsTrigger value="settings" className="text-xs">
+                  Settings
+                </TabsTrigger>
+              )}
             </TabsList>
 
             {/* Mind-Mirror Tab Content */}
@@ -1232,7 +1244,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               </Card>
             </TabsContent>
 
-            <TabsContent value="settings" className="mt-4">
+            {showSettingsPanel && (
+              <TabsContent value="settings" className="mt-4">
               {/* Production Settings */}
               <Card>
                 <CardContent className="p-4 space-y-4">
@@ -1412,6 +1425,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 </CardContent>
               </Card>
             </TabsContent>
+            )}
           </Tabs>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -72,21 +72,6 @@ export function SupervisorFeedback({
   const [activeTab, setActiveTab] = useState<
     'techniques' | 'opportunities' | 'summary'
   >('techniques')
-
-  // Analyze therapist techniques when component mounts or therapist responses change
-  useEffect(() => {
-    if (therapistResponses.length > 0) {
-      analyzeTechniques()
-      identifyMissedOpportunities()
-      generateFeedbackSummary()
-    }
-  }, [
-    therapistResponses,
-    sessionTranscript,
-    analyzeTechniques,
-    identifyMissedOpportunities,
-    generateFeedbackSummary,
-  ])
 
   // Analyze therapeutic techniques used by the therapist
   const analyzeTechniques = useCallback(() => {
@@ -273,6 +258,21 @@ export function SupervisorFeedback({
       growthAreas,
     })
   }, [detectedTechniques, missedOpportunities])
+
+  // Analyze therapist techniques when component mounts or therapist responses change
+  useEffect(() => {
+    if (therapistResponses.length > 0) {
+      analyzeTechniques()
+      identifyMissedOpportunities()
+      generateFeedbackSummary()
+    }
+  }, [
+    therapistResponses,
+    sessionTranscript,
+    analyzeTechniques,
+    identifyMissedOpportunities,
+    generateFeedbackSummary,
+  ])
 
   // Regenerate all feedback
   const regenerateFeedback = () => {

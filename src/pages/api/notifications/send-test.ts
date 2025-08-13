@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
 

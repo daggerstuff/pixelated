@@ -1,7 +1,7 @@
 // Import necessary libraries and types
 import { fheService } from '@/lib/fhe'
 import { EncryptionMode } from '@/lib/fhe/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { createVerificationToken } from '@/lib/security'
 
 // Initialize logger

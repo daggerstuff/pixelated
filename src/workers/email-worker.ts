@@ -1,5 +1,5 @@
 import { EmailService } from '@/lib/services/email/EmailService'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('default')
 
 const WORKER_ID = crypto.randomUUID()

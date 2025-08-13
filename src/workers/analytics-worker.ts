@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import { env } from '@/config/env.config'
-import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
-import { getLogger } from '@/lib/utils/logger'
+import { env } from '../config/env.config'
+import { AnalyticsService } from '../lib/services/analytics/AnalyticsService'
+import { getLogger } from '../lib/utils/logger'
 import { WebSocketServer } from 'ws'
 
 // Create logger (uses utils logger so tests can mock it)
@@ -93,7 +93,6 @@ async function startWorker() {
     })
 
     // Expose an emit method on the mock instance if present (testing helper)
-    // @ts-expect-error - tests may rely on .emit existing on the mocked server
     if (typeof (wss as unknown as { emit?: (...args: unknown[]) => void }).emit === 'function') {
       // no-op: tests call mockWssInstance.emit('error', err) which triggers above handler
     }

@@ -4,7 +4,7 @@
  * Production-grade risk assessment system for security breaches.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SecurityError } from '../security/errors'
 import { Cache } from '../cache'
 // Import shared types to avoid circular dependencies
@@ -17,8 +17,8 @@ const cache = new Cache({ ttl: 3600 }) // 1 hour cache
 export { BreachSeverity, type RiskAssessmentResult } from './types'
 
 // Lazy import to avoid circular dependency
-const getBreachDataService = () => {
-  const { BreachDataService } = require('./breach')
+const getBreachDataService = async () => {
+  const { BreachDataService } = await import('./breach')
   return BreachDataService
 }
 

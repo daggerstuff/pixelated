@@ -1,5 +1,5 @@
 import { mongoClient } from '../../supabase'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { createAuditLog, AuditEventType } from '../../audit'
 
 const logger = createBuildSafeLogger('crisis-session-flagging')

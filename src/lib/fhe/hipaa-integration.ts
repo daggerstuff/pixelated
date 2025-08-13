@@ -4,7 +4,7 @@
  * Orchestrates all HIPAA++ compliance components for production deployment
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import hipaaKeyRotationService from './key-rotation'
 import { hipaaMonitoring } from './hipaa-monitoring'
 import { validateHIPAAEnvironment, HIPAA_SECURITY_CONFIG } from './hipaa-config'

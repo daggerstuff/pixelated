@@ -71,12 +71,12 @@ export function ChatMessage({
     >
       <div
         className={cn(
-          'relative mb-6 max-w-[80%] rounded-lg p-4',
+          'relative mb-6 max-w-[80%] rounded-lg p-4 shadow-sm',
           isUser
-            ? 'bg-purple-800/80 text-white'
+            ? 'bg-blue-600 text-white'
             : isBotMessage
-              ? 'bg-gray-800/60 text-white'
-              : 'bg-gray-950/60 text-gray-400 italic',
+              ? 'bg-gray-50 text-gray-900 border border-gray-200'
+              : 'bg-gray-100 text-gray-600 italic border border-gray-200',
           isTyping && 'animate-pulse',
         )}
       >
@@ -86,10 +86,10 @@ export function ChatMessage({
             className={cn(
               'rounded-full px-2 py-1 text-xs',
               isUser
-                ? 'bg-purple-900 text-purple-300'
+                ? 'bg-blue-800 text-blue-200'
                 : isBotMessage
-                  ? 'bg-gray-900 text-gray-300'
-                  : 'bg-black/80 text-gray-500',
+                  ? 'bg-gray-200 text-gray-700'
+                  : 'bg-gray-300 text-gray-600',
             )}
           >
             {isUser ? 'You' : isBotMessage ? 'AI' : 'System'}
@@ -114,7 +114,7 @@ export function ChatMessage({
           ) : (
             /* For user and bot messages, convert markdown to HTML */
             <div
-              className="prose prose-sm dark:prose-invert prose-headings:mb-2 prose-p:my-1 max-w-none"
+              className="prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none"
               dangerouslySetInnerHTML={{
                 __html: markdownToHtml(message.content),
               }}

@@ -6,7 +6,7 @@
  */
 
 import { redis } from '../../lib/services/redis'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { v4 as uuidv4 } from 'uuid'
 
 const logger = createBuildSafeLogger('JobQueueService')

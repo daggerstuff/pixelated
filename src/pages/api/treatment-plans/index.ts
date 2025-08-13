@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import type { TreatmentPlan } from '../../../types/treatment'
 
 const logger = createBuildSafeLogger('treatment-plans-index')

@@ -258,11 +258,12 @@ export function MobileFormValidation({
         // Focus first invalid field
         if (focusFirstInvalidField && formRef.current) {
           const firstErrorName = Object.keys(newErrors)[0]
-          const firstErrorField = formRef.current.querySelector(
-            `[name="${firstErrorName}"]`,
-          )
-          if (firstErrorField && 'scrollIntoView' in firstErrorField) {
-            // Smooth scroll to the field
+          if (firstErrorName) {
+            const firstErrorField = formRef.current.querySelector(
+              `[name="${firstErrorName}"]`,
+            )
+            if (firstErrorField && 'scrollIntoView' in firstErrorField) {
+              // Smooth scroll to the field
             firstErrorField.scrollIntoView({
               behavior: 'smooth',
               block: 'center',
@@ -281,6 +282,7 @@ export function MobileFormValidation({
             }, 500)
           }
         }
+      }
 
         // Notify screen readers about validation errors
         if (isMobile) {

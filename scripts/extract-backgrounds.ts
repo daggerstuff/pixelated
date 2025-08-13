@@ -15,6 +15,11 @@ const images = new Map()
 while ((match = base64Regex.exec(content)) !== null) {
   const [, imageType, data] = match
 
+  // Ensure we have the data
+  if (!data) {
+    continue
+  }
+
   // Find the associated key by looking before this match
   const keyMatch = content
     .slice(Math.max(0, match.index - 50), match.index)

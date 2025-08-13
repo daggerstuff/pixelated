@@ -1,7 +1,6 @@
 ---
 // Brutalist Dark Homepage - Mental Health AI Training Platform
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { Image } from 'astro:assets';
 import LogoWall from '@/components/marketing/LogoWall.astro'
 import HeroTabs from '@/components/marketing/HeroTabs.astro'
 import HowItWorks from '@/components/marketing/HowItWorks.astro'
@@ -16,23 +15,7 @@ const heroStats = [
   { value: "0", label: "Patient Harm", subtitle: "Perfect safety record" }
 ]
 
-const testimonials = [
-  {
-    text: "This saved my students from making painful mistakes. They practice hard conversations here first.",
-    author: "Dr. Sarah M.",
-    role: "Clinical Supervisor"
-  },
-  {
-    text: "I had no idea I was being dismissive until the AI caught it. Humbling but grateful.",
-    author: "Mike T.",
-    role: "Therapist in Training"
-  },
-  {
-    text: "Graduation rates up 40%. Students seem actually ready now.",
-    author: "Dr. Jennifer L.",
-    role: "Program Director"
-  }
-]
+// testimonials removed (unused)
 
 const features = [
   {
@@ -245,7 +228,7 @@ const features = [
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map((f, i) => (
+        {features.map((f) => (
           <div class="group relative overflow-hidden rounded-xl border border-gray-800 bg-gradient-to-b from-gray-900/60 to-black hover:border-teal-500/30 transition-all duration-300">
             <div class="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: radial-gradient(600px circle at var(--x,50%) var(--y,50%), rgba(16,185,129,0.1), transparent 40%);"></div>
 

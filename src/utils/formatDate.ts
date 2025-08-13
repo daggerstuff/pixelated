@@ -115,9 +115,10 @@ function formatCustomDate(date: Date, formatString: string): string {
     ss: () => date.getSeconds().toString().padStart(2, '0'),
   }
 
-  return formatString.replace(/YYYY|MM|DD|HH|mm|ss/g, (match) =>
-    tokens[match](),
-  )
+  return formatString.replace(/YYYY|MM|DD|HH|mm|ss/g, (match) => {
+    const tokenFn = tokens[match]
+    return tokenFn ? tokenFn() : match
+  })
 }
 
 /**

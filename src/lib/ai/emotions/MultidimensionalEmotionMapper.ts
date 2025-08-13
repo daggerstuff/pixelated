@@ -3,7 +3,7 @@
  * Maps emotions to multidimensional spaces (valence, arousal, dominance)
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type {
   EmotionAnalysis,
   EmotionVector,

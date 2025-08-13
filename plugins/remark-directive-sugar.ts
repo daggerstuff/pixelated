@@ -121,8 +121,11 @@ function remarkDirectiveSugar() {
               vimeoId,
             })) {
               if (id) {
-                src = VIDEO_PLATFORMS[key](id)
-                break
+                const platformFn = VIDEO_PLATFORMS[key]
+                if (platformFn) {
+                  src = platformFn(id)
+                  break
+                }
               }
             }
             if (!src && iframeSrc) {
@@ -134,16 +137,16 @@ function remarkDirectiveSugar() {
           data.hName = 'div'
           data.hProperties = {
             class: 'sugar-video',
-            style: `${attributes.noScale && 'margin: 1rem 0'}`,
+            style: `${attributes['noScale'] && 'margin: 1rem 0'}`,
           }
           data.hChildren = [
             {
               type: 'element',
               tagName: 'iframe',
               properties: {
-                style: `${attributes.noScale && 'transform: none'}`,
+                style: `${attributes['noScale'] && 'transform: none'}`,
                 src,
-                title: attributes.title || 'Video Player',
+                title: attributes['title'] || 'Video Player',
                 loading: 'lazy',
                 allow:
                   'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
@@ -178,7 +181,7 @@ function remarkDirectiveSugar() {
           const { id, link, imageUrl, tab, style } = attributes
 
           // check label
-          if (children.length > 0 && children[0].type === 'text') {
+          if (children.length > 0 && children[0]?.type === 'text') {
             _resolvedText = children[0].value
           } else if (!id) {
             file.fail(
@@ -208,7 +211,7 @@ function remarkDirectiveSugar() {
             )
           } else if (tab) {
             const match = tab.match(TAB_ORG_REGEXP)
-            if (match) {
+            if (match && match[1]) {
               isOrg = true
               _resolvedTab = match[1]
             } else {
@@ -239,7 +242,6 @@ function remarkDirectiveSugar() {
               _resolvedStyle = _resolvedStyle || 'rounded'
               _resolvedText = _resolvedText || id.substring(1)
             } else if (id.match(GITHUB_REPO_REGEXP)) {
-              const _match = id.match(GITHUB_REPO_REGEXP)
               _resolvedLink = link || `https://github.com/${id}`
 
               _resolvedImageUrl = imageUrl || `https://github.com/${id}.png`
@@ -264,17 +266,17 @@ function remarkDirectiveSugar() {
             )
           }
 
-          let _resolvedBadge = ''
           let resolvedBadgeText = ''
           let resolvedBadgeColor = ''
 
           const { id: badgeId } = attributes
 
           if (badgeId && VALID_BADGES.has(badgeId)) {
-            _resolvedBadge = badgeId
             const badge = CONFIG.badge.preset[badgeId]
-            resolvedBadgeText = badge.text
-            resolvedBadgeColor = badge.color
+            if (badge) {
+              resolvedBadgeText = badge.text
+              resolvedBadgeColor = badge.color
+            }
           } else if (!badgeId) {
             file.fail(
               'Invalid `badge` directive. The text in the `[]` of `:badge[]{}` is required if `id` attribute is not specified.',

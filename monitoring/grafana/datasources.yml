@@ -1,0 +1,39 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: "5s"
+      queryTimeout: "60s"
+      httpMethod: "POST"
+
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true
+    jsonData:
+      maxLines: 1000
+
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    editable: true
+
+  - name: PostgreSQL
+    type: postgres
+    url: ${DB_HOST}:${DB_PORT}
+    database: ${DB_NAME}
+    user: ${DB_USERNAME}
+    secureJsonData:
+      password: ${DB_PASSWORD}
+    jsonData:
+      sslmode: "require"
+      postgresVersion: 1300
+      timescaledb: false

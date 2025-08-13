@@ -105,6 +105,10 @@ class LoadTestService {
       ) {
         // Select scenario based on weights
         const scenario = this.selectScenario()
+        
+        if (!scenario) {
+          continue
+        }
 
         // Execute scenario steps
         for (const step of scenario.steps) {
@@ -123,7 +127,7 @@ class LoadTestService {
               latency: performance.now() - startTime,
               success: false,
               timestamp: Date.now(),
-              error: error.message,
+              error: error instanceof Error ? error.message : String(error),
             })
           }
 
@@ -183,9 +187,7 @@ class LoadTestService {
     ]
 
     for (const event of events) {
-      await this.redis.set(`analytics:${Date.now()}`, JSON.stringify(event), {
-        EX: 3600,
-      })
+      await this.redis.set(`analytics:${Date.now()}`, JSON.stringify(event))
     }
   }
 
@@ -197,9 +199,7 @@ class LoadTestService {
     ]
 
     for (const pattern of patterns) {
-      await this.redis.set(`pattern:${Date.now()}`, JSON.stringify(pattern), {
-        EX: 3600,
-      })
+      await this.redis.set(`pattern:${Date.now()}`, JSON.stringify(pattern))
     }
   }
 
@@ -235,8 +235,8 @@ class LoadTestService {
     scenarioStats.forEach((latencies, scenario) => {
       const avg = latencies.reduce((a, b) => a + b, 0) / latencies.length
       const sorted = [...latencies].sort((a, b) => a - b)
-      const p95 = sorted[Math.floor(sorted.length * 0.95)]
-      const p99 = sorted[Math.floor(sorted.length * 0.99)]
+      const p95 = sorted[Math.floor(sorted.length * 0.95)] ?? 0
+      const p99 = sorted[Math.floor(sorted.length * 0.99)] ?? 0
 
       console.log(`\n${scenario}:`)
       console.log(`  Average: ${avg.toFixed(2)}ms`)

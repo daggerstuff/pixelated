@@ -5,7 +5,7 @@
  * caching, retry logic, and type safety.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type {
   AnalyticsChartData,
   SessionData,

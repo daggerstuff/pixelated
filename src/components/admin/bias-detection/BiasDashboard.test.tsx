@@ -1,8 +1,9 @@
+/// <reference types="vitest" />
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@/test/setup-react19'
 import { BiasDashboard } from './BiasDashboard'
-import { server } from '@/test/mocks/server'
-import { http, HttpResponse } from 'msw'
+import { vi } from 'vitest'
 import '@testing-library/jest-dom'
 
 // Mock the logger
@@ -58,6 +59,7 @@ vi.mock('@/lib/ai/bias-detection/BiasDetectionEngine', () => ({
 }))
 
 // Define proper WebSocket mock type
+// NOTE: If you add new properties to the real WebSocket, add them here too.
 interface MockWebSocketInstance {
   onopen: ((event: Event) => void) | null
   onclose: ((event: CloseEvent) => void) | null
@@ -70,6 +72,7 @@ interface MockWebSocketInstance {
   dispatchEvent: ReturnType<typeof vi.fn>
   readyState: number
   heartbeatInterval: number | null
+  // Add any additional properties as needed for new tests
 }
 
 // Create a factory function for WebSocket mocks
@@ -101,6 +104,40 @@ const MockWebSocketConstructor = vi.fn(createMockWebSocket) as ReturnType<
 
 // Mock WebSocket using Vitest's stubGlobal
 vi.stubGlobal('WebSocket', MockWebSocketConstructor)
+
+// --- GLOBAL MOCKS FOR BROWSER APIS ---
+// Ensure matchMedia is always mocked for all tests
+beforeAll(() => {
+  if (!window.matchMedia) {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    })
+  }
+  // Mock window.alert and window.prompt to prevent test failures
+  vi.spyOn(window, 'alert').mockImplementation(() => {})
+  vi.spyOn(window, 'prompt').mockImplementation(() => '')
+  // Mock URL.createObjectURL if not present
+  if (!global.URL.createObjectURL) {
+    global.URL.createObjectURL = vi.fn().mockReturnValue('blob:test-url')
+  }
+  if (!global.URL.revokeObjectURL) {
+    global.URL.revokeObjectURL = vi.fn()
+  }
+})
+
+afterAll(() => {
+  vi.restoreAllMocks()
+})
 
 describe('BiasDashboard', () => {
   beforeEach(() => {
@@ -501,11 +538,17 @@ describe('BiasDashboard', () => {
       demographics: {},
     }
 
-    server.use(
-      http.get('/api/bias-detection/dashboard', () => {
-        return HttpResponse.json(emptyMockData)
-      }),
-    )
+    // Mock the server with simple vi.fn mock instead of MSW for this test
+    const originalFetch = global.fetch
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(emptyMockData),
+    })
+
+    // Cleanup
+    return () => {
+      global.fetch = originalFetch
+    }
 
     render(<BiasDashboard />)
 
@@ -585,11 +628,11 @@ describe('BiasDashboard', () => {
 
   it('handles test notification sending', async () => {
     // Mock successful API response
-    server.use(
-      http.post('/api/bias-detection/test-notification', () => {
-        return HttpResponse.json({ success: true })
-      }),
-    )
+    const originalFetch = global.fetch
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true }),
+    })
 
     render(<BiasDashboard />)
 
@@ -615,6 +658,9 @@ describe('BiasDashboard', () => {
     })
 
     alertSpy.mockRestore()
+    
+    // Cleanup fetch mock
+    global.fetch = originalFetch
   })
 
   it('renders alert management controls', async () => {
@@ -942,7 +988,7 @@ describe('BiasDashboard', () => {
         value: 1024,
       })
 
-      // Mock matchMedia
+      // Mock matchMedia (override global mock for this suite)
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
         value: vi.fn().mockImplementation((query: string) => ({
@@ -1019,7 +1065,7 @@ describe('BiasDashboard', () => {
   // Accessibility Tests
   describe('Accessibility Features', () => {
     beforeEach(() => {
-      // Mock matchMedia for accessibility preferences
+      // Mock matchMedia for accessibility preferences (override global mock)
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
         value: vi.fn().mockImplementation((query: string) => ({

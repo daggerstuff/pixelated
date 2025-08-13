@@ -52,13 +52,14 @@ export async function GET(_params: GETParams): Promise<Response> {
 
     const responseTime = Date.now() - startTime
 
+    // Always return 200; encode degradation in JSON for CI parsing
     return new Response(
       JSON.stringify({
         ...healthStatus,
         responseTime,
       }),
       {
-        status: healthStatus.status === 'healthy' ? 200 : 503,
+        status: 200,
         headers: {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',

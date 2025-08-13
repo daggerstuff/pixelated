@@ -16,13 +16,13 @@ import {
   getCachedDashboardData,
   cacheReport,
   getCachedReport,
-} from './cache'
+} from '../cache'
 import type {
   BiasAnalysisResult,
   TherapeuticSession,
   BiasDashboardData,
   BiasReport,
-} from './types'
+} from '../types'
 
 // Mock logger
 vi.mock('../../utils/logger', () => ({

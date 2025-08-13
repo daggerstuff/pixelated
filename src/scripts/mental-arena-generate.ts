@@ -23,6 +23,7 @@ import {
 import type {
   MentalArenaProvider,
   FHEService,
+  GenerateSyntheticDataOptions,
 } from '../lib/ai/mental-arena/MentalArenaAdapter'
 
 // Parse command line arguments
@@ -221,7 +222,7 @@ async function main() {
   console.log(
     `Generating ${options['num-conversations']} synthetic therapy conversations`,
   )
-  console.log(`Output path: ${options['output-path']}`)
+  console.log(`Output path: ${options['output-path'] as string}`)
   console.log(`Using model: ${options['model']}`)
   console.log(`Complexity: ${options['complexity']}`)
   console.log(
@@ -230,7 +231,7 @@ async function main() {
 
   try {
     // Create output directory if it doesn't exist
-    const outputDir = path.dirname(options['output-path'])
+    const outputDir = path.dirname(options['output-path'] as string)
     await fs.mkdir(outputDir, { recursive: true })
 
     // Parse disorders from command line
@@ -300,16 +301,16 @@ async function main() {
 
     // Generate synthetic data with production configuration
     console.log('\n🎭 Generating synthetic therapeutic conversations...')
-    const generationOptions = {
+    const generateOptions: GenerateSyntheticDataOptions = {
       numSessions: parseInt(options['num-conversations']),
       maxTurns: parseInt(options['max-turns']),
       disorders: disorders.map((d: DisorderCategory) => d.toString()),
       qualityThreshold: 0.7,
-      enableValidation: options['validate-output'],
+      enableValidation: Boolean(options['enable-validation']),
     }
 
     const result =
-      await adapter.generateSyntheticDataWithMetrics(generationOptions)
+      await adapter.generateSyntheticDataWithMetrics(generateOptions)
 
     console.log('\n📊 Generation Results:')
     console.log(
@@ -363,7 +364,7 @@ async function main() {
       generationMetadata: {
         version: VERSION,
         generatedAt: new Date().toISOString(),
-        configuration: generationOptions,
+        configuration: generateOptions,
         qualityMetrics: result.qualityMetrics,
         validationResults: result.validationResults,
         processingTime: result.metadata.processingTime,
@@ -377,17 +378,17 @@ async function main() {
       .map((conversation) => JSON.stringify(conversation))
       .join('\n')
 
-    await fs.writeFile(options['output-path'], jsonlData)
+    await fs.writeFile(options['output-path'] as string, jsonlData)
 
     // Also save detailed results with metadata
-    const metadataPath = options['output-path'].replace(
+    const metadataPath = (options['output-path'] as string).replace(
       /\.jsonl?$/,
       '.meta.json',
     )
     await fs.writeFile(metadataPath, JSON.stringify(outputData, null, 2))
 
     console.log(`\n💾 Data saved successfully:`)
-    console.log(`   📄 Conversations: ${options['output-path']}`)
+    console.log(`   📄 Conversations: ${options['output-path'] as string}`)
     console.log(`   📋 Metadata: ${metadataPath}`)
 
     console.log(`\n⏱️  Performance metrics:`)

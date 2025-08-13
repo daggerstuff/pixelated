@@ -101,8 +101,16 @@ export enum TherapySentiment {
 }
 
 //---------------------------------------------------------------
-// Core Types and Interfaces
+ // Core Types and Interfaces
 //---------------------------------------------------------------
+
+/**
+ * Explicit key types for TFHE/SEAL
+ */
+export type ClientKey = unknown
+export type ServerKey = unknown
+export type PublicKey = unknown
+
 
 /**
  * Polynomial Representation
@@ -295,6 +303,19 @@ export interface EncryptedData<T = unknown> {
 
   /** Data type for type checking */
   dataType: 'number' | 'string' | 'boolean' | 'array' | 'object'
+}
+
+/**
+ * Type guard for EncryptedData
+ */
+export function isEncryptedData(obj: any): obj is EncryptedData<unknown> {
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    typeof obj.id === 'string' &&
+    'data' in obj &&
+    typeof obj.dataType === 'string'
+  )
 }
 
 /**
@@ -514,7 +535,7 @@ export interface FHEService {
     encryptedData: string,
     operation: FHEOperation | string,
     params?: Record<string, unknown>,
-  ): Promise<unknown>
+  ): Promise<FHEOperationResult<string>>
 }
 
 /**

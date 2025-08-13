@@ -31,7 +31,7 @@ export class EnterpriseAPIClient {
     }
   }
 
-  async request<T = any>(
+  async request<T = unknown>(
     endpoint: string,
     options: RequestInit & {
       timeout?: number
@@ -129,7 +129,7 @@ export class APIError extends Error {
   constructor(
     message: string,
     public status: number,
-    public data?: any
+    public data?: unknown
   ) {
     super(message)
     this.name = 'APIError'

@@ -10,7 +10,7 @@
  * - Bias pattern detection in emotional responses
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { BiasDetectionEngine } from '../bias-detection'
 import type {
   BiasAnalysisResult,

@@ -7,7 +7,7 @@
  */
 
 import type { ChatMessage } from '../../types/chat'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import {
   EncryptionMode,
   FHEOperation as FHEOpType,

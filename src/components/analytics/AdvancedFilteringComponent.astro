@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/Checkbox'
+import { Checkbox } from '@/components/ui/checkbox'
 import { IconFilter, IconX } from '@/components/ui/icons'
 
 import { cn } from '@/lib/utils'
@@ -69,8 +69,8 @@ const {
       <div class="filter-section space-y-4" data-section="time">
         <div class="space-y-2">
           <Label>Time Range</Label>
-          <Select id="time-range-select">
-            <SelectTrigger class="w-full">
+          <Select>
+            <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -101,14 +101,14 @@ const {
         <div class="space-y-2">
           <Label>Emotion Types</Label>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-            {availableEmotionTypes.map((type) => (
+            {availableEmotionTypes.map((type: string) => (
               <div class="flex items-center space-x-2">
                 <Checkbox
                   id={`emotion-${type}`}
                   value={type}
-                  class="emotion-type-checkbox"
+                  className="emotion-type-checkbox"
                 />
-                <Label htmlFor={`emotion-${type}`} class="cursor-pointer">
+                <Label htmlFor={`emotion-${type}`} className="cursor-pointer">
                   {type}
                 </Label>
               </div>
@@ -124,13 +124,14 @@ const {
             </span>
           </div>
           <div class="pt-2 px-2">
-            <Slider
-              id="intensity-range-slider"
-              data-min="0"
-              data-max="1"
-              data-start="0"
-              data-end="1"
-            />
+            <div id="intensity-range-slider-wrapper">
+              <Slider
+                data-min="0"
+                data-max="1"
+                data-start="0"
+                data-end="1"
+              />
+            </div>
           </div>
         </div>
 
@@ -146,13 +147,14 @@ const {
                 </span>
               </div>
               <div class="pt-1 px-2">
-                <Slider
-                  id="valence-range-slider"
-                  data-min="-1"
-                  data-max="1"
-                  data-start="-1"
-                  data-end="1"
-                />
+                <div id="valence-range-slider-wrapper">
+                  <Slider
+                    data-min="-1"
+                    data-max="1"
+                    data-start="-1"
+                    data-end="1"
+                  />
+                </div>
               </div>
             </div>
 
@@ -164,13 +166,14 @@ const {
                 </span>
               </div>
               <div class="pt-1 px-2">
-                <Slider
-                  id="arousal-range-slider"
-                  data-min="-1"
-                  data-max="1"
-                  data-start="-1"
-                  data-end="1"
-                />
+                <div id="arousal-range-slider-wrapper">
+                  <Slider
+                    data-min="-1"
+                    data-max="1"
+                    data-start="-1"
+                    data-end="1"
+                  />
+                </div>
               </div>
             </div>
 
@@ -185,13 +188,14 @@ const {
                 </span>
               </div>
               <div class="pt-1 px-2">
-                <Slider
-                  id="dominance-range-slider"
-                  data-min="-1"
-                  data-max="1"
-                  data-start="-1"
-                  data-end="1"
-                />
+                <div id="dominance-range-slider-wrapper">
+                  <Slider
+                    data-min="-1"
+                    data-max="1"
+                    data-start="-1"
+                    data-end="1"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -209,9 +213,9 @@ const {
                   <Checkbox
                     id={`pattern-${type}`}
                     value={type}
-                    class="pattern-type-checkbox"
+                    className="pattern-type-checkbox"
                   />
-                  <Label htmlFor={`pattern-${type}`} class="cursor-pointer">
+                  <Label htmlFor={`pattern-${type}`} className="cursor-pointer">
                     {type}
                   </Label>
                 </div>
@@ -228,12 +232,13 @@ const {
             </span>
           </div>
           <div class="pt-2 px-2">
-            <Slider
-              id="strength-slider"
-              data-min="0"
-              data-max="1"
-              data-value="0"
-            />
+            <div id="strength-slider-wrapper">
+              <Slider
+                data-min="0"
+                data-max="1"
+                data-value="0"
+              />
+            </div>
           </div>
         </div>
 
@@ -245,12 +250,13 @@ const {
             </span>
           </div>
           <div class="pt-2 px-2">
-            <Slider
-              id="confidence-slider"
-              data-min="0"
-              data-max="1"
-              data-value="0"
-            />
+            <div id="confidence-slider-wrapper">
+              <Slider
+                data-min="0"
+                data-max="1"
+                data-value="0"
+              />
+            </div>
           </div>
         </div>
 
@@ -263,11 +269,11 @@ const {
                   <Checkbox
                     id={`category-${category}`}
                     value={category}
-                    class="pattern-category-checkbox"
+                    className="pattern-category-checkbox"
                   />
                   <Label
                     htmlFor={`category-${category}`}
-                    class="cursor-pointer"
+                    className="cursor-pointer"
                   >
                     {category}
                   </Label>
@@ -283,7 +289,7 @@ const {
         <div class="space-y-2">
           <Label>Group By</Label>
           <Select>
-            <SelectTrigger id="group-by-select" class="w-full">
+            <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -304,11 +310,10 @@ const {
           </div>
           <div class="pt-2 px-2">
             <Slider
-              id="smoothing-slider"
-              data-min="0"
-              data-max="10"
-              data-value="0"
-              data-step="1"
+              min={0}
+              max={10}
+              defaultValue={[0]}
+              step={1}
             />
           </div>
         </div>
@@ -342,11 +347,11 @@ const {
     <!-- Action Buttons -->
     <div class="flex justify-between pt-2">
       <Button variant="outline" size="sm" id="reset-filters">
-        <IconX class="mr-1 h-4 w-4" />
+        <IconX className="mr-1 h-4 w-4" />
         Reset
       </Button>
       <Button id="apply-filters">
-        <IconFilter class="mr-1 h-4 w-4" />
+        <IconFilter className="mr-1 h-4 w-4" />
         Apply Filters
       </Button>
     </div>
@@ -357,18 +362,74 @@ const {
   // We need to initialize the component when it loads
   document.addEventListener('DOMContentLoaded', initializeAdvancedFiltering)
 
-  function initializeAdvancedFiltering() {
+  function initializeAdvancedFiltering(): void {
     const component = document.getElementById('advanced-filtering-component')
     if (!component) return
 
-    // JS object to track the current filter state
-    const options = {
-      timeRange: {},
+    // Define proper types for the options object
+    interface FilterOptions {
+      timeRange: {
+        presetRange?: string
+        startDate?: Date
+        endDate?: Date
+      }
       emotions: {
-        dimensionalRanges: {},
+        types: string[]
+        minIntensity?: number
+        maxIntensity?: number
+        dimensionalRanges: {
+          valence?: [number, number]
+          arousal?: [number, number]
+          dominance?: [number, number]
+        }
+      }
+      patterns: {
+        types: string[]
+        minStrength?: number
+        minConfidence?: number
+        categories: string[]
+      }
+      visualization: {
+        groupBy?: string
+        smoothing?: number
+        showRawData?: boolean
+        showTrendlines?: boolean
+        showConfidenceIntervals?: boolean
+        showAnnotations?: boolean
+      }
+    }
+
+    // JS object to track the current filter state
+    const options: FilterOptions = {
+      timeRange: {
+        presetRange: undefined,
+        startDate: undefined,
+        endDate: undefined,
       },
-      patterns: {},
-      visualization: {},
+      emotions: {
+        types: [],
+        minIntensity: undefined,
+        maxIntensity: undefined,
+        dimensionalRanges: {
+          valence: undefined,
+          arousal: undefined,
+          dominance: undefined,
+        },
+      },
+      patterns: {
+        types: [],
+        minStrength: undefined,
+        minConfidence: undefined,
+        categories: [],
+      },
+      visualization: {
+        groupBy: undefined,
+        smoothing: undefined,
+        showRawData: undefined,
+        showTrendlines: undefined,
+        showConfidenceIntervals: undefined,
+        showAnnotations: undefined,
+      },
     }
 
     // Elements
@@ -405,45 +466,50 @@ const {
 
     // Tab switching
     tabButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const tab = button.getAttribute('data-tab')
-
-        // Update active tab button
-        tabButtons.forEach((btn) => {
-          btn.classList.remove('border-primary')
-          btn.classList.add('border-transparent')
+      if (button instanceof HTMLElement) {
+        button.addEventListener('click', (_event: MouseEvent) => {
+          const tab = button.getAttribute('data-tab')
+    
+          // Update active tab button
+          tabButtons.forEach((btn) => {
+            if (btn instanceof HTMLElement) {
+              btn.classList.remove('border-primary')
+              btn.classList.add('border-transparent')
+            }
+          })
+          button.classList.remove('border-transparent')
+          button.classList.add('border-primary')
+    
+          // Show active section
+          filterSections.forEach((section) => {
+            if (section.getAttribute('data-section') === tab) {
+              section.classList.remove('hidden')
+            } else {
+              section.classList.add('hidden')
+            }
+          })
         })
-        button.classList.remove('border-transparent')
-        button.classList.add('border-primary')
-
-        // Show active section
-        filterSections.forEach((section) => {
-          if (section.getAttribute('data-section') === tab) {
-            section.classList.remove('hidden')
-          } else {
-            section.classList.add('hidden')
-          }
-        })
-      })
+      }
     })
 
     // Time range select
-    if (timeRangeSelect) {
+    if (timeRangeSelect instanceof HTMLElement) {
       timeRangeSelect.addEventListener(
         'valueChange',
         (e) => {
-          const value = e.detail
+          const event = e as CustomEvent<{ value: string }>
+          const value = event.detail?.value || (event.detail as any)
           options.timeRange.presetRange = value
-
+    
           if (value === 'custom') {
-            customDateRange.classList.remove('hidden')
+            if (customDateRange instanceof HTMLElement) customDateRange.classList.remove('hidden')
           } else {
-            customDateRange.classList.add('hidden')
-
+            if (customDateRange instanceof HTMLElement) customDateRange.classList.add('hidden')
+    
             // Calculate dates based on preset
             const today = new Date()
-            let startDate
-
+            let startDate: Date | undefined
+    
             switch (value) {
               case 'day':
                 startDate = new Date(today)
@@ -466,172 +532,205 @@ const {
                 startDate.setFullYear(today.getFullYear() - 1)
                 break
             }
-
-            if (startDate) {
-              options.timeRange.startDate = startDate
-              options.timeRange.endDate = today
-            }
+    
+            options.timeRange.startDate = startDate ?? undefined
+            options.timeRange.endDate = today
           }
         },
       )
     }
 
     // Date inputs
-    if (startDateInput) {
+    if (startDateInput instanceof HTMLInputElement) {
       startDateInput.addEventListener('change', () => {
         options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
       })
     }
 
-    if (endDateInput) {
+    if (endDateInput instanceof HTMLInputElement) {
       endDateInput.addEventListener('change', () => {
         options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
       })
     }
 
     // Initialize sliders
-    initializeSlider(
-      intensityRangeSlider,
-      intensityRangeDisplay,
-      (values) => {
-        if (values.length === 2) {
-          const [min, max] = values
-          options.emotions.minIntensity = min
-          options.emotions.maxIntensity = max
-          if (intensityRangeDisplay) intensityRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
-        }
-      },
-    )
-
-    initializeSlider(
-      valenceRangeSlider,
-      valenceRangeDisplay,
-      (values) => {
-        if (values.length === 2) {
-          const [min, max] = values
-          if (!options.emotions.dimensionalRanges) {
-            options.emotions.dimensionalRanges = {}
+    if (intensityRangeSlider && intensityRangeDisplay) {
+      initializeSlider(
+        intensityRangeSlider as HTMLElement,
+        intensityRangeDisplay as HTMLElement,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
+            const [min, max] = values
+            options.emotions.minIntensity = min
+            options.emotions.maxIntensity = max
+            intensityRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
           }
-          options.emotions.dimensionalRanges.valence = [min, max]
-          if (valenceRangeDisplay) valenceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
-        }
-      },
-    )
+        },
+      )
+    }
 
-    initializeSlider(
-      arousalRangeSlider,
-      arousalRangeDisplay,
-      (values) => {
-        if (values.length === 2) {
-          const [min, max] = values
-          if (!options.emotions.dimensionalRanges) {
-            options.emotions.dimensionalRanges = {}
+    if (valenceRangeSlider instanceof HTMLElement && valenceRangeDisplay instanceof HTMLElement) {
+      initializeSlider(
+        valenceRangeSlider,
+        valenceRangeDisplay,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
+            const [min, max] = values
+            if (!options.emotions.dimensionalRanges) {
+              options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
+            }
+            options.emotions.dimensionalRanges.valence = [min, max]
+            valenceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
           }
-          options.emotions.dimensionalRanges.arousal = [min, max]
-          if (arousalRangeDisplay) arousalRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
-        }
-      },
-    )
+        },
+      )
+    }
 
-    initializeSlider(
-      dominanceRangeSlider,
-      dominanceRangeDisplay,
-      (values) => {
-        if (values.length === 2) {
-          const [min, max] = values
-          if (!options.emotions.dimensionalRanges) {
-            options.emotions.dimensionalRanges = {}
+    if (arousalRangeSlider instanceof HTMLElement && arousalRangeDisplay instanceof HTMLElement) {
+      initializeSlider(
+        arousalRangeSlider,
+        arousalRangeDisplay,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
+            const [min, max] = values
+            if (!options.emotions.dimensionalRanges) {
+              options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
+            }
+            options.emotions.dimensionalRanges.arousal = [min, max]
+            arousalRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
           }
-          options.emotions.dimensionalRanges.dominance = [min, max]
-          if (dominanceRangeDisplay) dominanceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
-        }
-      },
-    )
+        },
+      )
+    }
 
-    initializeSlider(
-      strengthSlider,
-      strengthDisplay,
-      (values) => {
-        if (values.length === 1) {
-          const [value] = values
-          options.patterns.minStrength = value
-          if (strengthDisplay) strengthDisplay.textContent = value.toFixed(1)
-        }
-      },
-      true,
-    )
+    if (dominanceRangeSlider instanceof HTMLElement && dominanceRangeDisplay instanceof HTMLElement) {
+      initializeSlider(
+        dominanceRangeSlider,
+        dominanceRangeDisplay,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
+            const [min, max] = values
+            if (!options.emotions.dimensionalRanges) {
+              options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
+            }
+            options.emotions.dimensionalRanges.dominance = [min, max]
+            dominanceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
+          }
+        },
+      )
+    }
 
-    initializeSlider(
-      confidenceSlider,
-      confidenceDisplay,
-      (values) => {
-        if (values.length === 1) {
-          const [value] = values
-          options.patterns.minConfidence = value
-          if (confidenceDisplay) confidenceDisplay.textContent = value.toFixed(1)
-        }
-      },
-      true,
-    )
+    if (strengthSlider instanceof HTMLElement && strengthDisplay instanceof HTMLElement) {
+      initializeSlider(
+        strengthSlider,
+        strengthDisplay,
+        (values: number[]) => {
+          if (values.length === 1 && values[0] !== undefined) {
+            const value = values[0]
+            options.patterns.minStrength = value
+            strengthDisplay.textContent = value.toFixed(1)
+          }
+        },
+        true,
+      )
+    }
 
-    initializeSlider(
-      smoothingSlider,
-      smoothingDisplay,
-      (values) => {
-        if (values.length === 1) {
-          const [value] = values
-          options.visualization.smoothing = value
-          if (smoothingDisplay) smoothingDisplay.textContent = String(value)
-        }
-      },
-      true,
-    )
+    if (confidenceSlider instanceof HTMLElement && confidenceDisplay instanceof HTMLElement) {
+      initializeSlider(
+        confidenceSlider,
+        confidenceDisplay,
+        (values: number[]) => {
+          if (values.length === 1 && values[0] !== undefined) {
+            const value = values[0]
+            options.patterns.minConfidence = value
+            confidenceDisplay.textContent = value.toFixed(1)
+          }
+        },
+        true,
+      )
+    }
+
+    if (smoothingSlider instanceof HTMLElement && smoothingDisplay instanceof HTMLElement) {
+      initializeSlider(
+        smoothingSlider,
+        smoothingDisplay,
+        (values: number[]) => {
+          if (values.length === 1 && values[0] !== undefined) {
+            const value = values[0]
+            options.visualization.smoothing = value
+            smoothingDisplay.textContent = String(value)
+          }
+        },
+        true,
+      )
+    }
 
     // Initialize checkbox collections
     emotionTypeCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', (e) => {
-        const target = e.target
-        updateCheckboxArray(target, 'emotions', 'types')
-      })
+      if (checkbox instanceof HTMLInputElement) {
+        checkbox.addEventListener('change', (e: Event) => {
+          const target = e.target
+          if (target instanceof HTMLInputElement) {
+            updateCheckboxArray(target, 'emotions', 'types')
+          }
+        })
+      }
     })
 
     patternTypeCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', (e) => {
-        const target = e.target
-        updateCheckboxArray(target, 'patterns', 'types')
-      })
+      if (checkbox instanceof HTMLInputElement) {
+        checkbox.addEventListener('change', (e: Event) => {
+          const target = e.target
+          if (target instanceof HTMLInputElement) {
+            updateCheckboxArray(target, 'patterns', 'types')
+          }
+        })
+      }
     })
 
     patternCategoryCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', (e) => {
-        const target = e.target
-        updateCheckboxArray(target, 'patterns', 'categories')
-      })
+      if (checkbox instanceof HTMLInputElement) {
+        checkbox.addEventListener('change', (e: Event) => {
+          const target = e.target
+          if (target instanceof HTMLInputElement) {
+            updateCheckboxArray(target, 'patterns', 'categories')
+          }
+        })
+      }
     })
 
     // Initialize switches
-    initializeSwitch(showRawDataSwitch, (checked) => {
-      options.visualization.showRawData = checked
-    })
+    if (showRawDataSwitch instanceof HTMLElement) {
+      initializeSwitch(showRawDataSwitch, (checked: boolean) => {
+        options.visualization.showRawData = checked
+      })
+    }
 
-    initializeSwitch(showTrendlinesSwitch, (checked) => {
-      options.visualization.showTrendlines = checked
-    })
+    if (showTrendlinesSwitch instanceof HTMLElement) {
+      initializeSwitch(showTrendlinesSwitch, (checked: boolean) => {
+        options.visualization.showTrendlines = checked
+      })
+    }
 
-    initializeSwitch(showConfidenceIntervalsSwitch, (checked) => {
-      options.visualization.showConfidenceIntervals = checked
-    })
+    if (showConfidenceIntervalsSwitch instanceof HTMLElement) {
+      initializeSwitch(showConfidenceIntervalsSwitch, (checked: boolean) => {
+        options.visualization.showConfidenceIntervals = checked
+      })
+    }
 
-    initializeSwitch(showAnnotationsSwitch, (checked) => {
-      options.visualization.showAnnotations = checked
-    })
+    if (showAnnotationsSwitch instanceof HTMLElement) {
+      initializeSwitch(showAnnotationsSwitch, (checked: boolean) => {
+        options.visualization.showAnnotations = checked
+      })
+    }
 
     // Group by select
-    if (groupBySelect) {
+    if (groupBySelect instanceof HTMLElement) {
       groupBySelect.addEventListener(
         'valueChange',
         (e) => {
-          options.visualization.groupBy = e.detail
+          const event = e as CustomEvent<{ value: string }>
+          options.visualization.groupBy = event.detail?.value || (event.detail as any)
         },
       )
     }
@@ -639,11 +738,23 @@ const {
     // Reset button
     if (resetButton) {
       resetButton.addEventListener('click', () => {
-        // Reset the options object
-        options.timeRange = {}
-        options.emotions = { dimensionalRanges: {} }
-        options.patterns = {}
-        options.visualization = {}
+        // Reset the options object with proper types
+        options.timeRange = { presetRange: undefined, startDate: undefined, endDate: undefined }
+        options.emotions = { 
+          types: [], 
+          minIntensity: undefined, 
+          maxIntensity: undefined, 
+          dimensionalRanges: { valence: undefined, arousal: undefined, dominance: undefined } 
+        }
+        options.patterns = { types: [], minStrength: undefined, minConfidence: undefined, categories: [] }
+        options.visualization = { 
+          groupBy: undefined, 
+          smoothing: undefined, 
+          showRawData: undefined, 
+          showTrendlines: undefined, 
+          showConfidenceIntervals: undefined, 
+          showAnnotations: undefined 
+        }
 
         // Reset UI elements
         // This would require resetting all the UI elements to their default state
@@ -663,11 +774,11 @@ const {
 
     // Helper for slider initialization
     function initializeSlider(
-      slider,
-      _display,
-      onChange,
+      slider: HTMLElement,
+      _display: HTMLElement,
+      onChange: (values: number[]) => void,
       singleValue = false,
-    ) {
+    ): void {
       if (!slider) return
 
       let initialValues
@@ -685,15 +796,16 @@ const {
 
       // Add event listener for value changes
       slider.addEventListener('sliderValueChange', (e) => {
-        onChange(e.detail.values)
+        const event = e as CustomEvent<{ values: number[] }>
+        onChange(event.detail?.values || [])
       })
     }
 
     // Helper for switch initialization
     function initializeSwitch(
-      switchEl,
-      onChange,
-    ) {
+      switchEl: HTMLElement,
+      onChange: (checked: boolean) => void,
+    ): void {
       if (!switchEl) return
 
       // Initialize with default state
@@ -701,25 +813,29 @@ const {
 
       // Add event listener for changes
       switchEl.addEventListener('checkedChange', (e) => {
-        onChange(e.detail)
+        const event = e as CustomEvent<boolean>
+        onChange(event.detail)
       })
     }
 
     // Helper for checkbox array updates
     function updateCheckboxArray(
-      checkbox,
-      category,
-      key,
-    ) {
+      checkbox: HTMLInputElement,
+      category: keyof FilterOptions,
+      key: string,
+    ): void {
       const value = checkbox.value
       const checked = checkbox.checked
 
+      // Type-safe property access
+      const categoryObj = options[category] as any
+      
       // Ensure the property exists and is an array
-      if (!options[category][key]) {
-        options[category][key] = []
+      if (!Array.isArray(categoryObj[key])) {
+        categoryObj[key] = []
       }
 
-      const values = options[category][key]
+      const values: string[] = categoryObj[key]
 
       if (checked) {
         // Add to array if not already present
@@ -728,9 +844,7 @@ const {
         }
       } else {
         // Remove from array
-        options[category][key] = values.filter(
-          (item) => item !== value,
-        )
+        categoryObj[key] = values.filter((item: string) => item !== value)
       }
 
       // Dispatch change event
@@ -738,7 +852,7 @@ const {
     }
 
     // Dispatch options change event
-    function dispatchOptionsChange(filterOptions) {
+    function dispatchOptionsChange(filterOptions: FilterOptions): void {
       if (!component) return
 
       const event = new CustomEvent('advancedFilterOptionsChange', {
@@ -749,7 +863,7 @@ const {
     }
 
     // Dispatch apply event
-    function dispatchApplyEvent() {
+    function dispatchApplyEvent(): void {
       if (!component) return
 
       const event = new CustomEvent('advancedFilterApply', {

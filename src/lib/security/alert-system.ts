@@ -5,7 +5,7 @@
  * This service manages notifications, escalations, and human oversight for high-risk situations.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { RiskLevel, RiskAssessmentResult } from './risk-level-assessment'
 import { AIRepository } from '../db/ai/repository'
 

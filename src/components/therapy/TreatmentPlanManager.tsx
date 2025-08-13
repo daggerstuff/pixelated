@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Dialog } from '@/components/ui/dialog'
+import { Dialog, DialogModal } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -58,17 +58,20 @@ const formatDate = (dateString?: string | Date) => {
   }
 }
 
-interface ClientSideNewObjective extends NewTreatmentObjectiveData {
+interface ClientSideNewObjective extends Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>, 
+  Omit<NewTreatmentObjectiveData, 'description' | 'status'> {
   tempId: string
 }
 
-interface ClientSideNewGoal extends NewTreatmentGoalData {
+interface ClientSideNewGoal extends Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>, 
+  Omit<NewTreatmentGoalData, 'description' | 'status'> {
   tempId: string
   objectives: ClientSideNewObjective[]
 }
 
-interface FormNewPlanData extends Omit<NewTreatmentPlanData, 'goals'> {
+interface FormNewPlanData extends Omit<NewTreatmentPlanData, 'goals' | 'startDate'> {
   userId: string
+  startDate?: string
   goals: ClientSideNewGoal[]
 }
 
@@ -661,54 +664,56 @@ const TreatmentPlanManager: React.FC = () => {
       )}
 
       {plans.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Client ID</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Start Date</TableHead>
-              <TableHead>Last Updated</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {plans.map((plan) => (
-              <TableRow key={plan.id}>
-                <TableCell>{plan.title}</TableCell>
-                <TableCell>{plan.clientId}</TableCell>
-                <TableCell>{plan.status}</TableCell>
-                <TableCell>{formatDate(plan.startDate)}</TableCell>
-                <TableCell>{formatDate(plan.updatedAt)}</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm" className="mr-2">
-                    View
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mr-2"
-                    onClick={() => openEditModal(plan)}
-                  >
-                    Edit
-                  </Button>
-
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setPlanToDelete(plan)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1 md:mr-2" /> Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                </TableCell>
+        <div className="rounded-md border">
+          <table className="w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Client ID</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Start Date</TableHead>
+                <TableHead>Last Updated</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {plans.map((plan) => (
+                <TableRow key={plan.id}>
+                  <TableCell>{plan.title}</TableCell>
+                  <TableCell>{plan.clientId}</TableCell>
+                  <TableCell>{plan.status}</TableCell>
+                  <TableCell>{formatDate(plan.startDate)}</TableCell>
+                  <TableCell>{formatDate(plan.updatedAt)}</TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" className="mr-2">
+                      View
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mr-2"
+                      onClick={() => openEditModal(plan)}
+                    >
+                      Edit
+                    </Button>
+
+                    <AlertDialogTrigger>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setPlanToDelete(plan)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1 md:mr-2" /> Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </table>
+        </div>
       )}
-      <Dialog
+      <DialogModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         title="Create New Treatment Plan"
@@ -814,7 +819,7 @@ const TreatmentPlanManager: React.FC = () => {
             {renderGoalsSection(newPlanData.goals, false)}
           </div>
         </form>
-      </Dialog>
+      </DialogModal>
 
       <AlertDialog
         open={!!planToDelete}
@@ -848,7 +853,7 @@ const TreatmentPlanManager: React.FC = () => {
       </AlertDialog>
 
       {/* Edit Plan Modal */}
-      <Dialog
+      <DialogModal
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false)
@@ -968,7 +973,7 @@ const TreatmentPlanManager: React.FC = () => {
             </div>
           </form>
         )}
-      </Dialog>
+      </DialogModal>
     </div>
   )
 }

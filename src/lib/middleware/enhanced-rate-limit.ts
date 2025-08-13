@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { redis } from '../redis'
 
 // Initialize logger

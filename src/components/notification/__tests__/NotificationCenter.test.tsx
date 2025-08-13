@@ -1,6 +1,8 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { NotificationStatus } from '@/lib/services/notification/NotificationService'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { NotificationCenter } from '../NotificationCenter'
+import { useWebSocket } from '@/hooks/useWebSocket'
 
 // Mock useWebSocket hook
 vi.mock('@/hooks/useWebSocket', () => ({
@@ -27,13 +29,10 @@ describe('notificationCenter', () => {
 
     // Mock WebSocket message for unread count
     vi.mocked(useWebSocket).mockReturnValue({
+      isConnected: true,
+      error: null,
       sendMessage: vi.fn(),
-      lastMessage: {
-        data: JSON.stringify({
-          type: 'unread_count',
-          data: 5,
-        }),
-      },
+      sendStatus: vi.fn(),
     })
 
     rerender(<NotificationCenter />)
@@ -64,13 +63,10 @@ describe('notificationCenter', () => {
     }
 
     vi.mocked(useWebSocket).mockReturnValue({
+      isConnected: true,
+      error: null,
       sendMessage: vi.fn(),
-      lastMessage: {
-        data: JSON.stringify({
-          type: 'notifications',
-          data: [mockNotification],
-        }),
-      },
+      sendStatus: vi.fn(),
     })
 
     render(<NotificationCenter />)
@@ -91,13 +87,10 @@ describe('notificationCenter', () => {
     }
 
     vi.mocked(useWebSocket).mockReturnValue({
+      isConnected: true,
+      error: null,
       sendMessage: mockSendMessage,
-      lastMessage: {
-        data: JSON.stringify({
-          type: 'notifications',
-          data: [mockNotification],
-        }),
-      },
+      sendStatus: vi.fn(),
     })
 
     render(<NotificationCenter />)
@@ -123,13 +116,10 @@ describe('notificationCenter', () => {
     }
 
     vi.mocked(useWebSocket).mockReturnValue({
+      isConnected: true,
+      error: null,
       sendMessage: mockSendMessage,
-      lastMessage: {
-        data: JSON.stringify({
-          type: 'notifications',
-          data: [mockNotification],
-        }),
-      },
+      sendStatus: vi.fn(),
     })
 
     render(<NotificationCenter />)
@@ -166,13 +156,10 @@ describe('notificationCenter', () => {
     }
 
     vi.mocked(useWebSocket).mockReturnValue({
+      isConnected: true,
+      error: null,
       sendMessage: vi.fn(),
-      lastMessage: {
-        data: JSON.stringify({
-          type: 'notification',
-          data: newNotification,
-        }),
-      },
+      sendStatus: vi.fn(),
     })
 
     rerender(<NotificationCenter />)

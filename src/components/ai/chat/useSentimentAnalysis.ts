@@ -105,7 +105,7 @@ function generateSentimentInsights(results: SentimentAnalysisResult[]): Sentimen
   )
 
   // Generate emotional trends
-  const emotionalTrends = []
+  const emotionalTrends: string[] = []
   const negativeRatio = (sentimentCounts['negative'] ?? 0) / results.length
   const positiveRatio = (sentimentCounts['positive'] ?? 0) / results.length
 
@@ -120,7 +120,7 @@ function generateSentimentInsights(results: SentimentAnalysisResult[]): Sentimen
   }
 
   // Identify risk factors
-  const riskFactors = []
+  const riskFactors: string[] = []
   const avgConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / results.length
 
   if (negativeRatio > 0.7) {
@@ -134,7 +134,7 @@ function generateSentimentInsights(results: SentimentAnalysisResult[]): Sentimen
   }
 
   // Generate recommendations
-  const recommendations = []
+  const recommendations: string[] = []
   if (negativeRatio > 0.5) {
     recommendations.push('Consider therapeutic intervention or support')
     recommendations.push('Monitor for crisis indicators')

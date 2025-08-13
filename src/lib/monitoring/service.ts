@@ -1,5 +1,5 @@
 import type { MonitoringConfig } from './config'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getMonitoringConfig } from './config'
 
 const logger = createBuildSafeLogger('default')

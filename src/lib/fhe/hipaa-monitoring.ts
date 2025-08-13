@@ -5,7 +5,7 @@
  */
 
 import { EventEmitter } from 'node:events'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AuditEvent } from './key-rotation'
 import { HIPAA_SECURITY_CONFIG } from './hipaa-config'
 import AWS from 'aws-sdk'

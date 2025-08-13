@@ -1,5 +1,5 @@
 import { createAuditLog } from '../../audit/log'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { initializeSecurityTables } from './schema'
 
 const logger = createBuildSafeLogger('default')

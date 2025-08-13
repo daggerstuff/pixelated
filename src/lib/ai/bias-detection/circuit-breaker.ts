@@ -3,7 +3,7 @@
  * Prevents cascading failures by monitoring service health and failing fast
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('CircuitBreaker')
 

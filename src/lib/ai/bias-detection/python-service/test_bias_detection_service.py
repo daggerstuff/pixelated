@@ -348,12 +348,8 @@ class TestBiasDetectionService(unittest.TestCase):
 
     def test_calculate_confidence(self):
         """Test confidence calculation"""
-        self._extracted_from_test_calculate_confidence_4(
-            "bias_score", 0.5, 0.8
-        )
-        self._extracted_from_test_calculate_confidence_4(
-            "error", "Failed to analyze", 0.5
-        )
+        self._extracted_from_test_calculate_confidence_4("bias_score", 0.5, 0.8)
+        self._extracted_from_test_calculate_confidence_4("error", "Failed to analyze", 0.5)
 
     # TODO Rename this here and in `test_calculate_confidence`
     def _extracted_from_test_calculate_confidence_4(self, arg0, arg1, arg2):
@@ -449,9 +445,7 @@ class TestFlaskEndpoints(unittest.TestCase):
         """Test health check endpoint"""
         data = self._extracted_from_test_404_endpoint_3("/health", 200)
         assert data["status"] == "healthy"
-        self._extracted_from_test_dashboard_endpoint_8(
-            "components", data, "timestamp", "version"
-        )
+        self._extracted_from_test_dashboard_endpoint_8("components", data, "timestamp", "version")
 
     def test_analyze_endpoint_valid_data(self):
         """Test analyze endpoint with valid data"""
@@ -502,9 +496,7 @@ class TestFlaskEndpoints(unittest.TestCase):
     def test_dashboard_endpoint(self):
         """Test dashboard data endpoint"""
         data = self._extracted_from_test_404_endpoint_3("/dashboard", 200)
-        self._extracted_from_test_dashboard_endpoint_8(
-            "summary", data, "trends", "demographics"
-        )
+        self._extracted_from_test_dashboard_endpoint_8("summary", data, "trends", "demographics")
 
     def test_export_endpoint_json(self):
         """Test export endpoint with JSON format"""

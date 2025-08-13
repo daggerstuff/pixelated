@@ -1,8 +1,8 @@
 // MongoDB-based library utilities
 // This file provides MongoDB connection and utilities to replace Supabase functionality
 
-import mongodb from '@/config/mongodb.config'
-import { mongoAuthService } from '@/services/mongoAuth.service'
+import mongodb from '../config/mongodb.config'
+import { mongoAuthService } from '../services/mongoAuth.service'
 
 // MongoDB client type
 export type MongoDBClient = typeof mongodb
@@ -19,9 +19,8 @@ interface ProcessEnv {
 const processEnv = (
   typeof process !== 'undefined' ? process.env : {}
 ) as ProcessEnv
-const NODE_ENV = processEnv.NODE_ENV || 'development'
 
-const isProduction = NODE_ENV === 'production'
+// NODE_ENV was only used in a removed variable
 
 /**
  * Get environment variable with fallbacks

@@ -1,3 +1,4 @@
+import type { AstroCookies } from 'astro'
 import type { AuthRole } from '../config/auth.config'
 import type { AuditMetadata } from './audit/types'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
@@ -25,7 +26,7 @@ export interface AuthUser {
  * Get the current authenticated user from cookies
  */
 export async function getCurrentUser(
-  cookies: APIContext['cookies'],
+  cookies: AstroCookies,
 ): Promise<AuthUser | null> {
   const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
 
@@ -69,7 +70,7 @@ export async function getCurrentUser(
  * Check if the user is authenticated
  */
 export async function isAuthenticated(
-  cookies: APIContext['cookies'],
+  cookies: AstroCookies,
 ): Promise<boolean> {
   // Always return false in the browser context to prevent redirects
   if (typeof window !== 'undefined') {
@@ -99,7 +100,7 @@ export async function isAuthenticated(
  * Check if the user has the required role
  */
 export async function hasRole(
-  cookies: APIContext['cookies'],
+  cookies: AstroCookies,
   requiredRole: AuthRole,
 ): Promise<boolean> {
   const user = await getCurrentUser(cookies)
@@ -164,7 +165,7 @@ export async function requireAuth({
   redirect,
   request,
 }: {
-  cookies: APIContext['cookies']
+  cookies: AstroCookies
   redirect: (url: string) => Response
   request: Request
 }) {
@@ -188,7 +189,7 @@ export async function requireRole({
   request,
   role,
 }: {
-  cookies: APIContext['cookies']
+  cookies: AstroCookies
   redirect: (url: string) => Response
   request: Request
   role: AuthRole
@@ -215,7 +216,7 @@ export class Auth {
     return user ? { userId: user.id } : null
   }
 
-  private getCookiesFromRequest(request: Request): APIContext['cookies'] {
+  private getCookiesFromRequest(request: Request): AstroCookies {
     // Convert Request headers to AstroCookies format
     const cookieHeader = request.headers.get('cookie') || ''
     return {
@@ -223,7 +224,7 @@ export class Auth {
         const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))
         return match ? { value: match[1] } : undefined
       },
-    } as APIContext['cookies']
+    } as AstroCookies
   }
 }
 

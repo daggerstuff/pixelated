@@ -17,11 +17,13 @@ import { createMentalLLaMAFromEnv } from '../lib/ai/mental-llama'
 
 // Define types for CLI options
 interface CliOptions {
+  disorders: string
   text?: string
   file?: string
   crisisText?: boolean
   generalText?: boolean
   outputPath: string
+  pythonPath: string
   evaluateExplanation?: boolean
   pythonBridge?: boolean
   expert?: boolean
@@ -72,7 +74,7 @@ program
   )
   .parse(process.argv)
 
-const options = program.opts() as CliOptions
+const options = program.opts() as unknown as CliOptions
 
 async function main() {
   console.log('🧠 MentalLLaMA Analysis')
@@ -254,7 +256,7 @@ async function main() {
     // Detailed evidence extraction not available in this build
 
     // Evaluate explanation quality if requested
-    let qualityMetricsResults = null
+    let qualityMetricsResults: typeof adapter.evaluateExplanationQuality extends (...args: any[]) => Promise<infer R> ? R | undefined : undefined = undefined
     if (options.evaluateExplanation) {
       console.log('\nEvaluating explanation quality (STUBBED)...')
       qualityMetricsResults = await adapter.evaluateExplanationQuality(

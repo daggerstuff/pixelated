@@ -5,7 +5,7 @@
  */
 
 import mongodb from '@/config/mongodb.config'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SecurityError } from '../security/errors'
 // Import shared types to avoid circular dependencies
 import type { SecurityBreach, BreachSeverity } from './types'

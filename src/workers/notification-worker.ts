@@ -1,4 +1,3 @@
-import { config } from '../config/env.config'
 import { NotificationService } from '../lib/services/notification/NotificationService.mock'
 import { WebSocketServer } from '../lib/services/notification/WebSocketServer.mock'
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger.mock'
@@ -8,7 +7,6 @@ const logger = createBuildSafeLogger('notification-worker')
 
 const WORKER_ID = crypto.randomUUID()
 const PROCESSING_INTERVAL = 1000 // 1 second
-const WS_PORT = config.workers.notification.wsPort()
 
 async function startWorker() {
   logger.info('Starting notification worker', { workerId: WORKER_ID })
@@ -17,7 +15,7 @@ async function startWorker() {
   const notificationService = new NotificationService()
 
   // Create WebSocket server
-  const wsServer = new WebSocketServer(WS_PORT, notificationService)
+  const wsServer = new WebSocketServer()
 
   try {
     // Start processing notifications

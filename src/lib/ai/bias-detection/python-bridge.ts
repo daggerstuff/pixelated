@@ -5,7 +5,7 @@
  * Extracted from BiasDetectionEngine.ts for better separation of concerns.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   TherapeuticSession,
   PreprocessingAnalysisResult,

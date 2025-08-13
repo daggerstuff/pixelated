@@ -194,7 +194,9 @@ function cryptoRandomId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     try {
       return crypto.randomUUID()
-    } catch {}
+    } catch {
+      // Fallback if crypto.randomUUID is not available
+    }
   }
   return Math.random().toString(36).slice(2)
 }

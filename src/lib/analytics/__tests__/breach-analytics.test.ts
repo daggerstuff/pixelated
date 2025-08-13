@@ -1,14 +1,14 @@
 /// <reference types="vitest/globals" />
-import { ComplianceMetrics } from '@/lib/analytics/compliance'
-import { MachineLearning } from '@/lib/analytics/ml'
-import { NotificationEffectiveness } from '@/lib/analytics/notifications'
-import { RiskScoring } from '@/lib/analytics/risk'
+import * as ComplianceMetrics from '@/lib/analytics/compliance'
+import * as MachineLearning from '@/lib/analytics/ml'
+import * as NotificationEffectiveness from '@/lib/analytics/notifications'
+import * as RiskScoring from '@/lib/analytics/risk'
 import { StatisticalAnalysis } from '@/lib/analytics/statistics'
-import { SecurityTrends } from '@/lib/analytics/trends'
-import { FHE } from '@/lib/fhe'
+import * as SecurityTrends from '@/lib/analytics/trends'
+import { fheService } from '@/lib/fhe'
 import { redis } from '@/lib/redis'
-import { BreachNotificationSystem } from '@/lib/security/breach-notification'
-import { BreachAnalytics } from '../breach-analytics'
+import { listRecentBreaches } from '@/lib/security/breach-notification'
+import * as BreachAnalytics from '@/lib/analytics/breach-analytics'
 
 // Mock dependencies
 vi.mock('@/lib/redis', () => ({
@@ -29,43 +29,31 @@ vi.mock('@/lib/fhe', () => ({
 }))
 
 vi.mock('@/lib/security/breach-notification', () => ({
-  BreachNotificationSystem: {
-    listRecentBreaches: vi.fn(),
-  },
+  listRecentBreaches: vi.fn(),
 }))
 
 vi.mock('@/lib/analytics/ml', () => ({
-  MachineLearning: {
-    detectAnomalies: vi.fn(),
-    predictBreaches: vi.fn(),
-  },
+  detectAnomalies: vi.fn(),
+  predictBreaches: vi.fn(),
 }))
 
 vi.mock('@/lib/analytics/risk', () => ({
-  RiskScoring: {
-    calculateOverallRisk: vi.fn(),
-    calculateDailyRisk: vi.fn(),
-    getFactors: vi.fn(),
-  },
+  calculateOverallRisk: vi.fn(),
+  calculateDailyRisk: vi.fn(),
+  getFactors: vi.fn(),
 }))
 
 vi.mock('@/lib/analytics/notifications', () => ({
-  NotificationEffectiveness: {
-    calculate: vi.fn(),
-    calculateDaily: vi.fn(),
-  },
+  calculate: vi.fn(),
+  calculateDaily: vi.fn(),
 }))
 
 vi.mock('@/lib/analytics/compliance', () => ({
-  ComplianceMetrics: {
-    calculateScore: vi.fn(),
-  },
+  calculateScore: vi.fn(),
 }))
 
 vi.mock('@/lib/analytics/trends', () => ({
-  SecurityTrends: {
-    analyze: vi.fn(),
-  },
+  analyze: vi.fn(),
 }))
 
 vi.mock('@/lib/analytics/statistics', () => ({
@@ -103,7 +91,7 @@ describe('breachAnalytics', () => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    ;(BreachNotificationSystem.listRecentBreaches as any).mockResolvedValue(
+    ;(listRecentBreaches as any).mockResolvedValue(
       mockBreaches,
     )
     ;(redis.get as any).mockResolvedValue(
@@ -111,11 +99,53 @@ describe('breachAnalytics', () => {
         completedAt: Date.now(),
       }),
     )
-    ;(RiskScoring.calculateOverallRisk as any).mockResolvedValue(0.75)
-    ;(RiskScoring.calculateDailyRisk as any).mockResolvedValue(0.65)
+    ;(RiskScoring.calculateOverallRisk as any).mockResolvedValue({
+      overallScore: 0.75,
+      factors: [],
+      timestamp: new Date(),
+      confidence: 0.9,
+      recommendations: []
+    })
+    ;(RiskScoring.calculateDailyRisk as any).mockResolvedValue({
+      overallScore: 0.65,
+      factors: [],
+      timestamp: new Date(),
+      confidence: 0.9,
+      recommendations: []
+    })
     ;(ComplianceMetrics.calculateScore as any).mockResolvedValue(0.98)
-    ;(NotificationEffectiveness.calculate as any).mockResolvedValue(0.95)
-    ;(NotificationEffectiveness.calculateDaily as any).mockResolvedValue(0.92)
+    ;(NotificationEffectiveness.calculate as any).mockResolvedValue({
+      overall: 0.95,
+      delivery: 0.98,
+      timing: 0.92,
+      acknowledgment: 0.85,
+      compliance: 0.99,
+      details: {
+        totalBreaches: 5,
+        criticalBreaches: 2,
+        averageTimeToNotify: 1.5,
+        averageTimeToAcknowledge: 3.2,
+        deliveryRate: 0.98,
+        acknowledgmentRate: 0.85,
+        complianceRate: 0.99
+      }
+    })
+    ;(NotificationEffectiveness.calculateDaily as any).mockResolvedValue({
+      overall: 0.92,
+      delivery: 0.95,
+      timing: 0.88,
+      acknowledgment: 0.82,
+      compliance: 0.96,
+      details: {
+        totalBreaches: 2,
+        criticalBreaches: 1,
+        averageTimeToNotify: 1.2,
+        averageTimeToAcknowledge: 2.8,
+        deliveryRate: 0.95,
+        acknowledgmentRate: 0.82,
+        complianceRate: 0.96
+      }
+    })
     ;(MachineLearning.detectAnomalies as any).mockResolvedValue([0.1, 0.2])
     ;(MachineLearning.predictBreaches as any).mockResolvedValue([
       { value: 3, confidence: 0.8 },
@@ -127,7 +157,7 @@ describe('breachAnalytics', () => {
     ])
     ;(SecurityTrends.analyze as any).mockResolvedValue(['increasing', 'stable'])
     ;(StatisticalAnalysis.calculateTrend as any).mockReturnValue(0.15)
-    ;(FHE.encrypt as any).mockResolvedValue('encrypted_data')
+    ;(fheService.encrypt as any).mockResolvedValue('encrypted_data')
   })
 
   afterEach(() => {
@@ -154,7 +184,7 @@ describe('breachAnalytics', () => {
         notificationEffectiveness: 0.95,
       })
 
-      expect(BreachNotificationSystem.listRecentBreaches).toHaveBeenCalled()
+      expect(listRecentBreaches).toHaveBeenCalled()
       expect(RiskScoring.calculateOverallRisk).toHaveBeenCalledWith(
         mockBreaches,
       )
@@ -167,7 +197,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should handle empty breach list', async () => {
-      ;(BreachNotificationSystem.listRecentBreaches as any).mockResolvedValue(
+      ;(listRecentBreaches as any).mockResolvedValue(
         [],
       )
 
@@ -276,7 +306,22 @@ describe('breachAnalytics', () => {
     })
 
     it('should include notification effectiveness insights when below threshold', async () => {
-      ;(NotificationEffectiveness.calculate as any).mockResolvedValue(0.94)
+      ;(NotificationEffectiveness.calculate as any).mockResolvedValue({
+        overall: 0.94,
+        delivery: 0.95,
+        timing: 0.88,
+        acknowledgment: 0.82,
+        compliance: 0.96,
+        details: {
+          totalBreaches: 2,
+          criticalBreaches: 1,
+          averageTimeToNotify: 1.2,
+          averageTimeToAcknowledge: 2.8,
+          deliveryRate: 0.95,
+          acknowledgmentRate: 0.82,
+          complianceRate: 0.96
+        }
+      })
 
       const insights = await BreachAnalytics.generateInsights()
 
@@ -292,11 +337,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should include compliance insights when below threshold', async () => {
-      ;(
-        ComplianceMetrics.calculateScore as unknown as vi.Mocked<
-          typeof ComplianceMetrics.calculateScore
-        >
-      ).mockResolvedValue(0.97)
+      ;(ComplianceMetrics.calculateScore as any).mockResolvedValue(0.97)
 
       const insights = await BreachAnalytics.generateInsights()
 
@@ -342,15 +383,13 @@ describe('breachAnalytics', () => {
         generatedAt: expect.any(String),
       })
 
-      expect(FHE.encrypt).toHaveBeenCalled()
+      expect(fheService.encrypt).toHaveBeenCalled()
     })
 
     it('should handle errors during report generation', async () => {
-      ;(
-        BreachNotificationSystem.listRecentBreaches as unknown as vi.Mocked<
-          typeof BreachNotificationSystem.listRecentBreaches
-        >
-      ).mockRejectedValue(new Error('Failed to fetch breaches'))
+      ;(listRecentBreaches as any).mockRejectedValue(
+        new Error('Failed to fetch breaches'),
+      )
 
       await expect(
         BreachAnalytics.generateReport(mockTimeframe),

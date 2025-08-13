@@ -1,6 +1,6 @@
 import { defineMiddleware } from 'astro:middleware'
 import { getSession } from '../auth/session'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')

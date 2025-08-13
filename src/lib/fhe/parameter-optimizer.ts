@@ -21,7 +21,7 @@ import {
   type SealEncryptionParamsOptions,
   SEAL_PARAMETER_PRESETS,
 } from './seal-types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 // Define specific return types for analyzePerformanceHistory
 interface OperationStat {

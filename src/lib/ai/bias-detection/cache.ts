@@ -6,7 +6,7 @@
  * Enhanced with Redis integration for distributed caching.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getCacheService, type CacheClient } from '../../services/cacheService'
 import type {
   CacheEntry,

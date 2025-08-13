@@ -1,6 +1,6 @@
 import type { AuthContext } from './types'
 import { fheService } from '../fhe'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getSession } from './session'
 
 // Initialize logger

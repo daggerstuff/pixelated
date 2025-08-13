@@ -76,35 +76,6 @@ export default function KnowledgeParsingDemo() {
   const [confidence, setConfidence] = useState<number>(0)
   const realTimeTimeout = useRef<NodeJS.Timeout | null>(null)
 
-  // Real-time analysis with debouncing
-  useEffect(() => {
-    if (isRealTimeMode && inputText.trim().length > 10) {
-      if (realTimeTimeout.current) {
-        clearTimeout(realTimeTimeout.current)
-      }
-      realTimeTimeout.current = setTimeout(() => {
-        analyze()
-      }, 1500)
-    }
-    return () => {
-      if (realTimeTimeout.current) {
-        clearTimeout(realTimeTimeout.current)
-      }
-    }
-  }, [inputText, isRealTimeMode, analyze])
-
-  // Load analysis history from localStorage
-  useEffect(() => {
-    const savedHistory = localStorage.getItem('knowledgeParsingHistory')
-    if (savedHistory) {
-      try {
-        setAnalysisHistory(JSON.parse(savedHistory))
-      } catch (e) {
-        console.warn('Failed to load analysis history:', e)
-      }
-    }
-  }, [])
-
   // Save to history
   const saveToHistory = useCallback((text: string, result: AnalysisResults, processingTime: number) => {
     const historyItem: AnalysisHistory = {
@@ -218,6 +189,35 @@ export default function KnowledgeParsingDemo() {
       setIsAnalyzing(false)
     }
   }, [inputText, saveToHistory])
+
+  // Real-time analysis with debouncing
+  useEffect(() => {
+    if (isRealTimeMode && inputText.trim().length > 10) {
+      if (realTimeTimeout.current) {
+        clearTimeout(realTimeTimeout.current)
+      }
+      realTimeTimeout.current = setTimeout(() => {
+        analyze()
+      }, 1500)
+    }
+    return () => {
+      if (realTimeTimeout.current) {
+        clearTimeout(realTimeTimeout.current)
+      }
+    }
+  }, [inputText, isRealTimeMode, analyze])
+
+  // Load analysis history from localStorage
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('knowledgeParsingHistory')
+    if (savedHistory) {
+      try {
+        setAnalysisHistory(JSON.parse(savedHistory))
+      } catch (e) {
+        console.warn('Failed to load analysis history:', e)
+      }
+    }
+  }, [])
 
   const loadFromHistory = (historyItem: AnalysisHistory) => {
     setInputText(historyItem.text)

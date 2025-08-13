@@ -32,7 +32,8 @@ async function setupEnvironment() {
   log.info('Setting up build environment...')
 
   // Check Node.js version
-  const nodeMajorVersion = parseInt(process.versions.node.split('.')[0], 10)
+  const nodeVersionParts = process.versions.node.split('.')
+  const nodeMajorVersion = parseInt(nodeVersionParts[0] || '0', 10)
   const requiredNodeVersion = 22
 
   log.step(`Checking Node.js version (required: ${requiredNodeVersion}.x)`)

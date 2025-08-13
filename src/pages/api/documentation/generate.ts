@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
 import { DocumentationService } from '../../../lib/documentation'
 import { AIRepository } from '../../../lib/db/ai/repository'

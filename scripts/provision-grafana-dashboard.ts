@@ -43,9 +43,10 @@ async function provisionDashboard() {
       console.error('Failed to provision dashboard:', response.data)
     }
   } catch (error) {
-    console.error('Error provisioning dashboard:', error.message)
-    if (error.response) {
-      console.error('Response data:', error.response.data)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Error provisioning dashboard:', errorMessage)
+    if (error && typeof error === 'object' && 'response' in error) {
+      console.error('Response data:', (error as { response: { data: unknown } }).response.data)
     }
     process.exit(1)
   }

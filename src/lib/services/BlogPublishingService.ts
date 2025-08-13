@@ -2,7 +2,7 @@ import { z } from 'zod'
 import * as cron from 'node-cron'
 import fs from 'fs/promises'
 import path from 'path'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('blog-publishing')
 

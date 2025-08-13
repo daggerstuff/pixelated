@@ -10,7 +10,7 @@ export { BiasDetectionEngine } from './BiasDetectionEngine'
 // Core modules
 export { PythonBiasDetectionBridge } from './python-bridge'
 export { BiasMetricsCollector } from './metrics-collector'
-export { BiasAlertSystem } from './alerts-system'
+// export { BiasAlertSystem } from './alerts-system' // TODO: Fix alerts-system imports
 
 // Type exports - explicitly handle duplicates
 export type {

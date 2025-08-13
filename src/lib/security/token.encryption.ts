@@ -26,7 +26,7 @@ export class TokenEncryptionService {
       algorithm: 'aes-256-gcm',
       keyLength: 32,
       ivLength: 16,
-      salt: process.env.TOKEN_ENCRYPTION_SALT || '',
+      salt: process.env['TOKEN_ENCRYPTION_SALT'] || '',
     },
     logger: Console = console,
   ) {

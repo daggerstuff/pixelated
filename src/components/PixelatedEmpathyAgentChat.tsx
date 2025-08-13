@@ -3,6 +3,14 @@ import { createPixelatedEmpathyAgent, type TherapeuticScenario, type BiasAnalysi
 
 type AgentContext = 'scenario_generation' | 'bias_detection' | 'training_recommendation' | 'general';
 
+interface AgentResponse {
+  success: boolean;
+  response: string | null;
+  error?: string;
+  metadata?: Record<string, any>;
+  conversation_id?: string;
+}
+
 interface Message {
   id: string;
   content: string;
@@ -79,7 +87,7 @@ export const PixelatedEmpathyAgentChat: React.FC<AgentChatProps> = ({
     setIsLoading(true);
 
     try {
-      let response;
+      let response: AgentResponse;
       
       // Use specialized methods for specific contexts
       switch (context) {
@@ -110,7 +118,7 @@ export const PixelatedEmpathyAgentChat: React.FC<AgentChatProps> = ({
           response = await agent.current.sendMessage(input, context);
       }
 
-      if (response.success) {
+      if (response.success && response.response) {
         const agentMessage: Message = {
           id: `agent-${Date.now()}`,
           content: response.response,
@@ -122,11 +130,11 @@ export const PixelatedEmpathyAgentChat: React.FC<AgentChatProps> = ({
         setMessages(prev => [...prev, agentMessage]);
 
         // Handle specific response types
-        if (context === 'scenario_generation' && response.metadata?.scenario) {
-          onScenarioGenerated?.(response.metadata.scenario);
+        if (context === 'scenario_generation' && response.metadata?.['scenario']) {
+          onScenarioGenerated?.(response.metadata['scenario']);
         }
-        if (context === 'bias_detection' && response.metadata?.bias_analysis) {
-          onBiasAnalysis?.(response.metadata.bias_analysis);
+        if (context === 'bias_detection' && response.metadata?.['bias_analysis']) {
+          onBiasAnalysis?.(response.metadata['bias_analysis']);
         }
       } else {
         setMessages(prev => [...prev, {
@@ -325,7 +333,7 @@ function extractExperience(input: string): 'beginner' | 'intermediate' | 'advanc
 }
 
 function extractSpecializations(input: string): string[] {
-  const specializations = [];
+  const specializations: string[] = [];
   const lower = input.toLowerCase();
   
   if (lower.includes('depression')) specializations.push('Depression');

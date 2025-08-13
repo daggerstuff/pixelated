@@ -47,8 +47,10 @@ export function parseAspectRatio(aspectRatio: string): number | undefined {
   const parts = aspectRatio.split(':').map(Number)
   if (
     parts.length === 2 &&
-    !isNaN(parts[0] as number) &&
-    !isNaN(parts[1] as number) &&
+    parts[0] !== undefined &&
+    parts[1] !== undefined &&
+    !isNaN(parts[0]) &&
+    !isNaN(parts[1]) &&
     parts[1] !== 0
   ) {
     return parts[0] / parts[1]

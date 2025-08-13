@@ -5,7 +5,7 @@
  * Extracted from BiasDetectionEngine.ts for better separation of concerns.
  */
 
-import { standardizedLogger } from '@/lib/logging/standardized-logger'
+import { standardizedLogger } from '../../logging/standardized-logger'
 import { PythonBiasDetectionBridge } from './python-bridge'
 import type {
   BiasDetectionConfig,

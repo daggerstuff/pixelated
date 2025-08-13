@@ -1,15 +1,16 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { isAuthenticated } from '@/lib/auth'
-import { MemoryService } from '@/lib/memory'
+import type { APIRoute } from 'astro'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { getCurrentUser } from '../../../lib/auth'
+import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const PUT = async ({ request }: { request: Request }) => {
+export const PUT: APIRoute = async ({ request, cookies }) => {
   try {
     // Authenticate request
-    const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    const user = await getCurrentUser(cookies)
+    if (!user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -48,10 +49,25 @@ export const PUT = async ({ request }: { request: Request }) => {
       memoryId,
       content,
       {
-        userId: authResult.user?.id,
+        userId: user.id,
         ...metadata,
-      },
+      }
     )
+
+    if (result === null) {
+      return new Response(
+        JSON.stringify({
+          error: 'Not Found',
+          message: 'Memory not found or you do not have permission to update it',
+        }),
+        {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
 
     return new Response(JSON.stringify(result), {
       status: 200,

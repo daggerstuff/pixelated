@@ -24,7 +24,7 @@ import {
   ObjectiveMetricsEngine,
   AlignmentMetrics,
 } from '../core/objective-metrics'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('metaaligner-api')
 
@@ -596,24 +596,24 @@ export class MetaAlignerAPI {
     evaluation: AlignmentEvaluationResult,
     targetObjectives?: string[],
   ): string[] {
+    // If specific targets are provided, reflect them directly in prioritized areas
+    const targetedAreas: string[] = []
     const areas: string[] = []
 
     for (const [objectiveId, result] of Object.entries(
       evaluation.objectiveResults,
     )) {
-      if (targetObjectives && !targetObjectives.includes(objectiveId)) {
-        continue
-      }
-
-      if (result.score < 0.7) {
+      const isTargeted = !!targetObjectives?.includes(objectiveId)
+      if (isTargeted || result.score < 0.7) {
         const objective = this.objectives.find((o) => o.id === objectiveId)
         if (objective) {
-          areas.push(objective.name)
+          ;(isTargeted ? targetedAreas : areas).push(objective.name)
         }
       }
     }
 
-    return areas
+    // Ensure targeted objectives appear in explanation
+    return [...new Set([...targetedAreas, ...areas])]
   }
 
   private createEnhancementPrompt(

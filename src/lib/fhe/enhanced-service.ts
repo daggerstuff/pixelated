@@ -14,7 +14,7 @@ import type {
 } from './types'
 import { EncryptionMode } from './types'
 import { MockFHEService } from './mock/mock-fhe-service'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('enhanced-fhe')
 

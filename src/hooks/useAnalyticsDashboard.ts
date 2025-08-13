@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 import type {
   AnalyticsChartData,
   AnalyticsError,

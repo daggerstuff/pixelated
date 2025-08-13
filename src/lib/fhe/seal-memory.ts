@@ -4,7 +4,7 @@
  * Utilities for managing SEAL WebAssembly objects and memory
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('seal-memory')

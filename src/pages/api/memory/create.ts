@@ -1,15 +1,15 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { isAuthenticated } from '@/lib/auth'
-import { MemoryService } from '@/lib/memory'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { getCurrentUser } from '../../../lib/auth'
+import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request, cookies }) => {
   try {
     // Authenticate request
-    const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    const user = await getCurrentUser(cookies)
+    if (!user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -20,7 +20,7 @@ export const POST = async ({ request }: { request: Request }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       )
     }
 
@@ -39,7 +39,7 @@ export const POST = async ({ request }: { request: Request }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       )
     }
 
@@ -47,13 +47,13 @@ export const POST = async ({ request }: { request: Request }) => {
     const result = await memoryService.createMemory(
       content,
       {
-        userId: authResult.user?.id,
+        userId: user.id,
         ...metadata,
-      },
+      }
     )
 
     return new Response(JSON.stringify(result), {
-      status: 200,
+      status: 201,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -71,7 +71,7 @@ export const POST = async ({ request }: { request: Request }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
   }
 }

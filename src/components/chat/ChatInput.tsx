@@ -39,7 +39,7 @@ export function ChatInput({
   return (
     <form
       onSubmit={onSubmit}
-      className="relative flex items-end space-x-2 rounded-lg border border-purple-700/50 bg-black/50 p-2"
+      className="relative flex items-end space-x-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
     >
       <textarea
         ref={textareaRef}
@@ -53,10 +53,10 @@ export function ChatInput({
         }
         disabled={isLoading || disabled}
         className={cn(
-          'flex-1 resize-none bg-transparent p-2 placeholder-gray-500',
+          'flex-1 resize-none bg-transparent p-2 placeholder-gray-400',
           'focus:outline-none focus:ring-0',
           'min-h-[40px] max-h-[200px]',
-          'text-white scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent',
+          'text-gray-900 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent',
         )}
         rows={1}
       />
@@ -66,8 +66,8 @@ export function ChatInput({
         disabled={isLoading || disabled || !value.trim()}
         className={cn(
           'flex h-10 w-10 items-center justify-center rounded-lg',
-          'bg-purple-700 text-white transition-colors',
-          'hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed',
+          'bg-blue-600 text-white transition-colors',
+          'hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed',
         )}
       >
         <IconSend

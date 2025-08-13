@@ -1,15 +1,15 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { isAuthenticated } from '@/lib/auth'
-import { MemoryService } from '@/lib/memory'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { getCurrentUser } from '../../../lib/auth'
+import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const DELETE = async ({ request }: { request: Request }) => {
+export const DELETE = async ({ request, cookies }) => {
   try {
     // Authenticate request
-    const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    const user = await getCurrentUser(cookies)
+    if (!user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -44,7 +44,7 @@ export const DELETE = async ({ request }: { request: Request }) => {
     }
 
     // Delete memory
-    await memoryService.deleteMemory(memoryId, authResult.user?.id)
+    await memoryService.deleteMemory(memoryId, user.id)
 
     return new Response(
       JSON.stringify({

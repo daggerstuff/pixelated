@@ -1,0 +1,217 @@
+{
+  "api_testing": {
+    "enabled": true,
+    "base_url": "http://localhost:3000",
+    "timeout": 30000,
+    "retries": 2,
+    "parallel_workers": 4,
+    "test_categories": [
+      "authentication",
+      "user_management",
+      "chat_api",
+      "ai_service",
+      "analytics",
+      "file_upload",
+      "error_handling",
+      "performance"
+    ],
+    "endpoints": {
+      "authentication": {
+        "login": "/api/auth/login",
+        "register": "/api/auth/register",
+        "logout": "/api/auth/logout",
+        "refresh": "/api/auth/refresh",
+        "verify": "/api/auth/verify"
+      },
+      "user_management": {
+        "profile": "/api/user/profile",
+        "update_profile": "/api/user/profile",
+        "delete_account": "/api/user/account",
+        "preferences": "/api/user/preferences",
+        "sessions": "/api/user/sessions"
+      },
+      "chat": {
+        "conversations": "/api/chat/conversations",
+        "messages": "/api/chat/messages",
+        "search": "/api/chat/search",
+        "export": "/api/chat/export"
+      },
+      "ai_service": {
+        "analyze": "/api/ai/analyze",
+        "generate": "/api/ai/generate-response",
+        "models": "/api/ai/models",
+        "feedback": "/api/ai/feedback"
+      },
+      "analytics": {
+        "dashboard": "/api/analytics/dashboard",
+        "events": "/api/analytics/events",
+        "reports": "/api/analytics/reports"
+      },
+      "files": {
+        "upload": "/api/files/upload",
+        "download": "/api/files/:fileId",
+        "delete": "/api/files/:fileId",
+        "list": "/api/files"
+      }
+    },
+    "test_data": {
+      "users": {
+        "valid_user": {
+          "email": "test@example.com",
+          "password": "testPassword123",
+          "name": "Test User"
+        },
+        "admin_user": {
+          "email": "admin@example.com",
+          "password": "adminPassword123",
+          "name": "Admin User",
+          "role": "admin"
+        }
+      },
+      "messages": {
+        "text_message": {
+          "content": "Hello, this is a test message",
+          "type": "text"
+        },
+        "long_message": {
+          "content": "This is a very long message that exceeds the typical length to test how the API handles longer content. It should be processed correctly without any issues.",
+          "type": "text"
+        },
+        "special_chars": {
+          "content": "Message with special chars: !@#$%^&*()_+{}|:<>?[]\\;'\",./ and émojis 🚀🎉",
+          "type": "text"
+        }
+      },
+      "files": {
+        "text_file": {
+          "name": "test.txt",
+          "content": "Test file content",
+          "mime_type": "text/plain"
+        },
+        "large_file": {
+          "name": "large_test.txt",
+          "size_mb": 5,
+          "mime_type": "text/plain"
+        }
+      }
+    },
+    "performance_thresholds": {
+      "response_time_ms": {
+        "fast": 200,
+        "acceptable": 1000,
+        "slow": 3000
+      },
+      "concurrent_requests": {
+        "light_load": 10,
+        "medium_load": 50,
+        "heavy_load": 100
+      },
+      "rate_limits": {
+        "requests_per_minute": 60,
+        "requests_per_hour": 1000
+      }
+    },
+    "error_scenarios": {
+      "authentication_errors": [
+        {
+          "scenario": "invalid_credentials",
+          "expected_status": 401,
+          "expected_message": "Invalid credentials"
+        },
+        {
+          "scenario": "expired_token",
+          "expected_status": 401,
+          "expected_message": "Token expired"
+        },
+        {
+          "scenario": "missing_token",
+          "expected_status": 401,
+          "expected_message": "Authorization required"
+        }
+      ],
+      "validation_errors": [
+        {
+          "scenario": "invalid_email",
+          "expected_status": 400,
+          "expected_message": "Invalid email format"
+        },
+        {
+          "scenario": "missing_required_field",
+          "expected_status": 400,
+          "expected_message": "Required field missing"
+        },
+        {
+          "scenario": "invalid_data_type",
+          "expected_status": 400,
+          "expected_message": "Invalid data type"
+        }
+      ],
+      "resource_errors": [
+        {
+          "scenario": "not_found",
+          "expected_status": 404,
+          "expected_message": "Resource not found"
+        },
+        {
+          "scenario": "forbidden",
+          "expected_status": 403,
+          "expected_message": "Access forbidden"
+        }
+      ],
+      "server_errors": [
+        {
+          "scenario": "internal_error",
+          "expected_status": 500,
+          "expected_message": "Internal server error"
+        },
+        {
+          "scenario": "service_unavailable",
+          "expected_status": 503,
+          "expected_message": "Service unavailable"
+        }
+      ]
+    },
+    "security_tests": {
+      "sql_injection": {
+        "enabled": true,
+        "payloads": [
+          "'; DROP TABLE users; --",
+          "' OR '1'='1",
+          "admin'--"
+        ]
+      },
+      "xss_prevention": {
+        "enabled": true,
+        "payloads": [
+          "<script>alert('xss')</script>",
+          "javascript:alert('xss')",
+          "<img src=x onerror=alert('xss')>"
+        ]
+      },
+      "csrf_protection": {
+        "enabled": true,
+        "test_missing_token": true,
+        "test_invalid_token": true
+      },
+      "rate_limiting": {
+        "enabled": true,
+        "test_burst_requests": true,
+        "test_sustained_load": true
+      }
+    },
+    "monitoring": {
+      "response_time_tracking": true,
+      "error_rate_tracking": true,
+      "throughput_measurement": true,
+      "memory_usage_monitoring": false,
+      "detailed_logging": true
+    },
+    "reporting": {
+      "generate_html_report": true,
+      "generate_json_report": true,
+      "include_performance_metrics": true,
+      "include_security_results": true,
+      "export_to_file": true
+    }
+  }
+}

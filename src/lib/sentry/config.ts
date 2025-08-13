@@ -20,8 +20,8 @@ export const SENTRY_CONFIG = {
     import.meta.env['PUBLIC_SENTRY_PROFILES_SAMPLE_RATE'] ?? (import.meta.env.DEV ? 0.2 : 0.05)
   ),
 
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
+  replaysSessionSampleRate: 0,
+  replaysOnErrorSampleRate: 0,
 
   sendDefaultPii: true,
 

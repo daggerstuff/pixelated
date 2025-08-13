@@ -541,3 +541,12 @@ async function getNotificationTemplates(): Promise<string> {
 4. Media Notification Template (if required)
   `.trim()
 }
+
+export const BreachNotificationSystem = {
+  reportBreach,
+  getBreachStatus,
+  listRecentBreaches,
+  runTestScenario,
+  updateMetrics,
+  getTrainingMaterials,
+};

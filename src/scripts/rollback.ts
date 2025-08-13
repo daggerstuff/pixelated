@@ -35,7 +35,7 @@ async function sendNotification(message: string, environment: string) {
     console.log(`Sending notification for ${environment} rollback...`)
 
     // Send to Slack
-    await fetch(process.env.SLACK_WEBHOOK || '', {
+    await fetch(process.env['SLACK_WEBHOOK'] ?? '', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -44,12 +44,12 @@ async function sendNotification(message: string, environment: string) {
     })
 
     // Send to email
-    if (process.env.EMAIL_API_KEY) {
+    if (process.env['EMAIL_API_KEY']) {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.EMAIL_API_KEY}`,
+          Authorization: `Bearer ${process.env['EMAIL_API_KEY']}`,
         },
         body: JSON.stringify({
           from: 'alerts@pixelatedempathy.com',

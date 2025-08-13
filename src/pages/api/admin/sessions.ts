@@ -1,8 +1,7 @@
 export const prerender = false
-import type { APIRoute, APIContext } from 'astro'
 import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 
 interface AdminLocals {
   admin: {

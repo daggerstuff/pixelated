@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getSession } from '../auth/session'
 import { createEnhancedRateLimiter } from '../middleware/enhanced-rate-limit'
 import { generateHash } from '../crypto/hash'

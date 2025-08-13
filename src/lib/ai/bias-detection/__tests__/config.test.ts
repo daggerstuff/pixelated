@@ -11,7 +11,7 @@ import {
   getConfigSummary,
   isProductionReady,
   validateConfig,
-} from './config'
+} from '../config'
 
 describe('BiasDetectionConfigManager', () => {
   let originalEnv: NodeJS.ProcessEnv

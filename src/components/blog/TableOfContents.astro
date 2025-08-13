@@ -23,7 +23,7 @@
       // Create an ID for the heading if it doesn't have one
       if (!heading.id) {
         heading.id =
-          heading.textConten
+          heading.textContent
             ?.toLowerCase()
             .replace(/[^\w\s]/g, '')
             .replace(/\s+/g, '-') || ''
@@ -36,7 +36,7 @@
       // Create link
       const link = document.createElement('a')
       link.href = `#${heading.id}`
-      link.textContent = heading.textConten
+      link.textContent = heading.textContent
 
       // Add click event to smooth scroll
       link.addEventListener('click', (e) => {

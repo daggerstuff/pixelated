@@ -5,7 +5,7 @@
  * is working correctly. Run this file directly to test the SEAL implementation.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SealContext } from './seal-context'
 import { SealService } from './seal-service'
 import { SealOperations } from './seal-operations'
