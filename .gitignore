@@ -45,7 +45,6 @@ node_modules/
 /Thumbs.db*
 
 /.local
-/tools/
 /security-reports/
 
 /tests/security/node_modules/
@@ -84,8 +83,6 @@ pnpm-workspace.yaml
 
 .envrc
 
-*~
-
 ### Python ###
 __pycache__/
 *.py[cod]
@@ -96,11 +93,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+
 parts/
 sdist/
-var/
+
 wheels/
 share/python-wheels/
 *.egg-info/
