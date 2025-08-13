@@ -3,8 +3,14 @@ global:
   evaluation_interval: 15s
 
 rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
+  - "alert-rules.yml"
+
+# Send alerts directly to webhook instead of Alertmanager to avoid vulnerabilities
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alert-receiver:9093
 
 scrape_configs:
   # Prometheus itself

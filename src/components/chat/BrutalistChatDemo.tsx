@@ -17,7 +17,7 @@ const BrutalistChatDemo: React.FC = () => {
     {
       id: '1',
       type: 'system',
-      content: 'THERAPY TRAINING SESSION INITIALIZED. Client persona: Sarah, 28, presenting with anxiety and relationship concerns.',
+      content: 'THERAPY TRAINING SESSION INITIALIZED. You are the therapist. Client persona: Sarah, 28, presenting with anxiety and relationship concerns.',
       timestamp: new Date(),
     },
     {
@@ -51,30 +51,35 @@ const BrutalistChatDemo: React.FC = () => {
       type: 'user',
       content: inputValue,
       timestamp: new Date(),
+      metadata: {
+        biasDetected: Math.random() > 0.8, // Bias detection for therapist responses
+        confidenceScore: Math.floor(Math.random() * 30) + 70,
+        suggestions: ['Consider exploring both perspectives', 'Validate client emotions', 'Avoid taking sides']
+      }
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response with bias detection
+    // Simulate client response
     setTimeout(() => {
       const responses = [
         "That sounds really difficult. Can you tell me more about what's been happening in your relationship?",
         "I hear that you're feeling frustrated. What would you like to see change?",
         "It sounds like there might be different perspectives here. How do you think your boyfriend sees the situation?",
+        "He just doesn't listen to me anymore. Every time I try to talk about something important, he gets defensive.",
+        "I feel like I'm walking on eggshells around him. I can't say anything without it turning into an argument.",
+        "Maybe you're right... but it's hard to see past all the hurt and frustration right now."
       ];
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        // Assert non-undefined since responses has fixed non-empty items
         content: responses[Math.floor(Math.random() * responses.length)]!,
         timestamp: new Date(),
         metadata: {
-          biasDetected: Math.random() > 0.7,
-          confidenceScore: Math.floor(Math.random() * 30) + 70,
-          suggestions: ['Consider exploring both perspectives', 'Validate client emotions', 'Avoid taking sides']
+          confidenceScore: Math.floor(Math.random() * 20) + 80 // Client confidence in sharing
         }
       };
 
@@ -102,97 +107,117 @@ const BrutalistChatDemo: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Session Header */}
-      <div className="bg-gray-900 border-2 border-gray-700 p-4 mb-4">
+    <div className="max-w-5xl mx-auto">
+      {/* Simplified Session Header */}
+      <div className="bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-lg p-4 mb-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="status-indicator status-indicator--online">
-              <div className="pulse-dot pulse-dot--green"></div>
-              <span className="font-bold">TRAINING SESSION</span>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-slate-200">Training Session</span>
             </div>
-            <div className="brutalist-badge brutalist-badge--info">
-              BIAS DETECTION: ON
+            <div className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded border border-blue-500/30">
+              Bias Detection: Active
             </div>
           </div>
           <button
             onClick={endSession}
-            className="brutalist-button brutalist-button--outline text-sm px-4 py-2"
+            className="text-xs px-3 py-1.5 border border-slate-600 hover:border-slate-500 text-slate-300 hover:text-white rounded transition-colors"
             disabled={!sessionActive}
           >
-            END SESSION
+            End Session
           </button>
         </div>
       </div>
 
-      {/* Chat Container */}
-      <div className="chat-container">
+      {/* Main Chat Interface */}
+      <div className="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
         {/* Chat Header */}
-        <div className="chat-header">
+        <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-bold text-white">CLIENT: SARAH M.</h3>
-              <p className="text-sm text-gray-400">Anxiety, Relationship Issues</p>
+              <h3 className="font-semibold text-slate-800">Client: Sarah M.</h3>
+              <p className="text-sm text-slate-600">Anxiety, Relationship Issues</p>
             </div>
             <div className="flex gap-2">
-              <div className="brutalist-badge brutalist-badge--warning text-xs">
-                DIFFICULTY: MODERATE
-              </div>
-              <div className="brutalist-badge brutalist-badge--info text-xs">
-                BIAS RISK: LOW
-              </div>
+              <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full border border-amber-200">
+                Moderate Difficulty
+              </span>
+              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-200">
+                Low Bias Risk
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="chat-messages">
+        {/* Messages Area - Made Much Larger */}
+        <div className="h-96 overflow-y-auto p-6 space-y-4 bg-slate-50/30">
           {messages.map((message) => (
             <div key={message.id} className="space-y-2">
-              <div className={`message ${
-                message.type === 'user' ? 'message--user' : 
-                message.type === 'system' ? 'bg-yellow-900/20 border border-yellow-600 text-yellow-200 text-center text-sm' :
-                'message--ai'
+              <div className={`max-w-[85%] ${
+                message.type === 'user' ? 'ml-auto' : 
+                message.type === 'system' ? 'mx-auto' :
+                'mr-auto'
               }`}>
-                {message.type !== 'system' && (
-                  <div className="text-xs opacity-70 mb-1 font-bold uppercase tracking-wide">
-                    {message.type === 'user' ? 'THERAPIST' : 'CLIENT'}
+                {message.type === 'system' ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+                    <div className="text-sm text-amber-800 font-medium">
+                      {message.content}
+                    </div>
                   </div>
+                ) : (
+                  <>
+                    <div className="text-xs text-slate-500 mb-1 font-medium">
+                      {message.type === 'user' ? 'THERAPIST' : 'CLIENT'}
+                    </div>
+                    <div className={`rounded-2xl px-4 py-3 ${
+                      message.type === 'user' 
+                        ? 'bg-blue-500 text-white' 
+                        : 'bg-white border border-slate-200 text-slate-800 shadow-sm'
+                    }`}>
+                      {message.content}
+                    </div>
+                  </>
                 )}
-                <div className={message.type === 'system' ? 'font-bold' : ''}>
-                  {message.content}
-                </div>
               </div>
 
-              {/* Bias Detection Alert */}
-              {message.metadata?.biasDetected && (
-                <div className="alert alert--warning text-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span>⚠️</span>
-                    <span className="font-bold">POTENTIAL BIAS DETECTED</span>
-                  </div>
-                  <div className="text-xs">
-                    <strong>Suggestions:</strong>
-                    <ul className="list-disc list-inside mt-1">
-                      {message.metadata.suggestions?.map((suggestion) => (
-                        <li key={suggestion}>{suggestion}</li>
-                      ))}
-                    </ul>
+              {/* Bias Detection Alert - Refined */}
+              {message.metadata?.biasDetected && message.type === 'user' && (
+                <div className="max-w-[85%] ml-auto">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                    <div className="flex items-center gap-2 mb-2 text-amber-800">
+                      <span>⚠️</span>
+                      <span className="font-medium">Potential Bias Detected</span>
+                    </div>
+                    <div className="text-amber-700">
+                      <strong>Suggestions:</strong>
+                      <ul className="list-disc list-inside mt-1 space-y-1">
+                        {message.metadata.suggestions?.map((suggestion) => (
+                          <li key={suggestion} className="text-xs">{suggestion}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Confidence Score */}
-              {message.metadata?.confidenceScore && message.type === 'user' && (
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <span>CONFIDENCE:</span>
-                  <div className="progress-bar w-20">
+              {/* Confidence Indicators - Subtle */}
+              {message.metadata?.confidenceScore && (
+                <div className={`text-xs text-slate-500 flex items-center gap-2 ${
+                  message.type === 'user' ? 'justify-end' : 'justify-start'
+                }`}>
+                  <span>
+                    {message.type === 'user' ? 'Therapeutic Confidence:' : 'Client Openness:'}
+                  </span>
+                  <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                     <div 
-                      className="progress-fill" 
+                      className={`h-full rounded-full ${
+                        message.type === 'user' ? 'bg-blue-400' : 'bg-green-400'
+                      }`}
                       style={{ width: `${message.metadata.confidenceScore}%` }}
                     ></div>
                   </div>
-                  <span>{message.metadata.confidenceScore}%</span>
+                  <span className="font-medium">{message.metadata.confidenceScore}%</span>
                 </div>
               )}
             </div>
@@ -200,16 +225,16 @@ const BrutalistChatDemo: React.FC = () => {
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="message message--ai">
-              <div className="text-xs opacity-70 mb-1 font-bold uppercase tracking-wide">
-                CLIENT
-              </div>
-              <div className="flex items-center gap-2">
-                <span>Typing</span>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            <div className="max-w-[85%] mr-auto">
+              <div className="text-xs text-slate-500 mb-1 font-medium">CLIENT</div>
+              <div className="bg-white border border-slate-200 rounded-2xl px-4 py-3 shadow-sm">
+                <div className="flex items-center gap-2 text-slate-600">
+                  <span>Typing</span>
+                  <div className="flex gap-1">
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse"></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -218,39 +243,37 @@ const BrutalistChatDemo: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Chat Input */}
-        <div className="chat-input-area">
+        {/* Chat Input - Streamlined */}
+        <div className="border-t border-slate-200 p-4 bg-white">
           <div className="flex gap-3">
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={sessionActive ? "Type your therapeutic response..." : "Session ended"}
-              className="form-input form-textarea resize-none"
+              className="flex-1 resize-none border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={2}
               disabled={!sessionActive}
             />
             <button
               onClick={handleSendMessage}
               disabled={!inputValue.trim() || !sessionActive}
-              className="brutalist-button brutalist-button--primary px-6 py-2 self-end"
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
-              SEND
+              Send
             </button>
           </div>
           
           {sessionActive && (
-            <div className="flex items-center justify-between mt-3 text-xs text-gray-400">
+            <div className="flex items-center justify-between mt-3 text-xs text-slate-500">
               <div className="flex items-center gap-4">
-                <span>Press Enter to send</span>
-                <span>•</span>
-                <span>Shift+Enter for new line</span>
+                <span>Press Enter to send • Shift+Enter for new line</span>
               </div>
               <div className="flex items-center gap-2">
-                <span>REAL-TIME ANALYSIS:</span>
-                <div className="status-indicator status-indicator--online">
-                  <div className="pulse-dot pulse-dot--green"></div>
-                  <span>ACTIVE</span>
+                <span>Real-time Analysis:</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-600 font-medium">Active</span>
                 </div>
               </div>
             </div>
@@ -258,25 +281,29 @@ const BrutalistChatDemo: React.FC = () => {
         </div>
       </div>
 
-      {/* Session Stats */}
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="metric-card">
-          <div className="metric-value">{messages.filter(m => m.type === 'user').length}</div>
-          <div className="metric-label">Responses</div>
+      {/* Compact Session Stats */}
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div className="text-lg font-semibold text-slate-800">{messages.filter(m => m.type === 'user').length}</div>
+          <div className="text-xs text-slate-600">Responses</div>
         </div>
-        <div className="metric-card">
-          <div className="metric-value">{messages.filter(m => m.metadata?.biasDetected).length}</div>
-          <div className="metric-label">Bias Alerts</div>
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div className="text-lg font-semibold text-slate-800">{messages.filter(m => m.metadata?.biasDetected).length}</div>
+          <div className="text-xs text-slate-600">Bias Alerts</div>
         </div>
-        <div className="metric-card">
-          <div className="metric-value">
-            {Math.round(messages.filter(m => m.metadata?.confidenceScore).reduce((acc, m) => acc + (m.metadata?.confidenceScore || 0), 0) / messages.filter(m => m.metadata?.confidenceScore).length) || 0}%
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div className="text-lg font-semibold text-slate-800">
+            {(() => {
+              const messagesWithConfidence = messages.filter(m => m.metadata?.confidenceScore);
+              const totalConfidence = messagesWithConfidence.reduce((acc, m) => acc + (m.metadata?.confidenceScore || 0), 0);
+              return messagesWithConfidence.length > 0 ? Math.round(totalConfidence / messagesWithConfidence.length) : 0;
+            })()}%
           </div>
-          <div className="metric-label">Avg Confidence</div>
+          <div className="text-xs text-slate-600">Avg Confidence</div>
         </div>
-        <div className="metric-card">
-          <div className="metric-value">{Math.floor((Date.now() - (messages[0]?.timestamp?.getTime() ?? Date.now())) / 60000)}</div>
-          <div className="metric-label">Minutes</div>
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div className="text-lg font-semibold text-slate-800">{Math.floor((Date.now() - (messages[0]?.timestamp?.getTime() ?? Date.now())) / 60000)}</div>
+          <div className="text-xs text-slate-600">Minutes</div>
         </div>
       </div>
     </div>

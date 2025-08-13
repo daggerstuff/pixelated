@@ -1,0 +1,62 @@
+groups:
+  - name: pixelated-empathy-alerts
+    rules:
+      # Service health checks
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 2 minutes."
+
+      # Web application health
+      - alert: WebApplicationDown
+        expr: up{job="pixelated-web"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Web application is down"
+          description: "The main web application has been unreachable for more than 1 minute."
+
+      # High response time
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s"
+
+      # Memory usage
+      - alert: HighMemoryUsage
+        expr: (process_resident_memory_bytes / 1024 / 1024) > 512
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.job }}"
+          description: "Memory usage is {{ $value }}MB"
+
+      # AI Service health
+      - alert: AIServiceUnhealthy
+        expr: up{job="pixelated-ai-service"} == 0
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AI Service is unhealthy"
+          description: "AI Service has been down for more than 3 minutes."
+
+      # Database connectivity
+      - alert: DatabaseDown
+        expr: up{job="postgresql"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database is down"
+          description: "PostgreSQL database has been down for more than 1 minute."

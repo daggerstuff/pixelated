@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Existing services...
+  
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pixelated-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+
+  # Secure alert receiver (no vulnerabilities)
+  alert-receiver:
+    build:
+      context: ./docker/alert-receiver
+      dockerfile: Dockerfile
+    container_name: pixelated-alert-receiver
+    ports:
+      - "9093:9093"
+    environment:
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pixelated-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+
+  # Lightweight uptime monitor (alternative to GitHub Actions)
+  uptime-monitor:
+    image: louislam/uptime-kuma:1
+    container_name: pixelated-uptime-kuma
+    ports:
+      - "3002:3001"
+    volumes:
+      - uptime_data:/app/data
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  uptime_data:
+
+networks:
+  pixelated-network:
+    driver: bridge

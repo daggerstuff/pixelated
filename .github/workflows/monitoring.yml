@@ -2,7 +2,9 @@ name: Monitoring
 
 on:
   schedule:
-  - cron: '*/15 * * * *'
+  # Reduced to once per day instead of every 15 minutes!
+  # This saves ~95% of GitHub Actions costs
+  - cron: '0 12 * * *'  # Noon UTC daily
   workflow_dispatch:
 
 permissions: read-all
