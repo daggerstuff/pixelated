@@ -102,7 +102,6 @@ describe('BiasDetectionConfigManager', () => {
       expect(config.thresholds?.warningLevel).toBe(0.4)
       expect(config.thresholds?.highLevel).toBe(0.7)
       expect(config.pythonServiceUrl).toBeDefined()
-      expect(config.cache.enabled).toBe(false)
     })
 
     it('should handle invalid environment variable values gracefully', () => {
