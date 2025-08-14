@@ -199,7 +199,13 @@ export const BiasDetectionDemo: React.FC<BiasDetectionDemoProps> = ({
     const exportData = createExportData(
       analysisResults,
       counterfactualScenarios,
-      historicalComparison,
+      historicalComparison || {
+        thirtyDayAverage: 0,
+        sevenDayTrend: 'stable' as const,
+        percentileRank: 50,
+        comparisonToAverage: 0,
+        trendDirection: 'neutral'
+      },
     )
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {

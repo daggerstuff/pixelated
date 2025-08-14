@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { GET } from '../health'
 
 // Mock dependencies first to avoid hoisting issues

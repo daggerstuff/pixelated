@@ -1,6 +1,7 @@
+import type { APIRoute, APIContext } from 'astro'
 import { updatePassword } from '../../../services/auth.service'
 
-export const POST = async ({
+export const POST: APIRoute = async ({
   request,
   cookies,
 }: {

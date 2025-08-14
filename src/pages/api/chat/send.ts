@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 // Import the FHE chat library
 import { fheChat } from '../../../lib/chat/fheChat'
 
@@ -11,7 +12,7 @@ interface ChatMessageRequest {
 }
 
 // Define the message sending handler with FHE secure processing
-export async function POST(request: Request) {
+export const POST: APIRoute = async ({ request }: APIContext) => {
   const body = (await request.json()) as ChatMessageRequest
 
   // ... existing message validation logic

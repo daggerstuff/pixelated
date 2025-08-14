@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 
 export interface AnalyzeRequest {
@@ -394,7 +395,7 @@ function calculateProgressMetrics(content: string, clientContext?: AnalyzeReques
   }
 }
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   const startTime = Date.now()
   
   try {

@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { mongodb } from '@/config/mongodb.config'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 import { z } from 'zod'
@@ -15,7 +16,7 @@ const RegisterSchema = z.object({
  * This export is automatically used by Astro's routing system
  */
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   try {
     const body = await request.json()
     const { email, password, fullName } = RegisterSchema.parse(body)

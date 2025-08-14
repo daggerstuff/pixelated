@@ -1,5 +1,6 @@
+import type { APIRoute, APIContext } from 'astro'
 import { protectRoute } from '@/lib/auth/serverAuth'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import type { AuthAPIContext } from '@lib/auth/apiRouteTypes.ts'
 
 const logger = createBuildSafeLogger('security-admin')
@@ -15,7 +16,7 @@ async function testSecurityAlert(
   return { success: true, alertId: `test-${Date.now()}` }
 }
 
-export const POST = protectRoute({
+export const POST: APIRoute = protectRoute({
   requiredRole: 'admin',
 })(async ({ request, locals }: AuthAPIContext) => {
   try {

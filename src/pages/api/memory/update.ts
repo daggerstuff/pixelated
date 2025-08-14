@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { getCurrentUser } from '../../../lib/auth'
 import { MemoryService } from '../../../lib/memory'
@@ -47,9 +47,9 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     // Update memory
     const result = await memoryService.updateMemory(
       memoryId,
-      content,
+      user.id,
       {
-        userId: user.id,
+        content,
         ...metadata,
       }
     )

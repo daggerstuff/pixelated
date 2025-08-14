@@ -15,7 +15,7 @@ import type {
   FHEScheme,
   FHEService,
 } from '../types'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('mock-fhe')
 

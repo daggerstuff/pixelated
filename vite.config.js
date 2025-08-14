@@ -8,6 +8,7 @@ import nodeExcludePlugin from './src/plugins/vite-plugin-node-exclude'
 import externalNodePlugin from './src/plugins/vite-plugin-external-node'
 import flexsearchSSRPlugin from './src/plugins/vite-plugin-flexsearch-ssr'
 import middlewarePatchPlugin from './src/plugins/vite-plugin-middleware-patch'
+import rewriteLoggerImportPlugin from './src/plugins/vite-plugin-rewrite-logger-import'
 
 const cdnAssetMap = (() => {
   try {
@@ -49,6 +50,7 @@ export default defineConfig({
     }
   },
   plugins: [
+    rewriteLoggerImportPlugin(),
     {
       name: 'cdn-asset-replacer',
       transform(code, id) {

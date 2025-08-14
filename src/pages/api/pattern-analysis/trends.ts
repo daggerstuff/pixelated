@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
@@ -14,7 +15,7 @@ const logger = createBuildSafeLogger('api-pattern-trends')
  * over a given time range. It leverages the PatternRecognitionService with real FHE
  * capabilities to analyze patterns securely.
  */
-export const GET = protectRoute({})(async ({ request, locals }) => {
+export const GET: APIRoute = protectRoute({})(async ({ request, locals }: APIContext) => {
   try {
     // Authentication is now handled by protectRoute middleware
     const { user } = locals

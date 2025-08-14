@@ -32,6 +32,13 @@ interface EmotionData {
   context?: string
 }
 
+export interface TemporalEmotionAnalysis {
+  trendlines: EmotionTrendline[]
+  volatility: number
+  emotions: EmotionData[]
+  patterns?: EmotionPattern[]
+}
+
 export interface EmotionAnalysisResult {
   trendlines?: EmotionTrendline[]
   volatility?: number

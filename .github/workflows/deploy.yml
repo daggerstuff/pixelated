@@ -1,71 +1,215 @@
-name: Build
-
-permissions:
-  contents: read
-  security-events: write
+# -----------------------------------------------------------
+# Forgejo Deploy Workflow: Usage & Secrets Documentation
+#
+# This workflow deploys the Pixelated Empathy project to a VPS
+# on every push to the main branch using rsync and SSH.
+#
+# Required Forgejo Secrets:
+#   - VPS_HOST:        VPS IP address or hostname
+#   - VPS_USER:        SSH username for VPS
+#   - VPS_PORT:        SSH port (default: 22)
+#   - SSH_KEY:         Private SSH key (contents, not path)
+#   - DOMAIN:          Domain name (optional, for Caddy config)
+#
+# How to set up:
+# 1. Generate an SSH key pair (if you don't have one):
+#      ssh-keygen -t ed25519 -C "forgejo-deploy"
+#    Add the public key to ~/.ssh/authorized_keys on your VPS.
+# 2. In Forgejo repo settings, add the private key as the SSH_KEY secret.
+# 3. Add VPS_HOST, VPS_USER, VPS_PORT, and DOMAIN as secrets.
+# 4. Ensure your VPS user has sudo privileges and Docker permissions.
+# 5. On push to main, the workflow will sync, build, and deploy.
+#
+# Notes:
+# - The workflow overwrites /home/$VPS_USER/pixelated on the VPS.
+# - Caddy config is updated if DOMAIN is set.
+# - All commands run non-interactively; errors will fail the workflow.
+# -----------------------------------------------------------
+name: Deploy to VPS
 
 on:
   push:
     branches:
-      - master
-  workflow_dispatch:
-
-env:
-  NODE_VERSION: 22.16.0
-  PNPM_VERSION: 10.14.0
-  NODE_ENV: production
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_PORT: ${{ secrets.VPS_PORT }}
+      DOMAIN: ${{ secrets.DOMAIN }}
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          eval $(ssh-agent -s)
+          ssh-add /tmp/deploy_key
+          mkdir -p ~/.ssh
+          echo "Host *\n  StrictHostKeyChecking no\n" > ~/.ssh/config
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - name: Write rsync exclude file
+        run: |
+          cat <<EOF > /tmp/rsync-exclude
+          .git/
+          node_modules/
+          .next/
+          .nuxt/
+          dist/
+          build/
+          coverage/
+          .cache/
+          *.log
+          .DS_Store
+          Thumbs.db
+          __pycache__/
+          *.pyc
+          *.pyo
+          .pytest_cache/
+          .mypy_cache/
+          venv/
+          .venv/
+          ai/venv/
+          ai/.venv/
+          ai/*.pt
+          ai/*.pth
+          ai/*.model
+          ai/*.pkl
+          .docker/
+          docker-compose.override.yml
+          temp/
+          tmp/
+          EOF
 
-      - name: Get pnpm store directory
-        id: get-pnpm-store-path
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+      - name: Rsync project to VPS
+        run: |
+          rsync -avz --delete --exclude-from=/tmp/rsync-exclude -e "ssh -i /tmp/deploy_key -p $VPS_PORT" ./ $VPS_USER@$VPS_HOST:/home/$VPS_USER/pixelated
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+      - name: Remote VPS setup and deploy
+        run: |
+          ssh -i /tmp/deploy_key -p $VPS_PORT $VPS_USER@$VPS_HOST 'bash -s' <<'ENDSSH'
+            set -e
+            DOMAIN="${DOMAIN}"
+            cd /home/$VPS_USER/pixelated
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+            # System update and security
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
+            sudo apt-get install -y ufw fail2ban unattended-upgrades docker git
 
-      - name: Lint and Type Check
-        run: pnpm run lint; pnpm run typecheck
+            sudo ufw allow $VPS_PORT/tcp
+            sudo ufw allow 80/tcp
+            sudo ufw allow 443/tcp
+            sudo ufw default deny incoming
+            sudo ufw default allow outgoing
+            sudo ufw --force enable
+            sudo systemctl enable fail2ban
+            sudo systemctl start fail2ban
 
-      - name: Run Tests
-        run: pnpm run test
+            # Install nvm and Node.js 22
+            if ! command -v nvm &> /dev/null; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            fi
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            nvm alias default 22
 
-      - name: Build
-        run: pnpm build
-        timeout-minutes: 10
-        env:
-          DISABLE_WEB_FONTS: 'true'
-          NODE_OPTIONS: --max-old-space-size=8192
+            # Install pnpm
+            npm install -g pnpm
 
-      - name: Deploy Application
-        run: echo "Deployment step goes here. This could trigger another workflow or run deployment scripts."
-        # This step would typically involve commands like:
-        # - `pnpm run deploy` (if a custom deploy script exists)
-        # - `az webapp deploy` (for Azure)
-        # - `aws amplify publish` (for AWS Amplify)
-        # - `fly deploy` (for Fly.io)
-        # The actual deployment command would depend on the target environment and existing setup.
+            # Clean pnpm/node cache
+            rm -rf node_modules/.pnpm ~/.pnpm-store ~/.cache/pnpm .astro
+            pnpm store prune || true
+
+            # Install dependencies and build
+            pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+            export NODE_OPTIONS="--max-old-space-size=8192"
+            pnpm build
+
+            # Build Docker image
+            docker build -t pixelated-empathy:latest .
+
+            # Stop and remove old container
+            docker stop pixelated-app 2>/dev/null || true
+            docker rm pixelated-app 2>/dev/null || true
+
+            # Run new container
+            PUBLIC_URL="http://$VPS_HOST"
+            CORS_ORIGINS="http://$VPS_HOST,https://$VPS_HOST"
+            if [[ -n "$DOMAIN" ]]; then
+              PUBLIC_URL="https://$DOMAIN"
+              CORS_ORIGINS="$CORS_ORIGINS,http://$DOMAIN,https://$DOMAIN"
+            fi
+
+            docker run -d \
+              --name pixelated-app \
+              --restart unless-stopped \
+              -p 4321:4321 \
+              -e NODE_ENV=production \
+              -e PORT=4321 \
+              -e WEB_PORT=4321 \
+              -e LOG_LEVEL=info \
+              -e ENABLE_RATE_LIMITING=true \
+              -e RATE_LIMIT_WINDOW=60 \
+              -e RATE_LIMIT_MAX_REQUESTS=100 \
+              -e ENABLE_HIPAA_COMPLIANCE=true \
+              -e ENABLE_AUDIT_LOGGING=true \
+              -e ENABLE_DATA_MASKING=true \
+              -e ASTRO_TELEMETRY_DISABLED=1 \
+              -e PUBLIC_URL="$PUBLIC_URL" \
+              -e CORS_ORIGINS="$CORS_ORIGINS" \
+              pixelated-empathy:latest
+
+            sleep 15
+            docker ps | grep pixelated-app && docker logs --tail 10 pixelated-app
+
+            # Caddy setup (if domain is set)
+            if [[ -n "$DOMAIN" ]]; then
+              sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
+              curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+              curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+              sudo apt-get update
+              sudo apt-get install -y caddy
+              sudo systemctl enable caddy
+
+              # Create Caddyfile with proper formatting
+              sudo tee /etc/caddy/Caddyfile > /dev/null <<CADDY_EOF
+$DOMAIN {
+  reverse_proxy localhost:4321
+  encode gzip
+  header {
+    Strict-Transport-Security max-age=31536000
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    X-XSS-Protection "1; mode=block"
+    Referrer-Policy strict-origin-when-cross-origin
+  }
+}
+handle /api/health* {
+  reverse_proxy localhost:4321
+}
+handle /assets/* {
+  reverse_proxy localhost:4321
+  header Cache-Control "public, max-age=31536000, immutable"
+}
+handle {
+  reverse_proxy localhost:4321
+}
+CADDY_EOF
+
+              sudo caddy validate --config /etc/caddy/Caddyfile
+              sudo systemctl restart caddy
+            fi
+        ENDSSH
+
+      - name: Clean up SSH key
+        run: rm -f /tmp/deploy_key /tmp/rsync-exclude

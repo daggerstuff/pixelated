@@ -5,7 +5,7 @@
  * used by the backup security system to store and retrieve encrypted backups.
  */
 
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import * as path from 'path'
 import * as fs from 'fs/promises'
 import * as crypto from 'crypto'

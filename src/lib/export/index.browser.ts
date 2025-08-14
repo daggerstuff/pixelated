@@ -34,16 +34,19 @@ interface FHEServiceInterface {
 }
 
 /**
- * Export format types
+ * Export format types - Fixed to resolve value vs type confusion
  */
 export enum ExportFormat {
-  JSON_FORMAT = 'json',
+  JSON = 'json',
   PDF = 'pdf',
   ARCHIVE = 'archive',
-  // PDF and ENCRYPTED_ARCHIVE are not available in browser version
-  // PDF = 'pdf',
-  // ENCRYPTED_ARCHIVE = 'encrypted_archive',
+  ENCRYPTED_ARCHIVE = 'encrypted_archive',
 }
+
+/**
+ * Type-safe export format values
+ */
+export type ExportFormatValue = `${ExportFormat}`
 
 /**
  * Export options configuration
@@ -70,7 +73,7 @@ export interface ExportOptions {
  * Default export options
  */
 const DEFAULT_EXPORT_OPTIONS: ExportOptions = {
-  format: ExportFormat.JSON_FORMAT,
+  format: ExportFormat.JSON,
   includeMetadata: true,
   encryptionMode: EncryptionMode.HIPAA,
   includeVerificationToken: true,

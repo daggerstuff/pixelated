@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import {
   getOrCreateUserSettings,
@@ -93,7 +94,7 @@ function validateAIPreferences(input: unknown): asserts input is AIPreferences {
   }
 }
 
-export const GET = protectRoute()(async ({ locals }) => {
+export const GET: APIRoute = protectRoute()(async ({ locals }) => {
   try {
     const { user } = locals
     const settings = await getOrCreateUserSettings(user.id)
@@ -116,7 +117,7 @@ export const GET = protectRoute()(async ({ locals }) => {
   }
 })
 
-export const PUT = protectRoute()(async ({ request, locals }) => {
+export const PUT: APIRoute = protectRoute()(async ({ request, locals }) => {
   try {
     const { user } = locals
     const body = await request.json()
@@ -157,7 +158,7 @@ export const PUT = protectRoute()(async ({ request, locals }) => {
   }
 })
 
-export const DELETE = protectRoute()(async ({ locals, request }) => {
+export const DELETE: APIRoute = protectRoute()(async ({ locals, request }) => {
   try {
     const { user } = locals
     const settings = await getOrCreateUserSettings(user.id, request)

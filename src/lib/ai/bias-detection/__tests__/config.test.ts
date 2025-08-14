@@ -64,10 +64,9 @@ describe('BiasDetectionConfigManager', () => {
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
       expect(config).toBeDefined()
-      expect(config.environment).toBe('development')
-      expect(config.thresholds.warning).toBe(0.3)
-      expect(config.thresholds.high).toBe(0.6)
-      expect(config.thresholds.critical).toBe(0.8)
+      expect(config.thresholds?.warningLevel).toBe(0.3)
+      expect(config.thresholds?.highLevel).toBe(0.6)
+      expect(config.thresholds?.criticalLevel).toBe(0.8)
     })
   })
 

@@ -1,11 +1,11 @@
-import type { FHEOperation } from '@/lib/fhe/types'
-import type { APIRoute } from 'astro'
-import { fheService } from '@/lib/fhe'
-import { EncryptionMode } from '@/lib/fhe/types'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
-import { rateLimit } from '@/lib/middleware/rate-limit'
+import type { FHEOperation } from '../../../lib/fhe/types'
+import type { APIRoute, APIContext } from 'astro'
+import { fheService } from '../../../lib/fhe'
+import { EncryptionMode } from '../../../lib/fhe/types'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { rateLimit } from '../../../lib/middleware/rate-limit'
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   try {
     // Get client IP for rate limiting
     const clientIp =

@@ -1,21 +1,14 @@
+import type { APIRoute, APIContext } from 'astro'
 import { getCollection } from 'astro:content'
-import { techniqueSchema, type TechniqueSchema } from '@/content/schema'
-import { recommend } from '@/lib/ai/services/OutcomeRecommendationEngine'
+import { techniqueSchema, type TechniqueSchema } from '../../content/schema'
+import { recommend } from '../../lib/ai/services/OutcomeRecommendationEngine'
 
 import type { CollectionEntry } from 'astro:content'
-// Removed: import type { APIContext } from 'astro/types'
-
-// Define a type for API endpoints context
-interface APIEndpointContext {
-  request: Request
-  params: Record<string, string>
-  url: URL
-}
 
 const ALLOWED_CATEGORIES = ['CBT', 'Mindfulness', 'DBT', 'ACT', 'EMDR', 'Other']
 const ALLOWED_EVIDENCE = ['Strong', 'Moderate', 'Preliminary', 'Anecdotal']
 
-export async function GET({ request }: APIEndpointContext) {
+export const GET: APIRoute = async ({ request, cookies }: APIContext) => {
   try {
     const url = new URL(request.url)
     const category = url.searchParams.get('category')
@@ -32,6 +25,7 @@ export async function GET({ request }: APIEndpointContext) {
       }
       categoryFilter = category
     }
+
     let evidenceFilter: string | undefined = undefined
     if (evidenceLevel) {
       if (!ALLOWED_EVIDENCE.includes(evidenceLevel)) {
@@ -43,123 +37,119 @@ export async function GET({ request }: APIEndpointContext) {
       evidenceFilter = evidenceLevel
     }
 
-    // Fetch all techniques
-    const allTechniques = await getCollection('techniques')
-    // Validate and filter
-    const validTechniques = allTechniques
-      .map((entry: CollectionEntry<'techniques'>) => {
-        const parsed = techniqueSchema.safeParse(entry.data)
-        return parsed.success ? parsed.data : null
-      })
-      .filter(Boolean)
-
-    let filtered = validTechniques
+    // Get techniques from content collection
+    const techniques = await getCollection('techniques')
+    
+    // Filter techniques based on query parameters
+    let filteredTechniques = techniques
+    
     if (categoryFilter) {
-      filtered = filtered.filter(
-        (t: TechniqueSchema) => t.category === categoryFilter,
+      filteredTechniques = filteredTechniques.filter(
+        technique => technique.data.category === categoryFilter
       )
     }
+    
     if (evidenceFilter) {
-      filtered = filtered.filter(
-        (t: TechniqueSchema) => t.evidenceLevel === evidenceFilter,
+      filteredTechniques = filteredTechniques.filter(
+        technique => technique.data.evidenceLevel === evidenceFilter
       )
     }
 
-    return new Response(JSON.stringify(filtered), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=600',
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'Referrer-Policy': 'same-origin',
-        'Strict-Transport-Security':
-          'max-age=63072000; includeSubDomains; preload',
+    // Transform for API response
+    const responseData = filteredTechniques.map(technique => ({
+      id: technique.id,
+      slug: technique.slug,
+      title: technique.data.title,
+      description: technique.data.description,
+      category: technique.data.category,
+      evidenceLevel: technique.data.evidenceLevel,
+      duration: technique.data.duration,
+      difficulty: technique.data.difficulty,
+      tags: technique.data.tags || []
+    }))
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        techniques: responseData,
+        total: responseData.length,
+        filters: {
+          category: categoryFilter,
+          evidenceLevel: evidenceFilter
+        }
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
       },
-    })
+    )
   } catch (error) {
-    console.error('GET /api/techniques error:', error)
-    return new Response(JSON.stringify({ error: 'Internal server error.' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Failed to fetch techniques',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }
 
-export async function POST({ request }: APIEndpointContext) {
+export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   try {
-    if (request.headers.get('content-type') !== 'application/json') {
+    // Authentication check
+    const sessionCookie = cookies.get('session')
+    if (!sessionCookie) {
       return new Response(
-        JSON.stringify({ error: 'Content-Type must be application/json' }),
-        { status: 415, headers: { 'Content-Type': 'application/json' } },
+        JSON.stringify({ error: 'Unauthorized' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
+
     const body = await request.json()
-    const { context, desiredOutcomes, maxResults } = body || {}
+    const { patientData, preferences } = body
 
-    // Basic input validation
-    if (
-      !context ||
-      !Array.isArray(desiredOutcomes) ||
-      desiredOutcomes.length === 0
-    ) {
+    if (!patientData) {
       return new Response(
-        JSON.stringify({
-          error: 'context and desiredOutcomes[] are required.',
-        }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
-    // Optionally, validate context structure (minimal check)
-    if (!context.session || !context.chatSession) {
-      return new Response(
-        JSON.stringify({
-          error: 'context.session and context.chatSession are required.',
-        }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
-    // Defensive: limit maxResults
-    const safeMaxResults =
-      typeof maxResults === 'number' && maxResults > 0 && maxResults <= 10
-        ? maxResults
-        : 5
-
-    // Generate recommendations
-    let recommendations
-    try {
-      recommendations = recommend({
-        context,
-        desiredOutcomes,
-        maxResults: safeMaxResults,
-      })
-    } catch (err) {
-      return new Response(
-        JSON.stringify({
-          error: 'Recommendation engine error',
-          details: (err as Error).message,
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } },
+        JSON.stringify({ error: 'Patient data is required for recommendations' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
-    return new Response(JSON.stringify(recommendations), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store',
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'Referrer-Policy': 'same-origin',
-        'Strict-Transport-Security':
-          'max-age=63072000; includeSubDomains; preload',
+    // Get AI recommendations
+    const recommendations = await recommend(patientData, preferences)
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        recommendations,
+        timestamp: Date.now()
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
       },
-    })
+    )
   } catch (error) {
-    console.error('POST /api/techniques error:', error)
-    return new Response(JSON.stringify({ error: 'Internal server error.' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Failed to generate recommendations',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }

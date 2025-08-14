@@ -47,6 +47,16 @@ export interface AuthResult {
 }
 
 /**
+ * Authentication session data structure
+ */
+export interface Session {
+  user: AuthUser
+  expires: string
+  accessToken?: string
+  refreshToken?: string
+}
+
+/**
  * Props for authentication component states
  */
 export interface AuthComponentProps {

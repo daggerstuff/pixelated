@@ -1,10 +1,11 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 
 /**
  * Simple health check endpoint for Docker containers
  * Returns basic service status without external dependencies
  */
-export const GET = async () => {
+export const GET: APIRoute = async () => {
   const startTime = performance.now()
 
   try {

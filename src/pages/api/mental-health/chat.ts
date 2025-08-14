@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 
 export interface ChatRequest {
@@ -453,7 +454,7 @@ function extractKeyTopics(message: string): string[] {
   return topics
 }
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   const startTime = Date.now()
   
   try {

@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
@@ -19,7 +20,7 @@ const logger = createBuildSafeLogger('default')
  * API endpoint for fetching users (admin only)
  * GET /api/admin/users
  */
-export const GET = async (context: BaseAPIContext & { locals: AdminLocals }) => {
+export const GET: APIRoute = async (context: BaseAPIContext & { locals: AdminLocals }) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.VIEW_USERS)(
     context,
@@ -84,7 +85,7 @@ export const GET = async (context: BaseAPIContext & { locals: AdminLocals }) => 
  * API endpoint for updating a user (admin only)
  * PATCH /api/admin/users
  */
-export const PATCH = async (context: BaseAPIContext & { locals: AdminLocals }) => {
+export const PATCH: APIRoute = async (context: BaseAPIContext & { locals: AdminLocals }) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.UPDATE_USER)(
     context,

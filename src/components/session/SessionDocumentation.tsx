@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { SessionDocumentation } from '../../lib/documentation/useDocumentation'
+import type { SessionDocumentation } from '../../lib/documentation/types'
 import { useDocumentation } from '../../lib/documentation/useDocumentation'
 
 // Utility function to format duration

@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { MongoAuthService } from '@/services/mongoAuth.service'
 import { createAuditLog, AuditEventType } from '@/lib/audit'
 
@@ -6,7 +7,7 @@ type CookieStore = {
   delete(name: string, options?: { path?: string }): void
 }
 
-export const POST = async ({ cookies }: { cookies: CookieStore }) => {
+export const POST: APIRoute = async ({ cookies }: { cookies: CookieStore }) => {
   try {
     const authService = new MongoAuthService()
 

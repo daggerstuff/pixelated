@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
@@ -20,7 +21,7 @@ const logger = createBuildSafeLogger('api-pattern-risk')
  * client based on emotion analyses. It uses the PatternRecognitionService with real FHE
  * capabilities to analyze correlations securely.
  */
-export const POST = protectRoute({})(async ({ request, locals }) => {
+export const POST: APIRoute = protectRoute({})(async ({ request, locals }) => {
   try {
     const { user } = locals
 

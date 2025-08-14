@@ -1,9 +1,10 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 
 const logger = createBuildSafeLogger('auth-verify')
 
-export const GET = async ({ request }: { request: Request }) => {
+export const GET = async ({ request }: APIContext) => {
   try {
     const url = new URL(request.url)
     const token = url.searchParams.get('token')

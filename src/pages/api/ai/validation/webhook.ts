@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { validationRunner } from '@/lib/ai/validation/ContinuousValidationRunner';
 import { createBuildSafeLogger } from '../../../../../../lib/logging/build-safe-logger'
 import {
@@ -6,7 +7,7 @@ import {
   AuditEventStatus,
 } from '../../../../lib/audit'
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   const logger = createBuildSafeLogger('validation-webhook')
 
   try {

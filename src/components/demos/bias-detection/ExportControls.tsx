@@ -79,7 +79,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
 
   // Export as CSV
   const exportAsCSV = () => {
-    const csvData = []
+    const csvData: string[] = []
 
     // Headers
     const headers = ['Metric', 'Value', 'Category']
@@ -112,7 +112,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
     if (includeComponents.counterfactual) {
       counterfactualScenarios.forEach((scenario, index) => {
         csvData.push(
-          `Counterfactual ${index + 1},${scenario.expectedBiasReduction},Counterfactual`,
+          `Counterfactual ${index + 1},${scenario.biasScoreChange},Counterfactual`,
         )
         csvData.push(
           `Likelihood ${index + 1},${scenario.likelihood},Counterfactual`,
@@ -194,7 +194,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
       content += `COUNTERFACTUAL SCENARIOS\n`
       counterfactualScenarios.forEach((scenario, index) => {
         content += `${index + 1}. ${scenario.change}\n`
-        content += `   Expected Reduction: ${(scenario.expectedBiasReduction * 100).toFixed(1)}%\n`
+        content += `   Bias Score Change: ${(scenario.biasScoreChange * 100).toFixed(1)}%\n`
         content += `   Likelihood: ${scenario.likelihood}\n\n`
       })
     }

@@ -1,7 +1,8 @@
+import type { APIRoute, APIContext } from 'astro'
 import { mongoAuthService } from '@/services/mongoAuth.service'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 
-export const POST = async ({
+export const POST: APIRoute = async ({
   request,
 }: {
   request: Request

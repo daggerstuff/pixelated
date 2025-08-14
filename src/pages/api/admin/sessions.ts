@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'

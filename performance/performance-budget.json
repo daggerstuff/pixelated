@@ -1,0 +1,93 @@
+{
+  "performance_budgets": {
+    "page_load_time": {
+      "target": 2000,
+      "budget": 3000,
+      "unit": "milliseconds"
+    },
+    "first_contentful_paint": {
+      "target": 1500,
+      "budget": 2000,
+      "unit": "milliseconds"
+    },
+    "largest_contentful_paint": {
+      "target": 2500,
+      "budget": 3000,
+      "unit": "milliseconds"
+    },
+    "cumulative_layout_shift": {
+      "target": 0.1,
+      "budget": 0.25,
+      "unit": "score"
+    },
+    "first_input_delay": {
+      "target": 100,
+      "budget": 300,
+      "unit": "milliseconds"
+    },
+    "time_to_interactive": {
+      "target": 3000,
+      "budget": 5000,
+      "unit": "milliseconds"
+    },
+    "speed_index": {
+      "target": 2000,
+      "budget": 3000,
+      "unit": "milliseconds"
+    },
+    "total_blocking_time": {
+      "target": 200,
+      "budget": 600,
+      "unit": "milliseconds"
+    }
+  },
+  "resource_budgets": {
+    "javascript": {
+      "target": 200,
+      "budget": 300,
+      "unit": "kilobytes"
+    },
+    "css": {
+      "target": 50,
+      "budget": 100,
+      "unit": "kilobytes"
+    },
+    "images": {
+      "target": 500,
+      "budget": 1000,
+      "unit": "kilobytes"
+    },
+    "fonts": {
+      "target": 100,
+      "budget": 200,
+      "unit": "kilobytes"
+    },
+    "total_page_size": {
+      "target": 1000,
+      "budget": 2000,
+      "unit": "kilobytes"
+    }
+  },
+  "api_performance_budgets": {
+    "response_time_p95": {
+      "target": 500,
+      "budget": 1000,
+      "unit": "milliseconds"
+    },
+    "response_time_p99": {
+      "target": 1000,
+      "budget": 2000,
+      "unit": "milliseconds"
+    },
+    "throughput": {
+      "target": 1000,
+      "budget": 500,
+      "unit": "requests_per_second"
+    },
+    "error_rate": {
+      "target": 0.001,
+      "budget": 0.01,
+      "unit": "percentage"
+    }
+  }
+}

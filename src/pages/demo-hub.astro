@@ -72,52 +72,417 @@ const liveDemo = {
   description="Try our AI-powered therapy training simulations. Practice crisis interventions, bias detection, and complex client scenarios safely."
 >
   <!-- Hero Section -->
-  <section class="brutalist-section mesh-bg-1 relative overflow-hidden">
-    <!-- Floating Background Elements -->
-    <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-teal-500/10 to-blue-500/10 floating-element"></div>
-    <div class="absolute top-40 right-20 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 floating-element--delayed"></div>
-    <div class="absolute bottom-20 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-green-500/10 to-teal-500/10 floating-element"></div>
+  <section class="brutalist-section mesh-bg-1 relative overflow-hidden min-h-screen flex items-center">
+    <!-- Animated Background Grid -->
+    <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+    
+    <!-- Floating Neural Network Nodes -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="neural-node neural-node--1" data-speed="0.5"></div>
+      <div class="neural-node neural-node--2" data-speed="0.8"></div>
+      <div class="neural-node neural-node--3" data-speed="1.2"></div>
+      <div class="neural-node neural-node--4" data-speed="0.6"></div>
+      <div class="neural-node neural-node--5" data-speed="0.9"></div>
+      <div class="neural-node neural-node--6" data-speed="1.1"></div>
+    </div>
+
+    <!-- Particle System -->
+    <div class="absolute inset-0">
+      <div class="particle particle--1"></div>
+      <div class="particle particle--2"></div>
+      <div class="particle particle--3"></div>
+      <div class="particle particle--4"></div>
+      <div class="particle particle--5"></div>
+    </div>
+
+    <!-- Glitch Effect Overlay -->
+    <div class="absolute inset-0 glitch-overlay opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
 
     <div class="brutalist-container relative z-10">
-      <div class="text-center mb-16">
-        <div class="status-indicator status-indicator--online inline-flex mb-6">
-          <div class="pulse-dot pulse-dot--green"></div>
-          <span class="font-bold">ALL SYSTEMS OPERATIONAL</span>
+      <div class="text-center">
+        <!-- Animated Status Bar -->
+        <div class="status-bar mb-8 inline-block">
+          <div class="status-indicator status-indicator--online inline-flex items-center gap-3 px-6 py-3 bg-black/20 backdrop-blur-sm rounded-full border border-green-500/30">
+            <div class="pulse-dot pulse-dot--green"></div>
+            <span class="font-bold text-green-400">ALL SYSTEMS OPERATIONAL</span>
+            <div class="status-dots">
+              <span class="status-dot"></span>
+              <span class="status-dot"></span>
+              <span class="status-dot"></span>
+            </div>
+          </div>
         </div>
         
-        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
-          <span class="gradient-text-primary">EXPERIENCE THE</span>
-          <br />
-          <span class="gradient-text-secondary">TRAINING REVOLUTION</span>
-        </h1>
+        <!-- Main Headline with Typewriter Effect -->
+        <div class="headline-container mb-8">
+          <h1 class="brutalist-heading text-6xl md:text-8xl lg:text-9xl mb-4 leading-tight">
+            <span class="gradient-text-primary typewriter-text" data-text="EXPERIENCE THE">EXPERIENCE THE</span>
+            <br />
+            <span class="gradient-text-secondary glitch-text" data-text="TRAINING REVOLUTION">TRAINING REVOLUTION</span>
+          </h1>
+        </div>
         
-        <p class="text-xl text-gray-300 mb-8 max-w-4xl mx-auto">
-          Try our AI-powered therapy training simulations. Each demo represents years of development and thousands of hours of clinical expertise.
-        </p>
+        <!-- Animated Description -->
+        <div class="description-container mb-12">
+          <p class="text-xl md:text-2xl text-gray-300 max-w-5xl mx-auto leading-relaxed fade-in-text">
+            Try our <span class="text-teal-400 font-semibold">AI-powered therapy training simulations</span>. 
+            Each demo represents <span class="text-purple-400 font-semibold">years of development</span> and 
+            <span class="text-blue-400 font-semibold">thousands of hours</span> of clinical expertise.
+          </p>
+        </div>
 
-        <div class="flex flex-wrap justify-center gap-4 mb-12">
-          <div class="nav-pill bg-gradient-to-r from-green-500 to-teal-500 text-white">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            ZERO RISK TRAINING
+        <!-- Interactive Feature Pills -->
+        <div class="feature-pills-container mb-16">
+          <div class="flex flex-wrap justify-center gap-6">
+            <div class="feature-pill feature-pill--success hover:scale-110 transition-all duration-300 cursor-pointer" data-tooltip="Practice without consequences">
+              <div class="feature-pill-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <span class="feature-pill-text">ZERO RISK TRAINING</span>
+              <div class="feature-pill-glow"></div>
+            </div>
+            
+            <div class="feature-pill feature-pill--info hover:scale-110 transition-all duration-300 cursor-pointer" data-tooltip="End-to-end encryption">
+              <div class="feature-pill-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
+              <span class="feature-pill-text">FULLY ENCRYPTED</span>
+              <div class="feature-pill-glow"></div>
+            </div>
+            
+            <div class="feature-pill feature-pill--warning hover:scale-110 transition-all duration-300 cursor-pointer" data-tooltip="Instant analysis">
+              <div class="feature-pill-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <span class="feature-pill-text">REAL-TIME FEEDBACK</span>
+              <div class="feature-pill-glow"></div>
+            </div>
           </div>
-          <div class="nav-pill bg-gradient-to-r from-teal-500 to-blue-500 text-white">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-            FULLY ENCRYPTED
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="cta-container">
+          <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <button class="cta-button cta-button--primary group" id="live-demo-btn">
+              <span class="cta-button-text">LIVE DEMONSTRATION</span>
+              <div class="cta-button-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+              </div>
+              <div class="cta-button-glow"></div>
+            </button>
+            
+            <button class="cta-button cta-button--secondary group" id="modules-btn">
+              <span class="cta-button-text">VIEW MODULES</span>
+              <div class="cta-button-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+            </button>
           </div>
-          <div class="nav-pill bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-            REAL-TIME FEEDBACK
-          </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator mt-16">
+          <div class="scroll-arrow"></div>
+          <span class="scroll-text text-sm text-gray-400">Scroll to explore</span>
         </div>
       </div>
     </div>
   </section>
+
+  <style>
+    /* Neural Network Nodes */
+    .neural-node {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.8) 0%, rgba(34, 211, 238, 0.2) 70%, transparent 100%);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .neural-node--1 { top: 20%; left: 15%; animation-delay: 0s; }
+    .neural-node--2 { top: 30%; right: 20%; animation-delay: 1s; }
+    .neural-node--3 { bottom: 30%; left: 25%; animation-delay: 2s; }
+    .neural-node--4 { bottom: 20%; right: 15%; animation-delay: 3s; }
+    .neural-node--5 { top: 50%; left: 10%; animation-delay: 4s; }
+    .neural-node--6 { top: 60%; right: 10%; animation-delay: 5s; }
+
+    /* Particle System */
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(34, 211, 238, 0.6);
+      border-radius: 50%;
+      animation: particle-float 8s linear infinite;
+    }
+    
+    .particle--1 { top: 10%; left: 20%; animation-delay: 0s; }
+    .particle--2 { top: 25%; right: 30%; animation-delay: 2s; }
+    .particle--3 { bottom: 15%; left: 40%; animation-delay: 4s; }
+    .particle--4 { bottom: 35%; right: 25%; animation-delay: 6s; }
+    .particle--5 { top: 70%; left: 50%; animation-delay: 1s; }
+
+    /* Status Dots */
+    .status-dots {
+      display: flex;
+      gap: 2px;
+    }
+    
+    .status-dot {
+      width: 4px;
+      height: 4px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: status-pulse 2s ease-in-out infinite;
+    }
+    
+    .status-dot:nth-child(2) { animation-delay: 0.3s; }
+    .status-dot:nth-child(3) { animation-delay: 0.6s; }
+
+    /* Typewriter Effect */
+    .typewriter-text {
+      overflow: hidden;
+      border-right: 3px solid #22d3ee;
+      white-space: nowrap;
+      animation: typewriter 3s steps(12) 1s forwards, blink-caret 1s step-end infinite;
+    }
+
+    /* Glitch Text */
+    .glitch-text {
+      position: relative;
+      animation: glitch 2s infinite;
+    }
+    
+    .glitch-text::before,
+    .glitch-text::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .glitch-text::before {
+      animation: glitch-1 0.5s infinite;
+      color: #ff0080;
+      z-index: -1;
+    }
+    
+    .glitch-text::after {
+      animation: glitch-2 0.5s infinite;
+      color: #00ffff;
+      z-index: -2;
+    }
+
+    /* Feature Pills */
+    .feature-pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-blur-sm;
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+    
+    .feature-pill--success { border-color: rgba(34, 197, 94, 0.3); }
+    .feature-pill--info { border-color: rgba(59, 130, 246, 0.3); }
+    .feature-pill--warning { border-color: rgba(245, 158, 11, 0.3); }
+    
+    .feature-pill-glow {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .feature-pill:hover .feature-pill-glow {
+      opacity: 1;
+    }
+
+    /* CTA Buttons */
+    .cta-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #22d3ee, #3b82f6);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    
+    .cta-button--secondary {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(59, 130, 246, 0.1));
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      color: #22d3ee;
+    }
+    
+    .cta-button-glow {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .cta-button:hover .cta-button-glow {
+      opacity: 1;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .scroll-arrow {
+      width: 2px;
+      height: 30px;
+      background: linear-gradient(to bottom, #22d3ee, transparent);
+      animation: scroll-bounce 2s infinite;
+    }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    @keyframes particle-float {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+    
+    @keyframes status-pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    
+    @keyframes typewriter {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: #22d3ee; }
+    }
+    
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+    }
+    
+    @keyframes glitch-1 {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-3px, 3px); }
+      40% { transform: translate(-3px, -3px); }
+      60% { transform: translate(3px, 3px); }
+      80% { transform: translate(3px, -3px); }
+    }
+    
+    @keyframes glitch-2 {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(3px, -3px); }
+      40% { transform: translate(3px, 3px); }
+      60% { transform: translate(-3px, -3px); }
+      80% { transform: translate(-3px, 3px); }
+    }
+    
+    @keyframes scroll-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+    
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in-text {
+      animation: fade-in 1s ease-out 2s both;
+    }
+  </style>
+
+  <script is:inline>
+    // Add event listeners when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Live demo button
+      const liveDemoBtn = document.getElementById('live-demo-btn');
+      if (liveDemoBtn) {
+        liveDemoBtn.addEventListener('click', function() {
+          const liveDemoSection = document.querySelector('.brutalist-section:nth-of-type(2)');
+          if (liveDemoSection) {
+            liveDemoSection.scrollIntoView({ 
+              behavior: 'smooth' 
+            });
+          }
+        });
+      }
+      
+      // Modules button
+      const modulesBtn = document.getElementById('modules-btn');
+      if (modulesBtn) {
+        modulesBtn.addEventListener('click', function() {
+          const modulesSection = document.querySelector('.brutalist-section:nth-of-type(3)');
+          if (modulesSection) {
+            modulesSection.scrollIntoView({ 
+              behavior: 'smooth' 
+            });
+          }
+        });
+      }
+    });
+    
+    // Parallax effect for neural nodes
+    document.addEventListener('mousemove', (e) => {
+      const nodes = document.querySelectorAll('.neural-node');
+      const speed = 0.5;
+      
+      nodes.forEach((node) => {
+        const nodeSpeed = node.getAttribute('data-speed') || '1';
+        const x = (window.innerWidth - e.pageX * parseFloat(nodeSpeed) * speed) / 100;
+        const y = (window.innerHeight - e.pageY * parseFloat(nodeSpeed) * speed) / 100;
+        
+        node.style.transform = `translateX(${x}px) translateY(${y}px)`;
+      });
+    });
+  </script>
 
   <!-- Live Demo Section -->
   <section class="brutalist-section bg-gray-900/50">

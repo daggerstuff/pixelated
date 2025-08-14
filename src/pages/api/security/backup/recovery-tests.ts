@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { BackupSecurityManager } from '../../../../lib/security/backup'
 import {
@@ -24,7 +25,7 @@ backupManager.initialize().catch((error) => {
 })
 
 // GET endpoint for recovery tests
-export const GET = protectRoute({
+export const GET: APIRoute = protectRoute({
   requiredRole: 'admin' as AuthRole,
 })(async ({ request, _locals }: AuthAPIContext) => {
   try {
@@ -79,7 +80,7 @@ export const GET = protectRoute({
 })
 
 // POST endpoint for recovery tests
-export const POST = protectRoute({
+export const POST: APIRoute = protectRoute({
   requiredRole: 'admin' as AuthRole,
 })(async ({ request, _locals }: AuthAPIContext) => {
   try {

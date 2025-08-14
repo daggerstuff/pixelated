@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 
 export interface FrameworksRequest {
@@ -523,7 +524,7 @@ export const GET = async ({ url }: { url: URL }) => {
   }
 }
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   try {
     const body: FrameworksRequest = await request.json()
 

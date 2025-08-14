@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { CrisisSessionFlaggingService } from '@/lib/ai/crisis/CrisisSessionFlaggingService'
 import { getSession } from '@/lib/auth/session'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
@@ -5,7 +6,7 @@ import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 
 const logger = createBuildSafeLogger('crisis-session-flags-api')
 
-export const GET = async ({ request }: { request: Request }) => {
+export const GET = async ({ request }: APIContext) => {
   try {
     // Authenticate user
     const sessionData = await getSession(request)
@@ -103,7 +104,7 @@ export const GET = async ({ request }: { request: Request }) => {
   }
 }
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   try {
     // Authenticate user
     const sessionData = await getSession(request)
@@ -211,7 +212,7 @@ export const POST = async ({ request }: { request: Request }) => {
   }
 }
 
-export const PUT = async ({ request }: { request: Request }) => {
+export const PUT = async ({ request }: APIContext) => {
   try {
     // Authenticate user
     const sessionData = await getSession(request)

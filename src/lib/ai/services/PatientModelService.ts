@@ -5,6 +5,8 @@
 import type { KVStore } from '../../db/KVStore'
 import type { CognitiveModel } from '../types/CognitiveModel'
 
+export type ModelIdentifier = string
+
 export class PatientModelService {
   constructor(private kvStore: KVStore) {}
 

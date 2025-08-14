@@ -1,0 +1,40 @@
+{
+  "name": "leann-mcp",
+  "displayName": "LEANN MCP",
+  "description": "VSCode extension for LEANN MCP server: semantic search and RAG Q&A in your editor.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "leann.listIndexes",
+        "title": "LEANN: List Indexes"
+      },
+      {
+        "command": "leann.semanticSearch",
+        "title": "LEANN: Semantic Search"
+      },
+      {
+        "command": "leann.askQuestion",
+        "title": "LEANN: Ask Question"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.3.3",
+    "tslint": "^6.1.3"
+  },
+  "dependencies": {}
+}

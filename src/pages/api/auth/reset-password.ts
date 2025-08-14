@@ -1,4 +1,5 @@
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import type { APIRoute, APIContext } from 'astro'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { logAuditEvent } from '@/lib/audit/log'
 import { z } from 'zod'
 
@@ -8,7 +9,7 @@ const ResetPasswordSchema = z.object({
   email: z.string().email(),
 })
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   try {
     const body = await request.json()
     const { email } = ResetPasswordSchema.parse(body)

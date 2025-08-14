@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 
 export interface ParseRequest {
@@ -220,7 +221,7 @@ function calculateComplexity(content: string, entities: ParseResponse['entities'
   return 'low'
 }
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   const startTime = Date.now()
 
   try {

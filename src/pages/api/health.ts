@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { mongodb } from '~/config/mongodb.config.ts'
 
 interface HealthStatus {
@@ -18,7 +19,7 @@ interface GETParams {
   context: never
 }
 
-export async function GET(_params: GETParams): Promise<Response> {
+export const GET: APIRoute = async ({ request }: APIContext): Promise<Response> => {
   const startTime = Date.now()
 
   const healthStatus: HealthStatus = {

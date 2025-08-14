@@ -1,8 +1,9 @@
+import type { APIRoute, APIContext } from 'astro'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 import { MongoAuthService } from '@/services/mongoAuth.service'
 import mongodb from '@/config/mongodb.config'
 
-export const GET = async ({
+export const GET: APIRoute = async ({
   url,
   cookies,
   redirect,

@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import type { AIMessage } from '@/lib/ai/models/types'
 import type { SessionData } from '../../../lib/auth/session'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
@@ -7,7 +8,7 @@ import { getSession } from '../../../lib/auth/session'
 import { validateRequestBody } from '../../../lib/validation/index'
 import { CompletionRequestSchema } from '../../../lib/validation/schemas'
 import { applyRateLimit } from '../../../lib/api/rate-limit'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('ai-completion')

@@ -79,7 +79,7 @@ test.describe('Regression Test Suite', () => {
       await testUtils.loginAsTestUser(page);
       await page.goto('/chat');
       
-      const specialMessage = 'Test with émojis 🚀 and spëcial chars: <>&"'';
+      const specialMessage = 'Test with émojis 🚀 and spëcial chars: <>&"\'';
       await page.fill('[data-testid="message-input"]', specialMessage);
       await page.click('[data-testid="send-button"]');
       

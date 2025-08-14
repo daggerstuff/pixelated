@@ -1,11 +1,14 @@
 // src/lib/memory.ts
-// Simple in-memory MemoryService for demonstration. Replace with persistent storage as needed.
+// Enhanced MemoryService with proper type safety and method signatures
 
 export interface Memory {
   id: string;
   userId: string;
   content: string;
   createdAt: Date;
+  updatedAt: Date;
+  tags?: string[];
+  metadata?: Record<string, any>;
 }
 
 export interface ListMemoriesOptions {
@@ -13,71 +16,108 @@ export interface ListMemoriesOptions {
   offset?: number;
   sortBy?: keyof Memory;
   sortOrder?: 'asc' | 'desc';
+  tags?: string[];
+  search?: string;
+}
+
+export interface CreateMemoryOptions {
+  userId: string;
+  tags?: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface UpdateMemoryOptions {
+  content?: string;
+  tags?: string[];
+  metadata?: Record<string, any>;
 }
 
 export class MemoryService {
   private memories: Memory[] = [];
 
-  async createMemory(content: string, metadata: { userId: string; [key: string]: any }): Promise<Memory> {
+  async createMemory(content: string, options: CreateMemoryOptions): Promise<Memory> {
     const memory: Memory = {
       id: Math.random().toString(36).substr(2, 9),
-      userId: metadata.userId,
+      userId: options.userId,
       content,
       createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: options.tags || [],
+      metadata: options.metadata || {},
     };
     this.memories.push(memory);
     return memory;
   }
 
-  async updateMemory(memoryId: string, content: string, metadata: { userId: string; [key: string]: any }): Promise<Memory | null> {
-    const index = this.memories.findIndex(m => m.id === memoryId && m.userId === metadata.userId);
-    if (index === -1) {
+  async updateMemory(id: string, userId: string, options: UpdateMemoryOptions): Promise<Memory | null> {
+    const memoryIndex = this.memories.findIndex(m => m.id === id && m.userId === userId);
+    if (memoryIndex === -1) {
       return null;
     }
-    this.memories[index] = {
-      ...this.memories[index],
-      content,
+
+    const memory = this.memories[memoryIndex];
+    this.memories[memoryIndex] = {
+      ...memory,
+      content: options.content ?? memory.content,
+      tags: options.tags ?? memory.tags,
+      metadata: { ...memory.metadata, ...options.metadata },
+      updatedAt: new Date(),
     };
-    return this.memories[index];
+
+    return this.memories[memoryIndex];
   }
 
-  async deleteMemory(memoryId: string, userId: string): Promise<boolean> {
-    const index = this.memories.findIndex(m => m.id === memoryId && m.userId === userId);
-    if (index === -1) {
-      return false;
+  async deleteMemory(id: string, userId: string): Promise<boolean> {
+    const initialLength = this.memories.length;
+    this.memories = this.memories.filter(m => !(m.id === id && m.userId === userId));
+    return this.memories.length < initialLength;
+  }
+
+  async getMemory(id: string, userId: string): Promise<Memory | null> {
+    return this.memories.find(m => m.id === id && m.userId === userId) || null;
+  }
+
+  async listMemories(userId: string, options: ListMemoriesOptions = {}): Promise<Memory[]> {
+    let filtered = this.memories.filter(m => m.userId === userId);
+
+    // Apply tag filtering
+    if (options.tags && options.tags.length > 0) {
+      filtered = filtered.filter(m => 
+        options.tags!.some(tag => m.tags?.includes(tag))
+      );
     }
-    this.memories.splice(index, 1);
-    return true;
+
+    // Apply search filtering
+    if (options.search) {
+      const searchLower = options.search.toLowerCase();
+      filtered = filtered.filter(m => 
+        m.content.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply sorting
+    if (options.sortBy) {
+      filtered.sort((a, b) => {
+        const aVal = a[options.sortBy!];
+        const bVal = b[options.sortBy!];
+        
+        if (aVal < bVal) return options.sortOrder === 'desc' ? 1 : -1;
+        if (aVal > bVal) return options.sortOrder === 'desc' ? -1 : 1;
+        return 0;
+      });
+    }
+
+    // Apply pagination
+    const offset = options.offset || 0;
+    const limit = options.limit || 10;
+    return filtered.slice(offset, offset + limit);
   }
 
-  async searchMemories(query: string, metadata: { userId: string; [key: string]: any }): Promise<Memory[]> {
-    return this.memories.filter(m => 
-      m.userId === metadata.userId && 
-      m.content.toLowerCase().includes(query.toLowerCase())
-    );
+  async searchMemories(userId: string, query: string, options: Omit<ListMemoriesOptions, 'search'> = {}): Promise<Memory[]> {
+    return this.listMemories(userId, { ...options, search: query });
   }
 
-  async listMemories(
-    userId: string,
-    options: ListMemoriesOptions = {}
-  ): Promise<{ memories: Memory[]; total: number }> {
-    const { limit = 50, offset = 0, sortBy = 'createdAt', sortOrder = 'desc' } = options;
-    const userMemories = this.memories.filter(m => m.userId === userId);
-    const sorted = userMemories.sort((a, b) => {
-      if (sortOrder === 'asc') {
-        return a[sortBy] > b[sortBy] ? 1 : -1;
-      } else {
-        return a[sortBy] < b[sortBy] ? 1 : -1;
-      }
-    });
-    return {
-      memories: sorted.slice(offset, offset + limit),
-      total: userMemories.length,
-    };
-  }
-
-  // For demonstration: add a memory
-  async addMemory(memory: Memory) {
-    this.memories.push(memory);
+  async getMemoryCount(userId: string): Promise<number> {
+    return this.memories.filter(m => m.userId === userId).length;
   }
 }

@@ -11,7 +11,7 @@
 
 import { fheService } from '../../fhe'
 import { FHEOperation } from '../../fhe/types'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')

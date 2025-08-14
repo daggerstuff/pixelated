@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('vitest.global.setup')
 
 /**

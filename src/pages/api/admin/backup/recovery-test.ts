@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { logAuditEvent, AuditEventType } from '@/lib/audit'
 import { adminGuard } from '@/lib/admin/middleware'
@@ -161,7 +162,7 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
   }
 }
 
-export const POST = async ({ request, locals }: AuthAPIContext) => {
+export const POST: APIRoute = async ({ request, locals }: AuthAPIContext) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SECURITY)({
     request,

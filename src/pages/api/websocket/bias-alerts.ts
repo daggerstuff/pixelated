@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 /**
  * WebSocket API endpoint for real-time bias alerts
  *
@@ -110,7 +111,7 @@ export const GET = async () => {
 /**
  * Send test bias alert (for development/testing)
  */
-export const POST = async ({ request }: { request: Request }) => {
+export const POST = async ({ request }: APIContext) => {
   try {
     const body = await request.json()
     const { type = 'test', level = 'medium', message, sessionId } = body
@@ -295,7 +296,7 @@ export const POST = async ({ request }: { request: Request }) => {
 /**
  * Update WebSocket server configuration
  */
-export const PATCH = async ({ request }: { request: Request }) => {
+export const PATCH = async ({ request }: APIContext) => {
   try {
     const body = await request.json()
     const { action } = body

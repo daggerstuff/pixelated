@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 // Avoid importing Astro types directly to prevent type errors in tests
 import os from 'node:os'
 import { performance } from 'node:perf_hooks'
@@ -18,7 +19,7 @@ function isComponentStatus(v: unknown): v is ComponentStatus {
   return typeof v === 'object' && v !== null && 'status' in (v as Record<string, unknown>)
 }
 
-export const GET = async ({ request: _request }: { request: Request }) => {
+export const GET: APIRoute = async ({ request: _request }: { request: Request }) => {
   const startTime = performance.now()
   const mongoUri = process.env['MONGO_URI']
   const mongoDbName = process.env['MONGO_DB_NAME']

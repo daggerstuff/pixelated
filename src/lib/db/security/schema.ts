@@ -1,5 +1,5 @@
 import mongodb from '@/config/mongodb.config'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('security-schema')

@@ -1,7 +1,8 @@
+import type { APIRoute, APIContext } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import mongodb from '../../../config/mongodb.config'
 
-export const GET = async ({ request }: { request: Request }) => {
+export const GET = async ({ request }: APIContext) => {
   try {
     // Require authentication and admin role
     const session = await getSession(request)

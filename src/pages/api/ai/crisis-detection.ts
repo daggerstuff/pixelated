@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 
 
 // Use local types to avoid Astro 5.x APIContext bug

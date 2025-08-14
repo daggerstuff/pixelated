@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 import { mongoAuthService } from '@/services/mongoAuth.service'
 import { verifyAuthToken } from '@/utils/auth'
@@ -7,7 +8,7 @@ import { verifyAuthToken } from '@/utils/auth'
  * GET /api/auth/profile - Get current user profile
  * PUT /api/auth/profile - Update user profile
  */
-export const GET = async ({ request }: { request: Request }) => {
+export const GET = async ({ request }: APIContext) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -61,7 +62,7 @@ export const GET = async ({ request }: { request: Request }) => {
   }
 }
 
-export const PUT = async ({ request }: { request: Request }) => {
+export const PUT = async ({ request }: APIContext) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {

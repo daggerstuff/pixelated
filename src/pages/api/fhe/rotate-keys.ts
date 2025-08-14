@@ -1,11 +1,11 @@
-import type { APIRoute } from 'astro'
+import type { APIRoute, APIContext } from 'astro'
 import { rateLimitConfig } from '@/config/rate-limit.config'
 import { fheService } from '@/lib/fhe'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { RateLimiter } from '@/lib/middleware/rate-limit'
 import { EncryptionMode } from '@/lib/fhe/types'
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   // Create a rate limiter instance with specific config for sensitive operations
   const rateLimit = new RateLimiter(
     rateLimitConfig.sensitive.maxRequests,

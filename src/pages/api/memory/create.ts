@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { getCurrentUser } from '../../../lib/auth'
 import { MemoryService } from '../../../lib/memory'
@@ -5,7 +6,7 @@ import { MemoryService } from '../../../lib/memory'
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const POST = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   try {
     // Authenticate request
     const user = await getCurrentUser(cookies)

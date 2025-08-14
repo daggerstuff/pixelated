@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
@@ -21,7 +22,7 @@ const logger = createBuildSafeLogger('multidimensional-emotions-api')
  * - timeRange: Time range in days (default: 30)
  * - dataPoints: Number of data points to return (default: 100)
  */
-export const GET = protectRoute()(async (context: AuthAPIContext) => {
+export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
   try {
     const { locals } = context
     const { user } = locals

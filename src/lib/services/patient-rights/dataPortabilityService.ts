@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { randomBytes } from 'crypto'
 // Supabase import removed - migrated to MongoDB
 // Create our own audit logging service since the actual one has different signature

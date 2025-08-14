@@ -70,11 +70,10 @@ vi.mock('../python-bridge', () => {
   }
 })
 
-import { BiasDetectionEngine } from '../BiasDetectionEngine'
+import { BiasDetectionEngine, type AnalysisResult } from '../BiasDetectionEngine'
 import type {
   BiasDetectionConfig,
   TherapeuticSession,
-  BiasAnalysisResult,
 } from '../types'
 
 describe('BiasDetectionEngine Integration Tests', () => {
@@ -83,29 +82,6 @@ describe('BiasDetectionEngine Integration Tests', () => {
   let sampleSessions: TherapeuticSession[]
 
   // Add mock user and request for all tests
-  const mockUser = {
-    userId: 'test-user-001',
-    email: 'testuser@example.com',
-    role: {
-      id: 'analyst',
-      name: 'analyst',
-      description: 'Test Analyst',
-      level: 2,
-    },
-    permissions: [
-      {
-        resource: 'bias-analysis',
-        actions: ['read', 'write', 'export'],
-      },
-    ],
-    institution: 'Test University',
-    department: 'Testing',
-  }
-  const mockRequest = {
-    ipAddress: '127.0.0.1',
-    userAgent: 'jest-test-agent',
-  }
-
   beforeAll(async () => {
     // Setup integration test environment
     integrationConfig = {
@@ -325,7 +301,7 @@ describe('BiasDetectionEngine Integration Tests', () => {
       }
 
       // Perform complete analysis
-      const result = await engine.analyzeSession(session, mockUser, mockRequest)
+      const result = await engine.analyzeSession(session)
 
       // Verify complete result structure
       expect(result).toBeDefined()
@@ -352,7 +328,7 @@ describe('BiasDetectionEngine Integration Tests', () => {
 
       // Analyze sessions concurrently
       const analysisPromises = sampleSessions.map((session) =>
-        engine.analyzeSession(session, mockUser, mockRequest),
+        engine.analyzeSession(session),
       )
 
       const results = await Promise.all(analysisPromises)
@@ -376,14 +352,10 @@ describe('BiasDetectionEngine Integration Tests', () => {
   describe('Multi-Session Analysis and Reporting', () => {
     it('should analyze multiple sessions and generate comprehensive report', async () => {
       // Analyze all sample sessions
-      const analyses: BiasAnalysisResult[] = []
+      const analyses: AnalysisResult[] = []
 
       for (const session of sampleSessions) {
-        const analysis = await engine.analyzeSession(
-          session,
-          mockUser,
-          mockRequest,
-        )
+        const analysis = await engine.analyzeSession(session)
         analyses.push(analysis)
       }
 
@@ -398,22 +370,16 @@ describe('BiasDetectionEngine Integration Tests', () => {
         timeRange,
         {
           format: 'json',
-          includeRawData: true,
-          includeTrends: true,
-          includeRecommendations: true,
         },
       )
 
       // Verify report structure
       expect(report).toBeDefined()
-      expect(report.reportId).toBeDefined()
-      expect(report.generatedAt).toBeDefined()
-      expect(report.timeRange).toBeDefined()
-      expect(report.overallFairnessScore).toBeDefined()
-      expect(report.executiveSummary).toBeDefined()
-      expect(report.detailedAnalysis).toBeDefined()
-      expect(report.recommendations).toBeDefined()
-      expect(report.appendices).toBeDefined()
+      expect(report.summary).toBeDefined()
+      expect(report.summary.sessionCount).toBe(sampleSessions.length)
+      expect(typeof report.summary.averageBiasScore).toBe('number')
+      expect(report.performance).toBeDefined()
+      expect(report.alerts).toBeDefined()
     })
   })
 
@@ -429,14 +395,14 @@ describe('BiasDetectionEngine Integration Tests', () => {
       }
 
       // Start monitoring
-      await engine.startMonitoring(monitoringCallback, 1000)
+      await engine.startMonitoring(monitoringCallback)
 
       // Perform analysis while monitoring
       const session = sampleSessions[0]
       if (!session) {
         throw new Error('Session not found')
       }
-      await engine.analyzeSession(session, mockUser, mockRequest)
+      await engine.analyzeSession(session)
 
       // Wait for monitoring data
       await new Promise((resolve) => setTimeout(resolve, 1500))

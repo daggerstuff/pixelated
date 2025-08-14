@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -17,7 +18,7 @@ const logger = createBuildSafeLogger('session-analysis-api')
  * NOTE: The { locals, request } destructuring works due to a workaround for
  * Astro 5.x type inheritance bug. See /docs/ASTRO_TYPE_INHERITANCE_BUG.md
  */
-export const GET = protectRoute()(async ({ locals, request }) => {
+export const GET: APIRoute = protectRoute()(async ({ locals, request }) => {
   try {
     const { user } = locals
     if (!user) {

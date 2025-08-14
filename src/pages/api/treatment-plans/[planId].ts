@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { z } from 'zod'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import type { TreatmentPlan } from '@/types/treatment'
@@ -50,7 +51,7 @@ const updateTreatmentPlanClientSchema = z.object({
   generalNotes: z.string().optional().nullable(),
 })
 
-export const GET = async ({ params, locals }) => {
+export const GET: APIRoute = async ({ params, locals }: APIContext) => {
   try {
     // TODO: Replace with actual authentication check
     const { user } = locals
@@ -99,7 +100,7 @@ export const GET = async ({ params, locals }) => {
   }
 }
 
-export const PUT = async ({ params, request, locals }) => {
+export const PUT: APIRoute = async ({ params, request, locals }: APIContext) => {
   try {
     // TODO: Replace with actual authentication check
     const { user } = locals

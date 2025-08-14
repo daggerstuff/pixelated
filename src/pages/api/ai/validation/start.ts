@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { emotionValidationPipeline } from '@/lib/ai/emotions/EmotionValidationPipeline'
 import { createBuildSafeLogger } from '../../../../../../lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
@@ -7,7 +8,7 @@ import {
   AuditEventStatus,
 } from '@/lib/audit'
 
-export const POST = async ({ cookies }: never) => {
+export const POST: APIRoute = async ({ cookies }: never) => {
   const logger = createBuildSafeLogger('validation-api')
 
   try {

@@ -8,7 +8,7 @@
 import type { PIIDetectionConfig } from './'
 import type { PIIMiddlewareConfig } from './middleware'
 import process from 'node:process'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { piiDetectionService } from './'
 import { createPIIMiddleware } from './middleware'
 

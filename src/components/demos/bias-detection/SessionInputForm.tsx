@@ -49,10 +49,10 @@ export const SessionInputForm: React.FC<SessionInputFormProps> = ({
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.content.trim()) {
-      newErrors.content = 'Content is required'
-    } else if (formData.content.trim().length < 10) {
-      newErrors.content = 'Content must be at least 10 characters'
+    if (!formData['content'].trim()) {
+      newErrors['content'] = 'Content is required'
+    } else if (formData['content'].trim().length < 10) {
+      newErrors['content'] = 'Content must be at least 10 characters'
     }
 
     setErrors(newErrors)
@@ -68,9 +68,9 @@ export const SessionInputForm: React.FC<SessionInputFormProps> = ({
     }
 
     onSubmit({
-      scenario: formData.scenario || undefined,
+      scenario: formData.scenario || '',
       demographics: formData.demographics,
-      content: formData.content.trim(),
+      content: formData['content'].trim(),
     })
   }
 
@@ -238,11 +238,11 @@ export const SessionInputForm: React.FC<SessionInputFormProps> = ({
           rows={6}
           placeholder="Enter the therapeutic conversation content to analyze for bias patterns..."
           className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-            errors.content ? 'border-red-300' : 'border-gray-300'
+            errors['content'] ? 'border-red-300' : 'border-gray-300'
           }`}
         />
-        {errors.content && (
-          <p className="mt-1 text-sm text-red-600">{errors.content}</p>
+        {errors['content'] && (
+          <p className="mt-1 text-sm text-red-600">{errors['content']}</p>
         )}
         <p className="mt-1 text-sm text-gray-500">
           {formData.content.length}/1000 characters

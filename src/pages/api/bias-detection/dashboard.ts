@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
@@ -5,7 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 const logger = createBuildSafeLogger('bias-detection-api')
 const biasDetectionEngine = new BiasDetectionEngine()
 
-export const GET = async ({ request }: { request: Request }) => {
+export const GET = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)

@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 // API route implementation for user profile endpoints
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { MongoAuthService } from '@/services/mongoAuth.service'
@@ -11,7 +12,7 @@ const authService = new MongoAuthService()
 const logger = createBuildSafeLogger('profile-api')
 
 // GET endpoint for profile data
-export const GET = protectRoute({
+export const GET: APIRoute = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
 })(async ({ locals }: AuthAPIContext) => {
@@ -69,7 +70,7 @@ export const GET = protectRoute({
 })
 
 // PUT endpoint to update profile data
-export const PUT = protectRoute({
+export const PUT: APIRoute = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
 })(async ({ request, locals }: AuthAPIContext) => {

@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
@@ -5,7 +6,7 @@ import { NotificationService } from '@/lib/services/notification/NotificationSer
 const logger = createBuildSafeLogger('notifications-api')
 const notificationService = new NotificationService()
 
-export const GET = async ({ request }: { request: Request }) => {
+export const GET = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
@@ -51,7 +52,7 @@ export const GET = async ({ request }: { request: Request }) => {
   }
 }
 
-export const PUT = async ({ request }: { request: Request }) => {
+export const PUT = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)

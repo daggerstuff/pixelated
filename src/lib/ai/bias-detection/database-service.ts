@@ -5,7 +5,7 @@
  * Handles all CRUD operations with proper error handling and HIPAA compliance.
  */
 
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   BiasAnalysisResult,
   BiasAlert,

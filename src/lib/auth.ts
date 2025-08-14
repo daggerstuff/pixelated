@@ -44,21 +44,24 @@ export async function getCurrentUser(
     const userId = decoded.userId
 
     // Fetch user from the database
-    const user = await mongoAuthService.findUserById(userId)
+    const user = await mongoAuthService.getUserById(userId)
     if (!user) {
       return null
     }
+
+    // Type assertion for user profile to handle the unknown type
+    const userProfile = user.profile as { firstName?: string; lastName?: string; avatarUrl?: string } | undefined
 
     return {
       id: user._id.toString(),
       email: user.email,
       role: user.role as AuthRole,
-      fullName: user.profile?.firstName
-        ? `${user.profile.firstName} ${user.profile.lastName || ''}`.trim()
+      fullName: userProfile?.firstName
+        ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim()
         : null,
-      avatarUrl: user.profile?.avatarUrl,
+      avatarUrl: userProfile?.avatarUrl,
       lastLogin: user.lastLogin,
-      metadata: user.profile,
+      metadata: (user.profile as Record<string, unknown>) || {},
     }
   } catch (error) {
     console.error('Error getting current user:', error)

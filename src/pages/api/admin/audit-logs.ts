@@ -1,9 +1,10 @@
+import type { APIRoute, APIContext } from 'astro'
 import { type AuditLogEntry, getUserAuditLogs } from '../../../lib/audit/log'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('admin-audit-logs')
 
-export async function GET(context: { url: URL }) {
+export const GET: APIRoute = async ({ context: { url: URL } }: APIContext) => {
   try {
     const { url } = context
     const { searchParams } = new URL(url)

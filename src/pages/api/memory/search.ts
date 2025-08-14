@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { getCurrentUser } from '../../../lib/auth'
 import { MemoryService } from '../../../lib/memory'
@@ -5,7 +6,7 @@ import { MemoryService } from '../../../lib/memory'
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const GET = async ({ request, cookies }) => {
+export const GET: APIRoute = async ({ request, cookies }: APIContext) => {
   try {
     // Authenticate request
     const user = await getCurrentUser(cookies)
@@ -54,16 +55,21 @@ export const GET = async ({ request, cookies }) => {
     }
 
     // Search memories
-    const result = await memoryService.searchMemories(
+    const result = await memoryService.searchMemories(user.id, query, {
+      limit,
+      offset,
+    })
+
+    return new Response(JSON.stringify({
+      success: true,
+      memories: result,
       query,
-      user.id,
-      {
+      pagination: {
         limit,
         offset,
-      },
-    )
-
-    return new Response(JSON.stringify(result), {
+        total: result.length
+      }
+    }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 import { EmailService } from '@/lib/services/email/EmailService'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { z } from 'zod'
 import { readFile } from 'fs/promises'
 import { join } from 'path'

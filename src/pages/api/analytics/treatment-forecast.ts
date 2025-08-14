@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { z } from 'zod'
 import { recommend } from '@/lib/ai/services/OutcomeRecommendationEngine'
 import { collectContext } from '@/lib/ai/services/ContextualAwarenessService'
@@ -23,7 +24,7 @@ const ForecastRequestSchema = z.object({
   maxResults: z.number().min(1).max(10).optional(),
 })
 
-export const post = async ({ request }: { request: Request }) => {
+export const post = async ({ request }: APIContext) => {
   try {
     const body = await request.json()
     const parsed = ForecastRequestSchema.safeParse(body)

@@ -20,8 +20,12 @@ function getEnvVar(key: string): string | undefined {
   if (isServer && typeof process !== 'undefined') {
     return process.env[key]
   }
-  // In browser, environment variables should be accessed through import.meta.env
-  return (import.meta.env as Record<string, string | undefined>)[key]
+  // In browser, try to access environment variables through globalThis or window
+  // This is a fallback for build-time environment variables
+  if (typeof globalThis !== 'undefined' && (globalThis as any).process?.env) {
+    return (globalThis as any).process.env[key]
+  }
+  return undefined
 }
 
 // Audit log event types

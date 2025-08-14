@@ -1,8 +1,8 @@
-// Import necessary libraries and types
-import { fheService } from '@/lib/fhe'
-import { EncryptionMode } from '@/lib/fhe/types'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
-import { createVerificationToken } from '@/lib/security'
+import type { APIRoute, APIContext } from 'astro'
+import { fheService } from '../../../lib/fhe'
+import { EncryptionMode } from '../../../lib/fhe/types'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { createVerificationToken } from '../../../lib/security'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -18,7 +18,7 @@ interface User {
   email: string
 }
 
-export async function POST(request: Request) {
+export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   try {
     const body = (await request.json()) as LoginRequest
 
@@ -49,13 +49,23 @@ export async function POST(request: Request) {
     // Encrypt sensitive session data if security level requires i
     let encryptedSessionData = null
     if (sessionData.securityLevel !== 'low') {
+      // Map security levels to FHE security levels
+      const mapSecurityLevel = (level: string): 'tc128' | 'tc192' | 'tc256' => {
+        switch (level) {
+          case 'high': return 'tc256'
+          case 'medium': return 'tc192'
+          default: return 'tc128'
+        }
+      }
+
       // Initialize FHE service if needed
       await fheService.initialize({
         mode:
           sessionData.securityLevel === 'high'
             ? EncryptionMode.FHE
             : EncryptionMode.STANDARD,
-        securityLevel: sessionData.securityLevel,
+        keySize: 2048,
+        securityLevel: mapSecurityLevel(sessionData.securityLevel),
       })
 
       encryptedSessionData = await fheService.encrypt(
@@ -82,7 +92,17 @@ export async function POST(request: Request) {
       },
     }
 
-    // ... existing session storage logic ...
+    // Set secure session cookie
+    cookies.set('session', JSON.stringify({
+      sessionId: sessionData.sessionId,
+      userId: user.id,
+      expiresAt: sessionData.expiresAt
+    }), {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 // 24 hours
+    })
 
     // Log successful login
     logger.info('User authenticated successfully', {

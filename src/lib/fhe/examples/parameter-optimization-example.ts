@@ -11,7 +11,7 @@ import {
 } from '../parameter-optimizer'
 import { FHEOperation } from '../types'
 import { SealSchemeType } from '../seal-types'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('fhe-parameter-optimization-example')
 

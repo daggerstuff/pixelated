@@ -1,8 +1,8 @@
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import * as bcrypt from 'bcryptjs'
+import * as jwt from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
-import mongodb from '@/config/mongodb.config'
-import type { Session, User } from '@/types/mongodb.types'
+import mongodb from '../config/mongodb.config'
+import type { Session, User } from '../types/mongodb.types'
 
 interface AuthTokenPayload {
   userId: string

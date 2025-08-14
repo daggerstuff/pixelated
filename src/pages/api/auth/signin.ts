@@ -1,3 +1,5 @@
+import type { APIRoute, APIContext } from 'astro'
+
 export const prerender = false
 import { mongoAuthService } from '@/services/mongoAuth.service'
 
@@ -5,7 +7,7 @@ import { mongoAuthService } from '@/services/mongoAuth.service'
  * Sign in endpoint
  * POST /api/auth/signin
  */
-export const POST = async ({ request }) => {
+export const POST: APIRoute = async ({ request }: APIContext) => {
   try {
     const { email, password } = await request.json()
 

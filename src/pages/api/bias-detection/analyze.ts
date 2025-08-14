@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
 
@@ -18,7 +19,7 @@ function isValidBearerToken(token: string | null): boolean {
 
 const logger = createBuildSafeLogger('bias-detection-api')
 
-export const POST = async ({ request }: { request: Request }) => {
+export const POST: APIRoute = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const token = getBearerToken(request)

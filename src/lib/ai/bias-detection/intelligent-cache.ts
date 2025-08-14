@@ -3,7 +3,7 @@
  * Implements multi-tier caching with compression and smart invalidation
  */
 
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { TherapeuticSession } from './types'
 
 const logger = createBuildSafeLogger('IntelligentCache')

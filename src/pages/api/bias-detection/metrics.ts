@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 /**
  * Bias Detection Engine - Metrics API Endpoint
  *
@@ -20,7 +21,7 @@ const metricsQuerySchema = z.object({
 type MetricsQuery = z.infer<typeof metricsQuerySchema>
 
 // Astro API route export - simplified version
-export async function GET({ url }: { url: URL }) {
+export const GET: APIRoute = async ({ url }: APIContext) => {
   const startTime = Date.now()
 
   try {

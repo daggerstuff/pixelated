@@ -1,7 +1,7 @@
 {
   "extends": "./astro/tsconfigs/strict.json",
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],

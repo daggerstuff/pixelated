@@ -2,7 +2,7 @@ import type { WebSocket } from 'ws'
 import { config } from '@/config/env.config'
 import { EmailService } from '@/lib/services/email/EmailService'
 import { redis } from '@/lib/redis'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Add minimal RedisCommands interface for type safety
 interface RedisCommands {

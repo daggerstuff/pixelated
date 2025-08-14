@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 // Define audit log types
 interface AuditLog {
   id: string
@@ -89,7 +90,7 @@ function detectUnusualPatterns(logs: AuditLog[]): UnusualPattern[] {
   return patterns
 }
 
-export const GET = async () => {
+export const GET: APIRoute = async () => {
   try {
     // Get all audit logs and filter by date in memory
     // since getAuditLogs doesn't support date filtering directly

@@ -1,4 +1,4 @@
-import { AuthService } from '../services/AuthService'
+import AuthService from '../services/AuthService'
 import { RedisService } from '../lib/services/redis/RedisService'
 import { BreachNotificationSystem } from '../lib/security/breach-notification'
 import { test, expect } from '@playwright/test'
