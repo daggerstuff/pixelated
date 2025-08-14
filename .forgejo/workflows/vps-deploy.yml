@@ -42,84 +42,124 @@ env:
   REGISTRY: ${{ github.server_url }}/${{ github.repository }}
 
 jobs:
-  # Encrypt .env file for secure transfer
-  encrypt-env:
-    name: Encrypt Environment File
+  # Prepare environment variables from secrets
+  prepare-env:
+    name: Prepare Environment Variables
     runs-on: ubuntu-latest
     outputs:
-      encrypted-env: ${{ steps.encrypt.outputs.encrypted-env }}
-      env-hash: ${{ steps.hash.outputs.env-hash }}
+      env-content: ${{ steps.env-prep.outputs.env-content }}
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Generate encryption key
-        id: keygen
+      - name: Prepare environment file content
+        id: env-prep
         run: |
-          # Generate a random encryption key
-          ENCRYPTION_KEY=$(openssl rand -hex 32)
-          echo "encryption-key=$ENCRYPTION_KEY" >> $GITHUB_OUTPUT
+          # Create .env content from secrets and variables
+          cat > /tmp/env_content << 'EOF'
+          # Environment variables for Pixelated Empathy
+          NODE_ENV=production
+          PORT=4321
+          WEB_PORT=4321
+          LOG_LEVEL=info
+          ENABLE_RATE_LIMITING=true
+          RATE_LIMIT_WINDOW=60
+          RATE_LIMIT_MAX_REQUESTS=100
+          ENABLE_HIPAA_COMPLIANCE=true
+          ENABLE_AUDIT_LOGGING=true
+          ENABLE_DATA_MASKING=true
+          ASTRO_TELEMETRY_DISABLED=1
           
-          # Store key in GitHub secrets for later use
-          echo "$ENCRYPTION_KEY" > /tmp/encryption_key.txt
-
-      - name: Encrypt .env file
-        id: encrypt
-        run: |
-          if [ -f .env ]; then
-            # Encrypt .env file using AES-256-GCM
-            openssl enc -aes-256-gcm -salt -in .env -out /tmp/env.enc -k "${{ steps.keygen.outputs.encryption-key }}"
-            
-            # Convert to base64 for GitHub Actions
-            ENCRYPTED_B64=$(base64 -w 0 /tmp/env.enc)
-            echo "encrypted-env=$ENCRYPTED_B64" >> $GITHUB_OUTPUT
-            
-            echo "✅ .env file encrypted successfully"
-          else
-            echo "⚠️ No .env file found, creating empty encrypted file"
-            echo "" | openssl enc -aes-256-gcm -salt -out /tmp/env.enc -k "${{ steps.keygen.outputs.encryption-key }}"
-            ENCRYPTED_B64=$(base64 -w 0 /tmp/env.enc)
-            echo "encrypted-env=$ENCRYPTED_B64" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate .env hash
-        id: hash
-        run: |
-          if [ -f .env ]; then
-            ENV_HASH=$(sha256sum .env | cut -d' ' -f1)
-            echo "env-hash=$ENV_HASH" >> $GITHUB_OUTPUT
-          else
-            echo "env-hash=no-env-file" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Store encryption key
-        run: |
-          # Store the encryption key as a secret for the deployment job
-          echo "${{ steps.keygen.outputs.encryption-key }}" > /tmp/deploy_key.txt
-          echo "Encryption key stored for deployment"
+          # Authentication & User Management
+          PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+          
+          # Database Configuration
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          MONGODB_DB_NAME=${{ secrets.MONGODB_DB_NAME }}
+          PGHOST=${{ secrets.PGHOST }}
+          PGDATABASE=${{ secrets.PGDATABASE }}
+          PGUSER=${{ secrets.PGUSER }}
+          PGPASSWORD=${{ secrets.PGPASSWORD }}
+          
+          # Redis Configuration
+          UPSTASH_REDIS_REST_URL=${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN=${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          REDIS_URL=${{ secrets.REDIS_URL }}
+          
+          # AI/LLM Services
+          LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}
+          LLM_MODEL=${{ secrets.LLM_MODEL }}
+          LLM_ENDPOINT=${{ secrets.LLM_ENDPOINT }}
+          LLM_API_KEY=${{ secrets.LLM_API_KEY }}
+          LLM_API_VERSION=${{ secrets.LLM_API_VERSION }}
+          
+          EMBEDDING_PROVIDER=${{ secrets.EMBEDDING_PROVIDER }}
+          EMBEDDING_MODEL=${{ secrets.EMBEDDING_MODEL }}
+          EMBEDDING_ENDPOINT=${{ secrets.EMBEDDING_ENDPOINT }}
+          EMBEDDING_API_KEY=${{ secrets.EMBEDDING_API_KEY }}
+          EMBEDDING_API_VERSION=${{ secrets.EMBEDDING_API_VERSION }}
+          
+          AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_ENDPOINT=${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          
+          OLLAMA_BASE_URL=${{ secrets.OLLAMA_BASE_URL }}
+          
+          # External API Keys
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+          HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
+          OPENMEMORY_API_KEY=${{ secrets.OPENMEMORY_API_KEY }}
+          OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+          REPLICATE_API_TOKEN=${{ secrets.REPLICATE_API_TOKEN }}
+          SMITHERY_API_KEY=${{ secrets.SMITHERY_API_KEY }}
+          SOURCEBOT_API_KEY=${{ secrets.SOURCEBOT_API_KEY }}
+          
+          # Email & Communication
+          EMAIL_FROM=${{ secrets.EMAIL_FROM }}
+          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
+          
+          # File Storage
+          DROPBOX_TOKEN=${{ secrets.DROPBOX_TOKEN }}
+          
+          # Deployment & CI/CD
+          FLY_API_TOKEN=${{ secrets.FLY_API_TOKEN }}
+          G_TOKEN=${{ secrets.G_TOKEN }}
+          GITGUARDIAN_API_KEY=${{ secrets.GITGUARDIAN_API_KEY }}
+          TRUNK_API_TOKEN=${{ secrets.TRUNK_API_TOKEN }}
+          GCM_CREDENTIAL_STORE=${{ secrets.GCM_CREDENTIAL_STORE }}
+          
+          # Monitoring & Analytics
+          NEW_RELIC_AI_MONITORING_ENABLED=${{ secrets.NEW_RELIC_AI_MONITORING_ENABLED }}
+          NEW_RELIC_CUSTOM_INSIGHTS_EVENTS_MAX_SAMPLES_STORED=${{ secrets.NEW_RELIC_CUSTOM_INSIGHTS_EVENTS_MAX_SAMPLES_STORED }}
+          NEW_RELIC_SPAN_EVENTS_MAX_SAMPLES_STORED=${{ secrets.NEW_RELIC_SPAN_EVENTS_MAX_SAMPLES_STORED }}
+          NEW_RELIC_APP_NAME=${{ secrets.NEW_RELIC_APP_NAME }}
+          NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          
+          SENTRY_ACCESS_TOKEN=${{ secrets.SENTRY_ACCESS_TOKEN }}
+          SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
+          SENTRY_PUBLIC_DSN=${{ secrets.SENTRY_PUBLIC_DSN }}
+          
+          # Frontend Environment Variables
+          VITE_AUTH_TOKEN=${{ secrets.VITE_AUTH_TOKEN }}
+          VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
+          EOF
+          
+          # Convert to base64 for safe output
+          ENV_CONTENT_B64=$(base64 -w 0 /tmp/env_content)
+          echo "env-content=$ENV_CONTENT_B64" >> $GITHUB_OUTPUT
+          
+          echo "✅ Environment variables prepared from secrets"
 
   # Build and prepare deployment artifacts
   build:
     name: Build Application
     runs-on: ubuntu-latest
-    needs: [encrypt-env]
+    needs: [prepare-env]
     outputs:
       build-artifacts: ${{ steps.upload.outputs.build-artifacts }}
     
@@ -243,7 +283,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    needs: [build, encrypt-env]
+    needs: [build, prepare-env]
     environment: vps-production
     if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
     
@@ -544,21 +584,11 @@ jobs:
           script: |
             cd /home/${{ github.event.inputs.vps_user || 'vivi' }}/pixelated
             
-            # Create .env file
-            cat > .env << 'EOF'
-            # Environment variables for Pixelated Empathy
-            NODE_ENV=production
-            PORT=${{ env.APP_PORT }}
-            WEB_PORT=${{ env.APP_PORT }}
-            LOG_LEVEL=info
-            ENABLE_RATE_LIMITING=true
-            RATE_LIMIT_WINDOW=60
-            RATE_LIMIT_MAX_REQUESTS=100
-            ENABLE_HIPAA_COMPLIANCE=true
-            ENABLE_AUDIT_LOGGING=true
-            ENABLE_DATA_MASKING=true
-            ASTRO_TELEMETRY_DISABLED=1
-            EOF
+            # Decode and create .env file from prepared content
+            echo '${{ needs.prepare-env.outputs.env-content }}' | base64 -d > .env
+            
+            # Set proper permissions
+            chmod 600 .env
             
             # Restart container to pick up new environment
             docker restart ${{ env.CONTAINER_NAME }}

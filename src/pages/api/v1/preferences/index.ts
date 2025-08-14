@@ -4,7 +4,7 @@ import {
   getOrCreateUserSettings,
   updateUserSettings,
 } from '@/lib/db/user-settings'
-import { createBuildSafeLogger } from '../../../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Replace Supabase Json type with MongoDB-compatible type
 type JsonValue = string | number | boolean | null | JsonObject | JsonValue[]
