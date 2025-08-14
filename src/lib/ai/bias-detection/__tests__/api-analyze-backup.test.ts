@@ -279,7 +279,7 @@ describe('Session Analysis API Endpoint', () => {
         '../../../../pages/api/bias-detection/analyze'
       )
       POST = module.POST
-      GET = module.GET
+      GET = module.GET as unknown as GetHandler
     }
 
     // Reset all mocks

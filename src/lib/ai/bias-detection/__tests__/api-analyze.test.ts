@@ -100,7 +100,7 @@ beforeEach(async () => {
   if (!POST || !GET) {
     const module = await import('../../../../pages/api/bias-detection/analyze')
     POST = module.POST as unknown as PostHandler
-    GET = module.GET as GetHandler
+    GET = module.GET as unknown as GetHandler
     resetRateLimits = module.resetRateLimits
   }
   // Reset rate limits before each test
