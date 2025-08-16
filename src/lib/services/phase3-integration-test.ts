@@ -378,7 +378,7 @@ export class Phase3IntegrationTester {
       // Test memory service recovery
       try {
         await this.memoryService.createMemory('', { userId: '', tags: [] }) // Invalid data
-      } catch (error) {
+      } catch {
         // Expected error - test if service can continue after error
         const recovery = await this.memoryService.createMemory('Recovery test', {
           userId: 'recovery-user',
@@ -394,7 +394,7 @@ export class Phase3IntegrationTester {
         await this.redisService.connect()
         const testValue = await this.redisService.set('recovery-test', 'success', 1000)
         if (!testValue) recoverySuccess = false
-      } catch (error) {
+      } catch {
         recoverySuccess = false
       }
 

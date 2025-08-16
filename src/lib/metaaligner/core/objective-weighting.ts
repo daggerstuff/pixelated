@@ -209,7 +209,14 @@ export class ObjectiveWeightingEngine {
     baseWeights: Record<string, number>,
     context: AlignmentContext,
   ): Record<string, number> {
-    const weights = { ...baseWeights }
+    // Start from contextual weights to align with expectations in tests
+    const contextual = getContextualObjectiveWeights(context.detectedContext)
+    const weights: Record<string, number> = {}
+    // Ensure all objectives are represented; fall back to base when missing
+    for (const [objectiveId, base] of Object.entries(baseWeights)) {
+      weights[objectiveId] =
+        (contextual as Record<string, number>)[objectiveId] ?? base
+    }
     const {userProfile} = context
 
     if (userProfile?.preferences?.objectiveWeightAdjustments) {

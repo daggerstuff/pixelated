@@ -31,10 +31,18 @@ export const PatternVisualization: React.FC<PatternVisualizationProps> = ({
           {trends.length > 0 ? (
             <div className="space-y-2">
               {trends.map((trend) => (
-                <div 
+                <button
                   key={trend.id}
-                  className="p-2 border rounded cursor-pointer hover:bg-gray-50"
+                  className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
                   onClick={() => onPatternSelect?.(trend)}
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      onPatternSelect?.(trend)
+                    }
+                  }}
+                  aria-label={`Select trend pattern: ${trend.description}`}
+                  type="button"
                 >
                   <div className="font-medium">{trend.description}</div>
                   <div className="text-sm text-gray-600">
@@ -43,7 +51,7 @@ export const PatternVisualization: React.FC<PatternVisualizationProps> = ({
                   <div className="text-xs text-gray-500">
                     {trend.indicators.join(', ')}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -57,16 +65,24 @@ export const PatternVisualization: React.FC<PatternVisualizationProps> = ({
           {crossSessionPatterns.length > 0 ? (
             <div className="space-y-2">
               {crossSessionPatterns.map((pattern) => (
-                <div 
+                <button
                   key={pattern.id}
-                  className="p-2 border rounded cursor-pointer hover:bg-gray-50"
+                  className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
                   onClick={() => onPatternSelect?.(pattern)}
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      onPatternSelect?.(pattern)
+                    }
+                  }}
+                  aria-label={`Select cross-session pattern: ${pattern.description}`}
+                  type="button"
                 >
                   <div className="font-medium">{pattern.description}</div>
                   <div className="text-sm text-gray-600">
                     Confidence: {(pattern.confidence * 100).toFixed(1)}%
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -80,16 +96,24 @@ export const PatternVisualization: React.FC<PatternVisualizationProps> = ({
           {riskCorrelations.length > 0 ? (
             <div className="space-y-2">
               {riskCorrelations.map((correlation) => (
-                <div 
+                <button
                   key={correlation.id}
-                  className="p-2 border rounded cursor-pointer hover:bg-gray-50"
+                  className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
                   onClick={() => onPatternSelect?.(correlation)}
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      onPatternSelect?.(correlation)
+                    }
+                  }}
+                  aria-label={`Select risk correlation: ${correlation.description}`}
+                  type="button"
                 >
                   <div className="font-medium">{correlation.description}</div>
                   <div className="text-sm text-gray-600">
                     Strength: {(correlation.strength * 100).toFixed(1)}%
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           ) : (

@@ -107,42 +107,31 @@ stages:
       name: 'azure-infrastructure'
     pool:
       name: 'Default'
+    container: mcr.microsoft.com/azure-cli:2.73.0
     strategy:
       runOnce:
         deploy:
           steps:
           - script: |
-              # Install Azure CLI with Python 3.13 compatibility fixes
-              echo "Installing Azure CLI with Python 3.13 compatibility..."
-              
-              # Set environment variables to suppress warnings
+              set -eo pipefail
+              echo "Ensuring Azure CLI is available..."
               export PYTHONWARNINGS="ignore::FutureWarning"
               export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-              
-              # Try conda first with specific Python version
-              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
-                  echo "Azure CLI installed via conda with Python 3.11"
-                  echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
-                  /home/vivi/miniconda3/bin/az version
-              else
-                  echo "Conda installation failed, using pip with Python 3.11"
-                  # Install Python 3.11 if not available
-                  if ! command -v python3.11 &> /dev/null; then
-                      sudo apt-get update -qq
-                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
-                  fi
-                  
-                  # Create virtual environment with Python 3.11
-                  python3.11 -m venv ~/azure-cli-env
-                  source ~/azure-cli-env/bin/activate
-                  
-                  # Install Azure CLI in the virtual environment
-                  pip install azure-cli==2.73.0
-                  
-                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
-                  $HOME/azure-cli-env/bin/az version
+              if ! command -v az >/dev/null 2>&1; then
+                echo "Azure CLI not found; bootstrapping via uv..."
+                # Ensure uv is installed without sudo/apt
+                if ! command -v uv >/dev/null 2>&1; then
+                  curl -LsSf https://astral.sh/uv/install.sh | sh
+                  export PATH="$HOME/.local/bin:$PATH"
+                fi
+                # Create venv and install azure-cli
+                uv venv "$HOME/azure-cli-env"
+                "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
+                "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
+                echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
               fi
-            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
+              az version
+            displayName: Ensure Azure CLI available (uv fallback)
 
           - task: AzureCLI@2
             displayName: Deploy Container Apps Infrastructure
@@ -216,6 +205,7 @@ stages:
     displayName: Build and Push Docker Image
     pool:
       name: 'Default'
+    container: mcr.microsoft.com/azure-cli:2.73.0
     steps:
     - task: DownloadBuildArtifacts@0
       displayName: Download build artifacts
@@ -268,37 +258,23 @@ stages:
       displayName: Clean up disk space
 
     - script: |
-        # Install Azure CLI with Python 3.13 compatibility fixes
-        echo "Installing Azure CLI with Python 3.13 compatibility..."
-        
-        # Set environment variables to suppress warnings
+        set -eo pipefail
+        echo "Ensuring Azure CLI is available..."
         export PYTHONWARNINGS="ignore::FutureWarning"
         export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-        
-        # Try conda first with specific Python version
-        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
-            echo "Azure CLI installed via conda with Python 3.11"
-            echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
-            /home/vivi/miniconda3/bin/az version
-        else
-            echo "Conda installation failed, using pip with Python 3.11"
-            # Install Python 3.11 if not available
-            if ! command -v python3.11 &> /dev/null; then
-                sudo apt-get update -qq
-                sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
-            fi
-            
-            # Create virtual environment with Python 3.11
-            python3.11 -m venv ~/azure-cli-env
-            source ~/azure-cli-env/bin/activate
-            
-            # Install Azure CLI in the virtual environment
-            pip install azure-cli==2.73.0
-            
-            echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
-            $HOME/azure-cli-env/bin/az version
+        if ! command -v az >/dev/null 2>&1; then
+          echo "Azure CLI not found; bootstrapping via uv..."
+          if ! command -v uv >/dev/null 2>&1; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            export PATH="$HOME/.local/bin:$PATH"
+          fi
+          uv venv "$HOME/azure-cli-env"
+          "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
+          "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
+          echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
         fi
-      displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
+        az version
+      displayName: Ensure Azure CLI available (uv fallback)
 
     - task: AzureCLI@2
       displayName: Build and push Docker image
@@ -409,42 +385,29 @@ stages:
       name: azure-production
     pool:
       name: 'Default'
+    container: mcr.microsoft.com/azure-cli:2.73.0
     strategy:
       runOnce:
         deploy:
           steps:
           - script: |
-              # Install Azure CLI with Python 3.13 compatibility fixes
-              echo "Installing Azure CLI with Python 3.13 compatibility..."
-              
-              # Set environment variables to suppress warnings
+              set -eo pipefail
+              echo "Ensuring Azure CLI is available..."
               export PYTHONWARNINGS="ignore::FutureWarning"
               export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-              
-              # Try conda first with specific Python version
-              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
-                  echo "Azure CLI installed via conda with Python 3.11"
-                  echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
-                  /home/vivi/miniconda3/bin/az version
-              else
-                  echo "Conda installation failed, using pip with Python 3.11"
-                  # Install Python 3.11 if not available
-                  if ! command -v python3.11 &> /dev/null; then
-                      sudo apt-get update -qq
-                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
-                  fi
-                  
-                  # Create virtual environment with Python 3.11
-                  python3.11 -m venv ~/azure-cli-env
-                  source ~/azure-cli-env/bin/activate
-                  
-                  # Install Azure CLI in the virtual environment
-                  pip install azure-cli==2.73.0
-                  
-                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
-                  $HOME/azure-cli-env/bin/az version
+              if ! command -v az >/dev/null 2>&1; then
+                echo "Azure CLI not found; bootstrapping via uv..."
+                if ! command -v uv >/dev/null 2>&1; then
+                  curl -LsSf https://astral.sh/uv/install.sh | sh
+                  export PATH="$HOME/.local/bin:$PATH"
+                fi
+                uv venv "$HOME/azure-cli-env"
+                "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
+                "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
+                echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
               fi
-            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
+              az version
+            displayName: Ensure Azure CLI available (uv fallback)
 
           - task: AzureCLI@2
             displayName: Deploy Container App
@@ -689,42 +652,29 @@ stages:
       name: azure-production
     pool:
       name: 'Default'
+    container: mcr.microsoft.com/azure-cli:2.73.0
     strategy:
       runOnce:
         deploy:
           steps:
           - script: |
-              # Install Azure CLI with Python 3.13 compatibility fixes
-              echo "Installing Azure CLI with Python 3.13 compatibility..."
-              
-              # Set environment variables to suppress warnings
+              set -eo pipefail
+              echo "Ensuring Azure CLI is available..."
               export PYTHONWARNINGS="ignore::FutureWarning"
               export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-              
-              # Try conda first with specific Python version
-              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
-                  echo "Azure CLI installed via conda with Python 3.11"
-                  echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
-                  /home/vivi/miniconda3/bin/az version
-              else
-                  echo "Conda installation failed, using pip with Python 3.11"
-                  # Install Python 3.11 if not available
-                  if ! command -v python3.11 &> /dev/null; then
-                      sudo apt-get update -qq
-                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
-                  fi
-                  
-                  # Create virtual environment with Python 3.11
-                  python3.11 -m venv ~/azure-cli-env
-                  source ~/azure-cli-env/bin/activate
-                  
-                  # Install Azure CLI in the virtual environment
-                  pip install azure-cli==2.73.0
-                  
-                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
-                  $HOME/azure-cli-env/bin/az version
+              if ! command -v az >/dev/null 2>&1; then
+                echo "Azure CLI not found; bootstrapping via uv..."
+                if ! command -v uv >/dev/null 2>&1; then
+                  curl -LsSf https://astral.sh/uv/install.sh | sh
+                  export PATH="$HOME/.local/bin:$PATH"
+                fi
+                uv venv "$HOME/azure-cli-env"
+                "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
+                "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
+                echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
               fi
-            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
+              az version
+            displayName: Ensure Azure CLI available (uv fallback)
 
           - task: AzureCLI@2
             displayName: Deploy to App Service

@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { NotificationStatus } from '@/lib/services/notification/NotificationService'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { NotificationCenter } from '../NotificationCenter'
 import { useWebSocket } from '@/hooks/useWebSocket'
@@ -54,13 +53,6 @@ describe('notificationCenter', () => {
   })
 
   it('displays notifications when they are received', () => {
-    const mockNotification = {
-      id: '1',
-      title: 'Test Notification',
-      body: 'This is a test notification',
-      status: NotificationStatus.PENDING,
-      createdAt: Date.now(),
-    }
 
     vi.mocked(useWebSocket).mockReturnValue({
       isConnected: true,
@@ -78,13 +70,6 @@ describe('notificationCenter', () => {
 
   it('marks notification as read when clicking check button', async () => {
     const mockSendMessage = vi.fn()
-    const mockNotification = {
-      id: '1',
-      title: 'Test Notification',
-      body: 'This is a test notification',
-      status: NotificationStatus.PENDING,
-      createdAt: Date.now(),
-    }
 
     vi.mocked(useWebSocket).mockReturnValue({
       isConnected: true,
@@ -107,13 +92,6 @@ describe('notificationCenter', () => {
 
   it('dismisses notification when clicking dismiss button', async () => {
     const mockSendMessage = vi.fn()
-    const mockNotification = {
-      id: '1',
-      title: 'Test Notification',
-      body: 'This is a test notification',
-      status: NotificationStatus.PENDING,
-      createdAt: Date.now(),
-    }
 
     vi.mocked(useWebSocket).mockReturnValue({
       isConnected: true,
@@ -147,13 +125,6 @@ describe('notificationCenter', () => {
     const { rerender } = render(<NotificationCenter />)
     fireEvent.click(screen.getByRole('button'))
 
-    const newNotification = {
-      id: '2',
-      title: 'New Notification',
-      body: 'This is a new notification',
-      status: NotificationStatus.PENDING,
-      createdAt: Date.now(),
-    }
 
     vi.mocked(useWebSocket).mockReturnValue({
       isConnected: true,

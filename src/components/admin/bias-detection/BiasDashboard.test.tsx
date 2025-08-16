@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@/test/setup-react19'

@@ -1,6 +1,6 @@
-import { MongoAuthService } from '@/services/mongoAuth.service'
-import type { Session, User } from '@/types/mongodb.types'
-import { AuditEventStatus, AuditEventType, createAuditLog } from '@/lib/audit'
+import { MongoAuthService } from '../../services/mongoAuth.service'
+import type { Session, User } from '../../types/mongodb.types'
+import { AuditEventStatus, AuditEventType, createAuditLog } from '../../lib/audit'
 
 const authService = new MongoAuthService()
 

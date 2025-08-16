@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 /**
  * WebSocket API endpoint for real-time bias alerts
  *

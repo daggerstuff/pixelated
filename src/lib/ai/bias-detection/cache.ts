@@ -368,7 +368,14 @@ export class BiasDetectionCache {
         return null
       }
 
-      const cacheData = JSON.parse(cached)
+      // Parse with Date revival
+      const cacheData = JSON.parse(cached, (key, value) => {
+        // Revive Date objects from ISO strings
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/.test(value)) {
+          return new Date(value)
+        }
+        return value
+      })
 
       // Check expiration
       if (new Date(cacheData.expiresAt) < new Date()) {

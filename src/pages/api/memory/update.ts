@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { getCurrentUser } from '../../../lib/auth'
 import { MemoryService } from '../../../lib/memory'

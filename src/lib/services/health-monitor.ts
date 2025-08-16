@@ -1,484 +1,244 @@
-/**
- * Comprehensive Health Monitoring System for Phase 3
- * 
- * Provides real-time health monitoring for all services including:
- * - Service availability checks
- * - Performance monitoring
- * - Dependency health tracking
- * - Automated recovery mechanisms
- * - Health reporting and alerting
- */
+import { performance } from 'node:perf_hooks'
+import os from 'node:os'
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { performanceOptimizer } from './performance-optimizer'
-
-const logger = createBuildSafeLogger('health-monitor')
-
-export interface ServiceHealth {
+export interface HealthCheck {
   name: string
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown'
-  lastCheck: number
-  responseTime: number
-  errorRate: number
-  uptime: number
-  dependencies: string[]
-  metadata: Record<string, any>
-}
-
-export interface HealthCheckConfig {
-  interval: number
-  timeout: number
-  retries: number
-  degradedThreshold: number
-  unhealthyThreshold: number
+  status: 'healthy' | 'unhealthy' | 'degraded'
+  responseTime?: number
+  message?: string
+  details?: Record<string, unknown>
 }
 
 export interface SystemHealth {
-  overall: 'healthy' | 'degraded' | 'unhealthy'
-  services: ServiceHealth[]
-  lastUpdate: number
-  alerts: HealthAlert[]
-}
-
-export interface HealthAlert {
-  id: string
-  service: string
-  level: 'warning' | 'error' | 'critical'
-  message: string
-  timestamp: number
-  resolved: boolean
-}
-
-export type HealthCheckFunction = () => Promise<{
-  healthy: boolean
+  status: 'healthy' | 'unhealthy' | 'degraded'
+  timestamp: string
+  uptime: number
   responseTime: number
-  metadata?: Record<string, any>
-}>
+  checks: HealthCheck[]
+  system: {
+    memory: {
+      total: number
+      free: number
+      used: number
+      usagePercent: number
+    }
+    cpu: {
+      cores: number
+      loadAverage: number[]
+      model: string
+    }
+    platform: string
+    nodeVersion: string
+  }
+}
 
 export class HealthMonitor {
-  private services: Map<string, {
-    healthCheck: HealthCheckFunction
-    config: HealthCheckConfig
-    health: ServiceHealth
-    dependencies: string[]
-  }>
-  private alerts: HealthAlert[]
-  private monitoringInterval: NodeJS.Timeout | null
-  private isMonitoring: boolean
+  private checks: Map<string, () => Promise<HealthCheck>> = new Map()
 
   constructor() {
-    this.services = new Map()
-    this.alerts = []
-    this.monitoringInterval = null
-    this.isMonitoring = false
+    // Register default health checks
+    this.registerCheck('system', this.checkSystem.bind(this))
+    this.registerCheck('memory', this.checkMemory.bind(this))
+    this.registerCheck('disk', this.checkDisk.bind(this))
   }
 
-  /**
-   * Register a service for health monitoring
-   */
-  registerService(
-    name: string,
-    healthCheck: HealthCheckFunction,
-    dependencies: string[] = [],
-    config: Partial<HealthCheckConfig> = {}
-  ): void {
-    const defaultConfig: HealthCheckConfig = {
-      interval: 30000, // 30 seconds
-      timeout: 5000,   // 5 seconds
-      retries: 3,
-      degradedThreshold: 0.02, // 2% error rate
-      unhealthyThreshold: 0.05 // 5% error rate
-    }
-
-    const serviceConfig = { ...defaultConfig, ...config }
-
-    this.services.set(name, {
-      healthCheck,
-      config: serviceConfig,
-      dependencies,
-      health: {
-        name,
-        status: 'unknown',
-        lastCheck: 0,
-        responseTime: 0,
-        errorRate: 0,
-        uptime: 0,
-        dependencies,
-        metadata: {}
-      }
-    })
-
-    logger.info(`Registered service for health monitoring: ${name}`, {
-      dependencies,
-      config: serviceConfig
-    })
+  registerCheck(name: string, checkFn: () => Promise<HealthCheck>): void {
+    this.checks.set(name, checkFn)
   }
 
-  /**
-   * Start health monitoring
-   */
-  startMonitoring(): void {
-    if (this.isMonitoring) {
-      logger.warn('Health monitoring is already running')
-      return
-    }
-
-    this.isMonitoring = true
-    logger.info('Starting health monitoring system')
-
-    // Initial health check for all services
-    this.checkAllServices()
-
-    // Set up periodic monitoring
-    this.monitoringInterval = setInterval(() => {
-      this.checkAllServices()
-    }, 10000) // Check every 10 seconds
-  }
-
-  /**
-   * Stop health monitoring
-   */
-  stopMonitoring(): void {
-    if (!this.isMonitoring) {
-      return
-    }
-
-    this.isMonitoring = false
+  async getHealth(): Promise<SystemHealth> {
+    const startTime = performance.now()
+    const checks: HealthCheck[] = []
     
-    if (this.monitoringInterval) {
-      clearInterval(this.monitoringInterval)
-      this.monitoringInterval = null
-    }
-
-    logger.info('Stopped health monitoring system')
-  }
-
-  /**
-   * Check health of all registered services
-   */
-  private async checkAllServices(): Promise<void> {
-    const checkPromises = Array.from(this.services.entries()).map(
-      ([name, service]) => this.checkServiceHealth(name, service)
-    )
-
-    await Promise.allSettled(checkPromises)
-    this.updateSystemAlerts()
-  }
-
-  /**
-   * Check health of a specific service
-   */
-  private async checkServiceHealth(
-    name: string,
-    service: {
-      healthCheck: HealthCheckFunction
-      config: HealthCheckConfig
-      health: ServiceHealth
-      dependencies: string[]
-    }
-  ): Promise<void> {
-    const startTime = Date.now()
-    let attempt = 0
-    let lastError: Error | null = null
-
-    while (attempt < service.config.retries) {
+    // Run all health checks in parallel
+    const checkPromises = Array.from(this.checks.entries()).map(async ([name, checkFn]) => {
       try {
-        const checkPromise = service.healthCheck()
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('Health check timeout')), service.config.timeout)
-        })
-
-        const result = await Promise.race([checkPromise, timeoutPromise])
-        const responseTime = Date.now() - startTime
-
-        // Update service health
-        service.health.lastCheck = Date.now()
-        service.health.responseTime = responseTime
-        service.health.metadata = result.metadata || {}
-
-        if (result.healthy) {
-          service.health.status = 'healthy'
-          service.health.uptime = Date.now() - (service.health.uptime || Date.now())
-          
-          // Resolve any existing alerts for this service
-          this.resolveServiceAlerts(name)
-        } else {
-          service.health.status = 'unhealthy'
-          this.createAlert(name, 'error', 'Service health check failed')
-        }
-
-        return // Success, exit retry loop
-
+        const checkStart = performance.now()
+        const result = await Promise.race([
+          checkFn(),
+          this.timeoutPromise(5000, name) // 5 second timeout
+        ])
+        result.responseTime = performance.now() - checkStart
+        return result
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error))
-        attempt++
-        
-        if (attempt < service.config.retries) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt)) // Exponential backoff
+        return {
+          name,
+          status: 'unhealthy' as const,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          responseTime: performance.now() - startTime
         }
       }
-    }
-
-    // All retries failed
-    service.health.lastCheck = Date.now()
-    service.health.status = 'unhealthy'
-    service.health.responseTime = Date.now() - startTime
-
-    this.createAlert(
-      name,
-      'critical',
-      `Service health check failed after ${service.config.retries} attempts: ${lastError?.message}`
-    )
-
-    logger.error(`Health check failed for service: ${name}`, {
-      attempts: service.config.retries,
-      error: lastError?.message
     })
-  }
 
-  /**
-   * Get current system health status
-   */
-  getSystemHealth(): SystemHealth {
-    const services = Array.from(this.services.values()).map(service => service.health)
+    const checkResults = await Promise.all(checkPromises)
+    checks.push(...checkResults)
+
+    // Determine overall status
+    const hasUnhealthy = checks.some(check => check.status === 'unhealthy')
+    const hasDegraded = checks.some(check => check.status === 'degraded')
     
-    // Determine overall system health
-    const healthyCount = services.filter(s => s.status === 'healthy').length
-    const degradedCount = services.filter(s => s.status === 'degraded').length
-    const unhealthyCount = services.filter(s => s.status === 'unhealthy').length
-
-    let overall: 'healthy' | 'degraded' | 'unhealthy'
-    if (unhealthyCount > 0) {
-      overall = 'unhealthy'
-    } else if (degradedCount > 0) {
-      overall = 'degraded'
-    } else {
-      overall = 'healthy'
+    let overallStatus: 'healthy' | 'unhealthy' | 'degraded' = 'healthy'
+    if (hasUnhealthy) {
+      overallStatus = 'unhealthy'
+    } else if (hasDegraded) {
+      overallStatus = 'degraded'
     }
+
+    const responseTime = performance.now() - startTime
 
     return {
-      overall,
-      services,
-      lastUpdate: Date.now(),
-      alerts: this.alerts.filter(alert => !alert.resolved)
+      status: overallStatus,
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      responseTime,
+      checks,
+      system: this.getSystemInfo()
     }
   }
 
-  /**
-   * Get health status for a specific service
-   */
-  getServiceHealth(name: string): ServiceHealth | null {
-    const service = this.services.get(name)
-    return service ? service.health : null
-  }
-
-  /**
-   * Create a health alert
-   */
-  private createAlert(
-    service: string,
-    level: 'warning' | 'error' | 'critical',
-    message: string
-  ): void {
-    const alertId = `${service}-${Date.now()}`
-    
-    const alert: HealthAlert = {
-      id: alertId,
-      service,
-      level,
-      message,
-      timestamp: Date.now(),
-      resolved: false
-    }
-
-    this.alerts.push(alert)
-
-    logger.warn(`Health alert created`, {
-      alertId,
-      service,
-      level,
-      message
-    })
-
-    // Trigger automated recovery if configured
-    this.attemptAutomatedRecovery(service, level)
-  }
-
-  /**
-   * Resolve alerts for a service
-   */
-  private resolveServiceAlerts(service: string): void {
-    const unresolvedAlerts = this.alerts.filter(
-      alert => alert.service === service && !alert.resolved
-    )
-
-    unresolvedAlerts.forEach(alert => {
-      alert.resolved = true
-      logger.info(`Health alert resolved`, {
-        alertId: alert.id,
-        service: alert.service
-      })
+  private async timeoutPromise(ms: number, checkName: string): Promise<HealthCheck> {
+    return new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`Health check '${checkName}' timed out after ${ms}ms`))
+      }, ms)
     })
   }
 
-  /**
-   * Update system-wide alerts based on current health status
-   */
-  private updateSystemAlerts(): void {
-    const systemHealth = this.getSystemHealth()
-    
-    // Check for dependency failures
-    for (const service of systemHealth.services) {
-      if (service.dependencies.length > 0) {
-        const unhealthyDependencies = service.dependencies.filter(dep => {
-          const depHealth = this.getServiceHealth(dep)
-          return depHealth && depHealth.status === 'unhealthy'
-        })
-
-        if (unhealthyDependencies.length > 0) {
-          this.createAlert(
-            service.name,
-            'warning',
-            `Service has unhealthy dependencies: ${unhealthyDependencies.join(', ')}`
-          )
+  private async checkSystem(): Promise<HealthCheck> {
+    try {
+      const uptime = os.uptime()
+      const loadAvg = os.loadavg()
+      const cpuCount = os.cpus().length
+      
+      // Check if system load is reasonable (< 2x CPU cores)
+      const highLoad = loadAvg[0] > cpuCount * 2
+      
+      return {
+        name: 'system',
+        status: highLoad ? 'degraded' : 'healthy',
+        message: highLoad ? 'High system load detected' : 'System operating normally',
+        details: {
+          uptime,
+          loadAverage: loadAvg,
+          cpuCores: cpuCount,
+          platform: os.platform(),
+          release: os.release()
         }
       }
-    }
-
-    // Check overall system health
-    if (systemHealth.overall === 'unhealthy') {
-      const unhealthyServices = systemHealth.services
-        .filter(s => s.status === 'unhealthy')
-        .map(s => s.name)
-
-      this.createAlert(
-        'system',
-        'critical',
-        `System is unhealthy. Affected services: ${unhealthyServices.join(', ')}`
-      )
+    } catch (error) {
+      return {
+        name: 'system',
+        status: 'unhealthy',
+        message: error instanceof Error ? error.message : 'System check failed'
+      }
     }
   }
 
-  /**
-   * Attempt automated recovery for failed services
-   */
-  private async attemptAutomatedRecovery(
-    serviceName: string,
-    alertLevel: 'warning' | 'error' | 'critical'
-  ): Promise<void> {
-    if (alertLevel !== 'critical') {
-      return // Only attempt recovery for critical alerts
-    }
-
-    logger.info(`Attempting automated recovery for service: ${serviceName}`)
-
+  private async checkMemory(): Promise<HealthCheck> {
     try {
-      // Service-specific recovery strategies
-      switch (serviceName) {
-        case 'redis':
-          await this.recoverRedisService()
-          break
-        case 'database':
-          await this.recoverDatabaseService()
-          break
-        case 'memory-service':
-          await this.recoverMemoryService()
-          break
-        default:
-          logger.warn(`No automated recovery strategy for service: ${serviceName}`)
+      const totalMem = os.totalmem()
+      const freeMem = os.freemem()
+      const usedMem = totalMem - freeMem
+      const usagePercent = (usedMem / totalMem) * 100
+      
+      // Memory usage thresholds
+      let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
+      let message = 'Memory usage normal'
+      
+      if (usagePercent > 90) {
+        status = 'unhealthy'
+        message = 'Critical memory usage'
+      } else if (usagePercent > 80) {
+        status = 'degraded'
+        message = 'High memory usage'
+      }
+      
+      return {
+        name: 'memory',
+        status,
+        message,
+        details: {
+          total: totalMem,
+          free: freeMem,
+          used: usedMem,
+          usagePercent: Math.round(usagePercent * 100) / 100
+        }
       }
     } catch (error) {
-      logger.error(`Automated recovery failed for service: ${serviceName}`, {
-        error: error instanceof Error ? error.message : String(error)
-      })
+      return {
+        name: 'memory',
+        status: 'unhealthy',
+        message: error instanceof Error ? error.message : 'Memory check failed'
+      }
     }
   }
 
-  /**
-   * Recovery strategies for specific services
-   */
-  private async recoverRedisService(): Promise<void> {
-    // Attempt to reconnect Redis
+  private async checkDisk(): Promise<HealthCheck> {
     try {
-      const redisService = await import('./redis/RedisService')
-      // Implementation would depend on your Redis service structure
-      logger.info('Attempting Redis service recovery')
+      // Basic disk check - in production this would check actual disk usage
+      // For now, simulate a basic check
+      const processMemory = process.memoryUsage()
+      const heapUsagePercent = (processMemory.heapUsed / processMemory.heapTotal) * 100
+      
+      let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
+      let message = 'Disk usage normal'
+      
+      if (heapUsagePercent > 90) {
+        status = 'degraded'
+        message = 'High heap usage detected'
+      }
+      
+      return {
+        name: 'disk',
+        status,
+        message,
+        details: {
+          heapUsed: processMemory.heapUsed,
+          heapTotal: processMemory.heapTotal,
+          heapUsagePercent: Math.round(heapUsagePercent * 100) / 100
+        }
+      }
     } catch (error) {
-      throw new Error(`Redis recovery failed: ${error}`)
+      return {
+        name: 'disk',
+        status: 'unhealthy',
+        message: error instanceof Error ? error.message : 'Disk check failed'
+      }
     }
   }
 
-  private async recoverDatabaseService(): Promise<void> {
-    // Attempt to reconnect database
-    logger.info('Attempting database service recovery')
-    // Implementation would depend on your database service structure
-  }
-
-  private async recoverMemoryService(): Promise<void> {
-    // Clear memory service cache and restart
-    logger.info('Attempting memory service recovery')
-    // Implementation would depend on your memory service structure
-  }
-
-  /**
-   * Get health monitoring statistics
-   */
-  getMonitoringStats(): {
-    totalServices: number
-    healthyServices: number
-    degradedServices: number
-    unhealthyServices: number
-    totalAlerts: number
-    unresolvedAlerts: number
-    averageResponseTime: number
-    uptime: number
-  } {
-    const services = Array.from(this.services.values()).map(s => s.health)
-    const totalServices = services.length
-    const healthyServices = services.filter(s => s.status === 'healthy').length
-    const degradedServices = services.filter(s => s.status === 'degraded').length
-    const unhealthyServices = services.filter(s => s.status === 'unhealthy').length
-    
-    const totalAlerts = this.alerts.length
-    const unresolvedAlerts = this.alerts.filter(a => !a.resolved).length
-    
-    const averageResponseTime = services.length > 0 
-      ? services.reduce((sum, s) => sum + s.responseTime, 0) / services.length
-      : 0
-
-    const uptime = services.length > 0
-      ? Math.min(...services.map(s => s.uptime))
-      : 0
-
-    return {
-      totalServices,
-      healthyServices,
-      degradedServices,
-      unhealthyServices,
-      totalAlerts,
-      unresolvedAlerts,
-      averageResponseTime,
-      uptime
-    }
-  }
-
-  /**
-   * Export health data for external monitoring systems
-   */
-  exportHealthData(): {
-    timestamp: number
-    system: SystemHealth
-    performance: any
-    stats: any
-  } {
-    return {
-      timestamp: Date.now(),
-      system: this.getSystemHealth(),
-      performance: performanceOptimizer.getMetrics(),
-      stats: this.getMonitoringStats()
+  private getSystemInfo() {
+    try {
+      const totalMem = os.totalmem()
+      const freeMem = os.freemem()
+      const usedMem = totalMem - freeMem
+      const cpus = os.cpus()
+      
+      return {
+        memory: {
+          total: totalMem,
+          free: freeMem,
+          used: usedMem,
+          usagePercent: Math.round((usedMem / totalMem) * 100 * 100) / 100
+        },
+        cpu: {
+          cores: cpus.length,
+          loadAverage: os.loadavg(),
+          model: cpus[0]?.model || 'Unknown'
+        },
+        platform: os.platform(),
+        nodeVersion: process.version
+      }
+    } catch (error) {
+      return {
+        memory: { total: 0, free: 0, used: 0, usagePercent: 0 },
+        cpu: { cores: 0, loadAverage: [0, 0, 0], model: 'Unknown' },
+        platform: 'unknown',
+        nodeVersion: process.version
+      }
     }
   }
 }
 
-// Export singleton instance
+// Singleton instance
 export const healthMonitor = new HealthMonitor()

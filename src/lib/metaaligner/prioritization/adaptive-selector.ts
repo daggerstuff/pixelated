@@ -79,7 +79,7 @@ export class AdaptiveSelector {
     // Add simple transition metadata expected by tests
     if (this.lastDetectedContext && this.lastDetectedContext !== detection.detectedContext) {
       detection.metadata = detection.metadata || {}
-      ;(detection.metadata as any).transition = {
+      ;(detection.metadata as Record<string, unknown>).transition = {
         from: this.lastDetectedContext,
         to: detection.detectedContext,
       }
@@ -103,8 +103,8 @@ export class AdaptiveSelector {
         enableContextualAdjustment: true,
         minObjectiveScore: 0,
         maxObjectiveScore: 1,
-        normalizationMethod: 0 as any, // Not used directly in engine result
-        aggregationMethod: 0 as any, // Not used directly in engine result
+        normalizationMethod: 0 as unknown as number, // Not used directly in engine result
+        aggregationMethod: 0 as unknown as number, // Not used directly in engine result
       },
     }
 

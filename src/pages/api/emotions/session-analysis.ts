@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'

@@ -1,5 +1,3 @@
-import type { APIRoute } from 'astro'
-import type { APIContext } from 'astro'
 
 // Redirect to the versioned API endpoint
 export const GET: APIRoute = async ({ url }: APIContext) => {

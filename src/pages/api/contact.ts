@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIContext } from 'astro'
 import { ContactService } from '@/lib/services/contact/ContactService'
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 

@@ -17,6 +17,9 @@ export interface CrisisDetectionConfig {
 
 export class CrisisDetectionService {
   private aiService: AIService
+  private sensitivityLevel: 'low' | 'medium' | 'high'
+  private model?: string
+  private defaultPrompt?: string
 
   // Crisis detection keywords by category
   private static readonly CRISIS_KEYWORDS = {
@@ -39,6 +42,11 @@ export class CrisisDetectionService {
       'better off dead',
       'suicide plan',
       'take my own life',
+      'ending it all',
+      'can\'t take it anymore',
+      'can\'t take it',
+      'ending it',
+      'end it all',
     ],
     emergency: [
       'immediate danger',
@@ -81,6 +89,9 @@ export class CrisisDetectionService {
 
   constructor(config: CrisisDetectionConfig) {
     this.aiService = config.aiService
+    this.sensitivityLevel = config.sensitivityLevel
+    this.model = config.model
+    this.defaultPrompt = config.defaultPrompt
   }
 
   async detectCrisis(
@@ -94,14 +105,19 @@ export class CrisisDetectionService {
       // If high-risk keywords found, proceed with AI analysis
       let aiAnalysis: RiskAssessment | null = null
       if (keywordAnalysis.score >= 0.3) {
-        aiAnalysis = await this.performAIAnalysis(text)
+        try {
+          aiAnalysis = await this.performAIAnalysis(text)
+        } catch (error) {
+          // Log AI analysis failure but continue with keyword analysis
+          appLogger.warn('AI analysis failed, using keyword analysis only', { error })
+        }
       }
 
       // Combine results
       const finalScore = Math.max(keywordAnalysis.score, aiAnalysis?.score || 0)
 
       const thresholds =
-        CrisisDetectionService.SENSITIVITY_THRESHOLDS[options.sensitivityLevel]
+        CrisisDetectionService.SENSITIVITY_THRESHOLDS[this.sensitivityLevel]
       const isCrisis = finalScore >= thresholds.crisis
 
       return {
@@ -124,7 +140,19 @@ export class CrisisDetectionService {
         stack: error instanceof Error ? error.stack : '',
         error,
       })
-      throw new Error('Crisis detection analysis failed')
+      
+      // Return a safe fallback result instead of throwing
+      return {
+        isCrisis: false,
+        confidence: 0,
+        category: 'analysis_error',
+        content: text,
+        riskLevel: 'unknown',
+        urgency: 'low',
+        detectedTerms: [],
+        suggestedActions: ['Manual review recommended due to analysis error'],
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
@@ -153,24 +181,48 @@ export class CrisisDetectionService {
     const lowerText = text.toLowerCase()
     const indicators: string[] = []
     let score = 0
+    let maxCategoryScore = 0
 
     // Check each category with different weights
     for (const [category, keywords] of Object.entries(
       CrisisDetectionService.CRISIS_KEYWORDS,
     )) {
       const categoryWeight = this.getCategoryWeight(category)
+      let categoryMatches = 0
 
       for (const keyword of keywords) {
-        if (lowerText.includes(keyword.toLowerCase())) {
-          indicators.push(keyword)
-          score += categoryWeight
+        // Handle phrases with spaces differently than single words
+        const keywordLower = keyword.toLowerCase()
+        let matches = false
+        
+        if (keywordLower.includes(' ')) {
+          // For phrases, use simple includes check
+          matches = lowerText.includes(keywordLower)
+        } else {
+          // For single words, use word boundaries
+          const regex = new RegExp(`\\b${keywordLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+          matches = regex.test(lowerText)
         }
+        
+        if (matches) {
+          indicators.push(keyword)
+          categoryMatches++
+        }
+      }
+
+      if (categoryMatches > 0) {
+        // Calculate category score based on matches and weight
+        const categoryScore = Math.min(categoryMatches * categoryWeight * 0.8, categoryWeight)
+        score += categoryScore
+        maxCategoryScore = Math.max(maxCategoryScore, categoryScore)
       }
     }
 
-    // Normalize score (0-1 range)
+    // Use the maximum category score as the final score (less conservative)
+    const finalScore = Math.min(maxCategoryScore, 1.0)
+
     return {
-      score: Math.min(score / 3, 1), // Normalize to 0-1
+      score: finalScore,
       indicators: [...new Set(indicators)], // Remove duplicates
     }
   }
@@ -202,6 +254,12 @@ export class CrisisDetectionService {
       `
 
     try {
+      // Check if aiService exists and has the required method
+      if (!this.aiService || typeof this.aiService.createChatCompletion !== 'function') {
+        appLogger.warn('AI service not available, falling back to keyword analysis only')
+        return null
+      }
+
       const response = await this.aiService.createChatCompletion(
         [
           {
@@ -217,6 +275,12 @@ export class CrisisDetectionService {
         },
       )
 
+      // Validate response structure
+      if (!response || !response.content) {
+        appLogger.warn('Invalid AI response structure, falling back to keyword analysis')
+        return null
+      }
+
       // Parse AI response
       const { content } = response
       try {
@@ -224,7 +288,7 @@ export class CrisisDetectionService {
 
         if (typeof parsed === 'object' && parsed !== null) {
           return {
-            score: Number(parsed.score) || 0,
+            score: Math.min(Math.max(Number(parsed.score) || 0, 0), 1), // Clamp between 0-1
             category: parsed.category || 'general_concern',
             severity: parsed.severity || 'low',
             indicators: Array.isArray(parsed.indicators)
@@ -237,7 +301,7 @@ export class CrisisDetectionService {
         }
         // Throw an error if parsed content is not a valid object
         throw new Error('Parsed AI response is not a valid object.')
-      } catch (error) {
+      } catch {
         appLogger.error('AI response parsing failed', {
           error,
           responseContent: content,
@@ -254,7 +318,8 @@ export class CrisisDetectionService {
     } catch (error) {
       // This will catch errors from the AI service itself (e.g., network issues, API errors)
       appLogger.error('AI service call failed in crisis detection', { error })
-      throw error // Re-throw the error to be caught by the calling method
+      // Return null to fall back to keyword analysis instead of throwing
+      return null
     }
   }
 

@@ -5,13 +5,6 @@
  * Extracted from BiasDetectionEngine.ts for better separation of concerns.
  */
 
-import { EmotionalEvent } from '../../emotional-analysis/types'
-import { EmotionalContext } from '../../emotional-analysis/context-analyzer'
-import { createSecureWebSocket, SecureWebSocketConfig } from '../../websocket/secure-websocket'
-import { AlertConfig, AlertSeverity, AlertType } from './types'
-import { MetricsCollector } from './metrics-collector'
-import { BiasDetectionEngine } from './index'
-import { AuditLogger } from './audit'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { PythonBiasDetectionBridge } from './python-bridge'
 import { performanceMonitor } from './performance-monitor'

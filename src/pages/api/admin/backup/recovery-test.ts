@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { logAuditEvent, AuditEventType } from '@/lib/audit'
 import { adminGuard } from '@/lib/admin/middleware'

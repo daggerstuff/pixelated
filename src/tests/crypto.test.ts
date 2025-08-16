@@ -51,10 +51,26 @@ const Encryption = {
 
   decrypt(encrypted: string, key: string): string {
     const parts = encrypted.split(':')
-    if (parts.length < 3 || parts[1] !== key) {
+    if (parts.length < 3) {
       throw new Error('Failed to decrypt data')
     }
-    return parts.slice(2).join(':')
+    
+    // The encrypted format is v{version}:{key}:{data}
+    // But if the key contains colons, it will be split across multiple parts
+    // We need to reconstruct the key and find where the data starts
+    
+    // Skip the version part (parts[0])
+    // The key should match exactly what was passed to encrypt
+    const keyParts = key.split(':')
+    const encryptedKeyParts = parts.slice(1, 1 + keyParts.length)
+    const reconstructedKey = encryptedKeyParts.join(':')
+    
+    if (reconstructedKey !== key) {
+      throw new Error('Failed to decrypt data')
+    }
+    
+    // Data starts after version + key parts
+    return parts.slice(1 + keyParts.length).join(':')
   },
 }
 
@@ -128,21 +144,39 @@ class KeyRotationManager {
       throw new Error(`Key ${keyId} not found`)
     }
 
-    // Extract original data and version from the encrypted string
-    const [versionString, ...dataParts] = encrypted.split(':')
-    const version = parseInt(versionString.substring(1), 10)
-    const encryptedData = dataParts.join(':')
+    // Extract original data from the encrypted string
+    const parts = encrypted.split(':')
+    if (parts.length < 3) {
+      throw new Error('Invalid encrypted data format')
+    }
+    
+    const version = parseInt(parts[0].substring(1), 10)
+    
+    // The original encrypted format could be:
+    // v1:keyId:keyValue:data (4 parts) or v1:simpleKey:data (3 parts)
+    // We need to find where the actual data starts
+    // Since we know the keyId, we can determine the format
+    let originalData: string
+    if (parts.length >= 4 && parts[1] === keyId) {
+      // 4-part format: v1:keyId:keyValue:data
+      originalData = parts.slice(3).join(':')
+    } else {
+      // 3-part format: v1:key:data
+      originalData = parts.slice(2).join(':')
+    }
 
-    // Get the current key
-    const currentKey = this.keyValues.get(keyId) || 'mock-key'
+    // Get the current key value
+    const currentKeyValue = this.keyValues.get(keyId) || 'mock-key'
 
     // If already using latest version, return as is
     if (version === metadata.version) {
       return encrypted
     }
 
-    // Mock the decryption/reencryption process
-    return `v${metadata.version}:${currentKey}:${encryptedData}`
+    // Re-encrypt with the latest key version using the same format as Encryption.encrypt
+    // Format: v{version}:{fullKey}:{data}
+    const fullKey = `${keyId}:${currentKeyValue}`
+    return `v${metadata.version}:${fullKey}:${originalData}`
   }
 }
 
@@ -716,49 +750,40 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
   let fheSystem: ExtendedFHESystem
 
   beforeEach(() => {
-    // Mock FHE system
-    vi.mock('../lib/fhe', async () => {
-      return {
-        createFHESystem: () => ({
-          encrypt: async (data: string): Promise<string> => {
-            return `test-fhe:v1:${data}`
-          },
-          decrypt: async (encryptedData: string): Promise<string> => {
-            const parts = encryptedData.split(':')
-            return parts[parts.length - 1]
-          },
-          processEncrypted: async (
-            encryptedData: string,
-            operation: string,
-          ) => {
-            return {
-              success: true,
-              metadata: {
-                operation,
-                timestamp: Date.now(),
-              },
-            }
-          },
-          verifySender: async (
-            senderId: string,
-            authorizedSenders: string[],
-          ) => {
-            return authorizedSenders.includes(senderId)
-          },
-        }),
-      }
-    })
-
     // Create crypto system
     cryptoSystem = createCryptoSystem({
       namespace: 'test',
     })
 
-    // Create FHE system with crypto integration
-    fheSystem = createFHESystem({
-      namespace: 'test',
-      crypto: cryptoSystem,
-    }) as ExtendedFHESystem
+    // Create mock FHE system directly
+    fheSystem = {
+      encrypt: async (data: string): Promise<string> => {
+        return `test-fhe:v1:${data}`
+      },
+      decrypt: async (encryptedData: string): Promise<string> => {
+        const parts = encryptedData.split(':')
+        // Format is test-fhe:v1:{data}, so return everything after the second colon
+        return parts.slice(2).join(':')
+      },
+      processEncrypted: async (
+        encryptedData: string,
+        operation: string,
+      ) => {
+        return {
+          success: true,
+          metadata: {
+            operation,
+            timestamp: Date.now(),
+          },
+        }
+      },
+      verifySender: async (
+        senderId: string,
+        authorizedSenders: string[],
+      ) => {
+        return authorizedSenders.includes(senderId)
+      },
+    } as ExtendedFHESystem
   })
 
   afterEach(() => {

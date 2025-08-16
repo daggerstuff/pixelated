@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { updatePassword } from '../../../services/auth.service'
 
 export const POST: APIRoute = async ({

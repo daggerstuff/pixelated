@@ -124,7 +124,7 @@ export async function getAllDataDeletionRequests(filters?: {
 }): Promise<DataDeletionRequest[]> {
   try {
     const query = mongoClient.db.collection('data_deletion_requests')
-    const filter: any = {}
+    const filter: Record<string, unknown> = {}
     if (filters) {
       if (filters.status) {
         filter.status = filters.status

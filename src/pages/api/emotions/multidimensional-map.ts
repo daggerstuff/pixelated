@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 export const prerender = false
 
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'

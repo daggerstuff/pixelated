@@ -5,7 +5,7 @@ import { EncryptionMode } from '../../../lib/fhe/types'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { rateLimit } from '../../../lib/middleware/rate-limit'
 
-export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
+export const POST: APIRoute = async ({ request }: APIContext) => {
   try {
     // Get client IP for rate limiting
     const clientIp =

@@ -30,16 +30,27 @@ export class ConsentService {
   async getConsentTypes(): Promise<ConsentType[]> {
     try {
       // TODO: Replace with MongoDB implementation
-      const data: any[] = [] // Stub: Replace with MongoDB result
-      return data.map((type) => ({
-        id: type.id,
-        name: type.name,
-        description: type.description,
-        scope: type.scope,
-        isActive: type.is_active,
-        createdAt: type.created_at,
-        updatedAt: type.updated_at,
-      }))
+      const data: unknown[] = [] // Stub: Replace with MongoDB result
+      return data.map((type: unknown) => {
+        const t = type as {
+          id: string
+          name: string
+          description: string
+          scope: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        return {
+          id: t.id,
+          name: t.name,
+          description: t.description,
+          scope: t.scope,
+          isActive: t.is_active,
+          createdAt: t.created_at,
+          updatedAt: t.updated_at,
+        }
+      })
     } catch (error) {
       logger.error('Unexpected error in getConsentTypes', error)
       throw new Error('Failed to fetch consent types')
@@ -55,20 +66,20 @@ export class ConsentService {
     void consentTypeId;
     try {
       // TODO: Replace with MongoDB implementation
-      const data: any = {} // Stub: Replace with MongoDB result
+      const data: unknown = {} // Stub: Replace with MongoDB result
       return {
-        id: data.id,
-        consentTypeId: data.consent_type_id,
-        version: data.version,
-        effectiveDate: data.effective_date,
-        expirationDate: data.expiration_date,
-        documentText: data.document_text,
-        summary: data.summary,
-        isCurrent: data.is_current,
-        approvalDate: data.approval_date,
-        approvedBy: data.approved_by,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: (data as Record<string, unknown>).id as string,
+        consentTypeId: (data as Record<string, unknown>).consent_type_id as string,
+        version: (data as Record<string, unknown>).version as string,
+        effectiveDate: (data as Record<string, unknown>).effective_date as string,
+        expirationDate: (data as Record<string, unknown>).expiration_date as string,
+        documentText: (data as Record<string, unknown>).document_text as string,
+        summary: (data as Record<string, unknown>).summary as string,
+        isCurrent: (data as Record<string, unknown>).is_current as boolean,
+        approvalDate: (data as Record<string, unknown>).approval_date as string,
+        approvedBy: (data as Record<string, unknown>).approved_by as string,
+        createdAt: (data as Record<string, unknown>).created_at as string,
+        updatedAt: (data as Record<string, unknown>).updated_at as string,
       }
     } catch (error) {
       logger.error('Unexpected error in getCurrentConsentVersion', error)
@@ -83,17 +94,17 @@ export class ConsentService {
     void consentTypeId;
     try {
       // TODO: Replace with MongoDB implementation
-      const data: any[] = [] // Stub: Replace with MongoDB result
-      return data.map((option) => ({
-        id: option.id,
-        consentTypeId: option.consent_type_id,
-        optionName: option.option_name,
-        description: option.description,
-        isRequired: option.is_required,
+      const data: unknown[] = [] // Stub: Replace with MongoDB result
+      return data.map((option: Record<string, unknown>) => ({
+        id: option.id as string,
+        consentTypeId: option.consent_type_id as string,
+        optionName: option.option_name as string,
+        description: option.description as string,
+        isRequired: option.is_required as boolean,
         defaultValue: option.default_value,
-        displayOrder: option.display_order,
-        createdAt: option.created_at,
-        updatedAt: option.updated_at,
+        displayOrder: option.display_order as number,
+        createdAt: option.created_at as string,
+        updatedAt: option.updated_at as string,
       }))
     } catch (error) {
       logger.error('Unexpected error in getConsentOptions', error)
@@ -145,7 +156,7 @@ export class ConsentService {
     try {
       // Check if there's already an active consent for this version
       // TODO: Replace with MongoDB implementation
-      return {} as any
+      return {} as unknown as UserConsent
     } catch (error) {
       logger.error('Unexpected error in grantConsent', error)
       throw new Error('Failed to grant consent')

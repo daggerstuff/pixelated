@@ -8,7 +8,7 @@ export interface Memory {
   createdAt: Date;
   updatedAt: Date;
   tags?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ListMemoriesOptions {
@@ -23,13 +23,13 @@ export interface ListMemoriesOptions {
 export interface CreateMemoryOptions {
   userId: string;
   tags?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UpdateMemoryOptions {
   content?: string;
   tags?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export class MemoryService {

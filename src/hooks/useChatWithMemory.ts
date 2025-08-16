@@ -8,7 +8,7 @@ export interface ChatWithMemoryOptions {
 }
 
 export function useChatWithMemory(options: ChatWithMemoryOptions = {}) {
-  const { initialMessages = [], memoryKey = 'default' } = options
+  const { initialMessages = [] } = options
   const [isLoading, setIsLoading] = useState(false)
   
   const chat = useChat({ initialMessages })

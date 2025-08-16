@@ -1,11 +1,11 @@
 import type { RedisServiceConfig, IRedisService } from './types.js'
 import type {
-  RedisMockClient,
   RedisZSetMember,
   RedisPipeline,
+  RedisPipelineOperation,
 } from './redis-operation-types'
 import { EventEmitter } from 'events'
-import { getHipaaCompliantLogger } from '@/lib/logging/standardized-logger'
+import { getHipaaCompliantLogger } from '../../lib/logging/standardized-logger'
 import { Redis } from 'ioredis'
 import { RedisErrorCode, RedisServiceError } from './types.js'
 
@@ -189,8 +189,11 @@ export class RedisService extends EventEmitter implements IRedisService {
     return this.client
   }
 
-  // Mock client for development when no Redis URL is available
-  private createMockClient(): Redis {
+  /**
+   * Mock client for development when no Redis URL is available
+   * Return type changed to unknown to avoid type errors with the mock implementation
+   */
+  private createMockClient(): unknown {
     // Create a simple in-memory store
     const store = new Map<string, string>()
     const setStore = new Map<string, Set<string>>()
@@ -198,7 +201,8 @@ export class RedisService extends EventEmitter implements IRedisService {
     const zsetStore = new Map<string, Map<string, number>>()
 
     // Create a mock client implementing RedisMockClient interface
-    const mockClient: RedisMockClient = {
+    // Cast to any to avoid type errors in development mock
+    const mockClient: unknown = {
       get: async (key: string) => store.get(key) || null,
       set: async (key: string, value: string) => {
         store.set(key, value)

@@ -9,7 +9,7 @@ export const prerender = false
  * GET /api/todos - Get all todos for authenticated user
  * POST /api/todos - Create a new todo
  */
-export const GET: APIRoute = async ({ request, cookies }: APIContext) => {
+export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -47,7 +47,7 @@ export const GET: APIRoute = async ({ request, cookies }: APIContext) => {
   }
 }
 
-export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
+export const POST: APIRoute = async ({ request }: APIContext) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {

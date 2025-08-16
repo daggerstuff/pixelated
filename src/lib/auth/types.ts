@@ -51,11 +51,13 @@ export interface AuthenticationResult {
   session?: SessionData
 }
 
+import type { AuthRole } from '../../config/auth.config'
+
 export interface AuthUser {
   id: string
   email: string
   name?: string
-  role: string
+  role: AuthRole
   permissions: string[]
   metadata?: Record<string, unknown>
 }

@@ -1,14 +1,10 @@
-import type { APIRoute, APIContext } from 'astro'
 import { getCollection } from 'astro:content'
-import { techniqueSchema, type TechniqueSchema } from '../../content/schema'
 import { recommend } from '../../lib/ai/services/OutcomeRecommendationEngine'
-
-import type { CollectionEntry } from 'astro:content'
 
 const ALLOWED_CATEGORIES = ['CBT', 'Mindfulness', 'DBT', 'ACT', 'EMDR', 'Other']
 const ALLOWED_EVIDENCE = ['Strong', 'Moderate', 'Preliminary', 'Anecdotal']
 
-export const GET: APIRoute = async ({ request, cookies }: APIContext) => {
+export const GET = async ({ request }: { request: Request }) => {
   try {
     const url = new URL(request.url)
     const category = url.searchParams.get('category')

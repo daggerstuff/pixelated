@@ -1,6 +1,5 @@
 // API endpoint for bias detection data export
 
-import type { APIRoute } from 'astro'
 import { createExportData } from '../../../../lib/utils/demo-helpers'
 import type {
   BiasAnalysisResults,

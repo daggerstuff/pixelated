@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import { mongodb } from '@/config/mongodb.config'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 import { z } from 'zod'

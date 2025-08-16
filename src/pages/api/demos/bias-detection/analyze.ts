@@ -1,6 +1,5 @@
 // API endpoint for bias detection analysis
 
-import type { APIRoute } from 'astro'
 import {
   calculateBiasFactors,
   generateCounterfactualScenarios,

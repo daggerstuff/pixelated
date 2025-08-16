@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import type { ChatMessage } from '../../../types/chat'
 import { getSession } from '../../../lib/auth/session'
 import { ExportFormat, ExportService } from '../../../lib/export'

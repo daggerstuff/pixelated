@@ -42,7 +42,7 @@ export class RedisServiceError extends Error {
   constructor(
     public code: RedisErrorCode,
     message: string,
-    public override cause?: unknown,
+    public cause?: unknown,
   ) {
     super(message)
     this.name = 'RedisServiceError'

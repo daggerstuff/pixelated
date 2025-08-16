@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import { emotionValidationPipeline } from '@/lib/ai/emotions/EmotionValidationPipeline'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'

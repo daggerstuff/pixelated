@@ -1,6 +1,5 @@
 // WebSocket endpoint for real-time bias detection analysis
 
-import type { APIRoute } from 'astro'
 
 export const GET: APIRoute = async ({ request }) => {
   // Check if the request is a WebSocket upgrade request

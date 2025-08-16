@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import { type AuditLogEntry, getUserAuditLogs } from '../../../lib/audit/log'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 

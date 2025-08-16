@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIContext } from 'astro'
 import { z } from 'zod'
 import { recommend } from '@/lib/ai/services/OutcomeRecommendationEngine'
 import { collectContext } from '@/lib/ai/services/ContextualAwarenessService'

@@ -137,6 +137,7 @@ export class EducationalContextRecognizer {
   private aiService: AIService
   private model: string
   private adaptToUserLevel: boolean
+  private lastParseMalformed: boolean = false
 
   // Pattern-based educational indicators for quick detection
   private readonly educationalPatterns = {
@@ -242,12 +243,26 @@ export class EducationalContextRecognizer {
             conversationHistory,
           )
 
-          // If AI analysis succeeded, combine results
-          if (aiResult && aiResult.isEducational && aiResult.confidence > 0.5) {
-            return this.combineResults(patternResult, aiResult, userProfile)
+          // AI present: decide authority carefully
+          if (aiResult) {
+            // High-confidence educational -> combine
+            if (aiResult.isEducational && aiResult.confidence > 0.5) {
+              return this.combineResults(patternResult, aiResult, userProfile)
+            }
+            // If AI parsing clearly failed, treat as authoritative non-educational
+            if (this.lastParseMalformed) {
+              return aiResult
+            }
+            // Otherwise, prefer adapted pattern outcome
+            const adaptedPattern = this.adaptResultToUserProfile(
+              patternResult,
+              userProfile,
+            )
+            return adaptedPattern
           }
         } catch (error) {
-          logger.warn('AI analysis failed, using pattern result:', error)
+          logger.warn('AI analysis failed, using adapted pattern result:', error)
+          return this.adaptResultToUserProfile(patternResult, userProfile)
         }
       }
 
@@ -285,25 +300,17 @@ export class EducationalContextRecognizer {
     result: EducationalContextResult,
     userProfile?: UserProfile,
   ): EducationalContextResult {
-    if (!userProfile) return result
+    // Respect configuration toggle
+    if (!userProfile || !this.adaptToUserLevel) return result
 
     const adapted = { ...result }
 
-    // Adapt complexity based on education level
-    if (userProfile.educationLevel === 'graduate') {
-      adapted.complexity = 'advanced'
-    } else if (userProfile.educationLevel === 'high_school') {
-      adapted.complexity = result.complexity === 'advanced' ? 'intermediate' : 'basic'
-    }
-
-    // Adapt resources based on learning style
-    if (userProfile.preferredLearningStyle === 'visual') {
-      const resources = [...adapted.recommendedResources]
-      if (!resources.includes(ResourceType.INFOGRAPHICS)) {
-        resources.push(ResourceType.INFOGRAPHICS)
-      }
-      adapted.recommendedResources = resources
-    }
+    // Use shared adaptation helpers to ensure consistent behavior across code paths
+    adapted.complexity = this.adaptComplexityToUser(result.complexity, userProfile)
+    adapted.recommendedResources = this.adaptResourcesToUser(
+      result.recommendedResources,
+      userProfile,
+    )
 
     return adapted
   }
@@ -368,13 +375,31 @@ export class EducationalContextRecognizer {
        }
      }
    }
-   // If symptoms matched, use it; else use highest confidence
+   // If symptoms matched, use it; else use highest confidence with tie-break priority
    const symptomMatch = matchedTypes.find(mt => mt.type === EducationalType.SYMPTOMS)
     if (symptomMatch) {
      bestMatch = symptomMatch
    } else if (matchedTypes.length > 0) {
-     // Use highest confidence match
-     bestMatch = matchedTypes.reduce((a, b) => (a.confidence > b.confidence ? a : b))
+     const priority: Record<EducationalType, number> = {
+       [EducationalType.SYMPTOMS]: 3,
+       [EducationalType.EXPLANATION]: 2,
+       [EducationalType.DEFINITION]: 1,
+       [EducationalType.COMPARISON]: 2,
+       [EducationalType.MECHANISM]: 2,
+       [EducationalType.CAUSES]: 2,
+       [EducationalType.TREATMENT]: 2,
+       [EducationalType.PREVENTION]: 2,
+       [EducationalType.RESEARCH]: 2,
+       [EducationalType.STATISTICS]: 1,
+       [EducationalType.MYTH_BUSTING]: 1,
+       [EducationalType.DEVELOPMENTAL]: 1,
+     }
+     bestMatch = matchedTypes.reduce((a, b) => {
+       if (a.confidence !== b.confidence) return a.confidence > b.confidence ? a : b
+       const ap = priority[a.type] ?? 0
+       const bp = priority[b.type] ?? 0
+       return ap >= bp ? a : b
+     })
    }
 
     // Determine topic area
@@ -444,20 +469,27 @@ Adapt complexity and resource recommendations accordingly.`
       { role: 'user', content: queryWithContext },
     ]
 
-    const response = await this.aiService.createChatCompletion(messages, {
+    const response: unknown = await this.aiService.createChatCompletion(messages, {
       model: this.model,
     })
 
-    const content = response?.choices?.[0]?.message?.content
+    // Use unknown instead of any for type safety
+    const r = response as { choices?: Array<{ message?: { content?: unknown } }>; content?: unknown }
+    let content: unknown = r?.choices?.[0]?.message?.content ?? r?.content ?? r
+    if (content && typeof content !== 'string') {
+      try {
+        content = JSON.stringify(content)
+      } catch {
+        content = String(content)
+      }
+    }
     // If AI returned no content at all, throw to let caller fall back to patterns
-    if (!content || content.trim() === '') {
+    if (!content || (content as string).trim() === '') {
       throw new Error('Empty AI response')
     }
-    const result = this.parseAIResponse(content)
-    // Apply adaptation after AI parse if user profile provided
-    return userProfile && this.adaptToUserLevel
-      ? this.adaptResultToUserProfile(result, userProfile)
-      : result
+    // Return raw parsed result; caller will handle adaptation to avoid double-adjusting
+    const result = this.parseAIResponse(content as string)
+    return result
   }
 
   /**
@@ -465,14 +497,25 @@ Adapt complexity and resource recommendations accordingly.`
    */
   private parseAIResponse(content: string): EducationalContextResult {
     try {
+      this.lastParseMalformed = false
       logger.info('Raw AI response content', { content })
-      const jsonMatch =
-        content.match(/```json\n([\s\S]*?)\n```/) ||
-        content.match(/```\n([\s\S]*?)\n```/) ||
-        content.match(/\{[\s\S]*?\}/)
-
-      // Use captured group when available to avoid backticks, fall back to full match
-      const jsonStr = jsonMatch ? jsonMatch[1] || jsonMatch[0] : content
+      // Prefer fenced JSON
+      let jsonStr: string | undefined
+      const fencedJson = content.match(/```json\n([\s\S]*?)\n```/)
+      const fenced = fencedJson || content.match(/```\n([\s\S]*?)\n```/)
+      if (fenced && fenced[1]) {
+        jsonStr = fenced[1]
+      }
+      // Fall back to extracting the largest JSON-like block by slicing from first '{' to last '}'
+      if (!jsonStr) {
+        const first = content.indexOf('{')
+        const last = content.lastIndexOf('}')
+        if (first !== -1 && last !== -1 && last > first) {
+          jsonStr = content.slice(first, last + 1)
+        }
+      }
+      // Ultimate fallback: try the original content
+      if (!jsonStr) jsonStr = content
       logger.info('Extracted JSON string from AI response', { jsonStr })
       const parsed = JSON.parse(jsonStr)
       logger.info('Parsed AI response JSON', { parsed })
@@ -513,6 +556,7 @@ Adapt complexity and resource recommendations accordingly.`
         },
       }
     } catch (error) {
+      this.lastParseMalformed = true
       logger.error('Error parsing AI response:', {
         message: error instanceof Error ? error.message : String(error),
         content,
@@ -705,6 +749,17 @@ Adapt complexity and resource recommendations accordingly.`
       }
       return complexity
     }
+    // Upgrade for mid-level users to at least intermediate
+    if (
+      knowledge === 'intermediate' ||
+      education === 'undergraduate'
+    ) {
+      if (complexity === 'basic') {
+        logger.info('Upgrading basic to intermediate for mid-level user')
+        return 'intermediate'
+      }
+    }
+
     // Aggressively upgrade for advanced/professional users
     if (
       knowledge === 'advanced' ||
@@ -734,6 +789,20 @@ Adapt complexity and resource recommendations accordingly.`
     const learningStyle = userProfile.preferredLearningStyle
 
     let adapted = [...resources]
+    const ensureSciArticlesForHigherLevel = () => {
+      if (
+        userProfile.educationLevel === 'graduate' ||
+        userProfile.educationLevel === 'professional' ||
+        userProfile.priorMentalHealthKnowledge === 'advanced' ||
+        userProfile.priorMentalHealthKnowledge === 'intermediate'
+      ) {
+        if (!adapted.includes(ResourceType.SCIENTIFIC_ARTICLES)) {
+          logger.info('Adding scientific articles for higher-level user')
+          adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
+        }
+      }
+    }
+
     if (learningStyle === 'visual') {
       // Always include infographics and educational videos for visual learners
       if (!adapted.includes(ResourceType.INFOGRAPHICS)) {
@@ -748,6 +817,7 @@ Adapt complexity and resource recommendations accordingly.`
       if (adapted.length === 0) {
         adapted = [ResourceType.INFOGRAPHICS]
       }
+      ensureSciArticlesForHigherLevel()
       // Remove duplicates
       adapted = Array.from(new Set(adapted))
       logger.info('Adapted resources for visual learner', { adapted })
@@ -762,6 +832,7 @@ Adapt complexity and resource recommendations accordingly.`
         logger.info('Adding educational videos for auditory learner')
         adapted.unshift(ResourceType.EDUCATIONAL_VIDEOS)
       }
+      ensureSciArticlesForHigherLevel()
       adapted = Array.from(new Set(adapted))
       logger.info('Adapted resources for auditory learner', { adapted })
       return adapted.slice(0, 5)
@@ -775,13 +846,17 @@ Adapt complexity and resource recommendations accordingly.`
         logger.info('Adding scientific articles for reading learner')
         adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
       }
+      ensureSciArticlesForHigherLevel()
       adapted = Array.from(new Set(adapted))
       logger.info('Adapted resources for reading learner', { adapted })
       return adapted.slice(0, 5)
     }
 
+    // For higher-education/knowledge users, ensure scientific articles are included
+    ensureSciArticlesForHigherLevel()
+
     logger.info('No adaptation needed for resources', { adapted })
-    return adapted
+    return Array.from(new Set(adapted)).slice(0, 5)
   }
 
   private generateNextSteps(result: EducationalContextResult): string[] {

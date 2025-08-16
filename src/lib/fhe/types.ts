@@ -308,13 +308,13 @@ export interface EncryptedData<T = unknown> {
 /**
  * Type guard for EncryptedData
  */
-export function isEncryptedData(obj: any): obj is EncryptedData<unknown> {
+export function isEncryptedData(obj: unknown): obj is EncryptedData<unknown> {
   return (
     obj &&
     typeof obj === 'object' &&
-    typeof obj.id === 'string' &&
-    'data' in obj &&
-    typeof obj.dataType === 'string'
+    typeof (obj as { id?: string }).id === 'string' &&
+    'data' in (obj as { data?: unknown }) &&
+    typeof (obj as { dataType?: string }).dataType === 'string'
   )
 }
 

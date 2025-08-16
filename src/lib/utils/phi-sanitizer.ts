@@ -56,7 +56,7 @@ export function sanitizeMessagesForLogging(
         return `Message ${index + 1} (Role: unknown): [CONTENT_REDACTED]`
       })
       .join('\\n')
-  } catch (_error) {
+  } catch {
     // Fallback in case message structure is unexpected
     return '[MESSAGES_REDACTION_ERROR]'
   }
@@ -92,7 +92,7 @@ export function sanitizeObjectForLogging(
       }
     }
     return JSON.stringify(sanitizedObject)
-  } catch (_error) {
+  } catch {
     return '[OBJECT_REDACTION_ERROR]'
   }
 }

@@ -37,10 +37,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm run dev',
+    command: 'pnpm build && pnpm start',
     url: 'http://localhost:4321',
     reuseExistingServer: true,
-    timeout: 60 * 1000,
+    timeout: 300 * 1000,
     env: {
       NODE_ENV: 'test',
       DISABLE_WEB_FONTS: 'true',

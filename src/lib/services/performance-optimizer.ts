@@ -58,10 +58,10 @@ export interface OptimizationConfig {
 export class PerformanceOptimizer {
   private config: OptimizationConfig
   private metrics: PerformanceMetrics
-  private connectionPool: Map<string, any[]>
-  private cache: Map<string, { value: any; timestamp: number; accessCount: number }>
+  private connectionPool: Map<string, unknown[]>
+  private cache: Map<string, { value: unknown; timestamp: number; accessCount: number }>
   private circuitBreakers: Map<string, { failures: number; lastFailure: number; state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' }>
-  private batchQueues: Map<string, { items: any[]; timer: NodeJS.Timeout | null }>
+  private batchQueues: Map<string, { items: unknown[]; timer: NodeJS.Timeout | null }>
   private metricsHistory: PerformanceMetrics[]
 
   constructor(config: Partial<OptimizationConfig> = {}) {
@@ -123,7 +123,7 @@ export class PerformanceOptimizer {
   /**
    * Connection Pool Management
    */
-  async acquireConnection(poolName: string, factory: () => Promise<any>): Promise<any> {
+  async acquireConnection(poolName: string, factory: () => Promise<unknown>): Promise<unknown> {
     if (!this.connectionPool.has(poolName)) {
       this.connectionPool.set(poolName, [])
     }
@@ -166,7 +166,7 @@ export class PerformanceOptimizer {
     })
   }
 
-  releaseConnection(poolName: string, connection: any): void {
+  releaseConnection(poolName: string, connection: unknown): void {
     if (!this.connectionPool.has(poolName)) {
       return
     }
@@ -180,9 +180,8 @@ export class PerformanceOptimizer {
   /**
    * Intelligent Caching
    */
-  set(key: string, value: any, ttl?: number): void {
+  set(key: string, value: unknown): void {
     const now = Date.now()
-    const expiry = ttl || this.config.cache.ttl
 
     // Evict expired entries
     this.evictExpired()
@@ -199,7 +198,7 @@ export class PerformanceOptimizer {
     })
   }
 
-  get(key: string): any | null {
+  get(key: string): unknown | null {
     const entry = this.cache.get(key)
     if (!entry) {
       return null

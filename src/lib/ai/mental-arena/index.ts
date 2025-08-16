@@ -403,7 +403,7 @@ function validateTechnicalQuality(
   // Check for malformed JSON in symptom data
   try {
     JSON.stringify(conversation.encodedSymptoms)
-  } catch (_error) {
+  } catch {
     issues.push({
       type: 'technical',
       severity: 'high',

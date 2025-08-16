@@ -1,10 +1,8 @@
-param resourceGroupName string
 param azureLocation string = resourceGroup().location
 param environment string = 'production'
 param containerRegistryName string = 'pixelatedcr'
 param containerAppName string = 'pixelated-web'
 param appServiceName string = 'pixelated'
-param customDomain string = ''
 
 resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
   name: containerRegistryName
@@ -14,6 +12,38 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
   }
   properties: {
     adminUserEnabled: true
+  }
+}
+
+// App Service Plan (Linux)
+resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
+  name: '${appServiceName}-plan'
+  location: azureLocation
+  sku: {
+    name: 'B1'
+    tier: 'Basic'
+    size: 'B1'
+    family: 'B'
+    capacity: 1
+  }
+  kind: 'linux'
+  properties: {
+    reserved: true
+  }
+}
+
+// Key Vault (for secrets; RBAC must be granted separately)
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: '${appServiceName}-kv'
+  location: azureLocation
+  properties: {
+    tenantId: subscription().tenantId
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    enableRbacAuthorization: true
+    publicNetworkAccess: 'Enabled'
   }
 }
 
@@ -45,10 +75,15 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
         {
           server: acr.properties.loginServer
           username: acr.listCredentials().username
-          password: acr.listCredentials().passwords[0].value
+          passwordSecretRef: 'acr-password'
         }
       ]
-      secrets: []
+      secrets: [
+        {
+          name: 'acr-password'
+          value: acr.listCredentials().passwords[0].value
+        }
+      ]
     }
     template: {
       containers: [
@@ -56,7 +91,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           name: containerAppName
           image: '${acr.properties.loginServer}/${containerAppName}:latest'
           resources: {
-            cpu: '0.5'
+            cpu: 0.5
             memory: '1Gi'
           }
           env: [
@@ -84,7 +119,7 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
   location: azureLocation
   kind: 'app'
   properties: {
-    serverFarmId: ''
+    serverFarmId: appServicePlan.id
     siteConfig: {
       appSettings: [
         {
@@ -103,13 +138,20 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
           name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
           value: 'false'
         }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_URL'
+          value: 'https://${acr.properties.loginServer}'
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_USERNAME'
+          value: acr.listCredentials().username
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
+          value: acr.listCredentials().passwords[0].value
+        }
       ]
-      containerSettings: {
-        imageName: '${acr.properties.loginServer}/${containerAppName}:latest'
-        registryUrl: 'https://${acr.properties.loginServer}'
-        registryUsername: acr.listCredentials().username
-        registryPassword: acr.listCredentials().passwords[0].value
-      }
+      linuxFxVersion: 'DOCKER|${acr.properties.loginServer}/${containerAppName}:latest'
     }
   }
 }
@@ -117,3 +159,7 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
 output containerRegistryEndpoint string = acr.properties.loginServer
 output containerAppFqdn string = containerApp.properties.configuration.ingress.fqdn
 output appServiceDefaultHostName string = appService.properties.defaultHostName
+output appServiceName string = appService.name
+output containerRegistryName string = acr.name
+output AZURE_CONTAINER_REGISTRY_ENDPOINT string = acr.properties.loginServer
+output keyVaultName string = keyVault.name

@@ -32,7 +32,7 @@ function createMockClient() {
 export const mongoClient =
   mongoUri && mongoDbName
     ? mongodb
-    : (createMockClient() as any)
+    : (createMockClient() as unknown)
 
 // Export MongoDB auth service as main auth interface
 export const authService = mongoAuthService

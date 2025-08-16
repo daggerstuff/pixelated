@@ -30,7 +30,7 @@ export async function isModuleAvailable(moduleName: string): Promise<boolean> {
     // In Node.js, attempt to dynamically import the module
     await import(moduleName)
     return true
-  } catch (_error) {
+  } catch {
     return false
   }
 }

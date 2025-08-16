@@ -256,7 +256,7 @@ async function main() {
     // Detailed evidence extraction not available in this build
 
     // Evaluate explanation quality if requested
-    let qualityMetricsResults: typeof adapter.evaluateExplanationQuality extends (...args: any[]) => Promise<infer R> ? R | undefined : undefined = undefined
+    let qualityMetricsResults: typeof adapter.evaluateExplanationQuality extends (...args: unknown[]) => Promise<infer R> ? R | undefined : undefined = undefined
     if (options.evaluateExplanation) {
       console.log('\nEvaluating explanation quality (STUBBED)...')
       qualityMetricsResults = await adapter.evaluateExplanationQuality(

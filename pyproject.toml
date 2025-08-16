@@ -47,6 +47,8 @@ dependencies = [
   "pytest-cov>=6.2.1",
   "seaborn>=0.13.2",
   "plotly>=6.2.0",
+  "jupyter>=1.1.1",
+  "wandb>=0.21.1",
 ]
 
 [project.optional-dependencies]

@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'

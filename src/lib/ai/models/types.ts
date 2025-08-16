@@ -4,9 +4,9 @@
  */
 
 export interface AIService {
-  getModelInfo: (...args: any[]) => any
-  createChatCompletion: (...args: any[]) => any
-  createChatStream: (...args: any[]) => any
+  getModelInfo: (...args: unknown[]) => unknown
+  createChatCompletion: (...args: unknown[]) => unknown
+  createChatStream: (...args: unknown[]) => unknown
 }
 
 export interface AIModel {

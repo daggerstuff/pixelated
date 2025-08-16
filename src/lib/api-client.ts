@@ -206,12 +206,12 @@ interface GenerateScenarioRequest {
 }
 
 interface GenerateScenarioResponse {
-  scenario: any
+  scenario: unknown
   learningObjectives: string[]
-  assessmentCriteria: any[]
-  suggestedInterventions: any[]
+  assessmentCriteria: unknown[]
+  suggestedInterventions: unknown[]
   supervision_notes: string[]
-  metadata: any
+  metadata: unknown
 }
 
 interface FrameworksRequest {
@@ -223,58 +223,58 @@ interface FrameworksRequest {
 }
 
 interface FrameworksResponse {
-  frameworks: any[]
+  frameworks: unknown[]
   totalCount: number
   filteredCount: number
   categories: string[]
-  metadata: any
+  metadata: unknown
 }
 
 interface AnalyzeRequest {
   content: string
   analysisType: 'session' | 'progress' | 'intervention' | 'risk' | 'comprehensive'
-  clientContext?: any
-  analysisOptions?: any
+  clientContext?: unknown
+  analysisOptions?: unknown
 }
 
 interface AnalyzeResponse {
-  analysis: any
-  recommendations: any
-  interventionSuggestions: any[]
-  followUpActions: any[]
-  metadata: any
+  analysis: unknown
+  recommendations: unknown
+  interventionSuggestions: unknown[]
+  followUpActions: unknown[]
+  metadata: unknown
 }
 
 interface ChatRequest {
   message: string
   sessionId?: string
-  userContext?: any
-  options?: any
+  userContext?: unknown
+  options?: unknown
 }
 
 interface ChatResponse {
-  response: any
-  analysis: any
-  riskAssessment?: any
-  copingStrategies?: any
-  resources?: any
-  followUp: any
-  metadata: any
+  response: unknown
+  analysis: unknown
+  riskAssessment?: unknown
+  copingStrategies?: unknown
+  resources?: unknown
+  followUp: unknown
+  metadata: unknown
 }
 
 interface CrisisDetectionRequest {
   content: string
   contentType: 'chat_message' | 'journal_entry' | 'form_response' | 'voice_transcript'
-  context?: any
-  options?: any
+  context?: unknown
+  options?: unknown
 }
 
 interface CrisisDetectionResponse {
-  assessment: any
-  riskFactors: any[]
-  protectiveFactors: any[]
-  recommendations: any
-  resources: any
-  monitoring: any
-  metadata: any
+  assessment: unknown
+  riskFactors: unknown[]
+  protectiveFactors: unknown[]
+  recommendations: unknown
+  resources: unknown
+  monitoring: unknown
+  metadata: unknown
 }

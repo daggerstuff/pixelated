@@ -63,7 +63,7 @@ export class MentalLLaMAAdapter {
       this.crisisSessionFlaggingServiceImport = import(
         '../../crisis/CrisisSessionFlaggingService.ts'
       )
-    } catch (_e) {
+    } catch {
       logger.warn(
         'CrisisSessionFlaggingService module not found, continuing without it.',
       )

@@ -149,7 +149,7 @@ export const POST: APIRoute = async ({ request }) => {
 }
 
 // For documentation and OpenAPI schema only - this endpoint only accepts POST
-export const GET: APIRoute = ({  }: APIContext) => {
+export const GET: APIRoute = (_ctx: APIContext) => {
   return createErrorResponse({
     status: 405,
     message:

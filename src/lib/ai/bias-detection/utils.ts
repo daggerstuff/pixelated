@@ -260,7 +260,7 @@ export function formatTimestamp(timestamp: Date | string | number): string {
     }
     
     return date.toLocaleString()
-  } catch (error) {
+  } catch {
     return 'Invalid date'
   }
 }

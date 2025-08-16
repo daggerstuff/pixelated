@@ -1,6 +1,5 @@
 export const prerender = false
 
-import type { APIRoute } from 'astro'
 
 /**
  * API endpoint for fetching system metrics (admin only)

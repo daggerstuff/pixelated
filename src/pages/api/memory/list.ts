@@ -1,6 +1,5 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { getCurrentUser } from '../../../lib/auth'
 import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
@@ -31,7 +30,7 @@ export const GET: APIRoute = async ({ request, cookies }: APIContext) => {
     const memories = await memoryService.listMemories(userId, {
       limit,
       offset,
-      sortBy: sortBy as any,
+      sortBy: sortBy as string,
       sortOrder: sortOrder as 'asc' | 'desc'
     })
 

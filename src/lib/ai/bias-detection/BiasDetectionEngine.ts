@@ -263,28 +263,28 @@ export class BiasDetectionEngine {
 
     try {
       preprocessing = await this.pythonService.runPreprocessingAnalysis(session)
-    } catch (_e) {
+    } catch {
       const fb = this.fallbackLayer()
       preprocessing = { biasScore: fb.biasScore, confidence: fb.confidence }
       recs.push('Preprocessing analysis unavailable; using fallback results')
     }
     try {
       modelLevel = await this.pythonService.runModelLevelAnalysis(session)
-    } catch (_e) {
+    } catch {
       const fb = this.fallbackLayer()
       modelLevel = { biasScore: fb.biasScore, confidence: fb.confidence }
       recs.push('Model-level analysis unavailable; using fallback results')
     }
     try {
       interactive = await this.pythonService.runInteractiveAnalysis(session)
-    } catch (_e) {
+    } catch {
       const fb = this.fallbackLayer()
       interactive = { biasScore: fb.biasScore, confidence: fb.confidence }
       recs.push('Interactive analysis unavailable; using fallback results')
     }
     try {
       evaluation = await this.pythonService.runEvaluationAnalysis(session)
-    } catch (_e) {
+    } catch {
       const fb = this.fallbackLayer()
       evaluation = { biasScore: fb.biasScore, confidence: fb.confidence }
       recs.push('Evaluation analysis unavailable; using fallback results')

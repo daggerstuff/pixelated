@@ -190,7 +190,7 @@ export class AIRepository {
   private async getDatabase() {
     try {
       return mongodb.getDb()
-    } catch (error) {
+    } catch {
       // If not connected, try to connect
       await mongodb.connect()
       return mongodb.getDb()
@@ -463,7 +463,7 @@ export class AIRepository {
     status?: string
   }): Promise<TherapySession[]> {
     const db = await this.getDatabase()
-    const query: any = {}
+    const query: Record<string, unknown> = {}
 
     if (filter?.clientId) {
       query.clientId = filter.clientId
@@ -576,7 +576,7 @@ export class AIRepository {
    */
   async getTechniqueById(techniqueId: string): Promise<Technique | null> {
     const db = await this.getDatabase()
-    let query: any
+    let query: Record<string, unknown>
 
     try {
       // Try to use as ObjectId first
@@ -748,7 +748,7 @@ export class AIRepository {
     },
   ): Promise<BiasAnalysisResult[]> {
     const db = await this.getDatabase()
-    const query: any = { userId }
+    const query: Record<string, unknown> = { userId }
 
     if (options?.alertLevel) {
       query.alertLevel = { $in: options.alertLevel }
@@ -816,7 +816,7 @@ export class AIRepository {
     limit?: number
   }): Promise<BiasMetric[]> {
     const db = await this.getDatabase()
-    const query: any = {}
+    const query: Record<string, unknown> = {}
 
     if (options?.metricType) {
       query.metricType = { $in: options.metricType }
@@ -893,7 +893,7 @@ export class AIRepository {
     offset?: number
   }): Promise<BiasAlert[]> {
     const db = await this.getDatabase()
-    const query: any = {}
+    const query: Record<string, unknown> = {}
 
     if (options?.alertLevel) {
       query.alertLevel = { $in: options.alertLevel }
@@ -946,7 +946,7 @@ export class AIRepository {
     },
   ): Promise<boolean> {
     const db = await this.getDatabase()
-    const updateData: any = { updatedAt: new Date() }
+    const updateData: Record<string, unknown> = { updatedAt: new Date() }
 
     if (updates.acknowledged !== undefined) {
       updateData.acknowledged = updates.acknowledged

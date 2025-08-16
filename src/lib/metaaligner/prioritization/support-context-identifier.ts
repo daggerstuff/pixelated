@@ -596,8 +596,8 @@ Consider this context in your assessment.`
     }
 
     // Prefer generateText if available per tests; fallback to chat
-    if (typeof (this.aiService as any).generateText === 'function') {
-      const text = await (this.aiService as any).generateText(
+    if (typeof (this.aiService as { generateText?: (...args: unknown[]) => Promise<string> }).generateText === 'function') {
+      const text = await (this.aiService as { generateText: (...args: unknown[]) => Promise<string> }).generateText(
         `${contextualPrompt}\n\n${queryWithContext}`,
       )
       return this.parseAIResponse(String(text))
@@ -647,9 +647,9 @@ Consider this context in your assessment.`
         urgency: this.validateUrgency(parsed.urgency),
         supportNeeds: Array.isArray(parsed.supportNeeds)
           ? parsed.supportNeeds
-              .map((n: any) => this.validateSupportNeed(n))
-              .filter(Boolean)
-          : [],
+          .map((n: unknown) => this.validateSupportNeed(n as string))
+          .filter(Boolean)
+        : [],
         recommendedApproach: this.validateRecommendedApproach(
           parsed.recommendedApproach,
         ),

@@ -165,7 +165,7 @@ export class LocalFileSystemProvider implements StorageProvider {
       // Check if file exists
       try {
         await this.fs.access(fullPath)
-      } catch (_error) {
+      } catch {
         console.warn(`File not found for deletion: ${key}`)
         return
       }

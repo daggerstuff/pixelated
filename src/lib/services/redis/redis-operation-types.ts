@@ -24,7 +24,7 @@ export interface RedisEventHandler {
   (event: string, callback: (...args: unknown[]) => void): Redis
 }
 
-export interface RedisMockClient extends Partial<Redis> {
+export interface RedisMockClient {
   get(key: string): Promise<string | null>
   set(
     key: string,

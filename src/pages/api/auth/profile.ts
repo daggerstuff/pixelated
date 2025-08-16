@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 import { mongoAuthService } from '@/services/mongoAuth.service'
 import { verifyAuthToken } from '@/utils/auth'

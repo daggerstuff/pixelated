@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import type { AIMessage } from '@/lib/ai/models/types'
 import type { SessionData } from '../../../lib/auth/session'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'

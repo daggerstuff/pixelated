@@ -1,18 +1,8 @@
-import type { APIRoute, APIContext } from 'astro'
 import { BiasDetectionEngine } from '../../../lib/ai/bias-detection/index'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('BiasExportAPI')
 
-interface ExportRequest {
-  format: 'csv' | 'json' | 'pdf';
-  sessionIds?: string[];
-  dateRange?: {
-    start: string;
-    end: string;
-  };
-  includeMetadata?: boolean;
-}
 
 interface CsvSession {
   sessionId: string

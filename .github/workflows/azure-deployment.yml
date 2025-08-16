@@ -130,6 +130,8 @@ jobs:
     outputs:
       registry-name: ${{ steps.deployment.outputs.registry-name }}
       registry-login-server: ${{ steps.deployment.outputs.registry-login-server }}
+      app-service-name: ${{ steps.deployment.outputs.app-service-name }}
+      key-vault-name: ${{ steps.deployment.outputs.key-vault-name }}
     # environment: azure-infrastructure
 
     steps:
@@ -152,8 +154,8 @@ jobs:
           resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
           template: infra/main.bicep
           parameters: |
-            environmentName=${{ needs.build.outputs.environment }}
-            location=${{ env.AZURE_LOCATION }}
+            environment=${{ needs.build.outputs.environment }}
+            azureLocation=${{ env.AZURE_LOCATION }}
           failOnStdErr: false
 
       - name: Get deployment outputs
@@ -163,13 +165,15 @@ jobs:
           echo "Raw deployment outputs: $OUTPUTS"
 
           # Extract specific outputs (must exist in infra/main.bicep)
-          KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value')
+          KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value // empty')
           REGISTRY_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value // empty')
           REGISTRY_LOGIN_SERVER=$(echo "$OUTPUTS" | jq -r '.AZURE_CONTAINER_REGISTRY_ENDPOINT.value // empty')
+          APP_SERVICE_NAME=$(echo "$OUTPUTS" | jq -r '.appServiceName.value // empty')
 
           echo "key-vault-name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
           echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
           echo "registry-login-server=$REGISTRY_LOGIN_SERVER" >> $GITHUB_OUTPUT
+          echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
 
       - name: Store secrets in Key Vault
         env:
@@ -287,7 +291,11 @@ jobs:
       - name: Get deployment details
         id: details
         run: |
-          APP_SERVICE_NAME=$(az webapp list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
+          # Prefer app service name from infra outputs
+          APP_SERVICE_NAME="${{ needs.deploy-infrastructure.outputs.app-service-name }}"
+          if [[ -z "$APP_SERVICE_NAME" || "$APP_SERVICE_NAME" == "null" ]]; then
+            APP_SERVICE_NAME=$(az webapp list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
+          fi
           # Prefer registry login server from infra outputs
           LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
           if [[ -z "$LOGIN_SERVER" ]]; then

@@ -22,8 +22,11 @@ function getEnvVar(key: string): string | undefined {
   }
   // In browser, try to access environment variables through globalThis or window
   // This is a fallback for build-time environment variables
-  if (typeof globalThis !== 'undefined' && (globalThis as any).process?.env) {
-    return (globalThis as any).process.env[key]
+  if (
+    typeof globalThis !== 'undefined' &&
+    (globalThis as unknown as { process?: { env?: Record<string, string> } }).process?.env
+  ) {
+    return (globalThis as unknown as { process?: { env?: Record<string, string> } }).process?.env?.[key]
   }
   return undefined
 }

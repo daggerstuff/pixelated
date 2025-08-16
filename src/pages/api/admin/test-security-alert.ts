@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import type { AuthAPIContext } from '@lib/auth/apiRouteTypes.ts'

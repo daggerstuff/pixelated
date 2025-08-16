@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { mongoAuthService } from '@/services/mongoAuth.service'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 

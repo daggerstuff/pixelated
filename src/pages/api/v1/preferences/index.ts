@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import {
   getOrCreateUserSettings,

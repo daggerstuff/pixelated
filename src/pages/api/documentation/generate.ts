@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
 import { DocumentationService } from '../../../lib/documentation'

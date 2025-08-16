@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import mongodb from '../../../config/mongodb.config'
 

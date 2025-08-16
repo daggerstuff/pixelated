@@ -197,9 +197,7 @@ export class SecurityMonitoringService {
   /**
    * Get security events for a user
    */
-  public async getUserSecurityEvents(
-    limit = 100,
-  ): Promise<SecurityEvent[]> {
+  public async getUserSecurityEvents(): Promise<SecurityEvent[]> {
     // TODO: Implement MongoDB query for user security events
     return []
   }
@@ -207,9 +205,7 @@ export class SecurityMonitoringService {
   /**
    * Get security events by type
    */
-  public async getSecurityEventsByType(
-    limit = 100,
-  ): Promise<SecurityEvent[]> {
+  public async getSecurityEventsByType(): Promise<SecurityEvent[]> {
     // TODO: Implement MongoDB query for security events by type
     return []
   }

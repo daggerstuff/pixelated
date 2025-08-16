@@ -7,7 +7,7 @@ interface AgentResponse {
   success: boolean;
   response: string | null;
   error?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   conversation_id?: string;
 }
 

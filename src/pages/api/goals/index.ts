@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'

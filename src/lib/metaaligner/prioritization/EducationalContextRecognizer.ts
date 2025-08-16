@@ -29,7 +29,7 @@ export enum ResourceType {
 }
 
 export interface EducationalRecognizerConfig {
-  aiService?: any
+  aiService?: unknown
   model?: string
   includeResourceRecommendations?: boolean
   adaptToUserLevel?: boolean
@@ -45,7 +45,7 @@ export interface EducationalContextResult {
   learningObjectives: string[]
   recommendedResources: ResourceType[]
   priorKnowledgeRequired: string[]
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 }
 
 // Pattern matching for educational content
@@ -117,7 +117,7 @@ export class EducationalContextRecognizer {
 
   async recognizeEducationalContext(
     query: string,
-    userProfile?: Record<string, any>,
+    userProfile?: Record<string, unknown>,
   ): Promise<EducationalContextResult> {
     // Step 1: Pattern-based recognition
     const { type, confidence: patternConfidence } = matchEducationalType(query)
@@ -189,7 +189,7 @@ export class EducationalContextRecognizer {
 
   private async performAIAnalysis(
     query: string,
-    userProfile: Record<string, any> | undefined,
+    userProfile: Record<string, unknown> | undefined,
     type: EducationalType,
     topicArea: TopicArea,
   ): Promise<EducationalContextResult | null> {
@@ -249,18 +249,18 @@ export class EducationalContextRecognizer {
     }
   }
 
-  private adaptToUserProfile(result: EducationalContextResult, userProfile: Record<string, any>): EducationalContextResult {
+  private adaptToUserProfile(result: EducationalContextResult, userProfile: Record<string, unknown>): EducationalContextResult {
     const adapted = { ...result }
 
     // Adapt complexity based on education level
-    if (userProfile.educationLevel === 'graduate') {
+    if ((userProfile as { educationLevel?: string }).educationLevel === 'graduate') {
       adapted.complexity = 'advanced'
-    } else if (userProfile.educationLevel === 'high_school') {
+    } else if ((userProfile as { educationLevel?: string }).educationLevel === 'high_school') {
       adapted.complexity = result.complexity === 'advanced' ? 'intermediate' : 'basic'
     }
 
     // Adapt resources based on learning style
-    if (userProfile.preferredLearningStyle === 'visual') {
+    if ((userProfile as { preferredLearningStyle?: string }).preferredLearningStyle === 'visual') {
       const resources = [...adapted.recommendedResources]
       if (!resources.includes(ResourceType.INFOGRAPHICS)) {
         resources.push(ResourceType.INFOGRAPHICS)
@@ -275,7 +275,7 @@ export class EducationalContextRecognizer {
     return ['basic', 'intermediate', 'advanced'].includes(complexity) ? complexity : 'basic'
   }
 
-  private validateResources(resources: any): ResourceType[] {
+  private validateResources(resources: unknown): ResourceType[] {
     if (!Array.isArray(resources)) return []
     return resources
       .filter(r => Object.values(ResourceType).includes(r))
@@ -300,7 +300,7 @@ export function createEducationalContextRecognizer(config: EducationalRecognizer
   return new EducationalContextRecognizer(config)
 }
 
-export function getDefaultEducationalRecognizerConfig(aiService: any): EducationalRecognizerConfig {
+export function getDefaultEducationalRecognizerConfig(aiService: unknown): EducationalRecognizerConfig {
   return {
     aiService,
     model: 'gpt-4',

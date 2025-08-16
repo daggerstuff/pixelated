@@ -43,7 +43,7 @@ async function loadNodeModules() {
     pathModule = pathMod
     fsPromisesModule = fsPromisesMod
     nodeModulesLoaded = true
-  } catch (_error) {
+  } catch {
     // Modules not available, will use fallbacks
     console.warn('Node.js modules not available, using fallbacks')
   }

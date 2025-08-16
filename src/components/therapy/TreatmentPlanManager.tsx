@@ -10,14 +10,13 @@ import type {
 } from '@/types/treatment'
 import { Button } from '@/components/ui/button'
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Dialog, DialogModal } from '@/components/ui/dialog'
+import { DialogModal } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {

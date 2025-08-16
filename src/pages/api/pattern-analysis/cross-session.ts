@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
