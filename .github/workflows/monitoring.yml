@@ -506,7 +506,6 @@ jobs:
           CANDIDATES=(
             "${BASE_URL}"
             "${BASE_URL}/login"
-            "${BASE_URL}/dashboard?perf=1"
           )
 
           OK_URLS=()
@@ -542,6 +541,32 @@ jobs:
             } >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Prepare Lighthouse auth headers (optional)
+        id: prep-lh-headers
+        if: steps.resolve-perf.outputs.skip_lhci == 'false'
+        run: |
+          if [ -n "${{ secrets.LH_AUTH_COOKIE }}" ]; then
+            # Provide extraHeaders to Lighthouse via environment override
+            # Expect cookie like: "session=abc; other=value"
+            EH='{"Cookie":"'"${{ secrets.LH_AUTH_COOKIE }}"'"}'
+            echo "LHCI_COLLECT__SETTINGS__EXTRA_HEADERS=$EH" >> $GITHUB_ENV
+            echo "has_auth=true" >> $GITHUB_OUTPUT
+            echo "Set LHCI extraHeaders for authenticated pages"
+          else
+            echo "has_auth=false" >> $GITHUB_OUTPUT
+            echo "No LH_AUTH_COOKIE secret set; skipping authenticated URLs"
+          fi
+
+      - name: Add protected URLs (optional)
+        id: add-protected
+        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.prep-lh-headers.outputs.has_auth == 'true'
+        run: |
+          {
+            echo "extra_urls<<EOF"
+            echo "${BASE_URL}/dashboard?perf=1"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Run Lighthouse CI
         id: lhci
         uses: treosh/lighthouse-ci-action@v12
@@ -549,6 +574,7 @@ jobs:
         with:
           urls: |
             ${{ steps.build-urls.outputs.urls }}
+            ${{ steps.add-protected.outputs.extra_urls }}
           configPath: ./.github/lighthouse-config.json
           budgetPath: ./.github/lighthouse-budget.json
           uploadArtifacts: true

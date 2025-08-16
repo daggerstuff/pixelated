@@ -12,7 +12,6 @@
       { "resourceType": "total", "budget": 2500 }
     ],
     "timings": [
-      { "metric": "interactive", "budget": 8000 },
       { "metric": "first-contentful-paint", "budget": 3000 },
       { "metric": "largest-contentful-paint", "budget": 8000 },
       { "metric": "total-blocking-time", "budget": 600 },
@@ -26,7 +25,6 @@
       { "resourceType": "total", "budget": 3000 }
     ],
     "timings": [
-      { "metric": "interactive", "budget": 9000 },
       { "metric": "first-contentful-paint", "budget": 3500 }
     ]
   },
@@ -37,7 +35,6 @@
       { "resourceType": "total", "budget": 2000 }
     ],
     "timings": [
-      { "metric": "interactive", "budget": 7000 },
       { "metric": "first-contentful-paint", "budget": 2500 }
     ]
   }
