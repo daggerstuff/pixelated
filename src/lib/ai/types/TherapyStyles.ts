@@ -43,3 +43,12 @@ export const THERAPY_STYLES: Record<string, TherapyStyle> = {
 }
 
 export type TherapyStyleId = keyof typeof THERAPY_STYLES
+
+// Export therapyStyleConfigs as alias for THERAPY_STYLES
+export const therapyStyleConfigs = THERAPY_STYLES
+
+// Export getRecommendedStyles function
+export function getRecommendedStyles(issue: string): TherapyStyleId[] {
+  // Simple stub: recommend all styles for any issue
+  return Object.keys(THERAPY_STYLES) as TherapyStyleId[]
+}

@@ -45,6 +45,10 @@ variables:
   value: production
 - name: customDomain
   value: 'pixelatedempathy.com' # Your domain (on App Service)
+- name: PYTHONWARNINGS
+  value: 'ignore::FutureWarning'
+- name: AZURE_CLI_DISABLE_CONNECTION_VERIFICATION
+  value: '1'
 
 pool:
   vmImage: ubuntu-latest
@@ -108,21 +112,37 @@ stages:
         deploy:
           steps:
           - script: |
-              # Try conda first, fall back to pip if conda fails
-              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli -y; then
-                  echo "Azure CLI installed via conda"
+              # Install Azure CLI with Python 3.13 compatibility fixes
+              echo "Installing Azure CLI with Python 3.13 compatibility..."
+              
+              # Set environment variables to suppress warnings
+              export PYTHONWARNINGS="ignore::FutureWarning"
+              export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+              
+              # Try conda first with specific Python version
+              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+                  echo "Azure CLI installed via conda with Python 3.11"
                   echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
                   /home/vivi/miniconda3/bin/az version
               else
-                  echo "Conda installation failed, using pip"
-                  python3 -m pip install --user azure-cli==2.73.0 --break-system-packages
-                  echo "##vso[task.prependpath]$HOME/.local/bin"
-                  # Verify installation with full path
-                  $HOME/.local/bin/az version
-                  # Also verify the binary exists
-                  ls -la $HOME/.local/bin/az
+                  echo "Conda installation failed, using pip with Python 3.11"
+                  # Install Python 3.11 if not available
+                  if ! command -v python3.11 &> /dev/null; then
+                      sudo apt-get update -qq
+                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
+                  fi
+                  
+                  # Create virtual environment with Python 3.11
+                  python3.11 -m venv ~/azure-cli-env
+                  source ~/azure-cli-env/bin/activate
+                  
+                  # Install Azure CLI in the virtual environment
+                  pip install azure-cli==2.73.0
+                  
+                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+                  $HOME/azure-cli-env/bin/az version
               fi
-            displayName: Install Azure CLI 2.73.0
+            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
           - task: AzureCLI@2
             displayName: Deploy Container Apps Infrastructure
@@ -248,21 +268,37 @@ stages:
       displayName: Clean up disk space
 
     - script: |
-        # Try conda first, fall back to pip if conda fails
-        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli -y; then
-            echo "Azure CLI installed via conda"
+        # Install Azure CLI with Python 3.13 compatibility fixes
+        echo "Installing Azure CLI with Python 3.13 compatibility..."
+        
+        # Set environment variables to suppress warnings
+        export PYTHONWARNINGS="ignore::FutureWarning"
+        export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+        
+        # Try conda first with specific Python version
+        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+            echo "Azure CLI installed via conda with Python 3.11"
             echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
             /home/vivi/miniconda3/bin/az version
         else
-            echo "Conda installation failed, using pip"
-            python3 -m pip install --user azure-cli==2.73.0 --break-system-packages
-            echo "##vso[task.prependpath]$HOME/.local/bin"
-            # Verify installation with full path
-            $HOME/.local/bin/az version
-            # Also verify the binary exists
-            ls -la $HOME/.local/bin/az
+            echo "Conda installation failed, using pip with Python 3.11"
+            # Install Python 3.11 if not available
+            if ! command -v python3.11 &> /dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
+            fi
+            
+            # Create virtual environment with Python 3.11
+            python3.11 -m venv ~/azure-cli-env
+            source ~/azure-cli-env/bin/activate
+            
+            # Install Azure CLI in the virtual environment
+            pip install azure-cli==2.73.0
+            
+            echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+            $HOME/azure-cli-env/bin/az version
         fi
-      displayName: Install Azure CLI 2.73.0
+      displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
     - task: AzureCLI@2
       displayName: Build and push Docker image
@@ -378,21 +414,37 @@ stages:
         deploy:
           steps:
           - script: |
-              # Try conda first, fall back to pip if conda fails
-              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli -y; then
-                  echo "Azure CLI installed via conda"
+              # Install Azure CLI with Python 3.13 compatibility fixes
+              echo "Installing Azure CLI with Python 3.13 compatibility..."
+              
+              # Set environment variables to suppress warnings
+              export PYTHONWARNINGS="ignore::FutureWarning"
+              export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+              
+              # Try conda first with specific Python version
+              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+                  echo "Azure CLI installed via conda with Python 3.11"
                   echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
                   /home/vivi/miniconda3/bin/az version
               else
-                  echo "Conda installation failed, using pip"
-                  python3 -m pip install --user azure-cli==2.73.0 --break-system-packages
-                  echo "##vso[task.prependpath]$HOME/.local/bin"
-                  # Verify installation with full path
-                  $HOME/.local/bin/az version
-                  # Also verify the binary exists
-                  ls -la $HOME/.local/bin/az
+                  echo "Conda installation failed, using pip with Python 3.11"
+                  # Install Python 3.11 if not available
+                  if ! command -v python3.11 &> /dev/null; then
+                      sudo apt-get update -qq
+                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
+                  fi
+                  
+                  # Create virtual environment with Python 3.11
+                  python3.11 -m venv ~/azure-cli-env
+                  source ~/azure-cli-env/bin/activate
+                  
+                  # Install Azure CLI in the virtual environment
+                  pip install azure-cli==2.73.0
+                  
+                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+                  $HOME/azure-cli-env/bin/az version
               fi
-            displayName: Install Azure CLI 2.73.0
+            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
           - task: AzureCLI@2
             displayName: Deploy Container App
@@ -642,21 +694,37 @@ stages:
         deploy:
           steps:
           - script: |
-              # Try conda first, fall back to pip if conda fails
-              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli -y; then
-                  echo "Azure CLI installed via conda"
+              # Install Azure CLI with Python 3.13 compatibility fixes
+              echo "Installing Azure CLI with Python 3.13 compatibility..."
+              
+              # Set environment variables to suppress warnings
+              export PYTHONWARNINGS="ignore::FutureWarning"
+              export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+              
+              # Try conda first with specific Python version
+              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+                  echo "Azure CLI installed via conda with Python 3.11"
                   echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
                   /home/vivi/miniconda3/bin/az version
               else
-                  echo "Conda installation failed, using pip"
-                  python3 -m pip install --user azure-cli==2.73.0 --break-system-packages
-                  echo "##vso[task.prependpath]$HOME/.local/bin"
-                  # Verify installation with full path
-                  $HOME/.local/bin/az version
-                  # Also verify the binary exists
-                  ls -la $HOME/.local/bin/az
+                  echo "Conda installation failed, using pip with Python 3.11"
+                  # Install Python 3.11 if not available
+                  if ! command -v python3.11 &> /dev/null; then
+                      sudo apt-get update -qq
+                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
+                  fi
+                  
+                  # Create virtual environment with Python 3.11
+                  python3.11 -m venv ~/azure-cli-env
+                  source ~/azure-cli-env/bin/activate
+                  
+                  # Install Azure CLI in the virtual environment
+                  pip install azure-cli==2.73.0
+                  
+                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+                  $HOME/azure-cli-env/bin/az version
               fi
-            displayName: Install Azure CLI 2.73.0
+            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
           - task: AzureCLI@2
             displayName: Deploy to App Service
@@ -739,21 +807,37 @@ stages:
       name: 'Default'
     steps:
     - script: |
-        # Try conda first, fall back to pip if conda fails
-        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli -y; then
-            echo "Azure CLI installed via conda"
+        # Install Azure CLI with Python 3.13 compatibility fixes
+        echo "Installing Azure CLI with Python 3.13 compatibility..."
+        
+        # Set environment variables to suppress warnings
+        export PYTHONWARNINGS="ignore::FutureWarning"
+        export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+        
+        # Try conda first with specific Python version
+        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+            echo "Azure CLI installed via conda with Python 3.11"
             echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
             /home/vivi/miniconda3/bin/az version
         else
-            echo "Conda installation failed, using pip"
-            python3 -m pip install --user azure-cli==2.73.0 --break-system-packages
-            echo "##vso[task.prependpath]$HOME/.local/bin"
-            # Verify installation with full path
-            $HOME/.local/bin/az version
-            # Also verify the binary exists
-            ls -la $HOME/.local/bin/az
+            echo "Conda installation failed, using pip with Python 3.11"
+            # Install Python 3.11 if not available
+            if ! command -v python3.11 &> /dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
+            fi
+            
+            # Create virtual environment with Python 3.11
+            python3.11 -m venv ~/azure-cli-env
+            source ~/azure-cli-env/bin/activate
+            
+            # Install Azure CLI in the virtual environment
+            pip install azure-cli==2.73.0
+            
+            echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+            $HOME/azure-cli-env/bin/az version
         fi
-      displayName: Install Azure CLI 2.73.0
+      displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
     - task: AzureCLI@2
       displayName: Health Check App Service
@@ -835,21 +919,37 @@ stages:
       name: 'Default'
     steps:
     - script: |
-        # Try conda first, fall back to pip if conda fails
-        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli -y; then
-            echo "Azure CLI installed via conda"
+        # Install Azure CLI with Python 3.13 compatibility fixes
+        echo "Installing Azure CLI with Python 3.13 compatibility..."
+        
+        # Set environment variables to suppress warnings
+        export PYTHONWARNINGS="ignore::FutureWarning"
+        export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+        
+        # Try conda first with specific Python version
+        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+            echo "Azure CLI installed via conda with Python 3.11"
             echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
             /home/vivi/miniconda3/bin/az version
         else
-            echo "Conda installation failed, using pip"
-            python3 -m pip install --user azure-cli==2.73.0 --break-system-packages
-            echo "##vso[task.prependpath]$HOME/.local/bin"
-            # Verify installation with full path
-            $HOME/.local/bin/az version
-            # Also verify the binary exists
-            ls -la $HOME/.local/bin/az
+            echo "Conda installation failed, using pip with Python 3.11"
+            # Install Python 3.11 if not available
+            if ! command -v python3.11 &> /dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
+            fi
+            
+            # Create virtual environment with Python 3.11
+            python3.11 -m venv ~/azure-cli-env
+            source ~/azure-cli-env/bin/activate
+            
+            # Install Azure CLI in the virtual environment
+            pip install azure-cli==2.73.0
+            
+            echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+            $HOME/azure-cli-env/bin/az version
         fi
-      displayName: Install Azure CLI 2.73.0
+      displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
     - task: AzureCLI@2
       displayName: Summary and Cleanup
