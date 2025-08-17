@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { z } from 'zod'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { getUser } from '../../../lib/auth/sessionUtils'
@@ -12,7 +12,7 @@ const downloadRequestSchema = z.object({
   token: z.string().min(1, 'Security token is required'),
 })
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET = async ({ request }) => {
   try {
     // Extract query parameters from the URL
     const url = new URL(request.url)

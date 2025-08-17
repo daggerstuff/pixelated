@@ -12,7 +12,7 @@ const authService = new MongoAuthService()
 const logger = createBuildSafeLogger('profile-api')
 
 // GET endpoint for profile data
-export const GET: APIRoute = protectRoute({
+export const GET = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
 })(async ({ locals }: AuthAPIContext) => {
@@ -70,7 +70,7 @@ export const GET: APIRoute = protectRoute({
 })
 
 // PUT endpoint to update profile data
-export const PUT: APIRoute = protectRoute({
+export const PUT = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
 })(async ({ request, locals }: AuthAPIContext) => {

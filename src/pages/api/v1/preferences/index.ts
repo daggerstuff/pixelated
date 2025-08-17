@@ -94,7 +94,7 @@ function validateAIPreferences(input: unknown): asserts input is AIPreferences {
   }
 }
 
-export const GET: APIRoute = protectRoute()(async ({ locals }) => {
+export const GET = protectRoute()(async ({ locals }) => {
   try {
     const { user } = locals
     const settings = await getOrCreateUserSettings(user.id)

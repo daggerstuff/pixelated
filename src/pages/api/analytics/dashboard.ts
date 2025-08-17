@@ -206,7 +206,7 @@ type APIRoute = (context: BaseAPIContext) => Response | Promise<Response>
 /**
  * POST endpoint for generating test analytics data
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST = async ({ request }) => {
   const startTime = Date.now()
   
   try {
@@ -335,7 +335,7 @@ export const POST: APIRoute = async ({ request }) => {
 /**
  * GET endpoint for retrieving analytics dashboard data
  */
-export const GET: APIRoute = async () => {
+export const GET = async () => {
   return new Response(JSON.stringify({ 
     status: 'healthy',
     timestamp: new Date().toISOString(),

@@ -2,7 +2,7 @@ export const prerender = false
 import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
+// import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 
 interface AdminLocals {
   admin: {
@@ -19,7 +19,7 @@ const logger = createBuildSafeLogger('default')
  * API endpoint for fetching users (admin only)
  * GET /api/admin/users
  */
-export const GET: APIRoute = async (context: BaseAPIContext & { locals: AdminLocals }) => {
+export const GET = async (context) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.VIEW_USERS)(
     context,
@@ -84,7 +84,7 @@ export const GET: APIRoute = async (context: BaseAPIContext & { locals: AdminLoc
  * API endpoint for updating a user (admin only)
  * PATCH /api/admin/users
  */
-export const PATCH: APIRoute = async (context: BaseAPIContext & { locals: AdminLocals }) => {
+export const PATCH = async (context) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.UPDATE_USER)(
     context,

@@ -22,7 +22,7 @@ const exportRequestSchema = z.object({
     .optional(),
 })
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST = async ({ request }) => {
   try {
     // Parse request body as JSON
     let requestBody

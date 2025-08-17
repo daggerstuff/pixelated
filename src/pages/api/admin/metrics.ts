@@ -5,7 +5,7 @@ export const prerender = false
  * API endpoint for fetching system metrics (admin only)
  * GET /api/admin/metrics
  */
-export const GET: APIRoute = async () => {
+export const GET = async () => {
   try {
     // Mock metrics data for demonstration
     const mockMetrics = {

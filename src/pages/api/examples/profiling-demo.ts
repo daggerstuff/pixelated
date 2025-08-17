@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 
 // Simulates a CPU-intensive operation
 async function performHeavyComputation(): Promise<number> {
@@ -17,7 +17,7 @@ async function simulateDatabaseQuery(): Promise<Record<string, unknown>> {
   return { id: 1, name: 'Example Record', value: Math.random() * 100 }
 }
 
-export const GET: APIRoute = async (_) => {
+export const GET = async (_) => {
   try {
     // Directly call the computation function
     const computationResult = await performHeavyComputation()

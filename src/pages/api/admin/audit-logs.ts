@@ -3,9 +3,8 @@ import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('admin-audit-logs')
 
-export const GET: APIRoute = async ({ context: { url: URL } }: APIContext) => {
+export const GET = async ({ url }) => {
   try {
-    const { url } = context
     const { searchParams } = new URL(url)
 
     const eventType = searchParams.get('eventType')

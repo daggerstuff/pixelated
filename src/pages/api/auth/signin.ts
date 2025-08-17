@@ -7,7 +7,7 @@ import { mongoAuthService } from '@/services/mongoAuth.service'
  * Sign in endpoint
  * POST /api/auth/signin
  */
-export const POST: APIRoute = async ({ request }: APIContext) => {
+export const POST = async ({ request }) => {
   try {
     const { email, password } = await request.json()
 

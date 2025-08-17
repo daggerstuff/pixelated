@@ -10,7 +10,7 @@ vi.mock('../../../lib/monitoring/config', () => ({
       enableRUM: true,
       rumSamplingRate: 0.5,
       url: 'https://test.grafana.com',
-      apiKey: process.env.API_KEY || 'example-api-key',
+      apiKey: process.env['API_KEY'] || 'example-api-key',
       orgId: 'test-org',
       rumApplicationName: 'test-app',
     },

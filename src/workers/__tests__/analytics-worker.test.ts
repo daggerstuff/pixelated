@@ -19,10 +19,10 @@ vi.mock('@/lib/utils/logger', () => ({
 vi.mock('@/config/env.config')
 
 // --- Mock for 'ws' module ---
-const mockWssEventHandlers = new Map<string, Function[]>()
+const mockWssEventHandlers = new Map<string, Array<(event?: any, ...args: any[]) => void>>()
 
 const mockWssInstance = {
-  on: vi.fn((event: string, handler: Function) => {
+  on: vi.fn((event: string, handler: (event?: any, ...args: any[]) => void) => {
     if (!mockWssEventHandlers.has(event)) {
       mockWssEventHandlers.set(event, [])
     }

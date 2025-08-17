@@ -1,4 +1,5 @@
-import type { APIRoute, APIContext } from 'astro'
+// import type { APIRoute, APIContext } from 'astro'
+import { ObjectId } from 'mongodb'
 import { todoDAO } from '../../services/mongodb.dao'
 import { verifyAuthToken } from '../../utils/auth'
 
@@ -9,7 +10,7 @@ export const prerender = false
  * GET /api/todos - Get all todos for authenticated user
  * POST /api/todos - Create a new todo
  */
-export const GET: APIRoute = async ({ request }: APIContext) => {
+export const GET = async ({ request }) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -23,7 +24,7 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
     }
 
     const { userId } = await verifyAuthToken(authHeader)
-    const todos = await todoDAO.findAll(userId)
+    const todos = await todoDAO.findAll(new ObjectId(userId))
 
     return new Response(JSON.stringify({ 
       success: true,
@@ -47,7 +48,7 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
   }
 }
 
-export const POST: APIRoute = async ({ request }: APIContext) => {
+export const POST = async ({ request }) => {
   try {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
@@ -75,7 +76,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     const todo = await todoDAO.create({
-      userId,
+      userId: new ObjectId(userId),
       title,
       description,
       priority,

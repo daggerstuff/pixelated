@@ -1,8 +1,8 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import type { TherapeuticGoal } from '../../../lib/ai/types/TherapeuticGoals'
 import { goalSchema, goals } from './index' // Reuse schema if possible
 
-export const GET: APIRoute = async ({ params }: { params: unknown }) => {
+export const GET = async ({ params }: { params: unknown }) => {
   const { id } = params as { id: string }
   const goal = goals.find((g: TherapeuticGoal) => g.id === id)
   if (!goal) {
@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ params }: { params: unknown }) => {
   })
 }
 
-export const PUT: APIRoute = async ({
+export const PUT = async ({
   params,
   request,
 }: {
@@ -80,7 +80,7 @@ export const PUT: APIRoute = async ({
   }
 }
 
-export const DELETE: APIRoute = async ({ params }: { params: unknown }) => {
+export const DELETE = async ({ params }) => {
   const { id } = params as { id: string }
   const idx = goals.findIndex((g: TherapeuticGoal) => g.id === id)
   if (idx === -1) {

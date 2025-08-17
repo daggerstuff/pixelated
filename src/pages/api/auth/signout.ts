@@ -6,7 +6,7 @@ import { mongoAuthService } from '@/services/mongoAuth.service'
  * Sign out endpoint
  * POST /api/auth/signout
  */
-export const POST: APIRoute = async ({ request }: APIContext) => {
+export const POST = async ({ request }) => {
   try {
     const authHeader = request.headers.get('Authorization')
 

@@ -25,7 +25,7 @@ backupManager.initialize().catch((error) => {
 })
 
 // GET endpoint for recovery tests
-export const GET: APIRoute = protectRoute({
+export const GET = protectRoute({
   requiredRole: 'admin' as AuthRole,
 })(async ({ request, _locals }: AuthAPIContext) => {
   try {
@@ -80,7 +80,7 @@ export const GET: APIRoute = protectRoute({
 })
 
 // POST endpoint for recovery tests
-export const POST: APIRoute = protectRoute({
+export const POST = protectRoute({
   requiredRole: 'admin' as AuthRole,
 })(async ({ request, _locals }: AuthAPIContext) => {
   try {

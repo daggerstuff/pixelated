@@ -16,15 +16,6 @@ function formatDate(dateInput: any, options: any = {}) {
 }
 
 // Define interfaces for data structures
-interface ConsentType {
-  id: string
-  name: string
-  scope: string
-  is_active: boolean
-  created_at?: string
-  updated_at?: string
-}
-
 // Fetch data with proper typing
 const db = await mongodb.connect();
 

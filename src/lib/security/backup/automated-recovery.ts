@@ -57,12 +57,12 @@ export enum BackupSelectionStrategy {
  * Class for managing automated recovery testing procedures
  */
 export class AutomatedRecoverySystem {
-  private config: AutomatedRecoveryConfig
-  private recoveryManager: RecoveryTestingManager
-  private scheduledJobs: Map<string, cron.ScheduledTask> = new Map()
-  private backupProvider: () => Promise<BackupMetadata[]>
-  private isInitialized = false
-  private currentEnvironmentIndex = 0
+  private _config: AutomatedRecoveryConfig
+  private _recoveryManager: RecoveryTestingManager
+  private _scheduledJobs: Map<string, cron.ScheduledTask> = new Map()
+  private _backupProvider: () => Promise<BackupMetadata[]>
+  private _isInitialized = false
+  private _currentEnvironmentIndex = 0
 
   /**
    * Create a new automated recovery testing system

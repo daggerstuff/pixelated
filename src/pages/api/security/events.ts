@@ -40,7 +40,7 @@ const mockStats = {
   },
 }
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET = async ({ request }) => {
   try {
     const url = new URL(request.url)
     const type = url.searchParams.get('type')

@@ -95,7 +95,7 @@ export function ConversionDashboard() {
       if (!conversionTypes[event.conversionId]) {
         conversionTypes[event.conversionId] = []
       }
-      conversionTypes[event.conversionId].push(event)
+      conversionTypes[event.conversionId]!.push(event)
     })
 
     // Generate summary for each conversion type

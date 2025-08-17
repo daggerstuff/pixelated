@@ -1,11 +1,11 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const GET: APIRoute = async ({ request, cookies }: APIContext) => {
+export const GET = async ({ request, cookies }) => {
   try {
     // Authenticate request using cookies
     const sessionCookie = cookies.get('session')

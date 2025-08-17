@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { z } from 'zod'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { getSession } from '../../../lib/auth/session'
@@ -28,7 +28,7 @@ const updateExportSchema = z.object({
     .optional(),
 })
 
-export const put: APIRoute = async ({ request }) => {
+export const put = async ({ request }) => {
   try {
     // Verify user is authenticated and authorized
     const sessionData = await getSession(request)

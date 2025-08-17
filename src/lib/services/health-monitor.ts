@@ -60,11 +60,11 @@ export class HealthMonitor {
         ])
         result.responseTime = performance.now() - checkStart
         return result
-      } catch (error) {
+      } catch (_error) {
         return {
           name,
           status: 'unhealthy' as const,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: _error instanceof Error ? _error.message : 'Unknown error',
           responseTime: performance.now() - startTime
         }
       }
@@ -125,11 +125,11 @@ export class HealthMonitor {
           release: os.release()
         }
       }
-    } catch (error) {
+    } catch (_error) {
       return {
         name: 'system',
         status: 'unhealthy',
-        message: error instanceof Error ? error.message : 'System check failed'
+        message: _error instanceof Error ? _error.message : 'System check failed'
       }
     }
   }
@@ -164,11 +164,11 @@ export class HealthMonitor {
           usagePercent: Math.round(usagePercent * 100) / 100
         }
       }
-    } catch (error) {
+    } catch (_error) {
       return {
         name: 'memory',
         status: 'unhealthy',
-        message: error instanceof Error ? error.message : 'Memory check failed'
+        message: _error instanceof Error ? _error.message : 'Memory check failed'
       }
     }
   }
@@ -198,11 +198,11 @@ export class HealthMonitor {
           heapUsagePercent: Math.round(heapUsagePercent * 100) / 100
         }
       }
-    } catch (error) {
+    } catch (_error) {
       return {
         name: 'disk',
         status: 'unhealthy',
-        message: error instanceof Error ? error.message : 'Disk check failed'
+        message: _error instanceof Error ? _error.message : 'Disk check failed'
       }
     }
   }
@@ -229,7 +229,7 @@ export class HealthMonitor {
         platform: os.platform(),
         nodeVersion: process.version
       }
-    } catch (error) {
+    } catch {
       return {
         memory: { total: 0, free: 0, used: 0, usagePercent: 0 },
         cpu: { cores: 0, loadAverage: [0, 0, 0], model: 'Unknown' },

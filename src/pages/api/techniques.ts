@@ -94,7 +94,7 @@ export const GET = async ({ request }: { request: Request }) => {
   }
 }
 
-export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
+export const POST = async ({ request, cookies }) => {
   try {
     // Authentication check
     const sessionCookie = cookies.get('session')
@@ -122,7 +122,8 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
     }
 
     // Get AI recommendations
-    const recommendations = await recommend(patientData, preferences)
+    const recommendationRequest = { ...patientData, ...preferences }
+    const recommendations = await recommend(recommendationRequest)
 
     return new Response(
       JSON.stringify({

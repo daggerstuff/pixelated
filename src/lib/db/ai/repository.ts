@@ -948,29 +948,29 @@ export class AIRepository {
     const db = await this.getDatabase()
     const updateData: Record<string, unknown> = { updatedAt: new Date() }
 
-    if (updates.acknowledged !== undefined) {
-      updateData.acknowledged = updates.acknowledged
-      updateData.acknowledgedAt = updates.acknowledged ? new Date() : null
-      if (updates.acknowledgedBy) {
-        updateData.acknowledgedBy = updates.acknowledgedBy
+    if (updates['acknowledged'] !== undefined) {
+      updateData.acknowledged = updates['acknowledged']
+      updateData.acknowledgedAt = updates['acknowledged'] ? new Date() : null
+      if (updates['acknowledgedBy']) {
+        updateData.acknowledgedBy = updates['acknowledgedBy']
       }
     }
 
-    if (updates.resolved !== undefined) {
-      updateData.resolved = updates.resolved
-      updateData.resolvedAt = updates.resolved ? new Date() : null
-      if (updates.resolvedBy) {
-        updateData.resolvedBy = updates.resolvedBy
+    if (updates['resolved'] !== undefined) {
+      updateData.resolved = updates['resolved']
+      updateData.resolvedAt = updates['resolved'] ? new Date() : null
+      if (updates['resolvedBy']) {
+        updateData.resolvedBy = updates['resolvedBy']
       }
     }
 
-    if (updates.escalated !== undefined) {
-      updateData.escalated = updates.escalated
-      updateData.escalatedAt = updates.escalated ? new Date() : null
+    if (updates['escalated'] !== undefined) {
+      updateData.escalated = updates['escalated']
+      updateData.escalatedAt = updates['escalated'] ? new Date() : null
     }
 
-    if (updates.actions) {
-      updateData.actions = updates.actions
+    if (updates['actions']) {
+      updateData.actions = updates['actions']
     }
 
     const result = await db

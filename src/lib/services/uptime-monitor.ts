@@ -167,7 +167,9 @@ export class UptimeMonitor {
       // Ensure logs directory exists
       const logsDir = join(process.cwd(), 'logs')
       if (!existsSync(logsDir)) {
-        require('fs').mkdirSync(logsDir, { recursive: true })
+        // Use imported mkdirSync from node:fs
+        import { mkdirSync } from 'node:fs'
+        mkdirSync(logsDir, { recursive: true })
       }
       
       writeFileSync(this.dataFile, JSON.stringify(this.records, null, 2))

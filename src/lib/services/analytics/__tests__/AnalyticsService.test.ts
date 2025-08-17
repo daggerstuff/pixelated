@@ -1,10 +1,10 @@
 import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { WebSocket } from 'ws'
 import { AnalyticsService } from '../AnalyticsService'
-import { EventPriority, EventType } from '../analytics-types'
+import { EventPriority, EventType, EventDataSchema } from '../analytics-types'
 
 // Mock dependencies first to avoid hoisting issues
-vi.mock('@/lib/services/redis', () => {
+vi.mock('@/lib/redis', () => {
   const mockRedisClient = {
     lpush: vi.fn(),
     rpoplpush: vi.fn(),
@@ -23,16 +23,10 @@ vi.mock('@/lib/services/redis', () => {
   }
 
   return {
-    RedisService: vi.fn().mockImplementation(() => ({
-      getClient: () => mockRedisClient,
-    })),
+    redis: mockRedisClient, // Export as 'redis' to match the import
     mockRedisClient, // Export for test use
   }
 })
-
-vi.mock('crypto', () => ({
-  randomUUID: () => 'test-uuid',
-}))
 
 vi.mock('@/lib/utils/logger', () => {
   const mockLogger = {
@@ -70,7 +64,7 @@ vi.mock('ws', () => ({
 }))
 
 // Import mocks after they're defined
-import * as redisModule from '@/lib/services/redis'
+import * as redisModule from '@/lib/redis'
 type MockRedisClient = {
   lpush: ReturnType<typeof vi.fn>
   rpoplpush: ReturnType<typeof vi.fn>
@@ -126,6 +120,22 @@ describe('analyticsService', () => {
   })
 
   describe('trackEvent', () => {
+    it('should validate schema directly', () => {
+      // Test the schema directly
+      const testData = { type: EventType.USER_ACTION }
+      console.log('EventType.USER_ACTION:', EventType.USER_ACTION)
+      console.log('Test data:', testData)
+      
+      try {
+        const result = EventDataSchema.parse(testData)
+        console.log('Schema validation result:', result)
+        expect(result).toBeDefined()
+      } catch (error) {
+        console.error('Schema validation error:', error)
+        throw error
+      }
+    })
+
     it('should track an event successfully', async () => {
       const eventId = await analyticsService.trackEvent(mockEvent)
 

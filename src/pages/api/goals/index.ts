@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
@@ -42,7 +42,7 @@ export const goalSchema = z.object({
   notes: z.string().optional(),
 })
 
-export const GET: APIRoute = async () => {
+export const GET = async () => {
   // Return all goals (in a real app, filter by user/session)
   return new Response(JSON.stringify(goals), {
     status: 200,
@@ -50,7 +50,7 @@ export const GET: APIRoute = async () => {
   })
 }
 
-export const POST: APIRoute = async ({ request }: { request: any }) => {
+export const POST = async ({ request }: { request: any }) => {
   try {
     const data = await request.json()
     const parsed = goalSchema.safeParse(data)

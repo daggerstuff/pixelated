@@ -1,4 +1,4 @@
-import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+// import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { logAuditEvent, AuditEventType } from '@/lib/audit'
 import { adminGuard } from '@/lib/admin/middleware'
 import { AdminPermission } from '@/lib/admin'
@@ -161,7 +161,7 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
   }
 }
 
-export const POST: APIRoute = async ({ request, locals }: AuthAPIContext) => {
+export const POST = async ({ request, locals }) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SECURITY)({
     request,

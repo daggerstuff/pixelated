@@ -1,7 +1,7 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
+import { getCurrentUser } from '../../../lib/auth'
 import type { TherapySession } from '@/lib/ai/AIService'
 
 // Get logger instance
@@ -14,10 +14,22 @@ const logger = createBuildSafeLogger('api-pattern-cross-session')
  * therapy sessions for a specific client. It uses the PatternRecognitionService with
  * real FHE capabilities to analyze patterns securely.
  */
-export const POST: APIRoute = protectRoute({})(async ({ request, locals }) => {
+export const POST = async ({ request, cookies }) => {
   try {
-    // Authentication is now handled by protectRoute middleware
-    const { user } = locals
+    // Authenticate request
+    const user = await getCurrentUser(cookies)
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'You must be authenticated to access this endpoint',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
 
     // Parse request body
     let requestBody

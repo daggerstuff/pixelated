@@ -13,7 +13,7 @@ import type {
 // In-memory storage for demo (replace with database in production)
 const analyticsData: EnrichedAnalyticsEvent[] = []
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST = async ({ request }) => {
   try {
     const eventData = (await request.json()) as DemoAnalyticsEvent
 
@@ -117,7 +117,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 }
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET = async ({ url }) => {
   try {
     const { searchParams } = new URL(url)
     const sessionId = searchParams.get('session_id')

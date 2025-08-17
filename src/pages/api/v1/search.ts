@@ -18,7 +18,7 @@ async function indexPosts() {
   isIndexed = true
 }
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET = async ({ url }) => {
   const query = url.searchParams.get('q')
   if (!query) {
     return new Response(

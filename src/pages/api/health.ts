@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { mongodb } from '~/config/mongodb.config.ts'
 
 interface HealthStatus {
@@ -14,7 +14,7 @@ interface HealthStatusDetail {
   details?: Record<string, unknown>
 }
 
-export const GET: APIRoute = async (): Promise<Response> => {
+export const GET = async (): Promise<Response> => {
   const startTime = Date.now()
 
   const healthStatus: HealthStatus = {

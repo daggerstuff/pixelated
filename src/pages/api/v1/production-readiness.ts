@@ -1,7 +1,5 @@
 import type { APIRoute } from 'astro'
-import { healthMonitor } from '../../../lib/services/health-monitor'
 import { uptimeMonitor } from '../../../lib/services/uptime-monitor'
-import { execSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 
 interface ProductionReadinessCheck {
@@ -27,7 +25,7 @@ interface ProductionReadiness {
   }
 }
 
-export const GET: APIRoute = async () => {
+export const GET = async () => {
   try {
     const checks: ProductionReadinessCheck[] = []
     

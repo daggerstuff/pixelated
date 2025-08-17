@@ -1,7 +1,7 @@
 /**
  * Compatible APIRoute type for Astro API routes (define locally)
  */
-type APIRoute = (context: { request: Request }) => Promise<Response> | Response;
+// type APIRoute = (context: { request: Request }) => Promise<Response> | Response;
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger';
 import { isAuthenticated } from '../../../lib/auth';
@@ -22,7 +22,7 @@ const aiService = {
 };
 const documentationSystem = new DocumentationSystem(repository, aiService);
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET = async ({ request }) => {
   try {
     // Authenticate request
     const authenticated = await isAuthenticated(request);

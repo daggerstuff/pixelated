@@ -1,5 +1,5 @@
-import type { APIRoute } from 'astro'
-import { protectRoute } from '../../../../lib/auth/serverAuth'
+// import type { APIRoute } from 'astro'
+import { getCurrentUser } from '../../../../lib/auth'
 import { BackupSecurityManager } from '../../../../lib/security/backup'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { BackupType } from '../../../../lib/security/backup/backup-types'
@@ -18,13 +18,21 @@ backupManager.initialize().catch((error) => {
   )
 })
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET = async ({ request, cookies }) => {
   try {
-    // Protect this route - only admins can access backup functionality
-    const user = await protectRoute(request, locals, { role: 'admin' })
+    // Authenticate request
+    const user = await getCurrentUser(cookies)
     if (!user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Check if user has admin role
+    if (!user.roles?.includes('admin')) {
+      return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
+        status: 403,
         headers: { 'Content-Type': 'application/json' },
       })
     }
@@ -73,13 +81,24 @@ export const GET: APIRoute = async ({ request, locals }) => {
   }
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST = async ({ request, cookies }) => {
   try {
-    // Protect this route - only admins can access backup functionality
-    const user = await protectRoute(request, locals, { role: 'admin' })
+    // Authenticate request
+    const user = await getCurrentUser(cookies)
     if (!user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Check if user has admin role
+    if (!user.roles?.includes('admin')) {
+      return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
         headers: { 'Content-Type': 'application/json' },
       })
     }

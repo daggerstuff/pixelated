@@ -20,7 +20,7 @@ const exportRequestSchema = z.object({
   priority: z.enum(['normal', 'high']).optional().default('normal'),
 })
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST = async ({ request }) => {
   try {
     // Parse request body as JSON
     let requestBody

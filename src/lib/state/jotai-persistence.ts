@@ -162,7 +162,7 @@ class EncryptedJotaiStorage<Value> {
     }
   }
 
-  async getItem(key: string, initialValue: Value): Promise<Value> {
+  async getItem(_key: string, initialValue: Value): Promise<Value> {
     if (typeof window === 'undefined') {
       return initialValue
     }
@@ -181,7 +181,7 @@ class EncryptedJotaiStorage<Value> {
     }
   }
 
-  async setItem(key: string, newValue: Value): Promise<void> {
+  async setItem(_key: string, newValue: Value): Promise<void> {
     if (typeof window === 'undefined') {
       return
     }

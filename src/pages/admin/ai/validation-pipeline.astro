@@ -3,16 +3,25 @@ import AdminLayout from '../../../layouts/AdminLayout.astro'
 import { emotionValidationPipeline } from '../../../lib/ai/emotions/EmotionValidationPipeline'
 import { validationRunner } from '../../../lib/ai/validation/ContinuousValidationRunner'
 
+// Define types for the runner state
+interface RunnerState {
+  isScheduled: boolean
+  schedule?: string
+  nextScheduledRun?: string | Date
+  status?: string
+  lastRun?: string | Date
+}
+
 // Check if we need to initialize the pipeline
-let validationInitError = null
-let validationStats = null
-let runnerState = null
+let validationInitError: string | null = null
+let validationStats: any = null
+let runnerState: RunnerState | null = null
 
 try {
   await validationRunner.initialize()
   validationStats = emotionValidationPipeline.getValidationStats()
-  runnerState = validationRunner.getState()
-} catch (error) {
+  runnerState = validationRunner.getState() as RunnerState
+} catch (error: any) {
   validationInitError = error.message
 }
 

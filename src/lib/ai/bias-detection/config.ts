@@ -17,16 +17,16 @@ export const DEFAULT_CONFIG: BiasDetectionConfig = {
 
   // Bias score thresholds (0.0 - 1.0 scale)
   thresholds: {
-    warningLevel: 0.3,
-    highLevel: 0.6,
-    criticalLevel: 0.8,
+    warning: 0.3,
+    high: 0.6,
+    critical: 0.8,
   },
 
   // Layer weight configuration for aggregated bias scoring
   layerWeights: {
     preprocessing: 0.25,
-    modelLevel: 0.25,
-    interactive: 0.25,
+    modelLevel: 0.3,
+    interactive: 0.2,
     evaluation: 0.25,
   },
 
@@ -123,36 +123,36 @@ export function validateConfig(config: Partial<BiasDetectionConfig>): void {
     const { thresholds } = config
 
     if (
-      thresholds.warningLevel !== undefined &&
-      (thresholds.warningLevel < 0 || thresholds.warningLevel > 1)
+      thresholds.warning !== undefined &&
+      (thresholds.warning < 0 || thresholds.warning > 1)
     ) {
-      errors.push('thresholds.warningLevel must be between 0.0 and 1.0')
+      errors.push('thresholds.warning must be between 0.0 and 1.0')
     }
 
     if (
-      thresholds.highLevel !== undefined &&
-      (thresholds.highLevel < 0 || thresholds.highLevel > 1)
+      thresholds.high !== undefined &&
+      (thresholds.high < 0 || thresholds.high > 1)
     ) {
-      errors.push('thresholds.highLevel must be between 0.0 and 1.0')
+      errors.push('thresholds.high must be between 0.0 and 1.0')
     }
 
     if (
-      thresholds.criticalLevel !== undefined &&
-      (thresholds.criticalLevel < 0 || thresholds.criticalLevel > 1)
+      thresholds.critical !== undefined &&
+      (thresholds.critical < 0 || thresholds.critical > 1)
     ) {
-      errors.push('thresholds.criticalLevel must be between 0.0 and 1.0')
+      errors.push('thresholds.critical must be between 0.0 and 1.0')
     }
 
     // Validate threshold ordering
     const warning =
-      thresholds.warningLevel ?? DEFAULT_CONFIG.thresholds.warningLevel
-    const high = thresholds.highLevel ?? DEFAULT_CONFIG.thresholds.highLevel
+      thresholds.warning ?? DEFAULT_CONFIG.thresholds.warning
+    const high = thresholds.high ?? DEFAULT_CONFIG.thresholds.high
     const critical =
-      thresholds.criticalLevel ?? DEFAULT_CONFIG.thresholds.criticalLevel
+      thresholds.critical ?? DEFAULT_CONFIG.thresholds.critical
 
     if (warning >= high || high >= critical) {
       errors.push(
-        'Thresholds must be in ascending order: warningLevel < highLevel < criticalLevel',
+        'Thresholds must be in ascending order: warning < high < critical',
       )
     }
   }
@@ -609,6 +609,131 @@ export class BiasDetectionConfigManager {
       enableMetrics:
         this.config.performanceConfig?.enableMetrics ??
         this.config.metricsConfig.enableRealTimeMonitoring,
+      metricsInterval: this.config.performanceConfig?.metricsInterval ?? 60000,
+    }
+  }
+
+  public getMLToolkitConfig() {
+    return {
+      aif360: {
+        enabled: this.config.mlToolkitConfig?.aif360?.enabled ?? true,
+        fallbackOnError: this.config.mlToolkitConfig?.aif360?.fallbackOnError ?? true,
+      },
+      fairlearn: {
+        enabled: this.config.mlToolkitConfig?.fairlearn?.enabled ?? true,
+        fallbackOnError: this.config.mlToolkitConfig?.fairlearn?.fallbackOnError ?? true,
+      },
+      huggingFace: {
+        enabled: this.config.mlToolkitConfig?.huggingFace?.enabled ?? true,
+        apiKey: this.config.mlToolkitConfig?.huggingFace?.apiKey ?? undefined,
+        model: this.config.mlToolkitConfig?.huggingFace?.model ?? 'unitary/toxic-bert',
+        fallbackOnError: this.config.mlToolkitConfig?.huggingFace?.fallbackOnError ?? true,
+      },
+    }
+  }
+
+  public getLoggingConfig() {
+    return {
+      level: this.config.loggingConfig?.level ?? 'info',
+      enableConsole: this.config.loggingConfig?.enableConsole ?? true,
+      enableFile: this.config.loggingConfig?.enableFile ?? true,
+      filePath: this.config.loggingConfig?.filePath ?? './logs/bias-detection.log',
+      maxFileSize: this.config.loggingConfig?.maxFileSize ?? '10MB',
+      maxFiles: this.config.loggingConfig?.maxFiles ?? 5,
+      enableStructured: this.config.loggingConfig?.enableStructured ?? true,
+    }
+  }
+
+  public validateConfiguration(): string[] {
+    const errors: string[] = []
+    
+    try {
+      validateConfig(this.config)
+    } catch (error) {
+      if (error instanceof Error) {
+        errors.push(error.message)
+      }
+    }
+    
+    // Additional validation checks
+    const weights = Object.values(this.config.layerWeights)
+    const sum = weights.reduce((a, b) => a + b, 0)
+    if (Math.abs(sum - 1.0) > 0.001) {
+      errors.push('Layer weights must sum to 1.0')
+    }
+    
+    if (this.config.thresholds.warning >= this.config.thresholds.high) {
+      errors.push('Warning threshold must be less than high threshold')
+    }
+    
+    if (this.config.thresholds.high >= this.config.thresholds.critical) {
+      errors.push('High threshold must be less than critical threshold')
+    }
+    
+    return errors
+  }
+
+  public isProductionReady(): { ready: boolean; warnings: string[]; errors: string[] } {
+    const warnings: string[] = []
+    const errors: string[] = []
+    
+    // Check for debug logging in production
+    if (this.config.loggingConfig?.enableDebug) {
+      warnings.push('Debug logging is enabled in production')
+    }
+    
+    // Check for required production settings
+    if (!this.config.auditLogging) {
+      errors.push('Audit logging must be enabled in production')
+    }
+    
+    if (!this.config.dataMaskingEnabled) {
+      errors.push('Data masking must be enabled in production')
+    }
+    
+    // Check performance settings
+    const perfConfig = this.getPerformanceConfig()
+    if (perfConfig.maxConcurrentAnalyses > 50) {
+      warnings.push('High concurrent analysis limit may impact performance')
+    }
+    
+    // Check security settings
+    const secConfig = this.getSecurityConfig()
+    if (secConfig.sessionTimeoutMs > 7200000) { // 2 hours
+      warnings.push('Session timeout is very long for production')
+    }
+    
+    return {
+      ready: errors.length === 0,
+      warnings,
+      errors,
+    }
+  }
+
+  public getConfigSummary(): {
+    isValid: boolean
+    source: string
+    loadedEnvVars: string[]
+    errors: string[]
+    mlToolkits?: {
+      aif360: { enabled: boolean }
+      fairlearn: { enabled: boolean }
+      tensorflow: { enabled: boolean }
+    }
+  } {
+    const errors = this.validateConfiguration()
+    const envSummary = getEnvironmentConfigSummary()
+    
+    return {
+      isValid: errors.length === 0,
+      source: 'environment + defaults',
+      loadedEnvVars: envSummary.loaded,
+      errors,
+      mlToolkits: {
+        aif360: { enabled: this.config.mlToolkitConfig?.aif360?.enabled ?? true },
+        fairlearn: { enabled: this.config.mlToolkitConfig?.fairlearn?.enabled ?? true },
+        tensorflow: { enabled: this.config.mlToolkitConfig?.tensorflow?.enabled ?? true },
+      },
     }
   }
 

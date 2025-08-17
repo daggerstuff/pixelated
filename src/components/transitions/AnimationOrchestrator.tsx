@@ -91,15 +91,15 @@ export function AnimationOrchestrator({
     // Add stagger configuration if enabled
     if (
       staggerChildren &&
-      baseVariants.animate &&
-      typeof baseVariants.animate === 'object'
+      baseVariants['animate'] &&
+      typeof baseVariants['animate'] === 'object'
     ) {
       return {
         ...baseVariants,
         animate: {
-          ...baseVariants.animate,
+          ...baseVariants['animate'],
           transition: {
-            ...((baseVariants.animate as Record<string, unknown>).transition || {}),
+            ...((baseVariants['animate'] as Record<string, unknown>)['transition'] || {}),
             staggerChildren: staggerDelay,
           },
         },
@@ -285,7 +285,7 @@ export function AdvancedSequence({
       setCurrentStep(i)
 
       await controls.start({
-        ...step.variants.animate,
+        ...step.variants['animate'],
         transition: {
           duration: step.duration || TIMING.normal,
           ease: typeof step.ease === 'string' ? EASING[step.ease] : step.ease,
@@ -298,7 +298,7 @@ export function AdvancedSequence({
 
     if (loop) {
       setCurrentStep(0)
-      await controls.start(steps[0].variants.initial || {})
+      await controls.start(steps[0].variants['initial'] || {})
       executeSequence()
     }
   }, [steps, controls, loop, onSequenceComplete])
@@ -314,7 +314,7 @@ export function AdvancedSequence({
   return (
     <motion.div
       className={className}
-      initial={currentVariants.initial || {}}
+      initial={currentVariants['initial'] || {}}
       animate={controls}
     >
       {children}
@@ -348,7 +348,7 @@ export function Choreography({
   useEffect(() => {
     const runChoreography = async () => {
       if (masterSequence) {
-        await masterControls.start(masterSequence.animate || {})
+        await masterControls.start(masterSequence['animate'] || {})
       }
       onChoreographyComplete?.()
     }
@@ -359,7 +359,7 @@ export function Choreography({
   return (
     <motion.div
       className={className}
-      initial={masterSequence?.initial || {}}
+      initial={masterSequence?.['initial'] || {}}
       animate={masterControls}
     >
       <AnimatePresence>

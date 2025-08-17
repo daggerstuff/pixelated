@@ -18,7 +18,7 @@ const logger = createBuildSafeLogger('default')
  * API endpoint for fetching therapy sessions (admin only)
  * GET /api/admin/sessions
  */
-export const GET: APIRoute = async (context: APIContext & { locals: AdminLocals }) => {
+export const GET = async (context) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
     context,
@@ -86,7 +86,7 @@ export const GET: APIRoute = async (context: APIContext & { locals: AdminLocals 
  * API endpoint for managing a specific session (admin only)
  * POST /api/admin/sessions
  */
-export const POST: APIRoute = async (context: APIContext & { locals: AdminLocals }) => {
+export const POST = async (context) => {
   // Apply admin middleware to check for admin status and required permission
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
     context,

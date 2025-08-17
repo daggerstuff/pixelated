@@ -25,7 +25,7 @@ const logger = createBuildSafeLogger('default')
 // Initialize service
 const comparativeProgressService = new ComparativeProgressService(logger)
 
-export const get: APIRoute = async ({ request, cookies }) => {
+export const get = async ({ request, cookies }) => {
   try {
     // Basic authentication check (replace with your actual auth logic)
     const authToken = cookies.get('auth-token')?.value

@@ -1,6 +1,6 @@
-import { protectRoute } from '@/lib/auth/serverAuth'
+import { getCurrentUser } from '../../../lib/auth'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import type { AuthAPIContext } from '@lib/auth/apiRouteTypes.ts'
+// import type { AuthAPIContext } from '@lib/auth/apiRouteTypes.ts'
 
 const logger = createBuildSafeLogger('security-admin')
 
@@ -15,11 +15,37 @@ async function testSecurityAlert(
   return { success: true, alertId: `test-${Date.now()}` }
 }
 
-export const POST: APIRoute = protectRoute({
-  requiredRole: 'admin',
-})(async ({ request, locals }: AuthAPIContext) => {
+export const POST = async ({ request, cookies }) => {
   try {
-    const { user } = locals
+    // Authenticate request
+    const user = await getCurrentUser(cookies)
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'You must be authenticated to access this endpoint',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    // Check if user has admin role
+    if (!user.roles?.includes('admin')) {
+      return new Response(
+        JSON.stringify({
+          error: 'Forbidden',
+          message: 'Insufficient permissions',
+        }),
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
     // Get request body
     const body = await request.json()
     const alertType = body.alertType || 'suspicious_login'

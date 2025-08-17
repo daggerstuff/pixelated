@@ -1,6 +1,6 @@
 // API endpoint for bias detection preset scenarios
 
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import {
   PRESET_SCENARIOS,
   getPresetScenario,
@@ -8,7 +8,7 @@ import {
   getPresetScenariosByRiskLevel,
 } from '../../../../lib/utils/demo-helpers'
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET = async ({ url }) => {
   try {
     const { searchParams } = new URL(url)
     const category = searchParams.get('category')
@@ -180,7 +180,7 @@ export const GET: APIRoute = async ({ url }) => {
 }
 
 // POST endpoint for creating custom presets (future enhancement)
-export const POST: APIRoute = async () => {
+export const POST = async () => {
   return new Response(
     JSON.stringify({
       error: 'Custom preset creation not yet implemented',

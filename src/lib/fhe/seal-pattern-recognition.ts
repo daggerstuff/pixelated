@@ -30,7 +30,7 @@ const logger = createBuildSafeLogger('seal-pattern-recognition')
  */
 export class SealPatternRecognitionService implements FHEService {
   private sealService: SealService
-  private sealOperations: SealOperations
+  private _sealOperations: SealOperations
   private enhancedService: ReturnType<typeof createEnhancedFHEService>
 
   constructor() {
@@ -125,7 +125,6 @@ export class SealPatternRecognitionService implements FHEService {
 
       // Use SEAL for secure processing
       const scope = new SealResourceScope()
-      const _seal = this.sealService.getSeal()
 
       // Encrypt the features
       const encryptedFeatures = []
@@ -251,7 +250,6 @@ export class SealPatternRecognitionService implements FHEService {
 
       // Use SEAL for secure processing
       const scope = new SealResourceScope()
-      const _seal = this.sealService.getSeal()
 
       // Encrypt the session features
       const encryptedFeatures = []
@@ -377,7 +375,6 @@ export class SealPatternRecognitionService implements FHEService {
 
       // Use SEAL for secure processing
       const scope = new SealResourceScope()
-      const _seal = this.sealService.getSeal()
 
       // Encrypt the weighted factors
       const encryptedFactors = []
@@ -425,7 +422,7 @@ export class SealPatternRecognitionService implements FHEService {
     try {
       const correlations: RiskCorrelation[] = []
       for (const encryptedData of encryptedCorrelations) {
-        const _data = JSON.parse(encryptedData.encryptedData)
+        JSON.parse(encryptedData.encryptedData)
         // ...existing logic to generate RiskCorrelation(s) from _data...
         // (copy your current logic here, pushing to correlations array)
         // For each generated RiskCorrelation, push to correlations
@@ -634,8 +631,8 @@ export class SealPatternRecognitionService implements FHEService {
    * Analyze temporal patterns in encrypted features
    */
   private async analyzeTemporalPatterns(
-    encryptedFeatures: unknown[],
-    windowSize: number,
+    _encryptedFeatures: unknown[],
+    _windowSize: number,
     threshold: number,
   ): Promise<Array<{ type: string; confidence: number }>> {
     // This would use SEAL operations to detect patterns

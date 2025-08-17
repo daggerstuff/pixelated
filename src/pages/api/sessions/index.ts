@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -38,7 +38,7 @@ const ERROR_MESSAGES = {
  * - endDate: Filter sessions ending on or before this date (ISO string)
  * - limit: Maximum number of sessions to return (default: 50)
  */
-export const GET: APIRoute = protectRoute()(async ({ request, locals }) => {
+export const GET = protectRoute()(async ({ request, locals }) => {
   try {
     const { user } = locals
     if (!user) {

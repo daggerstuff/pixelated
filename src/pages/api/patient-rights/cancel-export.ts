@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { cancelDataExportRequest } from '../../../lib/services/patient-rights/dataPortabilityService'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectApi } from '../../../lib/auth/apiAuth'
@@ -12,7 +12,7 @@ const cancelExportSchema = z.object({
   reason: z.string().optional(),
 })
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST = async ({ request }) => {
   try {
     // Parse request body
     const body = await request.json()

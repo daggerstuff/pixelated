@@ -1,9 +1,9 @@
-import type { APIRoute, APIContext } from 'astro'
+// import type { APIRoute, APIContext } from 'astro'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
 import { aiRepository } from '../../../lib/db/ai/index.js'
 
-export const GET: APIRoute = async ({ request, url }: APIContext) => {
+export const GET = async ({ request, url }) => {
   let session
 
   try {

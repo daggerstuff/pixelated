@@ -7,7 +7,15 @@ import type {
   HistoricalComparison,
 } from '../../../../lib/types/bias-detection'
 
-export const POST: APIRoute = async ({ request }) => {
+interface IncludeComponents {
+  analysis: boolean
+  counterfactual: boolean
+  historical: boolean
+  recommendations: boolean
+  demographics: boolean
+}
+
+export const POST = async ({ request }) => {
   try {
     const body = await request.json()
 
@@ -29,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
       counterfactualScenarios = [],
       historicalComparison = null,
       format = 'json',
-      includeComponents = {
+      includeComponents: IncludeComponents = {
         analysis: true,
         counterfactual: true,
         historical: true,

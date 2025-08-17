@@ -1,6 +1,6 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '../../../../lib/auth/serverAuth'
+import { getCurrentUser } from '../../../../lib/auth'
 import { createDataDeletionRequest } from '../../../../lib/services/patient-rights/dataDeleteService'
 
 // Create a logger instance for this endpoint
@@ -17,11 +17,36 @@ interface DeleteRequestData {
   'hipaa-confirmation': boolean
 }
 
-export const POST: APIRoute = protectRoute({
-  requiredRole: 'admin',
-})(async ({ request, locals }) => {
+export const POST = async ({ request, cookies }) => {
   try {
-    const { user } = locals
+    // Authenticate request
+    const user = await getCurrentUser(cookies)
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Unauthorized',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    // Check if user has admin role
+    if (!user.roles?.includes('admin')) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Insufficient permissions',
+        }),
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
 
     // Parse and validate the form data
     const formData = await request.formData()
@@ -149,4 +174,4 @@ export const POST: APIRoute = protectRoute({
       },
     )
   }
-})
+}

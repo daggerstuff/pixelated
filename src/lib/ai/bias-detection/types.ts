@@ -2,9 +2,9 @@
 
 
 export interface BiasThresholdsConfig {
-  warningLevel: number
-  highLevel: number
-  criticalLevel: number
+  warning: number
+  high: number
+  critical: number
 }
 
 export interface BiasLayerWeights {
@@ -25,9 +25,9 @@ export interface BiasMetricsConfig {
 
   // Detection thresholds
   thresholds?: {
-    warningLevel: number // 0.3 - Bias score above which warnings are issued
-    highLevel: number // 0.6 - Bias score indicating high bias
-    criticalLevel: number // 0.8 - Bias score requiring immediate action
+    warning: number // 0.3 - Bias score above which warnings are issued
+    high: number // 0.6 - Bias score indicating high bias
+    critical: number // 0.8 - Bias score requiring immediate action
   }
 
   // Layer-specific weights for overall bias scoring
@@ -73,6 +73,17 @@ export interface BiasDetectionConfig {
   hipaaCompliant?: boolean
   dataMaskingEnabled?: boolean
   auditLogging?: boolean
+  // Missing properties that are used in config.ts
+  loggingConfig?: {
+    level?: string
+    enableConsole?: boolean
+    enableFile?: boolean
+  }
+  mlToolkitConfig?: {
+    aif360?: { enabled?: boolean }
+    fairlearn?: { enabled?: boolean }
+    tensorflow?: { enabled?: boolean }
+  }
 }
 
 export interface BiasMetricsConfig {

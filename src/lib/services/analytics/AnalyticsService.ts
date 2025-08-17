@@ -24,6 +24,13 @@ import {
 const logger = createBuildSafeLogger('analytics')
 
 /**
+ * Simple ID generator for analytics events
+ */
+function generateEventId(): string {
+  return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+}
+
+/**
  * Analytics service for tracking events and metrics with HIPAA compliance
  */
 export class AnalyticsService {
@@ -45,10 +52,12 @@ export class AnalyticsService {
   async trackEvent(data: EventData): Promise<string> {
     try {
       // Validate event data
+      logger.debug('Validating event data:', data)
       const validatedData = EventDataSchema.parse(data)
+      logger.debug('Event data validated successfully:', validatedData)
 
       // Generate event ID
-      const eventId = crypto.randomUUID()
+      const eventId = generateEventId()
 
       // Create event object
       const event = EventSchema.parse({
@@ -78,7 +87,9 @@ export class AnalyticsService {
   async trackMetric(data: Metric): Promise<void> {
     try {
       // Validate metric data
+      logger.debug('Validating metric data:', data)
       const metric = MetricSchema.parse(data)
+      logger.debug('Metric data validated successfully:', metric)
 
       // Store metric in time series
       await this.redisClient.zadd(

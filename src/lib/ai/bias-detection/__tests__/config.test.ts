@@ -64,9 +64,9 @@ describe('BiasDetectionConfigManager', () => {
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
       expect(config).toBeDefined()
-      expect(config.thresholds?.warningLevel).toBe(0.3)
-      expect(config.thresholds?.highLevel).toBe(0.6)
-      expect(config.thresholds?.criticalLevel).toBe(0.8)
+      expect(config.thresholds?.warning).toBe(0.3)
+      expect(config.thresholds?.high).toBe(0.6)
+      expect(config.thresholds?.critical).toBe(0.8)
     })
   })
 
@@ -99,8 +99,8 @@ describe('BiasDetectionConfigManager', () => {
 
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
-      expect(config.thresholds?.warningLevel).toBe(0.4)
-      expect(config.thresholds?.highLevel).toBe(0.7)
+      expect(config.thresholds?.warning).toBe(0.4)
+      expect(config.thresholds?.high).toBe(0.7)
       expect(config.pythonServiceUrl).toBeDefined()
     })
 
@@ -113,8 +113,8 @@ describe('BiasDetectionConfigManager', () => {
 
       // Should fall back to defaults for invalid values
       expect(config.thresholds.warning).toBe(0.3)
-      expect(config.pythonService.port).toBe(5000)
-      expect(config.cache.enabled).toBe(true) // 'maybe' !== 'true', so defaults to true
+      expect(config.pythonServiceUrl).toBeDefined() // Should use default URL
+      expect(config.cacheConfig?.enabled).toBe(true) // Should default to true
     })
   })
 

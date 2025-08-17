@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+// import type { APIRoute, APIContext } from 'astro'
 import type { AIMessage } from '../../../lib/ai/models/ai-types.js'
 // Import the type expected by InterventionAnalysisService
 import type { AIService } from '../../../lib/ai/models/types.js'
@@ -11,7 +11,7 @@ import { aiRepository } from '../../../lib/db/ai/index.js'
 /**
  * API route for intervention effectiveness analysis
  */
-export const POST: APIRoute = async ({ request }: APIContext) => {
+export const POST = async ({ request }) => {
   let session: Awaited<ReturnType<typeof getSession>> | null = null
 
   try {

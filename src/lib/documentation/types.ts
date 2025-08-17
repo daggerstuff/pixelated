@@ -15,6 +15,17 @@ export interface SessionDocumentation {
   readonly nextSteps: readonly string[]
   readonly riskAssessment: RiskAssessment
   readonly metadata: SessionMetadata
+  // Additional properties used in SessionDocumentation component
+  readonly summary?: string
+  readonly keyInsights?: readonly string[]
+  readonly therapeuticTechniques?: readonly string[]
+  readonly treatmentProgress?: string
+  readonly emotionalPatterns?: readonly string[]
+  readonly clientStrengths?: readonly string[]
+  readonly emergentIssues?: readonly string[]
+  readonly recommendedFollowUp?: readonly string[]
+  readonly nextSessionPlan?: string
+  readonly outcomePredictions?: readonly string[]
 }
 
 export interface RiskAssessment {

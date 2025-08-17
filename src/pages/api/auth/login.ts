@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+// import type { APIRoute, APIContext } from 'astro'
 import { fheService } from '../../../lib/fhe'
 import { EncryptionMode } from '../../../lib/fhe/types'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
@@ -18,7 +18,7 @@ interface User {
   email: string
 }
 
-export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
+export const POST = async ({ request, cookies }) => {
   try {
     const body = (await request.json()) as LoginRequest
 

@@ -1,4 +1,5 @@
-import type { APIContext } from 'astro'
+// import type { APIRoute } from 'astro/dist/types/public/common.d.ts'
+// import type { APIContext } from 'astro/dist/types/public/context.d.ts'
 import { ContactService } from '@/lib/services/contact/ContactService'
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 
@@ -40,7 +41,7 @@ function getClientIP(request: Request): string {
   return '127.0.0.1'
 }
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }) => {
   const startTime = Date.now()
 
   try {

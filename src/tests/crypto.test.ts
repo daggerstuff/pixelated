@@ -18,8 +18,6 @@ interface SessionData {
 // Import the actual implementation
 import { createCryptoSystem } from '../lib/crypto'
 
-// Mock createFHESystem instead of importing it
-const createFHESystem = vi.fn()
 
 // Check if FHE tests should be skipped
 const SKIP_FHE_TESTS = process.env.SKIP_FHE_TESTS === 'true'
@@ -746,7 +744,6 @@ describe('createCryptoSystem', () => {
 describe('Fully Homomorphic Encryption Integration Tests', () => {
   // Skip all these tests if SKIP_FHE_TESTS is true
   const itOrSkip = SKIP_FHE_TESTS ? (it as TestFunction).skip : it
-  let cryptoSystem: CryptoSystem
   let fheSystem: ExtendedFHESystem
 
   beforeEach(() => {

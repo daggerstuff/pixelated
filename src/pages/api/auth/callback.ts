@@ -2,7 +2,7 @@ import { AuditEventType, createAuditLog } from '@/lib/audit'
 import { MongoAuthService } from '@/services/mongoAuth.service'
 import mongodb from '@/config/mongodb.config'
 
-export const GET: APIRoute = async ({
+export const GET = async ({
   url,
   cookies,
   redirect,

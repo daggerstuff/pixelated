@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -14,7 +14,7 @@ import path from 'node:path'
  * - browsers: string - Comma-separated list of browsers to filter reports for
  * - since: string - ISO timestamp - Only return issues that occurred after this timestamp
  */
-export const GET: APIRoute = async ({ request }) => {
+export const GET = async ({ request }) => {
   try {
     const url = new URL(request.url)
     const latestOnly = url.searchParams.get('latest') === 'true'

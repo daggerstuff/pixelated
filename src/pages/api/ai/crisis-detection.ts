@@ -130,8 +130,8 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
           try {
             await crisisProtocolInstance.handleCrisis(
               session.user.id,
-              session.session?.access_token?.substring(0, 8) ||
-                `batch-item-session-${crypto.randomUUID()}`, // Use part of access token or generate UUID
+              session.session?.sessionId?.substring(0, 8) ||
+                `batch-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
               detection.content, // Text sample from CrisisDetectionResult
               detection.confidence, // Detection score from CrisisDetectionResult
               detection.category ? [detection.category] : [], // Detected risks from CrisisDetectionResult
@@ -161,8 +161,8 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
         try {
           await CrisisProtocol.getInstance().handleCrisis(
             session.user.id,
-            session.session?.access_token?.substring(0, 8) ||
-              `single-item-session-${crypto.randomUUID()}`, // Use part of access token or generate UUID
+            session.session?.sessionId?.substring(0, 8) ||
+              `single-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
             singleResult.content, // Text sample from CrisisDetectionResult
             singleResult.confidence, // Detection score from CrisisDetectionResult
             singleResult.category ? [singleResult.category] : [], // Detected risks from CrisisDetectionResult

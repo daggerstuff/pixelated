@@ -17,6 +17,14 @@ import { IconFilter, IconX } from '@/components/ui/icons'
 
 import { cn } from '@/lib/utils'
 
+export interface Props {
+  availableEmotionTypes?: string[]
+  availablePatternTypes?: string[]
+  availablePatternCategories?: string[]
+  className?: string
+  compact?: boolean
+}
+
 const {
   availableEmotionTypes = [],
   availablePatternTypes = [],

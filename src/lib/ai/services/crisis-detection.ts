@@ -96,7 +96,7 @@ export class CrisisDetectionService {
 
   async detectCrisis(
     text: string,
-    options: CrisisDetectionOptions,
+    _options: CrisisDetectionOptions,
   ): Promise<CrisisDetectionResult> {
     try {
       // Perform keyword-based analysis first (fast check)
@@ -180,7 +180,7 @@ export class CrisisDetectionService {
   } {
     const lowerText = text.toLowerCase()
     const indicators: string[] = []
-    let score = 0
+    let _score = 0
     let maxCategoryScore = 0
 
     // Check each category with different weights
@@ -213,7 +213,7 @@ export class CrisisDetectionService {
       if (categoryMatches > 0) {
         // Calculate category score based on matches and weight
         const categoryScore = Math.min(categoryMatches * categoryWeight * 0.8, categoryWeight)
-        score += categoryScore
+        _score += categoryScore
         maxCategoryScore = Math.max(maxCategoryScore, categoryScore)
       }
     }

@@ -4,7 +4,7 @@ export const prerender = false
  * Simple health check endpoint for Docker containers
  * Returns basic service status without external dependencies
  */
-export const GET: APIRoute = async () => {
+export const GET = async () => {
   const startTime = performance.now()
 
   try {

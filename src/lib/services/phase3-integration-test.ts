@@ -57,8 +57,8 @@ export class Phase3IntegrationTester {
     this.emotionMapper = new MultidimensionalEmotionMapper()
     this.analyticsService = new AnalyticsService()
     this.redisService = new RedisService({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
+      host: process.env['REDIS_HOST'] || 'localhost',
+      port: parseInt(process.env['REDIS_PORT'] || '6379'),
       retryAttempts: 3,
       retryDelay: 1000
     })
@@ -550,63 +550,63 @@ export class Phase3IntegrationTester {
       const maxScore = 10
 
       // Check environment configuration
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env['NODE_ENV'] === 'production') {
         readinessScore += 1
       } else {
         recommendations.push('Set NODE_ENV=production for production deployment')
       }
 
       // Check Redis configuration
-      if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
+      if (process.env['REDIS_HOST'] && process.env['REDIS_PORT']) {
         readinessScore += 1
       } else {
         recommendations.push('Configure Redis connection parameters')
       }
 
       // Check logging configuration
-      if (process.env.LOG_LEVEL) {
+      if (process.env['LOG_LEVEL']) {
         readinessScore += 1
       } else {
         recommendations.push('Configure LOG_LEVEL for production logging')
       }
 
       // Check security configurations
-      if (process.env.JWT_SECRET && process.env.ENCRYPTION_KEY) {
+      if (process.env['JWT_SECRET'] && process.env['ENCRYPTION_KEY']) {
         readinessScore += 2
       } else {
         recommendations.push('Configure JWT_SECRET and ENCRYPTION_KEY for security')
       }
 
       // Check database configuration
-      if (process.env.DATABASE_URL || process.env.MONGODB_URI) {
+      if (process.env['DATABASE_URL'] || process.env['MONGODB_URI']) {
         readinessScore += 1
       } else {
         recommendations.push('Configure database connection')
       }
 
       // Check monitoring configuration
-      if (process.env.MONITORING_ENABLED) {
+      if (process.env['MONITORING_ENABLED']) {
         readinessScore += 1
       } else {
         recommendations.push('Enable monitoring for production')
       }
 
       // Check error tracking
-      if (process.env.SENTRY_DSN || process.env.ERROR_TRACKING_URL) {
+      if (process.env['SENTRY_DSN'] || process.env['ERROR_TRACKING_URL']) {
         readinessScore += 1
       } else {
         recommendations.push('Configure error tracking service')
       }
 
       // Check rate limiting
-      if (process.env.RATE_LIMIT_ENABLED) {
+      if (process.env['RATE_LIMIT_ENABLED']) {
         readinessScore += 1
       } else {
         recommendations.push('Enable rate limiting for production')
       }
 
       // Check CORS configuration
-      if (process.env.CORS_ORIGIN) {
+      if (process.env['CORS_ORIGIN']) {
         readinessScore += 1
       } else {
         recommendations.push('Configure CORS for production')

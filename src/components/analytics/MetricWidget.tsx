@@ -66,6 +66,9 @@ export function MetricWidget({
       const interval = setInterval(loadData, refreshInterval)
       return () => clearInterval(interval)
     }
+    
+    // Return undefined for the case where no cleanup is needed
+    return undefined
   }, [metricName, fetchMetric, refreshInterval])
 
   // Calculate percentage change
