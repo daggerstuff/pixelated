@@ -95,7 +95,7 @@ export function SimulationContainer({
         return [
           {
             type: 'scenario',
-            content: `${currentScenario.contextDescription} ${currentScenario.clientBackground}`,
+            content: `${currentScenario?.['contextDescription'] || ''} ${currentScenario?.['clientBackground'] || ''}`,
             timestamp: Date.now(),
           },
         ]

@@ -49,7 +49,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               id="enhancedModelsCheckbox"
               type="checkbox"
               checked={isUsingEnhancedModels}
-              onChange={(e) => toggleEnhancedModels(e.target.checked)}
+              onChange={(e) => toggleEnhancedModels(e.target?.['checked'] || false)}
               disabled={!isConnected}
             />
 

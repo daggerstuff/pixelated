@@ -27,12 +27,12 @@ async function runPhase3Tests() {
       async () => {
         try {
           // Simple health check - attempt to create and retrieve a test memory
-          const testMemory = await phase3IntegrationTester['memoryService'].createMemory('health-check', {
+          const testMemory = await phase3IntegrationTester?.['memoryService']?.createMemory('health-check', {
             userId: 'health-check-user',
             tags: ['health-check'],
             metadata: { timestamp: Date.now() }
           })
-          return { healthy: !!testMemory.id, responseTime: 100 }
+          return { healthy: !!testMemory?.['id'], responseTime: 100 }
         } catch (error) {
           return { healthy: false, responseTime: 0 }
         }
@@ -45,7 +45,7 @@ async function runPhase3Tests() {
       'redis-service',
       async () => {
         try {
-          const isHealthy = await phase3IntegrationTester['redisService'].isHealthy()
+          const isHealthy = await phase3IntegrationTester?.['redisService']?.isHealthy()
           return { healthy: isHealthy, responseTime: 50 }
         } catch (error) {
           return { healthy: false, responseTime: 0 }

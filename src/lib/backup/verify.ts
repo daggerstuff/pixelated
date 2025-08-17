@@ -82,7 +82,7 @@ export class BackupVerificationService extends EventEmitter {
           results.push({
             file,
             isValid: false,
-            error: error.message,
+            error: error?.['message'] || 'Unknown error',
           })
         }
       }
@@ -91,7 +91,7 @@ export class BackupVerificationService extends EventEmitter {
 
       return results
     } catch (error) {
-      throw new Error(`Failed to verify backups: ${error.message}`)
+      throw new Error(`Failed to verify backups: ${error?.['message'] || 'Unknown error'}`)
     }
   }
 

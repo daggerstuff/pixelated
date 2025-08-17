@@ -105,39 +105,39 @@ export default function EmotionTemporalAnalysisChart({
 
   // Format data for critical points visualization
   const prepareCriticalPointsData = () => {
-    return data.criticalPoints.map((point) => ({
-      name: point.emotion,
-      intensity: point.intensity,
-      timestamp: point.timestamp.toLocaleString(),
-      sessionId: point.sessionId,
-      color: getEmotionColor(point.emotion),
-    }))
+    return data?.['criticalPoints']?.map((point) => ({
+      name: point?.['emotion'],
+      intensity: point?.['intensity'],
+      timestamp: point?.['timestamp']?.toLocaleString(),
+      sessionId: point?.['sessionId'],
+      color: getEmotionColor(point?.['emotion']),
+    })) || []
   }
 
   // Format data for progression visualization
   const prepareProgressionData = () => {
-    const { progression } = data
+    const { progression } = data || {}
 
     return [
       {
         name: 'Overall Improvement',
-        value: progression.overallImprovement,
-        fill: progression.overallImprovement >= 0 ? '#22c55e' : '#ef4444',
+        value: progression?.['overallImprovement'] || 0,
+        fill: (progression?.['overallImprovement'] || 0) >= 0 ? '#22c55e' : '#ef4444',
       },
       {
         name: 'Stability Change',
-        value: progression.stabilityChange,
-        fill: progression.stabilityChange >= 0 ? '#3b82f6' : '#f97316',
+        value: progression?.['stabilityChange'] || 0,
+        fill: (progression?.['stabilityChange'] || 0) >= 0 ? '#3b82f6' : '#f97316',
       },
       {
         name: 'Positive Emotion Change',
-        value: progression.positiveEmotionChange,
-        fill: progression.positiveEmotionChange >= 0 ? '#4ade80' : '#f59e0b',
+        value: progression?.['positiveEmotionChange'] || 0,
+        fill: (progression?.['positiveEmotionChange'] || 0) >= 0 ? '#4ade80' : '#f59e0b',
       },
       {
         name: 'Negative Emotion Change',
-        value: progression.negativeEmotionChange,
-        fill: progression.negativeEmotionChange >= 0 ? '#8b5cf6' : '#6366f1',
+        value: progression?.['negativeEmotionChange'] || 0,
+        fill: (progression?.['negativeEmotionChange'] || 0) >= 0 ? '#8b5cf6' : '#6366f1',
       },
     ]
   }
@@ -145,9 +145,9 @@ export default function EmotionTemporalAnalysisChart({
   // Format data for transitions visualization
   const prepareTransitionsData = () => {
     // Get top 10 most frequent transitions
-    return data.transitions.slice(0, 10).map((transition) => ({
-      name: `${transition.from} → ${transition.to}`,
-      frequency: transition.frequency,
+    return data?.['transitions']?.slice(0, 10)?.map((transition) => ({
+      name: `${transition?.['from']} → ${transition?.['to']}`,
+      frequency: transition?.['frequency'],
       duration: transition.avgDuration / (1000 * 60), // Convert to minutes
       from: transition.from,
       to: transition.to,

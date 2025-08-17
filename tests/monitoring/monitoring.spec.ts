@@ -90,9 +90,9 @@ test.describe('Health Check Monitoring', () => {
 
         // Validate based on the versioned format in the codebase
         const body = await v1Response.json()
-        expect(body.status).toBeTruthy()
-        expect(body.api).toBeTruthy()
-        expect(body.api.status).toBeTruthy()
+        expect(body['status']).toBeTruthy()
+        expect(body['api']).toBeTruthy()
+        expect(body['api']['status']).toBeTruthy()
         console.log('Using v1 health endpoint')
       } else {
         // Base endpoint exists

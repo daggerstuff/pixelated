@@ -9,7 +9,7 @@ export const GET = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    if (!authResult?.['authenticated']) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -25,7 +25,7 @@ export const GET = async ({ request }: APIContext) => {
     }
 
     // Get user's notification preferences
-    const preferences = await notificationService.getPreferences(authResult.user?.id)
+    const preferences = await notificationService.getPreferences(authResult?.['user']?.['id'])
 
     return new Response(JSON.stringify(preferences), {
       status: 200,

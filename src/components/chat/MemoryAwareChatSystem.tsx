@@ -328,7 +328,7 @@ export function MemoryAwareChatSystem({
 
     return (
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-        {messages.filter((m) => m.memoryStored).length > 0 && (
+        {messages.filter((m) => m?.['memoryStored']).length > 0 && (
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span>Messages stored in memory</span>
