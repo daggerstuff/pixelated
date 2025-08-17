@@ -244,3 +244,32 @@ export async function trackSuspiciousActivity(
     url: request.url,
   })
 }
+/**
+ * API route protection utility for server-side routes.
+ * Usage: await requirePageAuth({ request, requestIp, requiredRole })
+ * Returns: { authenticated: boolean, user: AuthUser | null, reason?: string }
+ */
+export async function requirePageAuth({
+  request,
+  requestIp,
+  requiredRole = 'admin',
+  validateIPMatch = true,
+  validateUserAgent = true,
+}: ServerAuthOptions): Promise<{
+  authenticated: boolean
+  user: AuthUser | null
+  reason?: string
+}> {
+  return verifyServerAuth({
+    request,
+    requestIp,
+    requiredRole,
+    validateIPMatch,
+    validateUserAgent,
+  })
+}
+
+/**
+ * Alias export for API route protection
+ */
+export { requirePageAuth as protectRoute }

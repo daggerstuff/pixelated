@@ -5,6 +5,7 @@ import type {
   BiasAnalysisResults,
   CounterfactualScenario,
   HistoricalComparison,
+  ExportData,
 } from '../../../../lib/types/bias-detection'
 
 interface IncludeComponents {
@@ -148,7 +149,7 @@ export const POST = async ({ request }) => {
 }
 
 // Helper function to convert export data to CSV format
-function convertToCSV(exportData: Record<string, unknown>): string {
+function convertToCSV(exportData: ExportData): string {
   const csvRows = []
 
   // Headers
@@ -226,7 +227,7 @@ function convertToCSV(exportData: Record<string, unknown>): string {
 }
 
 // Helper function to convert export data to text format
-function convertToText(exportData: Record<string, unknown>): string {
+function convertToText(exportData: ExportData): string {
   let content = `BIAS DETECTION ANALYSIS REPORT\n`
   content += `Generated: ${new Date().toLocaleString()}\n`
   content += `${'='.repeat(50)}\n\n`

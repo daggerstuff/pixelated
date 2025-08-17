@@ -14,8 +14,10 @@ import type { BiasDashboardData } from '@/lib/ai/bias-detection'
 const { GET } = await import('./dashboard')
 
 describe('Bias Detection Dashboard API Endpoint', () => {
-  let mockLogger: ReturnType<typeof vi.fn>
-  let mockBiasEngine: ReturnType<typeof vi.fn>
+  let mockLogger: any
+  let mockBiasEngine: {
+    getDashboardData: ReturnType<typeof vi.fn>
+  }
 
   const mockDashboardData: BiasDashboardData = {
     summary: {
@@ -231,7 +233,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       error: vi.fn(),
       debug: vi.fn(),
       warn: vi.fn(),
-    }
+    } as any
     vi.mocked(getLogger).mockReturnValue(mockLogger)
 
     global.Response = vi

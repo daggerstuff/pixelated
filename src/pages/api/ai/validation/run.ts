@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     // Authenticate the request
     const authResult = await isAuthenticated(request)
-    if (!authResult.authenticated) {
+    if (!authResult['authenticated']) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -30,16 +30,16 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Check user permissions (must be admin)
-    if (!authResult.user?.isAdmin) {
+    if (!authResult['user']?.['isAdmin']) {
       // Create audit log for unauthorized access attempt
       await createAuditLog(
         AuditEventType.SECURITY_EVENT,
         'validation-pipeline-run-unauthorized',
-        authResult.user?.id || 'unknown',
+        authResult['user']?.['id'] || 'unknown',
         'validation-api',
         {
-          userId: authResult.user?.id,
-          email: authResult.user?.email,
+          userId: authResult['user']?.['id'],
+          email: authResult['user']?.['email'],
         },
         AuditEventStatus.FAILURE,
       )

@@ -78,6 +78,11 @@ export interface BiasDetectionConfig {
     level?: string
     enableConsole?: boolean
     enableFile?: boolean
+    filePath?: string
+    maxFileSize?: string
+    maxFiles?: number
+    enableStructured?: boolean
+    enableDebug?: boolean
   }
   mlToolkitConfig?: {
     aif360?: { enabled?: boolean }

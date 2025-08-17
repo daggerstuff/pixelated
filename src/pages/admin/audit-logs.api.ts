@@ -1,5 +1,5 @@
 import type { BaseAPIContext } from '../../lib/auth/apiRouteTypes';
-import { requirePageAuth } from '../../lib/auth/serverAuth';
+import { requirePageAuth } from '../../lib/auth';
 
 /**
  * Handles GET requests for the admin audit logs endpoint.

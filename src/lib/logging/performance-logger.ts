@@ -42,16 +42,16 @@ export class PerformanceLogger {
     this.metricsBuffer.push(metric)
 
     // Log warnings for performance issues
-    if (metric.latency > 3000) {
+    if (metric['latency'] > 3000) {
       // 3 seconds threshold
       logger.warn(
-        `[Performance Warning] Slow request detected (${metric.latency}ms) for model ${metric.model}`,
+        `[Performance Warning] Slow request detected (${metric['latency']}ms) for model ${metric['model']}`,
       )
     }
 
-    if (metric.totalTokens && metric.totalTokens > 1000) {
+    if (metric['totalTokens'] && metric['totalTokens'] > 1000) {
       logger.warn(
-        `[Performance Warning] High token usage detected (${metric.totalTokens} tokens) for model ${metric.model}`,
+        `[Performance Warning] High token usage detected (${metric['totalTokens']} tokens) for model ${metric['model']}`,
       )
     }
 
@@ -88,7 +88,7 @@ export class PerformanceLogger {
   }
 
   public async getMetrics(timeRange: { start: Date; end: Date }) {
-    if (!timeRange?.start || !timeRange?.end) {
+    if (!timeRange?.['start'] || !timeRange?.['end']) {
       logger.error('Invalid time range provided')
       return []
     }
@@ -105,8 +105,8 @@ export class PerformanceLogger {
 
         const fileDate = file.replace('metrics-', '').replace('.jsonl', '')
         if (
-          fileDate >= timeRange.start.toISOString().split('T')[0] &&
-          fileDate <= timeRange.end.toISOString().split('T')[0]
+          fileDate >= timeRange['start'].toISOString().split('T')[0] &&
+          fileDate <= timeRange['end'].toISOString().split('T')[0]
         ) {
           const content = await fs.readFile(`${this.logDir}/${file}`, 'utf-8')
           const fileMetrics = content

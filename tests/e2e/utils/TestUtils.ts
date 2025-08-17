@@ -1,6 +1,46 @@
 import { Page, expect } from '@playwright/test';
 
 export class TestUtils {
+  private page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  async setupTestEnvironment() {
+    // Setup test environment
+    await this.page.goto('/');
+  }
+
+  async cleanupTestEnvironment() {
+    // Cleanup test environment
+    await this.page.close();
+  }
+
+  async loginAsTestUser(page?: Page) {
+    const targetPage = page || this.page;
+    await targetPage.goto('/login');
+    await targetPage.fill('[data-testid="email-input"]', 'test@example.com');
+    await targetPage.fill('[data-testid="password-input"]', 'password123');
+    await targetPage.click('[data-testid="login-button"]');
+    await targetPage.waitForURL('/dashboard');
+  }
+
+  async logout(page?: Page) {
+    const targetPage = page || this.page;
+    await targetPage.click('[data-testid="user-menu"]');
+    await targetPage.click('[data-testid="logout-button"]');
+    await targetPage.waitForURL('/login');
+  }
+
+  async performLogin(page: Page, email: string, password: string) {
+    await page.goto('/login');
+    await page.fill('[data-testid="email-input"]', email);
+    await page.fill('[data-testid="password-input"]', password);
+    await page.click('[data-testid="login-button"]');
+    await page.waitForURL('/dashboard');
+  }
+
   static async waitForNetworkIdle(page: Page, timeout = 30000) {
     await page.waitForLoadState('networkidle', { timeout });
   }

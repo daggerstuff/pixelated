@@ -361,44 +361,65 @@ const defaultPreferences = {
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('ai-preferences-form')
-    const resetButton = document.getElementById('reset-defaults')
-    const loadingIndicator = document.getElementById('ai-preferences-loading')
+    const form = document.getElementById('ai-preferences-form') as HTMLFormElement | null
+    const resetButton = document.getElementById('reset-defaults') as HTMLButtonElement | null
+    const loadingIndicator = document.getElementById('ai-preferences-loading') as HTMLElement | null
 
     async function fetchPreferences() {
-      loadingIndicator.classList.remove('hidden')
+      loadingIndicator?.classList.remove('hidden')
       try {
         const res = await fetch('/api/v1/preferences')
         if (!res.ok) throw new Error('Failed to load preferences')
         const { preferences } = await res.json()
         setFormValues(preferences)
-      } catch (err) {
+      } catch (err: any) {
         showNotification('Failed to load preferences', 'error')
       } finally {
-        loadingIndicator.classList.add('hidden')
+        loadingIndicator?.classList.add('hidden')
       }
     }
 
-    function setFormValues(prefs) {
-      if (!prefs) return
-      form.defaultModel.value = prefs.defaultModel
-      Array.from(form.preferredModels).forEach((cb) => {
+    function setFormValues(prefs: any) {
+      if (!prefs || !form) return
+      
+      const defaultModelElement = form.elements.namedItem('defaultModel') as HTMLSelectElement
+      if (defaultModelElement) defaultModelElement.value = prefs.defaultModel
+      
+      const preferredModelsElements = form.querySelectorAll('input[name="preferredModels"]') as NodeListOf<HTMLInputElement>
+      preferredModelsElements.forEach((cb) => {
         cb.checked = prefs.preferredModels?.includes(cb.value)
       })
-      Array.from(form.responseLength).forEach((rb) => {
+      
+      const responseLengthElements = form.querySelectorAll('input[name="responseLength"]') as NodeListOf<HTMLInputElement>
+      responseLengthElements.forEach((rb) => {
         rb.checked = rb.value === prefs.responseLength
       })
-      Array.from(form.responseStyle).forEach((rb) => {
+      
+      const responseStyleElements = form.querySelectorAll('input[name="responseStyle"]') as NodeListOf<HTMLInputElement>
+      responseStyleElements.forEach((rb) => {
         rb.checked = rb.value === prefs.responseStyle
       })
-      form.enableSentimentAnalysis.checked = !!prefs.enableSentimentAnalysis
-      form.enableCrisisDetection.checked = !!prefs.enableCrisisDetection
-      form.crisisDetectionSensitivity.value = prefs.crisisDetectionSensitivity
-      form.saveAnalysisResults.checked = !!prefs.saveAnalysisResults
-      form.aiSuggestions.checked = !!prefs.aiSuggestions
+      
+      const enableSentimentAnalysisElement = form.elements.namedItem('enableSentimentAnalysis') as HTMLInputElement
+      if (enableSentimentAnalysisElement) enableSentimentAnalysisElement.checked = !!prefs.enableSentimentAnalysis
+      
+      const enableCrisisDetectionElement = form.elements.namedItem('enableCrisisDetection') as HTMLInputElement
+      if (enableCrisisDetectionElement) enableCrisisDetectionElement.checked = !!prefs.enableCrisisDetection
+      
+      const crisisDetectionSensitivityElement = form.elements.namedItem('crisisDetectionSensitivity') as HTMLSelectElement
+      if (crisisDetectionSensitivityElement) crisisDetectionSensitivityElement.value = prefs.crisisDetectionSensitivity
+      
+      const saveAnalysisResultsElement = form.elements.namedItem('saveAnalysisResults') as HTMLInputElement
+      if (saveAnalysisResultsElement) saveAnalysisResultsElement.checked = !!prefs.saveAnalysisResults
+      
+      const aiSuggestionsElement = form.elements.namedItem('aiSuggestions') as HTMLInputElement
+      if (aiSuggestionsElement) aiSuggestionsElement.checked = !!prefs.aiSuggestions
+      
       // Show/hide crisis sensitivity
-      document.getElementById('crisisDetectionSensitivityGroup').style.display =
-        form.enableCrisisDetection.checked ? 'block' : 'none'
+      const crisisDetectionSensitivityGroup = document.getElementById('crisisDetectionSensitivityGroup')
+      if (crisisDetectionSensitivityGroup && enableCrisisDetectionElement) {
+        crisisDetectionSensitivityGroup.style.display = enableCrisisDetectionElement.checked ? 'block' : 'none'
+      }
     }
 
     if (form) {
@@ -429,7 +450,7 @@ const defaultPreferences = {
             throw new Error(err.error || 'Failed to save preferences')
           }
           showNotification('Preferences saved successfully!', 'success')
-        } catch (error) {
+        } catch (error: any) {
           showNotification(
             error.message || 'Failed to save preferences',
             'error',
@@ -450,7 +471,7 @@ const defaultPreferences = {
             if (!res.ok) throw new Error('Failed to reset preferences')
             await fetchPreferences()
             showNotification('Preferences reset to defaults.', 'success')
-          } catch (error) {
+          } catch (error: any) {
             showNotification(
               error.message || 'Failed to reset preferences',
               'error',
@@ -461,7 +482,7 @@ const defaultPreferences = {
     }
 
     // Notification helper function
-    function showNotification(message, type = 'info') {
+    function showNotification(message: string, type: string = 'info') {
       const notification = document.createElement('div')
       notification.className = `notification ${type}`
       notification.textContent = message

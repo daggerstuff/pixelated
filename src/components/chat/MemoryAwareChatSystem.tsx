@@ -85,16 +85,16 @@ export function MemoryAwareChatSystem({
       const exportData = {
         timestamp: new Date().toISOString(),
         sessionId,
-        userId: user?.id,
+        userId: user?.['id'],
         summary,
         messageCount: messages.length,
         memoryStats,
         messages: messages.map((msg) => ({
-          role: msg.role,
-          content: msg.content,
-          timestamp: msg.timestamp,
-          analyzed: msg.analyzed,
-          memoryStored: msg.memoryStored,
+          role: msg['role'],
+          content: msg['content'],
+          timestamp: msg['timestamp'],
+          analyzed: msg['analyzed'],
+          memoryStored: msg['memoryStored'],
         })),
       }
 
@@ -132,7 +132,7 @@ export function MemoryAwareChatSystem({
           <div className="grid grid-cols-3 gap-3 text-sm">
             <div className="text-center p-2 bg-blue-50 dark:bg-blue-950/20 rounded">
               <div className="font-semibold text-blue-700 dark:text-blue-300">
-                {memoryStats.totalMemories}
+                {memoryStats?.['totalMemories']}
               </div>
               <div className="text-xs text-blue-600 dark:text-blue-400">
                 Total Memories
@@ -140,7 +140,7 @@ export function MemoryAwareChatSystem({
             </div>
             <div className="text-center p-2 bg-green-50 dark:bg-green-950/20 rounded">
               <div className="font-semibold text-green-700 dark:text-green-300">
-                {memoryStats.sessionMemories}
+                {memoryStats?.['sessionMemories']}
               </div>
               <div className="text-xs text-green-600 dark:text-green-400">
                 This Session
@@ -148,7 +148,7 @@ export function MemoryAwareChatSystem({
             </div>
             <div className="text-center p-2 bg-purple-50 dark:bg-purple-950/20 rounded">
               <div className="font-semibold text-purple-700 dark:text-purple-300">
-                {memoryStats.contextUsed}
+                {memoryStats?.['contextUsed']}
               </div>
               <div className="text-xs text-purple-600 dark:text-purple-400">
                 Context Used

@@ -42,13 +42,13 @@ export class ConsentService {
           updated_at: string
         }
         return {
-          id: t.id,
-          name: t.name,
-          description: t.description,
-          scope: t.scope,
-          isActive: t.is_active,
-          createdAt: t.created_at,
-          updatedAt: t.updated_at,
+          id: t['id'],
+          name: t['name'],
+          description: t['description'],
+          scope: t['scope'],
+          isActive: t['is_active'],
+          createdAt: t['created_at'],
+          updatedAt: t['updated_at'],
         }
       })
     } catch (error) {
@@ -68,18 +68,18 @@ export class ConsentService {
       // TODO: Replace with MongoDB implementation
       const data: unknown = {} // Stub: Replace with MongoDB result
       return {
-        id: (data as Record<string, unknown>).id as string,
-        consentTypeId: (data as Record<string, unknown>).consent_type_id as string,
-        version: (data as Record<string, unknown>).version as string,
-        effectiveDate: (data as Record<string, unknown>).effective_date as string,
-        expirationDate: (data as Record<string, unknown>).expiration_date as string,
-        documentText: (data as Record<string, unknown>).document_text as string,
-        summary: (data as Record<string, unknown>).summary as string,
-        isCurrent: (data as Record<string, unknown>).is_current as boolean,
-        approvalDate: (data as Record<string, unknown>).approval_date as string,
-        approvedBy: (data as Record<string, unknown>).approved_by as string,
-        createdAt: (data as Record<string, unknown>).created_at as string,
-        updatedAt: (data as Record<string, unknown>).updated_at as string,
+        id: (data as Record<string, unknown>)['id'] as string,
+        consentTypeId: (data as Record<string, unknown>)['consent_type_id'] as string,
+        version: (data as Record<string, unknown>)['version'] as string,
+        effectiveDate: (data as Record<string, unknown>)['effective_date'] as string,
+        expirationDate: (data as Record<string, unknown>)['expiration_date'] as string,
+        documentText: (data as Record<string, unknown>)['document_text'] as string,
+        summary: (data as Record<string, unknown>)['summary'] as string,
+        isCurrent: (data as Record<string, unknown>)['is_current'] as boolean,
+        approvalDate: (data as Record<string, unknown>)['approval_date'] as string,
+        approvedBy: (data as Record<string, unknown>)['approved_by'] as string,
+        createdAt: (data as Record<string, unknown>)['created_at'] as string,
+        updatedAt: (data as Record<string, unknown>)['updated_at'] as string,
       }
     } catch (error) {
       logger.error('Unexpected error in getCurrentConsentVersion', error)
@@ -96,15 +96,15 @@ export class ConsentService {
       // TODO: Replace with MongoDB implementation
       const data: unknown[] = [] // Stub: Replace with MongoDB result
       return data.map((option: Record<string, unknown>) => ({
-        id: option.id as string,
-        consentTypeId: option.consent_type_id as string,
-        optionName: option.option_name as string,
-        description: option.description as string,
-        isRequired: option.is_required as boolean,
-        defaultValue: option.default_value,
-        displayOrder: option.display_order as number,
-        createdAt: option.created_at as string,
-        updatedAt: option.updated_at as string,
+        id: option['id'] as string,
+        consentTypeId: option['consent_type_id'] as string,
+        optionName: option['option_name'] as string,
+        description: option['description'] as string,
+        isRequired: option['is_required'] as boolean,
+        defaultValue: option['default_value'],
+        displayOrder: option['display_order'] as number,
+        createdAt: option['created_at'] as string,
+        updatedAt: option['updated_at'] as string,
       }))
     } catch (error) {
       logger.error('Unexpected error in getConsentOptions', error)

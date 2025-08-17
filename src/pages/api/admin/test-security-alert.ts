@@ -15,7 +15,7 @@ async function testSecurityAlert(
   return { success: true, alertId: `test-${Date.now()}` }
 }
 
-export const POST = async ({ request, cookies }) => {
+export async function POST({ request, cookies }) {
   try {
     // Authenticate request
     const user = await getCurrentUser(cookies)
@@ -33,7 +33,7 @@ export const POST = async ({ request, cookies }) => {
     }
 
     // Check if user has admin role
-    if (!user.roles?.includes('admin')) {
+    if (user.role !== 'admin') {
       return new Response(
         JSON.stringify({
           error: 'Forbidden',
@@ -112,4 +112,4 @@ export const POST = async ({ request, cookies }) => {
       },
     )
   }
-})
+};

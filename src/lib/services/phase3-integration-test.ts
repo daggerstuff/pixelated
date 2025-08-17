@@ -262,18 +262,18 @@ export class Phase3IntegrationTester {
         sessionId: 'phase3-cross-test',
         timestamp: Date.now(),
         metadata: {
-          emotionPrimary: emotionResult.primary,
-          biasScore: biasResult.biasScore
+          emotionPrimary: emotionResult['primary'],
+          biasScore: biasResult['biasScore']
         }
       })
 
       // 6. Send notification if high bias detected
-      if (biasResult.biasScore > 0.7) {
+      if (biasResult['biasScore'] > 0.7) {
         await this.notificationService.sendNotification({
           type: 'bias_alert',
           userId,
           title: 'High Bias Detected',
-          message: `Bias score: ${biasResult.biasScore}`,
+          message: `Bias score: ${biasResult['biasScore']}`,
           priority: 'high'
         })
       }
@@ -289,10 +289,10 @@ export class Phase3IntegrationTester {
       }))
 
       // Verify all operations succeeded
-      return emotionMemory.id !== undefined &&
-             biasMemory.id !== undefined &&
-             emotionResult.primary !== undefined &&
-             biasResult.biasScore !== undefined &&
+      return emotionMemory['id'] !== undefined &&
+             biasMemory['id'] !== undefined &&
+             emotionResult['primary'] !== undefined &&
+             biasResult['biasScore'] !== undefined &&
              encryptedData !== sessionText
 
     } catch (error) {
@@ -385,7 +385,7 @@ export class Phase3IntegrationTester {
           tags: ['recovery-test'],
           metadata: { test: 'error-recovery' }
         })
-        if (!recovery.id) recoverySuccess = false
+        if (!recovery?.['id']) recoverySuccess = false
       }
 
       // Test Redis connection recovery
@@ -437,7 +437,7 @@ export class Phase3IntegrationTester {
       }
 
       const results = await Promise.allSettled(concurrentOperations)
-      const successfulOperations = results.filter(result => result.status === 'fulfilled').length
+      const successfulOperations = results.filter(result => result['status'] === 'fulfilled').length
       const duration = Date.now() - startTime
       const operationsPerSecond = Math.round((successfulOperations * 1000) / duration)
 

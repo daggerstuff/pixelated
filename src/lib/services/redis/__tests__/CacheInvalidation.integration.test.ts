@@ -96,7 +96,7 @@ describe('cacheInvalidation Integration', () => {
       await runConcurrentOperations(operations, {
         description: 'Concurrent pattern invalidations',
         expectedDuration: 1000,
-      })
+      } as any)
 
       await sleep(100) // Allow time for invalidation to propagate
 

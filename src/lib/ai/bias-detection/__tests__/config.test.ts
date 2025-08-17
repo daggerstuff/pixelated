@@ -311,10 +311,10 @@ describe('BiasDetectionConfigManager', () => {
       const readiness = configManager.isProductionReady()
 
       expect(readiness.ready).toBe(false)
-      expect(readiness.issues).toContain(
+      expect(readiness.errors).toContain(
         'JWT secret is missing or too short (minimum 32 characters)',
       )
-      expect(readiness.issues).toContain(
+      expect(readiness.errors).toContain(
         'Encryption key is missing or too short (minimum 32 characters)',
       )
     })
@@ -331,7 +331,7 @@ describe('BiasDetectionConfigManager', () => {
       const readiness = configManager.isProductionReady()
 
       expect(readiness.ready).toBe(true)
-      expect(readiness.issues).toEqual([])
+      expect(readiness.errors).toEqual([])
     })
 
     it('should warn about debug logging in production', () => {
@@ -347,7 +347,7 @@ describe('BiasDetectionConfigManager', () => {
       const readiness = configManager.isProductionReady()
 
       expect(readiness.ready).toBe(false)
-      expect(readiness.issues).toContain(
+      expect(readiness.warnings).toContain(
         'Debug logging enabled in production - may expose sensitive data',
       )
     })
@@ -374,7 +374,7 @@ describe('BiasDetectionConfigManager', () => {
     it('should include only summary information for ML toolkits', () => {
       const summary = configManager.getConfigSummary()
 
-      expect(summary.mlToolkits).toEqual({
+      expect(summary['mlToolkits']).toEqual({
         aif360: { enabled: true },
         fairlearn: { enabled: true },
         huggingFace: { enabled: true },
@@ -429,10 +429,10 @@ describe('BiasDetectionConfigManager', () => {
       ;(BiasDetectionConfigManager as any).instance = undefined
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
-      expect(config.cache.enabled).toBe(true)
-      expect(config.security.encryptionEnabled).toBe(false)
-      expect(config.security.auditLoggingEnabled).toBe(true)
-      expect(config.performance.enableMetrics).toBe(false)
+      expect(config['cache']['enabled']).toBe(true)
+      expect(config['security']['encryptionEnabled']).toBe(false)
+      expect(config['security']['auditLoggingEnabled']).toBe(true)
+      expect(config['performance']['enableMetrics']).toBe(false)
     })
 
     it('should parse numeric environment variables correctly', () => {
@@ -444,9 +444,9 @@ describe('BiasDetectionConfigManager', () => {
       ;(BiasDetectionConfigManager as any).instance = undefined
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
-      expect(config.pythonService.port).toBe(8080)
-      expect(config.cache.ttl).toBe(600000)
-      expect(config.performance.maxConcurrentAnalyses).toBe(20)
+      expect(config['pythonService']['port']).toBe(8080)
+      expect(config['cache']['ttl']).toBe(600000)
+      expect(config['performance']['maxConcurrentAnalyses']).toBe(20)
     })
 
     it('should parse float environment variables correctly', () => {

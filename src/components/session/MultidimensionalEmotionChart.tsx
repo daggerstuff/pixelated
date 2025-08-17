@@ -148,7 +148,7 @@ export default function MultidimensionalEmotionChart({
   // Memoize sorted maps to avoid recomputation
   const sortedMaps = useMemo(() => {
     return [...dimensionalMaps].sort(
-      (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
+      (a, b) => new Date(a['timestamp']).getTime() - new Date(b['timestamp']).getTime()
     )
   }, [dimensionalMaps])
 
@@ -229,14 +229,14 @@ export default function MultidimensionalEmotionChart({
     // Controls setup
     const controls = new OrbitControls(camera, renderer.domElement)
     controlsRef.current = controls
-    controls['enableDamping'] = true
-    controls['dampingFactor'] = 0.25
+    ;(controls as any)['enableDamping'] = true
+    ;(controls as any)['dampingFactor'] = 0.25
 
     // Optimize controls based on detail level
     if (detailLevel !== 'high') {
-      controls.enableZoom = true
-      controls.zoomSpeed = 0.5
-      controls.rotateSpeed = 0.5
+      ;(controls as any)['enableZoom'] = true
+      ;(controls as any)['zoomSpeed'] = 0.5
+      ;(controls as any)['rotateSpeed'] = 0.5
     }
 
     // Add axis helper - simplified for performance on lower detail
@@ -288,8 +288,8 @@ export default function MultidimensionalEmotionChart({
 
           const material = new THREE.SpriteMaterial({ map: texture })
           const sprite = new THREE.Sprite(material)
-          sprite.position.copy(position)
-          sprite.scale.set(0.3, 0.15, 1)
+          ;(sprite as any).position.copy(position)
+          ;(sprite as any).scale.set(0.3, 0.15, 1)
 
           return sprite
         })
@@ -348,17 +348,14 @@ export default function MultidimensionalEmotionChart({
 
     dimensionalMaps.forEach((map) => {
       // Add point for primary vector
-      const { valence, arousal, dominance } = map.primaryVector
-
-      // Position in 3D space
-      vertices.push(valence, arousal, dominance)
-
+      const vector = map['primaryVector']
+      vertices.push(vector['valence'], vector['arousal'], vector['dominance'])
       // Color based on quadrant
-      const color = new THREE.Color(getQuadrantColor(map.quadrant))
+      const color = new THREE.Color(getQuadrantColor(map['quadrant']))
       colors.push(color.r, color.g, color.b)
 
       // Vary point size based on time recency for visual interest
-      const age = Date.now() - map.timestamp.getTime()
+      const age = Date.now() - new Date(map['timestamp']).getTime()
       const maxAge = 30 * 24 * 60 * 60 * 1000 // 30 days in ms
       const normalizedAge = Math.min(age / maxAge, 1)
       const size = 0.05 * (1 - normalizedAge * 0.7) // Newer points are bigger
@@ -417,8 +414,8 @@ export default function MultidimensionalEmotionChart({
 
       for (let i = 0; i < sortedMaps.length; i += stride) {
         const map = sortedMaps[i]
-        if (map && map.primaryVector) {
-          const { valence, arousal, dominance } = map.primaryVector
+        if (map && map['primaryVector']) {
+          const { valence, arousal, dominance } = map['primaryVector']
           lineVertices.push(valence, arousal, dominance)
         }
       }
@@ -500,21 +497,20 @@ export default function MultidimensionalEmotionChart({
         const frustum = frustrumRef.current
         frustum.setFromProjectionMatrix(
           new THREE.Matrix4().multiplyMatrices(
-            cameraRef.current.projectionMatrix,
-            cameraRef.current.matrixWorldInverse,
+            cameraRef.current['projectionMatrix'],
+            cameraRef.current['matrixWorldInverse'],
           ),
         )
-
         scene.traverse((object: Object3D) => {
           const { userData } = object as {
             userData?: { isCullable?: boolean; boundingSphere?: Sphere }
           }
-          if (userData?.isCullable) {
+          if (userData?.['isCullable']) {
             const { boundingSphere: sphere } = userData
             if (sphere instanceof Sphere) {
-              object.visible = frustum.intersectsSphere(sphere)
+              ;(object as any).visible = frustum.intersectsSphere(sphere)
             } else {
-              object.visible = true
+              ;(object as any).visible = true
             }
           }
         })
@@ -524,7 +520,7 @@ export default function MultidimensionalEmotionChart({
       if (detailLevel !== 'low') {
         labelsRef.current.forEach((label: Object3D) => {
           if (cameraRef.current) {
-            label.lookAt(cameraRef.current.position)
+            ;(label as any).lookAt(cameraRef.current['position'])
           }
         })
       }
@@ -545,8 +541,8 @@ export default function MultidimensionalEmotionChart({
       const width = containerRef.current.clientWidth
       const height = containerRef.current.clientHeight
 
-      cameraRef.current.aspect = width / height
-      cameraRef.current.updateProjectionMatrix()
+      ;(cameraRef.current as any).aspect = width / height
+      ;(cameraRef.current as any).updateProjectionMatrix()
 
       rendererRef.current.setSize(width, height)
     }

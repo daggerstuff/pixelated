@@ -107,23 +107,23 @@ export class ContextDetector {
         )
 
         // If crisis is detected, immediately return crisis context
-        if (crisisResult.isCrisis) {
+        if (crisisResult['isCrisis']) {
           return {
             detectedContext: ContextType.CRISIS,
-            confidence: crisisResult.confidence,
+            confidence: crisisResult['confidence'],
             contextualIndicators: [
               {
                 type: 'crisis_detection',
-                description: crisisResult.category || 'Crisis detected',
-                confidence: crisisResult.confidence,
-                severity: this.mapRiskLevelToNumber(crisisResult.riskLevel),
+                description: crisisResult['category'] || 'Crisis detected',
+                confidence: crisisResult['confidence'],
+                severity: this.mapRiskLevelToNumber(crisisResult['riskLevel']),
               },
             ],
             needsSpecialHandling: true,
-            urgency: this.mapUrgencyFromCrisis(crisisResult.urgency),
+            urgency: this.mapUrgencyFromCrisis(crisisResult['urgency']),
             metadata: {
               crisisResult,
-              suggestedActions: crisisResult.suggestedActions,
+              suggestedActions: crisisResult['suggestedActions'],
             },
           }
         }
@@ -144,25 +144,25 @@ export class ContextDetector {
 
         // If high confidence educational context, return it
         if (
-          educationalResult.isEducational &&
-          educationalResult.confidence > 0.8
+          educationalResult['isEducational'] &&
+          educationalResult['confidence'] > 0.8
         ) {
           return {
             detectedContext: ContextType.EDUCATIONAL,
-            confidence: educationalResult.confidence,
+            confidence: educationalResult['confidence'],
             contextualIndicators: [
               {
                 type: 'educational_recognition',
-                description: `Educational ${educationalResult.educationalType} about ${educationalResult.topicArea}`,
-                confidence: educationalResult.confidence,
+                description: `Educational ${educationalResult['educationalType']} about ${educationalResult['topicArea']}`,
+                confidence: educationalResult['confidence'],
               },
             ],
-            needsSpecialHandling: educationalResult.complexity === 'advanced',
+            needsSpecialHandling: educationalResult['complexity'] === 'advanced',
             urgency: 'low',
             metadata: {
               educationalResult,
-              learningObjectives: educationalResult.learningObjectives,
-              recommendedResources: educationalResult.recommendedResources,
+              learningObjectives: educationalResult['learningObjectives'],
+              recommendedResources: educationalResult['recommendedResources'],
             },
           }
         }
@@ -184,31 +184,31 @@ export class ContextDetector {
         model: this.model,
       })
 
-      const content = response.content || ''
+      const content = response['content'] || ''
       const result = this.parseContextDetectionResponse(content)
 
       // Merge crisis detection data if available
-      if (crisisResult && !crisisResult.isCrisis) {
-        result.metadata['crisisAnalysis'] = {
-          confidence: crisisResult.confidence,
-          riskLevel: crisisResult.riskLevel,
+      if (crisisResult && !crisisResult['isCrisis']) {
+        result['metadata']['crisisAnalysis'] = {
+          confidence: crisisResult['confidence'],
+          riskLevel: crisisResult['riskLevel'],
         }
       }
 
       // Merge educational analysis if available
-      if (educationalResult && educationalResult.isEducational) {
-        result.metadata['educationalAnalysis'] = {
-          confidence: educationalResult.confidence,
-          type: educationalResult.educationalType,
-          complexity: educationalResult.complexity,
-          topicArea: educationalResult.topicArea,
+      if (educationalResult && educationalResult['isEducational']) {
+        result['metadata']['educationalAnalysis'] = {
+          confidence: educationalResult['confidence'],
+          type: educationalResult['educationalType'],
+          complexity: educationalResult['complexity'],
+          topicArea: educationalResult['topicArea'],
         }
       }
 
       logger.info('Context detected', {
-        context: result.detectedContext,
-        confidence: result.confidence,
-        urgency: result.urgency,
+        context: result['detectedContext'],
+        confidence: result['confidence'],
+        urgency: result['urgency'],
       })
 
       return result
@@ -247,7 +247,7 @@ export class ContextDetector {
   ): Promise<ContextDetectionResult[]> {
     return Promise.all(
       inputs.map((input) =>
-        this.detectContext(input.text, input.conversationHistory, input.userId),
+        this.detectContext(input['text'], input['conversationHistory'], input['userId']),
       ),
     )
   }

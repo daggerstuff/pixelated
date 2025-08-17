@@ -2,6 +2,40 @@ export * from './middleware'
 // Re-export session functions
 export { createSession, endSession, getSession } from './session'
 
+import type { AstroCookies } from 'astro'
+import type { User } from './index'
+
+/**
+ * Get the current user from AstroCookies
+ */
+export async function getCurrentUser(cookies: AstroCookies): Promise<User | null> {
+  // Try to get the session token from cookies
+  const token = cookies.get('auth-token')?.value
+  if (!token) return null
+
+  // getSession expects a session token
+  const sessionData = await getSession(token)
+  if (!sessionData || !sessionData.user) return null
+
+  return sessionData.user
+}
+
+/**
+ * Check if the current user has the specified role
+ */
+export async function hasRole(cookies: AstroCookies, role: string): Promise<boolean> {
+  const user = await getCurrentUser(cookies)
+  if (!user) return false
+  return user.role === role
+}
+
+/**
+ * Check if the current user is authenticated
+ */
+export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
+  const user = await getCurrentUser(cookies)
+  return !!user
+}
 export type { SessionData } from './session'
 // Export authentication types and middleware
 export * from './types'
@@ -417,3 +451,16 @@ export async function createUser(
   const authService = getAuthService()
   return authService.createUser(userData)
 }
+
+/**
+ * Auth utility object for API routes
+ */
+export const auth = {
+  verifySession,
+  getCurrentUser,
+  isAuthenticated,
+  hasRole,
+  authenticate,
+  createUser,
+}
+export { requirePageAuth as requireAuth } from './serverAuth'

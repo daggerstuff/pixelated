@@ -30,7 +30,7 @@ export const GET = async ({ request, cookies }) => {
     }
 
     // Check if user has admin role
-    if (!user.roles?.includes('admin')) {
+    if (user.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },
@@ -79,7 +79,7 @@ export const GET = async ({ request, cookies }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   }
-}
+};
 
 export const POST = async ({ request, cookies }) => {
   try {
@@ -96,9 +96,6 @@ export const POST = async ({ request, cookies }) => {
     if (!user.roles?.includes('admin')) {
       return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
         status: 403,
-        headers: { 'Content-Type': 'application/json' },
-      })
-    }
         headers: { 'Content-Type': 'application/json' },
       })
     }
@@ -139,7 +136,7 @@ export const POST = async ({ request, cookies }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   }
-}
+};
 
 // Mock function to get backups - in production, this would query storage or database
 async function getBackups() {

@@ -31,7 +31,7 @@ export const POST = async ({ request, cookies }) => {
 
     // Check if user has admin role (basic check)
     // Note: In a real implementation, you'd want proper role checking
-    if (!user.roles?.includes('admin')) {
+    if (user.role !== 'admin') {
       return new Response(
         JSON.stringify({
           success: false,
@@ -120,4 +120,4 @@ export const POST = async ({ request, cookies }) => {
       },
     )
   }
-})
+};

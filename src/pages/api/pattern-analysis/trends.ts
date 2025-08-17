@@ -135,4 +135,4 @@ export const GET = async ({ request, cookies }) => {
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )
   }
-})
+};

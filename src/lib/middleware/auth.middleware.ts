@@ -51,7 +51,7 @@ export async function authGuard(
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${authConfig.redirects.authRequired}?redirect=${encodeURIComponent(
+        Location: `${authConfig['redirects']['authRequired']}?redirect=${encodeURIComponent(
           context.request.url,
         )}`,
       },
@@ -92,7 +92,7 @@ export function roleGuard(role: AuthRole) {
       return new Response(null, {
         status: 302,
         headers: {
-          Location: `${authConfig.redirects.authRequired}?redirect=${encodeURIComponent(
+          Location: `${authConfig['redirects']['authRequired']}?redirect=${encodeURIComponent(
             context.request.url,
           )}`,
         },
@@ -100,7 +100,7 @@ export function roleGuard(role: AuthRole) {
     }
 
     // Check the user's role
-    const hasRequiredRole = hasRolePrivilege(user.role, role)
+    const hasRequiredRole = hasRolePrivilege(user['role'], role)
 
     if (!hasRequiredRole) {
       await createResourceAuditLog(
@@ -117,7 +117,7 @@ export function roleGuard(role: AuthRole) {
           method: context.request.method,
           path: new URL(context.request.url).pathname,
           requiredRole: role,
-          userRole: user.role,
+          userRole: user['role'],
         } as AuditMetadata,
       )
 
@@ -125,7 +125,7 @@ export function roleGuard(role: AuthRole) {
       return new Response(null, {
         status: 302,
         headers: {
-          Location: authConfig.redirects.forbidden,
+          Location: authConfig['redirects']['forbidden'],
         },
       })
     }
@@ -187,7 +187,7 @@ export async function apiAuthGuard(
     },
   ).then((rest) => rest.json())
 
-  if (error || !data?.user) {
+  if (error || !data?.['user']) {
     await createResourceAuditLog(
       'api_access_denied',
       'system',

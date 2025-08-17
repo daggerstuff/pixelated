@@ -55,17 +55,17 @@ const DEFAULT_WEIGHTS: BiasLayerWeights = {
 }
 
 function validateThresholds(t: BiasThresholdsConfig) {
-  const values = [t.warningLevel, t.highLevel, t.criticalLevel]
+  const values = [t['warningLevel'], t['highLevel'], t['criticalLevel']]
   if (values.some((v) => v < 0 || v > 1)) {
     throw new Error('Invalid threshold values')
   }
-  if (!(t.warningLevel < t.highLevel && t.highLevel < t.criticalLevel)) {
+  if (!(t['warningLevel'] < t['highLevel'] && t['highLevel'] < t['criticalLevel'])) {
     throw new Error('Invalid threshold configuration')
   }
 }
 
 function validateWeights(w: BiasLayerWeights) {
-  const sum = w.preprocessing + w.modelLevel + w.interactive + w.evaluation
+  const sum = w['preprocessing'] + w['modelLevel'] + w['interactive'] + w['evaluation']
   if (Math.abs(sum - 1) > 1e-6) {
     throw new Error('Layer weights must sum to 1.0')
   }
@@ -167,29 +167,29 @@ export class BiasDetectionEngine {
   private sessionCache: Map<string, AnalysisResult> = new Map()
 
   constructor(cfg: BiasDetectionConfig = {}) {
-    const thresholds = cfg.thresholds ?? DEFAULT_THRESHOLDS
+    const thresholds = cfg['thresholds'] ?? DEFAULT_THRESHOLDS
     validateThresholds(thresholds)
 
-    const layerWeights = cfg.layerWeights ?? DEFAULT_WEIGHTS
+    const layerWeights = cfg['layerWeights'] ?? DEFAULT_WEIGHTS
     validateWeights(layerWeights)
 
   this.config = {
-      pythonServiceUrl: cfg.pythonServiceUrl ?? 'http://localhost:8000',
-      pythonServiceTimeout: cfg.pythonServiceTimeout ?? 30000,
+      pythonServiceUrl: cfg['pythonServiceUrl'] ?? 'http://localhost:8000',
+      pythonServiceTimeout: cfg['pythonServiceTimeout'] ?? 30000,
       thresholds,
       layerWeights,
-      evaluationMetrics: cfg.evaluationMetrics ?? ['demographic_parity', 'equalized_odds'],
-      metricsConfig: cfg.metricsConfig ?? { enableRealTimeMonitoring: true, metricsRetentionDays: 30, aggregationIntervals: ['1h', '1d'], dashboardRefreshRate: 60, exportFormats: ['json'] },
-      alertConfig: cfg.alertConfig ?? { enableSlackNotifications: false, enableEmailNotifications: false, emailRecipients: [], alertCooldownMinutes: 5, escalationThresholds: { criticalResponseTimeMinutes: 15, highResponseTimeMinutes: 30 } },
-      reportConfig: cfg.reportConfig ?? { includeConfidentialityAnalysis: true, includeDemographicBreakdown: true, includeTemporalTrends: true, includeRecommendations: true, reportTemplate: 'standard', exportFormats: ['json'] },
-      explanationConfig: cfg.explanationConfig ?? { explanationMethod: 'shap', maxFeatures: 10, includeCounterfactuals: true, generateVisualization: false },
+      evaluationMetrics: cfg['evaluationMetrics'] ?? ['demographic_parity', 'equalized_odds'],
+      metricsConfig: cfg['metricsConfig'] ?? { enableRealTimeMonitoring: true, metricsRetentionDays: 30, aggregationIntervals: ['1h', '1d'], dashboardRefreshRate: 60, exportFormats: ['json'] },
+      alertConfig: cfg['alertConfig'] ?? { enableSlackNotifications: false, enableEmailNotifications: false, emailRecipients: [], alertCooldownMinutes: 5, escalationThresholds: { criticalResponseTimeMinutes: 15, highResponseTimeMinutes: 30 } },
+      reportConfig: cfg['reportConfig'] ?? { includeConfidentialityAnalysis: true, includeDemographicBreakdown: true, includeTemporalTrends: true, includeRecommendations: true, reportTemplate: 'standard', exportFormats: ['json'] },
+      explanationConfig: cfg['explanationConfig'] ?? { explanationMethod: 'shap', maxFeatures: 10, includeCounterfactuals: true, generateVisualization: false },
   pythonServiceConfig: {},
   cacheConfig: {},
   securityConfig: {},
   performanceConfig: {},
-      hipaaCompliant: cfg.hipaaCompliant ?? true,
-      dataMaskingEnabled: cfg.dataMaskingEnabled ?? true,
-      auditLogging: cfg.auditLogging ?? true,
+      hipaaCompliant: cfg['hipaaCompliant'] ?? true,
+      dataMaskingEnabled: cfg['dataMaskingEnabled'] ?? true,
+      auditLogging: cfg['auditLogging'] ?? true,
     }
 
   const PythonBridgeCtor = (globalThis as any).PythonBiasDetectionBridge || PythonBiasDetectionBridge
@@ -224,28 +224,28 @@ export class BiasDetectionEngine {
   }
 
   private computeAlertLevel(score: number): AlertLevel {
-    const t = this.config.thresholds
-    if (score >= t.criticalLevel) { return 'critical' }
-    if (score >= t.highLevel) { return 'high' }
-    if (score >= t.warningLevel) { return 'medium' }
+    const t = this.config['thresholds']
+    if (score >= t['criticalLevel']) { return 'critical' }
+    if (score >= t['highLevel']) { return 'high' }
+    if (score >= t['warningLevel']) { return 'medium' }
     return 'low'
   }
 
   private maskDemographics(input?: Record<string, unknown>) {
     if (!input) { return undefined }
-    if (!this.config.hipaaCompliant && !this.config.dataMaskingEnabled) { return input }
+    if (!this.config['hipaaCompliant'] && !this.config['dataMaskingEnabled']) { return input }
     // Drop known PII-looking fields; keep coarse fields
     const { social_security: _social_security, phone_number: _phone_number, email: _email, ...rest } = input as any
     return rest
   }
 
   private weightedAverage(results: LayerResults): number {
-    const w = this.config.layerWeights
+    const w = this.config['layerWeights']
     return (
-      results.preprocessing.biasScore * w.preprocessing +
-      results.modelLevel.biasScore * w.modelLevel +
-      results.interactive.biasScore * w.interactive +
-      results.evaluation.biasScore * w.evaluation
+      results['preprocessing']['biasScore'] * w['preprocessing'] +
+      results['modelLevel']['biasScore'] * w['modelLevel'] +
+      results['interactive']['biasScore'] * w['interactive'] +
+      results['evaluation']['biasScore'] * w['evaluation']
     )
   }
 

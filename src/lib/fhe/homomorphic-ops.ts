@@ -353,47 +353,47 @@ export class HomomorphicOperations {
     switch (operation) {
       case FHEOperation.Addition:
         // Add a constant or another ciphertext
-        addend = (params?.addend as number[]) || [1]
+        addend = (params?.['addend'] as number[]) || [1]
         addResult = await this.sealOps.add(serializedCiphertext, addend)
-        return { result: addResult.result, success: addResult.success }
+        return { result: addResult['result'], success: addResult['success'] }
 
       case FHEOperation.Subtraction:
         // Subtract a constant or another ciphertext
-        subtrahend = (params?.subtrahend as number[]) || [1]
+        subtrahend = (params?.['subtrahend'] as number[]) || [1]
         subResult = await this.sealOps.subtract(
           serializedCiphertext,
           subtrahend,
         )
-        return { result: subResult.result, success: subResult.success }
+        return { result: subResult['result'], success: subResult['success'] }
 
       case FHEOperation.Multiplication:
         // Multiply by a constant or another ciphertext
-        multiplier = (params?.multiplier as number[]) || [2]
+        multiplier = (params?.['multiplier'] as number[]) || [2]
         multResult = await this.sealOps.multiply(
           serializedCiphertext,
           multiplier,
         )
-        return { result: multResult.result, success: multResult.success }
+        return { result: multResult['result'], success: multResult['success'] }
 
       case FHEOperation.Negation:
         // Negate the value
         negResult = await this.sealOps.negate(serializedCiphertext)
-        return { result: negResult.result, success: negResult.success }
+        return { result: negResult['result'], success: negResult['success'] }
 
       case FHEOperation.Polynomial:
         // Apply a polynomial function
-        coefficients = (params?.coefficients as number[]) || [0, 1]
+        coefficients = (params?.['coefficients'] as number[]) || [0, 1]
         polyResult = await this.sealOps.polynomial(
           serializedCiphertext,
           coefficients,
         )
-        return { result: polyResult.result, success: polyResult.success }
+        return { result: polyResult['result'], success: polyResult['success'] }
 
       case FHEOperation.Rotation:
         // Rotate elements in a vector
-        steps = (params?.steps as number) || 1
+        steps = (params?.['steps'] as number) || 1
         rotResult = await this.sealOps.rotate(serializedCiphertext, steps)
-        return { result: rotResult.result, success: rotResult.success }
+        return { result: rotResult['result'], success: rotResult['success'] }
 
       default:
         throw new Error(`Unsupported SEAL operation: ${operation}`)
@@ -456,17 +456,17 @@ export class HomomorphicOperations {
       case FHEOperation.CATEGORIZE:
         result = await this.categorizeText(
           decodedData,
-          params?.categories as Record<string, string[]> | undefined,
+          params?.['categories'] as Record<string, string[]> | undefined,
         )
-        metadata.categories = params?.categories || {}
+        metadata.categories = params?.['categories'] || {}
         break
 
       case FHEOperation.SUMMARIZE:
         result = await this.summarizeText(
           decodedData,
-          params?.maxLength as number | undefined,
+          params?.['maxLength'] as number | undefined,
         )
-        metadata.maxLength = params?.maxLength || 100
+        metadata.maxLength = params?.['maxLength'] || 100
         break
 
       case FHEOperation.TOKENIZE:
@@ -478,7 +478,7 @@ export class HomomorphicOperations {
       case FHEOperation.FILTER:
         result = await this.filterText(
           decodedData,
-          params?.filterTerms as string[] | undefined,
+          params?.['filterTerms'] as string[] | undefined,
         )
         metadata.filtered = true
         break
@@ -486,10 +486,10 @@ export class HomomorphicOperations {
       case FHEOperation.CUSTOM:
         result = await this.performCustomOperation(
           decodedData,
-          params?.operation as string,
+          params?.['operation'] as string,
           params,
         )
-        metadata.custom = params?.operation || 'unknown'
+        metadata.custom = params?.['operation'] || 'unknown'
         break
 
       default:

@@ -91,7 +91,7 @@ export async function signOut(token: string) {
 export async function getCurrentUser(authHeader: string) {
   try {
     const authInfo = await authService.verifyAuthToken(authHeader)
-    const user = await authService.getUserById(authInfo.userId)
+    const user = await authService.getUserById(authInfo['userId'])
 
     if (!user) {
       return null
@@ -181,18 +181,18 @@ export function mapToAuthUser(user: User): AuthUser | null {
   }
 
   return {
-    id: user._id?.toString() || '',
-    email: user.email,
-    name: user.metadata?.fullName || user.fullName || '',
-    image: user.metadata?.avatarUrl || user.avatarUrl || '',
-    role: user.role || 'user',
-    fullName: user.metadata?.fullName || user.fullName || '',
-    roles: [user.role],
-    emailVerified: user.emailVerified || false,
-    createdAt: user.createdAt?.toISOString() || new Date().toISOString(),
-    lastSignIn: user.lastLogin?.toISOString() || null,
-    avatarUrl: user.metadata?.avatarUrl || user.avatarUrl || '',
-    metadata: user.metadata || {},
+    id: user['_id']?.toString() || '',
+    email: user['email'],
+    name: user['metadata']?.['fullName'] || user['fullName'] || '',
+    image: user['metadata']?.['avatarUrl'] || user['avatarUrl'] || '',
+    role: user['role'] || 'user',
+    fullName: user['metadata']?.['fullName'] || user['fullName'] || '',
+    roles: [user['role']],
+    emailVerified: user['emailVerified'] || false,
+    createdAt: user['createdAt']?.toISOString() || new Date().toISOString(),
+    lastSignIn: user['lastLogin']?.toISOString() || null,
+    avatarUrl: user['metadata']?.['avatarUrl'] || user['avatarUrl'] || '',
+    metadata: user['metadata'] || {},
   }
 }
 

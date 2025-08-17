@@ -451,25 +451,26 @@ Body: JSON with action and environment
 <script>
   // Client-side functionality for the validation pipeline
   document.addEventListener('DOMContentLoaded', () => {
-    const runValidationBtn = document.getElementById('run-validation')
-    const startContinuousBtn = document.getElementById('start-continuous')
-    const stopContinuousBtn = document.getElementById('stop-continuous')
-    const scheduleValidationBtn = document.getElementById('schedule-validation')
+    const runValidationBtn = document.getElementById('run-validation') as HTMLButtonElement | null
+    const startContinuousBtn = document.getElementById('start-continuous') as HTMLButtonElement | null
+    const stopContinuousBtn = document.getElementById('stop-continuous') as HTMLButtonElement | null
+    const scheduleValidationBtn = document.getElementById('schedule-validation') as HTMLButtonElement | null
     const unscheduleValidationBtn = document.getElementById(
       'unschedule-validation',
-    )
-    const cronScheduleSelect = document.getElementById('cron-schedule')
+    ) as HTMLButtonElement | null
+    const cronScheduleSelect = document.getElementById('cron-schedule') as HTMLSelectElement | null
     const customScheduleContainer = document.getElementById(
       'custom-schedule-container',
-    )
-    const customCronInput = document.getElementById('custom-cron')
+    ) as HTMLElement | null
+    const customCronInput = document.getElementById('custom-cron') as HTMLInputElement | null
 
     // Get history on page load
     fetchValidationHistory()
 
     // Handle custom cron schedule
     cronScheduleSelect?.addEventListener('change', (e) => {
-      if (e.target.value === 'custom') {
+      const target = e.target as HTMLSelectElement
+      if (target.value === 'custom') {
         customScheduleContainer?.classList.remove('hidden')
       } else {
         customScheduleContainer?.classList.add('hidden')
@@ -479,8 +480,10 @@ Body: JSON with action and environment
     // Run validation
     runValidationBtn?.addEventListener('click', async () => {
       try {
-        runValidationBtn.disabled = true
-        runValidationBtn.textContent = 'Running...'
+        if (runValidationBtn) {
+          runValidationBtn.disabled = true
+          runValidationBtn.textContent = 'Running...'
+        }
 
         const response = await fetch('/api/ai/validation/run', {
           method: 'POST',
@@ -492,20 +495,24 @@ Body: JSON with action and environment
 
         // Refresh the page to show new results
         window.location.reload()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error running validation:', error)
         alert(`Error running validation: ${error.message}`)
       } finally {
-        runValidationBtn.disabled = false
-        runValidationBtn.textContent = 'Run Validation'
+        if (runValidationBtn) {
+          runValidationBtn.disabled = false
+          runValidationBtn.textContent = 'Run Validation'
+        }
       }
     })
 
     // Start continuous validation
     startContinuousBtn?.addEventListener('click', async () => {
       try {
-        startContinuousBtn.disabled = true
-        startContinuousBtn.textContent = 'Starting...'
+        if (startContinuousBtn) {
+          startContinuousBtn.disabled = true
+          startContinuousBtn.textContent = 'Starting...'
+        }
 
         const response = await fetch('/api/ai/validation/start', {
           method: 'POST',
@@ -517,20 +524,24 @@ Body: JSON with action and environment
 
         // Refresh the page
         window.location.reload()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error starting continuous validation:', error)
         alert(`Error starting continuous validation: ${error.message}`)
       } finally {
-        startContinuousBtn.disabled = false
-        startContinuousBtn.textContent = 'Start Continuous'
+        if (startContinuousBtn) {
+          startContinuousBtn.disabled = false
+          startContinuousBtn.textContent = 'Start Continuous'
+        }
       }
     })
 
     // Stop continuous validation
     stopContinuousBtn?.addEventListener('click', async () => {
       try {
-        stopContinuousBtn.disabled = true
-        stopContinuousBtn.textContent = 'Stopping...'
+        if (stopContinuousBtn) {
+          stopContinuousBtn.disabled = true
+          stopContinuousBtn.textContent = 'Stopping...'
+        }
 
         const response = await fetch('/api/ai/validation/stop', {
           method: 'POST',
@@ -542,23 +553,27 @@ Body: JSON with action and environment
 
         // Refresh the page
         window.location.reload()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error stopping continuous validation:', error)
         alert(`Error stopping continuous validation: ${error.message}`)
       } finally {
-        stopContinuousBtn.disabled = false
-        stopContinuousBtn.textContent = 'Stop Continuous'
+        if (stopContinuousBtn) {
+          stopContinuousBtn.disabled = false
+          stopContinuousBtn.textContent = 'Stop Continuous'
+        }
       }
     })
 
     // Schedule validation
     scheduleValidationBtn?.addEventListener('click', async () => {
       try {
-        scheduleValidationBtn.disabled = true
-        scheduleValidationBtn.textContent = 'Setting Schedule...'
+        if (scheduleValidationBtn) {
+          scheduleValidationBtn.disabled = true
+          scheduleValidationBtn.textContent = 'Setting Schedule...'
+        }
 
         // Get selected schedule
-        let schedule
+        let schedule: string | undefined
         if (cronScheduleSelect?.value === 'custom') {
           schedule = customCronInput?.value?.trim()
           if (!schedule) {
@@ -586,20 +601,24 @@ Body: JSON with action and environment
 
         // Refresh the page
         window.location.reload()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error setting schedule:', error)
         alert(`Error setting schedule: ${error.message}`)
       } finally {
-        scheduleValidationBtn.disabled = false
-        scheduleValidationBtn.textContent = 'Set Schedule'
+        if (scheduleValidationBtn) {
+          scheduleValidationBtn.disabled = false
+          scheduleValidationBtn.textContent = 'Set Schedule'
+        }
       }
     })
 
     // Unschedule validation
     unscheduleValidationBtn?.addEventListener('click', async () => {
       try {
-        unscheduleValidationBtn.disabled = true
-        unscheduleValidationBtn.textContent = 'Canceling...'
+        if (unscheduleValidationBtn) {
+          unscheduleValidationBtn.disabled = true
+          unscheduleValidationBtn.textContent = 'Canceling...'
+        }
 
         const response = await fetch('/api/ai/validation/schedule', {
           method: 'POST',
@@ -618,12 +637,14 @@ Body: JSON with action and environment
 
         // Refresh the page
         window.location.reload()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error canceling schedule:', error)
         alert(`Error canceling schedule: ${error.message}`)
       } finally {
-        unscheduleValidationBtn.disabled = false
-        unscheduleValidationBtn.textContent = 'Cancel Schedule'
+        if (unscheduleValidationBtn) {
+          unscheduleValidationBtn.disabled = false
+          unscheduleValidationBtn.textContent = 'Cancel Schedule'
+        }
       }
     })
 
@@ -644,7 +665,7 @@ Body: JSON with action and environment
           if (historyBody) {
             historyBody.innerHTML = ''
 
-            data.history.forEach((entry) => {
+            data.history.forEach((entry: any) => {
               const passRate =
                 entry.resultsCount > 0
                   ? Math.round((entry.passedCount / entry.resultsCount) * 100)
@@ -682,7 +703,7 @@ Body: JSON with action and environment
             })
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching validation history:', error)
       }
     }

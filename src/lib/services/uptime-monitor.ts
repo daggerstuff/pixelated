@@ -1,5 +1,5 @@
 import { performance } from 'node:perf_hooks'
-import { writeFileSync, readFileSync, existsSync } from 'node:fs'
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 export interface UptimeRecord {
@@ -167,8 +167,7 @@ export class UptimeMonitor {
       // Ensure logs directory exists
       const logsDir = join(process.cwd(), 'logs')
       if (!existsSync(logsDir)) {
-        // Use imported mkdirSync from node:fs
-        import { mkdirSync } from 'node:fs'
+        // Ensure logs directory exists
         mkdirSync(logsDir, { recursive: true })
       }
       

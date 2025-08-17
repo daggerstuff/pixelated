@@ -730,9 +730,9 @@ export class BiasDetectionConfigManager {
       loadedEnvVars: envSummary.loaded,
       errors,
       mlToolkits: {
-        aif360: { enabled: this.config.mlToolkitConfig?.aif360?.enabled ?? true },
-        fairlearn: { enabled: this.config.mlToolkitConfig?.fairlearn?.enabled ?? true },
-        tensorflow: { enabled: this.config.mlToolkitConfig?.tensorflow?.enabled ?? true },
+        aif360: { enabled: this.config['mlToolkitConfig']?.['aif360']?.['enabled'] ?? true },
+        fairlearn: { enabled: this.config['mlToolkitConfig']?.['fairlearn']?.['enabled'] ?? true },
+        tensorflow: { enabled: this.config['mlToolkitConfig']?.['tensorflow']?.['enabled'] ?? true },
       },
     }
   }
@@ -814,10 +814,10 @@ export function isProductionReady(): {
 
   // Check service configuration - comprehensive insecure URL checks
   if (
-    config.pythonServiceUrl.includes('localhost') ||
-    config.pythonServiceUrl.includes('127.0.0.1') ||
-    config.pythonServiceUrl.includes('0.0.0.0') ||
-    !config.pythonServiceUrl.startsWith('https://')
+    config['pythonServiceUrl'].includes('localhost') ||
+    config['pythonServiceUrl'].includes('127.0.0.1') ||
+    config['pythonServiceUrl'].includes('0.0.0.0') ||
+    !config['pythonServiceUrl'].startsWith('https://')
   ) {
     issues.push(
       'Python service URL should use HTTPS and not use localhost/127.0.0.1/0.0.0.0 in production',
@@ -825,18 +825,18 @@ export function isProductionReady(): {
   }
 
   // Check HIPAA compliance
-  if (!config.hipaaCompliant) {
+  if (!config['hipaaCompliant']) {
     issues.push('HIPAA compliance must be enabled for production')
   }
 
-  if (!config.auditLogging) {
+  if (!config['auditLogging']) {
     issues.push('Audit logging must be enabled for production')
   }
 
   // Check alert configuration
   if (
-    !config.alertConfig.enableEmailNotifications &&
-    !config.alertConfig.enableSlackNotifications
+    !config['alertConfig']['enableEmailNotifications'] &&
+    !config['alertConfig']['enableSlackNotifications']
   ) {
     issues.push('At least one alert method must be configured')
   }

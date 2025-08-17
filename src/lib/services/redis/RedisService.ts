@@ -5,7 +5,7 @@ import type {
   RedisPipelineOperation,
 } from './redis-operation-types'
 import { EventEmitter } from 'events'
-import { getHipaaCompliantLogger } from '../../lib/logging/standardized-logger'
+import { getHipaaCompliantLogger } from '../../logging/standardized-logger'
 import { Redis } from 'ioredis'
 import { RedisErrorCode, RedisServiceError } from './types.js'
 

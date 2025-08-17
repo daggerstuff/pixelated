@@ -135,7 +135,7 @@ describe('Data Validation', () => {
 
     it('should validate correct session data', () => {
       const result = validateTherapeuticSession(validSession)
-      expect(result.sessionId).toBe(validSession.sessionId)
+      expect(result['sessionId']).toBe(validSession.sessionId)
     })
 
     it('should throw error for invalid session ID', () => {
@@ -177,7 +177,7 @@ describe('Data Validation', () => {
 
     it('should validate correct config', () => {
       const result = validateBiasDetectionConfig(validConfig)
-      expect(result.pythonServiceUrl).toBe(validConfig.pythonServiceUrl)
+      expect(result['pythonServiceUrl']).toBe(validConfig.pythonServiceUrl)
     })
 
     it('should throw error for invalid threshold order', () => {
@@ -263,15 +263,15 @@ describe('Demographic Processing', () => {
       const groups = extractDemographicGroups(sampleDemographics)
 
       expect(groups).toHaveLength(7)
-      expect(groups.find((g) => g.type === 'age')?.value).toBe('25-35')
-      expect(groups.find((g) => g.type === 'gender')?.value).toBe('female')
-      expect(groups.find((g) => g.type === 'ethnicity')?.value).toBe('hispanic')
-      expect(groups.find((g) => g.type === 'language')?.value).toBe('en')
-      expect(groups.find((g) => g.type === 'socioeconomic')?.value).toBe(
+      expect(groups.find((g) => g['type'] === 'age')?.['value']).toBe('25-35')
+      expect(groups.find((g) => g['type'] === 'gender')?.['value']).toBe('female')
+      expect(groups.find((g) => g['type'] === 'ethnicity')?.['value']).toBe('hispanic')
+      expect(groups.find((g) => g['type'] === 'language')?.['value']).toBe('en')
+      expect(groups.find((g) => g['type'] === 'socioeconomic')?.['value']).toBe(
         'middle',
       )
-      expect(groups.find((g) => g.type === 'education')?.value).toBe('bachelor')
-      expect(groups.find((g) => g.type === 'region')?.value).toBe('west-coast')
+      expect(groups.find((g) => g['type'] === 'education')?.['value']).toBe('bachelor')
+      expect(groups.find((g) => g['type'] === 'region')?.['value']).toBe('west-coast')
     })
 
     it('should handle optional fields', () => {
@@ -301,8 +301,8 @@ describe('Demographic Processing', () => {
 
       const representation = calculateDemographicRepresentation(sessions)
 
-      expect(representation.gender.male).toBeCloseTo(0.333, 2)
-      expect(representation.gender.female).toBeCloseTo(0.667, 2)
+      expect(representation['gender']['male']).toBeCloseTo(0.333, 2)
+      expect(representation['gender']['female']).toBeCloseTo(0.667, 2)
     })
 
     it('should handle empty sessions array', () => {

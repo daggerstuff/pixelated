@@ -60,7 +60,7 @@ export default function SessionDocumentationComponent({
   // Handle changes to editable fields (when not in readOnly mode)
   const handleChange = (
     field: string,
-    value: SessionDocumentation[keyof SessionDocumentation],
+    value: any,
   ) => {
     if (readOnly || !editableDocumentation) {
       return
@@ -250,7 +250,7 @@ export default function SessionDocumentationComponent({
           Error Loading Documentation
         </h3>
         <p className="text-gray-600 text-center max-w-md">
-          {error.message ||
+          {error?.['message'] ||
             'An error occurred while loading session documentation.'}
         </p>
         <div className="flex gap-3 mt-4">
@@ -390,14 +390,14 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation.summary}
+                  value={editableDocumentation?.['summary'] || ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('summary', e.target.value)
                   }
                   className="w-full p-2 border border-gray-300 rounded-md min-h-[100px]"
                 />
               ) : (
-                <p className="text-gray-700">{editableDocumentation.summary}</p>
+                <p className="text-gray-700">{editableDocumentation?.['summary']}</p>
               )}
             </section>
 
@@ -406,7 +406,7 @@ export default function SessionDocumentationComponent({
                 Key Insights
               </h4>
               <ul className="list-disc pl-5 space-y-1">
-                {editableDocumentation.keyInsights.map(
+                {editableDocumentation?.['keyInsights']?.map(
                   (insight: string, index: number) => (
                     <li key={`insight-${index}`} className="text-gray-700">
                       {!readOnly ? (
@@ -417,7 +417,7 @@ export default function SessionDocumentationComponent({
                             e: React.ChangeEvent<HTMLInputElement>,
                           ) => {
                             const newInsights = [
-                              ...editableDocumentation.keyInsights,
+                              ...(editableDocumentation?.['keyInsights'] || []),
                             ]
 
                             newInsights[index] = e.target.value
@@ -430,13 +430,13 @@ export default function SessionDocumentationComponent({
                       )}
                     </li>
                   ),
-                )}
+                ) || []}
               </ul>
               {!readOnly && (
                 <button
                   onClick={() => {
                     handleChange('keyInsights', [
-                      ...editableDocumentation.keyInsights,
+                      ...(editableDocumentation?.['keyInsights'] || []),
                       '',
                     ])
                   }}

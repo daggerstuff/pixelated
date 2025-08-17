@@ -58,9 +58,9 @@ describe('SupportContextIdentifier', () => {
         'I feel so terrible about this situation and just need someone to understand'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.supportType).toBe(SupportType.EMOTIONAL_VALIDATION)
-      expect(result.confidence).toBeGreaterThan(0.6)
+      expect(result['isSupport']).toBe(true)
+      expect(result['supportType']).toBe(SupportType.EMOTIONAL_VALIDATION)
+      expect(result['confidence']).toBeGreaterThan(0.6)
     })
 
     it('should identify coping assistance requests', async () => {
@@ -68,19 +68,19 @@ describe('SupportContextIdentifier', () => {
         "I don't know how to handle this stress at work, what should I do?"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.supportType).toBe(SupportType.COPING_ASSISTANCE)
-      expect(result.emotionalState).toBe(EmotionalState.ANXIETY)
+      expect(result['isSupport']).toBe(true)
+      expect(result['supportType']).toBe(SupportType.COPING_ASSISTANCE)
+      expect(result['emotionalState']).toBe(EmotionalState.ANXIETY)
     })
 
     it('should identify encouragement needs', async () => {
       const query = "I'm losing hope and feel like giving up on everything"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.supportType).toBe(SupportType.ENCOURAGEMENT)
-      expect(result.emotionalState).toBe(EmotionalState.HOPELESSNESS)
-      expect(result.urgency).toBe('high')
+      expect(result['isSupport']).toBe(true)
+      expect(result['supportType']).toBe(SupportType.ENCOURAGEMENT)
+      expect(result['emotionalState']).toBe(EmotionalState.HOPELESSNESS)
+      expect(result['urgency']).toBe('high')
     })
 
     it('should identify active listening requests', async () => {
@@ -88,8 +88,8 @@ describe('SupportContextIdentifier', () => {
         'I just need someone to listen to me right now, no advice needed'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.supportType).toBe(SupportType.ACTIVE_LISTENING)
+      expect(result['isSupport']).toBe(true)
+      expect(result['supportType']).toBe(SupportType.ACTIVE_LISTENING)
     })
 
     it('should identify practical guidance requests', async () => {
@@ -97,8 +97,8 @@ describe('SupportContextIdentifier', () => {
         'What steps should I take to deal with my relationship problems?'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.supportType).toBe(SupportType.PRACTICAL_GUIDANCE)
+      expect(result['isSupport']).toBe(true)
+      expect(result['supportType']).toBe(SupportType.PRACTICAL_GUIDANCE)
     })
 
     it('should identify grief support needs', async () => {
@@ -106,9 +106,9 @@ describe('SupportContextIdentifier', () => {
         "I'm grieving the loss of my father and don't know how to cope"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.supportType).toBe(SupportType.GRIEF_SUPPORT)
-      expect(result.emotionalState).toBe(EmotionalState.SADNESS)
+      expect(result['isSupport']).toBe(true)
+      expect(result['supportType']).toBe(SupportType.GRIEF_SUPPORT)
+      expect(result['emotionalState']).toBe(EmotionalState.SADNESS)
     })
   })
 
@@ -118,23 +118,23 @@ describe('SupportContextIdentifier', () => {
         'I feel so sad and heartbroken about everything that happened'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalState).toBe(EmotionalState.SADNESS)
-      expect(result.emotionalIntensity).toBeGreaterThan(0.6)
+      expect(result['emotionalState']).toBe(EmotionalState.SADNESS)
+      expect(result['emotionalIntensity']).toBeGreaterThan(0.6)
     })
 
     it('should detect anxiety indicators', async () => {
       const query = "I'm so anxious and worried, my mind won't stop racing"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalState).toBe(EmotionalState.ANXIETY)
-      expect(result.emotionalIntensity).toBeGreaterThan(0.5)
+      expect(result['emotionalState']).toBe(EmotionalState.ANXIETY)
+      expect(result['emotionalIntensity']).toBeGreaterThan(0.5)
     })
 
     it('should detect anger indicators', async () => {
       const query = "I'm so frustrated and angry about this situation"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalState).toBe(EmotionalState.ANGER)
+      expect(result['emotionalState']).toBe(EmotionalState.ANGER)
     })
 
     it('should detect overwhelm indicators', async () => {
@@ -142,15 +142,15 @@ describe('SupportContextIdentifier', () => {
         "I'm completely overwhelmed and can't handle anything anymore"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalState).toBe(EmotionalState.OVERWHELM)
-      expect(result.urgency).toBe('high')
+      expect(result['emotionalState']).toBe(EmotionalState.OVERWHELM)
+      expect(result['urgency']).toBe('high')
     })
 
     it('should detect loneliness indicators', async () => {
       const query = 'I feel so alone and isolated, nobody understands me'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalState).toBe(EmotionalState.LONELINESS)
+      expect(result['emotionalState']).toBe(EmotionalState.LONELINESS)
     })
   })
 
@@ -183,8 +183,8 @@ describe('SupportContextIdentifier', () => {
       const result = await identifier.identifySupportContext(query)
 
       expect(mockAIService.generateText).toHaveBeenCalled()
-      expect(result.isSupport).toBe(true)
-      expect(result.confidence).toBe(0.85)
+      expect(result['isSupport']).toBe(true)
+      expect(result['confidence']).toBe(0.85)
     })
 
     it('should include conversation history in AI analysis', async () => {
@@ -225,8 +225,8 @@ describe('SupportContextIdentifier', () => {
       const query = 'I need emotional support'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.confidence).toBeLessThan(0.8)
+      expect(result['isSupport']).toBe(true)
+      expect(result['confidence']).toBeLessThan(0.8)
     })
 
     it('should handle malformed AI responses', async () => {
@@ -237,8 +237,8 @@ describe('SupportContextIdentifier', () => {
       const query = 'I need support'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.supportType).toBeDefined()
+      expect(result['isSupport']).toBe(true)
+      expect(result['supportType']).toBeDefined()
     })
   })
 
@@ -267,11 +267,11 @@ describe('SupportContextIdentifier', () => {
       const recommendations =
         identifier.generateSupportRecommendations(mockResult)
 
-      expect(recommendations.immediateActions).toContain(
+      expect(recommendations['immediateActions']).toContain(
         expect.stringMatching(/acknowledge|validate|understand/i),
       )
-      expect(recommendations.responseStyle.tone).toBe('warm')
-      expect(recommendations.responseStyle.approach).toBe('validating')
+      expect(recommendations['responseStyle']['tone']).toBe('warm')
+      expect(recommendations['responseStyle']['approach']).toBe('validating')
     })
 
     it('should generate crisis-appropriate recommendations for high urgency', async () => {
@@ -298,10 +298,10 @@ describe('SupportContextIdentifier', () => {
       const recommendations =
         identifier.generateSupportRecommendations(mockResult)
 
-      expect(recommendations.immediateActions).toContain(
+      expect(recommendations['immediateActions']).toContain(
         expect.stringMatching(/safety|crisis|immediate/i),
       )
-      expect(recommendations.resources).toContain(
+      expect(recommendations['resources']).toContain(
         expect.stringMatching(/crisis|hotline|emergency/i),
       )
     })
@@ -330,10 +330,10 @@ describe('SupportContextIdentifier', () => {
       const recommendations =
         identifier.generateSupportRecommendations(mockResult)
 
-      expect(recommendations.longerTermStrategies).toContain(
+      expect(recommendations['longerTermStrategies']).toContain(
         expect.stringMatching(/skill|practice|develop/i),
       )
-      expect(recommendations.responseStyle.approach).toBe('solution-focused')
+      expect(recommendations['responseStyle']['approach']).toBe('solution-focused')
     })
   })
 
@@ -372,8 +372,8 @@ describe('SupportContextIdentifier', () => {
 
       expect(results).toHaveLength(3)
       results.forEach((result) => {
-        expect(result.isSupport).toBe(true)
-        expect(result.confidence).toBeGreaterThan(0)
+        expect(result['isSupport']).toBe(true)
+        expect(result['confidence']).toBeGreaterThan(0)
       })
     })
 
@@ -392,9 +392,9 @@ describe('SupportContextIdentifier', () => {
       const results = await identifier.identifyBatch(queries)
 
       expect(results).toHaveLength(3)
-      expect(results[0].isSupport).toBe(true)
-      expect(results[1].isSupport).toBeDefined() // Should have fallback result
-      expect(results[2].isSupport).toBe(true)
+      expect(results[0]['isSupport']).toBe(true)
+      expect(results[1]['isSupport']).toBeDefined() // Should have fallback result
+      expect(results[2]['isSupport']).toBe(true)
     })
   })
 
@@ -404,22 +404,22 @@ describe('SupportContextIdentifier', () => {
         "I'm completely overwhelmed and breaking point, can't handle anything"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.urgency).toBe('high')
-      expect(result.emotionalIntensity).toBeGreaterThan(0.7)
+      expect(result['urgency']).toBe('high')
+      expect(result['emotionalIntensity']).toBeGreaterThan(0.7)
     })
 
     it('should classify medium urgency for moderate distress', async () => {
       const query = "I'm feeling pretty anxious about this situation"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.urgency).toBe('medium')
+      expect(result['urgency']).toBe('medium')
     })
 
     it('should classify low urgency for mild concerns', async () => {
       const query = "I'm slightly worried about an upcoming event"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.urgency).toBe('low')
+      expect(result['urgency']).toBe('low')
     })
   })
 
@@ -428,22 +428,22 @@ describe('SupportContextIdentifier', () => {
       const query = "I'm devastated, heartbroken, and completely falling apart"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalIntensity).toBeGreaterThan(0.8)
+      expect(result['emotionalIntensity']).toBeGreaterThan(0.8)
     })
 
     it('should calculate moderate intensity for typical distress', async () => {
       const query = "I'm feeling sad and need some support"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalIntensity).toBeGreaterThan(0.3)
-      expect(result.emotionalIntensity).toBeLessThan(0.8)
+      expect(result['emotionalIntensity']).toBeGreaterThan(0.3)
+      expect(result['emotionalIntensity']).toBeLessThan(0.8)
     })
 
     it('should calculate low intensity for mild concerns', async () => {
       const query = "I'm slightly concerned about this situation"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.emotionalIntensity).toBeLessThan(0.4)
+      expect(result['emotionalIntensity']).toBeLessThan(0.4)
     })
   })
 

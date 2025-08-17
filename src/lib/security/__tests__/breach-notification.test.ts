@@ -59,11 +59,11 @@ describe('breachNotificationSystem', () => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    ;(redis.set as any).mockResolvedValue('OK')
-    ;(redis.get as any).mockResolvedValue(null)
-    ;(redis.keys as any).mockResolvedValue([])
-    ;(auth.getUserById as any).mockResolvedValue(mockUser)
-    ;(FHE.encrypt as any).mockResolvedValue('encrypted_data')
+    ;(redis['set'] as any).mockResolvedValue('OK')
+    ;(redis['get'] as any).mockResolvedValue(null)
+    ;(redis['keys'] as any).mockResolvedValue([])
+    ;(auth['getUserById'] as any).mockResolvedValue(mockUser)
+    ;(FHE['encrypt'] as any).mockResolvedValue('encrypted_data')
     ;(sendEmail as any).mockResolvedValue(undefined)
 
     // Setup process.env
@@ -85,8 +85,8 @@ describe('breachNotificationSystem', () => {
         await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
       expect(breachId).toMatch(/^breach_\d+_[a-z0-9]+$/)
-      expect(redis.set).toHaveBeenCalledTimes(3) // Initial storage + status updates
-      expect(logger.error).toHaveBeenCalledWith(
+      expect(redis['set']).toHaveBeenCalledTimes(3) // Initial storage + status updates
+      expect(logger['error']).toHaveBeenCalledWith(
         'Security breach detected:',
         expect.any(Object),
       )
@@ -94,13 +94,13 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle errors during breach reporting', async () => {
-      ;(redis.set as any).mockRejectedValue(new Error('Redis error'))
+      ;(redis['set'] as any).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.reportBreach(mockBreachDetails),
       ).rejects.toThrow('Redis error')
 
-      expect(logger.error).toHaveBeenCalledWith(
+      expect(logger['error']).toHaveBeenCalledWith(
         'Failed to report breach:',
         expect.any(Error),
       )
@@ -111,13 +111,13 @@ describe('breachNotificationSystem', () => {
     it('should send notifications to all affected users', async () => {
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
-      expect(auth.getUserById).toHaveBeenCalledTimes(
-        mockBreachDetails.affectedUsers.length,
+      expect(auth['getUserById']).toHaveBeenCalledTimes(
+        mockBreachDetails['affectedUsers'].length,
       )
-      expect(FHE.encrypt).toHaveBeenCalled()
+      expect(FHE['encrypt']).toHaveBeenCalled()
       expect(sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: mockUser.email,
+          to: mockUser['email'],
           subject: expect.stringContaining('HIGH Security Event'),
           priority: 'urgent',
         }),
@@ -125,7 +125,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle missing user email gracefully', async () => {
-      ;(auth.getUserById as any).mockResolvedValue({ id: 'user1' }) // User without email
+      ;(auth['getUserById'] as any).mockResolvedValue({ id: 'user1' }) // User without email
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
@@ -137,7 +137,7 @@ describe('breachNotificationSystem', () => {
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
-      expect(logger.error).toHaveBeenCalledWith(
+      expect(logger['error']).toHaveBeenCalledWith(
         'Failed to notify user:',
         expect.any(Object),
       )

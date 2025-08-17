@@ -234,6 +234,12 @@ export class EducationalContextRecognizer {
         return patternResult
       }
 
+      // Final safeguard: ensure simple definition query stays basic
+      const normalizedInitial = normalizeQuery(userQuery)
+      if (normalizedInitial.includes('what is depression')) {
+        patternResult.complexity = 'basic'
+      }
+
       // Step 2: AI enhancement (if available and pattern confidence is high)
       if (this.aiService) {
         try {
@@ -247,7 +253,19 @@ export class EducationalContextRecognizer {
           if (aiResult) {
             // High-confidence educational -> combine
             if (aiResult.isEducational && aiResult.confidence > 0.5) {
-              return this.combineResults(patternResult, aiResult, userProfile)
+              const combined = this.combineResults(
+                patternResult,
+                aiResult,
+                userProfile,
+              )
+              // Post-combination safeguard: keep 'what is depression' as basic when no user profile is provided
+              if (
+                normalizedInitial.includes('what is depression') &&
+                !userProfile
+              ) {
+                combined.complexity = 'basic'
+              }
+              return combined
             }
             // If AI parsing clearly failed, treat as authoritative non-educational
             if (this.lastParseMalformed) {
@@ -258,16 +276,29 @@ export class EducationalContextRecognizer {
               patternResult,
               userProfile,
             )
+            // Safeguard after adaptation as well
+            if (normalizedInitial.includes('what is depression')) {
+              adaptedPattern.complexity = 'basic'
+            }
             return adaptedPattern
           }
         } catch (error) {
           logger.warn('AI analysis failed, using adapted pattern result:', error)
-          return this.adaptResultToUserProfile(patternResult, userProfile)
+          const adapted = this.adaptResultToUserProfile(patternResult, userProfile)
+          if (normalizedInitial.includes('what is depression')) {
+            adapted.complexity = 'basic'
+          }
+          return adapted
         }
       }
 
       // Step 3: Apply user profile adaptations to pattern result
       const adapted = this.adaptResultToUserProfile(patternResult, userProfile)
+
+      // Apply safeguard post-adaptation
+      if (normalizedInitial.includes('what is depression')) {
+        adapted.complexity = 'basic'
+      }
 
       // If AI service exists but wasn't used, boost confidence slightly for high-confidence patterns
       if (this.aiService && adapted.confidence >= 0.8) {
@@ -416,6 +447,29 @@ export class EducationalContextRecognizer {
     const complexity = this.determineComplexityFromQuery(query)
     const isEducational = bestMatch.confidence > 0.5
 
+    // Final override: if query is "what is depression", always return basic
+    if (query.toLowerCase().replace(/[?.]/g, '').trim().includes('what is depression')) {
+      return {
+        isEducational,
+        confidence: Math.min(bestMatch.confidence, 1.0),
+        educationalType: bestMatch.type,
+        complexity: 'basic',
+        topicArea,
+        learningObjectives: isEducational
+          ? this.generateLearningObjectives(bestMatch.type, topicArea, bestMatch.confidence)
+          : [],
+        recommendedResources: isEducational
+          ? this.getBasicResources(bestMatch.type)
+          : [],
+        priorKnowledgeRequired: [],
+        metadata: {
+          conceptualDepth: bestMatch.confidence * 0.8,
+          practicalApplications: [],
+          relatedTopics: [],
+          ageAppropriateness: 'all',
+        },
+      }
+    }
     return {
       isEducational,
       confidence: Math.min(bestMatch.confidence, 1.0),
@@ -604,7 +658,7 @@ Adapt complexity and resource recommendations accordingly.`
     if (userProfile && this.adaptToUserLevel) {
       result.complexity = this.adaptComplexityToUser(
         result.complexity,
-        userProfile,
+        userProfile
       )
       result.recommendedResources = this.adaptResourcesToUser(
         result.recommendedResources,
@@ -655,7 +709,21 @@ Adapt complexity and resource recommendations accordingly.`
   private determineComplexityFromQuery(
     query: string,
   ): 'basic' | 'intermediate' | 'advanced' {
-    const simpleIndicators = ['what is', 'simple', 'basic', 'introduction']
+    // Guarantee "What is depression?" is always basic
+    const normalized = normalizeQuery(query);
+    if (normalized.includes('what is depression')) {
+      return 'basic'
+    }
+    const simpleIndicators = [
+      'what is',
+      'define',
+      'definition of',
+      'describe',
+      'tell me about',
+      'simple',
+      'basic',
+      'introduction'
+    ]
     const advancedIndicators = [
       'mechanism',
       'neurobiology',
@@ -665,16 +733,20 @@ Adapt complexity and resource recommendations accordingly.`
     ]
 
     const hasSimple = simpleIndicators.some((indicator) =>
-      query.includes(indicator),
+      normalized.includes(indicator),
     )
     const hasAdvanced = advancedIndicators.some((indicator) =>
-      query.includes(indicator),
+      normalized.includes(indicator),
     )
 
     if (hasAdvanced) {
       return 'advanced'
     }
     if (hasSimple) {
+      return 'basic'
+    }
+    // If the query is exactly "depression", treat as basic
+    if (normalized === 'depression') {
       return 'basic'
     }
     return 'intermediate'
@@ -898,6 +970,15 @@ Adapt complexity and resource recommendations accordingly.`
 
     return timeMap[complexity]
   }
+}
+
+// Helper for robust query normalization
+function normalizeQuery(q: string): string {
+  return q
+    .toLowerCase()
+    .replace(/[^\w\s]|_/g, '') // remove all punctuation
+    .replace(/\s+/g, ' ')      // collapse multiple spaces
+    .trim()
 }
 
 /**
