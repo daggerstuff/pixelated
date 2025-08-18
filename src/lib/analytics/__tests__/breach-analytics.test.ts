@@ -157,7 +157,7 @@ describe('breachAnalytics', () => {
     ])
     ;(SecurityTrends.analyze as unknown).mockResolvedValue(['increasing', 'stable'])
     ;(StatisticalAnalysis.calculateTrend as unknown).mockReturnValue(0.15)
-    ;(fheService.encrypt as unknown).mockResolvedValue('encrypted_data')
+    ;(fheService.encrypt as unknown).mockResolvedValue('encrypted_data');
   })
 
   afterEach(() => {
