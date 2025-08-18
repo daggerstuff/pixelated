@@ -244,7 +244,7 @@ export class CrisisSessionFlaggingService {
           error,
           flagId: request && request.flagId,
         })
-        throw new Error(`Failed to update flag status: ${error && String(error)}`)
+        throw new Error(`Failed to update flag status: ${String(error)}`)
       }
 
       logger.info('Crisis flag status updated successfully', {
