@@ -132,7 +132,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     logger.error('Error in bias detection analysis:', error)
 
     return new Response(
-      JSON.stringify({ success: false, error: 'Internal Server Error', message: error instanceof Error ? String(error) : 'Unknown error' }),
+      JSON.stringify({ success: false, error: 'Internal Server Error', message: 'An internal error occurred' }),
       { status: 500, headers: { 'Content-Type': 'application/json', 'X-Processing-Time': '0', 'X-Cache': 'MISS' } },
     )
   }
