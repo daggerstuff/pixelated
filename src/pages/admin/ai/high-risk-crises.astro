@@ -3,19 +3,19 @@ export const prerender = false
 import { requirePermission } from '@/lib/access-control'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
-// Check if user has admin permission
-const checkPermission = requirePermission('read:admin')
-const permissionResponse = await checkPermission({
-  cookies: Astro.cookies,
-  redirect: Astro.redirect,
-})
+export async function get({ cookies, redirect }) {
+  // Check if user has admin permission
+  const checkPermission = requirePermission('read:admin')
+  const permissionResponse = await checkPermission({ cookies, redirect })
 
-// If permission check returned a response, return i
-if (permissionResponse) {
-  return permissionResponse
+  // If permission check returned a response, return it
+  if (permissionResponse) {
+    return permissionResponse
+  }
+
+  // Get the current user
+  return {}
 }
-
-// Get the current user
 ---
 
 <BaseLayout title="High-Risk Crisis Detections">
@@ -235,7 +235,7 @@ if (permissionResponse) {
 
     // Add event listeners to view details buttons
     document.querySelectorAll('.view-details').forEach((button) => {
-      button.addEventListener('click', (event: Event) => {
+      button.addEventListener('click', () => {
         const index = parseInt(button.getAttribute('data-index') || '0')
         showCrisisDetails(index)
       })
@@ -300,14 +300,14 @@ if (permissionResponse) {
   }
 
   // Initialize the page
-  document.addEventListener('DOMContentLoaded', (event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Initial table load
     updateTable()
 
     // Refresh button
     const refreshBtn = document.getElementById('refresh-btn')
     if (refreshBtn) {
-      refreshBtn.addEventListener('click', (event: Event) => {
+      refreshBtn.addEventListener('click', () => {
         updateTable()
       })
     }
@@ -317,7 +317,7 @@ if (permissionResponse) {
     const nextButton = document.getElementById('next-page')
 
     if (prevButton) {
-      prevButton.addEventListener('click', (event: Event) => {
+      prevButton.addEventListener('click', () => {
         if (currentPage > 0) {
           currentPage--
           updateTable()
@@ -326,7 +326,7 @@ if (permissionResponse) {
     }
 
     if (nextButton) {
-      nextButton.addEventListener('click', (event: Event) => {
+      nextButton.addEventListener('click', () => {
         currentPage++
         updateTable()
       })
@@ -351,7 +351,7 @@ if (permissionResponse) {
     const escalateBtn = document.getElementById('escalate-btn')
 
     if (markReviewedBtn) {
-      markReviewedBtn.addEventListener('click', (event: Event) => {
+      markReviewedBtn.addEventListener('click', () => {
         alert(
           'Crisis marked as reviewed. This would update the status in a real implementation.',
         )
@@ -360,7 +360,7 @@ if (permissionResponse) {
     }
 
     if (escalateBtn) {
-      escalateBtn.addEventListener('click', (event: Event) => {
+      escalateBtn.addEventListener('click', () => {
         alert(
           'Crisis escalated to emergency response team. This would trigger notifications in a real implementation.',
         )

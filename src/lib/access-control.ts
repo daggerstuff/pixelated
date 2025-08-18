@@ -135,7 +135,7 @@ export async function isStaffOrAdmin(cookies: AstroCookies): Promise<boolean> {
 /**
  * Create a middleware function that checks for a specific permission
  */
-export function requirePermission(permission: Permission): void {
+export function requirePermission(permission: Permission) {
   return async ({
     cookies,
     redirect,
