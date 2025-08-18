@@ -94,7 +94,7 @@ export class CacheInvalidation {
     try {
       const cacheKey = this.getKey(key)
       const value = await this.redis.get(cacheKey)
-      return value ? JSON.parse(value) as any : null
+      return value ? JSON.parse(value) as unknown : null
     } catch (error: unknown) {
       logger.error(this.formatErrorMessage('get cache', error))
       throw error

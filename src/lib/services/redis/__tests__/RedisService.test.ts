@@ -214,7 +214,7 @@ describe('RedisService', () => {
       await redis.set(key, value)
       const result = await redis.get(key)
 
-      expect(JSON.parse(result!) as any).toEqual({ test: 'data' })
+      expect(JSON.parse(result!) as unknown).toEqual({ test: 'data' })
       console.log('✅ PASS: should set and get values')
     })
 

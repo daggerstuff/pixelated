@@ -293,7 +293,7 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
     // Get existing logs
     const existingLogsJson = localStorage.getItem('hipaa-audit-logs')
     const existingLogs: AuditLogEntry[] = existingLogsJson
-      ? JSON.parse(existingLogsJson) as any
+      ? JSON.parse(existingLogsJson) as unknown
       : []
 
     // Add new log
@@ -450,7 +450,7 @@ export function getAuditLogs(): AuditLogEntry[] {
 
   try {
     const logsJson = localStorage.getItem('hipaa-audit-logs')
-    return logsJson ? JSON.parse(logsJson) as any : []
+    return logsJson ? JSON.parse(logsJson) as unknown : []
   } catch (error: unknown) {
     logger.error(
       'Failed to retrieve audit logs',

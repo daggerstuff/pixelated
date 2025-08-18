@@ -81,7 +81,7 @@ export class MentalLLaMAPythonBridge {
           .forEach((line) => {
             try {
               const response: PythonBridgeResponse & { id?: string } =
-                JSON.parse(line) as any
+                JSON.parse(line) as unknown
               if (
                 response &&
                 response.id &&

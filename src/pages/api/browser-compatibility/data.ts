@@ -79,7 +79,7 @@ export const GET = async ({ request }) => {
     for (const file of filesToProcess) {
       const reportPath = path.join(reportsDir, file)
       const fileContent = fs.readFileSync(reportPath, 'utf8')
-      const report = JSON.parse(fileContent) as any
+      const report = JSON.parse(fileContent) as unknown
 
       // Skip reports older than the threshold
       const reportDate = new Date(report.timestamp)

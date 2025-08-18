@@ -87,7 +87,7 @@ export const usePatternDetection = () => {
           analysisText = response
         }
 
-        const patterns = JSON.parse(analysisText) as any
+        const patterns = JSON.parse(analysisText) as unknown
 
         return Array.isArray(patterns)
           ? patterns.map((pattern) => ({

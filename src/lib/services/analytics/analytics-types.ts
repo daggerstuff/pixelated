@@ -113,7 +113,7 @@ export function isMetric(value: unknown): value is Metric {
 
 export function isValidEventJson(json: string): boolean {
   try {
-    const parsed = JSON.parse(json) as any
+    const parsed = JSON.parse(json) as unknown
     return isEvent(parsed)
   } catch {
     return false
@@ -122,7 +122,7 @@ export function isValidEventJson(json: string): boolean {
 
 export function isValidMetricJson(json: string): boolean {
   try {
-    const parsed = JSON.parse(json) as any
+    const parsed = JSON.parse(json) as unknown
     return isMetric(parsed)
   } catch {
     return false

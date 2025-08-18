@@ -436,7 +436,7 @@ export function verifySecureToken(
 
     // Decode payload using atob instead of Buffer
     const dataString = atob(encodedData)
-    const payload = JSON.parse(dataString) as any
+    const payload = JSON.parse(dataString) as unknown
 
     // Check expiration
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {

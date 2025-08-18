@@ -41,8 +41,8 @@ describe('DashboardLayout', () => {
   it('renders with default props', async () => {
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
     // Use computed path to avoid TS attempting to statically resolve .astro module
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any)
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown)
 
     // Check basic structure
     expect(container.querySelector('html')).toBeInTheDocument()
@@ -67,8 +67,8 @@ describe('DashboardLayout', () => {
     }
 
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any, customProps)
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown, customProps)
 
     // Check custom title and description
     expect(document.title).toBe('Custom Title')
@@ -85,8 +85,8 @@ describe('DashboardLayout', () => {
 
   it('applies custom className to content', async () => {
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any, {
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown, {
       contentClassName: 'custom-content-class',
     })
 
@@ -107,8 +107,8 @@ describe('DashboardLayout', () => {
 
   it('renders error boundary', async () => {
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any)
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown)
 
     expect(container.querySelector('error-boundary')).toBeInTheDocument()
   })

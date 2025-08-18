@@ -161,7 +161,7 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
 
     // Decode and parse result
     const decoder = new TextDecoder()
-    return JSON.parse(decoder.decode(decrypted) as any)
+    return JSON.parse(decoder.decode(decrypted) as unknown)
   } catch (error: unknown) {
     throw new Error(`Decryption failed: ${(error as Error).message}`)
   }

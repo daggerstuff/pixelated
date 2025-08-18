@@ -44,7 +44,7 @@ export const useRiskAssessment = () => {
           analysisText = response
         }
 
-        const analysis = JSON.parse(analysisText) as any
+        const analysis = JSON.parse(analysisText) as unknown
 
         return {
           category: analysis.category || 'low',

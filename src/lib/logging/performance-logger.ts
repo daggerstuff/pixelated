@@ -112,7 +112,7 @@ export class PerformanceLogger {
           const fileMetrics = content
             .split('\n')
             .filter((line) => line.trim())
-            .map((line) => JSON.parse(line) as any)
+            .map((line) => JSON.parse(line) as unknown)
           metrics.push(...fileMetrics)
         }
       }

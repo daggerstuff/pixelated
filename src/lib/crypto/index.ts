@@ -427,7 +427,7 @@ export class KeyStorage {
       const keyDataJson = await this.storageProvider.get(storageKey)
       if (keyDataJson) {
         try {
-          return JSON.parse(keyDataJson) as any as KeyData
+          return JSON.parse(keyDataJson) as unknown as KeyData
         } catch (error: unknown) {
           logger.error('Failed to parse key data', { keyId, error })
         }

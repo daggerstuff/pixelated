@@ -20,7 +20,7 @@ export function createSignedVerificationToken(payload: unknown): string {
   try {
     const timestamp = Date.now()
     const token = {
-      ...JSON.parse(JSON.stringify(payload) as any),
+      ...JSON.parse(JSON.stringify(payload) as unknown),
       iat: timestamp,
       exp: timestamp + 3600000, // 1 hour expiration
     }
@@ -43,7 +43,7 @@ export function createSignedVerificationToken(payload: unknown): string {
 export function verifyToken(token: string): unknown | null {
   try {
     // Use atob for browser compatibility instead of Buffer
-    const decoded = JSON.parse(atob(token) as any)
+    const decoded = JSON.parse(atob(token) as unknown)
 
     // Check expiration
     if (decoded.exp < Date.now()) {

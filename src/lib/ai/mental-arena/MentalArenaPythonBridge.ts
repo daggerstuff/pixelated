@@ -276,7 +276,7 @@ export class MentalArenaPythonBridge {
       // Read and parse result if successful
       if (result.success && (await this.fileExists(outputFile))) {
         const resultData = await fs.readFile(outputFile, 'utf-8')
-        result.output = JSON.parse(resultData) as any
+        result.output = JSON.parse(resultData) as unknown
       }
 
       return result

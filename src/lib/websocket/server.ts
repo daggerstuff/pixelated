@@ -36,7 +36,7 @@ class TherapyChatWebSocketServer {
 
     ws.on('message', async (data: string) => {
       try {
-        const message: WebSocketMessage = JSON.parse(data) as any
+        const message: WebSocketMessage = JSON.parse(data) as unknown
 
         switch (message.type) {
           case 'message':

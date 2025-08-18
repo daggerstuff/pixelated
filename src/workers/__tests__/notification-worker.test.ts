@@ -42,7 +42,7 @@ describe('notification-worker', () => {
     vi.resetModules()
 
     // Reset environment variables
-    ;(vi.mocked(env) as any).NOTIFICATION_WS_PORT = '8082'
+    ;(vi.mocked(env) as unknown).NOTIFICATION_WS_PORT = '8082'
 
     // Initialize mocks
     mockNotificationService = new NotificationService()
@@ -161,7 +161,7 @@ describe('notification-worker', () => {
   describe('environment configuration', () => {
     it('should use default WebSocket port if not configured', async () => {
       // Remove port from environment
-      ;(vi.mocked(env) as any).NOTIFICATION_WS_PORT = undefined
+      ;(vi.mocked(env) as unknown).NOTIFICATION_WS_PORT = undefined
 
       // Import worker module
       await import('../notification-worker.js')
@@ -174,7 +174,7 @@ describe('notification-worker', () => {
 
     it('should use configured WebSocket port', async () => {
       // Set custom port in environment
-      ;(vi.mocked(env) as any).NOTIFICATION_WS_PORT = '8090'
+      ;(vi.mocked(env) as unknown).NOTIFICATION_WS_PORT = '8090'
 
       // Import worker module
       await import('../notification-worker.js')

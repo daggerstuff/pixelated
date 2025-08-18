@@ -93,7 +93,7 @@ export class IntelligentCache {
       try {
         const redisValue = await this.redis.get(key)
         if (redisValue) {
-          const parsed = JSON.parse(redisValue) as any
+          const parsed = JSON.parse(redisValue) as unknown
           const value = this.deserializeValue(parsed.value, parsed.compressed)
           
           // Store back in memory cache
@@ -209,7 +209,7 @@ export class IntelligentCache {
     if (compressed && typeof value === 'string') {
       try {
         const decompressed = this.decompress(value)
-        return JSON.parse(decompressed) as any
+        return JSON.parse(decompressed) as unknown
       } catch (error: unknown) {
         logger.warn('Decompression failed:', error)
         throw error

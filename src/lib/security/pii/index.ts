@@ -534,7 +534,7 @@ class PIIDetectionService {
     const sensitiveKeys = options.sensitiveKeys ?? []
 
     // Create a copy of the data to avoid modifying the original
-    const result = JSON.parse(JSON.stringify(data) as any) as T
+    const result = JSON.parse(JSON.stringify(data) as unknown) as T
     let detectedPII = false
 
     // Process the object recursively

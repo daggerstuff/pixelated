@@ -68,13 +68,13 @@ describe('allscripts Provider', () => {
   describe('initialization', () => {
     it('should successfully initialize provider', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
-        allscriptsProvider as any,
+        allscriptsProvider as unknown,
         'verifyAllscriptsEndpoints',
       ).mockResolvedValue(undefined)
 
@@ -108,7 +108,7 @@ describe('allscripts Provider', () => {
       const mockSearchResources = vi
         .fn()
         .mockResolvedValue([mockCapabilityStatement])
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue({
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -123,7 +123,7 @@ describe('allscripts Provider', () => {
 
     it('should throw error when endpoint validation fails', async () => {
       // Mock the validateEndpoint method to return false
-      vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
         false,
       )
 
@@ -132,13 +132,13 @@ describe('allscripts Provider', () => {
 
     it('should throw error when CapabilityStatement is not found', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
       // Mock the FHIR client's searchResources method to return empty array
       const mockSearchResources = vi.fn().mockResolvedValue([])
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue({
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -149,7 +149,7 @@ describe('allscripts Provider', () => {
 
     it('should throw error when required endpoints are not available', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
@@ -190,7 +190,7 @@ describe('allscripts Provider', () => {
           return Promise.reject(new Error('Endpoint not available'))
         })
 
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue({
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -201,13 +201,13 @@ describe('allscripts Provider', () => {
 
     it('should throw error when OAuth2 configuration is missing', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
-        allscriptsProvider as any,
+        allscriptsProvider as unknown,
         'verifyAllscriptsEndpoints',
       ).mockResolvedValue(undefined)
 
@@ -225,7 +225,7 @@ describe('allscripts Provider', () => {
         },
       ])
 
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue({
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -236,13 +236,13 @@ describe('allscripts Provider', () => {
 
     it('should throw error when SMART on FHIR endpoints are missing', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
-        allscriptsProvider as any,
+        allscriptsProvider as unknown,
         'verifyAllscriptsEndpoints',
       ).mockResolvedValue(undefined)
 
@@ -261,7 +261,7 @@ describe('allscripts Provider', () => {
         },
       ])
 
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue({
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -333,7 +333,7 @@ describe('allscripts Provider', () => {
           .fn()
           .mockRejectedValue(new Error('Authentication Failed')),
       }
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue(
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue(
         mockFhirClient,
       )
 
@@ -363,7 +363,7 @@ describe('allscripts Provider', () => {
         read: vi.fn().mockResolvedValue({ resourceType: 'Patient', id: '123' }),
         searchResources: vi.fn().mockResolvedValue([]),
       }
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue(
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue(
         mockFhirClient,
       )
 
@@ -386,7 +386,7 @@ describe('allscripts Provider', () => {
             { resourceType: 'Patient', id: '123', name: [{ family: 'Test' }] },
           ]),
       }
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue(
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue(
         mockFhirClient,
       )
 
@@ -407,7 +407,7 @@ describe('allscripts Provider', () => {
       const mockFhirClient = {
         read: vi.fn().mockResolvedValue({ resourceType: 'Patient', id: '123' }),
       }
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue(
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue(
         mockFhirClient,
       )
 
@@ -426,7 +426,7 @@ describe('allscripts Provider', () => {
       const mockFhirClient = {
         read: vi.fn().mockResolvedValue({ resourceType: 'Patient', id: '123' }),
       }
-      vi.spyOn(allscriptsProvider as any, 'getClient').mockReturnValue(
+      vi.spyOn(allscriptsProvider as unknown, 'getClient').mockReturnValue(
         mockFhirClient,
       )
 

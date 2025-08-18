@@ -27,7 +27,7 @@ describe('Security Scanning Configuration', () => {
       expect(fs.existsSync(baselinePath)).toBe(true)
       
       const baselineContent = fs.readFileSync(baselinePath, 'utf8')
-      const baseline = JSON.parse(baselineContent) as any
+      const baseline = JSON.parse(baselineContent) as unknown
       
       expect(baseline.version).toBeDefined()
       expect(baseline.baseline).toBeDefined()

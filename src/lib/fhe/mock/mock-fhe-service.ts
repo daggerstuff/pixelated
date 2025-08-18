@@ -199,7 +199,7 @@ export class MockFHEService implements FHEService {
     // Parse the original value
     try {
       // Use the mockData which has been cast to MockEncryptedData<T>
-      return JSON.parse(mockData.originalValue) as any as T
+      return JSON.parse(mockData.originalValue) as unknown as T
     } catch {
       throw new Error('Failed to decrypt data')
     }
@@ -220,7 +220,7 @@ export class MockFHEService implements FHEService {
     // Parse the encrypted data
     let data: MockEncryptedData
     try {
-      data = JSON.parse(encryptedData) as any as MockEncryptedData
+      data = JSON.parse(encryptedData) as unknown as MockEncryptedData
     } catch {
       throw new Error('Invalid encrypted data format')
     }
@@ -251,7 +251,7 @@ export class MockFHEService implements FHEService {
 
     // Parse original text if it's a string
     try {
-      const originalText = JSON.parse(data.originalValue) as any
+      const originalText = JSON.parse(data.originalValue) as unknown
       if (typeof originalText === 'string') {
         // Simple sentiment detection based on keywords
         const positiveWords = ['good', 'great', 'excellent', 'happy', 'joy']
@@ -331,7 +331,7 @@ export class MockFHEService implements FHEService {
       (params?.['categories'] as Record<string, string[]>) || categories
 
     try {
-      const originalText = JSON.parse(data.originalValue) as any
+      const originalText = JSON.parse(data.originalValue) as unknown
       if (typeof originalText === 'string') {
         const text = originalText.toLowerCase()
 

@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+// Note: Avoid importing Astro types here to prevent version/type mismatches; rely on inference.
 /**
  * WebSocket API endpoint for real-time bias alerts
  *
@@ -111,7 +111,7 @@ export const GET = async () => {
 /**
  * Send test bias alert (for development/testing)
  */
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }) => {
   try {
     const body = await request.json()
     const { type = 'test', level = 'medium', message, sessionId } = body
@@ -296,7 +296,7 @@ export const POST = async ({ request }: APIContext) => {
 /**
  * Update WebSocket server configuration
  */
-export const PATCH = async ({ request }: APIContext) => {
+export const PATCH = async ({ request }: { request: Request }) => {
   try {
     const body = await request.json()
     const { action } = body

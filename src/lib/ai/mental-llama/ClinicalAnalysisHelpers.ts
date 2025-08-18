@@ -67,7 +67,7 @@ Provide a comprehensive clinical analysis in JSON format:
    */
   public parseClinicalResponse(content: string): void {
     try {
-      return JSON.parse(content) as any
+      return JSON.parse(content) as unknown
     } catch (error: unknown) {
       logger.error('Failed to parse clinical response', { error, content })
       return {

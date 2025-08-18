@@ -99,7 +99,7 @@ test('basic browser compatibility check', async ({ page, browser }) => {
 
   // Parse and validate the content
   try {
-    const featuresJson = JSON.parse(content) as any
+    const featuresJson = JSON.parse(content) as unknown
     console.log('Features detected:', featuresJson)
 
     // Verify essential features

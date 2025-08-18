@@ -77,7 +77,7 @@ export class StatePersistence {
 
       return this.config.deserialize
         ? this.config.deserialize(data)
-        : JSON.parse(data) as any
+        : JSON.parse(data) as unknown
     } catch (error: unknown) {
       logger.error('Failed to deserialize state:', error)
       throw error

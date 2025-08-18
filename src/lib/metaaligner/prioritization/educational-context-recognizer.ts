@@ -571,7 +571,7 @@ Adapt complexity and resource recommendations accordingly.`
       // Ultimate fallback: try the original content
       if (!jsonStr) jsonStr = content
       logger.info('Extracted JSON string from AI response', { jsonStr })
-      const parsed = JSON.parse(jsonStr) as any
+      const parsed = JSON.parse(jsonStr) as unknown
       logger.info('Parsed AI response JSON', { parsed })
 
       return {

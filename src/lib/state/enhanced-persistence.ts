@@ -156,7 +156,7 @@ class EnhancedStatePersistence {
     window.addEventListener('storage', (event) => {
       if (event.key && event.newValue !== event.oldValue) {
         try {
-          const newValue = event.newValue ? JSON.parse(event.newValue) as any : null
+          const newValue = event.newValue ? JSON.parse(event.newValue) as unknown : null
           this.notifyStorageChange(event.key, newValue)
         } catch (error: unknown) {
           logger.warn('Failed to parse storage change event:', error)
@@ -435,7 +435,7 @@ class EnhancedStatePersistence {
 
     try {
       const stored = localStorage.getItem(key)
-      return stored ? JSON.parse(stored) as any : defaultValue
+      return stored ? JSON.parse(stored) as unknown : defaultValue
     } catch (error: unknown) {
       logger.warn(`Failed to parse stored value for ${key}:`, error)
       return defaultValue
@@ -478,7 +478,7 @@ class EnhancedStatePersistence {
         try {
           const value = localStorage.getItem(key)
           if (value) {
-            exported[key] = JSON.parse(value) as any
+            exported[key] = JSON.parse(value) as unknown
           }
         } catch (error: unknown) {
           logger.warn(`Failed to export ${key}:`, error)

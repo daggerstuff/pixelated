@@ -192,9 +192,9 @@ export class BiasDetectionEngine {
       auditLogging: cfg['auditLogging'] ?? true,
     }
 
-  const PythonBridgeCtor = (globalThis as any).PythonBiasDetectionBridge || PythonBiasDetectionBridge
-  const MetricsCollectorCtor = (globalThis as any).BiasMetricsCollector || BiasMetricsCollector
-  const AlertSystemCtor = (globalThis as any).BiasAlertSystem || BiasAlertSystem
+  const PythonBridgeCtor = (globalThis as unknown).PythonBiasDetectionBridge || PythonBiasDetectionBridge
+  const MetricsCollectorCtor = (globalThis as unknown).BiasMetricsCollector || BiasMetricsCollector
+  const AlertSystemCtor = (globalThis as unknown).BiasAlertSystem || BiasAlertSystem
 
   this.pythonService = new PythonBridgeCtor(this.config)
   this.metricsCollector = new MetricsCollectorCtor()
@@ -235,7 +235,7 @@ export class BiasDetectionEngine {
     if (!input) { return undefined }
     if (!this.config['hipaaCompliant'] && !this.config['dataMaskingEnabled']) { return input }
     // Drop known PII-looking fields; keep coarse fields
-    const { social_security: _social_security, phone_number: _phone_number, email: _email, ...rest } = input as any
+    const { social_security: _social_security, phone_number: _phone_number, email: _email, ...rest } = input as unknown
     return rest
   }
 
@@ -376,7 +376,7 @@ export class BiasDetectionEngine {
       overallBiasScore: analysis.overallBiasScore,
       alertLevel: analysis.alertLevel,
       highlights: Object.entries(analysis.layerResults)
-        .map(([name, layer]) => ({ layer: name, biasScore: (layer as any).biasScore }))
+        .map(([name, layer]) => ({ layer: name, biasScore: (layer as unknown).biasScore }))
         .sort((a, b) => b.biasScore - a.biasScore)
         .slice(0, 3),
       confidence: analysis.confidence,
@@ -426,7 +426,7 @@ export class BiasDetectionEngine {
     this._isMonitoring = true
   this.monitoringCallbacks.push(callback)
     // Adapt callback type expected by alert system
-    this.alertSystem.addMonitoringCallback?.((a: unknown) => callback(a as any))
+    this.alertSystem.addMonitoringCallback?.((a: unknown) => callback(a as unknown))
   }
 
   async stopMonitoring() {

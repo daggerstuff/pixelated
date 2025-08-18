@@ -929,7 +929,7 @@ export class KeyRotationService extends EventEmitter {
           try {
             const value = localStorage.getItem(key)
             if (value) {
-              const keyPair = JSON.parse(value) as any as TFHEKeyPair
+              const keyPair = JSON.parse(value) as unknown as TFHEKeyPair
               allKeys.push(keyPair)
             }
           } catch (e) {

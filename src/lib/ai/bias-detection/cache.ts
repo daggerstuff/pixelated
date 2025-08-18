@@ -447,7 +447,7 @@ export class BiasDetectionCache {
           ? await this.cacheService.get(redisKey)
           : null
         if (cached) {
-          const cacheData = JSON.parse(cached) as any
+          const cacheData = JSON.parse(cached) as unknown
           return new Date(cacheData.expiresAt) >= new Date()
         }
       } catch (error: unknown) {
@@ -551,7 +551,7 @@ export class BiasDetectionCache {
           }
           let cacheData
           try {
-            cacheData = JSON.parse(cached) as any
+            cacheData = JSON.parse(cached) as unknown
           } catch {
             continue
           }
@@ -731,7 +731,7 @@ export class BiasDetectionCache {
       const base64Data = data.substring(COMPRESSION_PREFIX.length)
       const buffer = Buffer.from(base64Data, 'base64')
       const decompressed = await inflate(buffer)
-      return JSON.parse(decompressed.toString() as any)
+      return JSON.parse(decompressed.toString() as unknown)
     } catch (error: unknown) {
       logger.error('Failed to decompress data', { error })
       return data as T // Return original (potentially still compressed) data if decompression fails
@@ -907,7 +907,7 @@ export class BiasAnalysisCache {
           }
           let cacheData
           try {
-            cacheData = JSON.parse(cached) as any
+            cacheData = JSON.parse(cached) as unknown
           } catch {
             continue
           }

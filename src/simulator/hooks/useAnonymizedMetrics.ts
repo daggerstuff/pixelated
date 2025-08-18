@@ -40,7 +40,7 @@ export function useAnonymizedMetrics(): SimpleMetrics {
 
       if (storedMetrics) {
         // Use stored metrics if available
-        const parsedMetrics = JSON.parse(storedMetrics) as any
+        const parsedMetrics = JSON.parse(storedMetrics) as unknown
         setMetrics(parsedMetrics)
       } else {
         // Generate demo data for first-time users

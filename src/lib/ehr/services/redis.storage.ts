@@ -37,7 +37,7 @@ export class RedisStorageAPI implements StorageAPI {
   async get(key: string): Promise<unknown> {
     await this.ensureConnection()
     const value = await this.client.get(key)
-    return value ? JSON.parse(value) as any : null
+    return value ? JSON.parse(value) as unknown : null
   }
 
   async set(key: string, value: unknown): Promise<void> {

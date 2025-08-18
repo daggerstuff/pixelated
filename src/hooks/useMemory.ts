@@ -354,7 +354,7 @@ export function useUserPreferences(userId: string): void {
       if (prefMemory) {
         try {
           const match = prefMemory.content.match(/= (.+)$/)
-          return match && match[1] ? JSON.parse(match[1]) as any : null
+          return match && match[1] ? JSON.parse(match[1]) as unknown : null
         } catch {
           return null
         }

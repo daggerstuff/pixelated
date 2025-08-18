@@ -104,7 +104,7 @@ export function withDLPProtection(
             req.body =
               typeof req.body === 'string'
                 ? dlpResult.redactedContent
-                : JSON.parse(dlpResult.redactedContent) as any
+                : JSON.parse(dlpResult.redactedContent) as unknown
           } catch (e) {
             logger.error('Failed to parse redacted content', { error: e })
           }
@@ -137,7 +137,7 @@ export function withDLPProtection(
             // If redacted, update response body
             if (dlpResult.redactedContent) {
               try {
-                body = JSON.parse(dlpResult.redactedContent) as any
+                body = JSON.parse(dlpResult.redactedContent) as unknown
               } catch (e) {
                 logger.error('Failed to parse redacted response content', {
                   error: e,

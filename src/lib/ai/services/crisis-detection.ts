@@ -284,7 +284,7 @@ export class CrisisDetectionService {
       // Parse AI response
       const { content } = response
       try {
-        const parsed = JSON.parse(content) as any
+        const parsed = JSON.parse(content) as unknown
 
         if (typeof parsed === 'object' && parsed !== null) {
           return {

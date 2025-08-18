@@ -69,7 +69,7 @@ export class DocumentationSystem extends EventEmitter {
       // Subscribe to session update events through Redis pub/sub
       await this.redisService.subscribe('session:update', (message: string) => {
         try {
-          const sessionData = JSON.parse(message) as any
+          const sessionData = JSON.parse(message) as unknown
           if (sessionData && sessionData.sessionId) {
             this.handleSessionUpdate(sessionData.sessionId)
           }
@@ -81,7 +81,7 @@ export class DocumentationSystem extends EventEmitter {
       // Subscribe to session creation events
       await this.redisService.subscribe('session:create', (message: string) => {
         try {
-          const sessionData = JSON.parse(message) as any
+          const sessionData = JSON.parse(message) as unknown
           if (sessionData && sessionData.sessionId) {
             this.trackActiveSession(sessionData.sessionId)
           }
@@ -95,7 +95,7 @@ export class DocumentationSystem extends EventEmitter {
         'session:complete',
         (message: string) => {
           try {
-            const sessionData = JSON.parse(message) as any
+            const sessionData = JSON.parse(message) as unknown
             if (sessionData && sessionData.sessionId) {
               this.handleSessionCompletion(sessionData.sessionId)
             }

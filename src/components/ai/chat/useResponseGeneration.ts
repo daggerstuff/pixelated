@@ -413,7 +413,7 @@ export function useResponseGeneration({
             }
 
             try {
-              const data = JSON.parse(line) as any as AIStreamChunk
+              const data = JSON.parse(line) as unknown as AIStreamChunk
               const content = data?.content || ''
 
               if (content) {

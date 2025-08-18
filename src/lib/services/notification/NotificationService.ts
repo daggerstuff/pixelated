@@ -343,7 +343,7 @@ export class NotificationService {
         break
       }
 
-      const notification = NotificationItemSchema.parse(JSON.parse(item) as any)
+      const notification = NotificationItemSchema.parse(JSON.parse(item) as unknown)
 
       try {
         // Process each channel
@@ -423,7 +423,7 @@ export class NotificationService {
       throw new Error('Notification not found')
     }
 
-    const parsed = NotificationItemSchema.parse(JSON.parse(notification) as any)
+    const parsed = NotificationItemSchema.parse(JSON.parse(notification) as unknown)
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
 
@@ -448,7 +448,7 @@ export class NotificationService {
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as any))
+      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as unknown))
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(offset, offset + limit)
   }
@@ -463,7 +463,7 @@ export class NotificationService {
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as any))
+      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as unknown))
       .filter((n) => n.status !== NotificationStatus.READ).length
   }
 
@@ -531,7 +531,7 @@ export class NotificationService {
     if (!subscription) {
       return null
     }
-    return JSON.parse(subscription) as any
+    return JSON.parse(subscription) as unknown
   }
 
   /**

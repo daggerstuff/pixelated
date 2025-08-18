@@ -44,10 +44,10 @@ export const getAllTestScenarios = () => {
  */
 export const getBiasTestScenarios = () => {
   return {
-    ageBiasYoungPatient: (demographicBiasScenarios as any)?.['ageBiasYoungPatient'],
-    genderBiasFemalePatient: (demographicBiasScenarios as any)?.['genderBiasFemalePatient'],
-    racialBiasMinorityPatient: (demographicBiasScenarios as any)?.['racialBiasMinorityPatient'],
-    socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as any)?.['socioeconomicBiasLowIncomePatient'],
+    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['ageBiasYoungPatient'],
+    genderBiasFemalePatient: (demographicBiasScenarios as unknown)?.['genderBiasFemalePatient'],
+    racialBiasMinorityPatient: (demographicBiasScenarios as unknown)?.['racialBiasMinorityPatient'],
+    socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as unknown)?.['socioeconomicBiasLowIncomePatient'],
     ageBiasElderlyPatient,
   }
 }
@@ -62,9 +62,9 @@ export const getBaselineTestScenarios = () => {
     baselineDepressionScenario,
     baselinePainManagementScenario,
   } = {
-    baselineAnxietyScenario: (baselineScenarios as any)?.['anxiety'],
-    baselineDepressionScenario: (baselineScenarios as any)?.['depression'],
-    baselinePainManagementScenario: (baselineScenarios as any)?.['painManagement'],
+    baselineAnxietyScenario: (baselineScenarios as unknown)?.['anxiety'],
+    baselineDepressionScenario: (baselineScenarios as unknown)?.['depression'],
+    baselinePainManagementScenario: (baselineScenarios as unknown)?.['painManagement'],
   }
 
   return [
@@ -85,8 +85,8 @@ export const getComparativeBiasScenarios = () => {
     ageBiasYoungPatient,
     ageBiasElderlyPatient,
   } = {
-    ageBiasYoungPatient: (demographicBiasScenarios as any)?.['age']?.['young'],
-    ageBiasElderlyPatient: (demographicBiasScenarios as any)?.['age']?.['elderly'],
+    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['age']?.['young'],
+    ageBiasElderlyPatient: (demographicBiasScenarios as unknown)?.['age']?.['elderly'],
   }
 
   return [

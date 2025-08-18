@@ -421,7 +421,7 @@ export async function createProductionLLMInvoker(
         // Parse and validate response content for routing
         let parsedResponse: unknown
         try {
-          parsedResponse = JSON.parse(choice.message.content) as any
+          parsedResponse = JSON.parse(choice.message.content) as unknown
         } catch (parseError) {
           // If JSON parsing fails, create a structured fallback
           logger.warn(

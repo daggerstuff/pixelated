@@ -296,7 +296,7 @@ export class ContextDetector {
     content: string,
   ): ContextDetectionResult {
     try {
-      const parsed = JSON.parse(content) as any as Record<string, unknown>
+      const parsed = JSON.parse(content) as unknown as Record<string, unknown>
       return {
         detectedContext:
           (parsed['detectedContext'] as ContextType) || ContextType.GENERAL,

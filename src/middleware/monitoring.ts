@@ -48,7 +48,7 @@ export async function monitoringMiddleware(
       ?.split('=')[1]
 
     if (sessionCookie) {
-      const session = JSON.parse(decodeURIComponent(sessionCookie) as any)
+      const session = JSON.parse(decodeURIComponent(sessionCookie) as unknown)
       userId = session.userId
     }
   } catch {

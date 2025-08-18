@@ -637,7 +637,7 @@ Consider this context in your assessment.`
         jsonStr = content
       }
 
-      const parsed = JSON.parse(jsonStr) as any
+      const parsed = JSON.parse(jsonStr) as unknown
 
       return {
         isSupport: Boolean(parsed.isSupport),

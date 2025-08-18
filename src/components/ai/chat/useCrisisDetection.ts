@@ -1,6 +1,5 @@
 import type { CrisisDetectionResult } from '../../../lib/ai/crisis/types'
 import { useCallback, useState, useRef } from 'react'
-import crypto from 'crypto'
 
 interface UseCrisisDetectionOptions {
   apiEndpoint?: string
@@ -267,7 +266,7 @@ export function useCrisisDetection({
     }
 
     return {
-      id: `alert-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`,
+      id: `alert-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
       timestamp: new Date(),
       level,
       message,
@@ -376,7 +375,7 @@ export function useCrisisDetection({
 
           retries++
           // Exponential backoff with jitter
-          const secureJitter = parseInt(crypto.randomBytes(2).toString('hex'), 16) % 1000
+          const secureJitter = Math.floor(Math.random() * 1000)
           const delay = Math.min(1000 * Math.pow(2, retries) + secureJitter, 10000)
           await new Promise((resolve) => setTimeout(resolve, delay))
         } finally {

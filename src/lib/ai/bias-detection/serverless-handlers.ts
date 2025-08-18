@@ -16,7 +16,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
         method: event.httpMethod || event.method || 'GET',
         headers: event.headers || {},
         query: event.queryStringParameters || {},
-        body: event.body ? JSON.parse(event.body) as any : null,
+        body: event.body ? JSON.parse(event.body) as unknown : null,
         path: event.path || event.rawPath || '/',
       }
 

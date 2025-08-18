@@ -304,7 +304,7 @@ export class AnalyticsService {
       // Get existing events
       const existingEventsJson = localStorage.getItem('analytics_events')
       const existingEvents: AnalyticsEvent[] = existingEventsJson
-        ? JSON.parse(existingEventsJson) as any
+        ? JSON.parse(existingEventsJson) as unknown
         : []
 
       // Add new events
@@ -636,7 +636,7 @@ export class AnalyticsService {
 
     try {
       const eventsJson = localStorage.getItem('analytics_events')
-      return eventsJson ? JSON.parse(eventsJson) as any : []
+      return eventsJson ? JSON.parse(eventsJson) as unknown : []
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error

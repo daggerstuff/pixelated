@@ -525,7 +525,7 @@ export function createTogetherAIService(
 
                 try {
                   const jsonData = trimmedLine.slice(6) // Remove 'data: ' prefix
-                  const parsed: TogetherStreamResponse = JSON.parse(jsonData) as any
+                  const parsed: TogetherStreamResponse = JSON.parse(jsonData) as unknown
 
                   if (parsed.id) {
                     requestId = parsed.id

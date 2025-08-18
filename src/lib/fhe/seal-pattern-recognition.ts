@@ -180,7 +180,7 @@ export class SealPatternRecognitionService implements FHEService {
       // Accept an array of EncryptedPattern and process each
       const allPatterns: TrendPattern[] = []
       for (const encryptedData of encryptedPatterns) {
-        const data = JSON.parse(encryptedData.encryptedData) as any
+        const data = JSON.parse(encryptedData.encryptedData) as unknown
 
         // In a real implementation, we would decrypt the data using SEAL
         // For now, we'll generate synthetic data based on the encrypted info
@@ -295,7 +295,7 @@ export class SealPatternRecognitionService implements FHEService {
 
     try {
       // Parse the encrypted data
-      const data = JSON.parse(encryptedData.encryptedData) as any
+      const data = JSON.parse(encryptedData.encryptedData) as unknown
 
       // Session IDs from the encrypted data
       const sessionIds = data.sessionIds as string[]
@@ -422,7 +422,7 @@ export class SealPatternRecognitionService implements FHEService {
     try {
       const correlations: RiskCorrelation[] = []
       for (const encryptedData of encryptedCorrelations) {
-        JSON.parse(encryptedData.encryptedData) as any
+        JSON.parse(encryptedData.encryptedData) as unknown
         // ...existing logic to generate RiskCorrelation(s) from _data...
         // (copy your current logic here, pushing to correlations array)
         // For each generated RiskCorrelation, push to correlations

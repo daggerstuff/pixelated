@@ -402,7 +402,7 @@ export class MentalLLaMAAdapter {
         max_tokens: 500,
       })
       try {
-        const parsedLlmResponse = JSON.parse(llmResponseRaw.content) as any
+        const parsedLlmResponse = JSON.parse(llmResponseRaw.content) as unknown
         llmAnalysisResult.mentalHealthCategory =
           parsedLlmResponse.mentalHealthCategory || categoryForPrompt
         llmAnalysisResult.confidence =
@@ -588,7 +588,7 @@ export class MentalLLaMAAdapter {
         temperature: 0.2,
         max_tokens: 200,
       })
-      const parsed = JSON.parse(response.content) as any
+      const parsed = JSON.parse(response.content) as unknown
       return {
         fluency: parsed.fluency,
         completeness: parsed.completeness,

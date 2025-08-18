@@ -702,7 +702,7 @@ describe('createCryptoSystem', () => {
     const crypto = createCryptoSystem({
       namespace: 'test',
       enableScheduledRotation: true,
-    } as any) as ExtendedCryptoSystem
+    } as unknown) as ExtendedCryptoSystem
 
     expect(crypto.scheduledRotation).not.toBeNull()
 
@@ -833,7 +833,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
 
     // Decrypt the data
     const decrypted = await fheSystem.decrypt(encrypted)
-    const parsedData = JSON.parse(decrypted) as any
+    const parsedData = JSON.parse(decrypted) as unknown
 
     expect(parsedData.message).toBe(data.message)
     expect(parsedData.patientId).toBe(data.patientId)

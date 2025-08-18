@@ -196,7 +196,7 @@ async function calculateResponseTime(breach: Breach): Promise<number> {
     return 0
   }
 
-  const notificationData = JSON.parse(notifications) as any
+  const notificationData = JSON.parse(notifications) as unknown
   return notificationData.completedAt - breach.timestamp
 }
 

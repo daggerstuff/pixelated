@@ -220,7 +220,7 @@ export class HomomorphicOperations {
         // Parse the encrypted data
         let parsedData
         try {
-          parsedData = JSON.parse(encryptedData) as any
+          parsedData = JSON.parse(encryptedData) as unknown
         } catch {
           // If not JSON, use as is
           parsedData = { serializedCiphertext: encryptedData }
@@ -430,7 +430,7 @@ export class HomomorphicOperations {
       if (encryptedData.startsWith('eyJ')) {
         // Base64 JSON format
         const decoded = atob(encryptedData)
-        const parsed = JSON.parse(decoded) as any
+        const parsed = JSON.parse(decoded) as unknown
 
         if (parsed.data && typeof parsed.data === 'string') {
           decodedData = parsed.data

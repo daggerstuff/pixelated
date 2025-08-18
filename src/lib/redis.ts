@@ -78,7 +78,7 @@ export async function getFromCache<T>(key: string): Promise<T | null> {
       return null
     }
     try {
-      return JSON.parse(raw) as any as T
+      return JSON.parse(raw) as unknown as T
     } catch {
       // If not JSON, return as-is
       return raw as unknown as T

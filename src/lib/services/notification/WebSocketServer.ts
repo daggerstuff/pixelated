@@ -230,7 +230,7 @@ private async verifyToken(_token: string): Promise<string> {
     ws: WebSocket,
   ): void {
     try {
-      const message: unknown = JSON.parse(data) as any
+      const message: unknown = JSON.parse(data) as unknown
       const validatedMessage = ClientMessageSchema.parse(message)
       this.processMessage(userId, validatedMessage, ws)
     } catch (error: unknown) {

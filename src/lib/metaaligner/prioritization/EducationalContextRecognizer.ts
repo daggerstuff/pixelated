@@ -214,7 +214,7 @@ export class EducationalContextRecognizer {
     if (!content) return null
 
     try {
-      const parsed = JSON.parse(content) as any
+      const parsed = JSON.parse(content) as unknown
       return {
         isEducational: Boolean(parsed.isEducational),
         confidence: Math.max(0, Math.min(1, parsed.confidence || 0.8)),

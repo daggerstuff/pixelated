@@ -38,7 +38,7 @@ export function parseSemanticEvidenceResponse(
     // Step 1: Parse JSON safely
     let parsedResponse: unknown
     try {
-      parsedResponse = JSON.parse(response) as any
+      parsedResponse = JSON.parse(response) as unknown
     } catch (parseError) {
       logger.error('Invalid JSON in semantic evidence response', {
         error: parseError,

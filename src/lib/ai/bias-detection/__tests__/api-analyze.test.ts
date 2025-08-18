@@ -111,7 +111,7 @@ beforeEach(async () => {
 
 // Helper function to serialize mock data like JSON.stringify does for dates
 function serializeForComparison(obj: unknown): unknown {
-  return JSON.parse(JSON.stringify(obj) as any)
+  return JSON.parse(JSON.stringify(obj) as unknown)
 }
 
 describe('Session Analysis API Endpoint', () => {
@@ -234,7 +234,7 @@ describe('Session Analysis API Endpoint', () => {
       .mockImplementation((body: string, init?: ResponseInit) => {
         let responseData
         try {
-          responseData = JSON.parse(body) as any
+          responseData = JSON.parse(body) as unknown
         } catch {
           responseData = { error: 'Invalid JSON' }
         }
@@ -338,7 +338,7 @@ describe('Session Analysis API Endpoint', () => {
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => ({
           status: init?.status || 200,
-          json: mockResponseJson.mockResolvedValue(JSON.parse(body) as any),
+          json: mockResponseJson.mockResolvedValue(JSON.parse(body) as unknown),
           headers: {
             get: vi.fn((key: string) => mockResponseHeaders.get(key) || null),
           },
@@ -571,7 +571,7 @@ describe('Session Analysis API Endpoint', () => {
       global.Response = vi
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => {
-          const responseData = JSON.parse(body) as any
+          const responseData = JSON.parse(body) as unknown
           return {
             status: init?.status || 200,
             json: vi.fn().mockResolvedValue(responseData),
@@ -604,7 +604,7 @@ describe('Session Analysis API Endpoint', () => {
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => ({
           status: init?.status || 200,
-          json: vi.fn().mockResolvedValue(JSON.parse(body) as any),
+          json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
           headers: {
             get: vi.fn((key: string) => mockHeaders.get(key) || null),
           },

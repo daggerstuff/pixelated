@@ -80,7 +80,7 @@ describe('therapyChatWebSocketServer', () => {
     wss = new TherapyChatWebSocketServer(mockHttpServer)
 
     // Store reference to internal clients map (optional, if needed for assertions)
-    mockClients = (wss as any).clients
+    mockClients = (wss as unknown).clients
 
     // Important: Clear the listeners attached to the *mock server instance* before each test
     vi.mocked(mockWssInstance.on).mockClear()
@@ -111,7 +111,7 @@ describe('therapyChatWebSocketServer', () => {
 
   describe('handleConnection', () => {
     it('should add new client on connection', () => {
-      const handleConnection = (wss as any).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       expect(mockClients.size).toBe(1)
@@ -151,7 +151,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle encrypted messages with FHE', async () => {
-      const handleConnection = (wss as any).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -187,7 +187,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle status updates', async () => {
-      const handleConnection = (wss as any).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -210,7 +210,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle client disconnection', () => {
-      const handleConnection = (wss as any).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       // Get close handler using type-safe helper
@@ -228,7 +228,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle message parsing errors', async () => {
-      const handleConnection = (wss as any).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -254,10 +254,10 @@ describe('therapyChatWebSocketServer', () => {
 
       // Add client to session
       mockClients.set(clientId, mockWebSocket)
-      ;(wss as any).sessions.set(sessionId, new Set([clientId]))
+      ;(wss as unknown).sessions.set(sessionId, new Set([clientId]))
 
       // Broadcast message
-      ;(wss as any).broadcastToSession(sessionId, {
+      ;(wss as unknown).broadcastToSession(sessionId, {
         type: 'message',
         data: { content: 'test' },
       })
@@ -282,7 +282,7 @@ describe('therapyChatWebSocketServer', () => {
 
   describe('error handling', () => {
     it('should handle FHE initialization errors', async () => {
-      const handleConnection = (wss as any).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -313,7 +313,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle missing session ID', async () => {
-      const handleConnection = (wss as any).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(

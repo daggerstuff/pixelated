@@ -108,7 +108,7 @@ export class BackupVerificationService extends EventEmitter {
       const checksum = this.calculateChecksum(data)
 
       // Parse backup data
-      const backup = JSON.parse(data.toString() as any)
+      const backup = JSON.parse(data.toString() as unknown)
 
       // Verify structure
       if (!this.isValidBackupStructure(backup)) {
@@ -242,7 +242,7 @@ export class BackupVerificationService extends EventEmitter {
     try {
       // Read backup file
       const backupData = await fs.readFile(backupPath)
-      const backup = JSON.parse(backupData.toString() as any)
+      const backup = JSON.parse(backupData.toString() as unknown)
 
       // Verify backup structure
       if (!backup.data || !backup.metadata) {
@@ -321,7 +321,7 @@ export class BackupVerificationService extends EventEmitter {
       if (user && typeof user === 'object' && 'id' in user) {
         const userId = (user as { id: string }).id
         const restored = await redis.get(`user:${userId}`)
-        if (!restored || JSON.parse(restored) as any.id !== userId) {
+        if (!restored || JSON.parse(restored) as unknown.id !== userId) {
           throw new Error(`Restoration verification failed for user: ${userId}`)
         }
       }
@@ -335,7 +335,7 @@ export class BackupVerificationService extends EventEmitter {
     try {
       const metadataPath = path.join(this.backupDir, `${backupFile}.meta`)
       const data = await fs.readFile(metadataPath, 'utf-8')
-      return JSON.parse(data) as any
+      return JSON.parse(data) as unknown
     } catch {
       return null
     }

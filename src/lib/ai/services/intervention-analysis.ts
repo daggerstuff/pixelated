@@ -123,7 +123,7 @@ User response:
 
       let parsed: Record<string, unknown>
       try {
-        parsed = JSON.parse(rawContent) as any as Record<string, unknown>
+        parsed = JSON.parse(rawContent) as unknown as Record<string, unknown>
       } catch (err: unknown) {
         appLogger.error('Failed to parse AI response as JSON', {
           content: rawContent,

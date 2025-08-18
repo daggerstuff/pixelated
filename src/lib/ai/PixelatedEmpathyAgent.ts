@@ -157,7 +157,7 @@ export class PixelatedEmpathyAgent {
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               try {
-                const data = JSON.parse(line.slice(6) as any);
+                const data = JSON.parse(line.slice(6) as unknown);
                 yield data;
               } catch {
                 // Skip invalid JSON

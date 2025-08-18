@@ -122,7 +122,7 @@ async function getLastStableVersion(
       )
     }
 
-    const deployments = JSON.parse(result.stdout.toString() as any) as DeploymentInfo[]
+    const deployments = JSON.parse(result.stdout.toString() as unknown) as DeploymentInfo[]
 
     // Find last successful deployment (not the current failing one)
     const lastStable = deployments.find(

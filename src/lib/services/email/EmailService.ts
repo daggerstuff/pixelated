@@ -108,7 +108,7 @@ export class EmailService {
         break
       }
 
-      const queueItem = EmailQueueItemSchema.parse(JSON.parse(item) as any)
+      const queueItem = EmailQueueItemSchema.parse(JSON.parse(item) as unknown)
 
       try {
         // Check if we should retry based on last attempt and delay

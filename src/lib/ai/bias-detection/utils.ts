@@ -304,7 +304,7 @@ export class BiasDetectionError extends Error {
     this.retryable = retryable
     this.recoverable = retryable
     if (data && typeof data === 'object' && 'sessionId' in data) {
-      this.sessionId = String((data as any).sessionId)
+      this.sessionId = String((data as unknown).sessionId)
     }
   }
 }
@@ -319,7 +319,7 @@ export function createBiasDetectionError(
 }
 
 export function isBiasDetectionError(err: unknown): err is BiasDetectionError {
-  return err instanceof BiasDetectionError || (typeof err === 'object' && err !== null && (err as any).name === 'BiasDetectionError')
+  return err instanceof BiasDetectionError || (typeof err === 'object' && err !== null && (err as unknown).name === 'BiasDetectionError')
 }
 
 export function handleBiasDetectionError(error: unknown, _context?: Record<string, unknown>): void {

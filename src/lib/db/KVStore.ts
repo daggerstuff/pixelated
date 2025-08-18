@@ -79,7 +79,7 @@ export class KVStore {
         const storedValue = localStorage.getItem(prefixedKey)
         if (storedValue) {
           try {
-            const parsedValue = JSON.parse(storedValue) as any as T
+            const parsedValue = JSON.parse(storedValue) as unknown as T
             this.cache.set(prefixedKey, parsedValue)
             return parsedValue
           } catch (error: unknown) {

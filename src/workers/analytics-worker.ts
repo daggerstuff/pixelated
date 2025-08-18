@@ -73,7 +73,7 @@ async function startWorker() {
         // Wait for authentication message
         ws.once('message', async (data) => {
           try {
-            const message = JSON.parse(data.toString() as any)
+            const message = JSON.parse(data.toString() as unknown)
             if (message.type === 'authenticate' && message.userId) {
               // Register client for real-time updates
               serviceRef.registerClient(message.userId, ws)

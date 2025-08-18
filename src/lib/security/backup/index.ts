@@ -959,7 +959,7 @@ export class BackupSecurityManager {
       const dataStr = new TextDecoder().decode(data)
 
       // Parse the data
-      const restoredData = JSON.parse(dataStr) as any
+      const restoredData = JSON.parse(dataStr) as unknown
 
       // Process the restored data (implementation would be specific to the application)
       logger.info(

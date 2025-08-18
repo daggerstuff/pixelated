@@ -59,7 +59,7 @@ export const useEmotionDetection = () => {
               : (response as { content: string }).content
         }
 
-        const analysis = JSON.parse(analysisText) as any
+        const analysis = JSON.parse(analysisText) as unknown
 
         return {
           primaryEmotion: analysis.primaryEmotion || 'neutral',

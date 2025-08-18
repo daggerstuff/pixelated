@@ -58,7 +58,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys exist
       for (const key of keys) {
-        await (expect(key) as any)['toExistInRedis']()
+        await (expect(key) as unknown)['toExistInRedis']()
       }
 
       // Invalidate keys matching pattern
@@ -96,7 +96,7 @@ describe('cacheInvalidation Integration', () => {
       await runConcurrentOperations(operations, {
         description: 'Concurrent pattern invalidations',
         expectedDuration: 1000,
-      } as any)
+      } as unknown)
 
       await sleep(100) // Allow time for invalidation to propagate
 

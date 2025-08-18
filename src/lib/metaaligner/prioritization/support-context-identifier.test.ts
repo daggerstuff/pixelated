@@ -212,13 +212,13 @@ describe('SupportContextIdentifier', () => {
 
       await identifier.identifySupportContext(query, [], emotionalProfile)
 
-      expect((mockAIService as any)['generateText']).toHaveBeenCalledWith(
+      expect((mockAIService as unknown)['generateText']).toHaveBeenCalledWith(
         expect.stringContaining('anxiety'),
       )
     })
 
     it('should handle AI service errors gracefully', async () => {
-      ;((mockAIService as any)['generateText'] as Mock).mockRejectedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockRejectedValue(
         new Error('AI service unavailable'),
       )
 
@@ -230,7 +230,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle malformed AI responses', async () => {
-      ;((mockAIService as any)['generateText'] as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         'Invalid JSON response',
       )
 
@@ -356,7 +356,7 @@ describe('SupportContextIdentifier', () => {
         },
       }
 
-      ;((mockAIService as any)['generateText'] as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify(mockAIResponse),
       )
     })
@@ -378,7 +378,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle batch processing errors gracefully', async () => {
-      ;((mockAIService as any)['generateText'] as Mock)
+      ;((mockAIService as unknown)['generateText'] as Mock)
         .mockResolvedValueOnce('{"isSupport": true, "confidence": 0.8}')
         .mockRejectedValueOnce(new Error('AI error'))
         .mockResolvedValueOnce('{"isSupport": true, "confidence": 0.7}')
@@ -553,7 +553,7 @@ describe('SupportContextIdentifier', () => {
 
   describe('Error Handling and Validation', () => {
     it('should handle invalid support types gracefully', async () => {
-      ;((mockAIService as any)['generateText'] as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify({
           isSupport: true,
           supportType: 'invalid_type',
@@ -568,7 +568,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle invalid emotional states gracefully', async () => {
-      ;((mockAIService as any)['generateText'] as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify({
           isSupport: true,
           supportType: 'emotional_validation',
@@ -583,7 +583,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should validate urgency levels', async () => {
-      ;((mockAIService as any)['generateText'] as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify({
           isSupport: true,
           urgency: 'extreme',
@@ -597,7 +597,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle network timeouts gracefully', async () => {
-      ;((mockAIService as any)['generateText'] as Mock).mockImplementation(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockImplementation(
         () =>
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Timeout')), 100),

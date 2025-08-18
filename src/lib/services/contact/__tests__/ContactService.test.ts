@@ -39,7 +39,7 @@ describe('ContactService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    MockedEmailService.mockImplementation(() => mockEmailService as any)
+    MockedEmailService.mockImplementation(() => mockEmailService as unknown)
     contactService = new ContactService()
   })
 

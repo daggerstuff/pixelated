@@ -193,7 +193,7 @@ export function useChatCompletion({
       try {
         const saved = localStorage.getItem(persistKey)
         if (saved) {
-          const parsedMessages = JSON.parse(saved) as any as AIMessage[]
+          const parsedMessages = JSON.parse(saved) as unknown as AIMessage[]
           setMessages(parsedMessages)
           setConversationStats(prev => ({
             ...prev,
@@ -383,7 +383,7 @@ export function useChatCompletion({
                 }
 
                 try {
-                  const data = JSON.parse(line) as any as AIStreamChunk
+                  const data = JSON.parse(line) as unknown as AIStreamChunk
                   const content = data?.content
 
                   if (content) {
@@ -570,7 +570,7 @@ export function useChatCompletion({
             }
 
             try {
-              const data = JSON.parse(line) as any as AIStreamChunk
+              const data = JSON.parse(line) as unknown as AIStreamChunk
               const content = data?.content
 
               if (content) {
@@ -696,7 +696,7 @@ export function useChatCompletion({
       try {
         const saved = localStorage.getItem(persistKey)
         if (saved) {
-          const parsedMessages = JSON.parse(saved) as any as AIMessage[]
+          const parsedMessages = JSON.parse(saved) as unknown as AIMessage[]
           setMessages(parsedMessages)
         }
       } catch (err: unknown) {
@@ -718,7 +718,7 @@ export function useChatCompletion({
   // Import conversation
   const importConversation = useCallback((data: string) => {
     try {
-      const parsed = JSON.parse(data) as any
+      const parsed = JSON.parse(data) as unknown
       if (parsed.messages && Array.isArray(parsed.messages)) {
         setMessages(parsed.messages)
         if (parsed.stats) {

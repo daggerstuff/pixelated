@@ -136,7 +136,7 @@ export class AnalyticsService {
             continue
           }
 
-          const event = JSON.parse(eventJson) as any as Event
+          const event = JSON.parse(eventJson) as unknown as Event
 
           // Mark event as processed
           const processedEvent = EventSchema.parse({
@@ -193,7 +193,7 @@ export class AnalyticsService {
               logger.warn('Invalid event JSON in storage:', json)
               return null
             }
-            return JSON.parse(json) as any as Event
+            return JSON.parse(json) as unknown as Event
           } catch (error: unknown) {
             logger.error('Error parsing event JSON:', error)
             return null
@@ -231,7 +231,7 @@ export class AnalyticsService {
               logger.warn('Invalid metric JSON in storage:', json)
               return null
             }
-            return JSON.parse(json) as any as Metric
+            return JSON.parse(json) as unknown as Metric
           } catch (error: unknown) {
             logger.error('Error parsing metric JSON:', error)
             return null

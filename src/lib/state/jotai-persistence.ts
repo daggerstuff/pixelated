@@ -129,7 +129,7 @@ class EncryptedJotaiStorage<Value> {
         }
       }
 
-      const storedState: StoredState<Value> = JSON.parse(decrypted) as any
+      const storedState: StoredState<Value> = JSON.parse(decrypted) as unknown
 
       // Check TTL
       if (storedState.metadata.ttl) {
@@ -372,7 +372,7 @@ export class StatePersistenceManager {
       try {
         const value = localStorage.getItem(key)
         if (value) {
-          exported[key] = JSON.parse(value) as any
+          exported[key] = JSON.parse(value) as unknown
         }
       } catch (error: unknown) {
         logger.warn(`Failed to export state for ${key}:`, error)

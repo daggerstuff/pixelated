@@ -16,7 +16,7 @@ export const GET = async ({ request, cookies }) => {
       })
     }
 
-    const session = JSON.parse(sessionCookie.value) as any
+    const session = JSON.parse(sessionCookie.value) as unknown
     const userId = session.userId
 
     // Parse query parameters

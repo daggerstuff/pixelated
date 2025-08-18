@@ -154,7 +154,7 @@ export class UptimeMonitor {
     try {
       if (existsSync(this.dataFile)) {
         const data = readFileSync(this.dataFile, 'utf8')
-        this.records = JSON.parse(data) as any
+        this.records = JSON.parse(data) as unknown
       }
     } catch (error: unknown) {
       console.warn('Failed to load uptime records:', error)

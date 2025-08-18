@@ -41,7 +41,7 @@ describe('BiasDetectionConfigManager', () => {
     })
 
     // Reset singleton instance
-    ;(BiasDetectionConfigManager as any).instance = undefined
+    ;(BiasDetectionConfigManager as unknown).instance = undefined
   })
 
   afterEach(() => {
@@ -49,7 +49,7 @@ describe('BiasDetectionConfigManager', () => {
     process.env = originalEnv
 
     // Reset singleton instance
-    ;(BiasDetectionConfigManager as any).instance = undefined
+    ;(BiasDetectionConfigManager as unknown).instance = undefined
   })
 
   describe('Singleton Pattern', () => {
@@ -258,7 +258,7 @@ describe('BiasDetectionConfigManager', () => {
         },
       }
 
-      expect(() => configManager.updateConfig(invalidUpdates as any)).toThrow()
+      expect(() => configManager.updateConfig(invalidUpdates as unknown)).toThrow()
     })
 
     it('should preserve unchanged configuration sections', () => {
@@ -295,10 +295,10 @@ describe('BiasDetectionConfigManager', () => {
         },
       }
 
-      configManager.updateConfig(invalidConfig as any)
+      configManager.updateConfig(invalidConfig as unknown)
 
       // This should throw during update, so we test differently
-      expect(() => configManager.updateConfig(invalidConfig as any)).toThrow()
+      expect(() => configManager.updateConfig(invalidConfig as unknown)).toThrow()
     })
   })
 
@@ -325,7 +325,7 @@ describe('BiasDetectionConfigManager', () => {
       process.env['NODE_ENV'] = 'production'
 
       // Reset instance to pick up new env vars
-      ;(BiasDetectionConfigManager as any).instance = undefined
+      ;(BiasDetectionConfigManager as unknown).instance = undefined
       configManager = BiasDetectionConfigManager.getInstance()
 
       const readiness = configManager.isProductionReady()
@@ -341,7 +341,7 @@ describe('BiasDetectionConfigManager', () => {
       process.env['LOG_LEVEL'] = 'debug'
 
       // Reset instance to pick up new env vars
-      ;(BiasDetectionConfigManager as any).instance = undefined
+      ;(BiasDetectionConfigManager as unknown).instance = undefined
       configManager = BiasDetectionConfigManager.getInstance()
 
       const readiness = configManager.isProductionReady()
@@ -426,7 +426,7 @@ describe('BiasDetectionConfigManager', () => {
       process.env['ENABLE_METRICS'] = '0'
 
       // Reset instance
-      ;(BiasDetectionConfigManager as any).instance = undefined
+      ;(BiasDetectionConfigManager as unknown).instance = undefined
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
       expect(config['cache']['enabled']).toBe(true)
@@ -441,7 +441,7 @@ describe('BiasDetectionConfigManager', () => {
       process.env['MAX_CONCURRENT_ANALYSES'] = '20'
 
       // Reset instance
-      ;(BiasDetectionConfigManager as any).instance = undefined
+      ;(BiasDetectionConfigManager as unknown).instance = undefined
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
       expect(config['pythonService']['port']).toBe(8080)
@@ -454,7 +454,7 @@ describe('BiasDetectionConfigManager', () => {
       process.env.BIAS_WEIGHT_PREPROCESSING = '0.3'
 
       // Reset instance
-      ;(BiasDetectionConfigManager as any).instance = undefined
+      ;(BiasDetectionConfigManager as unknown).instance = undefined
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
       expect(config.thresholds.warning).toBe(0.35)
