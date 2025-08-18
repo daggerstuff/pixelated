@@ -5,6 +5,7 @@
  *
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import type { CryptoSystem } from '../lib/crypto'
 
 // Define SessionData locally rather than importing it
@@ -85,7 +86,7 @@ class KeyRotationManager {
   private keys: Map<string, KeyMetadata> = new Map<string, KeyMetadata>()
   private keyValues: Map<string, string> = new Map<string, string>() // Store keys for reencryption
 
-  constructor(rotationDays: number): void {
+  constructor(rotationDays: number) {
     this.rotationDays = rotationDays
   }
 
@@ -127,7 +128,7 @@ class KeyRotationManager {
     const now = Date.now()
     const result: string[] = []
 
-    for (const [keyId, metadata] of this.keys.entries()) {
+    for (const [keyId, metadata] of Array.from(this.keys.entries())) {
       if (metadata.expiresAt <= now) {
         result.push(keyId)
       }
@@ -148,7 +149,7 @@ class KeyRotationManager {
       throw new Error('Invalid encrypted data format')
     }
     
-    const version = parseInt(parts[0].substring(1), 10)
+    const version = parseInt(parts[0]?.substring(1) || '1', 10)
     
     // The original encrypted format could be:
     // v1:keyId:keyValue:data (4 parts) or v1:simpleKey:data (3 parts)
@@ -189,7 +190,7 @@ class KeyStorage {
   private namespace: string
   private keys: Map<string, KeyData> = new Map<string, KeyData>()
 
-  constructor(options: { namespace: string }): void {
+  constructor(options: { namespace: string }) {
     this.namespace = options.namespace
   }
 
@@ -254,7 +255,7 @@ class ScheduledKeyRotation {
   private interval: ReturnType<typeof setInterval> | null = null
   private keyStorage: KeyStorage
 
-  constructor(options: ScheduledKeyRotationOptions): void {
+  constructor(options: ScheduledKeyRotationOptions) {
     this.options = options
     this.keyStorage = new KeyStorage({ namespace: options.namespace })
   }
@@ -337,7 +338,7 @@ interface ExtendedFHESystem {
 
 // Function to obfuscate test keys to avoid gitleaks detection
 // while still having usable test values
-function getTestKey(id = ''): void {
+function getTestKey(id = ''): string {
   return `test-${id}-mock-key-${new Date().getTime().toString().substring(5)}`
 }
 
@@ -353,10 +354,10 @@ describe('encryption', () => {
     // Mock test key - DO NOT USE IN PRODUCTION
     const key = getTestKey('encryption')
 
-    const encrypted = Encryption.encrypt(data, key)
+    const encrypted = Encryption.encrypt(data, key as string)
     expect(encrypted).toContain('v1:') // Should have version prefix
 
-    const decrypted = Encryption.decrypt(encrypted, key)
+    const decrypted = Encryption.decrypt(encrypted, key as string)
     expect(decrypted).toBe(data)
   })
 
@@ -366,7 +367,7 @@ describe('encryption', () => {
     const key = getTestKey('version-test')
     const version = 3
 
-    const encrypted = Encryption.encrypt(data, key, version)
+    const encrypted = Encryption.encrypt(data, key as string, version)
     expect(encrypted).toContain(`v${version}:`)
   })
 
@@ -376,10 +377,10 @@ describe('encryption', () => {
     const key = getTestKey('correct')
     const wrongKey = getTestKey('wrong')
 
-    const encrypted = Encryption.encrypt(data, key)
+    const encrypted = Encryption.encrypt(data, key as string)
 
     expect(() => {
-      Encryption.decrypt(encrypted, wrongKey)
+      Encryption.decrypt(encrypted, wrongKey as string)
     }).toThrow('Failed to decrypt data')
   })
 })
@@ -411,10 +412,10 @@ describe('keyRotationManager', () => {
     const newKey = getTestKey('rotated')
 
     // Add initial key
-    keyManager.addKey(keyId, key)
+    keyManager.addKey(keyId, key as string)
 
     // Rotate the key
-    const rotatedMetadata = keyManager.rotateKey(keyId, newKey)
+    const rotatedMetadata = keyManager.rotateKey(keyId, newKey as string)
 
     expect(rotatedMetadata.id).toBe(keyId)
     expect(rotatedMetadata.version).toBe(2)
@@ -427,7 +428,7 @@ describe('keyRotationManager', () => {
     const key = getTestKey('rotation-check')
 
     // Add a key with custom expiration (expired)
-    const metadata = keyManager.addKey(keyId, key)
+    const metadata = keyManager.addKey(keyId, key as string)
 
     // Mock the expiration date to be in the pas
     const originalDate = Date.now
@@ -702,7 +703,7 @@ describe('createCryptoSystem', () => {
     const crypto = createCryptoSystem({
       namespace: 'test',
       enableScheduledRotation: true,
-    } as unknown) as ExtendedCryptoSystem
+    } as any) as ExtendedCryptoSystem
 
     expect(crypto.scheduledRotation).not.toBeNull()
 
@@ -749,8 +750,8 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
   let fheSystem: ExtendedFHESystem
 
   beforeEach(() => {
-    // Create crypto system
-    cryptoSystem = createCryptoSystem({
+    // Create crypto system (not used in these tests)
+    createCryptoSystem({
       namespace: 'test',
     })
 
@@ -765,7 +766,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
         return parts.slice(2).join(':')
       },
       processEncrypted: async (
-        encryptedData: string,
+        _encryptedData: string,
         operation: string,
       ) => {
         return {
@@ -833,7 +834,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
 
     // Decrypt the data
     const decrypted = await fheSystem.decrypt(encrypted)
-    const parsedData = JSON.parse(decrypted) as unknown
+    const parsedData = JSON.parse(decrypted) as any
 
     expect(parsedData.message).toBe(data.message)
     expect(parsedData.patientId).toBe(data.patientId)

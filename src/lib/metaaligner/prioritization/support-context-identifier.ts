@@ -210,6 +210,7 @@ export class SupportContextIdentifier {
       /\b(?:strategies for|ways to manage|help me manage)\b/i,
       /\b(?:don't know how to cope|struggling to cope)\b/i,
       /\b(?:need help coping|can't handle this|overwhelmed and need)\b/i,
+      /\b(?:don't know how to handle|how to handle this|what should I do)\b/i,
     ],
     encouragement: [
       /\b(?:need hope|give up|motivation|strength|keep going|hang in there)\b/i,
@@ -255,7 +256,7 @@ export class SupportContextIdentifier {
     ],
   }
 
-  constructor(config: SupportIdentifierConfig): void {
+  constructor(config: SupportIdentifierConfig) {
     this.aiService = config.aiService
     this.model = config.model || 'claude-4-sonnet'
     this.enableEmotionalAnalysis = config.enableEmotionalAnalysis ?? true
@@ -596,8 +597,9 @@ Consider this context in your assessment.`
     }
 
     // Prefer generateText if available per tests; fallback to chat
-    if (typeof (this.aiService as { generateText?: (...args: unknown[]) => Promise<string> }).generateText === 'function') {
-      const text = await (this.aiService as { generateText: (...args: unknown[]) => Promise<string> }).generateText(
+    const aiServiceWithGenerateText = this.aiService as unknown as { generateText?: (...args: unknown[]) => Promise<string> }
+    if (typeof aiServiceWithGenerateText.generateText === 'function') {
+      const text = await aiServiceWithGenerateText.generateText(
         `${contextualPrompt}\n\n${queryWithContext}`,
       )
       return this.parseAIResponse(String(text))
@@ -610,7 +612,7 @@ Consider this context in your assessment.`
 
     const response = await this.aiService.createChatCompletion(messages, {
       model: this.model,
-    })
+    }) as { choices?: Array<{ message?: { content?: string } }> }
     const content = response.choices?.[0]?.message?.content
     if (!content) {
       throw new Error('No content received from AI service response')
@@ -637,21 +639,38 @@ Consider this context in your assessment.`
         jsonStr = content
       }
 
-      const parsed = JSON.parse(jsonStr) as unknown
+      const parsed = JSON.parse(jsonStr) as {
+        isSupport?: boolean
+        confidence?: number
+        supportType?: string
+        emotionalState?: string
+        urgency?: string
+        supportNeeds?: unknown[]
+        recommendedApproach?: string
+        emotionalIntensity?: number
+        metadata?: {
+          emotionalIndicators?: unknown[]
+          copingCapacity?: string
+          socialSupport?: string
+          immediateNeeds?: unknown[]
+          triggerEvents?: unknown[]
+          resilientFactors?: unknown[]
+        }
+      }
 
       return {
         isSupport: Boolean(parsed.isSupport),
         confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
-        supportType: this.validateSupportType(parsed.supportType),
-        emotionalState: this.validateEmotionalState(parsed.emotionalState),
-        urgency: this.validateUrgency(parsed.urgency),
+        supportType: this.validateSupportType(parsed.supportType || ''),
+        emotionalState: this.validateEmotionalState(parsed.emotionalState || ''),
+        urgency: this.validateUrgency(parsed.urgency || ''),
         supportNeeds: Array.isArray(parsed.supportNeeds)
           ? parsed.supportNeeds
           .map((n: unknown) => this.validateSupportNeed(n as string))
-          .filter(Boolean)
+          .filter((need): need is SupportNeed => need !== null)
         : [],
         recommendedApproach: this.validateRecommendedApproach(
-          parsed.recommendedApproach,
+          parsed.recommendedApproach || '',
         ),
         emotionalIntensity: Math.max(
           0,
@@ -661,22 +680,22 @@ Consider this context in your assessment.`
           emotionalIndicators: Array.isArray(
             parsed.metadata?.emotionalIndicators,
           )
-            ? parsed.metadata.emotionalIndicators
+            ? (parsed.metadata.emotionalIndicators as string[])
             : [],
           copingCapacity: this.validateCopingCapacity(
-            parsed.metadata?.copingCapacity,
+            parsed.metadata?.copingCapacity || '',
           ),
           socialSupport: this.validateSocialSupport(
-            parsed.metadata?.socialSupport,
+            parsed.metadata?.socialSupport || '',
           ),
           immediateNeeds: Array.isArray(parsed.metadata?.immediateNeeds)
-            ? parsed.metadata.immediateNeeds
+            ? (parsed.metadata.immediateNeeds as string[])
             : [],
           triggerEvents: Array.isArray(parsed.metadata?.triggerEvents)
-            ? parsed.metadata.triggerEvents
+            ? (parsed.metadata.triggerEvents as string[])
             : undefined,
           resilientFactors: Array.isArray(parsed.metadata?.resilientFactors)
-            ? parsed.metadata.resilientFactors
+            ? (parsed.metadata.resilientFactors as string[])
             : undefined,
         },
       }

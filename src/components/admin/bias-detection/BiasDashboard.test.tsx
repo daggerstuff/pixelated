@@ -7,7 +7,7 @@ import { vi } from 'vitest'
 import '@testing-library/jest-dom'
 
 // Keep original fetch to restore after tests
-let __originalFetch: typeof fetch | undefined = (global.fetch as unknown)
+let __originalFetch: typeof fetch | undefined = global.fetch as typeof fetch
 
 // Mock the logger
 vi.mock('@/lib/logging/build-safe-logger', () => ({
@@ -110,10 +110,10 @@ const MockWebSocketConstructor = vi.fn(createMockWebSocket) as ReturnType<
 vi.stubGlobal('WebSocket', MockWebSocketConstructor)
 
 // Define standard readyState constants on the mock constructor
-;(MockWebSocketConstructor as unknown).CONNECTING = 0
-;(MockWebSocketConstructor as unknown).OPEN = 1
-;(MockWebSocketConstructor as unknown).CLOSING = 2
-;(MockWebSocketConstructor as unknown).CLOSED = 3
+;(MockWebSocketConstructor as any).CONNECTING = 0
+;(MockWebSocketConstructor as any).OPEN = 1
+;(MockWebSocketConstructor as any).CLOSING = 2
+;(MockWebSocketConstructor as any).CLOSED = 3
 
 // --- GLOBAL MOCKS FOR BROWSER APIS ---
 // Ensure matchMedia is always mocked for all tests
@@ -173,7 +173,7 @@ describe('BiasDashboard', () => {
         recentAnalyses: [],
         recommendations: [],
       }),
-    } as unknown)
+    } as any)
   })
 
   afterEach(() => {
@@ -182,10 +182,10 @@ describe('BiasDashboard', () => {
     vi.useRealTimers()
     // Restore original fetch for safety
     if (__originalFetch) {
-      global.fetch = __originalFetch as unknown
+      global.fetch = __originalFetch
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(global as unknown).fetch = undefined
+      ;(global as any).fetch = undefined
     }
     // Ensure global WebSocket remains our mock after tests that might override it
     vi.stubGlobal('WebSocket', MockWebSocketConstructor)
@@ -233,7 +233,7 @@ describe('BiasDashboard', () => {
       openCall[1]()
     }
 
-    expect(screen.getByText('Live updates connected')).toBeInTheDocument()
+    expect(screen.getByText(/Live updates connected/)).toBeInTheDocument()
   })
 
   it('handles WebSocket errors gracefully', async () => {
@@ -254,7 +254,7 @@ describe('BiasDashboard', () => {
       heartbeatInterval: null,
     }
 
-    global.WebSocket = vi.fn(() => mockWebSocket) as typeof WebSocket
+    global.WebSocket = vi.fn(() => mockWebSocket) as any
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
 
@@ -329,7 +329,7 @@ describe('BiasDashboard', () => {
     fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('New high bias alert')).toBeInTheDocument()
+      expect(screen.getByText(/New high bias alert/)).toBeInTheDocument()
     })
   })
 
@@ -419,7 +419,7 @@ describe('BiasDashboard', () => {
     if (openCall && typeof openCall[1] === 'function') {
       openCall[1]()
       // Set up heartbeat interval to simulate real behavior
-      mockWs.heartbeatInterval = setInterval(() => {}, 30000) as unknown
+      mockWs.heartbeatInterval = setInterval(() => {}, 30000) as any
     }
 
     unmount()
@@ -954,8 +954,8 @@ describe('BiasDashboard', () => {
       const clickSpy = vi
         .spyOn(HTMLAnchorElement.prototype, 'click')
         .mockImplementation(() => {})
-      const originalFetch = (globalThis as unknown).fetch
-      ;(globalThis as unknown).fetch = vi
+      const originalFetch = globalThis.fetch
+      globalThis.fetch = vi
         .fn(async (input: any, init?: any) => {
           const url = typeof input === 'string' ? input : input?.url
           if (url && url.includes('/api/bias-detection/export')) {
@@ -969,7 +969,7 @@ describe('BiasDashboard', () => {
           }
           // Defer all other requests to the original fetch (handled by MSW)
           return originalFetch(input, init)
-        }) as typeof fetch
+        }) as any
 
       render(<BiasDashboard />)
 
@@ -988,9 +988,9 @@ describe('BiasDashboard', () => {
 
       // Cleanup
       clickSpy.mockRestore()
-      ;(globalThis as unknown).fetch = originalFetch
-      ;(global.URL.createObjectURL as unknown) = vi.fn()
-      ;(global.URL.revokeObjectURL as unknown) = vi.fn()
+      globalThis.fetch = originalFetch
+      ;(global.URL.createObjectURL as any) = vi.fn()
+      ;(global.URL.revokeObjectURL as any) = vi.fn()
     })
 
     it('closes export dialog when cancel is clicked', async () => {
@@ -1311,7 +1311,7 @@ describe('BiasDashboard', () => {
 
     // Helper to always reference the latest constructed WebSocket instance
     const getCurrentWS = (): MockWebSocketInstance => {
-      const results = (MockWebSocketConstructor as unknown).mock?.results || []
+      const results = (MockWebSocketConstructor as any).mock?.results || []
       const last = results.length ? results[results.length - 1] : undefined
       return (last?.value ?? mockWebSocket) as MockWebSocketInstance
     }
@@ -1330,7 +1330,7 @@ describe('BiasDashboard', () => {
       container = document.body.appendChild(document.createElement('div'))
 
       // Mock fetch used by BiasDashboard initial data load
-      originalFetch = global.fetch as unknown
+      originalFetch = global.fetch
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         statusText: 'OK',
@@ -1349,7 +1349,7 @@ describe('BiasDashboard', () => {
           recentAnalyses: [],
           recommendations: [],
         }),
-      } as unknown)
+      } as any)
       // Ensure the component receives the same mock instance we control
       MockWebSocketConstructor.mockImplementation(() => {
         const ws = createMockWebSocket()
@@ -1364,10 +1364,10 @@ describe('BiasDashboard', () => {
     afterEach(() => {
       // Clean up fetch and container
       if (originalFetch) {
-        global.fetch = originalFetch as unknown
+        global.fetch = originalFetch
       } else {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(global as unknown).fetch = undefined
+        ;(global as any).fetch = undefined
       }
       if (container && container.parentNode) {
         container.parentNode.removeChild(container)
@@ -1375,7 +1375,7 @@ describe('BiasDashboard', () => {
       // Clear any heartbeat interval that might have been set on the current mock
       const ws = getCurrentWS()
       if (ws && ws.heartbeatInterval) {
-        clearInterval(ws.heartbeatInterval as unknown)
+        clearInterval(ws.heartbeatInterval as any)
         ws.heartbeatInterval = null
       }
       MockWebSocketConstructor.mockReset()
@@ -1490,7 +1490,7 @@ describe('BiasDashboard', () => {
       // Should send subscription message quickly after open
       await waitFor(() => {
         expect(mockWebSocket.send).toHaveBeenCalled()
-        const sent = (mockWebSocket.send as unknown).mock.calls
+        const sent = (mockWebSocket.send as any).mock.calls
           .map((c: any[]) => c[0])
           .join('\n')
         expect(sent).toContain('"type":"subscribe"')
@@ -1720,7 +1720,7 @@ describe('BiasDashboard', () => {
       // Our mock does not automatically call onclose when close() is invoked.
       // Trigger onclose to allow the component's reconnect logic to run.
       const ws = getCurrentWS() || mockWebSocket
-      ws?.onclose?.({ code: 1000, reason: 'Manual reconnection', wasClean: true } as unknown)
+      ws?.onclose?.(new CloseEvent('close', { code: 1000, reason: 'Manual reconnection', wasClean: true }))
 
       // Allow the 100ms reconnect timeout to elapse
       await new Promise((r) => setTimeout(r, 150))
@@ -1748,7 +1748,7 @@ describe('BiasDashboard', () => {
       })
 
       // Set up heartbeat interval
-      mockWebSocket.heartbeatInterval = setInterval(() => {}, 30000) as unknown
+      mockWebSocket.heartbeatInterval = setInterval(() => {}, 30000) as any
 
       // Unmount component
       unmount()

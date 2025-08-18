@@ -546,15 +546,14 @@ test.describe('Legacy Browser Support', () => {
 // Test browser-specific device combinations
 test.describe('Browser-Device Combinations', () => {
   const deviceBrowserCombinations = [
-    { device: devices['iPhone 12'], browser: 'webkit' },
-    { device: devices['Pixel 5'], browser: 'chromium' },
-    { device: devices['iPad Pro'], browser: 'webkit' },
+    { deviceName: 'iPhone 12', device: devices['iPhone 12'], browser: 'webkit' as const },
+    { deviceName: 'Pixel 5', device: devices['Pixel 5'], browser: 'chromium' as const },
+    { deviceName: 'iPad Pro', device: devices['iPad Pro'], browser: 'webkit' as const },
   ]
 
-  deviceBrowserCombinations.forEach(({ device, browser }) => {
-    test(`${device.name} with ${browser}`, async ({ playwright }) => {
-      const browserInstance =
-        await playwright[browser as keyof typeof playwright].launch()
+  deviceBrowserCombinations.forEach(({ deviceName, device, browser }) => {
+    test(`${deviceName} with ${browser}`, async ({ playwright }) => {
+      const browserInstance = await playwright[browser].launch()
       const context = await browserInstance.newContext({
         ...device,
       })

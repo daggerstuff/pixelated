@@ -1,0 +1,32 @@
+{
+  "name": "pixelated-empathy",
+  "description": "AI-powered bias detection and mental health platform",
+  "repository": "https://github.com/your-repo/pixelated",
+  "keywords": ["astro", "ai", "mental-health", "bias-detection"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "value": "production"
+    },
+    "PYTHON_VERSION": {
+      "value": "3.11"
+    }
+  },
+  "scripts": {
+    "test": "pnpm test:unit && python -m pytest"
+  },
+  "environments": {
+    "test": {
+      "scripts": {
+        "test": "pnpm test:unit && python -m pytest"
+      }
+    }
+  }
+}

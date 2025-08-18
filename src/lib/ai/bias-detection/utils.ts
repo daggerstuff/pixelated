@@ -162,7 +162,7 @@ export function sanitizeTextContent(content: string, maskingEnabled = true): str
 }
 
 // Demographic helpers
-export function extractDemographicGroups(d: ParticipantDemographics): void {
+export function extractDemographicGroups(d: ParticipantDemographics): Array<{ type: string; value: string }> {
   const groups: Array<{ type: string; value: string }> = []
   if (d.age) groups.push({ type: 'age', value: d.age })
   if (d.gender) groups.push({ type: 'gender', value: d.gender })
@@ -296,7 +296,7 @@ export class BiasDetectionError extends Error {
   retryable: boolean
   recoverable: boolean
   sessionId?: string
-  constructor(code: string, message: string, data: Record<string, unknown> = {}, retryable = false): void {
+  constructor(code: string, message: string, data: Record<string, unknown> = {}, retryable = false) {
     super(message)
     this.name = 'BiasDetectionError'
     this.code = code
@@ -304,8 +304,12 @@ export class BiasDetectionError extends Error {
     this.retryable = retryable
     this.recoverable = retryable
     if (data && typeof data === 'object' && 'sessionId' in data) {
-      this.sessionId = String((data as unknown).sessionId)
+      this.sessionId = String(data['sessionId'])
     }
+  }
+
+  override toString(): string {
+    return this.message
   }
 }
 
@@ -319,10 +323,10 @@ export function createBiasDetectionError(
 }
 
 export function isBiasDetectionError(err: unknown): err is BiasDetectionError {
-  return err instanceof BiasDetectionError || (typeof err === 'object' && err !== null && (err as unknown).name === 'BiasDetectionError')
+  return err instanceof BiasDetectionError || (typeof err === 'object' && err !== null && 'name' in err && (err as any).name === 'BiasDetectionError')
 }
 
-export function handleBiasDetectionError(error: unknown, _context?: Record<string, unknown>): void {
+export function handleBiasDetectionError(error: unknown, _context?: Record<string, unknown>): { shouldRetry: boolean; alertLevel: AlertLevel } {
   if (isBiasDetectionError(error)) {
     return { shouldRetry: !!error.retryable, alertLevel: 'medium' as AlertLevel }
   }
@@ -330,7 +334,7 @@ export function handleBiasDetectionError(error: unknown, _context?: Record<strin
 }
 
 // Data transformation to/from Python
-export function transformSessionForPython(session: TherapeuticSession): void {
+export function transformSessionForPython(session: TherapeuticSession): any {
   return {
     session_id: session.sessionId,
     timestamp: session.timestamp.toISOString(),
@@ -365,7 +369,7 @@ export function transformSessionForPython(session: TherapeuticSession): void {
   }
 }
 
-export function transformPythonResponse(response: any): void {
+export function transformPythonResponse(response: any): any {
   return {
     overallBiasScore: response.overall_bias_score,
     confidence: response.confidence,
@@ -410,7 +414,7 @@ export function requiresAdditionalAuth(
   return false
 }
 
-export function generateAnonymizedId(input: string, salt: string): void {
+export function generateAnonymizedId(input: string, salt: string): string {
   const hash = crypto.createHash('sha256').update(`${salt}:${input}`).digest('hex')
   return `anon_${hash.slice(0, 16)}`
 }
