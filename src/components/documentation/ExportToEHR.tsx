@@ -184,7 +184,6 @@ export function ExportToEHR({
                       Format: {exportFormat.toUpperCase()}
                     </p>
                    {typeof exportResult === 'object' &&
-                     exportResult !== null &&
                      'documentId' in exportResult &&
                      exportResult.documentId && (
                        <p className="text-sm text-green-700 dark:text-green-300">
@@ -192,7 +191,6 @@ export function ExportToEHR({
                        </p>
                      )}
                    {typeof exportResult === 'object' &&
-                     exportResult !== null &&
                      'documentUrl' in exportResult &&
                      exportResult.documentUrl && (
                        <div className="mt-1">
