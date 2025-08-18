@@ -1399,7 +1399,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
       ethnicity: Record<string, number>
     },
     recommendations = [],
-  } = dashboardData || {}
+  } = dashboardData
 
   // Apply filters to data
   const filteredTrends =
