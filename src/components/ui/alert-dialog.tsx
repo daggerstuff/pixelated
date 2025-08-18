@@ -24,7 +24,7 @@ const AlertDialogContext = React.createContext<{
   onOpenChange: (open: boolean) => void
 }>({ open: false, onOpenChange: () => {} })
 
-function AlertDialog({ open = false, onOpenChange, children }: AlertDialogProps): void {
+function AlertDialog({ open = false, onOpenChange, children }: AlertDialogProps) {
   const [isOpen, setIsOpen] = React.useState(open)
 
   React.useEffect(() => {
@@ -43,7 +43,7 @@ function AlertDialog({ open = false, onOpenChange, children }: AlertDialogProps)
   )
 }
 
-function AlertDialogTrigger({ className, children, onClick, ...props }: AlertDialogTriggerProps): void {
+function AlertDialogTrigger({ className, children, onClick, ...props }: AlertDialogTriggerProps) {
   const { onOpenChange } = React.useContext(AlertDialogContext)
 
   const handleClick = () => {
@@ -58,7 +58,7 @@ function AlertDialogTrigger({ className, children, onClick, ...props }: AlertDia
   )
 }
 
-function AlertDialogPortal({ children }: { children: React.ReactNode }): void {
+function AlertDialogPortal({ children }: { children: React.ReactNode }) {
   const { open } = React.useContext(AlertDialogContext)
   
   if (!open) {
@@ -72,7 +72,7 @@ function AlertDialogPortal({ children }: { children: React.ReactNode }): void {
   )
 }
 
-function AlertDialogOverlay({ className, ...props }: React.ComponentProps<'button'>): void {
+function AlertDialogOverlay({ className, ...props }: React.ComponentProps<'button'>) {
   const { onOpenChange } = React.useContext(AlertDialogContext)
   
   return (
@@ -94,7 +94,7 @@ function AlertDialogOverlay({ className, ...props }: React.ComponentProps<'butto
   )
 }
 
-function AlertDialogContent({ className, children, ...props }: AlertDialogContentProps): void {
+function AlertDialogContent({ className, children, ...props }: AlertDialogContentProps) {
   const { open } = React.useContext(AlertDialogContext)
   
   if (!open) {
@@ -128,7 +128,7 @@ function AlertDialogContent({ className, children, ...props }: AlertDialogConten
   )
 }
 
-function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>): void {
+function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       className={cn(
@@ -140,7 +140,7 @@ function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>)
   )
 }
 
-function AlertDialogFooter({ className, ...props }: React.ComponentProps<'div'>): void {
+function AlertDialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       className={cn(
@@ -152,7 +152,7 @@ function AlertDialogFooter({ className, ...props }: React.ComponentProps<'div'>)
   )
 }
 
-function AlertDialogTitle({ className, children, ...props }: React.ComponentProps<'h2'>): void {
+function AlertDialogTitle({ className, children, ...props }: React.ComponentProps<'h2'>) {
   if (!children) {
     return null; // Don't render empty headings
   }
@@ -166,7 +166,7 @@ function AlertDialogTitle({ className, children, ...props }: React.ComponentProp
   )
 }
 
-function AlertDialogDescription({ className, ...props }: React.ComponentProps<'p'>): void {
+function AlertDialogDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
     <p
       className={cn('text-sm text-muted-foreground', className)}
@@ -175,7 +175,7 @@ function AlertDialogDescription({ className, ...props }: React.ComponentProps<'p
   )
 }
 
-function AlertDialogAction({ className, onClick, ...props }: React.ComponentProps<'button'>): void {
+function AlertDialogAction({ className, onClick, ...props }: React.ComponentProps<'button'>) {
   const { onOpenChange } = React.useContext(AlertDialogContext)
   
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -192,7 +192,7 @@ function AlertDialogAction({ className, onClick, ...props }: React.ComponentProp
   )
 }
 
-function AlertDialogCancel({ className, onClick, ...props }: React.ComponentProps<'button'>): void {
+function AlertDialogCancel({ className, onClick, ...props }: React.ComponentProps<'button'>) {
   const { onOpenChange } = React.useContext(AlertDialogContext)
   
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {

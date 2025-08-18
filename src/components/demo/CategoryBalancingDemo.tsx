@@ -2,7 +2,7 @@ export interface CategoryBalancingDemoProps {
   className?: string
 }
 
-export function CategoryBalancingDemo({ className }: CategoryBalancingDemoProps): void {
+export function CategoryBalancingDemo({ className }: CategoryBalancingDemoProps) {
   return (
     <div className={className}>
       <h3>Category Balancing Demo</h3>

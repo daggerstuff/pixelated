@@ -12,7 +12,7 @@ interface NotificationCenterProps {
   className?: string
 }
 
-export function NotificationCenter({ className }: NotificationCenterProps): void {
+export function NotificationCenter({ className }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)

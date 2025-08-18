@@ -59,11 +59,11 @@ export function ChatContainer({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>): void {
+  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value)
   }
 
-  function handleSubmit(e: FormEvent): void {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
     if (!input.trim() || isLoading || disabled) {

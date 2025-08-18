@@ -94,7 +94,7 @@ function CameraController() {
   );
 }
 
-function EnhancedSpotlight(props: SpotLightProps): void {
+function EnhancedSpotlight(props: SpotLightProps) {
   const light = useRef<THREE.SpotLight>(null!);
   const { scene } = useThree();
 

@@ -62,7 +62,7 @@ function BiasLoadingFallback() {
   );
 }
 
-export default function LazyBiasDashboard(props: LazyBiasDashboardProps): void {
+export default function LazyBiasDashboard(props: LazyBiasDashboardProps) {
   return (
     <Suspense fallback={<BiasLoadingFallback />}>
       <BiasDashboard {...props} />

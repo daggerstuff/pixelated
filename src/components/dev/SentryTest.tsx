@@ -16,7 +16,7 @@ interface SentryTestProps {
   className?: string
 }
 
-export default function SentryTest({ className = '' }: SentryTestProps): void {
+export default function SentryTest({ className = '' }: SentryTestProps) {
   // Only show in development
   if (import.meta.env.PROD) {
     return null

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Button } from '~/components/ui/button'
 
-function FloatingPaths({ position }: { position: number }): void {
+function FloatingPaths({ position }: { position: number }) {
   const paths = Array.from({ length: 36 }, (_, i) => ({
     id: i,
     d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${

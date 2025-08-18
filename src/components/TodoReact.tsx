@@ -11,7 +11,7 @@ interface TodoProps {
   initialTodos?: TodoItem[]
 }
 
-export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps): void {
+export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [inputValue, setInputValue] = useState('')
 

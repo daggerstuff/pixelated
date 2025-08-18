@@ -134,7 +134,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Update an existing goal
-  async function updateGoal(goal: TherapeuticGoal): void {
+  async function updateGoal(goal: TherapeuticGoal) {
     setActionLoading(true)
     setActionError(null)
     try {
@@ -162,7 +162,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Delete a goal
-  async function deleteGoal(goalId: string): void {
+  async function deleteGoal(goalId: string) {
     setActionLoading(true)
     setActionError(null)
     try {
@@ -186,7 +186,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Open modal for new or edit
-  function openModal(goal?: TherapeuticGoal): void {
+  function openModal(goal?: TherapeuticGoal) {
     setEditGoal(goal || null)
     setForm(
       goal
@@ -222,7 +222,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Handle form submit
-  async function handleFormSubmit(e: React.FormEvent): void {
+  async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (editGoal) {
       await updateGoal({ ...editGoal, ...form })

@@ -19,7 +19,7 @@ export function useTheme() {
   return context
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }): void {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   // Initialize with dark as default
   const [theme, setThemeState] = useState<Theme>('dark')
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark')

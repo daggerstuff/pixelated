@@ -43,7 +43,7 @@ function AnalyticsLoadingFallback() {
   );
 }
 
-export default function LazyAnalyticsDashboard(props: LazyAnalyticsDashboardProps): void {
+export default function LazyAnalyticsDashboard(props: LazyAnalyticsDashboardProps) {
   return (
     <Suspense fallback={<AnalyticsLoadingFallback />}>
       <AnalyticsDashboardReact {...props} />

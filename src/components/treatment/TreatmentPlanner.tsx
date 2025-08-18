@@ -21,7 +21,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState('all')
 
-  async function fetchRecommendations(e: React.FormEvent<HTMLFormElement>): void {
+  async function fetchRecommendations(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError(null)

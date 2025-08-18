@@ -342,7 +342,7 @@ export interface SelectGroupProps {
 }
 
 // SelectGroup component - a group of related options
-export function SelectGroup({ children, className = '' }: SelectGroupProps): void {
+export function SelectGroup({ children, className = '' }: SelectGroupProps) {
   return (
     <div className={`select-group ${className}`} role="group">
       {children}
@@ -357,7 +357,7 @@ export interface SelectLabelProps {
 }
 
 // SelectLabel component - a label for a group of options
-export function SelectLabel({ children, className = '' }: SelectLabelProps): void {
+export function SelectLabel({ children, className = '' }: SelectLabelProps) {
   return <div className={`select-label ${className}`}>{children}</div>
 }
 
@@ -423,7 +423,7 @@ export interface SelectValueProps {
   className?: string
 }
 
-export function SelectValue({ className = '' }: SelectValueProps): void {
+export function SelectValue({ className = '' }: SelectValueProps) {
   const { selectedLabel } = useSelectContext()
 
   return <span className={`select-value ${className}`}>{selectedLabel}</span>

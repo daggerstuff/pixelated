@@ -6,7 +6,7 @@ interface ResetPasswordFormProps {
   email: string
 }
 
-export function ResetPasswordForm({ token, email }: ResetPasswordFormProps): void {
+export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
   const { verifyOtp } = useAuth()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')

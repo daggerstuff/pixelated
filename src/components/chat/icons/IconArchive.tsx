@@ -2,7 +2,7 @@ interface IconProps {
   className?: string
 }
 
-export default function IconArchive({ className = 'w-6 h-6' }: IconProps): void {
+export default function IconArchive({ className = 'w-6 h-6' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

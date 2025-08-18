@@ -3,7 +3,7 @@ export interface ResultsExportDemoProps {
   className?: string
 }
 
-export function ResultsExportDemo({ className }: ResultsExportDemoProps): void {
+export function ResultsExportDemo({ className }: ResultsExportDemoProps) {
   return (
     <div className={className}>
       <h3>Results Export Demo</h3>

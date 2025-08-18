@@ -60,7 +60,7 @@ const availableMetricsForDisplay = [
   { id: 'treatment_adherence', label: 'Treatment Adherence', color: '#f59e0b' },
 ]
 
-function getMetricConfig(metricId: string): void {
+function getMetricConfig(metricId: string) {
   const config = availableMetricsForDisplay.find((m) => m.id === metricId)
   return config || { label: metricId, color: '#6366f1' } // Default
 }
@@ -77,7 +77,7 @@ function getDefaultEndDate(): string {
 }
 
 // Prepares chart data from the API response
-function prepareChartData(progressData: ComparativeProgressResult | null): void {
+function prepareChartData(progressData: ComparativeProgressResult | null) {
   if (
     !progressData ||
     !progressData.userProgressSnapshots ||

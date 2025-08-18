@@ -52,7 +52,7 @@ const TreatmentForecastForm: FC = () => {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError(null)
