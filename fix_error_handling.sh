@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# WARNING: This script uses sed for bulk code modifications.
+# It is fragile and may cause unintended changes, especially if patterns appear in strings or comments.
+# For future refactoring, use AST-aware tools (e.g., ts-morph) or ESLint autofix rules.
+# This script is intended for one-time use only and should be removed after execution.
+
 echo "Fixing error handling patterns..."
 
 # Fix unknown error types in catch blocks

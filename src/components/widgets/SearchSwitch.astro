@@ -74,12 +74,12 @@ import { getUrl } from '~/utils/common'
   })
 
   /* Handle click on link or outside search panel to close */
-  const handleClose = (event: MouseEvent) => {
+  const handleClose = (event: Event) => {
     const searchPanel = document.getElementById('search-panel')
     if (!searchPanel || searchPanel.classList.contains('hidden')) return
 
     const isWidthUnder1128 = window.innerWidth < 1128
-    const target = event.target
+    const target = event.target as HTMLElement | null
 
     // check if the click event occurred outside the search panel
     // in a non-ignored area ('search-switch')
@@ -108,7 +108,7 @@ import { getUrl } from '~/utils/common'
     }
   }
 
-  document.addEventListener('click', (event: Event) => handleClose(event))
+  document.addEventListener('click', (event) => handleClose(event))
 </script>
 
 <script>
@@ -174,7 +174,7 @@ import { getUrl } from '~/utils/common'
 <script is:inline>
   // The search index is loaded via the flexsearch integration
   // and will be available as window.searchIndex
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event) => {
     if (window.searchClient && window.searchIndex) {
       console.log('Search initialized with', window.searchIndex.length, 'documents')
     }
