@@ -384,7 +384,7 @@ const TEST_SECTIONS: TestSections = {
 
   // Form submission handler
   const form = document.getElementById('compatibility-form') as HTMLFormElement
-  form?.addEventListener('submit', (e: SubmitEvent: Event) => {
+  form?.addEventListener('submit', (e: SubmitEvent) => {
     e.preventDefault()
     const formElement = e.target as HTMLFormElement
     const formData = new FormData(formElement)

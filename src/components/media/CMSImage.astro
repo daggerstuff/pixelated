@@ -166,7 +166,7 @@ const generateSrcSet = (format: string) => {
 
 <script>
   // Handle blur-up loading effect
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const images = document.querySelectorAll('.blur-up')
 
     images.forEach((img) => {
@@ -174,7 +174,7 @@ const generateSrcSet = (format: string) => {
         if (img.complete) {
           img.classList.add('loaded')
         } else {
-          img.addEventListener('load', (: Event) => {
+          img.addEventListener('load', (_event: Event) => {
             img.classList.add('loaded')
           })
         }

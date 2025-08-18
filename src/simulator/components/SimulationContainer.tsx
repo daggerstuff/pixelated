@@ -36,7 +36,7 @@ export function SimulationContainer({
     transcribedText,
     isConnected,
   } = {
-    currentScenario: (state as unknown as {
+    currentScenario: (state as {
       currentScenario?: unknown
       isProcessing?: boolean
       realtimeFeedback?: unknown[]
@@ -45,7 +45,7 @@ export function SimulationContainer({
       transcribedText?: string
       isConnected?: boolean
     })?.currentScenario,
-    isProcessing: (state as unknown as {
+    isProcessing: (state as {
       currentScenario?: unknown
       isProcessing?: boolean
       realtimeFeedback?: unknown[]
@@ -54,7 +54,7 @@ export function SimulationContainer({
       transcribedText?: string
       isConnected?: boolean
     })?.isProcessing,
-    realtimeFeedback: (state as unknown as {
+    realtimeFeedback: (state as {
       currentScenario?: unknown
       isProcessing?: boolean
       realtimeFeedback?: unknown[]
@@ -63,7 +63,7 @@ export function SimulationContainer({
       transcribedText?: string
       isConnected?: boolean
     })?.realtimeFeedback,
-    startSimulation: (state as unknown as {
+    startSimulation: (state as {
       currentScenario?: unknown
       isProcessing?: boolean
       realtimeFeedback?: unknown[]
@@ -72,7 +72,7 @@ export function SimulationContainer({
       transcribedText?: string
       isConnected?: boolean
     })?.startSimulation,
-    endSimulation: (state as unknown as {
+    endSimulation: (state as {
       currentScenario?: unknown
       isProcessing?: boolean
       realtimeFeedback?: unknown[]
@@ -81,7 +81,7 @@ export function SimulationContainer({
       transcribedText?: string
       isConnected?: boolean
     })?.endSimulation,
-    transcribedText: (state as unknown as {
+    transcribedText: (state as {
       currentScenario?: unknown
       isProcessing?: boolean
       realtimeFeedback?: unknown[]
@@ -90,7 +90,7 @@ export function SimulationContainer({
       transcribedText?: string
       isConnected?: boolean
     })?.transcribedText,
-    isConnected: (state as unknown as {
+    isConnected: (state as {
       currentScenario?: unknown
       isProcessing?: boolean
       realtimeFeedback?: unknown[]

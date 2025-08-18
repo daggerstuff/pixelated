@@ -43,7 +43,7 @@
 
 <script>
   // Theme toggling functionality
-  document.addEventListener('astro:page-load', (: Event) => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     const themeToggle = document.getElementById('theme-toggle')
 
     // Function to set theme and update storage
@@ -63,7 +63,7 @@
     setTheme(savedTheme)
 
     // Toggle theme on button click
-    themeToggle?.addEventListener('click', (: Event) => {
+    themeToggle?.addEventListener('click', (_event: Event) => {
       const currentTheme = localStorage.getItem('theme') || 'light'
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
       setTheme(newTheme)

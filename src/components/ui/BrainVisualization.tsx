@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useMemo, useCallback } from 'react'
-import { FC, Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FC, Badge } from '@/components/ui/badge'
-import { FC, Brain, Activity, Zap } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Brain, Activity, Zap } from 'lucide-react'
 
 interface BrainRegion {
   id: string

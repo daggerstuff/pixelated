@@ -21,7 +21,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
     transcribedText,
     isConnected,
   } = {
-    isSpeechRecognitionEnabled: (simulator as unknown as {
+    isSpeechRecognitionEnabled: (simulator as {
       isSpeechRecognitionEnabled?: boolean
       toggleSpeechRecognition?: () => void
       isUsingEnhancedModels?: boolean
@@ -29,7 +29,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
       transcribedText?: string
       isConnected?: boolean
     })?.isSpeechRecognitionEnabled,
-    toggleSpeechRecognition: (simulator as unknown as {
+    toggleSpeechRecognition: (simulator as {
       isSpeechRecognitionEnabled?: boolean
       toggleSpeechRecognition?: () => void
       isUsingEnhancedModels?: boolean
@@ -37,7 +37,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
       transcribedText?: string
       isConnected?: boolean
     })?.toggleSpeechRecognition,
-    isUsingEnhancedModels: (simulator as unknown as {
+    isUsingEnhancedModels: (simulator as {
       isSpeechRecognitionEnabled?: boolean
       toggleSpeechRecognition?: () => void
       isUsingEnhancedModels?: boolean
@@ -45,7 +45,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
       transcribedText?: string
       isConnected?: boolean
     })?.isUsingEnhancedModels,
-    toggleEnhancedModels: (simulator as unknown as {
+    toggleEnhancedModels: (simulator as {
       isSpeechRecognitionEnabled?: boolean
       toggleSpeechRecognition?: () => void
       isUsingEnhancedModels?: boolean
@@ -53,7 +53,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
       transcribedText?: string
       isConnected?: boolean
     })?.toggleEnhancedModels,
-    transcribedText: (simulator as unknown as {
+    transcribedText: (simulator as {
       isSpeechRecognitionEnabled?: boolean
       toggleSpeechRecognition?: () => void
       isUsingEnhancedModels?: boolean
@@ -61,7 +61,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
       transcribedText?: string
       isConnected?: boolean
     })?.transcribedText,
-    isConnected: (simulator as unknown as {
+    isConnected: (simulator as {
       isSpeechRecognitionEnabled?: boolean
       toggleSpeechRecognition?: () => void
       isUsingEnhancedModels?: boolean

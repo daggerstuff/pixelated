@@ -223,7 +223,7 @@ describe('API Service Integration Tests', () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            query: 'mutation { createRun(input: $input): void { run { id url } } }',
+            query: 'mutation { createRun(input: $input) { run { id url } } }',
             variables: { input: runData },
           }),
         })
@@ -339,7 +339,7 @@ describe('API Service Integration Tests', () => {
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(() => mockWebSocket) as any
+      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -358,7 +358,7 @@ describe('API Service Integration Tests', () => {
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(() => mockWebSocket) as any
+      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 

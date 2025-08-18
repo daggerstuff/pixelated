@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react'
-import { FC, useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
+import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
 import type {
   SessionData,
   SkillProgressData,

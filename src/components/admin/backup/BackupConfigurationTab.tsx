@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FC, Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardHeader,
@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
-import { FC, Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -15,10 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { FC, Label } from '@/components/ui/label'
+import { Label } from '@/components/ui/label'
 import type { BackupType } from '../../../lib/security/backup/types'
-import { FC, StorageLocation } from '../../../lib/security/backup/backup-types'
-import { FC, Switch } from '@/components/ui/switch'
+import { StorageLocation } from '../../../lib/security/backup/backup-types'
+import { Switch } from '@/components/ui/switch'
 
 interface BackupTypeConfig {
   schedule: string

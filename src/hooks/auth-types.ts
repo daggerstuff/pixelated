@@ -163,7 +163,7 @@ export function createAuthError(
   details?: Record<string, unknown>
 ): AuthError {
   const error = new Error(message) as AuthError
-  (error as Error)?.name = 'AuthError'
+  error.name = 'AuthError'
   if (code) error.code = code
   if (details) error.details = details
   return error

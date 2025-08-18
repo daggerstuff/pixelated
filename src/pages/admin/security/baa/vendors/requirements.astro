@@ -556,7 +556,7 @@ const frequencyOptions = [
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const modal = document.getElementById('add-requirement-modal')
     const addButton = document.getElementById('add-requirement-btn')
     const closeButton = document.getElementById('close-modal')
@@ -564,7 +564,7 @@ const frequencyOptions = [
     const requirementForm = document.getElementById('requirement-form')
 
     // Open modal
-    addButton?.addEventListener('click', (: Event) => {
+    addButton?.addEventListener('click', (_event: Event) => {
       modal?.classList.remove('hidden')
     })
 

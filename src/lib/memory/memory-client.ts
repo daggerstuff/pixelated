@@ -184,7 +184,7 @@ export const memoryManager = {
     )
   },
 
-  async getMemoryHistory(userId = 'default'): void {
+  async getMemoryHistory(userId = 'default') {
     ensureUser(userId)
     return [...(history.get(userId) || [])]
   },

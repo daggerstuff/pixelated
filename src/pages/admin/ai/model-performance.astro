@@ -184,13 +184,13 @@ if (permissionResponse) {
 
 <script>
   // Initialize the page
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Set up tab switching
     const tabButtons = document.querySelectorAll('.tab-btn')
     const tabContents = document.querySelectorAll('.tab-content')
 
     tabButtons.forEach((button) => {
-      button.addEventListener('click', (: Event) => {
+      button.addEventListener('click', (_event: Event) => {
         // Remove active class from all buttons and contents
         tabButtons.forEach((btn) => btn.classList.remove('active'))
         tabContents.forEach((content) => content.classList.remove('active'))

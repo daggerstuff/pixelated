@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { FC, toast } from 'react-hot-toast'
-import { FC, serviceWorkerManager } from '../../utils/serviceWorkerRegistration'
+import { toast } from 'react-hot-toast'
+import { serviceWorkerManager } from '../../utils/serviceWorkerRegistration'
 
 interface ServiceWorkerUpdaterProps {
   onUpdateAvailable?: () => void

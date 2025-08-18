@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
-import { FC, Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FC, Badge } from '@/components/ui/badge'
-import { FC, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Brain,
   Heart,
@@ -9,7 +9,7 @@ import {
   Shield,
   User
 } from 'lucide-react'
-import { FC, Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
+import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
 
 // Archetype definitions inspired by Mind-Mirror
 export interface ArchetypeResult {

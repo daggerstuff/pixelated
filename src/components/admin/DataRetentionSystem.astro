@@ -395,7 +395,7 @@ const archivingActions = [
 
 <script>
   // Initialize the data retention form
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Destruction method change handler
     const destructionMethodSelect =
       document.getElementById('destruction-method')
@@ -429,7 +429,7 @@ const archivingActions = [
       'button[type="button"]:first-of-type',
     )
     if (saveButton) {
-      saveButton.addEventListener('click', (: Event) => {
+      saveButton.addEventListener('click', (_event: Event) => {
         // For demonstration purposes, just show an alert
         alert(
           'Settings saved. In a production environment, this would update your data retention configuration.',

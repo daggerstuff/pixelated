@@ -1,6 +1,6 @@
 import React from 'react'
-import { FC, toast } from 'react-hot-toast'
-import { FC, useOffline } from '../../hooks/useOffline'
+import { toast } from 'react-hot-toast'
+import { useOffline } from '../../hooks/useOffline'
 
 interface OfflineIndicatorProps {
   className?: string

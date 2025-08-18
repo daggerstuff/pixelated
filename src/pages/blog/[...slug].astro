@@ -528,10 +528,10 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
 <script>
   // Track blog post interactions
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Handle navigation buttons
     document.querySelectorAll('[data-back-button]').forEach((button) => {
-      button.addEventListener('click', (: Event) => {
+      button.addEventListener('click', (_event: Event) => {
         window.history.back()
       })
     })
@@ -567,7 +567,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
     // Track reading progress
     let maxScroll = 0
-    window.addEventListener('scroll', (: Event) => {
+    window.addEventListener('scroll', (_event: Event) => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
           100,

@@ -7,7 +7,7 @@ import { getAllScenarios } from '../data/scenarios'
  * Component for selecting scenarios to practice
  * Provides filtering options by domain and difficulty
  */
-export function ScenarioSelector({ onSelectScenario }: ScenarioSelectorProps): void {
+export function ScenarioSelector({ onSelectScenario }: ScenarioSelectorProps) {
   const [selectedDomain, setSelectedDomain] = useState<string>('all')
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')

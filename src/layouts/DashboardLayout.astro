@@ -143,7 +143,7 @@ const {
       // Listen for OS theme changes
       window
         .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', (: Event) => {
+        .addEventListener('change', (event: Event) => {
           const theme = getTheme()
           if (theme === 'system') {
             applyTheme('system')

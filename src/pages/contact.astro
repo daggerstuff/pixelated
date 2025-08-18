@@ -287,7 +287,7 @@ import Badge from '../components/ui/Badge.astro'
   const messageError = document.getElementById('message-error') as HTMLElement
 
   // Character counter for message
-  messageInput?.addEventListener('input', (: Event) => {
+  messageInput?.addEventListener('input', (event: Event) => {
     const length = messageInput.value.length
     messageCount.textContent = length.toString()
 
@@ -461,7 +461,7 @@ import Badge from '../components/ui/Badge.astro'
   })
 
   // Real-time validation
-  nameInput?.addEventListener('blur', (: Event) => {
+  nameInput?.addEventListener('blur', (event: Event) => {
     const error = validateName(nameInput.value)
     if (error) {
       showFieldError(nameInput, nameError, error)
@@ -470,7 +470,7 @@ import Badge from '../components/ui/Badge.astro'
     }
   })
 
-  emailInput?.addEventListener('blur', (: Event) => {
+  emailInput?.addEventListener('blur', (event: Event) => {
     const error = validateEmail(emailInput.value)
     if (error) {
       showFieldError(emailInput, emailError, error)
@@ -479,7 +479,7 @@ import Badge from '../components/ui/Badge.astro'
     }
   })
 
-  subjectInput?.addEventListener('blur', (: Event) => {
+  subjectInput?.addEventListener('blur', (event: Event) => {
     const error = validateSubject(subjectInput.value)
     if (error) {
       showFieldError(subjectInput, subjectError, error)
@@ -488,7 +488,7 @@ import Badge from '../components/ui/Badge.astro'
     }
   })
 
-  messageInput?.addEventListener('blur', (: Event) => {
+  messageInput?.addEventListener('blur', (event: Event) => {
     const error = validateMessage(messageInput.value)
     if (error) {
       showFieldError(messageInput, messageError, error)

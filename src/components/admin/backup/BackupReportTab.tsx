@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FC, Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardHeader,
@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
 } from '@/components/ui/card';
-import { FC, Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,

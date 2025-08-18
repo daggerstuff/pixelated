@@ -140,11 +140,11 @@ const currentPath = Astro.url.pathname
 
 <script>
   // Mobile menu toggle
-  document.addEventListener('astro:page-load', (: Event) => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle')
     const mobileMenu = document.getElementById('mobile-menu')
 
-    mobileMenuToggle?.addEventListener('click', (: Event) => {
+    mobileMenuToggle?.addEventListener('click', (_event: Event) => {
       mobileMenu?.classList.toggle('hidden')
       if (mobileMenuToggle.getAttribute('aria-expanded') === 'true') {
         mobileMenuToggle.setAttribute('aria-expanded', 'false')

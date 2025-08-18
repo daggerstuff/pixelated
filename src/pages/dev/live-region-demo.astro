@@ -160,7 +160,7 @@ const sections = [
 
 <script is:inline>
   // Progress demo functionality
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const progressButton = document.getElementById('progress-demo')
     const progressBar = document.getElementById('progress-bar')
     const progressText = document.getElementById('progress-text')
@@ -168,7 +168,7 @@ const sections = [
     if (progressButton && progressBar && progressText) {
       let isRunning = false
 
-      progressButton.addEventListener('click', (: Event) => {
+      progressButton.addEventListener('click', (_event: Event) => {
         if (isRunning) return
         isRunning = true
 

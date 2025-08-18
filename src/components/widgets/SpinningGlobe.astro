@@ -137,7 +137,7 @@
     updateSize()
 
     // Handle visibility change
-    document.addEventListener('visibilitychange', (: Event) => {
+    document.addEventListener('visibilitychange', (_event: Event) => {
       running = !document.hidden
       if (running && !animationId) {
         animate()
@@ -148,7 +148,7 @@
     })
 
     // Clean up on page unload
-    window.addEventListener('beforeunload', (: Event) => {
+    window.addEventListener('beforeunload', (_event: Event) => {
       running = false
       if (animationId) {
         cancelAnimationFrame(animationId)
@@ -182,7 +182,7 @@
     { threshold: 0.1 },
   )
 
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const container = document.getElementById('globe-container')
     if (container) {
       observer.observe(container)

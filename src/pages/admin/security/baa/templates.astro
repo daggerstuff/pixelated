@@ -211,11 +211,11 @@ const allTemplates = templateService.getAllTemplates()
 
 <script>
   // Client-side JavaScript for template management
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Handle create template button
     const createTemplateBtn = document.getElementById('create-template')
     if (createTemplateBtn) {
-      createTemplateBtn.addEventListener('click', (: Event) => {
+      createTemplateBtn.addEventListener('click', (_event: Event) => {
         window.location.href = '/admin/security/baa/templates/new'
       })
     }

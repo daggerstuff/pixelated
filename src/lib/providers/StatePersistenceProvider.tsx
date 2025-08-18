@@ -358,7 +358,7 @@ export function StatePersistenceDebugger() {
     const reader = new FileReader()
     reader.onload = async (e) => {
       try {
-        const state = JSON.parse(e.target?.result as string) as any
+        const state = JSON.parse(e.target?.result as string) as unknown
         await importState(state)
         alert('State imported successfully!')
       } catch (error: unknown) {

@@ -186,7 +186,7 @@ export default function AnalyticsDashboard({
           if (result.isEncrypted && typeof result.data === 'string') {
             const parsedData = JSON.parse(
               result.data,
-            ) as unknown as AnalyticsData
+            ) as AnalyticsData
             return {
               ...result,
               data: parsedData,

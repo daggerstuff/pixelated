@@ -55,7 +55,7 @@ export function MemoryAwareChatSystem({
   const [conversationSummary, setConversationSummary] = useState<string>('')
 
   const chatHook = useChatWithMemory({
-    sessionId: sessionId as unknown as string,
+    sessionId: sessionId as string,
     enableMemory,
     enableAnalysis,
     maxMemoryContext: 15,
@@ -73,12 +73,12 @@ export function MemoryAwareChatSystem({
   } = {
     messages: chatHook?.['messages'] || [],
     isLoading: chatHook?.['isLoading'] || false,
-    error: (chatHook as unknown as { error?: string })?.error,
+    error: (chatHook as { error?: string })?.error,
     sendMessage: chatHook?.['sendMessage'] || (() => Promise.resolve()),
-    clearMessages: (chatHook as unknown as { clearMessages?: () => void })?.clearMessages || (() => {}),
-    regenerateResponse: (chatHook as unknown as { regenerateResponse?: () => void })?.regenerateResponse || (() => {}),
-    getConversationSummary: (chatHook as unknown as { getConversationSummary?: () => Promise<string> })?.getConversationSummary || (() => ''),
-    memoryStats: (chatHook as unknown as { memoryStats?: object })?.memoryStats || {},
+    clearMessages: (chatHook as { clearMessages?: () => void })?.clearMessages || (() => {}),
+    regenerateResponse: (chatHook as { regenerateResponse?: () => void })?.regenerateResponse || (() => {}),
+    getConversationSummary: (chatHook as { getConversationSummary?: () => Promise<string> })?.getConversationSummary || (() => ''),
+    memoryStats: (chatHook as { memoryStats?: object })?.memoryStats || {},
   }
 
   // Generate conversation summary when messages change

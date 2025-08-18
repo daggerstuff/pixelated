@@ -245,12 +245,12 @@ const isActive = (navId: string) => activeItem === navId
 
     <script>
       // Simple sidebar toggle functionality
-      document.addEventListener('DOMContentLoaded', (: Event) => {
+      document.addEventListener('DOMContentLoaded', (_event: Event) => {
         const sidebarToggle = document.getElementById('sidebar-toggle')
         const sidebar = document.getElementById('sidebar')
 
         if (sidebarToggle && sidebar) {
-          sidebarToggle.addEventListener('click', (: Event) => {
+          sidebarToggle.addEventListener('click', (_event: Event) => {
             sidebar.classList.toggle('-translate-x-full')
           })
         }

@@ -87,7 +87,7 @@ export class PerformanceLogger {
     }
   }
 
-  public async getMetrics(timeRange: { start: Date; end: Date }): void {
+  public async getMetrics(timeRange: { start: Date; end: Date }) {
     if (!timeRange?.['start'] || !timeRange?.['end']) {
       logger.error('Invalid time range provided')
       return []

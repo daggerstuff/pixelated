@@ -20,7 +20,7 @@
   ]
 
   /* Close panel when user click on backdrop */
-  document.addEventListener('astro:page-load', (: Event) => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     const handleClick = () => {
       for (const { id, hiddenClass } of PANELS) {
         const panel = document.getElementById(id)

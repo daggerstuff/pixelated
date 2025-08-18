@@ -428,11 +428,11 @@ export class ChatDemoErrorBoundary extends React.Component<
     this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(error: Error): void {
+  static getDerivedStateFromError(error: Error) {
     return { hasError: true, error }
   }
 
-  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ChatDemo Error:', error, errorInfo)
     // Log to monitoring service in production
   }

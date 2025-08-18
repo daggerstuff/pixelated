@@ -295,7 +295,7 @@ function DialogModal<TData>({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          handleBackdropClick(e as unknown as React.MouseEvent<HTMLDivElement>)
+          handleBackdropClick(e as React.MouseEvent<HTMLDivElement>)
         }
       }}
       tabIndex={-1}

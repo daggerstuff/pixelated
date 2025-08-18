@@ -533,7 +533,7 @@ const placeholderThumbnail =
 
 <script define:vars={{ visualData, placeholderThumbnail }}>
   // Refresh button
-  document.getElementById('refresh-data')?.addEventListener('click', (: Event) => {
+  document.getElementById('refresh-data')?.addEventListener('click', (_event: Event) => {
     window.location.reload()
   })
 
@@ -558,7 +558,7 @@ const placeholderThumbnail =
   }
 
   // Close modal button click
-  closeModalBtn?.addEventListener('click', (: Event) => {
+  closeModalBtn?.addEventListener('click', (_event: Event) => {
     closeModal()
   })
 

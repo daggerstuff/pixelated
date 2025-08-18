@@ -115,12 +115,12 @@ interface LoadingIndicatorProps {
 
   <script>
     // Add interactivity for the screen reader tes
-    document.addEventListener('DOMContentLoaded', (: Event) => {
+    document.addEventListener('DOMContentLoaded', (_event: Event) => {
       const announceBtn = document.getElementById('announce-btn')
       const announcementArea = document.getElementById('announcement-area')
 
       if (announceBtn && announcementArea) {
-        announceBtn.addEventListener('click', (: Event) => {
+        announceBtn.addEventListener('click', (_event: Event) => {
           announcementArea.textContent = `Announcement at ${new Date().toLocaleTimeString()}`
         })
       }

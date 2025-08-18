@@ -25,7 +25,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
       console.log('Received message:', message)
       // For now, parsing and handling logic from the original useEffect [lastMessage] needs to be adapted here
       // Example of how you might handle based on your previous logic:
-      // const data = JSON.parse(message.content) as any // Assuming message.content is the stringified data
+      // const data = JSON.parse(message.content) as unknown // Assuming message.content is the stringified data
       // switch (data.type) { ... }
     },
   })

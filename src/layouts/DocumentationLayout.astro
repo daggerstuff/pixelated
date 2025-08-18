@@ -371,7 +371,7 @@ const image = frontmatter?.image || propImage
     </script>
     <script>
       // Generate table of contents from headings
-      document.addEventListener('astro:page-load', (: Event) => {
+      document.addEventListener('astro:page-load', (_event: Event) => {
         const headings = document.querySelectorAll(
           '.docs-content h2, .docs-content h3',
         )

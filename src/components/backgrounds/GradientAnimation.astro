@@ -151,7 +151,7 @@ const selectedScheme = colorSchemes[colorScheme]
 <script>
   // Optional: Add interactivity with mouse movement
   // This adds a subtle parallax effect to the gradient
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const gradients = document.querySelectorAll('.gradient-animation')
 
     if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {

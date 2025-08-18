@@ -350,13 +350,13 @@ const getTrendClass = (trend: string) => {
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Tab functionality
     const tabs = document.querySelectorAll('[id^="tab-"]')
     const panels = document.querySelectorAll('[id^="panel-"]')
 
     tabs.forEach((tab) => {
-      tab.addEventListener('click', (: Event) => {
+      tab.addEventListener('click', (_event: Event) => {
         // Toggle tabs
         tabs.forEach((t) => {
           t.classList.remove(

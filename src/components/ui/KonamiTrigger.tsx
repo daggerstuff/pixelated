@@ -1,5 +1,5 @@
 import React from 'react';
-import { FC, useKonamiCode } from '@/lib/hooks/useKonamiCode';
+import { useKonamiCode } from '@/lib/hooks/useKonamiCode';
 
 export const KonamiTrigger: FC = () => {
   useKonamiCode(() => {

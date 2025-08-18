@@ -485,11 +485,11 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
 
 <script>
   // Initialize interactive elements
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Handle add vendor button
     const addVendorBtn = document.getElementById('add-vendor-btn')
     if (addVendorBtn) {
-      addVendorBtn.addEventListener('click', (: Event) => {
+      addVendorBtn.addEventListener('click', (_event: Event) => {
         window.location.href = '/admin/security/baa/vendors/new'
       })
     }
@@ -522,11 +522,11 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
       'search-form',
     ) as HTMLFormElement | null
 
-    typeSelect?.addEventListener('change', (: Event) => {
+    typeSelect?.addEventListener('change', (_event: Event) => {
       searchForm?.submit()
     })
 
-    complianceSelect?.addEventListener('change', (: Event) => {
+    complianceSelect?.addEventListener('change', (_event: Event) => {
       searchForm?.submit()
     })
   })

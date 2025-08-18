@@ -325,7 +325,7 @@ const deletionReasons = [
 
 <script>
   // Toggle data categories visibility based on deletion scope selection
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const scopeAllRadio = document.getElementById('scope-all') as HTMLInputElement | null
     const scopeSpecificRadio = document.getElementById('scope-specific') as HTMLInputElement | null
     const dataCategoriesContainer = document.getElementById(
@@ -391,7 +391,7 @@ const deletionReasons = [
     })
 
     // Cancel button handler
-    cancelButton?.addEventListener('click', (: Event) => {
+    cancelButton?.addEventListener('click', (_event: Event) => {
       // Redirect back to the main data deletion log view
       window.location.href = '/admin/patient-rights'
     })

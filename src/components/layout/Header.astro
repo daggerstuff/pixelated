@@ -100,7 +100,7 @@ const navLinks = [
   const mobileMenu = document.getElementById('mobile-menu');
 
   if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', (: Event) => {
+    mobileMenuButton.addEventListener('click', (_event: Event) => {
       const isOpen = !mobileMenu.classList.contains('hidden');
 
       if (isOpen) {

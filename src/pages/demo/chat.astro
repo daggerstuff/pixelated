@@ -328,15 +328,15 @@ export const prerender = false
       const depressionBtn = document.getElementById('sample-depression')
       const crisisBtn = document.getElementById('sample-crisis')
 
-      anxietyBtn?.addEventListener('click', (: Event) => {
+      anxietyBtn?.addEventListener('click', (_event: Event) => {
         this.sendSampleMessage("I'm feeling really anxious about my presentation tomorrow. My heart won't stop racing and I can't sleep.")
       })
 
-      depressionBtn?.addEventListener('click', (: Event) => {
+      depressionBtn?.addEventListener('click', (_event: Event) => {
         this.sendSampleMessage("I've been feeling empty and hopeless lately. Nothing seems to bring me joy anymore.")
       })
 
-      crisisBtn?.addEventListener('click', (: Event) => {
+      crisisBtn?.addEventListener('click', (_event: Event) => {
         this.sendSampleMessage("I don't think I can handle this anymore. Everything feels overwhelming and pointless.")
       })
     }
@@ -391,7 +391,7 @@ export const prerender = false
   }
 
   // Initialize demo interface
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const _chatDemo = new ChatDemoInterface()
   })
 </script>

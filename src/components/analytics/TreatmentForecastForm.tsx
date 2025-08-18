@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FC, ChartWidget } from '@/components/analytics/ChartWidget'
+import { ChartWidget } from '@/components/analytics/ChartWidget'
 
 interface ForecastForm {
   sessionId: string

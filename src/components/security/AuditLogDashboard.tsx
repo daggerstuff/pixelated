@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card'
-import { FC, Input } from '../ui/input'
+import { Input } from '../ui/input'
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { FC, Button } from '../ui/button'
+import { Button } from '../ui/button'
 import {
   Table as UITable,
   TableBody,
@@ -32,7 +32,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { FC, format } from 'date-fns'
+import { format } from 'date-fns'
 
 export interface AuditLogEntry {
   id: string

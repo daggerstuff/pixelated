@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { FC, Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FC, Button } from '@/components/ui/button'
-import { FC, Badge } from '@/components/ui/badge'
-import { FC, Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Send,
   Brain,

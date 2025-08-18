@@ -8,7 +8,7 @@ import type {
   TreatmentObjective,
   NewTreatmentObjectiveData,
 } from '@/types/treatment'
-import { FC, Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   TableBody,
   TableCell,
@@ -16,9 +16,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { FC, DialogModal } from '@/components/ui/dialog'
-import { FC, Input } from '@/components/ui/input'
-import { FC, Textarea } from '@/components/ui/textarea'
+import { DialogModal } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -37,8 +37,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { FC, toast } from 'sonner'
-import { FC, PlusCircle, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { PlusCircle, Trash2 } from 'lucide-react'
 
 const formatDate = (dateString?: string | Date) => {
   if (!dateString) {
@@ -109,7 +109,7 @@ const TreatmentPlanManager: FC = () => {
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(
-    JSON.parse(JSON.stringify(initialNewPlanData) as any),
+    JSON.parse(JSON.stringify(initialNewPlanData) as unknown),
   )
 
   const [planToDelete, setPlanToDelete] = useState<TreatmentPlan | null>(null)
@@ -388,7 +388,7 @@ const TreatmentPlanManager: FC = () => {
       }
       await fetchPlans()
       setIsCreateModalOpen(false)
-      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as any))
+      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown))
       toast.success('Treatment plan created successfully!')
     } catch (err: unknown) {
       const errorMessage =
@@ -485,7 +485,7 @@ const TreatmentPlanManager: FC = () => {
   }
 
   const openCreateModal = () => {
-    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as any)) // Reset with deep copy
+    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown)) // Reset with deep copy
     setIsCreateModalOpen(true)
   }
 

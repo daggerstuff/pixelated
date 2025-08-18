@@ -88,7 +88,7 @@
     timer = setInterval(next, 4000);
   }
 
-  tabs.forEach((t, idx) => t.addEventListener('click', (: Event) => { setActive(idx); start(); }));
+  tabs.forEach((t, idx) => t.addEventListener('click', (_event: Event) => { setActive(idx); start(); }));
 
   setActive(0);
   start();

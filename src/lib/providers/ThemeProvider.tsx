@@ -56,7 +56,7 @@ export function ThemeProvider({
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-    function updateTheme(e: MediaQueryListEvent | MediaQueryList): void {
+    function updateTheme(e: MediaQueryListEvent | MediaQueryList) {
       if (colorScheme === 'system') {
         setActiveTheme(e.matches ? 'dark' : 'light')
       }

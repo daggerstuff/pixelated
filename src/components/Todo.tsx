@@ -20,7 +20,7 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     const loadTodos = () => {
       try {
         const savedTodos = localStorage.getItem('todos')
-        return savedTodos ? JSON.parse(savedTodos) as any : initialTodos
+        return savedTodos ? JSON.parse(savedTodos) as unknown : initialTodos
       } catch (err: unknown) {
         console.error('Error loading todos:', err)
         return initialTodos

@@ -40,7 +40,7 @@ const content = await Astro.slots.render('default')
   // For now, we'll just display the raw LaTeX content
   // In a production environment, you might want to integrate with KaTeX or MathJax
 
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const latexElements = document.querySelectorAll('.latex-container')
 
     latexElements.forEach((element) => {

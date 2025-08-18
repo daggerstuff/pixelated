@@ -353,7 +353,7 @@ import { BiasDetectionDemo } from '../../components/demos/bias-detection/BiasDet
 
 <script>
   // Analytics tracking for demo interactions
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Track demo page view
     if (typeof gtag !== 'undefined') {
       gtag('event', 'page_view', {

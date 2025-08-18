@@ -257,7 +257,7 @@ const isActive = (href: string) => {
 
 <script>
   // Handle mobile menu toggle
-  document.addEventListener('astro:page-load', (: Event) => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     const button = document.getElementById('mobile-menu-button')
     const menu = document.getElementById('mobile-menu')
     const menuIcons = button?.querySelectorAll('svg')

@@ -388,22 +388,22 @@ export const prerender = false
         // Preset scenario buttons
         document
           .getElementById('preset-bias-high')
-          ?.addEventListener('click', (: Event) =>
+          ?.addEventListener('click', (event: Event) =>
             this.loadPresetScenario('high-bias'),
           )
         document
           .getElementById('preset-bias-low')
-          ?.addEventListener('click', (: Event) => this.loadPresetScenario('low-bias'))
+          ?.addEventListener('click', (event: Event) => this.loadPresetScenario('low-bias'))
         document
           .getElementById('preset-cultural')
-          ?.addEventListener('click', (: Event) => this.loadPresetScenario('cultural'))
+          ?.addEventListener('click', (event: Event) => this.loadPresetScenario('cultural'))
         document
           .getElementById('preset-gender')
-          ?.addEventListener('click', (: Event) => this.loadPresetScenario('gender'))
+          ?.addEventListener('click', (event: Event) => this.loadPresetScenario('gender'))
 
-        analyzeBtn?.addEventListener('click', (: Event) => this.runAnalysis())
-        clearBtn?.addEventListener('click', (: Event) => this.clearInputs())
-        exportBtn?.addEventListener('click', (: Event) => {
+        analyzeBtn?.addEventListener('click', (event: Event) => this.runAnalysis())
+        clearBtn?.addEventListener('click', (event: Event) => this.clearInputs())
+        exportBtn?.addEventListener('click', (event: Event) => {
           const formatSel = document.getElementById('export-format') as HTMLSelectElement | null
           const fmt = (formatSel?.value || 'json') as 'json' | 'csv' | 'txt'
           return this.exportResults(fmt)
@@ -861,7 +861,7 @@ export const prerender = false
     }
 
     // Initialize demo when page loads
-    document.addEventListener('DOMContentLoaded', (: Event) => {
+    document.addEventListener('DOMContentLoaded', (event: Event) => {
       void new BiasDetectionDemo()
     })
   </script>

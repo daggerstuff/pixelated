@@ -16,7 +16,7 @@ const mockFileReader = {
   onload: null as ((event: ProgressEvent<FileReader>) => void) | null,
   onerror: null as ((event: ProgressEvent<FileReader>) => void) | null,
 }
-global.FileReader = vi.fn(() => mockFileReader) as any
+global.FileReader = vi.fn(() => mockFileReader) as unknown
 
 describe('Pipeline Service Integration Tests', () => {
   beforeEach(() => {

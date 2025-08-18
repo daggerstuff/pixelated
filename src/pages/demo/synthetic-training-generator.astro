@@ -685,7 +685,7 @@ const universityResults = [
   }
 
   // Analytics tracking for demo interactions
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Track page view
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'page_view', {
@@ -772,7 +772,7 @@ const universityResults = [
 
     // Track scroll depth
     let maxScroll = 0
-    window.addEventListener('scroll', (: Event) => {
+    window.addEventListener('scroll', (_event: Event) => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
           100,

@@ -4,7 +4,7 @@ export class EnterpriseAPIClient {
   private maxRetries: number = 3
   private retryDelay: number = 1000
 
-  constructor(baseURL: string = ''): void {
+  constructor(baseURL: string = '') {
     this.baseURL = baseURL
   }
 
@@ -137,14 +137,14 @@ export class APIError extends Error {
 }
 
 export class APIRetryableError extends APIError {
-  constructor(message: string, status: number): void {
+  constructor(message: string, status: number) {
     super(message, status)
     this.name = 'APIRetryableError'
   }
 }
 
 export class APITimeoutError extends Error {
-  constructor(message: string): void {
+  constructor(message: string) {
     super(message)
     this.name = 'APITimeoutError'
   }

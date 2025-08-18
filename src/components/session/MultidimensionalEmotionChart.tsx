@@ -234,14 +234,14 @@ export default function MultidimensionalEmotionChart({
     // Controls setup
     const controls = new OrbitControls(camera, renderer.domElement)
     controlsRef.current = controls;
-    (controls as unknown as { enableDamping?: boolean })['enableDamping'] = true;
-    (controls as unknown as { dampingFactor?: number })['dampingFactor'] = 0.25;
+    (controls as { enableDamping?: boolean })['enableDamping'] = true;
+    (controls as { dampingFactor?: number })['dampingFactor'] = 0.25;
 
     // Optimize controls based on detail level
     if (detailLevel !== 'high') {
-      (controls as unknown as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).enableZoom = true;
-      (controls as unknown as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).zoomSpeed = 0.5;
-      (controls as unknown as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).rotateSpeed = 0.5;
+      (controls as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).enableZoom = true;
+      (controls as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).zoomSpeed = 0.5;
+      (controls as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).rotateSpeed = 0.5;
     }
 
     // Add axis helper - simplified for performance on lower detail
@@ -293,8 +293,8 @@ export default function MultidimensionalEmotionChart({
 
           const material = new THREE.SpriteMaterial({ map: texture })
           const sprite = new THREE.Sprite(material);
-          (sprite.position as unknown as { copy: (v: Vector3) => void }).copy(position);
-          (sprite.scale as unknown as { set: (x: number, y: number, z: number) => void }).set(0.3, 0.15, 1);
+          (sprite.position as { copy: (v: Vector3) => void }).copy(position);
+          (sprite.scale as { set: (x: number, y: number, z: number) => void }).set(0.3, 0.15, 1);
 
           return sprite
         })
@@ -622,10 +622,10 @@ export default function MultidimensionalEmotionChart({
             // Only dispose if object is a Mesh
             if (
               typeof window !== 'undefined' &&
-              (window as unknown as { THREE?: { Mesh?: unknown } }).THREE &&
-              (window as unknown as { THREE?: { Mesh?: unknown } }).THREE.Mesh &&
+              (window as { THREE?: { Mesh?: unknown } }).THREE &&
+              (window as { THREE?: { Mesh?: unknown } }).THREE.Mesh &&
               // Safe instanceof check to avoid unsafe optional chaining
-              object instanceof ((window as unknown as { THREE: { Mesh: unknown } }).THREE.Mesh)
+              object instanceof ((window as { THREE: { Mesh: unknown } }).THREE.Mesh)
             ) {
               if ('geometry' in object && object.geometry) {
                 (object.geometry as { dispose?: () => void }).dispose?.()
@@ -645,7 +645,7 @@ export default function MultidimensionalEmotionChart({
       }
 
       // Clear object pools
-      ;(window as unknown as { initialObjectPool?: { clear?: () => void } })?.initialObjectPool?.clear?.()
+      ;(window as { initialObjectPool?: { clear?: () => void } })?.initialObjectPool?.clear?.()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dimensionalMaps, isLoading, viewMode, detailLevel, sortedMaps])

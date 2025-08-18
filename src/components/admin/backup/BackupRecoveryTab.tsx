@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FC, Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardHeader,
@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { FC, Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -15,9 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FC, RecoveryTestStatus } from '../../../lib/security/backup/backup-types';
+import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types';
 import type { BackupType, BackupStatus } from '../../../lib/security/backup';
-import { FC, toast } from '@/components/ui/toast';
+import { toast } from '@/components/ui/toast';
 
 // Define the enum locally to avoid server-side imports
 enum TestEnvironmentType {

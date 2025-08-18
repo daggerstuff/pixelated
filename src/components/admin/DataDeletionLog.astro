@@ -457,7 +457,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
     }
   }
 
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Modal elements
     const modal = document.getElementById('deletion-request-modal')
     const newRequestBtn = document.getElementById('new-deletion-request-btn')
@@ -467,13 +467,13 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
     const actionButtons = document.querySelectorAll('[data-action]')
 
     // Open modal
-    newRequestBtn?.addEventListener('click', (: Event) => {
+    newRequestBtn?.addEventListener('click', (_event: Event) => {
       modal?.classList.remove('hidden')
       document.body.classList.add('overflow-hidden')
     })
 
     // Close modal
-    closeModalBtn?.addEventListener('click', (: Event) => {
+    closeModalBtn?.addEventListener('click', (_event: Event) => {
       modal?.classList.add('hidden')
       document.body.classList.remove('overflow-hidden')
     })

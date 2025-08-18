@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FC, useDebounce, useDebouncedCallback } from '@/hooks/useDebounce'
+import { useDebounce, useDebouncedCallback } from '@/hooks/useDebounce'
 
 const DebounceDemoComponent: FC = () => {
   // For useDebounce hook demo

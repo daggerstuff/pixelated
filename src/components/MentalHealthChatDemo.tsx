@@ -345,7 +345,7 @@ How are you feeling today? I'm here to listen and help.`,
         const clinicalKnowledge = new ClinicalKnowledgeBase()
 
         setMentalHealthService({
-          adapter: adapter as unknown as MentalHealthAdapter,
+          adapter: adapter as MentalHealthAdapter,
           clinicalKnowledge,
           isInitialized: true,
         })

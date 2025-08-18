@@ -208,7 +208,7 @@ export function SecurityProvider({
 
   const decrypt = async (data: string): Promise<unknown> => {
     if (securityState.level === 'standard') {
-      return JSON.parse(data) as any
+      return JSON.parse(data) as unknown
     }
 
     if (!securityState.currentKey) {
@@ -220,7 +220,7 @@ export function SecurityProvider({
       // Try to parse the result as JSON if it's a string
       if (typeof result === 'string') {
         try {
-          return JSON.parse(result) as any
+          return JSON.parse(result) as unknown
         } catch {
           return result
         }
@@ -230,9 +230,9 @@ export function SecurityProvider({
       console.error('Decryption failed:', error)
       // Attempt to parse as JSON
       try {
-        const parsed = JSON.parse(data) as any
+        const parsed = JSON.parse(data) as unknown
         if (parsed.data) {
-          return JSON.parse(parsed.data) as any
+          return JSON.parse(parsed.data) as unknown
         }
         return parsed
       } catch {

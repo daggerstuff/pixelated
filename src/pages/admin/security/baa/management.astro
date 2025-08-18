@@ -526,10 +526,10 @@ const mockUpcomingActions = [
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Auto-submit form when status changes
     const statusSelect = document.getElementById('status')
-    statusSelect?.addEventListener('change', (: Event) => {
+    statusSelect?.addEventListener('change', (_event: Event) => {
       document.getElementById('search-form')?.submit()
     })
 
@@ -542,7 +542,7 @@ const mockUpcomingActions = [
 
     // Handle "Create New Agreement" button
     const newAgreementBtn = document.getElementById('new-agreement-btn')
-    newAgreementBtn?.addEventListener('click', (: Event) => {
+    newAgreementBtn?.addEventListener('click', (_event: Event) => {
       window.location.href = '/admin/security/baa/create'
     })
 
@@ -582,7 +582,7 @@ const mockUpcomingActions = [
 
     // Handle "View All Actions" button
     const viewAllActionsBtn = document.getElementById('view-all-actions')
-    viewAllActionsBtn?.addEventListener('click', (: Event) => {
+    viewAllActionsBtn?.addEventListener('click', (_event: Event) => {
       window.location.href = '/admin/security/baa/actions'
     })
 

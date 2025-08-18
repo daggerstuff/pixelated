@@ -55,7 +55,7 @@ import { getUrl } from '~/utils/common'
   import { toggleFadeEffect } from '~/utils/animation'
 
   /* Handle click on search switch to open or close */
-  document.addEventListener('astro:page-load', (: Event) => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     const handleToggle = () => {
       const searchPanel = document.getElementById('search-panel')
       const isClosed = searchPanel?.classList.contains('hidden')
@@ -174,7 +174,7 @@ import { getUrl } from '~/utils/common'
 <script is:inline>
   // The search index is loaded via the flexsearch integration
   // and will be available as window.searchIndex
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     if (window.searchClient && window.searchIndex) {
       console.log('Search initialized with', window.searchIndex.length, 'documents')
     }

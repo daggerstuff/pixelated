@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FC, useMultidimensionalEmotions } from '../../hooks/useMultidimensionalEmotions'
+import { useMultidimensionalEmotions } from '../../hooks/useMultidimensionalEmotions'
 import MultidimensionalEmotionChart from '../../components/dashboard/MultidimensionalEmotionChart'
 
 type TimeRange = 'day' | 'week' | 'month' | 'year'

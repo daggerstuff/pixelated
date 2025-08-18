@@ -268,7 +268,7 @@ const verificationHistory: Verification[] = []
 
 <script>
   // Document form submission (demo only)
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const documentForm = document.getElementById('document-form')
     documentForm?.addEventListener('submit', (e: Event) => {
       e.preventDefault()
@@ -482,9 +482,9 @@ const verificationHistory: Verification[] = []
 
 <script>
   // Document selection modal - this would be implemented with a proper modal in production
-  document.addEventListener('DOMContentLoaded', (: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const selectDocumentsBtn = document.getElementById('select-documents-btn')
-    selectDocumentsBtn?.addEventListener('click', (: Event) => {
+    selectDocumentsBtn?.addEventListener('click', (_event: Event) => {
       alert(
         'In a production environment, this would open a modal for selecting from existing documents. For this demo, please upload documents first and then reference them in your verification.',
       )

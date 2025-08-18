@@ -19,17 +19,17 @@
  */
 
 import type React from 'react';
-import { FC, useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
-import { FC, Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FC, Button } from '@/components/ui/button';
-import { FC, Badge } from '@/components/ui/badge';
-import { FC, Progress } from '@/components/ui/progress';
-import { FC, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FC, Alert } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert } from '@/components/ui/alert';
 // Use lazy-loaded chart components to reduce bundle size
 import {
   XAxis,
@@ -74,7 +74,7 @@ import {
   Info,
   CheckCircle,
 } from 'lucide-react';
-import { FC, createBuildSafeLogger } from '@/lib/logging/build-safe-logger';
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger';
 import type { BiasDashboardData, BiasAnalysisResult, DashboardRecommendation } from '@/lib/ai/bias-detection';
 
 const logger = createBuildSafeLogger('bias-dashboard');
@@ -819,7 +819,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
 
         ws.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data) as any
+            const data = JSON.parse(event.data) as unknown
 
             // Handle different types of real-time updates
             switch (data.type) {
@@ -1393,7 +1393,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
     recentAnalyses = [],
     alerts = [],
     trends = [],
-    demographics = { age: {}, gender: {}, ethnicity: {} } as unknown as {
+    demographics = { age: {}, gender: {}, ethnicity: {} } as {
       age: Record<string, number>
       gender: Record<string, number>
       ethnicity: Record<string, number>

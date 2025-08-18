@@ -1,12 +1,12 @@
 // Main bias detection demo component with comprehensive analysis interface
 
 import React, { useState, useCallback } from 'react'
-import { FC, BiasAnalysisDisplay } from './BiasAnalysisDisplay'
-import { FC, PresetScenarioSelector } from './PresetScenarioSelector'
-import { FC, CounterfactualAnalysis } from './CounterfactualAnalysis'
-import { FC, HistoricalProgressTracker } from './HistoricalProgressTracker'
-import { FC, SessionInputForm } from './SessionInputForm'
-import { FC, ExportControls } from './ExportControls'
+import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
+import { PresetScenarioSelector } from './PresetScenarioSelector'
+import { CounterfactualAnalysis } from './CounterfactualAnalysis'
+import { HistoricalProgressTracker } from './HistoricalProgressTracker'
+import { SessionInputForm } from './SessionInputForm'
+import { ExportControls } from './ExportControls'
 import {
   PRESET_SCENARIOS,
   calculateBiasFactors,
