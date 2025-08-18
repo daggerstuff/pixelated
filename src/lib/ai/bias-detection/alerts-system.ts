@@ -148,7 +148,7 @@ export class BiasAlertSystem {
     this.initializeNotificationChannels()
   }
 
-  private initializeDefaultAlertRules(): void {
+  private initializeDefaultAlertRules() {
     this.alertRules = [
       {
         id: 'high-bias-score',
@@ -223,7 +223,7 @@ export class BiasAlertSystem {
     ]
   }
 
-  private initializeNotificationChannels(): void {
+  private initializeNotificationChannels() {
     // Initialize notification channels (email, Slack, webhook, etc.)
     this.notificationChannels.set('email', {
       enabled: this.config.notifications?.email?.enabled || false,
@@ -345,9 +345,9 @@ export class BiasAlertSystem {
       }
 
       return shouldAlert
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in demographic disparity detection', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         sessionId: result.sessionId,
       })
 
@@ -407,7 +407,7 @@ export class BiasAlertSystem {
         )
         indicators.push(hasAgeDisparity, hasGenderDisparity)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Error analyzing demographic layer disparities', { error })
     }
   
@@ -455,7 +455,7 @@ export class BiasAlertSystem {
 
         indicators.push(hasTherapeuticBias, hasLowCulturalSensitivity)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Error analyzing fairness metric disparities', { error })
     }
 
@@ -521,7 +521,7 @@ export class BiasAlertSystem {
           }
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Error analyzing counterfactual disparities', { error })
     }
   
@@ -559,7 +559,7 @@ export class BiasAlertSystem {
           notificationChannels: this.notificationChannels.size,
         },
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('BiasAlertSystem falling back to local-only mode', { error })
 
       // Initialize in fallback mode - no Python service connection
@@ -642,7 +642,7 @@ export class BiasAlertSystem {
           )
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Alert checking failed', {
         error,
         sessionId: result.sessionId,
@@ -668,7 +668,7 @@ export class BiasAlertSystem {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('System alert checking failed', { error })
       throw error
     }
@@ -695,7 +695,7 @@ export class BiasAlertSystem {
           this.alertQueue.push(alert)
           this.scheduleEscalation(alert, rule.escalationDelay)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Error evaluating alert rule ${rule.id}`, {
           error,
           sessionId: result.sessionId,
@@ -725,7 +725,7 @@ export class BiasAlertSystem {
           this.alertQueue.push(alert)
           this.scheduleEscalation(alert, rule.escalationDelay)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Error evaluating system alert rule ${rule.id}`, { error })
       }
     }
@@ -739,7 +739,7 @@ export class BiasAlertSystem {
           alert.escalated = true
           await this.escalateAlert(alert)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Alert escalation failed', { error, alertId: alert.id })
       }
     }, delayMs)
@@ -766,7 +766,7 @@ export class BiasAlertSystem {
         escalated_to: alert.recipients || [],
         reason: 'Unacknowledged alert escalation',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.debug(
         'Python service does not support alert escalation, escalation logged locally only',
         {
@@ -798,7 +798,7 @@ export class BiasAlertSystem {
     this.monitoringCallbacks.forEach((callback) => {
       try {
         callback(callbackData)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error in monitoring callback', { error })
       }
     })
@@ -835,7 +835,7 @@ export class BiasAlertSystem {
     // Wait for all notifications to complete
     try {
       await Promise.allSettled(notifications)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Some notifications failed to send', {
         error,
         alertId: alert.id,
@@ -862,7 +862,7 @@ export class BiasAlertSystem {
       })
 
       logger.debug(`Notification sent via ${channel}`, { alertId: alert.id })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.debug(
         `Python service does not support notifications for ${channel}, logging notification locally`,
         {
@@ -918,7 +918,7 @@ export class BiasAlertSystem {
       const localActive = this.alertQueue.filter((alert) => !alert.acknowledged);
   
       return [...serverInstances, ...localActive];
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch active alerts', { error });
       return this.alertQueue.filter((alert) => !alert.acknowledged);
     }
@@ -943,7 +943,7 @@ export class BiasAlertSystem {
       }
 
       logger.info('Alert acknowledged', { alertId, acknowledgedBy })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to acknowledge alert', { error, alertId })
       throw error
     }
@@ -962,7 +962,7 @@ export class BiasAlertSystem {
       })
 
       logger.info('System notification sent', { message, recipients })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send system notification', {
         error,
         message,
@@ -983,7 +983,7 @@ export class BiasAlertSystem {
       const recentInstances: AlertInstance[] = (response || []).map(alertDataToInstance);
   
       return recentInstances;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch recent alerts', { error });
   
       // Fallback to local alerts
@@ -1012,7 +1012,7 @@ export class BiasAlertSystem {
         escalated: 0, // Would need to be calculated
         averageResponseTime: response.average_response_time,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch alert statistics', { error })
 
       // Fallback to local calculation
@@ -1050,7 +1050,7 @@ export class BiasAlertSystem {
       await this.pythonBridge.dispose()
 
       logger.info('BiasAlertSystem disposed successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error disposing BiasAlertSystem', { error })
     }
   }
@@ -1086,7 +1086,7 @@ export class BiasAlertSystem {
         sessionId: alertData.sessionId,
         level: alertData.level,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process alert', {
         error,
         sessionId: alertData.sessionId,

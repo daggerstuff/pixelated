@@ -1,4 +1,3 @@
-import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 import { mongoAuthService } from '@/services/mongoAuth.service'
 
@@ -33,11 +32,11 @@ export const POST = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Sign out error:', error)
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'Sign out failed',
+        error: error instanceof Error ? String(error) : 'Sign out failed',
       }),
       {
         status: 500,

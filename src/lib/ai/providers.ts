@@ -71,7 +71,7 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
 /**
  * Initialize AI providers with environment configuration
  */
-export function initializeProviders(): void {
+export function initializeProviders() {
   try {
     // Together AI (primary provider)
     const togetherApiKey = getEnvVar('TOGETHER_API_KEY')
@@ -121,7 +121,7 @@ export function initializeProviders(): void {
     }
 
     appLogger.info(`Initialized ${providers.size} AI providers`)
-  } catch (error) {
+  } catch (error: unknown) {
     appLogger.error('Failed to initialize AI providers:', {
       error: error as Error,
     })
@@ -154,7 +154,7 @@ export function getAIServiceByProvider(
         appLogger.warn(`Unsupported provider type: ${providerType}`)
         return null
     }
-  } catch (error) {
+  } catch (error: unknown) {
     appLogger.error(
       `Failed to create AI service for provider ${providerType}:`,
       { error: error as Error },

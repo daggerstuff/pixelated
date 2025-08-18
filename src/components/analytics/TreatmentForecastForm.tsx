@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ChartWidget } from '@/components/analytics/ChartWidget'
+import { FC, ChartWidget } from '@/components/analytics/ChartWidget'
 
 interface ForecastForm {
   sessionId: string
@@ -29,7 +29,7 @@ const initialForm: ForecastForm = {
   desiredOutcomes: '',
 }
 
-const TreatmentForecastForm: React.FC = () => {
+const TreatmentForecastForm: FC = () => {
   const [form, setForm] = useState<ForecastForm>(initialForm)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,7 +52,7 @@ const TreatmentForecastForm: React.FC = () => {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault()
     setLoading(true)
     setError(null)
@@ -89,7 +89,7 @@ const TreatmentForecastForm: React.FC = () => {
       }
       setResults(data.data.forecasts)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Unknown error')
     } finally {
       setLoading(false)
     }

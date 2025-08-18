@@ -1,6 +1,6 @@
 import React from 'react'
-import { toast } from 'react-hot-toast'
-import { useOffline } from '../../hooks/useOffline'
+import { FC, toast } from 'react-hot-toast'
+import { FC, useOffline } from '../../hooks/useOffline'
 
 interface OfflineIndicatorProps {
   className?: string
@@ -14,7 +14,7 @@ interface OfflineIndicatorProps {
  * This component shows a notification when the user is offline and provides options
  * to retry the connection or switch to offline mode.
  */
-export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
+export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
   className = '',
   showToast = true,
   showIndicator = true,

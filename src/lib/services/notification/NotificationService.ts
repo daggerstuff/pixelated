@@ -225,7 +225,7 @@ export class NotificationService {
         logger.info(
           `Default crisis alert template '${CRISIS_ALERT_TEMPLATE_ID}' registered.`,
         )
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(
           `Failed to register default crisis alert template: ${CRISIS_ALERT_TEMPLATE_ID}`,
           { error },
@@ -343,7 +343,7 @@ export class NotificationService {
         break
       }
 
-      const notification = NotificationItemSchema.parse(JSON.parse(item))
+      const notification = NotificationItemSchema.parse(JSON.parse(item) as any)
 
       try {
         // Process each channel
@@ -388,7 +388,7 @@ export class NotificationService {
         // Update status and error
         notification.status = NotificationStatus.FAILED
         notification.error =
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error ? String(error) : String(error)
 
         // Store failed notification
         await (redis as unknown as RedisCommands).hset(
@@ -423,7 +423,7 @@ export class NotificationService {
       throw new Error('Notification not found')
     }
 
-    const parsed = NotificationItemSchema.parse(JSON.parse(notification))
+    const parsed = NotificationItemSchema.parse(JSON.parse(notification) as any)
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
 
@@ -448,7 +448,7 @@ export class NotificationService {
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string)))
+      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as any))
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(offset, offset + limit)
   }
@@ -463,7 +463,7 @@ export class NotificationService {
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string)))
+      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as any))
       .filter((n) => n.status !== NotificationStatus.READ).length
   }
 
@@ -481,7 +481,7 @@ export class NotificationService {
   /**
    * Stop queue processing
    */
-  stopProcessing(): void {
+  stopProcessing() {
     this.isProcessing = false
   }
 
@@ -531,7 +531,7 @@ export class NotificationService {
     if (!subscription) {
       return null
     }
-    return JSON.parse(subscription)
+    return JSON.parse(subscription) as any
   }
 
   /**
@@ -570,7 +570,7 @@ export class NotificationService {
         notificationId: notification.id,
       })
     } catch (error: unknown) {
-      if (error instanceof Error && error.name === 'ExpiredSubscriptionError') {
+      if (error instanceof Error && (error as Error)?.name === 'ExpiredSubscriptionError') {
         await this.removePushSubscription(notification.userId)
         logger.info('Removed expired push subscription', {
           userId: notification.userId,
@@ -579,7 +579,7 @@ export class NotificationService {
         logger.error('Failed to send push notification', {
           userId: notification.userId,
           notificationId: notification.id,
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
         throw error
       }
@@ -667,7 +667,7 @@ export class NotificationService {
         `Crisis alert queued successfully. Notification ID: ${notificationId}`,
         { userId, sessionId },
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to queue crisis alert notification.', {
         error,
         alertContext,

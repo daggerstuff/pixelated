@@ -75,7 +75,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
       await this.verifyAthenahealthEndpoints()
 
       this.logger.info(`Provider ${this.id} initialized successfully`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to initialize provider ${this.id}:`, error)
       throw error
     }
@@ -145,7 +145,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
           this.id,
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to initialize Athenahealth features:', error)
       throw error
     }
@@ -168,7 +168,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
         try {
           await client.searchResources(endpoint, { _count: '1' })
           this.logger.info(`Verified Athenahealth endpoint: ${endpoint}`)
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.error(`Failed to access ${endpoint} endpoint:`, error)
           throw new EHRError(
             `Required Athenahealth endpoint ${endpoint} is not available`,
@@ -177,7 +177,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
           )
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to verify Athenahealth endpoints:', error)
       throw error
     }
@@ -189,7 +189,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
       await super.cleanup()
       // Add any Athenahealth-specific cleanup here if needed
       this.logger.info(`Cleaned up provider ${this.id}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to cleanup provider ${this.id}:`, error)
       throw error
     }

@@ -179,7 +179,7 @@ export interface TableHeaderProps
   className?: string
 }
 
-function TableHeader({ className, ...props }: TableHeaderProps) {
+function TableHeader({ className, ...props }: TableHeaderProps): void {
   return (
     <thead
       className={cn('bg-gray-50 dark:bg-gray-800', className)}
@@ -193,7 +193,7 @@ export interface TableBodyProps
   className?: string
 }
 
-function TableBody({ className, ...props }: TableBodyProps) {
+function TableBody({ className, ...props }: TableBodyProps): void {
   return (
     <tbody
       className={cn('divide-y divide-gray-200 dark:divide-gray-700', className)}
@@ -207,7 +207,7 @@ export interface TableFooterProps
   className?: string
 }
 
-function TableFooter({ className, ...props }: TableFooterProps) {
+function TableFooter({ className, ...props }: TableFooterProps): void {
   return (
     <tfoot
       className={cn('bg-gray-50 dark:bg-gray-800 font-medium', className)}
@@ -220,7 +220,7 @@ export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement>
   className?: string
 }
 
-function TableRow({ selected = false, disabled = false, className, ...props }: TableRowProps) {
+function TableRow({ selected = false, disabled = false, className, ...props }: TableRowProps): void {
   return (
     <tr
       className={cn(
@@ -353,7 +353,7 @@ export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElem
   className?: string
 }
 
-function TableCell({ align = 'left', hideMobile = false, className, ...props }: TableCellProps) {
+function TableCell({ align = 'left', hideMobile = false, className, ...props }: TableCellProps): void {
   return (
     <td
       className={cn(

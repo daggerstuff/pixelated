@@ -388,7 +388,7 @@ function ConfirmDialog<TData>({
     setIsConfirming(true)
     try {
       await onConfirm()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in confirmation handler:', error)
     } finally {
       setIsConfirming(false)

@@ -20,7 +20,7 @@ export function createSignedVerificationToken(payload: unknown): string {
   try {
     const timestamp = Date.now()
     const token = {
-      ...JSON.parse(JSON.stringify(payload)),
+      ...JSON.parse(JSON.stringify(payload) as any),
       iat: timestamp,
       exp: timestamp + 3600000, // 1 hour expiration
     }
@@ -28,7 +28,7 @@ export function createSignedVerificationToken(payload: unknown): string {
     // Use btoa for browser compatibility instead of Buffer
     const jsonString = JSON.stringify(token)
     return btoa(jsonString)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to create verification token', { error })
     throw new Error('Verification token creation failed')
   }
@@ -43,7 +43,7 @@ export function createSignedVerificationToken(payload: unknown): string {
 export function verifyToken(token: string): unknown | null {
   try {
     // Use atob for browser compatibility instead of Buffer
-    const decoded = JSON.parse(atob(token))
+    const decoded = JSON.parse(atob(token) as any)
 
     // Check expiration
     if (decoded.exp < Date.now()) {
@@ -52,7 +52,7 @@ export function verifyToken(token: string): unknown | null {
     }
 
     return decoded
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error verifying token', { error, token })
     return null
   }

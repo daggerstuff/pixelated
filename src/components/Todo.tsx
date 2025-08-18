@@ -11,7 +11,7 @@ interface TodoProps {
   initialTodos?: TodoItem[]
 }
 
-export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
+export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps): void {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [inputValue, setInputValue] = useState('')
 
@@ -20,8 +20,8 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     const loadTodos = () => {
       try {
         const savedTodos = localStorage.getItem('todos')
-        return savedTodos ? JSON.parse(savedTodos) : initialTodos
-      } catch (err) {
+        return savedTodos ? JSON.parse(savedTodos) as any : initialTodos
+      } catch (err: unknown) {
         console.error('Error loading todos:', err)
         return initialTodos
       }
@@ -34,7 +34,7 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
   useEffect(() => {
     try {
       localStorage.setItem('todos', JSON.stringify(todos))
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error saving todos:', err)
     }
   }, [todos])

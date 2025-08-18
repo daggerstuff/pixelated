@@ -122,7 +122,7 @@ export function PrivacyDashboard() {
               max={2.0}
               step={0.1}
               onValueChange={(values: number[]) =>
-                handleSettingChange('privacyBudget', values[0])
+                handleSettingChange('privacyBudget', values[0] ?? settings.privacyBudget)
               }
             />
 

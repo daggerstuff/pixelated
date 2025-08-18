@@ -74,7 +74,7 @@ interface MessageStats {
  */
 function isRetryableError(error: unknown): boolean {
   // Network errors are retryable
-  if (error instanceof TypeError && error.message.includes('network')) {
+  if (error instanceof TypeError && String(error).includes('network')) {
     return true
   }
 
@@ -97,7 +97,7 @@ function isRetryableError(error: unknown): boolean {
   }
 
   // Response errors with 5xx status
-  if (error instanceof Error && error.message.includes('50')) {
+  if (error instanceof Error && String(error).includes('50')) {
     return true
   }
 
@@ -181,7 +181,7 @@ export function useChatCompletion({
         if (onMessageSaved) {
           onMessageSaved(messages)
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.warn('Failed to auto-save conversation:', err)
       }
     }
@@ -193,7 +193,7 @@ export function useChatCompletion({
       try {
         const saved = localStorage.getItem(persistKey)
         if (saved) {
-          const parsedMessages = JSON.parse(saved) as AIMessage[]
+          const parsedMessages = JSON.parse(saved) as any as AIMessage[]
           setMessages(parsedMessages)
           setConversationStats(prev => ({
             ...prev,
@@ -203,7 +203,7 @@ export function useChatCompletion({
             startTime: new Date(),
           }))
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.warn('Failed to load conversation:', err)
       }
     }
@@ -233,7 +233,7 @@ export function useChatCompletion({
     if (persistKey) {
       try {
         localStorage.removeItem(persistKey)
-      } catch (err) {
+      } catch (err: unknown) {
         console.warn('Failed to clear saved conversation:', err)
       }
     }
@@ -300,7 +300,7 @@ export function useChatCompletion({
         }
 
         return response
-      } catch (err) {
+      } catch (err: unknown) {
         clearTimeout(timeoutId)
         throw err
       }
@@ -383,7 +383,7 @@ export function useChatCompletion({
                 }
 
                 try {
-                  const data = JSON.parse(line) as AIStreamChunk
+                  const data = JSON.parse(line) as any as AIStreamChunk
                   const content = data?.content
 
                   if (content) {
@@ -466,10 +466,10 @@ export function useChatCompletion({
           }
 
           success = true
-        } catch (err) {
+        } catch (err: unknown) {
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? err.message : 'An unknown error occurred'
+              err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
             setError(errorMessage)
 
             if (onError && err instanceof Error) {
@@ -570,7 +570,7 @@ export function useChatCompletion({
             }
 
             try {
-              const data = JSON.parse(line) as AIStreamChunk
+              const data = JSON.parse(line) as any as AIStreamChunk
               const content = data?.content
 
               if (content) {
@@ -684,7 +684,7 @@ export function useChatCompletion({
         if (onMessageSaved) {
           onMessageSaved(messages)
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to save conversation:', err)
       }
     }
@@ -696,10 +696,10 @@ export function useChatCompletion({
       try {
         const saved = localStorage.getItem(persistKey)
         if (saved) {
-          const parsedMessages = JSON.parse(saved) as AIMessage[]
+          const parsedMessages = JSON.parse(saved) as any as AIMessage[]
           setMessages(parsedMessages)
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to load conversation:', err)
       }
     }
@@ -718,14 +718,14 @@ export function useChatCompletion({
   // Import conversation
   const importConversation = useCallback((data: string) => {
     try {
-      const parsed = JSON.parse(data)
+      const parsed = JSON.parse(data) as any
       if (parsed.messages && Array.isArray(parsed.messages)) {
         setMessages(parsed.messages)
         if (parsed.stats) {
           setConversationStats(parsed.stats)
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to import conversation:', err)
       setError('Invalid conversation data format')
     }

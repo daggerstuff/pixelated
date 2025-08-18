@@ -1,0 +1,359 @@
+
+> pixelated@0.0.1 lint /home/vivi/pixelated
+> oxlint src
+
+
+  ! eslint(no-unused-vars): Parameter 'placeholder' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/chat/MemoryAwareChatSystem.tsx:47:3]
+ 46 |   subtitle = 'Chat with an AI that learns and remembers your conversations',
+ 47 |   placeholder = 'Type your message here...',
+    :   ^^^^^|^^^^^
+    :        `-- 'placeholder' is declared here
+ 48 |   enableMemoryToggle = true,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/v1/search.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { getCollection } from 'astro:content'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/v1/production-readiness.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { uptimeMonitor } from '../../../lib/services/uptime-monitor'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Interface 'IncludeComponents' is declared but never used.
+    ,-[src/pages/api/demos/bias-detection/export.ts:11:11]
+ 10 | 
+ 11 | interface IncludeComponents {
+    :           ^^^^^^^^|^^^^^^^^
+    :                   `-- 'IncludeComponents' is declared here
+ 12 |   analysis: boolean
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'IncludeComponents' is declared but never used. Unused variables should start with a '_'.
+    ,-[src/pages/api/demos/bias-detection/export.ts:41:26]
+ 40 |       format = 'json',
+ 41 |       includeComponents: IncludeComponents = {
+    :                          ^^^^^^^^|^^^^^^^^
+    :                                  `-- 'IncludeComponents' is declared here
+ 42 |         analysis: true,
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Interface 'AdminLocals' is declared but never used.
+   ,-[src/pages/api/admin/users.ts:7:11]
+ 6 | 
+ 7 | interface AdminLocals {
+   :           ^^^^^|^^^^^
+   :                `-- 'AdminLocals' is declared here
+ 8 |   admin: {
+   `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/v1/profile/index.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | // API route implementation for user profile endpoints
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Interface 'AdminLocals' is declared but never used.
+   ,-[src/pages/api/admin/sessions.ts:6:11]
+ 5 | 
+ 6 | interface AdminLocals {
+   :           ^^^^^|^^^^^
+   :                `-- 'AdminLocals' is declared here
+ 7 |   admin: {
+   `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/pattern-analysis/risk-correlations.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/analytics/demo-tracking.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import type {
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type alias 'APIRoute' is declared but never used.
+     ,-[src/pages/api/analytics/dashboard.ts:204:6]
+ 203 |  */
+ 204 | type APIRoute = (context: BaseAPIContext) => Response | Promise<Response>
+     :      ^^^^|^^^
+     :          `-- 'APIRoute' is declared here
+ 205 | 
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/analytics/comparative-progress.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { z } from 'zod'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/auth/signout.ts:1:15]
+ 1 | import type { APIRoute, APIContext } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | export const prerender = false
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIContext' is imported but never used.
+   ,-[src/pages/api/auth/signout.ts:1:25]
+ 1 | import type { APIRoute, APIContext } from 'astro'
+   :                         ^^^^^|^^^^
+   :                              `-- 'APIContext' is imported here
+ 2 | export const prerender = false
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/auth/signin.ts:1:15]
+ 1 | import type { APIRoute, APIContext } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | 
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIContext' is imported but never used.
+   ,-[src/pages/api/auth/signin.ts:1:25]
+ 1 | import type { APIRoute, APIContext } from 'astro'
+   :                         ^^^^^|^^^^
+   :                              `-- 'APIContext' is imported here
+ 2 | 
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/auth/update-password.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { updatePassword } from '../../../services/auth.service'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/security/events.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/security/backup/recovery-tests.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { protectRoute } from '../../../../lib/auth/serverAuth'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/patient-rights/initiate-export.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { z } from 'zod'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/patient-rights/export-status.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { z } from 'zod'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/patient-rights/create-export.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { z } from 'zod'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/patient-rights/request-export.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { z } from 'zod'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Type 'APIRoute' is imported but never used.
+   ,-[src/pages/api/patient-rights/export-request.ts:1:15]
+ 1 | import type { APIRoute } from 'astro'
+   :               ^^^^|^^^
+   :                   `-- 'APIRoute' is imported here
+ 2 | import { z } from 'zod'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Variable 'cryptoSystem' is assigned a value but never used. Unused variables should start with a '_'.
+     ,-[src/tests/crypto.test.ts:746:5]
+ 745 |  
+ 746 | let cryptoSystem: any
+     :     ^^^^^^|^^^^^
+     :           `-- 'cryptoSystem' is declared here
+ 747 | 
+ 748 | describe('Fully Homomorphic Encryption Integration Tests', () => {
+ 749 |   // Skip all these tests if SKIP_FHE_TESTS is true
+ 750 |   const itOrSkip = SKIP_FHE_TESTS ? (it as TestFunction).skip : it
+ 751 |   let fheSystem: ExtendedFHESystem
+ 752 | 
+ 753 |   beforeEach(() => {
+ 754 |     // Create crypto system
+ 755 |     cryptoSystem = createCryptoSystem({
+     :     ^^^^^^|^^^^^
+     :           `-- it was last assigned here
+ 756 |       namespace: 'test',
+     `----
+  help: Did you mean to use this variable?
+
+  x eslint(no-unsafe-optional-chaining): Unsafe usage of optional chaining
+     ,-[src/lib/ai/crisis/CrisisSessionFlaggingService.ts:216:37]
+ 215 |     
+ 216 | ,->       const { data, error } = await (mongoClient as unknown as {
+ 217 | |           from?: (table: string) => unknown
+ 218 | |         })
+ 219 | |           ?.from?.('crisis_session_flags')
+ 220 | |           ?.update?.(updateData)
+ 221 | |           ?.eq?.('id', request?.['flagId'])
+ 222 | |           ?.select?.()
+ 223 | `->         .single()
+ 224 |     
+     `----
+  help: If this short-circuits with 'undefined' the evaluation will throw TypeError
+
+  x eslint(no-unsafe-optional-chaining): Unsafe usage of optional chaining
+     ,-[src/lib/ai/crisis/CrisisSessionFlaggingService.ts:295:37]
+ 294 |         try {
+ 295 | ,->       const { data, error } = await (mongoClient as unknown as {
+ 296 | |           from?: (table: string) => unknown
+ 297 | |         })
+ 298 | |           ?.from?.('user_session_status')
+ 299 | |           ?.select?.('*')
+ 300 | |           ?.eq?.('user_id', userId)
+ 301 | `->         ?.single?.()
+ 302 |     
+     `----
+  help: If this short-circuits with 'undefined' the evaluation will throw TypeError
+
+  x eslint(no-unsafe-optional-chaining): Unsafe usage of optional chaining
+     ,-[src/lib/ai/crisis/CrisisSessionFlaggingService.ts:332:37]
+ 331 |         try {
+ 332 | ,->       const { data, error } = await (mongoClient as unknown as {
+ 333 | |           from?: (table: string) => unknown
+ 334 | |         })
+ 335 | |           ?.from?.('crisis_session_flags')
+ 336 | |           ?.select?.('*')
+ 337 | |           ?.in?.('status', ['pending', 'under_review'])
+ 338 | |           ?.order?.('flagged_at', { ascending: true })
+ 339 | `->         .limit(limit)
+ 340 |     
+     `----
+  help: If this short-circuits with 'undefined' the evaluation will throw TypeError
+
+  x eslint(no-unexpected-multiline): Unexpected newline between function name and open parenthesis of function call
+     ,-[src/components/session/MultidimensionalEmotionChart.tsx:291:11]
+ 290 |           const sprite = new THREE.Sprite(material)
+ 291 |           (sprite.position as unknown as { copy: (v: Vector3) => void }).copy(position);
+     :           |
+     :           `-- this is parsed as a function call, which may be unintentional
+ 292 |           (sprite.scale as unknown as { set: (x: number, y: number, z: number) => void }).set(0.3, 0.15, 1);
+     `----
+  help: If you did not intend to make a function call, insert ';' before the parenthesis
+
+  ! eslint-plugin-react-hooks(exhaustive-deps): The ref's value `.current` is accessed directly in the effect cleanup function.
+     ,-[src/components/session/MultidimensionalEmotionChart.tsx:580:34]
+ 579 | 
+ 580 |       if (rendererRef.current && containerRef.current) {
+     :                                  ^^^^^^^^^^^^^^^^^^^^
+ 581 |         if (
+     `----
+  help: The ref value will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by react, copy it to a variable inside the effect and use that variable in the cleanup function.
+
+  ! eslint-plugin-react-hooks(exhaustive-deps): The ref's value `.current` is accessed directly in the effect cleanup function.
+     ,-[src/components/session/MultidimensionalEmotionChart.tsx:592:102]
+ 591 |           'domElement' in rendererRef.current &&
+ 592 |           (rendererRef.current as { domElement: { parentNode: unknown } }).domElement.parentNode === containerRef.current
+     :                                                                                                      ^^^^^^^^^^^^^^^^^^^^
+ 593 |         ) {
+     `----
+  help: The ref value will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by react, copy it to a variable inside the effect and use that variable in the cleanup function.
+
+  ! eslint-plugin-react-hooks(exhaustive-deps): The ref's value `.current` is accessed directly in the effect cleanup function.
+     ,-[src/components/session/MultidimensionalEmotionChart.tsx:594:11]
+ 593 |         ) {
+ 594 |           containerRef.current.removeChild((rendererRef.current as { domElement: HTMLElement }).domElement)
+     :           ^^^^^^^^^^^^^^^^^^^^
+ 595 |         }
+     `----
+  help: The ref value will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by react, copy it to a variable inside the effect and use that variable in the cleanup function.
+
+  ! typescript-eslint(no-explicit-any): Unexpected any. Specify a different type.
+     ,-[src/components/session/MultidimensionalEmotionChart.tsx:621:104]
+ 620 |               (window as unknown as { THREE?: { Mesh?: unknown } })?.THREE?.Mesh &&
+ 621 |               object instanceof ((window as unknown as { THREE?: { Mesh?: unknown } })?.THREE?.Mesh as any)
+     :                                                                                                        ^^^
+ 622 |             ) {
+     `----
+  help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+
+  x eslint(no-unsafe-optional-chaining): Unsafe usage of optional chaining
+     ,-[src/components/session/MultidimensionalEmotionChart.tsx:621:34]
+ 620 |               (window as unknown as { THREE?: { Mesh?: unknown } })?.THREE?.Mesh &&
+ 621 |               object instanceof ((window as unknown as { THREE?: { Mesh?: unknown } })?.THREE?.Mesh as any)
+     :                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 622 |             ) {
+     `----
+  help: If this short-circuits with 'undefined' the evaluation will throw TypeError
+
+  x eslint(no-empty): Unexpected empty block statements
+     ,-[src/components/admin/bias-detection/BiasDashboard.tsx:963:19]
+ 962 |             wsRef.current?.send(JSON.stringify({ type: 'unsubscribe' }))
+ 963 |           } catch {}
+     :                   ^^
+ 964 |         }
+     `----
+  help: Remove this block or add a comment inside it
+
+Found 29 warnings and 6 errors.
+Finished in 242ms on 1449 files using 8 threads.
+ ELIFECYCLE  Command failed with exit code 1.

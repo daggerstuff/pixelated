@@ -475,7 +475,7 @@ const {
     // Tab switching
     tabButtons.forEach((button) => {
       if (button instanceof HTMLElement) {
-        button.addEventListener('click', (_event: MouseEvent) => {
+        button.addEventListener('click', (_event: MouseEvent: Event) => {
           const tab = button.getAttribute('data-tab')
     
           // Update active tab button
@@ -504,7 +504,7 @@ const {
     if (timeRangeSelect instanceof HTMLElement) {
       timeRangeSelect.addEventListener(
         'valueChange',
-        (e) => {
+        (e: Event) => {
           const event = e as CustomEvent<{ value: string }>
           const value = event.detail?.value || (event.detail as any)
           options.timeRange.presetRange = value
@@ -550,13 +550,13 @@ const {
 
     // Date inputs
     if (startDateInput instanceof HTMLInputElement) {
-      startDateInput.addEventListener('change', () => {
+      startDateInput.addEventListener('change', (: Event) => {
         options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
       })
     }
 
     if (endDateInput instanceof HTMLInputElement) {
-      endDateInput.addEventListener('change', () => {
+      endDateInput.addEventListener('change', (: Event) => {
         options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
       })
     }
@@ -676,7 +676,7 @@ const {
     // Initialize checkbox collections
     emotionTypeCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
-        checkbox.addEventListener('change', (e: Event) => {
+        checkbox.addEventListener('change', (e: Event: Event) => {
           const target = e.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'emotions', 'types')
@@ -687,7 +687,7 @@ const {
 
     patternTypeCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
-        checkbox.addEventListener('change', (e: Event) => {
+        checkbox.addEventListener('change', (e: Event: Event) => {
           const target = e.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'patterns', 'types')
@@ -698,7 +698,7 @@ const {
 
     patternCategoryCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
-        checkbox.addEventListener('change', (e: Event) => {
+        checkbox.addEventListener('change', (e: Event: Event) => {
           const target = e.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'patterns', 'categories')
@@ -736,7 +736,7 @@ const {
     if (groupBySelect instanceof HTMLElement) {
       groupBySelect.addEventListener(
         'valueChange',
-        (e) => {
+        (e: Event) => {
           const event = e as CustomEvent<{ value: string }>
           options.visualization.groupBy = event.detail?.value || (event.detail as any)
         },
@@ -745,7 +745,7 @@ const {
 
     // Reset button
     if (resetButton) {
-      resetButton.addEventListener('click', () => {
+      resetButton.addEventListener('click', (: Event) => {
         // Reset the options object with proper types
         options.timeRange = { presetRange: undefined, startDate: undefined, endDate: undefined }
         options.emotions = { 
@@ -775,7 +775,7 @@ const {
 
     // Apply button
     if (applyButton) {
-      applyButton.addEventListener('click', () => {
+      applyButton.addEventListener('click', (: Event) => {
         dispatchApplyEvent()
       })
     }
@@ -789,7 +789,7 @@ const {
     ): void {
       if (!slider) return
 
-      let initialValues
+      let initialValues: number[]
       if (singleValue) {
         const value = parseFloat(slider.getAttribute('data-value') || '0')
         initialValues = [value]
@@ -803,7 +803,7 @@ const {
       onChange(initialValues)
 
       // Add event listener for value changes
-      slider.addEventListener('sliderValueChange', (e) => {
+      slider.addEventListener('sliderValueChange', (e: Event: Event) => {
         const event = e as CustomEvent<{ values: number[] }>
         onChange(event.detail?.values || [])
       })
@@ -820,7 +820,7 @@ const {
       onChange(false)
 
       // Add event listener for changes
-      switchEl.addEventListener('checkedChange', (e) => {
+      switchEl.addEventListener('checkedChange', (e: Event: Event) => {
         const event = e as CustomEvent<boolean>
         onChange(event.detail)
       })

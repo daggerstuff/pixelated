@@ -23,7 +23,7 @@ const {
 } = Astro.props
 
 // Generate base64 LQIP for local images
-async function generateBase64Placeholder(src: string | ImageMetadata) {
+async function generateBase64Placeholder(_src: string | ImageMetadata) {
   // Optionally, return a transparent pixel or a static placeholder
   // This disables sharp-based LQIP
   return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
@@ -88,7 +88,7 @@ const aspectRatio = width && height ? width / height : undefined
 
 <script>
   // Add loaded class when image is loaded
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (: Event) => {
     const images = document.querySelectorAll('.optimized-image')
     images.forEach((img) => {
       if (img instanceof HTMLImageElement) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -102,7 +102,7 @@ export default function PsychologyFrameworksDemo() {
         setSelectedFramework(result.frameworks[0] || null)
       }
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load frameworks:', error)
       
       // Fallback to demo data

@@ -217,8 +217,8 @@ async function testMissingAuthentication(
       details = 'Endpoint accessible without authentication'
       evidence = JSON.stringify(response.data)
     }
-  } catch (error) {
-    details = `Error testing missing authentication: ${error instanceof Error ? error.message : 'Unknown error'}`
+  } catch (error: unknown) {
+    details = `Error testing missing authentication: ${error instanceof Error ? String(error) : 'Unknown error'}`
   }
 
   const endTime = performance.now()
@@ -298,8 +298,8 @@ async function testJWTManipulation(endpoint: Endpoint): Promise<TestResult> {
       details = 'Endpoint accessible with manipulated JWT token'
       evidence = JSON.stringify(response.data)
     }
-  } catch (error) {
-    details = `Error testing JWT manipulation: ${error instanceof Error ? error.message : 'Unknown error'}`
+  } catch (error: unknown) {
+    details = `Error testing JWT manipulation: ${error instanceof Error ? String(error) : 'Unknown error'}`
   }
 
   const endTime = performance.now()
@@ -380,8 +380,8 @@ async function testCookieManipulation(endpoint: Endpoint): Promise<TestResult> {
       details = 'Endpoint accessible with manipulated cookie'
       evidence = JSON.stringify(response.data)
     }
-  } catch (error) {
-    details = `Error testing cookie manipulation: ${error instanceof Error ? error.message : 'Unknown error'}`
+  } catch (error: unknown) {
+    details = `Error testing cookie manipulation: ${error instanceof Error ? String(error) : 'Unknown error'}`
   }
 
   const endTime = performance.now()
@@ -489,8 +489,8 @@ async function testHeaderManipulation(
         details = `Endpoint accessible with manipulated ${test.name}`
         evidence = JSON.stringify(response.data)
       }
-    } catch (error) {
-      details = `Error testing ${test.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+    } catch (error: unknown) {
+      details = `Error testing ${test.name}: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
 
     const endTime = performance.now()
@@ -565,8 +565,8 @@ async function testParameterPollution(endpoint: Endpoint): Promise<TestResult> {
       details = 'Endpoint accessible with parameter pollution'
       evidence = JSON.stringify(response.data)
     }
-  } catch (error) {
-    details = `Error testing parameter pollution: ${error instanceof Error ? error.message : 'Unknown error'}`
+  } catch (error: unknown) {
+    details = `Error testing parameter pollution: ${error instanceof Error ? String(error) : 'Unknown error'}`
   }
 
   const endTime = performance.now()
@@ -637,8 +637,8 @@ async function testRBACBypass(endpoint: Endpoint): Promise<TestResult> {
       details = 'Admin endpoint accessible with user token'
       evidence = JSON.stringify(response.data)
     }
-  } catch (error) {
-    details = `Error testing RBAC bypass: ${error instanceof Error ? error.message : 'Unknown error'}`
+  } catch (error: unknown) {
+    details = `Error testing RBAC bypass: ${error instanceof Error ? String(error) : 'Unknown error'}`
   }
 
   const endTime = performance.now()

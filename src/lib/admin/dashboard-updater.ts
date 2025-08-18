@@ -4,22 +4,22 @@ export class DashboardUpdater {
   private updateInterval: number | null = null
   private readonly UPDATE_INTERVAL_MS = 30000
 
-  private updateElement(id: string, value: string | number) {
-    const element = document.getElementById(id)
+  private updateElement(id: string, value: string | number): void {
+    const element = document.getElementById(id) as HTMLElement
     if (element) {
       element.textContent = String(value)
     }
   }
 
-  private updateProgressBar(id: string, percent: number) {
-    const element = document.getElementById(id)
+  private updateProgressBar(id: string, percent: number): void {
+    const element = document.getElementById(id) as HTMLElement
     if (element) {
       element.style.width = `${Math.min(percent, 100)}%`
     }
   }
 
-  private updateSecurityLevel(level: SystemMetrics['activeSecurityLevel']) {
-    const element = document.getElementById('security-level-value')
+  private updateSecurityLevel(level: SystemMetrics['activeSecurityLevel']): void {
+    const element = document.getElementById('security-level-value') as HTMLElement
     if (!element) {
       return
     }
@@ -44,8 +44,8 @@ export class DashboardUpdater {
     element.className = className
   }
 
-  private showError(message: string) {
-    const errorEl = document.getElementById('error-message')
+  private showError(message: string): void {
+    const errorEl = document.getElementById('error-message') as HTMLElement
     if (errorEl) {
       errorEl.style.display = 'block'
       errorEl.textContent = message
@@ -53,7 +53,7 @@ export class DashboardUpdater {
   }
 
   private hideError() {
-    const errorEl = document.getElementById('error-message')
+    const errorEl = document.getElementById('error-message') as HTMLElement
     if (errorEl) {
       errorEl.style.display = 'none'
     }
@@ -88,9 +88,9 @@ export class DashboardUpdater {
       this.updateSecurityLevel(data.activeSecurityLevel)
 
       this.hideError()
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error updating metrics:', err)
-      this.showError(err instanceof Error ? err.message : String(err))
+      this.showError(err instanceof Error ? (err as Error)?.message || String(err) : String(err))
     }
   }
 

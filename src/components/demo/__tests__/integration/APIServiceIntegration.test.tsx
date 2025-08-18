@@ -43,7 +43,7 @@ describe('API Service Integration Tests', () => {
 
       try {
         await fetch('/api/knowledge-balancer/status')
-      } catch (error) {
+      } catch (error: unknown) {
         expect(error).toBeInstanceOf(Error)
         expect((error as Error).message).toBe('Service unavailable')
       }
@@ -223,7 +223,7 @@ describe('API Service Integration Tests', () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            query: 'mutation { createRun(input: $input) { run { id url } } }',
+            query: 'mutation { createRun(input: $input): void { run { id url } } }',
             variables: { input: runData },
           }),
         })
@@ -389,7 +389,7 @@ describe('API Service Integration Tests', () => {
         for (let i = 0; i < maxRetries; i++) {
           try {
             return await fetch(url, options)
-          } catch (error) {
+          } catch (error: unknown) {
             if (i === maxRetries - 1) {
               throw error
             }

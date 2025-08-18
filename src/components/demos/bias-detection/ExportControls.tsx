@@ -14,7 +14,7 @@ interface ExportControlsProps {
   onExport: () => void
 }
 
-export const ExportControls: React.FC<ExportControlsProps> = ({
+export const ExportControls: FC<ExportControlsProps> = ({
   analysisResults,
   counterfactualScenarios,
   historicalComparison,
@@ -70,7 +70,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
         // Handle PDF export
         exportAsPDF()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Export failed:', error)
     } finally {
       setIsExporting(false)

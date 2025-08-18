@@ -118,9 +118,9 @@ export default function flexsearchIntegration(
                   await fs.writeFile(htmlFile, html, 'utf-8')
                   modifiedFiles++
                 }
-              } catch (error) {
+              } catch (error: unknown) {
                 logger.error(
-                  `Failed to modify HTML file: ${htmlFile} - ${error instanceof Error ? error.message : String(error)}`,
+                  `Failed to modify HTML file: ${htmlFile} - ${error instanceof Error ? String(error) : String(error)}`,
                 )
               }
             }
@@ -129,9 +129,9 @@ export default function flexsearchIntegration(
               `Added search index script to ${modifiedFiles} HTML files`,
             )
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error(
-            `Failed to build search index: ${error instanceof Error ? error.message : String(error)}`,
+            `Failed to build search index: ${error instanceof Error ? String(error) : String(error)}`,
           )
         }
       },
@@ -161,7 +161,7 @@ async function scanDirectory(
         files.push(fullPath)
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Failed to scan directory ${dir}:`, error)
   }
 

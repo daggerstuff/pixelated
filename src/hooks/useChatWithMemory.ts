@@ -7,7 +7,7 @@ export interface ChatWithMemoryOptions {
   memoryKey?: string
 }
 
-export function useChatWithMemory(options: ChatWithMemoryOptions = {}) {
+export function useChatWithMemory(options: ChatWithMemoryOptions = {}): void {
   const { initialMessages = [] } = options
   const [isLoading, setIsLoading] = useState(false)
   

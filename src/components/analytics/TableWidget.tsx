@@ -101,7 +101,7 @@ export function TableWidget({
         setIsLoading(true)
         const result = await fetchData()
         setData(result)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error fetching table data:', error)
       } finally {
         setIsLoading(false)
@@ -209,7 +209,7 @@ export function TableWidget({
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error exporting data:', error)
     }
   }, [columns, title, filteredAndSortedData])

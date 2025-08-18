@@ -25,7 +25,7 @@ export const GET = async ({ request }: APIContext) => {
 
     if (pending) {
       // Get all pending crisis flags (admin/therapist only)
-      const userRole = sessionData.user.user_metadata?.['role']
+      const userRole = sessionData?.['user']?.['user_metadata']?.['role']
       if (!userRole || !['admin', 'therapist'].includes(userRole)) {
         return new Response(
           JSON.stringify({ error: 'Insufficient permissions' }),
@@ -46,7 +46,7 @@ export const GET = async ({ request }: APIContext) => {
     if (userId) {
       // Get crisis flags for specific user
       // Users can only see their own flags, admins/therapists can see any
-      const userRole = sessionData.user.user_metadata?.['role']
+      const userRole = sessionData?.['user']?.['user_metadata']?.['role']
       if (
         userId !== sessionData.user.id &&
         !['admin', 'therapist'].includes(userRole)
@@ -85,15 +85,15 @@ export const GET = async ({ request }: APIContext) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in GET /api/crisis/session-flags', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
@@ -193,15 +193,15 @@ export const POST = async ({ request }: APIContext) => {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in POST /api/crisis/session-flags', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
@@ -293,15 +293,15 @@ export const PUT = async ({ request }: APIContext) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in PUT /api/crisis/session-flags', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

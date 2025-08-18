@@ -269,7 +269,7 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
       // Notify screen readers
       if (isMobile) {
         const errorCount = Object.keys(errors).length
-        const errorSummary = document.getElementById('validation-error-summary')
+        const errorSummary = document.getElementById('validation-error-summary') as HTMLElement
         if (errorSummary) {
           errorSummary.textContent = `Form has ${errorCount} ${
             errorCount === 1 ? 'error' : 'errors'
@@ -388,7 +388,7 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
                   href={`#${field}`}
                   onClick={(e) => {
                     e.preventDefault()
-                    const element = document.querySelector(`[name="${field}"]`)
+                    const element = document.querySelector(`[name="${field}"]`) as HTMLElement
                     if (element instanceof HTMLElement) {
                       element.focus()
                       element.scrollIntoView({

@@ -12,7 +12,7 @@ export class EHRServiceImpl implements EHRService {
   private clients: Map<string, FHIRClient> = new Map()
   private logger: Console
 
-  constructor(logger: Console = console) {
+  constructor(logger: Console = console): void {
     this.logger = logger
   }
 
@@ -83,7 +83,7 @@ export class EHRServiceImpl implements EHRService {
       this.providers.set(validatedConfig.id, provider)
 
       this.logger.info(`Configured EHR provider: ${validatedConfig.id}`)
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         throw new EHRError(
           'Invalid provider configuration',
@@ -110,7 +110,7 @@ export class EHRServiceImpl implements EHRService {
       this.clients.set(providerId, client)
 
       this.logger.info(`Connected to EHR provider: ${providerId}`)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new EHRError(
         'Failed to connect to provider',
         'CONNECTION_ERROR',
@@ -140,7 +140,7 @@ export class EHRServiceImpl implements EHRService {
       this.clients.delete(providerId)
 
       this.logger.info(`Disconnected from EHR provider: ${providerId}`)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new EHRError(
         'Failed to disconnect from provider',
         'DISCONNECT_ERROR',

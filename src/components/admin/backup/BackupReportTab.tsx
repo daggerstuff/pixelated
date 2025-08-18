@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { FC, Button } from '@/components/ui/button';
 import {
   Card,
   CardHeader,
@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { FC, Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -68,7 +68,7 @@ const calculateSuccessRate = (successful: number, total: number) => {
   return `${Math.round((successful / total) * 100)}%`
 }
 
-const BackupReportTab: React.FC<BackupReportTabProps> = ({
+const BackupReportTab: FC<BackupReportTabProps> = ({
   backups,
   recoveryTests,
 }) => {

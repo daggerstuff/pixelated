@@ -6,7 +6,7 @@ interface MobileDrawerProps {
   children: React.ReactNode
 }
 
-export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
+export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps): void {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {

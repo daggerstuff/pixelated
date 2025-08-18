@@ -216,7 +216,7 @@ export function SkeletonCard({
   )
 }
 
-export function SkeletonChartBar({ className }: SkeletonProps) {
+export function SkeletonChartBar({ className }: SkeletonProps): void {
   return (
     <div className={cn('flex h-40 items-end gap-2', className)}>
       {Array.from({ length: 7 }).map((_, i) => {
@@ -240,7 +240,7 @@ export function SkeletonChartBar({ className }: SkeletonProps) {
   )
 }
 
-export function SkeletonChartLine({ className }: SkeletonProps) {
+export function SkeletonChartLine({ className }: SkeletonProps): void {
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex justify-between">
@@ -287,7 +287,7 @@ export function SkeletonTable({
   )
 }
 
-export function SkeletonProfile({ className }: SkeletonProps) {
+export function SkeletonProfile({ className }: SkeletonProps): void {
   return (
     <div className={cn('space-y-8', className)}>
       <div className="flex flex-col md:flex-row gap-6">

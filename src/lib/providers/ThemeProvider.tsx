@@ -56,7 +56,7 @@ export function ThemeProvider({
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-    function updateTheme(e: MediaQueryListEvent | MediaQueryList) {
+    function updateTheme(e: MediaQueryListEvent | MediaQueryList): void {
       if (colorScheme === 'system') {
         setActiveTheme(e.matches ? 'dark' : 'light')
       }
@@ -97,7 +97,7 @@ export function ThemeProvider({
     root.classList.toggle('reduced-motion', motionPreference === 'reduced')
 
     // Update color scheme meta tag
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]') as HTMLElement
     if (metaThemeColor) {
       metaThemeColor.setAttribute(
         'content',

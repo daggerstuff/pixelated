@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { FC, Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FC, Button } from '@/components/ui/button'
+import { FC, Progress } from '@/components/ui/progress'
+import { FC, Badge } from '@/components/ui/badge'
+import { FC, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Upload,
   CheckCircle,
@@ -24,7 +24,7 @@ interface DemoStep {
   progress: number
 }
 
-const ClientFacingDemo: React.FC = () => {
+const ClientFacingDemo: FC = () => {
   const [currentStep, setCurrentStep] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [, setDemoData] = useState({

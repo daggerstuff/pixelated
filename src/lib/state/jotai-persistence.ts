@@ -51,7 +51,7 @@ class EncryptedJotaiStorage<Value> {
     Pick<PersistenceOptions, 'migration'>
   private syncListeners: Set<() => void> = new Set()
 
-  constructor(key: string, options: PersistenceOptions = {}) {
+  constructor(key: string, options: PersistenceOptions = {}): void {
     this.key = `jotai_${key}`
     this.options = {
       encrypt: false,
@@ -103,7 +103,7 @@ class EncryptedJotaiStorage<Value> {
     if (this.options.encrypt) {
       try {
         serialized = await encrypt(serialized)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to encrypt state:', error)
         throw new Error('Failed to encrypt state for storage')
       }
@@ -120,7 +120,7 @@ class EncryptedJotaiStorage<Value> {
       if (this.options.encrypt || serialized.startsWith('enc:')) {
         try {
           decrypted = await decrypt(serialized)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn(
             'Failed to decrypt stored state, treating as plain text:',
             error,
@@ -129,7 +129,7 @@ class EncryptedJotaiStorage<Value> {
         }
       }
 
-      const storedState: StoredState<Value> = JSON.parse(decrypted)
+      const storedState: StoredState<Value> = JSON.parse(decrypted) as any
 
       // Check TTL
       if (storedState.metadata.ttl) {
@@ -156,7 +156,7 @@ class EncryptedJotaiStorage<Value> {
       }
 
       return storedState.data
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to deserialize state for ${this.key}:`, error)
       return null
     }
@@ -175,7 +175,7 @@ class EncryptedJotaiStorage<Value> {
 
       const result = await this.deserializeValue(stored)
       return result ?? initialValue
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to get item ${this.key}:`, error)
       return initialValue
     }
@@ -189,7 +189,7 @@ class EncryptedJotaiStorage<Value> {
     try {
       const serialized = await this.serializeValue(newValue)
       localStorage.setItem(this.key, serialized)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to set item ${this.key}:`, error)
       throw error
     }
@@ -202,7 +202,7 @@ class EncryptedJotaiStorage<Value> {
 
     try {
       localStorage.removeItem(this.key)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to remove item ${this.key}:`, error)
       throw error
     }
@@ -324,7 +324,7 @@ export class StatePersistenceManager {
     for (const key of keys) {
       try {
         localStorage.removeItem(key)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Failed to clear persisted state for ${key}:`, error)
       }
     }
@@ -372,9 +372,9 @@ export class StatePersistenceManager {
       try {
         const value = localStorage.getItem(key)
         if (value) {
-          exported[key] = JSON.parse(value)
+          exported[key] = JSON.parse(value) as any
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(`Failed to export state for ${key}:`, error)
       }
     }
@@ -394,7 +394,7 @@ export class StatePersistenceManager {
       if (key.startsWith('jotai_')) {
         try {
           localStorage.setItem(key, JSON.stringify(value))
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error(`Failed to import state for ${key}:`, error)
         }
       }

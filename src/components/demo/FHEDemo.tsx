@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { fetchJSONWithRetry } from '@/lib/net/index'
+import { FC, fetchJSONWithRetry } from '@/lib/net/index'
 import type { FHEOperation } from '@/lib/fhe/types'
 
 interface Props {
   defaultMessage?: string
 }
 
-export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protected with FHE technology' }) => {
+export const FHEDemo: FC<Props> = ({ defaultMessage = 'Your data is protected with FHE technology' }) => {
   const [plainText, setPlainText] = useState('Therapist: How are you feeling today?')
   const [operation, setOperation] = useState<FHEOperation | 'word_count' | 'sentiment'>('word_count')
   const [isLoading, setIsLoading] = useState(false)

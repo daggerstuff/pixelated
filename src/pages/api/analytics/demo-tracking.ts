@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import type {
   DemoAnalyticsEvent,
   EnrichedAnalyticsEvent,
@@ -98,7 +97,7 @@ export const POST = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Demo analytics error:', error)
 
     const apiError: AnalyticsError = {
@@ -106,7 +105,7 @@ export const POST = async ({ request }) => {
       message: 'Failed to process analytics event',
       details: {
         source: 'demo-tracking',
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? String(error) : String(error),
       },
     }
 
@@ -156,7 +155,7 @@ export const GET = async ({ url }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Demo analytics query error:', error)
 
     const apiError: AnalyticsError = {
@@ -164,7 +163,7 @@ export const GET = async ({ url }) => {
       message: 'Failed to retrieve analytics data',
       details: {
         source: 'demo-tracking',
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? String(error) : String(error),
       },
     }
 
@@ -228,7 +227,7 @@ async function sendToGoogleAnalytics(
     if (!response.ok) {
       throw new Error(`GA4 API error: ${response.status}`)
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to send to Google Analytics:', error)
   }
 }
@@ -265,7 +264,7 @@ async function sendToMixpanel(event: EnrichedAnalyticsEvent): Promise<void> {
     if (!response.ok) {
       throw new Error(`Mixpanel API error: ${response.status}`)
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to send to Mixpanel:', error)
   }
 }
@@ -293,7 +292,7 @@ async function sendToCustomAnalytics(
     if (!response.ok) {
       throw new Error(`Custom analytics API error: ${response.status}`)
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to send to custom analytics:', error)
   }
 }

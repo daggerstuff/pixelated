@@ -111,7 +111,7 @@ beforeEach(async () => {
 
 // Helper function to serialize mock data like JSON.stringify does for dates
 function serializeForComparison(obj: unknown): unknown {
-  return JSON.parse(JSON.stringify(obj))
+  return JSON.parse(JSON.stringify(obj) as any)
 }
 
 describe('Session Analysis API Endpoint', () => {
@@ -234,7 +234,7 @@ describe('Session Analysis API Endpoint', () => {
       .mockImplementation((body: string, init?: ResponseInit) => {
         let responseData
         try {
-          responseData = JSON.parse(body)
+          responseData = JSON.parse(body) as any
         } catch {
           responseData = { error: 'Invalid JSON' }
         }
@@ -338,7 +338,7 @@ describe('Session Analysis API Endpoint', () => {
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => ({
           status: init?.status || 200,
-          json: mockResponseJson.mockResolvedValue(JSON.parse(body)),
+          json: mockResponseJson.mockResolvedValue(JSON.parse(body) as any),
           headers: {
             get: vi.fn((key: string) => mockResponseHeaders.get(key) || null),
           },
@@ -531,7 +531,7 @@ describe('Session Analysis API Endpoint', () => {
         await mockPOST({
           request: createMockRequest({ session: mockSessionForRequest }),
         })
-      } catch (error) {
+      } catch (error: unknown) {
         expect(error).toBeInstanceOf(Error)
         expect((error as Error).message).toBe('Internal server error')
       }
@@ -571,7 +571,7 @@ describe('Session Analysis API Endpoint', () => {
       global.Response = vi
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => {
-          const responseData = JSON.parse(body)
+          const responseData = JSON.parse(body) as any
           return {
             status: init?.status || 200,
             json: vi.fn().mockResolvedValue(responseData),
@@ -604,7 +604,7 @@ describe('Session Analysis API Endpoint', () => {
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => ({
           status: init?.status || 200,
-          json: vi.fn().mockResolvedValue(JSON.parse(body)),
+          json: vi.fn().mockResolvedValue(JSON.parse(body) as any),
           headers: {
             get: vi.fn((key: string) => mockHeaders.get(key) || null),
           },

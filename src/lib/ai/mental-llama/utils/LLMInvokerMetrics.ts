@@ -39,7 +39,7 @@ export class LLMInvokerMetrics {
     }
   }
 
-  reset(): void {
+  reset() {
     this.totalRequests = 0
     this.successfulRequests = 0
     this.failedRequests = 0

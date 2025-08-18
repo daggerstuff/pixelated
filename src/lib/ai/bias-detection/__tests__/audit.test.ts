@@ -86,7 +86,7 @@ class MockAuditStorage implements AuditStorage {
     return [...this.entries]
   }
 
-  clear(): void {
+  clear() {
     this.entries = []
   }
 }

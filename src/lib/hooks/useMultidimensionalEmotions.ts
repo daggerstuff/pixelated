@@ -93,7 +93,7 @@ export function useMultidimensionalEmotions(
 
       const patternsData = await patternsResponse.json()
       setPatterns(patternsData)
-    } catch (err) {
+    } catch (err: unknown) {
       const errorObj =
         err instanceof Error ? err : new Error('An unknown error occurred')
       setError(errorObj)

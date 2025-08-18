@@ -51,7 +51,7 @@ export class ConsentService {
           updatedAt: t['updated_at'],
         }
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in getConsentTypes', error)
       throw new Error('Failed to fetch consent types')
     }
@@ -81,7 +81,7 @@ export class ConsentService {
         createdAt: (data as Record<string, unknown>)['created_at'] as string,
         updatedAt: (data as Record<string, unknown>)['updated_at'] as string,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in getCurrentConsentVersion', error)
       throw new Error('Failed to fetch current consent version')
     }
@@ -106,7 +106,7 @@ export class ConsentService {
         createdAt: option['created_at'] as string,
         updatedAt: option['updated_at'] as string,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in getConsentOptions', error)
       throw new Error('Failed to fetch consent options')
     }
@@ -125,7 +125,7 @@ export class ConsentService {
       // Get current version ID for this consent type
       // TODO: Replace with MongoDB implementation
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in getUserConsent', error)
       throw new Error('Failed to fetch user consent')
     }
@@ -142,7 +142,7 @@ export class ConsentService {
       // Get consent types - either all or specific one
       // TODO: Replace with MongoDB implementation
       return []
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in getUserConsentStatus', error)
       throw new Error('Failed to fetch user consent status')
     }
@@ -157,7 +157,7 @@ export class ConsentService {
       // Check if there's already an active consent for this version
       // TODO: Replace with MongoDB implementation
       return {} as unknown as UserConsent
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in grantConsent', error)
       throw new Error('Failed to grant consent')
     }
@@ -172,7 +172,7 @@ export class ConsentService {
       // Get the consent record
       // TODO: Replace with MongoDB implementation
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in withdrawConsent', error)
       throw new Error('Failed to withdraw consent')
     }
@@ -191,7 +191,7 @@ export class ConsentService {
       // Get the consent type
       // TODO: Replace with MongoDB implementation
       return false
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unexpected error in hasActiveConsent', error)
       throw new Error('Failed to check active consent')
     }

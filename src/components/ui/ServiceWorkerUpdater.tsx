@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { serviceWorkerManager } from '../../utils/serviceWorkerRegistration'
+import { FC, toast } from 'react-hot-toast'
+import { FC, serviceWorkerManager } from '../../utils/serviceWorkerRegistration'
 
 interface ServiceWorkerUpdaterProps {
   onUpdateAvailable?: () => void
@@ -14,7 +14,7 @@ interface ServiceWorkerUpdaterProps {
  * It doesn't render anything visible but handles the service worker lifecycle
  * and shows notifications when updates are available.
  */
-export const ServiceWorkerUpdater: React.FC<ServiceWorkerUpdaterProps> = ({
+export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
   onUpdateAvailable,
   onUpdateComplete,
 }) => {

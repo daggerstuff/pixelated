@@ -54,7 +54,7 @@ const DEFAULT_WEIGHTS: BiasLayerWeights = {
   evaluation: 0.25,
 }
 
-function validateThresholds(t: BiasThresholdsConfig) {
+function validateThresholds(t: BiasThresholdsConfig): void {
   const values = [t['warningLevel'], t['highLevel'], t['criticalLevel']]
   if (values.some((v) => v < 0 || v > 1)) {
     throw new Error('Invalid threshold values')
@@ -64,7 +64,7 @@ function validateThresholds(t: BiasThresholdsConfig) {
   }
 }
 
-function validateWeights(w: BiasLayerWeights) {
+function validateWeights(w: BiasLayerWeights): void {
   const sum = w['preprocessing'] + w['modelLevel'] + w['interactive'] + w['evaluation']
   if (Math.abs(sum - 1) > 1e-6) {
     throw new Error('Layer weights must sum to 1.0')
@@ -166,7 +166,7 @@ export class BiasDetectionEngine {
   > = []
   private sessionCache: Map<string, AnalysisResult> = new Map()
 
-  constructor(cfg: BiasDetectionConfig = {}) {
+  constructor(cfg: BiasDetectionConfig = {}): void {
     const thresholds = cfg['thresholds'] ?? DEFAULT_THRESHOLDS
     validateThresholds(thresholds)
 
@@ -231,7 +231,7 @@ export class BiasDetectionEngine {
     return 'low'
   }
 
-  private maskDemographics(input?: Record<string, unknown>) {
+  private maskDemographics(input?: Record<string, unknown>): void {
     if (!input) { return undefined }
     if (!this.config['hipaaCompliant'] && !this.config['dataMaskingEnabled']) { return input }
     // Drop known PII-looking fields; keep coarse fields
@@ -357,19 +357,19 @@ export class BiasDetectionEngine {
   }
   
   // Lightweight metrics pass-through for performance tests
-  async getMetrics(_opts?: unknown) {
+  async getMetrics(_opts?: unknown): void {
     this.ensureInitialized()
     return this.metricsCollector.getMetrics?.()
   }
 
   // Fast cached lookup used by performance tests
-  async getSessionAnalysis(sessionId: string) {
+  async getSessionAnalysis(sessionId: string): void {
     this.ensureInitialized()
     return this.sessionCache.get(sessionId)
   }
 
   // Simple explanation generator – fast and synchronous-friendly
-  async explainBiasDetection(analysis: AnalysisResult) {
+  async explainBiasDetection(analysis: AnalysisResult): void {
     this.ensureInitialized()
     return {
       sessionId: analysis.sessionId,
@@ -384,7 +384,7 @@ export class BiasDetectionEngine {
   }
 
   // Update thresholds with validation
-  async updateThresholds(thresholds: BiasThresholdsConfig) {
+  async updateThresholds(thresholds: BiasThresholdsConfig): void {
     validateThresholds(thresholds)
     this.config.thresholds = thresholds
     return this.config.thresholds
@@ -417,7 +417,7 @@ export class BiasDetectionEngine {
       ),
     }
   }
-  async getDashboardData(_opts: { timeRange?: string; includeDetails?: boolean } = {}) {
+  async getDashboardData(_opts: { timeRange?: string; includeDetails?: boolean } = {}): void {
     return this.metricsCollector.getDashboardData()
   }
 

@@ -162,6 +162,7 @@ jobs:
     needs: [prepare-env]
     outputs:
       build-artifacts: ${{ steps.upload.outputs.build-artifacts }}
+      registry-host: ${{ steps.reg.outputs.host }}
     
     steps:
       - name: Checkout code
@@ -249,13 +250,30 @@ jobs:
           cp -r docker/ deployment/ 2>/dev/null || true
           cp -r infra/ deployment/ 2>/dev/null || true
 
+      - name: Ensure Docker CLI
+        run: |
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "Installing Docker CLI..."
+            sudo apt-get update -qq
+            sudo apt-get install -y docker.io
+          fi
+          docker --version
+
+      - name: Derive registry host
+        id: reg
+        run: |
+          SERVER="${GITHUB_SERVER_URL}"
+          SERVER="${SERVER#https://}"
+          SERVER="${SERVER#http://}"
+          echo "host=${SERVER}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Forgejo Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ steps.reg.outputs.host }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -265,8 +283,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE }}:latest
-            ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            ${{ steps.reg.outputs.host }}/${{ github.repository_owner }}/${{ env.DOCKER_IMAGE }}:latest
+            ${{ steps.reg.outputs.host }}/${{ github.repository_owner }}/${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
@@ -432,7 +450,7 @@ jobs:
           port: ${{ github.event.inputs.vps_port || '22' }}
           script: |
             echo "🔐 Logging in to Forgejo Container Registry..."
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ needs.build.outputs.registry-host }} -u ${{ github.actor }} --password-stdin
 
       - name: Pull and deploy Docker image
         uses: appleboy/ssh-action@v1.0.3
@@ -449,7 +467,7 @@ jobs:
             docker rm ${{ env.CONTAINER_NAME }} 2>/dev/null || true
             
             echo "📥 Pulling Docker image from registry..."
-            docker pull ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE }}:latest
+            docker pull ${{ needs.build.outputs.registry-host }}/${{ github.repository_owner }}/${{ env.DOCKER_IMAGE }}:latest
             
             echo "🧹 Cleaning up old images..."
             docker image prune -f
@@ -473,25 +491,25 @@ jobs:
               CORS_ORIGINS="$CORS_ORIGINS,http://${{ github.event.inputs.domain }},https://${{ github.event.inputs.domain }}"
             fi
             
-                         echo "🚀 Starting new container..."
-             docker run -d \
-               --name ${{ env.CONTAINER_NAME }} \
-               --restart unless-stopped \
-               -p ${{ env.APP_PORT }}:${{ env.APP_PORT }} \
-               -e NODE_ENV=production \
-               -e PORT=${{ env.APP_PORT }} \
-               -e WEB_PORT=${{ env.APP_PORT }} \
-               -e LOG_LEVEL=info \
-               -e ENABLE_RATE_LIMITING=true \
-               -e RATE_LIMIT_WINDOW=60 \
-               -e RATE_LIMIT_MAX_REQUESTS=100 \
-               -e ENABLE_HIPAA_COMPLIANCE=true \
-               -e ENABLE_AUDIT_LOGGING=true \
-               -e ENABLE_DATA_MASKING=true \
-               -e ASTRO_TELEMETRY_DISABLED=1 \
-               -e PUBLIC_URL="$PUBLIC_URL" \
-               -e CORS_ORIGINS="$CORS_ORIGINS" \
-               ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE }}:latest
+            echo "🚀 Starting new container..."
+            docker run -d \
+              --name ${{ env.CONTAINER_NAME }} \
+              --restart unless-stopped \
+              -p ${{ env.APP_PORT }}:${{ env.APP_PORT }} \
+              -e NODE_ENV=production \
+              -e PORT=${{ env.APP_PORT }} \
+              -e WEB_PORT=${{ env.APP_PORT }} \
+              -e LOG_LEVEL=info \
+              -e ENABLE_RATE_LIMITING=true \
+              -e RATE_LIMIT_WINDOW=60 \
+              -e RATE_LIMIT_MAX_REQUESTS=100 \
+              -e ENABLE_HIPAA_COMPLIANCE=true \
+              -e ENABLE_AUDIT_LOGGING=true \
+              -e ENABLE_DATA_MASKING=true \
+              -e ASTRO_TELEMETRY_DISABLED=1 \
+              -e PUBLIC_URL="$PUBLIC_URL" \
+              -e CORS_ORIGINS="$CORS_ORIGINS" \
+              ${{ needs.build.outputs.registry-host }}/${{ github.repository_owner }}/${{ env.DOCKER_IMAGE }}:latest
             
             echo "⏳ Waiting for container to start..."
             sleep 15

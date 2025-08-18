@@ -122,7 +122,7 @@ export async function reportBreach(
     await initiateNotificationProcess(breach)
 
     return id
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to report breach:', error)
     throw error
   }
@@ -156,7 +156,7 @@ async function initiateNotificationProcess(
       notificationStatus: 'completed',
     }
     await redis.set(getBreachKey(breach.id), JSON.stringify(completedBreach))
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to process breach notifications:', error)
     throw error
   }
@@ -224,7 +224,7 @@ async function notifyAffectedUsers(
           user.name || 'Valued User',
         ),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to notify user:', {
         userId,
         breachId: breach.id,
@@ -273,7 +273,7 @@ async function notifyAuthorities(breach: BreachDetails): Promise<void> {
       breachId: breach.id,
       timestamp: Date.now(),
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to notify authorities:', error)
     throw error
   }
@@ -308,7 +308,7 @@ Please review the incident and take necessary actions.
     )
 
     await Promise.all(notifications)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to notify internal stakeholders:', error)
     throw error
   }
@@ -319,8 +319,8 @@ export async function getBreachStatus(
 ): Promise<BreachDetails | null> {
   try {
     const breach = await redis.get(getBreachKey(id))
-    return breach ? JSON.parse(breach) : null
-  } catch (error) {
+    return breach ? JSON.parse(breach) as any : null
+  } catch (error: unknown) {
     logger.error('Failed to get breach status:', error)
     throw error
   }
@@ -332,12 +332,12 @@ export async function listRecentBreaches(): Promise<BreachDetails[]> {
     const breaches = await Promise.all(
       keys.map(async (key: string) => {
         const breach = await redis.get(key)
-        return breach ? JSON.parse(breach) : null
+        return breach ? JSON.parse(breach) as any : null
       }),
     )
 
     return breaches.filter(Boolean).sort((a, b) => b.timestamp - a.timestamp)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to list recent breaches:', error)
     throw error
   }
@@ -372,7 +372,7 @@ export async function runTestScenario(scenario: {
     await recordTestExecution(breachId, scenario)
 
     return breachId
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to run test scenario:', error)
     throw error
   }
@@ -420,7 +420,7 @@ export async function updateMetrics(breach: BreachDetails): Promise<void> {
 
     // Set retention period
     await redis.expire(monthKey, DOCUMENTATION_RETENTION)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to update metrics:', error)
   }
 }
@@ -481,7 +481,7 @@ export async function getTrainingMaterials(): Promise<TrainingMaterials> {
     )
 
     return materials
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to get training materials:', error)
     throw error
   }

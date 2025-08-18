@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { TechniqueDisplay } from '../TechniqueDisplay'
 import { SimulatorProvider } from '../../context/SimulatorContext'

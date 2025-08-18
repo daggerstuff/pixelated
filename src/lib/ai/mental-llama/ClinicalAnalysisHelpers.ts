@@ -12,7 +12,7 @@ const logger = getClinicalAnalysisLogger('helpers')
  * recommendations generation, and quality metrics calculation.
  */
 export class ClinicalAnalysisHelpers {
-  constructor(private modelProvider?: IModelProvider) {}
+  constructor(private modelProvider?: IModelProvider): void {}
 
   /**
    * Builds clinical prompt for LLM analysis.
@@ -65,10 +65,10 @@ Provide a comprehensive clinical analysis in JSON format:
   /**
    * Parses clinical response from LLM.
    */
-  public parseClinicalResponse(content: string) {
+  public parseClinicalResponse(content: string): void {
     try {
-      return JSON.parse(content)
-    } catch (error) {
+      return JSON.parse(content) as any
+    } catch (error: unknown) {
       logger.error('Failed to parse clinical response', { error, content })
       return {
         explanation: content,
@@ -607,7 +607,7 @@ Provide a comprehensive clinical analysis in JSON format:
           baseAnalysis.supportingEvidence ||
           [],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in expert-guided LLM analysis', { error })
       return {
         explanation: `${baseAnalysis.explanation} [Clinical analysis enhanced with expert guidelines]`,

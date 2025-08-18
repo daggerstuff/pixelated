@@ -149,10 +149,10 @@ const getActionBadge = (action: DLPAction) => {
   import './DLPRules';
 
   // Set up event listeners when the component mounts
-  document.addEventListener('astro:mount', () => {
+  document.addEventListener('astro:mount', (: Event) => {
     // Set up edit handlers
     document.querySelectorAll('[data-edit-rule]').forEach((button) => {
-      button.addEventListener('click', (event) => {
+      button.addEventListener('click', (event: Event: Event) => {
         const target = event.currentTarget as HTMLElement;
         const ruleData = target.getAttribute('data-rule');
 
@@ -179,7 +179,7 @@ const getActionBadge = (action: DLPAction) => {
     // Set up new rule button
     const newRuleButton = document.querySelector('[data-new-rule]');
     if (newRuleButton) {
-      newRuleButton.addEventListener('click', () => {
+      newRuleButton.addEventListener('click', (: Event) => {
         // Switch to the editor tab
         const editorTab = document.querySelector('[data-tab="editor"]') as HTMLElement;
         if (editorTab) {

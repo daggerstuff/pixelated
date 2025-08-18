@@ -266,7 +266,7 @@ export async function calculate(
       compliance,
       details,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error calculating notification effectiveness:', {
       error: (error as Error).message,
     })

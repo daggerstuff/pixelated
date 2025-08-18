@@ -4,7 +4,7 @@ export class EnterpriseAPIClient {
   private maxRetries: number = 3
   private retryDelay: number = 1000
 
-  constructor(baseURL: string = '') {
+  constructor(baseURL: string = ''): void {
     this.baseURL = baseURL
   }
 
@@ -18,7 +18,7 @@ export class EnterpriseAPIClient {
   ): Promise<T> {
     try {
       return await operation()
-    } catch (error) {
+    } catch (error: unknown) {
       if (attempt >= this.maxRetries) {
         throw error
       }
@@ -69,10 +69,10 @@ export class EnterpriseAPIClient {
         }
 
         return await response.json()
-      } catch (error) {
+      } catch (error: unknown) {
         clearTimeout(timeoutId)
         
-        if (error instanceof Error && error.name === 'AbortError') {
+        if (error instanceof Error && (error as Error)?.name === 'AbortError') {
           throw new APITimeoutError(`Request timeout after ${timeout}ms`)
         }
         
@@ -137,14 +137,14 @@ export class APIError extends Error {
 }
 
 export class APIRetryableError extends APIError {
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number): void {
     super(message, status)
     this.name = 'APIRetryableError'
   }
 }
 
 export class APITimeoutError extends Error {
-  constructor(message: string) {
+  constructor(message: string): void {
     super(message)
     this.name = 'APITimeoutError'
   }

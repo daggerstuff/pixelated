@@ -249,7 +249,7 @@ export class RecommendationService {
       })
 
       return filteredRecommendations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error generating recommendations', { clientId, error })
       return this.getFallbackRecommendations(context)
     }
@@ -310,7 +310,7 @@ export class RecommendationService {
       }
 
       return recommendations.slice(0, 5) // Limit to top 5 recommendations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error generating recommendations from analysis', {
         clientId,
         error,
@@ -532,7 +532,7 @@ export class RecommendationService {
   /**
    * Generate base recommendations from clinical knowledge
    */
-  private async generateBaseRecommendations(currentState: ClientState) {
+  private async generateBaseRecommendations(currentState: ClientState): void {
     const recommendations: Partial<TreatmentRecommendation>[] = []
 
     // Get recommendations for each primary concern

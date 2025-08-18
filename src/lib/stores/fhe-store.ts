@@ -154,7 +154,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
           keyId,
           initTime: endTime - startTime,
         })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('FHE initialization error:', { error })
         set({
           encryptionStatus: 'error',
@@ -200,7 +200,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         })
 
         return encryptedStr
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('FHE encryption error:', { error })
         set({
           lastError: error instanceof Error ? error : new Error(String(error)),
@@ -227,7 +227,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         const encryptedData =
           typeof encryptedMessage === 'string' &&
           encryptedMessage.startsWith('{')
-            ? (isEncryptedData(JSON.parse(encryptedMessage)) ? JSON.parse(encryptedMessage) : { id: '', data: null, dataType: 'object' })
+            ? (isEncryptedData(JSON.parse(encryptedMessage) as any) ? JSON.parse(encryptedMessage) as any : { id: '', data: null, dataType: 'object' })
             : (isEncryptedData(encryptedMessage) ? encryptedMessage : { id: '', data: null, dataType: 'object' })
 
         // Perform decryption
@@ -252,7 +252,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         })
 
         return decryptedStr
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('FHE decryption error:', { error })
         set({
           lastError: error instanceof Error ? error : new Error(String(error)),
@@ -297,7 +297,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
           const encryptedData =
             typeof encryptedMessage === 'string' &&
             encryptedMessage.startsWith('{')
-              ? (isEncryptedData(JSON.parse(encryptedMessage)) ? JSON.parse(encryptedMessage) : { id: '', data: null, dataType: 'object' })
+              ? (isEncryptedData(JSON.parse(encryptedMessage) as any) ? JSON.parse(encryptedMessage) as any : { id: '', data: null, dataType: 'object' })
               : (isEncryptedData(encryptedMessage) ? encryptedMessage : { id: '', data: null, dataType: 'object' })
 
           let processedData: unknown
@@ -351,7 +351,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         })
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`FHE operation ${operation} error:`, { error, params })
         set({
           lastError: error instanceof Error ? error : new Error(String(error)),
@@ -379,7 +379,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
               scheme: keys.scheme,
               status: keys.status,
             })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('FHE public key export error:', { error })
         set({
           lastError: error instanceof Error ? error : new Error(String(error)),
@@ -438,7 +438,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         set({ keyId: newKeyId })
 
         logger.info('Key rotation completed successfully', { keyId: newKeyId })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Key rotation failed:', { error })
         set({
           lastError: error instanceof Error ? error : new Error(String(error)),

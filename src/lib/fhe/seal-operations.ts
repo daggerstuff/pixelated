@@ -20,7 +20,7 @@ const logger = createBuildSafeLogger('seal-operations')
 export class SealOperations {
   private service: SealService
 
-  constructor(service?: SealService) {
+  constructor(service?: SealService): void {
     this.service = service || SealService.getInstance()
   }
 
@@ -108,7 +108,7 @@ export class SealOperations {
       logger.error('Homomorphic addition failed', { error })
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: FHEOperation.Addition,
       }
     }
@@ -187,7 +187,7 @@ export class SealOperations {
       logger.error('Homomorphic subtraction failed', { error })
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: FHEOperation.Subtraction,
       }
     }
@@ -310,7 +310,7 @@ export class SealOperations {
       logger.error('Homomorphic multiplication failed', { error })
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: FHEOperation.Multiplication,
       }
     }
@@ -353,7 +353,7 @@ export class SealOperations {
       logger.error('Homomorphic negation failed', { error })
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: FHEOperation.Negation,
       }
     }
@@ -412,7 +412,7 @@ export class SealOperations {
       logger.error('Homomorphic rotation failed', { error })
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: FHEOperation.Rotation,
       }
     }
@@ -468,7 +468,7 @@ export class SealOperations {
       logger.error('Homomorphic squaring failed', { error })
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: FHEOperation.Square,
       }
     }
@@ -627,7 +627,7 @@ export class SealOperations {
       logger.error('Homomorphic polynomial evaluation failed', { error })
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: FHEOperation.Polynomial,
       }
     }

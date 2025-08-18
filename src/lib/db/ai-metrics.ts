@@ -21,7 +21,7 @@ export async function insertAIPerformanceMetric(_data: {
     // TODO: Implement MongoDB insert for AI metrics
     // Example: await mongoClient.db().collection('ai_metrics').insertOne({...})
     return
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error inserting AI performance metric:', error)
   }
 }

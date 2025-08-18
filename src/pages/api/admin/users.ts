@@ -4,13 +4,6 @@ import { adminGuard } from '../../../lib/admin/middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 
-interface AdminLocals {
-  admin: {
-    userId: string
-    isAdmin: boolean
-    hasPermission: boolean
-  }
-}
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -69,9 +62,9 @@ export const GET = async (context) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching users:', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return new Response(JSON.stringify({ error: 'Failed to fetch users' }), {
       status: 500,
@@ -134,9 +127,9 @@ export const PATCH = async (context) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error updating user:', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return new Response(JSON.stringify({ error: 'Failed to update user' }), {
       status: 500,

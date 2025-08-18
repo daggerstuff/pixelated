@@ -108,7 +108,7 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Private constructor for singleton pattern
    */
-  private constructor(options?: Partial<KeyManagementOptions>) {
+  private constructor(options?: Partial<KeyManagementOptions>): void {
     super()
     this.options = { ...HIPAA_DEFAULT_OPTIONS, ...options }
     this.nodeId = this.generateSecureId()
@@ -142,9 +142,9 @@ export class KeyRotationService extends EventEmitter {
 
         logger.info('HIPAA++ AWS clients initialized with enhanced security')
         this.auditLog('aws_clients_initialized', { success: true })
-      } catch (error) {
+      } catch (error: unknown) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? String(error) : 'Unknown error'
         this.auditLog('aws_clients_init_failed', {
           success: false,
           details: { error: errorMessage },
@@ -186,7 +186,7 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Security monitoring setup
    */
-  private setupSecurityMonitoring(): void {
+  private setupSecurityMonitoring() {
     // Monitor for suspicious activity
     setInterval(() => {
       this.performSecurityCheck()
@@ -294,9 +294,9 @@ export class KeyRotationService extends EventEmitter {
         riskLevel: 'medium',
       })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? String(error) : 'Unknown error'
       this.auditLog('lock_acquisition_failed', {
         success: false,
         details: { operation, error: errorMessage },
@@ -321,7 +321,7 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Perform security health check
    */
-  private performSecurityCheck(): void {
+  private performSecurityCheck() {
     const now = Date.now()
 
     // Check for expired keys
@@ -383,7 +383,7 @@ export class KeyRotationService extends EventEmitter {
           ],
         })
         .promise()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to trigger security alarm', { alarmType, error })
     }
   }
@@ -422,7 +422,7 @@ export class KeyRotationService extends EventEmitter {
       }
 
       await this.cloudWatch.putMetricData(params).promise()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to emit security metrics', { error })
     }
   }
@@ -430,7 +430,7 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Clean up old audit logs (HIPAA 7-year retention)
    */
-  private cleanupAuditLogs(): void {
+  private cleanupAuditLogs() {
     const cutoffTime =
       Date.now() - SECURITY_CONSTANTS.AUDIT_RETENTION_DAYS * 24 * 60 * 60 * 1000
     const initialCount = this.auditEvents.length
@@ -489,7 +489,7 @@ export class KeyRotationService extends EventEmitter {
           await this.sealService.initialize(EncryptionMode.FHE)
           this.sealInitialized = true
         }
-      } catch (err) {
+      } catch (err: unknown) {
         logger.warn(
           'SEAL service initialization failed, will rely on standard key management',
           { error: err },
@@ -517,9 +517,9 @@ export class KeyRotationService extends EventEmitter {
       })
 
       this.emit('initialized', { activeKeyId: this.activeKeyId })
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? String(error) : 'Unknown error'
       this.auditLog('service_initialization_failed', {
         success: false,
         details: { error: errorMessage },
@@ -699,12 +699,12 @@ export class KeyRotationService extends EventEmitter {
 
       this.emit('key-rotated', { keyId, rotationTime })
       return keyId
-    } catch (error) {
+    } catch (error: unknown) {
       this.securityMetrics.rotationFailures++
       this.releaseLock('key_rotation')
 
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? String(error) : 'Unknown error'
       this.auditLog('key_rotation_failed', {
         success: false,
         details: { error: errorMessage, rotationId },
@@ -777,9 +777,9 @@ export class KeyRotationService extends EventEmitter {
         details: { destructionTime: Date.now() },
         riskLevel: 'medium',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? String(error) : 'Unknown error'
       this.auditLog('key_destruction_failed', {
         success: false,
         keyId,
@@ -865,9 +865,9 @@ export class KeyRotationService extends EventEmitter {
           this.keyCache.set(keyPair.id, keyPair)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? String(error) : 'Unknown error'
       this.auditLog('key_storage_failed', {
         success: false,
         keyId: keyPair.id,
@@ -901,7 +901,7 @@ export class KeyRotationService extends EventEmitter {
       logger.info(
         `Loaded keys successfully. Active key: ${this.activeKeyId || 'none'}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load keys', { error })
       // Non-blocking error, we'll generate new keys if needed
     }
@@ -910,7 +910,7 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Load keys from localStorage (client-side)
    */
-  private loadKeysFromLocalStorage(): void {
+  private loadKeysFromLocalStorage() {
     try {
       // Find all key-related items in localStorage
       const keyPrefix = this.options.storagePrefix || ''
@@ -929,7 +929,7 @@ export class KeyRotationService extends EventEmitter {
           try {
             const value = localStorage.getItem(key)
             if (value) {
-              const keyPair = JSON.parse(value) as TFHEKeyPair
+              const keyPair = JSON.parse(value) as any as TFHEKeyPair
               allKeys.push(keyPair)
             }
           } catch (e) {
@@ -975,7 +975,7 @@ export class KeyRotationService extends EventEmitter {
           logger.info(`Removed expired key: ${key.id}`)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error loading keys from localStorage', { error })
     }
   }
@@ -1106,9 +1106,9 @@ export class KeyRotationService extends EventEmitter {
           this.registerKey(newestKey.id, newestKey.expires)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? String(error) : 'Unknown error'
       logger.error('Failed to load keys from secure storage', { error })
       throw new Error(`Key loading error: ${errorMessage}`)
     }

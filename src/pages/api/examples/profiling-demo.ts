@@ -40,7 +40,7 @@ export const GET = async (_) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in profiling demo API:', error)
     const isProd = process.env.NODE_ENV === 'production'
     return new Response(
@@ -49,7 +49,7 @@ export const GET = async (_) => {
         error: isProd
           ? 'Internal server error'
           : error instanceof Error
-            ? error.message
+            ? String(error)
             : 'Unknown error',
       }),
       {

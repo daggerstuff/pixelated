@@ -49,7 +49,7 @@ export class BlogPublishingService {
   private scheduledJobs: Map<string, cron.ScheduledTask> = new Map()
   private posts: Map<string, PostInfo> = new Map()
 
-  constructor(contentDir = 'src/content/blog') {
+  constructor(contentDir = 'src/content/blog'): void {
     this.contentDir = contentDir
   }
 
@@ -64,7 +64,7 @@ export class BlogPublishingService {
       // Set up a daily job to check for overdue posts
       cron.schedule('0 0 * * *', () => this.checkForOverduePosts())
       logger.info('Blog Publishing Service initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Blog Publishing Service', { error })
       throw error
     }
@@ -78,7 +78,7 @@ export class BlogPublishingService {
       logger.info(`Scanning content directory: ${this.contentDir}`)
       await this.walkDirectory(this.contentDir)
       logger.info(`Found ${this.posts.size} posts`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error scanning content directory', { error })
       throw error
     }
@@ -87,7 +87,7 @@ export class BlogPublishingService {
   /**
    * Schedule all posts based on their publication dates
    */
-  private scheduleAllPosts(): void {
+  private scheduleAllPosts() {
     const now = new Date()
 
     for (const [id, post] of this.posts.entries()) {
@@ -104,7 +104,7 @@ export class BlogPublishingService {
           post.scheduled = pubDate
           this.schedulePost(id, post)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Error scheduling post ${id}`, { error })
       }
     }
@@ -149,7 +149,7 @@ export class BlogPublishingService {
           cronExpression,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Error scheduling post ${id}`, { error })
     }
   }
@@ -181,7 +181,7 @@ export class BlogPublishingService {
       post.metadata.draft = false
 
       logger.info(`Post published successfully: ${post.metadata.title}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Error publishing post ${id}`, { error })
     }
   }
@@ -189,7 +189,7 @@ export class BlogPublishingService {
   /**
    * Check for posts that should have been published but weren't
    */
-  private checkForOverduePosts(): void {
+  private checkForOverduePosts() {
     const now = new Date()
 
     for (const [id, post] of this.posts.entries()) {
@@ -204,7 +204,7 @@ export class BlogPublishingService {
 
           post.status = PostStatus.OVERDUE
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Error checking post ${id}`, { error })
       }
     }
@@ -229,7 +229,7 @@ export class BlogPublishingService {
           await this.processFile(fullPath)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Error walking directory ${dirPath}`, { error })
     }
   }
@@ -259,7 +259,7 @@ export class BlogPublishingService {
           })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Error processing file ${filePath}`, { error })
     }
   }
@@ -304,7 +304,7 @@ export class BlogPublishingService {
 
       // Validate against schema
       return BlogPostSchema.parse(data)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error parsing frontmatter', { error, frontmatter })
       return null
     }

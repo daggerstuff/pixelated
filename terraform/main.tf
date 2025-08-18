@@ -45,7 +45,7 @@ data "aws_eks_cluster_auth" "cluster" {
 
 # VPC Module
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws?ref=v3.19.0"
 
   name = "${var.project_name}-vpc"
   cidr = var.vpc_cidr
@@ -64,7 +64,7 @@ module "vpc" {
 
 # EKS Cluster Module
 module "eks" {
-  source = "terraform-aws-modules/eks/aws"
+  source = "terraform-aws-modules/eks/aws?ref=v19.20.0"
 
   cluster_name    = "${var.project_name}-cluster"
   cluster_version = var.kubernetes_version
@@ -115,8 +115,17 @@ resource "aws_db_instance" "main" {
   backup_window          = var.db_backup_window
   maintenance_window     = var.db_maintenance_window
 
-  skip_final_snapshot = false
+  multi_az = true
+  performance_insights_enabled = true
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade", "error", "general", "slowquery"]
+  monitoring_interval = 60
+  iam_database_authentication_enabled = true
+  auto_minor_version_upgrade = true
+  deletion_protection = true
+  copy_tags_to_snapshot = true
+  parameter_group_name = "default.postgres15"
   final_snapshot_identifier = "${var.project_name}-db-final-snapshot"
+  skip_final_snapshot = false
 
   tags = var.common_tags
 }
@@ -142,6 +151,9 @@ resource "aws_elasticache_replication_group" "main" {
 
   at_rest_encryption_enabled = true
   transit_encryption_enabled = true
+  kms_key_id = var.redis_kms_key_id
+  auth_token = var.redis_auth_token
+  automatic_failover_enabled = true
 
   tags = var.common_tags
 }
@@ -150,8 +162,10 @@ resource "aws_elasticache_replication_group" "main" {
 resource "aws_security_group" "rds" {
   name_prefix = "${var.project_name}-rds"
   vpc_id      = module.vpc.vpc_id
+  description = "Security group for RDS database"
 
   ingress {
+    description = "Allow PostgreSQL from VPC"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
@@ -159,10 +173,11 @@ resource "aws_security_group" "rds" {
   }
 
   egress {
+    description = "Restrict egress"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = []
   }
 
   tags = var.common_tags
@@ -171,8 +186,10 @@ resource "aws_security_group" "rds" {
 resource "aws_security_group" "redis" {
   name_prefix = "${var.project_name}-redis"
   vpc_id      = module.vpc.vpc_id
+  description = "Security group for Redis cluster"
 
   ingress {
+    description = "Allow Redis from VPC"
     from_port   = 6379
     to_port     = 6379
     protocol    = "tcp"
@@ -180,10 +197,11 @@ resource "aws_security_group" "redis" {
   }
 
   egress {
+    description = "Restrict egress"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = []
   }
 
   tags = var.common_tags
@@ -202,6 +220,66 @@ resource "aws_s3_bucket" "assets" {
   bucket = "${var.project_name}-assets-${random_string.bucket_suffix.result}"
 
   tags = var.common_tags
+}
+
+resource "aws_s3_bucket_public_access_block" "assets" {
+  bucket = aws_s3_bucket.assets.id
+  block_public_acls   = true
+  block_public_policy = true
+  ignore_public_acls  = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "assets_kms" {
+  bucket = aws_s3_bucket.assets.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "assets" {
+  bucket = aws_s3_bucket.assets.id
+  target_bucket = var.s3_logging_bucket
+  target_prefix = "log/"
+}
+
+resource "aws_s3_bucket_replication_configuration" "assets" {
+  bucket = aws_s3_bucket.assets.id
+  role   = var.s3_replication_role_arn
+  rules {
+    id     = "replication"
+    status = "Enabled"
+    destination {
+      bucket        = var.s3_replication_dest_arn
+      storage_class = "STANDARD"
+    }
+    filter {
+      prefix = ""
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "assets" {
+  bucket = aws_s3_bucket.assets.id
+  rule {
+    id     = "expire-old"
+    status = "Enabled"
+    filter {
+      prefix = ""
+    }
+    expiration {
+      days = 365
+    }
+  }
+}
+
+resource "aws_s3_bucket_notification" "assets" {
+  bucket = aws_s3_bucket.assets.id
+  eventbridge {
+    events = ["s3:ObjectCreated:*"]
+  }
 }
 
 resource "aws_s3_bucket_versioning" "assets" {

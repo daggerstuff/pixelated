@@ -47,7 +47,7 @@ function ChartLoading({ height = 300, className = '' }: ChartLoadingProps) {
 // Export wrapped components with Suspense
 export function ResponsiveContainer({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) {
   return (
-    <Suspense fallback={<ChartLoading height={props.height} />}>
+    <Suspense fallback={<ChartLoading height={props['height']} />}>
       <LazyResponsiveContainer {...props}>
         {children}
       </LazyResponsiveContainer>

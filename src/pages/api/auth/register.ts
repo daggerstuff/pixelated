@@ -85,7 +85,7 @@ export const POST = async ({ request }: APIContext) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return new Response(
         JSON.stringify({
@@ -105,7 +105,7 @@ export const POST = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         success: false,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

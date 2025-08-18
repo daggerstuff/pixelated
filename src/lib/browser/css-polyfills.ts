@@ -85,7 +85,7 @@ export const CSS_FEATURES: CSSFeature[] = [
 /**
  * Initialize CSS feature detection
  */
-export function initializeCSSFeatureDetection(): void {
+export function initializeCSSFeatureDetection() {
   if (typeof window === 'undefined' || !window.CSS || !window.CSS.supports) {
     // If CSS.supports is not available, assume no support for modern CSS
     CSS_FEATURES.forEach((feature) => {
@@ -181,7 +181,7 @@ export function generateCSSFallbacks(): Record<string, string> {
  * Initialize CSS feature detection and apply document-level classes
  * Call this early in the application lifecycle
  */
-export function setupCSSPolyfills(): void {
+export function setupCSSPolyfills() {
   if (typeof document === 'undefined') {
     return
   }

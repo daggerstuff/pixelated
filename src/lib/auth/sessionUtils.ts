@@ -25,7 +25,7 @@ export async function getUser(request: Request): Promise<AuthUser | null> {
       permissions: [],
       metadata: {},
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error getting user:', error as Record<string, unknown>)
     return null
   }

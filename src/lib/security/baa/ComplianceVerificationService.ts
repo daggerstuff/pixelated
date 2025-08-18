@@ -497,7 +497,7 @@ export class ComplianceVerificationService {
   /**
    * Initialize with default HIPAA compliance requirements
    */
-  public initializeDefaultRequirements(): void {
+  public initializeDefaultRequirements() {
     // Clear any existing requirements
     this.requirements.clear()
 

@@ -30,7 +30,7 @@ interface BiasChartsProps {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-export function BiasCharts({ biasData, demographicData, timeSeriesData, radarData }: BiasChartsProps) {
+export function BiasCharts({ biasData, demographicData, timeSeriesData, radarData }: BiasChartsProps): void {
   return (
     <>
       {/* Bias Distribution Chart */}

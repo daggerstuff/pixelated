@@ -2,10 +2,10 @@ import { test, expect } from '@playwright/test'
 import * as fs from 'fs'
 
 // Ensure screenshots directory exists
-function ensureDirectoryExists(directory) {
+function ensureDirectoryExists(directory): void {
   try {
     fs.mkdirSync(directory, { recursive: true })
-  } catch (err) {
+  } catch (err: unknown) {
     // Directory already exists or cannot be created
     console.error(`Failed to create directory ${directory}:`, err)
   }
@@ -44,9 +44,9 @@ test('basic browser compatibility check', async ({ page, browser }) => {
                 }
               };
 
-              document.getElementById('results').textContent = JSON.stringify(features, null, 2);
+              document.getElementById('results') as HTMLElement.textContent = JSON.stringify(features, null, 2);
             } catch (e) {
-              document.getElementById('results').textContent = JSON.stringify({
+              document.getElementById('results') as HTMLElement.textContent = JSON.stringify({
                 testCompleted: true,
                 error: e.message
               });
@@ -63,7 +63,7 @@ test('basic browser compatibility check', async ({ page, browser }) => {
   // Wait for results to be populated
   await page.waitForFunction(
     () => {
-      const content = document.getElementById('results')?.textContent
+      const content = (document.getElementById('results') as HTMLElement)?.textContent
       return content && content !== 'Running tests...'
     },
     { timeout: 5000 },
@@ -92,14 +92,14 @@ test('basic browser compatibility check', async ({ page, browser }) => {
         path: `./test-results/cross-browser/${browserName}-compatibility.png`,
       })
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Failed to take screenshot:', err)
     // Don't fail the test if screenshot fails
   }
 
   // Parse and validate the content
   try {
-    const featuresJson = JSON.parse(content)
+    const featuresJson = JSON.parse(content) as any
     console.log('Features detected:', featuresJson)
 
     // Verify essential features
@@ -107,7 +107,7 @@ test('basic browser compatibility check', async ({ page, browser }) => {
     expect(featuresJson.promise).toBe(true)
     expect(featuresJson.arrayMethods).toBe(true)
     expect(featuresJson.css.flexbox).toBe(true)
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error parsing features JSON:', err)
     // Include the content in the error message for better debugging
     throw new Error(`Failed to parse features JSON. Content: ${content}`)

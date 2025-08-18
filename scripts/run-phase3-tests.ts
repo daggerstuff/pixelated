@@ -32,13 +32,20 @@ async function runPhase3Tests() {
             tags: ['health-check'],
             metadata: { timestamp: Date.now() }
           })
-          return { healthy: !!testMemory?.['id'], responseTime: 100 }
+          return { 
+            name: 'memory-service',
+            status: testMemory?.['id'] ? 'healthy' : 'unhealthy',
+            responseTime: 100 
+          }
         } catch (error) {
-          return { healthy: false, responseTime: 0 }
+          return { 
+            name: 'memory-service',
+            status: 'unhealthy',
+            responseTime: 0,
+            message: error instanceof Error ? error.message : 'Unknown error'
+          }
         }
-      },
-      [],
-      { interval: 30000, timeout: 5000 }
+      }
     )
 
     healthMonitor.registerService(
@@ -46,13 +53,20 @@ async function runPhase3Tests() {
       async () => {
         try {
           const isHealthy = await phase3IntegrationTester?.['redisService']?.isHealthy()
-          return { healthy: isHealthy, responseTime: 50 }
+          return { 
+            name: 'redis-service',
+            status: isHealthy ? 'healthy' : 'unhealthy',
+            responseTime: 50 
+          }
         } catch (error) {
-          return { healthy: false, responseTime: 0 }
+          return { 
+            name: 'redis-service',
+            status: 'unhealthy',
+            responseTime: 0,
+            message: error instanceof Error ? error.message : 'Unknown error'
+          }
         }
-      },
-      [],
-      { interval: 15000, timeout: 3000 }
+      }
     )
 
     healthMonitor.registerService(
@@ -61,18 +75,27 @@ async function runPhase3Tests() {
         try {
           // Test analytics service by tracking a health check event
           await phase3IntegrationTester['analyticsService'].trackEvent({
-            event: 'health_check',
+            type: 'health_check' as any,
             userId: 'health-check-user',
             timestamp: Date.now(),
+            priority: 'low' as any,
+            properties: {},
             metadata: { source: 'health-monitor' }
           })
-          return { healthy: true, responseTime: 75 }
+          return { 
+            name: 'analytics-service',
+            status: 'healthy',
+            responseTime: 75 
+          }
         } catch (error) {
-          return { healthy: false, responseTime: 0 }
+          return { 
+            name: 'analytics-service',
+            status: 'unhealthy',
+            responseTime: 0,
+            message: error instanceof Error ? error.message : 'Unknown error'
+          }
         }
-      },
-      ['redis-service'],
-      { interval: 60000, timeout: 10000 }
+      }
     )
 
     // Start health monitoring
@@ -98,19 +121,19 @@ async function runPhase3Tests() {
 
     // Performance Metrics
     console.log('⚡ Performance Metrics:')
-    console.log(`  Service Health: ${testResults.performance.serviceTimings.serviceHealth}ms`)
-    console.log(`  Cross-Service Communication: ${testResults.performance.serviceTimings.crossServiceCommunication}ms`)
-    console.log(`  Performance Benchmarks: ${testResults.performance.serviceTimings.performanceBenchmarks}ms`)
-    console.log(`  API Throughput: ${testResults.performance.throughputMetrics.apiRequests || 0} req/s`)
-    console.log(`  Data Processing: ${testResults.performance.throughputMetrics.dataProcessing || 0} ops/s`)
-    console.log(`  Concurrent Operations: ${testResults.performance.throughputMetrics.concurrentOperations || 0} ops/s`)
+    console.log(`  Service Health: ${testResults.performance.serviceTimings['serviceHealth']}ms`)
+    console.log(`  Cross-Service Communication: ${testResults.performance.serviceTimings['crossServiceCommunication']}ms`)
+    console.log(`  Performance Benchmarks: ${testResults.performance.serviceTimings['performanceBenchmarks']}ms`)
+    console.log(`  API Throughput: ${testResults.performance.throughputMetrics['apiRequests'] || 0} req/s`)
+    console.log(`  Data Processing: ${testResults.performance.throughputMetrics['dataProcessing'] || 0} ops/s`)
+    console.log(`  Concurrent Operations: ${(testResults.performance.throughputMetrics as any)?.['concurrentOperations'] || 0} ops/s`)
     console.log()
 
     // Memory Usage
     console.log('💾 Memory Usage:')
-    console.log(`  Baseline: ${testResults.performance.memoryUsage.baseline || 0}MB`)
-    console.log(`  Peak: ${testResults.performance.memoryUsage.peak || 0}MB`)
-    console.log(`  After Cleanup: ${testResults.performance.memoryUsage.afterCleanup || 0}MB`)
+    console.log(`  Baseline: ${(testResults.performance.memoryUsage as any)?.['baseline'] || 0}MB`)
+    console.log(`  Peak: ${(testResults.performance.memoryUsage as any)?.['peak'] || 0}MB`)
+    console.log(`  After Cleanup: ${(testResults.performance.memoryUsage as any)?.['afterCleanup'] || 0}MB`)
     console.log()
 
     // Errors
@@ -142,11 +165,11 @@ async function runPhase3Tests() {
     }
 
     // Health Monitor Status
-    const systemHealth = healthMonitor.getSystemHealth()
+    const systemHealth = (healthMonitor as any)?.['getSystemHealth']()
     console.log('🏥 System Health Status:')
-    console.log(`  Overall: ${systemHealth.overall.toUpperCase()}`)
-    systemHealth.services.forEach(service => {
-      console.log(`  ${service.status === 'healthy' ? '✅' : service.status === 'degraded' ? '⚠️' : '❌'} ${service.name}: ${service.status} (${service.responseTime}ms)`)
+    console.log(`  Overall: ${systemHealth?.['overall']?.toUpperCase() || 'UNKNOWN'}`)
+    systemHealth?.['services']?.forEach((service: any) => {
+      console.log(`  ${service?.['status'] === 'healthy' ? '✅' : service?.['status'] === 'degraded' ? '⚠️' : '❌'} ${service?.['name']}: ${service?.['status']} (${service?.['responseTime']}ms)`)
     })
     
     if (systemHealth.alerts.length > 0) {
@@ -185,7 +208,7 @@ async function runPhase3Tests() {
     process.exit(1)
   } finally {
     // Cleanup
-    healthMonitor.stopMonitoring()
+    ;(healthMonitor as any)?.['stopMonitoring']?.()
     performanceOptimizer.cleanup()
   }
 }

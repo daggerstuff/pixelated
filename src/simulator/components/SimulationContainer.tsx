@@ -35,7 +35,71 @@ export function SimulationContainer({
     endSimulation,
     transcribedText,
     isConnected,
-  } = state
+  } = {
+    currentScenario: (state as unknown as {
+      currentScenario?: unknown
+      isProcessing?: boolean
+      realtimeFeedback?: unknown[]
+      startSimulation?: (id: string) => Promise<void>
+      endSimulation?: () => Promise<void>
+      transcribedText?: string
+      isConnected?: boolean
+    })?.currentScenario,
+    isProcessing: (state as unknown as {
+      currentScenario?: unknown
+      isProcessing?: boolean
+      realtimeFeedback?: unknown[]
+      startSimulation?: (id: string) => Promise<void>
+      endSimulation?: () => Promise<void>
+      transcribedText?: string
+      isConnected?: boolean
+    })?.isProcessing,
+    realtimeFeedback: (state as unknown as {
+      currentScenario?: unknown
+      isProcessing?: boolean
+      realtimeFeedback?: unknown[]
+      startSimulation?: (id: string) => Promise<void>
+      endSimulation?: () => Promise<void>
+      transcribedText?: string
+      isConnected?: boolean
+    })?.realtimeFeedback,
+    startSimulation: (state as unknown as {
+      currentScenario?: unknown
+      isProcessing?: boolean
+      realtimeFeedback?: unknown[]
+      startSimulation?: (id: string) => Promise<void>
+      endSimulation?: () => Promise<void>
+      transcribedText?: string
+      isConnected?: boolean
+    })?.startSimulation,
+    endSimulation: (state as unknown as {
+      currentScenario?: unknown
+      isProcessing?: boolean
+      realtimeFeedback?: unknown[]
+      startSimulation?: (id: string) => Promise<void>
+      endSimulation?: () => Promise<void>
+      transcribedText?: string
+      isConnected?: boolean
+    })?.endSimulation,
+    transcribedText: (state as unknown as {
+      currentScenario?: unknown
+      isProcessing?: boolean
+      realtimeFeedback?: unknown[]
+      startSimulation?: (id: string) => Promise<void>
+      endSimulation?: () => Promise<void>
+      transcribedText?: string
+      isConnected?: boolean
+    })?.transcribedText,
+    isConnected: (state as unknown as {
+      currentScenario?: unknown
+      isProcessing?: boolean
+      realtimeFeedback?: unknown[]
+      startSimulation?: (id: string) => Promise<void>
+      endSimulation?: () => Promise<void>
+      transcribedText?: string
+      isConnected?: boolean
+    })?.isConnected,
+  }
 
   // Conversation history for the current session
   const [conversation, setConversation] = useState<

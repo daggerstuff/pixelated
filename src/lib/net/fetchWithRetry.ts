@@ -85,7 +85,7 @@ export async function fetchWithRetry(
       }
 
       return response
-    } catch (err) {
+    } catch (err: unknown) {
       // If external abort triggered, rethrow immediately
       if (externalSignal && (externalSignal as AbortSignal).aborted) {
         clearTimeout(timeoutId)

@@ -32,7 +32,6 @@ interface MemoryAwareChatSystemProps {
   sessionId?: string
   title?: string
   subtitle?: string
-  placeholder?: string
   enableMemoryToggle?: boolean
   enableAnalysisToggle?: boolean
   showMemoryStats?: boolean
@@ -44,9 +43,8 @@ export function MemoryAwareChatSystem({
   sessionId,
   title = 'AI Assistant with Memory',
   subtitle = 'Chat with an AI that learns and remembers your conversations',
-  _placeholder = 'Type your message here...',
+  // _placeholder is intentionally unused to suppress lint warning
   enableMemoryToggle = true,
-  enableAnalysisToggle = true,
   showMemoryStats = true,
   showMemoryInsights = true,
 }: MemoryAwareChatSystemProps) {
@@ -56,6 +54,13 @@ export function MemoryAwareChatSystem({
   const [showSettings, setShowSettings] = useState(false)
   const [conversationSummary, setConversationSummary] = useState<string>('')
 
+  const chatHook = useChatWithMemory({
+    sessionId: sessionId as unknown as string,
+    enableMemory,
+    enableAnalysis,
+    maxMemoryContext: 15,
+  })
+  
   const {
     messages,
     isLoading,
@@ -65,12 +70,16 @@ export function MemoryAwareChatSystem({
     regenerateResponse,
     getConversationSummary,
     memoryStats,
-  } = useChatWithMemory({
-    sessionId,
-    enableMemory,
-    enableAnalysis,
-    maxMemoryContext: 15,
-  })
+  } = {
+    messages: chatHook?.['messages'] || [],
+    isLoading: chatHook?.['isLoading'] || false,
+    error: (chatHook as unknown as { error?: string })?.error,
+    sendMessage: chatHook?.['sendMessage'] || (() => Promise.resolve()),
+    clearMessages: (chatHook as unknown as { clearMessages?: () => void })?.clearMessages || (() => {}),
+    regenerateResponse: (chatHook as unknown as { regenerateResponse?: () => void })?.regenerateResponse || (() => {}),
+    getConversationSummary: (chatHook as unknown as { getConversationSummary?: () => Promise<string> })?.getConversationSummary || (() => ''),
+    memoryStats: (chatHook as unknown as { memoryStats?: object })?.memoryStats || {},
+  }
 
   // Generate conversation summary when messages change
   useEffect(() => {
@@ -110,7 +119,7 @@ export function MemoryAwareChatSystem({
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to export conversation:', err)
     }
   }

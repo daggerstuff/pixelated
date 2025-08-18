@@ -60,7 +60,7 @@ const availableMetricsForDisplay = [
   { id: 'treatment_adherence', label: 'Treatment Adherence', color: '#f59e0b' },
 ]
 
-function getMetricConfig(metricId: string) {
+function getMetricConfig(metricId: string): void {
   const config = availableMetricsForDisplay.find((m) => m.id === metricId)
   return config || { label: metricId, color: '#6366f1' } // Default
 }
@@ -69,15 +69,15 @@ function getMetricConfig(metricId: string) {
 function getDefaultStartDate(): string {
   const date = new Date()
   date.setMonth(date.getMonth() - 3)
-  return date.toISOString().split('T')[0]
+  return date.toISOString().split('T')[0] || ''
 }
 
 function getDefaultEndDate(): string {
-  return new Date().toISOString().split('T')[0]
+  return new Date().toISOString().split('T')[0] || ''
 }
 
 // Prepares chart data from the API response
-function prepareChartData(progressData: ComparativeProgressResult | null) {
+function prepareChartData(progressData: ComparativeProgressResult | null): void {
   if (
     !progressData ||
     !progressData.userProgressSnapshots ||

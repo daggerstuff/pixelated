@@ -300,10 +300,10 @@ export class SealService {
 
       this.initialized = true
       logger.info('SEAL service initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize SEAL service', { error })
       throw new Error(
-        `SEAL service initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+        `SEAL service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -359,10 +359,10 @@ export class SealService {
 
       this.keyGenerated = true
       logger.info('SEAL keys generated successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate SEAL keys', { error })
       throw new Error(
-        `Key generation failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Key generation failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -377,7 +377,7 @@ export class SealService {
   /**
    * Release current keys
    */
-  private releaseKeys(): void {
+  private releaseKeys() {
     if (this.keyGenerator) {
       this.memoryManager.release(this.keyGenerator, 'keyGenerator')
       this.keyGenerator = null
@@ -569,10 +569,10 @@ export class SealService {
 
         return result
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Encryption failed', { error })
       throw new Error(
-        `Encryption failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Encryption failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -604,10 +604,10 @@ export class SealService {
 
       plaintext.delete() // Release plaintext
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Decryption failed', { error })
       throw new Error(
-        `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Decryption failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -706,10 +706,10 @@ export class SealService {
 
       this.keyGenerated = true
       logger.info('SEAL keys loaded successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load SEAL keys', { error })
       throw new Error(
-        `Key loading failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Key loading failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -717,7 +717,7 @@ export class SealService {
   /**
    * Check if the service is initialized
    */
-  private checkInitialized(): void {
+  private checkInitialized() {
     if (!this.initialized || !this.sealContext) {
       throw new Error('SEAL service not initialized. Call initialize() first.')
     }
@@ -726,7 +726,7 @@ export class SealService {
   /**
    * Check if keys have been generated
    */
-  private checkKeysGenerated(): void {
+  private checkKeysGenerated() {
     this.checkInitialized()
     if (!this.keyGenerated || !this.secretKey || !this.publicKey) {
       // RelinKeys and GaloisKeys might be optional depending on operations,
@@ -740,7 +740,7 @@ export class SealService {
   /**
    * Dispose of all SEAL resources
    */
-  public dispose(): void {
+  public dispose() {
     logger.info('Disposing SEAL service')
 
     this.releaseKeys() // Releases keyGenerator, secretKey, publicKey, relinKeys, galoisKeys, encryptor, decryptor

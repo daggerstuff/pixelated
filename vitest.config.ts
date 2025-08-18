@@ -23,6 +23,10 @@ export default defineConfig({
         __dirname,
         '__mocks__/react-dom/test-utils.js',
       ),
+      'react/jsx-dev-runtime': path.resolve(
+        __dirname,
+        './node_modules/react/jsx-dev-runtime.js',
+      ),
       'react/jsx-runtime': path.resolve(
         __dirname,
         './node_modules/react/jsx-runtime.js',

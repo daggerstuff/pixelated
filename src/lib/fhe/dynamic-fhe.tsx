@@ -53,7 +53,7 @@ export const loadAllFHEModules = async () => {
  *   const { fhe, loading, error } = useFHE();
  *
  *   if (loading) return <div>Loading FHE module...</div>;
- *   if (error) return <div>Error loading FHE: {error.message}</div>;
+ *   if (error) return <div>Error loading FHE: {String(error)}</div>;
  *
  *   return (
  *     <div>
@@ -78,7 +78,7 @@ export const useFHE = () => {
           setFHE(module)
           setLoading(false)
         }
-      } catch (err) {
+      } catch (err: unknown) {
         if (isMounted) {
           setError(
             err instanceof Error ? err : new Error('Failed to load FHE module'),

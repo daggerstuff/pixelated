@@ -184,10 +184,10 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
     }
 
     return response
-  } catch (error) {
+  } catch (error: unknown) {
     // Log any errors that occur during CORS handling
     logger.error('CORS middleware error:', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       origin,
       path,
       method: request.method,

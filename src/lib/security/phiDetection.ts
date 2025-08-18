@@ -12,7 +12,7 @@ class Analyzer {
     return Promise.resolve()
   }
 
-  async analyze(text: string, options: { language: string }) {
+  async analyze(text: string, options: { language: string }): void {
     // Use text and options parameters to avoid unused variable warnings
     console.log(
       `Analyzing text with length ${text.length} in language ${options.language}`,
@@ -22,7 +22,7 @@ class Analyzer {
 }
 
 class Anonymizer {
-  async anonymize(payload: { text: string }) {
+  async anonymize(payload: { text: string }): void {
     return { text: payload.text }
   }
 }
@@ -47,7 +47,7 @@ function memoize<T extends (...args: Parameters<T>) => ReturnType<T>>(
 }
 
 // Mock implementation of createLogger
-function createLogger(name: string) {
+function createLogger(name: string): void {
   return {
     info: (message: string) => console.log(`[INFO] ${name}: ${message}`),
     warn: (message: string, meta?: unknown) =>
@@ -142,7 +142,7 @@ export class PresidioPHIDetector {
 
       this.initialized = true
       logger.info('Presidio PHI detector initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       this.initializationError =
         error instanceof Error
           ? error
@@ -220,10 +220,10 @@ export class PresidioPHIDetector {
         entities,
         redactedText,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error detecting PHI', {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        error: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : undefined,
       })
 
       // Use fallback detection in case of error
@@ -281,9 +281,9 @@ export class PresidioPHIDetector {
         // Use fallback redaction if Presidio is not available
         return this.fallbackRedaction(text, entities)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error redacting PHI', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       // Use fallback redaction in case of error
@@ -457,9 +457,9 @@ export function detectAndRedactPHI(text: string): string {
     }
 
     return detector['fallbackRedaction'](text, entities)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in detectAndRedactPHI', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return text // Return original text if redaction fails
   }

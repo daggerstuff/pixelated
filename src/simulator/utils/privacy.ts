@@ -42,7 +42,7 @@ export const sanitizeText = (text: string): string => {
  * Cleans up any temporary data from memory
  * Called when a session ends to ensure no data is retained
  */
-export const cleanupTemporaryData = (): void => {
+export const cleanupTemporaryData = () => {
   // In a real implementation, this would explicitly free memory
   // For this example, it's a placeholder for garbage collection
 

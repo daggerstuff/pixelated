@@ -16,7 +16,7 @@ interface SessionInputFormProps {
   }
 }
 
-export const SessionInputForm: React.FC<SessionInputFormProps> = ({
+export const SessionInputForm: FC<SessionInputFormProps> = ({
   onSubmit,
   disabled = false,
   initialData,

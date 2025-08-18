@@ -172,7 +172,7 @@ export class HomomorphicOperations {
 
       this.initialized = true
       logger.info('Homomorphic operations initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize homomorphic operations', { error })
       throw new FHEOperationError(
         'Homomorphic operations initialization error',
@@ -220,7 +220,7 @@ export class HomomorphicOperations {
         // Parse the encrypted data
         let parsedData
         try {
-          parsedData = JSON.parse(encryptedData)
+          parsedData = JSON.parse(encryptedData) as any
         } catch {
           // If not JSON, use as is
           parsedData = { serializedCiphertext: encryptedData }
@@ -296,21 +296,21 @@ export class HomomorphicOperations {
           timestamp: Date.now(),
           metadata,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Error in SEAL operation ${operation}`, { error })
         throw new FHEOperationError(
-          `SEAL operation error: ${error instanceof Error ? error.message : String(error)}`,
+          `SEAL operation error: ${error instanceof Error ? String(error) : String(error)}`,
           operation,
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         `Failed to process encrypted data with operation ${operation}`,
         { error },
       )
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         result: undefined,
         operationType: String(operation),
         timestamp: Date.now(),
@@ -430,7 +430,7 @@ export class HomomorphicOperations {
       if (encryptedData.startsWith('eyJ')) {
         // Base64 JSON format
         const decoded = atob(encryptedData)
-        const parsed = JSON.parse(decoded)
+        const parsed = JSON.parse(decoded) as any
 
         if (parsed.data && typeof parsed.data === 'string') {
           decodedData = parsed.data

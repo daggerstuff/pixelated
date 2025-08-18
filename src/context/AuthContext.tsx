@@ -21,7 +21,7 @@ interface AuthContextType extends AuthState {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Provider component
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }): void {
   const auth = useAuth()
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
@@ -39,7 +39,7 @@ export function useAuthContext() {
 }
 
 // Utility hook for role-based access control
-export function useAuthorized(requiredRole: UserRole | UserRole[]) {
+export function useAuthorized(requiredRole: UserRole | UserRole[]): void {
   const { hasRole, isAuthenticated, isLoading } = useAuthContext()
 
   return {

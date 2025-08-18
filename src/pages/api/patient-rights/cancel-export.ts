@@ -145,9 +145,9 @@ export const POST = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error cancelling export request', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
 
     return new Response(

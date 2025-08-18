@@ -95,10 +95,10 @@ export default function SessionAnalysis({
           : []
 
         setEmotionData(formattedData)
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error fetching session emotion data:', err)
         setError(
-          err instanceof Error ? err.message : 'An unknown error occurred',
+          err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred',
         )
       } finally {
         setIsLoading(false)

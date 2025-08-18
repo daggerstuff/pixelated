@@ -10,7 +10,7 @@ interface ProgressDataDisplayProps {
   benchmarkLabel: string
 }
 
-export const ProgressDataDisplay: React.FC<ProgressDataDisplayProps> = ({
+export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
   labels = [],
   userData = [],
   benchmarkData = [],

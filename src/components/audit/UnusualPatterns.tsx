@@ -19,7 +19,7 @@ const severityColors = {
   high: 'bg-red-100 text-red-800',
 }
 
-export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
+export function UnusualPatterns({ patterns }: UnusualPatternsProps): void {
   if (!patterns.length) {
     return (
       <Card>

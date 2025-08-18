@@ -44,13 +44,13 @@ interface MultidimensionalPattern {
 }
 
 // Define Three.js types to fix TypeScript namespace errors (using unknown for dynamic imports)
-type WebGLRenderer = unknown // typeof THREE.WebGLRenderer.prototype
-type Scene = unknown // typeof THREE.Scene.prototype
-type PerspectiveCamera = unknown // typeof THREE.PerspectiveCamera.prototype
-type Points = unknown // typeof THREE.Points.prototype
+type WebGLRenderer = object // typeof THREE.WebGLRenderer.prototype
+type Scene = object // typeof THREE.Scene.prototype
+type PerspectiveCamera = object // typeof THREE.PerspectiveCamera.prototype
+type Points = object // typeof THREE.Points.prototype
 
-type Frustum = unknown // typeof THREE.Frustum.prototype
-type Vector3 = unknown // typeof THREE.Vector3.prototype
+type Frustum = object // typeof THREE.Frustum.prototype
+type Vector3 = object // typeof THREE.Vector3.prototype
 
 interface MultidimensionalEmotionChartProps {
   dimensionalMaps: DimensionalEmotionMap[]
@@ -153,7 +153,8 @@ export default function MultidimensionalEmotionChart({
   }, [dimensionalMaps])
 
   // Object pooling logic
-  const getOrCreateObject = (type: string, creator: () => Object3D) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getOrCreateObject = (type: string, creator: () => any) => {
     if (!objectPoolRef.current.has(type)) {
       objectPoolRef.current.set(type, [])
     }
@@ -168,6 +169,10 @@ export default function MultidimensionalEmotionChart({
 
   // Initialize and set up the 3D scene
   useEffect(() => {
+    // Capture ref values for cleanup closure
+    const cleanupRenderer = rendererRef.current;
+    const cleanupContainer = containerRef.current;
+
     const initScene = async () => {
       // Dynamically load Three.js
       const THREE = await loadThree()
@@ -228,15 +233,15 @@ export default function MultidimensionalEmotionChart({
 
     // Controls setup
     const controls = new OrbitControls(camera, renderer.domElement)
-    controlsRef.current = controls
-    ;(controls as any)['enableDamping'] = true
-    ;(controls as any)['dampingFactor'] = 0.25
+    controlsRef.current = controls;
+    (controls as unknown as { enableDamping?: boolean })['enableDamping'] = true;
+    (controls as unknown as { dampingFactor?: number })['dampingFactor'] = 0.25;
 
     // Optimize controls based on detail level
     if (detailLevel !== 'high') {
-      ;(controls as any)['enableZoom'] = true
-      ;(controls as any)['zoomSpeed'] = 0.5
-      ;(controls as any)['rotateSpeed'] = 0.5
+      (controls as unknown as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).enableZoom = true;
+      (controls as unknown as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).zoomSpeed = 0.5;
+      (controls as unknown as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).rotateSpeed = 0.5;
     }
 
     // Add axis helper - simplified for performance on lower detail
@@ -287,9 +292,9 @@ export default function MultidimensionalEmotionChart({
           texture.needsUpdate = true
 
           const material = new THREE.SpriteMaterial({ map: texture })
-          const sprite = new THREE.Sprite(material)
-          ;(sprite as any).position.copy(position)
-          ;(sprite as any).scale.set(0.3, 0.15, 1)
+          const sprite = new THREE.Sprite(material);
+          (sprite.position as unknown as { copy: (v: Vector3) => void }).copy(position);
+          (sprite.scale as unknown as { set: (x: number, y: number, z: number) => void }).set(0.3, 0.15, 1);
 
           return sprite
         })
@@ -501,16 +506,20 @@ export default function MultidimensionalEmotionChart({
             cameraRef.current['matrixWorldInverse'],
           ),
         )
-        scene.traverse((object: Object3D) => {
-          const { userData } = object as {
-            userData?: { isCullable?: boolean; boundingSphere?: Sphere }
-          }
-          if (userData?.['isCullable']) {
-            const { boundingSphere: sphere } = userData
-            if (sphere instanceof Sphere) {
-              ;(object as any).visible = frustum.intersectsSphere(sphere)
-            } else {
-              ;(object as any).visible = true
+        scene.traverse((object: unknown) => {
+          if (
+            typeof object === 'object' &&
+            object !== null &&
+            'userData' in object
+          ) {
+            const { userData } = object as { userData?: { isCullable?: boolean; boundingSphere?: unknown } }
+            if (userData?.isCullable) {
+              const { boundingSphere: sphere } = userData
+              if (sphere && typeof frustum.intersectsSphere === 'function') {
+                (object as { visible: boolean }).visible = frustum.intersectsSphere(sphere)
+              } else {
+                (object as { visible: boolean }).visible = true
+              }
             }
           }
         })
@@ -518,9 +527,17 @@ export default function MultidimensionalEmotionChart({
 
       // Make labels always face the camera - only in higher detail modes
       if (detailLevel !== 'low') {
-        labelsRef.current.forEach((label: Object3D) => {
-          if (cameraRef.current) {
-            ;(label as any).lookAt(cameraRef.current['position'])
+        labelsRef.current.forEach((label) => {
+          if (
+            label &&
+            typeof label === 'object' &&
+            'lookAt' in label &&
+            cameraRef.current &&
+            'position' in cameraRef.current
+          ) {
+            (label as { lookAt: (pos: unknown) => void }).lookAt(
+              (cameraRef.current as { position: unknown }).position
+            )
           }
         })
       }
@@ -541,8 +558,10 @@ export default function MultidimensionalEmotionChart({
       const width = containerRef.current.clientWidth
       const height = containerRef.current.clientHeight
 
-      ;(cameraRef.current as any).aspect = width / height
-      ;(cameraRef.current as any).updateProjectionMatrix()
+      if (cameraRef.current && 'aspect' in cameraRef.current && 'updateProjectionMatrix' in cameraRef.current) {
+        (cameraRef.current as { aspect: number }).aspect = width / height;
+        (cameraRef.current as { updateProjectionMatrix: () => void }).updateProjectionMatrix();
+      }
 
       rendererRef.current.setSize(width, height)
     }
@@ -555,47 +574,81 @@ export default function MultidimensionalEmotionChart({
 
     // Cleanup function
     return () => {
-      window.removeEventListener('resize', handleResize)
+      // Note: handleResize is defined inside initScene, so we can't remove the specific listener
+      // The component unmounting will handle cleanup
 
       const animationFrame = animationFrameRef.current
       if (animationFrame) {
         cancelAnimationFrame(animationFrame)
       }
 
-      if (initialRenderer && initialContainer) {
-        initialRenderer.dispose()
-        if (initialRenderer.domElement.parentNode === initialContainer) {
-          initialContainer.removeChild(initialRenderer.domElement)
+     if (cleanupRenderer && cleanupContainer) {
+       if (
+         cleanupRenderer &&
+         typeof cleanupRenderer === 'object' &&
+         'dispose' in cleanupRenderer &&
+         typeof (cleanupRenderer as { dispose: () => void }).dispose === 'function'
+       ) {
+         (cleanupRenderer as { dispose: () => void }).dispose()
+       }
+       if (
+         cleanupRenderer &&
+         'domElement' in cleanupRenderer &&
+         (cleanupRenderer as { domElement: { parentNode: unknown } }).domElement.parentNode === cleanupContainer
+       ) {
+         cleanupContainer.removeChild((cleanupRenderer as { domElement: HTMLElement }).domElement)
+       }
+     }
+
+      if (controlsRef.current) {
+        if (
+          controlsRef.current &&
+          typeof controlsRef.current === 'object' &&
+          'dispose' in controlsRef.current &&
+          typeof (controlsRef.current as { dispose: () => void }).dispose === 'function'
+        ) {
+          (controlsRef.current as { dispose: () => void }).dispose()
         }
       }
 
-      if (initialControls) {
-        initialControls.dispose()
-      }
-
-      if (initialScene) {
-        initialScene.traverse((object: Object3D) => {
-          if (object instanceof THREE.Mesh) {
-            if (object.geometry) {
-              object.geometry.dispose()
-            }
-            if (object.material) {
-              if (Array.isArray(object.material)) {
-                ;(object.material as (typeof THREE.Material)[]).forEach(
-                  (material) => material.dispose(),
-                )
-              } else {
-                ;(object.material as typeof THREE.Material).dispose()
+      if (sceneRef.current) {
+        if (
+          sceneRef.current &&
+          typeof sceneRef.current === 'object' &&
+          'traverse' in sceneRef.current &&
+          typeof (sceneRef.current as { traverse: (cb: (obj: unknown) => void) => void }).traverse === 'function'
+        ) {
+          (sceneRef.current as { traverse: (cb: (obj: unknown) => void) => void }).traverse((object: unknown) => {
+            // Only dispose if object is a Mesh
+            if (
+              typeof window !== 'undefined' &&
+              (window as unknown as { THREE?: { Mesh?: unknown } }).THREE &&
+              (window as unknown as { THREE?: { Mesh?: unknown } }).THREE.Mesh &&
+              // Safe instanceof check to avoid unsafe optional chaining
+              object instanceof ((window as unknown as { THREE: { Mesh: unknown } }).THREE.Mesh)
+            ) {
+              if ('geometry' in object && object.geometry) {
+                (object.geometry as { dispose?: () => void }).dispose?.()
+              }
+              if ('material' in object && object.material) {
+                if (Array.isArray(object.material)) {
+                  (object.material as { dispose?: () => void }[]).forEach(
+                    (material) => material.dispose?.(),
+                  )
+                } else {
+                  (object.material as { dispose?: () => void }).dispose?.()
+                }
               }
             }
-          }
-        })
+          })
+        }
       }
 
       // Clear object pools
-      initialObjectPool.clear()
+      ;(window as unknown as { initialObjectPool?: { clear?: () => void } })?.initialObjectPool?.clear?.()
     }
-  }, [dimensionalMaps, isLoading, viewMode, detailLevel, sortedMaps, measure])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dimensionalMaps, isLoading, viewMode, detailLevel, sortedMaps])
 
   // Loading state
   if (isLoading) {

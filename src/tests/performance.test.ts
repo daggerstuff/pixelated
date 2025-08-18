@@ -432,14 +432,14 @@ describe('performance Tests', () => {
           }
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error in performance regression test:', err)
       throw err
     }
   })
 })
 
-export async function simulateUserInteraction(page: Page) {
+export async function simulateUserInteraction(page: Page): void {
   // Simulate scrolling
   await page.evaluate(() => {
     window.scrollBy(0, 500)

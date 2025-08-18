@@ -105,7 +105,7 @@ export class EmotionSynthesizer {
   /**
    * Reset the singleton instance (useful for testing)
    */
-  public static resetInstance(): void {
+  public static resetInstance() {
     EmotionSynthesizer.instance = null
   }
 
@@ -220,7 +220,7 @@ export class EmotionSynthesizer {
         success: true,
         message: 'Emotion synthesized successfully',
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error synthesizing emotion', { error })
       return {
         profile: this.getDefaultProfile(),
@@ -240,7 +240,7 @@ export class EmotionSynthesizer {
   /**
    * Reset to neutral emotional state
    */
-  reset(): void {
+  reset() {
     this.currentProfile = null
     logger.debug('EmotionSynthesizer reset')
   }

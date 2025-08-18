@@ -64,10 +64,10 @@ export const POST = async ({ request }: APIContext) => {
         },
       )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
     logger.error(`Webhook processing error: ${errorMessage}`)
 
     // Create audit log

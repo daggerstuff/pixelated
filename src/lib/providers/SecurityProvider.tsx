@@ -89,7 +89,7 @@ export function SecurityProvider({
           ...prev,
           isEncrypted: level !== 'standard',
         }))
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Failed to initialize security:', error)
         // Fallback to standard security on initialization failure
         setSecurityState((prev) => ({
@@ -148,7 +148,7 @@ export function SecurityProvider({
           isEncrypted: newLevel !== 'standard',
         }))
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to change security level:', error)
       throw new Error('Security level change failed')
     }
@@ -168,7 +168,7 @@ export function SecurityProvider({
         lastKeyRotation: new Date(),
         isKeyRotationNeeded: false,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Key rotation failed:', error)
       throw new Error('Key rotation failed')
     }
@@ -195,7 +195,7 @@ export function SecurityProvider({
           timestamp: Date.now(),
         })
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Encryption failed:', error)
       // Fallback to simple encryption
       return JSON.stringify({
@@ -208,7 +208,7 @@ export function SecurityProvider({
 
   const decrypt = async (data: string): Promise<unknown> => {
     if (securityState.level === 'standard') {
-      return JSON.parse(data)
+      return JSON.parse(data) as any
     }
 
     if (!securityState.currentKey) {
@@ -220,19 +220,19 @@ export function SecurityProvider({
       // Try to parse the result as JSON if it's a string
       if (typeof result === 'string') {
         try {
-          return JSON.parse(result)
+          return JSON.parse(result) as any
         } catch {
           return result
         }
       }
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Decryption failed:', error)
       // Attempt to parse as JSON
       try {
-        const parsed = JSON.parse(data)
+        const parsed = JSON.parse(data) as any
         if (parsed.data) {
-          return JSON.parse(parsed.data)
+          return JSON.parse(parsed.data) as any
         }
         return parsed
       } catch {

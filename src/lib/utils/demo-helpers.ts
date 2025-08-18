@@ -508,7 +508,7 @@ export function downloadExportData(exportData: ExportData): void {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Export failed:', error)
     throw new Error('Failed to export analysis results. Please try again.')
   }

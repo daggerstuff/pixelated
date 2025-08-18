@@ -457,7 +457,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     // Modal elements
     const modal = document.getElementById('deletion-request-modal')
     const newRequestBtn = document.getElementById('new-deletion-request-btn')
@@ -467,19 +467,19 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
     const actionButtons = document.querySelectorAll('[data-action]')
 
     // Open modal
-    newRequestBtn?.addEventListener('click', () => {
+    newRequestBtn?.addEventListener('click', (: Event) => {
       modal?.classList.remove('hidden')
       document.body.classList.add('overflow-hidden')
     })
 
     // Close modal
-    closeModalBtn?.addEventListener('click', () => {
+    closeModalBtn?.addEventListener('click', (: Event) => {
       modal?.classList.add('hidden')
       document.body.classList.remove('overflow-hidden')
     })
 
     // Close modal when clicking outside
-    modal?.addEventListener('click', (event) => {
+    modal?.addEventListener('click', (event: Event) => {
       if (event.target === modal) {
         modal.classList.add('hidden')
         document.body.classList.remove('overflow-hidden')
@@ -487,7 +487,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
     })
 
     // Escape key closes modal
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', (event: Event) => {
       if (event.key === 'Escape' && !modal?.classList.contains('hidden')) {
         modal?.classList.add('hidden')
         document.body.classList.remove('overflow-hidden')

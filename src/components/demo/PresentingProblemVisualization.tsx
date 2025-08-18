@@ -6,7 +6,7 @@ interface PresentingProblemVisualizationProps {
   presentingProblem: string
 }
 
-const PresentingProblemVisualization: React.FC<
+const PresentingProblemVisualization: FC<
   PresentingProblemVisualizationProps
 > = ({ events, presentingProblem }) => {
   // Sort events by time (rough chronological order)

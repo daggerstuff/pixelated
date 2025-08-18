@@ -257,7 +257,7 @@ const isActive = (href: string) => {
 
 <script>
   // Handle mobile menu toggle
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (: Event) => {
     const button = document.getElementById('mobile-menu-button')
     const menu = document.getElementById('mobile-menu')
     const menuIcons = button?.querySelectorAll('svg')
@@ -282,7 +282,7 @@ const isActive = (href: string) => {
     button.addEventListener('click', toggleMenu)
 
     // Close menu on Escape key
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', (e: Event) => {
       if (
         e.key === 'Escape' &&
         button.getAttribute('aria-expanded') === 'true'
@@ -293,7 +293,7 @@ const isActive = (href: string) => {
     })
 
     // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', (e: Event) => {
       if (
         button.getAttribute('aria-expanded') === 'true' &&
         !menu.contains(e.target as Node) &&
@@ -304,7 +304,7 @@ const isActive = (href: string) => {
     })
 
     // Trap focus within mobile menu when open
-    menu.addEventListener('keydown', (e) => {
+    menu.addEventListener('keydown', (e: Event) => {
       if (e.key !== 'Tab') return
 
       const focusableElements = menu.querySelectorAll(

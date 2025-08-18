@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useRUMData, getPerformanceIndicator } from '../../lib/monitoring/hooks'
 
 interface RUMWidgetProps {

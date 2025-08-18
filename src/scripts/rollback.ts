@@ -30,7 +30,7 @@ interface DeploymentInfo {
   target?: string
 }
 
-async function sendNotification(message: string, environment: string) {
+async function sendNotification(message: string, environment: string): void {
   try {
     console.log(`Sending notification for ${environment} rollback...`)
 
@@ -61,7 +61,7 @@ async function sendNotification(message: string, environment: string) {
     }
 
     console.log('✓ Notifications sent')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to send notification:', error)
   }
 }
@@ -122,7 +122,7 @@ async function getLastStableVersion(
       )
     }
 
-    const deployments = JSON.parse(result.stdout.toString()) as DeploymentInfo[]
+    const deployments = JSON.parse(result.stdout.toString() as any) as DeploymentInfo[]
 
     // Find last successful deployment (not the current failing one)
     const lastStable = deployments.find(
@@ -145,7 +145,7 @@ async function getLastStableVersion(
 
     console.log(`Found stable deployment: ${lastStable.url}`)
     return lastStable.url
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error finding last stable version:', error)
 
     // If fallback branch is specified, use i
@@ -163,7 +163,7 @@ async function getLastStableVersion(
   }
 }
 
-async function performRollback(options: RollbackOptions) {
+async function performRollback(options: RollbackOptions): void {
   try {
     console.log(`=== Initiating Rollback for ${options.environment} ===`)
 
@@ -249,7 +249,7 @@ async function performRollback(options: RollbackOptions) {
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('\n❌ Rollback failed:', error)
 
     if (options.notify) {
@@ -284,7 +284,7 @@ async function main() {
 
     const success = await performRollback(options)
     process.exit(success ? 0 : 1)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Unhandled error:', error)
     process.exit(1)
   }

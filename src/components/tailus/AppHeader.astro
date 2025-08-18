@@ -119,7 +119,7 @@ const links = [
 
 <script>
   // Mobile navigation toggle functionality
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     const hamburger = document.getElementById('hamburger')
     const navLayer = document.getElementById('navLayer')
     const navlinks = document.getElementById('navlinks')
@@ -131,7 +131,7 @@ const links = [
       return
     }
 
-    hamburger.addEventListener('click', (e) => {
+    hamburger.addEventListener('click', (e: Event) => {
       e.preventDefault()
       e.stopPropagation()
 
@@ -166,7 +166,7 @@ const links = [
     // Close mobile menu when clicking on navigation links
     const navLinks = navlinks.querySelectorAll('a')
     navLinks.forEach((link) => {
-      link.addEventListener('click', () => {
+      link.addEventListener('click', (: Event) => {
         navlinks.classList.add('hidden')
         navLayer.classList.remove('scale-y-100')
         navLayer.classList.add('scale-y-0')
@@ -180,7 +180,7 @@ const links = [
     })
 
     // Close mobile menu when clicking on the backdrop
-    navLayer.addEventListener('click', () => {
+    navLayer.addEventListener('click', (: Event) => {
       navlinks.classList.add('hidden')
       navLayer.classList.remove('scale-y-100')
       navLayer.classList.add('scale-y-0')

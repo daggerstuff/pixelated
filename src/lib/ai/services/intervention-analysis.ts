@@ -43,7 +43,7 @@ export class InterventionAnalysisService {
   private readonly model: string
   private readonly systemPrompt: string
 
-  constructor(config: InterventionAnalysisServiceConfig) {
+  constructor(config: InterventionAnalysisServiceConfig): void {
     const {
       aiService,
       model = 'mistralai/Mixtral-8x7B-Instruct-v0.2',
@@ -123,8 +123,8 @@ User response:
 
       let parsed: Record<string, unknown>
       try {
-        parsed = JSON.parse(rawContent) as Record<string, unknown>
-      } catch (err) {
+        parsed = JSON.parse(rawContent) as any as Record<string, unknown>
+      } catch (err: unknown) {
         appLogger.error('Failed to parse AI response as JSON', {
           content: rawContent,
           error: err,
@@ -147,7 +147,7 @@ User response:
       }
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       // Add contextual logging before propagating
       appLogger.error('Intervention analysis failed', { error })
       throw error

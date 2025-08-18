@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import type { SecurityLevel } from '../../hooks/useSecurity';
 import type { Message } from '../../types/chat';
 
@@ -43,7 +43,7 @@ function AnalyticsLoadingFallback() {
   );
 }
 
-export default function LazyAnalyticsDashboard(props: LazyAnalyticsDashboardProps) {
+export default function LazyAnalyticsDashboard(props: LazyAnalyticsDashboardProps): void {
   return (
     <Suspense fallback={<AnalyticsLoadingFallback />}>
       <AnalyticsDashboardReact {...props} />

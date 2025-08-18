@@ -37,9 +37,9 @@ export function AuditDashboard() {
 
         const data = await response.json()
         setMetrics(data)
-      } catch (err) {
+      } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : 'Failed to load audit metrics',
+          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to load audit metrics',
         )
       } finally {
         setLoading(false)
@@ -93,8 +93,8 @@ export function AuditDashboard() {
         </h2>
         {metrics.unusualAccess.details.length > 0 ? (
           <ul className="space-y-2">
-            {metrics.unusualAccess.details.map((detail) => (
-              <li key={`unusual-access-${detail.id || detail.timestamp || detail.user || Date.now()}`} className="flex items-center text-red-600">
+            {metrics.unusualAccess.details.map((detail, index) => (
+              <li key={`unusual-access-${index}`} className="flex items-center text-red-600">
                 <svg
                   className="w-5 h-5 mr-2"
                   fill="currentColor"

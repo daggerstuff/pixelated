@@ -60,11 +60,11 @@ export const POST = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Sign up error:', error)
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'Sign up failed',
+        error: error instanceof Error ? String(error) : 'Sign up failed',
       }),
       {
         status: 400,

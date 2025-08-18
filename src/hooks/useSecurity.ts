@@ -22,7 +22,7 @@ export function useSecurity() {
         try {
           await fheService.initialize()
           setState((prev) => ({ ...prev, fheInitialized: true }))
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Failed to initialize FHE:', error)
           // Fall back to standard security if FHE initialization fails
           if (state.securityLevel === 'maximum') {

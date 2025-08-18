@@ -308,6 +308,10 @@ jobs:
         run: |
           cd src/lib/ai/bias-detection/python-service
           python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
+        env:
+          ENV: ci
+          FLASK_SECRET_KEY: test-flask-secret
+          JWT_SECRET_KEY: test-jwt-secret
 
       - name: Upload Python coverage
         uses: codecov/codecov-action@v5
@@ -414,6 +418,9 @@ jobs:
           fi
         env:
           FLASK_ENV: testing
+          ENV: ci
+          FLASK_SECRET_KEY: test-flask-secret
+          JWT_SECRET_KEY: test-jwt-secret
 
       - name: Build application
         run: pnpm build

@@ -346,11 +346,11 @@ const getStatusBadge = (status: string) => {
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     // Filter functionality
     const applyFiltersButton = document.getElementById('apply-filters')
     if (applyFiltersButton) {
-      applyFiltersButton.addEventListener('click', () => {
+      applyFiltersButton.addEventListener('click', (: Event) => {
         const actionFilter = (
           document.getElementById('action-filter') as HTMLSelectElement
         ).value
@@ -381,7 +381,7 @@ const getStatusBadge = (status: string) => {
     // Detail view handlers
     const detailButtons = document.querySelectorAll('button[data-log-id]')
     detailButtons.forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (: Event) => {
         const logId = button.getAttribute('data-log-id')
 
         // In a real implementation, we would show a modal with details

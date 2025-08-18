@@ -157,7 +157,7 @@ export async function createProductionLLMInvoker(
 
     const errorMessage =
       error instanceof Error
-        ? error.message.toLowerCase()
+        ? String(error).toLowerCase()
         : String(error).toLowerCase()
 
     // Network errors are generally retryable
@@ -214,7 +214,7 @@ export async function createProductionLLMInvoker(
 
     const errorMessage =
       error instanceof Error
-        ? error.message.toLowerCase()
+        ? String(error).toLowerCase()
         : String(error).toLowerCase()
 
     if (
@@ -405,7 +405,7 @@ export async function createProductionLLMInvoker(
 
         // Check for provider-level errors
         if (response.error) {
-          throw new Error(`Provider error: ${response.error.message}`)
+          throw new Error(`Provider error: ${response.String(error)}`)
         }
 
         // Validate response structure
@@ -421,7 +421,7 @@ export async function createProductionLLMInvoker(
         // Parse and validate response content for routing
         let parsedResponse: unknown
         try {
-          parsedResponse = JSON.parse(choice.message.content)
+          parsedResponse = JSON.parse(choice.message.content) as any
         } catch (parseError) {
           // If JSON parsing fails, create a structured fallback
           logger.warn(
@@ -493,11 +493,11 @@ export async function createProductionLLMInvoker(
         }
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         lastError = error
         const errorType = categorizeError(error)
         const errorMessage =
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error ? String(error) : String(error)
 
         logger.warn(`Production LLM invocation attempt ${attempt + 1} failed`, {
           requestId,

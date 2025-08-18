@@ -93,7 +93,7 @@ class VercelKVCacheService implements CacheService {
 
       logger.debug('Cache miss', { key })
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting from cache', { key, error })
       return null
     }
@@ -110,7 +110,7 @@ class VercelKVCacheService implements CacheService {
         await this.redis.set(fullKey, value, { ex: ttl })
         logger.debug('Cached value', { key, ttl })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error setting cache', { key, error })
     }
   }
@@ -126,7 +126,7 @@ class VercelKVCacheService implements CacheService {
         await this.redis.del(fullKey)
         logger.debug('Deleted from cache', { key })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error deleting from cache', { key, error })
     }
   }
@@ -146,7 +146,7 @@ class VercelKVCacheService implements CacheService {
           logger.info('Cleared cache by prefix', { prefix, count: keys.length })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error clearing cache by prefix', { prefix, error })
     }
   }
@@ -173,7 +173,7 @@ class VercelKVCacheService implements CacheService {
       }
 
       return resultMap
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting multiple values from cache', { error })
       return {}
     }
@@ -200,7 +200,7 @@ class MemoryCacheService implements CacheService {
     return `${this.prefix}${key}`
   }
 
-  private cleanup(): void {
+  private cleanup() {
     const now = Date.now()
     let expiredCount = 0
 
@@ -290,7 +290,7 @@ class MemoryCacheService implements CacheService {
     return result
   }
 
-  private evictOldest(): void {
+  private evictOldest() {
     let oldestKey: string | null = null
     let oldestTime = Infinity
 
@@ -307,7 +307,7 @@ class MemoryCacheService implements CacheService {
     }
   }
 
-  destroy(): void {
+  destroy() {
     clearInterval(this.cleanupInterval)
     this.cache.clear()
     logger.debug('Memory cache service destroyed')

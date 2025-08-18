@@ -60,7 +60,7 @@ export function TherapyChatClient() {
       analytics.trackEvent({
         type: 'websocket_error',
         properties: {
-          error: error.message,
+          error: String(error),
           sessionId,
         },
       })

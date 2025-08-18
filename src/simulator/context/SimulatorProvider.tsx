@@ -14,7 +14,7 @@ const SimulatorContext = createContext<SimulatorContextType | undefined>(
  * Provider component for simulator functionality
  * Makes simulator state and functions available to all children
  */
-export function SimulatorProvider({ children }: SimulatorProviderProps) {
+export function SimulatorProvider({ children }: SimulatorProviderProps): void {
   // Use the simulator hook to get all functionality
   const simulatorState = useSimulator()
 

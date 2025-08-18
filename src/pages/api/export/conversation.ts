@@ -48,12 +48,12 @@ export const GET: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Export API info error:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to get endpoint information',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
@@ -149,7 +149,7 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Export API error:', error)
     return new Response(JSON.stringify({ error: 'Export failed' }), {
       status: 500,

@@ -14,7 +14,7 @@ const backupManager = new BackupSecurityManager()
 // to make sure it's ready when requests come in
 backupManager.initialize().catch((error) => {
   logger.error(
-    `Failed to initialize backup manager: ${error instanceof Error ? error.message : String(error)}`,
+    `Failed to initialize backup manager: ${error instanceof Error ? String(error) : String(error)}`,
   )
 })
 
@@ -70,9 +70,9 @@ export const GET = async ({ request, cookies }) => {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
-      `Error handling backup GET request: ${error instanceof Error ? error.message : String(error)}`,
+      `Error handling backup GET request: ${error instanceof Error ? String(error) : String(error)}`,
     )
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -127,9 +127,9 @@ export const POST = async ({ request, cookies }) => {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
-      `Error handling backup POST request: ${error instanceof Error ? error.message : String(error)}`,
+      `Error handling backup POST request: ${error instanceof Error ? String(error) : String(error)}`,
     )
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

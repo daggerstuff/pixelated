@@ -128,7 +128,7 @@ export function ChatDemo({
           analyzeSentiment(message),
           detectCrisis(message),
         ])
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Message handling error:', error)
         throw error
       }
@@ -428,11 +428,11 @@ export class ChatDemoErrorBoundary extends React.Component<
     this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(error: Error): void {
     return { hasError: true, error }
   }
 
-  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     console.error('ChatDemo Error:', error, errorInfo)
     // Log to monitoring service in production
   }

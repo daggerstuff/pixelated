@@ -1,12 +1,12 @@
 // Main bias detection demo component with comprehensive analysis interface
 
 import React, { useState, useCallback } from 'react'
-import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
-import { PresetScenarioSelector } from './PresetScenarioSelector'
-import { CounterfactualAnalysis } from './CounterfactualAnalysis'
-import { HistoricalProgressTracker } from './HistoricalProgressTracker'
-import { SessionInputForm } from './SessionInputForm'
-import { ExportControls } from './ExportControls'
+import { FC, BiasAnalysisDisplay } from './BiasAnalysisDisplay'
+import { FC, PresetScenarioSelector } from './PresetScenarioSelector'
+import { FC, CounterfactualAnalysis } from './CounterfactualAnalysis'
+import { FC, HistoricalProgressTracker } from './HistoricalProgressTracker'
+import { FC, SessionInputForm } from './SessionInputForm'
+import { FC, ExportControls } from './ExportControls'
 import {
   PRESET_SCENARIOS,
   calculateBiasFactors,
@@ -31,7 +31,7 @@ interface BiasDetectionDemoProps {
   showHistoricalData?: boolean
 }
 
-export const BiasDetectionDemo: React.FC<BiasDetectionDemoProps> = ({
+export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
   className = '',
   onAnalysisComplete,
   enableExport = true,
@@ -147,8 +147,8 @@ export const BiasDetectionDemo: React.FC<BiasDetectionDemoProps> = ({
 
         // Notify parent component
         onAnalysisComplete?.(results)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Analysis failed')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Analysis failed')
       } finally {
         setIsAnalyzing(false)
       }

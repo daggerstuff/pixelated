@@ -8,7 +8,7 @@ interface LabelProps extends React.ComponentPropsWithoutRef<'label'> {
 const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   ({ className, htmlFor, ...props }, ref) => {
     // Warn if no htmlFor is provided
-    if (process.env.NODE_ENV !== 'production' && !htmlFor) {
+    if (process.env['NODE_ENV'] !== 'production' && !htmlFor) {
       console.warn(
         'Label component should have an htmlFor prop to associate it with a form control'
       )

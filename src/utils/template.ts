@@ -35,7 +35,7 @@ export async function previewTemplate(
     })
 
     return renderedHtml
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to render template', error as Error, {
       context: 'Template',
       data: { templateName },

@@ -45,7 +45,7 @@ function nowISO() {
   return new Date().toISOString()
 }
 
-function ensureUser(userId: string) {
+function ensureUser(userId: string): void {
   if (!store.has(userId)) {
     store.set(userId, [])
   }
@@ -54,7 +54,7 @@ function ensureUser(userId: string) {
   }
 }
 
-function addHistory(userId: string, operation: string, memoryId: string) {
+function addHistory(userId: string, operation: string, memoryId: string): void {
   ensureUser(userId)
   history.get(userId)!.push({ id: `${Date.now()}-${Math.random()}`, timestamp: nowISO(), operation, memoryId })
 }
@@ -184,7 +184,7 @@ export const memoryManager = {
     )
   },
 
-  async getMemoryHistory(userId = 'default') {
+  async getMemoryHistory(userId = 'default'): void {
     ensureUser(userId)
     return [...(history.get(userId) || [])]
   },

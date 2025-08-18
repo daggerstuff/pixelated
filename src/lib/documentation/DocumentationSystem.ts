@@ -55,7 +55,7 @@ export class DocumentationSystem extends EventEmitter {
    * @param repository The repository to use for session data
    * @param aiService The AI service to use for NLP-based summary generation
    */
-  constructor(repository: AIRepository, _aiService: AIService) {
+  constructor(repository: AIRepository, _aiService: AIService): void {
     super()
     this.repository = repository
     this.initializeRealTimeUpdates()
@@ -69,11 +69,11 @@ export class DocumentationSystem extends EventEmitter {
       // Subscribe to session update events through Redis pub/sub
       await this.redisService.subscribe('session:update', (message: string) => {
         try {
-          const sessionData = JSON.parse(message)
+          const sessionData = JSON.parse(message) as any
           if (sessionData && sessionData.sessionId) {
             this.handleSessionUpdate(sessionData.sessionId)
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Error processing session update', { error })
         }
       })
@@ -81,11 +81,11 @@ export class DocumentationSystem extends EventEmitter {
       // Subscribe to session creation events
       await this.redisService.subscribe('session:create', (message: string) => {
         try {
-          const sessionData = JSON.parse(message)
+          const sessionData = JSON.parse(message) as any
           if (sessionData && sessionData.sessionId) {
             this.trackActiveSession(sessionData.sessionId)
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Error processing session creation', { error })
         }
       })
@@ -95,18 +95,18 @@ export class DocumentationSystem extends EventEmitter {
         'session:complete',
         (message: string) => {
           try {
-            const sessionData = JSON.parse(message)
+            const sessionData = JSON.parse(message) as any
             if (sessionData && sessionData.sessionId) {
               this.handleSessionCompletion(sessionData.sessionId)
             }
-          } catch (error) {
+          } catch (error: unknown) {
             logger.error('Error processing session completion', { error })
           }
         },
       )
 
       logger.info('Real-time session updates initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize real-time updates', { error })
     }
   }
@@ -124,7 +124,7 @@ export class DocumentationSystem extends EventEmitter {
 
       logger.info('Tracking new active session', { sessionId })
       this.emit('session:tracking', { sessionId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error tracking active session', { sessionId, error })
     }
   }
@@ -151,7 +151,7 @@ export class DocumentationSystem extends EventEmitter {
       // Emit an update event
       this.emit('session:updated', { sessionId })
       logger.debug('Session update processed', { sessionId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling session update', { sessionId, error })
     }
   }
@@ -182,7 +182,7 @@ export class DocumentationSystem extends EventEmitter {
       // Emit completion event
       this.emit('session:completed', { sessionId })
       logger.info('Session completed', { sessionId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling session completion', { sessionId, error })
     }
   }
@@ -201,7 +201,7 @@ export class DocumentationSystem extends EventEmitter {
       }
 
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting session', { sessionId, error })
       return null
     }
@@ -217,7 +217,7 @@ export class DocumentationSystem extends EventEmitter {
   ): Promise<EmotionAnalysis[]> {
     try {
       return await this.repository.getEmotionsForSession(sessionId)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting session emotions', { sessionId, error })
       return []
     }
@@ -244,7 +244,7 @@ export class DocumentationSystem extends EventEmitter {
       }
 
       return [mockResponse]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting interventions for session', {
         sessionId,
         error,
@@ -318,7 +318,7 @@ export class DocumentationSystem extends EventEmitter {
       this.emit('documentation:generated', { sessionId, documentation })
 
       return documentation
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error generating documentation', { sessionId, error })
       return null
     }
@@ -343,7 +343,7 @@ export class DocumentationSystem extends EventEmitter {
 
       // Otherwise generate new documentation
       return await this.generateDocumentation(sessionId)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting documentation', { sessionId, error })
       return null
     }
@@ -375,7 +375,7 @@ export class DocumentationSystem extends EventEmitter {
       this.emit('documentation:saved', { sessionId, documentation })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error saving documentation', { sessionId, error })
       return false
     }
@@ -447,7 +447,7 @@ export class DocumentationSystem extends EventEmitter {
       )
 
       logger.debug('Published session update', { sessionId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error publishing session update', { sessionId, error })
     }
   }
@@ -506,12 +506,12 @@ export class DocumentationSystem extends EventEmitter {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error exporting documentation to EHR', { sessionId, error })
 
       return {
         success: false,
-        errors: [error instanceof Error ? error.message : String(error)],
+        errors: [error instanceof Error ? String(error) : String(error)],
         format: options.format,
         metadata: {
           exportedAt: new Date(),

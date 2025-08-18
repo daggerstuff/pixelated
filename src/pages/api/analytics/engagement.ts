@@ -130,7 +130,7 @@ export const GET = async ({ request, cookies }) => {
       message: 'Failed to fetch engagement metrics',
       details: {
         source: 'engagement',
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? String(error) : String(error),
       },
     }
 

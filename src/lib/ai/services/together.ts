@@ -84,7 +84,7 @@ class TogetherAIError extends Error {
 class RateLimitManager {
   private rateLimitInfo: RateLimitInfo
 
-  constructor(config: { requestsPerMinute: number; tokensPerMinute: number }) {
+  constructor(config: { requestsPerMinute: number; tokensPerMinute: number }): void {
     this.rateLimitInfo = {
       requestsPerMinute: config.requestsPerMinute,
       tokensPerMinute: config.tokensPerMinute,
@@ -201,7 +201,7 @@ async function exponentialBackoffRetry<T>(
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
       return await fn()
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error as Error
 
       if (attempt === config.maxRetries) {
@@ -225,7 +225,7 @@ async function exponentialBackoffRetry<T>(
         attempt: attempt + 1,
         maxRetries: config.maxRetries,
         delay,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       await new Promise((resolve) => setTimeout(resolve, delay))
@@ -276,7 +276,7 @@ export function createTogetherAIService(
 
     if (data && typeof data === 'object' && 'error' in data) {
       const errorData = data as { error: { message?: string; code?: string } }
-      errorMessage = `Together AI API error: ${errorData.error.message || errorData.error}`
+      errorMessage = `Together AI API error: ${errorData.String(error) || errorData.error}`
       errorCode = errorData.error.code || errorCode
     }
 
@@ -414,11 +414,11 @@ export function createTogetherAIService(
         appLogger.error('Error in Together AI completion:', {
           error:
             error instanceof Error
-              ? { message: error.message, stack: error.stack }
+              ? { message: String(error), stack: (error as Error)?.stack }
               : error,
         })
         throw new TogetherAIError(
-          `Together AI service error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Together AI service error: ${error instanceof Error ? String(error) : 'Unknown error'}`,
         )
       }
     },
@@ -525,7 +525,7 @@ export function createTogetherAIService(
 
                 try {
                   const jsonData = trimmedLine.slice(6) // Remove 'data: ' prefix
-                  const parsed: TogetherStreamResponse = JSON.parse(jsonData)
+                  const parsed: TogetherStreamResponse = JSON.parse(jsonData) as any
 
                   if (parsed.id) {
                     requestId = parsed.id
@@ -618,16 +618,16 @@ export function createTogetherAIService(
         appLogger.error('Error in Together AI streaming completion:', {
           error:
             error instanceof Error
-              ? { message: error.message, stack: error.stack }
+              ? { message: String(error), stack: (error as Error)?.stack }
               : error,
         })
         throw new TogetherAIError(
-          `Together AI streaming service error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Together AI streaming service error: ${error instanceof Error ? String(error) : 'Unknown error'}`,
         )
       }
     },
 
-    dispose(): void {
+    dispose() {
       // Clean up any resources if needed
       appLogger.debug('Together AI service disposed')
     },

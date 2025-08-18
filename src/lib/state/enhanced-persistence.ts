@@ -152,13 +152,13 @@ class EnhancedStatePersistence {
     logger.info('Enhanced state persistence initialized')
   }
 
-  private setupCrossTabSync(): void {
+  private setupCrossTabSync() {
     window.addEventListener('storage', (event) => {
       if (event.key && event.newValue !== event.oldValue) {
         try {
-          const newValue = event.newValue ? JSON.parse(event.newValue) : null
+          const newValue = event.newValue ? JSON.parse(event.newValue) as any : null
           this.notifyStorageChange(event.key, newValue)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn('Failed to parse storage change event:', error)
         }
       }
@@ -169,13 +169,13 @@ class EnhancedStatePersistence {
     this.storageChangeListeners.forEach((listener) => {
       try {
         listener(key, newValue)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Storage change listener error:', error)
       }
     })
   }
 
-  private startPeriodicCleanup(): void {
+  private startPeriodicCleanup() {
     this.cleanupTimer = setInterval(() => {
       this.performCleanup()
     }, this.config.cleanupInterval)
@@ -198,7 +198,7 @@ class EnhancedStatePersistence {
 
       // Clean up old form drafts
       this.cleanupOldFormDrafts()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cleanup failed:', error)
     }
   }
@@ -240,7 +240,7 @@ class EnhancedStatePersistence {
     logger.info(`Cleaned up ${toRemove.length} old form drafts`)
   }
 
-  private cleanupExpiredSessions(): void {
+  private cleanupExpiredSessions() {
     const sessionState = this.getStoredValue('session_state', {}) as Record<
       string,
       unknown
@@ -264,7 +264,7 @@ class EnhancedStatePersistence {
     }
   }
 
-  private cleanupOldFormDrafts(): void {
+  private cleanupOldFormDrafts() {
     const formDrafts = this.getStoredValue('form_drafts', {}) as Record<
       string,
       unknown
@@ -326,7 +326,7 @@ class EnhancedStatePersistence {
     }
   }
 
-  private updateUsageStats(): void {
+  private updateUsageStats() {
     const stats = this.getStoredValue('usage_stats', {
       sessionCount: 0,
       totalTimeSpent: 0,
@@ -435,8 +435,8 @@ class EnhancedStatePersistence {
 
     try {
       const stored = localStorage.getItem(key)
-      return stored ? JSON.parse(stored) : defaultValue
-    } catch (error) {
+      return stored ? JSON.parse(stored) as any : defaultValue
+    } catch (error: unknown) {
       logger.warn(`Failed to parse stored value for ${key}:`, error)
       return defaultValue
     }
@@ -449,7 +449,7 @@ class EnhancedStatePersistence {
 
     try {
       localStorage.setItem(key, JSON.stringify(value))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to store value for ${key}:`, error)
     }
   }
@@ -478,9 +478,9 @@ class EnhancedStatePersistence {
         try {
           const value = localStorage.getItem(key)
           if (value) {
-            exported[key] = JSON.parse(value)
+            exported[key] = JSON.parse(value) as any
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn(`Failed to export ${key}:`, error)
         }
       }
@@ -497,13 +497,13 @@ class EnhancedStatePersistence {
     for (const [key, value] of Object.entries(state)) {
       try {
         localStorage.setItem(key, JSON.stringify(value))
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Failed to import ${key}:`, error)
       }
     }
   }
 
-  clearAllState(): void {
+  clearAllState() {
     if (typeof window === 'undefined') {
       return
     }
@@ -513,7 +513,7 @@ class EnhancedStatePersistence {
     logger.info('All persisted state cleared')
   }
 
-  destroy(): void {
+  destroy() {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer)
       this.cleanupTimer = null
@@ -527,7 +527,7 @@ class EnhancedStatePersistence {
 // Hooks and Utilities
 // ============================================================================
 
-export function useFormDraft(formId: string) {
+export function useFormDraft(formId: string): void {
   const persistence = EnhancedStatePersistence.getInstance()
 
   return {

@@ -40,7 +40,7 @@ export class CircuitBreaker {
   private requestWindow: Array<{ timestamp: Date; success: boolean }> = []
   private config: CircuitBreakerConfig
 
-  constructor(config: Partial<CircuitBreakerConfig> = {}) {
+  constructor(config: Partial<CircuitBreakerConfig> = {}): void {
     this.config = {
       failureThreshold: 5,
       recoveryTimeout: 60000, // 1 minute
@@ -70,13 +70,13 @@ export class CircuitBreaker {
       const result = await operation()
       this.onSuccess()
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.onFailure()
       throw error
     }
   }
 
-  private onSuccess(): void {
+  private onSuccess() {
     this.successCount++
     this.totalRequests++
     this.lastSuccessTime = new Date()
@@ -104,7 +104,7 @@ export class CircuitBreaker {
     })
   }
 
-  private onFailure(): void {
+  private onFailure() {
     this.failureCount++
     this.totalRequests++
     this.lastFailureTime = new Date()
@@ -157,12 +157,12 @@ export class CircuitBreaker {
     return this.requestWindow.filter(req => req.timestamp >= cutoff)
   }
 
-  private cleanupRequestWindow(): void {
+  private cleanupRequestWindow() {
     const cutoff = new Date(Date.now() - this.config.monitoringPeriod)
     this.requestWindow = this.requestWindow.filter(req => req.timestamp >= cutoff)
   }
 
-  private resetCounts(): void {
+  private resetCounts() {
     this.failureCount = 0
     this.successCount = 0
     this.requestWindow = []
@@ -186,20 +186,20 @@ export class CircuitBreaker {
   }
 
   // Force state changes for testing or manual intervention
-  forceOpen(): void {
+  forceOpen() {
     this.state = 'OPEN'
     this.stateChangedAt = new Date()
     logger.warn('Circuit breaker manually forced OPEN')
   }
 
-  forceClose(): void {
+  forceClose() {
     this.state = 'CLOSED'
     this.stateChangedAt = new Date()
     this.resetCounts()
     logger.info('Circuit breaker manually forced CLOSED')
   }
 
-  forceHalfOpen(): void {
+  forceHalfOpen() {
     this.state = 'HALF_OPEN'
     this.stateChangedAt = new Date()
     this.successCount = 0

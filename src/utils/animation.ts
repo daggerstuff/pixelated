@@ -14,7 +14,7 @@ export function toggleFadeEffect(
   visible: boolean,
   hiddenClass: string,
 ) {
-  const element = document.getElementById(elementId)
+  const element = document.getElementById(elementId) as HTMLElement
   if (!element) {
     return
   }

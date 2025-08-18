@@ -10,7 +10,7 @@ import * as Sentry from '@sentry/astro'
 /**
  * Manually capture an error with additional context
  */
-export function captureError(error: Error, context?: Record<string, unknown>) {
+export function captureError(error: Error, context?: Record<string, unknown>): void {
   return Sentry.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
@@ -81,7 +81,7 @@ export function addBreadcrumb(
  *
  * @deprecated Sentry Astro does not support manual transactions. This is a no-op.
  */
-export function startTransaction(_name: string, _operation: string) {
+export function startTransaction(_name: string, _operation: string): void {
   // Sentry Astro does not support manual transactions.
   // This function is a no-op for compatibility.
   if (import.meta.env.DEV) {

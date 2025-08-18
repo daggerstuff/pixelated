@@ -3,13 +3,6 @@ import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 
-interface AdminLocals {
-  admin: {
-    userId: string
-    isAdmin: boolean
-    hasPermission: boolean
-  }
-}
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')

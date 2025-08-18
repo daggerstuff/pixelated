@@ -116,7 +116,9 @@ export default function EmotionTemporalAnalysisChart({
 
   // Format data for progression visualization
   const prepareProgressionData = () => {
-    const { progression } = data || {}
+    const progression = typeof data === 'object' && data !== null && 'progression' in data
+      ? (data as { progression?: Record<string, unknown> }).progression
+      : undefined
 
     return [
       {
@@ -158,12 +160,24 @@ export default function EmotionTemporalAnalysisChart({
 
   // Format data for relationships visualization
   const prepareRelationshipsData = () => {
-    return data.dimensionalRelationships.map((rel) => ({
-      name: `${rel.dimensions[0]} & ${rel.dimensions[1]}`,
-      correlation: rel.correlation,
-      description: rel.description,
-      color: rel.correlation >= 0 ? '#22c55e' : '#ef4444',
-    }))
+    return Array.isArray((data as { dimensionalRelationships?: unknown[] }).dimensionalRelationships)
+      ? ((data as { dimensionalRelationships: unknown[] }).dimensionalRelationships).map((rel) => {
+          if (
+            typeof rel === 'object' &&
+            rel !== null &&
+            'dimensions' in rel &&
+            Array.isArray((rel as { dimensions: unknown[] }).dimensions)
+          ) {
+            return {
+              name: `${(rel as { dimensions: unknown[] }).dimensions?.[0]} & ${(rel as { dimensions: unknown[] }).dimensions?.[1]}`,
+              correlation: (rel as { correlation?: number }).correlation,
+              description: (rel as { description?: string }).description,
+              color: (rel as { correlation?: number }).correlation! >= 0 ? '#22c55e' : '#ef4444',
+            }
+          }
+          return null
+        }).filter(Boolean)
+      : []
   }
 
   // Toggle emotion selection in filters
@@ -189,9 +203,13 @@ export default function EmotionTemporalAnalysisChart({
   // Empty state (no data)
   if (
     !data ||
-    (Object.keys(data.trendlines).length === 0 &&
-      data.criticalPoints.length === 0 &&
-      data.transitions.length === 0)
+    (Object.keys(data.trendlines || {}).length === 0 &&
+      (Array.isArray((data as { criticalPoints?: unknown[] }).criticalPoints)
+        ? (data as { criticalPoints: unknown[] }).criticalPoints.length
+        : 0) === 0 &&
+      (Array.isArray((data as { transitions?: unknown[] }).transitions)
+        ? (data as { transitions: unknown[] }).transitions.length
+        : 0) === 0)
   ) {
     return (
       <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">

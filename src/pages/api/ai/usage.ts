@@ -170,7 +170,7 @@ export const GET: APIRoute = async ({ request }) => {
         'X-RateLimit-Reset': reset.toString(),
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in AI usage API:', error)
 
     // Create audit log for the error
@@ -180,8 +180,8 @@ export const GET: APIRoute = async ({ request }) => {
       session?.user?.id || 'anonymous',
       'ai_usage',
       {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        error: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : undefined,
         status: 'error',
       },
       AuditEventStatus.FAILURE,

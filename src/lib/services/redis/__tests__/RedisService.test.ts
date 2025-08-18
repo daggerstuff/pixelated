@@ -66,10 +66,10 @@ describe('RedisService', () => {
       // Skip the Redis connection verification in test environment
       // await verifyRedisConnection()
       console.log('⏩ SKIP: Redis connection verification')
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         'Failed to verify Redis connection:',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? String(error) : String(error),
       )
       throw error
     }
@@ -79,7 +79,7 @@ describe('RedisService', () => {
     try {
       // Create a clean instance for each test
       redis = new RedisService({
-        url: process.env.REDIS_URL!,
+        url: process.env['REDIS_URL']!,
         keyPrefix: process.env.REDIS_KEY_PREFIX!,
         maxRetries: 3,
         retryDelay: 100,
@@ -100,10 +100,10 @@ describe('RedisService', () => {
 
       // Call connect to simulate connection without actually connecting
       await redis.connect()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         'Failed to set up Redis service:',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? String(error) : String(error),
       )
       throw error
     }
@@ -116,10 +116,10 @@ describe('RedisService', () => {
       if (redis) {
         await redis.disconnect()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         'Error during test cleanup:',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? String(error) : String(error),
       )
       // Don't rethrow here to allow other tests to run
     }
@@ -214,7 +214,7 @@ describe('RedisService', () => {
       await redis.set(key, value)
       const result = await redis.get(key)
 
-      expect(JSON.parse(result!)).toEqual({ test: 'data' })
+      expect(JSON.parse(result!) as any).toEqual({ test: 'data' })
       console.log('✅ PASS: should set and get values')
     })
 
@@ -359,7 +359,7 @@ describe('RedisService', () => {
     it('should handle operation timeouts', async () => {
       // Create a new instance with short timeout
       const shortTimeoutRedis = new RedisService({
-        url: process.env.REDIS_URL!,
+        url: process.env['REDIS_URL']!,
         keyPrefix: process.env.REDIS_KEY_PREFIX!,
         connectTimeout: 1,
       })

@@ -7,7 +7,7 @@ export class WebSocketServer {
   /**
    * Close the WebSocket server
    */
-  close(): void {
+  close() {
     // Mock implementation
   }
 }

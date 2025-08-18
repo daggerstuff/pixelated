@@ -28,13 +28,13 @@ const { class: className = '' } = Astro.props
 </button>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (: Event) => {
     const toTopButton = document.getElementById('to-top-button')
 
     if (!toTopButton) return
 
     // Show button when user scrolls down 300px
-    window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', (: Event) => {
       if (window.scrollY > 300) {
         toTopButton.classList.remove('translate-y-20', 'opacity-0')
         toTopButton.classList.add('translate-y-0', 'opacity-100')
@@ -45,7 +45,7 @@ const { class: className = '' } = Astro.props
     })
 
     // Scroll to top when button is clicked
-    toTopButton.addEventListener('click', () => {
+    toTopButton.addEventListener('click', (: Event) => {
       window.scrollTo({
         top: 0,
         behavior: 'smooth',

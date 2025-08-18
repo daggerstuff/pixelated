@@ -83,7 +83,7 @@ const { title, defaultOpen = false, class: className } = Astro.props
 
 <script>
   // Add smooth animation for expand/collapse
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     const expandables = document.querySelectorAll('.expandable')
 
     expandables.forEach((expandable) => {
@@ -95,7 +95,7 @@ const { title, defaultOpen = false, class: className } = Astro.props
       // Type assertion to HTMLDetailsElement which has the 'open' property
       const detailsElement = expandable as HTMLDetailsElement
 
-      expandable.addEventListener('toggle', () => {
+      expandable.addEventListener('toggle', (: Event) => {
         if (detailsElement.open) {
           content.style.maxHeight = content.scrollHeight + 'px'
         } else {

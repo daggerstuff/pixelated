@@ -175,7 +175,7 @@ export class RegressionUtils {
       await page.click('[data-testid="send-button"]');
       const xssExecuted = await page.evaluate(() => (window as any).xssTest === true);
       results.xssProtection = !xssExecuted;
-    } catch (error) {
+    } catch (error: unknown) {
       results.xssProtection = true; // Error means XSS was blocked
     }
 
@@ -185,7 +185,7 @@ export class RegressionUtils {
       await page.click('[data-testid="send-button"]');
       const messageContent = await page.locator('.message-bubble').last().textContent();
       results.inputSanitization = !messageContent?.includes('<img');
-    } catch (error) {
+    } catch (error: unknown) {
       results.inputSanitization = true;
     }
 

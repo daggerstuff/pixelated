@@ -78,8 +78,8 @@ export class ServiceIntegrationTester {
       results.crossServiceCommunication = await this.testCrossServiceCommunication();
       serviceTimings.crossServiceCommunication = Date.now() - crossStart;
 
-    } catch (error) {
-      errors.push(`Integration test failed: ${error instanceof Error ? error.message : String(error)}`);
+    } catch (error: unknown) {
+      errors.push(`Integration test failed: ${error instanceof Error ? String(error) : String(error)}`);
     }
 
     const totalTime = Date.now() - startTime;
@@ -98,8 +98,8 @@ export class ServiceIntegrationTester {
       errors,
       performance: {
         totalTime,
-        serviceTimings
-      }
+        serviceTimings,
+      },
     };
   }
 
@@ -135,8 +135,8 @@ export class ServiceIntegrationTester {
              searchResults.length > 0 && 
              deleted === true;
 
-    } catch (error) {
-      logger.error('Memory service test failed:', { error: error instanceof Error ? error.message : String(error) });
+    } catch (error: unknown) {
+      logger.error('Memory service test failed:', { error: error instanceof Error ? String(error) : String(error) });
       return false;
     }
   }
@@ -161,8 +161,8 @@ export class ServiceIntegrationTester {
 
       return encrypted !== testData && decrypted === testData;
 
-    } catch (error) {
-      logger.error('FHE service test failed:', { error: error instanceof Error ? error.message : String(error) });
+    } catch (error: unknown) {
+      logger.error('FHE service test failed:', { error: error instanceof Error ? String(error) : String(error) });
       return false;
     }
   }
@@ -184,8 +184,8 @@ export class ServiceIntegrationTester {
              result.alertLevel !== undefined && 
              typeof result.biasScore === 'number';
 
-    } catch (error) {
-      logger.error('Bias detection test failed:', { error: error instanceof Error ? error.message : String(error) });
+    } catch (error: unknown) {
+      logger.error('Bias detection test failed:', { error: error instanceof Error ? String(error) : String(error) });
       return false;
     }
   }
@@ -204,8 +204,8 @@ export class ServiceIntegrationTester {
              result.dimensions !== undefined &&
              typeof result.confidence === 'number';
 
-    } catch (error) {
-      logger.error('Emotion analysis test failed:', { error: error instanceof Error ? error.message : String(error) });
+    } catch (error: unknown) {
+      logger.error('Emotion analysis test failed:', { error: error instanceof Error ? String(error) : String(error) });
       return false;
     }
   }
@@ -257,14 +257,14 @@ export class ServiceIntegrationTester {
       );
 
       // Verify all services worked together
-      return memory.id !== undefined && 
-             biasMemory.id !== undefined && 
+      return memory?.id !== undefined && 
+             biasMemory?.id !== undefined && 
              encryptedAnalysis !== sessionText &&
-             emotionResult.primary !== undefined &&
-             biasResult.biasScore !== undefined;
+             emotionResult?.primary !== undefined &&
+             biasResult?.biasScore !== undefined;
 
-    } catch (error) {
-      logger.error('Cross-service communication test failed:', { error: error instanceof Error ? error.message : String(error) });
+    } catch (error: unknown) {
+      logger.error('Cross-service communication test failed:', { error: error instanceof Error ? String(error) : String(error) });
       return false;
     }
   }

@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { BackupSecurityManager } from '../../../../lib/security/backup'
 import {
@@ -20,7 +19,7 @@ const backupManager = new BackupSecurityManager()
 // Ensure it's initialized
 backupManager.initialize().catch((error) => {
   logger.error(
-    `Failed to initialize backup manager for recovery tests: ${error instanceof Error ? error.message : String(error)}`,
+    `Failed to initialize backup manager for recovery tests: ${error instanceof Error ? String(error) : String(error)}`,
   )
 })
 
@@ -68,9 +67,9 @@ export const GET = protectRoute({
         headers: { 'Content-Type': 'application/json' },
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
-      `Error handling recovery test GET request: ${error instanceof Error ? error.message : String(error)}`,
+      `Error handling recovery test GET request: ${error instanceof Error ? String(error) : String(error)}`,
     )
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -127,9 +126,9 @@ export const POST = protectRoute({
         headers: { 'Content-Type': 'application/json' },
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
-      `Error handling recovery test POST request: ${error instanceof Error ? error.message : String(error)}`,
+      `Error handling recovery test POST request: ${error instanceof Error ? String(error) : String(error)}`,
     )
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -210,7 +209,7 @@ async function getRecoveryTests() {
 }
 
 // Mock function to get a specific recovery test by ID
-async function getRecoveryTestById(testId: string) {
+async function getRecoveryTestById(testId: string): void {
   const tests = await getRecoveryTests()
   return tests.find((test) => test.id === testId)
 }

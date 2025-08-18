@@ -697,7 +697,7 @@ const performanceBudgets = {
   }
 
   // Initialize dashboard when DOM is loaded
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     updateDashboard()
 
     // Set up refresh button click handler
@@ -711,7 +711,7 @@ const performanceBudgets = {
   })
 
   // Listen for theme changes to update chart colors
-  document.addEventListener('astro:after-swap', () => {
+  document.addEventListener('astro:after-swap', (: Event) => {
     if (resourceSizeChart) resourceSizeChart.destroy()
     if (requestCountChart) requestCountChart.destroy()
     if (performanceTrendChart) performanceTrendChart.destroy()

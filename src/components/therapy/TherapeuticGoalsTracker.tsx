@@ -61,7 +61,7 @@ export function TherapeuticGoalsTracker({
         }
       })
       .catch((err) => {
-        setError(err.message)
+        setError((err as Error)?.message || String(err))
         // Optionally, load generated goals on API error as well
         const fallbackGoals = generateGoalsFromPatientModel(patientModel)
         setGoals(fallbackGoals)
@@ -124,7 +124,7 @@ export function TherapeuticGoalsTracker({
       setActiveGoalId(newGoal.id)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError(err.message)
+        setActionError((err as Error)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -134,7 +134,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Update an existing goal
-  async function updateGoal(goal: TherapeuticGoal) {
+  async function updateGoal(goal: TherapeuticGoal): void {
     setActionLoading(true)
     setActionError(null)
     try {
@@ -152,7 +152,7 @@ export function TherapeuticGoalsTracker({
       )
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError(err.message)
+        setActionError((err as Error)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -162,7 +162,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Delete a goal
-  async function deleteGoal(goalId: string) {
+  async function deleteGoal(goalId: string): void {
     setActionLoading(true)
     setActionError(null)
     try {
@@ -176,7 +176,7 @@ export function TherapeuticGoalsTracker({
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError(err.message)
+        setActionError((err as Error)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -186,7 +186,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Open modal for new or edit
-  function openModal(goal?: TherapeuticGoal) {
+  function openModal(goal?: TherapeuticGoal): void {
     setEditGoal(goal || null)
     setForm(
       goal
@@ -222,7 +222,7 @@ export function TherapeuticGoalsTracker({
   }
 
   // Handle form submit
-  async function handleFormSubmit(e: React.FormEvent) {
+  async function handleFormSubmit(e: React.FormEvent): void {
     e.preventDefault()
     if (editGoal) {
       await updateGoal({ ...editGoal, ...form })

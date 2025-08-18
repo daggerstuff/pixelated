@@ -53,7 +53,7 @@ export const POST = async ({ request }: APIContext) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Password reset error:', error)
     return new Response(
       JSON.stringify({

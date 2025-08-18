@@ -2,7 +2,7 @@ import React from '@/lib/esm-compat/react'
 import { useAnonymizedMetrics } from './hooks'
 
 // Simple simulator components
-export function SimulatorProvider({ children }: { children: React.ReactNode }) {
+export function SimulatorProvider({ children }: { children: React.ReactNode }): void {
   return <>{children}</>
 }
 

@@ -16,7 +16,7 @@ export const GET = async ({ request, cookies }) => {
       })
     }
 
-    const session = JSON.parse(sessionCookie.value)
+    const session = JSON.parse(sessionCookie.value) as any
     const userId = session.userId
 
     // Parse query parameters
@@ -54,9 +54,9 @@ export const GET = async ({ request, cookies }) => {
       headers: { 'Content-Type': 'application/json' }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Memory list error:', {
-      message: error instanceof Error ? error.message : String(error)
+      message: error instanceof Error ? String(error) : String(error)
     })
 
     return new Response(JSON.stringify({

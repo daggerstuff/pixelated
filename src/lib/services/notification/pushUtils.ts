@@ -10,7 +10,7 @@ export interface PushSubscription {
 }
 
 export class ExpiredSubscriptionError extends Error {
-  constructor(message = 'Push subscription has expired') {
+  constructor(message = 'Push subscription has expired'): void {
     super(message)
     this.name = 'ExpiredSubscriptionError'
   }

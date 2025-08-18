@@ -49,9 +49,9 @@ export const POST = async ({ request }) => {
     let formData: Record<string, unknown>
     try {
       formData = await request.json()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Invalid JSON in contact form request', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? String(error) : 'Unknown error',
         userAgent: request.headers.get('user-agent'),
         ip: getClientIP(request),
       })
@@ -126,12 +126,12 @@ export const POST = async ({ request }) => {
       status: result.success ? 200 : 400,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const duration = Date.now() - startTime
 
     logger.error('Contact form submission failed with unexpected error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : 'Unknown error',
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
       userAgent: request.headers.get('user-agent'),
       ip: getClientIP(request),
       duration: `${duration}ms`,

@@ -124,7 +124,7 @@ const getEHRServiceInstance = async (): Promise<EHRService> => {
   return ehrServiceInstance
 }
 
-const releaseInstances = (): void => {
+const releaseInstances = () => {
   refCount--
   if (refCount <= 0) {
     ehrServiceInstance?.disconnect?.()
@@ -221,8 +221,8 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
           }
           safeSetState(setDocumentation, docWithMeta)
         }
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
+      } catch (error: unknown) {
+        if (error instanceof Error && (error as Error)?.name === 'AbortError') {
           return
         }
         const errorObj = handleError(error, 'loadDocumentation')
@@ -263,8 +263,8 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
         }
 
         toast.success('Documentation generated successfully')
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
+      } catch (error: unknown) {
+        if (error instanceof Error && (error as Error)?.name === 'AbortError') {
           return
         }
         const errorObj = handleError(error, 'generateDocumentation')
@@ -313,7 +313,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
         }
 
         return success
-      } catch (error) {
+      } catch (error: unknown) {
         const errorObj = handleError(error, 'saveDocumentation')
         safeSetState(setError, errorObj)
         toast.error('Failed to save documentation')
@@ -344,7 +344,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
 
         toast.success(`Connected to EHR provider: ${providerId}`)
         return true
-      } catch (error) {
+      } catch (error: unknown) {
         const errorObj = handleError(error, 'setupEHRIntegration')
         safeSetState(setError, errorObj)
         toast.error('Failed to set up EHR integration')
@@ -435,7 +435,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
         }
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         const errorObj = handleError(error, 'exportToEHR')
         // Fallbacks for format and metadata if options is not available
         const fallbackFormat: 'fhir' | 'ccda' | 'pdf' = options?.format || 'pdf'

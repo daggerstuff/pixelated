@@ -173,7 +173,7 @@ export const GET: APIRoute = protectRoute()(async ({
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error retrieving temporal emotion analysis', { error })
 
     return new Response(

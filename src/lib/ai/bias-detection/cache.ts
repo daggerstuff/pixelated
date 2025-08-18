@@ -108,7 +108,7 @@ export class BiasDetectionCache {
     }
   }
 
-  constructor(config: Partial<CacheConfig> = {}) {
+  constructor(config: Partial<CacheConfig> = {}): void {
     this.config = {
       maxSize: 1000,
       defaultTtl: 30 * 60 * 1000, // 30 minutes
@@ -158,7 +158,7 @@ export class BiasDetectionCache {
       }
       this.redisAvailable = true
       logger.info('Redis cache service connected for bias detection')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Redis cache service unavailable, using memory-only mode', {
         error,
       })
@@ -270,7 +270,7 @@ export class BiasDetectionCache {
         redis: this.redisAvailable && this.config.useRedis,
         memory: this.config.hybridMode || !this.config.useRedis,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store cache entry', { key, error })
       throw error
     }
@@ -317,7 +317,7 @@ export class BiasDetectionCache {
       this.stats.missRate++
       logger.debug('Cache miss (both memory and Redis)', { key })
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to retrieve cache entry', { key, error })
       this.stats.missRate++
       return null
@@ -369,7 +369,7 @@ export class BiasDetectionCache {
       }
 
       // Parse with Date revival
-      const cacheData = JSON.parse(cached, (key, value) => {
+      const cacheData = JSON.parse(cached, (key, value): any => {
         // Revive Date objects from ISO strings
         if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/.test(value)) {
           return new Date(value)
@@ -391,7 +391,7 @@ export class BiasDetectionCache {
 
       logger.debug('Redis cache hit', { key: redisKey })
       return value
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Error retrieving from Redis cache', { key, error })
       return null
     }
@@ -422,7 +422,7 @@ export class BiasDetectionCache {
 
       this.memoryCache.set(key, entry)
       logger.debug('Stored Redis result in memory cache', { key })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to store Redis result in memory', { key, error })
     }
   }
@@ -447,10 +447,10 @@ export class BiasDetectionCache {
           ? await this.cacheService.get(redisKey)
           : null
         if (cached) {
-          const cacheData = JSON.parse(cached)
+          const cacheData = JSON.parse(cached) as any
           return new Date(cacheData.expiresAt) >= new Date()
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Error checking Redis cache existence', { key, error })
       }
     }
@@ -480,7 +480,7 @@ export class BiasDetectionCache {
         }
         deleted = true
         console.log('[DEBUG] delete: deleted from Redis cache', { redisKey })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to delete from Redis cache', { key, error })
       }
     }
@@ -508,7 +508,7 @@ export class BiasDetectionCache {
         logger.info('Cleared Redis cache with prefix', {
           prefix: this.config.redisKeyPrefix,
         })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to clear Redis cache', { error })
       }
     }
@@ -551,7 +551,7 @@ export class BiasDetectionCache {
           }
           let cacheData
           try {
-            cacheData = JSON.parse(cached)
+            cacheData = JSON.parse(cached) as any
           } catch {
             continue
           }
@@ -573,7 +573,7 @@ export class BiasDetectionCache {
           tags,
           count: invalidated,
         })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to invalidate Redis cache by tags', { tags, error })
       }
     }
@@ -668,7 +668,7 @@ export class BiasDetectionCache {
   /**
    * Update cache statistics
    */
-  private updateStats(): void {
+  private updateStats() {
     const entries = Array.from(this.memoryCache.values())
 
     this.stats.totalEntries = entries.length
@@ -713,7 +713,7 @@ export class BiasDetectionCache {
       const stringData = JSON.stringify(data)
       const compressed = await deflate(stringData)
       return COMPRESSION_PREFIX + compressed.toString('base64')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to compress data', { error })
       return data // Return original data if compression fails
     }
@@ -731,8 +731,8 @@ export class BiasDetectionCache {
       const base64Data = data.substring(COMPRESSION_PREFIX.length)
       const buffer = Buffer.from(base64Data, 'base64')
       const decompressed = await inflate(buffer)
-      return JSON.parse(decompressed.toString())
-    } catch (error) {
+      return JSON.parse(decompressed.toString() as any)
+    } catch (error: unknown) {
       logger.error('Failed to decompress data', { error })
       return data as T // Return original (potentially still compressed) data if decompression fails
     }
@@ -748,7 +748,7 @@ export class BiasDetectionCache {
   /**
    * Start cleanup timer
    */
-  private startCleanupTimer(): void {
+  private startCleanupTimer() {
     this.cleanupTimer = setInterval(() => {
       this.cleanup()
     }, this.config.cleanupInterval)
@@ -757,7 +757,7 @@ export class BiasDetectionCache {
   /**
    * Stop cleanup timer
    */
-  private stopCleanupTimer(): void {
+  private stopCleanupTimer() {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer)
       this.cleanupTimer = undefined
@@ -784,7 +784,7 @@ export class BiasDetectionCache {
 export class BiasAnalysisCache {
   private cache: BiasDetectionCache
 
-  constructor(config?: Partial<CacheConfig>) {
+  constructor(config?: Partial<CacheConfig>): void {
     this.cache = new BiasDetectionCache({
       maxSize: 500,
       defaultTtl: 60 * 60 * 1000, // 1 hour
@@ -907,7 +907,7 @@ export class BiasAnalysisCache {
           }
           let cacheData
           try {
-            cacheData = JSON.parse(cached)
+            cacheData = JSON.parse(cached) as any
           } catch {
             continue
           }
@@ -964,7 +964,7 @@ export class BiasAnalysisCache {
 export class DashboardCache {
   private cache: BiasDetectionCache
 
-  constructor(config?: Partial<CacheConfig>) {
+  constructor(config?: Partial<CacheConfig>): void {
     this.cache = new BiasDetectionCache({
       maxSize: 100,
       defaultTtl: 5 * 60 * 1000, // 5 minutes for dashboard data
@@ -1026,7 +1026,7 @@ export class DashboardCache {
 export class ReportCache {
   private cache: BiasDetectionCache
 
-  constructor(config?: Partial<CacheConfig>) {
+  constructor(config?: Partial<CacheConfig>): void {
     this.cache = new BiasDetectionCache({
       maxSize: 50,
       defaultTtl: 24 * 60 * 60 * 1000, // 24 hours for reports

@@ -118,7 +118,7 @@ if (authResponse) {
 
 <script>
   // Client-side functionality
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     // Sync Security Settings button
     const syncSettingsButton = document.getElementById('sync-security-settings')
     syncSettingsButton?.addEventListener('click', async () => {
@@ -165,7 +165,7 @@ if (authResponse) {
 
     // View Security Logs button
     const viewLogsButton = document.getElementById('view-security-logs')
-    viewLogsButton?.addEventListener('click', () => {
+    viewLogsButton?.addEventListener('click', (: Event) => {
       window.location.href = '/admin/security-logs'
     })
   })

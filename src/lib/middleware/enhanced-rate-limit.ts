@@ -150,7 +150,7 @@ export const enhancedRateLimitMiddleware = defineMiddleware(
       response.headers.set('X-RateLimit-Reset', (Date.now() + 60000).toString())
 
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       // Log any errors and continue
       logger.error('Error in rate limiting:', { error })
       return next()

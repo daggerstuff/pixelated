@@ -75,13 +75,13 @@ export const GET = async ({ request, cookies }) => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error searching memories:', error)
 
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

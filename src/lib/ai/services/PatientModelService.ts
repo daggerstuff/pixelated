@@ -8,7 +8,7 @@ import type { CognitiveModel } from '../types/CognitiveModel'
 export type ModelIdentifier = string
 
 export class PatientModelService {
-  constructor(private kvStore: KVStore) {}
+  constructor(private kvStore: KVStore): void {}
 
   /**
    * Get all available cognitive models
@@ -26,7 +26,7 @@ export class PatientModelService {
       }
 
       return models
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get available models:', error)
       return []
     }
@@ -38,7 +38,7 @@ export class PatientModelService {
   async saveModel(model: CognitiveModel): Promise<void> {
     try {
       await this.kvStore.set(model.id, model)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to save model:', error)
       throw error
     }
@@ -50,7 +50,7 @@ export class PatientModelService {
   async getModel(id: string): Promise<CognitiveModel | null> {
     try {
       return await this.kvStore.get<CognitiveModel>(id)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get model:', error)
       return null
     }
@@ -62,7 +62,7 @@ export class PatientModelService {
   async deleteModel(id: string): Promise<void> {
     try {
       await this.kvStore.delete(id)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to delete model:', error)
       throw error
     }

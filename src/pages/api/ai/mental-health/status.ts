@@ -21,13 +21,13 @@ export const GET: APIRoute = async () => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error checking MentalLLaMA model status:', error)
 
     return new Response(
       JSON.stringify({
         isConfigured: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       }),
       {
         status: 500,

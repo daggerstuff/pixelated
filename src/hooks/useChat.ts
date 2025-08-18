@@ -12,7 +12,7 @@ interface LocalMessage {
   isError?: boolean
 }
 
-export function useChat(options: ChatOptions) {
+export function useChat(options: ChatOptions): void {
   const {
     initialMessages = [],
     api = '/api/chat',
@@ -89,7 +89,7 @@ export function useChat(options: ChatOptions) {
       }
 
       setMessages((prev) => [...prev, assistantMessage])
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in chat:', error)
 
       // Add error message

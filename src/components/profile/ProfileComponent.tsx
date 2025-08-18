@@ -6,7 +6,7 @@ interface ProfileComponentProps {
   user: User
 }
 
-export function ProfileComponent({ user }: ProfileComponentProps) {
+export function ProfileComponent({ user }: ProfileComponentProps): void {
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [formData, setFormData] = useState({

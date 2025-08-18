@@ -128,7 +128,7 @@ export async function generateHash(data: string): Promise<string> {
     return Array.from(new Uint8Array(hashBuffer))
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('')
-  } catch (error) {
+  } catch (error: unknown) {
     // Fallback to simple hash if crypto not available
     console.warn(
       'Web Crypto API not available, using fallback hash method',

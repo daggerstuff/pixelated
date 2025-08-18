@@ -36,7 +36,7 @@ interface SlackMessagePayload {
 export class SlackNotificationService implements ICrisisNotificationHandler {
   private webhookUrl: string
 
-  constructor(webhookUrl?: string) {
+  constructor(webhookUrl?: string): void {
     const url = webhookUrl || config.notifications.slackWebhookUrl()
     if (!url) {
       const errorMsg =
@@ -172,10 +172,10 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
         userId: alertContext.userId,
         sessionId: alertContext.sessionId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Exception while sending Slack crisis alert:', {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        error: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : undefined,
         webhookUrl:
           this.webhookUrl.substring(
             0,
@@ -184,7 +184,7 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
       })
       // Rethrow to indicate failure to dispatch, allowing caller (MentalLLaMAAdapter) to handle
       throw new Error(
-        `Failed to dispatch crisis alert via SlackNotificationService: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to dispatch crisis alert via SlackNotificationService: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
       )
     }

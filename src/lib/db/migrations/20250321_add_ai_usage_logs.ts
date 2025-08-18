@@ -20,7 +20,7 @@ export async function up(): Promise<void> {
     await collection.createIndex({ user_id: 1, created_at: -1 })
 
     console.log('✅ Created ai_usage_logs collection with indexes')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Migration failed:', error)
     throw error
   } finally {
@@ -37,7 +37,7 @@ export async function down(): Promise<void> {
     await db.collection('ai_usage_logs').drop()
 
     console.log('✅ Dropped ai_usage_logs collection')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Rollback failed:', error)
     throw error
   } finally {

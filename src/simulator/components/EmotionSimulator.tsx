@@ -58,7 +58,7 @@ export const EmotionSimulator: React.FC = () => {
       try {
         setHasConsent(checked)
         updateConsent(checked)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error updating consent status:', error)
       }
     },
@@ -73,7 +73,7 @@ export const EmotionSimulator: React.FC = () => {
 
     try {
       startAnalysis()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error starting analysis:', error)
     }
   }, [hasConsent, startAnalysis])
@@ -81,7 +81,7 @@ export const EmotionSimulator: React.FC = () => {
   const handleStop = useCallback(() => {
     try {
       stopAnalysis()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error stopping analysis:', error)
     }
   }, [stopAnalysis])
@@ -89,7 +89,7 @@ export const EmotionSimulator: React.FC = () => {
   const handleReset = useCallback(() => {
     try {
       resetAnalysis()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error resetting analysis:', error)
     }
   }, [resetAnalysis])

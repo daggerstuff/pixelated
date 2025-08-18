@@ -21,7 +21,7 @@ async function main() {
     console.log('✅ Quality assessment system operational')
     console.log('✅ Caching and metrics tracking active')
     console.log('✅ LLM-enhanced evidence extraction ready')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('\n❌ Evidence system test failed:', error)
     process.exit(1)
   }

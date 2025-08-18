@@ -141,7 +141,7 @@ export function isAllowedDomain(
       }
       return url.hostname === domain
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error validating image domain:', error)
     return false
   }
@@ -182,7 +182,7 @@ export function getOptimalFormat(): 'avif' | 'webp' | 'jpg' {
  * Fix CLS (Cumulative Layout Shift) issues by setting explicit dimensions
  * Use this in client-side scripts
  */
-export function preventCLS(): void {
+export function preventCLS() {
   if (typeof document === 'undefined') {
     return
   }

@@ -14,7 +14,7 @@ export interface PatternVisualizationProps {
   onPatternSelect?: (pattern: TrendPattern | CrossSessionPattern | RiskCorrelation) => void
 }
 
-export const PatternVisualization: React.FC<PatternVisualizationProps> = ({
+export const PatternVisualization: FC<PatternVisualizationProps> = ({
   trends = [],
   crossSessionPatterns = [],
   riskCorrelations = [],
@@ -111,7 +111,7 @@ export const PatternVisualization: React.FC<PatternVisualizationProps> = ({
                 >
                   <div className="font-medium">{correlation.description}</div>
                   <div className="text-sm text-gray-600">
-                    Strength: {(correlation.strength * 100).toFixed(1)}%
+                    Confidence: {(correlation.confidence * 100).toFixed(1)}%
                   </div>
                 </button>
               ))}

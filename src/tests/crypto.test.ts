@@ -20,7 +20,7 @@ import { createCryptoSystem } from '../lib/crypto'
 
 
 // Check if FHE tests should be skipped
-const SKIP_FHE_TESTS = process.env.SKIP_FHE_TESTS === 'true'
+const SKIP_FHE_TESTS = process.env['SKIP_FHE_TESTS'] === 'true'
 
 // Mock FHE service if we're skipping FHE tests
 if (SKIP_FHE_TESTS) {
@@ -85,7 +85,7 @@ class KeyRotationManager {
   private keys: Map<string, KeyMetadata> = new Map<string, KeyMetadata>()
   private keyValues: Map<string, string> = new Map<string, string>() // Store keys for reencryption
 
-  constructor(rotationDays: number) {
+  constructor(rotationDays: number): void {
     this.rotationDays = rotationDays
   }
 
@@ -189,7 +189,7 @@ class KeyStorage {
   private namespace: string
   private keys: Map<string, KeyData> = new Map<string, KeyData>()
 
-  constructor(options: { namespace: string }) {
+  constructor(options: { namespace: string }): void {
     this.namespace = options.namespace
   }
 
@@ -254,12 +254,12 @@ class ScheduledKeyRotation {
   private interval: ReturnType<typeof setInterval> | null = null
   private keyStorage: KeyStorage
 
-  constructor(options: ScheduledKeyRotationOptions) {
+  constructor(options: ScheduledKeyRotationOptions): void {
     this.options = options
     this.keyStorage = new KeyStorage({ namespace: options.namespace })
   }
 
-  start(): void {
+  start() {
     if (this.interval) {
       return // Already started
     }
@@ -268,7 +268,7 @@ class ScheduledKeyRotation {
     }, this.options.checkIntervalMs)
   }
 
-  stop(): void {
+  stop() {
     if (this.interval) {
       clearInterval(this.interval)
       this.interval = null
@@ -337,7 +337,7 @@ interface ExtendedFHESystem {
 
 // Function to obfuscate test keys to avoid gitleaks detection
 // while still having usable test values
-function getTestKey(id = '') {
+function getTestKey(id = ''): void {
   return `test-${id}-mock-key-${new Date().getTime().toString().substring(5)}`
 }
 
@@ -443,7 +443,8 @@ describe('keyRotationManager', () => {
   })
 
   // Skip this test in CI - it's failing with "Failed to decrypt data"
-  const skipKeyRotationTest = process.env.SKIP_CRYPTO_ROTATION_TEST === 'true'
+  const skipKeyRotationTest =
+    process.env['SKIP_CRYPTO_ROTATION_TEST'] === 'true'
   ;(skipKeyRotationTest ? it.skip : it)(
     'should re-encrypt data with the latest key version',
     async () => {
@@ -741,6 +742,7 @@ describe('createCryptoSystem', () => {
   })
 })
 
+ 
 describe('Fully Homomorphic Encryption Integration Tests', () => {
   // Skip all these tests if SKIP_FHE_TESTS is true
   const itOrSkip = SKIP_FHE_TESTS ? (it as TestFunction).skip : it
@@ -822,7 +824,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
   itOrSkip('should encrypt and decrypt data securely', async () => {
     const data = {
       message: 'Secret therapy notes',
-      patientId: process.env.PATIENT_ID || 'example-patient-id',
+      patientId: process.env['PATIENT_ID'] || 'example-patient-id',
     }
 
     // Encrypt the data
@@ -831,7 +833,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
 
     // Decrypt the data
     const decrypted = await fheSystem.decrypt(encrypted)
-    const parsedData = JSON.parse(decrypted)
+    const parsedData = JSON.parse(decrypted) as any
 
     expect(parsedData.message).toBe(data.message)
     expect(parsedData.patientId).toBe(data.patientId)

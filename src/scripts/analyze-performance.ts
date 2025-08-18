@@ -114,7 +114,7 @@ async function main() {
     // TODO: Replace with proper cleanup implementation
     // await PerformanceLogger.getInstance().cleanup()
     logger.info('Performance report generation completed')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to generate performance report:', error)
     process.exit(1)
   }

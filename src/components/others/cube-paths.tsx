@@ -8,7 +8,7 @@ import { Button } from '~/components/ui/button'
 // Replace Next.js font initialization with a CSS class
 const interFont = 'font-["Inter"]'
 
-function FloatingPaths({ position }: { position: number }) {
+function FloatingPaths({ position }: { position: number }): void {
   const paths = Array.from({ length: 24 }, (_, i) => ({
     id: i,
     d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${

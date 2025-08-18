@@ -58,7 +58,7 @@ export class RateLimiter {
   private readonly userLimits: Record<string, number>
   private storage: Map<string, number>
 
-  constructor(defaultLimit = 30, windowMs = 60 * 1000) {
+  constructor(defaultLimit = 30, windowMs = 60 * 1000): void {
     this.defaultLimit = defaultLimit
     this.windowMs = windowMs
     this.userLimits = {
@@ -195,7 +195,7 @@ export const rateLimitMiddleware = defineMiddleware(
       }
 
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Error in rate limiting middleware:',
         error as Record<string, unknown>,

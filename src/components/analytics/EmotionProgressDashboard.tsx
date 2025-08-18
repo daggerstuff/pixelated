@@ -17,7 +17,7 @@ interface EmotionProgressDashboardProps {
   timeRange?: 'week' | 'month' | 'quarter' | 'year'
 }
 
-const EmotionProgressDashboard: React.FC<EmotionProgressDashboardProps> = ({
+const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
   data = [],
   isLoading = false,
   error = null,
@@ -106,7 +106,7 @@ const EmotionProgressDashboard: React.FC<EmotionProgressDashboardProps> = ({
       <div className="w-full max-w-6xl mx-auto p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h3 className="text-red-800 font-semibold mb-2">Error Loading Progress Data</h3>
-          <p className="text-red-600">{error.message}</p>
+          <p className="text-red-600">{String(error)}</p>
         </div>
       </div>
     )

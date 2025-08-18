@@ -533,7 +533,7 @@ const placeholderThumbnail =
 
 <script define:vars={{ visualData, placeholderThumbnail }}>
   // Refresh button
-  document.getElementById('refresh-data')?.addEventListener('click', () => {
+  document.getElementById('refresh-data')?.addEventListener('click', (: Event) => {
     window.location.reload()
   })
 
@@ -546,7 +546,7 @@ const placeholderThumbnail =
   const modalDiff = document.getElementById('modalDiff')
 
   // Close modal with escape key
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', (e: Event) => {
     if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
       closeModal()
     }
@@ -558,12 +558,12 @@ const placeholderThumbnail =
   }
 
   // Close modal button click
-  closeModalBtn?.addEventListener('click', () => {
+  closeModalBtn?.addEventListener('click', (: Event) => {
     closeModal()
   })
 
   // Allow clicking outside modal to close
-  modal?.addEventListener('click', (e) => {
+  modal?.addEventListener('click', (e: Event) => {
     if (e.target === modal) {
       closeModal()
     }

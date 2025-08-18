@@ -65,7 +65,7 @@ interface CrisisAnalytics {
  */
 function isRetryableError(error: unknown): boolean {
   // Network errors are retryable
-  if (error instanceof TypeError && error.message.includes('network')) {
+  if (error instanceof TypeError && String(error).includes('network')) {
     return true
   }
 
@@ -311,7 +311,7 @@ export function useCrisisDetection({
         }
 
         return response
-      } catch (err) {
+      } catch (err: unknown) {
         clearTimeout(timeoutId)
         throw err
       }
@@ -362,10 +362,10 @@ export function useCrisisDetection({
           }
 
           return data
-        } catch (err) {
+        } catch (err: unknown) {
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? err.message : 'Failed to detect crisis'
+              err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to detect crisis'
             setError(errorMessage)
 
             if (onError && err instanceof Error) {
@@ -448,9 +448,9 @@ export function useCrisisDetection({
         }
 
         return batchResults
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to detect crisis in batch'
+          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to detect crisis in batch'
         setError(errorMessage)
 
         if (onError && err instanceof Error) {
@@ -514,7 +514,7 @@ export function useCrisisDetection({
             }
 
             yield data
-          } catch (err) {
+          } catch (err: unknown) {
             console.warn(`Failed to detect crisis in text ${i + 1}:`, err)
           }
         }

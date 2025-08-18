@@ -6,7 +6,7 @@ export interface UserMenuProps {
   className?: string
 }
 
-export function UserMenu({ className = '' }: UserMenuProps) {
+export function UserMenu({ className = '' }: UserMenuProps): void {
   const { user, signOut } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)

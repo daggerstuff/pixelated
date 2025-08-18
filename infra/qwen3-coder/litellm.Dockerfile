@@ -23,5 +23,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 WORKDIR /app
 EXPOSE 8080
 
+# Create non-root user
+RUN addgroup --system litellm && adduser --system --ingroup litellm litellm
+USER litellm
+
 # Default command will be provided by compose via args
 ENTRYPOINT ["litellm", "--config", "/app/config.yaml", "--port", "8080"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl -f http://localhost:8080/health || exit 1

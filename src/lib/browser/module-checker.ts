@@ -53,7 +53,7 @@ export async function safeImport<T = unknown>(
     // In Node.js, attempt to dynamically import the module
     const module = await import(moduleName)
     return module.default || module
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn(`Module ${moduleName} is not available:`, error)
     return null
   }

@@ -15,7 +15,7 @@ export class RedisService extends EventEmitter implements IRedisService {
   private connected = false
   private healthy = true
 
-  constructor(_config: Record<string, unknown>) {
+  constructor(_config: Record<string, unknown>): void {
     super()
     this.connected = false
     this.healthy = true
@@ -51,29 +51,29 @@ export class RedisService extends EventEmitter implements IRedisService {
     }
   }
 
-  async set(key: string, value: string, _ttlMs?: number) {
+  async set(key: string, value: string, _ttlMs?: number): void {
     store.set(key, value)
     // Simulate TTL (no actual implementation needed for tests)
   }
 
-  async get(key: string) {
+  async get(key: string): void {
     return store.get(key) || null
   }
 
-  async del(key: string) {
+  async del(key: string): void {
     store.delete(key)
   }
 
-  async exists(key: string) {
+  async exists(key: string): void {
     return store.has(key)
   }
 
-  async ttl(key: string) {
+  async ttl(key: string): void {
     return store.has(key) ? 60 : -2 // 60 seconds if exists, -2 if not
   }
 
   // Hash operations
-  async hset(key: string, field: string, value: string) {
+  async hset(key: string, field: string, value: string): void {
     if (!hashStore.has(key)) {
       hashStore.set(key, new Map())
     }
@@ -83,12 +83,12 @@ export class RedisService extends EventEmitter implements IRedisService {
     return existed ? 0 : 1
   }
 
-  async hget(key: string, field: string) {
+  async hget(key: string, field: string): void {
     const hash = hashStore.get(key)
     return hash ? hash.get(field) || null : null
   }
 
-  async hdel(key: string, field: string) {
+  async hdel(key: string, field: string): void {
     const hash = hashStore.get(key)
     if (!hash) {
       return 0
@@ -97,7 +97,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return deleted ? 1 : 0
   }
 
-  async hgetall(key: string) {
+  async hgetall(key: string): void {
     const hash = hashStore.get(key)
     if (!hash) {
       return {}
@@ -110,7 +110,7 @@ export class RedisService extends EventEmitter implements IRedisService {
   }
 
   // List operations
-  async lpush(key: string, ...values: string[]) {
+  async lpush(key: string, ...values: string[]): void {
     if (!listStore.has(key)) {
       listStore.set(key, [])
     }
@@ -119,7 +119,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return list.length
   }
 
-  async rpush(key: string, ...values: string[]) {
+  async rpush(key: string, ...values: string[]): void {
     if (!listStore.has(key)) {
       listStore.set(key, [])
     }
@@ -128,24 +128,24 @@ export class RedisService extends EventEmitter implements IRedisService {
     return list.length
   }
 
-  async lpop(key: string) {
+  async lpop(key: string): void {
     const list = listStore.get(key)
     return list && list.length > 0 ? list.shift()! : null
   }
 
-  async rpop(key: string) {
+  async rpop(key: string): void {
     const list = listStore.get(key)
     return list && list.length > 0 ? list.pop()! : null
   }
 
-  async lrange(key: string, start: number, end: number) {
+  async lrange(key: string, start: number, end: number): void {
     const list = listStore.get(key) || []
     // Handle negative indices and convert end=-1 to the end of the array
     const adjustedEnd = end < 0 ? list.length + end + 1 : end + 1
     return list.slice(start, adjustedEnd)
   }
 
-  async lrem(key: string, count: number, value: string) {
+  async lrem(key: string, count: number, value: string): void {
     const list = listStore.get(key)
     if (!list) {
       return 0
@@ -183,13 +183,13 @@ export class RedisService extends EventEmitter implements IRedisService {
     return removed
   }
 
-  async llen(key: string) {
+  async llen(key: string): void {
     const list = listStore.get(key)
     return list ? list.length : 0
   }
 
   // Set operations
-  async sadd(key: string, ...members: string[]) {
+  async sadd(key: string, ...members: string[]): void {
     if (!setStore.has(key)) {
       setStore.set(key, new Set())
     }
@@ -204,7 +204,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return added
   }
 
-  async srem(key: string, ...members: string[]) {
+  async srem(key: string, ...members: string[]): void {
     const set = setStore.get(key)
     if (!set) {
       return 0
@@ -219,27 +219,27 @@ export class RedisService extends EventEmitter implements IRedisService {
     return removed
   }
 
-  async smembers(key: string) {
+  async smembers(key: string): void {
     const set = setStore.get(key)
     return set ? Array.from(set) : []
   }
 
   // Other operations
-  async incr(key: string) {
+  async incr(key: string): void {
     const value = store.get(key)
     const num = value ? parseInt(value, 10) + 1 : 1
     store.set(key, num.toString())
     return num
   }
 
-  async keys(pattern: string) {
+  async keys(pattern: string): void {
     // Simple glob pattern matching
     const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$')
     return Array.from(store.keys()).filter((key) => regex.test(key))
   }
 
   // Missing method from interface
-  async deletePattern(pattern: string) {
+  async deletePattern(pattern: string): void {
     const keys = await this.keys(pattern)
     for (const key of keys) {
       await this.del(key)
@@ -247,7 +247,7 @@ export class RedisService extends EventEmitter implements IRedisService {
   }
 
   // Sorted set operations
-  async zadd(key: string, score: number, member: string) {
+  async zadd(key: string, score: number, member: string): void {
     if (!zsetStore.has(key)) {
       zsetStore.set(key, new Map())
     }
@@ -257,7 +257,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return existed ? 0 : 1
   }
 
-  async zrangebyscore(key: string, min: string | number, max: string | number) {
+  async zrangebyscore(key: string, min: string | number, max: string | number): void {
     const zset = zsetStore.get(key)
     if (!zset) {
       return []

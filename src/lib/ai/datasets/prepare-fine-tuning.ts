@@ -66,7 +66,7 @@ export async function prepareForOpenAI(): Promise<string | null> {
 
     logger.info(`OpenAI dataset prepared: ${outputPath}`)
     return outputPath
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(`Failed to prepare OpenAI dataset: ${error}`)
     return null
   }
@@ -101,7 +101,7 @@ export async function prepareForHuggingFace(): Promise<string | null> {
 
     logger.info(`HuggingFace dataset prepared: ${outputPath}`)
     return outputPath
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(`Failed to prepare HuggingFace dataset: ${error}`)
     return null
   }

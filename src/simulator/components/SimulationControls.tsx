@@ -12,6 +12,7 @@ interface SimulationControlsProps {
 export const SimulationControls: React.FC<SimulationControlsProps> = ({
   className = '',
 }) => {
+  const simulator = useSimulator()
   const {
     isSpeechRecognitionEnabled,
     toggleSpeechRecognition,
@@ -19,7 +20,56 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
     toggleEnhancedModels,
     transcribedText,
     isConnected,
-  } = useSimulator()
+  } = {
+    isSpeechRecognitionEnabled: (simulator as unknown as {
+      isSpeechRecognitionEnabled?: boolean
+      toggleSpeechRecognition?: () => void
+      isUsingEnhancedModels?: boolean
+      toggleEnhancedModels?: (enabled: boolean) => void
+      transcribedText?: string
+      isConnected?: boolean
+    })?.isSpeechRecognitionEnabled,
+    toggleSpeechRecognition: (simulator as unknown as {
+      isSpeechRecognitionEnabled?: boolean
+      toggleSpeechRecognition?: () => void
+      isUsingEnhancedModels?: boolean
+      toggleEnhancedModels?: (enabled: boolean) => void
+      transcribedText?: string
+      isConnected?: boolean
+    })?.toggleSpeechRecognition,
+    isUsingEnhancedModels: (simulator as unknown as {
+      isSpeechRecognitionEnabled?: boolean
+      toggleSpeechRecognition?: () => void
+      isUsingEnhancedModels?: boolean
+      toggleEnhancedModels?: (enabled: boolean) => void
+      transcribedText?: string
+      isConnected?: boolean
+    })?.isUsingEnhancedModels,
+    toggleEnhancedModels: (simulator as unknown as {
+      isSpeechRecognitionEnabled?: boolean
+      toggleSpeechRecognition?: () => void
+      isUsingEnhancedModels?: boolean
+      toggleEnhancedModels?: (enabled: boolean) => void
+      transcribedText?: string
+      isConnected?: boolean
+    })?.toggleEnhancedModels,
+    transcribedText: (simulator as unknown as {
+      isSpeechRecognitionEnabled?: boolean
+      toggleSpeechRecognition?: () => void
+      isUsingEnhancedModels?: boolean
+      toggleEnhancedModels?: (enabled: boolean) => void
+      transcribedText?: string
+      isConnected?: boolean
+    })?.transcribedText,
+    isConnected: (simulator as unknown as {
+      isSpeechRecognitionEnabled?: boolean
+      toggleSpeechRecognition?: () => void
+      isUsingEnhancedModels?: boolean
+      toggleEnhancedModels?: (enabled: boolean) => void
+      transcribedText?: string
+      isConnected?: boolean
+    })?.isConnected,
+  }
 
   return (
     <div className={`simulation-controls ${className}`}>

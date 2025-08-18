@@ -78,7 +78,7 @@ const currentStats = {
   },
 }
 
-const DemographicBalancingDisplay: React.FC<DemographicBalancingDisplayProps> = ({
+const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
   currentProfile,
   onBalanceUpdate,
 }) => {

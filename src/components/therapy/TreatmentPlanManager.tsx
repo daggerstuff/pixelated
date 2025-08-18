@@ -8,7 +8,7 @@ import type {
   TreatmentObjective,
   NewTreatmentObjectiveData,
 } from '@/types/treatment'
-import { Button } from '@/components/ui/button'
+import { FC, Button } from '@/components/ui/button'
 import {
   TableBody,
   TableCell,
@@ -16,9 +16,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DialogModal } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { FC, DialogModal } from '@/components/ui/dialog'
+import { FC, Input } from '@/components/ui/input'
+import { FC, Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -37,8 +37,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { toast } from 'sonner'
-import { PlusCircle, Trash2 } from 'lucide-react'
+import { FC, toast } from 'sonner'
+import { FC, PlusCircle, Trash2 } from 'lucide-react'
 
 const formatDate = (dateString?: string | Date) => {
   if (!dateString) {
@@ -102,14 +102,14 @@ const initialNewPlanData: FormNewPlanData = {
   goals: [],
 }
 
-const TreatmentPlanManager: React.FC = () => {
+const TreatmentPlanManager: FC = () => {
   const [plans, setPlans] = useState<TreatmentPlan[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(
-    JSON.parse(JSON.stringify(initialNewPlanData)),
+    JSON.parse(JSON.stringify(initialNewPlanData) as any),
   )
 
   const [planToDelete, setPlanToDelete] = useState<TreatmentPlan | null>(null)
@@ -129,9 +129,9 @@ const TreatmentPlanManager: React.FC = () => {
       }
       const data: TreatmentPlan[] = await response.json()
       setPlans(data)
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       setError(errorMessage)
       toast.error(`Failed to load plans: ${errorMessage}`)
     } finally {
@@ -388,11 +388,11 @@ const TreatmentPlanManager: React.FC = () => {
       }
       await fetchPlans()
       setIsCreateModalOpen(false)
-      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData)))
+      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as any))
       toast.success('Treatment plan created successfully!')
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       toast.error(`Failed to create plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -415,9 +415,9 @@ const TreatmentPlanManager: React.FC = () => {
       await fetchPlans() // Refresh list
       setPlanToDelete(null) // Close dialog
       toast.success('Treatment plan deleted successfully!')
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       toast.error(`Failed to delete plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -457,9 +457,9 @@ const TreatmentPlanManager: React.FC = () => {
       setIsEditModalOpen(false)
       setEditingPlanData(null)
       toast.success('Treatment plan updated successfully!')
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       toast.error(`Failed to update plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -485,7 +485,7 @@ const TreatmentPlanManager: React.FC = () => {
   }
 
   const openCreateModal = () => {
-    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData))) // Reset with deep copy
+    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as any)) // Reset with deep copy
     setIsCreateModalOpen(true)
   }
 

@@ -48,7 +48,7 @@ export async function monitoringMiddleware(
       ?.split('=')[1]
 
     if (sessionCookie) {
-      const session = JSON.parse(decodeURIComponent(sessionCookie))
+      const session = JSON.parse(decodeURIComponent(sessionCookie) as any)
       userId = session.userId
     }
   } catch {
@@ -199,7 +199,7 @@ export async function monitoringMiddleware(
     })
 
     return response
-  } catch (error) {
+  } catch (error: unknown) {
     // Calculate metrics for failed requests
     const endTime = Date.now()
     const duration = endTime - startTime
@@ -237,7 +237,7 @@ export async function monitoringMiddleware(
         ip,
         userId: userId || 'anonymous',
         pathname: url.pathname,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       },
       measurements: {
         duration,
@@ -260,8 +260,8 @@ export async function monitoringMiddleware(
       method,
       pathname: url.pathname,
       duration,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
       userId: userId || 'anonymous',
       ip,
     })

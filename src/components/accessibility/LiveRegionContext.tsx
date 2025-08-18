@@ -38,7 +38,7 @@ interface LiveRegionProviderProps {
  * This provider creates hidden live regions for screen reader announcements
  * and provides methods to announce messages with different politeness levels.
  */
-export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
+export function LiveRegionProvider({ children }: LiveRegionProviderProps): void {
   // State for each region (primarily for React to re-render)
   const [statusMessage, setStatusMessage] = useState('')
   const [alertMessage, setAlertMessage] = useState('')

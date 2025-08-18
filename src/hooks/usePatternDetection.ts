@@ -87,7 +87,7 @@ export const usePatternDetection = () => {
           analysisText = response
         }
 
-        const patterns = JSON.parse(analysisText)
+        const patterns = JSON.parse(analysisText) as any
 
         return Array.isArray(patterns)
           ? patterns.map((pattern) => ({
@@ -99,7 +99,7 @@ export const usePatternDetection = () => {
               confidence: pattern.confidence || 0.5,
             }))
           : []
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error detecting patterns:', error)
         return [
           {

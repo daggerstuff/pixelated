@@ -40,7 +40,7 @@ export class MentalLLaMAAdapter {
   // @ts-expect-error: Module may not exist in all environments
   private crisisSessionFlaggingServiceImport?: Promise<unknown>
 
-  constructor(options: MentalLLaMAAdapterOptions) {
+  constructor(options: MentalLLaMAAdapterOptions): void {
     this.modelProvider = options.modelProvider
     this.crisisNotifier = options.crisisNotifier
     this.taskRouter = options.taskRouter
@@ -111,7 +111,7 @@ export class MentalLLaMAAdapter {
     }
     try {
       await this.crisisNotifier.sendCrisisAlert(alertContext)
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error('Failed to send crisis alert', { error: err })
     }
   }
@@ -402,7 +402,7 @@ export class MentalLLaMAAdapter {
         max_tokens: 500,
       })
       try {
-        const parsedLlmResponse = JSON.parse(llmResponseRaw.content)
+        const parsedLlmResponse = JSON.parse(llmResponseRaw.content) as any
         llmAnalysisResult.mentalHealthCategory =
           parsedLlmResponse.mentalHealthCategory || categoryForPrompt
         llmAnalysisResult.confidence =
@@ -540,7 +540,7 @@ export class MentalLLaMAAdapter {
         fetchExpertGuidance,
         routingContextParams,
       )
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error('Expert guidance orchestration failed', { error: err })
       return {
         ...baseAnalysis,
@@ -588,7 +588,7 @@ export class MentalLLaMAAdapter {
         temperature: 0.2,
         max_tokens: 200,
       })
-      const parsed = JSON.parse(response.content)
+      const parsed = JSON.parse(response.content) as any
       return {
         fluency: parsed.fluency,
         completeness: parsed.completeness,
@@ -596,7 +596,7 @@ export class MentalLLaMAAdapter {
         overall: parsed.overall,
         assessment: parsed.assessment,
       }
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error('Failed to evaluate explanation quality', { error: err })
       return {
         fluency: 0.1,
@@ -609,7 +609,7 @@ export class MentalLLaMAAdapter {
   }
 
   // EvidenceService wrapper methods for advanced use/testing
-  public async extractDetailedEvidence(text: string, category: string) {
+  public async extractDetailedEvidence(text: string, category: string): void {
     return this.evidenceService.extractSupportingEvidence(text, category)
   }
   public getEvidenceMetrics() {

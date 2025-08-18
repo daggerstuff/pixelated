@@ -34,7 +34,7 @@ const variants = {
 
 // Randomly assign variant
 const variantKey = ['A', 'B', 'C'][Math.floor(Math.random() * 3)]
-const currentVariant = variants[variantKey]
+const currentVariant = (variants as any)?.[variantKey]
 
 const generationSpecs = [
   {
@@ -241,7 +241,7 @@ const universityResults = [
                   <div
                     class="bg-slate-700/50 rounded p-3 text-green-100 text-sm"
                   >
-                    {generationDemo.prompt}
+                    {generationDemo?.['prompt']}
                   </div>
                 </div>
 
@@ -685,7 +685,7 @@ const universityResults = [
   }
 
   // Analytics tracking for demo interactions
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     // Track page view
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'page_view', {
@@ -699,7 +699,7 @@ const universityResults = [
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
         
@@ -737,12 +737,12 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
         
-        const ctaType = target.dataset?.demoCta
-        const variant = target.dataset?.variant
+        const ctaType = target.dataset?.['demoCta']
+        const variant = target.dataset?.['variant']
 
         if (!ctaType) return
 
@@ -772,7 +772,7 @@ const universityResults = [
 
     // Track scroll depth
     let maxScroll = 0
-    window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', (: Event) => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
           100,
@@ -785,7 +785,7 @@ const universityResults = [
             demo_type: 'synthetic_training_generator',
             scroll_depth: maxScroll,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset.variant ||
+              document.querySelector('[data-variant]')?.dataset?.['variant'] ||
               'unknown',
           })
         }

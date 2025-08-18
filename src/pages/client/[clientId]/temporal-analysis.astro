@@ -421,7 +421,7 @@ const title = `Temporal Analysis - ${client.name}`
 <script>
   // This script will run on the client to initialize the actual data loading
   // In a production environment, this would connect to your actual API
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     // For demo purposes we'll populate with mock data
     // In production, you'd fetch from the API using the useTemporalEmotionAnalysis hook
     const clientId = document.location.pathname.split('/')[2]

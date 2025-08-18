@@ -41,7 +41,7 @@ class ContinuousValidationRunner {
     }
   }
 
-  stopScheduledRuns(): void {
+  stopScheduledRuns() {
     appLogger.info('stopScheduledRuns called (stub)')
   }
 }

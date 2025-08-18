@@ -45,7 +45,7 @@ export default function FHEChatStatus({
   )
 }
 
-function LockIcon({ className = '' }) {
+function LockIcon({ className = '' }): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +62,7 @@ function LockIcon({ className = '' }) {
   )
 }
 
-function UnlockIcon({ className = '' }) {
+function UnlockIcon({ className = '' }): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@ function UnlockIcon({ className = '' }) {
   )
 }
 
-function CheckIcon({ className = '' }) {
+function CheckIcon({ className = '' }): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@ function CheckIcon({ className = '' }) {
   )
 }
 
-function AlertIcon({ className = '' }) {
+function AlertIcon({ className = '' }): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

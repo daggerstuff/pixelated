@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@/components/ui/button'
+import { FC, Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { FC, Badge } from '@/components/ui/badge'
 import {
   BackupType,
   BackupStatus,
@@ -146,7 +146,7 @@ interface BackupStatusTabProps {
   onVerifyBackup: (backupId: string) => void
 }
 
-const BackupStatusTab: React.FC<BackupStatusTabProps> = ({
+const BackupStatusTab: FC<BackupStatusTabProps> = ({
   backups,
   onCreateBackup,
   onVerifyBackup,

@@ -1,7 +1,7 @@
 import { dlpService } from '../../../lib/security/dlp';
 
 // Function to handle rule updates
-function handleRuleUpdated(event: CustomEvent) {
+function handleRuleUpdated(event: CustomEvent): void {
   const { id, name, isActive } = event.detail;
   console.log(
     `Rule updated: ${name} (${id}) is now ${isActive ? 'active' : 'inactive'}`,
@@ -9,16 +9,16 @@ function handleRuleUpdated(event: CustomEvent) {
 }
 
 // Function to handle rule deletions
-function handleRuleDeleted(event: CustomEvent) {
+function handleRuleDeleted(event: CustomEvent): void {
   const { id, name } = event.detail;
   console.log(`Rule deleted: ${name} (${id})`);
 
   // Find and remove the deleted rule element
-  const ruleElement = document.querySelector(`[data-rule-id="${id}"]`);
+  const ruleElement = document.querySelector(`[data-rule-id="${id}"]`) as HTMLElement;
   ruleElement?.parentElement?.remove();
 
   // Check if there are no more rules after removal
-  const rulesList = document.querySelector('.rules-list .space-y-4');
+  const rulesList = document.querySelector('.rules-list .space-y-4') as HTMLElement;
   if (rulesList && rulesList.children.length === 0) {
     // Show the "No rules" message
     const noRulesCard = document.createElement('div');
@@ -35,7 +35,7 @@ function handleRuleDeleted(event: CustomEvent) {
 }
 
 // Function to handle delete button clicks
-function handleDeleteClick(e: Event) {
+function handleDeleteClick(e: Event): void {
   e.preventDefault();
   e.stopPropagation();
 

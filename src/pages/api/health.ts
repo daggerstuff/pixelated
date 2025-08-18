@@ -26,12 +26,12 @@ export const GET = async (): Promise<Response> => {
   try {
     try {
       healthStatus.services['mongodb'] = await checkMongoDBConnection()
-    } catch (error) {
+    } catch (error: unknown) {
       healthStatus.services['mongodb'] = {
         status: 'unhealthy',
         message: 'MongoDB connection failed',
         details: {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         },
       }
     }
@@ -62,7 +62,7 @@ export const GET = async (): Promise<Response> => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Health check error:', error)
 
     return new Response(
@@ -70,7 +70,7 @@ export const GET = async (): Promise<Response> => {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
         message: 'Health check failed',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         responseTime: Date.now() - startTime,
       }),
       {
@@ -100,7 +100,7 @@ async function checkMongoDBConnection(): Promise<HealthStatusDetail> {
       message: 'MongoDB connection successful',
       responseTime,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     const responseTime = Date.now() - startTime
 
     return {
@@ -108,7 +108,7 @@ async function checkMongoDBConnection(): Promise<HealthStatusDetail> {
       message: 'MongoDB connection failed',
       responseTime,
       details: {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       },
     }
   }

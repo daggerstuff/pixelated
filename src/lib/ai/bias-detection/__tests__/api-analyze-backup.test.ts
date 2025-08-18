@@ -73,7 +73,7 @@ const generateAnonymizedId = vi.fn()
 
 // Helper function to serialize mock data like JSON.stringify does for dates
 function serializeForComparison(obj: unknown): unknown {
-  return JSON.parse(JSON.stringify(obj))
+  return JSON.parse(JSON.stringify(obj) as any)
 }
 
 // Import the actual handlers - using dynamic import inside test functions
@@ -301,7 +301,7 @@ describe('Session Analysis API Endpoint', () => {
       .mockImplementation((body: string, init: { status: number }) => {
         let responseData
         try {
-          responseData = JSON.parse(body)
+          responseData = JSON.parse(body) as any
         } catch {
           responseData = { message: body }
         }

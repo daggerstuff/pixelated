@@ -255,7 +255,7 @@ export class SupportContextIdentifier {
     ],
   }
 
-  constructor(config: SupportIdentifierConfig) {
+  constructor(config: SupportIdentifierConfig): void {
     this.aiService = config.aiService
     this.model = config.model || 'claude-4-sonnet'
     this.enableEmotionalAnalysis = config.enableEmotionalAnalysis ?? true
@@ -300,17 +300,17 @@ export class SupportContextIdentifier {
         } else {
           return patternResult // Fall back to pattern result if AI failed
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('AI analysis failed, using pattern result:', {
           context: 'ai-analysis',
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
         return patternResult
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error identifying support context:', {
         context: 'support-identification',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       // Fallback to pattern-based result
@@ -637,7 +637,7 @@ Consider this context in your assessment.`
         jsonStr = content
       }
 
-      const parsed = JSON.parse(jsonStr)
+      const parsed = JSON.parse(jsonStr) as any
 
       return {
         isSupport: Boolean(parsed.isSupport),
@@ -680,10 +680,10 @@ Consider this context in your assessment.`
             : undefined,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error parsing AI response:', {
         context: 'response-parsing',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       return {

@@ -16,7 +16,7 @@ interface SentryTestProps {
   className?: string
 }
 
-export default function SentryTest({ className = '' }: SentryTestProps) {
+export default function SentryTest({ className = '' }: SentryTestProps): void {
   // Only show in development
   if (import.meta.env.PROD) {
     return null
@@ -25,7 +25,7 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
   const handleTestError = () => {
     try {
       throw new Error('Test error from Sentry Test component')
-    } catch (error) {
+    } catch (error: unknown) {
       captureError(error as Error, {
         testComponent: {
           action: 'manual_test_error',

@@ -1,10 +1,8 @@
-import React from 'react'
-
 export interface CategoryBalancingDemoProps {
   className?: string
 }
 
-export function CategoryBalancingDemo({ className }: CategoryBalancingDemoProps) {
+export function CategoryBalancingDemo({ className }: CategoryBalancingDemoProps): void {
   return (
     <div className={className}>
       <h3>Category Balancing Demo</h3>

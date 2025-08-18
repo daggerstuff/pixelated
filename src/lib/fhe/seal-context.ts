@@ -32,7 +32,7 @@ export class SealContext {
   /**
    * Create a new SealContext with the specified options
    */
-  constructor(options: SealContextOptions) {
+  constructor(options: SealContextOptions): void {
     this.contextOptions = options // Store the full options object
     this.parameters = options.params
     this.scheme = options.scheme
@@ -73,7 +73,7 @@ export class SealContext {
         const SEAL = await import('node-seal')
         this.seal = await SEAL.default()
         logger.info('Successfully loaded node-seal')
-      } catch (err) {
+      } catch (err: unknown) {
         // If node-seal is not available, try loading from window if in browser
         logger.debug('Failed to load node-seal package', { error: err })
         if (
@@ -125,10 +125,10 @@ export class SealContext {
 
       this.initialized = true
       logger.info('SEAL context initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize SEAL context', { error })
       throw new Error(
-        `SEAL initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+        `SEAL initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     } finally {
       this.loadPromise = null
@@ -263,7 +263,7 @@ export class SealContext {
     return this.contextOptions
   }
 
-  private logEncryptionParameters(): void {
+  private logEncryptionParameters() {
     logger.info('SEAL encryption parameters:', {
       scheme: this.scheme,
       polyModulusDegree: this.parameters.polyModulusDegree,
@@ -324,7 +324,7 @@ export class SealContext {
   /**
    * Check if the context is initialized
    */
-  private checkInitialized(): void {
+  private checkInitialized() {
     if (!this.initialized) {
       throw new Error('SEAL context not initialized. Call initialize() first.')
     }
@@ -334,7 +334,7 @@ export class SealContext {
    * Dispose of SEAL resources
    * This should be called when the context is no longer needed
    */
-  public dispose(): void {
+  public dispose() {
     if (this.context) {
       logger.info('Disposing SEAL context')
       ;(this.context as { delete: () => void }).delete()

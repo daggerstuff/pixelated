@@ -84,9 +84,9 @@ export async function createDataDeletionRequest(
     })
 
     return deletionRequest
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in createDataDeletionRequest', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       params,
     })
     throw error
@@ -105,9 +105,9 @@ export async function getDataDeletionRequest(
       .findOne({ id })
 
     return request as DataDeletionRequest | null
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in getDataDeletionRequest', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       id,
     })
     throw error
@@ -143,9 +143,9 @@ export async function getAllDataDeletionRequests(filters?: {
       .toArray()
 
     return requests as DataDeletionRequest[]
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in getAllDataDeletionRequests', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       filters,
     })
     throw error
@@ -205,9 +205,9 @@ export async function updateDataDeletionRequest(
     }
 
     return updatedRequest
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in updateDataDeletionRequest', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       params,
     })
     throw error
@@ -266,9 +266,9 @@ async function executeDataDeletion(
         reason: request.reason,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error executing data deletion', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       requestId: request.id,
       patientId: request.patientId,
     })
@@ -284,7 +284,7 @@ async function executeDataDeletion(
       userId: processedBy,
       details: {
         requestId: request.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       },
     })
   }

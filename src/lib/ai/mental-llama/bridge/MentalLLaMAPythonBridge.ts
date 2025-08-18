@@ -15,7 +15,7 @@ const logger = baseLogger
  */
 
 class PythonBridgeError extends Error {
-  constructor(message: string) {
+  constructor(message: string): void {
     super(message)
     this.name = 'PythonBridgeError'
   }
@@ -45,7 +45,7 @@ export class MentalLLaMAPythonBridge {
   private readonly REQUEST_TIMEOUT_MS = 20000
   public pythonBridgeDisabled: boolean = false
 
-  constructor(pythonScriptPath?: string) {
+  constructor(pythonScriptPath?: string): void {
     this.pythonScriptPath =
       pythonScriptPath || './scripts/mental_llama_python_handler.py'
     this.pythonBridgeDisabled = false
@@ -81,7 +81,7 @@ export class MentalLLaMAPythonBridge {
           .forEach((line) => {
             try {
               const response: PythonBridgeResponse & { id?: string } =
-                JSON.parse(line)
+                JSON.parse(line) as any
               if (
                 response &&
                 response.id &&
@@ -96,7 +96,7 @@ export class MentalLLaMAPythonBridge {
                   resolve(response) // Let caller handle error
                 }
               }
-            } catch (err) {
+            } catch (err: unknown) {
               logger.error('Failed to parse PythonBridge response', line, err)
             }
           })
@@ -123,7 +123,7 @@ export class MentalLLaMAPythonBridge {
       this.isFunctional = true
       logger.info('PythonBridge initialized and functional.')
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('PythonBridge initialization failed.', { error })
       this.isInitialized = true
       this.isFunctional = false

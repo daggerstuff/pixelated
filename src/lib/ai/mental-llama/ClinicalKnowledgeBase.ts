@@ -14,7 +14,7 @@ export class ClinicalKnowledgeBase {
   /**
    * Gets clinical guidelines for a specific mental health category.
    */
-  public getClinicalGuidelines(category: string) {
+  public getClinicalGuidelines(category: string): void {
     const guidelinesMap: Record<
       string,
       Array<{
@@ -539,7 +539,7 @@ export class ClinicalKnowledgeBase {
   /**
    * Gets evidence base for recommendations based on category.
    */
-  public getEvidenceBase(category: string) {
+  public getEvidenceBase(category: string): void {
     const evidenceMap: Record<
       string,
       Array<{
@@ -616,7 +616,7 @@ export class ClinicalKnowledgeBase {
         clinicalContext,
         evidenceBase,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching expert guidance', { error, category })
 
       // Return minimal guidance on error

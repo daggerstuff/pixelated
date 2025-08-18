@@ -43,7 +43,7 @@ export class UptimeMonitor {
     this.performCheck()
   }
 
-  stop(): void {
+  stop() {
     if (this.checkInterval) {
       clearInterval(this.checkInterval)
       this.checkInterval = null
@@ -76,12 +76,12 @@ export class UptimeMonitor {
       
       this.addRecord(record)
       
-    } catch (error) {
+    } catch (error: unknown) {
       const record: UptimeRecord = {
         timestamp: new Date().toISOString(),
         status: 'down',
         responseTime: performance.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? String(error) : 'Unknown error'
       }
       
       this.addRecord(record)
@@ -150,19 +150,19 @@ export class UptimeMonitor {
     return this.getUptimePercentage(periodHours) >= targetUptime
   }
 
-  private loadRecords(): void {
+  private loadRecords() {
     try {
       if (existsSync(this.dataFile)) {
         const data = readFileSync(this.dataFile, 'utf8')
-        this.records = JSON.parse(data)
+        this.records = JSON.parse(data) as any
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to load uptime records:', error)
       this.records = []
     }
   }
 
-  private saveRecords(): void {
+  private saveRecords() {
     try {
       // Ensure logs directory exists
       const logsDir = join(process.cwd(), 'logs')
@@ -172,7 +172,7 @@ export class UptimeMonitor {
       }
       
       writeFileSync(this.dataFile, JSON.stringify(this.records, null, 2))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to save uptime records:', error)
     }
   }

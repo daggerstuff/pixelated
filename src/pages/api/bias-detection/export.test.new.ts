@@ -455,7 +455,7 @@ describe('Bias Detection Export API Endpoint', () => {
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => ({
           status: init?.status || 500,
-          json: vi.fn().mockResolvedValue(JSON.parse(body)),
+          json: vi.fn().mockResolvedValue(JSON.parse(body) as any),
           headers: { get: vi.fn(() => 'application/json') },
         })) as unknown as typeof Response
 

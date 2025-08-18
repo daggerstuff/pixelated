@@ -33,12 +33,12 @@ export const GET = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({ 
         success: false,
         error: 'Failed to fetch todos',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? String(error) : 'Unknown error'
       }),
       {
         status: 500,
@@ -92,12 +92,12 @@ export const POST = async ({ request }) => {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({ 
         success: false,
         error: 'Failed to create todo',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? String(error) : 'Unknown error'
       }),
       {
         status: 500,

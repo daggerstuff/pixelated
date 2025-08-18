@@ -11,7 +11,7 @@ export class InMemoryStorageProvider implements StorageProvider {
   private storage: Map<string, Uint8Array> = new Map()
   private initialized = false
 
-  constructor(private config: StorageProviderConfig) {}
+  constructor(private config: StorageProviderConfig): void {}
 
   async initialize(): Promise<void> {
     this.initialized = true
@@ -68,7 +68,7 @@ export class InMemoryStorageProvider implements StorageProvider {
     this.storage.delete(key)
   }
 
-  private checkInitialized(): void {
+  private checkInitialized() {
     if (!this.initialized) {
       throw new Error('Storage provider not initialized')
     }

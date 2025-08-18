@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card'
-import { Input } from '../ui/input'
+import { FC, Input } from '../ui/input'
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { Button } from '../ui/button'
+import { FC, Button } from '../ui/button'
 import {
   Table as UITable,
   TableBody,
@@ -32,7 +32,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { format } from 'date-fns'
+import { FC, format } from 'date-fns'
 
 export interface AuditLogEntry {
   id: string
@@ -47,7 +47,7 @@ export interface AuditLogEntry {
 }
 
 // Simple Table wrapper that doesn't require the complex props
-const Table: React.FC<React.PropsWithChildren> = ({ children }) => {
+const Table: FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <UITable
       columns={[]}
@@ -145,7 +145,7 @@ export function AuditLogDashboard() {
       }
 
       setLogs(fetchedLogs)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching audit logs:', error)
     } finally {
       setLoading(false)

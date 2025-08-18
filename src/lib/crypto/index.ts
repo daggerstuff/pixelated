@@ -100,11 +100,11 @@ class RedisStorageProvider implements StorageProvider {
   private client: RedisClientType
   private connected = false
 
-  constructor(redisUrl: string) {
+  constructor(redisUrl: string): void {
     this.client = createClient({ url: redisUrl })
 
     this.client.on('error', (err) => {
-      logger.error('Redis connection error', { error: err.message })
+      logger.error('Redis connection error', { error: (err as Error)?.message || String(err) })
       this.connected = false
     })
 
@@ -198,10 +198,10 @@ class SecureStorageProvider implements StorageProvider {
       }
 
       return Buffer.from(response.Plaintext).toString('utf8')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to decrypt key from secure storage', {
         key,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return null
     }
@@ -223,10 +223,10 @@ class SecureStorageProvider implements StorageProvider {
         'base64',
       )
       await this.fallbackProvider.set(key, encryptedBase64, ttlSeconds)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to encrypt key in secure storage', {
         key,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -262,9 +262,9 @@ class SecureStorageProvider implements StorageProvider {
         plaintext: Buffer.from(response.Plaintext).toString('hex'),
         ciphertext: Buffer.from(response.CiphertextBlob).toString('base64'),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('KMS data key generation failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -320,12 +320,12 @@ export function decrypt(data: string, key: string): string {
     }
 
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Decryption failed', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     throw new Error(
-      `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Decryption failed: ${error instanceof Error ? String(error) : String(error)}`,
     )
   }
 }
@@ -361,7 +361,7 @@ export function createHMAC(data: string, key: string): string {
  * Key rotation manager for handling key lifecycle
  */
 export class KeyRotationManager {
-  constructor(private readonly rotationDays: number = 90) {}
+  constructor(private readonly rotationDays: number = 90): void {}
 
   needsRotation(createdAt: number): boolean {
     const ageMs = Date.now() - createdAt
@@ -427,8 +427,8 @@ export class KeyStorage {
       const keyDataJson = await this.storageProvider.get(storageKey)
       if (keyDataJson) {
         try {
-          return JSON.parse(keyDataJson) as KeyData
-        } catch (error) {
+          return JSON.parse(keyDataJson) as any as KeyData
+        } catch (error: unknown) {
           logger.error('Failed to parse key data', { keyId, error })
         }
       }
@@ -517,7 +517,7 @@ export interface CryptoSystemOptions {
 /**
  * Comprehensive crypto system factory
  */
-export function createCryptoSystem(options: CryptoSystemOptions = {}) {
+export function createCryptoSystem(options: CryptoSystemOptions = {}): void {
   const {
     namespace = 'app',
     useSecureStorage = false,

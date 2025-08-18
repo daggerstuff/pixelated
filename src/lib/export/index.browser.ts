@@ -112,7 +112,7 @@ interface JWEHeader {
  * Custom error class for export-related errors
  */
 class ExportError extends Error {
-  constructor(message: string) {
+  constructor(message: string): void {
     super(message)
     this.name = 'ExportError'
   }
@@ -131,7 +131,7 @@ export class ExportService {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(fheService: FHEServiceInterface) {
+  private constructor(fheService: FHEServiceInterface): void {
     this.fheService = fheService
     logger.info('Export service (browser) initialized')
     this.options = { ...DEFAULT_EXPORT_OPTIONS }
@@ -168,7 +168,7 @@ export class ExportService {
       logger.info('Export service initialized successfully')
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? String(error) : String(error)
       logger.error('Failed to initialize export service', {
         error: errorMessage,
       })
@@ -244,7 +244,7 @@ export class ExportService {
       }
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? String(error) : String(error)
       logger.error('Failed to export conversation', { error: errorMessage })
       throw new Error(`Export failed: ${errorMessage}`)
     }
@@ -307,17 +307,17 @@ export class ExportService {
           }
 
           return JSON.stringify(jwe, null, 2)
-        } catch (err) {
+        } catch (err: unknown) {
           throw new Error(
-            `Encryption failed: ${err instanceof Error ? err.message : String(err)}`,
+            `Encryption failed: ${err instanceof Error ? (err as Error)?.message || String(err) : String(err)}`,
           )
         }
       }
 
       return jsonData
-    } catch (error) {
+    } catch (error: unknown) {
       throw new ExportError(
-        `JSON export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `JSON export failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
       )
     }
   }

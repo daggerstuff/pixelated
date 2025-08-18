@@ -22,7 +22,7 @@ export async function initializeApplication(): Promise<void> {
     await initializeSecurity()
 
     logger.info('Application initialization complete')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Failed to initialize application',
       error as Record<string, unknown>,
@@ -45,7 +45,7 @@ export async function shutdownApplication(): Promise<void> {
     // - Clean up resources
 
     logger.info('Application shutdown complete')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Error during application shutdown',
       error as Record<string, unknown>,

@@ -14,7 +14,7 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+  constructor(props: Props): void {
     super(props)
     this.state = {
       hasError: false,
@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Log error to error reporting service
     console.error('Error caught by boundary:', error, errorInfo)
 
@@ -77,7 +77,7 @@ export function withErrorBoundary<T extends object>(
   Component: React.ComponentType<T>,
   options: Omit<Props, 'children'> = {},
 ): React.FC<T> {
-  return function WithErrorBoundaryWrapper(props: T) {
+  return function WithErrorBoundaryWrapper(props: T): void {
     return (
       <ErrorBoundary {...options}>
         <Component {...props} />

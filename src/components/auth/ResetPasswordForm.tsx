@@ -6,7 +6,7 @@ interface ResetPasswordFormProps {
   email: string
 }
 
-export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
+export function ResetPasswordForm({ token, email }: ResetPasswordFormProps): void {
   const { verifyOtp } = useAuth()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -50,7 +50,7 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
         )
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'An error occurred'
+      const message = err instanceof Error ? (err as Error)?.message || String(err) : 'An error occurred'
       setError(message)
 
       // Dispatch error event

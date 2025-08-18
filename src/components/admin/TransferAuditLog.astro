@@ -294,7 +294,7 @@ const getEncryptionClass = (verified: boolean) => {
 
 <script>
   // Initialize filters and search functionality
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     const searchInput = document.getElementById('search')
     const statusFilter = document.getElementById('status-filter')
     const dateFilter = document.getElementById('date-filter')
@@ -303,21 +303,21 @@ const getEncryptionClass = (verified: boolean) => {
     // For demonstration purposes, we'll just log the filter changes
 
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
+      searchInput.addEventListener('input', (e: Event) => {
         const searchTerm = (e.target as HTMLInputElement).value
         console.log('Search term:', searchTerm)
       })
     }
 
     if (statusFilter) {
-      statusFilter.addEventListener('change', (e) => {
+      statusFilter.addEventListener('change', (e: Event) => {
         const status = (e.target as HTMLSelectElement).value
         console.log('Status filter:', status)
       })
     }
 
     if (dateFilter) {
-      dateFilter.addEventListener('change', (e) => {
+      dateFilter.addEventListener('change', (e: Event) => {
         const days = (e.target as HTMLSelectElement).value
         console.log('Date filter:', days)
       })

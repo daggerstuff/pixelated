@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { z } from 'zod'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { auth } from '../../../lib/auth'
@@ -111,7 +110,7 @@ export const POST = async ({ request }) => {
       }),
       { status: 201, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error creating export request', { error })
 
     return new Response(

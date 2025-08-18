@@ -142,13 +142,13 @@ export const GET = async ({ request }) => {
         },
       },
     );
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error exporting documentation:', error);
 
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

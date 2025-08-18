@@ -33,7 +33,7 @@ export async function protectApi(request: Request): Promise<AuthResult> {
       success: true,
       userId: 'user-id-placeholder',
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('API authentication error:', error)
     return {
       success: false,

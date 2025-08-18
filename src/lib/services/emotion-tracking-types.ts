@@ -108,14 +108,14 @@ export class EmotionTrackingError extends Error {
 }
 
 export class ValidationError extends EmotionTrackingError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'VALIDATION_ERROR', details)
     this.name = 'ValidationError'
   }
 }
 
 export class FetchError extends EmotionTrackingError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'FETCH_ERROR', details)
     this.name = 'FetchError'
   }

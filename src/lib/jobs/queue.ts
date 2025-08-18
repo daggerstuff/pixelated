@@ -114,7 +114,7 @@ export class JobQueueService {
       return null
     }
 
-    const job: Job = JSON.parse(jobString[0].value)
+    const job: Job = JSON.parse(jobString[0].value) as any
     job.status = JobStatus.IN_PROGRESS
     job.startedAt = new Date().toISOString()
     job.updatedAt = new Date().toISOString()
@@ -142,7 +142,7 @@ export class JobQueueService {
 
     if (currentJobString) {
       job = {
-        ...JSON.parse(currentJobString),
+        ...JSON.parse(currentJobString) as any,
         ...updates,
         status,
         updatedAt: new Date().toISOString(),
@@ -199,7 +199,7 @@ export class JobQueueService {
    */
   async getJobStatus(jobId: string): Promise<Job | null> {
     const jobString = await redis.hget(this.jobStatusKeyPrefix + jobId, jobId)
-    return jobString ? JSON.parse(jobString) : null
+    return jobString ? JSON.parse(jobString) as any : null
   }
 
   /**
@@ -237,13 +237,13 @@ export class JobQueueService {
         // Cancelled jobs are currently stored in failedKey
         jobStrings = Object.values(await redis.hgetall(this.failedKey))
         jobStrings = jobStrings.filter(
-          (jobStr) => JSON.parse(jobStr).status === JobStatus.CANCELLED,
+          (jobStr) => JSON.parse(jobStr) as any.status === JobStatus.CANCELLED,
         )
         break
       default:
         return []
     }
-    return jobStrings.map((jobString) => JSON.parse(jobString))
+    return jobStrings.map((jobString) => JSON.parse(jobString) as any)
   }
 
   /**
@@ -255,7 +255,7 @@ export class JobQueueService {
       case JobStatus.PENDING: {
         const pendingJobs = await redis.zrange(this.queueKey, 0, -1)
         jobIds = pendingJobs.map((jobStr) => {
-          const job = JSON.parse(jobStr) as Job
+          const job = JSON.parse(jobStr) as any as Job
           return job.id
         })
         break
@@ -273,9 +273,9 @@ export class JobQueueService {
         const cancelledJobs = Object.values(await redis.hgetall(this.failedKey))
         jobIds = cancelledJobs
           .filter(
-            (jobStr: string) => JSON.parse(jobStr).status === JobStatus.CANCELLED,
+            (jobStr: string) => JSON.parse(jobStr) as any.status === JobStatus.CANCELLED,
           )
-          .map((jobStr: string) => JSON.parse(jobStr).id)
+          .map((jobStr: string) => JSON.parse(jobStr) as any.id)
         break
       }
       default:
@@ -328,7 +328,7 @@ export class JobQueueService {
     // Need to filter failedKey for actual cancelled jobs if they are stored there
     const allFailedJobs = Object.values(await redis.hgetall(this.failedKey))
     const cancelledCount = allFailedJobs.filter((jobStr) => {
-      const job = JSON.parse(jobStr) as Job
+      const job = JSON.parse(jobStr) as any as Job
       return job.status === JobStatus.CANCELLED
     }).length
     const actualFailedCount = failed - cancelledCount

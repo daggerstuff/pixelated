@@ -241,7 +241,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       .mockImplementation((body: string, init?: ResponseInit) => {
         let responseData
         try {
-          responseData = JSON.parse(body)
+          responseData = JSON.parse(body) as any
         } catch {
           responseData = { error: 'Invalid JSON' }
         }
@@ -354,7 +354,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => ({
           status: init?.status || 500,
-          json: vi.fn().mockResolvedValue(JSON.parse(body)),
+          json: vi.fn().mockResolvedValue(JSON.parse(body) as any),
           headers: {
             get: vi.fn((_key: string) => 'application/json'),
           },
@@ -372,7 +372,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to fetch dashboard data',
         expect.objectContaining({
-          error: error.message,
+          error: String(error),
         }),
       )
     })
@@ -480,7 +480,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         .fn()
         .mockImplementation((body: string, init?: ResponseInit) => ({
           status: init?.status || 500,
-          json: vi.fn().mockResolvedValue(JSON.parse(body)),
+          json: vi.fn().mockResolvedValue(JSON.parse(body) as any),
           headers: {
             get: vi.fn((_key: string) => 'application/json'),
           },

@@ -19,17 +19,17 @@
  */
 
 import type React from 'react';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { FC, useState, useEffect, useCallback, useRef } from 'react';
 
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert } from '@/components/ui/alert';
+import { FC, Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FC, Button } from '@/components/ui/button';
+import { FC, Badge } from '@/components/ui/badge';
+import { FC, Progress } from '@/components/ui/progress';
+import { FC, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FC, Alert } from '@/components/ui/alert';
 // Use lazy-loaded chart components to reduce bundle size
 import {
   XAxis,
@@ -74,7 +74,7 @@ import {
   Info,
   CheckCircle,
 } from 'lucide-react';
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger';
+import { FC, createBuildSafeLogger } from '@/lib/logging/build-safe-logger';
 import type { BiasDashboardData, BiasAnalysisResult, DashboardRecommendation } from '@/lib/ai/bias-detection';
 
 const logger = createBuildSafeLogger('bias-dashboard');
@@ -155,7 +155,7 @@ interface TooltipProps {
   label?: string
 }
 
-export const BiasDashboard: React.FC<BiasDashboardProps> = ({
+export const BiasDashboard: FC<BiasDashboardProps> = ({
   className = '',
   refreshInterval = 30000, // 30 seconds
   enableRealTimeUpdates = true,
@@ -565,7 +565,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         }
 
         logger.info('Alert action completed', { alertId, action, notes })
-      } catch (err) {
+      } catch (err: unknown) {
         logger.error('Failed to perform alert action', {
           error: err,
           alertId,
@@ -592,7 +592,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         await Promise.all(promises)
         setSelectedAlerts(new Set()) // Clear selection
         logger.info(`Bulk ${action} completed`, { count: alertIds.length })
-      } catch (err) {
+      } catch (err: unknown) {
         logger.error('Failed to perform bulk alert action', {
           error: err,
           action,
@@ -656,7 +656,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         }
 
         logger.info('Notification settings updated', updatedSettings)
-      } catch (err) {
+      } catch (err: unknown) {
         logger.error('Failed to update notification settings', { error: err })
         // Revert on error
         setNotificationSettings(notificationSettings)
@@ -682,7 +682,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       logger.info('Test notification sent')
       // Show success message (in real app, use toast notification)
       alert('Test notification sent successfully!')
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error('Failed to send test notification', { error: err })
       alert('Failed to send test notification')
     }
@@ -716,8 +716,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         averageBiasScore: data.summary.averageBiasScore,
         alertsCount: data.alerts.length,
       })
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? (err as Error)?.message || String(err) : 'Unknown error'
       setError(errorMessage)
       logger.error('Failed to fetch dashboard data', { error: errorMessage })
     } finally {
@@ -749,7 +749,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           setWsConnectionStatus('connected')
           setWsReconnectAttempts(0)
           reconnectAttempts = 0 // Reset attempts on successful connection
-          announceToScreenReader('Live updates connected')
+          // Use distinct message for screen readers to avoid duplicating visible label text
+          announceToScreenReader('Live updates connection established')
           logger.info('WebSocket connection established', { url: wsUrl })
 
           // Send initial subscription message
@@ -773,7 +774,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
         ws.onclose = (event) => {
           setWsConnected(false)
-          announceToScreenReader('Live updates disconnected')
+          // Use distinct message for screen readers
+          announceToScreenReader('Live updates connection closed')
           logger.info('WebSocket connection closed', {
             code: event.code,
             reason: event.reason,
@@ -811,12 +813,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           setWsConnectionStatus('error')
           setWsConnected(false)
           logger.error('WebSocket error', { error })
-          announceToScreenReader('Live updates connection error')
+          // Keep error message distinct from visible label 'Live updates failed'
+          announceToScreenReader('Live updates encountered a connection error')
         }
 
         ws.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data)
+            const data = JSON.parse(event.data) as any
 
             // Handle different types of real-time updates
             switch (data.type) {
@@ -920,7 +923,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
             // Update last updated timestamp
             setLastUpdated(new Date())
-          } catch (error) {
+          } catch (error: unknown) {
             logger.error('Failed to process WebSocket message', {
               error,
               rawData: event.data,
@@ -938,7 +941,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         // Store interval reference for cleanup
         // Store interval reference for cleanup using extended interface
         ;(ws as ExtendedWebSocket).heartbeatInterval = heartbeatInterval
-      } catch (error) {
+      } catch (error: unknown) {
         setWsConnectionStatus('error')
         logger.error('Failed to create WebSocket connection', { error })
         setWsConnected(false)
@@ -950,15 +953,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     return () => {
       if (wsRef.current) {
         // Clear heartbeat interval
-        if (wsRef.current.heartbeatInterval) {
-          clearInterval(wsRef.current.heartbeatInterval)
+        if ((wsRef.current as ExtendedWebSocket).heartbeatInterval) {
+          clearInterval((wsRef.current as ExtendedWebSocket).heartbeatInterval!)
         }
-
-        // Close connection gracefully
+        // Attempt graceful unsubscribe
         if (wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({ type: 'unsubscribe' }))
+          try {
+            wsRef.current?.send(JSON.stringify({ type: 'unsubscribe' }))
+          } catch {
+            // Intentionally ignore errors during WebSocket unsubscribe/close
+          }
         }
-
         wsRef.current.close(1000, 'Component unmounting')
         wsRef.current = null
       }
@@ -973,8 +978,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
   // Update WebSocket subscription when filters change
   useEffect(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current?.send(
         JSON.stringify({
           type: 'update_subscription',
           filters: {
@@ -1194,8 +1199,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         dateRange: exportDateRange,
         filename,
       })
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Export failed'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? (err as Error)?.message || String(err) : 'Export failed'
       setExportProgress({
         isExporting: false,
         progress: 0,
@@ -1378,13 +1383,23 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   }
 
   const {
-    summary,
+    summary = {
+      totalSessions: 0,
+      averageBiasScore: 0,
+      highBiasSessions: 0,
+      totalAlerts: 0,
+      complianceScore: 0,
+    },
     recentAnalyses = [],
     alerts = [],
     trends = [],
-    demographics,
+    demographics = { age: {}, gender: {}, ethnicity: {} } as unknown as {
+      age: Record<string, number>
+      gender: Record<string, number>
+      ethnicity: Record<string, number>
+    },
     recommendations = [],
-  } = dashboardData
+  } = dashboardData || {}
 
   // Apply filters to data
   const filteredTrends =
@@ -2808,7 +2823,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                       <Pie
-                        data={Object.entries(demographics.age).map(
+                        data={Object.entries(demographics.age ?? {}).map(
                           ([age, count]) => ({
                             name: age,
                             value: count,
@@ -2825,13 +2840,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         animationDuration={1000}
                         animationBegin={0}
                       >
-                        {Object.entries(demographics.age).map(
+                        {Object.entries(demographics.age ?? {}).map(
                           ([age, count], index) => (
                             <Cell
                               key={`age-${age}-${count}`}
                               fill={getChartColors(
                                 index,
-                                Object.keys(demographics.age).length,
+                                Object.keys(demographics.age ?? {}).length,
                               )}
                             />
                           ),
@@ -2872,7 +2887,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                       <Pie
-                        data={Object.entries(demographics.gender).map(
+                        data={Object.entries(demographics.gender ?? {}).map(
                           ([gender, count]) => ({
                             name: gender,
                             value: count,
@@ -2889,13 +2904,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         animationDuration={1000}
                         animationBegin={0}
                       >
-                        {Object.entries(demographics.gender).map(
+                        {Object.entries(demographics.gender ?? {}).map(
                           ([gender, count], index) => (
                             <Cell
                               key={`gender-${gender}-${count}`}
                               fill={getChartColors(
                                 index,
-                                Object.keys(demographics.gender).length,
+                                Object.keys(demographics.gender ?? {}).length,
                               )}
                             />
                           ),
@@ -2936,7 +2951,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
-                    data={Object.entries(demographics.ethnicity).map(
+                    data={Object.entries(demographics.ethnicity ?? {}).map(
                       ([ethnicity, count]) => ({
                         ethnicity,
                         count,

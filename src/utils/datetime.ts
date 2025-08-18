@@ -3,7 +3,7 @@ import { SITE } from '@/config'
 /**
  * Formats a given date into a human-readable string.
  */
-export function formatDate(d: Date | string, showYear = true, useUTC = false) {
+export function formatDate(d: Date | string, showYear = true, useUTC = false): void {
   const date = typeof d === 'string' ? new Date(d) : d
   if (Number.isNaN(date.getTime())) {
     throw new Error('Invalid Date')
@@ -22,7 +22,7 @@ export function formatDate(d: Date | string, showYear = true, useUTC = false) {
 /**
  * Gets the year from a given date.
  */
-export function getYear(a: Date | string | number) {
+export function getYear(a: Date | string | number): void {
   return new Date(a).getFullYear()
 }
 
@@ -51,7 +51,7 @@ export function getCurrentFormattedTime() {
 /**
  * Check if the current time is in the same month as the previous time
  */
-export function isDiffMonth(currentTime: string, preTime?: string) {
+export function isDiffMonth(currentTime: string, preTime?: string): void {
   return preTime
     ? new Date(currentTime).getMonth() !== new Date(preTime!).getMonth()
     : false

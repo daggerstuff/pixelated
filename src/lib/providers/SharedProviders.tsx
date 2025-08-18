@@ -76,7 +76,7 @@ export function withSharedProviders<T extends object>(
   Component: React.ComponentType<T>,
   options: Omit<SharedProvidersProps, 'children'> = {},
 ): React.FC<T> {
-  return function WithSharedProvidersWrapper(props: T) {
+  return function WithSharedProvidersWrapper(props: T): void {
     return (
       <SharedProviders {...options}>
         <Component {...props} />

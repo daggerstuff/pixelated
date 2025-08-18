@@ -522,11 +522,11 @@ const getStatusBadge = (status: string) => {
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     // Generate report button handler
     const generateReportBtn = document.getElementById('generate-report-btn')
     if (generateReportBtn) {
-      generateReportBtn.addEventListener('click', () => {
+      generateReportBtn.addEventListener('click', (: Event) => {
         const title =
           (document.getElementById('report-title') as HTMLInputElement)
             ?.value || 'Untitled Report'
@@ -547,7 +547,7 @@ const getStatusBadge = (status: string) => {
     )
     generateNowButtons.forEach((button) => {
       if (button.textContent?.trim() === 'Generate Now') {
-        button.addEventListener('click', (e: Event) => {
+        button.addEventListener('click', (e: Event: Event) => {
           const reportElement = (e.currentTarget as HTMLElement).closest(
             'div[class*="border"]',
           )

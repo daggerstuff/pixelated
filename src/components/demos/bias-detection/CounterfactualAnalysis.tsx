@@ -11,7 +11,7 @@ interface CounterfactualAnalysisProps {
   originalSession: SessionData | null
 }
 
-export const CounterfactualAnalysis: React.FC<CounterfactualAnalysisProps> = ({
+export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
   scenarios,
   originalSession,
 }) => {

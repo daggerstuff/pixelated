@@ -88,12 +88,12 @@ export const GET: APIRoute = async ({ params, locals }: APIContext) => {
     }
 
     return new Response(JSON.stringify(plan), { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(`Error fetching treatment plan:`, error)
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch treatment plan.',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       { status: 500 },
     )
@@ -153,12 +153,12 @@ export const PUT: APIRoute = async ({ params, request, locals }: APIContext) => 
     }
 
     return new Response(JSON.stringify(updatedPlan), { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(`Error updating treatment plan:`, error)
     return new Response(
       JSON.stringify({
         error: 'Failed to update treatment plan.',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       { status: 500 },
     )

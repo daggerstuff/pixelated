@@ -85,9 +85,9 @@ export class AzureMongoIntegration {
       })
 
       return session
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Azure AD + MongoDB authentication failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -184,11 +184,11 @@ export class AzureMongoIntegration {
         roles,
         metadata: mongoUser['metadata'],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error creating/updating MongoDB user', {
         azureId: azureUser.id,
         email: azureUser.email,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -211,10 +211,10 @@ export class AzureMongoIntegration {
         refreshToken: azureResult.tokens.refreshToken || '',
         expiresAt: azureResult.tokens.expiresAt,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error creating MongoDB session', {
         userId: user.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -273,9 +273,9 @@ export class AzureMongoIntegration {
         refreshToken: newTokens.refreshToken || refreshToken,
         expiresAt: newTokens.expiresAt,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error refreshing session', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -309,10 +309,10 @@ export class AzureMongoIntegration {
       logger.info('User signed out', { userId })
 
       return logoutUrl
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during sign out', {
         userId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -352,10 +352,10 @@ export class AzureMongoIntegration {
         roles,
         metadata: user['metadata'],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting user by ID', {
         userId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return null
     }

@@ -113,7 +113,7 @@ export function isMetric(value: unknown): value is Metric {
 
 export function isValidEventJson(json: string): boolean {
   try {
-    const parsed = JSON.parse(json)
+    const parsed = JSON.parse(json) as any
     return isEvent(parsed)
   } catch {
     return false
@@ -122,7 +122,7 @@ export function isValidEventJson(json: string): boolean {
 
 export function isValidMetricJson(json: string): boolean {
   try {
-    const parsed = JSON.parse(json)
+    const parsed = JSON.parse(json) as any
     return isMetric(parsed)
   } catch {
     return false
@@ -142,14 +142,14 @@ export class AnalyticsError extends Error {
 }
 
 export class ValidationError extends AnalyticsError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'VALIDATION_ERROR', details)
     this.name = 'ValidationError'
   }
 }
 
 export class ProcessingError extends AnalyticsError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'PROCESSING_ERROR', details)
     this.name = 'ProcessingError'
   }

@@ -40,7 +40,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Get bias detection analysis
    */
-  async analyzeBias(conversationTranscript: string) {
+  async analyzeBias(conversationTranscript: string): void {
     const prompt = `Analyze this therapeutic conversation for potential biases (cultural, gender, racial, socioeconomic): ${conversationTranscript}`;
     return this.sendMessage(prompt, 'bias_detection');
   }
@@ -70,7 +70,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Generate assessment criteria for a scenario
    */
-  async generateAssessment(scenarioId: string, difficulty: string) {
+  async generateAssessment(scenarioId: string, difficulty: string): void {
     const prompt = `Generate assessment criteria and rubric for scenario ${scenarioId} at ${difficulty} difficulty level`;
     return this.sendMessage(prompt, 'assessment_generation');
   }
@@ -78,7 +78,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Send message to the Azure AI Agent
    */
-  async sendMessage(message: string, context: string) {
+  async sendMessage(message: string, context: string): void {
     try {
       const response = await fetch(`${this.agentEndpoint}/chat`, {
         method: 'POST',
@@ -107,11 +107,11 @@ export class PixelatedEmpathyAgent {
         metadata: data.metadata || {},
         conversation_id: data.conversation_id
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Azure AI Agent error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? String(error) : 'Unknown error',
         response: null
       };
     }
@@ -120,7 +120,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Stream conversation with the agent (for real-time interactions)
    */
-  async *streamConversation(message: string, context: string = 'general') {
+  async *streamConversation(message: string, context: string = 'general'): void {
     try {
       const response = await fetch(`${this.agentEndpoint}/stream`, {
         method: 'POST',
@@ -157,7 +157,7 @@ export class PixelatedEmpathyAgent {
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               try {
-                const data = JSON.parse(line.slice(6));
+                const data = JSON.parse(line.slice(6) as any);
                 yield data;
               } catch {
                 // Skip invalid JSON
@@ -168,9 +168,9 @@ export class PixelatedEmpathyAgent {
       } finally {
         reader.releaseLock();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Stream error:', error);
-      yield { error: error instanceof Error ? error.message : 'Stream error' };
+      yield { error: error instanceof Error ? String(error) : 'Stream error' };
     }
   }
 }

@@ -795,7 +795,7 @@ const complianceMetrics = {
       Object.entries(elements).forEach(([key, element]) => {
         if (element) {
           const eventType = key === 'search' ? 'input' : 'change'
-          element.addEventListener(eventType, (e: Event) => {
+          element.addEventListener(eventType, (e: Event: Event) => {
             const target = e.target as HTMLInputElement | HTMLSelectElement;
             this._filters[key as keyof FilterState] = target.value;
             
@@ -1113,7 +1113,7 @@ const complianceMetrics = {
   }
   
   // Initialize the enterprise system when DOM is ready
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     const manager = new PatientRightsManager()
     // Store reference for potential cleanup
     ;(window as any).patientRightsManager = manager

@@ -34,7 +34,7 @@ let currentLogLevel =
 /**
  * Creates a logger with the given context
  */
-export function createLogger(options: LogOptions = {}) {
+export function createLogger(options: LogOptions = {}): void {
   const opts = { ...DEFAULT_OPTIONS, ...options }
 
   return {
@@ -110,7 +110,7 @@ function logMessage(
 export const logger = createLogger()
 
 // Export a function to set the global log level
-export function setLogLevel(level: LogLevel) {
+export function setLogLevel(level: LogLevel): void {
   currentLogLevel = level
   logger.setLevel(level)
 }

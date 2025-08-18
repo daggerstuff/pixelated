@@ -82,9 +82,9 @@ export const GET: APIRoute = async ({ params, request }) => {
         'X-Verification-Token': exportData.verificationToken || '',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Export download API error:', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return new Response(JSON.stringify({ error: 'Download failed' }), {
       status: 500,

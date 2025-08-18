@@ -63,7 +63,7 @@ const initialReducedMotion = false
     // Listen for scheme changes
     window
       .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', (e) => {
+      .addEventListener('change', (e: Event) => {
         document.documentElement.style.setProperty(
           '--prefers-dark-mode',
           e.matches ? 'true' : 'false',
@@ -73,7 +73,7 @@ const initialReducedMotion = false
 
     window
       .matchMedia('(prefers-reduced-motion: reduce)')
-      .addEventListener('change', (e) => {
+      .addEventListener('change', (e: Event) => {
         document.documentElement.style.setProperty(
           '--prefers-reduced-motion',
           e.matches ? 'true' : 'false',

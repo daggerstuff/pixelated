@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { FC, Button } from '@/components/ui/button'
 import {
   Card,
   CardHeader,
@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { FC, Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -15,10 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
+import { FC, Label } from '@/components/ui/label'
 import type { BackupType } from '../../../lib/security/backup/types'
-import { StorageLocation } from '../../../lib/security/backup/backup-types'
-import { Switch } from '@/components/ui/switch'
+import { FC, StorageLocation } from '../../../lib/security/backup/backup-types'
+import { FC, Switch } from '@/components/ui/switch'
 
 interface BackupTypeConfig {
   schedule: string
@@ -48,7 +48,7 @@ interface BackupConfigurationTabProps {
   onUpdateConfig: (config: BackupConfig) => void
 }
 
-const BackupConfigurationTab: React.FC<BackupConfigurationTabProps> = ({
+const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
   config,
   onUpdateConfig,
 }) => {

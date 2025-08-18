@@ -51,7 +51,7 @@ describe('DashboardLayout', () => {
 
     // Check default title and description
     expect(document.title).toBe('Pixelated Empathy | Dashboard')
-    expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
+    expect(document.querySelector('meta[name="description"]') as HTMLElement).toHaveAttribute(
       'content',
       'Advanced therapeutic tools for mental health professionals',
     )
@@ -72,7 +72,7 @@ describe('DashboardLayout', () => {
 
     // Check custom title and description
     expect(document.title).toBe('Custom Title')
-    expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
+    expect(document.querySelector('meta[name="description"]') as HTMLElement).toHaveAttribute(
       'content',
       'Custom description',
     )
@@ -95,11 +95,11 @@ describe('DashboardLayout', () => {
   })
 
   it('renders with meta image and type', async () => {
-    expect(document.querySelector('meta[property="og:image"]')).toHaveAttribute(
+    expect(document.querySelector('meta[property="og:image"]') as HTMLElement).toHaveAttribute(
       'content',
       '/custom-image.png',
     )
-    expect(document.querySelector('meta[property="og:type"]')).toHaveAttribute(
+    expect(document.querySelector('meta[property="og:type"]') as HTMLElement).toHaveAttribute(
       'content',
       'article',
     )

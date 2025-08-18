@@ -63,7 +63,7 @@ export async function getCurrentUser(
       lastLogin: user.lastLogin,
       metadata: (user.profile as Record<string, unknown>) || {},
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting current user:', error)
     return null
   }
@@ -93,7 +93,7 @@ export async function isAuthenticated(
     // For now, just having valid tokens is enough
     // In production, you'd validate the tokens
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error checking authentication:', error)
     return false
   }
@@ -134,7 +134,7 @@ export async function createAuthAuditLog(entry: {
       eventType: AuditEventType.SECURITY,
       status: AuditEventStatus.SUCCESS,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error logging auth audit event:', error)
   }
 }
@@ -213,7 +213,7 @@ export async function requireRole({
 }
 
 export class Auth {
-  async verifySession(request: Request) {
+  async verifySession(request: Request): void {
     const cookies = this.getCookiesFromRequest(request)
     const user = await getCurrentUser(cookies)
     return user ? { userId: user.id } : null

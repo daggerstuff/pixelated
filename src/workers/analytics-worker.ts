@@ -73,7 +73,7 @@ async function startWorker() {
         // Wait for authentication message
         ws.once('message', async (data) => {
           try {
-            const message = JSON.parse(data.toString())
+            const message = JSON.parse(data.toString() as any)
             if (message.type === 'authenticate' && message.userId) {
               // Register client for real-time updates
               serviceRef.registerClient(message.userId, ws)
@@ -87,12 +87,12 @@ async function startWorker() {
             } else {
               ws.close()
             }
-          } catch (error) {
+          } catch (error: unknown) {
             logger.error('Error handling WebSocket message:', error)
             ws.close()
           }
         })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error handling WebSocket connection:', error)
         ws.close()
       }
@@ -112,7 +112,7 @@ async function startWorker() {
     const processEvents = async () => {
       try {
         await analyticsService.processEvents()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error processing analytics events:', error)
       }
       
@@ -126,7 +126,7 @@ async function startWorker() {
     const cleanup = async () => {
       try {
         await analyticsService.cleanup()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error during analytics cleanup:', error)
       }
       
@@ -147,14 +147,14 @@ async function startWorker() {
     }
 
     logger.info(`Analytics worker started successfully on port ${WS_PORT}`)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error starting analytics worker:', error)
     process.exit(1)
   }
 }
 
 // Handle shutdown signals
-async function shutdown(signal: string) {
+async function shutdown(signal: string): void {
   logger.info(`Shutting down analytics worker (signal: ${signal})`)
 
   try {
@@ -171,7 +171,7 @@ async function shutdown(signal: string) {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     process.exit(0)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error during shutdown:', error)
     process.exit(1)
   }

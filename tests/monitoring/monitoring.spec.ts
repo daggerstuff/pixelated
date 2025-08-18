@@ -105,7 +105,7 @@ test.describe('Health Check Monitoring', () => {
         expect(body.api.status).toBeTruthy() // Should be 'healthy'
         console.log('Using base health endpoint')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to reach health endpoint:', error)
       test.fail(true, 'Health endpoint request failed')
     }
@@ -228,7 +228,7 @@ test.describe('Health Check Monitoring', () => {
     }
 
     console.log(
-      `Found ${mainNavLinks.length} navigation links: ${mainNavLinks.map((l) => l.text).join(', ')}`,
+      `Found ${mainNavLinks.length} navigation links: ${mainNavLinks.map((l: any) => l?.['text']).join(', ')}`,
     )
 
     // If there are no navigation links, the test should still pass

@@ -38,7 +38,7 @@ interface InsightMessageProps {
   trend: 'info' | 'success' | 'warning'
 }
 
-export const InsightMessage: React.FC<InsightMessageProps> = ({
+export const InsightMessage: FC<InsightMessageProps> = ({
   summary,
   trend,
 }) => {

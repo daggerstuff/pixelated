@@ -33,7 +33,7 @@ export async function registerPIIDetection(
     await piiDetectionService.initialize()
 
     logger.info('PII detection service registered and initialized')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection service',
       error as Record<string, unknown>,
@@ -68,7 +68,7 @@ function getEnvironmentConfig(): Partial<PIIMiddlewareConfig> {
   }
 
   // Development-specific configuration
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env['NODE_ENV'] === 'development') {
     return {
       ...baseConfig,
       // Log detections but don't block in development
@@ -79,18 +79,18 @@ function getEnvironmentConfig(): Partial<PIIMiddlewareConfig> {
   }
 
   // Production-specific configuration
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env['NODE_ENV'] === 'production') {
     return {
       ...baseConfig,
       // In HIPAA-compliant mode, block requests with PII in sensitive paths
-      blockRequests: process.env.HIPAA_COMPLIANCE_MODE === 'true',
+      blockRequests: process.env['HIPAA_COMPLIANCE_MODE'] === 'true',
       // Always audit in production
       auditDetections: true,
     }
   }
 
   // Test-specific configuration
-  if (process.env.NODE_ENV === 'test') {
+  if (process.env['NODE_ENV'] === 'test') {
     return {
       ...baseConfig,
       // Disable blocking in test
@@ -122,7 +122,7 @@ export function registerPIIMiddleware(
     app.use(middleware)
 
     logger.info('PII detection middleware registered')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection middleware',
       error as Record<string, unknown>,
@@ -147,7 +147,7 @@ export async function registerPIIDetectionSystem(
     registerPIIMiddleware(app, middlewareConfig)
 
     logger.info('PII detection system registered and initialized')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection system',
       error as Record<string, unknown>,

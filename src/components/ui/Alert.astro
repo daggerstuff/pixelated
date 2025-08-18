@@ -93,9 +93,9 @@ const classes = cn(baseClasses, variantClasses[variant], className);
 
 <script is:inline>
   // Client-side dismiss functionality for all alerts
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     document.querySelectorAll('.alert-dismiss').forEach(button => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (: Event) => {
         const alert = button.closest('[role="alert"]');
         if (alert) {
           alert.remove();

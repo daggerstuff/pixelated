@@ -104,7 +104,7 @@ export function withDLPProtection(
             req.body =
               typeof req.body === 'string'
                 ? dlpResult.redactedContent
-                : JSON.parse(dlpResult.redactedContent)
+                : JSON.parse(dlpResult.redactedContent) as any
           } catch (e) {
             logger.error('Failed to parse redacted content', { error: e })
           }
@@ -137,7 +137,7 @@ export function withDLPProtection(
             // If redacted, update response body
             if (dlpResult.redactedContent) {
               try {
-                body = JSON.parse(dlpResult.redactedContent)
+                body = JSON.parse(dlpResult.redactedContent) as any
               } catch (e) {
                 logger.error('Failed to parse redacted response content', {
                   error: e,
@@ -155,7 +155,7 @@ export function withDLPProtection(
 
       // Continue to the next middleware or route handler
       return next()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in DLP middleware', { error })
       return next()
     }
@@ -231,7 +231,7 @@ export function astroWithDLPProtection() {
       }
 
       return next()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in Astro DLP middleware', { error })
       return next()
     }
@@ -378,7 +378,7 @@ export function shouldApplyDLPToRoute(route: string): boolean {
 /**
  * Setup guide for DLP integration
  */
-export function printDLPIntegrationGuide(): void {
+export function printDLPIntegrationGuide() {
   console.log(`
 DLP Integration Guide
 ====================

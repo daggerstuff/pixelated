@@ -19,7 +19,7 @@ const logger = createBuildSafeLogger('pattern-recognition')
  * Concrete implementation of PatternRecognitionService that uses FHE
  */
 class ConcretePatternRecognitionService implements PatternRecognitionService {
-  constructor(private fheService: PatternRecognitionOps) {}
+  constructor(private fheService: PatternRecognitionOps): void {}
 
   async detectCrossSessionPatterns(
     clientId: string,
@@ -80,7 +80,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error detecting cross-session patterns', { error, clientId })
       throw new ProcessingError(
         'Failed to detect cross-session patterns',
@@ -147,7 +147,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error analyzing session patterns', {
         error,
         sessionId: session.sessionId,
@@ -197,7 +197,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       return { common, unique1, unique2 }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error comparing patterns', { error })
       throw new ProcessingError('Failed to compare patterns', error)
     }
@@ -296,7 +296,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error analyzing risk factor correlations', {
         error,
         clientId,
@@ -414,7 +414,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error analyzing long-term trends', {
         error,
         clientId,
@@ -508,7 +508,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error detecting advanced cross-session patterns', {
         error,
         clientId,
@@ -569,7 +569,7 @@ export async function createPatternRecognitionService(): Promise<PatternRecognit
 
     logger.info('Pattern recognition service created successfully')
     return service
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to create pattern recognition service', { error })
     throw new ProcessingError(
       'Failed to create pattern recognition service',

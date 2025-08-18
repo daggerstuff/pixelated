@@ -21,7 +21,7 @@ export class ResponseGenerationService {
   private temperature: number
   private maxResponseTokens: number
 
-  constructor(config: ResponseGenerationConfig) {
+  constructor(config: ResponseGenerationConfig): void {
     this.aiService = config.aiService
     this.model = config.model
     this.temperature = config.temperature ?? 0.7
@@ -46,7 +46,7 @@ export class ResponseGenerationService {
         confidence: 0.8, // Default confidence - could be enhanced with actual scoring
         usage: completion.usage,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Error in response generation:', error)
       throw new Error('Failed to generate therapeutic response')
     }
@@ -73,7 +73,7 @@ export class ResponseGenerationService {
       }
 
       return await this.generateResponse(enhancedMessages)
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Error in response generation with instructions:', error)
       throw new Error(
         'Failed to generate therapeutic response with instructions',
@@ -81,7 +81,7 @@ export class ResponseGenerationService {
     }
   }
 
-  dispose(): void {
+  dispose() {
     this.aiService.dispose()
   }
 }

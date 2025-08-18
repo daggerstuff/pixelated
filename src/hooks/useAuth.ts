@@ -85,7 +85,7 @@ export function useAuth(): UseAuthReturn {
             AuthErrorCode.INVALID_USER
           )
         }
-      } catch (err) {
+      } catch (err: unknown) {
         if (!mounted) {
           return
         }
@@ -122,20 +122,20 @@ export function useAuth(): UseAuthReturn {
       
       const result = await signInWithEmail(email, password)
       
-      if (!isAuthResult(result) || !result.success || !result.user) {
+      if (!isAuthResult(result) || !result?.['success'] || !result?.['user']) {
         throw createAuthError(
-          result.error || 'Authentication failed',
+          result?.['error'] || 'Authentication failed',
           AuthErrorCode.AUTH_FAILED
         )
       }
 
-      setUser(result.user)
+      setUser(result?.['user'])
       return result
-    } catch (err) {
+    } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? err.message : 'Authentication failed',
+            err instanceof Error ? (err as Error)?.message || String(err) : 'Authentication failed',
             AuthErrorCode.AUTH_FAILED
           )
       
@@ -167,11 +167,11 @@ export function useAuth(): UseAuthReturn {
 
       setUser(result.user)
       return result
-    } catch (err) {
+    } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? err.message : 'Registration failed',
+            err instanceof Error ? (err as Error)?.message || String(err) : 'Registration failed',
             AuthErrorCode.SIGNUP_FAILED
           )
       
@@ -191,11 +191,11 @@ export function useAuth(): UseAuthReturn {
       setLoading(true)
       setError(null)
       await authSignInWithOAuth(provider, redirectTo)
-    } catch (err) {
+    } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? err.message : 'OAuth sign in failed',
+            err instanceof Error ? (err as Error)?.message || String(err) : 'OAuth sign in failed',
             AuthErrorCode.OAUTH_FAILED
           )
       setError(authError)
@@ -212,11 +212,11 @@ export function useAuth(): UseAuthReturn {
       setError(null)
       await authSignOut()
       setUser(null)
-    } catch (err) {
+    } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? err.message : 'Sign out failed',
+            err instanceof Error ? (err as Error)?.message || String(err) : 'Sign out failed',
             AuthErrorCode.SIGNOUT_FAILED
           )
       setError(authError)
@@ -234,11 +234,11 @@ export function useAuth(): UseAuthReturn {
     try {
       setError(null)
       return await authResetPassword(email, redirectTo)
-    } catch (err) {
+    } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? err.message : 'Password reset failed',
+            err instanceof Error ? (err as Error)?.message || String(err) : 'Password reset failed',
             AuthErrorCode.RESET_FAILED
           )
       setError(authError)
@@ -266,11 +266,11 @@ export function useAuth(): UseAuthReturn {
       }
 
       return response
-    } catch (err) {
+    } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? err.message : 'OTP verification failed',
+            err instanceof Error ? (err as Error)?.message || String(err) : 'OTP verification failed',
             AuthErrorCode.OTP_FAILED
           )
       setError(authError)
@@ -316,11 +316,11 @@ export function useAuth(): UseAuthReturn {
           },
         } as AuthUser
       })
-    } catch (err) {
+    } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? err.message : 'Profile update failed',
+            err instanceof Error ? (err as Error)?.message || String(err) : 'Profile update failed',
             AuthErrorCode.UPDATE_FAILED
           )
       setError(authError)

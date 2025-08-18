@@ -235,7 +235,7 @@ if (permissionResponse) {
 
     // Add event listeners to view details buttons
     document.querySelectorAll('.view-details').forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (: Event) => {
         const index = parseInt(button.getAttribute('data-index') || '0')
         showCrisisDetails(index)
       })
@@ -300,14 +300,14 @@ if (permissionResponse) {
   }
 
   // Initialize the page
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (: Event) => {
     // Initial table load
     updateTable()
 
     // Refresh button
     const refreshBtn = document.getElementById('refresh-btn')
     if (refreshBtn) {
-      refreshBtn.addEventListener('click', () => {
+      refreshBtn.addEventListener('click', (: Event) => {
         updateTable()
       })
     }
@@ -317,7 +317,7 @@ if (permissionResponse) {
     const nextButton = document.getElementById('next-page')
 
     if (prevButton) {
-      prevButton.addEventListener('click', () => {
+      prevButton.addEventListener('click', (: Event) => {
         if (currentPage > 0) {
           currentPage--
           updateTable()
@@ -326,7 +326,7 @@ if (permissionResponse) {
     }
 
     if (nextButton) {
-      nextButton.addEventListener('click', () => {
+      nextButton.addEventListener('click', (: Event) => {
         currentPage++
         updateTable()
       })
@@ -339,7 +339,7 @@ if (permissionResponse) {
     }
 
     // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
+    window.addEventListener('click', (event: Event) => {
       const modal = document.getElementById('crisis-modal')
       if (event.target === modal) {
         closeModal()
@@ -351,7 +351,7 @@ if (permissionResponse) {
     const escalateBtn = document.getElementById('escalate-btn')
 
     if (markReviewedBtn) {
-      markReviewedBtn.addEventListener('click', () => {
+      markReviewedBtn.addEventListener('click', (: Event) => {
         alert(
           'Crisis marked as reviewed. This would update the status in a real implementation.',
         )
@@ -360,7 +360,7 @@ if (permissionResponse) {
     }
 
     if (escalateBtn) {
-      escalateBtn.addEventListener('click', () => {
+      escalateBtn.addEventListener('click', (: Event) => {
         alert(
           'Crisis escalated to emergency response team. This would trigger notifications in a real implementation.',
         )

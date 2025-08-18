@@ -358,11 +358,11 @@ export const POST = async ({ request }: APIContext) => {
       }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Psychology scenario generation error:', error)
     return new Response(JSON.stringify({ 
       error: 'Internal server error during scenario generation',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? String(error) : 'Unknown error'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

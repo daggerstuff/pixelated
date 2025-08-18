@@ -141,7 +141,7 @@ function generateBreachDetails() {
 }
 
 // Helper function to check breach status
-function checkBreachStatus(breachId: string) {
+function checkBreachStatus(breachId: string): void {
   const response = http.get(`/api/security/breaches/${breachId}`)
   return response.json()
 }
@@ -243,7 +243,7 @@ export function setup() {
   return response.json()
 }
 
-export function teardown(data: { testRunId: string }) {
+export function teardown(data: { testRunId: string }): void {
   // Cleanup test environment
   const response = http.post(
     '/api/security/test/teardown',

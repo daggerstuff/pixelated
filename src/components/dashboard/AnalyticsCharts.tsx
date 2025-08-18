@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react'
-import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
+import { FC, useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
 import type {
   SessionData,
   SkillProgressData,
@@ -10,7 +10,7 @@ import type {
 } from '@/types/analytics'
 
 // Loading skeleton component
-const LoadingSkeleton: React.FC = () => (
+const LoadingSkeleton: FC = () => (
   <div className="animate-pulse">
     <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
     <div className="space-y-2">
@@ -27,12 +27,12 @@ interface ErrorDisplayProps {
   onRetry: () => void
 }
 
-const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry }) => (
+const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
     <div className="flex items-center justify-between">
       <div>
         <h4 className="text-red-800 font-medium">Unable to load analytics data</h4>
-        <p className="text-red-600 text-sm mt-1">{error.message}</p>
+        <p className="text-red-600 text-sm mt-1">{String(error)}</p>
       </div>
       <button
         onClick={onRetry}
@@ -50,7 +50,7 @@ interface TimeRangeSelectorProps {
   onChange: (range: TimeRange) => void
 }
 
-const TimeRangeSelector: React.FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
+const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
   const options: { value: TimeRange; label: string }[] = [
     { value: '7d', label: 'Last 7 days' },
     { value: '30d', label: 'Last 30 days' },
@@ -83,7 +83,7 @@ interface SessionChartProps {
   isLoading: boolean
 }
 
-const SessionChart: React.FC<SessionChartProps> = ({ data, isLoading }) => {
+const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
   const maxSessions = useMemo(() => {
     return Math.max(...data.map(d => d.sessions), 1)
   }, [data])
@@ -123,7 +123,7 @@ interface SkillProgressProps {
   isLoading: boolean
 }
 
-const SkillProgress: React.FC<SkillProgressProps> = ({ data, isLoading }) => {
+const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
   if (isLoading) {
     return <LoadingSkeleton />
   }
@@ -178,7 +178,7 @@ interface SummaryStatsProps {
   isLoading: boolean
 }
 
-const SummaryStats: React.FC<SummaryStatsProps> = ({ data, isLoading }) => {
+const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -227,7 +227,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({ data, isLoading }) => {
 }
 
 // Main analytics charts component
-export const AnalyticsCharts: React.FC = () => {
+export const AnalyticsCharts: FC = () => {
   // State for filters
   const [filters, setFilters] = useState<AnalyticsFilters>({
     timeRange: '7d',

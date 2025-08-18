@@ -99,7 +99,7 @@ export class RiskAlertSystem {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(config: Partial<AlertConfig> = {}) {
+  private constructor(config: Partial<AlertConfig> = {}): void {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.repository = new AIRepository()
   }
@@ -224,9 +224,9 @@ export class RiskAlertSystem {
             await this.sendWebhookAlert(alert)
             break
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Failed to send alert via ${channel}`, {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
           alertId: alert.id,
           userId: alert.userId,
           level: alert.level,
@@ -278,9 +278,9 @@ export class RiskAlertSystem {
         level: alert.level,
         userId: alert.userId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store alert', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         alertId: alert.id,
         userId: alert.userId,
         level: alert.level,
@@ -394,9 +394,9 @@ export class RiskAlertSystem {
           metadata: metadataObject,
         }
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get pending alerts', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return []
     }

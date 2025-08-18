@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     logger.error('ErrorBoundary caught an error:', {
       error,
       errorInfo,
@@ -73,7 +73,7 @@ export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   errorBoundaryProps?: Omit<Props, 'children'>,
 ) {
-  return function WithErrorBoundary(props: P) {
+  return function WithErrorBoundary(props: P): void {
     return (
       <ErrorBoundary {...errorBoundaryProps}>
         <WrappedComponent {...props} />

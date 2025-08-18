@@ -68,7 +68,7 @@ export function ResearchConsentForm({
             setSelectedOptions(initialOptions)
           }
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error fetching consent status:', err)
         setError('Failed to load consent information. Please try again later.')
       } finally {
@@ -113,7 +113,7 @@ export function ResearchConsentForm({
       if (onConsentChanged) {
         onConsentChanged(true)
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error granting consent:', err)
       setError('Failed to record your consent. Please try again later.')
     } finally {
@@ -159,7 +159,7 @@ export function ResearchConsentForm({
       if (onConsentChanged) {
         onConsentChanged(false)
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error withdrawing consent:', err)
       setError('Failed to withdraw your consent. Please try again later.')
     } finally {

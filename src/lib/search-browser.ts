@@ -199,7 +199,7 @@ class BrowserSearchClient implements ISearchClient {
       }
 
       return searchResults
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Search failed:', error)
       return []
     }
@@ -215,7 +215,7 @@ class BrowserSearchClient implements ISearchClient {
       this.documents.set(doc.id, doc)
       try {
         this.index.add(doc)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Failed to add document ${doc.id} to index:`, error)
       }
     }
@@ -243,7 +243,7 @@ export async function initBrowserSearch(
       const flexsearch = await import(flexsearchPath)
       Document = (flexsearch.default?.Document ||
         flexsearch.Document) as FlexSearchDocumentConstructor
-    } catch (err) {
+    } catch (err: unknown) {
       console.warn(
         'Failed to load flexsearch directly, trying alternative path:',
         err,
@@ -271,7 +271,7 @@ export async function initBrowserSearch(
       )
       return createFallbackClient()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error loading flexsearch:', error)
     return createFallbackClient()
   }

@@ -129,7 +129,7 @@ export function useRUMData() {
       })
 
       setLastUpdated(new Date())
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch RUM data:', error)
     } finally {
       setIsLoading(false)

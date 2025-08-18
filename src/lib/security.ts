@@ -47,7 +47,7 @@ const enhancedFHEService = fheService as unknown as EnhancedFHEService
 // Secret key for signatures
 const SECRET_KEY =
   typeof process !== 'undefined' && process.env
-    ? process.env.SECRET_KEY || 'default-secret-key'
+    ? process.env['SECRET_KEY'] || 'default-secret-key'
     : 'default-secret-key'
 
 /**
@@ -59,7 +59,7 @@ export async function initializeSecurity(): Promise<void> {
     logger.info('Initializing security system...')
 
     // Get the configured security level
-    const securityLevel = process.env.SECURITY_LEVEL || 'medium'
+    const securityLevel = process.env['SECURITY_LEVEL'] || 'medium'
 
     // Initialize encryption with the configured level
     const encryptionSuccess = await initializeEncryption(securityLevel)
@@ -72,13 +72,13 @@ export async function initializeSecurity(): Promise<void> {
 
     // Set up other security features as needed
     logger.info('Security system initialized successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('Failed to initialize security system:', errorDetails)
     throw new Error(
-      `Security initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Security initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
     )
   }
 }
@@ -100,7 +100,7 @@ export async function initializeEncryption(level = 'medium'): Promise<boolean> {
       mode: encryptionMode,
       keySize: level === 'high' ? 2048 : 1024,
       securityLevel: level,
-      enableDebug: process.env.NODE_ENV === 'development',
+      enableDebug: process.env['NODE_ENV'] === 'development',
     })
 
     // For FHE mode, also set up key management - fix typo and safely handle optional method
@@ -120,9 +120,9 @@ export async function initializeEncryption(level = 'medium'): Promise<boolean> {
       `Encryption initialized successfully with mode: ${encryptionMode}`,
     )
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('Failed to initialize encryption:', errorDetails)
     return false
@@ -135,9 +135,9 @@ export async function initializeEncryption(level = 'medium'): Promise<boolean> {
 export async function encryptMessage(message: string): Promise<string> {
   try {
     return await enhancedFHEService.encrypt(message)
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('Encryption error:', errorDetails)
     throw error
@@ -161,9 +161,9 @@ export async function decryptMessage(
     }
 
     return decrypted
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('Decryption error:', errorDetails)
     throw error
@@ -195,9 +195,9 @@ export async function processEncryptedMessage(
 
     // Convert result to string format for return
     return result.result || JSON.stringify(result)
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('FHE operation error:', errorDetails)
     throw error
@@ -219,9 +219,9 @@ export async function createVerificationToken(
     const timestamp = Date.now().toString()
     const data = `${message}:${timestamp}`
     return `${createSignature(data)}.${timestamp}`
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('Verification token generation error:', errorDetails)
     throw error
@@ -267,7 +267,7 @@ export function logSecurityEvent(
   details: Record<string, string | number | boolean | null | undefined>,
 ): void {
   // Log to console in dev mode
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env['NODE_ENV'] === 'development') {
     logger.debug(`[SECURITY EVENT] ${eventType.toUpperCase()}:`, details)
   }
 }
@@ -338,9 +338,9 @@ export function generateSecureToken(length = 32): string {
         Math.random().toString(36).substring(2, 15)
       )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('Token generation error:', errorDetails)
     return ''
@@ -369,9 +369,9 @@ export function createSignature(data: string): string {
       // Convert Uint8Array to base64 string without using Buffer
       return btoa(String.fromCharCode.apply(null, Array.from(dataWithKey)))
     }
-  } catch (error) {
+  } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
     }
     logger.error('Signature creation error:', errorDetails)
     return ''
@@ -436,7 +436,7 @@ export function verifySecureToken(
 
     // Decode payload using atob instead of Buffer
     const dataString = atob(encodedData)
-    const payload = JSON.parse(dataString)
+    const payload = JSON.parse(dataString) as any
 
     // Check expiration
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {

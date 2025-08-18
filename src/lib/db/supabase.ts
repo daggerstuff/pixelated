@@ -1,7 +1,7 @@
 import mongodb from '@/config/mongodb.config'
 import { mongoAuthService } from '@/services/mongoAuth.service'
 
-const mongoUri = process.env.MONGODB_URI
+const mongoUri = process.env['MONGODB_URI']
 const mongoDbName = process.env.MONGODB_DB_NAME
 
 // Create mock client for builds

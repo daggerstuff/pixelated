@@ -29,7 +29,7 @@ export class StatePersistence {
   private config: PersistenceConfig
   private options: Required<StorageOptions>
 
-  constructor(config: PersistenceConfig) {
+  constructor(config: PersistenceConfig): void {
     this.config = config
     this.options = { ...defaultOptions, ...(config.options || {}) }
   }
@@ -57,7 +57,7 @@ export class StatePersistence {
       }
 
       return serialized
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to serialize state:', error)
       throw error
     }
@@ -77,8 +77,8 @@ export class StatePersistence {
 
       return this.config.deserialize
         ? this.config.deserialize(data)
-        : JSON.parse(data)
-    } catch (error) {
+        : JSON.parse(data) as any
+    } catch (error: unknown) {
       logger.error('Failed to deserialize state:', error)
       throw error
     }
@@ -119,7 +119,7 @@ export class StatePersistence {
       if (this.config.version) {
         storage.setItem(this.getVersionKey(), String(this.config.version))
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to save state:', error)
       throw error
     }
@@ -139,7 +139,7 @@ export class StatePersistence {
 
       const state = await this.deserialize(serialized)
       return await this.migrate(state)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load state:', error)
       throw error
     }
@@ -155,7 +155,7 @@ export class StatePersistence {
       return this.config.merge
         ? this.config.merge(persistedState, currentState)
         : { ...(currentState as object), ...(persistedState as object) }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to merge state:', error)
       throw error
     }
@@ -170,7 +170,7 @@ export class StatePersistence {
 
       storage.removeItem(this.getStorageKey())
       storage.removeItem(this.getVersionKey())
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to clear state:', error)
       throw error
     }

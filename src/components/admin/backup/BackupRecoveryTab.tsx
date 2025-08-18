@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { FC, Button } from '@/components/ui/button';
 import {
   Card,
   CardHeader,
@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { FC, Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -15,9 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types';
+import { FC, RecoveryTestStatus } from '../../../lib/security/backup/backup-types';
 import type { BackupType, BackupStatus } from '../../../lib/security/backup';
-import { toast } from '@/components/ui/toast';
+import { FC, toast } from '@/components/ui/toast';
 
 // Define the enum locally to avoid server-side imports
 enum TestEnvironmentType {
@@ -92,7 +92,7 @@ const renderStatusBadge = (status: RecoveryTestStatus) => {
   }
 }
 
-const BackupRecoveryTab: React.FC<BackupRecoveryTabProps> = ({
+const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
   backups,
   recoveryHistory: initialRecoveryHistory,
 }) => {
@@ -145,10 +145,10 @@ const BackupRecoveryTab: React.FC<BackupRecoveryTabProps> = ({
     } catch (error: unknown) {
       console.error('Recovery test failed:', error);
 
-      // Type guard to safely access error.message
+      // Type guard to safely access String(error)
       const errorMessage =
         error instanceof Error
-          ? error.message
+          ? String(error)
           : typeof error === 'object' && error !== null && 'message' in error
           ? String((error as { message: unknown }).message)
           : 'An unexpected error occurred.';

@@ -167,12 +167,12 @@ const newTransform = currentTransition.new.transform || 'none'
 
 <!-- Script to handle custom transitions logic -->
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (: Event) => {
     // Add here any JS that needs to run on page transitions
     console.log('Page transition completed')
   })
 
-  document.addEventListener('astro:before-swap', (event) => {
+  document.addEventListener('astro:before-swap', (event: Event) => {
     // Access the document that is about to be added to the page
     const newDocument = event.newDocument
 
@@ -181,7 +181,7 @@ const newTransform = currentTransition.new.transform || 'none'
   })
 
   // Handle back/forward navigation
-  window.addEventListener('popstate', () => {
+  window.addEventListener('popstate', (: Event) => {
     // Add specific logic for back/forward navigation if needed
   })
 </script>

@@ -213,9 +213,9 @@ export function useCognitiveDistortionDetection({
         }
 
         return data
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : 'An unknown error occurred'
+          err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
         setError(errorMessage)
 
         // Call onError callback
@@ -292,9 +292,9 @@ export function useCognitiveDistortionDetection({
         }
 
         return data
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : 'An unknown error occurred'
+          err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
         setError(errorMessage)
 
         // Call onError callback

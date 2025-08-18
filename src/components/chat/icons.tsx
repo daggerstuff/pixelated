@@ -1,4 +1,3 @@
-import React from 'react'
 
 interface IconProps {
   className?: string
@@ -6,7 +5,7 @@ interface IconProps {
   strokeWidth?: number
 }
 
-export function IconSend({ className = 'h-6 w-6' }: IconProps) {
+export function IconSend({ className = 'h-6 w-6' }: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +22,7 @@ export function IconSend({ className = 'h-6 w-6' }: IconProps) {
   )
 }
 
-export function IconLock({ className = 'h-6 w-6' }: IconProps) {
+export function IconLock({ className = 'h-6 w-6' }: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +41,7 @@ export function IconLock({ className = 'h-6 w-6' }: IconProps) {
   )
 }
 
-export function IconShieldLock({ className = 'h-6 w-6' }: IconProps) {
+export function IconShieldLock({ className = 'h-6 w-6' }: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +61,7 @@ export function IconShieldLock({ className = 'h-6 w-6' }: IconProps) {
   )
 }
 
-export function IconUserCircle({ className = 'h-6 w-6' }: IconProps) {
+export function IconUserCircle({ className = 'h-6 w-6' }: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -82,7 +81,7 @@ export function IconUserCircle({ className = 'h-6 w-6' }: IconProps) {
   )
 }
 
-export function IconChevronDown(props: IconProps) {
+export function IconChevronDown(props: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +100,7 @@ export function IconChevronDown(props: IconProps) {
   )
 }
 
-export function IconMaximize(props: IconProps) {
+export function IconMaximize(props: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +119,7 @@ export function IconMaximize(props: IconProps) {
   )
 }
 
-export function IconMinimize(props: IconProps) {
+export function IconMinimize(props: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +138,7 @@ export function IconMinimize(props: IconProps) {
   )
 }
 
-export function IconMessage(props: IconProps) {
+export function IconMessage(props: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -158,7 +157,7 @@ export function IconMessage(props: IconProps) {
   )
 }
 
-export function IconX(props: IconProps) {
+export function IconX(props: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +177,7 @@ export function IconX(props: IconProps) {
   )
 }
 
-export function IconBrain(props: IconProps) {
+export function IconBrain(props: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +198,7 @@ export function IconBrain(props: IconProps) {
   )
 }
 
-export function IconUser(props: IconProps) {
+export function IconUser(props: IconProps): void {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

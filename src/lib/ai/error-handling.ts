@@ -6,7 +6,7 @@ const logger = createBuildSafeLogger('default')
  * Handles API errors and returns a standardized Response
  */
 export function handleApiError(error: unknown): Response {
-  const errorMessage = error instanceof Error ? error.message : String(error)
+  const errorMessage = error instanceof Error ? String(error) : String(error)
 
   logger.error('API Error:', { error: errorMessage })
 

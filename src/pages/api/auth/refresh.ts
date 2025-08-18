@@ -74,11 +74,11 @@ export const POST = async ({
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({
         success: false,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 401,
