@@ -284,7 +284,7 @@ async function main() {
     )
 
     console.log('✅ Analysis complete!')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Error analyzing text:', error)
     process.exit(1)
   }

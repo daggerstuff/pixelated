@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ request }) => {
         } else {
           logger.warn('Invalid API token provided for validation history')
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to verify API token:', error)
       }
     }
@@ -107,10 +107,10 @@ export const GET: APIRoute = async ({ request }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
     logger.error(`Failed to get validation history: ${errorMessage}`)
 
     // Create audit log for failed retrieval

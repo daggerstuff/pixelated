@@ -212,13 +212,13 @@ describe('SupportContextIdentifier', () => {
 
       await identifier.identifySupportContext(query, [], emotionalProfile)
 
-      expect(mockAIService.generateText).toHaveBeenCalledWith(
+      expect((mockAIService as unknown)['generateText']).toHaveBeenCalledWith(
         expect.stringContaining('anxiety'),
       )
     })
 
     it('should handle AI service errors gracefully', async () => {
-      ;(mockAIService.generateText as Mock).mockRejectedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockRejectedValue(
         new Error('AI service unavailable'),
       )
 
@@ -230,7 +230,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle malformed AI responses', async () => {
-      ;(mockAIService.generateText as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         'Invalid JSON response',
       )
 
@@ -356,7 +356,7 @@ describe('SupportContextIdentifier', () => {
         },
       }
 
-      ;(mockAIService.generateText as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify(mockAIResponse),
       )
     })
@@ -378,7 +378,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle batch processing errors gracefully', async () => {
-      ;(mockAIService.generateText as Mock)
+      ;((mockAIService as unknown)['generateText'] as Mock)
         .mockResolvedValueOnce('{"isSupport": true, "confidence": 0.8}')
         .mockRejectedValueOnce(new Error('AI error'))
         .mockResolvedValueOnce('{"isSupport": true, "confidence": 0.7}')
@@ -392,9 +392,9 @@ describe('SupportContextIdentifier', () => {
       const results = await identifier.identifyBatch(queries)
 
       expect(results).toHaveLength(3)
-      expect(results[0]['isSupport']).toBe(true)
-      expect(results[1]['isSupport']).toBeDefined() // Should have fallback result
-      expect(results[2]['isSupport']).toBe(true)
+      expect(results[0]?.['isSupport']).toBe(true)
+      expect(results[1]?.['isSupport']).toBeDefined() // Should have fallback result
+      expect(results[2]?.['isSupport']).toBe(true)
     })
   })
 
@@ -453,21 +453,21 @@ describe('SupportContextIdentifier', () => {
         "I can't cope anymore, everything is too much, I'm falling apart"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.metadata.copingCapacity).toBe('low')
+      expect(result['metadata']['copingCapacity']).toBe('low')
     })
 
     it('should identify medium coping capacity', async () => {
       const query = "I'm struggling with this situation but trying to manage"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.metadata.copingCapacity).toBe('medium')
+      expect(result['metadata']['copingCapacity']).toBe('medium')
     })
 
     it('should identify high coping capacity', async () => {
       const query = "I'm handling things well but could use some advice"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.metadata.copingCapacity).toBe('high')
+      expect(result['metadata']['copingCapacity']).toBe('high')
     })
   })
 
@@ -476,23 +476,23 @@ describe('SupportContextIdentifier', () => {
       const query = 'What is the capital of France?'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(false)
-      expect(result.confidence).toBeLessThan(0.3)
+      expect(result['isSupport']).toBe(false)
+      expect(result['confidence']).toBeLessThan(0.3)
     })
 
     it('should handle informational queries', async () => {
       const query = 'Can you explain how depression medication works?'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(false)
-      expect(result.confidence).toBeLessThan(0.5)
+      expect(result['isSupport']).toBe(false)
+      expect(result['confidence']).toBeLessThan(0.5)
     })
 
     it('should handle casual conversation', async () => {
       const query = 'How was your day today?'
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(false)
+      expect(result['isSupport']).toBe(false)
     })
   })
 
@@ -500,16 +500,16 @@ describe('SupportContextIdentifier', () => {
     it('should handle empty queries', async () => {
       const result = await identifier.identifySupportContext('')
 
-      expect(result.isSupport).toBe(false)
-      expect(result.confidence).toBe(0)
+      expect(result['isSupport']).toBe(false)
+      expect(result['confidence']).toBe(0)
     })
 
     it('should handle very long queries', async () => {
       const longQuery = 'I feel sad '.repeat(100) + 'and need support'
       const result = await identifier.identifySupportContext(longQuery)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.emotionalState).toBe(EmotionalState.SADNESS)
+      expect(result['isSupport']).toBe(true)
+      expect(result['emotionalState']).toBe(EmotionalState.SADNESS)
     })
 
     it('should handle mixed emotional states', async () => {
@@ -517,9 +517,9 @@ describe('SupportContextIdentifier', () => {
         "I'm feeling sad but also angry and confused about everything"
       const result = await identifier.identifySupportContext(query)
 
-      expect(result.isSupport).toBe(true)
-      expect(result.emotionalState).toBeDefined()
-      expect(result.metadata.emotionalIndicators.length).toBeGreaterThan(1)
+      expect(result['isSupport']).toBe(true)
+      expect(result['emotionalState']).toBeDefined()
+      expect(result['metadata']['emotionalIndicators'].length).toBeGreaterThan(1)
     })
 
     it('should maintain consistent results for similar queries', async () => {
@@ -529,8 +529,8 @@ describe('SupportContextIdentifier', () => {
       const result1 = await identifier.identifySupportContext(query1)
       const result2 = await identifier.identifySupportContext(query2)
 
-      expect(result1.supportType).toBe(result2.supportType)
-      expect(result1.emotionalState).toBe(result2.emotionalState)
+      expect(result1['supportType']).toBe(result2['supportType'])
+      expect(result1['emotionalState']).toBe(result2['emotionalState'])
     })
   })
 
@@ -543,17 +543,17 @@ describe('SupportContextIdentifier', () => {
     it('should create default config', () => {
       const defaultConfig = getDefaultSupportIdentifierConfig(mockAIService)
 
-      expect(defaultConfig.aiService).toBe(mockAIService)
-      expect(defaultConfig.model).toBe('claude-3-sonnet')
-      expect(defaultConfig.enableEmotionalAnalysis).toBe(true)
-      expect(defaultConfig.enableCopingAssessment).toBe(true)
-      expect(defaultConfig.adaptToEmotionalState).toBe(true)
+      expect(defaultConfig['aiService']).toBe(mockAIService)
+      expect(defaultConfig['model']).toBe('claude-3-sonnet')
+      expect(defaultConfig['enableEmotionalAnalysis']).toBe(true)
+      expect(defaultConfig['enableCopingAssessment']).toBe(true)
+      expect(defaultConfig['adaptToEmotionalState']).toBe(true)
     })
   })
 
   describe('Error Handling and Validation', () => {
     it('should handle invalid support types gracefully', async () => {
-      ;(mockAIService.generateText as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify({
           isSupport: true,
           supportType: 'invalid_type',
@@ -568,7 +568,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle invalid emotional states gracefully', async () => {
-      ;(mockAIService.generateText as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify({
           isSupport: true,
           supportType: 'emotional_validation',
@@ -583,7 +583,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should validate urgency levels', async () => {
-      ;(mockAIService.generateText as Mock).mockResolvedValue(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockResolvedValue(
         JSON.stringify({
           isSupport: true,
           urgency: 'extreme',
@@ -597,7 +597,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle network timeouts gracefully', async () => {
-      ;(mockAIService.generateText as Mock).mockImplementation(
+      ;((mockAIService as unknown)['generateText'] as Mock).mockImplementation(
         () =>
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Timeout')), 100),

@@ -426,7 +426,7 @@ export class PatientResponseService {
         default:
           return `Experiencing a complex mix of ${dominantEmotions.join(', ')}.`
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error synthesizing emotional context:', error)
       return `Feeling ${baseEmotion} with typical intensity.`
     }
@@ -453,7 +453,7 @@ export class PatientResponseService {
   /**
    * Reset emotional state - useful for starting new sessions.
    */
-  resetEmotionalState(): void {
+  resetEmotionalState() {
     this.emotionSynthesizer.reset()
   }
 

@@ -29,12 +29,12 @@ export const GET = async () => {
         'Cache-Control': 'no-store, max-age=0',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         responseTimeMs: Math.round(performance.now() - startTime),
       }),
       {

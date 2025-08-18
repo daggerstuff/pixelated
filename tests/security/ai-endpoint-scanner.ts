@@ -237,8 +237,8 @@ async function runTest(
 
     status = response.status
     message = response.statusText
-  } catch (error) {
-    message = error.message
+  } catch (error: unknown) {
+    message = String(error)
   }
 
   const endTime = performance.now()

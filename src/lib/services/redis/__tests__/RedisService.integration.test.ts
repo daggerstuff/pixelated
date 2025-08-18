@@ -4,7 +4,7 @@ import { RedisErrorCode } from '../types'
 import { generateTestKey, sleep } from './test-utils'
 
 expect.extend({
-  toBeRedisError(received: unknown, code: RedisErrorCode) {
+  toBeRedisError(received: unknown, code: RedisErrorCode): void {
     const error = received as { code?: RedisErrorCode }
     const pass = error?.code === code
     return {
@@ -107,7 +107,7 @@ describeFn('RedisService Integration Tests', () => {
 
         // Verify session
         const session = await redis.get(`integration:session:${sessionId}`)
-        expect(JSON.parse(session!)).toEqual(userData)
+        expect(JSON.parse(session!) as unknown).toEqual(userData)
 
         // Update session
         userData.roles.push('admin')
@@ -121,7 +121,7 @@ describeFn('RedisService Integration Tests', () => {
         const updatedSession = await redis.get(
           `integration:session:${sessionId}`,
         )
-        expect(JSON.parse(updatedSession!).roles).toContain('admin')
+        expect(JSON.parse(updatedSession!) as unknown.roles).toContain('admin')
 
         // Delete session
         await redis.del(`integration:session:${sessionId}`)
@@ -153,7 +153,7 @@ describeFn('RedisService Integration Tests', () => {
         )
 
         results.forEach((result, i) => {
-          expect(JSON.parse(result!)).toEqual(sessions[i]!.data)
+          expect(JSON.parse(result!) as unknown).toEqual(sessions[i]!.data)
         })
       })
     })
@@ -221,7 +221,7 @@ describeFn('RedisService Integration Tests', () => {
           ),
         )
         successEvents.forEach((event) => {
-          const parsed = JSON.parse(event!)
+          const parsed = JSON.parse(event!) as unknown
           expect(parsed.type).toBe('success')
         })
       })
@@ -269,7 +269,7 @@ describeFn('RedisService Integration Tests', () => {
           ),
         )
         highConfidencePatterns.forEach((pattern) => {
-          const parsed = JSON.parse(pattern!)
+          const parsed = JSON.parse(pattern!) as unknown
           expect(parsed.confidence).toBeGreaterThanOrEqual(0.8)
         })
       })

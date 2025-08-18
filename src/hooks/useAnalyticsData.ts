@@ -95,7 +95,7 @@ export function useAnalyticsData() {
         value: currentValue,
         previousValue: previousValue > 0 ? previousValue : undefined,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error fetching metric data for ${metricName}:`, error)
       setError(
         error instanceof Error
@@ -220,7 +220,7 @@ export function useAnalyticsData() {
           },
         ],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error fetching chart data for ${metricName}:`, error)
       setError(
         error instanceof Error
@@ -263,7 +263,7 @@ export function useAnalyticsData() {
       }))
 
       return { data: tableData }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error fetching table data for ${eventType}:`, error)
       setError(
         error instanceof Error

@@ -649,24 +649,24 @@ export class BiasDetectionConfigManager {
     
     try {
       validateConfig(this.config)
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
-        errors.push(error.message)
+        errors.push(String(error))
       }
     }
     
     // Additional validation checks
     const weights = Object.values(this.config.layerWeights)
-    const sum = weights.reduce((a, b) => a + b, 0)
+    const sum = weights.reduce((a: any, b: any) => (a as number) + (b as number), 0) as number
     if (Math.abs(sum - 1.0) > 0.001) {
       errors.push('Layer weights must sum to 1.0')
     }
     
-    if (this.config.thresholds.warning >= this.config.thresholds.high) {
+    if (this.config?.['thresholds']?.['warning'] >= this.config?.['thresholds']?.['high']) {
       errors.push('Warning threshold must be less than high threshold')
     }
     
-    if (this.config.thresholds.high >= this.config.thresholds.critical) {
+    if (this.config?.['thresholds']?.['high'] >= this.config?.['thresholds']?.['critical']) {
       errors.push('High threshold must be less than critical threshold')
     }
     
@@ -741,7 +741,7 @@ export class BiasDetectionConfigManager {
     this.config = updateConfiguration(this.config, updates)
   }
 
-  public reloadFromEnvironment(): void {
+  public reloadFromEnvironment() {
     this.config = createConfigWithEnvOverrides()
   }
 }
@@ -779,8 +779,8 @@ export function getConfigSummary(): {
       loadedEnvVars: envSummary.loaded,
       errors: [],
     }
-  } catch (error) {
-    errors.push(error instanceof Error ? error.message : String(error))
+  } catch (error: unknown) {
+    errors.push(error instanceof Error ? String(error) : String(error))
     return {
       isValid: false,
       source: 'invalid',
@@ -814,10 +814,10 @@ export function isProductionReady(): {
 
   // Check service configuration - comprehensive insecure URL checks
   if (
-    config['pythonServiceUrl'].includes('localhost') ||
-    config['pythonServiceUrl'].includes('127.0.0.1') ||
-    config['pythonServiceUrl'].includes('0.0.0.0') ||
-    !config['pythonServiceUrl'].startsWith('https://')
+    config?.['pythonServiceUrl']?.includes?.('localhost') ||
+    config?.['pythonServiceUrl']?.includes?.('127.0.0.1') ||
+    config?.['pythonServiceUrl']?.includes?.('0.0.0.0') ||
+    !config?.['pythonServiceUrl']?.startsWith?.('https://')
   ) {
     issues.push(
       'Python service URL should use HTTPS and not use localhost/127.0.0.1/0.0.0.0 in production',
@@ -835,8 +835,8 @@ export function isProductionReady(): {
 
   // Check alert configuration
   if (
-    !config['alertConfig']['enableEmailNotifications'] &&
-    !config['alertConfig']['enableSlackNotifications']
+    !config?.['alertConfig']?.['enableEmailNotifications'] &&
+    !config?.['alertConfig']?.['enableSlackNotifications']
   ) {
     issues.push('At least one alert method must be configured')
   }

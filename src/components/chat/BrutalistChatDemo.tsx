@@ -12,7 +12,7 @@ interface Message {
   };
 }
 
-const BrutalistChatDemo: React.FC = () => {
+const BrutalistChatDemo: FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -123,7 +123,7 @@ export default function ClinicalAnalysisDemo() {
 
       setResults(analysisResult)
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Clinical analysis failed:', error)
       setError('Analysis failed. Please try again.')
       

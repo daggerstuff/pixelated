@@ -188,10 +188,10 @@ export class EvidenceService {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.metrics.errorCount++
       this.metrics.lastError =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? String(error) : 'Unknown error'
 
       logger.error('Evidence extraction failed', {
         error,
@@ -282,7 +282,7 @@ export class EvidenceService {
         contextualFactors: contextualFactors.slice(0, 4),
         protectiveFactors: protectiveFactors.slice(0, 3),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Crisis evidence extraction failed', { error })
       return {
         immediateRiskIndicators: [],
@@ -364,7 +364,7 @@ export class EvidenceService {
   /**
    * Clear cache
    */
-  clearCache(): void {
+  clearCache() {
     this.cache.clear()
     logger.info('Evidence cache cleared')
   }

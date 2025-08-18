@@ -6,12 +6,9 @@
  * Focuses on core service integration without external dependencies
  */
 
-import { createBuildSafeLogger } from '../src/lib/logging/build-safe-logger'
 import { MemoryService } from '../src/lib/memory'
 import { fheService } from '../src/lib/fhe'
 import { EncryptionMode } from '../src/lib/fhe/types'
-
-const logger = createBuildSafeLogger('phase3-simple-test')
 
 interface TestResult {
   name: string
@@ -133,7 +130,8 @@ class SimplePhase3Tester {
       // Initialize FHE service
       await fheService.initialize({
         mode: EncryptionMode.STANDARD,
-        securityLevel: 'medium'
+        keySize: 2048,
+        securityLevel: 'tc128'
       })
 
       // Test encryption
@@ -194,7 +192,8 @@ class SimplePhase3Tester {
       // 2. Encrypt the memory content
       await fheService.initialize({
         mode: EncryptionMode.STANDARD,
-        securityLevel: 'medium'
+        keySize: 2048,
+        securityLevel: 'tc128'
       })
 
       const encryptedContent = await fheService.encrypt(memory.content)
@@ -319,7 +318,7 @@ class SimplePhase3Tester {
       
       // Test concurrent memory operations
       const concurrentStart = Date.now()
-      const operations = []
+      const operations: Promise<any>[] = []
       
       for (let i = 0; i < operationCount; i++) {
         operations.push(

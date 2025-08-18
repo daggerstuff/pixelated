@@ -59,7 +59,7 @@ export class BiasWebSocketServer {
   private bannedIPs: Map<string, Date> = new Map()
   private messageRateLimits: Map<string, Array<Date>> = new Map()
 
-  constructor(private config: WebSocketServerConfig) {}
+  constructor(private config: WebSocketServerConfig): void {}
 
   async start(): Promise<void> {
     if (this.isRunning) {
@@ -90,7 +90,7 @@ export class BiasWebSocketServer {
         port: this.config.port,
         maxConnections: this.config.maxConnections,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to start WebSocket server', { error })
       throw error
     }
@@ -116,7 +116,7 @@ export class BiasWebSocketServer {
       for (const [clientId, client] of this.clients) {
         try {
           client.ws.close(1001, 'Server shutting down')
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn('Error closing client connection', { clientId, error })
         }
       }
@@ -138,7 +138,7 @@ export class BiasWebSocketServer {
 
       this.isRunning = false
       logger.info('Bias WebSocket server stopped successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error stopping WebSocket server', { error })
       throw error
     }
@@ -288,7 +288,7 @@ export class BiasWebSocketServer {
         default:
           logger.warn('Unknown message type', { clientId, type: message.type })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error parsing WebSocket message', { clientId, error })
       this.sendErrorToClient(clientId, 'Invalid message format')
     }
@@ -522,7 +522,7 @@ export class BiasWebSocketServer {
           updatedTrends: dashboardData.trends,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching dashboard data', { clientId, error })
       this.sendErrorToClient(clientId, 'Failed to fetch dashboard data')
     }
@@ -679,7 +679,7 @@ export class BiasWebSocketServer {
         try {
           this.sendToClient(clientId, message)
           recipients.push(clientId)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to send message to client', {
             clientId,
             error,
@@ -707,7 +707,7 @@ export class BiasWebSocketServer {
 
     try {
       client.ws.send(JSON.stringify(message))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error sending message to client', { clientId, error })
       this.clients.delete(clientId)
     }
@@ -802,7 +802,7 @@ export class BiasWebSocketServer {
     return ['bias_analysis_read', 'dashboard_read', 'alerts_read']
   }
 
-  private startHeartbeat(): void {
+  private startHeartbeat() {
     this.heartbeatInterval = setInterval(() => {
       const now = new Date()
       const timeout = this.config.heartbeatInterval * 2
@@ -825,7 +825,7 @@ export class BiasWebSocketServer {
     }, this.config.heartbeatInterval)
   }
 
-  private startMetricsCollection(): void {
+  private startMetricsCollection() {
     this.metricsInterval = setInterval(() => {
       logger.info('WebSocket server metrics', {
         activeConnections: this.clients.size,

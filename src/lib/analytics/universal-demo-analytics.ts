@@ -42,7 +42,7 @@ export class UniversalDemoAnalytics {
   private eventQueue: AnalyticsEventData[]
   private isInitialized: boolean
 
-  constructor(pageName: DemoPageName) {
+  constructor(pageName: DemoPageName): void {
     this.pageName = pageName
     this.pageConfig = DEMO_PAGES_CONFIG[pageName]
     this.sessionId = this.generateSessionId()
@@ -85,7 +85,7 @@ export class UniversalDemoAnalytics {
         variant: this.abTestVariant,
         pageConfig: this.pageConfig,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to initialize analytics:', error)
     }
   }
@@ -123,24 +123,24 @@ export class UniversalDemoAnalytics {
     return variant
   }
 
-  private applyABTestVariant(): void {
+  private applyABTestVariant() {
     const variant = this.abTestVariant
     const config = this.pageConfig.abTestVariants
 
     // Update headline
-    const headlineElement = document.getElementById('headline-text')
+    const headlineElement = document.getElementById('headline-text') as HTMLElement
     if (headlineElement && config.headline[variant]) {
       headlineElement.textContent = config.headline[variant]
     }
 
     // Update CTA
-    const ctaElement = document.getElementById('cta-text')
+    const ctaElement = document.getElementById('cta-text') as HTMLElement
     if (ctaElement && config.cta[variant]) {
       ctaElement.textContent = config.cta[variant]
     }
 
     // Update urgency badge
-    const urgencyElement = document.getElementById('urgency-text')
+    const urgencyElement = document.getElementById('urgency-text') as HTMLElement
     if (urgencyElement && config.urgency[variant]) {
       urgencyElement.textContent = config.urgency[variant]
     }
@@ -164,7 +164,7 @@ export class UniversalDemoAnalytics {
     })
   }
 
-  private setupScrollTracking(): void {
+  private setupScrollTracking() {
     let ticking = false
 
     const handleScroll = () => {
@@ -199,7 +199,7 @@ export class UniversalDemoAnalytics {
     window.addEventListener('scroll', handleScroll, { passive: true })
   }
 
-  private setupSectionTracking(): void {
+  private setupSectionTracking() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -228,7 +228,7 @@ export class UniversalDemoAnalytics {
       })
   }
 
-  private setupCTATracking(): void {
+  private setupCTATracking() {
     document
       .querySelectorAll('[data-event="cta_click"], button, a[href]')
       .forEach((element) => {
@@ -249,7 +249,7 @@ export class UniversalDemoAnalytics {
       })
   }
 
-  private setupDemoInteractionTracking(): void {
+  private setupDemoInteractionTracking() {
     // Track demo component interactions
     const demoContainers = document.querySelectorAll(
       '.bg-slate-900\\/50, [data-demo], .demo-container',
@@ -278,7 +278,7 @@ export class UniversalDemoAnalytics {
     })
   }
 
-  private setupTimeTracking(): void {
+  private setupTimeTracking() {
     TIME_THRESHOLDS.forEach((threshold) => {
       setTimeout(() => {
         this.trackEvent(ANALYTICS_EVENTS.TIME_ON_PAGE, {
@@ -303,7 +303,7 @@ export class UniversalDemoAnalytics {
     })
   }
 
-  private setupErrorTracking(): void {
+  private setupErrorTracking() {
     window.addEventListener('error', (e) => {
       this.trackEvent(ANALYTICS_EVENTS.ERROR_OCCURRED, {
         error_message: e.message,
@@ -322,7 +322,7 @@ export class UniversalDemoAnalytics {
     })
   }
 
-  private setupPerformanceTracking(): void {
+  private setupPerformanceTracking() {
     // Track page load performance
     window.addEventListener('load', () => {
       setTimeout(() => {
@@ -344,7 +344,7 @@ export class UniversalDemoAnalytics {
     })
   }
 
-  private setupEventFlushing(): void {
+  private setupEventFlushing() {
     // Flush events every 30 seconds
     setInterval(() => {
       this.flushEvents()
@@ -394,7 +394,7 @@ export class UniversalDemoAnalytics {
 
     try {
       await this.sendEvents(eventsToSend)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to send analytics events:', error)
       // Re-queue events for retry
       this.eventQueue.unshift(...eventsToSend)
@@ -430,7 +430,7 @@ export class UniversalDemoAnalytics {
       if (!response.ok) {
         throw new Error(`Analytics API error: ${response.status}`)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to send to custom analytics:', error)
       throw error
     }

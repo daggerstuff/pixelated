@@ -60,7 +60,7 @@ export function TherapyChatClient() {
       analytics.trackEvent({
         type: 'websocket_error',
         properties: {
-          error: error.message,
+          error: String(error),
           sessionId,
         },
       })
@@ -173,7 +173,7 @@ export function TherapyChatClient() {
 
   // Create a custom input change handler that adapts to textarea
   const handleTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    handleInputChange(e as unknown as ChangeEvent<HTMLInputElement>)
+    handleInputChange(e as ChangeEvent<HTMLInputElement>)
   }
 
   return (

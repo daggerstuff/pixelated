@@ -87,7 +87,7 @@ export class CrisisDetectionService {
     high: { crisis: 0.4, concern: 0.2 },
   }
 
-  constructor(config: CrisisDetectionConfig) {
+  constructor(config: CrisisDetectionConfig): void {
     this.aiService = config.aiService
     this.sensitivityLevel = config.sensitivityLevel
     this.model = config.model
@@ -107,7 +107,7 @@ export class CrisisDetectionService {
       if (keywordAnalysis.score >= 0.3) {
         try {
           aiAnalysis = await this.performAIAnalysis(text)
-        } catch (error) {
+        } catch (error: unknown) {
           // Log AI analysis failure but continue with keyword analysis
           appLogger.warn('AI analysis failed, using keyword analysis only', { error })
         }
@@ -134,10 +134,10 @@ export class CrisisDetectionService {
         suggestedActions: this.generateSuggestedActions(finalScore),
         timestamp: new Date().toISOString(),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Error in crisis detection:', {
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : '',
+        message: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : '',
         error,
       })
       
@@ -164,10 +164,10 @@ export class CrisisDetectionService {
       return await Promise.all(
         texts.map((text) => this.detectCrisis(text, options)),
       )
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Error in batch crisis detection:', {
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : '',
+        message: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : '',
         error,
       })
       throw new Error('Batch crisis detection failed')
@@ -284,7 +284,7 @@ export class CrisisDetectionService {
       // Parse AI response
       const { content } = response
       try {
-        const parsed = JSON.parse(content)
+        const parsed = JSON.parse(content) as unknown
 
         if (typeof parsed === 'object' && parsed !== null) {
           return {
@@ -315,7 +315,7 @@ export class CrisisDetectionService {
           recommendations: ['Manual review recommended'],
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       // This will catch errors from the AI service itself (e.g., network issues, API errors)
       appLogger.error('AI service call failed in crisis detection', { error })
       // Return null to fall back to keyword analysis instead of throwing

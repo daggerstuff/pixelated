@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen, act } from '@testing-library/react'
 import RUMWidget from '../RUMWidget'
 import * as hooks from '../../../lib/monitoring/hooks'

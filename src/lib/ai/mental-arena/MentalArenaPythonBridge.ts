@@ -89,7 +89,7 @@ export class MentalArenaPythonBridge {
   private isProcessing: boolean = false
   private performanceMetrics: BridgePerformanceMetrics
 
-  constructor(config: PythonBridgeConfig) {
+  constructor(config: PythonBridgeConfig): void {
     this.config = {
       timeout: 300000, // 5 minutes default
       maxRetries: 3,
@@ -137,7 +137,7 @@ export class MentalArenaPythonBridge {
       logger.info('MentalArena Python bridge initialized successfully', {
         initializationTime: initTime,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize MentalArena Python bridge', error)
       throw new Error(`Python bridge initialization failed: ${error}`)
     }
@@ -276,7 +276,7 @@ export class MentalArenaPythonBridge {
       // Read and parse result if successful
       if (result.success && (await this.fileExists(outputFile))) {
         const resultData = await fs.readFile(outputFile, 'utf-8')
-        result.output = JSON.parse(resultData)
+        result.output = JSON.parse(resultData) as unknown
       }
 
       return result
@@ -332,7 +332,7 @@ export class MentalArenaPythonBridge {
       )
 
       return result.success
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Python bridge availability check failed', error)
       return false
     }
@@ -364,7 +364,7 @@ export class MentalArenaPythonBridge {
       )
 
       return `Python: ${pythonVersion.output}, MentalArena: ${mentalArenaInfo.output}`
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get version information', error)
       return 'Version information unavailable'
     }
@@ -396,7 +396,7 @@ export class MentalArenaPythonBridge {
         }
 
         logger.info('Virtual environment cleaned up successfully')
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to clean up virtual environment', error)
       }
     }
@@ -424,7 +424,7 @@ export class MentalArenaPythonBridge {
       // Recreate environment
       await this.setupPythonEnvironment()
       logger.info('Virtual environment reinstalled successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       // Restore previous Python path on failure
       this.config.pythonPath = currentPythonPath
       throw error
@@ -495,7 +495,7 @@ export class MentalArenaPythonBridge {
 
   // Private methods
 
-  private ensureInitialized(): void {
+  private ensureInitialized() {
     if (!this.isInitialized) {
       throw new Error(
         'MentalArena Python bridge not initialized. Call initialize() first.',
@@ -804,7 +804,7 @@ export class MentalArenaPythonBridge {
           true,
         )
         item.resolve(result)
-      } catch (error) {
+      } catch (error: unknown) {
         this.performanceMetrics.recordExecution(
           Date.now() - item.timestamp,
           false,
@@ -965,10 +965,10 @@ export class MentalArenaPythonBridge {
         violations: violations.length,
         missingVersions: missingVersions.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (
         error instanceof Error &&
-        error.message.includes('Security violations')
+        String(error).includes('Security violations')
       ) {
         throw error
       }
@@ -1114,7 +1114,7 @@ export class MentalArenaPythonBridge {
           if (await this.fileExists(filePath)) {
             await fs.unlink(filePath)
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn(`Failed to cleanup temp file: ${filePath}`, error)
         }
       }),

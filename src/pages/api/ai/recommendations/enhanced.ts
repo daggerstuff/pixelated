@@ -137,13 +137,13 @@ export const POST: APIRoute = async ({ request }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error generating enhanced recommendations', { error })
 
     return createErrorResponse({
       status: 500,
       message: 'Failed to generate enhanced recommendations',
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
   }
 }

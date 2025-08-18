@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
@@ -31,7 +30,7 @@ export const POST = protectRoute({})(async ({ request, locals }) => {
     let requestBody
     try {
       requestBody = await request.json()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to parse request body', { error })
       return new Response(
         JSON.stringify({ error: 'Bad Request', message: 'Invalid JSON body' }),
@@ -82,7 +81,7 @@ export const POST = protectRoute({})(async ({ request, locals }) => {
           ...analysis,
           timestamp: new Date(analysis.timestamp),
         } as ExtendedEmotionAnalysis)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Invalid date format in analysis', { analysis, error })
       }
     }
@@ -142,7 +141,7 @@ export const POST = protectRoute({})(async ({ request, locals }) => {
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     logger.error('Error processing risk correlation request', { error })
 
@@ -152,7 +151,7 @@ export const POST = protectRoute({})(async ({ request, locals }) => {
         error: 'Internal Server Error',
         message:
           error instanceof Error
-            ? error.message
+            ? String(error)
             : 'An unexpected error occurred',
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },

@@ -185,7 +185,7 @@ function addLazyLoading(img: HTMLImageElement): void {
 /**
  * Apply all optimizations to images in the DOM
  */
-function optimizeAllImages(): void {
+function optimizeAllImages() {
   // Fix CLS (Cumulative Layout Shift) issues
   preventCLS()
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import { useSimulatorContext } from '../context/SimulatorContext'
 
 interface ProgressBarProps {

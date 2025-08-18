@@ -61,7 +61,7 @@ export async function setupBrowserEnvironment(): Promise<void> {
     setupDeviceSpecificFixes()
 
     logger.info('Browser environment setup complete')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error setting up browser environment:', error)
   }
 }
@@ -70,7 +70,7 @@ export async function setupBrowserEnvironment(): Promise<void> {
  * Fix viewport height issues on mobile devices
  * This addresses the iOS viewport height issue with the virtual keyboard
  */
-function setupViewportHeightFix(): void {
+function setupViewportHeightFix() {
   if (typeof window === 'undefined') {
     return
   }
@@ -94,7 +94,7 @@ function setupViewportHeightFix(): void {
 /**
  * Detect touch-capable devices and add appropriate class to document
  */
-function setupTouchDeviceDetection(): void {
+function setupTouchDeviceDetection() {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return
   }
@@ -115,7 +115,7 @@ function setupTouchDeviceDetection(): void {
 /**
  * Detect reduced motion preference and add appropriate class to document
  */
-function setupPrefersReducedMotion(): void {
+function setupPrefersReducedMotion() {
   if (typeof window === 'undefined') {
     return
   }
@@ -140,7 +140,7 @@ function setupPrefersReducedMotion(): void {
 /**
  * Detect save-data preference for users on limited data plans
  */
-function setupReducedDataDetection(): void {
+function setupReducedDataDetection() {
   if (typeof navigator === 'undefined') {
     return
   }
@@ -162,7 +162,7 @@ function setupReducedDataDetection(): void {
 /**
  * Detect high contrast mode / forced colors mode
  */
-function setupHighContrastDetection(): void {
+function setupHighContrastDetection() {
   if (typeof window === 'undefined') {
     return
   }
@@ -187,7 +187,7 @@ function setupHighContrastDetection(): void {
 /**
  * Apply fixes specific to certain devices or browsers
  */
-function setupDeviceSpecificFixes(): void {
+function setupDeviceSpecificFixes() {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return
   }

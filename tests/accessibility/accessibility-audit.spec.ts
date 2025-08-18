@@ -254,8 +254,8 @@ test.describe('Accessibility Audit and Compliance', () => {
 
         // Check for proper nesting (no skipping levels)
         for (let i = 1; i < headingLevels.length; i++) {
-          const currentLevel = headingLevels[i]?.level
-          const previousLevel = headingLevels[i - 1]?.level
+          const currentLevel = (headingLevels[i] as any)?.level
+          const previousLevel = (headingLevels[i - 1] as any)?.level
 
           if (currentLevel !== undefined && previousLevel !== undefined) {
             // Should not skip more than one level
@@ -353,7 +353,7 @@ test.describe('Accessibility Audit and Compliance', () => {
 
           if (!hasGoodContrast) {
             const text = await element.textContent()
-            contrastIssues.push({ text: text?.slice(0, 50), styles })
+            ;(contrastIssues as any[]).push({ text: text?.slice(0, 50), styles })
           }
         }
       }

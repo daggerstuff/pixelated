@@ -108,7 +108,7 @@ export function StatePersistenceProvider({
         if (debug) {
           logger.info('State persistence system initialized successfully')
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to initialize state persistence system:', error)
         setStats((prev) => ({ ...prev, isHealthy: false }))
       }
@@ -156,7 +156,7 @@ export function StatePersistenceProvider({
             }
           })
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.debug('Storage estimation not available:', error)
       }
     }
@@ -187,7 +187,7 @@ export function StatePersistenceProvider({
       if (debug) {
         logger.debug('Storage stats updated:', storageStats)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to refresh storage stats:', error)
       setStats((prev) => ({ ...prev, isHealthy: false }))
     }
@@ -202,7 +202,7 @@ export function StatePersistenceProvider({
       if (debug) {
         logger.info('All persisted state cleared')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to clear persisted state:', error)
       throw error
     }
@@ -218,7 +218,7 @@ export function StatePersistenceProvider({
       }
 
       return exported
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to export state:', error)
       throw error
     }
@@ -234,7 +234,7 @@ export function StatePersistenceProvider({
         if (debug) {
           logger.info('State imported:', Object.keys(state))
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to import state:', error)
         throw error
       }
@@ -280,7 +280,7 @@ export function StatePersistenceProvider({
           logger.warn('Failed to store backup to localStorage:', storageError)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create state backup:', error)
     }
   }, [exportState, debug])
@@ -358,10 +358,10 @@ export function StatePersistenceDebugger() {
     const reader = new FileReader()
     reader.onload = async (e) => {
       try {
-        const state = JSON.parse(e.target?.result as string)
+        const state = JSON.parse(e.target?.result as string) as unknown
         await importState(state)
         alert('State imported successfully!')
-      } catch (error) {
+      } catch (error: unknown) {
         alert('Failed to import state: ' + error)
       }
     }
@@ -411,7 +411,7 @@ export function StatePersistenceDebugger() {
           id="import-input"
         />
         <button
-          onClick={() => document.getElementById('import-input')?.click()}
+          onClick={() => (document.getElementById('import-input') as HTMLElement)?.click()}
         >
           Import
         </button>

@@ -34,7 +34,7 @@ export class AnalyticsDataService {
   private analyticsService: AnalyticsService
   private config: AnalyticsServiceConfig
 
-  private constructor(config?: Partial<AnalyticsServiceConfig>) {
+  private constructor(config?: Partial<AnalyticsServiceConfig>): void {
     this.config = {
       apiBaseUrl: '/api/analytics',
       refreshInterval: 300000, // 5 minutes
@@ -89,7 +89,7 @@ export class AnalyticsDataService {
       this.setCachedData(cacheKey, analyticsData, this.config.refreshInterval)
 
       return analyticsData
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch analytics data', { error, filters })
       throw this.handleError(error)
     }
@@ -113,7 +113,7 @@ export class AnalyticsDataService {
       })
 
       return this.aggregateSessionData(events, filters.timeRange)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch session metrics', { error })
       throw new Error('Failed to fetch session metrics')
     }
@@ -134,7 +134,7 @@ export class AnalyticsDataService {
       ])
 
       return skillMetrics.filter(Boolean) as SkillProgressData[]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch skill progress', { error })
       throw new Error('Failed to fetch skill progress data')
     }
@@ -192,7 +192,7 @@ export class AnalyticsDataService {
           trend: await this.calculateTrend('average_rating', filters.timeRange),
         },
       ]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch summary stats', { error })
       throw new Error('Failed to fetch summary statistics')
     }
@@ -269,7 +269,7 @@ export class AnalyticsDataService {
         trend: this.calculateTrendDirection(currentScore, safePreviousScore),
         category: this.getSkillCategory(skillName),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to fetch skill metric: ${skillName}`, { error })
       return null
     }
@@ -297,7 +297,7 @@ export class AnalyticsDataService {
     return Math.round(avgRating * 10) / 10 // Round to 1 decimal
   }
 
-  private async calculateTrend(metricName: string, timeRange: TimeRange) {
+  private async calculateTrend(metricName: string, timeRange: TimeRange): void {
     try {
       const currentPeriod = this.getTimeRangeInMs(timeRange)
       const endTime = Date.now()
@@ -337,7 +337,7 @@ export class AnalyticsDataService {
               : ('stable' as const),
         period: `vs previous ${timeRange}`,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to calculate trend for ${metricName}`, { error })
       return undefined
     }
@@ -426,8 +426,8 @@ export class AnalyticsDataService {
     if (error instanceof Error) {
       return {
         code: 'FETCH_ERROR',
-        message: error.message,
-        details: error.stack,
+        message: String(error),
+        details: (error as Error)?.stack,
       }
     }
 
@@ -441,7 +441,7 @@ export class AnalyticsDataService {
   /**
    * Clear cache (useful for testing or forced refresh)
    */
-  clearCache(): void {
+  clearCache() {
     this.cache.clear()
     logger.info('Analytics cache cleared')
   }

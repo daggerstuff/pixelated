@@ -39,7 +39,7 @@ export function useDashboard() {
         const dashboardData = await response.json()
         setData(dashboardData)
         setError(null)
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error fetching dashboard data:', err)
         setError('Failed to load dashboard data')
       } finally {

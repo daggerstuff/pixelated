@@ -9,7 +9,7 @@ export const POST = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    if (!authResult?.['authenticated']) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -25,7 +25,7 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Check admin permission
-    if (!authResult.user?.isAdmin) {
+    if (!authResult?.['user']?.['isAdmin']) {
       return new Response(
         JSON.stringify({
           error: 'Forbidden',
@@ -69,8 +69,8 @@ export const POST = async ({ request }: APIContext) => {
       notificationType,
       testData,
       {
-        userId: authResult.user?.id,
-        email: authResult.user?.email,
+        userId: authResult?.['user']?.['id'],
+        email: authResult?.['user']?.['email'],
       },
     )
 
@@ -80,13 +80,13 @@ export const POST = async ({ request }: APIContext) => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error sending test notification:', error)
 
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

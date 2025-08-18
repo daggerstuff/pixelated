@@ -48,7 +48,7 @@ class MockWebSocket {
   public readonly url: string
   public readyState: number = 1
 
-  constructor(url: string) {
+  constructor(url: string): void {
     this.url = url
   }
 
@@ -130,7 +130,7 @@ describe('analyticsService', () => {
         const result = EventDataSchema.parse(testData)
         console.log('Schema validation result:', result)
         expect(result).toBeDefined()
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Schema validation error:', error)
         throw error
       }

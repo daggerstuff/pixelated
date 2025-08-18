@@ -71,7 +71,7 @@ export const loggingMiddleware = defineMiddleware(async ({ request }, next) => {
     })
 
     return response
-  } catch (error) {
+  } catch (error: unknown) {
     // Calculate request duration event for errors
     const duration = performance.now() - startTime
 

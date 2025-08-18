@@ -98,7 +98,7 @@ return new Response(null, {
   import { toast } from '@/components/ui/toast'
 
   // Show toast notification when the page loads
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     toast.info('Verifying authentication...', {
       duration: 3000,
     })

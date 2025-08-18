@@ -84,7 +84,7 @@ program
 
         console.log(chalk.blue('\nTo check status of this test breach:'))
         console.log(chalk.gray(`pnpm security:breach-status ${breachId}`))
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to run test breach notification:', error)
         process.exit(1)
       }
@@ -208,7 +208,7 @@ program
         console.log(chalk.yellow('Notification process has been initiated'))
         console.log(chalk.blue('\nTo check status of this breach:'))
         console.log(chalk.gray(`pnpm security:breach-status ${breachId}`))
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to report breach:', error)
         process.exit(1)
       }
@@ -267,7 +267,7 @@ program
 
       console.log(chalk.blue('\nTo view details of a specific breach:'))
       console.log(chalk.gray('pnpm security:breach-status <breach-id>'))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to list breaches:', error)
       process.exit(1)
     }
@@ -308,13 +308,13 @@ program
       console.log(`Detection Method: ${chalk.gray(breach.detectionMethod)}`)
       console.log(`Remediation: ${chalk.gray(breach.remediation)}`)
       console.log(chalk.blue('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get breach status:', error)
       process.exit(1)
     }
   })
 
-function getSeverityColor(severity: 'low' | 'medium' | 'high' | 'critical') {
+function getSeverityColor(severity: 'low' | 'medium' | 'high' | 'critical'): void {
   switch (severity) {
     case 'critical':
       return chalk.red.bold
@@ -329,7 +329,7 @@ function getSeverityColor(severity: 'low' | 'medium' | 'high' | 'critical') {
   }
 }
 
-function getStatusColor(status: 'pending' | 'in_progress' | 'completed') {
+function getStatusColor(status: 'pending' | 'in_progress' | 'completed'): void {
   switch (status) {
     case 'pending':
       return chalk.yellow

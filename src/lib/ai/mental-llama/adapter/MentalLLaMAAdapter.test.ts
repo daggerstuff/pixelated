@@ -67,17 +67,17 @@ describe('MentalLLaMAAdapter (Consolidated)', () => {
     }
 
     // Use the mocked constructors for EvidenceService and ExpertGuidanceOrchestrator
-    mockEvidenceService = new EvidenceService(mockModelProvider) as any
+    mockEvidenceService = new EvidenceService(mockModelProvider) as unknown
     mockExpertGuidanceOrchestrator = new ExpertGuidanceOrchestrator(
       mockEvidenceService,
       mockModelProvider,
       mockCrisisNotifier,
-    ) as any
+    ) as unknown
 
     // Mock methods of the instances
     vi.mocked(mockEvidenceService.extractSupportingEvidence).mockResolvedValue({
       evidenceItems: ['mocked evidence'],
-      detailedEvidence: {} as any, // simplified for mock
+      detailedEvidence: {} as unknown, // simplified for mock
       processingMetadata: {
         cacheUsed: false,
         processingTime: 10,

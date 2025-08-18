@@ -10,7 +10,7 @@ interface CrisisSessionFlagsManagerProps {
   allowManagement?: boolean
 }
 
-export const CrisisSessionFlagsManager: React.FC<
+export const CrisisSessionFlagsManager: FC<
   CrisisSessionFlagsManagerProps
 > = ({ userId, showPendingOnly = false, allowManagement = false }) => {
   const [flags, setFlags] = useState<CrisisSessionFlag[]>([])
@@ -43,9 +43,9 @@ export const CrisisSessionFlagsManager: React.FC<
       const data = await response.json()
       setFlags(data.flags || [])
       setUserStatus(data.status || null)
-    } catch (err) {
+    } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : 'Failed to load crisis flags',
+        err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to load crisis flags',
       )
     } finally {
       setLoading(false)
@@ -91,8 +91,8 @@ export const CrisisSessionFlagsManager: React.FC<
       )
 
       setSelectedFlag(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update flag')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to update flag')
     } finally {
       setUpdating(null)
     }

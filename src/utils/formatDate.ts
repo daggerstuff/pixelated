@@ -55,9 +55,9 @@ export function formatDate(
     }
 
     return date.toLocaleDateString(options.locale || 'en-US', formatOptions)
-  } catch (error) {
+  } catch (error: unknown) {
     throw new Error(
-      `Failed to format date: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      `Failed to format date: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     )
   }
 }

@@ -199,7 +199,7 @@ const RubiksCubeModel = forwardRef<THREE.Group, RubiksCubeModelProps>((props, re
 
   // Set up the finalizeRotation function
   useEffect(() => {
-    finalizeRotationRef.current = (move: Move): void => {
+    finalizeRotationRef.current = (move: Move) => {
       const finalRotationMatrix = getRotationMatrix(move.axis, (Math.PI / 2) * move.direction);
       setCubes(prevCubes => {
         const newCubes = prevCubes.map(cube => {

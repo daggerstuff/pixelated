@@ -47,11 +47,11 @@ export const GET = async ({ request }: APIContext) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get profile error:', error)
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'Failed to get profile',
+        error: error instanceof Error ? String(error) : 'Failed to get profile',
       }),
       {
         status: 401,
@@ -122,12 +122,12 @@ export const PUT = async ({ request }: APIContext) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Update profile error:', error)
     return new Response(
       JSON.stringify({
         error:
-          error instanceof Error ? error.message : 'Failed to update profile',
+          error instanceof Error ? String(error) : 'Failed to update profile',
       }),
       {
         status: 500,

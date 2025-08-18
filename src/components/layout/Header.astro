@@ -100,7 +100,7 @@ const navLinks = [
   const mobileMenu = document.getElementById('mobile-menu');
 
   if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', () => {
+    mobileMenuButton.addEventListener('click', (_event: Event) => {
       const isOpen = !mobileMenu.classList.contains('hidden');
 
       if (isOpen) {
@@ -113,7 +113,7 @@ const navLinks = [
     });
 
     // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', (e: Event) => {
       if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
         mobileMenu.classList.add('hidden');
         mobileMenuButton.setAttribute('aria-expanded', 'false');

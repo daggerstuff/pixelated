@@ -74,7 +74,7 @@ export class ObjectiveWeightingEngine {
   private performanceHistory: Map<string, number[]> = new Map()
   private adjustmentHistory: WeightAdjustment[] = []
 
-  constructor(adjustmentParams: WeightAdjustmentParams) {
+  constructor(adjustmentParams: WeightAdjustmentParams): void {
     this.adjustmentParams = adjustmentParams
   }
 

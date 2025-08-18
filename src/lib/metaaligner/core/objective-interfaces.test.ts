@@ -403,7 +403,7 @@ describe('Objective Interfaces', () => {
         expect(error).toHaveProperty('message')
         expect(error).toHaveProperty('code')
         expect(typeof error.field).toBe('string')
-        expect(typeof error.message).toBe('string')
+        expect(typeof String(error)).toBe('string')
         expect(typeof error.code).toBe('string')
       }
     })

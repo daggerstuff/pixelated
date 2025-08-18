@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     // Authenticate the request
     const authResult = await isAuthenticated(request)
-    if (!authResult['authenticated']) {
+    if (!authResult?.['authenticated']) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -30,16 +30,16 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Check user permissions (must be admin)
-    if (!authResult['user']?.['isAdmin']) {
+    if (!authResult?.['user']?.['isAdmin']) {
       // Create audit log for unauthorized access attempt
       await createAuditLog(
-        AuditEventType.SECURITY_EVENT,
+        (AuditEventType as unknown as { SECURITY_EVENT?: string })?.['SECURITY_EVENT'] || 'SECURITY_EVENT',
         'validation-schedule-unauthorized',
-        authResult['user']?.['id'] || 'unknown',
+        (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'] || 'unknown',
         'validation-api',
         {
-          userId: authResult['user']?.['id'],
-          email: authResult['user']?.['email'],
+          userId: (authResult as unknown as { user?: { id?: string; email?: string } })?.['user']?.['id'],
+          email: (authResult as unknown as { user?: { id?: string; email?: string } })?.['user']?.['email'],
         },
         AuditEventStatus.FAILURE,
       )
@@ -73,10 +73,10 @@ export const POST: APIRoute = async ({ request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'validation-schedule-create',
-        authResult.user?.id || 'system',
+        (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'] || 'system',
         'validation-api',
         {
-          userId: authResult.user?.id,
+          userId: (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'],
           schedule,
         },
         AuditEventStatus.SUCCESS,
@@ -103,10 +103,10 @@ export const POST: APIRoute = async ({ request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'validation-schedule-stop',
-        authResult.user?.id || 'system',
+        (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'] || 'system',
         'validation-api',
         {
-          userId: authResult.user?.id,
+          userId: (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'],
         },
         AuditEventStatus.SUCCESS,
       )
@@ -152,10 +152,10 @@ export const POST: APIRoute = async ({ request }) => {
         },
       )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
     logger.error(`Validation schedule error: ${errorMessage}`)
 
     // Create audit log

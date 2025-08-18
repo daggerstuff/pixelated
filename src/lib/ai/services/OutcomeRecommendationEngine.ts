@@ -23,7 +23,7 @@ export function recommend(request: RecommendationRequest): TreatmentForecast[] {
     // Validate request
     try {
       RecommendationRequestSchema.parse(request)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new ValidationError('Invalid recommendation request', error)
     }
 
@@ -42,10 +42,10 @@ export function recommend(request: RecommendationRequest): TreatmentForecast[] {
       try {
         TreatmentForecastSchema.parse(forecast)
         return true
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Invalid forecast generated:', {
           outcomeId: forecast.outcomeId,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? String(error) : 'Unknown error',
         })
         return false
       }
@@ -62,12 +62,12 @@ export function recommend(request: RecommendationRequest): TreatmentForecast[] {
     return filteredForecasts
       .sort((a, b) => b.confidence - a.confidence)
       .slice(0, request.maxResults)
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof ValidationError) {
       throw error
     }
     logger.error('Error generating recommendations:', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? String(error) : 'Unknown error',
       desiredOutcomes: request.desiredOutcomes,
       maxResults: request.maxResults,
     })

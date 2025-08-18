@@ -51,7 +51,7 @@ export class WebSocketServer {
   private wss: WSServer
   private notificationService: NotificationService
 
-  constructor(port: number, notificationService: NotificationService) {
+  constructor(port: number, notificationService: NotificationService): void {
     this.notificationService = notificationService
     this.wss = new WSServer({ port })
 
@@ -68,7 +68,7 @@ export class WebSocketServer {
    */
   private handleServerError(error: Error): void {
     logger.createBuildSafeLogger('websocket').error('WebSocket server error', {
-      error: error.message,
+      error: String(error),
     })
   }
 
@@ -78,11 +78,11 @@ export class WebSocketServer {
   private sendMessage(ws: WebSocket, message: ServerMessage): void {
     try {
       ws.send(JSON.stringify(message))
-    } catch (error) {
+    } catch (error: unknown) {
       logger
         .createBuildSafeLogger('websocket')
         .error('Failed to send message to client', {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
     }
   }
@@ -128,11 +128,11 @@ private async verifyToken(_token: string): Promise<string> {
           role: 'user',
         })
       return userId
-    } catch (error) {
+    } catch (error: unknown) {
       logger
         .createBuildSafeLogger('websocket')
         .error('Token verification failed', {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
       throw new Error('Invalid token')
     }
@@ -152,7 +152,7 @@ private async verifyToken(_token: string): Promise<string> {
     this.verifyToken(token)
       .then((userId: string) => this.setupAuthenticatedConnection(userId, ws))
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error)
+        const message = error instanceof Error ? String(error) : String(error)
         this.sendError(ws, `Authentication failed: ${message}`)
         ws.close(1008, 'Unauthorized - Token verification failed')
       })
@@ -200,7 +200,7 @@ private async verifyToken(_token: string): Promise<string> {
   private handleClientError(userId: string, error: Error): void {
     logger.createBuildSafeLogger('websocket').error('WebSocket client error', {
       userId,
-      error: error.message,
+      error: String(error),
     })
   }
 
@@ -211,12 +211,12 @@ private async verifyToken(_token: string): Promise<string> {
     try {
       const count = await this.notificationService.getUnreadCount(userId)
       this.sendMessage(ws, { type: 'unreadCount', count })
-    } catch (error) {
+    } catch (error: unknown) {
       logger
         .createBuildSafeLogger('websocket')
         .error('Failed to send unread count', {
           userId,
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
     }
   }
@@ -230,15 +230,15 @@ private async verifyToken(_token: string): Promise<string> {
     ws: WebSocket,
   ): void {
     try {
-      const message: unknown = JSON.parse(data)
+      const message: unknown = JSON.parse(data) as unknown
       const validatedMessage = ClientMessageSchema.parse(message)
       this.processMessage(userId, validatedMessage, ws)
-    } catch (error) {
+    } catch (error: unknown) {
       logger
         .createBuildSafeLogger('websocket')
         .error('Invalid message received', {
           userId,
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
       this.sendError(ws, 'Invalid message format')
     }
@@ -293,12 +293,12 @@ private async verifyToken(_token: string): Promise<string> {
           this.sendError(ws, `Unknown type: ${type}`)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger
         .createBuildSafeLogger('websocket')
         .error('Error processing message', {
           userId,
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
       this.sendError(ws, 'Error processing message')
     }

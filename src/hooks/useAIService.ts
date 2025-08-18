@@ -30,7 +30,7 @@ export function useAIService() {
         aiService.dispose()
 
         return response.content
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error getting AI response:', error)
         throw error
       }

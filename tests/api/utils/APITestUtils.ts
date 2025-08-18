@@ -179,7 +179,7 @@ export class APITestUtils {
         password: 'testPassword123',
         name: 'Primary Test User'
       });
-    } catch (error) {
+    } catch (error: unknown) {
       // User might already exist, try to login
       try {
         await this.getValidToken();
@@ -201,7 +201,7 @@ export class APITestUtils {
             'Authorization': `Bearer ${user.token}`
           }
         });
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(`Failed to cleanup user ${key}:`, error);
       }
     }
@@ -223,7 +223,7 @@ export class APITestUtils {
             'Authorization': `Bearer ${token}`
           }
         });
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(`Failed to cleanup conversation ${conversationId}:`, error);
       }
     }
@@ -245,7 +245,7 @@ export class APITestUtils {
             'Authorization': `Bearer ${token}`
           }
         });
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(`Failed to cleanup file ${fileId}:`, error);
       }
     }

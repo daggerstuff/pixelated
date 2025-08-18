@@ -72,7 +72,7 @@ test.describe('Pipeline Load Testing', () => {
             await expect(page.locator('text=Processing complete')).toBeVisible({
               timeout: 15000,
             })
-          } catch (error) {
+          } catch (error: unknown) {
             console.error(`User ${userIndex} ingestion failed:`, error)
           }
         }
@@ -109,7 +109,7 @@ test.describe('Pipeline Load Testing', () => {
             await expect(page.locator('text=Validation Results')).toBeVisible({
               timeout: 10000,
             })
-          } catch (error) {
+          } catch (error: unknown) {
             console.error(`User ${userIndex} validation failed:`, error)
           }
         }
@@ -145,7 +145,7 @@ test.describe('Pipeline Load Testing', () => {
               await page.click('button:has-text("Simulate Influx")')
               await page.waitForTimeout(500)
             }
-          } catch (error) {
+          } catch (error: unknown) {
             console.error(`User ${userIndex} balancing failed:`, error)
           }
         }
@@ -181,7 +181,7 @@ test.describe('Pipeline Load Testing', () => {
             await expect(page.locator('text=COMPLETED')).toBeVisible({
               timeout: 20000,
             })
-          } catch (error) {
+          } catch (error: unknown) {
             console.error(`User ${userIndex} export failed:`, error)
           }
         }
@@ -365,7 +365,7 @@ test.describe('Pipeline Load Testing', () => {
               },
               { timeout: 15000 },
             )
-          } catch (error) {
+          } catch (error: unknown) {
             console.error(`API connection ${i} failed:`, error)
           }
         }

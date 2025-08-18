@@ -645,7 +645,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
     const tabButtons = document.querySelectorAll('.tab-button')
 
     tabButtons.forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (_event: Event) => {
         // Update active tab
         tabButtons.forEach((btn) => {
           btn.classList.remove(
@@ -671,7 +671,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
   }
 
   // Initialize dashboard
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     setupTabs()
     updateDashboard()
 
@@ -686,7 +686,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
   })
 
   // Listen for theme changes to update chart colors
-  document.addEventListener('astro:after-swap', () => {
+  document.addEventListener('astro:after-swap', (_event: Event) => {
     if (processingTimeChart) processingTimeChart.destroy()
     if (tokenUsageChart) tokenUsageChart.destroy()
 

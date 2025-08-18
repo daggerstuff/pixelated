@@ -74,7 +74,7 @@ export class SealMemoryManager {
 
       // If the object wasn't tracked, just delete it
       obj.delete()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error releasing SEAL object', { error, name })
     }
   }
@@ -82,7 +82,7 @@ export class SealMemoryManager {
   /**
    * Release all tracked SEAL objects
    */
-  public releaseAll(): void {
+  public releaseAll() {
     logger.info(`Releasing ${this.objects.size} SEAL objects`)
 
     for (const [id, obj] of this.objects.entries()) {
@@ -90,7 +90,7 @@ export class SealMemoryManager {
         if (obj && typeof obj.delete === 'function') {
           obj.delete()
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Error releasing SEAL object ${id}`, { error })
       }
     }
@@ -158,7 +158,7 @@ export class SealResourceScope {
   /**
    * Explicitly close the scope and release all tracked resources
    */
-  public close(): void {
+  public close() {
     this.memoryManager.releaseAll()
   }
 }

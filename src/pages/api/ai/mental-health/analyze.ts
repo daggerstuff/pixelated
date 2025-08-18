@@ -43,7 +43,7 @@ async function getInitializedMentalLLaMA() {
     try {
       mentalLLaMAInstanceCache = await createMentalLLaMAFromEnv()
       logger.info('MentalLLaMA instance created and cached successfully.')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create MentalLLaMA instance for cache', { error })
       throw error // Rethrow to make it explicit that initialization failed
     }
@@ -201,15 +201,15 @@ export const POST: APIRoute = async ({ request }) => {
         'Expires': '0',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     timing.totalMs = Date.now() - overallStartTime
     const userId = (requestBody as Partial<AnalyzeRequestBody>)?.routingContext
       ?.userId
     const sessionId = (requestBody as Partial<AnalyzeRequestBody>)
       ?.routingContext?.sessionId
     logger.error('Error analyzing mental health', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
       timing,
       textLength: text.length, // text might not be initialized if parsing failed early
       userId,
@@ -219,7 +219,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'An error occurred while analyzing the text.',
-        detail: error instanceof Error ? error.message : 'Unknown error',
+        detail: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

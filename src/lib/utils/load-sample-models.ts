@@ -38,7 +38,7 @@ export async function loadSampleModels(): Promise<boolean> {
       `Successfully loaded ${sampleCognitiveModels.length} sample cognitive models.`,
     )
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to load sample cognitive models:', error)
     return false
   }
@@ -65,7 +65,7 @@ export async function resetModelStore(): Promise<boolean> {
 
     console.log('Successfully reset cognitive model store.')
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to reset cognitive model store:', error)
     return false
   }
@@ -82,7 +82,7 @@ export async function areSampleModelsLoaded(): Promise<boolean> {
 
     const existingModels = await patientService.getAvailableModels()
     return existingModels && existingModels.length > 0
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to check if sample models are loaded:', error)
     return false
   }

@@ -86,7 +86,7 @@ export const POST = async ({ request, cookies }) => {
           startTime: new Date(session.startTime),
           endTime: new Date(session.endTime),
         })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Invalid date format in session', { session, error })
       }
     }
@@ -146,7 +146,7 @@ export const POST = async ({ request, cookies }) => {
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     logger.error('Error processing cross-session pattern request', { error })
 
@@ -156,7 +156,7 @@ export const POST = async ({ request, cookies }) => {
         error: 'Internal Server Error',
         message:
           error instanceof Error
-            ? error.message
+            ? String(error)
             : 'An unexpected error occurred',
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },

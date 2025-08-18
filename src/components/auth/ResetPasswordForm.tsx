@@ -50,7 +50,7 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
         )
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'An error occurred'
+      const message = err instanceof Error ? (err as Error)?.message || String(err) : 'An error occurred'
       setError(message)
 
       // Dispatch error event

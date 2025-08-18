@@ -30,7 +30,7 @@ interface ConnectionInfo {
  * @param options Configuration options including callbacks for state changes
  * @returns Object with offline status and connection information
  */
-export function useOffline(options: UseOfflineOptions = {}) {
+export function useOffline(options: UseOfflineOptions = {}): void {
   const [isOffline, setIsOffline] = useState<boolean>(false)
   const { onOffline, onOnline } = options
 

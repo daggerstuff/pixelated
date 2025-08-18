@@ -133,7 +133,7 @@ describe('epic Provider', () => {
   describe('initialization', () => {
     it('should successfully initialize provider', async () => {
       // Mock the base provider's validateEndpoint method
-      vi.spyOn(epicProvider as any, 'validateEndpoint').mockResolvedValue(true)
+      vi.spyOn(epicProvider as unknown, 'validateEndpoint').mockResolvedValue(true)
 
       // Mock the getClient method to return a mock FHIR client
       const mockFhirClient = {
@@ -195,7 +195,7 @@ describe('epic Provider', () => {
         update: vi.fn(),
         delete: vi.fn(),
       }
-      vi.spyOn(epicProvider as any, 'getClient').mockReturnValue(mockFhirClient)
+      vi.spyOn(epicProvider as unknown, 'getClient').mockReturnValue(mockFhirClient)
 
       // Now initialization should work without network calls
       await expect(epicProvider.initialize()).resolves.not.toThrow()
@@ -211,7 +211,7 @@ describe('epic Provider', () => {
 
     it('should throw error when endpoint validation fails', async () => {
       // Mock the validateEndpoint method to return false
-      vi.spyOn(epicProvider as any, 'validateEndpoint').mockResolvedValue(false)
+      vi.spyOn(epicProvider as unknown, 'validateEndpoint').mockResolvedValue(false)
 
       await expect(epicProvider.initialize()).rejects.toThrow()
     })

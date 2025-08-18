@@ -84,7 +84,7 @@ export class MetaAlignerAPI {
   private metricsEngine: ObjectiveMetricsEngine
   private aiService: AIService | undefined
 
-  constructor(config: AlignmentIntegrationConfig = {}) {
+  constructor(config: AlignmentIntegrationConfig = {}): void {
     this.config = {
       enableRealTimeEvaluation: true,
       enableResponseEnhancement: true,
@@ -267,13 +267,13 @@ export class MetaAlignerAPI {
         recommendations,
         needsEnhancement,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Response evaluation failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? String(error) : 'Unknown error',
         action: 'evaluate_response_error',
       })
       throw new Error(
-        `Response evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Response evaluation failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
       )
     }
   }
@@ -376,9 +376,9 @@ export class MetaAlignerAPI {
         enhancementExplanation,
         enhancementApplied,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Response enhancement failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? String(error) : 'Unknown error',
         action: 'enhance_response_error',
       })
 
@@ -389,7 +389,7 @@ export class MetaAlignerAPI {
           evaluationResult,
           this.objectives,
         ),
-        enhancementExplanation: `Enhancement failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        enhancementExplanation: `Enhancement failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
         enhancementApplied: false,
       }
     }

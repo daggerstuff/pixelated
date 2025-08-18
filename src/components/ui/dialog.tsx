@@ -295,7 +295,7 @@ function DialogModal<TData>({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          handleBackdropClick(e as unknown as React.MouseEvent<HTMLDivElement>)
+          handleBackdropClick(e as React.MouseEvent<HTMLDivElement>)
         }
       }}
       tabIndex={-1}
@@ -388,7 +388,7 @@ function ConfirmDialog<TData>({
     setIsConfirming(true)
     try {
       await onConfirm()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in confirmation handler:', error)
     } finally {
       setIsConfirming(false)

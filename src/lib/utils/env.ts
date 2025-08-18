@@ -50,7 +50,7 @@ export function isEnvTrue(key: string): boolean {
  * Legacy env object for compatibility. Prefer getEnv/isEnvTrue.
  */
 export const env = new Proxy({}, {
-  get(_target, prop: string) {
+  get(_target, prop: string): void {
     return getEnv(prop) ?? '';
   }
 });

@@ -50,7 +50,7 @@ const ANXIETY_KEYWORDS = [
 ]
 
 export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
-  constructor(private llmInvoker: LLMInvoker) {}
+  constructor(private llmInvoker: LLMInvoker): void {}
 
   async route(input: RoutingInput): Promise<RoutingDecision> {
     const text = input.text.toLowerCase()

@@ -18,7 +18,7 @@ export class EnterpriseAPIClient {
   ): Promise<T> {
     try {
       return await operation()
-    } catch (error) {
+    } catch (error: unknown) {
       if (attempt >= this.maxRetries) {
         throw error
       }
@@ -69,10 +69,10 @@ export class EnterpriseAPIClient {
         }
 
         return await response.json()
-      } catch (error) {
+      } catch (error: unknown) {
         clearTimeout(timeoutId)
         
-        if (error instanceof Error && error.name === 'AbortError') {
+        if (error instanceof Error && (error as Error)?.name === 'AbortError') {
           throw new APITimeoutError(`Request timeout after ${timeout}ms`)
         }
         

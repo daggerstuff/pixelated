@@ -63,7 +63,7 @@ async function globalSetup(_config: FullConfig) {
         if (attempts >= 10) {
           throw new Error('Failed to start MCP server after multiple attempts')
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Failed to start MCP server:', error)
         throw new Error('MCP server failed to start')
       }

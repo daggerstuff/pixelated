@@ -208,11 +208,11 @@ export class BiasDetectionAuditLogger {
           success,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to log audit entry', {
         userId: user.userId,
         action: action.type,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       // In production, this should trigger an alert
       throw error
@@ -509,7 +509,7 @@ export class BiasDetectionAuditLogger {
         socioeconomicStatus: demographics.socioeconomicStatus,
       }),
       // Explicitly redact region for privacy instead of omitting
-      ...(demographics as any).region !== undefined && { region: 'REDACTED' },
+      ...(demographics as unknown).region !== undefined && { region: 'REDACTED' },
     }
     return result
   }
@@ -781,7 +781,7 @@ export function getAuditLogger(
 /**
  * Reset the singleton instance (for testing purposes)
  */
-export function resetAuditLogger(): void {
+export function resetAuditLogger() {
   auditLoggerInstance = null
 }
 

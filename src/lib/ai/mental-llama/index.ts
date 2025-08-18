@@ -104,7 +104,7 @@ export async function createMentalLLaMAFactory(
       logger.info(
         'SlackNotificationService initialized for MentalLLaMAAdapter.',
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to initialize SlackNotificationService for MentalLLaMAAdapter:',
         error,
@@ -133,7 +133,7 @@ export async function createMentalLLaMAFactory(
         )
         // Optionally set pythonBridge back to undefined if it's not usable
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize MentalLLaMAPythonBridge:', error)
     }
   }
@@ -226,7 +226,7 @@ export async function createMentalLLaMAFromEnv(): Promise<{
       adapter: result.adapter,
       modelProvider: result.modelProvider,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to create MentalLLaMA components', { error })
     throw error
   }

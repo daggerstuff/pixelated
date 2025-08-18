@@ -2,7 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
-import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
+// import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false // Enable SSR for A/B testing
 
@@ -30,7 +30,7 @@ const variants = {
 
 // Randomly assign variant (in production, this would be more sophisticated)
 const variantKey = ['A', 'B', 'C'][Math.floor(Math.random() * 3)]
-const currentVariant = variants[variantKey]
+const currentVariant = (variants as any)?.[variantKey]
 
 const technicalSpecs = [
   {
@@ -340,7 +340,7 @@ const universityResults = [
             data-demo-cta="primary"
             data-variant={variantKey}
           >
-            {currentVariant.cta}
+            {currentVariant?.['cta']}
           </BrutalistButton>
           <BrutalistButton 
             href="/demo-hub" 
@@ -379,7 +379,7 @@ const universityResults = [
   }
 
   // Analytics tracking for demo interactions
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Track page view
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'page_view', {
@@ -393,7 +393,7 @@ const universityResults = [
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
         
@@ -431,12 +431,12 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
         
-        const ctaType = target.dataset?.demoCta
-        const variant = target.dataset?.variant
+        const ctaType = target.dataset?.['demoCta']
+        const variant = target.dataset?.['variant']
 
         if (!ctaType) return
 
@@ -466,7 +466,7 @@ const universityResults = [
 
     // Track scroll depth
     let maxScroll = 0
-    window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', (_event: Event) => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
           100,
@@ -479,7 +479,7 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             scroll_depth: maxScroll,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset.variant ||
+              document.querySelector('[data-variant]')?.dataset?.['variant'] ||
               'unknown',
           })
         }

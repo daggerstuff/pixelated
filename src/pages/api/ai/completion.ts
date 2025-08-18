@@ -73,11 +73,11 @@ export const GET: APIRoute = async ({ request }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({
         error: 'Failed to get endpoint information',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
@@ -209,7 +209,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (data?.stream) {
       // Create a readable stream for the response
       const readableStream = new ReadableStream({
-        async start(controller) {
+        async start(controller): void {
           try {
             const stream = await aiService.createStreamingChatCompletion(
               formattedMessages,
@@ -255,7 +255,7 @@ export const POST: APIRoute = async ({ request }) => {
                 AuditEventStatus.FAILURE, // status
               )
             }
-          } catch (error) {
+          } catch (error: unknown) {
             console.error('Error creating streaming completion:', error)
             controller.error(error)
 
@@ -267,7 +267,7 @@ export const POST: APIRoute = async ({ request }) => {
               'ai-completion', // resource
               {
                 // details
-                error: error instanceof Error ? error.message : String(error),
+                error: error instanceof Error ? String(error) : String(error),
               },
               AuditEventStatus.FAILURE, // status
             )
@@ -319,11 +319,11 @@ export const POST: APIRoute = async ({ request }) => {
         ...Object.fromEntries(rateLimit.headers.entries()),
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Error in AI completion API:',
       error instanceof Error
-        ? { message: error.message, stack: error.stack }
+        ? { message: String(error), stack: (error as Error)?.stack }
         : { message: String(error) },
     )
     console.error('Error in AI completion API:', error)

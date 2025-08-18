@@ -287,13 +287,13 @@ const initialStats: SecurityStats = {
   const eventTypeSelect = document.getElementById('eventType')
   const severitySelect = document.getElementById('severity')
 
-  eventTypeSelect?.addEventListener('change', (e) => {
+  eventTypeSelect?.addEventListener('change', (e: Event) => {
     const target = e.target as HTMLSelectElement
     currentType = target.value
     updateEvents()
   })
 
-  severitySelect?.addEventListener('change', (e) => {
+  severitySelect?.addEventListener('change', (e: Event) => {
     const target = e.target as HTMLSelectElement
     currentSeverity = target.value
     updateEvents()

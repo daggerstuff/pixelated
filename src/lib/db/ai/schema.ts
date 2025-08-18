@@ -32,7 +32,7 @@ export async function initializeAICollections(): Promise<boolean> {
     )
     console.log('✅ AI collections initialized with indexes')
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Failed to initialize AI collections:', error)
     throw error
   }

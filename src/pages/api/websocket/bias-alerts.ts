@@ -1,3 +1,4 @@
+// Note: Avoid importing Astro types here to prevent version/type mismatches; rely on inference.
 /**
  * WebSocket API endpoint for real-time bias alerts
  *
@@ -41,7 +42,7 @@ async function initializeWebSocketServer(): Promise<BiasWebSocketServer> {
         port: wsConfig.port,
         maxConnections: wsConfig.maxConnections,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize WebSocket server', { error })
       throw error
     }
@@ -87,14 +88,14 @@ export const GET = async () => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to get WebSocket server status', { error })
 
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to get WebSocket server status',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -110,7 +111,7 @@ export const GET = async () => {
 /**
  * Send test bias alert (for development/testing)
  */
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }) => {
   try {
     const body = await request.json()
     const { type = 'test', level = 'medium', message, sessionId } = body
@@ -272,14 +273,14 @@ export const POST = async ({ request }: APIContext) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to send test bias alert', { error })
 
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to send test bias alert',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -295,7 +296,7 @@ export const POST = async ({ request }: APIContext) => {
 /**
  * Update WebSocket server configuration
  */
-export const PATCH = async ({ request }: APIContext) => {
+export const PATCH = async ({ request }: { request: Request }) => {
   try {
     const body = await request.json()
     const { action } = body
@@ -336,14 +337,14 @@ export const PATCH = async ({ request }: APIContext) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to update WebSocket server', { error })
 
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to update WebSocket server',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -382,14 +383,14 @@ export const DELETE = async () => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to stop WebSocket server', { error })
 
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to stop WebSocket server',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {

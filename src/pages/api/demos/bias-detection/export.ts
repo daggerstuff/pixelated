@@ -8,13 +8,6 @@ import type {
   ExportData,
 } from '../../../../lib/types/bias-detection'
 
-interface IncludeComponents {
-  analysis: boolean
-  counterfactual: boolean
-  historical: boolean
-  recommendations: boolean
-  demographics: boolean
-}
 
 export const POST = async ({ request }) => {
   try {
@@ -38,7 +31,7 @@ export const POST = async ({ request }) => {
       counterfactualScenarios = [],
       historicalComparison = null,
       format = 'json',
-      includeComponents: IncludeComponents = {
+      includeComponents = {
         analysis: true,
         counterfactual: true,
         historical: true,
@@ -131,14 +124,14 @@ export const POST = async ({ request }) => {
           },
         )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Export API error:', error)
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error during export',
         message:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+          error instanceof Error ? String(error) : 'Unknown error occurred',
       }),
       {
         status: 500,

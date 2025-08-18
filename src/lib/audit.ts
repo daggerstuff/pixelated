@@ -155,7 +155,7 @@ export function initializeAuditService(
 /**
  * Start the batch processing timer
  */
-function startBatchTimer(): void {
+function startBatchTimer() {
   if (batchTimer) {
     clearInterval(batchTimer)
   }
@@ -181,7 +181,7 @@ async function processBatch(): Promise<void> {
   if (config.remoteStorageEnabled && config.remoteEndpoint) {
     try {
       await sendLogsToRemoteEndpoint(batch)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to send audit logs to remote endpoint',
         error as Record<string, unknown>,
@@ -224,7 +224,7 @@ async function sendLogsToRemoteEndpoint(logs: AuditLogEntry[]): Promise<void> {
     if (config.debugMode) {
       logger.debug(`Sent ${logs.length} audit logs to remote endpoint`)
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Error sending logs to remote endpoint',
       error as Record<string, unknown>,
@@ -293,7 +293,7 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
     // Get existing logs
     const existingLogsJson = localStorage.getItem('hipaa-audit-logs')
     const existingLogs: AuditLogEntry[] = existingLogsJson
-      ? JSON.parse(existingLogsJson)
+      ? JSON.parse(existingLogsJson) as unknown
       : []
 
     // Add new log
@@ -311,7 +311,7 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
 
     // Save back to localStorage
     localStorage.setItem('hipaa-audit-logs', JSON.stringify(filteredLogs))
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Failed to store audit log locally',
       error as Record<string, unknown>,
@@ -450,8 +450,8 @@ export function getAuditLogs(): AuditLogEntry[] {
 
   try {
     const logsJson = localStorage.getItem('hipaa-audit-logs')
-    return logsJson ? JSON.parse(logsJson) : []
-  } catch (error) {
+    return logsJson ? JSON.parse(logsJson) as unknown : []
+  } catch (error: unknown) {
     logger.error(
       'Failed to retrieve audit logs',
       error as Record<string, unknown>,
@@ -463,7 +463,7 @@ export function getAuditLogs(): AuditLogEntry[] {
 /**
  * Clear all audit logs from local storage
  */
-export function clearAuditLogs(): void {
+export function clearAuditLogs() {
   if (!config.localStorageEnabled) {
     return
   }
@@ -471,7 +471,7 @@ export function clearAuditLogs(): void {
   try {
     localStorage.removeItem('hipaa-audit-logs')
     logger.info('Audit logs cleared from local storage')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to clear audit logs', error as Record<string, unknown>)
   }
 }

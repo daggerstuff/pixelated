@@ -39,7 +39,7 @@
       link.textContent = heading.textContent
 
       // Add click event to smooth scroll
-      link.addEventListener('click', (e) => {
+      link.addEventListener('click', (e: Event) => {
         e.preventDefault()
         document.querySelector(`#${heading.id}`)?.scrollIntoView({
           behavior: 'smooth',

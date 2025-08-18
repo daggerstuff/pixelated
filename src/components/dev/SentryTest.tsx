@@ -25,7 +25,7 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
   const handleTestError = () => {
     try {
       throw new Error('Test error from Sentry Test component')
-    } catch (error) {
+    } catch (error: unknown) {
       captureError(error as Error, {
         testComponent: {
           action: 'manual_test_error',

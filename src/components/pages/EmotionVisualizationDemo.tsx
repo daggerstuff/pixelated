@@ -4,7 +4,7 @@ import MultidimensionalEmotionChart from '../../components/dashboard/Multidimens
 
 type TimeRange = 'day' | 'week' | 'month' | 'year'
 
-const EmotionVisualizationDemo: React.FC = () => {
+const EmotionVisualizationDemo: FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('week')
   const [dataPoints, setDataPoints] = useState<number>(100)
   const [selectedEmotionIndex, setSelectedEmotionIndex] = useState<
@@ -163,7 +163,7 @@ const EmotionVisualizationDemo: React.FC = () => {
 
               {error && (
                 <p id="emotion-error" className="text-red-500 mt-2">
-                  Error loading emotion data: {error.message}
+                  Error loading emotion data: {String(error)}
                 </p>
               )}
             </div>

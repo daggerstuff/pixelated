@@ -278,7 +278,7 @@ export default function DLPRuleEditor() {
       setIsEditing(false)
 
       // Switch back to rules tab
-      const rulesTab = document.querySelector('[value="rules"]') as HTMLElement
+      const rulesTab = document.querySelector('[value="rules"]') as HTMLElement as HTMLElement
       if (rulesTab) {
         setTimeout(() => {
           rulesTab.click()
@@ -287,12 +287,12 @@ export default function DLPRuleEditor() {
           document.dispatchEvent(new CustomEvent('dlp:rules-updated'))
         }, 100)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving rule:', error)
       document.dispatchEvent(
         new CustomEvent('dlp:error', {
           detail: {
-            message: `Error saving rule: ${error instanceof Error ? error.message : String(error)}`,
+            message: `Error saving rule: ${error instanceof Error ? String(error) : String(error)}`,
           },
         }),
       )

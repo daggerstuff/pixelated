@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import EmotionProgressDashboard from '../../components/analytics/EmotionProgressDashboard'
 import useEmotionProgress from '../../hooks/useEmotionProgress'
 
-const EmotionProgressDemo: React.FC = () => {
+const EmotionProgressDemo: FC = () => {
   const [timeRange, setTimeRange] = useState<
     'week' | 'month' | 'quarter' | 'year'
   >('month')
@@ -22,7 +22,7 @@ const EmotionProgressDemo: React.FC = () => {
       {error && (
         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
           <p className="font-bold">Error</p>
-          <p>{error.message}</p>
+          <p>{String(error)}</p>
         </div>
       )}
 

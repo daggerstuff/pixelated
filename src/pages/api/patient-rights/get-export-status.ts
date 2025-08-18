@@ -164,9 +164,9 @@ export const GET = async ({ request, url }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error checking export status', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
 
     return new Response(

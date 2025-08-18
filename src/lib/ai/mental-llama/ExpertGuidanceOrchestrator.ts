@@ -188,7 +188,7 @@ export class ExpertGuidanceOrchestrator {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in expert-guided analysis orchestration', {
         error,
         userId: routingContextParams?.userId,
@@ -237,7 +237,7 @@ export class ExpertGuidanceOrchestrator {
       try {
         await this.crisisNotifier.sendCrisisAlert(enhancedCrisisContext)
         logger.info('Enhanced crisis alert sent successfully')
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to send enhanced crisis alert', { error })
       }
     }

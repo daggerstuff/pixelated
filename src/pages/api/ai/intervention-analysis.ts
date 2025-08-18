@@ -193,8 +193,8 @@ export const POST = async ({ request }) => {
       session?.user?.id || 'anonymous',
       'intervention-analysis',
       {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        error: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : undefined,
         status: 'error',
       },
     )

@@ -30,7 +30,7 @@ export const useEmotionDetection = () => {
           apiKey,
           fheService,
         )
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to initialize EmotionLlamaProvider:', error)
       }
     }
@@ -121,7 +121,7 @@ export const useEmotionDetection = () => {
         }
 
         return analysis
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error detecting emotions:', error)
         return null
       }

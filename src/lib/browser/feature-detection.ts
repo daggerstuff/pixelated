@@ -212,7 +212,7 @@ export const FEATURES: Record<string, FeatureDefinition> = {
  * Initialize the feature detection system
  * Tests all defined features and registers their support status
  */
-export function initializeFeatureDetection(): void {
+export function initializeFeatureDetection() {
   if (typeof window === 'undefined') {
     return // Skip on server-side
   }
@@ -221,7 +221,7 @@ export function initializeFeatureDetection(): void {
     try {
       const isSupported = feature.detectionFn()
       registerFeature(featureKey, isSupported)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error detecting feature ${featureKey}:`, error)
       registerFeature(featureKey, false) // Assume not supported on error
     }

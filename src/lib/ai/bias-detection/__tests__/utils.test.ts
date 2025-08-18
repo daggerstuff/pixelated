@@ -430,9 +430,9 @@ describe('Error Handling', () => {
         false,
       )
 
-      expect(error.name).toBe('BiasDetectionError')
+      expect((error as Error)?.name).toBe('BiasDetectionError')
       expect(error.code).toBe('TEST_ERROR')
-      expect(error.message).toBe('Test error message')
+      expect(String(error)).toBe('Test error message')
       expect(error.sessionId).toBe('test-session')
       expect(error.recoverable).toBe(false)
     })
@@ -729,8 +729,8 @@ describe('Utility Helpers', () => {
           sessionId: 'session-1',
           timestamp: new Date(),
           overallBiasScore: 0.3,
-          layerResults: {} as any,
-          demographics: {} as any,
+          layerResults: {} as unknown,
+          demographics: {} as unknown,
           recommendations: ['Improve diversity', 'Add training'],
           alertLevel: 'medium',
           confidence: 0.8,
@@ -739,8 +739,8 @@ describe('Utility Helpers', () => {
           sessionId: 'session-2',
           timestamp: new Date(),
           overallBiasScore: 0.7,
-          layerResults: {} as any,
-          demographics: {} as any,
+          layerResults: {} as unknown,
+          demographics: {} as unknown,
           recommendations: ['Improve diversity', 'Review model'],
           alertLevel: 'high',
           confidence: 0.9,
@@ -751,8 +751,8 @@ describe('Utility Helpers', () => {
 
       expect(summary.totalSessions).toBe(2)
       expect(summary.averageBiasScore).toBe(0.5)
-      expect(summary.alertDistribution.medium).toBe(1)
-      expect(summary.alertDistribution.high).toBe(1)
+      expect(summary.alertDistribution['medium']).toBe(1)
+      expect(summary.alertDistribution['high']).toBe(1)
       expect(summary.topRecommendations).toContain('Improve diversity')
     })
 

@@ -54,7 +54,7 @@ export function sortPosts(posts: PostCollectionEntry[]): PostCollectionEntry[] {
 }
 
 export function filterDraftPosts() {
-  return function filterDraftPosts(entry: PostCollectionEntry) {
+  return function filterDraftPosts(entry: PostCollectionEntry): void {
     return !('draft' in entry.data) || !entry.data.draft
   }
 }

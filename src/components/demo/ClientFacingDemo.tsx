@@ -24,7 +24,7 @@ interface DemoStep {
   progress: number
 }
 
-const ClientFacingDemo: React.FC = () => {
+const ClientFacingDemo: FC = () => {
   const [currentStep, setCurrentStep] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [, setDemoData] = useState({

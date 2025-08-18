@@ -48,7 +48,7 @@ interface SentimentInsights {
  */
 function isRetryableError(error: unknown): boolean {
   // Network errors are retryable
-  if (error instanceof TypeError && error.message.includes('network')) {
+  if (error instanceof TypeError && String(error).includes('network')) {
     return true
   }
 
@@ -254,7 +254,7 @@ export function useSentimentAnalysis({
         }
 
         return response
-      } catch (err) {
+      } catch (err: unknown) {
         clearTimeout(timeoutId)
         throw err
       }
@@ -296,10 +296,10 @@ export function useSentimentAnalysis({
           }
 
           return data
-        } catch (err) {
+        } catch (err: unknown) {
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? err.message : 'Failed to analyze sentiment'
+              err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to analyze sentiment'
             setError(errorMessage)
             setFailureCount(prev => prev + 1)
 
@@ -368,9 +368,9 @@ export function useSentimentAnalysis({
         }
 
         return batchResults
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to analyze sentiment batch'
+          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to analyze sentiment batch'
         setError(errorMessage)
         setFailureCount(prev => prev + texts.length - batchResults.length)
 
@@ -423,7 +423,7 @@ export function useSentimentAnalysis({
             }
 
             yield data
-          } catch (err) {
+          } catch (err: unknown) {
             setFailureCount(prev => prev + 1)
             console.warn(`Failed to analyze text ${i + 1}:`, err)
           }

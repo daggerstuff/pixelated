@@ -499,10 +499,10 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Handle "Start New Scan" button
     const startScanBtn = document.getElementById('start-scan-btn')
-    startScanBtn?.addEventListener('click', () => {
+    startScanBtn?.addEventListener('click', (_event: Event) => {
       // In a real implementation, this would trigger a modal or navigate to a scan configuration page
       alert(
         'In a production environment, this would launch the scan configuration dialog.',

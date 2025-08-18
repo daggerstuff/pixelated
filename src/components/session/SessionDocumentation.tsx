@@ -60,7 +60,7 @@ export default function SessionDocumentationComponent({
   // Handle changes to editable fields (when not in readOnly mode)
   const handleChange = (
     field: string,
-    value: any,
+    value: unknown,
   ) => {
     if (readOnly || !editableDocumentation) {
       return
@@ -86,7 +86,7 @@ export default function SessionDocumentationComponent({
 
     try {
       await saveDocumentation(editableDocumentation)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving documentation:', error)
     }
   }
@@ -95,7 +95,7 @@ export default function SessionDocumentationComponent({
   const handleGenerateDocumentation = async () => {
     try {
       await generateDocumentation()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating documentation:', error)
     }
   }
@@ -453,7 +453,7 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation.recommendedFollowUp}
+                  value={editableDocumentation?.['recommendedFollowUp'] || ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('recommendedFollowUp', e.target.value)
                   }
@@ -461,7 +461,7 @@ export default function SessionDocumentationComponent({
                 />
               ) : (
                 <p className="text-gray-700">
-                  {editableDocumentation.recommendedFollowUp}
+                  {editableDocumentation?.['recommendedFollowUp']}
                 </p>
               )}
             </section>
@@ -472,7 +472,7 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation.nextSessionPlan}
+                  value={editableDocumentation?.['nextSessionPlan'] || ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('nextSessionPlan', e.target.value)
                   }
@@ -480,7 +480,7 @@ export default function SessionDocumentationComponent({
                 />
               ) : (
                 <p className="text-gray-700">
-                  {editableDocumentation.nextSessionPlan}
+                  {editableDocumentation?.['nextSessionPlan']}
                 </p>
               )}
             </section>
@@ -493,7 +493,7 @@ export default function SessionDocumentationComponent({
               Therapeutic Techniques Used
             </h4>
             <div className="space-y-3">
-              {editableDocumentation.therapeuticTechniques.map(
+              {editableDocumentation?.['therapeuticTechniques']?.map(
                 (
                   technique: {
                     name: string
@@ -511,12 +511,12 @@ export default function SessionDocumentationComponent({
                         {!readOnly ? (
                           <input
                             type="text"
-                            value={technique.name}
+                            value={technique?.['name'] || ''}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newTechniques = [
-                                ...editableDocumentation.therapeuticTechniques,
+                                ...(editableDocumentation?.['therapeuticTechniques'] || []),
                               ]
 
                               newTechniques[index] = {
@@ -531,19 +531,19 @@ export default function SessionDocumentationComponent({
                             className="w-full p-1 border border-gray-300 rounded-md"
                           />
                         ) : (
-                          technique.name
+                          technique?.['name']
                         )}
                       </h5>
                     </div>
                     <div className="mb-2">
                       {!readOnly ? (
                         <textarea
-                          value={technique.description}
+                          value={technique?.['description'] || ''}
                           onChange={(
                             e: React.ChangeEvent<HTMLTextAreaElement>,
                           ) => {
                             const newTechniques = [
-                              ...editableDocumentation.therapeuticTechniques,
+                              ...(editableDocumentation?.['therapeuticTechniques'] || []),
                             ]
 
                             newTechniques[index] = {
@@ -789,7 +789,11 @@ export default function SessionDocumentationComponent({
                   />
                 ) : (
                   <p className="text-gray-700">
-                    {editableDocumentation.treatmentProgress.overallAssessment}
+                    {typeof editableDocumentation.treatmentProgress === 'object' &&
+                    editableDocumentation.treatmentProgress !== null &&
+                    'overallAssessment' in editableDocumentation.treatmentProgress
+                      ? (editableDocumentation.treatmentProgress as { overallAssessment?: string }).overallAssessment
+                      : ''}
                   </p>
                 )}
               </div>
@@ -849,27 +853,28 @@ export default function SessionDocumentationComponent({
               Emotional Patterns Observed
             </h4>
             <div className="space-y-3">
-              {editableDocumentation.emotionalPatterns.map(
-                (
-                  pattern: { pattern: string; significance: string },
-                  index: number,
-                ) => (
-                  <div
-                    key={`pattern-${index}`}
-                    className="border border-gray-200 rounded-md p-3"
-                  >
-                    <div className="mb-2">
-                      <h5 className="font-medium text-gray-800">
-                        {!readOnly ? (
-                          <input
-                            type="text"
-                            value={pattern.pattern}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>,
-                            ) => {
-                              const newPatterns = [
-                                ...editableDocumentation.emotionalPatterns,
-                              ]
+              {Array.isArray(editableDocumentation.emotionalPatterns) &&
+                editableDocumentation.emotionalPatterns.map(
+                  (
+                    pattern: { pattern: string; significance: string },
+                    index: number,
+                  ) => (
+                    <div
+                      key={`pattern-${index}`}
+                      className="border border-gray-200 rounded-md p-3"
+                    >
+                      <div className="mb-2">
+                        <h5 className="font-medium text-gray-800">
+                          {!readOnly ? (
+                            <input
+                              type="text"
+                              value={pattern.pattern}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>,
+                              ) => {
+                                const newPatterns = [
+                                  ...editableDocumentation.emotionalPatterns,
+                                ]
 
                               newPatterns[index] = {
                                 ...pattern,
@@ -990,13 +995,14 @@ export default function SessionDocumentationComponent({
                 Key Insights
               </h5>
               <ul className="list-disc pl-5 space-y-1 mb-4">
-                {editableDocumentation.keyInsights.map(
-                  (insight: string, index: number) => (
-                    <li key={`insight-full-${index}`} className="text-gray-700">
-                      {insight}
-                    </li>
-                  ),
-                )}
+                {Array.isArray(editableDocumentation.keyInsights) &&
+                  editableDocumentation.keyInsights.map(
+                    (insight: string, index: number) => (
+                      <li key={`insight-full-${index}`} className="text-gray-700">
+                        {insight}
+                      </li>
+                    ),
+                  )}
               </ul>
             </section>
 
@@ -1005,26 +1011,27 @@ export default function SessionDocumentationComponent({
                 Therapeutic Techniques Used
               </h4>
               <div className="space-y-3 mb-4">
-                {editableDocumentation.therapeuticTechniques.map(
-                  (
-                    technique: {
-                      name: string
-                      description: string
-                      effectiveness: number
-                    },
-                    index: number,
-                  ) => (
-                    <div key={`technique-full-${index}`} className="mb-3">
-                      <h5 className="font-medium text-gray-800">
-                        {technique.name}{' '}
-                        <span className="text-sm font-normal text-gray-600">
-                          (Effectiveness: {technique.effectiveness}/10)
-                        </span>
-                      </h5>
-                      <p className="text-gray-700">{technique.description}</p>
-                    </div>
-                  ),
-                )}
+                {Array.isArray(editableDocumentation?.therapeuticTechniques) &&
+                  editableDocumentation.therapeuticTechniques.map(
+                    (
+                      technique: {
+                        name: string
+                        description: string
+                        effectiveness: number
+                      },
+                      index: number,
+                    ) => (
+                      <div key={`technique-full-${index}`} className="mb-3">
+                        <h5 className="font-medium text-gray-800">
+                          {technique.name}{' '}
+                          <span className="text-sm font-normal text-gray-600">
+                            (Effectiveness: {technique.effectiveness}/10)
+                          </span>
+                        </h5>
+                        <p className="text-gray-700">{technique.description}</p>
+                      </div>
+                    ),
+                  )}
               </div>
             </section>
 
@@ -1033,19 +1040,20 @@ export default function SessionDocumentationComponent({
                 Emotional Patterns Observed
               </h4>
               <div className="space-y-3 mb-4">
-                {editableDocumentation.emotionalPatterns.map(
-                  (
-                    pattern: { pattern: string; significance: string },
-                    index: number,
-                  ) => (
-                    <div key={`pattern-full-${index}`} className="mb-3">
-                      <h5 className="font-medium text-gray-800">
-                        {pattern.pattern}
-                      </h5>
-                      <p className="text-gray-700">{pattern.significance}</p>
-                    </div>
-                  ),
-                )}
+                {Array.isArray(editableDocumentation?.emotionalPatterns) &&
+                  editableDocumentation.emotionalPatterns.map(
+                    (
+                      pattern: { pattern: string; significance: string },
+                      index: number,
+                    ) => (
+                      <div key={`pattern-full-${index}`} className="mb-3">
+                        <h5 className="font-medium text-gray-800">
+                          {pattern.pattern}
+                        </h5>
+                        <p className="text-gray-700">{pattern.significance}</p>
+                      </div>
+                    ),
+                  )}
               </div>
             </section>
 
@@ -1057,7 +1065,7 @@ export default function SessionDocumentationComponent({
               <h5 className="text-md font-medium text-gray-700 mb-2">
                 Treatment Goals
               </h5>
-              {editableDocumentation.treatmentProgress.goals.map(
+              {editableDocumentation?.['treatmentProgress']?.['goals']?.map(
                 (
                   goal: {
                     description: string
@@ -1093,7 +1101,7 @@ export default function SessionDocumentationComponent({
                 Overall Assessment
               </h5>
               <p className="text-gray-700 mb-4">
-                {editableDocumentation.treatmentProgress.overallAssessment}
+                {editableDocumentation?.['treatmentProgress']?.['overallAssessment']}
               </p>
             </section>
 
@@ -1177,35 +1185,36 @@ export default function SessionDocumentationComponent({
                         </tr>
                       </thead>
                       <tbody>
-                        {editableDocumentation.outcomePredictions.map(
-                          (
-                            pred: {
-                              technique: string
-                              predictedEfficacy: number
-                              confidence: number
-                              rationale: string
-                            },
-                            idx: number,
-                          ) => (
-                            <tr
-                              key={`prediction-${idx}`}
-                              className="border-t border-gray-100 hover:bg-blue-50 transition-colors"
-                            >
-                              <td className="px-4 py-2 font-semibold text-gray-900">
-                                {pred.technique}
-                              </td>
-                              <td className="px-4 py-2">
-                                {(pred.predictedEfficacy * 100).toFixed(1)}%
-                              </td>
-                              <td className="px-4 py-2">
-                                {(pred.confidence * 100).toFixed(0)}%
-                              </td>
-                              <td className="px-4 py-2 text-gray-700">
-                                {pred.rationale}
-                              </td>
-                            </tr>
-                          ),
-                        )}
+                        {Array.isArray(editableDocumentation?.outcomePredictions) &&
+                          editableDocumentation.outcomePredictions.map(
+                            (
+                              pred: {
+                                technique: string
+                                predictedEfficacy: number
+                                confidence: number
+                                rationale: string
+                              },
+                              idx: number,
+                            ) => (
+                              <tr
+                                key={`prediction-${idx}`}
+                                className="border-t border-gray-100 hover:bg-blue-50 transition-colors"
+                              >
+                                <td className="px-4 py-2 font-semibold text-gray-900">
+                                  {pred.technique}
+                                </td>
+                                <td className="px-4 py-2">
+                                  {(pred.predictedEfficacy * 100).toFixed(1)}%
+                                </td>
+                                <td className="px-4 py-2">
+                                  {(pred.confidence * 100).toFixed(0)}%
+                                </td>
+                                <td className="px-4 py-2 text-gray-700">
+                                  {pred.rationale}
+                                </td>
+                              </tr>
+                            ),
+                          )}
                       </tbody>
                     </table>
                   </div>

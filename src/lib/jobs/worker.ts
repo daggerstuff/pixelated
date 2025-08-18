@@ -184,9 +184,9 @@ const jobsWorker = {
         default:
           throw new Error(`Unknown job type: ${job.type}`)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       await jobQueue.updateJobStatus(job.id, JobStatus.FAILED, {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         completedAt: new Date().toISOString(),
       })
     }

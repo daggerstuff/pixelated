@@ -21,7 +21,7 @@ interface EncryptedData {
 export class Encryption {
   private keyStorage: KeyStorage
 
-  constructor(options: EncryptionOptions) {
+  constructor(options: EncryptionOptions): void {
     this.keyStorage = new KeyStorage({
       namespace: options.namespace,
       region: options.region,
@@ -82,7 +82,7 @@ export class Encryption {
   async decrypt(encryptedString: string): Promise<string> {
     try {
       // Parse the encrypted data
-      const encrypted: EncryptedData = JSON.parse(encryptedString)
+      const encrypted: EncryptedData = JSON.parse(encryptedString) as unknown
 
       // Get the key data
       const keyData = await this.keyStorage.getKey(encrypted.keyId)
@@ -115,7 +115,7 @@ export class Encryption {
       ])
 
       return decrypted.toString()
-    } catch (error) {
+    } catch (error: unknown) {
       throw error instanceof Error ? error : new Error(String(error))
     }
   }
@@ -130,7 +130,7 @@ export class Encryption {
     const decrypted = await this.decrypt(encryptedString)
 
     // Parse the encrypted data to get the purpose
-    const encrypted: EncryptedData = JSON.parse(encryptedString)
+    const encrypted: EncryptedData = JSON.parse(encryptedString) as unknown
     const oldKey = await this.keyStorage.getKey(encrypted.keyId)
 
     if (!oldKey) {

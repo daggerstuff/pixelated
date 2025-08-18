@@ -131,7 +131,7 @@ export default function AnalyticsDashboard({
         await fheAnalytics.initialize()
 
         setFheInitialized(true)
-      } catch (error) {
+      } catch (error: unknown) {
         setError('Failed to initialize FHE system')
         console.error('FHE initialization error:', error)
       }
@@ -143,7 +143,7 @@ export default function AnalyticsDashboard({
   const generateId = () => {
     try {
       return crypto.randomUUID()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to generate UUID:', error)
       return `id-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
     }
@@ -186,7 +186,7 @@ export default function AnalyticsDashboard({
           if (result.isEncrypted && typeof result.data === 'string') {
             const parsedData = JSON.parse(
               result.data,
-            ) as unknown as AnalyticsData
+            ) as AnalyticsData
             return {
               ...result,
               data: parsedData,
@@ -198,7 +198,7 @@ export default function AnalyticsDashboard({
       )
 
       setAnalyticsData(processedResults)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Analytics error:', error)
       setError('Failed to generate analytics')
     } finally {

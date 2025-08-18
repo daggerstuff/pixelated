@@ -510,12 +510,12 @@ test.describe('Pipeline Performance Tests', () => {
 
       // Perform operations in all tabs simultaneously
       const operations = tabs.map(async (tab, index) => {
-        await tab.click('[data-testid="validation-tab"]')
-        const textArea = tab.locator(
+        await (tab as any)?.['click']?.('[data-testid="validation-tab"]')
+        const textArea = (tab as any)?.['locator']?.(
           '[placeholder*="Enter psychology content"]',
         )
-        await textArea.fill(`Concurrent user ${index} validation test`)
-        await tab.waitForSelector('text=Validation Results')
+        await textArea?.['fill']?.(`Concurrent user ${index} validation test`)
+        await (tab as any)?.['waitForSelector']?.('text=Validation Results')
       })
 
       // Wait for all operations to complete
@@ -530,7 +530,7 @@ test.describe('Pipeline Performance Tests', () => {
 
       // Clean up tabs
       for (const tab of tabs) {
-        await tab.close()
+        await (tab as any)?.['close']?.()
       }
     })
   })

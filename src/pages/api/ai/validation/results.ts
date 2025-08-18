@@ -110,10 +110,10 @@ export const GET: APIRoute = async ({ request }) => {
         'ETag': `"validation-${validationResults.length}-${validationStats.runCount}"`,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
     logger.error(`Error retrieving validation results: ${errorMessage}`)
 
     // Create audit log for failed retrieval

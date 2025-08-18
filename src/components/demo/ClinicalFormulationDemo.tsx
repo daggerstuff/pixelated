@@ -34,7 +34,7 @@ interface ClinicalFormulationDemoProps {
   }
 }
 
-const ClinicalFormulationDemo: React.FC<ClinicalFormulationDemoProps> = ({
+const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
   patientData
 }) => {
   const [formulation, setFormulation] = useState<ClinicalFormulation | null>(null)

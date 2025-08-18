@@ -14,7 +14,7 @@ interface MultidimensionalEmotionChartProps {
   isLoading?: boolean
 }
 
-const MultidimensionalEmotionChart: React.FC<MultidimensionalEmotionChartProps> = ({
+const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
   emotionData = [],
   isLoading = false
 }) => {

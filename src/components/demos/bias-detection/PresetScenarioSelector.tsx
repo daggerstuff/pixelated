@@ -10,7 +10,7 @@ interface PresetScenarioSelectorProps {
   disabled?: boolean
 }
 
-export const PresetScenarioSelector: React.FC<PresetScenarioSelectorProps> = ({
+export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
   scenarios,
   selectedScenario,
   onScenarioSelect,

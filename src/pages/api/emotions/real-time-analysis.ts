@@ -103,9 +103,9 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Emotion analysis error:', {
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? String(error) : String(error),
       processingTime: Date.now() - startTime
     })
 

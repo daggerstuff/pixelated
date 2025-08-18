@@ -30,7 +30,7 @@ export async function initializeSecurity(): Promise<void> {
     await initializeEncryption()
 
     logger.info('Security module initialized successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     const typedError = error instanceof Error ? error : new Error(String(error))
     logger.error('Failed to initialize security module', {
       module: 'security',
@@ -96,7 +96,7 @@ export async function initializeEncryption(): Promise<void> {
     // For now, we're using a simulated FHE implementation
     await simulateInitializeFHE()
     logger.info('FHE encryption system initialized successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     const typedError = error instanceof Error ? error : new Error(String(error))
     logger.error('Failed to initialize FHE encryption', {
       error: typedError.message,
@@ -116,7 +116,7 @@ export async function encryptMessage(message: string): Promise<string> {
     // In production, this would use real FHE libraries
     // For now, we're using a simulated implementation
     return await simulateEncrypt(message)
-  } catch (error) {
+  } catch (error: unknown) {
     const typedError = error instanceof Error ? error : new Error(String(error))
     logger.error('Failed to encrypt message', {
       operation: 'encrypt',
@@ -137,7 +137,7 @@ export async function decryptMessage(ciphertext: string): Promise<string> {
     // In production, this would use real FHE libraries
     // For now, we're using a simulated implementation
     return await simulateDecrypt(ciphertext)
-  } catch (error) {
+  } catch (error: unknown) {
     const typedError = error instanceof Error ? error : new Error(String(error))
     logger.error('Failed to decrypt message', {
       operation: 'decrypt',
@@ -162,7 +162,7 @@ export async function processEncryptedMessage(
     // In production, this would use real FHE libraries to perform
     // operations on the encrypted data without decrypting i
     return await simulateHomomorphicOperation(ciphertext, operation)
-  } catch (error) {
+  } catch (error: unknown) {
     const typedError = error instanceof Error ? error : new Error(String(error))
     logger.error('Failed to process encrypted message', {
       operation,
@@ -185,7 +185,7 @@ async function simulateEncrypt(message: string): Promise<string> {
   // Simple XOR-based "encryption" for simulation only
   // This is NOT secure and is only for development illustration
   const key =
-    process.env.SIMULATION_KEY ||
+    process.env['SIMULATION_KEY'] ||
     crypto.randomBytes(32).toString('hex').slice(0, 24)
   let result = ''
   for (let i = 0; i < message.length; i++) {
@@ -206,7 +206,7 @@ async function simulateDecrypt(ciphertext: string): Promise<string> {
 
   // Simple XOR-based "decryption" for simulation only
   const key =
-    process.env.SIMULATION_KEY ||
+    process.env['SIMULATION_KEY'] ||
     crypto.randomBytes(32).toString('hex').slice(0, 24)
   let result = ''
   for (let i = 0; i < encryptedContent.length; i++) {

@@ -99,10 +99,10 @@ export function extractJsonFromString(text: string): string | null {
  */
 export function safeJsonParse<T = unknown>(jsonString: string): T | null {
   try {
-    return JSON.parse(jsonString) as T
-  } catch (error) {
+    return JSON.parse(jsonString) as unknown as T
+  } catch (error: unknown) {
     logger.error('Failed to parse JSON string', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       jsonPreview: jsonString.slice(0, 100),
     })
     return null

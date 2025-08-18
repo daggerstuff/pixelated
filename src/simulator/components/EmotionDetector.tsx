@@ -27,7 +27,7 @@ export const EmotionDetector: React.FC<EmotionDetectorProps> = ({
       try {
         const analysis = await detectEmotions(text)
         onAnalysisComplete?.(!!analysis)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error in emotion analysis:', error)
         onAnalysisComplete?.(false)
       }

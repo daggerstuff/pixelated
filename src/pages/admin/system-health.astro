@@ -307,7 +307,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
   const HEALTH_CHECK_INTERVAL = 30000 // 30 seconds
 
   // Initialize the dashboard
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Initial health check
     performHealthCheck()
 
@@ -324,7 +324,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
     }
 
     // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', (_event: Event) => {
       if (healthCheckInterval) {
         clearInterval(healthCheckInterval)
       }

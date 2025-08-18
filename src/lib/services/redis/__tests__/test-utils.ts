@@ -190,7 +190,7 @@ export async function verifyDataIntegrity(
  * Custom test matchers
  */
 export const customMatchers = {
-  toBeRedisError(received: unknown, expectedCode: RedisErrorCode) {
+  toBeRedisError(received: unknown, expectedCode: RedisErrorCode): void {
     const pass =
       received instanceof RedisServiceError && received.code === expectedCode
 
@@ -201,7 +201,7 @@ export const customMatchers = {
     }
   },
 
-  async toBeInRedis(key: string, expectedValue: unknown) {
+  async toBeInRedis(key: string, expectedValue: unknown): void {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {
@@ -227,7 +227,7 @@ export const customMatchers = {
     }
   },
 
-  async toExistInRedis(key: string) {
+  async toExistInRedis(key: string): void {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {
@@ -253,7 +253,7 @@ export const customMatchers = {
     }
   },
 
-  async toHaveTTL(key: string, expectedTTL: number) {
+  async toHaveTTL(key: string, expectedTTL: number): void {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {

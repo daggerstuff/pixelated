@@ -619,7 +619,7 @@ const hasNewIssues = newIssues.length > 0
   let lastCheckedTimestamp = new Date().toISOString()
 
   // Refresh button logic
-  document.getElementById('refresh-data')?.addEventListener('click', () => {
+  document.getElementById('refresh-data')?.addEventListener('click', (_event: Event) => {
     window.location.reload()
   })
 

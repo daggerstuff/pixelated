@@ -48,7 +48,7 @@ interface BackupConfigurationTabProps {
   onUpdateConfig: (config: BackupConfig) => void
 }
 
-const BackupConfigurationTab: React.FC<BackupConfigurationTabProps> = ({
+const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
   config,
   onUpdateConfig,
 }) => {

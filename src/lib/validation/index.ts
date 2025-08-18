@@ -54,7 +54,7 @@ export async function validateRequestBody<T extends z.ZodType>(
     }
 
     return [result?.data, null]
-  } catch (error) {
+  } catch (error: unknown) {
     return [
       null,
       {
@@ -98,7 +98,7 @@ export function validateQueryParams<T extends z.ZodType>(
     }
 
     return [result?.data, null]
-  } catch (error) {
+  } catch (error: unknown) {
     return [
       null,
       {

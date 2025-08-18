@@ -25,8 +25,6 @@ const VIDEO_PLATFORMS: Record<string, (id: string) => string> = {
 }
 
 /* link */
-const FAVICON_BASE_URL = 'https://www.google.com/s2/favicons'
-const FAVICON_RESOLUTION = 128
 const GITHUB_USERNAME_REGEXP = /^@[a-z0-9](?!.*--)[\w-]{0,37}[a-z0-9]$/i
 const GITHUB_REPO_REGEXP = /^@?([a-z0-9](?!.*--)[\w-]{0,37}[a-z0-9])\/.*$/i
 const LINK_STYLE = ['square', 'rounded', 'github'] as const
@@ -172,13 +170,11 @@ function remarkDirectiveSugar() {
           }
 
           let _resolvedText = ''
-          let _resolvedLink = ''
-          let _resolvedImageUrl = ''
+          let _resolvedStyle = ''
           let _resolvedTab = ''
           let isOrg = false
-          let _resolvedStyle = ''
 
-          const { id, link, imageUrl, tab, style } = attributes
+          const { id, link, tab, style } = attributes
 
           // check label
           if (children.length > 0 && children[0]?.type === 'text') {
@@ -222,29 +218,14 @@ function remarkDirectiveSugar() {
           // handle
           if (!id && link) {
             // non github scope
-            _resolvedLink = link
-            _resolvedImageUrl =
-              imageUrl ||
-              `${FAVICON_BASE_URL}?domain=${new URL(link).hostname}&sz=${FAVICON_RESOLUTION}`
             _resolvedStyle = _resolvedStyle || 'square'
           } else if (id) {
             // github scope
             if (id.match(GITHUB_USERNAME_REGEXP)) {
-              _resolvedLink =
-                link ||
-                (tab && isOrg
-                  ? `https://github.com/orgs/${id.substring(1)}/${_resolvedTab}`
-                  : `https://github.com/${id.substring(1)}?tab=${_resolvedTab}`)
-
-              _resolvedImageUrl =
-                imageUrl || `https://github.com/${id.substring(1)}.png`
 
               _resolvedStyle = _resolvedStyle || 'rounded'
               _resolvedText = _resolvedText || id.substring(1)
             } else if (id.match(GITHUB_REPO_REGEXP)) {
-              _resolvedLink = link || `https://github.com/${id}`
-
-              _resolvedImageUrl = imageUrl || `https://github.com/${id}.png`
 
               _resolvedStyle = _resolvedStyle || 'rounded'
               _resolvedText = _resolvedText || id.substring(1)

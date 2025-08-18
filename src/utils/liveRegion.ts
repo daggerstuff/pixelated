@@ -55,7 +55,7 @@ export function announceStatus(message: string, clearDelay?: number): void {
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('status-live-region')
+  const element = document.getElementById('status-live-region') as HTMLElement
   if (element) {
     element.textContent = message
     if (clearDelay && clearDelay > 0) {
@@ -86,7 +86,7 @@ export function announceAlert(message: string, clearDelay?: number): void {
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('alert-live-region')
+  const element = document.getElementById('alert-live-region') as HTMLElement
   if (element) {
     element.textContent = message
     if (clearDelay && clearDelay > 0) {
@@ -117,7 +117,7 @@ export function log(message: string, clear = false): void {
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('log-live-region')
+  const element = document.getElementById('log-live-region') as HTMLElement
   if (element) {
     if (clear) {
       element.textContent = message
@@ -159,7 +159,7 @@ export function announceProgress(
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('progress-live-region')
+  const element = document.getElementById('progress-live-region') as HTMLElement
   if (element) {
     element.textContent = message
     return

@@ -46,9 +46,9 @@ export const GET = async ({ cookies }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Dashboard API error:', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

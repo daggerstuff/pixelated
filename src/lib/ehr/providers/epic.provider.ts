@@ -57,7 +57,7 @@ export class EpicProvider extends BaseEHRProvider {
       this.logger.info(
         `Successfully initialized Epic features for provider ${this.id}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to initialize Epic features for provider ${this.id}:`,
         error,
@@ -74,7 +74,7 @@ export class EpicProvider extends BaseEHRProvider {
       // Perform any Epic-specific cleanup tasks here
 
       await super.cleanup()
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to cleanup Epic provider ${this.id}:`, error)
       throw error
     }

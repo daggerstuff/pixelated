@@ -12,7 +12,7 @@ interface CheckboxProps {
   children?: React.ReactNode
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({
+export const Checkbox: FC<CheckboxProps> = ({
   checked,
   defaultChecked = false,
   disabled = false,

@@ -61,7 +61,7 @@ export function AccessibilityAnnouncer({
 export function announceToScreenReader(
   message: string,
   options: { assertive?: boolean; clearDelay?: number } = {},
-): void {
+) {
   const { assertive = false, clearDelay = 1000 } = options
 
   // Create a temporary element for the announcemen
@@ -93,7 +93,7 @@ export function announceToScreenReader(
  * @param {boolean} [message.assertive] - Whether to use assertive announcemen
  * @param {number} [message.clearDelay] - Delay before clearing in milliseconds
  */
-export function announce(message: Message): void {
+export function announce(message: Message) {
   const { assertive = false, clearDelay = 1000 } = message
   const element = document.getElementById(
     assertive ? 'assertive-announce' : 'polite-announce',

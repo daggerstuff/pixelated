@@ -93,7 +93,7 @@ export class IntelligentCache {
       try {
         const redisValue = await this.redis.get(key)
         if (redisValue) {
-          const parsed = JSON.parse(redisValue)
+          const parsed = JSON.parse(redisValue) as unknown
           const value = this.deserializeValue(parsed.value, parsed.compressed)
           
           // Store back in memory cache
@@ -105,7 +105,7 @@ export class IntelligentCache {
           logger.debug(`Redis cache hit for key: ${key}`)
           return value as T
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(`Redis cache error for key ${key}:`, error)
       }
     }
@@ -143,7 +143,7 @@ export class IntelligentCache {
         )
         
         logger.debug(`Stored in Redis cache: ${key}`)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(`Redis cache set error for key ${key}:`, error)
       }
     }
@@ -193,7 +193,7 @@ export class IntelligentCache {
           size: compressedSize,
           compressed: true,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Compression failed, storing uncompressed:', error)
       }
     }
@@ -209,8 +209,8 @@ export class IntelligentCache {
     if (compressed && typeof value === 'string') {
       try {
         const decompressed = this.decompress(value)
-        return JSON.parse(decompressed)
-      } catch (error) {
+        return JSON.parse(decompressed) as unknown
+      } catch (error: unknown) {
         logger.warn('Decompression failed:', error)
         throw error
       }
@@ -230,7 +230,7 @@ export class IntelligentCache {
     return atob(data) // Simple base64 decoding as placeholder
   }
 
-  private enforceMemoryLimit(): void {
+  private enforceMemoryLimit() {
     const maxSizeBytes = this.config.maxMemorySize * 1024 * 1024
     
     while (this.stats.totalSize > maxSizeBytes && this.memoryCache.size > 0) {
@@ -256,7 +256,7 @@ export class IntelligentCache {
     }
   }
 
-  private cleanup(): void {
+  private cleanup() {
     const now = new Date()
     const toDelete: string[] = []
     
@@ -274,7 +274,7 @@ export class IntelligentCache {
     })
   }
 
-  private updateHitRate(): void {
+  private updateHitRate() {
     const totalRequests = this.stats.memoryHits + this.stats.memoryMisses + 
                          this.stats.redisHits + this.stats.redisMisses
     const totalHits = this.stats.memoryHits + this.stats.redisHits
@@ -331,7 +331,7 @@ export class IntelligentCache {
     return { ...this.stats }
   }
 
-  clear(): void {
+  clear() {
     this.memoryCache.clear()
     this.stats = {
       memoryHits: 0,

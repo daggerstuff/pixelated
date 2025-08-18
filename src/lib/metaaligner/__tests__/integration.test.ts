@@ -254,8 +254,8 @@ describe('MetaAligner Integration Tests', () => {
       expect(typeof response.alignment?.enhancementAttempts).toBe('number')
 
       // Response should have been processed
-      expect((response as any).content).toBeDefined()
-      expect((response as any).choices?.[0]?.message?.content).toBeDefined()
+      expect((response as unknown).content).toBeDefined()
+      expect((response as unknown).choices?.[0]?.message?.content).toBeDefined()
     })
 
     it('should handle conversation history in context detection', async () => {
@@ -506,13 +506,13 @@ describe('MetaAligner Integration Tests', () => {
         evaluation.evaluation.objectiveResults,
       )) {
         if (typeof result === 'object' && result !== null) {
-          expect((result as any).objectiveId).toBe(objectiveId)
-          expect((result as any).score).toBeGreaterThanOrEqual(0)
-          expect((result as any).score).toBeLessThanOrEqual(1)
-          expect((result as any).confidence).toBeGreaterThanOrEqual(0)
-          expect((result as any).confidence).toBeLessThanOrEqual(1)
-          expect((result as any).explanation).toBeTruthy()
-          expect(typeof (result as any).explanation).toBe('string')
+          expect((result as unknown).objectiveId).toBe(objectiveId)
+          expect((result as unknown).score).toBeGreaterThanOrEqual(0)
+          expect((result as unknown).score).toBeLessThanOrEqual(1)
+          expect((result as unknown).confidence).toBeGreaterThanOrEqual(0)
+          expect((result as unknown).confidence).toBeLessThanOrEqual(1)
+          expect((result as unknown).explanation).toBeTruthy()
+          expect(typeof (result as unknown).explanation).toBe('string')
         }
       }
     })

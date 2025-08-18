@@ -99,7 +99,7 @@ describe('serverAuth', () => {
 
       // Act
       const result = await verifyServerAuth({
-        cookies: mockCookies as any,
+        cookies: mockCookies as unknown,
         request: mockRequest,
         requestIp: mockRequestIp,
       })
@@ -117,7 +117,7 @@ describe('serverAuth', () => {
 
       // Act
       const result = await verifyServerAuth({
-        cookies: mockCookies as any,
+        cookies: mockCookies as unknown,
         request: mockRequest,
         requestIp: mockRequestIp,
       })
@@ -131,11 +131,11 @@ describe('serverAuth', () => {
     it('should return authenticated true with valid user when auth checks pass', async () => {
       // Arrange
       vi.mocked(isAuthenticated).mockResolvedValue(true)
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as any)
+      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as unknown)
 
       // Act
       const result = await verifyServerAuth({
-        cookies: mockCookies as any,
+        cookies: mockCookies as unknown,
         request: mockRequest,
         requestIp: mockRequestIp,
       })
@@ -152,11 +152,11 @@ describe('serverAuth', () => {
       vi.mocked(getCurrentUser).mockResolvedValue({
         ...mockUser,
         role: 'user',
-      } as any)
+      } as unknown)
 
       // Act
       const result = await verifyServerAuth({
-        cookies: mockCookies as any,
+        cookies: mockCookies as unknown,
         request: mockRequest,
         requestIp: mockRequestIp,
         requiredRole: 'admin',
@@ -176,7 +176,7 @@ describe('serverAuth', () => {
     it('should check IP match when validateIPMatch is true', async () => {
       // Arrange
       vi.mocked(isAuthenticated).mockResolvedValue(true)
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as any)
+      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as unknown)
 
       // Simulate a previous IP being stored
       mockRedisMethods.get.mockImplementation((key: string) => {
@@ -188,7 +188,7 @@ describe('serverAuth', () => {
 
       // Act
       const result = await verifyServerAuth({
-        cookies: mockCookies as any,
+        cookies: mockCookies as unknown,
         request: mockRequest,
         requestIp: mockRequestIp,
         validateIPMatch: true,
@@ -215,7 +215,7 @@ describe('serverAuth', () => {
     it('should check user agent match when validateUserAgent is true', async () => {
       // Arrange
       vi.mocked(isAuthenticated).mockResolvedValue(true)
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as any)
+      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as unknown)
 
       // Simulate a previous user agent being stored
       mockRedisMethods.get.mockImplementation((key: string) => {
@@ -227,7 +227,7 @@ describe('serverAuth', () => {
 
       // Act
       const result = await verifyServerAuth({
-        cookies: mockCookies as any,
+        cookies: mockCookies as unknown,
         request: mockRequest,
         requestIp: mockRequestIp,
         validateUserAgent: true,
@@ -256,7 +256,7 @@ describe('serverAuth', () => {
     it('should create an API route handler that uses verifyServerAuth', async () => {
       // Arrange
       vi.mocked(isAuthenticated).mockResolvedValue(true)
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as any)
+      vi.mocked(getCurrentUser).mockResolvedValue(mockUser as unknown)
 
       const astroContext = {
         request: mockRequest,
@@ -277,7 +277,7 @@ describe('serverAuth', () => {
 
       // Act - call the outer function to get the APIRoute, then call that with the context
       const apiRoute = protectedHandler(mockRouteHandler)
-      const result = await apiRoute(astroContext as any)
+      const result = await apiRoute(astroContext as unknown)
 
       // Assert
       expect(result).toBeDefined()
@@ -302,7 +302,7 @@ describe('serverAuth', () => {
 
       // Act - call the outer function to get the APIRoute, then call that with the context
       const apiRoute = protectedHandler(mockRouteHandler)
-      const response = await apiRoute(astroContext as any)
+      const response = await apiRoute(astroContext as unknown)
 
       // Assert
       expect(response).toBeInstanceOf(Response)
@@ -322,7 +322,7 @@ describe('serverAuth', () => {
       vi.mocked(getCurrentUser).mockResolvedValue({
         ...mockUser,
         role: 'user',
-      } as any)
+      } as unknown)
 
       const astroContext = {
         request: mockRequest,
@@ -339,7 +339,7 @@ describe('serverAuth', () => {
 
       // Act - call the outer function to get the APIRoute, then call that with the context
       const apiRoute = protectedHandler(mockRouteHandler)
-      const response = await apiRoute(astroContext as any)
+      const response = await apiRoute(astroContext as unknown)
 
       // Assert
       expect(response).toBeInstanceOf(Response)

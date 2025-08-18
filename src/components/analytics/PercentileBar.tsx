@@ -5,7 +5,7 @@ interface PercentileBarProps {
   label?: string
 }
 
-export const PercentileBar: React.FC<PercentileBarProps> = ({
+export const PercentileBar: FC<PercentileBarProps> = ({
   rank,
   label,
 }) => {

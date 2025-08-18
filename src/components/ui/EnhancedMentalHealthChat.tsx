@@ -118,7 +118,7 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
   }
 }
 
-export const EnhancedMentalHealthChat: React.FC<EnhancedMentalHealthChatProps> = ({
+export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
   onAnalyze = mockAnalyze,
   className = "",
   showBrainViz = true,
@@ -178,7 +178,7 @@ export const EnhancedMentalHealthChat: React.FC<EnhancedMentalHealthChatProps> =
       }
 
       setMessages(prev => [...prev, assistantMessage])
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Analysis failed:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),

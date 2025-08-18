@@ -240,7 +240,7 @@ export function createMentalHealthChat(
         const mentalLLaMAFactory = await createMentalLLaMAFromEnv()
         mentalLLaMAAdapter = mentalLLaMAFactory.adapter
         logger.info('MentalLLaMA adapter initialized successfully')
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(
           'MentalLLaMA not available, falling back to basic analysis',
           { error },
@@ -251,13 +251,13 @@ export function createMentalHealthChat(
       try {
         recommendationService = new RecommendationService()
         logger.info('RecommendationService initialized successfully')
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('RecommendationService not available', { error })
       }
 
       isInitialized = true
       logger.info('MentalHealthChat initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize MentalHealthChat', { error })
       throw new Error('MentalHealthChat initialization failed')
     }
@@ -329,7 +329,7 @@ export function createMentalHealthChat(
           ...message,
           mentalHealthAnalysis: analysis,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error processing message', { error })
         return {
           ...message,
@@ -350,7 +350,7 @@ export function createMentalHealthChat(
 
       try {
         return mentalHealthService.needsIntervention(config.sessionId)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error checking intervention need', { error })
         return false
       }
@@ -383,7 +383,7 @@ export function createMentalHealthChat(
           interventions[Math.floor(Math.random() * interventions.length)] ||
           "I'm here to support you."
         )
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error generating intervention', { error })
         return "I'm here to support you. How are you feeling right now?"
       }
@@ -409,7 +409,7 @@ export function createMentalHealthChat(
 
       try {
         return mentalHealthService.getAnalysisHistory(config.sessionId)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error retrieving analysis history', { error })
         return []
       }
@@ -437,7 +437,7 @@ export function createMentalHealthChat(
           config.userId,
           latestAnalysis as unknown as MentalHealthAnalysisResult, // Type conversion needed for compatibility
         )
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error generating recommendations', { error })
         return []
       }

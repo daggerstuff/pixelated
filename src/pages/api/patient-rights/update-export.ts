@@ -149,7 +149,7 @@ export const put = async ({ request }) => {
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error updating export request', { error })
 
     return new Response(

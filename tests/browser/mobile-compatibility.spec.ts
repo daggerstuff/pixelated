@@ -55,7 +55,7 @@ for (const device of TEST_DEVICES) {
             `Navigation to ${page.url} failed: ${response ? response.status() : 'No response'}`,
           )
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Failed to navigate to ${page.url} on ${device}:`, error)
         await pageObj.screenshot({
           path: `./test-results/mobile/${device.replace(/\s+/g, '-')}-${page.name}-error.png`,
@@ -138,7 +138,7 @@ test('responsive navigation should work on mobile devices', async ({
         `Navigation to homepage failed: ${response ? response.status() : 'No response'}`,
       )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Failed to navigate to homepage:`, error)
     await page.screenshot({
       path: `./test-results/mobile/navigation-test-error.png`,

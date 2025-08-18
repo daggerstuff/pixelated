@@ -54,7 +54,7 @@ interface ResponseGenerationRequest {
  */
 function isRetryableError(error: unknown): boolean {
   // Network errors are retryable
-  if (error instanceof TypeError && error.message.includes('network')) {
+  if (error instanceof TypeError && String(error).includes('network')) {
     return true
   }
 
@@ -184,7 +184,7 @@ export function useResponseGeneration({
         }
 
         return response
-      } catch (err) {
+      } catch (err: unknown) {
         clearTimeout(timeoutId)
         throw err
       }
@@ -241,10 +241,10 @@ export function useResponseGeneration({
           }
 
           return generatedResponse
-        } catch (err) {
+        } catch (err: unknown) {
           if (retries === MAX_RETRIES - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? err.message : 'Failed to generate response'
+              err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to generate response'
             setError(errorMessage)
 
             if (onError && err instanceof Error) {
@@ -329,9 +329,9 @@ export function useResponseGeneration({
         }
 
         return therapeuticResponse
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to generate therapeutic response'
+          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to generate therapeutic response'
         setError(errorMessage)
 
         if (onError && err instanceof Error) {
@@ -413,7 +413,7 @@ export function useResponseGeneration({
             }
 
             try {
-              const data = JSON.parse(line) as AIStreamChunk
+              const data = JSON.parse(line) as unknown as AIStreamChunk
               const content = data?.content || ''
 
               if (content) {
@@ -450,9 +450,9 @@ export function useResponseGeneration({
         }
 
         return accumulatedResponse
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to generate streaming response'
+          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to generate streaming response'
         setError(errorMessage)
 
         if (onError && err instanceof Error) {

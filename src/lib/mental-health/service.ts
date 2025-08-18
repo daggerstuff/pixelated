@@ -14,7 +14,7 @@ export class MentalHealthService {
   private conversationHistory: Map<string, ChatMessage[]> = new Map()
   private analysisHistory: Map<string, MentalHealthAnalysis[]> = new Map()
 
-  constructor(config: Partial<AnalysisConfig> = {}) {
+  constructor(config: Partial<AnalysisConfig> = {}): void {
     this.analyzer = new MentalHealthAnalyzer()
     this.therapist = new TherapeuticResponseGenerator()
     this.config = {
@@ -54,7 +54,7 @@ export class MentalHealthService {
           analysisHistory.push(analysis)
           this.analysisHistory.set(conversationId, analysisHistory.slice(-20)) // Keep last 20
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Analysis failed:', error)
       }
     }
@@ -176,7 +176,7 @@ export class MentalHealthService {
     this.analysisHistory.delete(conversationId)
   }
 
-  getStats(conversationId: string) {
+  getStats(conversationId: string): void {
     const messages = this.conversationHistory.get(conversationId) || []
     const analyses = this.analysisHistory.get(conversationId) || []
 

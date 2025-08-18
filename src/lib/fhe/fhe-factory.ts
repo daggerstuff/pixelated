@@ -88,7 +88,7 @@ const sealFHEService: FHEService = {
   async initialize(): Promise<void> {
     try {
       await sealService.initialize()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize SEAL FHE service', { error })
       throw error
     }
@@ -112,7 +112,7 @@ const sealFHEService: FHEService = {
         scheme: 'SEAL',
         status: 'active',
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate SEAL keys', { error })
       throw error
     }
@@ -131,7 +131,7 @@ const sealFHEService: FHEService = {
       }
       const encrypted = await sealService.encrypt(data as number[])
       return createEncryptedData(encrypted, data as number[])
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL encryption failed', { error })
       throw error
     }
@@ -152,7 +152,7 @@ const sealFHEService: FHEService = {
       }
 
       return (await sealService.decrypt(ciphertext)) as T
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL decryption failed', { error })
       throw error
     }
@@ -186,7 +186,7 @@ const sealFHEService: FHEService = {
       }
 
       return createEncryptedData(result.result)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL addition failed', { error })
       throw error
     }
@@ -220,7 +220,7 @@ const sealFHEService: FHEService = {
       }
 
       return createEncryptedData(result.result)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL subtraction failed', { error })
       throw error
     }
@@ -254,7 +254,7 @@ const sealFHEService: FHEService = {
       }
 
       return createEncryptedData(result.result)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL multiplication failed', { error })
       throw error
     }
@@ -277,7 +277,7 @@ const sealFHEService: FHEService = {
       }
 
       return createEncryptedData(result.result)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL negation failed', { error })
       throw error
     }
@@ -303,7 +303,7 @@ const sealFHEService: FHEService = {
       }
 
       return createEncryptedData(result.result)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL polynomial failed', { error })
       throw error
     }
@@ -329,7 +329,7 @@ const sealFHEService: FHEService = {
       }
 
       return createEncryptedData(result.result)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('SEAL rotation failed', { error })
       throw error
     }
@@ -611,7 +611,7 @@ export async function initializeFHEServices(): Promise<void> {
       await sealFHEService.initialize()
       logger.info('SEAL FHE service initialized successfully')
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to initialize FHE services', { error })
     throw error
   }

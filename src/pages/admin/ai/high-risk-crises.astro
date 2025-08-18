@@ -3,19 +3,19 @@ export const prerender = false
 import { requirePermission } from '@/lib/access-control'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
-// Check if user has admin permission
-const checkPermission = requirePermission('read:admin')
-const permissionResponse = await checkPermission({
-  cookies: Astro.cookies,
-  redirect: Astro.redirect,
-})
+export async function get({ cookies, redirect }) {
+  // Check if user has admin permission
+  const checkPermission = requirePermission('read:admin')
+  const permissionResponse = await checkPermission({ cookies, redirect })
 
-// If permission check returned a response, return i
-if (permissionResponse) {
-  return permissionResponse
+  // If permission check returned a response, return it
+  if (permissionResponse) {
+    return permissionResponse
+  }
+
+  // Get the current user
+  return {}
 }
-
-// Get the current user
 ---
 
 <BaseLayout title="High-Risk Crisis Detections">
@@ -339,7 +339,7 @@ if (permissionResponse) {
     }
 
     // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
+    window.addEventListener('click', (event: Event) => {
       const modal = document.getElementById('crisis-modal')
       if (event.target === modal) {
         closeModal()

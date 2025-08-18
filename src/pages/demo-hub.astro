@@ -470,7 +470,7 @@ const liveDemo = {
     });
     
     // Parallax effect for neural nodes
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', (e: Event) => {
       const nodes = document.querySelectorAll('.neural-node');
       const speed = 0.5;
       

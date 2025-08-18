@@ -26,7 +26,7 @@ interface PopoverContentProps {
   className?: string
 }
 
-export const Popover: React.FC<PopoverProps> = ({ 
+export const Popover: FC<PopoverProps> = ({ 
   trigger, 
   children, 
   open, 
@@ -72,7 +72,7 @@ export const Popover: React.FC<PopoverProps> = ({
   )
 }
 
-export const PopoverTrigger: React.FC<PopoverTriggerProps> = ({ 
+export const PopoverTrigger: FC<PopoverTriggerProps> = ({ 
   children, 
   onClick,
   className = '' 
@@ -91,7 +91,7 @@ export const PopoverTrigger: React.FC<PopoverTriggerProps> = ({
   )
 }
 
-export const PopoverContent: React.FC<PopoverContentProps> = ({ 
+export const PopoverContent: FC<PopoverContentProps> = ({ 
   children, 
   className = '' 
 }) => {

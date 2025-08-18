@@ -184,7 +184,7 @@ export const GET = async ({ request }: APIContext) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching AI performance metrics:', error)
 
     return new Response(

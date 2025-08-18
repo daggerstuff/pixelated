@@ -105,7 +105,7 @@ function matchTopicArea(query: string): TopicArea {
 export class EducationalContextRecognizer {
   private config: EducationalRecognizerConfig
 
-  constructor(config: EducationalRecognizerConfig = {}) {
+  constructor(config: EducationalRecognizerConfig = {}): void {
     this.config = {
       model: config.model ?? 'gpt-4',
       includeResourceRecommendations: config.includeResourceRecommendations ?? true,
@@ -147,7 +147,7 @@ export class EducationalContextRecognizer {
         if (aiResult) {
           finalResult = this.combineResults(finalResult, aiResult)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         // Continue with pattern-based result if AI fails
         console.warn('AI analysis failed, using pattern-based result:', error)
       }
@@ -214,7 +214,7 @@ export class EducationalContextRecognizer {
     if (!content) return null
 
     try {
-      const parsed = JSON.parse(content)
+      const parsed = JSON.parse(content) as unknown
       return {
         isEducational: Boolean(parsed.isEducational),
         confidence: Math.max(0, Math.min(1, parsed.confidence || 0.8)),
@@ -286,7 +286,7 @@ export class EducationalContextRecognizer {
     return Promise.all(queries.map(q => this.recognizeEducationalContext(q.query)))
   }
 
-  generateLearningPathway(result: EducationalContextResult) {
+  generateLearningPathway(result: EducationalContextResult): void {
     return {
       currentTopic: `${result.educationalType} - ${result.topicArea}`,
       nextSteps: ['Learn about symptoms'],
@@ -296,7 +296,7 @@ export class EducationalContextRecognizer {
   }
 }
 
-export function createEducationalContextRecognizer(config: EducationalRecognizerConfig) {
+export function createEducationalContextRecognizer(config: EducationalRecognizerConfig): void {
   return new EducationalContextRecognizer(config)
 }
 

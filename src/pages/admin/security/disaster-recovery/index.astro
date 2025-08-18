@@ -576,10 +576,10 @@ function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-upda
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Handle "Run Test" button
     const runTestBtn = document.getElementById('run-test-btn')
-    runTestBtn?.addEventListener('click', () => {
+    runTestBtn?.addEventListener('click', (_event: Event) => {
       // In a real implementation, this would open a modal to select a test to run
       alert(
         'In a production environment, this would open the test configuration dialog.',
@@ -588,14 +588,14 @@ function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-upda
 
     // Handle "Schedule Test" button
     const scheduleTestBtn = document.getElementById('schedule-test-btn')
-    scheduleTestBtn?.addEventListener('click', () => {
+    scheduleTestBtn?.addEventListener('click', (_event: Event) => {
       window.location.href = '/admin/security/disaster-recovery/tests/schedule'
     })
 
     // Handle "Test Plan" buttons
     const testPlanBtns = document.querySelectorAll('.test-plan')
     testPlanBtns.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
         window.location.href = `/admin/security/disaster-recovery/plans/${planId}/test`
       })
@@ -604,7 +604,7 @@ function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-upda
     // Handle "Edit Plan" buttons
     const editPlanBtns = document.querySelectorAll('.edit-plan')
     editPlanBtns.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
         window.location.href = `/admin/security/disaster-recovery/plans/${planId}/edit`
       })
@@ -613,7 +613,7 @@ function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-upda
     // Handle test detail buttons
     const testDetailBtns = document.querySelectorAll('[data-test-id]')
     testDetailBtns.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const testId = (e.target as HTMLElement).getAttribute('data-test-id')
         window.location.href = `/admin/security/disaster-recovery/tests/${testId}`
       })

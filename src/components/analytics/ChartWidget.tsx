@@ -223,7 +223,7 @@ export function ChartWidget({
           const data = await fetchData(range)
           setLabels(data.labels)
           setSeries(data.series)
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error fetching chart data:', error)
         } finally {
           setIsLoading(false)
@@ -251,7 +251,7 @@ export function ChartWidget({
           const data = await fetchData(range)
           setLabels(data.labels)
           setSeries(data.series)
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error refreshing chart data:', error)
         } finally {
           setIsLoading(false)

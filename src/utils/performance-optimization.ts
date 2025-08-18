@@ -8,7 +8,7 @@
  * Reports Core Web Vitals and other metrics to the console
  * Helps with debugging performance issues during development
  */
-export function reportWebVitals(): void {
+export function reportWebVitals() {
   if (typeof window !== 'undefined') {
     try {
       // Only report in development or when explicitly enabled
@@ -57,7 +57,7 @@ interface FirstInputEntry extends PerformanceEntry {
 /**
  * Reports Largest Contentful Paint (LCP)
  */
-function reportLCP(): void {
+function reportLCP() {
   try {
     const entryTypes = 'largest-contentful-paint'
 
@@ -90,7 +90,7 @@ function reportLCP(): void {
 /**
  * Reports Cumulative Layout Shift (CLS)
  */
-function reportCLS(): void {
+function reportCLS() {
   try {
     let clsValue = 0
     const clsEntries: LayoutShiftEntry[] = []
@@ -122,7 +122,7 @@ function reportCLS(): void {
 /**
  * Reports First Input Delay (FID)
  */
-function reportFID(): void {
+function reportFID() {
   try {
     const observer = new PerformanceObserver((entryList) => {
       const entries = entryList.getEntries()
@@ -148,7 +148,7 @@ function reportFID(): void {
 /**
  * Reports First Contentful Paint (FCP)
  */
-function reportFCP(): void {
+function reportFCP() {
   try {
     const observer = new PerformanceObserver((entryList) => {
       const entries = entryList.getEntries()
@@ -173,7 +173,7 @@ function reportFCP(): void {
 /**
  * Reports Time to First Byte (TTFB)
  */
-function reportTTFB(): void {
+function reportTTFB() {
   try {
     const navigationEntries = performance.getEntriesByType('navigation')
 
@@ -259,7 +259,7 @@ export function optimizeLCP(resources: string[] = []): void {
 /**
  * Optimizes FID by deferring non-critical scripts and styles
  */
-export function optimizeFID(): void {
+export function optimizeFID() {
   if (typeof document === 'undefined') {
     return
   }
@@ -276,7 +276,7 @@ export function optimizeFID(): void {
 /**
  * Optimizes CLS by setting explicit dimensions for media and placeholders
  */
-export function optimizeCLS(): void {
+export function optimizeCLS() {
   if (typeof document === 'undefined') {
     return
   }
@@ -358,7 +358,7 @@ export function initializeOptimizations(
 /**
  * Cleans up listeners and runs garbage collection for better performance
  */
-function garbageCollection(): void {
+function garbageCollection() {
   // Remove unnecessary event listeners
   const cleanupElements = document.querySelectorAll(
     '[data-cleanup-events="true"]',

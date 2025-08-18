@@ -66,7 +66,7 @@ export const GET: APIRoute = protectRoute({
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching users:', error)
     return new Response(
       JSON.stringify({
@@ -136,7 +136,7 @@ export const PATCH: APIRoute = protectRoute({
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error updating user:', error)
     return new Response(
       JSON.stringify({

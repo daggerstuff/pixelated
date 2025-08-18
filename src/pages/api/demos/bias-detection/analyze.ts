@@ -177,14 +177,14 @@ export const POST: APIRoute = async ({ request }) => {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Bias analysis API error:', error)
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error during bias analysis',
         message:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+          error instanceof Error ? String(error) : 'Unknown error occurred',
       }),
       {
         status: 500,

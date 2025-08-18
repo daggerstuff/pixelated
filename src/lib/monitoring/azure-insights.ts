@@ -18,9 +18,9 @@ if (!isBuildTime) {
     try {
       const module = await import('../../config/azure.config')
       azureConfig = module.azureConfig
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to load Azure configuration', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   })()
@@ -150,10 +150,10 @@ export class AzureInsightsTelemetry {
       })
 
       logger.debug('Event tracked', { eventName: event.name })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track event', {
         eventName: event.name,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }
@@ -190,10 +190,10 @@ export class AzureInsightsTelemetry {
         message: exception.exception.message,
         severityLevel: exception.severityLevel,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track exception', {
         originalError: exception.exception.message,
-        trackingError: error instanceof Error ? error.message : String(error),
+        trackingError: error instanceof Error ? String(error) : String(error),
       })
     }
   }
@@ -228,10 +228,10 @@ export class AzureInsightsTelemetry {
         duration: dependency.duration,
         success: dependency.success,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track dependency', {
         dependencyName: dependency.name,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }
@@ -264,10 +264,10 @@ export class AzureInsightsTelemetry {
         responseCode: request.responseCode,
         duration: request.duration,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track request', {
         requestName: request.name,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }
@@ -299,10 +299,10 @@ export class AzureInsightsTelemetry {
         name: metric.name,
         value: metric.value,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track metric', {
         metricName: metric.name,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }
@@ -332,10 +332,10 @@ export class AzureInsightsTelemetry {
       })
 
       logger.debug('Page view tracked', { name, url })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track page view', {
         pageName: name,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }
@@ -343,7 +343,7 @@ export class AzureInsightsTelemetry {
   /**
    * Flush all pending telemetry
    */
-  flush(): void {
+  flush() {
     if (!this.isConfigured) {
       return
     }
@@ -351,9 +351,9 @@ export class AzureInsightsTelemetry {
     try {
       // In a real implementation, this would flush the Application Insights buffer
       logger.debug('Telemetry flushed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to flush telemetry', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }
@@ -384,10 +384,10 @@ export class AzureInsightsTelemetry {
       // In production, you would send this to:
       // https://dc.applicationinsights.azure.com/v2/track
       // with proper authentication and error handling
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send telemetry', {
         type,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }

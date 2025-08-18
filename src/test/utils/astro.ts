@@ -43,7 +43,7 @@ export async function renderAstro<Props extends Record<string, unknown>>(
  * @param props Props to override in the mock
  * @returns A mock Astro global object
  */
-export function createMockAstro(props: Record<string, unknown> = {}) {
+export function createMockAstro(props: Record<string, unknown> = {}): void {
   return {
     props,
     request: new Request('http://localhost:3000'),

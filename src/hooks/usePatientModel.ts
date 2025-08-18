@@ -44,7 +44,7 @@ export function usePatientModel() {
         if (models.length > 0 && !currentModelId) {
           setCurrentModelId(models[0].id)
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to load patient models:', err)
         setError('Failed to load available patient models')
       } finally {
@@ -73,10 +73,10 @@ export function usePatientModel() {
         } else {
           setError(`Could not load patient model with ID: ${currentModelId}`)
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error(`Failed to load patient model ${currentModelId}:`, err)
         setError(
-          `Error loading patient model: ${err instanceof Error ? err.message : String(err)}`,
+          `Error loading patient model: ${err instanceof Error ? (err as Error)?.message || String(err) : String(err)}`,
         )
       } finally {
         setIsLoading(false)
@@ -141,7 +141,7 @@ export function usePatientModel() {
           prompt,
           context: responseContext,
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to generate patient response:', err)
         throw err
       }

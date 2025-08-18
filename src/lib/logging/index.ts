@@ -80,7 +80,7 @@ const MAX_COLLECTED_LOGS = 1000
 export class Logger {
   private options: LoggerOptions
 
-  constructor(options?: Partial<LoggerOptions>) {
+  constructor(options?: Partial<LoggerOptions>): void {
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -389,7 +389,7 @@ export function getCollectedLogs(): LogMessage[] {
 /**
  * Clear collected logs
  */
-export function clearCollectedLogs(): void {
+export function clearCollectedLogs() {
   collectedLogs.length = 0
 }
 

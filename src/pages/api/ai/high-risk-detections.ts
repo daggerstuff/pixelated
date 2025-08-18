@@ -70,7 +70,7 @@ export const GET = async ({ request, url }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error retrieving high-risk crisis detections:', error)
     return new Response(
       JSON.stringify({

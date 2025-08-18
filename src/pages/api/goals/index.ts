@@ -75,11 +75,11 @@ export const POST = async ({ request }: { request: any }) => {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (err) {
+  } catch (err: unknown) {
     return new Response(
       JSON.stringify({
         error: 'Server error',
-        details: err instanceof Error ? err.message : String(err),
+        details: err instanceof Error ? (err as Error)?.message || String(err) : String(err),
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

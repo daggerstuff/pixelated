@@ -92,7 +92,7 @@ const renderStatusBadge = (status: RecoveryTestStatus) => {
   }
 }
 
-const BackupRecoveryTab: React.FC<BackupRecoveryTabProps> = ({
+const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
   backups,
   recoveryHistory: initialRecoveryHistory,
 }) => {
@@ -145,10 +145,10 @@ const BackupRecoveryTab: React.FC<BackupRecoveryTabProps> = ({
     } catch (error: unknown) {
       console.error('Recovery test failed:', error);
 
-      // Type guard to safely access error.message
+      // Type guard to safely access String(error)
       const errorMessage =
         error instanceof Error
-          ? error.message
+          ? String(error)
           : typeof error === 'object' && error !== null && 'message' in error
           ? String((error as { message: unknown }).message)
           : 'An unexpected error occurred.';

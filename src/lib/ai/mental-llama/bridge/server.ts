@@ -1,5 +1,5 @@
 // Conditional module export for Python bridge
-export async function createMentalLLaMAPythonBridge(scriptPath?: string) {
+export async function createMentalLLaMAPythonBridge(scriptPath?: string): void {
   // Only import server implementation when actually in a Node.js environment
   if (
     typeof process !== 'undefined' &&
@@ -17,7 +17,7 @@ export async function createMentalLLaMAPythonBridge(scriptPath?: string) {
       ].join('/')
       const module = await import(/* @vite-ignore */ modulePath)
       return new module.MentalLLaMAPythonBridge(scriptPath)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn(
         'Failed to load server-side Python bridge, using stub:',
         error,

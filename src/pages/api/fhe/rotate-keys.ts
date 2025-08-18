@@ -72,7 +72,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     createBuildSafeLogger('default').error(
       `Key rotation API error: ${(error as Error).message}`,
     )

@@ -34,7 +34,7 @@ export class BackupVerificationService extends EventEmitter {
   private config: BackupConfig
   private backupDir: string
 
-  constructor(redis: RedisService, config: Partial<BackupConfig> = {}) {
+  constructor(redis: RedisService, config: Partial<BackupConfig> = {}): void {
     super()
     this.redis = redis
     this.config = {
@@ -56,7 +56,7 @@ export class BackupVerificationService extends EventEmitter {
     await fs.mkdir(this.backupDir, { recursive: true })
   }
 
-  private startVerificationSchedule(): void {
+  private startVerificationSchedule() {
     setInterval(() => {
       this.verifyAllBackups().catch(console.error)
     }, this.config.verificationInterval)
@@ -78,7 +78,7 @@ export class BackupVerificationService extends EventEmitter {
         try {
           const result = await this.verifyBackup(file)
           results.push(result)
-        } catch (error) {
+        } catch (error: unknown) {
           results.push({
             file,
             isValid: false,
@@ -90,7 +90,7 @@ export class BackupVerificationService extends EventEmitter {
       await this.cleanupOldBackups()
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(`Failed to verify backups: ${error?.['message'] || 'Unknown error'}`)
     }
   }
@@ -108,7 +108,7 @@ export class BackupVerificationService extends EventEmitter {
       const checksum = this.calculateChecksum(data)
 
       // Parse backup data
-      const backup = JSON.parse(data.toString())
+      const backup = JSON.parse(data.toString() as unknown)
 
       // Verify structure
       if (!this.isValidBackupStructure(backup)) {
@@ -151,11 +151,11 @@ export class BackupVerificationService extends EventEmitter {
         isValid: true,
         metadata,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         file: filename,
         isValid: false,
-        error: `Verification failed: ${error.message}`,
+        error: `Verification failed: ${String(error)}`,
       }
     }
   }
@@ -242,7 +242,7 @@ export class BackupVerificationService extends EventEmitter {
     try {
       // Read backup file
       const backupData = await fs.readFile(backupPath)
-      const backup = JSON.parse(backupData.toString())
+      const backup = JSON.parse(backupData.toString() as unknown)
 
       // Verify backup structure
       if (!backup.data || !backup.metadata) {
@@ -256,15 +256,15 @@ export class BackupVerificationService extends EventEmitter {
 
       // Verify restoration capability
       await this.verifyRestoration(backup)
-    } catch (error) {
-      throw new Error(`Backup content verification failed: ${error.message}`)
+    } catch (error: unknown) {
+      throw new Error(`Backup content verification failed: ${String(error)}`)
     }
   }
 
   private async verifyRestoration(backup: unknown): Promise<void> {
     // Create temporary Redis instance for restoration testing
     const testRedis = new RedisService({
-      url: process.env.REDIS_URL!,
+      url: process.env['REDIS_URL']!,
       keyPrefix: 'backup_test_',
       maxRetries: 3,
       retryDelay: 100,
@@ -287,10 +287,11 @@ export class BackupVerificationService extends EventEmitter {
 
   private extractTestData(data: unknown): unknown {
     // Extract a small sample of each data type
+    const typedData = data as Record<string, unknown>
     return {
-      users: data.users.slice(0, 5),
-      sessions: data.sessions.slice(0, 5),
-      analytics: data.analytics.slice(0, 5),
+      users: Array.isArray(typedData?.['users']) ? (typedData['users'] as unknown[]).slice(0, 5) : [],
+      sessions: Array.isArray(typedData?.['sessions']) ? (typedData['sessions'] as unknown[]).slice(0, 5) : [],
+      analytics: Array.isArray(typedData?.['analytics']) ? (typedData['analytics'] as unknown[]).slice(0, 5) : [],
     }
   }
 
@@ -299,8 +300,12 @@ export class BackupVerificationService extends EventEmitter {
     data: unknown,
   ): Promise<void> {
     // Implement test data restoration logic
-    for (const user of data.users) {
-      await redis.set(`user:${user.id}`, JSON.stringify(user))
+    const typedData = data as Record<string, unknown>
+    const users = Array.isArray(typedData?.['users']) ? (typedData['users'] as unknown[]) : []
+    for (const user of users) {
+      if (user && typeof user === 'object' && 'id' in user) {
+        await redis.set(`user:${(user as { id: string }).id}`, JSON.stringify(user))
+      }
     }
     // ... similar for other data types
   }
@@ -310,10 +315,15 @@ export class BackupVerificationService extends EventEmitter {
     data: unknown,
   ): Promise<void> {
     // Verify restored data matches original
-    for (const user of data.users) {
-      const restored = await redis.get(`user:${user.id}`)
-      if (!restored || JSON.parse(restored).id !== user.id) {
-        throw new Error(`Restoration verification failed for user: ${user.id}`)
+    const typedData = data as Record<string, unknown>
+    const users = Array.isArray(typedData?.['users']) ? (typedData['users'] as unknown[]) : []
+    for (const user of users) {
+      if (user && typeof user === 'object' && 'id' in user) {
+        const userId = (user as { id: string }).id
+        const restored = await redis.get(`user:${userId}`)
+        if (!restored || JSON.parse(restored) as unknown.id !== userId) {
+          throw new Error(`Restoration verification failed for user: ${userId}`)
+        }
       }
     }
     // ... similar for other data types
@@ -325,7 +335,7 @@ export class BackupVerificationService extends EventEmitter {
     try {
       const metadataPath = path.join(this.backupDir, `${backupFile}.meta`)
       const data = await fs.readFile(metadataPath, 'utf-8')
-      return JSON.parse(data)
+      return JSON.parse(data) as unknown
     } catch {
       return null
     }
@@ -344,13 +354,13 @@ export class BackupVerificationService extends EventEmitter {
     }
   }
 
-  private async markBackupFailed(backupFile: string): Promise<void> {
-    const metadata = await this.getBackupMetadata(backupFile)
-    if (metadata) {
-      metadata.status = 'failed'
-      await this.saveBackupMetadata(backupFile, metadata)
-    }
-  }
+  // private async markBackupFailed(backupFile: string): Promise<void> {
+  //   const metadata = await this.getBackupMetadata(backupFile)
+  //   if (metadata) {
+  //     metadata.status = 'failed'
+  //     await this.saveBackupMetadata(backupFile, metadata)
+  //   }
+  // }
 
   private async saveBackupMetadata(
     backupFile: string,
@@ -380,7 +390,7 @@ export class BackupVerificationService extends EventEmitter {
     try {
       await fs.unlink(backupPath)
       await fs.unlink(metadataPath)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Failed to delete backup ${backupFile}:`, error)
     }
   }

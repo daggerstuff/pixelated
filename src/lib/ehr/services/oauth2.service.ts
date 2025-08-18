@@ -19,7 +19,7 @@ export class OAuth2Service {
   private tokenStore: TokenStore = {}
   private readonly EXPIRY_BUFFER = 300 // 5 minutes buffer before token expiry
 
-  constructor(private readonly logger: Console = console) {}
+  constructor(private readonly logger: Console = console): void {}
 
   async getAccessToken(provider: EHRProvider): Promise<string> {
     const storedToken = this.tokenStore[provider.id]
@@ -35,7 +35,7 @@ export class OAuth2Service {
           storedToken.token.refresh_token,
         )
         return newToken.access_token
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(
           `Failed to refresh token for provider ${provider.id}:`,
           error,
@@ -73,7 +73,7 @@ export class OAuth2Service {
       const token: OAuth2Token = await response.json()
       this.storeToken(provider.id, token)
       return token.access_token
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to request token for provider ${provider.id}:`,
         error,

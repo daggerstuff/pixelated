@@ -162,7 +162,7 @@ export class SealPatternRecognitionService implements FHEService {
 
       // Return as an array to match PatternRecognitionOps
       return [encryptedResult]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error processing patterns', { error })
       throw error
     }
@@ -180,7 +180,7 @@ export class SealPatternRecognitionService implements FHEService {
       // Accept an array of EncryptedPattern and process each
       const allPatterns: TrendPattern[] = []
       for (const encryptedData of encryptedPatterns) {
-        const data = JSON.parse(encryptedData.encryptedData)
+        const data = JSON.parse(encryptedData.encryptedData) as unknown
 
         // In a real implementation, we would decrypt the data using SEAL
         // For now, we'll generate synthetic data based on the encrypted info
@@ -217,7 +217,7 @@ export class SealPatternRecognitionService implements FHEService {
         allPatterns.push(...decodedPatterns)
       }
       return allPatterns
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error decrypting pattern analysis', { error })
       throw error
     }
@@ -279,7 +279,7 @@ export class SealPatternRecognitionService implements FHEService {
       }
 
       return encryptedResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error analyzing cross sessions', { error })
       throw error
     }
@@ -295,7 +295,7 @@ export class SealPatternRecognitionService implements FHEService {
 
     try {
       // Parse the encrypted data
-      const data = JSON.parse(encryptedData.encryptedData)
+      const data = JSON.parse(encryptedData.encryptedData) as unknown
 
       // Session IDs from the encrypted data
       const sessionIds = data.sessionIds as string[]
@@ -341,7 +341,7 @@ export class SealPatternRecognitionService implements FHEService {
       }
 
       return patterns
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error decrypting cross-session analysis', { error })
       throw error
     }
@@ -405,7 +405,7 @@ export class SealPatternRecognitionService implements FHEService {
 
       // Return as array to match PatternRecognitionOps
       return [encryptedResult]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error processing risk correlations', { error })
       throw error
     }
@@ -422,7 +422,7 @@ export class SealPatternRecognitionService implements FHEService {
     try {
       const correlations: RiskCorrelation[] = []
       for (const encryptedData of encryptedCorrelations) {
-        JSON.parse(encryptedData.encryptedData)
+        JSON.parse(encryptedData.encryptedData) as unknown
         // ...existing logic to generate RiskCorrelation(s) from _data...
         // (copy your current logic here, pushing to correlations array)
         // For each generated RiskCorrelation, push to correlations
@@ -430,7 +430,7 @@ export class SealPatternRecognitionService implements FHEService {
         // correlations.push({ ... })
       }
       return correlations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error decrypting risk correlations', { error })
       throw error
     }

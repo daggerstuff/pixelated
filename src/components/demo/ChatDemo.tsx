@@ -128,7 +128,7 @@ export function ChatDemo({
           analyzeSentiment(message),
           detectCrisis(message),
         ])
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Message handling error:', error)
         throw error
       }

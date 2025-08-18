@@ -185,7 +185,7 @@ export class CompatibilityService {
   /**
    * Clear all issues
    */
-  public clearIssues(): void {
+  public clearIssues() {
     this.issueRegistry.clear()
   }
 
@@ -201,7 +201,7 @@ export class CompatibilityService {
       if (this.options.sendSlack && this.options.slackWebhook) {
         await this.sendSlackAlert(issues)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send compatibility alert', error)
     }
   }

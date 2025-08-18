@@ -94,13 +94,13 @@ bias_detection_alerts_total ${mockMetrics.summary.alertsTriggered}
         'Cache-Control': 'no-cache',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Metrics endpoint error:', error)
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {

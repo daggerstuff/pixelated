@@ -23,7 +23,7 @@ export class RedisService extends EventEmitter implements IRedisService {
   private healthCheckInterval: NodeJS.Timeout | null = null
   private readonly config: RedisServiceConfig
 
-  constructor(config: RedisServiceConfig = { url: '' }) {
+  constructor(config: RedisServiceConfig = { url: '' }): void {
     super()
     this.config = {
       maxRetries: 3,
@@ -120,13 +120,13 @@ export class RedisService extends EventEmitter implements IRedisService {
 
       // Start health checks
       this.startHealthCheck()
-    } catch (error) {
+    } catch (error: unknown) {
       // In development, we can continue without Redis
       if (process.env['NODE_ENV'] === 'development') {
         logger.warn(
           'Failed to connect to Redis in development, will use mock:',
           {
-            error: error instanceof Error ? error.message : String(error),
+            error: error instanceof Error ? String(error) : String(error),
           },
         )
         // Clear the client so we'll use the mock
@@ -158,7 +158,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         Array.from(this.subscribers.values()).map((sub) => sub.quit()),
       )
       this.subscribers.clear()
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.CONNECTION_CLOSED,
         'Error disconnecting from Redis',
@@ -411,7 +411,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return new Redis(this.config.url, redisOptions)
   }
 
-  private startHealthCheck(): void {
+  private startHealthCheck() {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval)
     }
@@ -419,7 +419,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     this.healthCheckInterval = setInterval(async () => {
       try {
         await this.isHealthy()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Health check failed:', { error: String(error) })
       }
     }, this.config.healthCheckInterval || 5000)
@@ -430,9 +430,9 @@ export class RedisService extends EventEmitter implements IRedisService {
       const client = await this.ensureConnection()
       await client.ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return false
     }
@@ -442,7 +442,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.get(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get key: ${key}`,
@@ -459,7 +459,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       } else {
         await client.set(key, value)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to set key: ${key}`,
@@ -472,7 +472,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       await client.del(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to delete key: ${key}`,
@@ -486,7 +486,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       const client = await this.ensureConnection()
       const result = await client.exists(key)
       return result === 1
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to check existence of key: ${key}`,
@@ -499,7 +499,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.pttl(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get TTL for key: ${key}`,
@@ -512,7 +512,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.incr(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to increment key: ${key}`,
@@ -525,7 +525,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.sadd(key, member)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to add member to set: ${key}`,
@@ -538,7 +538,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.srem(key, member)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to remove member from set: ${key}`,
@@ -551,7 +551,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.smembers(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get members of set: ${key}`,
@@ -564,7 +564,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.keys(pattern)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get keys matching pattern: ${pattern}`,
@@ -612,7 +612,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       )
 
       return stats
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         'Failed to get pool stats',
@@ -653,7 +653,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       }
 
       return await this.client.publish(channel, message)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to publish to channel: ${channel}`,
@@ -693,7 +693,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       }
 
       logger.debug(`Deleted ${keys.length} keys matching pattern: ${pattern}`)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to delete keys matching pattern: ${pattern}`,
@@ -707,7 +707,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.hset(key, field, value)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to set hash field: ${key}[${field}]`,
@@ -720,7 +720,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.hget(key, field)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get hash field: ${key}[${field}]`,
@@ -734,7 +734,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       const client = await this.ensureConnection()
       const result = await client.hgetall(key)
       return result || {}
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get all hash fields: ${key}`,
@@ -747,7 +747,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.hdel(key, field)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to delete hash field: ${key}[${field}]`,
@@ -760,7 +760,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.hlen(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get hash length: ${key}`,
@@ -774,7 +774,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.zadd(key, score, member)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to add to sorted set: ${key}`,
@@ -787,7 +787,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.zrem(key, member)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to remove from sorted set: ${key}`,
@@ -826,7 +826,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         return arr
       }
       return await client.zrange(key, start, stop)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get range from sorted set: ${key}`,
@@ -854,7 +854,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         )
       }
       return []
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to pop min from sorted set: ${key}`,
@@ -867,7 +867,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.zcard(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get sorted set cardinality: ${key}`,
@@ -881,7 +881,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.lpush(key, ...elements)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to push to list: ${key}`,
@@ -894,7 +894,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.rpoplpush(source, destination)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to move element from ${source} to ${destination}`,
@@ -907,7 +907,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.lrem(key, count, value)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to remove elements from list: ${key}`,
@@ -920,7 +920,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     try {
       const client = await this.ensureConnection()
       return await client.llen(key)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
         `Failed to get list length: ${key}`,

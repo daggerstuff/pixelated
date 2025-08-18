@@ -48,7 +48,7 @@
 </script>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     let isDark: boolean
 
     const saveTheme = () => {
@@ -120,12 +120,13 @@
     }
 
     const toggleThemeButton = document.getElementById('theme-switch')
-    toggleThemeButton?.addEventListener('click', (event) => handleToggle(event))
+    toggleThemeButton?.addEventListener('click', (event: Event) => handleToggle(event as MouseEvent))
 
     /* Listening system changes */
     window
       .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', ({ matches }) => {
+      .addEventListener('change', (event: Event) => {
+        const { matches } = event as MediaQueryListEvent
         isDark = matches
         document.documentElement.classList.toggle('dark', isDark)
         saveTheme()

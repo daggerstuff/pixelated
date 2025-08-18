@@ -12,7 +12,7 @@ interface TherapyStyleSelectorProps {
   showRecommendations?: boolean
 }
 
-export const TherapyStyleSelector: React.FC<TherapyStyleSelectorProps> = ({
+export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
   selectedStyle,
   onSelectStyle,
   issue,
@@ -28,9 +28,7 @@ export const TherapyStyleSelector: React.FC<TherapyStyleSelectorProps> = ({
     showRecommendations && issue ? getRecommendedStyles(issue) : []
 
   // Create a set of recommended style IDs for easy lookup
-  const recommendedStyleIds = new Set(
-    recommendedStyles.map((style) => style.id),
-  )
+  const recommendedStyleIds = new Set(recommendedStyles)
 
   // Handler for style button click
   const handleStyleClick = (styleId: TherapyStyleId) => {
@@ -93,7 +91,7 @@ export const TherapyStyleSelector: React.FC<TherapyStyleSelectorProps> = ({
         <div className="style-issues">
           <h4>Recommended For:</h4>
           <ul>
-            {currentStyle.recommendedFor.map((issue) => (
+            {currentStyle.suitableFor.map((issue) => (
               <li key={issue}>{issue}</li>
             ))}
           </ul>

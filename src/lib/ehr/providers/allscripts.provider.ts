@@ -71,7 +71,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
       this.logger.info(
         `Successfully initialized Allscripts features for provider ${this.id}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to initialize Allscripts features for provider ${this.id}:`,
         error,
@@ -100,7 +100,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
       try {
         await client.searchResources(endpoint, { _summary: 'count' })
         this.logger.info(`Verified Allscripts endpoint: ${endpoint}`)
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `Failed to verify Allscripts endpoint ${endpoint}:`,
           error,
@@ -166,7 +166,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
       // For example: revoke tokens, clear session data, etc.
 
       await super.cleanup()
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to cleanup Allscripts provider ${this.id}:`,
         error,

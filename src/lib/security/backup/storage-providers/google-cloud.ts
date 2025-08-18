@@ -60,7 +60,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   private bucketName: string;
   private initialized = false;
 
-  constructor(private config: StorageProviderConfig) {
+  constructor(private config: StorageProviderConfig): void {
     this.bucketName = (config.bucket as string) || '';
     if (!this.bucketName) {
       throw new Error(
@@ -87,13 +87,13 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       console.info(
         `Google Cloud Storage provider initialized for bucket: ${this.bucketName}`,
       );
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         'Failed to initialize Google Cloud Storage provider:',
         error,
       );
       throw new Error(
-        `Google Cloud Storage initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Google Cloud Storage initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
       );
     }
   }
@@ -130,10 +130,10 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       }
 
       return fileNames
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to list files from Google Cloud Storage:', error)
       throw new Error(
-        `Failed to list files: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to list files: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -164,13 +164,13 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         const nodeBuffer = Buffer.from(data)
         stream.end(nodeBuffer)
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to store file ${key} to Google Cloud Storage:`,
         error,
       )
       throw new Error(
-        `Failed to store file: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to store file: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -192,13 +192,13 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 
       // Convert Buffer to Uint8Array
       return new Uint8Array(fileContent)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to get file ${key} from Google Cloud Storage:`,
         error,
       )
       throw new Error(
-        `Failed to get file: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to get file: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -218,18 +218,18 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 
       // Delete the file
       await file.delete()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to delete file ${key} from Google Cloud Storage:`,
         error,
       )
       throw new Error(
-        `Failed to delete file: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
 
-  private checkInitialized(): void {
+  private checkInitialized() {
     if (!this.initialized) {
       throw new Error('Google Cloud Storage provider not initialized')
     }

@@ -12,7 +12,7 @@ interface SliderProps {
   className?: string
 }
 
-const Slider: React.FC<SliderProps> = ({
+const Slider: FC<SliderProps> = ({
   value,
   defaultValue = [0],
   min = 0,

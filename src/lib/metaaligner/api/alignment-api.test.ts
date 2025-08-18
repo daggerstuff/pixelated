@@ -246,7 +246,7 @@ describe('MetaAlignerAPI', () => {
   describe('enhanceResponse', () => {
     beforeEach(() => {
       // Mock AI service response for enhancement
-      ;(mockAIService.createChatCompletion as any).mockResolvedValue({
+      ;(mockAIService.createChatCompletion as unknown).mockResolvedValue({
         choices: [
           {
             message: {
@@ -323,7 +323,7 @@ describe('MetaAlignerAPI', () => {
 
     it('should handle AI service failures gracefully', async () => {
       // Mock AI service to fail
-      ;(mockAIService.createChatCompletion as any).mockRejectedValue(
+      ;(mockAIService.createChatCompletion as unknown).mockRejectedValue(
         new Error('AI service error'),
       )
 
@@ -411,7 +411,7 @@ describe('IntegratedAIService', () => {
   describe('createChatCompletion', () => {
     beforeEach(() => {
       // Mock base AI service response
-      ;(mockAIService.createChatCompletion as any).mockResolvedValue({
+      ;(mockAIService.createChatCompletion as unknown).mockResolvedValue({
         choices: [
           {
             message: {
@@ -460,7 +460,7 @@ describe('IntegratedAIService', () => {
 
     it('should handle empty response content', async () => {
       // Mock empty response
-      ;(mockAIService.createChatCompletion as any).mockResolvedValue({
+      ;(mockAIService.createChatCompletion as unknown).mockResolvedValue({
         choices: [],
         model: 'test-model',
       })
@@ -477,7 +477,7 @@ describe('IntegratedAIService', () => {
 
     it('should perform enhancement when response quality is low', async () => {
       // Mock a poor quality response first
-      ;(mockAIService.createChatCompletion as any)
+      ;(mockAIService.createChatCompletion as unknown)
         .mockResolvedValueOnce({
           choices: [
             {
@@ -513,7 +513,7 @@ describe('IntegratedAIService', () => {
 
     it('should limit enhancement attempts', async () => {
       // Mock consistently poor responses
-      ;(mockAIService.createChatCompletion as any).mockResolvedValue({
+      ;(mockAIService.createChatCompletion as unknown).mockResolvedValue({
         choices: [
           {
             message: {
@@ -622,7 +622,7 @@ describe('IntegratedAIService', () => {
 
   describe('Error Handling and Edge Cases', () => {
     it('should handle AI service errors gracefully', async () => {
-      ;(mockAIService.createChatCompletion as any).mockRejectedValue(
+      ;(mockAIService.createChatCompletion as unknown).mockRejectedValue(
         new Error('Network error'),
       )
 

@@ -73,7 +73,7 @@ export class ContextDetector {
   private enableCrisisIntegration: boolean
   private enableEducationalRecognition: boolean
 
-  constructor(config: ContextDetectorConfig) {
+  constructor(config: ContextDetectorConfig): void {
     this.aiService = config.aiService
     this.crisisDetectionService = config.crisisDetectionService ?? undefined
     this.educationalContextRecognizer =
@@ -212,7 +212,7 @@ export class ContextDetector {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error detecting context:', error as Record<string, unknown>)
 
       // Fallback to general context with low confidence
@@ -229,7 +229,7 @@ export class ContextDetector {
         needsSpecialHandling: false,
         urgency: 'low',
         metadata: {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? String(error) : 'Unknown error',
         },
       }
     }
@@ -296,7 +296,7 @@ export class ContextDetector {
     content: string,
   ): ContextDetectionResult {
     try {
-      const parsed = JSON.parse(content) as Record<string, unknown>
+      const parsed = JSON.parse(content) as unknown as Record<string, unknown>
       return {
         detectedContext:
           (parsed['detectedContext'] as ContextType) || ContextType.GENERAL,

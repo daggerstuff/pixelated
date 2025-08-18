@@ -188,12 +188,12 @@ export function LoginForm({
 
         setResetEmailSent(true)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setToastMessage({
         type: 'error',
         message:
           error instanceof Error
-            ? `Authentication error: ${error.message}`
+            ? `Authentication error: ${String(error)}`
             : 'An unexpected error occurred. Please try again.',
       })
 
@@ -217,12 +217,12 @@ export function LoginForm({
         type: 'info',
         message: 'Redirecting to Google authentication...',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       setToastMessage({
         type: 'error',
         message:
           error instanceof Error
-            ? `Google sign-in error: ${error.message}`
+            ? `Google sign-in error: ${String(error)}`
             : 'Failed to connect to Google. Please try again.',
       })
 

@@ -130,9 +130,9 @@ export class RealFHEService implements FHEService {
 
       this.isInitialized = true
       logger.info('FHE service initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize FHE service', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -216,9 +216,9 @@ export class RealFHEService implements FHEService {
       plaintext.delete()
 
       return serialized
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Encryption failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -252,9 +252,9 @@ export class RealFHEService implements FHEService {
       ciphertext.delete()
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Decryption failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -280,9 +280,9 @@ export class RealFHEService implements FHEService {
       // Convert the hash to hex string
       const hashArray = Array.from(new Uint8Array(hashBuffer))
       return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Hash generation failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -309,15 +309,15 @@ export class RealFHEService implements FHEService {
           params,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Processing encrypted data failed', {
         operation,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         operation: operation as FHEOperation,
         metadata: {
           timestamp: Date.now(),
@@ -351,9 +351,9 @@ export class RealFHEService implements FHEService {
       )
 
       logger.info('Key rotation completed successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Key rotation failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }

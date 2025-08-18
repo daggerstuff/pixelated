@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { FC } from 'react'
 import MentalHealthChatDemo from './MentalHealthChatDemo'
 
 interface MindMirrorDemoProps {
   className?: string
 }
 
-export const MindMirrorDemo: React.FC<MindMirrorDemoProps> = ({
+export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({
   className = ""
 }) => {
   return (

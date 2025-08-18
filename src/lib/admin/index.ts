@@ -168,9 +168,9 @@ export class AdminService {
     try {
       const user = await this.getAdminUser(userId)
       return !!user
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking admin status:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return false
     }
@@ -184,9 +184,9 @@ export class AdminService {
       // In a real implementation, this would fetch from the database
       // For this example, we'll use a mock implementation
       return this.getMockAdminUser(userId)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting admin user:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return null
     }
@@ -212,9 +212,9 @@ export class AdminService {
 
       // Otherwise check role-based permissions
       return ROLE_PERMISSIONS[user.role].includes(permission)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking permission:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return false
     }
@@ -241,9 +241,9 @@ export class AdminService {
         userId: user.id,
         role: user.role,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error verifying admin token:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return null
     }
@@ -262,9 +262,9 @@ export class AdminService {
         this.getMockAdminUser('admin3'),
         this.getMockAdminUser('admin4'),
       ].filter(Boolean) as AdminUser[]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting all admins:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return []
     }
@@ -290,9 +290,9 @@ export class AdminService {
           maximum: 20,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting system metrics:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return {}
     }
@@ -381,9 +381,9 @@ export class AdminService {
       // Verify the token and check if user is admin
       const adminAuth = await this.verifyAdminToken(token)
       return !!adminAuth
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking admin request:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return false
     }

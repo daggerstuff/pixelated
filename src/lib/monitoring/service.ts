@@ -17,9 +17,9 @@ interface ExtendedPerformance extends Performance {
 function formatError(error: unknown): Record<string, unknown> {
   if (error instanceof Error) {
     return {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
+      name: (error as Error)?.name,
+      message: String(error),
+      stack: (error as Error)?.stack,
     }
   }
   return { unknownError: error }
@@ -132,7 +132,7 @@ export class MonitoringService {
     }
   }
 
-  private initializePerformanceObservers(): void {
+  private initializePerformanceObservers() {
     // Performance Observer for Core Web Vitals
     if ('PerformanceObserver' in window) {
       // Largest Contentful Paint
@@ -171,7 +171,7 @@ export class MonitoringService {
     }
   }
 
-  private collectPerformanceMetrics(): void {
+  private collectPerformanceMetrics() {
     const metrics = {
       timestamp: Date.now(),
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize || 0,
@@ -233,7 +233,7 @@ export class MonitoringService {
     }
   }
 
-  private setupAlertHandlers(): void {
+  private setupAlertHandlers() {
     window.addEventListener('error', (event) => {
       this.triggerAlert('error', {
         message: event.message,

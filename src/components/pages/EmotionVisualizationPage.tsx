@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import MultidimensionalEmotionChart from '../dashboard/MultidimensionalEmotionChart'
 import useMultidimensionalEmotions from '../../hooks/useMultidimensionalEmotions'
 
-const EmotionVisualizationPage: React.FC = () => {
+const EmotionVisualizationPage: FC = () => {
   const { clientId } = useParams<{ clientId: string }>()
   const [timeRange, setTimeRange] = useState<'day' | 'week' | 'month' | 'year'>(
     'week',
@@ -22,7 +22,7 @@ const EmotionVisualizationPage: React.FC = () => {
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          Error: {error.message}
+          Error: {String(error)}
         </div>
       )}
 

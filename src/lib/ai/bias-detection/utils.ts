@@ -83,7 +83,7 @@ const TherapeuticSessionSchema = z.object({
 export { TherapeuticSessionSchema }
 
 // Validate participant demographics data
-export function validateParticipantDemographics(demographics: any) {
+export function validateParticipantDemographics(demographics: any): void {
   const requiredFields = ['age', 'gender', 'ethnicity', 'primaryLanguage']
   for (const field of requiredFields) {
     if (!(field in demographics)) {
@@ -122,7 +122,7 @@ export function validateTherapeuticSession(session: any): TherapeuticSession {
 }
 
 // Validate Bias Detection configuration used in tests
-export function validateBiasDetectionConfig(config: any) {
+export function validateBiasDetectionConfig(config: any): void {
   if (!config || typeof config !== 'object') throw new Error('Invalid bias detection configuration')
   const t = config.thresholds || {}
   if (!(t.warningLevel ?? t.warning) || !(t.highLevel ?? t.high) || !(t.criticalLevel ?? t.critical)) {
@@ -162,7 +162,7 @@ export function sanitizeTextContent(content: string, maskingEnabled = true): str
 }
 
 // Demographic helpers
-export function extractDemographicGroups(d: ParticipantDemographics) {
+export function extractDemographicGroups(d: ParticipantDemographics): Array<{ type: string; value: string }> {
   const groups: Array<{ type: string; value: string }> = []
   if (d.age) groups.push({ type: 'age', value: d.age })
   if (d.gender) groups.push({ type: 'gender', value: d.gender })
@@ -304,8 +304,12 @@ export class BiasDetectionError extends Error {
     this.retryable = retryable
     this.recoverable = retryable
     if (data && typeof data === 'object' && 'sessionId' in data) {
-      this.sessionId = String((data as any).sessionId)
+      this.sessionId = String(data['sessionId'])
     }
+  }
+
+  override toString(): string {
+    return this.message
   }
 }
 
@@ -319,10 +323,10 @@ export function createBiasDetectionError(
 }
 
 export function isBiasDetectionError(err: unknown): err is BiasDetectionError {
-  return err instanceof BiasDetectionError || (typeof err === 'object' && err !== null && (err as any).name === 'BiasDetectionError')
+  return err instanceof BiasDetectionError || (typeof err === 'object' && err !== null && 'name' in err && (err as any).name === 'BiasDetectionError')
 }
 
-export function handleBiasDetectionError(error: unknown, _context?: Record<string, unknown>) {
+export function handleBiasDetectionError(error: unknown, _context?: Record<string, unknown>): { shouldRetry: boolean; alertLevel: AlertLevel } {
   if (isBiasDetectionError(error)) {
     return { shouldRetry: !!error.retryable, alertLevel: 'medium' as AlertLevel }
   }
@@ -330,7 +334,7 @@ export function handleBiasDetectionError(error: unknown, _context?: Record<strin
 }
 
 // Data transformation to/from Python
-export function transformSessionForPython(session: TherapeuticSession) {
+export function transformSessionForPython(session: TherapeuticSession): any {
   return {
     session_id: session.sessionId,
     timestamp: session.timestamp.toISOString(),
@@ -365,7 +369,7 @@ export function transformSessionForPython(session: TherapeuticSession) {
   }
 }
 
-export function transformPythonResponse(response: any) {
+export function transformPythonResponse(response: any): any {
   return {
     overallBiasScore: response.overall_bias_score,
     confidence: response.confidence,
@@ -410,7 +414,7 @@ export function requiresAdditionalAuth(
   return false
 }
 
-export function generateAnonymizedId(input: string, salt: string) {
+export function generateAnonymizedId(input: string, salt: string): string {
   const hash = crypto.createHash('sha256').update(`${salt}:${input}`).digest('hex')
   return `anon_${hash.slice(0, 16)}`
 }
@@ -458,7 +462,7 @@ export function validateExampleSession() {
     const rawSession = TherapeuticSessionSchema.parse(session)
     console.log('Session validation successful:', rawSession)
     return rawSession
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error parsing session data:', error)
     throw error
   }
@@ -569,7 +573,7 @@ export async function retryWithBackoff<T>(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error instanceof Error ? error : new Error(String(error))
       
       if (attempt === maxRetries) {

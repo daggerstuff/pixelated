@@ -316,7 +316,7 @@ export class EvidenceExtractor {
             baseAnalysis,
           )
           evidenceItems.push(...semanticEvidence)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('LLM-enhanced evidence extraction failed', { error })
           errors.push('Semantic analysis unavailable')
         }
@@ -358,7 +358,7 @@ export class EvidenceExtractor {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Evidence extraction failed', { error, category })
 
       // Return minimal evidence on error
@@ -381,7 +381,7 @@ export class EvidenceExtractor {
           method: 'pattern_based',
           processingTime: Date.now() - startTime,
           errors: [
-            `Evidence extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            `Evidence extraction failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
           ],
         },
       }
@@ -649,22 +649,25 @@ export class EvidenceExtractor {
       // Map shared EvidenceItem -> extractor EvidenceItem
       const mapped: EvidenceItem[] = parsed.map((item) => {
         // clinicalRelevance mapping: prefer categorical where possible
-        // If numeric present, bucket into categories; otherwise default to 'supportive'
-        let clinical: EvidenceItem['clinicalRelevance'] | undefined
+        // If numeric present, bucket into categories; if string provided, preserve it; otherwise default to 'supportive'
+        let clinical: EvidenceItem['clinicalRelevance']
         if (typeof item.clinicalRelevance === 'number') {
           const v = item.clinicalRelevance
           if (v >= 0.95) {
             clinical = 'critical'
           } else if (v >= 0.7) {
-                   clinical = 'significant'
-                 } else if (v >= 0.4) {
-                          clinical = 'supportive'
-                        } else {
-                          clinical = 'contextual'
-                        }
+            clinical = 'significant'
+          } else if (v >= 0.4) {
+            clinical = 'supportive'
+          } else {
+            clinical = 'contextual'
+          }
+        } else if (typeof item.clinicalRelevance === 'string') {
+          // Parser may emit 'supportive' default; preserve valid string
+          clinical = item.clinicalRelevance as EvidenceItem['clinicalRelevance']
         } else {
-          // no numeric, let it be undefined and rely on ranking by confidence
-          clinical = undefined
+          // Default when missing
+          clinical = 'supportive'
         }
 
         // severity mapping to relevance/intensity
@@ -693,7 +696,7 @@ export class EvidenceExtractor {
       })
 
       return mapped
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Semantic evidence extraction failed', { error })
       return []
     }

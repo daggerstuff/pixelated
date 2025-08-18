@@ -46,7 +46,7 @@ export class TokenEncryptionService {
         this.config.keyLength,
       )) as Buffer
       this.logger.info('Token encryption service initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to initialize token encryption service:', error)
       throw new SecurityError('Failed to initialize token encryption service')
     }
@@ -82,7 +82,7 @@ export class TokenEncryptionService {
         ),
         iv: iv.toString('base64'),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to encrypt token:', error)
       throw new SecurityError('Failed to encrypt token')
     }
@@ -114,7 +114,7 @@ export class TokenEncryptionService {
       ])
 
       return decryptedToken.toString('utf8')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to decrypt token:', error)
       throw new SecurityError('Failed to decrypt token')
     }
@@ -135,13 +135,13 @@ export class TokenEncryptionService {
       this.encryptionKey = Buffer.from(newKey as Buffer)
 
       this.logger.info('Encryption key rotated successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to rotate encryption key:', error)
       throw new SecurityError('Failed to rotate encryption key')
     }
   }
 
-  cleanup(): void {
+  cleanup() {
     this.encryptionKey = null
     this.logger.info('Token encryption service cleaned up')
   }

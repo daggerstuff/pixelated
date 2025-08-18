@@ -18,11 +18,11 @@ export const GET = async () => {
         'Expires': '0'
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const errorResponse = {
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Health check failed',
+      error: error instanceof Error ? String(error) : 'Health check failed',
       uptime: process.uptime(),
       responseTime: 0,
       checks: [],

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, FC } from 'react';
 import { createPixelatedEmpathyAgent, type TherapeuticScenario, type BiasAnalysis } from '../lib/ai/PixelatedEmpathyAgent';
 
 type AgentContext = 'scenario_generation' | 'bias_detection' | 'training_recommendation' | 'general';
@@ -26,7 +26,7 @@ interface AgentChatProps {
   onBiasAnalysis?: (analysis: BiasAnalysis) => void;
 }
 
-export const PixelatedEmpathyAgentChat: React.FC<AgentChatProps> = ({
+export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
   className = '',
   initialContext = 'general',
   onScenarioGenerated,
@@ -53,7 +53,7 @@ export const PixelatedEmpathyAgentChat: React.FC<AgentChatProps> = ({
         timestamp: new Date(),
         context: 'system'
       }]);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to initialize agent:', error);
       setMessages([{
         id: 'error',
@@ -131,10 +131,10 @@ export const PixelatedEmpathyAgentChat: React.FC<AgentChatProps> = ({
 
         // Handle specific response types
         if (context === 'scenario_generation' && response.metadata?.['scenario']) {
-          onScenarioGenerated?.(response.metadata['scenario']);
+          onScenarioGenerated?.(response.metadata['scenario'] as TherapeuticScenario);
         }
         if (context === 'bias_detection' && response.metadata?.['bias_analysis']) {
-          onBiasAnalysis?.(response.metadata['bias_analysis']);
+          onBiasAnalysis?.(response.metadata['bias_analysis'] as BiasAnalysis);
         }
       } else {
         setMessages(prev => [...prev, {

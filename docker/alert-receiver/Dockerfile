@@ -24,3 +24,5 @@ USER alertuser
 EXPOSE 9093
 
 CMD ["node", "alert-receiver.js"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:9093/ || exit 1

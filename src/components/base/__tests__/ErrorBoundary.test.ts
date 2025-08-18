@@ -1,5 +1,6 @@
 import ErrorBoundary from '../ErrorBoundary.astro'
 import { renderAstro } from '@/test/utils/astro'
+import type { AstroComponent } from 'astro'
 
 describe('ErrorBoundary', () => {
   beforeEach(() => {
@@ -7,7 +8,7 @@ describe('ErrorBoundary', () => {
   })
 
   it('renders children when no error occurs', async () => {
-    const { querySelector } = await renderAstro(ErrorBoundary, {
+    const { querySelector } = await renderAstro(ErrorBoundary as AstroComponent, {
       children: '<div data-testid="test-content">Test Content</div>',
     })
 
@@ -18,7 +19,7 @@ describe('ErrorBoundary', () => {
 
   it('renders with custom fallback message', async () => {
     const customFallback = 'Custom error message'
-    const { querySelector } = await renderAstro(ErrorBoundary, {
+    const { querySelector } = await renderAstro(ErrorBoundary as AstroComponent, {
       fallback: customFallback,
     })
 

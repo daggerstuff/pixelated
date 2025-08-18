@@ -37,7 +37,7 @@ export const ThreeDLoading = () => (
 export const ErrorFallback = ({ error }: { error: Error }) => (
   <div className="p-4 border border-red-200 bg-red-50 rounded-md">
     <p className="text-red-600 font-medium">Failed to load component</p>
-    <p className="text-sm text-red-500">{error.message}</p>
+    <p className="text-sm text-red-500">{String(error)}</p>
   </div>
 )
 

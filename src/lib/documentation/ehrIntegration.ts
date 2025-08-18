@@ -20,7 +20,7 @@ export class EHRIntegration {
    * @param fhirClient The FHIR client to use for EHR integration
    * @param options Additional options for the integration
    */
-  constructor(fhirClient: unknown, options: { auditLog?: boolean } = {}) {
+  constructor(fhirClient: unknown, options: { auditLog?: boolean } = {}): void {
     if (!fhirClient || typeof fhirClient !== 'object') {
       throw new Error('Invalid FHIR client provided.')
     }
@@ -79,7 +79,7 @@ export class EHRIntegration {
         },
       }
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to export documentation to EHR', {
         error,
         format: options.format,
@@ -88,7 +88,7 @@ export class EHRIntegration {
 
       const result: EHRExportResult = {
         success: false,
-        errors: [error instanceof Error ? error.message : String(error)],
+        errors: [error instanceof Error ? String(error) : String(error)],
         format: options.format,
         metadata: {
           exportedAt: new Date(),
@@ -411,7 +411,7 @@ export class EHRIntegration {
       ) {
         try {
           await this.fhirClient.createResource(auditEvent)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to create audit event in FHIR server', {
             error,
             auditInfo,
@@ -434,7 +434,7 @@ export class EHRIntegration {
           },
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create audit log', { error, auditInfo })
     }
   }

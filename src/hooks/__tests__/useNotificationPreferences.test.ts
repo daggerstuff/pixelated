@@ -205,7 +205,7 @@ describe('useNotificationPreferences', () => {
       await result.current.updateCategory('updates', false)
     })
 
-    expect(result.current.preferences.categories.updates).toBe(false)
+    expect(result.current.preferences.categories['updates']).toBe(false)
     expect(mockFetch).toHaveBeenCalledWith(
       '/api/user/notification-preferences',
       expect.objectContaining({

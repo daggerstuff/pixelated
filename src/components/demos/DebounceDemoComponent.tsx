@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDebounce, useDebouncedCallback } from '@/hooks/useDebounce'
 
-const DebounceDemoComponent: React.FC = () => {
+const DebounceDemoComponent: FC = () => {
   // For useDebounce hook demo
   const [inputValue1, setInputValue1] = useState('')
   const debouncedValue = useDebounce(inputValue1, 500)

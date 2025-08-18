@@ -146,7 +146,7 @@ interface BackupStatusTabProps {
   onVerifyBackup: (backupId: string) => void
 }
 
-const BackupStatusTab: React.FC<BackupStatusTabProps> = ({
+const BackupStatusTab: FC<BackupStatusTabProps> = ({
   backups,
   onCreateBackup,
   onVerifyBackup,

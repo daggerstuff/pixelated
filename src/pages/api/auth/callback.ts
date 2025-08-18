@@ -74,7 +74,7 @@ export const GET = async ({
     }
 
     return redirect('/dashboard')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Auth callback error:', error)
     return new Response('Authentication failed', { status: 500 })
   }

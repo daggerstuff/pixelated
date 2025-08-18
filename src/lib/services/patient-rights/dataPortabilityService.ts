@@ -5,7 +5,7 @@ import { randomBytes } from 'crypto'
 class AuditLoggingService {
   private context: string
 
-  constructor(context: string) {
+  constructor(context: string): void {
     this.context = context
   }
 
@@ -292,10 +292,10 @@ export async function createDataExportRequest(
       createdAt: now,
       message: 'Export request created successfully',
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error creating export request', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
       input,
     })
 
@@ -416,16 +416,16 @@ export async function getDataExportDetails(
       requestedBy: exportRequest.requestedBy,
       priority: 'normal',
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error getting export status', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       exportId,
       userId,
     })
 
     return {
       success: false,
-      message: `Failed to get export status: ${error instanceof Error ? error.message : String(error)}`,
+      message: `Failed to get export status: ${error instanceof Error ? String(error) : String(error)}`,
     }
   }
 }
@@ -443,17 +443,17 @@ async function queueExportJob(exportRequest: DataExportRequest): Promise<void> {
     setTimeout(() => {
       processExportRequest(exportRequest.id).catch((err) =>
         logger.error('Error in export processing job', {
-          error: err.message,
-          stack: err.stack,
+          error: (err as Error)?.message || String(err),
+          stack: (err as Error)?.stack,
           exportId: exportRequest.id,
         }),
       )
     }, 100)
 
     logger.info('Export job queued', { exportId: exportRequest.id })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to queue export job', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       exportId: exportRequest.id,
     })
 
@@ -546,10 +546,10 @@ async function processExportRequest(exportId: string): Promise<void> {
 
     // Send notification to user (would implement in production)
     // await notifyUserOfCompletedExport(exportData.requestedBy, exportId);
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error processing export', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
       exportId,
     })
 
@@ -558,7 +558,7 @@ async function processExportRequest(exportId: string): Promise<void> {
       where: { id: exportId },
       data: {
         status: 'failed',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       },
     })
   }
@@ -612,9 +612,9 @@ async function verifyPatientDataAccess(
     }
 
     return false
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error verifying patient data access', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       patientId,
       userId,
     })
@@ -641,9 +641,9 @@ async function isAdminUser(userId: string): Promise<boolean> {
     }
 
     return user.roles.some((role: { name: string }) => role.name === 'admin')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error checking admin status', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       userId,
     })
 
@@ -664,9 +664,9 @@ export async function getDataExportRequest(
       where: { id },
     })
     return exportRequest as DataExportRequest
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in getDataExportRequest', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       id,
     })
     throw error
@@ -705,9 +705,9 @@ export async function getAllDataExportRequests(filters?: {
       }
     }
     return results as DataExportRequest[]
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in getAllDataExportRequests', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       filters,
     })
     throw error
@@ -772,9 +772,9 @@ async function updateExportStatus(
     })
 
     logger.info(`Export status updated to ${status}`, { exportId })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error updating export status', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       exportId,
     })
     throw error
@@ -854,15 +854,15 @@ export async function cancelDataExportRequest(
       message: 'Export request cancelled successfully',
       status: 'cancelled',
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error cancelling export request', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       exportId: params.exportId,
     })
 
     return {
       success: false,
-      message: `Failed to cancel export request: ${error instanceof Error ? error.message : String(error)}`,
+      message: `Failed to cancel export request: ${error instanceof Error ? String(error) : String(error)}`,
     }
   }
 }
@@ -1050,16 +1050,16 @@ export async function downloadDataExport(
       success: false,
       message: 'Export has no download URL available',
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error downloading export', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
       exportId,
       userId,
     })
 
     return {
       success: false,
-      message: `Failed to download export: ${error instanceof Error ? error.message : String(error)}`,
+      message: `Failed to download export: ${error instanceof Error ? String(error) : String(error)}`,
     }
   }
 }

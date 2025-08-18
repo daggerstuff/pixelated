@@ -60,12 +60,12 @@ export const GET = async ({ locals }) => {
     const plans: TreatmentPlan[] = []
 
     return new Response(JSON.stringify(plans), { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching treatment plans:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch treatment plans.',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       { status: 500 },
     )
@@ -140,12 +140,12 @@ export const POST = async ({ request, locals }) => {
     }
 
     return new Response(JSON.stringify(newPlan), { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error creating treatment plan:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to create treatment plan.',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       { status: 500 },
     )

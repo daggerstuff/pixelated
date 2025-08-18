@@ -72,15 +72,15 @@
           return
 
         // otherwise continue drawring
-        const rad1 = rad + random() * R15
-        const rad2 = rad - random() * R15
+        const rad1: number = rad + (random() * R15)
+        const rad2: number = rad - (random() * R15)
         const rate = counter.value <= THRESHOLD ? 0.8 : 0.5
         // left branch
         if (random() < rate)
-          pendingSteps.push(() => step(nx, ny, rad1, counter))
+          pendingSteps.push(() => step(nx, ny, rad1, counter || { value: 0 }))
         // right branch
         if (random() < rate)
-          pendingSteps.push(() => step(nx, ny, rad2, counter))
+          pendingSteps.push(() => step(nx, ny, rad2, counter || { value: 0 }))
       }
 
       /* RAF callback functions */

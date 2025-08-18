@@ -142,12 +142,12 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
         durationMs: duration,
       },
     }
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
     logger.error('Recovery test failed', {
       error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined,
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
     })
 
     return {
@@ -236,7 +236,7 @@ export const POST = async ({ request, locals }) => {
     // Get user ID from locals or fallback to 'system' if not available
     const userId = locals?.user?.id || 'system'
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
 
     // Log detailed error to server logs only
     console.error(`[RecoveryTest] Error for user ${userId}:`, error)

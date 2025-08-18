@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -154,9 +154,9 @@ export default function KnowledgeParsingDemo() {
       // Save to history
       saveToHistory(inputText, enhancedResults, requestTime)
 
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Analysis failed:', err)
-      setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.')
+      setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Analysis failed. Please try again.')
       
       // Fallback to demo data for demonstration
       const demoResults: AnalysisResults = {
@@ -212,7 +212,7 @@ export default function KnowledgeParsingDemo() {
     const savedHistory = localStorage.getItem('knowledgeParsingHistory')
     if (savedHistory) {
       try {
-        setAnalysisHistory(JSON.parse(savedHistory))
+        setAnalysisHistory(JSON.parse(savedHistory) as unknown)
       } catch (e) {
         console.warn('Failed to load analysis history:', e)
       }

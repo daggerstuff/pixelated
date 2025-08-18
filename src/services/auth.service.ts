@@ -11,7 +11,7 @@ const authService = new MongoAuthService()
  * @param password User password
  * @returns User session or error
  */
-export async function signInWithEmail(email: string, password: string) {
+export async function signInWithEmail(email: string, password: string): void {
   try {
     const { user, token } = await authService.signIn(email, password)
 
@@ -19,7 +19,7 @@ export async function signInWithEmail(email: string, password: string) {
       user: mapToAuthUser(user),
       session: { access_token: token, refresh_token: token },
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error signing in:', error)
     throw error
   }
@@ -30,13 +30,13 @@ export async function signInWithEmail(email: string, password: string) {
  * @param provider OAuth provider (google, github)
  * @param redirectTo URL to redirect after authentication
  */
-export async function signInWithOAuth(_provider: Provider, _redirectTo?: string) {
+export async function signInWithOAuth(_provider: Provider, _redirectTo?: string): void {
   try {
     // This would need to be implemented based on your OAuth setup
     throw new Error(
       'OAuth sign in not implemented yet. Please implement based on your OAuth provider.',
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error signing in with OAuth:', error)
     throw error
   }
@@ -65,7 +65,7 @@ export async function signUp(
       user: mapToAuthUser(signedInUser),
       session: { access_token: token, refresh_token: token },
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error signing up:', error)
     throw error
   }
@@ -74,11 +74,11 @@ export async function signUp(
 /**
  * Sign out the current user
  */
-export async function signOut(token: string) {
+export async function signOut(token: string): void {
   try {
     await authService.signOut(token)
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error signing out:', error)
     throw error
   }
@@ -88,7 +88,7 @@ export async function signOut(token: string) {
  * Get the current user by token
  * @returns Current authenticated user or null
  */
-export async function getCurrentUser(authHeader: string) {
+export async function getCurrentUser(authHeader: string): void {
   try {
     const authInfo = await authService.verifyAuthToken(authHeader)
     const user = await authService.getUserById(authInfo['userId'])
@@ -98,7 +98,7 @@ export async function getCurrentUser(authHeader: string) {
     }
 
     return mapToAuthUser(user)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting current user:', error)
     return null
   }
@@ -109,13 +109,13 @@ export async function getCurrentUser(authHeader: string) {
  * @param email User email
  * @param redirectTo URL to redirect after reset
  */
-export async function resetPassword(_email: string, _redirectTo?: string) {
+export async function resetPassword(_email: string, _redirectTo?: string): void {
   try {
     // For MongoDB implementation, you'd need to implement email sending
     throw new Error(
       'Password reset not implemented yet. Please implement email sending logic.',
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error resetting password:', error)
     throw error
   }
@@ -135,7 +135,7 @@ export async function updatePassword(
   try {
     await authService.changePassword(userId, currentPassword, newPassword)
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating password:', error)
     throw error
   }
@@ -162,7 +162,7 @@ export function createAuthToken(
  * @param purpose Expected token purpose
  * @returns Verified token payload or null
  */
-export function verifyAuthToken(token: string, purpose: string) {
+export function verifyAuthToken(token: string, purpose: string): void {
   const result = verifySecureToken(token)
   if (!result || result['purpose'] !== purpose) {
     return null
@@ -222,7 +222,7 @@ export async function updateProfile(
     }
 
     return { success: true }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating profile:', error)
     return { error }
   }
@@ -244,7 +244,7 @@ export async function verifyOtp(_params: {
     throw new Error(
       'OTP verification not implemented yet. Please implement based on your OTP provider.',
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error verifying OTP:', error)
     return { success: false, error }
   }

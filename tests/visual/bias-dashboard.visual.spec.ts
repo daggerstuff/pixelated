@@ -17,6 +17,17 @@
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
+// Extend Window interface for mockAuth
+declare global {
+  interface Window {
+    mockAuth?: {
+      isAuthenticated: boolean
+      isAdmin: boolean
+      user: { id: string; role: string }
+    }
+  }
+}
+
 // Mock dashboard data for consistent visual testing
 const mockDashboardData = {
   summary: {

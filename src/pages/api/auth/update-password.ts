@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { updatePassword } from '../../../services/auth.service'
 
 export const POST = async ({
@@ -48,14 +47,14 @@ export const POST = async ({
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating password:', error)
 
     return new Response(
       JSON.stringify({
         success: false,
         message:
-          error instanceof Error ? error.message : 'Failed to update password',
+          error instanceof Error ? String(error) : 'Failed to update password',
       }),
       {
         status: 500,

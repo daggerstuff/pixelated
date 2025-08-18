@@ -135,11 +135,11 @@ export const getVisualRegressionData =
         diffCount,
         lastUpdated,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching visual regression data:', error)
       return {
         error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+          error instanceof Error ? String(error) : 'Unknown error occurred',
         screenshots: [],
         byPage: {},
         diffCount: 0,

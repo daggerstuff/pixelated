@@ -23,7 +23,7 @@ export class CacheInvalidation {
   private prefix: string
   private defaultTTL: number
 
-  constructor(options: InvalidationOptions) {
+  constructor(options: InvalidationOptions): void {
     this.redis =
       options.redis instanceof RedisService
         ? options.redis.getClient()
@@ -45,7 +45,7 @@ export class CacheInvalidation {
   }
 
   private formatErrorMessage(operation: string, error: unknown): string {
-    return `Failed to ${operation}: ${error instanceof Error ? error.message : String(error)}`
+    return `Failed to ${operation}: ${error instanceof Error ? String(error) : String(error)}`
   }
 
   async set(
@@ -84,7 +84,7 @@ export class CacheInvalidation {
 
       // Execute the transaction
       await multi.exec()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('set cache', error))
       throw error
     }
@@ -94,8 +94,8 @@ export class CacheInvalidation {
     try {
       const cacheKey = this.getKey(key)
       const value = await this.redis.get(cacheKey)
-      return value ? JSON.parse(value) : null
-    } catch (error) {
+      return value ? JSON.parse(value) as unknown : null
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('get cache', error))
       throw error
     }
@@ -105,7 +105,7 @@ export class CacheInvalidation {
     try {
       const cacheKey = this.getKey(key)
       await this.redis.del(cacheKey)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('invalidate cache key', error))
       throw error
     }
@@ -117,7 +117,7 @@ export class CacheInvalidation {
       if (keys.length) {
         await this.redis.del(...keys)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('invalidate cache pattern', error))
       throw error
     }
@@ -134,7 +134,7 @@ export class CacheInvalidation {
         multi.del(tagKey)
         await multi.exec()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('invalidate cache tag', error))
       throw error
     }
@@ -151,7 +151,7 @@ export class CacheInvalidation {
         multi.del(depKey)
         await multi.exec()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         this.formatErrorMessage('invalidate cache dependency', error),
       )
@@ -165,7 +165,7 @@ export class CacheInvalidation {
       if (keys.length) {
         await this.redis.del(...keys)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('clear cache', error))
       throw error
     }
@@ -180,7 +180,7 @@ export class CacheInvalidation {
       const value = await getValue()
       await this.set(key, value, rule)
       return value
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('refresh cache', error))
       throw error
     }
@@ -200,7 +200,7 @@ export class CacheInvalidation {
       const value = await getValue()
       await this.set(key, value, rule)
       return value
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(this.formatErrorMessage('get or set cache', error))
       throw error
     }

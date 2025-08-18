@@ -158,9 +158,9 @@ export async function verifyServerAuth({
     )
 
     return { authenticated: true, user }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Server auth error', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return { authenticated: false, user: null, reason: 'server_error' }
   }
@@ -201,9 +201,9 @@ async function checkRateLimit(ip: string): Promise<boolean> {
     }
 
     return false
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Rate limit check error', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return false // Default to allowing on error
   }

@@ -1,4 +1,4 @@
-  import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -164,11 +164,11 @@ export default function CrisisDetectionDemo() {
         console.warn('HIGH RISK SITUATION DETECTED:', crisisAssessment)
       }
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Crisis assessment failed:', error)
 
       if (error instanceof APIError) {
-        setError(`Assessment failed: ${error.message}`)
+        setError(`Assessment failed: ${String(error)}`)
       } else {
         setError('Assessment failed. Please try again.')
       }

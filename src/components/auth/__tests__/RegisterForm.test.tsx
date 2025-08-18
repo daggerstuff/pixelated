@@ -14,7 +14,7 @@ describe('RegisterForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(useAuth as any).mockImplementation(() => ({
+    ;(useAuth as unknown).mockImplementation(() => ({
       signUp: mockSignUp,
       signInWithOAuth: mockSignInWithOAuth,
     }))

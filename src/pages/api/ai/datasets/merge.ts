@@ -74,7 +74,7 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(`Error in dataset merge API: ${error}`)
 
     return new Response(
@@ -105,7 +105,7 @@ export const GET: APIRoute = async () => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(`Error in dataset status API: ${error}`)
 
     return new Response(

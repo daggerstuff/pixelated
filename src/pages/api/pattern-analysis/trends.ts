@@ -119,7 +119,7 @@ export const GET = async ({ request, cookies }) => {
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     logger.error('Error processing trend pattern request', { error })
 
@@ -129,7 +129,7 @@ export const GET = async ({ request, cookies }) => {
         error: 'Internal Server Error',
         message:
           error instanceof Error
-            ? error.message
+            ? String(error)
             : 'An unexpected error occurred',
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },

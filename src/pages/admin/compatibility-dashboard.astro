@@ -187,7 +187,7 @@ function formatDate(dateString: string): string {
   import { Chart } from 'chart.js/auto'
 
   // Initialize charts once the page has loaded
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     setupCharts()
   })
 

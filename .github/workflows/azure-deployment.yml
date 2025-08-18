@@ -311,14 +311,43 @@ jobs:
           echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
           echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
 
-      - name: Deploy to App Service
+      - name: Ensure staging slot exists (non-production)
+        if: ${{ needs.build.outputs.environment != 'production' }}
+        run: |
+          APP_SERVICE_NAME=${{ steps.details.outputs.app-service-name || env.AZURE_APP_NAME }}
+          SLOT_NAME=staging
+          echo "Ensuring slot '$SLOT_NAME' exists for app '$APP_SERVICE_NAME'..."
+          EXIST_COUNT=$(az webapp deployment slot list \
+            --name "$APP_SERVICE_NAME" \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "[?name=='$SLOT_NAME'] | length(@)" -o tsv || echo 0)
+          if [[ "$EXIST_COUNT" == "0" ]]; then
+            echo "Creating deployment slot '$SLOT_NAME'..."
+            az webapp deployment slot create \
+              --name "$APP_SERVICE_NAME" \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --slot "$SLOT_NAME" || true
+          else
+            echo "Slot '$SLOT_NAME' already exists. Skipping creation."
+          fi
+
+      - name: Deploy to App Service (production)
+        if: ${{ needs.build.outputs.environment == 'production' }}
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ steps.details.outputs.app-service-name }}
-          slot-name: ${{ needs.build.outputs.environment == 'production' && 'production' || 'staging' }}
+          app-name: ${{ steps.details.outputs.app-service-name || env.AZURE_APP_NAME }}
           images: ${{ steps.details.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
 
-      - name: Configure App Service settings
+      - name: Deploy to App Service (staging slot)
+        if: ${{ needs.build.outputs.environment != 'production' }}
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ steps.details.outputs.app-service-name || env.AZURE_APP_NAME }}
+          slot-name: staging
+          images: ${{ steps.details.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
+
+      - name: Configure App Service settings (production)
+        if: ${{ needs.build.outputs.environment == 'production' }}
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
@@ -327,7 +356,6 @@ jobs:
           az webapp config appsettings set \
             --name ${{ steps.details.outputs.app-service-name }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --slot ${{ needs.build.outputs.environment == 'production' && 'production' || 'staging' }} \
             --settings \
               NODE_ENV=${{ needs.build.outputs.environment }} \
               WEBSITES_PORT=3000 \
@@ -338,7 +366,6 @@ jobs:
             az webapp config appsettings set \
               --name ${{ steps.details.outputs.app-service-name }} \
               --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-              --slot ${{ needs.build.outputs.environment == 'production' && 'production' || 'staging' }} \
               --settings \
                 MONGODB_URI="$MONGODB_URI" \
                 MONGO_URI="$MONGODB_URI"
@@ -348,7 +375,43 @@ jobs:
             az webapp config appsettings set \
               --name ${{ steps.details.outputs.app-service-name }} \
               --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-              --slot ${{ needs.build.outputs.environment == 'production' && 'production' || 'staging' }} \
+              --settings \
+                MONGODB_DB_NAME="$MONGODB_DB_NAME" \
+                MONGO_DB_NAME="$MONGODB_DB_NAME"
+          fi
+
+      - name: Configure App Service settings (staging slot)
+        if: ${{ needs.build.outputs.environment != 'production' }}
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
+        run: |
+          # Base settings
+          az webapp config appsettings set \
+            --name ${{ steps.details.outputs.app-service-name }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --slot staging \
+            --settings \
+              NODE_ENV=${{ needs.build.outputs.environment }} \
+              WEBSITES_PORT=3000 \
+              WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
+
+          # MongoDB settings (apply only if provided)
+          if [[ -n "$MONGODB_URI" ]]; then
+            az webapp config appsettings set \
+              --name ${{ steps.details.outputs.app-service-name }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --slot staging \
+              --settings \
+                MONGODB_URI="$MONGODB_URI" \
+                MONGO_URI="$MONGODB_URI"
+          fi
+
+          if [[ -n "$MONGODB_DB_NAME" ]]; then
+            az webapp config appsettings set \
+              --name ${{ steps.details.outputs.app-service-name }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --slot staging \
               --settings \
                 MONGODB_DB_NAME="$MONGODB_DB_NAME" \
                 MONGO_DB_NAME="$MONGODB_DB_NAME"

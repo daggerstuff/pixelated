@@ -84,11 +84,11 @@ export default function ExportButton({
       if (onExportComplete) {
         onExportComplete(result)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Export error:', error)
       setExportError(
         error instanceof Error
-          ? error.message
+          ? String(error)
           : 'Failed to export conversation',
       )
 

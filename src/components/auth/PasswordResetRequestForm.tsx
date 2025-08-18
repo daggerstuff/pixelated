@@ -41,11 +41,11 @@ export default function PasswordResetRequestForm() {
       } else {
         throw new Error('Failed to send password reset email')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       let errorMessage = 'An error occurred while requesting password reset'
 
       if (error instanceof Error) {
-        errorMessage = error.message
+        errorMessage = String(error)
       }
 
       // Dispatch custom error event that will be caught by the Astro component
