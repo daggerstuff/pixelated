@@ -14,7 +14,7 @@ async function globalTeardown(config: FullConfig) {
     
     console.log('  ✅ Global teardown completed');
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Global teardown failed:', error);
     // Don't throw error in teardown to avoid masking test failures
   }

@@ -183,23 +183,27 @@ export function ExportToEHR({
                     <p className="text-sm text-green-700 dark:text-green-300">
                       Format: {exportFormat.toUpperCase()}
                     </p>
-                    {exportResult.documentId && (
-                      <p className="text-sm text-green-700 dark:text-green-300">
-                        Document ID: {exportResult.documentId}
-                      </p>
-                    )}
-                    {exportResult.documentUrl && (
-                      <div className="mt-1">
-                        <a
-                          href={exportResult.documentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
-                        >
-                          View Document in EHR System
-                        </a>
-                      </div>
-                    )}
+                   {typeof exportResult === 'object' &&
+                     'documentId' in exportResult &&
+                     exportResult.documentId && (
+                       <p className="text-sm text-green-700 dark:text-green-300">
+                         Document ID: {exportResult.documentId as string}
+                       </p>
+                     )}
+                   {typeof exportResult === 'object' &&
+                     'documentUrl' in exportResult &&
+                     exportResult.documentUrl && (
+                       <div className="mt-1">
+                         <a
+                           href={exportResult.documentUrl as string}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           className="text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
+                         >
+                           View Document in EHR System
+                         </a>
+                       </div>
+                     )}
                   </div>
                 )}
               </div>

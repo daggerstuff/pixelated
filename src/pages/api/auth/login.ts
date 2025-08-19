@@ -126,7 +126,7 @@ export const POST = async ({ request, cookies }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Handle the error properly
     logger.error('Login error:', {
       message: error instanceof Error ? error?.message : String(error),

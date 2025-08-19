@@ -53,7 +53,7 @@ export class KeyStorage {
    * Creates a new KeyStorage instance
    * @param options - Configuration options
    */
-  constructor(options: KeyStorageOptions) {
+  constructor(options: KeyStorageOptions): void {
     this.namespace = options.namespace
     this.useKms = options.useKms
     this.kmsKeyId = options.kmsKeyId
@@ -242,7 +242,7 @@ export class KeyStorage {
         }),
       )
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting key:', error)
       return false
     }

@@ -65,7 +65,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
 
   const handleError = useCallback((err: Error | unknown) => {
     const errorMessage =
-      err instanceof Error ? err.message : 'An unknown error occurred'
+      err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
     setError(errorMessage)
     console.error('Memory operation error:', err)
   }, [])
@@ -92,7 +92,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
       // Update stats
       const memoryStats = await memoryManager.getMemoryStats(userId)
       setStats(memoryStats)
-    } catch (err) {
+    } catch (err: unknown) {
       handleError(err)
     } finally {
       setIsLoading(false)
@@ -124,7 +124,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
         await refreshMemories()
 
         return memoryId
-      } catch (err) {
+      } catch (err: unknown) {
         handleError(err)
         throw err
       }
@@ -147,7 +147,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
                   limit: 10,
                   ...searchOptions,
                 });
-      } catch (err) {
+      } catch (err: unknown) {
         handleError(err)
         return []
       }
@@ -162,7 +162,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
       try {
         await memoryManager.updateMemory(memoryId, content, userId)
         await refreshMemories()
-      } catch (err) {
+      } catch (err: unknown) {
         handleError(err)
         throw err
       }
@@ -177,7 +177,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
       try {
         await memoryManager.deleteMemory(memoryId, userId)
         await refreshMemories()
-      } catch (err) {
+      } catch (err: unknown) {
         handleError(err)
         throw err
       }
@@ -213,7 +213,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
     async (searchCategory: string): Promise<MemoryEntry[]> => {
       try {
         return await memoryManager.searchByCategory(searchCategory, userId)
-      } catch (err) {
+      } catch (err: unknown) {
         handleError(err)
         return []
       }
@@ -225,7 +225,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
     async (tags: string[]): Promise<MemoryEntry[]> => {
       try {
         return await memoryManager.searchByTags(tags, userId)
-      } catch (err) {
+      } catch (err: unknown) {
         handleError(err)
         return []
       }
@@ -242,7 +242,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   const getMemoryHistory = useCallback(async (): Promise<MemoryHistoryItem[]> => {
     try {
       return await memoryManager.getMemoryHistory(userId)
-    } catch (err) {
+    } catch (err: unknown) {
       handleError(err)
       return []
     }
@@ -284,7 +284,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
 }
 
 // Hook for conversation memory management
-export function useConversationMemory(userId: string, sessionId?: string) {
+export function useConversationMemory(userId: string, sessionId?: string): void {
   const memory = useMemory({
     userId,
     category: 'conversation',
@@ -320,7 +320,7 @@ export function useConversationMemory(userId: string, sessionId?: string) {
 }
 
 // Hook for user preferences memory
-export function useUserPreferences(userId: string) {
+export function useUserPreferences(userId: string): void {
   const memory = useMemory({
     userId,
     category: 'preference',
@@ -354,7 +354,7 @@ export function useUserPreferences(userId: string) {
       if (prefMemory) {
         try {
           const match = prefMemory.content.match(/= (.+)$/)
-          return match && match[1] ? JSON.parse(match[1]) : null
+          return match && match[1] ? JSON.parse(match[1]) as unknown : null
         } catch {
           return null
         }

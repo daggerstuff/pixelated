@@ -79,7 +79,7 @@ export const GET = async ({ request }) => {
     for (const file of filesToProcess) {
       const reportPath = path.join(reportsDir, file)
       const fileContent = fs.readFileSync(reportPath, 'utf8')
-      const report = JSON.parse(fileContent)
+      const report = JSON.parse(fileContent) as unknown
 
       // Skip reports older than the threshold
       const reportDate = new Date(report.timestamp)
@@ -153,12 +153,12 @@ export const GET = async ({ request }) => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching compatibility data:', error)
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? String(error) : String(error),
       }),
       {
         status: 500,

@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { uptimeMonitor } from '../../../lib/services/uptime-monitor'
 import { existsSync } from 'node:fs'
 
@@ -90,9 +89,9 @@ export const GET = async () => {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(JSON.stringify({
-      error: error instanceof Error ? error.message : 'Production readiness check failed',
+      error: error instanceof Error ? String(error) : 'Production readiness check failed',
       timestamp: new Date().toISOString()
     }), {
       status: 500,
@@ -128,14 +127,14 @@ async function checkCrisisDetection(): Promise<ProductionReadinessCheck> {
       message: `Crisis detection accuracy: ${accuracy}%`,
       details: { target: '≥95%', current: `${accuracy}%` }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'crisis-detection',
       name: 'Crisis Detection Accuracy',
       status: 'fail',
       score: 0,
       target: 95,
-      message: `Crisis detection check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Crisis detection check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }
@@ -154,14 +153,14 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
       message: `Test coverage: ${coverage}%`,
       details: { target: '≥90%', current: `${coverage}%` }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'test-coverage',
       name: 'Test Coverage',
       status: 'fail',
       score: 0,
       target: 90,
-      message: `Test coverage check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Test coverage check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }
@@ -192,14 +191,14 @@ async function checkPerformanceStandards(): Promise<ProductionReadinessCheck> {
       message: `Performance: ${conversationsPerMinute} conversations/minute`,
       details: { target: '≥1000/min', current: `${conversationsPerMinute}/min` }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'performance',
       name: 'Performance Standards',
       status: 'fail',
       score: 0,
       target: 1000,
-      message: `Performance check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Performance check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }
@@ -223,14 +222,14 @@ async function checkReliabilityStandards(): Promise<ProductionReadinessCheck> {
         totalChecks: uptimeStats.totalChecks
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'reliability',
       name: 'Reliability Standards',
       status: 'fail',
       score: 0,
       target: 99.9,
-      message: `Reliability check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Reliability check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }
@@ -262,14 +261,14 @@ async function checkSecurityStandards(): Promise<ProductionReadinessCheck> {
         }
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'security',
       name: 'Security Standards',
       status: 'fail',
       score: 0,
       target: 90,
-      message: `Security check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Security check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }
@@ -294,14 +293,14 @@ async function checkDocumentationStandards(): Promise<ProductionReadinessCheck> 
       message: `Documentation: ${docScore}% complete`,
       details: { target: '≥80%', current: `${docScore}%` }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'documentation',
       name: 'Documentation Standards',
       status: 'fail',
       score: 0,
       target: 80,
-      message: `Documentation check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Documentation check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }
@@ -325,14 +324,14 @@ async function checkComplianceStandards(): Promise<ProductionReadinessCheck> {
       message: `Compliance: ${complianceScore}% documented`,
       details: { target: '≥70%', current: `${complianceScore}%` }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'compliance',
       name: 'Compliance Standards',
       status: 'fail',
       score: 0,
       target: 70,
-      message: `Compliance check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Compliance check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }
@@ -357,14 +356,14 @@ async function checkUsabilityStandards(): Promise<ProductionReadinessCheck> {
       message: `Usability: ${usabilityScore}% components available`,
       details: { target: '≥75%', current: `${usabilityScore}%` }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       id: 'usability',
       name: 'Usability Standards',
       status: 'fail',
       score: 0,
       target: 75,
-      message: `Usability check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: `Usability check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
     }
   }
 }

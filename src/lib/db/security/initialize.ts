@@ -27,7 +27,7 @@ export async function initializeSecurityDatabase() {
 
     logger.info('Security database tables initialized successfully')
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Failed to initialize security database',
       error instanceof Error ? error : new Error(String(error)),

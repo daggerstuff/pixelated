@@ -435,7 +435,7 @@ const {
 </style>
 
 <script define:vars={{ initialTodos, storageKey }} is:inline>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     // DOM elements
     const todoForm = document.getElementById('todo-form')
     const todoInput = document.getElementById('todo-input')
@@ -565,7 +565,7 @@ const {
         'aria-label',
         `Mark "${todo.text}" as ${todo.completed ? 'incomplete' : 'complete'}`,
       )
-      checkbox.addEventListener('change', () => toggleTodoComplete(todo.id))
+      checkbox.addEventListener('change', (_event: Event) => toggleTodoComplete(todo.id))
 
       const label = document.createElement('label')
       label.htmlFor = `todo-${todo.id}`
@@ -579,7 +579,7 @@ const {
       deleteBtn.className = 'delete-button'
       deleteBtn.innerHTML = '×'
       deleteBtn.setAttribute('aria-label', `Delete "${todo.text}"`)
-      deleteBtn.addEventListener('click', () => deleteTodo(todo.id))
+      deleteBtn.addEventListener('click', (_event: Event) => deleteTodo(todo.id))
 
       // Assemble the main section
       checkboxDiv.appendChild(checkbox)
@@ -632,12 +632,12 @@ const {
     }
 
     // Add event listener for add button
-    addTodoBtn.addEventListener('click', () => {
+    addTodoBtn.addEventListener('click', (_event: Event) => {
       toggleForm(true)
     })
 
     // Add event listener for cancel button
-    cancelBtn.addEventListener('click', () => {
+    cancelBtn.addEventListener('click', (_event: Event) => {
       resetForm()
       toggleForm(false)
     })
@@ -828,7 +828,7 @@ const {
 
     // Filter button event listeners
     filterButtons.forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (_event: Event) => {
         currentFilter = button.dataset.filter
         updateFilterButtons()
         renderTodos()
@@ -836,7 +836,7 @@ const {
     })
 
     // Category filter event listener
-    categorySelect.addEventListener('change', () => {
+    categorySelect.addEventListener('change', (_event: Event) => {
       currentCategoryFilter = categorySelect.value
       renderTodos()
     })

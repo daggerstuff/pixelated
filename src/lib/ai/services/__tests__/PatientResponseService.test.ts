@@ -29,12 +29,12 @@ describe('PatientResponseService', () => {
     // We are mocking the service classes, so we don't need their actual instances for these tests,
     // but rather their mocked constructor or instances.
     // However, if methods of these services are called by PatientResponseService, they need to be mocked on the instances.
-    mockPatientProfileService = new (PatientProfileService as any)() // Keep as is if only used for constructor typing
-    mockBeliefConsistencyService = new (BeliefConsistencyService as any)()
+    mockPatientProfileService = new (PatientProfileService as unknown)() // Keep as is if only used for constructor typing
+    mockBeliefConsistencyService = new (BeliefConsistencyService as unknown)()
 
     // Create a mocked instance of EmotionSynthesizer
     mockEmotionSynthesizer =
-      new (EmotionSynthesizer as any)() as vi.Mocked<EmotionSynthesizer>
+      new (EmotionSynthesizer as unknown)() as vi.Mocked<EmotionSynthesizer>
 
     // Setup default mock implementations for EmotionSynthesizer methods if needed globally
     // For example, if every call to generatePatientPrompt will invoke synthesizeEmotion:
@@ -156,7 +156,7 @@ describe('PatientResponseService', () => {
       const therapistUtterance = "You shouldn't feel that way, just relax."
       const patientUtterance = "But I can't just relax!"
 
-      const profileCopy = JSON.parse(JSON.stringify(sampleProfile)) // Deep copy
+      const profileCopy = JSON.parse(JSON.stringify(sampleProfile) as unknown) // Deep copy
       const updatedProfile =
         patientResponseService.updateTherapeuticAllianceMetrics(
           profileCopy,
@@ -174,7 +174,7 @@ describe('PatientResponseService', () => {
       const therapistUtterance = 'I wonder if that belief is truly serving you?'
       const patientUtterance = "Hmm, I'm not sure. Maybe not."
 
-      const profileCopy = JSON.parse(JSON.stringify(sampleProfile))
+      const profileCopy = JSON.parse(JSON.stringify(sampleProfile) as unknown)
       const updatedProfile =
         patientResponseService.updateTherapeuticAllianceMetrics(
           profileCopy,
@@ -191,7 +191,7 @@ describe('PatientResponseService', () => {
       const therapistUtterance = 'Can you tell me more about that feeling?'
       const patientUtterance = 'Fine.' // Very short, indicative of withdrawal
 
-      const profileCopy = JSON.parse(JSON.stringify(sampleProfile))
+      const profileCopy = JSON.parse(JSON.stringify(sampleProfile) as unknown)
       profileCopy.cognitiveModel.therapeuticProgress.therapistPerception =
         'supportive' // Start positive
 
@@ -214,7 +214,7 @@ describe('PatientResponseService', () => {
       const patientUtterance =
         'She was just like my mother always is, critical.'
 
-      const profileCopy = JSON.parse(JSON.stringify(sampleProfile))
+      const profileCopy = JSON.parse(JSON.stringify(sampleProfile) as unknown)
       const updatedProfile =
         patientResponseService.updateTherapeuticAllianceMetrics(
           profileCopy,
@@ -229,7 +229,7 @@ describe('PatientResponseService', () => {
       const therapistUtterance = "That's perfectly understandable."
       const patientUtterance = 'Thank you, I feel very understood.'
 
-      const profileCopy = JSON.parse(JSON.stringify(sampleProfile))
+      const profileCopy = JSON.parse(JSON.stringify(sampleProfile) as unknown)
       profileCopy.cognitiveModel.therapeuticProgress.trustLevel = 9.8
       profileCopy.cognitiveModel.therapeuticProgress.rapportScore = 9.9
 
@@ -243,7 +243,7 @@ describe('PatientResponseService', () => {
       expect(tp.trustLevel).toBe(10) // 9.8 + 0.5 (therapist) + 0.7 (patient) = 11 -> capped at 10
       expect(tp.rapportScore).toBe(10) // 9.9 + 0.5 + 0.5 = 10.9 -> capped at 10
 
-      const profileCopy2 = JSON.parse(JSON.stringify(sampleProfile))
+      const profileCopy2 = JSON.parse(JSON.stringify(sampleProfile) as unknown)
       profileCopy2.cognitiveModel.therapeuticProgress.trustLevel = 0.2
       profileCopy2.cognitiveModel.therapeuticProgress.rapportScore = 0.1
       const updatedProfile2 =
@@ -262,7 +262,7 @@ describe('PatientResponseService', () => {
         'I wonder if avoiding that is actually making it harder?' // Challenging
       const patientUtterance = "You know, that's right. I think it is." // Agreeing with challenge
 
-      const profileCopy = JSON.parse(JSON.stringify(sampleProfile))
+      const profileCopy = JSON.parse(JSON.stringify(sampleProfile) as unknown)
       // Set initial perception to neutral to see it change to challenging then supportive
       profileCopy.cognitiveModel.therapeuticProgress.therapistPerception =
         'neutral'

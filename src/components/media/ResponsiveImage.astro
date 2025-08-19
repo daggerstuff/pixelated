@@ -167,7 +167,7 @@ const aspectRatio = width && height ? width / height : undefined
 
 <script>
   // Handle blur-up loading effect
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const images = document.querySelectorAll('.blur-up')
 
     images.forEach((img) => {
@@ -175,7 +175,7 @@ const aspectRatio = width && height ? width / height : undefined
         if (img.complete) {
           img.classList.add('loaded')
         } else {
-          img.addEventListener('load', () => {
+          img.addEventListener('load', (_event: Event) => {
             img.classList.add('loaded')
           })
         }

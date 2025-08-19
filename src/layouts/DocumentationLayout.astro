@@ -371,7 +371,7 @@ const image = frontmatter?.image || propImage
     </script>
     <script>
       // Generate table of contents from headings
-      document.addEventListener('astro:page-load', () => {
+      document.addEventListener('astro:page-load', (_event: Event) => {
         const headings = document.querySelectorAll(
           '.docs-content h2, .docs-content h3',
         )
@@ -398,7 +398,7 @@ const image = frontmatter?.image || propImage
                 ? 'block py-1 hover:text-primary transition-colors'
                 : 'block py-1 pl-4 text-muted-foreground hover:text-primary transition-colors'
 
-            link.addEventListener('click', (e) => {
+            link.addEventListener('click', (e: Event) => {
               e.preventDefault()
               const targetElement = document.querySelector(`#${heading.id}`)
               if (targetElement) {

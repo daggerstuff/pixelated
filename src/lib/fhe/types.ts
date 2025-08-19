@@ -663,7 +663,7 @@ export interface TherapyHomomorphicRequest {
 
 // Export error type for use in error handling
 export class OperationError extends Error {
-  constructor(message: string) {
+  constructor(message: string): void {
     super(message)
     this.name = 'OperationError'
   }

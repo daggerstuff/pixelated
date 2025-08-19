@@ -78,8 +78,8 @@ export class UsabilityUtils {
           }
         }
       }
-    } catch (error) {
-      results.errors.push(`Form usability test error: ${error.message}`);
+    } catch (error: unknown) {
+      results.errors.push(`Form usability test error: ${String(error)}`);
     }
     
     return results;
@@ -117,8 +117,8 @@ export class UsabilityUtils {
         results.searchFunctional = true;
       }
       
-    } catch (error) {
-      results.errors.push(`Navigation usability test error: ${error.message}`);
+    } catch (error: unknown) {
+      results.errors.push(`Navigation usability test error: ${String(error)}`);
     }
     
     return results;
@@ -189,8 +189,8 @@ export class UsabilityUtils {
         }
       }
       
-    } catch (error) {
-      results.errors.push(`Mobile usability test error: ${error.message}`);
+    } catch (error: unknown) {
+      results.errors.push(`Mobile usability test error: ${String(error)}`);
     }
     
     return results;

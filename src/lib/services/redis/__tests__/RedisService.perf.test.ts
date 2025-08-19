@@ -19,7 +19,7 @@ describeFn('RedisService Performance', () => {
 
   beforeEach(async () => {
     redis = new RedisService({
-      url: process.env.REDIS_URL!,
+      url: process.env['REDIS_URL']!,
       keyPrefix: process.env.REDIS_KEY_PREFIX!,
       maxConnections: 50,
       minConnections: 5,

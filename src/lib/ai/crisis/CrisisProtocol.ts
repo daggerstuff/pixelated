@@ -99,7 +99,7 @@ export class CrisisProtocol {
         alertLevel,
         confidence,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Error handling crisis event:', error)
       throw error
     }
@@ -276,7 +276,7 @@ export class CrisisProtocol {
         }
         // Add other notification channels (email, SMS, etc.) here
       }
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Error sending staff notifications:', error)
     }
   }
@@ -344,7 +344,7 @@ export class CrisisProtocol {
         eventId: event.id,
         alertLevel: event.alertLevel,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Failed to send Slack notification:', error)
     }
   }
@@ -381,7 +381,7 @@ ${config.responseTemplate.replace('{triggerTerms}', event.detectedRisks.join(', 
         ) {
           await this.escalateEvent(event.id, 'auto-escalation')
         }
-      } catch (error) {
+      } catch (error: unknown) {
         appLogger.error('Auto-escalation failed:', error)
       }
     }, config.autoEscalateAfterMs)

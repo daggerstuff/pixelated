@@ -211,7 +211,7 @@ export class EducationalContextRecognizer {
     ],
   }
 
-  constructor(config: EducationalRecognizerConfig) {
+  constructor(config: EducationalRecognizerConfig): void {
     this.aiService = config.aiService
     this.model = config.model || 'gpt-4'
     this.adaptToUserLevel = config.adaptToUserLevel ?? true
@@ -282,7 +282,7 @@ export class EducationalContextRecognizer {
             }
             return adaptedPattern
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn('AI analysis failed, using adapted pattern result:', error)
           const adapted = this.adaptResultToUserProfile(patternResult, userProfile)
           if (normalizedInitial.includes('what is depression')) {
@@ -306,7 +306,7 @@ export class EducationalContextRecognizer {
       }
 
       return adapted
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error recognizing educational context:', error)
 
       // Fallback to basic non-educational result
@@ -571,7 +571,7 @@ Adapt complexity and resource recommendations accordingly.`
       // Ultimate fallback: try the original content
       if (!jsonStr) jsonStr = content
       logger.info('Extracted JSON string from AI response', { jsonStr })
-      const parsed = JSON.parse(jsonStr)
+      const parsed = JSON.parse(jsonStr) as unknown
       logger.info('Parsed AI response JSON', { parsed })
 
       return {
@@ -609,10 +609,10 @@ Adapt complexity and resource recommendations accordingly.`
           ),
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.lastParseMalformed = true
       logger.error('Error parsing AI response:', {
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? String(error) : String(error),
         content,
       })
 

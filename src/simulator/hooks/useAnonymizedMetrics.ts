@@ -40,7 +40,7 @@ export function useAnonymizedMetrics(): SimpleMetrics {
 
       if (storedMetrics) {
         // Use stored metrics if available
-        const parsedMetrics = JSON.parse(storedMetrics)
+        const parsedMetrics = JSON.parse(storedMetrics) as unknown
         setMetrics(parsedMetrics)
       } else {
         // Generate demo data for first-time users
@@ -61,7 +61,7 @@ export function useAnonymizedMetrics(): SimpleMetrics {
         setMetrics(demoMetrics)
         localStorage.setItem(METRICS_STORAGE_KEY, JSON.stringify(demoMetrics))
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load metrics from localStorage:', error)
       // Fall back to default empty metrics
     }

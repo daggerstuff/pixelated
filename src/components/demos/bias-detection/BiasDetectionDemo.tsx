@@ -31,7 +31,7 @@ interface BiasDetectionDemoProps {
   showHistoricalData?: boolean
 }
 
-export const BiasDetectionDemo: React.FC<BiasDetectionDemoProps> = ({
+export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
   className = '',
   onAnalysisComplete,
   enableExport = true,
@@ -147,8 +147,8 @@ export const BiasDetectionDemo: React.FC<BiasDetectionDemoProps> = ({
 
         // Notify parent component
         onAnalysisComplete?.(results)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Analysis failed')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Analysis failed')
       } finally {
         setIsAnalyzing(false)
       }

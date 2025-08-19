@@ -1,6 +1,5 @@
 import type { CrisisDetectionResult } from '../../../lib/ai/crisis/types'
 import { useCallback, useState, useRef } from 'react'
-import crypto from 'crypto'
 
 interface UseCrisisDetectionOptions {
   apiEndpoint?: string
@@ -65,7 +64,7 @@ interface CrisisAnalytics {
  */
 function isRetryableError(error: unknown): boolean {
   // Network errors are retryable
-  if (error instanceof TypeError && error.message.includes('network')) {
+  if (error instanceof TypeError && String(error).includes('network')) {
     return true
   }
 
@@ -267,7 +266,7 @@ export function useCrisisDetection({
     }
 
     return {
-      id: `alert-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`,
+      id: `alert-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
       timestamp: new Date(),
       level,
       message,
@@ -311,7 +310,7 @@ export function useCrisisDetection({
         }
 
         return response
-      } catch (err) {
+      } catch (err: unknown) {
         clearTimeout(timeoutId)
         throw err
       }
@@ -362,10 +361,10 @@ export function useCrisisDetection({
           }
 
           return data
-        } catch (err) {
+        } catch (err: unknown) {
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? err.message : 'Failed to detect crisis'
+              err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to detect crisis'
             setError(errorMessage)
 
             if (onError && err instanceof Error) {
@@ -376,7 +375,7 @@ export function useCrisisDetection({
 
           retries++
           // Exponential backoff with jitter
-          const secureJitter = parseInt(crypto.randomBytes(2).toString('hex'), 16) % 1000
+          const secureJitter = Math.floor(Math.random() * 1000)
           const delay = Math.min(1000 * Math.pow(2, retries) + secureJitter, 10000)
           await new Promise((resolve) => setTimeout(resolve, delay))
         } finally {
@@ -448,9 +447,9 @@ export function useCrisisDetection({
         }
 
         return batchResults
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to detect crisis in batch'
+          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to detect crisis in batch'
         setError(errorMessage)
 
         if (onError && err instanceof Error) {
@@ -514,7 +513,7 @@ export function useCrisisDetection({
             }
 
             yield data
-          } catch (err) {
+          } catch (err: unknown) {
             console.warn(`Failed to detect crisis in text ${i + 1}:`, err)
           }
         }

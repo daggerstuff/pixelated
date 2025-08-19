@@ -51,12 +51,12 @@ describe('auditLoggingService', () => {
         auditLoggingService.logEvent(testEntry),
       ).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalled()
-      const loggedEntry = JSON.parse(mockLogger.info.mock.calls[0][0])
+      const loggedEntry = JSON.parse(mockLogger.info.mock.calls[0][0]) as unknown
       expect(loggedEntry.details.password).toBe('[REDACTED]')
     })
 
     it('should handle logging errors gracefully', async () => {
-      vi.spyOn(auditLoggingService as any, 'storeLogEntry').mockRejectedValue(
+      vi.spyOn(auditLoggingService as unknown, 'storeLogEntry').mockRejectedValue(
         new Error('Storage failed'),
       )
       await expect(auditLoggingService.logEvent(testEntry)).rejects.toThrow(
@@ -68,9 +68,9 @@ describe('auditLoggingService', () => {
 
   describe('sanitizeEntry', () => {
     it('should hash sensitive identifiers when PII is not included', () => {
-      const hashSpy = vi.spyOn(auditLoggingService as any, 'hashValue')
+      const hashSpy = vi.spyOn(auditLoggingService as unknown, 'hashValue')
 
-      const sanitizedEntry = (auditLoggingService as any).sanitizeEntry({
+      const sanitizedEntry = (auditLoggingService as unknown).sanitizeEntry({
         ...testEntry,
         timestamp: new Date().toISOString(),
       })

@@ -119,7 +119,7 @@ export class FileSystemStorageProvider implements StorageProvider {
     basePath: string
   }
 
-  constructor(config: Record<string, unknown>) {
+  constructor(config: Record<string, unknown>): void {
     this.config = {
       basePath:
         (config['basePath'] as string) ||
@@ -184,9 +184,9 @@ export class FileSystemStorageProvider implements StorageProvider {
 
       await scanDir(basePath)
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error listing files: ${error instanceof Error ? error.message : String(error)}`,
+        `Error listing files: ${error instanceof Error ? String(error) : String(error)}`,
       )
       return []
     }
@@ -255,7 +255,7 @@ export class MockCloudStorageProvider implements StorageProvider {
     basePath: string
   }
 
-  constructor(config: Record<string, unknown>) {
+  constructor(config: Record<string, unknown>): void {
     this.config = {
       provider: (config['provider'] as string) || 'mock-cloud',
       bucket: (config['bucket'] as string) || 'mock-bucket',
@@ -310,9 +310,9 @@ export class MockCloudStorageProvider implements StorageProvider {
     try {
       const data = await fs.readFile(filePath)
       return new Uint8Array(data)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error reading file ${key}: ${error instanceof Error ? error.message : String(error)}`,
+        `Error reading file ${key}: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(`File not found in cloud storage: ${key}`)
     }
@@ -361,9 +361,9 @@ export class MockCloudStorageProvider implements StorageProvider {
 
       await scanDir(bucketPath)
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error listing files in cloud storage: ${error instanceof Error ? error.message : String(error)}`,
+        `Error listing files in cloud storage: ${error instanceof Error ? String(error) : String(error)}`,
       )
       return []
     }
@@ -381,17 +381,17 @@ export class MockCloudStorageProvider implements StorageProvider {
       // Also delete metadata file if it exists
       try {
         await fs.unlink(`${filePath}.meta`)
-      } catch (error) {
+      } catch (error: unknown) {
         // Log errors deleting metadata file but don't fail the operation
         logger.debug(
-          `Error deleting metadata file for ${key}: ${error instanceof Error ? error.message : String(error)}`,
+          `Error deleting metadata file for ${key}: ${error instanceof Error ? String(error) : String(error)}`,
         )
       }
 
       logger.debug(`Deleted file ${key} from mock cloud storage`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error deleting file ${key}: ${error instanceof Error ? error.message : String(error)}`,
+        `Error deleting file ${key}: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw error
     }
@@ -424,7 +424,7 @@ export class AWSS3StorageProvider implements StorageProvider {
     }
   }
 
-  constructor(config: Record<string, unknown>) {
+  constructor(config: Record<string, unknown>): void {
     const bucket = config['bucket'] as string
     const region = (config['region'] as string) || 'us-east-1'
     const prefix = (config['prefix'] as string) || ''
@@ -486,12 +486,12 @@ export class AWSS3StorageProvider implements StorageProvider {
       logger.info(
         `Initialized AWS S3 storage provider for bucket: ${this.config.bucket}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Failed to initialize AWS S3 provider: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to initialize AWS S3 provider: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to initialize AWS S3 provider: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to initialize AWS S3 provider: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -524,12 +524,12 @@ export class AWSS3StorageProvider implements StorageProvider {
       logger.debug(
         `Stored file at ${fullKey} in S3 bucket ${this.config.bucket}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error storing file ${key} in S3: ${error instanceof Error ? error.message : String(error)}`,
+        `Error storing file ${key} in S3: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to store file in S3: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to store file in S3: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -567,9 +567,9 @@ export class AWSS3StorageProvider implements StorageProvider {
         body.on('end', () => resolve(concatUint8Arrays(chunks)))
         body.on('error', reject)
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error getting file ${key} from S3: ${error instanceof Error ? error.message : String(error)}`,
+        `Error getting file ${key} from S3: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(`File not found in S3: ${key}`)
     }
@@ -630,9 +630,9 @@ export class AWSS3StorageProvider implements StorageProvider {
       } while (continuationToken)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error listing files in S3: ${error instanceof Error ? error.message : String(error)}`,
+        `Error listing files in S3: ${error instanceof Error ? String(error) : String(error)}`,
       )
       return []
     }
@@ -663,12 +663,12 @@ export class AWSS3StorageProvider implements StorageProvider {
       logger.debug(
         `Deleted file ${fullKey} from S3 bucket ${this.config.bucket}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error deleting file ${key} from S3: ${error instanceof Error ? error.message : String(error)}`,
+        `Error deleting file ${key} from S3: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to delete file from S3: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to delete file from S3: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -692,7 +692,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     credentials?: Record<string, unknown>
   }
 
-  constructor(config: Record<string, unknown>) {
+  constructor(config: Record<string, unknown>): void {
     const bucketName = config['bucketName'] as string
     const prefix = (config['prefix'] as string) || ''
     const keyFilename = config['keyFilename'] as string | undefined
@@ -747,12 +747,12 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       logger.info(
         `Initialized Google Cloud Storage provider for bucket: ${this.config.bucketName}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Failed to initialize GCS provider: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to initialize GCS provider: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to initialize GCS provider: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to initialize GCS provider: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -770,12 +770,12 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       logger.debug(
         `Stored file ${fullKey} in GCS bucket ${this.config.bucketName}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error storing file ${key} in GCS: ${error instanceof Error ? error.message : String(error)}`,
+        `Error storing file ${key} in GCS: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to store file in GCS: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to store file in GCS: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -787,9 +787,9 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 
       const [contents] = await file.download()
       return new Uint8Array(contents)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error getting file ${key} from GCS: ${error instanceof Error ? error.message : String(error)}`,
+        `Error getting file ${key} from GCS: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(`File not found in GCS: ${key}`)
     }
@@ -822,9 +822,9 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error listing files in GCS: ${error instanceof Error ? error.message : String(error)}`,
+        `Error listing files in GCS: ${error instanceof Error ? String(error) : String(error)}`,
       )
       return []
     }
@@ -839,12 +839,12 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       logger.debug(
         `Deleted file ${fullKey} from GCS bucket ${this.config.bucketName}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error deleting file ${key} from GCS: ${error instanceof Error ? error.message : String(error)}`,
+        `Error deleting file ${key} from GCS: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to delete file from GCS: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to delete file from GCS: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -869,7 +869,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
     prefix: string
   }
 
-  constructor(config: Record<string, unknown>) {
+  constructor(config: Record<string, unknown>): void {
     const connectionString = config['connectionString'] as string | undefined
     const accountName = config['accountName'] as string | undefined
     const accountKey = config['accountKey'] as string | undefined
@@ -947,12 +947,12 @@ export class AzureBlobStorageProvider implements StorageProvider {
       logger.info(
         `Initialized Azure Blob Storage provider for container: ${this.config.containerName}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Failed to initialize Azure Blob Storage provider: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to initialize Azure Blob Storage provider: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to initialize Azure Blob Storage provider: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to initialize Azure Blob Storage provider: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -973,12 +973,12 @@ export class AzureBlobStorageProvider implements StorageProvider {
       logger.debug(
         `Stored file ${fullKey} in Azure container ${this.config.containerName}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error storing file ${key} in Azure: ${error instanceof Error ? error.message : String(error)}`,
+        `Error storing file ${key} in Azure: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to store file in Azure: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to store file in Azure: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -1008,9 +1008,9 @@ export class AzureBlobStorageProvider implements StorageProvider {
           reject(error)
         })
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error getting file ${key} from Azure: ${error instanceof Error ? error.message : String(error)}`,
+        `Error getting file ${key} from Azure: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(`File not found in Azure: ${key}`)
     }
@@ -1041,9 +1041,9 @@ export class AzureBlobStorageProvider implements StorageProvider {
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error listing files in Azure: ${error instanceof Error ? error.message : String(error)}`,
+        `Error listing files in Azure: ${error instanceof Error ? String(error) : String(error)}`,
       )
       return []
     }
@@ -1060,12 +1060,12 @@ export class AzureBlobStorageProvider implements StorageProvider {
       logger.debug(
         `Deleted file ${fullKey} from Azure container ${this.config.containerName}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Error deleting file ${key} from Azure: ${error instanceof Error ? error.message : String(error)}`,
+        `Error deleting file ${key} from Azure: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `Failed to delete file from Azure: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to delete file from Azure: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }

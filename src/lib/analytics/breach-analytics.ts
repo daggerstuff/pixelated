@@ -147,7 +147,7 @@ export async function generateMetrics(
       complianceScore,
       notificationEffectiveness: notificationEffectiveness.overall,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to generate breach metrics:', error)
     throw error
   }
@@ -196,7 +196,7 @@ async function calculateResponseTime(breach: Breach): Promise<number> {
     return 0
   }
 
-  const notificationData = JSON.parse(notifications)
+  const notificationData = JSON.parse(notifications) as unknown
   return notificationData.completedAt - breach.timestamp
 }
 
@@ -221,7 +221,7 @@ export async function analyzeTrends(
       ...point,
       anomalyScore: anomalies[index] || 0,
     }))
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to analyze breach trends:', error)
     throw error
   }
@@ -295,7 +295,7 @@ export async function predictBreaches(
           .map((factor) => factor.name),
       }),
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to predict breaches:', error)
     throw error
   }
@@ -317,7 +317,7 @@ export async function analyzeRiskFactors(): Promise<RiskFactor[]> {
         trend: trends[index] || 'stable',
       }),
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to analyze risk factors:', error)
     throw error
   }
@@ -408,7 +408,7 @@ export async function generateInsights(): Promise<SecurityInsight[]> {
     }
 
     return insights
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to generate insights:', error)
     throw error
   }
@@ -471,7 +471,7 @@ export async function generateReport(
       insights,
       generatedAt: new Date().toISOString(),
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to generate analytics report:', error)
     throw error
   }

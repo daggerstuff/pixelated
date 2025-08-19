@@ -450,7 +450,7 @@ Body: JSON with action and environment
 
 <script>
   // Client-side functionality for the validation pipeline
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const runValidationBtn = document.getElementById('run-validation') as HTMLButtonElement | null
     const startContinuousBtn = document.getElementById('start-continuous') as HTMLButtonElement | null
     const stopContinuousBtn = document.getElementById('stop-continuous') as HTMLButtonElement | null
@@ -468,7 +468,7 @@ Body: JSON with action and environment
     fetchValidationHistory()
 
     // Handle custom cron schedule
-    cronScheduleSelect?.addEventListener('change', (e) => {
+    cronScheduleSelect?.addEventListener('change', (e: Event) => {
       const target = e.target as HTMLSelectElement
       if (target.value === 'custom') {
         customScheduleContainer?.classList.remove('hidden')

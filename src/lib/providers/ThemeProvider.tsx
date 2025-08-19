@@ -97,7 +97,7 @@ export function ThemeProvider({
     root.classList.toggle('reduced-motion', motionPreference === 'reduced')
 
     // Update color scheme meta tag
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]') as HTMLElement
     if (metaThemeColor) {
       metaThemeColor.setAttribute(
         'content',

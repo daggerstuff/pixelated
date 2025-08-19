@@ -486,7 +486,7 @@ class TestFlaskEndpoints(unittest.TestCase):
 
     def test_analyze_endpoint_no_data(self):
         """Test analyze endpoint with no data"""
-        response = self.client.post("/analyze")
+        response = self.client.post("/analyze", content_type="application/json")
         assert response.status_code == 400
 
         data = response.get_json()

@@ -23,9 +23,9 @@ export function removeIssue(id: number): void {
 /**
  * Displays all stored compatibility issues in the DOM
  */
-export function displayIssues(): void {
+export function displayIssues() {
   const issues = getStoredIssues()
-  const container = document.getElementById('issues-container')
+  const container = document.getElementById('issues-container') as HTMLElement
 
   if (!container) {
     return

@@ -29,7 +29,7 @@ export const GET = async ({ url }) => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching audit logs:', error)
     return new Response(
       JSON.stringify({

@@ -49,7 +49,7 @@ export async function applyRateLimit(
       userId = session.user.id
       role = session.user.role || 'user'
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn('Error getting session for rate limiting:', { error, path })
   }
 

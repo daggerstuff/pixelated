@@ -74,7 +74,7 @@ export async function verifyAdmin(
  * Admin middleware factory
  * Returns a middleware function that checks for admin status and required permission
  */
-export function adminGuard(requiredPermission?: AdminPermission) {
+export function adminGuard(requiredPermission?: AdminPermission): void {
   return async (context: APIContext) => {
     const admin = await verifyAdmin(context, requiredPermission)
 

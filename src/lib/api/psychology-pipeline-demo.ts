@@ -692,7 +692,7 @@ interface ConversationRequest {
   [key: string]: unknown
 }
 
-function calculateConversationQuality(request: ConversationRequest) {
+function calculateConversationQuality(request: ConversationRequest): void {
   // Simulate quality calculation based on knowledge integration
   const baseScore = 80
   const knowledgeIntegration = Math.min(
@@ -722,7 +722,7 @@ function calculateConversationQuality(request: ConversationRequest) {
   }
 }
 
-function mapKnowledgeToDialogue(dialogue: DialogueEntry[]) {
+function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): void {
   return dialogue.map((turn, index) => ({
     dialogueTurn: index + 1,
     appliedKnowledge: [

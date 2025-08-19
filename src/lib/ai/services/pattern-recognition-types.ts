@@ -257,14 +257,14 @@ export class PatternRecognitionError extends Error {
 }
 
 export class ValidationError extends PatternRecognitionError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'VALIDATION_ERROR', details)
     this.name = 'ValidationError'
   }
 }
 
 export class ProcessingError extends PatternRecognitionError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'PROCESSING_ERROR', details)
     this.name = 'ProcessingError'
   }

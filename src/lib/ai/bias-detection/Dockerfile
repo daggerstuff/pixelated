@@ -26,7 +26,13 @@ EXPOSE 5001
 ENV BIAS_SERVICE_HOST=0.0.0.0
 ENV BIAS_SERVICE_PORT=5001
 
+# Create non-root user
+RUN addgroup --system bias && adduser --system --ingroup bias bias
+USER bias
+
 # Command to run the service
 COPY gunicorn_config.py .
 CMD ["gunicorn", "-c", "gunicorn_config.py", "start-python-service:app"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl -f http://localhost:5001/health || exit 1
 

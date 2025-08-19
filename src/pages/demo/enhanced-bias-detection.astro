@@ -353,7 +353,7 @@ import { BiasDetectionDemo } from '../../components/demos/bias-detection/BiasDet
 
 <script>
   // Analytics tracking for demo interactions
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Track demo page view
     if (typeof gtag !== 'undefined') {
       gtag('event', 'page_view', {
@@ -367,7 +367,7 @@ import { BiasDetectionDemo } from '../../components/demos/bias-detection/BiasDet
     const demoContainer = document.querySelector('.bias-detection-demo')
     if (demoContainer) {
       // Track analysis starts
-      demoContainer.addEventListener('click', (e) => {
+      demoContainer.addEventListener('click', (e: Event) => {
         if (e.target?.textContent?.includes('Analyze for Bias')) {
           if (typeof gtag !== 'undefined') {
             gtag('event', 'demo_interaction', {
@@ -380,7 +380,7 @@ import { BiasDetectionDemo } from '../../components/demos/bias-detection/BiasDet
       })
 
       // Track preset selections
-      demoContainer.addEventListener('click', (e) => {
+      demoContainer.addEventListener('click', (e: Event) => {
         if (e.target?.closest('.preset-scenario-selector')) {
           if (typeof gtag !== 'undefined') {
             gtag('event', 'demo_interaction', {
@@ -393,7 +393,7 @@ import { BiasDetectionDemo } from '../../components/demos/bias-detection/BiasDet
       })
 
       // Track exports
-      demoContainer.addEventListener('click', (e) => {
+      demoContainer.addEventListener('click', (e: Event) => {
         if (e.target?.textContent?.includes('Export Data')) {
           if (typeof gtag !== 'undefined') {
             gtag('event', 'demo_interaction', {

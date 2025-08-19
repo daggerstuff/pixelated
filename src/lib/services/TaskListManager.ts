@@ -144,10 +144,10 @@ export class TaskListManager {
           completedTasks,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load task list', {
         filePath,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -189,10 +189,10 @@ export class TaskListManager {
         totalTasks: taskList.metadata?.totalTasks,
         completedTasks: taskList.metadata?.completedTasks,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to save task list', {
         filePath: taskList.filePath,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -271,7 +271,7 @@ export class TaskListManager {
   /**
    * Check if parent task should be marked complete based on children
    */
-  private checkParentCompletion(): void {
+  private checkParentCompletion() {
     // This is a simplified version - in a full implementation you'd track parent-child relationships
     // For now, we'll handle this in the markTaskCompleted method
   }
@@ -414,9 +414,9 @@ export class TaskListManager {
         updatedTaskList: taskList,
         shouldContinue: checkInResult.shouldContinue,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Task check-in failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         completedTaskId,
         taskSummary,
       })

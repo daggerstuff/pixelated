@@ -622,7 +622,7 @@ export class BiasInitializationError extends BiasSystemError {
  */
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    return error.message
+    return String(error)
   }
   if (typeof error === 'string') {
     return error
@@ -682,11 +682,11 @@ export function isRetryable(error: unknown): boolean {
   if (error instanceof Error) {
     // Network errors are typically retryable
     return (
-      error.message.includes('fetch') ||
-      error.message.includes('timeout') ||
-      error.message.includes('network') ||
-      error.message.includes('ECONNRESET') ||
-      error.message.includes('ENOTFOUND')
+      String(error).includes('fetch') ||
+      String(error).includes('timeout') ||
+      String(error).includes('network') ||
+      String(error).includes('ECONNRESET') ||
+      String(error).includes('ENOTFOUND')
     )
   }
   return false
@@ -817,7 +817,7 @@ export class BiasErrorAggregator {
   /**
    * Reset statistics
    */
-  reset(): void {
+  reset() {
     this.errorCounts.clear()
     this.errorSamples.clear()
   }

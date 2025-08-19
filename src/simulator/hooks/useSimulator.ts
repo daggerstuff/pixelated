@@ -55,7 +55,7 @@ export function useSimulator() {
         }
 
         return
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Failed to start simulation:', error)
         throw error
       }
@@ -122,7 +122,7 @@ export function useSimulator() {
         }
 
         return simulationFeedback
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error processing response:', error)
         throw error
       } finally {

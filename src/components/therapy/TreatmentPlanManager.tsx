@@ -102,14 +102,14 @@ const initialNewPlanData: FormNewPlanData = {
   goals: [],
 }
 
-const TreatmentPlanManager: React.FC = () => {
+const TreatmentPlanManager: FC = () => {
   const [plans, setPlans] = useState<TreatmentPlan[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(
-    JSON.parse(JSON.stringify(initialNewPlanData)),
+    JSON.parse(JSON.stringify(initialNewPlanData) as unknown),
   )
 
   const [planToDelete, setPlanToDelete] = useState<TreatmentPlan | null>(null)
@@ -129,9 +129,9 @@ const TreatmentPlanManager: React.FC = () => {
       }
       const data: TreatmentPlan[] = await response.json()
       setPlans(data)
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       setError(errorMessage)
       toast.error(`Failed to load plans: ${errorMessage}`)
     } finally {
@@ -388,11 +388,11 @@ const TreatmentPlanManager: React.FC = () => {
       }
       await fetchPlans()
       setIsCreateModalOpen(false)
-      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData)))
+      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown))
       toast.success('Treatment plan created successfully!')
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       toast.error(`Failed to create plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -415,9 +415,9 @@ const TreatmentPlanManager: React.FC = () => {
       await fetchPlans() // Refresh list
       setPlanToDelete(null) // Close dialog
       toast.success('Treatment plan deleted successfully!')
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       toast.error(`Failed to delete plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -457,9 +457,9 @@ const TreatmentPlanManager: React.FC = () => {
       setIsEditModalOpen(false)
       setEditingPlanData(null)
       toast.success('Treatment plan updated successfully!')
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'An unknown error occurred'
+        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
       toast.error(`Failed to update plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -485,7 +485,7 @@ const TreatmentPlanManager: React.FC = () => {
   }
 
   const openCreateModal = () => {
-    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData))) // Reset with deep copy
+    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown)) // Reset with deep copy
     setIsCreateModalOpen(true)
   }
 

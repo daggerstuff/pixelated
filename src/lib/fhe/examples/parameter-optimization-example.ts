@@ -36,7 +36,7 @@ export async function demonstrateParameterOptimization(): Promise<void> {
 /**
  * Compare the effect of different optimization strategies on parameters
  */
-function compareOptimizationStrategies(): void {
+function compareOptimizationStrategies() {
   logger.info('Comparing optimization strategies')
 
   const operation = FHEOperation.Polynomial
@@ -90,7 +90,7 @@ function compareOptimizationStrategies(): void {
 /**
  * Compare parameters for operations with different complexity
  */
-function compareOperationComplexity(): void {
+function compareOperationComplexity() {
   logger.info('Comparing parameters for different operation complexities')
 
   // Set a balanced strategy
@@ -155,7 +155,7 @@ function compareOperationComplexity(): void {
 /**
  * Simulate adaptive optimization based on performance metrics
  */
-function simulateAdaptiveOptimization(): void {
+function simulateAdaptiveOptimization() {
   logger.info('Simulating adaptive optimization based on performance metrics')
 
   // Set auto-adaptive strategy

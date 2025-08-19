@@ -1,6 +1,5 @@
 import type { ToastOptions } from 'react-hot-toast'
 import type { ReactNode } from 'react'
-import React from 'react'
 import { toast as hotToast, Toaster } from 'react-hot-toast'
 import { cn } from '../../lib/utils'
 

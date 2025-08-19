@@ -8,7 +8,7 @@ interface TreatmentPlannerProps {
   // Define any props this component might receive from Astro, if necessary
 }
 
-const TreatmentPlanner: React.FC<TreatmentPlannerProps> = ({
+const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
   pageTitle,
   pageDescription,
 }) => {
@@ -55,7 +55,7 @@ const TreatmentPlanner: React.FC<TreatmentPlannerProps> = ({
       }
       setRecommendations(data.data.recommendations as TreatmentRecommendation[])
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      const errorMessage = err instanceof Error ? (err as Error)?.message || String(err) : 'Unknown error'
       setError(errorMessage)
     } finally {
       setLoading(false)

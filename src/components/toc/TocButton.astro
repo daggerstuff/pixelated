@@ -32,7 +32,7 @@
 <script>
   import { toggleFadeEffect } from '~/utils/animation'
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     /* Open toc panel when user click on button */
     const handleBtnClickToOpen = () => {
       toggleFadeEffect('backdrop', true, 'hidden')
@@ -55,6 +55,6 @@
     }
 
     const tocPanel = document.getElementById('toc-panel')
-    tocPanel?.addEventListener('click', (event) => handleClickToClose(event))
+    tocPanel?.addEventListener('click', (event: Event) => handleClickToClose(event))
   })
 </script>

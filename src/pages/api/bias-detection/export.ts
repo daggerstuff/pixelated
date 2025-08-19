@@ -131,13 +131,13 @@ export const GET: APIRoute = async ({ request }) => {
           },
         )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Export failed', { error })
 
     return new Response(
       JSON.stringify({
         error: 'Export failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

@@ -107,7 +107,7 @@ export class InMemoryStorageProvider implements StorageProvider {
 export class LocalStorageProvider implements StorageProvider {
   private prefix: string
 
-  constructor(config: Record<string, unknown>) {
+  constructor(config: Record<string, unknown>): void {
     this.prefix = (config.prefix as string) || 'backup-'
   }
 
@@ -123,13 +123,13 @@ export class LocalStorageProvider implements StorageProvider {
       // Store with prefix
       localStorage.setItem(this.prefix + key, base64Data)
       logger.debug(`Stored file with key ${key} in localStorage`)
-    } catch (error) {
+    } catch (error: unknown) {
       // Handle quota exceeded or other storage errors
       logger.error(
-        `Failed to store file in localStorage: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to store file in localStorage: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw new Error(
-        `LocalStorage error: ${error instanceof Error ? error.message : String(error)}`,
+        `LocalStorage error: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -186,7 +186,7 @@ export class IndexedDBStorageProvider implements StorageProvider {
   private storeName: string
   private db: IDBDatabase | null = null
 
-  constructor(config: Record<string, unknown>) {
+  constructor(config: Record<string, unknown>): void {
     this.dbName = (config.dbName as string) || 'backupStorage'
     this.storeName = (config.storeName as string) || 'backups'
   }

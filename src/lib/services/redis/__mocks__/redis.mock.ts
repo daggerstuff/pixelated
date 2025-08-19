@@ -52,7 +52,7 @@ export const mockRedisClient = {
   scan: vi.fn().mockResolvedValue(['0', []]),
 
   // Method chaining support
-  on: vi.fn(function (this: any) {
+  on: vi.fn(function (this: any): void {
     return this
   }),
 

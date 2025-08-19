@@ -59,7 +59,7 @@ export const useEmotionDetection = () => {
               : (response as { content: string }).content
         }
 
-        const analysis = JSON.parse(analysisText)
+        const analysis = JSON.parse(analysisText) as unknown
 
         return {
           primaryEmotion: analysis.primaryEmotion || 'neutral',
@@ -67,7 +67,7 @@ export const useEmotionDetection = () => {
           intensity: analysis.intensity || 0.5,
           confidence: analysis.confidence || 0.8,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error detecting emotions:', error)
         return {
           primaryEmotion: 'neutral',

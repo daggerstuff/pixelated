@@ -11,7 +11,7 @@ interface BiasAnalysisDisplayProps {
   sessionData: SessionData | null
 }
 
-export const BiasAnalysisDisplay: React.FC<BiasAnalysisDisplayProps> = ({
+export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
   results,
   sessionData,
 }) => {

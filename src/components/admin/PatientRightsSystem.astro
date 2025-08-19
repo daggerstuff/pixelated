@@ -1113,7 +1113,7 @@ const complianceMetrics = {
   }
   
   // Initialize the enterprise system when DOM is ready
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const manager = new PatientRightsManager()
     // Store reference for potential cleanup
     ;(window as any).patientRightsManager = manager

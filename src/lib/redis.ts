@@ -8,15 +8,15 @@ import Redis from 'ioredis'
 // Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
   return {
-    restUrl: process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL,
-    restToken: process.env.UPSTASH_REDIS_REST_TOKEN,
-    url: process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL,
+    restUrl: process.env['UPSTASH_REDIS_REST_URL'] || process.env['REDIS_URL'],
+    restToken: process.env['UPSTASH_REDIS_REST_TOKEN'],
+    url: process.env['REDIS_URL'] || process.env['UPSTASH_REDIS_REST_URL'],
   }
 }
 
 // Determine if we're in a production environment
 const isProduction = () => {
-  return process.env.NODE_ENV === 'production'
+  return process.env['NODE_ENV'] === 'production'
 }
 
 // Create a mock Redis client for development
@@ -78,12 +78,12 @@ export async function getFromCache<T>(key: string): Promise<T | null> {
       return null
     }
     try {
-      return JSON.parse(raw) as T
+      return JSON.parse(raw) as unknown as T
     } catch {
       // If not JSON, return as-is
       return raw as unknown as T
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Error getting key ${key} from Redis:`, error)
     return null
   }
@@ -105,7 +105,7 @@ export async function setInCache(
       await redis.set(key, serialized)
     }
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Error setting key ${key} in Redis:`, error)
     return false
   }
@@ -118,7 +118,7 @@ export async function removeFromCache(key: string): Promise<boolean> {
   try {
     await redis.del(key)
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Error removing key ${key} from Redis:`, error)
     return false
   }
@@ -131,7 +131,7 @@ export async function checkRedisConnection(): Promise<boolean> {
   try {
     const pingResult = await redis.ping()
     return pingResult === 'PONG'
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Redis connectivity check failed:', error)
     return false
   }
@@ -154,12 +154,12 @@ export async function getRedisHealth(): Promise<{
         details: { message: 'Could not connect to Redis' },
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       status: 'unhealthy',
       details: {
         message: 'Redis health check failed',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       },
     }
   }

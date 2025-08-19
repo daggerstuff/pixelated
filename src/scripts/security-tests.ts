@@ -63,8 +63,8 @@ async function runTest(
   }
 
   try {
-    return JSON.parse(result?.stdout)
-  } catch (error) {
+    return JSON.parse(result?.stdout) as unknown
+  } catch (error: unknown) {
     console.error(`Failed to parse test results for ${name}:`, error)
     return [
       {

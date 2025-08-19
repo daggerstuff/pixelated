@@ -146,7 +146,7 @@ export class FHEAnalyticsService {
         mode: this.fheService.getMode(),
         scheme: serviceOptions.sealScheme,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize FHE Analytics service', { error })
       throw error
     }
@@ -212,7 +212,7 @@ export class FHEAnalyticsService {
                   timestamp: message.timestamp || Date.now(),
                 }
               }
-            } catch (error) {
+            } catch (error: unknown) {
               logger.error(`Failed to analyze sentiment for message ${index}`, {
                 error,
               })
@@ -266,7 +266,7 @@ export class FHEAnalyticsService {
       }
 
       return finalResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze sentiment trend', { error })
       throw new Error(`Sentiment analysis error: ${(error as Error).message}`)
     }
@@ -323,7 +323,7 @@ export class FHEAnalyticsService {
                 topic: topicResult,
                 timestamp: message.timestamp || Date.now(),
               }
-            } catch (error) {
+            } catch (error: unknown) {
               logger.error(
                 `Failed to analyze topics for message ${index}`,
                 error as Record<string, unknown>,
@@ -369,7 +369,7 @@ export class FHEAnalyticsService {
       }
 
       return finalResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to analyze topic clusters',
         error as Record<string, unknown>,
@@ -428,7 +428,7 @@ export class FHEAnalyticsService {
                 risk: riskResult,
                 timestamp: message.timestamp || Date.now(),
               }
-            } catch (error) {
+            } catch (error: unknown) {
               logger.error(
                 `Failed to analyze risk for message ${index}`,
                 error as Record<string, unknown>,
@@ -478,7 +478,7 @@ export class FHEAnalyticsService {
       }
 
       return finalResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to perform risk assessment',
         error as Record<string, unknown>,
@@ -562,7 +562,7 @@ export class FHEAnalyticsService {
               responseSentiment,
               timestamp: exchange.client.timestamp || Date.now(),
             }
-          } catch (error) {
+          } catch (error: unknown) {
             logger.error(
               `Failed to analyze exchange ${index}`,
               error as Record<string, unknown>,
@@ -608,7 +608,7 @@ export class FHEAnalyticsService {
       }
 
       return finalResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to analyze intervention effectiveness',
         error as Record<string, unknown>,
@@ -697,7 +697,7 @@ export class FHEAnalyticsService {
                   emotion: emotionResult,
                   timestamp: message.timestamp || Date.now(),
                 }
-              } catch (error) {
+              } catch (error: unknown) {
                 logger.error(
                   `Failed to analyze emotion for message ${messageIndex}`,
                   error as Record<string, unknown>,
@@ -754,7 +754,7 @@ export class FHEAnalyticsService {
       }
 
       return finalResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to analyze emotional patterns',
         error as Record<string, unknown>,
@@ -787,7 +787,7 @@ export class FHEAnalyticsService {
         this.analyzeInterventionEffectiveness(messages, config),
         this.performRiskAssessment(messages, config),
       ])
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to create analytics dashboard',
         error as Record<string, unknown>,

@@ -153,7 +153,7 @@ export default function SyntheticTherapyDemo() {
       }]
 
       setConversations(apiConversations)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to generate conversations:', error);
 
       // Fallback to mock data on API failure

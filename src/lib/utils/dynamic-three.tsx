@@ -54,7 +54,7 @@ export const useThree = () => {
           setControls(controlsModule)
           setLoading(false)
         }
-      } catch (err) {
+      } catch (err: unknown) {
         if (isMounted) {
           setError(
             err instanceof Error

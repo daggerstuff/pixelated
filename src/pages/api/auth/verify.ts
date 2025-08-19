@@ -75,7 +75,7 @@ export const GET = async ({ request }: APIContext) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Verification error:', error)
     return new Response(
       JSON.stringify({

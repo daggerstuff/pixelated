@@ -75,7 +75,7 @@ class LoadTestService {
     await this.monitoring.initialize()
 
     // Create user sessions
-    const userSessions = []
+    const userSessions: Promise<void>[] = []
     const usersPerSecond = this.config.concurrentUsers / this.config.rampUpTime
 
     for (let i = 0; i < this.config.rampUpTime; i++) {

@@ -352,7 +352,7 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
 
           // Check if there's a label with a matching 'for' attribute
           const hasLabelFor =
-            document.querySelector(`label[for="${id}"]`) !== null
+            document.querySelector(`label[for="${id}"]`) as HTMLElement !== null
           return !hasLabelFor
         })
         .map((el) => ({

@@ -128,7 +128,7 @@ export const prerender = false
   document.head.appendChild(linkElement)
 
   // Add smooth rendering for card animation
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const cardElement = document.querySelector('.card-gradient')
     if (cardElement) {
       cardElement.classList.add('fade-in')

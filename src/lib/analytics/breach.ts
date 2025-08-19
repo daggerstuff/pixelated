@@ -13,7 +13,7 @@ import type { SecurityBreach, BreachSeverity } from './types'
 const logger = createBuildSafeLogger('breach-data')
 
 // Initialize MongoDB client
-const mongoUri = process.env.MONGODB_URI
+const mongoUri = process.env['MONGODB_URI']
 const mongoDbName = process.env.MONGODB_DB_NAME
 
 if (!mongoUri || !mongoDbName) {
@@ -98,7 +98,7 @@ export async function createBreach(breach: SecurityBreach): Promise<void> {
     })
 
     logger.info('Security breach recorded', { breachId: breach.id })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to store security breach', {
       error,
       breachId: breach.id,
@@ -123,7 +123,7 @@ export async function getBreachesSince(date: Date): Promise<SecurityBreach[]> {
       .toArray()
 
     return data.map(fromStoredBreach)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to retrieve security breaches', {
       error,
       since: date,
@@ -160,7 +160,7 @@ export async function updateRemediationStatus(
     }
 
     logger.info('Updated breach remediation status', { breachId, status })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to update breach status', { error, breachId })
     throw new SecurityError('Failed to update breach status', {
       cause: error,
@@ -185,7 +185,7 @@ export async function getBreachById(
     }
 
     return fromStoredBreach(data)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to retrieve security breach', {
       error,
       breachId: id,
@@ -211,7 +211,7 @@ export async function deleteBreach(id: string): Promise<void> {
     }
 
     logger.info('Deleted security breach record', { breachId: id })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to delete security breach', { error, breachId: id })
     throw new SecurityError('Failed to delete security breach', {
       cause: error,

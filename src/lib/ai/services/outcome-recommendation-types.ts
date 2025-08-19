@@ -172,14 +172,14 @@ export class RecommendationError extends Error {
 }
 
 export class ValidationError extends RecommendationError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'VALIDATION_ERROR', details)
     this.name = 'ValidationError'
   }
 }
 
 export class ProcessingError extends RecommendationError {
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown): void {
     super(message, 'PROCESSING_ERROR', details)
     this.name = 'ProcessingError'
   }

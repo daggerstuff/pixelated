@@ -11,7 +11,7 @@ import CardAction from '../CardAction.astro'
 describe('Card Components', () => {
   describe('Card', () => {
     it('renders with base classes', async () => {
-      const { astroContainer } = await renderAstro(Card as any)
+      const { astroContainer } = await renderAstro(Card as unknown)
       const card = astroContainer.querySelector('[data-slot="card"]')
 
       expect(card).toHaveClass(
@@ -29,21 +29,21 @@ describe('Card Components', () => {
 
     it('applies custom classes', async () => {
       const customClass = 'custom-card'
-      const { astroContainer } = await renderAstro(Card as any, { class: customClass })
+      const { astroContainer } = await renderAstro(Card as unknown, { class: customClass })
       const card = astroContainer.querySelector('[data-slot="card"]')
 
       expect(card).toHaveClass(customClass)
     })
 
     it('renders slot content', async () => {
-      await renderAstro(Card as any, {}, 'Card Content')
+      await renderAstro(Card as unknown, {}, 'Card Content')
       expect(screen.getByText('Card Content')).toBeInTheDocument()
     })
   })
 
   describe('CardHeader', () => {
     it('renders with base classes', async () => {
-      const { astroContainer } = await renderAstro(CardHeader as any)
+      const { astroContainer } = await renderAstro(CardHeader as unknown)
       const header = astroContainer.querySelector('[data-slot="card-header"]')
 
       expect(header).toHaveClass(
@@ -58,7 +58,7 @@ describe('Card Components', () => {
     })
 
     it('applies grid columns when action slot is present', async () => {
-      const { astroContainer } = await renderAstro(CardHeader as any, {
+      const { astroContainer } = await renderAstro(CardHeader as unknown, {
         'data-slot': 'card-action',
       })
       const header = astroContainer.querySelector('[data-slot="card-header"]')
@@ -71,21 +71,21 @@ describe('Card Components', () => {
 
   describe('CardTitle', () => {
     it('renders with base classes', async () => {
-      const { astroContainer } = await renderAstro(CardTitle as any)
+      const { astroContainer } = await renderAstro(CardTitle as unknown)
       const title = astroContainer.querySelector('[data-slot="card-title"]')
 
       expect(title).toHaveClass('leading-none', 'font-semibold')
     })
 
     it('renders title content', async () => {
-      await renderAstro(CardTitle as any, {}, 'Card Title')
+      await renderAstro(CardTitle as unknown, {}, 'Card Title')
       expect(screen.getByText('Card Title')).toBeInTheDocument()
     })
   })
 
   describe('CardDescription', () => {
     it('renders with base classes', async () => {
-      const { astroContainer } = await renderAstro(CardDescription as any)
+      const { astroContainer } = await renderAstro(CardDescription as unknown)
       const description = astroContainer.querySelector(
         '[data-slot="card-description"]',
       )
@@ -94,28 +94,28 @@ describe('Card Components', () => {
     })
 
     it('renders description content', async () => {
-      await renderAstro(CardDescription as any, {}, 'Card Description')
+      await renderAstro(CardDescription as unknown, {}, 'Card Description')
       expect(screen.getByText('Card Description')).toBeInTheDocument()
     })
   })
 
   describe('CardContent', () => {
     it('renders with base classes', async () => {
-      const { astroContainer } = await renderAstro(CardContent as any)
+      const { astroContainer } = await renderAstro(CardContent as unknown)
       const content = astroContainer.querySelector('[data-slot="card-content"]')
 
       expect(content).toHaveClass('px-6')
     })
 
     it('renders content', async () => {
-      await renderAstro(CardContent as any, {}, 'Card Content')
+      await renderAstro(CardContent as unknown, {}, 'Card Content')
       expect(screen.getByText('Card Content')).toBeInTheDocument()
     })
   })
 
   describe('CardFooter', () => {
     it('renders with base classes', async () => {
-      const { astroContainer } = await renderAstro(CardFooter as any)
+      const { astroContainer } = await renderAstro(CardFooter as unknown)
       const footer = astroContainer.querySelector('[data-slot="card-footer"]')
 
       expect(footer).toHaveClass(
@@ -127,14 +127,14 @@ describe('Card Components', () => {
     })
 
     it('renders footer content', async () => {
-      await renderAstro(CardFooter as any, {}, 'Card Footer')
+      await renderAstro(CardFooter as unknown, {}, 'Card Footer')
       expect(screen.getByText('Card Footer')).toBeInTheDocument()
     })
   })
 
   describe('CardAction', () => {
     it('renders with base classes', async () => {
-      const { astroContainer } = await renderAstro(CardAction as any)
+      const { astroContainer } = await renderAstro(CardAction as unknown)
       const action = astroContainer.querySelector('[data-slot="card-action"]')
 
       expect(action).toHaveClass(
@@ -147,7 +147,7 @@ describe('Card Components', () => {
     })
 
     it('renders action content', async () => {
-      await renderAstro(CardAction as any, {}, 'Card Action')
+      await renderAstro(CardAction as unknown, {}, 'Card Action')
       expect(screen.getByText('Card Action')).toBeInTheDocument()
     })
   })
@@ -155,7 +155,7 @@ describe('Card Components', () => {
   describe('Card Integration', () => {
     it('renders a complete card with all components', async () => {
       await renderAstro(
-        Card as any,
+        Card as unknown,
         {},
         `
         <${CardHeader.name}>

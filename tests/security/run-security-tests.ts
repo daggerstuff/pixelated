@@ -496,7 +496,7 @@ async function runTests() {
             category: suite.category,
             severity: 'High',
             status: 'Error',
-            details: error instanceof Error ? error.message : String(error),
+            details: error instanceof Error ? String(error) : String(error),
             timestamp: new Date().toISOString(),
           },
         ]),

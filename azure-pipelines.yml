@@ -207,6 +207,14 @@ stages:
       name: 'Default'
     container: mcr.microsoft.com/azure-cli:2.73.0
     steps:
+    - script: |
+        set -e
+        echo "Installing Docker CLI in container..."
+        apt-get update -qq
+        # Prefer docker.io for Debian/Ubuntu-based images
+        apt-get install -y docker.io
+        docker version
+      displayName: Install Docker CLI (inside container)
     - task: DownloadBuildArtifacts@0
       displayName: Download build artifacts
       inputs:

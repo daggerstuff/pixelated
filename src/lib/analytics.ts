@@ -78,7 +78,7 @@ const DEFAULT_CONFIG: AnalyticsConfig = {
   enabled: true,
   differentialPrivacyEnabled: true,
   privacyBudget: 1.0, // Epsilon value for differential privacy
-  endpointUrl: import.meta.env.PUBLIC_ANALYTICS_ENDPOINT,
+  endpointUrl: import.meta.env['PUBLIC_ANALYTICS_ENDPOINT'],
   bufferSize: 20,
   flushIntervalMs: 30000, // 30 seconds
   anonymize: true,
@@ -101,7 +101,7 @@ export class AnalyticsService {
   /**
    * Private constructor (singleton pattern)
    */
-  private constructor(config: AnalyticsConfig = DEFAULT_CONFIG) {
+  private constructor(config: AnalyticsConfig = DEFAULT_CONFIG): void {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = this.generateSessionId()
     this.anonymousId = this.generateAnonymousId()
@@ -165,7 +165,7 @@ export class AnalyticsService {
   /**
    * Start the flush timer
    */
-  private startFlushTimer(): void {
+  private startFlushTimer() {
     if (this.flushTimer) {
       clearInterval(this.flushTimer)
     }
@@ -206,7 +206,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to flush analytics events', errorObj)
 
@@ -267,7 +267,7 @@ export class AnalyticsService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': import.meta.env.PUBLIC_ANALYTICS_API_KEY || '',
+          'X-API-Key': import.meta.env['PUBLIC_ANALYTICS_API_KEY'] || '',
         },
         body: JSON.stringify({
           events,
@@ -285,7 +285,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to send analytics to endpoint', errorObj)
       throw error
@@ -304,7 +304,7 @@ export class AnalyticsService {
       // Get existing events
       const existingEventsJson = localStorage.getItem('analytics_events')
       const existingEvents: AnalyticsEvent[] = existingEventsJson
-        ? JSON.parse(existingEventsJson)
+        ? JSON.parse(existingEventsJson) as unknown
         : []
 
       // Add new events
@@ -318,7 +318,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to save analytics to local storage', errorObj)
     }
@@ -473,7 +473,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error(`Failed to record analytics event: ${eventName}`, errorObj)
     }
@@ -636,11 +636,11 @@ export class AnalyticsService {
 
     try {
       const eventsJson = localStorage.getItem('analytics_events')
-      return eventsJson ? JSON.parse(eventsJson) : []
+      return eventsJson ? JSON.parse(eventsJson) as unknown : []
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to get analytics events', errorObj)
       return []
@@ -650,7 +650,7 @@ export class AnalyticsService {
   /**
    * Clear recorded events (for debugging or privacy requests)
    */
-  public clearEvents(): void {
+  public clearEvents() {
     if (typeof window === 'undefined') {
       return
     }
@@ -662,7 +662,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to clear analytics events', errorObj)
     }

@@ -27,12 +27,12 @@ export const GET = async () => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching metrics:', error)
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? String(error) : String(error),
       }),
       {
         status: 500,

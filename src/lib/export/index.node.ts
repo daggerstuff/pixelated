@@ -94,7 +94,7 @@ interface JWEHeader {
  * Custom error class for export-related errors
  */
 class ExportError extends Error {
-  constructor(message: string) {
+  constructor(message: string): void {
     super(message)
     this.name = 'ExportError'
   }
@@ -112,7 +112,7 @@ export class ExportService {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(fheService: FHEServiceInterface) {
+  private constructor(fheService: FHEServiceInterface): void {
     this.fheService = fheService
     logger.info('Export service initialized')
   }
@@ -148,7 +148,7 @@ export class ExportService {
       logger.info('Export service initialized successfully')
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? String(error) : String(error)
       logger.error('Failed to initialize export service', {
         error: errorMessage,
       })
@@ -239,7 +239,7 @@ export class ExportService {
       }
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? String(error) : String(error)
       logger.error('Failed to export conversation', { error: errorMessage })
       throw new Error(`Export failed: ${errorMessage}`)
     }
@@ -355,7 +355,7 @@ export class ExportService {
 
       // Set up error handling for PDF generation
       doc.on('error', (err: Error) => {
-        throw new Error(`PDF generation error: ${err.message}`)
+        throw new Error(`PDF generation error: ${(err as Error)?.message || String(err)}`)
       })
 
       // Create a buffer to store the PDF with timeout
@@ -378,9 +378,9 @@ export class ExportService {
               ),
             })
           doc.restore()
-        } catch (err) {
+        } catch (err: unknown) {
           const error = err as Error
-          console.error('Error adding watermark:', error.message)
+          console.error('Error adding watermark:', String(error))
           // Continue without watermark rather than failing the export
         }
       })
@@ -466,7 +466,7 @@ export class ExportService {
               .stroke()
               .moveDown()
           }
-        } catch (err) {
+        } catch (err: unknown) {
           console.error(`Error processing message ${index}:`, err)
           // Add error notice in the document
           doc
@@ -520,16 +520,16 @@ export class ExportService {
             options.encryptionMode,
           )
           return { data: new Uint8Array(encryptedData.data) }
-        } catch (err) {
+        } catch (err: unknown) {
           const error = err as Error
-          throw new Error(`Encryption failed: ${error.message}`)
+          throw new Error(`Encryption failed: ${String(error)}`)
         }
       }
 
       return { data: new Uint8Array(pdfBuffer) }
-    } catch (error) {
+    } catch (error: unknown) {
       throw new ExportError(
-        `PDF export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `PDF export failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
       )
     }
   }

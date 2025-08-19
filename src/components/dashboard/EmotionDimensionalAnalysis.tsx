@@ -15,7 +15,7 @@ interface EmotionDimensionalAnalysisProps {
   className?: string
 }
 
-const EmotionDimensionalAnalysis: React.FC<EmotionDimensionalAnalysisProps> = ({ 
+const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({ 
   userId, 
   className 
 }) => {

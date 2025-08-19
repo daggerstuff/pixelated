@@ -18,7 +18,7 @@ export async function getSystemMetrics(): Promise<SystemMetrics> {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     return await response.json()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching system metrics:', error)
     throw error
   }

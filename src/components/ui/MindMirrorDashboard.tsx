@@ -96,7 +96,7 @@ const ARCHETYPES = {
   }
 }
 
-export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
+export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
   analysis,
   isAnalyzing = false,
   className = ""

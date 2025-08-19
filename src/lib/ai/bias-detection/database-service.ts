@@ -31,9 +31,9 @@ export class BiasDetectionDatabaseService {
         sessionId: result.sessionId,
         processingTimeMs,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store analysis result', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         sessionId: result.sessionId,
       })
       throw error
@@ -50,9 +50,9 @@ export class BiasDetectionDatabaseService {
         alertId: alert.alertId,
         level: alert.level,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store alert', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         alertId: alert.alertId,
       })
       throw error
@@ -99,9 +99,9 @@ export class BiasDetectionDatabaseService {
         recentAnalyses,
         recommendations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get dashboard data', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         timeRange: options?.timeRange,
       })
       throw error
@@ -123,9 +123,9 @@ export class BiasDetectionDatabaseService {
         improvementRate: 0,
         complianceScore: 0,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get summary stats', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -141,9 +141,9 @@ export class BiasDetectionDatabaseService {
     try {
       // TODO: Replace with MongoDB implementation
       return []
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent alerts', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return []
     }
@@ -166,9 +166,9 @@ export class BiasDetectionDatabaseService {
       }
 
       return trends
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get trend data', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         timeRange,
       })
       return []
@@ -190,9 +190,9 @@ export class BiasDetectionDatabaseService {
         language: {},
         intersectional: [],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get demographic breakdown', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return {
         age: {},
@@ -214,9 +214,9 @@ export class BiasDetectionDatabaseService {
     try {
       // TODO: Replace with MongoDB implementation
       return []
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent analyses', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return []
     }
@@ -305,9 +305,9 @@ export class BiasDetectionDatabaseService {
     try {
       // TODO: Replace with MongoDB implementation
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get session analysis', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         sessionId,
       })
       return null
@@ -331,9 +331,9 @@ export class BiasDetectionDatabaseService {
   }): Promise<void> {
     try {
       // TODO: Replace with MongoDB implementation
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to record system metrics', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       // Don't throw - system metrics recording should not break the main flow
     }
@@ -355,9 +355,9 @@ export class BiasDetectionDatabaseService {
   }): Promise<void> {
     try {
       // TODO: Replace with MongoDB implementation
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to record audit log', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         action: entry.action,
       })
       // Don't throw - audit logging should not break the main flow

@@ -12,7 +12,7 @@ interface AdminLayoutProps {
  * This component allows React pages to use the same layout as Astro pages
  * by providing a bridge to the Astro AdminLayout component
  */
-const AdminLayout: React.FC<AdminLayoutProps> = ({
+const AdminLayout: FC<AdminLayoutProps> = ({
   title = 'Admin Dashboard',
   children,
 }) => {

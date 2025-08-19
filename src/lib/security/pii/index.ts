@@ -106,7 +106,7 @@ class PIIDetectionService {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(config: Partial<PIIDetectionConfig> = {}) {
+  private constructor(config: Partial<PIIDetectionConfig> = {}): void {
     this.config = { ...DEFAULT_CONFIG, ...config }
 
     // Initialize base patterns for detection
@@ -205,9 +205,9 @@ class PIIDetectionService {
 
       this.initialized = true
       logger.info('PII Detection Service initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize PII Detection Service', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -228,9 +228,9 @@ class PIIDetectionService {
 
       this.mlModelLoaded = true
       logger.info('ML model loaded successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load ML model', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       this.mlModelLoaded = false
       // Fall back to pattern matching
@@ -366,9 +366,9 @@ class PIIDetectionService {
       }
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error detecting PII', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       // Return a safe default
@@ -447,9 +447,9 @@ class PIIDetectionService {
       }
 
       return detectionResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error detecting PII in encrypted text', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       // Fall back to assuming no PII
@@ -534,7 +534,7 @@ class PIIDetectionService {
     const sensitiveKeys = options.sensitiveKeys ?? []
 
     // Create a copy of the data to avoid modifying the original
-    const result = JSON.parse(JSON.stringify(data)) as T
+    const result = JSON.parse(JSON.stringify(data) as unknown) as T
     let detectedPII = false
 
     // Process the object recursively

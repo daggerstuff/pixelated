@@ -55,7 +55,7 @@ export function NotificationPreferences({
   if (error) {
     return (
       <Alert variant="error" className={className}>
-        Failed to load notification preferences: {error.message}
+        Failed to load notification preferences: {String(error)}
       </Alert>
     )
   }

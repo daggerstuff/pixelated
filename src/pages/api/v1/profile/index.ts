@@ -1,5 +1,4 @@
-import type { APIRoute } from 'astro'
-// API route implementation for user profile endpoints
+ // API route implementation for user profile endpoints
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { MongoAuthService } from '@/services/mongoAuth.service'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'

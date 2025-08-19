@@ -83,7 +83,7 @@ export function useRealTimeAnalysis() {
 
       // Subscribe to error events
       feedbackServiceRef.current.on('error', (error: Error) => {
-        setState((prev) => ({ ...prev, lastError: error.message }))
+        setState((prev) => ({ ...prev, lastError: String(error) }))
       })
 
       // Subscribe to connection status changes
@@ -93,12 +93,12 @@ export function useRealTimeAnalysis() {
           setState((prev) => ({ ...prev, isConnected }))
         },
       )
-    } catch (error) {
+    } catch (error: unknown) {
       setState((prev) => ({
         ...prev,
         isProcessing: false,
         lastError:
-          error instanceof Error ? error.message : 'Failed to start analysis',
+          error instanceof Error ? String(error) : 'Failed to start analysis',
       }))
     }
   }, [])

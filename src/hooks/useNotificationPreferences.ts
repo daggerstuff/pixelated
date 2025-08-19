@@ -61,7 +61,7 @@ export function useNotificationPreferences() {
       const data = await response.json()
       setPreferences(data)
       setError(null)
-    } catch (err) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err : new Error('Unknown error'))
       // Fall back to default preferences on error
       setPreferences(defaultPreferences)
@@ -93,7 +93,7 @@ export function useNotificationPreferences() {
       const data = await response.json()
       setPreferences(data)
       setError(null)
-    } catch (err) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err : new Error('Unknown error'))
       // Keep existing preferences on error
     } finally {

@@ -16,7 +16,7 @@ export function BlogSearch() {
   const [results, setResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
 
-  async function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSearch(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
     if (!query.trim()) {
       return
@@ -27,7 +27,7 @@ export function BlogSearch() {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
       const data = await response.json()
       setResults(data.results)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Search failed:', error)
     } finally {
       setIsSearching(false)

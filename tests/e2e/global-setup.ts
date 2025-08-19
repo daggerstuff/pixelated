@@ -22,7 +22,7 @@ async function globalSetup(config: FullConfig) {
     
     console.log('  ✅ Global setup completed');
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Global setup failed:', error);
     throw error;
   } finally {

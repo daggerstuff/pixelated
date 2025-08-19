@@ -56,9 +56,9 @@ export function getMonitoringConfig(): MonitoringConfig {
         orgId: process.env.GRAFANA_ORG_ID || defaultConfig.grafana.orgId,
       },
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to load monitoring configuration', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
     return defaultConfig
   }

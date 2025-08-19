@@ -53,7 +53,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to initialize CdnService', errorData)
       throw error
@@ -75,7 +75,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to initialize edge locations', errorData)
       throw error
@@ -112,7 +112,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to initialize cache rules', errorData)
       throw error
@@ -145,7 +145,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to initialize security headers', errorData)
       throw error
@@ -188,7 +188,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to initialize performance optimizations', errorData)
       throw error
@@ -214,7 +214,7 @@ export class CdnService {
         } catch (error: unknown) {
           const errorData =
             error instanceof Error
-              ? { message: error.message, stack: error.stack }
+              ? { message: String(error), stack: (error as Error)?.stack }
               : { message: String(error) }
           logger.error(`Failed to warm up ${url}`, errorData)
         }
@@ -225,7 +225,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to warm up cache', errorData)
       throw error
@@ -240,7 +240,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to invalidate cache', errorData)
       throw error
@@ -268,7 +268,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to get edge metrics', errorData)
       throw error
@@ -295,7 +295,7 @@ export class CdnService {
     } catch (error: unknown) {
       const errorData =
         error instanceof Error
-          ? { message: error.message, stack: error.stack }
+          ? { message: String(error), stack: (error as Error)?.stack }
           : { message: String(error) }
       logger.error('Failed to optimize image', errorData)
       return url

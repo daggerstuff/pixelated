@@ -64,7 +64,7 @@ export class PerformanceOptimizer {
   private batchQueues: Map<string, { items: unknown[]; timer: NodeJS.Timeout | null }>
   private metricsHistory: PerformanceMetrics[]
 
-  constructor(config: Partial<OptimizationConfig> = {}) {
+  constructor(config: Partial<OptimizationConfig> = {}): void {
     this.config = {
       connectionPool: {
         maxConnections: 100,
@@ -141,7 +141,7 @@ export class PerformanceOptimizer {
         const connection = await factory()
         logger.debug(`Created new connection for pool: ${poolName}`)
         return connection
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Failed to create connection for pool: ${poolName}`, { error })
         throw error
       }
@@ -214,7 +214,7 @@ export class PerformanceOptimizer {
     return entry.value
   }
 
-  private evictExpired(): void {
+  private evictExpired() {
     const now = Date.now()
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > this.config.cache.ttl) {
@@ -223,7 +223,7 @@ export class PerformanceOptimizer {
     }
   }
 
-  private evictByStrategy(): void {
+  private evictByStrategy() {
     if (this.cache.size === 0) return
 
     let keyToEvict: string
@@ -304,7 +304,7 @@ export class PerformanceOptimizer {
       }
       
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       breaker.failures++
       breaker.lastFailure = Date.now()
       
@@ -320,7 +320,7 @@ export class PerformanceOptimizer {
     }
   }
 
-  private getCircuitBreaker(serviceName: string) {
+  private getCircuitBreaker(serviceName: string): void {
     if (!this.circuitBreakers.has(serviceName)) {
       this.circuitBreakers.set(serviceName, {
         failures: 0,
@@ -382,7 +382,7 @@ export class PerformanceOptimizer {
 
     try {
       await processor(items)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Batch processing failed for: ${batchName}`, { error, itemCount: items.length })
     }
   }
@@ -390,14 +390,14 @@ export class PerformanceOptimizer {
   /**
    * Performance Monitoring
    */
-  private startMonitoring(): void {
+  private startMonitoring() {
     setInterval(() => {
       this.updateMetrics()
       this.checkAlerts()
     }, this.config.monitoring.metricsInterval)
   }
 
-  private updateMetrics(): void {
+  private updateMetrics() {
     // Update cache hit rate
     const totalCacheAccesses = Array.from(this.cache.values())
       .reduce((sum, entry) => sum + entry.accessCount, 0)
@@ -421,7 +421,7 @@ export class PerformanceOptimizer {
     }
   }
 
-  private checkAlerts(): void {
+  private checkAlerts() {
     const thresholds = this.config.monitoring.alertThresholds
 
     if (this.metrics.averageResponseTime > thresholds.responseTime) {
@@ -495,7 +495,7 @@ export class PerformanceOptimizer {
   /**
    * Cleanup resources
    */
-  cleanup(): void {
+  cleanup() {
     // Clear all timers
     for (const batch of this.batchQueues.values()) {
       if (batch.timer) {

@@ -108,7 +108,7 @@ export class EmailService {
         break
       }
 
-      const queueItem = EmailQueueItemSchema.parse(JSON.parse(item))
+      const queueItem = EmailQueueItemSchema.parse(JSON.parse(item) as unknown)
 
       try {
         // Check if we should retry based on last attempt and delay
@@ -181,11 +181,11 @@ export class EmailService {
           attempts: queueItem.attempts + 1,
           resendId: data?.id,
         })
-      } catch (error) {
+      } catch (error: unknown) {
         // Update attempts and error
         queueItem.attempts++
         queueItem.lastAttempt = Date.now()
-        queueItem.error = error instanceof Error ? error.message : String(error)
+        queueItem.error = error instanceof Error ? String(error) : String(error)
 
         if (queueItem.attempts >= this.maxAttempts) {
           // Log failure and remove from processing

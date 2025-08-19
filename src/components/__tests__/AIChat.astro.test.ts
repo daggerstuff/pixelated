@@ -95,7 +95,7 @@ vi.mock('../AIChatReact', () => {
 })
 
 // Helper function to render Astro components in tests
-async function renderAstroComponent(Component: any, props = {}) {
+async function renderAstroComponent(Component: any, props = {}): void {
   const { default: defaultExport } = Component
   const html = await defaultExport.render(props)
   const container = document.createElement('div')

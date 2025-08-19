@@ -157,10 +157,10 @@ export async function createPatternRecognitionFHEService(
       logger.info('SEAL pattern recognition FHE service initialized')
       return sealService
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to create pattern recognition FHE service', { error })
     throw new Error(
-      `Pattern recognition FHE service creation failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Pattern recognition FHE service creation failed: ${error instanceof Error ? String(error) : String(error)}`,
     )
   }
 }

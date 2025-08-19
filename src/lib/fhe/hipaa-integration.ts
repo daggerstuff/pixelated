@@ -125,7 +125,7 @@ export class HIPAAComplianceService {
         initTime,
         timestamp: new Date().toISOString(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('HIPAA++ Compliance Service initialization failed', {
         error,
       })
@@ -138,7 +138,7 @@ export class HIPAAComplianceService {
   /**
    * Setup monitoring integration with key rotation service
    */
-  private setupMonitoringIntegration(): void {
+  private setupMonitoringIntegration() {
     // Forward security events from key rotation to monitoring
     hipaaKeyRotationService.on('security-alert', (event: AuditEvent) => {
       hipaaMonitoring.processSecurityEvent(event)
@@ -162,7 +162,7 @@ export class HIPAAComplianceService {
   /**
    * Setup comprehensive event handlers
    */
-  private setupEventHandlers(): void {
+  private setupEventHandlers() {
     // Handle critical security events
     hipaaKeyRotationService.on('security-alert', (event: AuditEvent) => {
       if (event.riskLevel === 'critical') {
@@ -259,7 +259,7 @@ export class HIPAAComplianceService {
     for (const action of alert.recommendedActions) {
       try {
         await this.executeResponseAction(action, alert)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to execute response action', { action, error })
       }
     }
@@ -430,7 +430,7 @@ export class HIPAAComplianceService {
 
       logger.info('HIPAA++ service shutdown completed')
       process.exit(0)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during graceful shutdown', { error })
       process.exit(1)
     }
@@ -451,7 +451,7 @@ export class HIPAAComplianceService {
 
     try {
       return await Promise.race([this.performHealthCheck(), timeoutPromise])
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         details: { error: (error as Error).message },

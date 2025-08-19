@@ -8,7 +8,7 @@ interface HistoricalProgressTrackerProps {
   currentScore: number
 }
 
-export const HistoricalProgressTracker: React.FC<
+export const HistoricalProgressTracker: FC<
   HistoricalProgressTrackerProps
 > = ({ comparison, currentScore }) => {
   // Helper function to get trend styling

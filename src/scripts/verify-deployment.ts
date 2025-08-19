@@ -137,7 +137,7 @@ async function main() {
     console.log('✓ All checks passed successfully')
 
     process.exit(0)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('\n❌ Verification failed:', error)
     process.exit(1)
   }

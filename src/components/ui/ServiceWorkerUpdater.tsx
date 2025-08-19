@@ -14,7 +14,7 @@ interface ServiceWorkerUpdaterProps {
  * It doesn't render anything visible but handles the service worker lifecycle
  * and shows notifications when updates are available.
  */
-export const ServiceWorkerUpdater: React.FC<ServiceWorkerUpdaterProps> = ({
+export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
   onUpdateAvailable,
   onUpdateComplete,
 }) => {

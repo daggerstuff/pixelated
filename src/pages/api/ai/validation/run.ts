@@ -33,7 +33,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!authResult['user']?.['isAdmin']) {
       // Create audit log for unauthorized access attempt
       await createAuditLog(
-        AuditEventType.SECURITY_EVENT,
+        (AuditEventType as unknown as { SECURITY_EVENT?: string })?.SECURITY_EVENT || 'SECURITY_EVENT',
         'validation-pipeline-run-unauthorized',
         authResult['user']?.['id'] || 'unknown',
         'validation-api',
@@ -65,18 +65,18 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Run validation
     logger.info('Starting validation run')
-    const results = await emotionValidationPipeline.runValidation()
+    const results = await (emotionValidationPipeline as unknown as { runValidation?: () => Promise<unknown[]> })?.runValidation?.()
 
     // Create audit log for successful run
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'validation-pipeline-run',
-      authResult.user?.id || 'system',
+      (authResult as unknown as { user?: { id?: string } })?.user?.id || 'system',
       'validation-api',
       {
-        userId: authResult.user?.id,
-        resultsCount: results.length,
-        passedCount: results.filter((r) => r.passed).length,
+        userId: (authResult as unknown as { user?: { id?: string } })?.user?.id,
+        resultsCount: results?.length || 0,
+        passedCount: results?.filter?.((r: unknown) => (r as { passed?: boolean })?.passed)?.length || 0,
       },
       AuditEventStatus.SUCCESS,
     )
@@ -94,10 +94,10 @@ export const POST: APIRoute = async ({ request }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
     logger.error(`Error running validation: ${errorMessage}`)
 
     // Create audit log for failed run

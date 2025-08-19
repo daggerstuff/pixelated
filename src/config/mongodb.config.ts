@@ -95,7 +95,7 @@ class MongoDB {
 
       console.log(`✅ Connected to MongoDB database: ${this.config.dbName}`)
       return this.db
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Failed to connect to MongoDB:', error)
       throw error
     }
@@ -124,7 +124,7 @@ class MongoDB {
       }
   await this.db!.admin().ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('MongoDB health check failed:', error)
       return false
     }

@@ -53,16 +53,16 @@ function remarkImageContainer() {
         // priority: content inside [] of `:::image-figure[]{}`、`![]()`
         let content: PhrasingContent[]
         if (
-          children[0].type === 'paragraph' &&
-          children[0].data?.directiveLabel &&
-          children[0].children[0].type === 'text'
+          children[0]?.type === 'paragraph' &&
+          children[0]?.data?.directiveLabel &&
+          children[0]?.children[0]?.type === 'text'
         ) {
           content = children[0].children
           children.shift()
         } else if (
-          children[0].type === 'paragraph' &&
-          children[0].children[0].type === 'image' &&
-          children[0].children[0].alt
+          children[0]?.type === 'paragraph' &&
+          children[0]?.children[0]?.type === 'image' &&
+          children[0]?.children[0]?.alt
         ) {
           content = [{ type: 'text', value: children[0].children[0].alt }]
         } else {
@@ -85,7 +85,7 @@ function remarkImageContainer() {
         children.push(figcaptionNode)
       } else if (node.name === 'image-a') {
         /* image-a */
-        if (!node.attributes || !node.attributes.href) {
+        if (!node.attributes || !node.attributes['href']) {
           file.fail(
             'Unexpectedly missing `href` in the `image-a` directive.',
             node,
@@ -100,7 +100,7 @@ function remarkImageContainer() {
       } else if (node.name.match(IMAGE_DIR_REGEXP)) {
         /* image-* */
         const match = node.name.match(IMAGE_DIR_REGEXP)
-        if (match && VALID_TAGS_FOR_IMG.has(match[1])) {
+        if (match && match[1] && VALID_TAGS_FOR_IMG.has(match[1])) {
           const data = node.data || (node.data = {})
           const attributes = node.attributes || {}
 

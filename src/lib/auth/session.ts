@@ -56,7 +56,7 @@ export async function getSession(
       user,
       session,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting session:', error)
     return null
   }
@@ -100,7 +100,7 @@ export async function createSession(user: User): Promise<SessionData | null> {
       user,
       session,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating session:', error)
     return null
   }
@@ -131,7 +131,7 @@ export async function endSession(
       },
       AuditEventStatus.SUCCESS,
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error ending session:', error)
   }
 }

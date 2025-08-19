@@ -58,12 +58,14 @@
       "users": {
         "valid_user": {
           "email": "test@example.com",
-          "password": "testPassword123",
+          // password is now loaded from environment variable TEST_USER_PASSWORD
+          "password": "${TEST_USER_PASSWORD}",
           "name": "Test User"
         },
         "admin_user": {
           "email": "admin@example.com",
-          "password": "adminPassword123",
+          // password is now loaded from environment variable ADMIN_USER_PASSWORD
+          "password": "${ADMIN_USER_PASSWORD}",
           "name": "Admin User",
           "role": "admin"
         }

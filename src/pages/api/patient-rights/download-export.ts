@@ -174,7 +174,7 @@ export const GET = async ({ request }) => {
         'X-Content-Type-Options': 'nosniff',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error processing export download', { error })
 
     return new Response(

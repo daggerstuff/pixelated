@@ -5,7 +5,7 @@
 /**
  * Adds focus-visible polyfill for browsers that don't support i
  */
-export function addFocusVisiblePolyfill(): void {
+export function addFocusVisiblePolyfill() {
   if (typeof window === 'undefined') {
     return
   }
@@ -59,12 +59,12 @@ export function addFocusVisiblePolyfill(): void {
       },
 
       // Handle pointer down events
-      handlePointerDown(): void {
+      handlePointerDown() {
         hadKeyboardEvent = false
       },
 
       // Handle focus events
-      handleFocus(): void {
+      handleFocus() {
         if (hadKeyboardEvent) {
           document.documentElement.classList.add('focus-visible')
           focusTracker.trackFocusChange()
@@ -72,7 +72,7 @@ export function addFocusVisiblePolyfill(): void {
       },
 
       // Handle blur events
-      handleBlur(): void {
+      handleBlur() {
         document.documentElement.classList.remove('focus-visible')
         focusTracker.reset()
       },
@@ -125,7 +125,7 @@ export function checkAccessibility() {
     document.querySelectorAll('input, select, textarea').forEach((input) => {
       const id = input.getAttribute('id')
       if (id) {
-        const hasLabel = document.querySelector(`label[for="${id}"]`)
+        const hasLabel = document.querySelector(`label[for="${id}"]`) as HTMLElement
         const hasAriaLabel =
           input.hasAttribute('aria-label') ||
           input.hasAttribute('aria-labelledby')

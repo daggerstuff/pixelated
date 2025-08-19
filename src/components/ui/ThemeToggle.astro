@@ -102,7 +102,7 @@ const { class: className = '' } = Astro.props
   setTheme(savedTheme)
 
   // Toggle theme on click
-  themeToggle?.addEventListener('click', () => {
+  themeToggle?.addEventListener('click', (_event: Event) => {
     const currentTheme = localStorage.getItem('theme') || 'dark'
 
     // Cycle through themes: dark -> light -> system -> dark
@@ -118,7 +118,7 @@ const { class: className = '' } = Astro.props
   // Listen for system preference changes
   window
     .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', () => {
+    .addEventListener('change', (_event: Event) => {
       const currentTheme = localStorage.getItem('theme') || 'dark'
       if (currentTheme === 'system') {
         setTheme('system')

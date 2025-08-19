@@ -66,7 +66,7 @@ export class CernerProvider extends BaseEHRProvider {
       this.logger.info(
         `Successfully initialized Cerner features for provider ${this.id}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to initialize Cerner features for provider ${this.id}:`,
         error,
@@ -95,7 +95,7 @@ export class CernerProvider extends BaseEHRProvider {
       try {
         await client.searchResources(endpoint, { _summary: 'count' })
         this.logger.info(`Verified Cerner endpoint: ${endpoint}`)
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `Failed to verify Cerner endpoint ${endpoint}:`,
           error,
@@ -114,7 +114,7 @@ export class CernerProvider extends BaseEHRProvider {
       // For example: close any open sessions, clear caches, etc.
 
       await super.cleanup()
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to cleanup Cerner provider ${this.id}:`, error)
       throw error
     }

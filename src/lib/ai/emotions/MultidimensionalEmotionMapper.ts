@@ -19,7 +19,7 @@ const logger = createBuildSafeLogger('multidimensional-emotion-mapper')
 export class MultidimensionalEmotionMapper {
   private config: EmotionMappingConfig
 
-  constructor(config?: Partial<EmotionMappingConfig>) {
+  constructor(config?: Partial<EmotionMappingConfig>): void {
     this.config = {
       timeWindow: 30,
       samplingRate: 2,

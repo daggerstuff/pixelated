@@ -128,20 +128,20 @@ export class FeedbackService implements FeedbackServiceInterface {
           energyThreshold: 0.01,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize audio processor:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     }
   }
 
-  private handleAudioProcessorMessage(event: MessageEvent) {
+  private handleAudioProcessorMessage(event: MessageEvent): void {
     if (event.data.type === 'audioData') {
       this.queueAudioData(event.data.data, event.data.metadata)
     }
   }
 
-  private queueAudioData(data: Float32Array, metadata: { timestamp: number }) {
+  private queueAudioData(data: Float32Array, metadata: { timestamp: number }): void {
     // Add to processing queue
     this.processingQueue.push({
       data,
@@ -184,9 +184,9 @@ export class FeedbackService implements FeedbackServiceInterface {
       results.forEach(({ result, timestamp }) => {
         this.updateEmotionState(result, timestamp)
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error processing audio data:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
     } finally {
       this.isProcessing = false
@@ -256,9 +256,9 @@ export class FeedbackService implements FeedbackServiceInterface {
 
       this.isEnhancedModelLoaded = true
       logger.info('Enhanced healthcare models loaded successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load enhanced healthcare models:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       this.isEnhancedModelLoaded = false
       this.isUsingEnhancedModels = false
@@ -345,9 +345,9 @@ export class FeedbackService implements FeedbackServiceInterface {
         mentalHealthInsights: mentalHealthAnalysis,
         therapeuticSuggestions,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error analyzing transcribed text with enhanced models:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       return {
@@ -419,9 +419,9 @@ export class FeedbackService implements FeedbackServiceInterface {
       }
 
       return feedback
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error generating enhanced feedback:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return null
     }
@@ -591,9 +591,9 @@ export class FeedbackService implements FeedbackServiceInterface {
       }
 
       return feedback
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error processing feedback:', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return null
     }
@@ -755,9 +755,9 @@ export class FeedbackService implements FeedbackServiceInterface {
       ]
 
       return techniques[maxIndex] || null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in therapeutic approach analysis', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       return null
     }
@@ -859,7 +859,7 @@ export class FeedbackService implements FeedbackServiceInterface {
   /**
    * Clears all context and feedback
    */
-  clearContext(): void {
+  clearContext() {
     this.currentScenario = null
     this.clearFeedbackBuffer()
 
@@ -886,14 +886,14 @@ export class FeedbackService implements FeedbackServiceInterface {
   /**
    * Clears the feedback buffer
    */
-  private clearFeedbackBuffer(): void {
+  private clearFeedbackBuffer() {
     this.feedbackBuffer = []
   }
 
   /**
    * Cleanup method to release resources
    */
-  cleanup(): void {
+  cleanup() {
     // Clean up audio context if it exists
     if (this.audioWorklet) {
       this.audioWorklet.disconnect()
@@ -941,9 +941,9 @@ export class FeedbackService implements FeedbackServiceInterface {
 
         this.isModelLoaded = true
         logger.info('ML models loaded successfully')
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to load ML models', {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
 
         // Create fallback models if loading fails
@@ -984,9 +984,9 @@ export class FeedbackService implements FeedbackServiceInterface {
       this.techniqueModel = techniqueModel
 
       this.isModelLoaded = true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create fallback models', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       // Set model to null if even fallback creation fails
       this.techniqueModel = null

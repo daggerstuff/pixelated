@@ -29,7 +29,7 @@ export class MonitoringService extends EventEmitter {
   private initialized: boolean = false
   private metrics: Metric[] = []
 
-  constructor(redis: RedisService, config: Partial<MonitoringConfig> = {}) {
+  constructor(redis: RedisService, config: Partial<MonitoringConfig> = {}): void {
     super()
     this.redis = redis
     this.analytics = new AnalyticsService(redis)
@@ -65,13 +65,13 @@ export class MonitoringService extends EventEmitter {
 
       this.initialized = true
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('error', error)
       return false
     }
   }
 
-  private setupWebVitals(): void {
+  private setupWebVitals() {
     // Setup performance observers
     if (typeof window !== 'undefined') {
       const observer = new PerformanceObserver((list) => {
@@ -90,7 +90,7 @@ export class MonitoringService extends EventEmitter {
     }
   }
 
-  private setupErrorTracking(): void {
+  private setupErrorTracking() {
     if (typeof window !== 'undefined') {
       window.addEventListener('error', (event) => {
         this.recordMetric({
@@ -118,7 +118,7 @@ export class MonitoringService extends EventEmitter {
     }
   }
 
-  private setupUsageAnalytics(): void {
+  private setupUsageAnalytics() {
     if (typeof window !== 'undefined') {
       // Track page views
       this.recordMetric({

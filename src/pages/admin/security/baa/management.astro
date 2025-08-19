@@ -526,30 +526,30 @@ const mockUpcomingActions = [
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Auto-submit form when status changes
     const statusSelect = document.getElementById('status')
-    statusSelect?.addEventListener('change', () => {
+    statusSelect?.addEventListener('change', (_event: Event) => {
       document.getElementById('search-form')?.submit()
     })
 
     // Handle search form submission
     const searchForm = document.getElementById('search-form')
-    searchForm?.addEventListener('submit', (e) => {
+    searchForm?.addEventListener('submit', (e: Event) => {
       e.preventDefault()
       searchForm.submit()
     })
 
     // Handle "Create New Agreement" button
     const newAgreementBtn = document.getElementById('new-agreement-btn')
-    newAgreementBtn?.addEventListener('click', () => {
+    newAgreementBtn?.addEventListener('click', (_event: Event) => {
       window.location.href = '/admin/security/baa/create'
     })
 
     // Handle "Create BAA" buttons
     const createBaaButtons = document.querySelectorAll('.create-baa')
     createBaaButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )
@@ -560,7 +560,7 @@ const mockUpcomingActions = [
     // Handle "Send BAA" buttons
     const sendBaaButtons = document.querySelectorAll('.send-baa')
     sendBaaButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )
@@ -572,7 +572,7 @@ const mockUpcomingActions = [
     // Handle "Renew BAA" buttons
     const renewBaaButtons = document.querySelectorAll('.renew-baa')
     renewBaaButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )
@@ -582,14 +582,14 @@ const mockUpcomingActions = [
 
     // Handle "View All Actions" button
     const viewAllActionsBtn = document.getElementById('view-all-actions')
-    viewAllActionsBtn?.addEventListener('click', () => {
+    viewAllActionsBtn?.addEventListener('click', (_event: Event) => {
       window.location.href = '/admin/security/baa/actions'
     })
 
     // Handle action detail buttons
     const actionButtons = document.querySelectorAll('[data-action-id]')
     actionButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const actionId = (e.target as HTMLElement).getAttribute(
           'data-action-id',
         )

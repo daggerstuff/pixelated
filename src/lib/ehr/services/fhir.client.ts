@@ -21,7 +21,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
       throw new FHIRError(
-        error.message || `HTTP error ${response.status}`,
+        String(error) || `HTTP error ${response.status}`,
         `HTTP_${response.status}`,
         provider.id,
         error.resourceType,
@@ -46,7 +46,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           response,
         )
         return bundle.entry?.map((e) => e.resource) || []
-      } catch (error) {
+      } catch (error: unknown) {
         throw new FHIRError(
           'Failed to search resources',
           'SEARCH_ERROR',
@@ -68,7 +68,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           headers: await authorizeRequest(),
         })
         return handleResponse<T>(response)
-      } catch (error) {
+      } catch (error: unknown) {
         throw new FHIRError(
           'Failed to get resource',
           'GET_ERROR',
@@ -91,7 +91,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           body: JSON.stringify(resource),
         })
         return handleResponse<T>(response)
-      } catch (error) {
+      } catch (error: unknown) {
         throw new FHIRError(
           'Failed to create resource',
           'CREATE_ERROR',
@@ -112,7 +112,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           body: JSON.stringify(resource),
         })
         return handleResponse<T>(response)
-      } catch (error) {
+      } catch (error: unknown) {
         throw new FHIRError(
           'Failed to update resource',
           'UPDATE_ERROR',
@@ -132,7 +132,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           headers: await authorizeRequest(),
         })
         await handleResponse<void>(response)
-      } catch (error) {
+      } catch (error: unknown) {
         throw new FHIRError(
           'Failed to delete resource',
           'DELETE_ERROR',

@@ -126,7 +126,7 @@ describe('PatientResponseService', () => {
     // It's important that the constructor of the actual service gets *instances* of the mocked services.
     // Vitest's vi.mock() replaces the original class with a mock constructor.
     // So, new MockPatientProfileService() creates an instance of the mock.
-    mockProfileService = new MockPatientProfileService(null as any) // Pass null or valid mock for KVStore if its constructor is called
+    mockProfileService = new MockPatientProfileService(null as unknown) // Pass null or valid mock for KVStore if its constructor is called
     mockConsistencyService = new MockBeliefConsistencyService()
 
     responseService = new PatientResponseService(

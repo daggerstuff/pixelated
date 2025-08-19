@@ -511,11 +511,11 @@ export const GET = async ({ url }: { url: URL }) => {
       }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Psychology frameworks error:', error)
     return new Response(JSON.stringify({ 
       error: 'Internal server error retrieving frameworks',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? String(error) : 'Unknown error'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -562,11 +562,11 @@ export const POST = async ({ request }: APIContext) => {
       }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Psychology frameworks error:', error)
     return new Response(JSON.stringify({ 
       error: 'Internal server error retrieving frameworks',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? String(error) : 'Unknown error'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

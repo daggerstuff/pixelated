@@ -42,7 +42,7 @@ const defaultConfig: LogRotationConfig = {
 export class LogRotationService {
   private config: LogRotationConfig
 
-  constructor(config: Partial<LogRotationConfig> = {}) {
+  constructor(config: Partial<LogRotationConfig> = {}): void {
     this.config = { ...defaultConfig, ...config }
   }
 
@@ -52,7 +52,7 @@ export class LogRotationService {
   async ensureLogDir(): Promise<void> {
     try {
       await fs.mkdir(this.config.logDir, { recursive: true })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to create log directory:', error)
     }
   }
@@ -95,7 +95,7 @@ export class LogRotationService {
 
       // Check file size and rotate if needed
       await this.checkAndRotate(filename)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to write log:', error)
     }
   }
@@ -137,7 +137,7 @@ export class LogRotationService {
 
       // Cleanup old logs
       await this.cleanupOldLogs(filename)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to rotate log:', error)
     }
   }
@@ -149,7 +149,7 @@ export class LogRotationService {
     try {
       // Use gzip to compress the file
       await execAsync(`gzip -9 ${filename}`)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to compress log:', error)
     }
   }
@@ -187,7 +187,7 @@ export class LogRotationService {
           await fs.unlink(file.path)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to clean up old logs:', error)
     }
   }
@@ -255,7 +255,7 @@ export class LogRotationService {
           await fs.appendFile(output, content)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to aggregate logs:', error)
     }
   }

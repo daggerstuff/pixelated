@@ -1,4 +1,3 @@
-import React from 'react'
 import { RefreshCw, Download, Filter, X } from 'lucide-react'
 
 // Icon props interface

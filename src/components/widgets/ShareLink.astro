@@ -117,7 +117,7 @@ const linkProviders = Object.entries(config)
 <div id="share-links" data-post-url={postUrlString}></div>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     interface _ShareLink {
       url: string
       label: string
@@ -279,6 +279,7 @@ const linkProviders = Object.entries(config)
   // Pre-render links for initial state (for SSR and SEO)
   linkProviders.map((provider, idx) => {
     const linkConfig = SHARE_LINKS[provider.key]
+    if (!linkConfig) return null
     // For initial SSR, create a URL object from the string
     const initialPostUrl = new URL(postUrlString)
     return (

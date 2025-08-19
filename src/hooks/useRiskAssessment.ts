@@ -44,7 +44,7 @@ export const useRiskAssessment = () => {
           analysisText = response
         }
 
-        const analysis = JSON.parse(analysisText)
+        const analysis = JSON.parse(analysisText) as unknown
 
         return {
           category: analysis.category || 'low',
@@ -52,7 +52,7 @@ export const useRiskAssessment = () => {
           requiresExpert: analysis.requiresExpert || false,
           confidence: analysis.confidence || 0.5,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error assessing risk:', error)
         return {
           category: 'low',

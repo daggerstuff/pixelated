@@ -4,7 +4,7 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 // Initialize logger
 const logger = createBuildSafeLogger('security-schema')
 
-const mongoUri = process.env.MONGODB_URI
+const mongoUri = process.env['MONGODB_URI']
 const mongoDbName = process.env.MONGODB_DB_NAME
 
 // Create mock client for builds without proper credentials
@@ -50,7 +50,7 @@ export async function initializeSecurityTables(): Promise<void> {
     await securityEventsCollection.createIndex({ ip_address: 1 })
 
     console.warn('Security collections and indexes initialized successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       'Failed to initialize security collections:',
       error instanceof Error ? error : new Error(String(error)),
@@ -65,7 +65,7 @@ export async function initializeSecurityTables(): Promise<void> {
 export async function initializeSecurityDatabase(): Promise<void> {
   try {
     await initializeSecurityTables()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       'Failed to initialize security database:',
       error instanceof Error ? error : new Error(String(error)),

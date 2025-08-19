@@ -1,3 +1,4 @@
+import type { APIRoute } from "astro";
 import { getCurrentUser } from '../../../lib/auth'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 // import type { AuthAPIContext } from '@lib/auth/apiRouteTypes.ts'
@@ -15,7 +16,7 @@ async function testSecurityAlert(
   return { success: true, alertId: `test-${Date.now()}` }
 }
 
-export async function POST({ request, cookies }) {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     // Authenticate request
     const user = await getCurrentUser(cookies)
@@ -97,7 +98,7 @@ export async function POST({ request, cookies }) {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error testing security alert:', error)
     return new Response(
       JSON.stringify({

@@ -19,7 +19,7 @@ class TherapyChatWebSocketServer {
   private clients: Map<string, WebSocket>
   private sessions: Map<string, Set<string>>
 
-  constructor(server: Server) {
+  constructor(server: Server): void {
     this.wss = new WebSocketServer({ server })
     this.clients = new Map()
     this.sessions = new Map()
@@ -28,7 +28,7 @@ class TherapyChatWebSocketServer {
     logger.info('WebSocket server initialized')
   }
 
-  private handleConnection(ws: WebSocket) {
+  private handleConnection(ws: WebSocket): void {
     const clientId = crypto.randomUUID()
     this.clients.set(clientId, ws)
 
@@ -36,7 +36,7 @@ class TherapyChatWebSocketServer {
 
     ws.on('message', async (data: string) => {
       try {
-        const message: WebSocketMessage = JSON.parse(data)
+        const message: WebSocketMessage = JSON.parse(data) as unknown
 
         switch (message.type) {
           case 'message':
@@ -48,9 +48,9 @@ class TherapyChatWebSocketServer {
           default:
             logger.warn(`Unknown message type: ${message.type}`)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         const errorMessage =
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error ? String(error) : String(error)
         logger.error('Error handling WebSocket message:', {
           error: errorMessage,
         })
@@ -63,7 +63,7 @@ class TherapyChatWebSocketServer {
     })
   }
 
-  private async handleChatMessage(clientId: string, message: WebSocketMessage) {
+  private async handleChatMessage(clientId: string, message: WebSocketMessage): void {
     if (!message.sessionId) {
       this.sendError(this.clients.get(clientId)!, 'Session ID required')
       return
@@ -96,9 +96,9 @@ class TherapyChatWebSocketServer {
           logger.info('Using mock FHE processing', { error: errorMessage })
           // Simply keep the message data as is for mock implementation
         }
-      } catch (error) {
+      } catch (error: unknown) {
         const errorMessage =
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error ? String(error) : String(error)
         logger.error('FHE processing error:', { error: errorMessage })
         this.sendError(this.clients.get(clientId)!, 'Encryption error')
         return
@@ -114,7 +114,7 @@ class TherapyChatWebSocketServer {
     })
   }
 
-  private handleStatusUpdate(clientId: string, message: WebSocketMessage) {
+  private handleStatusUpdate(clientId: string, message: WebSocketMessage): void {
     if (!message.sessionId) {
       this.sendError(this.clients.get(clientId)!, 'Session ID required')
       return
@@ -134,7 +134,7 @@ class TherapyChatWebSocketServer {
     })
   }
 
-  private handleDisconnect(clientId: string) {
+  private handleDisconnect(clientId: string): void {
     // Remove client from all sessions
     for (const [sessionId, clients] of this.sessions.entries()) {
       if (clients.has(clientId)) {
@@ -150,7 +150,7 @@ class TherapyChatWebSocketServer {
     logger.info(`Client disconnected: ${clientId}`)
   }
 
-  private broadcastToSession(sessionId: string, message: WebSocketMessage) {
+  private broadcastToSession(sessionId: string, message: WebSocketMessage): void {
     const sessionClients = this.sessions.get(sessionId)
     if (!sessionClients) {
       return
@@ -165,7 +165,7 @@ class TherapyChatWebSocketServer {
     }
   }
 
-  private sendError(ws: WebSocket, error: string) {
+  private sendError(ws: WebSocket, error: string): void {
     if (ws.readyState === WebSocket.OPEN) {
       ws.send(
         JSON.stringify({
@@ -176,7 +176,7 @@ class TherapyChatWebSocketServer {
     }
   }
 
-  public broadcast(message: ChatMessage) {
+  public broadcast(message: ChatMessage): void {
     const messageStr = JSON.stringify({
       type: 'message',
       data: message,

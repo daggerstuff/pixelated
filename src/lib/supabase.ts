@@ -66,7 +66,7 @@ export async function initializeDatabase() {
     await mongodb.connect()
     console.log('✅ MongoDB connected successfully')
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Failed to connect to MongoDB:', error)
     return false
   }
@@ -83,11 +83,11 @@ export async function getDatabaseHealth() {
       type: 'mongodb',
       database: getMongoDBName(),
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       status: 'unhealthy',
       type: 'mongodb',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? String(error) : 'Unknown error',
     }
   }
 }

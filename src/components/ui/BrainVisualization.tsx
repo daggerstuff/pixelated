@@ -26,7 +26,7 @@ interface BrainVisualizationProps {
   className?: string
 }
 
-export const BrainVisualization: React.FC<BrainVisualizationProps> = ({
+export const BrainVisualization: FC<BrainVisualizationProps> = ({
   moodVector,
   archetype,
   className = ""

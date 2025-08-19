@@ -5,6 +5,7 @@
  *
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import type { CryptoSystem } from '../lib/crypto'
 
 // Define SessionData locally rather than importing it
@@ -20,7 +21,7 @@ import { createCryptoSystem } from '../lib/crypto'
 
 
 // Check if FHE tests should be skipped
-const SKIP_FHE_TESTS = process.env.SKIP_FHE_TESTS === 'true'
+const SKIP_FHE_TESTS = process.env['SKIP_FHE_TESTS'] === 'true'
 
 // Mock FHE service if we're skipping FHE tests
 if (SKIP_FHE_TESTS) {
@@ -127,7 +128,7 @@ class KeyRotationManager {
     const now = Date.now()
     const result: string[] = []
 
-    for (const [keyId, metadata] of this.keys.entries()) {
+    for (const [keyId, metadata] of Array.from(this.keys.entries())) {
       if (metadata.expiresAt <= now) {
         result.push(keyId)
       }
@@ -148,7 +149,7 @@ class KeyRotationManager {
       throw new Error('Invalid encrypted data format')
     }
     
-    const version = parseInt(parts[0].substring(1), 10)
+    const version = parseInt(parts[0]?.substring(1) || '1', 10)
     
     // The original encrypted format could be:
     // v1:keyId:keyValue:data (4 parts) or v1:simpleKey:data (3 parts)
@@ -259,7 +260,7 @@ class ScheduledKeyRotation {
     this.keyStorage = new KeyStorage({ namespace: options.namespace })
   }
 
-  start(): void {
+  start() {
     if (this.interval) {
       return // Already started
     }
@@ -268,7 +269,7 @@ class ScheduledKeyRotation {
     }, this.options.checkIntervalMs)
   }
 
-  stop(): void {
+  stop() {
     if (this.interval) {
       clearInterval(this.interval)
       this.interval = null
@@ -337,7 +338,7 @@ interface ExtendedFHESystem {
 
 // Function to obfuscate test keys to avoid gitleaks detection
 // while still having usable test values
-function getTestKey(id = '') {
+function getTestKey(id = ''): string {
   return `test-${id}-mock-key-${new Date().getTime().toString().substring(5)}`
 }
 
@@ -353,10 +354,10 @@ describe('encryption', () => {
     // Mock test key - DO NOT USE IN PRODUCTION
     const key = getTestKey('encryption')
 
-    const encrypted = Encryption.encrypt(data, key)
+    const encrypted = Encryption.encrypt(data, key as string)
     expect(encrypted).toContain('v1:') // Should have version prefix
 
-    const decrypted = Encryption.decrypt(encrypted, key)
+    const decrypted = Encryption.decrypt(encrypted, key as string)
     expect(decrypted).toBe(data)
   })
 
@@ -366,7 +367,7 @@ describe('encryption', () => {
     const key = getTestKey('version-test')
     const version = 3
 
-    const encrypted = Encryption.encrypt(data, key, version)
+    const encrypted = Encryption.encrypt(data, key as string, version)
     expect(encrypted).toContain(`v${version}:`)
   })
 
@@ -376,10 +377,10 @@ describe('encryption', () => {
     const key = getTestKey('correct')
     const wrongKey = getTestKey('wrong')
 
-    const encrypted = Encryption.encrypt(data, key)
+    const encrypted = Encryption.encrypt(data, key as string)
 
     expect(() => {
-      Encryption.decrypt(encrypted, wrongKey)
+      Encryption.decrypt(encrypted, wrongKey as string)
     }).toThrow('Failed to decrypt data')
   })
 })
@@ -411,10 +412,10 @@ describe('keyRotationManager', () => {
     const newKey = getTestKey('rotated')
 
     // Add initial key
-    keyManager.addKey(keyId, key)
+    keyManager.addKey(keyId, key as string)
 
     // Rotate the key
-    const rotatedMetadata = keyManager.rotateKey(keyId, newKey)
+    const rotatedMetadata = keyManager.rotateKey(keyId, newKey as string)
 
     expect(rotatedMetadata.id).toBe(keyId)
     expect(rotatedMetadata.version).toBe(2)
@@ -427,7 +428,7 @@ describe('keyRotationManager', () => {
     const key = getTestKey('rotation-check')
 
     // Add a key with custom expiration (expired)
-    const metadata = keyManager.addKey(keyId, key)
+    const metadata = keyManager.addKey(keyId, key as string)
 
     // Mock the expiration date to be in the pas
     const originalDate = Date.now
@@ -443,7 +444,8 @@ describe('keyRotationManager', () => {
   })
 
   // Skip this test in CI - it's failing with "Failed to decrypt data"
-  const skipKeyRotationTest = process.env.SKIP_CRYPTO_ROTATION_TEST === 'true'
+  const skipKeyRotationTest =
+    process.env['SKIP_CRYPTO_ROTATION_TEST'] === 'true'
   ;(skipKeyRotationTest ? it.skip : it)(
     'should re-encrypt data with the latest key version',
     async () => {
@@ -741,14 +743,15 @@ describe('createCryptoSystem', () => {
   })
 })
 
+ 
 describe('Fully Homomorphic Encryption Integration Tests', () => {
   // Skip all these tests if SKIP_FHE_TESTS is true
   const itOrSkip = SKIP_FHE_TESTS ? (it as TestFunction).skip : it
   let fheSystem: ExtendedFHESystem
 
   beforeEach(() => {
-    // Create crypto system
-    cryptoSystem = createCryptoSystem({
+    // Create crypto system (not used in these tests)
+    createCryptoSystem({
       namespace: 'test',
     })
 
@@ -763,7 +766,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
         return parts.slice(2).join(':')
       },
       processEncrypted: async (
-        encryptedData: string,
+        _encryptedData: string,
         operation: string,
       ) => {
         return {
@@ -822,7 +825,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
   itOrSkip('should encrypt and decrypt data securely', async () => {
     const data = {
       message: 'Secret therapy notes',
-      patientId: process.env.PATIENT_ID || 'example-patient-id',
+      patientId: process.env['PATIENT_ID'] || 'example-patient-id',
     }
 
     // Encrypt the data
@@ -831,7 +834,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
 
     // Decrypt the data
     const decrypted = await fheSystem.decrypt(encrypted)
-    const parsedData = JSON.parse(decrypted)
+    const parsedData = JSON.parse(decrypted) as any
 
     expect(parsedData.message).toBe(data.message)
     expect(parsedData.patientId).toBe(data.patientId)

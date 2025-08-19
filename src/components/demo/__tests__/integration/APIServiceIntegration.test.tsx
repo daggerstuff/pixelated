@@ -43,7 +43,7 @@ describe('API Service Integration Tests', () => {
 
       try {
         await fetch('/api/knowledge-balancer/status')
-      } catch (error) {
+      } catch (error: unknown) {
         expect(error).toBeInstanceOf(Error)
         expect((error as Error).message).toBe('Service unavailable')
       }
@@ -339,7 +339,7 @@ describe('API Service Integration Tests', () => {
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(() => mockWebSocket) as any
+      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -358,7 +358,7 @@ describe('API Service Integration Tests', () => {
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(() => mockWebSocket) as any
+      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -389,7 +389,7 @@ describe('API Service Integration Tests', () => {
         for (let i = 0; i < maxRetries; i++) {
           try {
             return await fetch(url, options)
-          } catch (error) {
+          } catch (error: unknown) {
             if (i === maxRetries - 1) {
               throw error
             }

@@ -69,11 +69,11 @@ function getMetricConfig(metricId: string) {
 function getDefaultStartDate(): string {
   const date = new Date()
   date.setMonth(date.getMonth() - 3)
-  return date.toISOString().split('T')[0]
+  return date.toISOString().split('T')[0] || ''
 }
 
 function getDefaultEndDate(): string {
-  return new Date().toISOString().split('T')[0]
+  return new Date().toISOString().split('T')[0] || ''
 }
 
 // Prepares chart data from the API response

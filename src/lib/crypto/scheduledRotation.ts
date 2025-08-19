@@ -26,7 +26,7 @@ export class ScheduledKeyRotation {
    * Creates a new ScheduledKeyRotation instance
    * @param options - Configuration options
    */
-  constructor(options: ScheduledRotationOptions = {}) {
+  constructor(options: ScheduledRotationOptions = {}): void {
     this.keyStorage = new KeyStorage({
       namespace: options.namespace || 'app',
       useSecureStorage: options.useSecureStorage || false,
@@ -41,7 +41,7 @@ export class ScheduledKeyRotation {
   /**
    * Starts the scheduled key rotation
    */
-  start(): void {
+  start() {
     if (this.intervalId) {
       return // Already started
     }
@@ -70,7 +70,7 @@ export class ScheduledKeyRotation {
   /**
    * Stops the scheduled key rotation
    */
-  stop(): void {
+  stop() {
     if (this.intervalId) {
       clearInterval(this.intervalId)
       this.intervalId = null
@@ -114,7 +114,7 @@ export class ScheduledKeyRotation {
               this.onRotation(keyId, rotatedKey.keyId)
             }
           }
-        } catch (error) {
+        } catch (error: unknown) {
           if (this.onError) {
             this.onError(
               error instanceof Error ? error : new Error(String(error)),
@@ -148,7 +148,7 @@ export class ScheduledKeyRotation {
       }
 
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       if (this.onError) {
         this.onError(error instanceof Error ? error : new Error(String(error)))
       } else {

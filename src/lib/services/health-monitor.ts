@@ -46,6 +46,15 @@ export class HealthMonitor {
     this.checks.set(name, checkFn)
   }
 
+  registerService(name: string, checkFn: () => Promise<HealthCheck>): void {
+    this.registerCheck(name, checkFn)
+  }
+
+  startMonitoring(): void {
+    // Start monitoring services
+    console.log('Health monitoring started')
+  }
+
   async getHealth(): Promise<SystemHealth> {
     const startTime = performance.now()
     const checks: HealthCheck[] = []
@@ -64,7 +73,7 @@ export class HealthMonitor {
         return {
           name,
           status: 'unhealthy' as const,
-          message: _error instanceof Error ? _error.message : 'Unknown error',
+          message: _error instanceof Error ? _String(error) : 'Unknown error',
           responseTime: performance.now() - startTime
         }
       }
@@ -129,7 +138,7 @@ export class HealthMonitor {
       return {
         name: 'system',
         status: 'unhealthy',
-        message: _error instanceof Error ? _error.message : 'System check failed'
+        message: _error instanceof Error ? _String(error) : 'System check failed'
       }
     }
   }
@@ -168,7 +177,7 @@ export class HealthMonitor {
       return {
         name: 'memory',
         status: 'unhealthy',
-        message: _error instanceof Error ? _error.message : 'Memory check failed'
+        message: _error instanceof Error ? _String(error) : 'Memory check failed'
       }
     }
   }
@@ -202,7 +211,7 @@ export class HealthMonitor {
       return {
         name: 'disk',
         status: 'unhealthy',
-        message: _error instanceof Error ? _error.message : 'Disk check failed'
+        message: _error instanceof Error ? _String(error) : 'Disk check failed'
       }
     }
   }

@@ -46,7 +46,7 @@ describe('SemanticEvidenceParser', () => {
         source: 'depression_symptom',
         clinicalRelevance: 0.75, // converted from 'significant'
       })
-      expect(firstItem.context?.semanticRationale).toBe(
+      expect(firstItem.context?.['semanticRationale']).toBe(
         'Indicates depressive mood',
       )
     })
@@ -299,7 +299,7 @@ describe('SemanticEvidenceParser', () => {
       expect(result.evidenceItem?.confidence).toBe(0.5)
       expect(result.evidenceItem?.clinicalRelevance).toBe(0.5) // default value
       expect(result.evidenceItem?.source).toBe('semantic_analysis')
-      expect(result.evidenceItem?.context?.semanticRationale).toBe(
+      expect(result.evidenceItem?.context?.['semanticRationale']).toBe(
         'Generated via semantic analysis',
       )
     })

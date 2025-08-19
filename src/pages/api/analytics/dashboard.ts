@@ -6,7 +6,6 @@
  */
 
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
-import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
 import { EventType } from '@/lib/services/analytics/analytics-types'
 import type {
@@ -189,7 +188,7 @@ async function calculateTrend(
       direction: changePercent > 0 ? 'up' : changePercent < 0 ? 'down' : 'stable',
       period: `vs previous ${timeRange}`,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(`Failed to calculate trend for ${metricName}`, { error })
     return undefined
   }
@@ -198,10 +197,6 @@ async function calculateTrend(
 /**
  * POST endpoint for analytics dashboard data
  */
-/**
- * Type definition for API Route handler
- */
-type APIRoute = (context: BaseAPIContext) => Response | Promise<Response>
 
 /**
  * POST endpoint for generating test analytics data
@@ -307,13 +302,13 @@ export const POST = async ({ request }) => {
       },
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     const processingTime = Date.now() - startTime
     logger.error('Analytics dashboard request failed', { error, processingTime })
 
     const apiError: ApiError = {
-      code: error instanceof Error && error.message.includes('Invalid') ? 'VALIDATION_ERROR' : 'PROCESSING_ERROR',
-      message: error instanceof Error ? error.message : 'An unexpected error occurred',
+      code: error instanceof Error && String(error).includes('Invalid') ? 'VALIDATION_ERROR' : 'PROCESSING_ERROR',
+      message: error instanceof Error ? String(error) : 'An unexpected error occurred',
       details: {
         processingTime,
         timestamp: new Date().toISOString(),
@@ -321,7 +316,7 @@ export const POST = async ({ request }) => {
     }
 
     return new Response(JSON.stringify(apiError), {
-      status: error instanceof Error && error.message.includes('Invalid') ? 400 : 500,
+      status: error instanceof Error && String(error).includes('Invalid') ? 400 : 500,
       headers: {
         'Content-Type': 'application/json',
       },

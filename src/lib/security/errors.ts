@@ -3,7 +3,7 @@
  */
 
 export class SecurityError extends Error {
-  constructor(message: string, options?: { cause?: unknown }) {
+  constructor(message: string, options?: { cause?: unknown }): void {
     super(message)
     this.name = 'SecurityError'
     if (options?.cause) {

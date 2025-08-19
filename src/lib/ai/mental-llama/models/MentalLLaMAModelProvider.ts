@@ -37,8 +37,8 @@ export class MentalLLaMAModelProvider implements IModelProvider {
     let result: LLMResponse
     try {
       result = await this.invoke(messages, options)
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error)
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? String(error) : String(error)
       if (msg.includes('Unrecognized or invalid response structure from MentalLLaMA API')) {
         // Normalize error message to what tests expect
         throw new Error('Invalid response structure from MentalLLaMA API.')
@@ -59,7 +59,7 @@ export class MentalLLaMAModelProvider implements IModelProvider {
    * @param {('7B' | '13B' | string)} [modelTier='7B'] - The model tier to use (e.g., '7B', '13B').
    * @throws Error if essential configuration (API key, endpoint URL for the tier) is missing.
    */
-  constructor(modelTier: '7B' | '13B' | string = '7B') {
+  constructor(modelTier: '7B' | '13B' | string = '7B'): void {
     this.modelTier = modelTier
 
     // Read configuration from environment
@@ -119,10 +119,10 @@ export class MentalLLaMAModelProvider implements IModelProvider {
         `MentalLLaMA API health check failed with status ${response.status}`,
       )
       return false
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during MentalLLaMA API health check', {
         modelId: this.modelConfig.modelId,
-        errorMessage: error instanceof Error ? error.message : String(error),
+        errorMessage: error instanceof Error ? String(error) : String(error),
       })
       return false
     }
@@ -242,13 +242,13 @@ export class MentalLLaMAModelProvider implements IModelProvider {
           'Unrecognized or invalid response structure from MentalLLaMA API.',
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Error calling MentalLLaMA model or processing its response:',
         {
           modelId: this.modelConfig.modelId,
-          errorMessage: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined,
+          errorMessage: error instanceof Error ? String(error) : String(error),
+          stack: error instanceof Error ? (error as Error)?.stack : undefined,
         },
       )
       throw error

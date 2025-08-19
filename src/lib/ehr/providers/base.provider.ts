@@ -13,7 +13,7 @@ export abstract class BaseEHRProvider implements EHRProvider {
   protected client: FHIRClient | null = null
   protected logger: Console
 
-  constructor(logger: Console = console) {
+  constructor(logger: Console = console): void {
     this.logger = logger
   }
 
@@ -42,7 +42,7 @@ export abstract class BaseEHRProvider implements EHRProvider {
       const client = this.getClient()
       await client.searchResources('Patient', { _summary: 'count' })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to validate endpoint for provider ${this.id}:`,
         error,

@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
@@ -79,7 +78,7 @@ export const GET = async ({ request }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'Error fetching security events:',
       error as Record<string, unknown>,

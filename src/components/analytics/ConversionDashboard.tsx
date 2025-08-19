@@ -75,7 +75,7 @@ export function ConversionDashboard() {
           : conversions.filter((c) => String(c.conversionId) === filter)
 
       setConversionEvents(filtered as ConversionEvent[])
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load conversion data', error)
     } finally {
       setIsLoading(false)

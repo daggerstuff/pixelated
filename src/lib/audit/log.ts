@@ -26,7 +26,7 @@ export async function getUserAuditLogs(
     // TODO: Replace with actual database implementation
     // For now, return empty array to prevent build errors
     return []
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error getting user audit logs:', error)
     return []
   }
@@ -50,7 +50,7 @@ export async function logAuditEvent(
 
     // TODO: Replace with actual database implementation
     // For now, just log to console to prevent build errors
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error logging audit event:', error)
   }
 }

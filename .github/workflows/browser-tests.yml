@@ -57,7 +57,7 @@ jobs:
         run: pnpm run build
 
       - name: Run browser tests
-        run: pnpm exec playwright test tests/browser-compatibility.spec.ts --reporter=html,list
+        run: pnpm exec playwright test tests/browser/** tests/cross-browser/** tests/browser-compatibility.spec.ts --reporter=html,list
         env:
           DISABLE_WEB_FONTS: 'true'
           PUBLIC_SITE_URL: http://localhost:4321
@@ -118,7 +118,7 @@ jobs:
         run: pnpm run build
 
       - name: Run visual comparison tests
-        run: pnpm exec playwright test tests/browser-compatibility.spec.ts --reporter=html,list
+        run: pnpm exec playwright test tests/browser/** tests/cross-browser/** tests/browser-compatibility.spec.ts --reporter=html,list
         env:
           CI: true
           NODE_ENV: test

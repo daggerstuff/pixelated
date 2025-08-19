@@ -360,7 +360,7 @@ const defaultPreferences = {
 </BaseLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const form = document.getElementById('ai-preferences-form') as HTMLFormElement | null
     const resetButton = document.getElementById('reset-defaults') as HTMLButtonElement | null
     const loadingIndicator = document.getElementById('ai-preferences-loading') as HTMLElement | null

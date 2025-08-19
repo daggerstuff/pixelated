@@ -67,7 +67,7 @@ export async function fetchSessionEmotionData(
       )
     }
     return await response.json()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching emotion data:', error)
     return []
   }
@@ -170,7 +170,7 @@ export function calculateEmotionSummary(
  * Custom hook that returns emotion data for a session with additional processing
  * This is a placeholder that would integrate with your state management
  */
-export function useSessionEmotions(sessionId: string) {
+export function useSessionEmotions(sessionId: string): void {
   // This would ideally use your existing data fetching patterns
   // For example, if using a data fetching library:
   // const data = useQuery(['sessions', sessionId, 'emotions'], () => fetchSessionEmotionData(sessionId));
@@ -189,7 +189,7 @@ export function useSessionEmotions(sessionId: string) {
           setData(emotionData)
           setIsLoading(false)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error loading emotion data:', error)
         if (isMounted) {
           setIsLoading(false)

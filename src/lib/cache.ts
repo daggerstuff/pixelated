@@ -17,7 +17,7 @@ export class Cache {
   private readonly ttl: number
   private readonly maxSize: number
 
-  constructor(options: CacheOptions) {
+  constructor(options: CacheOptions): void {
     this.store = new Map()
     this.ttl = options.ttl * 1000 // Convert to milliseconds
     this.maxSize = options.maxSize || 1000

@@ -62,7 +62,7 @@ export function createEnhancedFHEService(
       logger.info('Initializing enhanced FHE service')
       try {
         return await baseService.initialize(options)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to initialize FHE service', { error })
         stats.errorCount++
         throw error
@@ -73,7 +73,7 @@ export function createEnhancedFHEService(
     generateKeys: async (config?: FHEConfig | undefined) => {
       try {
         return await baseService.generateKeys(config)
-      } catch (error) {
+      } catch (error: unknown) {
         stats.errorCount++
         throw error
       }
@@ -92,7 +92,7 @@ export function createEnhancedFHEService(
       try {
         stats.encryptCount++
         return await baseService.encrypt(value, options)
-      } catch (error) {
+      } catch (error: unknown) {
         stats.errorCount++
         logger.error('Encryption failed', { error })
         throw error
@@ -107,7 +107,7 @@ export function createEnhancedFHEService(
       try {
         stats.decryptCount++
         return await baseService.decrypt(encryptedData, options)
-      } catch (error) {
+      } catch (error: unknown) {
         stats.errorCount++
         logger.error('Decryption failed', { error })
         throw error
@@ -138,7 +138,7 @@ export function createEnhancedFHEService(
           operation,
           params,
         )
-      } catch (error) {
+      } catch (error: unknown) {
         stats.errorCount++
         logger.error('Processing failed', { operation, error })
         throw error

@@ -28,12 +28,12 @@ export class CircuitBreaker {
     return true
   }
 
-  onSuccess(): void {
+  onSuccess() {
     this.failures = 0
     this.state = 'closed'
   }
 
-  onFailure(): void {
+  onFailure() {
     this.failures++
     this.lastFailureTime = Date.now()
 

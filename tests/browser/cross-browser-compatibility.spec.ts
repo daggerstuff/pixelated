@@ -68,7 +68,7 @@ async function testCoreFunctionality(
       // For non-admin pages, check for main content with increased timeout
       await expect(page.locator('main')).toBeVisible({ timeout: 30000 })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Error checking elements on ${url}:`, error)
 
     // Capture page HTML for debugging

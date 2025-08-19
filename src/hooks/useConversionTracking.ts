@@ -78,7 +78,7 @@ export default function useConversionTracking(
             ...data,
           })
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error tracking event:', error)
       }
     },
@@ -103,7 +103,7 @@ export default function useConversionTracking(
         // Examples:
         // - Google Analytics: gtag('event', 'conversion', { send_to: 'AW-CONVERSION_ID/CONVERSION_LABEL', value, currency: 'USD' })
         // - Facebook Pixel: fbq('track', conversionName, { value, currency: 'USD', ...data })
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error tracking conversion:', error)
       }
     },
@@ -142,7 +142,7 @@ export default function useConversionTracking(
           stage_index: stage.index,
           ...data,
         })
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error tracking funnel stage:', error)
       }
     },

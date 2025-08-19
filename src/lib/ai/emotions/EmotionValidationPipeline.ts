@@ -143,10 +143,10 @@ class EmotionValidationPipeline {
       this._isInitialized = true
 
       this.logger.info('Emotion Validation Pipeline initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to initialize pipeline', { error })
       throw new Error(
-        `Pipeline initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Pipeline initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -183,7 +183,7 @@ class EmotionValidationPipeline {
       }, 30000) // Check every 30 seconds
 
       this.logger.info('Continuous emotion validation started successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       this.isRunning = false
       this.logger.error('Failed to start continuous validation', { error })
       throw error
@@ -193,7 +193,7 @@ class EmotionValidationPipeline {
   /**
    * Stop continuous validation
    */
-  stopContinuousValidation(): void {
+  stopContinuousValidation() {
     if (!this.isRunning) {
       this.logger.warn('Emotion validation pipeline is not currently running')
       return
@@ -214,7 +214,7 @@ class EmotionValidationPipeline {
       }
 
       this.logger.info('Emotion validation pipeline stopped successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error stopping validation pipeline', { error })
     }
   }
@@ -274,7 +274,7 @@ class EmotionValidationPipeline {
           biasAnalysis =
             await this.biasDetectionEngine.analyzeSession(therapeuticSession)
           biasScore = biasAnalysis.overallBiasScore
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.warn('Bias detection failed for emotion validation', {
             sessionId: emotionData.sessionId,
             error,
@@ -348,7 +348,7 @@ class EmotionValidationPipeline {
       this.updateRunningMetrics(result)
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.metrics.errors++
       this.logger.error('Emotion validation failed', {
         sessionId: emotionData.sessionId,
@@ -381,11 +381,11 @@ class EmotionValidationPipeline {
             timestamp: new Date(),
             data,
           })
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.error('Error in monitoring callback', { error })
         }
       })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error handling bias detection alert', { error })
     }
   }
@@ -411,7 +411,7 @@ class EmotionValidationPipeline {
           metrics: this.metrics,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Periodic validation check failed', { error })
     }
   }
@@ -807,7 +807,7 @@ class EmotionValidationPipeline {
       this._isInitialized = false
 
       this.logger.info('Emotion validation pipeline disposed successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error disposing pipeline', { error })
     }
   }

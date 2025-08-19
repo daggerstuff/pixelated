@@ -45,7 +45,7 @@ export const POST = async ({ cookies }: { cookies: CookieStore }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Logout error:', error)
     return new Response(
       JSON.stringify({

@@ -39,7 +39,7 @@ interface ExtendedTreatmentRecommendation extends TreatmentRecommendation {
   timestamp?: string;
 }
 
-const RecommendationDisplay: React.FC<RecommendationDisplayProps> = ({
+const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
   recommendations
 }) => {
   if (!recommendations || recommendations.length === 0) {

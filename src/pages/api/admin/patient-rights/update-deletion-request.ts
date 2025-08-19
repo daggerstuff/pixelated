@@ -102,10 +102,10 @@ export const POST = async ({ request, cookies }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     logger.error('Error updating data deletion request', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? String(error) : String(error),
     })
 
     // Return error response

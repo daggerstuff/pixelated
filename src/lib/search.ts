@@ -89,7 +89,7 @@ class ServerSearchClient implements ISearchClient {
   search(): SearchResult[] {
     return []
   }
-  importDocuments(): void {
+  importDocuments() {
     /* No-op on server */
   }
 }
@@ -98,7 +98,7 @@ class ServerSearchClient implements ISearchClient {
 export const blogSearch: BlogSearchInterface = {
   _posts: [] as SearchDocument[],
 
-  addPost(post: PostInput, content: string) {
+  addPost(post: PostInput, content: string): void {
     // Extract a summary for search results (first 200 chars)
     const summary = content.slice(0, 200).replace(/<[^>]*>?/gm, '')
 
@@ -239,7 +239,7 @@ if (typeof window !== 'undefined') {
 
       // Update the instance
       searchClientInstance = realClient
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load search implementation:', error)
     }
   })()

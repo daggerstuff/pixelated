@@ -88,8 +88,8 @@ export async function verifyMentalLLaMAModelConfiguration(): Promise<MentalLLaMA
       connectionStatus: 'available',
       details: { ...requiredVars },
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? String(error) : String(error)
     logger.error('Error during MentalLLaMA model configuration verification:', {
       error: errorMessage,
     })

@@ -224,7 +224,7 @@ export async function calculateOverallRisk(
           factorResult.metadata = factor.metadata
         }
         factorResults.push(factorResult)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error calculating factor score', {
           factor: factor.name,
           error,
@@ -260,7 +260,7 @@ export async function calculateOverallRisk(
     })
 
     return assessment
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to calculate risk score', { error })
     throw new SecurityError('Risk calculation failed', { cause: error })
   }

@@ -571,7 +571,7 @@ const demoPages = [
   }
 
   // Initialize dashboard when DOM is ready
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (event: Event) => {
     const dashboard = new AllDemosAnalyticsDashboard();
     dashboard.init(); // Assuming there's an init method, or you can use any other method
   });

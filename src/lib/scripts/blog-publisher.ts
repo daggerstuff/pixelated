@@ -81,7 +81,7 @@ const command = args[0] || 'status'
         )
         break
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error executing command', { command, error })
     process.exit(1)
   }
@@ -145,7 +145,7 @@ async function generateReport(): Promise<void> {
     await fs.writeFile(reportPath, report, 'utf8')
 
     logger.info(`Report saved to: ${reportPath}`)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error saving report', { error })
   }
 }
@@ -402,7 +402,7 @@ async function publishPost(postPath?: string): Promise<void> {
     await fs.writeFile(targetPost.filePath, updatedContent, 'utf8')
 
     console.log(`Published post: ${targetPost.metadata.title}`)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error publishing post', { error })
   }
 }

@@ -195,14 +195,14 @@ export const csrfMiddleware = defineMiddleware(
         try {
           const formData = await clonedRequest.formData()
           requestToken = formData.get(config.formFieldName) as string
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Error parsing form data for CSRF check', error)
         }
       } else if (contentType.includes('application/json')) {
         try {
           const body = await clonedRequest.json()
           requestToken = body[config.formFieldName]
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Error parsing JSON body for CSRF check', error)
         }
       }

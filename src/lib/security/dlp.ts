@@ -98,7 +98,7 @@ export class DLPService {
   /**
    * Add built-in default rules
    */
-  private addDefaultRules(): void {
+  private addDefaultRules() {
     // Rule to detect and redact PHI/PII
     this.addRule({
       id: 'phi-detection',

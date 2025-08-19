@@ -310,10 +310,10 @@ function ProfessionalTherapistWorkspace() {
           name: '',
         } as ExtendedMessage,
       ])
-    } catch (err) {
+    } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? err.message
+          ? (err as Error)?.message || String(err)
           : 'An error occurred while processing your message',
       )
       console.error('Chat error:', err)
@@ -343,7 +343,7 @@ function ProfessionalTherapistWorkspace() {
   }
 
   // Toggle expert guidance
-  const toggleExpertGuidance = (): void => {
+  const toggleExpertGuidance = () => {
     storeState.configureMentalHealthAnalysis(
       storeState.mentalHealthAnalysisEnabled,
       !storeState.expertGuidanceEnabled,
@@ -401,7 +401,7 @@ function ProfessionalTherapistWorkspace() {
       // At this point we'd send the prompt to the LLM service
       // but for now, we'll use the regular AI service
       return prompt
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error generating patient response:', err)
       return null
     }

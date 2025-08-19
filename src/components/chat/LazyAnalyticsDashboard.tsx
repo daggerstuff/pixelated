@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import type { SecurityLevel } from '../../hooks/useSecurity';
 import type { Message } from '../../types/chat';
 

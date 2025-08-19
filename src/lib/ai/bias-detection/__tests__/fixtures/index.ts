@@ -44,10 +44,10 @@ export const getAllTestScenarios = () => {
  */
 export const getBiasTestScenarios = () => {
   return {
-    ageBiasYoungPatient,
-    genderBiasFemalePatient,
-    racialBiasMinorityPatient,
-    socioeconomicBiasLowIncomePatient,
+    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['ageBiasYoungPatient'],
+    genderBiasFemalePatient: (demographicBiasScenarios as unknown)?.['genderBiasFemalePatient'],
+    racialBiasMinorityPatient: (demographicBiasScenarios as unknown)?.['racialBiasMinorityPatient'],
+    socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as unknown)?.['socioeconomicBiasLowIncomePatient'],
     ageBiasElderlyPatient,
   }
 }
@@ -61,7 +61,11 @@ export const getBaselineTestScenarios = () => {
     baselineAnxietyScenario,
     baselineDepressionScenario,
     baselinePainManagementScenario,
-  } = baselineScenarios
+  } = {
+    baselineAnxietyScenario: (baselineScenarios as unknown)?.['anxiety'],
+    baselineDepressionScenario: (baselineScenarios as unknown)?.['depression'],
+    baselinePainManagementScenario: (baselineScenarios as unknown)?.['painManagement'],
+  }
 
   return [
     baselineAnxietyScenario,
@@ -80,7 +84,10 @@ export const getComparativeBiasScenarios = () => {
   const {
     ageBiasYoungPatient,
     ageBiasElderlyPatient,
-  } = demographicBiasScenarios
+  } = {
+    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['age']?.['young'],
+    ageBiasElderlyPatient: (demographicBiasScenarios as unknown)?.['age']?.['elderly'],
+  }
 
   return [
     [ageBiasYoungPatient, ageBiasElderlyPatient], // Age bias comparison

@@ -254,7 +254,7 @@ export const stream = {
     on(_event: string, _listener: (...args: unknown[]) => void) {
       return this
     }
-    pipe(destination: unknown) {
+    pipe(destination: unknown): void {
       return destination
     }
     read() {
@@ -265,7 +265,7 @@ export const stream = {
     on(_event: string, _listener: (...args: unknown[]) => void) {
       return this
     }
-    write(_chunk: unknown) {
+    write(_chunk: unknown): void {
       return true
     }
     end() {}
@@ -274,11 +274,11 @@ export const stream = {
     on(_event: string, _listener: (...args: unknown[]) => void) {
       return this
     }
-    write(_chunk: unknown) {
+    write(_chunk: unknown): void {
       return true
     }
     end() {}
-    pipe(destination: unknown) {
+    pipe(destination: unknown): void {
       return destination
     }
   },
@@ -297,7 +297,7 @@ export const events = {
       return this
     }
 
-    emit(event: string, ...args: unknown[]) {
+    emit(event: string, ...args: unknown[]): void {
       if (!this.listeners[event]) {
         return false
       }

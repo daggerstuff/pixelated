@@ -51,7 +51,7 @@ const { className } = Astro.props
 
 <script>
   // Add basic tab functionality
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const tabContainers = document.querySelectorAll('.tabs')
 
     tabContainers.forEach((container) => {
@@ -59,7 +59,7 @@ const { className } = Astro.props
       const tabItems = container.querySelectorAll('.tab-item')
 
       tabs.forEach((tab, index) => {
-        tab.addEventListener('click', () => {
+        tab.addEventListener('click', (_event: Event) => {
           // Remove active class from all tabs and tab items
           tabs.forEach((t) => t.classList.remove('tab-active'))
           tabItems.forEach((item) => {

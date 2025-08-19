@@ -268,9 +268,9 @@ const verificationHistory: Verification[] = []
 
 <script>
   // Document form submission (demo only)
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const documentForm = document.getElementById('document-form')
-    documentForm?.addEventListener('submit', (e) => {
+    documentForm?.addEventListener('submit', (e: Event) => {
       e.preventDefault()
       alert('Document upload would be processed here with a real backend API.')
       window.location.reload()
@@ -482,9 +482,9 @@ const verificationHistory: Verification[] = []
 
 <script>
   // Document selection modal - this would be implemented with a proper modal in production
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const selectDocumentsBtn = document.getElementById('select-documents-btn')
-    selectDocumentsBtn?.addEventListener('click', () => {
+    selectDocumentsBtn?.addEventListener('click', (_event: Event) => {
       alert(
         'In a production environment, this would open a modal for selecting from existing documents. For this demo, please upload documents first and then reference them in your verification.',
       )
@@ -492,7 +492,7 @@ const verificationHistory: Verification[] = []
 
     // Handle document form submission
     const documentForm = document.getElementById('document-form')
-    documentForm?.addEventListener('submit', (e) => {
+    documentForm?.addEventListener('submit', (e: Event) => {
       e.preventDefault()
       // In a real implementation, this would upload the document via API
       alert('Document upload would be processed here with a real backend API.')
@@ -502,7 +502,7 @@ const verificationHistory: Verification[] = []
 
     // Handle verification form submission
     const verificationForm = document.getElementById('verification-form')
-    verificationForm?.addEventListener('submit', (e) => {
+    verificationForm?.addEventListener('submit', (e: Event) => {
       e.preventDefault()
       // In a real implementation, this would record the verification via API
       alert('Verification would be recorded here with a real backend API.')

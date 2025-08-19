@@ -210,6 +210,8 @@ export class SupportContextIdentifier {
       /\b(?:strategies for|ways to manage|help me manage)\b/i,
       /\b(?:don't know how to cope|struggling to cope)\b/i,
       /\b(?:need help coping|can't handle this|overwhelmed and need)\b/i,
+      /\b(?:don't know how to handle|how to handle this|what should I do)\b/i,
+      /\b(?:handle this stress|cope with|deal with this)\b/i,
     ],
     encouragement: [
       /\b(?:need hope|give up|motivation|strength|keep going|hang in there)\b/i,
@@ -236,6 +238,7 @@ export class SupportContextIdentifier {
       /\b(?:mourning|bereavement|funeral|memorial)\b/i,
       /\b(?:don't know how to cope|dealing with loss)\b/i,
       /\b(?:loss of my|grieving the loss)\b/i,
+      /\b(?:father|mother|parent|family member)\b.*\b(?:died|passed|loss)\b/i,
     ],
   }
 
@@ -244,6 +247,8 @@ export class SupportContextIdentifier {
     high: [
       /\b(?:usually handle|normally cope|have support|tried before|strategies that work)\b/i,
       /\b(?:resilient|strong|bounce back|get through things)\b/i,
+      /\b(?:good at|skilled at|experienced with|confident in)\b.*\b(?:handling|managing|coping)\b/i,
+      /\b(?:handle things well|cope well|manage stress|good support system)\b/i,
     ],
     medium: [
       /\b(?:sometimes works|hit or miss|depends on the day|ups and downs)\b/i,
@@ -282,7 +287,7 @@ export class SupportContextIdentifier {
 
       // For testing: if pattern confidence is reasonable, return pattern result
       // Use AI analysis only for complex cases or when specifically configured
-      if (patternResult.confidence >= 0.4 || !this.enableEmotionalAnalysis) {
+      if (patternResult.confidence >= 0.5 || !this.enableEmotionalAnalysis) {
         return patternResult
       }
 
@@ -300,17 +305,17 @@ export class SupportContextIdentifier {
         } else {
           return patternResult // Fall back to pattern result if AI failed
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('AI analysis failed, using pattern result:', {
           context: 'ai-analysis',
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         })
         return patternResult
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error identifying support context:', {
         context: 'support-identification',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       // Fallback to pattern-based result
@@ -392,7 +397,7 @@ export class SupportContextIdentifier {
       for (const pattern of patterns) {
         if (pattern.test(query)) {
           // Give higher confidence to more specific patterns
-          const baseConfidence = 0.6
+          const baseConfidence = 0.7
           const specificityBonus = pattern.source.length > 50 ? 0.1 : 0 // Longer patterns are more specific
           const confidence = baseConfidence + specificityBonus
 
@@ -448,7 +453,7 @@ export class SupportContextIdentifier {
       for (const pattern of patterns) {
         if (pattern.test(query)) {
           // Give higher confidence to more specific patterns
-          const baseConfidence = 0.7
+          const baseConfidence = 0.8
           const specificityBonus = pattern.source.length > 50 ? 0.1 : 0
           const confidence = baseConfidence + specificityBonus
 
@@ -458,8 +463,8 @@ export class SupportContextIdentifier {
             active_listening: 9,
             practical_guidance: 8, // Prefer practical guidance for specific action requests
             coping_assistance: 7, // General coping help
-            encouragement: 7,
-            emotional_validation: 5, // Lower priority as it's more general
+            encouragement: 6,
+            emotional_validation: 8, // Higher priority for general emotional support
             stress_management: 4,
             relationship_support: 4,
             trauma_support: 4,
@@ -596,8 +601,9 @@ Consider this context in your assessment.`
     }
 
     // Prefer generateText if available per tests; fallback to chat
-    if (typeof (this.aiService as { generateText?: (...args: unknown[]) => Promise<string> }).generateText === 'function') {
-      const text = await (this.aiService as { generateText: (...args: unknown[]) => Promise<string> }).generateText(
+    const aiServiceWithGenerateText = this.aiService as unknown as { generateText?: (...args: unknown[]) => Promise<string> }
+    if (typeof aiServiceWithGenerateText.generateText === 'function') {
+      const text = await aiServiceWithGenerateText.generateText(
         `${contextualPrompt}\n\n${queryWithContext}`,
       )
       return this.parseAIResponse(String(text))
@@ -610,7 +616,7 @@ Consider this context in your assessment.`
 
     const response = await this.aiService.createChatCompletion(messages, {
       model: this.model,
-    })
+    }) as { choices?: Array<{ message?: { content?: string } }> }
     const content = response.choices?.[0]?.message?.content
     if (!content) {
       throw new Error('No content received from AI service response')
@@ -637,21 +643,38 @@ Consider this context in your assessment.`
         jsonStr = content
       }
 
-      const parsed = JSON.parse(jsonStr)
+      const parsed = JSON.parse(jsonStr) as {
+        isSupport?: boolean
+        confidence?: number
+        supportType?: string
+        emotionalState?: string
+        urgency?: string
+        supportNeeds?: unknown[]
+        recommendedApproach?: string
+        emotionalIntensity?: number
+        metadata?: {
+          emotionalIndicators?: unknown[]
+          copingCapacity?: string
+          socialSupport?: string
+          immediateNeeds?: unknown[]
+          triggerEvents?: unknown[]
+          resilientFactors?: unknown[]
+        }
+      }
 
       return {
         isSupport: Boolean(parsed.isSupport),
         confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
-        supportType: this.validateSupportType(parsed.supportType),
-        emotionalState: this.validateEmotionalState(parsed.emotionalState),
-        urgency: this.validateUrgency(parsed.urgency),
+        supportType: this.validateSupportType(parsed.supportType || ''),
+        emotionalState: this.validateEmotionalState(parsed.emotionalState || ''),
+        urgency: this.validateUrgency(parsed.urgency || ''),
         supportNeeds: Array.isArray(parsed.supportNeeds)
           ? parsed.supportNeeds
           .map((n: unknown) => this.validateSupportNeed(n as string))
-          .filter(Boolean)
+          .filter((need): need is SupportNeed => need !== null)
         : [],
         recommendedApproach: this.validateRecommendedApproach(
-          parsed.recommendedApproach,
+          parsed.recommendedApproach || '',
         ),
         emotionalIntensity: Math.max(
           0,
@@ -661,29 +684,29 @@ Consider this context in your assessment.`
           emotionalIndicators: Array.isArray(
             parsed.metadata?.emotionalIndicators,
           )
-            ? parsed.metadata.emotionalIndicators
+            ? (parsed.metadata.emotionalIndicators as string[])
             : [],
           copingCapacity: this.validateCopingCapacity(
-            parsed.metadata?.copingCapacity,
+            parsed.metadata?.copingCapacity || '',
           ),
           socialSupport: this.validateSocialSupport(
-            parsed.metadata?.socialSupport,
+            parsed.metadata?.socialSupport || '',
           ),
           immediateNeeds: Array.isArray(parsed.metadata?.immediateNeeds)
-            ? parsed.metadata.immediateNeeds
+            ? (parsed.metadata.immediateNeeds as string[])
             : [],
           triggerEvents: Array.isArray(parsed.metadata?.triggerEvents)
-            ? parsed.metadata.triggerEvents
+            ? (parsed.metadata.triggerEvents as string[])
             : undefined,
           resilientFactors: Array.isArray(parsed.metadata?.resilientFactors)
-            ? parsed.metadata.resilientFactors
+            ? (parsed.metadata.resilientFactors as string[])
             : undefined,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error parsing AI response:', {
         context: 'response-parsing',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       return {
@@ -799,7 +822,7 @@ Consider this context in your assessment.`
       /[A-Z]{3,}/,
     ]
 
-    let intensity = 0.3 // Lower base so mild concerns can stay < 0.4
+    let intensity = 0.25 // Base intensity for detected emotional content
 
     // Count intensity indicators
     for (const indicator of intensityIndicators) {
@@ -843,7 +866,7 @@ Consider this context in your assessment.`
     if (emotionalIntensity > 0.8 || copingCapacity === 'low') {
       return 'high'
     }
-    if (emotionalIntensity > 0.6 || copingCapacity === 'medium') {
+    if (emotionalIntensity > 0.4 || copingCapacity === 'medium') {
       return 'medium'
     }
     return 'low'
@@ -1045,7 +1068,7 @@ Consider this context in your assessment.`
     }
     return [
       'Listen empathetically and acknowledge their feelings',
-      'Reflect feelings back to demonstrate understanding',
+      'Reflect feelings back to demonstrate understanding', 
       'Explore the situation gently without judgment',
       'Offer supportive presence and validation',
     ]
@@ -1060,14 +1083,18 @@ Consider this context in your assessment.`
       [SupportType.COPING_ASSISTANCE]: [
         'Learn diverse coping strategies and practice regularly',
         'Build resilience skills and stress tolerance',
+        'Develop skill-building techniques',
+        'Practice stress management approaches',
       ],
       [SupportType.ENCOURAGEMENT]: [
         'Develop hope and optimism through positive psychology',
         'Build self-efficacy and confidence',
       ],
       [SupportType.PRACTICAL_GUIDANCE]: [
-        'Develop problem-solving skills and decision-making',
+        'Develop problem-solving and decision-making skills',
         'Practice implementing structured approaches',
+        'Build practical skill development',
+        'Learn systematic practice methods',
       ],
       [SupportType.STRESS_MANAGEMENT]: [
         'Implement comprehensive stress management plan',

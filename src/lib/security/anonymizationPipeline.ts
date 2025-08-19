@@ -100,8 +100,8 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
     } else {
       throw new Error('Unsupported input type for anonymization')
     }
-  } catch (error) {
-    summary.errors = [error instanceof Error ? error.message : String(error)]
+  } catch (error: unknown) {
+    summary.errors = [error instanceof Error ? String(error) : String(error)]
     // Log anonymization failure (do not log sensitive input)
     if (typeof window !== 'undefined') {
       // Browser context

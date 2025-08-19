@@ -108,7 +108,7 @@ export function CognitiveModelSelector({
             onSelectModel('example-depression')
           }
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to fetch cognitive models:', err)
         setError('Failed to load patient models. Please try again later.')
       } finally {
@@ -336,7 +336,7 @@ export function CognitiveModelSelector({
           },
         })
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(`Failed to load model details for ${modelId}:`, err)
     }
   }

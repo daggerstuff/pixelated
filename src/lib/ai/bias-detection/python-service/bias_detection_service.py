@@ -121,8 +121,21 @@ app = Flask(__name__)
 CORS(app)
 
 # Configuration
+ENV_NAME = os.getenv("ENV", "").lower()
+IS_PYTEST = "PYTEST_CURRENT_TEST" in os.environ or os.getenv("PYTEST") == "1"
+IS_NON_PROD = IS_PYTEST or ENV_NAME in {"test", "testing", "development", "dev", "ci"}
+
 flask_secret_key = os.environ.get("FLASK_SECRET_KEY")
 jwt_secret_key = os.environ.get("JWT_SECRET_KEY")
+
+if (not flask_secret_key or not jwt_secret_key) and IS_NON_PROD:
+    # In non-production environments, fall back to insecure defaults to enable testing and local dev
+    if not flask_secret_key:
+        flask_secret_key = "insecure-test-flask-secret"
+        logging.warning("Using insecure default FLASK_SECRET_KEY for testing/development.")
+    if not jwt_secret_key:
+        jwt_secret_key = "insecure-test-jwt-secret"
+        logging.warning("Using insecure default JWT_SECRET_KEY for testing/development.")
 
 if not flask_secret_key:
     raise RuntimeError(

@@ -24,3 +24,5 @@ EXPOSE 9093
 
 ENTRYPOINT ["/bin/alertmanager"]
 CMD ["--config.file=/etc/alertmanager/alertmanager.yml", "--storage.path=/alertmanager"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:9093/-/ready || exit 1

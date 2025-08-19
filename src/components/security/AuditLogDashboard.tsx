@@ -47,7 +47,7 @@ export interface AuditLogEntry {
 }
 
 // Simple Table wrapper that doesn't require the complex props
-const Table: React.FC<React.PropsWithChildren> = ({ children }) => {
+const Table: FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <UITable
       columns={[]}
@@ -145,7 +145,7 @@ export function AuditLogDashboard() {
       }
 
       setLogs(fetchedLogs)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching audit logs:', error)
     } finally {
       setLoading(false)

@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import React from 'react'
 import { useErrorBoundary } from '../ErrorBoundary'
 import { useSecurity } from '../SecurityProvider'
 import { SharedProviders } from '../SharedProviders'

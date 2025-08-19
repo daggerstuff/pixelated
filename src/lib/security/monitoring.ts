@@ -55,14 +55,14 @@ export interface SecurityMonitoringConfig {
  * Custom error types
  */
 export class SecurityMonitoringError extends Error {
-  constructor(message: string) {
+  constructor(message: string): void {
     super(message)
     this.name = 'SecurityMonitoringError'
   }
 }
 
 export class DatabaseError extends SecurityMonitoringError {
-  constructor(message: string) {
+  constructor(message: string): void {
     super(message)
     this.name = 'DatabaseError'
   }
@@ -91,7 +91,7 @@ export class SecurityMonitoringService {
   private lockedAccounts: Map<string, Date> = new Map<string, Date>()
   private cleanupInterval: NodeJS.Timeout
 
-  constructor(config: Partial<SecurityMonitoringConfig> = {}) {
+  constructor(config: Partial<SecurityMonitoringConfig> = {}): void {
     this.config = { ...defaultConfig, ...config }
     this.cleanupInterval = setInterval(() => this.cleanupStaleRecords(), 60000)
   }
@@ -99,7 +99,7 @@ export class SecurityMonitoringService {
   /**
    * Clean up service resources
    */
-  public destroy(): void {
+  public destroy() {
     clearInterval(this.cleanupInterval)
   }
 
@@ -117,9 +117,9 @@ export class SecurityMonitoringService {
       // If this fails, store in Redis as a fallback
       await this.storeEventInRedis(event)
       return Promise.resolve()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track security event', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
       throw error
     }
@@ -213,7 +213,7 @@ export class SecurityMonitoringService {
   /**
    * Clean up stale records
    */
-  private cleanupStaleRecords(): void {
+  private cleanupStaleRecords() {
     const now = new Date()
     const staleLoginThreshold = new Date(
       now.getTime() - this.config.failedLoginWindow,

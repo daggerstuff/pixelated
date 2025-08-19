@@ -395,13 +395,13 @@ const archivingActions = [
 
 <script>
   // Initialize the data retention form
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Destruction method change handler
     const destructionMethodSelect =
       document.getElementById('destruction-method')
 
     if (destructionMethodSelect) {
-      destructionMethodSelect.addEventListener('change', (e) => {
+      destructionMethodSelect.addEventListener('change', (e: Event) => {
         const method = (e.target as HTMLSelectElement)
           .value as keyof typeof descriptions
 
@@ -429,7 +429,7 @@ const archivingActions = [
       'button[type="button"]:first-of-type',
     )
     if (saveButton) {
-      saveButton.addEventListener('click', () => {
+      saveButton.addEventListener('click', (_event: Event) => {
         // For demonstration purposes, just show an alert
         alert(
           'Settings saved. In a production environment, this would update your data retention configuration.',

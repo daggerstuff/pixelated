@@ -141,7 +141,7 @@ export const GET: APIRoute = async ({ request }) => {
         'Vary': 'Accept-Encoding, Authorization',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching dimensional emotions:', error)
     return new Response(
       JSON.stringify({ error: 'Failed to fetch emotion data' }),

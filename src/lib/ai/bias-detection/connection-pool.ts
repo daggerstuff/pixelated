@@ -32,7 +32,7 @@ export class ConnectionPool {
   private config: ConnectionPoolConfig
   private cleanupIntervalId?: ReturnType<typeof setInterval>
 
-  constructor(config: Partial<ConnectionPoolConfig> = {}) {
+  constructor(config: Partial<ConnectionPoolConfig> = {}): void {
     this.config = {
       maxConnections: 10,
       connectionTimeout: 30000,
@@ -104,7 +104,7 @@ export class ConnectionPool {
     }
   }
 
-  private cleanupIdleConnections(): void {
+  private cleanupIdleConnections() {
     const now = new Date()
     const toRemove: string[] = []
 

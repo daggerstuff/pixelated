@@ -39,7 +39,7 @@ export class AnalyticsService {
   private readonly batchSize: number
   private readonly redisClient: RedisClient
 
-  constructor(options: AnalyticsServiceOptions = {}) {
+  constructor(options: AnalyticsServiceOptions = {}): void {
     this.wsClients = new Map()
     this.retentionDays = options.retentionDays || 90 // Default 90 days retention
     this.batchSize = options.batchSize || 100
@@ -75,7 +75,7 @@ export class AnalyticsService {
       this.notifySubscribers(event)
 
       return eventId
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error tracking event:', error)
       throw new ValidationError('Invalid event data', error)
     }
@@ -106,7 +106,7 @@ export class AnalyticsService {
           JSON.stringify(metric.tags),
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error tracking metric:', error)
       throw new ValidationError('Invalid metric data', error)
     }
@@ -136,7 +136,7 @@ export class AnalyticsService {
             continue
           }
 
-          const event = JSON.parse(eventJson) as Event
+          const event = JSON.parse(eventJson) as unknown as Event
 
           // Mark event as processed
           const processedEvent = EventSchema.parse({
@@ -153,12 +153,12 @@ export class AnalyticsService {
 
           // Remove from queue
           await this.redisClient.lrem('analytics:events:queue', 1, eventJson)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Error processing event:', error)
           throw new ProcessingError('Failed to process event', error)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in event processing:', error)
       throw new ProcessingError('Event processing failed', error)
     }
@@ -193,14 +193,14 @@ export class AnalyticsService {
               logger.warn('Invalid event JSON in storage:', json)
               return null
             }
-            return JSON.parse(json) as Event
-          } catch (error) {
+            return JSON.parse(json) as unknown as Event
+          } catch (error: unknown) {
             logger.error('Error parsing event JSON:', error)
             return null
           }
         })
         .filter((event): event is Event => event !== null)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting events:', error)
       throw new ProcessingError('Failed to retrieve events', error)
     }
@@ -231,8 +231,8 @@ export class AnalyticsService {
               logger.warn('Invalid metric JSON in storage:', json)
               return null
             }
-            return JSON.parse(json) as Metric
-          } catch (error) {
+            return JSON.parse(json) as unknown as Metric
+          } catch (error: unknown) {
             logger.error('Error parsing metric JSON:', error)
             return null
           }
@@ -249,7 +249,7 @@ export class AnalyticsService {
       }
 
       return metrics
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error getting metrics:', error)
       throw new ProcessingError('Failed to retrieve metrics', error)
     }
@@ -298,7 +298,7 @@ export class AnalyticsService {
       }
 
       logger.info('Analytics cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error in analytics cleanup:', error)
       throw new ProcessingError('Cleanup operation failed', error)
     }

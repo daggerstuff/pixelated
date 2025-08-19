@@ -245,7 +245,7 @@ export function useSpeechRecognition({
       recognitionRef.current.start()
       setIsListening(true)
       listeningRef.current = true
-    } catch (err) {
+    } catch (err: unknown) {
       setError(`Failed to start speech recognition: ${err}`)
       setIsListening(false)
       listeningRef.current = false
@@ -266,7 +266,7 @@ export function useSpeechRecognition({
       recognitionRef.current.stop()
       setIsListening(false)
       listeningRef.current = false
-    } catch (err) {
+    } catch (err: unknown) {
       setError(`Failed to stop speech recognition: ${err}`)
 
       if (onError) {

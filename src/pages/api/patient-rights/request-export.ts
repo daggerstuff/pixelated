@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { z } from 'zod'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { getSession } from '../../../lib/auth/session'
@@ -26,10 +25,10 @@ export const POST = async ({ request }) => {
     let requestBody
     try {
       requestBody = await request.json()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Invalid JSON in request body', {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        error: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : undefined,
       })
       return new Response(
         JSON.stringify({
@@ -120,10 +119,10 @@ export const POST = async ({ request }) => {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error processing export request', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
     })
 
     return new Response(

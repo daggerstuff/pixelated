@@ -11,7 +11,8 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
     name: 'Standard'
   }
   properties: {
-    adminUserEnabled: true
+    adminUserEnabled: false
+    publicNetworkAccess: 'Disabled'
   }
 }
 
@@ -29,6 +30,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   kind: 'linux'
   properties: {
     reserved: true
+    zoneRedundant: true
   }
 }
 
@@ -43,7 +45,16 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       name: 'standard'
     }
     enableRbacAuthorization: true
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: 'Disabled'
+    enablePurgeProtection: true
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 90
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+      ipRules: []
+      virtualNetworkRules: []
+    }
   }
 }
 
@@ -91,7 +102,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           name: containerAppName
           image: '${acr.properties.loginServer}/${containerAppName}:latest'
           resources: {
-            cpu: 0.5
+            cpu: 1
             memory: '1Gi'
           }
           env: [
@@ -120,6 +131,9 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
   kind: 'app'
   properties: {
     serverFarmId: appServicePlan.id
+    httpsOnly: true
+    clientCertEnabled: true
+    minimumTlsVersion: '1.2'
     siteConfig: {
       appSettings: [
         {
@@ -152,6 +166,8 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
         }
       ]
       linuxFxVersion: 'DOCKER|${acr.properties.loginServer}/${containerAppName}:latest'
+      healthCheckPath: '/health'
+      ftpsState: 'Disabled'
     }
   }
 }

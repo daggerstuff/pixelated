@@ -136,10 +136,10 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
               detection.confidence, // Detection score from CrisisDetectionResult
               detection.category ? [detection.category] : [], // Detected risks from CrisisDetectionResult
             )
-          } catch (error) {
+          } catch (error: unknown) {
             logger.error('Error handling crisis event in batch:', {
-              error: error instanceof Error ? error.message : String(error),
-              stack: error instanceof Error ? error.stack : undefined,
+              error: error instanceof Error ? String(error) : String(error),
+              stack: error instanceof Error ? (error as Error)?.stack : undefined,
               detection,
             })
           }
@@ -167,10 +167,10 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
             singleResult.confidence, // Detection score from CrisisDetectionResult
             singleResult.category ? [singleResult.category] : [], // Detected risks from CrisisDetectionResult
           )
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Error handling single crisis event:', {
-            error: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
+            error: error instanceof Error ? String(error) : String(error),
+            stack: error instanceof Error ? (error as Error)?.stack : undefined,
             result,
           })
         }
@@ -237,11 +237,11 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? String(error) : String(error)
     logger.error('Error processing crisis detection request:', {
       error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined,
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
     })
 
     // Define audit resource for error
@@ -259,7 +259,7 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
       {
         // details instead of metadata
         error: errorMessage,
-        stack: error instanceof Error ? error.stack : undefined,
+        stack: error instanceof Error ? (error as Error)?.stack : undefined,
         status: 'error', // This can go into details
         resourceType: aiResource.type,
       } as AuditDetails,

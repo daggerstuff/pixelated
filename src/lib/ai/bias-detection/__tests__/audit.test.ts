@@ -86,7 +86,7 @@ class MockAuditStorage implements AuditStorage {
     return [...this.entries]
   }
 
-  clear(): void {
+  clear() {
     this.entries = []
   }
 }
@@ -225,7 +225,7 @@ describe('BiasDetectionAuditLogger', () => {
       expect(entry!.action.category).toBe('user-data')
       expect(entry!.action.sensitivityLevel).toBe('medium') // 2 records = medium
       expect(entry!.details['dataAccessLog']).toBeDefined()
-      const dataAccessLog = entry!.details['dataAccessLog'] as any
+      const dataAccessLog = entry!.details['dataAccessLog'] as unknown
       expect(dataAccessLog.dataType).toBe('demographics')
       expect(dataAccessLog.dataIds).toEqual(['demo-1', 'demo-2'])
       expect(dataAccessLog.approvedBy).toBe('supervisor-456')
@@ -297,7 +297,7 @@ describe('BiasDetectionAuditLogger', () => {
       expect(entry!.details['alertLevel']).toBe('high')
 
       // Check demographics anonymization
-      const loggedDemographics = entry!.details['demographics'] as any
+      const loggedDemographics = entry!.details['demographics'] as unknown
       expect(loggedDemographics).toBeDefined()
       expect(loggedDemographics.age).toBe('25-35')
       expect(loggedDemographics.gender).toBe('female')
@@ -583,7 +583,7 @@ describe('BiasDetectionAuditLogger', () => {
       expect(entry).toBeDefined()
 
       // Should anonymize demographics
-      const demographics = entry!.details['demographics'] as any
+      const demographics = entry!.details['demographics'] as unknown
       expect(demographics.region).toBe('REDACTED')
 
       // Should redact session content

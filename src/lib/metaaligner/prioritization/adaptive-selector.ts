@@ -45,7 +45,7 @@ export class AdaptiveSelector {
   private weightingEngine: ObjectiveWeightingEngine
   private lastDetectedContext: ContextType | null = null
 
-  constructor(config: AdaptiveSelectorConfig) {
+  constructor(config: AdaptiveSelectorConfig): void {
     this.aiService = config.aiService
     this.contextDetector = new ContextDetector({
       aiService: this.aiService,

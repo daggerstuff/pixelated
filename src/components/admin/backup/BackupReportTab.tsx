@@ -68,7 +68,7 @@ const calculateSuccessRate = (successful: number, total: number) => {
   return `${Math.round((successful / total) * 100)}%`
 }
 
-const BackupReportTab: React.FC<BackupReportTabProps> = ({
+const BackupReportTab: FC<BackupReportTabProps> = ({
   backups,
   recoveryTests,
 }) => {

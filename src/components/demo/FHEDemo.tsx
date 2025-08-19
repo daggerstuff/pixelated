@@ -6,7 +6,7 @@ interface Props {
   defaultMessage?: string
 }
 
-export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protected with FHE technology' }) => {
+export const FHEDemo: FC<Props> = ({ defaultMessage = 'Your data is protected with FHE technology' }) => {
   const [plainText, setPlainText] = useState('Therapist: How are you feeling today?')
   const [operation, setOperation] = useState<FHEOperation | 'word_count' | 'sentiment'>('word_count')
   const [isLoading, setIsLoading] = useState(false)
@@ -96,7 +96,7 @@ export const FHEDemo: React.FC<Props> = ({ defaultMessage = 'Your data is protec
             <select
               className="w-full rounded border bg-background p-2 mt-1"
               value={operation}
-              onChange={(e) => setOperation(e.target.value as unknown as FHEOperation | 'word_count' | 'sentiment')}
+              onChange={(e) => setOperation(e.target.value as FHEOperation | 'word_count' | 'sentiment')}
             >
               {operations.map((op) => (
                 <option key={op.value} value={op.value}>

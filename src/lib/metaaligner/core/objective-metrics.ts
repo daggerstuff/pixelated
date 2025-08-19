@@ -126,7 +126,7 @@ export class ObjectiveMetricsEngine {
   private config: MetricsConfig
   private baselines: Map<string, number> = new Map()
 
-  constructor(config: MetricsConfig) {
+  constructor(config: MetricsConfig): void {
     this.config = config
     this.evaluationHistory = {
       evaluations: [],
@@ -607,7 +607,7 @@ export class ObjectiveMetricsEngine {
     }
   }
 
-  private updateTrends(): void {
+  private updateTrends() {
     // Update trends for all objectives with sufficient history
     const objectiveIds = new Set<string>()
     this.evaluationHistory.evaluations.forEach((e) => {
@@ -622,7 +622,7 @@ export class ObjectiveMetricsEngine {
     })
   }
 
-  private updatePatterns(): void {
+  private updatePatterns() {
     // Simple pattern detection - could be more sophisticated
     // For now, just identify consistent high/low performance patterns
     const patterns: EvaluationPattern[] = []
@@ -632,7 +632,7 @@ export class ObjectiveMetricsEngine {
     this.evaluationHistory.patterns = patterns
   }
 
-  private updateBenchmarks(): void {
+  private updateBenchmarks() {
     // Update benchmark achievement tracking
     const benchmarks: EvaluationBenchmark[] = [
       {

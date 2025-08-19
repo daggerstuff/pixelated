@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { z } from 'zod'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { protectApi } from '../../../lib/auth/apiAuth'
@@ -28,11 +27,11 @@ export const POST = async ({ request }) => {
     let requestBody
     try {
       requestBody = await request.json()
-    } catch (error) {
+    } catch (error: unknown) {
       // Log the JSON parsing error
       logger.error('Invalid JSON in request body', {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        error: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error as Error)?.stack : undefined,
         url: request.url,
         method: request.method,
       })
@@ -146,11 +145,11 @@ export const POST = async ({ request }) => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     logger.error('Error creating export request', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
     })
 
     // Return a generic error response

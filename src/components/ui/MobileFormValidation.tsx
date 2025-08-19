@@ -354,7 +354,7 @@ export function MobileFormValidation({
                   href={`#${field}`}
                   onClick={(e) => {
                     e.preventDefault()
-                    const element = document.querySelector(`[name="${field}"]`)
+                    const element = document.querySelector(`[name="${field}"]`) as HTMLElement
                     if (element instanceof HTMLElement) {
                       element.focus()
                       element.scrollIntoView({

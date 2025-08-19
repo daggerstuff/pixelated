@@ -41,8 +41,8 @@ describe('DashboardLayout', () => {
   it('renders with default props', async () => {
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
     // Use computed path to avoid TS attempting to statically resolve .astro module
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any)
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown)
 
     // Check basic structure
     expect(container.querySelector('html')).toBeInTheDocument()
@@ -51,7 +51,7 @@ describe('DashboardLayout', () => {
 
     // Check default title and description
     expect(document.title).toBe('Pixelated Empathy | Dashboard')
-    expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
+    expect(document.querySelector('meta[name="description"]') as HTMLElement).toHaveAttribute(
       'content',
       'Advanced therapeutic tools for mental health professionals',
     )
@@ -67,12 +67,12 @@ describe('DashboardLayout', () => {
     }
 
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any, customProps)
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown, customProps)
 
     // Check custom title and description
     expect(document.title).toBe('Custom Title')
-    expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
+    expect(document.querySelector('meta[name="description"]') as HTMLElement).toHaveAttribute(
       'content',
       'Custom description',
     )
@@ -85,8 +85,8 @@ describe('DashboardLayout', () => {
 
   it('applies custom className to content', async () => {
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any, {
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown, {
       contentClassName: 'custom-content-class',
     })
 
@@ -95,11 +95,11 @@ describe('DashboardLayout', () => {
   })
 
   it('renders with meta image and type', async () => {
-    expect(document.querySelector('meta[property="og:image"]')).toHaveAttribute(
+    expect(document.querySelector('meta[property="og:image"]') as HTMLElement).toHaveAttribute(
       'content',
       '/custom-image.png',
     )
-    expect(document.querySelector('meta[property="og:type"]')).toHaveAttribute(
+    expect(document.querySelector('meta[property="og:type"]') as HTMLElement).toHaveAttribute(
       'content',
       'article',
     )
@@ -107,8 +107,8 @@ describe('DashboardLayout', () => {
 
   it('renders error boundary', async () => {
     const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as any)) as any
-    const { container } = await renderAstro(DashboardLayout as any)
+    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
+    const { container } = await renderAstro(DashboardLayout as unknown)
 
     expect(container.querySelector('error-boundary')).toBeInTheDocument()
   })

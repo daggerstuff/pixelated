@@ -19,7 +19,7 @@ export async function initializeSecurityDatabase() {
     // For now, we'll just simulate the initialization
 
     logger.info('Security database initialized successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     const typedError = error instanceof Error ? error : new Error(String(error))
     logger.error('Failed to initialize security database', typedError)
     throw typedError

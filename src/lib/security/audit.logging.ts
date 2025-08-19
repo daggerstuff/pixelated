@@ -85,7 +85,7 @@ export class AuditLoggingService {
 
       // Store the log entry (implement your storage mechanism here)
       await this.storeLogEntry(sanitizedEntry)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to log audit event:', error)
       throw new SecurityError('Failed to log audit event')
     }

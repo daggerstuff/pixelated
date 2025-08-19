@@ -16,12 +16,12 @@ export interface CrisisEventData {
 // Initialize logger
 const logger = createBuildSafeLogger('crisis-event-db')
 
-if (!process.env.DATABASE_URL) {
+if (!process.env['DATABASE_URL']) {
   throw new Error('DATABASE_URL is not defined in the environment variables.')
 }
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env['DATABASE_URL'],
   ssl:
     process.env.NODE_ENV === 'production'
       ? { rejectUnauthorized: false }
@@ -59,15 +59,15 @@ export async function recordCrisisEventToDb(
       ],
     )
     logger.info('Crisis event recorded successfully', { caseId })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to record crisis event to database', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
       caseId,
     })
     // Rethrow to allow calling code to handle the error if needed
     throw new Error(
-      `Failed to record crisis event: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to record crisis event: ${error instanceof Error ? String(error) : String(error)}`,
     )
   }
 }

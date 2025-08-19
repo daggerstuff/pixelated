@@ -146,7 +146,7 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
 
 <script>
   // Wait for client-side hydration
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', (_event: Event) => {
     const todoInput = document.getElementById('todo-input') as HTMLInputElement
     const addButton = document.getElementById('add-todo-btn')
     const todoList = document.getElementById('todo-list')
@@ -224,12 +224,12 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
       const completeBtn = document.createElement('button')
       completeBtn.className = 'todo-button complete-button'
       completeBtn.textContent = todo.completed ? '↩️' : '✓'
-      completeBtn.addEventListener('click', () => toggleTodoComplete(todo.id))
+      completeBtn.addEventListener('click', (_event: Event) => toggleTodoComplete(todo.id))
 
       const deleteBtn = document.createElement('button')
       deleteBtn.className = 'todo-button delete-button'
       deleteBtn.textContent = '×'
-      deleteBtn.addEventListener('click', () => deleteTodo(todo.id))
+      deleteBtn.addEventListener('click', (_event: Event) => deleteTodo(todo.id))
 
       actionsDiv.appendChild(completeBtn)
       actionsDiv.appendChild(deleteBtn)
@@ -293,7 +293,7 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     // Event listeners
     addButton?.addEventListener('click', addTodo)
 
-    todoInput?.addEventListener('keydown', (e) => {
+    todoInput?.addEventListener('keydown', (e: Event) => {
       if (e.key === 'Enter') {
         addTodo()
       }

@@ -117,7 +117,7 @@ async function piiMiddleware(
 
     // Continue to next middleware/handler
     return next()
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in PII middleware', { error })
     return new NextResponse('Internal Server Error', { status: 500 })
   }
@@ -130,7 +130,7 @@ export const onRequest = defineMiddleware(async (context: APIContext, next) => {
   try {
     // Add PII detection logic here
     return await next()
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in PII middleware', { error })
     return new Response('Internal Server Error', { status: 500 })
   }

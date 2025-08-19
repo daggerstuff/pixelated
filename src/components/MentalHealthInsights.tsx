@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { AlertTriangle, Heart, Brain, Shield, Zap } from 'lucide-react'
 
@@ -22,7 +22,7 @@ interface MentalHealthInsightsProps {
   analysis: EnhancedMentalHealthAnalysis
 }
 
-export const MentalHealthInsights: React.FC<MentalHealthInsightsProps> = ({
+export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
   analysis,
 }) => {
   const getRiskIcon = () => {

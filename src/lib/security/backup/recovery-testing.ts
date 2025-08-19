@@ -139,7 +139,7 @@ export class RecoveryTestingManager {
   private testEnvironments: Map<string, TestEnvironment> = new Map()
   private testCases: Map<string, TestCase> = new Map()
 
-  constructor(config: RecoveryTestConfig) {
+  constructor(config: RecoveryTestConfig): void {
     this.config = config
     this.initialize()
   }
@@ -157,7 +157,7 @@ export class RecoveryTestingManager {
   /**
    * Internal initialization method
    */
-  private initialize(): void {
+  private initialize() {
     if (!this.config.testCases || this.config.testCases.length === 0) {
       this.loadDefaultTestCases()
     } else {
@@ -181,7 +181,7 @@ export class RecoveryTestingManager {
     if (this.config.enabled) {
       this.scheduleAutomatedTests().catch((error) => {
         logger.error(
-          `Failed to schedule automated tests: ${error instanceof Error ? error.message : String(error)}`,
+          `Failed to schedule automated tests: ${error instanceof Error ? String(error) : String(error)}`,
         )
       })
     }
@@ -233,9 +233,9 @@ export class RecoveryTestingManager {
       }
 
       logger.info('Recovery testing configuration updated successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Failed to update recovery testing configuration: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to update recovery testing configuration: ${error instanceof Error ? String(error) : String(error)}`,
       )
       throw error
     }
@@ -244,7 +244,7 @@ export class RecoveryTestingManager {
   /**
    * Load default test cases for common backup types
    */
-  private loadDefaultTestCases(): void {
+  private loadDefaultTestCases() {
     const defaultTestCases: TestCase[] = [
       {
         id: generateUUID(),
@@ -439,11 +439,11 @@ export class RecoveryTestingManager {
       }
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Recovery test failed with exception', {
         testId,
         backupId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       // Log failure
@@ -455,7 +455,7 @@ export class RecoveryTestingManager {
         {
           testId,
           backupId,
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? String(error) : String(error),
         },
       )
 
@@ -471,7 +471,7 @@ export class RecoveryTestingManager {
         issues: [
           {
             type: 'test_error',
-            description: `Test failed with error: ${error instanceof Error ? error.message : String(error)}`,
+            description: `Test failed with error: ${error instanceof Error ? String(error) : String(error)}`,
             severity: 'critical',
           },
         ],
@@ -587,11 +587,11 @@ export class RecoveryTestingManager {
       )
       logger.info(`Test report generated: ${reportPath}`)
       return reportPath
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
-        `Failed to generate test report: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to generate test report: ${error instanceof Error ? String(error) : String(error)}`,
       )
-      return `Error generating report: ${error instanceof Error ? error.message : String(error)}`
+      return `Error generating report: ${error instanceof Error ? String(error) : String(error)}`
     }
   }
 

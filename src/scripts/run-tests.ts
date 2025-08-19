@@ -52,7 +52,7 @@ function installPlaywright() {
 /**
  * Run Playwright tests
  */
-function runTests(args: string[] = []) {
+function runTests(args: string[] = []): void {
   console.log('Running Playwright tests...')
 
   // Build the command arguments

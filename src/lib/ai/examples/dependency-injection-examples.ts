@@ -75,7 +75,7 @@ export function getSharedEmotionSynthesizer(): EmotionSynthesizer {
 }
 
 // Example 6: Resetting for tests
-export function resetEmotionSynthesizerForTests(): void {
+export function resetEmotionSynthesizerForTests() {
   // Clear singleton state between tests
   EmotionSynthesizer.resetInstance()
 }

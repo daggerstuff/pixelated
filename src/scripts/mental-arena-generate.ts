@@ -63,7 +63,7 @@ const options = program.opts()
 
 // Mock provider implementation with production-like features
 class MockMentalArenaProvider {
-  async analyzeEmotions(text: string) {
+  async analyzeEmotions(text: string): void {
     // Simulate emotion analysis with realistic patterns
     const emotions = ['anxiety', 'depression', 'neutral', 'hope', 'frustration']
     const dominant = emotions[Math.floor(Math.random() * emotions.length)]
@@ -85,7 +85,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async generateIntervention(symptoms: string[]) {
+  async generateIntervention(symptoms: string[]): void {
     const techniques = [
       'cognitive-reframing',
       'mindfulness',
@@ -117,7 +117,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async assessRisk(conversation: string) {
+  async assessRisk(conversation: string): void {
     const riskKeywords = ['harm', 'hurt', 'end', 'die', 'kill']
     const hasRiskIndicators = riskKeywords.some((keyword) =>
       conversation.toLowerCase().includes(keyword),
@@ -148,7 +148,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async generateText(prompt: string) {
+  async generateText(prompt: string): void {
     // Generate contextually appropriate therapeutic responses
     if (prompt.includes('patient')) {
       return "I've been feeling really anxious lately, especially about work and social situations."
@@ -160,7 +160,7 @@ class MockMentalArenaProvider {
 
 // Mock FHE service for encryption capabilities
 class MockFHEService {
-  async encrypt(value: unknown) {
+  async encrypt(value: unknown): void {
     return {
       data: `encrypted_${typeof value}_${Date.now()}`,
       originalType: typeof value,
@@ -168,7 +168,7 @@ class MockFHEService {
     }
   }
 
-  async decrypt(encrypted: unknown) {
+  async decrypt(encrypted: unknown): void {
     const encryptedData = encrypted as { data?: string }
     return (
       encryptedData.data?.replace(/^encrypted_\w+_\d+$/, 'decrypted_data') ||
@@ -176,22 +176,22 @@ class MockFHEService {
     )
   }
 
-  async encryptText(text: string) {
+  async encryptText(text: string): void {
     return `enc:${Buffer.from(text).toString('base64')}`
   }
 
-  async decryptText(encrypted: string) {
+  async decryptText(encrypted: string): void {
     if (encrypted.startsWith('enc:')) {
       return Buffer.from(encrypted.slice(4), 'base64').toString()
     }
     return encrypted
   }
 
-  async generateHash(data: unknown) {
+  async generateHash(data: unknown): void {
     return `hash_${JSON.stringify(data).length}_${Date.now()}`
   }
 
-  setEncryptionMode(mode: string) {
+  setEncryptionMode(mode: string): void {
     console.log(`Encryption mode set to: ${mode}`)
   }
 
@@ -404,10 +404,10 @@ async function main() {
     console.log(`   - Failed generations: ${result.metadata.failedGenerations}`)
 
     console.log('\n✅ Mental Arena data generation complete!')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('\n❌ Error generating data:', error)
     if (error instanceof Error) {
-      console.error('Stack trace:', error.stack)
+      console.error('Stack trace:', (error as Error)?.stack)
     }
     process.exit(1)
   }

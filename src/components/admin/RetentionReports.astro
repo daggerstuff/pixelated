@@ -522,11 +522,11 @@ const getStatusBadge = (status: string) => {
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Generate report button handler
     const generateReportBtn = document.getElementById('generate-report-btn')
     if (generateReportBtn) {
-      generateReportBtn.addEventListener('click', () => {
+      generateReportBtn.addEventListener('click', (_event: Event) => {
         const title =
           (document.getElementById('report-title') as HTMLInputElement)
             ?.value || 'Untitled Report'

@@ -112,7 +112,7 @@ async function testSEALIntegration() {
 
     logger.info('SEAL integration test completed')
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('SEAL integration test failed:', { error })
     return false
   }

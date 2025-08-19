@@ -17,11 +17,6 @@ on:
 
   # Allow manual runs for debugging
   workflow_dispatch:
-    inputs:
-      ENV_NAME:
-        description: "Target environment (staging|production)"
-        required: false
-        default: "staging"
 
 jobs:
   validate-ai-models:

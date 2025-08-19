@@ -25,7 +25,7 @@ export class PerformanceLogger {
     try {
       const fs = await import('node:fs/promises')
       await fs.mkdir(this.logDir, { recursive: true })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create performance log directory:', error)
     }
   }
@@ -38,7 +38,7 @@ export class PerformanceLogger {
     }, this.FLUSH_INTERVAL)
   }
 
-  public async logMetric(metric: PerformanceMetrics) {
+  public async logMetric(metric: PerformanceMetrics): void {
     this.metricsBuffer.push(metric)
 
     // Log warnings for performance issues
@@ -82,7 +82,7 @@ export class PerformanceLogger {
       logger.info(
         `Flushed ${this.metricsBuffer.length} performance metrics to ${logFile}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to flush performance metrics:', error)
     }
   }
@@ -112,19 +112,19 @@ export class PerformanceLogger {
           const fileMetrics = content
             .split('\n')
             .filter((line) => line.trim())
-            .map((line) => JSON.parse(line))
+            .map((line) => JSON.parse(line) as unknown)
           metrics.push(...fileMetrics)
         }
       }
 
       return metrics
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get performance metrics:', error)
       return []
     }
   }
 
-  public async cleanup(retentionDays = 30) {
+  public async cleanup(retentionDays = 30): void {
     try {
       const fs = await import('node:fs/promises')
       const files = await fs.readdir(this.logDir)
@@ -142,7 +142,7 @@ export class PerformanceLogger {
           logger.info(`Cleaned up old performance log file: ${file}`)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to clean up performance logs:', error)
     }
   }

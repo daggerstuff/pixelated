@@ -38,12 +38,12 @@ export async function authGuard(
       {
         reason: 'missing_token',
         ipAddress:
-          context.request.headers.get('x-forwarded-for') ||
-          context.request.headers.get('x-real-ip') ||
-          'unknown',
-        userAgent: context.request.headers.get('user-agent') || 'unknown',
-        method: context.request.method,
-        path: new URL(context.request.url).pathname,
+        (context as unknown as APIContextWithUser).request?.headers?.get('x-forwarded-for') ||
+        (context as unknown as APIContextWithUser).request?.headers?.get('x-real-ip') ||
+        'unknown',
+      userAgent: (context as unknown as APIContextWithUser).request?.headers?.get('user-agent') || 'unknown',
+      method: (context as unknown as APIContextWithUser).request?.method,
+      path: new URL((context as unknown as APIContextWithUser).request?.url).pathname,
       } as AuditMetadata,
     )
 
@@ -52,14 +52,14 @@ export async function authGuard(
       status: 302,
       headers: {
         Location: `${authConfig['redirects']['authRequired']}?redirect=${encodeURIComponent(
-          context.request.url,
+          (context as unknown as APIContextWithUser).request?.url,
         )}`,
       },
     })
   }
 
   // Attach user to context
-  ;(context.locals as AstroLocals).user = user
+  ;((context as unknown as APIContextWithUser).locals as AstroLocals).user = user as AuthUser
 
   return undefined
 }
@@ -67,7 +67,7 @@ export async function authGuard(
 /**
  * Middleware to ensure routes are accessible only by users with specific roles
  */
-export function roleGuard(role: AuthRole) {
+export function roleGuard(role: AuthRole): void {
   return async (context: APIContext): Promise<Response | undefined> => {
     const user = await getCurrentUser(context.cookies)
 
@@ -100,7 +100,7 @@ export function roleGuard(role: AuthRole) {
     }
 
     // Check the user's role
-    const hasRequiredRole = hasRolePrivilege(user['role'], role)
+    const hasRequiredRole = hasRolePrivilege(user?.['role'] as AuthRole, role)
 
     if (!hasRequiredRole) {
       await createResourceAuditLog(
@@ -131,7 +131,7 @@ export function roleGuard(role: AuthRole) {
     }
 
     // Attach user to context
-    ;(context.locals as AstroLocals).user = user
+    ;((context as unknown as APIContextWithUser).locals as AstroLocals).user = user as AuthUser
 
     return undefined
   }
@@ -210,12 +210,12 @@ export async function apiAuthGuard(
   }
 
   // Set the user data in context
-  context.user = data.user as AuthUser
+  ;(context as Record<string, unknown>).user = data?.['user'] as AuthUser
 
   // Log the successful authentication
   await createResourceAuditLog(
     'api_authenticated',
-    data.user.id,
+    data?.['user']?.['id'],
     createResource(new URL(request.url).pathname, 'api'),
     {
       method: request.method,
@@ -229,7 +229,7 @@ export async function apiAuthGuard(
 /**
  * API middleware for protecting routes by role
  */
-export function apiRoleGuard(role: AuthRole) {
+export function apiRoleGuard(role: AuthRole): void {
   return async (
     request: Request,
     context: Record<string, unknown>,
@@ -245,7 +245,7 @@ export function apiRoleGuard(role: AuthRole) {
     const { user } = apiContext
 
     // Check if the user has the required role
-    if (!hasRolePrivilege(user.role, role)) {
+    if (!hasRolePrivilege(user?.['role'], role)) {
       await createResourceAuditLog(
         'api_access_denied',
         user.id,

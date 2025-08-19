@@ -17,7 +17,7 @@ describe('KeyRotationService', () => {
 
   beforeEach(() => {
     // Reset singleton for testing
-    ;(KeyRotationService as any).instance = undefined
+    ;(KeyRotationService as unknown).instance = undefined
     service = KeyRotationService.getInstance()
   })
 

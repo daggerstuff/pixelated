@@ -21,10 +21,10 @@ export async function isAuthenticated(
     // Use MongoDB-based session retrieval
     const sessionData = await getSession(request)
     return sessionData !== null
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error checking authentication:', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
     })
     return false
   }
@@ -39,10 +39,10 @@ export async function hasAdminRole(user: AuthUser): Promise<boolean> {
   try {
     // Check if the user has the 'admin' role
     return user.role === 'admin'
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error checking admin role:', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? String(error) : String(error),
+      stack: error instanceof Error ? (error as Error)?.stack : undefined,
     })
     return false
   }

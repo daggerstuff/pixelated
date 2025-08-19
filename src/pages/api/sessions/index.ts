@@ -165,15 +165,15 @@ export const GET = protectRoute()(async ({ request, locals }) => {
       status: HTTP_STATUS.OK,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error processing sessions request', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? String(error) : 'Unknown error',
     })
 
     return new Response(
       JSON.stringify({
         error: ERROR_MESSAGES.INTERNAL_ERROR,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: HTTP_STATUS.INTERNAL_SERVER_ERROR,

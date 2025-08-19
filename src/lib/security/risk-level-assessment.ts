@@ -78,7 +78,7 @@ export class RiskLevelAssessmentService {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(options: RiskAssessmentOptions = {}) {
+  private constructor(options: RiskAssessmentOptions = {}): void {
     this.options = { ...DEFAULT_OPTIONS, ...options }
   }
 

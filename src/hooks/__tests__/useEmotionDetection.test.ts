@@ -18,7 +18,7 @@ describe('useEmotionDetection', () => {
   }
 
   const mockStreamResponse = new ReadableStream({
-    start(controller) {
+    start(controller): void {
       controller.enqueue(
         new TextEncoder().encode(JSON.stringify(mockAIResponse)),
       )

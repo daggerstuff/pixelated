@@ -79,12 +79,12 @@ export const GET = async ({ request }: { request: Request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to fetch techniques',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? String(error) : 'Unknown error'
       }),
       {
         status: 500,
@@ -136,12 +136,12 @@ export const POST = async ({ request, cookies }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to generate recommendations',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? String(error) : 'Unknown error'
       }),
       {
         status: 500,

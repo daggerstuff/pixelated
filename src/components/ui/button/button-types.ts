@@ -69,7 +69,7 @@ export const BUTTON_VARIANTS: ButtonVariant[] = [
 export const BUTTON_SIZES: ButtonSize[] = ['default', 'sm', 'lg', 'icon']
 
 // Accessibility helpers
-export function getAriaProps(props: ButtonProps) {
+export function getAriaProps(props: ButtonProps): void {
   return {
     'aria-label': props['aria-label'],
     'aria-description': props['aria-description'],

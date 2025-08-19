@@ -18,7 +18,7 @@ export function useAnalytics() {
         timestamp: Date.now(),
         metadata: {},
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to track analytics event:', error)
     }
   }
@@ -34,7 +34,7 @@ export function useAnalytics() {
         tags: data.tags || {},
         timestamp: Date.now(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to track analytics metric:', error)
     }
   }

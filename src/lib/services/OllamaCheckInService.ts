@@ -45,7 +45,7 @@ export class OllamaCheckInService {
   private baseUrl: string
   private defaultModel: string
 
-  constructor(baseUrl?: string, defaultModel?: string) {
+  constructor(baseUrl?: string, defaultModel?: string): void {
     this.baseUrl =
       baseUrl ||
       getEnv('OLLAMA_BASE_URL') ||
@@ -128,9 +128,9 @@ Remember:
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send Ollama request', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         baseUrl: this.baseUrl,
       })
       throw error
@@ -193,9 +193,9 @@ Remember:
         improvementsCount: improvements.length,
         decision,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to parse Ollama response, using defaults', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         response: response.substring(0, 200) + '...',
       })
     }
@@ -368,9 +368,9 @@ Remember:
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Check-in failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
         taskSummary,
       })
 
@@ -378,7 +378,7 @@ Remember:
       return {
         shouldContinue: false, // Stop on error
         improvements: [],
-        rawResponse: `Error: ${error instanceof Error ? error.message : String(error)}`,
+        rawResponse: `Error: ${error instanceof Error ? String(error) : String(error)}`,
         decision: 'no',
         reasoningLog: [
           'Error occurred during check-in, stopping execution for safety',

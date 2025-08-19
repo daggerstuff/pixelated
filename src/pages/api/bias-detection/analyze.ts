@@ -128,18 +128,18 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       JSON.stringify({ success: true, data: mockAnalysisResult, cacheHit: false, processingTime }),
       { status: 200, headers: { 'Content-Type': 'application/json', 'X-Processing-Time': `${processingTime}`, 'X-Cache': 'MISS' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in bias detection analysis:', error)
 
     return new Response(
-      JSON.stringify({ success: false, error: 'Internal Server Error', message: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ success: false, error: 'Internal Server Error', message: 'An internal error occurred' }),
       { status: 500, headers: { 'Content-Type': 'application/json', 'X-Processing-Time': '0', 'X-Cache': 'MISS' } },
     )
   }
 }
 
 // Reset rate limits for testing purposes
-export function resetRateLimits(): void {
+export function resetRateLimits() {
   requestCount = 0;
   logger.info('Rate limits reset');
 }
@@ -173,10 +173,10 @@ export const GET = async ({ request, url }: { request: Request; url: URL }) => {
       JSON.stringify({ success: true, data: mockGetAnalysisResult, cacheHit: true }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error in bias detection GET:', error)
     return new Response(
-      JSON.stringify({ success: false, error: 'Internal Server Error', message: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ success: false, error: 'Internal Server Error', message: error instanceof Error ? String(error) : 'Unknown error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )
   }

@@ -85,7 +85,7 @@ export function useTemporalEmotionAnalysis(
 
       setData(result.data)
       setIsLoading(false)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching temporal emotion analysis:', error)
       setError(error instanceof Error ? error : new Error('Unknown error'))
       setIsLoading(false)
@@ -161,7 +161,7 @@ export function useEmotionProgression(
 
       setProgression(result.data.progression)
       setIsLoading(false)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching emotion progression:', error)
       setError(error instanceof Error ? error : new Error('Unknown error'))
       setIsLoading(false)
@@ -238,7 +238,7 @@ export function useEmotionPatterns(
 
       setPatterns(result.data.patterns)
       setIsLoading(false)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching emotion patterns:', error)
       setError(error instanceof Error ? error : new Error('Unknown error'))
       setIsLoading(false)

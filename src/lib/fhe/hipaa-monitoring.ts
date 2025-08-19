@@ -101,12 +101,12 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Initialize AWS monitoring services
    */
-  private initializeAWSServices(): void {
+  private initializeAWSServices() {
     try {
       this.cloudWatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' })
       this.sns = new AWS.SNS({ apiVersion: '2010-03-31' })
       logger.info('AWS monitoring services initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize AWS monitoring services', { error })
     }
   }
@@ -114,7 +114,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Setup threat detection patterns
    */
-  private setupThreatPatterns(): void {
+  private setupThreatPatterns() {
     this.threatPatterns = [
       {
         id: 'rapid_rotation_failures',
@@ -187,7 +187,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Start continuous monitoring
    */
-  public startMonitoring(): void {
+  public startMonitoring() {
     if (this.isMonitoring) {
       logger.warn('Monitoring already active')
       return
@@ -229,7 +229,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Stop monitoring
    */
-  public stopMonitoring(): void {
+  public stopMonitoring() {
     this.isMonitoring = false
 
     for (const interval of this.monitoringIntervals) {
@@ -276,13 +276,13 @@ export class HIPAAMonitoringService extends EventEmitter {
             if (recentEvents.length >= indicator.threshold) {
               this.triggerThreatResponse(pattern, recentEvents)
             }
-          } catch (error) {
+          } catch (error: unknown) {
             logger.warn(
               'Failed to retrieve recent events for threat pattern evaluation',
               {
                 eventType: indicator.eventType,
                 patternId: pattern.id,
-                error: error instanceof Error ? error.message : 'Unknown error',
+                error: error instanceof Error ? String(error) : 'Unknown error',
               },
             )
             // Continue processing other patterns
@@ -407,7 +407,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         .promise()
 
       logger.info('Security alert notification sent', { alertId: alert.id })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send alert notification', {
         error,
         alertId: alert.id,
@@ -418,7 +418,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Perform threat detection analysis
    */
-  private performThreatDetection(): void {
+  private performThreatDetection() {
     // CRITICAL: This method is not implemented - threat detection is disabled
     logger.warn(
       'performThreatDetection not implemented - ML-based threat analysis disabled',
@@ -447,7 +447,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Perform compliance check
    */
-  private performComplianceCheck(): void {
+  private performComplianceCheck() {
     // CRITICAL: This method is not implemented - compliance monitoring is disabled
     logger.warn(
       'performComplianceCheck not implemented - HIPAA compliance monitoring disabled',
@@ -476,7 +476,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Perform system health check
    */
-  private performHealthCheck(): void {
+  private performHealthCheck() {
     // CRITICAL: This method is not implemented - system health monitoring is disabled
     logger.warn(
       'performHealthCheck not implemented - system health monitoring disabled',
@@ -547,7 +547,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         .promise()
 
       logger.debug('Security metrics emitted to CloudWatch')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to emit security metrics', { error })
     }
   }

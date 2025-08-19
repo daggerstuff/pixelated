@@ -444,7 +444,7 @@ export class StandardObjectiveRegistry implements ObjectiveRegistry {
     return this.getAll()
   }
 
-  clear(): void {
+  clear() {
     this.objectives.clear()
   }
 

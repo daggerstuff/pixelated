@@ -45,7 +45,7 @@ export class EdgeComputing {
   private taskQueue: EdgeComputeTask[] = []
   private isProcessing = false
 
-  constructor(config: EdgeComputeConfig) {
+  constructor(config: EdgeComputeConfig): void {
     this.config = config
     logger.info('EdgeComputing initialized', { config })
   }
@@ -103,7 +103,7 @@ export class EdgeComputing {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Edge compute task failed', { taskId: task.id, error })
 
       return {
@@ -152,7 +152,7 @@ export class EdgeComputing {
 
       logger.info('Edge compute health check completed', { isHealthy })
       return isHealthy
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Edge compute health check failed', { error })
       return false
     }
@@ -170,7 +170,7 @@ export class EdgeComputing {
 
       logger.info('Edge compute resources scaled successfully')
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to scale edge compute resources', { error })
       return false
     }
@@ -205,7 +205,7 @@ export class EdgeComputing {
       if (task) {
         try {
           await this.executeTask(task)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Queue task execution failed', {
             taskId: task.id,
             error,
@@ -232,7 +232,7 @@ export class EdgeComputing {
   /**
    * Cleanup resources
    */
-  dispose(): void {
+  dispose() {
     this.activeConnections.forEach((connection) => {
       connection.close()
     })

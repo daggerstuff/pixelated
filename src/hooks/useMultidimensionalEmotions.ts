@@ -132,13 +132,13 @@ class EmotionDataCache {
   }
 
   // Clear all entries
-  clear(): void {
+  clear() {
     this.cache.clear()
     this.currentMemory = 0
   }
 
   // Clean up expired entries
-  cleanup(): void {
+  cleanup() {
     const now = Date.now()
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > this.ttl) {
@@ -174,7 +174,7 @@ class EmotionDataCache {
   }
 
   // Remove the least valuable entry based on priority and access time
-  private evictLeastValuable(): void {
+  private evictLeastValuable() {
     let leastValuableKey: string | null = null
     let lowestValue = Infinity
 
@@ -198,7 +198,7 @@ class EmotionDataCache {
   }
 
   // Clean up when the object is garbage collected
-  destroy(): void {
+  destroy() {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval)
       this.cleanupInterval = null
@@ -391,11 +391,11 @@ export function useMultidimensionalEmotions(
             emotionCache.set(lowResKey, sampledData, priority - 1)
           }
         }
-      } catch (err) {
+      } catch (err: unknown) {
         // Only update state if the component is still mounted and it's not an abort error
         if (
           isMountedRef.current &&
-          !(err instanceof DOMException && err.name === 'AbortError')
+          !(err instanceof DOMException && (err as Error)?.name === 'AbortError')
         ) {
           console.error('Error fetching emotion data:', err)
           setError(err instanceof Error ? err : new Error(String(err)))

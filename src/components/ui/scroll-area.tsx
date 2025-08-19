@@ -7,7 +7,7 @@ interface ScrollAreaProps {
   maxHeight?: string | number
 }
 
-export const ScrollArea: React.FC<ScrollAreaProps> = ({
+export const ScrollArea: FC<ScrollAreaProps> = ({
   children,
   className = '',
   height,

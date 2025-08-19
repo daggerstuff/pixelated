@@ -92,10 +92,10 @@ export const POST: APIRoute = async ({ cookies }: never) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     // Log the error
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error'
+      error instanceof Error ? String(error) : 'Unknown error'
     logger.error(`Error starting continuous validation: ${errorMessage}`)
 
     // Create audit log for failed start

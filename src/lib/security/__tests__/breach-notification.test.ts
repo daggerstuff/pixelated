@@ -59,12 +59,12 @@ describe('breachNotificationSystem', () => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    ;(redis['set'] as any).mockResolvedValue('OK')
-    ;(redis['get'] as any).mockResolvedValue(null)
-    ;(redis['keys'] as any).mockResolvedValue([])
-    ;(auth['getUserById'] as any).mockResolvedValue(mockUser)
-    ;(FHE['encrypt'] as any).mockResolvedValue('encrypted_data')
-    ;(sendEmail as any).mockResolvedValue(undefined)
+    ;(redis['set'] as unknown).mockResolvedValue('OK')
+    ;(redis['get'] as unknown).mockResolvedValue(null)
+    ;(redis['keys'] as unknown).mockResolvedValue([])
+    ;(auth['getUserById'] as unknown).mockResolvedValue(mockUser)
+    ;(FHE['encrypt'] as unknown).mockResolvedValue('encrypted_data')
+    ;(sendEmail as unknown).mockResolvedValue(undefined)
 
     // Setup process.env
     process.env.ORGANIZATION_NAME = 'Test Org'
@@ -94,7 +94,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle errors during breach reporting', async () => {
-      ;(redis['set'] as any).mockRejectedValue(new Error('Redis error'))
+      ;(redis['set'] as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.reportBreach(mockBreachDetails),
@@ -125,7 +125,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle missing user email gracefully', async () => {
-      ;(auth['getUserById'] as any).mockResolvedValue({ id: 'user1' }) // User without email
+      ;(auth['getUserById'] as unknown).mockResolvedValue({ id: 'user1' }) // User without email
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
@@ -133,7 +133,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle user notification errors', async () => {
-      ;(sendEmail as any).mockRejectedValue(new Error('Email error'))
+      ;(sendEmail as unknown).mockRejectedValue(new Error('Email error'))
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
@@ -218,7 +218,7 @@ describe('breachNotificationSystem', () => {
         notificationStatus: 'completed',
       }
 
-      ;(redis.get as any).mockResolvedValue(JSON.stringify(mockStoredBreach))
+      ;(redis.get as unknown).mockResolvedValue(JSON.stringify(mockStoredBreach))
 
       const breach =
         await BreachNotificationSystem.getBreachStatus('test_breach')
@@ -228,7 +228,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should return null for non-existent breach', async () => {
-      ;(redis.get as any).mockResolvedValue(null)
+      ;(redis.get as unknown).mockResolvedValue(null)
 
       const breach =
         await BreachNotificationSystem.getBreachStatus('non_existent')
@@ -237,7 +237,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle Redis errors', async () => {
-      ;(redis.get as any).mockRejectedValue(new Error('Redis error'))
+      ;(redis.get as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.getBreachStatus('test_breach'),
@@ -267,11 +267,11 @@ describe('breachNotificationSystem', () => {
         },
       ]
 
-      ;(redis.keys as any).mockResolvedValue([
+      ;(redis.keys as unknown).mockResolvedValue([
         'breach:breach1',
         'breach:breach2',
       ])
-      ;(redis.get as any)
+      ;(redis.get as unknown)
         .mockResolvedValueOnce(JSON.stringify(mockBreaches[0]))
         .mockResolvedValueOnce(JSON.stringify(mockBreaches[1]))
 
@@ -283,7 +283,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle Redis errors', async () => {
-      ;(redis.keys as any).mockRejectedValue(new Error('Redis error'))
+      ;(redis.keys as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.listRecentBreaches(),
@@ -296,8 +296,8 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should filter out invalid breach data', async () => {
-      ;(redis.keys as any).mockResolvedValue(['breach:valid', 'breach:invalid'])
-      ;(redis.get as any)
+      ;(redis.keys as unknown).mockResolvedValue(['breach:valid', 'breach:invalid'])
+      ;(redis.get as unknown)
         .mockResolvedValueOnce(
           JSON.stringify({
             ...mockBreachDetails,

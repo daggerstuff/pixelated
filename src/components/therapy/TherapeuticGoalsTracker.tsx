@@ -61,7 +61,7 @@ export function TherapeuticGoalsTracker({
         }
       })
       .catch((err) => {
-        setError(err.message)
+        setError((err as Error)?.message || String(err))
         // Optionally, load generated goals on API error as well
         const fallbackGoals = generateGoalsFromPatientModel(patientModel)
         setGoals(fallbackGoals)
@@ -124,7 +124,7 @@ export function TherapeuticGoalsTracker({
       setActiveGoalId(newGoal.id)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError(err.message)
+        setActionError((err as Error)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -152,7 +152,7 @@ export function TherapeuticGoalsTracker({
       )
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError(err.message)
+        setActionError((err as Error)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -176,7 +176,7 @@ export function TherapeuticGoalsTracker({
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError(err.message)
+        setActionError((err as Error)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }

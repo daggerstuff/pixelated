@@ -129,7 +129,7 @@ export default function useEmotionProgress({
         }
 
         setData(mockData)
-      } catch (err) {
+      } catch (err: unknown) {
         setError(
           err instanceof Error
             ? err

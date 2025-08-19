@@ -17,7 +17,7 @@ interface Logger {
 export class ComparativeProgressService {
   private logger: Logger
 
-  constructor(logger: Logger) {
+  constructor(logger: Logger): void {
     this.logger = logger
   }
 
@@ -60,12 +60,12 @@ export class ComparativeProgressService {
         benchmarkData,
         comparisonInsights,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       // Log the error (without PII)
       this.logger.error('Error in comparative progress analysis', {
         metricName: params.metricName,
         cohortId: params.cohortId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? String(error) : String(error),
       })
 
       // Return error result
