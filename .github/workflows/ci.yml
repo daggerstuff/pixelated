@@ -401,6 +401,9 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
+      - name: Ensure coverage directory exists
+        run: mkdir -p coverage/.tmp
+
       - name: Run tests with increased timeout
         run: pnpm test --pool=threads --poolOptions.threads.minThreads=0 --poolOptions.threads.maxThreads=3
         env:

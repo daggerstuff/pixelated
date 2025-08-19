@@ -270,7 +270,6 @@ export function calculateBiasFactors(sessionData: SessionData): BiasFactors {
  * Generate counterfactual scenarios based on analysis results
  */
 export function generateCounterfactualScenarios(
-  sessionData: SessionData,
   biasFactors: BiasFactors,
 ): CounterfactualScenario[] {
   const scenarios: CounterfactualScenario[] = []
@@ -576,6 +575,7 @@ export function generateSessionId(): string {
     array[0] = Math.floor(Math.random() * 0xffffffff);
     array[1] = Math.floor(Math.random() * 0xffffffff);
   }
-  const randomStr = array[0].toString(36) + array[1].toString(36);
-  return 'demo_' + Date.now() + '_' + randomStr.substr(0, 9);
+  const randomStr =
+    (array[0] ?? 0).toString(36) + (array[1] ?? 0).toString(36);
+  return 'demo_' + Date.now() + '_' + randomStr.slice(0, 9);
 }

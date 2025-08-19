@@ -2,6 +2,7 @@ name: Security Scanning
 
 permissions:
   contents: read
+  security-events: write
 
 on:
   push:
@@ -35,17 +36,17 @@ jobs:
           directory: .
           framework: all
           output_format: sarif
-          output_file: checkov-results.sarif
+          output_file_path: checkov-results.sarif
           baseline: security-baseline.json
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
 
       - name: Upload Checkov scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'checkov-results.sarif'

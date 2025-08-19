@@ -263,6 +263,8 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
   const [highContrast, setHighContrast] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [announcements, setAnnouncements] = useState<string[]>([])
+  // State for new high/critical bias alert notification
+  const [newHighBiasAlert, setNewHighBiasAlert] = useState<AlertItem | null>(null)
 
   // Focus management refs
   const skipLinkRef = useRef<HTMLButtonElement>(null)
@@ -830,6 +832,10 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
                     return prev
                   }
                   const newAlert = data.alert
+                  // Show notification if high/critical
+                  if (newAlert.level === 'high' || newAlert.level === 'critical') {
+                    setNewHighBiasAlert(newAlert)
+                  }
                   announceToScreenReader(
                     `New ${newAlert.level} bias alert: ${newAlert.message}`,
                   )
@@ -1413,6 +1419,28 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
     <div
       className={`p-6 space-y-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
     >
+      {/* New High Bias Alert Notification */}
+      {newHighBiasAlert && (
+        <div
+          className="mb-4 p-4 bg-orange-100 border-l-4 border-orange-500 flex items-center justify-between"
+          role="alert"
+          data-testid="new-high-bias-alert"
+        >
+          <div>
+            <span className="font-bold text-orange-700 mr-2">New high bias alert</span>
+            <span className="text-sm text-orange-800">
+              {newHighBiasAlert.message}
+            </span>
+          </div>
+          <button
+            className="ml-4 px-2 py-1 bg-orange-200 rounded text-orange-800 hover:bg-orange-300"
+            aria-label="Dismiss new high bias alert"
+            onClick={() => setNewHighBiasAlert(null)}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Skip Links for Accessibility */}
       <div className="sr-only">
         <button

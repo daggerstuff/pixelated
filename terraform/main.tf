@@ -117,6 +117,7 @@ resource "aws_db_instance" "main" {
 
   multi_az = true
   performance_insights_enabled = true
+  performance_insights_kms_key_id = var.rds_performance_insights_kms_key_id
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade", "error", "general", "slowquery"]
   monitoring_interval = 60
   iam_database_authentication_enabled = true
@@ -272,6 +273,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "assets" {
     expiration {
       days = 365
     }
+    abort_incomplete_multipart_upload_days = 7
   }
 }
 

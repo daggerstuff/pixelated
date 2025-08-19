@@ -133,8 +133,8 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     clientCertEnabled: true
-    minimumTlsVersion: '1.2'
     siteConfig: {
+      minTlsVersion: '1.2'
       appSettings: [
         {
           name: 'NODE_ENV'
