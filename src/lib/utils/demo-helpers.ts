@@ -561,5 +561,21 @@ export function determineAlertLevel(
  * Generate session ID
  */
 export function generateSessionId(): string {
-  return 'demo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+  // Use cryptographically secure random values for session ID
+  const array = new Uint32Array(2);
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(array);
+  } else if (typeof require !== 'undefined') {
+    // Node.js fallback
+    const crypto = require('crypto');
+    const buf = crypto.randomBytes(8);
+    array[0] = buf.readUInt32LE(0);
+    array[1] = buf.readUInt32LE(4);
+  } else {
+    // Fallback to Math.random (should not happen)
+    array[0] = Math.floor(Math.random() * 0xffffffff);
+    array[1] = Math.floor(Math.random() * 0xffffffff);
+  }
+  const randomStr = array[0].toString(36) + array[1].toString(36);
+  return 'demo_' + Date.now() + '_' + randomStr.substr(0, 9);
 }
