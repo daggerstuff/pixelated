@@ -6,7 +6,7 @@ import {
   AuditEventStatus,
 } from '../../../../lib/audit'
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }): Promise<Response> => {
   const logger = createBuildSafeLogger('validation-webhook')
 
   try {

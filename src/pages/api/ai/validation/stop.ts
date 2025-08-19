@@ -7,7 +7,7 @@ import {
   AuditEventStatus,
 } from '../../../../lib/audit'
 
-export const POST: APIRoute = async ({ cookies }: never) => {
+export const POST = async ({ cookies }: { cookies: any }): Promise<Response> => {
   const logger = createBuildSafeLogger('validation-api')
 
   try {
@@ -70,7 +70,7 @@ export const POST: APIRoute = async ({ cookies }: never) => {
       'validation-api',
       {
         userId: user.id,
-        username: user.fullName || user.email,
+        username: user.name || user.email,
       },
       AuditEventStatus.SUCCESS,
     )

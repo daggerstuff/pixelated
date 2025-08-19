@@ -93,7 +93,7 @@ export const POST = async ({ request, cookies }) => {
     }
 
     // Check if user has admin role
-    if (!user.roles?.includes('admin')) {
+    if (user.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },

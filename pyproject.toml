@@ -49,6 +49,19 @@ dependencies = [
   "plotly>=6.2.0",
   "jupyter>=1.1.1",
   "wandb>=0.21.1",
+  # Training dependencies
+  "datasets>=2.19.0",
+  "accelerate>=0.33.0", 
+  "bitsandbytes>=0.43.0",
+  "peft>=0.11.0",
+  "trl>=0.9.6",
+  "sentencepiece>=0.2.0",
+  "einops>=0.8.0",
+  # HuggingFace Hub
+  "huggingface-hub>=0.24.0",
+  # GGUF conversion
+  "llama-cpp-python>=0.2.90",
+  "gguf>=0.10.0",
 ]
 
 [project.optional-dependencies]

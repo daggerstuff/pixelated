@@ -1,10 +1,17 @@
 export const prerender = false
 
-import type { APIRoute } from 'astro'
+// import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
-import { EmotionTemporalAnalyzer } from '@/lib/ai/temporal/EmotionTemporalAnalyzer'
+import { 
+  EmotionTemporalAnalyzer, 
+  type EmotionAnalysisResult,
+  type EmotionTrendline,
+  type EmotionData,
+  type EmotionProgression,
+  type EmotionCorrelation
+} from '@/lib/ai/temporal/EmotionTemporalAnalyzer'
 
 const logger = createBuildSafeLogger('temporal-emotions-api')
 
@@ -19,14 +26,22 @@ const logger = createBuildSafeLogger('temporal-emotions-api')
  * - analysisType: Type of analysis to perform (default: 'full')
  *   Options: 'full', 'trends', 'critical', 'progression', 'transitions', 'relationships'
  */
-export const GET: APIRoute = protectRoute()(async ({
+export const GET = protectRoute({
+  requiredRole: 'user',
+  validateIPMatch: true,
+  validateUserAgent: true,
+})(async ({
   params,
   request,
   locals,
-}) => {
+}: {
+  params: Record<string, string | undefined>
+  request: Request
+  locals: { user: any }
+}): Promise<Response> => {
   try {
     const { user } = locals
-    const { sessionId } = params
+    const sessionId = params['sessionId']
 
     // Validate session ID
     if (!sessionId) {
@@ -59,7 +74,13 @@ export const GET: APIRoute = protectRoute()(async ({
     const clientId = user.id
 
     // Perform analysis based on requested type
-    let result = null
+    let result: 
+      | { trendlines: EmotionTrendline[] | undefined; volatility: number | undefined }
+      | EmotionAnalysisResult
+      | EmotionData[]
+      | EmotionProgression
+      | EmotionCorrelation[]
+      | undefined = undefined
 
     switch (analysisType) {
       case 'trends': {

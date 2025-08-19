@@ -77,16 +77,30 @@ stages:
     - task: Cache@2
       displayName: Cache pnpm dependencies
       inputs:
-        key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+        key: 'pnpm-v2 | "$(Agent.OS)" | pnpm-lock.yaml'
         restoreKeys: |
+          pnpm-v2 | "$(Agent.OS)"
           pnpm | "$(Agent.OS)"
         path: $(Agent.WorkFolder)/.pnpm-store
 
+    - task: Cache@2
+      displayName: Cache Astro build artifacts
+      inputs:
+        key: 'astro-build | "$(Agent.OS)" | package.json | pnpm-lock.yaml'
+        restoreKeys: |
+          astro-build | "$(Agent.OS)"
+        path: |
+          node_modules/.astro
+          .astro
+
     - script: |
-        pnpm install --frozen-lockfile
+        # Install dependencies with optimizations
+        pnpm install --frozen-lockfile --prefer-offline
       displayName: Install dependencies
 
     - script: |
+        # Build with optimizations
+        export NODE_OPTIONS="--max-old-space-size=4096"
         pnpm run build
       displayName: Build application
 
@@ -325,8 +339,8 @@ stages:
             echo "Copied build artifacts to current directory"
           fi
 
-          # Build and push Docker images with build cache optimization
-          echo "Building Docker image with cache optimization..."
+          # Build and push Docker images with advanced multi-stage cache optimization
+          echo "Building Docker image with multi-stage cache optimization..."
           
           # Use Dockerfile.azure if it exists, otherwise use Dockerfile
           DOCKERFILE="Dockerfile"
@@ -336,16 +350,63 @@ stages:
           else
             echo "Using default Dockerfile: $DOCKERFILE"
           fi
+
+          # Enable Docker BuildKit for advanced caching
+          export DOCKER_BUILDKIT=1
           
+          # Pull existing images for cache layers
+          echo "Pulling existing images for cache optimization..."
+          docker pull "$ACR_LOGIN_SERVER/$(imageName):latest" || echo "No latest image found, proceeding without cache"
+          docker pull "$ACR_LOGIN_SERVER/$(imageName):cache-base" || echo "No base cache found"
+          docker pull "$ACR_LOGIN_SERVER/$(imageName):cache-build" || echo "No build cache found"
+          
+          # Build base stage and push for caching
+          echo "Building base stage for cache..."
           docker build \
             -f "$DOCKERFILE" \
+            --target base \
+            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
             --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg NODE_VERSION=22 \
+            --build-arg PNPM_VERSION=10.14.0 \
+            -t "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
+            . || echo "Base stage build failed, continuing..."
+            
+          # Build build stage and push for caching
+          echo "Building build stage for cache..."
+          docker build \
+            -f "$DOCKERFILE" \
+            --target build \
+            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
+            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
+            --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg NODE_VERSION=22 \
+            --build-arg PNPM_VERSION=10.14.0 \
+            -t "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
+            . || echo "Build stage build failed, continuing..."
+            
+          # Final production build with all cache layers
+          echo "Building final production image..."
+          docker build \
+            -f "$DOCKERFILE" \
+            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
+            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
+            --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg NODE_VERSION=22 \
+            --build-arg PNPM_VERSION=10.14.0 \
             -t "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" \
             -t "$ACR_LOGIN_SERVER/$(imageName):latest" \
             .
 
-          echo "Pushing Docker images..."
+          echo "Pushing Docker images and cache layers..."
+          # Push cache layers first for next build optimization
+          docker push "$ACR_LOGIN_SERVER/$(imageName):cache-base" || echo "Base cache push failed"
+          docker push "$ACR_LOGIN_SERVER/$(imageName):cache-build" || echo "Build cache push failed"
+          
+          # Push main images
           docker push "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)"
           docker push "$ACR_LOGIN_SERVER/$(imageName):latest"
 
@@ -524,6 +585,10 @@ stages:
                     --name "$CONTAINER_APP_NAME" \
                     --resource-group $(resourceGroupName) \
                     --image "$ACR_LOGIN_SERVER/$(imageName):$DOCKER_IMAGE_TAG" \
+                    --cpu 1.0 \
+                    --memory 2Gi \
+                    --min-replicas 1 \
+                    --max-replicas 10 \
                     --set-env-vars \
                       BUILD_ID=$(dockerTag) \
                       NODE_ENV=production \
@@ -551,10 +616,10 @@ stages:
                     --registry-server "$ACR_LOGIN_SERVER" \
                     --registry-username "$ACR_USERNAME" \
                     --registry-password "$ACR_PASSWORD" \
-                    --cpu 0.5 \
-                    --memory 1Gi \
-                    --min-replicas 0 \
-                    --max-replicas 3 \
+                    --cpu 1.0 \
+                    --memory 2Gi \
+                    --min-replicas 1 \
+                    --max-replicas 10 \
                     --env-vars \
                       BUILD_ID=$(dockerTag) \
                       NODE_ENV=production \
@@ -978,11 +1043,11 @@ stages:
             TAG_COUNT=$(echo "$ALL_TAGS" | grep -c "^" || echo "0")
             echo "Found $TAG_COUNT image tags in registry"
             
-            if [ "$TAG_COUNT" -gt 5 ]; then
-              TAGS_TO_DELETE=$((TAG_COUNT - 5))
-              echo "Keeping only the 5 most recent image tags, deleting $TAGS_TO_DELETE oldest"
+            if [ "$TAG_COUNT" -gt 10 ]; then
+              TAGS_TO_DELETE=$((TAG_COUNT - 10))
+              echo "Keeping only the 10 most recent image tags (including cache layers), deleting $TAGS_TO_DELETE oldest"
               
-              echo "$ALL_TAGS" | grep -v "latest" | head -n $TAGS_TO_DELETE | while read tag; do
+              echo "$ALL_TAGS" | grep -v "latest" | grep -v "cache-" | head -n $TAGS_TO_DELETE | while read tag; do
                 if [ ! -z "$tag" ] && [ "$tag" != "$(dockerTag)" ]; then
                   echo "Deleting old image tag: $(imageName):$tag"
                   az acr repository delete \
@@ -995,7 +1060,7 @@ stages:
                 fi
               done
             else
-              echo "✅ No image cleanup needed - only $TAG_COUNT tags exist"
+              echo "✅ No image cleanup needed - only $TAG_COUNT tags exist (keeping cache layers for optimization)"
             fi
           else
             echo "No image tags found for cleanup"
