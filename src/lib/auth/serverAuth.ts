@@ -270,6 +270,92 @@ export async function requirePageAuth({
 }
 
 /**
- * Alias export for API route protection
+ * Higher-order function to protect API routes with authentication and authorization
+ * Usage: export const GET = protectRoute({ requiredRole: 'user' })(async ({ locals, request }) => { ... })
  */
-export { requirePageAuth as protectRoute }
+export function protectRoute<
+  Props extends Record<string, unknown> = Record<string, unknown>,
+  Params extends Record<string, string | undefined> = Record<string, string | undefined>
+>(
+  options: {
+    requiredRole?: AuthRole
+    validateIPMatch?: boolean
+    validateUserAgent?: boolean
+  } = {}
+) {
+  return (
+    handler: (context: {
+      params: Params
+      request: Request
+      locals: { user: AuthUser }
+    }) => Response | Promise<Response>
+  ) => {
+    return async (context: {
+      params: Params
+      request: Request
+      locals: Record<string, unknown>
+    }): Promise<Response> => {
+      try {
+        // Get client IP
+        const requestIp = 
+          context.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          context.request.headers.get('x-real-ip') ||
+          'unknown'
+
+        // Verify authentication
+        const authResult = await verifyServerAuth({
+          cookies: {} as any, // We don't need cookies for API routes
+          request: context.request,
+          requestIp,
+          requiredRole: options.requiredRole,
+          validateIPMatch: options.validateIPMatch ?? true,
+          validateUserAgent: options.validateUserAgent ?? true,
+        })
+
+        if (!authResult.authenticated) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Authentication required',
+              reason: authResult.reason 
+            }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          )
+        }
+
+        if (!authResult.user) {
+          return new Response(
+            JSON.stringify({ error: 'User not found' }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          )
+        }
+
+        // Add user to locals
+        context.locals.user = authResult.user
+
+        // Call the handler with the authenticated context
+        return handler(context as {
+          params: Params
+          request: Request
+          locals: { user: AuthUser }
+        })
+      } catch (error: unknown) {
+        logger.error('Error in protected route', { error })
+        return new Response(
+          JSON.stringify({ error: 'Internal server error' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        )
+      }
+    }
+  }
+}
+
+// protectRoute is now implemented above as a higher-order function

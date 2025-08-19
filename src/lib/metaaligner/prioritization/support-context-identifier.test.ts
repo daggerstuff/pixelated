@@ -179,7 +179,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should perform AI analysis when pattern confidence is low', async () => {
-      const query = 'Complex emotional situation that needs nuanced analysis'
+      const query = 'The temperature outside is 72 degrees Fahrenheit'
       const result = await identifier.identifySupportContext(query)
 
       expect(mockAIService.generateText).toHaveBeenCalled()
@@ -222,7 +222,7 @@ describe('SupportContextIdentifier', () => {
         new Error('AI service unavailable'),
       )
 
-      const query = 'I need emotional support'
+      const query = 'The library has 15,000 books in its collection'
       const result = await identifier.identifySupportContext(query)
 
       expect(result['isSupport']).toBe(true)
@@ -384,9 +384,9 @@ describe('SupportContextIdentifier', () => {
         .mockResolvedValueOnce('{"isSupport": true, "confidence": 0.7}')
 
       const queries = [
-        { query: 'Query 1' },
-        { query: 'Query 2' },
-        { query: 'Query 3' },
+        { query: 'I feel sad today' },
+        { query: 'I need emotional support' },
+        { query: 'Feeling overwhelmed' },
       ]
 
       const results = await identifier.identifyBatch(queries)

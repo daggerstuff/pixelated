@@ -1,8 +1,7 @@
-import type { APIRoute } from 'astro'
+
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { createBuildSafeLogger } from '../../../../../lib/logging/build-safe-logger'
 import { createResourceAuditLog, AuditEventType } from '../../../../lib/audit'
-import type { AuthAPIContext } from '../../../../lib/auth/apiRouteTypes'
 
 export const prerender = false
 
@@ -11,11 +10,11 @@ const logger = createBuildSafeLogger('admin-users-api')
 /**
  * Get all users (admin only)
  */
-export const GET: APIRoute = protectRoute({
+export const GET = protectRoute({
   requiredRole: 'admin',
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ locals, request }: AuthAPIContext) => {
+})(async ({ locals, request }) => {
   try {
     const admin = locals.user
     const params = new URL(request.url).searchParams
@@ -86,11 +85,11 @@ export const GET: APIRoute = protectRoute({
 /**
  * Update user (admin only)
  */
-export const PATCH: APIRoute = protectRoute({
+export const PATCH = protectRoute({
   requiredRole: 'admin',
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ locals, request }: AuthAPIContext) => {
+})(async ({ locals, request }) => {
   try {
     const admin = locals.user
     const body = await request.json()

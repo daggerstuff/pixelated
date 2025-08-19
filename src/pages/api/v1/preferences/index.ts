@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// Note: APIRoute type not available in current Astro version
 import { protectRoute } from '@/lib/auth/serverAuth'
 import {
   getOrCreateUserSettings,
@@ -117,7 +117,7 @@ export const GET = protectRoute()(async ({ locals }) => {
   }
 })
 
-export const PUT: APIRoute = protectRoute()(async ({ request, locals }) => {
+export const PUT = protectRoute()(async ({ request, locals }: { request: Request, locals: any }): Promise<Response> => {
   try {
     const { user } = locals
     const body = await request.json()
@@ -139,7 +139,7 @@ export const PUT: APIRoute = protectRoute()(async ({ request, locals }) => {
 
     await updateUserSettings(
       user.id,
-      { preferences: newPrefs as unknown as JsonValue },
+      { preferences: newPrefs },
       request,
     )
     logger.info('AI preferences updated', { userId: user.id })
@@ -158,7 +158,7 @@ export const PUT: APIRoute = protectRoute()(async ({ request, locals }) => {
   }
 })
 
-export const DELETE: APIRoute = protectRoute()(async ({ locals, request }) => {
+export const DELETE = protectRoute()(async ({ locals, request }: { locals: any, request: Request }): Promise<Response> => {
   try {
     const { user } = locals
     const settings = await getOrCreateUserSettings(user.id, request)
@@ -173,7 +173,7 @@ export const DELETE: APIRoute = protectRoute()(async ({ locals, request }) => {
 
     await updateUserSettings(
       user.id,
-      { preferences: newPrefs as unknown as JsonValue },
+      { preferences: newPrefs },
       request,
     )
     logger.info('AI preferences reset to defaults', { userId: user.id })

@@ -7,7 +7,7 @@ import {
 } from '../../../../lib/security/backup/backup-types'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import type { AuthRole } from '../../../../config/auth.config'
-import type { AuthAPIContext } from '../../../../lib/auth/apiRouteTypes'
+
 
 export const prerender = false
 
@@ -26,7 +26,7 @@ backupManager.initialize().catch((error) => {
 // GET endpoint for recovery tests
 export const GET = protectRoute({
   requiredRole: 'admin' as AuthRole,
-})(async ({ request, _locals }: AuthAPIContext) => {
+})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
   try {
     // Extract action from query params
     const url = new URL(request.url)
@@ -44,7 +44,7 @@ export const GET = protectRoute({
     } else if (action === 'get' && testId) {
       // Get a specific test result
       const test = await getRecoveryTestById(testId)
-      if (!test) {
+      if (test === undefined) {
         return new Response(JSON.stringify({ error: 'Test not found' }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' },
@@ -81,7 +81,7 @@ export const GET = protectRoute({
 // POST endpoint for recovery tests
 export const POST = protectRoute({
   requiredRole: 'admin' as AuthRole,
-})(async ({ request, _locals }: AuthAPIContext) => {
+})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
   try {
     // Parse request body
     const requestData = await request.json()
@@ -201,7 +201,7 @@ async function getRecoveryTests() {
           type: 'verification_failed',
           description:
             'Verification failed for test case: Differential Backup Verification',
-          severity: 'high',
+          severity: 'high' as const,
         },
       ],
     },
@@ -209,7 +209,7 @@ async function getRecoveryTests() {
 }
 
 // Mock function to get a specific recovery test by ID
-async function getRecoveryTestById(testId: string): void {
+async function getRecoveryTestById(testId: string): Promise<RecoveryTestResult | undefined> {
   const tests = await getRecoveryTests()
   return tests.find((test) => test.id === testId)
 }
@@ -380,7 +380,7 @@ function simulateRecoveryTest(
         type: 'verification_failed',
         description:
           'Verification failed for test case: Full Backup Basic Verification',
-        severity: 'high',
+        severity: 'high' as const,
       },
     ]
   }

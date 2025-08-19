@@ -5,7 +5,7 @@ FROM node:${NODE_VERSION}-slim AS base
 
 LABEL org.opencontainers.image.description="Pixelated Empathy - Azure Deployment"
 
-ARG PNPM_VERSION=
+ARG PNPM_VERSION=10.14.0
 RUN npm install -g pnpm@$PNPM_VERSION
 
 RUN apt-get update -qq && \
@@ -42,8 +42,8 @@ COPY --chown=astro:astro . .
 
 RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
     chmod -R 755 /tmp/.astro /app/node_modules/.astro && \
-    pnpm install --no-frozen-lockfile --prod=false && \
-    pnpm build || echo "Build failed, continuing with fallback" && \
+    pnpm install --frozen-lockfile --prefer-offline --prod=false && \
+    NODE_OPTIONS="--max-old-space-size=4096" pnpm build || echo "Build failed, continuing with fallback" && \
     pnpm prune --prod || true
 
 FROM base

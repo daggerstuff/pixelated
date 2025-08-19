@@ -2,7 +2,7 @@
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { MongoAuthService } from '@/services/mongoAuth.service'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+// Removed AuthAPIContext import - using direct type annotation instead
 
 export const prerender = false
 
@@ -14,7 +14,7 @@ const logger = createBuildSafeLogger('profile-api')
 export const GET = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ locals }: AuthAPIContext) => {
+})(async ({ locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
   try {
     const { user } = locals
 
@@ -72,7 +72,7 @@ export const GET = protectRoute({
 export const PUT = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ request, locals }: AuthAPIContext) => {
+})(async ({ request, locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
   try {
     const { user } = locals
     const data = await request.json()

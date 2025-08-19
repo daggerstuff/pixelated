@@ -12,7 +12,7 @@ export interface EmotionAnalysisOptions {
   }
 }
 
-interface EmotionTrendline {
+export interface EmotionTrendline {
   emotion: string
   values: number[]
   timestamps: Date[]
@@ -25,7 +25,7 @@ interface EmotionPattern {
   frequency?: number
 }
 
-interface EmotionData {
+export interface EmotionData {
   type: string
   intensity: number
   timestamp: Date
@@ -46,13 +46,13 @@ export interface EmotionAnalysisResult {
   patterns?: EmotionPattern[]
 }
 
-interface EmotionProgression {
+export interface EmotionProgression {
   progression: 'improving' | 'stable' | 'declining'
   score: number
   trends?: EmotionTrendline[]
 }
 
-interface EmotionCorrelation {
+export interface EmotionCorrelation {
   emotion1: string
   emotion2: string
   correlationStrength: number

@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+// Note: APIRoute type not available in current Astro version
 import { emotionValidationPipeline } from '../../../../lib/ai/emotions/EmotionValidationPipeline'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { isAuthenticated } from '../../../../lib/auth'
@@ -8,7 +8,7 @@ import {
   AuditEventStatus,
 } from '../../../../lib/audit'
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST = async ({ request }: { request: Request }): Promise<Response> => {
   const logger = createBuildSafeLogger('validation-api')
 
   try {
@@ -33,7 +33,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!authResult['user']?.['isAdmin']) {
       // Create audit log for unauthorized access attempt
       await createAuditLog(
-        (AuditEventType as unknown as { SECURITY_EVENT?: string })?.SECURITY_EVENT || 'SECURITY_EVENT',
+        AuditEventType.SECURITY,
         'validation-pipeline-run-unauthorized',
         authResult['user']?.['id'] || 'unknown',
         'validation-api',
@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: true,
         message: 'Validation run completed successfully',
-        resultsCount: results.length,
+        resultsCount: results?.length || 0,
       }),
       {
         status: 200,

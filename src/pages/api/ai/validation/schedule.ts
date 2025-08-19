@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro'
 import { validationRunner } from '../../../../lib/ai/validation/ContinuousValidationRunner'
 import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { isAuthenticated } from '../../../../lib/auth'
@@ -8,7 +7,7 @@ import {
   AuditEventStatus,
 } from '../../../../lib/audit'
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST = async ({ request }: { request: Request }) => {
   const logger = createBuildSafeLogger('validation-schedule')
 
   try {
@@ -33,7 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!authResult?.['user']?.['isAdmin']) {
       // Create audit log for unauthorized access attempt
       await createAuditLog(
-        (AuditEventType as unknown as { SECURITY_EVENT?: string })?.['SECURITY_EVENT'] || 'SECURITY_EVENT',
+        AuditEventType.SECURITY,
         'validation-schedule-unauthorized',
         (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'] || 'unknown',
         'validation-api',
