@@ -74,23 +74,59 @@ jobs:
           echo "🏥 Running PRODUCTION health checks against $BASE_URL"
           echo "ℹ️  Production failures will trigger alerts and notifications"
 
-          # Basic endpoint check
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
-          echo "HTTP Status: $HTTP_STATUS"
+          # Function to perform robust HTTP check with retries
+          check_endpoint() {
+            local url="$1"
+            local endpoint_name="$2"
+            local max_retries=3
+            local timeout=30
+            local retry_delay=10
+            
+            for attempt in $(seq 1 $max_retries); do
+              echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
+              
+              # Use curl with explicit timeout and connection timeout
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+                --connect-timeout 15 \
+                --max-time $timeout \
+                --retry 0 \
+                "$url" 2>/dev/null || echo "000")
+              
+              echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
+              
+              if [[ "$HTTP_STATUS" == "200" ]]; then
+                echo "✅ $endpoint_name check successful"
+                return 0
+              elif [[ "$HTTP_STATUS" == "000" ]]; then
+                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              else
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+              fi
+              
+              if [[ $attempt -lt $max_retries ]]; then
+                echo "⏳ Waiting ${retry_delay}s before retry..."
+                sleep $retry_delay
+              fi
+            done
+            
+            return 1
+          }
 
-          if [[ "$HTTP_STATUS" != "200" ]]; then
-            echo "::error::PRODUCTION site is down or returning errors (HTTP $HTTP_STATUS)"
+          # Basic endpoint check with retries
+          if check_endpoint "$BASE_URL" "Main Site"; then
+            MAIN_STATUS="passing"
+          else
+            echo "::error::PRODUCTION site is down or returning errors after $max_retries attempts"
             echo "status=failing" >> $GITHUB_OUTPUT
             exit 1
           fi
 
-          # API health check (using the simple health endpoint)
-          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health")
-          echo "API Status: $API_STATUS"
-
-          # Only warn but don't fail if API health check fails
-          if [[ "$API_STATUS" != "200" ]]; then
-            echo "::warning::API health endpoint is not responding with 200 (HTTP $API_STATUS)"
+          # API health check with retries (non-blocking)
+          if check_endpoint "$BASE_URL/api/health" "API Health"; then
+            API_STATUS="passing"
+          else
+            echo "::warning::API health endpoint is not responding after retries"
+            API_STATUS="failing"
           fi
 
           echo "✅ PRODUCTION health checks passed"
@@ -236,29 +272,64 @@ jobs:
           echo "🏥 Running STAGING health checks against $BASE_URL"
           echo "ℹ️  Staging failures will warn but not trigger critical alerts"
 
-          # Basic endpoint check
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
-          echo "HTTP Status: $HTTP_STATUS"
+          # Function to perform robust HTTP check with retries
+          check_endpoint() {
+            local url="$1"
+            local endpoint_name="$2"
+            local max_retries=2  # Fewer retries for staging
+            local timeout=20     # Shorter timeout for staging
+            local retry_delay=5  # Shorter delay for staging
+            
+            for attempt in $(seq 1 $max_retries); do
+              echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
+              
+              # Use curl with explicit timeout and connection timeout
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+                --connect-timeout 10 \
+                --max-time $timeout \
+                --retry 0 \
+                "$url" 2>/dev/null || echo "000")
+              
+              echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
+              
+              if [[ "$HTTP_STATUS" == "200" ]]; then
+                echo "✅ $endpoint_name check successful"
+                return 0
+              elif [[ "$HTTP_STATUS" == "000" ]]; then
+                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              else
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+              fi
+              
+              if [[ $attempt -lt $max_retries ]]; then
+                echo "⏳ Waiting ${retry_delay}s before retry..."
+                sleep $retry_delay
+              fi
+            done
+            
+            return 1
+          }
 
-          if [[ "$HTTP_STATUS" != "200" ]]; then
-            echo "::warning::STAGING site is down or returning errors (HTTP $HTTP_STATUS)"
+          # Basic endpoint check with retries
+          if check_endpoint "$BASE_URL" "Main Site"; then
+            MAIN_STATUS="passing"
+            echo "status=passing" >> $GITHUB_OUTPUT
+          else
+            echo "::warning::STAGING site is down or returning errors after retries"
             echo "::notice::This is a staging environment failure, not affecting production"
             echo "status=warning" >> $GITHUB_OUTPUT
-            # Don't exit 1 for staging builds, just warn
+            MAIN_STATUS="warning"
+          fi
+
+          # API health check with retries (non-blocking)
+          if check_endpoint "$BASE_URL/api/health" "API Health"; then
+            API_STATUS="passing"
           else
-            echo "status=passing" >> $GITHUB_OUTPUT
+            echo "::warning::API health endpoint is not responding after retries"
+            API_STATUS="failing"
           fi
 
-          # API health check (using the simple health endpoint)
-          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health")
-          echo "API Status: $API_STATUS"
-
-          # Only warn but don't fail if API health check fails
-          if [[ "$API_STATUS" != "200" ]]; then
-            echo "::warning::API health endpoint is not responding with 200 (HTTP $API_STATUS)"
-          fi
-
-          if [[ "${status}" == "warning" ]]; then
+          if [[ "$MAIN_STATUS" == "warning" ]]; then
             echo "⚠️  STAGING health checks completed with warnings"
           else
             echo "✅ STAGING health checks passed"
@@ -372,31 +443,66 @@ jobs:
           echo "ℹ️  Preview failures will warn but not trigger alerts - this is expected for preview builds"
           echo "ℹ️  Preview sites may be temporarily unavailable during deployments or restarts"
 
-          # Basic endpoint check
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
-          echo "HTTP Status: $HTTP_STATUS"
+          # Function to perform robust HTTP check with retries
+          check_endpoint() {
+            local url="$1"
+            local endpoint_name="$2"
+            local max_retries=1  # Single retry for preview
+            local timeout=15     # Short timeout for preview
+            local retry_delay=3  # Very short delay for preview
+            
+            for attempt in $(seq 1 $max_retries); do
+              echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
+              
+              # Use curl with explicit timeout and connection timeout
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+                --connect-timeout 8 \
+                --max-time $timeout \
+                --retry 0 \
+                "$url" 2>/dev/null || echo "000")
+              
+              echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
+              
+              if [[ "$HTTP_STATUS" == "200" ]]; then
+                echo "✅ $endpoint_name check successful"
+                return 0
+              elif [[ "$HTTP_STATUS" == "000" ]]; then
+                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              else
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+              fi
+              
+              if [[ $attempt -lt $max_retries ]]; then
+                echo "⏳ Waiting ${retry_delay}s before retry..."
+                sleep $retry_delay
+              fi
+            done
+            
+            return 1
+          }
 
-          if [[ "$HTTP_STATUS" != "200" ]]; then
-            echo "::warning::Preview site is down or returning errors (HTTP $HTTP_STATUS)"
+          # Basic endpoint check with retries
+          if check_endpoint "$BASE_URL" "Main Site"; then
+            MAIN_STATUS="passing"
+            echo "status=passing" >> $GITHUB_OUTPUT
+          else
+            echo "::warning::Preview site is down or returning errors after retries"
             echo "::notice::This is a PREVIEW environment failure, not affecting production"
             echo "::notice::Preview deployments may be restarting or temporarily unavailable"
             echo "status=warning" >> $GITHUB_OUTPUT
-            # Don't exit 1 for preview builds, just warn
+            MAIN_STATUS="warning"
+          fi
+
+          # API health check with retries (non-blocking)
+          if check_endpoint "$BASE_URL/api/health" "API Health"; then
+            API_STATUS="passing"
           else
-            echo "status=passing" >> $GITHUB_OUTPUT
-          fi
-
-          # API health check (using the simple health endpoint)
-          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health")
-          echo "API Status: $API_STATUS"
-
-          # Only warn but don't fail if API health check fails
-          if [[ "$API_STATUS" != "200" ]]; then
-            echo "::warning::API health endpoint is not responding with 200 (HTTP $API_STATUS)"
+            echo "::warning::API health endpoint is not responding after retries"
             echo "::notice::API may not be fully initialized in preview environment"
+            API_STATUS="failing"
           fi
 
-          if [[ "${status}" == "warning" ]]; then
+          if [[ "$MAIN_STATUS" == "warning" ]]; then
             echo "⚠️  PREVIEW health checks completed with warnings (this is normal for preview builds)"
           else
             echo "✅ PREVIEW health checks passed"
