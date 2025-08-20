@@ -10,6 +10,7 @@ import type {
   ExportData,
   Demographics,
 } from '../types/bias-detection'
+import { randomBytes } from 'crypto'
 
 /**
  * Comprehensive preset scenarios with realistic bias patterns
@@ -564,10 +565,9 @@ export function generateSessionId(): string {
   const array = new Uint32Array(2);
   if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
     window.crypto.getRandomValues(array);
-  } else if (typeof require !== 'undefined') {
+  } else if (typeof randomBytes !== 'undefined') {
     // Node.js fallback
-    const crypto = require('crypto');
-    const buf = crypto.randomBytes(8);
+    const buf = randomBytes(8);
     array[0] = buf.readUInt32LE(0);
     array[1] = buf.readUInt32LE(4);
   } else {

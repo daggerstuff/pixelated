@@ -274,7 +274,7 @@ export async function requirePageAuth({
  * Usage: export const GET = protectRoute({ requiredRole: 'user' })(async ({ locals, request }) => { ... })
  */
 export function protectRoute<
-  Props extends Record<string, unknown> = Record<string, unknown>,
+  _Props extends Record<string, unknown> = Record<string, unknown>,
   Params extends Record<string, string | undefined> = Record<string, string | undefined>
 >(
   options: {
@@ -304,7 +304,7 @@ export function protectRoute<
 
         // Verify authentication
         const authResult = await verifyServerAuth({
-          cookies: {} as any, // We don't need cookies for API routes
+          cookies: {} as Record<string, never>, // We don't need cookies for API routes
           request: context.request,
           requestIp,
           requiredRole: options.requiredRole,

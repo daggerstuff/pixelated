@@ -1,5 +1,6 @@
  // API route implementation for user profile endpoints
 import { protectRoute } from '@/lib/auth/serverAuth'
+import type { AuthUser } from '@/lib/auth/types'
 import { MongoAuthService } from '@/services/mongoAuth.service'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // Removed AuthAPIContext import - using direct type annotation instead
@@ -14,7 +15,7 @@ const logger = createBuildSafeLogger('profile-api')
 export const GET = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
+})(async ({ locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
   try {
     const { user } = locals
 
@@ -72,7 +73,7 @@ export const GET = protectRoute({
 export const PUT = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ request, locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
+})(async ({ request, locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
   try {
     const { user } = locals
     const data = await request.json()

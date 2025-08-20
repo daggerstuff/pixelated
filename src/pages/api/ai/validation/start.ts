@@ -7,7 +7,7 @@ import {
   AuditEventStatus,
 } from '@/lib/audit'
 
-export const POST = async ({ cookies }: { cookies: any }): Promise<Response> => {
+export const POST = async ({ cookies }: { cookies: { get(name: string): { value: string } | undefined } }): Promise<Response> => {
   const logger = createBuildSafeLogger('validation-api')
 
   try {

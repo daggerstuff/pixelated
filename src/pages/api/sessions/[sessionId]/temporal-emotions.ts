@@ -4,6 +4,7 @@ export const prerender = false
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
+import type { AuthUser } from '@/lib/auth/types'
 import { 
   EmotionTemporalAnalyzer, 
   type EmotionAnalysisResult,
@@ -37,7 +38,7 @@ export const GET = protectRoute({
 }: {
   params: Record<string, string | undefined>
   request: Request
-  locals: { user: any }
+  locals: { user: AuthUser }
 }): Promise<Response> => {
   try {
     const { user } = locals

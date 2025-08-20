@@ -356,7 +356,7 @@ export class SupportContextIdentifier {
             if (patternResult.isSupport) return patternResult
           }
           return result
-        } catch (err) {
+        } catch {
           // Fallback to pattern-based result on error
           const fallback = this.performPatternBasedIdentification(query)
           // Always set isSupport true for batch fallback if pattern matches or any emotional content is detected
@@ -578,7 +578,7 @@ export class SupportContextIdentifier {
     const hasSupportLanguage = bestSupportMatch.confidence > 0
     
     // Also check for general emotional language that might indicate support needs
-    const hasEmotionalLanguage = /emotional|feeling|situation|analysis|support|help|need|struggling/i.test(query)
+    const _hasEmotionalLanguage = /emotional|feeling|situation|analysis|support|help|need|struggling/i.test(query)
 
     const overallConfidence = Math.max(
       bestEmotionalMatch.confidence,
