@@ -83,6 +83,15 @@ stages:
           pnpm | "$(Agent.OS)"
         path: $(Agent.WorkFolder)/.pnpm-store
 
+    - script: |
+        # Create cache directories if they don't exist to prevent tar errors
+        mkdir -p node_modules/.astro
+        mkdir -p .astro
+        mkdir -p $(Agent.WorkFolder)/.astro-cache
+        mkdir -p $(Agent.WorkFolder)/.vite-cache
+        echo "Created cache directories"
+      displayName: Create cache directories
+
     - task: Cache@2
       displayName: Cache Astro build artifacts
       inputs:
@@ -92,6 +101,8 @@ stages:
         path: |
           node_modules/.astro
           .astro
+          $(Agent.WorkFolder)/.astro-cache
+          $(Agent.WorkFolder)/.vite-cache
 
     - script: |
         # Install dependencies with optimizations
@@ -99,10 +110,30 @@ stages:
       displayName: Install dependencies
 
     - script: |
-        # Build with optimizations
+        # Build with optimizations and cache configuration
         export NODE_OPTIONS="--max-old-space-size=4096"
+        export ASTRO_CACHE_DIR="$(Agent.WorkFolder)/.astro-cache"
+        export VITE_CACHE_DIR="$(Agent.WorkFolder)/.vite-cache"
+        export ASTRO_TELEMETRY_DISABLED=1
+        # Ensure cache directories exist and have proper permissions
+        mkdir -p "$ASTRO_CACHE_DIR" "$VITE_CACHE_DIR" node_modules/.astro .astro
+        chmod -R 755 "$ASTRO_CACHE_DIR" "$VITE_CACHE_DIR" node_modules/.astro .astro 2>/dev/null || true
         pnpm run build
       displayName: Build application
+
+    - script: |
+        # Preserve cache artifacts after build
+        echo "Build completed. Cache directories status:"
+        ls -la node_modules/.astro/ 2>/dev/null || echo "node_modules/.astro/ not found"
+        ls -la .astro/ 2>/dev/null || echo ".astro/ not found" 
+        ls -la "$ASTRO_CACHE_DIR" 2>/dev/null || echo "ASTRO_CACHE_DIR not found"
+        ls -la "$VITE_CACHE_DIR" 2>/dev/null || echo "VITE_CACHE_DIR not found"
+        # Ensure cache directories are preserved for next run
+        touch node_modules/.astro/.gitkeep .astro/.gitkeep "$ASTRO_CACHE_DIR/.gitkeep" "$VITE_CACHE_DIR/.gitkeep" 2>/dev/null || true
+      displayName: Preserve cache artifacts
+      env:
+        ASTRO_CACHE_DIR: $(Agent.WorkFolder)/.astro-cache
+        VITE_CACHE_DIR: $(Agent.WorkFolder)/.vite-cache
 
     - task: PublishBuildArtifacts@1
       displayName: Publish build artifacts

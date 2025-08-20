@@ -1,5 +1,6 @@
 // Note: APIRoute type not available in current Astro version
 import { protectRoute } from '@/lib/auth/serverAuth'
+import type { AuthUser } from '@/lib/auth/types'
 import {
   getOrCreateUserSettings,
   updateUserSettings,
@@ -117,7 +118,7 @@ export const GET = protectRoute()(async ({ locals }) => {
   }
 })
 
-export const PUT = protectRoute()(async ({ request, locals }: { request: Request, locals: any }): Promise<Response> => {
+export const PUT = protectRoute()(async ({ request, locals }: { request: Request, locals: { user: AuthUser } }): Promise<Response> => {
   try {
     const { user } = locals
     const body = await request.json()
@@ -158,7 +159,7 @@ export const PUT = protectRoute()(async ({ request, locals }: { request: Request
   }
 })
 
-export const DELETE = protectRoute()(async ({ locals, request }: { locals: any, request: Request }): Promise<Response> => {
+export const DELETE = protectRoute()(async ({ locals, request }: { locals: { user: AuthUser }, request: Request }): Promise<Response> => {
   try {
     const { user } = locals
     const settings = await getOrCreateUserSettings(user.id, request)

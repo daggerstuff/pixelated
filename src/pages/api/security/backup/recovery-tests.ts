@@ -1,4 +1,5 @@
 import { protectRoute } from '../../../../lib/auth/serverAuth'
+import type { AuthUser } from '../../../../lib/auth/types'
 import { BackupSecurityManager } from '../../../../lib/security/backup'
 import {
   BackupType,
@@ -26,7 +27,7 @@ backupManager.initialize().catch((error) => {
 // GET endpoint for recovery tests
 export const GET = protectRoute({
   requiredRole: 'admin' as AuthRole,
-})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
+})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
   try {
     // Extract action from query params
     const url = new URL(request.url)
@@ -81,7 +82,7 @@ export const GET = protectRoute({
 // POST endpoint for recovery tests
 export const POST = protectRoute({
   requiredRole: 'admin' as AuthRole,
-})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: any } }) => {
+})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
   try {
     // Parse request body
     const requestData = await request.json()
