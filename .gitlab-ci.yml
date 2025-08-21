@@ -29,7 +29,7 @@ variables:
   # Disable automatic Git clone to avoid HTTPS issues
   GIT_STRATEGY: none
   # Force SSH URL for repository checkout
-  CI_REPOSITORY_URL: git@gitlab.com:pixelatedtech/pixelated.git
+  CI_REPOSITORY_URL: git@git.pixelatedempathy.tech:pixeltech/pixelated.git
 
 # Build frontend container
 build-frontend:
@@ -47,16 +47,26 @@ build-frontend:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H gitlab.com >> ~/.ssh/known_hosts
-    # Configure Git to use SSH instead of HTTPS
-    - git config --global url."git@gitlab.com:".insteadOf "https://gitlab.com/"
     # Login to container registry
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Building Pixelated Empathy frontend container..."
     # Manually clone the repository via SSH
-    - git clone git@gitlab.com:pixelatedtech/pixelated.git .
+    # Clone via SSH (new instance)
+    - git clone git@git.pixelatedempathy.tech:pixeltech/pixelated.git .
+    # For HTTPS cloning, use: https://git.pixelatedempathy.tech/pixeltech/pixelated.git
     - ls -la
-    - docker build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+    # Enable Docker layer caching for faster builds
+    - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+    # If using npm/pnpm/yarn, cache dependencies for faster installs
+    - if [ -f package-lock.json ]; then
+        echo "Restoring npm cache...";
+        npm ci --cache .npm --prefer-offline;
+      fi
+    - if [ -f pnpm-lock.yaml ]; then
+        echo "Restoring pnpm cache...";
+        pnpm install --frozen-lockfile --store-dir .pnpm-store;
+      fi
     - docker push $CONTAINER_IMAGE
     - docker push $CONTAINER_IMAGE_LATEST
     - echo "✅ Frontend container pushed to GitLab Container Registry"
@@ -328,14 +338,132 @@ security-scan:
     - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
 
-# Cleanup old images
+# Automated Rollback (if deploy fails)
+rollback:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "Rolling back to previous container version..."
+    - docker pull $CONTAINER_IMAGE_LATEST_PREV || echo "No previous image found"
+    - docker stop pixelated-app || true
+    - docker rm pixelated-app || true
+    - docker run -d --name pixelated-app -p 4321:4321 $CONTAINER_IMAGE_LATEST_PREV
+    - echo "Rollback complete"
+  rules:
+    - if: $CI_DEPLOY_FAILED == "true"
+      when: on_failure
+  allow_failure: true
+
+# Health Check & Notification
+health-check:
+  stage: test
+  image: alpine:latest
+  script:
+    - apk add --no-cache curl
+    - echo "Running post-deploy health check..."
+    - |
+      if curl -f https://$VPS_DOMAIN/api/health; then
+        echo "Health check passed";
+      else
+        echo "Health check failed";
+        # Add Slack/email notification integration here
+        exit 1;
+      fi
+  dependencies:
+    - deploy-vps
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# Artifact/Log Retention
+retain-logs:
+  stage: test
+  image: alpine:latest
+  script:
+    - mkdir -p artifacts
+    - cp /var/log/* artifacts/ || true
+    - echo "Logs retained for debugging"
+  artifacts:
+    paths:
+      - artifacts/
+    expire_in: 7 days
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# Staging Environment
+deploy-staging:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client curl git
+    - eval $(ssh-agent -s)
+    - echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to staging VPS..."
+    # Add staging deployment logic here
+  environment:
+    name: staging
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+      when: manual
+
+# Secret Management (comment)
+# Use GitLab CI/CD protected variables for all secrets and tokens.
+# Example: VPS_SSH_PRIVATE_KEY_B64, API_KEY, DB_PASSWORD
+
+# Image Tagging
+tag-image:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - echo "Tagging image with branch and build number..."
+    - docker tag $CONTAINER_IMAGE $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# Advanced Security Scanning
+trivy-scan:
+  stage: test
+  image: aquasec/trivy:latest
+  script:
+    - trivy image $CONTAINER_IMAGE
+  dependencies:
+    - build-frontend
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main"
+  allow_failure: true
+
+# Dependency Caching (using GitLab cache)
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+    - .pnpm-store/
+    - .cache/
+    - ai/.cache/
+    - node_modules/
+    - ai/node_modules/
+
+# Automated Cleanup (improved)
 cleanup:
   stage: deploy
   image: alpine:latest
   script:
-    - echo "Cleanup job - remove old container images if needed"
-    - echo "This can be implemented to clean up old registry images"
+    - echo "Cleaning up old container images..."
+    - docker image prune -af
+    - echo "Old images removed"
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
       when: manual
   allow_failure: true
+
+# Documentation (see docs/ci-cd/pipeline-variables.md for variable setup and troubleshooting)
