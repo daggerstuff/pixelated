@@ -427,7 +427,6 @@ export class BiasDetectionEngine {
     try {
       evaluation = await this.pythonService.runEvaluationAnalysis(session)
     } catch {
-      const fb = this.fallbackLayer()
       recs.push('Evaluation analysis unavailable; using fallback results')
     }
 
@@ -582,9 +581,10 @@ export class BiasDetectionEngine {
       overallFairnessScore: 1,
       recommendations: [],
       executiveSummary: {
-        summary: '',
         keyFindings: [],
-        recommendations: [],
+        criticalIssues: [],
+        improvementAreas: [],
+        complianceStatus: 'compliant',
       },
       detailedAnalysis: {
         demographicAnalysis: {
@@ -756,7 +756,9 @@ async batchAnalyzeSessions(
     const batchPromises: Promise<void>[] = []
     let idx = 0
     const processNext = async (): Promise<void> => {
-      if (idx >= batch.length) return
+      if (idx >= batch.length) {
+        return
+      }
       const session = batch[idx++]
       if (session) {
         const result = await processSession(session)
@@ -767,13 +769,17 @@ async batchAnalyzeSessions(
       // result is only defined inside the previous block, so remove this line
       completed++
       metrics.completed = completed
-      if (onProgress) onProgress({ completed, total })
+      if (onProgress) {
+        onProgress({ completed, total })
+      }
       if (logProgress) {
         // Simple console logging, could be replaced with structured logger
         console.log(`[BatchProgress] Completed: ${completed}/${total}`)
       }
       // Start next in this slot
-      if (idx < batch.length) await processNext()
+      if (idx < batch.length) {
+        await processNext()
+      }
     }
     // Start up to 'concurrency' parallel workers
     for (let c = 0; c < Math.min(concurrency, batch.length); c++) {
