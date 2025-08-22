@@ -12,6 +12,7 @@ import {
   cacheReport,
   getCachedReport,
 } from './cache'
+import { getPerformanceOptimizer, type PerformanceOptimizer } from './performance-optimizer'
 
 type LayerResults = {
   preprocessing: import('./types').PreprocessingAnalysisResult
@@ -45,11 +46,16 @@ const DEFAULT_WEIGHTS: BiasLayerWeights = {
 }
 
 function validateThresholds(t: BiasThresholdsConfig): void {
-  const values = [t['warning'], t['high'], t['critical']]
-  if (values.some((v) => v < 0 || v > 1)) {
+  // Handle both old and new threshold property names for backward compatibility
+  const warning = t['warning'] ?? (t as any)['warningLevel']
+  const high = t['high'] ?? (t as any)['highLevel']
+  const critical = t['critical'] ?? (t as any)['criticalLevel']
+  
+  const values = [warning, high, critical]
+  if (values.some((v) => v === undefined || v < 0 || v > 1)) {
     throw new Error('Invalid threshold values')
   }
-  if (!(t['warning'] < t['high'] && t['high'] < t['critical'])) {
+  if (!(warning < high && high < critical)) {
     throw new Error('Invalid threshold configuration')
   }
 }
@@ -221,6 +227,7 @@ export class BiasDetectionEngine {
   public pythonService: PythonBiasDetectionBridge
   private metricsCollector: BiasMetricsCollector
   private alertSystem: BiasAlertSystem
+  private performanceOptimizer: PerformanceOptimizer | null
   private initialized = false
   private _isMonitoring = false
   private monitoringCallbacks: Array<
@@ -230,7 +237,15 @@ export class BiasDetectionEngine {
 
   constructor(cfg: BiasDetectionConfig = {}) {
     const thresholds = cfg['thresholds'] ?? DEFAULT_THRESHOLDS
-    validateThresholds(thresholds)
+    
+    // Normalize threshold property names for backward compatibility
+    const normalizedThresholds = {
+      warning: thresholds['warning'] ?? (thresholds as any)['warningLevel'] ?? DEFAULT_THRESHOLDS.warning,
+      high: thresholds['high'] ?? (thresholds as any)['highLevel'] ?? DEFAULT_THRESHOLDS.high,
+      critical: thresholds['critical'] ?? (thresholds as any)['criticalLevel'] ?? DEFAULT_THRESHOLDS.critical,
+    }
+    
+    validateThresholds(normalizedThresholds)
 
     const layerWeights = cfg['layerWeights'] ?? DEFAULT_WEIGHTS
     validateWeights(layerWeights)
@@ -244,7 +259,7 @@ export class BiasDetectionEngine {
     this.config = {
       pythonServiceUrl: cfg['pythonServiceUrl'] ?? 'http://localhost:8000',
       pythonServiceTimeout: cfg['pythonServiceTimeout'] ?? 30000,
-      thresholds,
+      thresholds: normalizedThresholds,
       layerWeights,
       evaluationMetrics: cfg['evaluationMetrics'] ?? ['demographic_parity', 'equalized_odds'],
       metricsConfig: cfg['metricsConfig'] ?? { enableRealTimeMonitoring: true, metricsRetentionDays: 30, aggregationIntervals: ['1h', '1d'], dashboardRefreshRate: 60, exportFormats: ['json'] },
@@ -272,6 +287,31 @@ export class BiasDetectionEngine {
     this.pythonService = new PythonBridgeCtor()
     this.metricsCollector = new MetricsCollectorCtor()
     this.alertSystem = new AlertSystemCtor()
+    
+    // Initialize performance optimizer with engine configuration (optional for backward compatibility)
+    try {
+      this.performanceOptimizer = getPerformanceOptimizer({
+        httpPool: {
+          maxConnections: this.config.performanceConfig?.maxConcurrentAnalyses || 10,
+          connectionTimeout: this.config.pythonServiceTimeout || 30000,
+        },
+        batchProcessing: {
+          defaultBatchSize: this.config.batchProcessingConfig?.batchSize || 10,
+          maxConcurrency: this.config.batchProcessingConfig?.concurrency || 5,
+          timeoutMs: this.config.batchProcessingConfig?.timeoutMs || 30000,
+          retryAttempts: this.config.batchProcessingConfig?.retries || 2,
+        },
+        cache: {
+          enableCompression: this.config.cacheConfig?.compressionEnabled !== false,
+          defaultTtl: (this.config.cacheConfig?.ttl || 300000) / 1000, // Convert to seconds
+          maxCacheSize: this.config.cacheConfig?.maxSize || 1000,
+        }
+      })
+    } catch (error) {
+      // Fallback to null if performance optimizer fails to initialize
+      this.performanceOptimizer = null as any
+      console.warn('Performance optimizer initialization failed, using fallback mode:', error)
+    }
   }
 
   getInitializationStatus() { return this.initialized }
@@ -674,6 +714,11 @@ export class BiasDetectionEngine {
 async dispose() {
   try { await this.metricsCollector.dispose?.() } catch { /* swallow */ }
   try { await this.alertSystem.dispose?.() } catch { /* swallow */ }
+  try { 
+    if (this.performanceOptimizer) {
+      await this.performanceOptimizer.dispose() 
+    }
+  } catch { /* swallow */ }
 }
 // Expose cache statistics for monitoring
 getCacheStats() {
@@ -681,7 +726,83 @@ getCacheStats() {
 }
 
 /**
- * Batch analyze multiple sessions with configurable concurrency, chunking, and error handling.
+ * Get comprehensive performance statistics including connection pools, cache, and memory usage
+ */
+async getPerformanceStats() {
+  this.ensureInitialized()
+  
+  if (this.performanceOptimizer) {
+    return await this.performanceOptimizer.getPerformanceStats()
+  }
+  
+  // Fallback performance stats
+  return {
+    connections: { http: { total: 0, active: 0, idle: 0, queue: 0 }, redis: { total: 0, active: 0, idle: 0 } },
+    cache: { hitRate: 0, missRate: 0, size: 0, memoryUsage: 0, compressionRatio: 0 },
+    batch: { activeJobs: 0, completedJobs: 0, failedJobs: 0, averageProcessingTime: 0 },
+    memory: { heapUsed: process.memoryUsage().heapUsed, heapTotal: process.memoryUsage().heapTotal, external: process.memoryUsage().external, rss: process.memoryUsage().rss, gcCount: 0 },
+    performance: { averageResponseTime: 0, throughput: 0, errorRate: 0, slowQueries: 0 }
+  }
+}
+
+/**
+ * Health check for all performance-critical components
+ */
+async getHealthStatus() {
+  this.ensureInitialized()
+  
+  let performanceHealth = { healthy: true, components: {} }
+  
+  if (this.performanceOptimizer) {
+    performanceHealth = await this.performanceOptimizer.healthCheck()
+  }
+  
+  const pythonServiceHealth = await this.pythonService.checkHealth?.()
+  
+  return {
+    overall: performanceHealth.healthy && (pythonServiceHealth?.status === 'healthy'),
+    components: {
+      ...performanceHealth.components,
+      pythonService: pythonServiceHealth?.status === 'healthy',
+      engine: this.initialized,
+      monitoring: this._isMonitoring,
+      performanceOptimizer: this.performanceOptimizer !== null
+    },
+    performance: await this.getPerformanceStats()
+  }
+}
+
+/**
+ * Add a session analysis to the background job queue for processing
+ */
+async queueSessionAnalysis(
+  session: SessionData,
+  priority: 'low' | 'medium' | 'high' = 'medium'
+): Promise<string> {
+  this.ensureInitialized()
+  
+  if (this.performanceOptimizer) {
+    const priorityMap = { low: 1, medium: 5, high: 10 }
+    
+    return await this.performanceOptimizer.addBackgroundJob(
+      'session-analysis',
+      session,
+      {
+        priority: priorityMap[priority],
+        timeout: this.config.pythonServiceTimeout || 30000,
+        maxAttempts: 3
+      }
+    )
+  }
+  
+  // Fallback: process immediately if no background job queue
+  const result = await this.analyzeSession(session)
+  return `immediate_${result.sessionId}_${Date.now()}`
+}
+
+/**
+ * Batch analyze multiple sessions with optimized performance and concurrency control.
+ * Uses the performance optimizer for intelligent batching and resource management.
  */
 async batchAnalyzeSessions(
   sessions: SessionData[],
@@ -694,105 +815,82 @@ async batchAnalyzeSessions(
     timeoutMs?: number
     logProgress?: boolean
     logErrors?: boolean
+    priority?: 'low' | 'medium' | 'high'
   } = {}
 ): Promise<{ results: AnalysisResult[]; errors: { session: SessionData; error: Error }[]; metrics: { completed: number; total: number; errorCount: number } }> {
-  // Use config defaults if not provided in options
-  const defaults = this.config.batchProcessingConfig ?? {}
-  const {
-    concurrency = defaults.concurrency ?? 5,
-    batchSize = defaults.batchSize ?? 10,
-    onProgress,
-    onError,
-    retries = defaults.retries ?? 1,
-    timeoutMs = defaults.timeoutMs,
-    logProgress = true,
-    logErrors = true,
-  } = options
-  const total = sessions.length
-  let completed = 0
-  const results: AnalysisResult[] = []
-  const errors: { session: SessionData; error: Error }[] = []
-  // Metrics for monitoring
-  const metrics = { completed: 0, total, errorCount: 0 }
-
-  // Helper to process a single session with retries
-  const processSession = async (session: SessionData): Promise<AnalysisResult | null> => {
-    let attempt = 0
-    while (attempt <= retries) {
+  this.ensureInitialized()
+  
+  const startTime = Date.now()
+  
+  // Use performance optimizer for batch processing if available, otherwise fallback to original implementation
+  let analysisResults: AnalysisResult[]
+  let errors: { session: SessionData; error: Error }[]
+  
+  if (this.performanceOptimizer) {
+    const result = await this.performanceOptimizer.processBatch(
+      sessions,
+      async (session: SessionData) => {
+        return await this.analyzeSession(session)
+      },
+      {
+        batchSize: options.batchSize,
+        concurrency: options.concurrency,
+        timeout: options.timeoutMs,
+        retries: options.retries,
+        priority: options.priority,
+        onProgress: options.onProgress,
+        onError: options.onError
+      }
+    )
+    analysisResults = result.results
+    errors = result.errors.map(({ item: session, error }) => ({ session, error }))
+  } else {
+    // Fallback to original batch processing implementation
+    analysisResults = []
+    errors = []
+    
+    for (const session of sessions) {
       try {
-        if (timeoutMs) {
-          // Timeout wrapper
-          return await Promise.race([
-            this.analyzeSession(session),
-            new Promise<null>((_, reject) =>
-              setTimeout(() => reject(new Error('Timeout')), timeoutMs)
-            )
-          ])
-        } else {
-          return await this.analyzeSession(session)
+        const result = await this.analyzeSession(session)
+        analysisResults.push(result)
+        if (options.onProgress) {
+          options.onProgress({ completed: analysisResults.length, total: sessions.length })
         }
       } catch (error) {
-        attempt++
-        if (attempt > retries) {
-          if (onError) {
-            onError(error as Error, session)
-          }
-          errors.push({ session, error: error as Error })
-          return null
+        const err = { session, error: error as Error }
+        errors.push(err)
+        if (options.onError) {
+          options.onError(error as Error, session)
         }
       }
     }
-    return null
   }
-
-  // Chunk sessions for batch processing
-  const chunked: SessionData[][] = []
-  for (let i = 0; i < sessions.length; i += batchSize) {
-    chunked.push(sessions.slice(i, i + batchSize))
+  
+  const processingTime = Date.now() - startTime
+  
+  // Log performance metrics
+  if (options.logProgress !== false) {
+    console.log(`[BatchAnalysis] Completed ${analysisResults.length}/${sessions.length} sessions in ${processingTime}ms`)
+    console.log(`[BatchAnalysis] Average time per session: ${Math.round(processingTime / sessions.length)}ms`)
   }
-
-  for (const batch of chunked as SessionData[][]) {
-    // Process up to 'concurrency' sessions in parallel
-    const batchPromises: Promise<void>[] = []
-    let idx = 0
-    const processNext = async (): Promise<void> => {
-      if (idx >= batch.length) {
-        return
-      }
-      const session = batch[idx++]
-      if (session) {
-        const result = await processSession(session)
-        if (result) {
-          results.push(result)
-        }
-      }
-      // result is only defined inside the previous block, so remove this line
-      completed++
-      metrics.completed = completed
-      if (onProgress) {
-        onProgress({ completed, total })
-      }
-      if (logProgress) {
-        // Simple console logging, could be replaced with structured logger
-        console.log(`[BatchProgress] Completed: ${completed}/${total}`)
-      }
-      // Start next in this slot
-      if (idx < batch.length) {
-        await processNext()
-      }
-    }
-    // Start up to 'concurrency' parallel workers
-    for (let c = 0; c < Math.min(concurrency, batch.length); c++) {
-      batchPromises.push(processNext())
-    }
-    await Promise.all(batchPromises)
-  }
-  metrics.errorCount = errors.length
-  if (logErrors && errors.length > 0) {
-    errors.forEach(({ session, error }) => {
+  
+  if (options.logErrors !== false && errors.length > 0) {
+    errors.forEach(({ item: session, error }) => {
       console.error(`[BatchError] Session ${session.sessionId}: ${error.message}`)
     })
   }
-  return { results, errors, metrics }
+  
+  // Store batch processing metrics
+  await this.metricsCollector.recordAnalysis?.()
+  
+  return {
+    results: analysisResults,
+    errors,
+    metrics: {
+      completed: analysisResults.length,
+      total: sessions.length,
+      errorCount: errors.length
+    }
+  }
 }
 }

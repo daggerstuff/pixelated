@@ -334,7 +334,7 @@ describe('BiasDetectionEngine', () => {
 
     it('should initialize with custom configuration', async () => {
       expect(biasEngine).toBeDefined()
-      expect(biasEngine['config'].thresholds.warningLevel).toBe(0.3)
+      expect(biasEngine['config'].thresholds.warning).toBe(0.3)
       expect(biasEngine['config'].hipaaCompliant).toBe(true)
       await biasEngine.initialize()
     })
@@ -344,9 +344,9 @@ describe('BiasDetectionEngine', () => {
         return new BiasDetectionEngine({
           ...mockConfig,
           thresholds: {
-            warningLevel: -0.1, // Invalid threshold
-            highLevel: 0.6,
-            criticalLevel: 0.8,
+            warning: -0.1, // Invalid threshold
+            high: 0.6,
+            critical: 0.8,
           },
         })
       }).toThrow('Invalid threshold values')

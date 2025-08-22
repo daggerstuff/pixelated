@@ -2,494 +2,352 @@
 trigger:
   branches:
     include:
-    - main
-    - master
-    - develop
+      - main
+      - master
+      - develop
   paths:
     include:
-    - src/**
-    - infra/**
-    - Dockerfile.azure
-    - azure-pipelines.yml
-    - package.json
-    - pnpm-lock.yaml
+      - src/**
+      - infra/**
+      - Dockerfile.azure
+      - azure-pipelines.yml
+      - package.json
+      - pnpm-lock.yaml
 
 pr:
   branches:
     include:
-    - master
-    - develop
+      - master
+      - develop
 
 variables:
-- name: buildConfiguration
-  value: Release
-- name: nodeVersion
-  value: 22.x
-- name: dockerTag
-  value: $(Build.BuildId)
-- name: azureSubscription
-  value: 'pixelated-service-connection'
-- name: resourceGroupName
-  value: pixelated-rg
-- name: appServiceName
-  value: pixelated # Existing App Service with your domain
-- name: containerAppName
-  value: pixelated-web # Container Apps for testing
-- name: containerRegistryPrefix
-  value: pixelcr
-- name: imageName
-  value: pixelated-web
-- name: azureLocation
-  value: eastus
-- name: environment
-  value: production
-- name: customDomain
-  value: 'pixelatedempathy.com' # Your domain (on App Service)
-- name: PYTHONWARNINGS
-  value: 'ignore::FutureWarning'
-- name: AZURE_CLI_DISABLE_CONNECTION_VERIFICATION
-  value: '1'
+  - name: buildConfiguration
+    value: Release
+  - name: nodeVersion
+    value: 22.x
+  - name: dockerTag
+    value: $(Build.BuildId)
+  - name: azureSubscription
+    value: "pixelated-service-connection"
+  - name: resourceGroupName
+    value: pixelated-rg
+  - name: appServiceName
+    value: pixelated # Existing App Service with your domain
+  - name: containerAppName
+    value: pixelated-web # Container Apps for testing
+  - name: containerRegistryPrefix
+    value: pixelcr
+  - name: imageName
+    value: pixelated-web
+  - name: azureLocation
+    value: eastus
+  - name: environment
+    value: production
+  - name: customDomain
+    value: "pixelatedempathy.com" # Your domain (on App Service)
+  - name: PYTHONWARNINGS
+    value: "ignore::FutureWarning"
+  - name: AZURE_CLI_DISABLE_CONNECTION_VERIFICATION
+    value: "1"
 
 pool:
   vmImage: ubuntu-latest
 
 stages:
-- stage: Build
-  displayName: Build Application
-  jobs:
+  - stage: Build
+    displayName: Build Application
+    jobs:
+      - job: BuildApp
+        displayName: Build Node.js Application
+        pool:
+          name: "Default"
+        steps:
+          - task: NodeTool@0
+            displayName: Use Node.js $(nodeVersion)
+            inputs:
+              versionSpec: $(nodeVersion)
 
-  - job: BuildApp
-    displayName: Build Node.js Application
-    pool:
-      name: 'Default'
-    steps:
-    - task: NodeTool@0
-      displayName: Use Node.js $(nodeVersion)
-      inputs:
-        versionSpec: $(nodeVersion)
-
-    - script: |
-        npm install -g pnpm@10.14.0
-        pnpm config set store-dir $(Agent.WorkFolder)/.pnpm-store
-        mkdir -p $(Agent.WorkFolder)/.pnpm-store
-      displayName: Install and configure pnpm
-
-    - task: Cache@2
-      displayName: Cache pnpm dependencies
-      inputs:
-        key: 'pnpm-v2 | "$(Agent.OS)" | pnpm-lock.yaml'
-        restoreKeys: |
-          pnpm-v2 | "$(Agent.OS)"
-          pnpm | "$(Agent.OS)"
-        path: $(Agent.WorkFolder)/.pnpm-store
-
-    - script: |
-        # Create cache directories if they don't exist to prevent tar errors
-        mkdir -p node_modules/.astro
-        mkdir -p .astro
-        mkdir -p $(Agent.WorkFolder)/.astro-cache
-        mkdir -p $(Agent.WorkFolder)/.vite-cache
-        echo "Created cache directories"
-      displayName: Create cache directories
-
-    - task: Cache@2
-      displayName: Cache Astro build artifacts
-      inputs:
-        key: 'astro-build | "$(Agent.OS)" | package.json | pnpm-lock.yaml'
-        restoreKeys: |
-          astro-build | "$(Agent.OS)"
-        path: |
-          node_modules/.astro
-          .astro
-          $(Agent.WorkFolder)/.astro-cache
-          $(Agent.WorkFolder)/.vite-cache
-
-    - script: |
-        # Install dependencies with optimizations
-        pnpm install --frozen-lockfile --prefer-offline
-      displayName: Install dependencies
-
-    - script: |
-        # Build with optimizations and cache configuration
-        export NODE_OPTIONS="--max-old-space-size=4096"
-        export ASTRO_CACHE_DIR="$(Agent.WorkFolder)/.astro-cache"
-        export VITE_CACHE_DIR="$(Agent.WorkFolder)/.vite-cache"
-        export ASTRO_TELEMETRY_DISABLED=1
-        # Ensure cache directories exist and have proper permissions
-        mkdir -p "$ASTRO_CACHE_DIR" "$VITE_CACHE_DIR" node_modules/.astro .astro
-        chmod -R 755 "$ASTRO_CACHE_DIR" "$VITE_CACHE_DIR" node_modules/.astro .astro 2>/dev/null || true
-        pnpm run build
-      displayName: Build application
-
-    - script: |
-        # Preserve cache artifacts after build
-        echo "Build completed. Cache directories status:"
-        ls -la node_modules/.astro/ 2>/dev/null || echo "node_modules/.astro/ not found"
-        ls -la .astro/ 2>/dev/null || echo ".astro/ not found" 
-        ls -la "$ASTRO_CACHE_DIR" 2>/dev/null || echo "ASTRO_CACHE_DIR not found"
-        ls -la "$VITE_CACHE_DIR" 2>/dev/null || echo "VITE_CACHE_DIR not found"
-        # Ensure cache directories are preserved for next run
-        touch node_modules/.astro/.gitkeep .astro/.gitkeep "$ASTRO_CACHE_DIR/.gitkeep" "$VITE_CACHE_DIR/.gitkeep" 2>/dev/null || true
-      displayName: Preserve cache artifacts
-      env:
-        ASTRO_CACHE_DIR: $(Agent.WorkFolder)/.astro-cache
-        VITE_CACHE_DIR: $(Agent.WorkFolder)/.vite-cache
-
-    - task: PublishBuildArtifacts@1
-      displayName: Publish build artifacts
-      inputs:
-        PathtoPublish: 'dist'
-        ArtifactName: 'dist'
-        publishLocation: 'Container'
-
-- stage: Infrastructure
-  displayName: Deploy Infrastructure
-  dependsOn: Build
-  jobs:
-  - deployment: InfrastructureDeployment
-    displayName: Deploy Container Apps Infrastructure
-    environment:
-      name: 'azure-infrastructure'
-    pool:
-      name: 'Default'
-    container: mcr.microsoft.com/azure-cli:2.73.0
-    strategy:
-      runOnce:
-        deploy:
-          steps:
           - script: |
-              set -eo pipefail
-              echo "Ensuring Azure CLI is available..."
-              export PYTHONWARNINGS="ignore::FutureWarning"
-              export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-              if ! command -v az >/dev/null 2>&1; then
-                echo "Azure CLI not found; bootstrapping via uv..."
-                # Ensure uv is installed without sudo/apt
-                if ! command -v uv >/dev/null 2>&1; then
-                  curl -LsSf https://astral.sh/uv/install.sh | sh
-                  export PATH="$HOME/.local/bin:$PATH"
-                fi
-                # Create venv and install azure-cli
-                uv venv "$HOME/azure-cli-env"
-                "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
-                "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
-                echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+              npm install -g pnpm@10.14.0
+              pnpm config set store-dir $(Agent.WorkFolder)/.pnpm-store
+              mkdir -p $(Agent.WorkFolder)/.pnpm-store
+            displayName: Install and configure pnpm
+
+          - task: Cache@2
+            displayName: Cache pnpm dependencies
+            inputs:
+              key: 'pnpm-v2 | "$(Agent.OS)" | pnpm-lock.yaml'
+              restoreKeys: |
+                pnpm-v2 | "$(Agent.OS)"
+                pnpm | "$(Agent.OS)"
+              path: $(Agent.WorkFolder)/.pnpm-store
+
+          - script: |
+              # Create cache directories if they don't exist to prevent tar errors
+              mkdir -p node_modules/.astro
+              mkdir -p .astro
+              mkdir -p $(Agent.WorkFolder)/.astro-cache
+              mkdir -p $(Agent.WorkFolder)/.vite-cache
+              # Create placeholder files to ensure directories are not empty
+              touch node_modules/.astro/.gitkeep
+              touch .astro/.gitkeep
+              touch $(Agent.WorkFolder)/.astro-cache/.gitkeep
+              touch $(Agent.WorkFolder)/.vite-cache/.gitkeep
+              echo "Created cache directories with placeholder files"
+            displayName: Create cache directories
+
+          - task: Cache@2
+            displayName: Cache Astro build artifacts
+            inputs:
+              key: 'astro-build | "$(Agent.OS)" | package.json | pnpm-lock.yaml'
+              restoreKeys: |
+                astro-build | "$(Agent.OS)"
+              path: |
+                node_modules/.astro
+                .astro
+                $(Agent.WorkFolder)/.astro-cache
+                $(Agent.WorkFolder)/.vite-cache
+
+          - script: |
+              # Install dependencies with optimizations
+              pnpm install --frozen-lockfile --prefer-offline
+            displayName: Install dependencies
+
+          - script: |
+              # Build with optimizations and cache configuration
+              export NODE_OPTIONS="--max-old-space-size=4096"
+              export ASTRO_CACHE_DIR="$(Agent.WorkFolder)/.astro-cache"
+              export VITE_CACHE_DIR="$(Agent.WorkFolder)/.vite-cache"
+              export ASTRO_TELEMETRY_DISABLED=1
+              # Ensure cache directories exist and have proper permissions
+              mkdir -p "$ASTRO_CACHE_DIR" "$VITE_CACHE_DIR" node_modules/.astro .astro
+              chmod -R 755 "$ASTRO_CACHE_DIR" "$VITE_CACHE_DIR" node_modules/.astro .astro 2>/dev/null || true
+              pnpm run build
+            displayName: Build application
+
+          - script: |
+              # Preserve cache artifacts after build
+              echo "Build completed. Cache directories status:"
+
+              # Ensure all cache directories exist
+              mkdir -p node_modules/.astro .astro "$ASTRO_CACHE_DIR" "$VITE_CACHE_DIR"
+
+              # Check and report directory contents
+              if [ -d "node_modules/.astro" ]; then
+                echo "node_modules/.astro/ contents:"
+                ls -la node_modules/.astro/ || echo "Empty directory"
               fi
-              az version
-            displayName: Ensure Azure CLI available (uv fallback)
 
-          - task: AzureCLI@2
-            displayName: Deploy Container Apps Infrastructure
+              if [ -d ".astro" ]; then
+                echo ".astro/ contents:"
+                ls -la .astro/ || echo "Empty directory"
+              fi
+
+              if [ -d "$ASTRO_CACHE_DIR" ]; then
+                echo "ASTRO_CACHE_DIR contents:"
+                ls -la "$ASTRO_CACHE_DIR" || echo "Empty directory"
+              fi
+
+              if [ -d "$VITE_CACHE_DIR" ]; then
+                echo "VITE_CACHE_DIR contents:"
+                ls -la "$VITE_CACHE_DIR" || echo "Empty directory"
+              fi
+
+              # Ensure cache directories have at least placeholder files for next cache save
+              touch node_modules/.astro/.gitkeep .astro/.gitkeep "$ASTRO_CACHE_DIR/.gitkeep" "$VITE_CACHE_DIR/.gitkeep"
+
+              echo "Cache preservation completed"
+            displayName: Preserve cache artifacts
+            env:
+              ASTRO_CACHE_DIR: $(Agent.WorkFolder)/.astro-cache
+              VITE_CACHE_DIR: $(Agent.WorkFolder)/.vite-cache
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish build artifacts
             inputs:
-              azureSubscription: $(azureSubscription)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                # Debug: Show the actual parameter values being passed
-                echo "=== Deployment Parameters ==="
-                echo "Resource Group: $(resourceGroupName)"
-                echo "Azure Location: $(azureLocation)"
-                echo "Environment: $(environment)"
-                echo "============================"
+              PathtoPublish: "dist"
+              ArtifactName: "dist"
+              publishLocation: "Container"
 
-                # Try primary deployment method
-                chmod +x scripts/deploy-infrastructure.sh
-                echo "Attempting primary deployment method..."
-
-                if ./scripts/deploy-infrastructure.sh '$(resourceGroupName)' '$(azureLocation)' '$(environment)'; then
-                    echo "✅ Primary deployment method succeeded"
-                else
-                    echo "❌ Primary deployment failed, trying alternative REST API method..."
-                    
-                    # Install jq for JSON processing
-                    if ! command -v jq &> /dev/null; then
-                        echo "Installing jq for JSON processing..."
-                        sudo apt-get update -qq && sudo apt-get install -y jq
+  - stage: Infrastructure
+    displayName: Deploy Infrastructure
+    dependsOn: Build
+    jobs:
+      - deployment: InfrastructureDeployment
+        displayName: Deploy Container Apps Infrastructure
+        environment:
+          name: "azure-infrastructure"
+        pool:
+          name: "Default"
+        container: mcr.microsoft.com/azure-cli:2.73.0
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                    set -eo pipefail
+                    echo "Ensuring Azure CLI is available..."
+                    export PYTHONWARNINGS="ignore::FutureWarning"
+                    export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+                    if ! command -v az >/dev/null 2>&1; then
+                      echo "Azure CLI not found; bootstrapping via uv..."
+                      # Ensure uv is installed without sudo/apt
+                      if ! command -v uv >/dev/null 2>&1; then
+                        curl -LsSf https://astral.sh/uv/install.sh | sh
+                        export PATH="$HOME/.local/bin:$PATH"
+                      fi
+                      # Create venv and install azure-cli
+                      uv venv "$HOME/azure-cli-env"
+                      "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
+                      "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
+                      echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
                     fi
-                    
-                    # Try REST API deployment
-                    chmod +x scripts/deploy-infrastructure-rest.sh
-                    if ./scripts/deploy-infrastructure-rest.sh '$(resourceGroupName)' '$(azureLocation)' '$(environment)'; then
-                        echo "✅ Alternative REST API deployment succeeded"
-                    else
-                        echo "❌ Both standard deployment methods failed"
-                        echo "Trying emergency deployment as final fallback..."
-                        
-                        # Emergency deployment with individual Azure CLI commands
-                        chmod +x scripts/emergency-deploy.sh
-                        if ./scripts/emergency-deploy.sh '$(resourceGroupName)' '$(azureLocation)' '$(environment)'; then
-                            echo "✅ Emergency deployment succeeded"
-                        else
-                            echo "❌ All deployment methods failed including emergency fallback"
-                            exit 1
-                        fi
-                    fi
-                fi
+                    az version
+                  displayName: Ensure Azure CLI available (uv fallback)
 
-          - task: AzureCLI@2
-            displayName: Validate Infrastructure Deployment
+                - task: AzureCLI@2
+                  displayName: Deploy Container Apps Infrastructure
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      # Debug: Show the actual parameter values being passed
+                      echo "=== Deployment Parameters ==="
+                      echo "Resource Group: $(resourceGroupName)"
+                      echo "Azure Location: $(azureLocation)"
+                      echo "Environment: $(environment)"
+                      echo "============================"
+
+                      # Try primary deployment method
+                      chmod +x scripts/deploy-infrastructure.sh
+                      echo "Attempting primary deployment method..."
+
+                      if ./scripts/deploy-infrastructure.sh '$(resourceGroupName)' '$(azureLocation)' '$(environment)'; then
+                          echo "✅ Primary deployment method succeeded"
+                      else
+                          echo "❌ Primary deployment failed, trying alternative REST API method..."
+                          
+                          # Install jq for JSON processing
+                          if ! command -v jq &> /dev/null; then
+                              echo "Installing jq for JSON processing..."
+                              sudo apt-get update -qq && sudo apt-get install -y jq
+                          fi
+                          
+                          # Try REST API deployment
+                          chmod +x scripts/deploy-infrastructure-rest.sh
+                          if ./scripts/deploy-infrastructure-rest.sh '$(resourceGroupName)' '$(azureLocation)' '$(environment)'; then
+                              echo "✅ Alternative REST API deployment succeeded"
+                          else
+                              echo "❌ Both standard deployment methods failed"
+                              echo "Trying emergency deployment as final fallback..."
+                              
+                              # Emergency deployment with individual Azure CLI commands
+                              chmod +x scripts/emergency-deploy.sh
+                              if ./scripts/emergency-deploy.sh '$(resourceGroupName)' '$(azureLocation)' '$(environment)'; then
+                                  echo "✅ Emergency deployment succeeded"
+                              else
+                                  echo "❌ All deployment methods failed including emergency fallback"
+                                  exit 1
+                              fi
+                          fi
+                      fi
+
+                - task: AzureCLI@2
+                  displayName: Validate Infrastructure Deployment
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      # Make diagnose script non-blocking
+                      echo "Running infrastructure diagnostics..."
+                      chmod +x scripts/diagnose-containerapp.sh
+                      ./scripts/diagnose-containerapp.sh '$(resourceGroupName)' || {
+                        echo "⚠️  Diagnostics failed, but continuing with deployment"
+                        echo "This is not critical for the deployment process"
+                      }
+                  continueOnError: true
+
+  - stage: DockerBuild
+    displayName: Build Docker Image
+    dependsOn: Infrastructure
+    jobs:
+      - job: BuildDockerImage
+        displayName: Build and Push Docker Image
+        pool:
+          name: "Default"
+        container: mcr.microsoft.com/azure-cli:2.73.0
+        steps:
+          - script: |
+              set -e
+              echo "Installing Docker CLI in container..."
+              apt-get update -qq
+              # Prefer docker.io for Debian/Ubuntu-based images
+              apt-get install -y docker.io
+
+              # Verify Docker daemon is accessible
+              if ! docker version >/dev/null 2>&1; then
+                echo "❌ Docker daemon not accessible. Checking Docker socket..."
+                ls -la /var/run/docker.sock || echo "Docker socket not found"
+                echo "Docker service status:"
+                systemctl status docker || echo "Cannot check Docker service status"
+                exit 1
+              fi
+
+              echo "✅ Docker CLI installed and daemon accessible"
+              docker version
+            displayName: Install Docker CLI (inside container)
+          - task: DownloadBuildArtifacts@0
+            displayName: Download build artifacts
             inputs:
-              azureSubscription: $(azureSubscription)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                # Make diagnose script non-blocking
-                echo "Running infrastructure diagnostics..."
-                chmod +x scripts/diagnose-containerapp.sh
-                ./scripts/diagnose-containerapp.sh '$(resourceGroupName)' || {
-                  echo "⚠️  Diagnostics failed, but continuing with deployment"
-                  echo "This is not critical for the deployment process"
-                }
-            continueOnError: true
+              buildType: "current"
+              downloadType: "single"
+              artifactName: "dist"
+              downloadPath: "$(System.ArtifactsDirectory)"
 
-- stage: DockerBuild
-  displayName: Build Docker Image
-  dependsOn: Infrastructure
-  jobs:
-  - job: BuildDockerImage
-    displayName: Build and Push Docker Image
-    pool:
-      name: 'Default'
-    container: mcr.microsoft.com/azure-cli:2.73.0
-    steps:
-    - script: |
-        set -e
-        echo "Installing Docker CLI in container..."
-        apt-get update -qq
-        # Prefer docker.io for Debian/Ubuntu-based images
-        apt-get install -y docker.io
-        docker version
-      displayName: Install Docker CLI (inside container)
-    - task: DownloadBuildArtifacts@0
-      displayName: Download build artifacts
-      inputs:
-        buildType: 'current'
-        downloadType: 'single'
-        artifactName: 'dist'
-        downloadPath: '$(System.ArtifactsDirectory)'
+          - script: |
+              echo "Cleaning up old Docker containers before build..."
+              if command -v docker &> /dev/null; then
+                docker ps -a --filter "name=pixel" --format '{{.ID}} {{.Names}}' | while read id name; do
+                  echo "Removing container $name ($id)"
+                  docker rm -f "$id" || true
+                done
+              else
+                echo "Docker not installed, skipping container cleanup."
+              fi
+            displayName: Clean up old Docker containers
 
-    - script: |
-        echo "Cleaning up old Docker containers before build..."
-        if command -v docker &> /dev/null; then
-          docker ps -a --filter "name=pixel" --format '{{.ID}} {{.Names}}' | while read id name; do
-            echo "Removing container $name ($id)"
-            docker rm -f "$id" || true
-          done
-        else
-          echo "Docker not installed, skipping container cleanup."
-        fi
-      displayName: Clean up old Docker containers
+          - script: |
+              echo "Cleaning up disk space before Docker build..."
+              # Check current disk usage
+              df -h /
 
-    - script: |
-        echo "Cleaning up disk space before Docker build..."
-        # Check current disk usage
-        df -h /
+              # Clean up Docker system
+              docker system prune -af --volumes || true
 
-        # Clean up Docker system
-        docker system prune -af --volumes || true
+              # Clean package caches
+              sudo apt-get clean || true
+              sudo rm -rf /var/cache/apt/archives/* || true
 
-        # Clean package caches
-        sudo apt-get clean || true
-        sudo rm -rf /var/cache/apt/archives/* || true
+              # Clean temporary files
+              sudo rm -rf /tmp/* || true
+              sudo rm -rf /var/tmp/* || true
 
-        # Clean temporary files
-        sudo rm -rf /tmp/* || true
-        sudo rm -rf /var/tmp/* || true
+              # Clean old log files
+              sudo find /var/log -name "*.log" -type f -mtime +7 -delete || true
 
-        # Clean old log files
-        sudo find /var/log -name "*.log" -type f -mtime +7 -delete || true
+              # Check disk usage after cleanup
+              df -h /
 
-        # Check disk usage after cleanup
-        df -h /
+              DISK_USAGE=$(df / | awk 'END{print $(NF-1)}' | sed 's/%//')
+              if [ "$DISK_USAGE" -gt 90 ]; then
+                echo "##[warning]Disk usage is still high: ${DISK_USAGE}%"
+              else
+                echo "Disk usage after cleanup: ${DISK_USAGE}%"
+              fi
+            displayName: Clean up disk space
 
-        DISK_USAGE=$(df / | awk 'END{print $(NF-1)}' | sed 's/%//')
-        if [ "$DISK_USAGE" -gt 90 ]; then
-          echo "##[warning]Disk usage is still high: ${DISK_USAGE}%"
-        else
-          echo "Disk usage after cleanup: ${DISK_USAGE}%"
-        fi
-      displayName: Clean up disk space
-
-    - script: |
-        set -eo pipefail
-        echo "Ensuring Azure CLI is available..."
-        export PYTHONWARNINGS="ignore::FutureWarning"
-        export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-        if ! command -v az >/dev/null 2>&1; then
-          echo "Azure CLI not found; bootstrapping via uv..."
-          if ! command -v uv >/dev/null 2>&1; then
-            curl -LsSf https://astral.sh/uv/install.sh | sh
-            export PATH="$HOME/.local/bin:$PATH"
-          fi
-          uv venv "$HOME/azure-cli-env"
-          "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
-          "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
-          echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
-        fi
-        az version
-      displayName: Ensure Azure CLI available (uv fallback)
-
-    - task: AzureCLI@2
-      displayName: Build and push Docker image
-      inputs:
-        azureSubscription: $(azureSubscription)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          echo "Looking for container registry 'pixelatedcr'"
-
-          # Use the existing pixelatedcr registry
-          ACR_NAME="pixelatedcr"
-
-          # Verify it exists, create if it doesn't
-          if ! az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) &>/dev/null; then
-            echo "Container registry 'pixelatedcr' not found. Creating it..."
-            az acr create \
-              --name "$ACR_NAME" \
-              --resource-group $(resourceGroupName) \
-              --location $(azureLocation) \
-              --sku Standard \
-              --admin-enabled true
-            
-            echo "Created Container Registry: $ACR_NAME"
-          else
-            echo "Found existing Container Registry: $ACR_NAME"
-          fi
-
-          # Login to the container registry
-          az acr login --name "$ACR_NAME"
-
-          # Get the login server
-          ACR_LOGIN_SERVER=$(az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) --query loginServer --output tsv)
-
-          echo "Container Registry Login Server: $ACR_LOGIN_SERVER"
-
-          # Copy build artifacts to current directory
-          if [ -d "$(System.ArtifactsDirectory)/dist" ]; then
-            cp -r $(System.ArtifactsDirectory)/dist ./
-            echo "Copied build artifacts to current directory"
-          fi
-
-          # Build and push Docker images with advanced multi-stage cache optimization
-          echo "Building Docker image with multi-stage cache optimization..."
-          
-          # Use Dockerfile.azure if it exists, otherwise use Dockerfile
-          DOCKERFILE="Dockerfile"
-          if [ -f "Dockerfile.azure" ]; then
-            DOCKERFILE="Dockerfile.azure"
-            echo "Using Azure-specific Dockerfile: $DOCKERFILE"
-          else
-            echo "Using default Dockerfile: $DOCKERFILE"
-          fi
-
-          # Enable Docker BuildKit for advanced caching
-          export DOCKER_BUILDKIT=1
-          
-          # Pull existing images for cache layers
-          echo "Pulling existing images for cache optimization..."
-          docker pull "$ACR_LOGIN_SERVER/$(imageName):latest" || echo "No latest image found, proceeding without cache"
-          docker pull "$ACR_LOGIN_SERVER/$(imageName):cache-base" || echo "No base cache found"
-          docker pull "$ACR_LOGIN_SERVER/$(imageName):cache-build" || echo "No build cache found"
-          
-          # Build base stage and push for caching
-          echo "Building base stage for cache..."
-          docker build \
-            -f "$DOCKERFILE" \
-            --target base \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --build-arg NODE_VERSION=22 \
-            --build-arg PNPM_VERSION=10.14.0 \
-            -t "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
-            . || echo "Base stage build failed, continuing..."
-            
-          # Build build stage and push for caching
-          echo "Building build stage for cache..."
-          docker build \
-            -f "$DOCKERFILE" \
-            --target build \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --build-arg NODE_VERSION=22 \
-            --build-arg PNPM_VERSION=10.14.0 \
-            -t "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
-            . || echo "Build stage build failed, continuing..."
-            
-          # Final production build with all cache layers
-          echo "Building final production image..."
-          docker build \
-            -f "$DOCKERFILE" \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
-            --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --build-arg NODE_VERSION=22 \
-            --build-arg PNPM_VERSION=10.14.0 \
-            -t "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" \
-            -t "$ACR_LOGIN_SERVER/$(imageName):latest" \
-            .
-
-          echo "Pushing Docker images and cache layers..."
-          # Push cache layers first for next build optimization
-          docker push "$ACR_LOGIN_SERVER/$(imageName):cache-base" || echo "Base cache push failed"
-          docker push "$ACR_LOGIN_SERVER/$(imageName):cache-build" || echo "Build cache push failed"
-          
-          # Push main images
-          docker push "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)"
-          docker push "$ACR_LOGIN_SERVER/$(imageName):latest"
-
-
-
-          # Verify the push was successful
-          echo "Verifying image push was successful..."
-          sleep 5  # Give ACR a moment to process the push
-
-          # Check if the image exists in the registry
-          IMAGE_CHECK=$(az acr repository show-tags \
-            --name "$ACR_NAME" \
-            --repository "$(imageName)" \
-            --query "[?contains(@, '$(dockerTag)')].length(@)" \
-            --output tsv 2>/dev/null || echo "0")
-
-          if [ "$IMAGE_CHECK" = "0" ]; then
-            echo "❌ Failed to verify image push. Image $(imageName):$(dockerTag) not found in registry"
-            echo "Available tags:"
-            az acr repository show-tags \
-              --name "$ACR_NAME" \
-              --repository "$(imageName)" \
-              --output table 2>/dev/null || echo "No tags found"
-            exit 1
-          else
-            echo "✅ Successfully verified image $(imageName):$(dockerTag) exists in registry"
-          fi
-
-          # Clean up local images to save space
-          docker rmi "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" || true
-          docker rmi "$ACR_LOGIN_SERVER/$(imageName):latest" || true
-          docker system prune -f
-
-- stage: Deploy
-  displayName: Deploy Container App
-  dependsOn:
-  - Build
-  - Infrastructure
-  - DockerBuild
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment: ContainerAppDeployment
-    displayName: Deploy to Container Apps
-    environment:
-      name: azure-production
-    pool:
-      name: 'Default'
-    container: mcr.microsoft.com/azure-cli:2.73.0
-    strategy:
-      runOnce:
-        deploy:
-          steps:
           - script: |
               set -eo pipefail
               echo "Ensuring Azure CLI is available..."
@@ -510,593 +368,795 @@ stages:
             displayName: Ensure Azure CLI available (uv fallback)
 
           - task: AzureCLI@2
-            displayName: Deploy Container App
+            displayName: Build and push Docker image
             inputs:
               azureSubscription: $(azureSubscription)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
-                echo "Deploying Container App: $(containerAppName)"
-                CONTAINER_APP_NAME="$(containerAppName)"
-
-                # Check if the container app already exists
-                if az containerapp show --name "$CONTAINER_APP_NAME" --resource-group $(resourceGroupName) >/dev/null 2>&1; then
-                  echo "Container App exists, updating with new image..."
-                  UPDATE_MODE="update"
-                else
-                  echo "Container App doesn't exist, creating new one..."
-                  UPDATE_MODE="create"
-                fi
+                echo "Looking for container registry 'pixelatedcr'"
 
                 # Use the existing pixelatedcr registry
                 ACR_NAME="pixelatedcr"
 
-                # Verify it exists
+                # Verify it exists, create if it doesn't
                 if ! az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) &>/dev/null; then
-                  echo "❌ Container Registry 'pixelatedcr' not found in resource group"
-                  echo "Available registries:"
-                  az acr list --resource-group $(resourceGroupName) --query "[].name" --output table
+                  echo "Container registry 'pixelatedcr' not found. Creating it..."
+                  az acr create \
+                    --name "$ACR_NAME" \
+                    --resource-group $(resourceGroupName) \
+                    --location $(azureLocation) \
+                    --sku Standard \
+                    --admin-enabled true
+                  
+                  echo "Created Container Registry: $ACR_NAME"
+                else
+                  echo "Found existing Container Registry: $ACR_NAME"
+                fi
+
+                # Login to the container registry
+                az acr login --name "$ACR_NAME"
+
+                # Get the login server
+                ACR_LOGIN_SERVER=$(az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) --query loginServer --output tsv)
+
+                echo "Container Registry Login Server: $ACR_LOGIN_SERVER"
+
+                # Copy build artifacts to current directory
+                if [ -d "$(System.ArtifactsDirectory)/dist" ]; then
+                  cp -r $(System.ArtifactsDirectory)/dist ./
+                  echo "✅ Copied build artifacts to current directory"
+                  echo "Build artifacts contents:"
+                  ls -la dist/ | head -10
+                else
+                  echo "❌ Build artifacts not found at $(System.ArtifactsDirectory)/dist"
+                  echo "Available artifacts:"
+                  ls -la $(System.ArtifactsDirectory)/ || echo "No artifacts directory found"
                   exit 1
                 fi
 
-                ACR_LOGIN_SERVER=$(az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) --query loginServer --output tsv)
-                echo "Using Container Registry: $ACR_NAME ($ACR_LOGIN_SERVER)"
+                # Build and push Docker images with advanced multi-stage cache optimization
+                echo "Building Docker image with multi-stage cache optimization..."
 
-                # Enable admin user on ACR if not already enabled
-                echo "Ensuring ACR admin user is enabled..."
-                az acr update --name "$ACR_NAME" --admin-enabled true
+                # Use Dockerfile.azure if it exists, otherwise use Dockerfile
+                DOCKERFILE="Dockerfile"
+                if [ -f "Dockerfile.azure" ]; then
+                  DOCKERFILE="Dockerfile.azure"
+                  echo "✅ Using Azure-specific Dockerfile: $DOCKERFILE"
+                elif [ -f "Dockerfile" ]; then
+                  DOCKERFILE="Dockerfile"
+                  echo "✅ Using default Dockerfile: $DOCKERFILE"
+                else
+                  echo "❌ No Dockerfile found! Available files:"
+                  ls -la | grep -i docker || echo "No Docker-related files found"
+                  exit 1
+                fi
 
-                # Get ACR admin credentials
-                ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username --output tsv)
-                ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value --output tsv)
-                echo "Retrieved ACR credentials for user: $ACR_USERNAME"
+                echo "Dockerfile contents preview:"
+                head -20 "$DOCKERFILE"
 
-                # Verify the Docker image exists before deployment
-                echo "Verifying Docker image exists: $ACR_LOGIN_SERVER/$(imageName):$(dockerTag)"
-                IMAGE_EXISTS=$(az acr repository show-tags \
+                # Enable Docker BuildKit for advanced caching
+                export DOCKER_BUILDKIT=1
+
+                # Pull existing images for cache layers
+                echo "Pulling existing images for cache optimization..."
+                docker pull "$ACR_LOGIN_SERVER/$(imageName):latest" || echo "No latest image found, proceeding without cache"
+                docker pull "$ACR_LOGIN_SERVER/$(imageName):cache-base" || echo "No base cache found"
+                docker pull "$ACR_LOGIN_SERVER/$(imageName):cache-build" || echo "No build cache found"
+
+                # Check if Dockerfile has multi-stage targets before attempting stage-specific builds
+                if grep -q "FROM.*AS base" "$DOCKERFILE" 2>/dev/null; then
+                  echo "Multi-stage Dockerfile detected, building base stage for cache..."
+                  docker build \
+                    -f "$DOCKERFILE" \
+                    --target base \
+                    --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
+                    --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
+                    --build-arg BUILDKIT_INLINE_CACHE=1 \
+                    --build-arg NODE_VERSION=22 \
+                    --build-arg PNPM_VERSION=10.14.0 \
+                    -t "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
+                    . || echo "Base stage build failed, continuing..."
+                else
+                  echo "Single-stage Dockerfile detected, skipping base stage build"
+                fi
+                  
+                if grep -q "FROM.*AS build" "$DOCKERFILE" 2>/dev/null; then
+                  echo "Build stage detected, building for cache..."
+                  docker build \
+                    -f "$DOCKERFILE" \
+                    --target build \
+                    --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
+                    --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
+                    --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
+                    --build-arg BUILDKIT_INLINE_CACHE=1 \
+                    --build-arg NODE_VERSION=22 \
+                    --build-arg PNPM_VERSION=10.14.0 \
+                    -t "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
+                    . || echo "Build stage build failed, continuing..."
+                else
+                  echo "No build stage detected, skipping build stage cache"
+                fi
+                  
+                # Final production build with all cache layers
+                echo "Building final production image..."
+                docker build \
+                  -f "$DOCKERFILE" \
+                  --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
+                  --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
+                  --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
+                  --build-arg BUILDKIT_INLINE_CACHE=1 \
+                  --build-arg NODE_VERSION=22 \
+                  --build-arg PNPM_VERSION=10.14.0 \
+                  -t "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" \
+                  -t "$ACR_LOGIN_SERVER/$(imageName):latest" \
+                  .
+
+                echo "Pushing Docker images and cache layers..."
+                # Push cache layers first for next build optimization
+                docker push "$ACR_LOGIN_SERVER/$(imageName):cache-base" || echo "Base cache push failed"
+                docker push "$ACR_LOGIN_SERVER/$(imageName):cache-build" || echo "Build cache push failed"
+
+                # Push main images
+                docker push "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)"
+                docker push "$ACR_LOGIN_SERVER/$(imageName):latest"
+
+
+
+                # Verify the push was successful
+                echo "Verifying image push was successful..."
+                sleep 5  # Give ACR a moment to process the push
+
+                # Check if the image exists in the registry
+                IMAGE_CHECK=$(az acr repository show-tags \
                   --name "$ACR_NAME" \
                   --repository "$(imageName)" \
                   --query "[?contains(@, '$(dockerTag)')].length(@)" \
-                  --output tsv)
+                  --output tsv 2>/dev/null || echo "0")
 
-                if [ -z "$IMAGE_EXISTS" ] || [ "$IMAGE_EXISTS" = "0" ]; then
-                  echo "❌ Docker image $(imageName):$(dockerTag) not found in registry"
-                  echo "Available tags for $(imageName):"
+                if [ "$IMAGE_CHECK" = "0" ]; then
+                  echo "❌ Failed to verify image push. Image $(imageName):$(dockerTag) not found in registry"
+                  echo "Available tags:"
                   az acr repository show-tags \
                     --name "$ACR_NAME" \
                     --repository "$(imageName)" \
-                    --output table || echo "No tags found or repository doesn't exist"
-                  
-                  echo "Available repositories:"
-                  az acr repository list \
-                    --name "$ACR_NAME" \
-                    --output table
-                  
-                  echo "Attempting to use 'latest' tag as fallback..."
-                  DOCKER_IMAGE_TAG="latest"
+                    --output table 2>/dev/null || echo "No tags found"
+                  exit 1
                 else
-                  echo "✅ Docker image $(imageName):$(dockerTag) found in registry"
-                  DOCKER_IMAGE_TAG="$(dockerTag)"
+                  echo "✅ Successfully verified image $(imageName):$(dockerTag) exists in registry"
                 fi
 
-                # Find Container App Environment
-                APP_ENV_NAME=$(az containerapp env list \
-                  --resource-group $(resourceGroupName) \
-                  --query "[?starts_with(name, 'pixel-env')].name | [0]" \
-                  --output tsv)
+                # Clean up local images to save space
+                docker rmi "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" || true
+                docker rmi "$ACR_LOGIN_SERVER/$(imageName):latest" || true
+                docker system prune -f
 
-                if [ -z "$APP_ENV_NAME" ]; then
-                  echo "No Container App Environment found. Creating one..."
-                  # Generate unique suffix for resources
-                  UNIQUE_SUFFIX=$(echo -n "$(resourceGroupName)-$(environment)" | sha256sum | cut -c1-8)
-                  APP_ENV_NAME="pixel-env-${UNIQUE_SUFFIX}"
-                  
-                  az containerapp env create \
-                    --name "$APP_ENV_NAME" \
-                    --resource-group $(resourceGroupName) \
-                    --location $(azureLocation) \
-                    --only-show-errors
-                  
-                  if [ $? -ne 0 ]; then
-                    echo "❌ Failed to create Container App Environment"
-                    exit 1
+  - stage: Deploy
+    displayName: Deploy Container App
+    dependsOn:
+      - Build
+      - Infrastructure
+      - DockerBuild
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main')))
+    jobs:
+      - deployment: ContainerAppDeployment
+        displayName: Deploy to Container Apps
+        environment:
+          name: azure-production
+        pool:
+          name: "Default"
+        container: mcr.microsoft.com/azure-cli:2.73.0
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                    set -eo pipefail
+                    echo "Ensuring Azure CLI is available..."
+                    export PYTHONWARNINGS="ignore::FutureWarning"
+                    export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+                    if ! command -v az >/dev/null 2>&1; then
+                      echo "Azure CLI not found; bootstrapping via uv..."
+                      if ! command -v uv >/dev/null 2>&1; then
+                        curl -LsSf https://astral.sh/uv/install.sh | sh
+                        export PATH="$HOME/.local/bin:$PATH"
+                      fi
+                      uv venv "$HOME/azure-cli-env"
+                      "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
+                      "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
+                      echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+                    fi
+                    az version
+                  displayName: Ensure Azure CLI available (uv fallback)
+
+                - task: AzureCLI@2
+                  displayName: Deploy Container App
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      echo "Deploying Container App: $(containerAppName)"
+                      CONTAINER_APP_NAME="$(containerAppName)"
+
+                      # Check if the container app already exists
+                      if az containerapp show --name "$CONTAINER_APP_NAME" --resource-group $(resourceGroupName) >/dev/null 2>&1; then
+                        echo "Container App exists, updating with new image..."
+                        UPDATE_MODE="update"
+                      else
+                        echo "Container App doesn't exist, creating new one..."
+                        UPDATE_MODE="create"
+                      fi
+
+                      # Use the existing pixelatedcr registry
+                      ACR_NAME="pixelatedcr"
+
+                      # Verify it exists
+                      if ! az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) &>/dev/null; then
+                        echo "❌ Container Registry 'pixelatedcr' not found in resource group"
+                        echo "Available registries:"
+                        az acr list --resource-group $(resourceGroupName) --query "[].name" --output table
+                        exit 1
+                      fi
+
+                      ACR_LOGIN_SERVER=$(az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) --query loginServer --output tsv)
+                      echo "Using Container Registry: $ACR_NAME ($ACR_LOGIN_SERVER)"
+
+                      # Enable admin user on ACR if not already enabled
+                      echo "Ensuring ACR admin user is enabled..."
+                      az acr update --name "$ACR_NAME" --admin-enabled true
+
+                      # Get ACR admin credentials
+                      ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username --output tsv)
+                      ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value --output tsv)
+                      echo "Retrieved ACR credentials for user: $ACR_USERNAME"
+
+                      # Verify the Docker image exists before deployment
+                      echo "Verifying Docker image exists: $ACR_LOGIN_SERVER/$(imageName):$(dockerTag)"
+                      IMAGE_EXISTS=$(az acr repository show-tags \
+                        --name "$ACR_NAME" \
+                        --repository "$(imageName)" \
+                        --query "[?contains(@, '$(dockerTag)')].length(@)" \
+                        --output tsv)
+
+                      if [ -z "$IMAGE_EXISTS" ] || [ "$IMAGE_EXISTS" = "0" ]; then
+                        echo "❌ Docker image $(imageName):$(dockerTag) not found in registry"
+                        echo "Available tags for $(imageName):"
+                        az acr repository show-tags \
+                          --name "$ACR_NAME" \
+                          --repository "$(imageName)" \
+                          --output table || echo "No tags found or repository doesn't exist"
+                        
+                        echo "Available repositories:"
+                        az acr repository list \
+                          --name "$ACR_NAME" \
+                          --output table
+                        
+                        echo "Attempting to use 'latest' tag as fallback..."
+                        DOCKER_IMAGE_TAG="latest"
+                      else
+                        echo "✅ Docker image $(imageName):$(dockerTag) found in registry"
+                        DOCKER_IMAGE_TAG="$(dockerTag)"
+                      fi
+
+                      # Find Container App Environment
+                      APP_ENV_NAME=$(az containerapp env list \
+                        --resource-group $(resourceGroupName) \
+                        --query "[?starts_with(name, 'pixel-env')].name | [0]" \
+                        --output tsv)
+
+                      if [ -z "$APP_ENV_NAME" ]; then
+                        echo "No Container App Environment found. Creating one..."
+                        # Generate unique suffix for resources
+                        UNIQUE_SUFFIX=$(echo -n "$(resourceGroupName)-$(environment)" | sha256sum | cut -c1-8)
+                        APP_ENV_NAME="pixel-env-${UNIQUE_SUFFIX}"
+                        
+                        az containerapp env create \
+                          --name "$APP_ENV_NAME" \
+                          --resource-group $(resourceGroupName) \
+                          --location $(azureLocation) \
+                          --only-show-errors
+                        
+                        if [ $? -ne 0 ]; then
+                          echo "❌ Failed to create Container App Environment"
+                          exit 1
+                        fi
+                        echo "✅ Created Container App Environment: $APP_ENV_NAME"
+                      else
+                        echo "Found Container App Environment: $APP_ENV_NAME"
+                      fi
+
+                      echo "Container App operation mode: $UPDATE_MODE"
+                      echo "Using Docker image: $ACR_LOGIN_SERVER/$(imageName):$DOCKER_IMAGE_TAG"
+
+                      if [ "$UPDATE_MODE" = "update" ]; then
+                        echo "Updating existing Container App: $CONTAINER_APP_NAME"
+                        
+                        az containerapp update \
+                          --name "$CONTAINER_APP_NAME" \
+                          --resource-group $(resourceGroupName) \
+                          --image "$ACR_LOGIN_SERVER/$(imageName):$DOCKER_IMAGE_TAG" \
+                          --cpu 1.0 \
+                          --memory 2Gi \
+                          --min-replicas 1 \
+                          --max-replicas 10 \
+                          --set-env-vars \
+                            "BUILD_ID=$(dockerTag)" \
+                            "NODE_ENV=production" \
+                            "PORT=4321" \
+                            "PUBLIC_CLERK_PUBLISHABLE_KEY=$(CLERK_PUBLISHABLE_KEY)" \
+                            "CLERK_SECRET_KEY=$(CLERK_SECRET_KEY)" \
+                          --only-show-errors
+
+                        if [ $? -eq 0 ]; then
+                          echo "✅ Container App updated successfully"
+                        else
+                          echo "❌ Container App update failed"
+                          exit 1
+                        fi
+                      else
+                        echo "Creating new Container App: $CONTAINER_APP_NAME"
+                        
+                        az containerapp create \
+                          --name "$CONTAINER_APP_NAME" \
+                          --resource-group $(resourceGroupName) \
+                          --environment "$APP_ENV_NAME" \
+                          --image "$ACR_LOGIN_SERVER/$(imageName):$DOCKER_IMAGE_TAG" \
+                          --target-port 4321 \
+                          --ingress 'external' \
+                          --registry-server "$ACR_LOGIN_SERVER" \
+                          --registry-username "$ACR_USERNAME" \
+                          --registry-password "$ACR_PASSWORD" \
+                          --cpu 1.0 \
+                          --memory 2Gi \
+                          --min-replicas 1 \
+                          --max-replicas 10 \
+                          --env-vars \
+                            "BUILD_ID=$(dockerTag)" \
+                            "NODE_ENV=production" \
+                            "PORT=4321" \
+                            "PUBLIC_CLERK_PUBLISHABLE_KEY=$(CLERK_PUBLISHABLE_KEY)" \
+                            "CLERK_SECRET_KEY=$(CLERK_SECRET_KEY)" \
+                          --only-show-errors
+
+                        if [ $? -eq 0 ]; then
+                          echo "✅ Container App created successfully"
+                        else
+                          echo "❌ Container App creation failed"
+                          exit 1
+                        fi
+                      fi
+
+                      # Configure custom domain if specified
+                      CUSTOM_DOMAIN="$(customDomain)"
+                      if [ ! -z "$CUSTOM_DOMAIN" ] && [ "$CUSTOM_DOMAIN" != "" ]; then
+                        echo "Configuring custom domain: $CUSTOM_DOMAIN"
+                        
+                        # Add custom domain to the Container App
+                        az containerapp hostname add \
+                          --hostname "$CUSTOM_DOMAIN" \
+                          --name "$CONTAINER_APP_NAME" \
+                          --resource-group $(resourceGroupName) \
+                          --only-show-errors || {
+                          echo "⚠️  Failed to add custom domain $CUSTOM_DOMAIN"
+                          echo "Make sure:"
+                          echo "1. DNS CNAME record points $CUSTOM_DOMAIN to the Container App FQDN"
+                          echo "2. Domain ownership is verified"
+                          echo "3. You have necessary permissions"
+                        }
+                        
+                        # Create managed certificate for the custom domain
+                        echo "Creating managed certificate for $CUSTOM_DOMAIN..."
+                        az containerapp env certificate create \
+                          --name "${CUSTOM_DOMAIN//./-}-cert" \
+                          --environment "$APP_ENV_NAME" \
+                          --resource-group $(resourceGroupName) \
+                          --hostname "$CUSTOM_DOMAIN" \
+                          --validation-method CNAME \
+                          --only-show-errors || {
+                          echo "⚠️  Failed to create managed certificate for $CUSTOM_DOMAIN"
+                          echo "You may need to manually create and bind an SSL certificate"
+                        }
+                        
+                        # Bind the certificate to the hostname
+                        CERT_ID=$(az containerapp env certificate list \
+                          --environment "$APP_ENV_NAME" \
+                          --resource-group $(resourceGroupName) \
+                          --query "[?properties.subjectName=='$CUSTOM_DOMAIN'].id | [0]" \
+                          --output tsv)
+                        
+                        if [ ! -z "$CERT_ID" ]; then
+                          echo "Binding certificate to hostname..."
+                          az containerapp hostname bind \
+                            --hostname "$CUSTOM_DOMAIN" \
+                            --name "$CONTAINER_APP_NAME" \
+                            --resource-group $(resourceGroupName) \
+                            --certificate "$CERT_ID" \
+                            --only-show-errors || {
+                            echo "⚠️  Failed to bind certificate to $CUSTOM_DOMAIN"
+                          }
+                        fi
+                        
+                        echo "✅ Custom domain configuration completed for: $CUSTOM_DOMAIN"
+                      else
+                        echo "No custom domain specified, using default Container App URL"
+                      fi
+
+                      # Get and display the Container App URL
+                      APP_URL=$(az containerapp show \
+                        --name "$CONTAINER_APP_NAME" \
+                        --resource-group $(resourceGroupName) \
+                        --query properties.configuration.ingress.fqdn \
+                        --output tsv)
+
+                      if [ ! -z "$APP_URL" ]; then
+                        echo "🚀 Container App deployed to: https://$APP_URL"
+                        echo "##vso[task.setvariable variable=containerAppUrl]https://$APP_URL"
+                        
+                        # Also show custom domain if configured
+                        CUSTOM_DOMAIN="$(customDomain)"
+                        if [ ! -z "$CUSTOM_DOMAIN" ] && [ "$CUSTOM_DOMAIN" != "" ]; then
+                          echo "🌐 Custom domain: https://$CUSTOM_DOMAIN"
+                        fi
+                      else
+                        echo "⚠️  Could not retrieve Container App URL"
+                      fi
+
+  - stage: DeployAppService
+    displayName: Deploy to App Service
+    dependsOn:
+      - Build
+      - Infrastructure
+      - DockerBuild
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - deployment: AppServiceDeployment
+        displayName: Deploy to App Service
+        environment:
+          name: azure-production
+        pool:
+          name: "Default"
+        container: mcr.microsoft.com/azure-cli:2.73.0
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                    set -eo pipefail
+                    echo "Ensuring Azure CLI is available..."
+                    export PYTHONWARNINGS="ignore::FutureWarning"
+                    export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+                    if ! command -v az >/dev/null 2>&1; then
+                      echo "Azure CLI not found; bootstrapping via uv..."
+                      if ! command -v uv >/dev/null 2>&1; then
+                        curl -LsSf https://astral.sh/uv/install.sh | sh
+                        export PATH="$HOME/.local/bin:$PATH"
+                      fi
+                      uv venv "$HOME/azure-cli-env"
+                      "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
+                      "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
+                      echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+                    fi
+                    az version
+                  displayName: Ensure Azure CLI available (uv fallback)
+
+                - task: AzureCLI@2
+                  displayName: Deploy to App Service
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      echo "Deploying to App Service: $(appServiceName)"
+                      APP_SERVICE_NAME="$(appServiceName)"
+
+                      # Use the existing pixelatedcr registry
+                      ACR_NAME="pixelatedcr"
+                      ACR_LOGIN_SERVER=$(az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) --query loginServer --output tsv)
+
+                      echo "Using Container Registry: $ACR_NAME ($ACR_LOGIN_SERVER)"
+                      echo "Using Docker image: $ACR_LOGIN_SERVER/$(imageName):$(dockerTag)"
+
+                      # Get ACR credentials first
+                      ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username --output tsv)
+                      ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value --output tsv)
+
+                      echo "Using ACR credentials: $ACR_USERNAME"
+
+                      # Configure App Service for container deployment using new syntax
+                      echo "Configuring App Service container settings..."
+                      az webapp config container set \
+                        --name "$APP_SERVICE_NAME" \
+                        --resource-group $(resourceGroupName) \
+                        --container-image-name "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" \
+                        --container-registry-url "https://$ACR_LOGIN_SERVER" \
+                        --container-registry-user "$ACR_USERNAME" \
+                        --container-registry-password "$ACR_PASSWORD"
+
+                      # Configure App Service app settings
+                      echo "Configuring App Service environment variables..."
+                      az webapp config appsettings set \
+                        --name "$APP_SERVICE_NAME" \
+                        --resource-group $(resourceGroupName) \
+                        --settings \
+                          BUILD_ID=$(dockerTag) \
+                          NODE_ENV=production \
+                          PORT=4321 \
+                          WEBSITES_PORT=4321 \
+                          PUBLIC_CLERK_PUBLISHABLE_KEY="$(CLERK_PUBLISHABLE_KEY)" \
+                          CLERK_SECRET_KEY="$(CLERK_SECRET_KEY)" \
+                          WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
+
+                      # Restart App Service to pick up new container
+                      echo "Restarting App Service to deploy new container..."
+                      az webapp restart \
+                        --name "$APP_SERVICE_NAME" \
+                        --resource-group $(resourceGroupName)
+
+                      # Get App Service URL
+                      APP_URL=$(az webapp show \
+                        --name "$APP_SERVICE_NAME" \
+                        --resource-group $(resourceGroupName) \
+                        --query defaultHostName \
+                        --output tsv)
+
+                      if [ ! -z "$APP_URL" ]; then
+                        echo "🚀 App Service deployed to: https://$APP_URL"
+                        echo "🌐 Custom domain: https://$(customDomain)"
+                        echo "##vso[task.setvariable variable=appServiceUrl]https://$APP_URL"
+                      else
+                        echo "⚠️  Could not retrieve App Service URL"
+                      fi
+
+  - stage: PostDeploymentTests
+    displayName: Post Deployment Tests
+    dependsOn:
+      - Deploy
+      - DeployAppService
+    condition: succeeded()
+    jobs:
+      - job: HealthCheck
+        displayName: Health Check Both Deployments
+        pool:
+          name: "Default"
+        steps:
+          - script: |
+              # Install Azure CLI with Python 3.13 compatibility fixes
+              echo "Installing Azure CLI with Python 3.13 compatibility..."
+
+              # Set environment variables to suppress warnings
+              export PYTHONWARNINGS="ignore::FutureWarning"
+              export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+
+              # Try conda first with specific Python version
+              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+                  echo "Azure CLI installed via conda with Python 3.11"
+                  echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
+                  /home/vivi/miniconda3/bin/az version
+              else
+                  echo "Conda installation failed, using pip with Python 3.11"
+                  # Install Python 3.11 if not available
+                  if ! command -v python3.11 &> /dev/null; then
+                      sudo apt-get update -qq
+                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
                   fi
-                  echo "✅ Created Container App Environment: $APP_ENV_NAME"
-                else
-                  echo "Found Container App Environment: $APP_ENV_NAME"
-                fi
+                  
+                  # Create virtual environment with Python 3.11
+                  python3.11 -m venv ~/azure-cli-env
+                  source ~/azure-cli-env/bin/activate
+                  
+                  # Install Azure CLI in the virtual environment
+                  pip install azure-cli==2.73.0
+                  
+                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+                  $HOME/azure-cli-env/bin/az version
+              fi
+            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
-                echo "Container App operation mode: $UPDATE_MODE"
-                echo "Using Docker image: $ACR_LOGIN_SERVER/$(imageName):$DOCKER_IMAGE_TAG"
+          - task: AzureCLI@2
+            displayName: Health Check App Service
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                chmod +x scripts/minimal-health-check.sh
+                ./scripts/minimal-health-check.sh '$(appServiceName)' '$(customDomain)'
+            continueOnError: true
 
-                if [ "$UPDATE_MODE" = "update" ]; then
-                  echo "Updating existing Container App: $CONTAINER_APP_NAME"
-                  
-                  az containerapp update \
-                    --name "$CONTAINER_APP_NAME" \
-                    --resource-group $(resourceGroupName) \
-                    --image "$ACR_LOGIN_SERVER/$(imageName):$DOCKER_IMAGE_TAG" \
-                    --cpu 1.0 \
-                    --memory 2Gi \
-                    --min-replicas 1 \
-                    --max-replicas 10 \
-                    --set-env-vars \
-                      BUILD_ID=$(dockerTag) \
-                      NODE_ENV=production \
-                      PORT=4321 \
-                      PUBLIC_CLERK_PUBLISHABLE_KEY="$(CLERK_PUBLISHABLE_KEY)" \
-                      CLERK_SECRET_KEY="$(CLERK_SECRET_KEY)" \
-                    --only-show-errors
+          - task: AzureCLI@2
+            displayName: Health Check Container App
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                echo "=== Container App Health Check ==="
+                CONTAINER_APP_NAME="$(containerAppName)"
 
-                  if [ $? -eq 0 ]; then
-                    echo "✅ Container App updated successfully"
-                  else
-                    echo "❌ Container App update failed"
-                    exit 1
-                  fi
-                else
-                  echo "Creating new Container App: $CONTAINER_APP_NAME"
-                  
-                  az containerapp create \
-                    --name "$CONTAINER_APP_NAME" \
-                    --resource-group $(resourceGroupName) \
-                    --environment "$APP_ENV_NAME" \
-                    --image "$ACR_LOGIN_SERVER/$(imageName):$DOCKER_IMAGE_TAG" \
-                    --target-port 4321 \
-                    --ingress 'external' \
-                    --registry-server "$ACR_LOGIN_SERVER" \
-                    --registry-username "$ACR_USERNAME" \
-                    --registry-password "$ACR_PASSWORD" \
-                    --cpu 1.0 \
-                    --memory 2Gi \
-                    --min-replicas 1 \
-                    --max-replicas 10 \
-                    --env-vars \
-                      BUILD_ID=$(dockerTag) \
-                      NODE_ENV=production \
-                      PORT=4321 \
-                      PUBLIC_CLERK_PUBLISHABLE_KEY="$(CLERK_PUBLISHABLE_KEY)" \
-                      CLERK_SECRET_KEY="$(CLERK_SECRET_KEY)" \
-                    --only-show-errors
-
-                  if [ $? -eq 0 ]; then
-                    echo "✅ Container App created successfully"
-                  else
-                    echo "❌ Container App creation failed"
-                    exit 1
-                  fi
-                fi
-
-                # Configure custom domain if specified
-                CUSTOM_DOMAIN="$(customDomain)"
-                if [ ! -z "$CUSTOM_DOMAIN" ] && [ "$CUSTOM_DOMAIN" != "" ]; then
-                  echo "Configuring custom domain: $CUSTOM_DOMAIN"
-                  
-                  # Add custom domain to the Container App
-                  az containerapp hostname add \
-                    --hostname "$CUSTOM_DOMAIN" \
-                    --name "$CONTAINER_APP_NAME" \
-                    --resource-group $(resourceGroupName) \
-                    --only-show-errors || {
-                    echo "⚠️  Failed to add custom domain $CUSTOM_DOMAIN"
-                    echo "Make sure:"
-                    echo "1. DNS CNAME record points $CUSTOM_DOMAIN to the Container App FQDN"
-                    echo "2. Domain ownership is verified"
-                    echo "3. You have necessary permissions"
-                  }
-                  
-                  # Create managed certificate for the custom domain
-                  echo "Creating managed certificate for $CUSTOM_DOMAIN..."
-                  az containerapp env certificate create \
-                    --name "${CUSTOM_DOMAIN//./-}-cert" \
-                    --environment "$APP_ENV_NAME" \
-                    --resource-group $(resourceGroupName) \
-                    --hostname "$CUSTOM_DOMAIN" \
-                    --validation-method CNAME \
-                    --only-show-errors || {
-                    echo "⚠️  Failed to create managed certificate for $CUSTOM_DOMAIN"
-                    echo "You may need to manually create and bind an SSL certificate"
-                  }
-                  
-                  # Bind the certificate to the hostname
-                  CERT_ID=$(az containerapp env certificate list \
-                    --environment "$APP_ENV_NAME" \
-                    --resource-group $(resourceGroupName) \
-                    --query "[?properties.subjectName=='$CUSTOM_DOMAIN'].id | [0]" \
-                    --output tsv)
-                  
-                  if [ ! -z "$CERT_ID" ]; then
-                    echo "Binding certificate to hostname..."
-                    az containerapp hostname bind \
-                      --hostname "$CUSTOM_DOMAIN" \
-                      --name "$CONTAINER_APP_NAME" \
-                      --resource-group $(resourceGroupName) \
-                      --certificate "$CERT_ID" \
-                      --only-show-errors || {
-                      echo "⚠️  Failed to bind certificate to $CUSTOM_DOMAIN"
-                    }
-                  fi
-                  
-                  echo "✅ Custom domain configuration completed for: $CUSTOM_DOMAIN"
-                else
-                  echo "No custom domain specified, using default Container App URL"
-                fi
-
-                # Get and display the Container App URL
+                # Get Container App URL
                 APP_URL=$(az containerapp show \
                   --name "$CONTAINER_APP_NAME" \
                   --resource-group $(resourceGroupName) \
                   --query properties.configuration.ingress.fqdn \
                   --output tsv)
 
-                if [ ! -z "$APP_URL" ]; then
-                  echo "🚀 Container App deployed to: https://$APP_URL"
-                  echo "##vso[task.setvariable variable=containerAppUrl]https://$APP_URL"
-                  
-                  # Also show custom domain if configured
-                  CUSTOM_DOMAIN="$(customDomain)"
-                  if [ ! -z "$CUSTOM_DOMAIN" ] && [ "$CUSTOM_DOMAIN" != "" ]; then
-                    echo "🌐 Custom domain: https://$CUSTOM_DOMAIN"
-                  fi
-                else
-                  echo "⚠️  Could not retrieve Container App URL"
+                if [ -z "$APP_URL" ]; then
+                  echo "❌ Failed to get Container App URL"
+                  exit 1
                 fi
 
-- stage: DeployAppService
-  displayName: Deploy to App Service
-  dependsOn:
-  - Build
-  - Infrastructure
-  - DockerBuild
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment: AppServiceDeployment
-    displayName: Deploy to App Service
-    environment:
-      name: azure-production
-    pool:
-      name: 'Default'
-    container: mcr.microsoft.com/azure-cli:2.73.0
-    strategy:
-      runOnce:
-        deploy:
-          steps:
+                FULL_URL="https://$APP_URL"
+                echo "Testing Container App at: $FULL_URL"
+
+                # Health check with retries
+                MAX_RETRIES=3
+                RETRY_COUNT=0
+                SUCCESS=false
+
+                while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                  echo "Health check attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
+                  
+                  HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$FULL_URL" --connect-timeout 10 --max-time 30 || echo "000")
+                  
+                  if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "301" ] || [ "$HTTP_STATUS" = "302" ]; then
+                    echo "✅ Container App health check passed: $HTTP_STATUS"
+                    SUCCESS=true
+                    break
+                  else
+                    echo "⚠️  Container App attempt $((RETRY_COUNT + 1)) failed with status: $HTTP_STATUS"
+                  fi
+                  
+                  RETRY_COUNT=$((RETRY_COUNT + 1))
+                  if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                    echo "Waiting 15 seconds before next attempt..."
+                    sleep 15
+                  fi
+                done
+
+                if [ "$SUCCESS" = false ]; then
+                  echo "⚠️  Container App health check failed (non-blocking)"
+                else
+                  echo "🎉 Container App health check completed successfully!"
+                  echo "🧪 Testing URL: $FULL_URL"
+                fi
+            continueOnError: true
+
+  - stage: Cleanup
+    displayName: Cleanup Old Deployments
+    dependsOn: PostDeploymentTests
+    condition: succeeded()
+    jobs:
+      - job: CleanupOldApps
+        displayName: Clean Up Old Container Apps Only
+        pool:
+          name: "Default"
+        steps:
           - script: |
-              set -eo pipefail
-              echo "Ensuring Azure CLI is available..."
+              # Install Azure CLI with Python 3.13 compatibility fixes
+              echo "Installing Azure CLI with Python 3.13 compatibility..."
+
+              # Set environment variables to suppress warnings
               export PYTHONWARNINGS="ignore::FutureWarning"
               export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-              if ! command -v az >/dev/null 2>&1; then
-                echo "Azure CLI not found; bootstrapping via uv..."
-                if ! command -v uv >/dev/null 2>&1; then
-                  curl -LsSf https://astral.sh/uv/install.sh | sh
-                  export PATH="$HOME/.local/bin:$PATH"
-                fi
-                uv venv "$HOME/azure-cli-env"
-                "$HOME/azure-cli-env/bin/python" -m pip install --upgrade pip
-                "$HOME/azure-cli-env/bin/pip" install "azure-cli==2.73.0"
-                echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+
+              # Try conda first with specific Python version
+              if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
+                  echo "Azure CLI installed via conda with Python 3.11"
+                  echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
+                  /home/vivi/miniconda3/bin/az version
+              else
+                  echo "Conda installation failed, using pip with Python 3.11"
+                  # Install Python 3.11 if not available
+                  if ! command -v python3.11 &> /dev/null; then
+                      sudo apt-get update -qq
+                      sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
+                  fi
+                  
+                  # Create virtual environment with Python 3.11
+                  python3.11 -m venv ~/azure-cli-env
+                  source ~/azure-cli-env/bin/activate
+                  
+                  # Install Azure CLI in the virtual environment
+                  pip install azure-cli==2.73.0
+                  
+                  echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
+                  $HOME/azure-cli-env/bin/az version
               fi
-              az version
-            displayName: Ensure Azure CLI available (uv fallback)
+            displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
 
           - task: AzureCLI@2
-            displayName: Deploy to App Service
+            displayName: Summary and Cleanup
             inputs:
               azureSubscription: $(azureSubscription)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
-                echo "Deploying to App Service: $(appServiceName)"
-                APP_SERVICE_NAME="$(appServiceName)"
-
-                # Use the existing pixelatedcr registry
-                ACR_NAME="pixelatedcr"
-                ACR_LOGIN_SERVER=$(az acr show --name "$ACR_NAME" --resource-group $(resourceGroupName) --query loginServer --output tsv)
-
-                echo "Using Container Registry: $ACR_NAME ($ACR_LOGIN_SERVER)"
-                echo "Using Docker image: $ACR_LOGIN_SERVER/$(imageName):$(dockerTag)"
-
-                # Get ACR credentials first
-                ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username --output tsv)
-                ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value --output tsv)
-
-                echo "Using ACR credentials: $ACR_USERNAME"
-
-                # Configure App Service for container deployment using new syntax
-                echo "Configuring App Service container settings..."
-                az webapp config container set \
-                  --name "$APP_SERVICE_NAME" \
+                echo "🎉 Dual Deployment Complete!"
+                echo "================================="
+                echo ""
+                echo "🌐 PRODUCTION (App Service):"
+                echo "   • URL: https://$(customDomain)"
+                echo "   • Service: $(appServiceName)"
+                echo "   • Purpose: Live production site with your domain"
+                echo ""
+                echo "🧪 TESTING (Container Apps):"
+                CONTAINER_APP_URL=$(az containerapp show \
+                  --name "$(containerAppName)" \
                   --resource-group $(resourceGroupName) \
-                  --container-image-name "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" \
-                  --container-registry-url "https://$ACR_LOGIN_SERVER" \
-                  --container-registry-user "$ACR_USERNAME" \
-                  --container-registry-password "$ACR_PASSWORD"
+                  --query properties.configuration.ingress.fqdn \
+                  --output tsv 2>/dev/null || echo "not-deployed")
+                echo "   • URL: https://$CONTAINER_APP_URL"
+                echo "   • Service: $(containerAppName)"
+                echo "   • Purpose: Testing new features and deployments"
+                echo ""
+                echo "✅ Both deployments use the same Docker image: $(dockerTag)"
+                echo "✅ No DNS changes required - domain stays on App Service"
+                echo ""
 
-                # Configure App Service app settings
-                echo "Configuring App Service environment variables..."
-                az webapp config appsettings set \
-                  --name "$APP_SERVICE_NAME" \
+                # Clean up old build-specific container apps if they exist
+                echo "Checking for old container apps to clean up..."
+                OLD_APPS=$(az containerapp list \
                   --resource-group $(resourceGroupName) \
-                  --settings \
-                    BUILD_ID=$(dockerTag) \
-                    NODE_ENV=production \
-                    PORT=4321 \
-                    WEBSITES_PORT=4321 \
-                    PUBLIC_CLERK_PUBLISHABLE_KEY="$(CLERK_PUBLISHABLE_KEY)" \
-                    CLERK_SECRET_KEY="$(CLERK_SECRET_KEY)" \
-                    WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
-
-                # Restart App Service to pick up new container
-                echo "Restarting App Service to deploy new container..."
-                az webapp restart \
-                  --name "$APP_SERVICE_NAME" \
-                  --resource-group $(resourceGroupName)
-
-                # Get App Service URL
-                APP_URL=$(az webapp show \
-                  --name "$APP_SERVICE_NAME" \
-                  --resource-group $(resourceGroupName) \
-                  --query defaultHostName \
+                  --query "[?starts_with(name, 'pixel-') && name != '$(containerAppName)'].name" \
                   --output tsv)
 
-                if [ ! -z "$APP_URL" ]; then
-                  echo "🚀 App Service deployed to: https://$APP_URL"
-                  echo "🌐 Custom domain: https://$(customDomain)"
-                  echo "##vso[task.setvariable variable=appServiceUrl]https://$APP_URL"
+                if [ ! -z "$OLD_APPS" ]; then
+                  echo "Found old container apps to clean up:"
+                  echo "$OLD_APPS"
+                  echo "$OLD_APPS" | while read app_name; do
+                    if [ ! -z "$app_name" ]; then
+                      echo "Deleting old Container App: $app_name"
+                      az containerapp delete \
+                        --name "$app_name" \
+                        --resource-group $(resourceGroupName) \
+                        --yes \
+                        --only-show-errors || {
+                        echo "⚠️  Failed to delete $app_name, continuing..."
+                      }
+                    fi
+                  done
                 else
-                  echo "⚠️  Could not retrieve App Service URL"
+                  echo "No old container apps found to clean up"
                 fi
 
-- stage: PostDeploymentTests
-  displayName: Post Deployment Tests
-  dependsOn:
-  - Deploy
-  - DeployAppService
-  condition: succeeded()
-  jobs:
-  - job: HealthCheck
-    displayName: Health Check Both Deployments
-    pool:
-      name: 'Default'
-    steps:
-    - script: |
-        # Install Azure CLI with Python 3.13 compatibility fixes
-        echo "Installing Azure CLI with Python 3.13 compatibility..."
-        
-        # Set environment variables to suppress warnings
-        export PYTHONWARNINGS="ignore::FutureWarning"
-        export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-        
-        # Try conda first with specific Python version
-        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
-            echo "Azure CLI installed via conda with Python 3.11"
-            echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
-            /home/vivi/miniconda3/bin/az version
-        else
-            echo "Conda installation failed, using pip with Python 3.11"
-            # Install Python 3.11 if not available
-            if ! command -v python3.11 &> /dev/null; then
-                sudo apt-get update -qq
-                sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
-            fi
-            
-            # Create virtual environment with Python 3.11
-            python3.11 -m venv ~/azure-cli-env
-            source ~/azure-cli-env/bin/activate
-            
-            # Install Azure CLI in the virtual environment
-            pip install azure-cli==2.73.0
-            
-            echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
-            $HOME/azure-cli-env/bin/az version
-        fi
-      displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
+                # Clean up old Docker images in ACR
+                echo "Cleaning up old Docker images in Container Registry..."
+                ACR_NAME="pixelatedcr"
 
-    - task: AzureCLI@2
-      displayName: Health Check App Service
-      inputs:
-        azureSubscription: $(azureSubscription)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          chmod +x scripts/minimal-health-check.sh
-          ./scripts/minimal-health-check.sh '$(appServiceName)' '$(customDomain)'
-      continueOnError: true
+                # Get all tags for the image
+                ALL_TAGS=$(az acr repository show-tags \
+                  --name "$ACR_NAME" \
+                  --repository "$(imageName)" \
+                  --output tsv 2>/dev/null | sort -V || echo "")
 
-    - task: AzureCLI@2
-      displayName: Health Check Container App
-      inputs:
-        azureSubscription: $(azureSubscription)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          echo "=== Container App Health Check ==="
-          CONTAINER_APP_NAME="$(containerAppName)"
-
-          # Get Container App URL
-          APP_URL=$(az containerapp show \
-            --name "$CONTAINER_APP_NAME" \
-            --resource-group $(resourceGroupName) \
-            --query properties.configuration.ingress.fqdn \
-            --output tsv)
-
-          if [ -z "$APP_URL" ]; then
-            echo "❌ Failed to get Container App URL"
-            exit 1
-          fi
-
-          FULL_URL="https://$APP_URL"
-          echo "Testing Container App at: $FULL_URL"
-
-          # Health check with retries
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          SUCCESS=false
-
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            echo "Health check attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
-            
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$FULL_URL" --connect-timeout 10 --max-time 30 || echo "000")
-            
-            if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "301" ] || [ "$HTTP_STATUS" = "302" ]; then
-              echo "✅ Container App health check passed: $HTTP_STATUS"
-              SUCCESS=true
-              break
-            else
-              echo "⚠️  Container App attempt $((RETRY_COUNT + 1)) failed with status: $HTTP_STATUS"
-            fi
-            
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-              echo "Waiting 15 seconds before next attempt..."
-              sleep 15
-            fi
-          done
-
-          if [ "$SUCCESS" = false ]; then
-            echo "⚠️  Container App health check failed (non-blocking)"
-          else
-            echo "🎉 Container App health check completed successfully!"
-            echo "🧪 Testing URL: $FULL_URL"
-          fi
-      continueOnError: true
-
-- stage: Cleanup
-  displayName: Cleanup Old Deployments
-  dependsOn: PostDeploymentTests
-  condition: succeeded()
-  jobs:
-  - job: CleanupOldApps
-    displayName: Clean Up Old Container Apps Only
-    pool:
-      name: 'Default'
-    steps:
-    - script: |
-        # Install Azure CLI with Python 3.13 compatibility fixes
-        echo "Installing Azure CLI with Python 3.13 compatibility..."
-        
-        # Set environment variables to suppress warnings
-        export PYTHONWARNINGS="ignore::FutureWarning"
-        export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-        
-        # Try conda first with specific Python version
-        if /home/vivi/miniconda3/bin/conda install -c conda-forge azure-cli python=3.11 -y; then
-            echo "Azure CLI installed via conda with Python 3.11"
-            echo "##vso[task.prependpath]/home/vivi/miniconda3/bin"
-            /home/vivi/miniconda3/bin/az version
-        else
-            echo "Conda installation failed, using pip with Python 3.11"
-            # Install Python 3.11 if not available
-            if ! command -v python3.11 &> /dev/null; then
-                sudo apt-get update -qq
-                sudo apt-get install -y python3.11 python3.11-pip python3.11-venv
-            fi
-            
-            # Create virtual environment with Python 3.11
-            python3.11 -m venv ~/azure-cli-env
-            source ~/azure-cli-env/bin/activate
-            
-            # Install Azure CLI in the virtual environment
-            pip install azure-cli==2.73.0
-            
-            echo "##vso[task.prependpath]$HOME/azure-cli-env/bin"
-            $HOME/azure-cli-env/bin/az version
-        fi
-      displayName: Install Azure CLI 2.73.0 with Python 3.13 Compatibility
-
-    - task: AzureCLI@2
-      displayName: Summary and Cleanup
-      inputs:
-        azureSubscription: $(azureSubscription)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          echo "🎉 Dual Deployment Complete!"
-          echo "================================="
-          echo ""
-          echo "🌐 PRODUCTION (App Service):"
-          echo "   • URL: https://$(customDomain)"
-          echo "   • Service: $(appServiceName)"
-          echo "   • Purpose: Live production site with your domain"
-          echo ""
-          echo "🧪 TESTING (Container Apps):"
-          CONTAINER_APP_URL=$(az containerapp show \
-            --name "$(containerAppName)" \
-            --resource-group $(resourceGroupName) \
-            --query properties.configuration.ingress.fqdn \
-            --output tsv 2>/dev/null || echo "not-deployed")
-          echo "   • URL: https://$CONTAINER_APP_URL"
-          echo "   • Service: $(containerAppName)"
-          echo "   • Purpose: Testing new features and deployments"
-          echo ""
-          echo "✅ Both deployments use the same Docker image: $(dockerTag)"
-          echo "✅ No DNS changes required - domain stays on App Service"
-          echo ""
-
-          # Clean up old build-specific container apps if they exist
-          echo "Checking for old container apps to clean up..."
-          OLD_APPS=$(az containerapp list \
-            --resource-group $(resourceGroupName) \
-            --query "[?starts_with(name, 'pixel-') && name != '$(containerAppName)'].name" \
-            --output tsv)
-
-          if [ ! -z "$OLD_APPS" ]; then
-            echo "Found old container apps to clean up:"
-            echo "$OLD_APPS"
-            echo "$OLD_APPS" | while read app_name; do
-              if [ ! -z "$app_name" ]; then
-                echo "Deleting old Container App: $app_name"
-                az containerapp delete \
-                  --name "$app_name" \
-                  --resource-group $(resourceGroupName) \
-                  --yes \
-                  --only-show-errors || {
-                  echo "⚠️  Failed to delete $app_name, continuing..."
-                }
-              fi
-            done
-          else
-            echo "No old container apps found to clean up"
-          fi
-
-          # Clean up old Docker images in ACR
-          echo "Cleaning up old Docker images in Container Registry..."
-          ACR_NAME="pixelatedcr"
-
-          # Get all tags for the image
-          ALL_TAGS=$(az acr repository show-tags \
-            --name "$ACR_NAME" \
-            --repository "$(imageName)" \
-            --output tsv 2>/dev/null | sort -V || echo "")
-
-          if [ ! -z "$ALL_TAGS" ]; then
-            TAG_COUNT=$(echo "$ALL_TAGS" | grep -c "^" || echo "0")
-            echo "Found $TAG_COUNT image tags in registry"
-            
-            if [ "$TAG_COUNT" -gt 10 ]; then
-              TAGS_TO_DELETE=$((TAG_COUNT - 10))
-              echo "Keeping only the 10 most recent image tags (including cache layers), deleting $TAGS_TO_DELETE oldest"
-              
-              echo "$ALL_TAGS" | grep -v "latest" | grep -v "cache-" | head -n $TAGS_TO_DELETE | while read tag; do
-                if [ ! -z "$tag" ] && [ "$tag" != "$(dockerTag)" ]; then
-                  echo "Deleting old image tag: $(imageName):$tag"
-                  az acr repository delete \
-                    --name "$ACR_NAME" \
-                    --image "$(imageName):$tag" \
-                    --yes \
-                    --only-show-errors || {
-                    echo "⚠️  Failed to delete image tag $tag, but continuing..."
-                  }
+                if [ ! -z "$ALL_TAGS" ]; then
+                  TAG_COUNT=$(echo "$ALL_TAGS" | grep -c "^" || echo "0")
+                  echo "Found $TAG_COUNT image tags in registry"
+                  
+                  if [ "$TAG_COUNT" -gt 10 ]; then
+                    TAGS_TO_DELETE=$((TAG_COUNT - 10))
+                    echo "Keeping only the 10 most recent image tags (including cache layers), deleting $TAGS_TO_DELETE oldest"
+                    
+                    echo "$ALL_TAGS" | grep -v "latest" | grep -v "cache-" | head -n $TAGS_TO_DELETE | while read tag; do
+                      if [ ! -z "$tag" ] && [ "$tag" != "$(dockerTag)" ]; then
+                        echo "Deleting old image tag: $(imageName):$tag"
+                        az acr repository delete \
+                          --name "$ACR_NAME" \
+                          --image "$(imageName):$tag" \
+                          --yes \
+                          --only-show-errors || {
+                          echo "⚠️  Failed to delete image tag $tag, but continuing..."
+                        }
+                      fi
+                    done
+                  else
+                    echo "✅ No image cleanup needed - only $TAG_COUNT tags exist (keeping cache layers for optimization)"
+                  fi
+                else
+                  echo "No image tags found for cleanup"
                 fi
-              done
-            else
-              echo "✅ No image cleanup needed - only $TAG_COUNT tags exist (keeping cache layers for optimization)"
-            fi
-          else
-            echo "No image tags found for cleanup"
-          fi
 
-          echo "🧹 Cleanup completed!"
-          echo "================================="
-          echo "You can now access your production site at: https://$(customDomain)"
+                echo "🧹 Cleanup completed!"
+                echo "================================="
+                echo "You can now access your production site at: https://$(customDomain)"
