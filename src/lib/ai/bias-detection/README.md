@@ -86,6 +86,75 @@ The Bias Detection Engine has been refactored into a modular architecture for be
 - **Accuracy**: 92%+ overall bias detection accuracy
 - **Compliance**: HIPAA-compliant data processing
 
+## Connection Pooling & Monitoring
+
+### Overview
+
+The Bias Detection Engine uses robust, production-grade connection pooling for all critical services:
+- **Redis**: Managed by `RedisService` with configurable pool size, timeouts, and health checks.
+- **Python Service HTTP**: All requests from `PythonBiasDetectionBridge` use a custom `ConnectionPool` for efficient, concurrent HTTP connection management.
+- **Generic Pools**: The `PerformanceOptimizer` and other modules can use the same pooling patterns for any resource.
+
+### Configuration
+
+#### Redis Pooling
+
+Configure via environment variables or config files (see `config/environments/*.json`):
+
+```json
+"redis": {
+  "maxConnections": 50,
+  "minConnections": 5,
+  "connectTimeout": 5000,
+  "healthCheckInterval": 10000
+}
+```
+
+#### HTTP (PythonBiasDetectionBridge) Pooling
+
+You can pass a custom `ConnectionPool` or configure pooling via code:
+
+```typescript
+import { PythonBiasDetectionBridge } from '@/lib/ai/bias-detection/python-bridge'
+import { ConnectionPool } from '@/lib/ai/bias-detection/connection-pool'
+
+const pool = new ConnectionPool({
+  maxConnections: 20,
+  connectionTimeout: 10000,
+  idleTimeout: 60000,
+  retryAttempts: 3,
+  retryDelay: 500,
+})
+
+const pythonBridge = new PythonBiasDetectionBridge('http://localhost:5000', 30000, pool)
+```
+
+#### Generic Pooling
+
+For other services, use the `ConnectionPool` or `PerformanceOptimizer` as needed.
+
+### Monitoring & Health Checks
+
+- **RedisService**: Use `getPoolStats()` and `isHealthy()` to monitor pool status and health.
+- **PythonBiasDetectionBridge**: Use `getMetrics()` and `getHealthStatus()` for HTTP pool monitoring.
+- **ConnectionPool**: Use `getStats()` for pool metrics and `isHealthy()` for health checks.
+
+Example:
+
+```typescript
+const stats = pythonBridge['connectionPool'].getStats()
+const healthy = pythonBridge['connectionPool'].isHealthy()
+```
+
+### Production Best Practices
+
+- Set pool sizes based on expected concurrency and load (see `performance/optimization.json` for recommended values).
+- Monitor pool health and queue lengths; alert if pools are saturated or unhealthy.
+- Use health check endpoints and metrics dashboards to track system status.
+- Tune timeouts and retry logic for your deployment environment.
+- Regularly review logs for connection errors or pool exhaustion.
+
+For more details, see the [Performance Optimization](#performance-optimization) and [Monitoring and Alerts](#monitoring-and-alerts) sections.
 ## Installation
 
 ### Prerequisites
@@ -548,3 +617,279 @@ For technical support or questions:
 - Mobile dashboard support
 - Extended language support
 - Cloud deployment options 
+## Intelligent Caching for Bias Computations
+
+### Overview
+The bias detection engine uses a robust, hybrid caching system to optimize performance for expensive computations such as session analysis and report generation. The cache supports in-memory and Redis-backed storage, LRU eviction, TTL, tag-based invalidation, and compression.
+
+### Key Features
+- **Hybrid Memory + Redis**: Fast local access with distributed consistency.
+- **Configurable**: Control cache size, TTL, compression, and backend via `cacheConfig` in the engine constructor.
+- **Specialized Managers**: Separate caches for analysis results, dashboard data, and reports.
+- **Tag-based Invalidation**: Invalidate cache entries by session, demographic, or report.
+- **Monitoring**: Use `engine.getCacheStats()` to monitor hit/miss rates, evictions, and memory usage.
+
+### Usage
+
+#### Engine Integration
+- `analyzeSession(session)`: Checks cache before running analysis; stores result after computation.
+- `generateBiasReport(sessions, ...)`: Caches aggregated report results by session list and parameters.
+
+#### Batch Processing Usage
+
+The engine supports robust batch analysis of multiple sessions with configurable concurrency, chunking, retries, and timeouts. Monitoring and error reporting are built-in.
+
+**Example Usage:**
+```ts
+const engine = new BiasDetectionEngine({
+  batchProcessingConfig: {
+    concurrency: 8,      // Number of parallel workers for batch analysis
+    batchSize: 20,       // Sessions per batch
+    retries: 2,          // Number of retries per session
+    timeoutMs: 20000     // Timeout per session in ms
+  }
+})
+
+// Run batch analysis
+const { results, errors, metrics } = await engine.batchAnalyzeSessions(sessions, {
+  logProgress: true,    // Log progress to console
+  logErrors: true,      // Log errors to console
+  onProgress: ({ completed, total }) => {
+    // Custom progress callback (optional)
+    updateProgressBar(completed / total)
+  },
+  onError: (error, session) => {
+    // Custom error callback (optional)
+    sendErrorToMonitoring(error, session)
+  }
+})
+
+console.log('Batch Results:', results)
+console.log('Batch Errors:', errors)
+console.log('Batch Metrics:', metrics)
+```
+
+**Monitoring & Logging:**
+- Progress and errors are logged to the console by default.
+- You can provide custom callbacks for progress and error reporting.
+- The returned `metrics` object includes completed count, total, and error count for observability.
+
+**Production Recommendations:**
+- Use structured logging for batch jobs in production.
+- Monitor batch metrics and error rates via your observability platform.
+- Tune concurrency and batch size for your deployment environment.
+
+
+#### Monitoring Example
+```ts
+const stats = engine.getCacheStats()
+console.log('Cache Stats:', stats)
+```
+
+### Best Practices
+- Set appropriate TTLs for analysis and report results to balance freshness and performance.
+- Use Redis in production for distributed deployments.
+- Monitor cache hit/miss rates and adjust size/TTL as needed.
+## Background Job Processing for Long-Running Analyses
+
+### Overview
+For large batch analyses or long-running computations, the Bias Detection Engine supports asynchronous background job processing. This offloads heavy work to a job queue and worker, allowing clients to submit jobs and poll for status/results without blocking.
+
+### Key Concepts
+- **Job Queue**: In-memory (or Redis-backed) queue for batch analysis jobs.
+- **Worker**: Background process that executes jobs and updates status/results.
+- **Job Submission API**: `POST /api/bias-detection/submit-batch-job` to enqueue a batch analysis job.
+- **Job Status API**: `GET /api/bias-detection/job-status?jobId=...` to poll for job progress and retrieve results.
+
+### Usage
+
+#### Submit a Batch Analysis Job
+```bash
+POST /api/bias-detection/submit-batch-job
+Content-Type: application/json
+
+{
+  "sessions": [ ... ], // Array of session data objects
+  "options": {
+    "concurrency": 8,
+    "batchSize": 20,
+    "timeoutMs": 30000
+  }
+}
+```
+**Response:**
+```json
+{
+  "jobId": "job-abc123",
+  "status": "queued"
+}
+```
+
+#### Poll Job Status and Retrieve Results
+```bash
+GET /api/bias-detection/job-status?jobId=job-abc123
+```
+**Response (in progress):**
+```json
+{
+  "jobId": "job-abc123",
+  "status": "running",
+  "progress": {
+    "completed": 40,
+    "total": 100
+  }
+}
+```
+**Response (completed):**
+```json
+{
+  "jobId": "job-abc123",
+  "status": "completed",
+  "results": [ ... ], // Array of BiasAnalysisResult
+  "errors": [ ... ],  // Any failed sessions
+  "metrics": {
+    "completed": 100,
+    "total": 100,
+    "errorCount": 0
+  }
+}
+```
+
+### Best Practices
+- Use the job API for any batch analysis expected to take >5 seconds or involve >50 sessions.
+- Poll job status at reasonable intervals (e.g., every 2-5 seconds).
+- Handle job errors and timeouts gracefully; check the `errors` array in the result.
+- For production, consider using a Redis-backed queue for durability and scalability.
+
+### Architecture Notes
+- The job queue and worker are modular; you can swap in a Redis-backed implementation for distributed deployments.
+- All job submissions and results are logged for audit and monitoring.
+- Job metrics are exposed via the status API for observability.
+
+### Example Client Integration
+```typescript
+// Submit a batch job
+const submitRes = await fetch('/api/bias-detection/submit-batch-job', {
+  method: 'POST',
+  body: JSON.stringify({ sessions, options }),
+  headers: { 'Content-Type': 'application/json' }
+});
+const { jobId } = await submitRes.json();
+
+// Poll for status
+let status;
+do {
+  const statusRes = await fetch(`/api/bias-detection/job-status?jobId=${jobId}`);
+  status = await statusRes.json();
+  // Optionally update UI with status.progress
+  await new Promise(r => setTimeout(r, 2000));
+} while (status.status !== 'completed');
+
+// Use results
+console.log('Batch Results:', status.results);
+```
+
+### Monitoring & Logging
+- All job events (submission, start, completion, errors) are logged.
+- Metrics are available via the job status API.
+- For advanced monitoring, integrate with your observability platform.
+
+- Use tag-based invalidation to clear stale or sensitive data.
+
+### Production Setup for Background Job Processing
+
+For robust, scalable background job processing in production environments:
+
+- **Use Redis-backed Queue**: Replace the in-memory queue with a Redis-backed implementation for durability, distributed processing, and crash recovery.
+- **Scale Workers Horizontally**: Run multiple worker processes to handle high job throughput. Use process managers (PM2, systemd) or container orchestration (Kubernetes).
+- **Configure Environment Variables**:
+  - `REDIS_URL`: Redis connection string
+  - `JOB_WORKER_CONCURRENCY`: Number of concurrent jobs per worker
+  - `JOB_QUEUE_RETRY_LIMIT`: Max retries for failed jobs
+  - `JOB_QUEUE_TIMEOUT_MS`: Job execution timeout
+- **Monitoring & Observability**:
+  - Integrate job metrics with your monitoring platform (Prometheus, Datadog, etc.)
+  - Use structured logging for all job events (submission, start, completion, error)
+  - Set up alerting for high error rates or job queue saturation
+- **Security & Compliance**:
+  - Ensure job data is encrypted in transit and at rest
+  - Restrict access to job APIs and queue endpoints
+  - Audit all job submissions and results for compliance (HIPAA, GDPR)
+- **Disaster Recovery**:
+  - Persist job state in Redis or a database
+  - Implement dead-letter queues for failed jobs
+  - Regularly backup job queue data
+
+**Example Redis-backed Setup**:
+```typescript
+import { RedisJobQueue } from '@/lib/ai/bias-detection/redis-job-queue'
+const jobQueue = new RedisJobQueue(handler, process.env.REDIS_URL)
+```
+
+**Kubernetes Worker Deployment**:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bias-job-worker
+spec:
+  replicas: 4
+  template:
+    spec:
+      containers:
+        - name: worker
+          image: your-repo/bias-job-worker:latest
+          env:
+            - name: REDIS_URL
+              value: "redis://redis:6379"
+            - name: JOB_WORKER_CONCURRENCY
+              value: "8"
+```
+
+**Best Practices**:
+- Test job queue failover and recovery scenarios
+- Monitor job queue length and worker health
+- Tune concurrency and retry settings for your workload
+- Document operational procedures for job queue maintenance
+
+### CDN Integration for Static Assets and Report Delivery
+
+For optimal performance and scalability, all static assets (including bias detection reports, exports, and dashboard resources) should be served via a Content Delivery Network (CDN).
+
+**Configuration:**
+- Enable CDN in your environment config:
+  ```json
+  "cdn": {
+    "enabled": true,
+    "provider": "cloudflare",
+    "domain": "${CDN_DOMAIN}",
+    "cache_headers": true,
+    "static_asset_caching": true
+  }
+  ```
+- Set the `CDN_DOMAIN` environment variable to your CDN endpoint (e.g., `cdn.example.com`).
+
+**Report Delivery:**
+- When generating downloadable reports (JSON, CSV, PDF), upload them to your CDN storage bucket or static hosting directory.
+- Return the CDN URL in the API response for client download, e.g.:
+  ```json
+  {
+    "reportUrl": "https://cdn.example.com/reports/bias-report-2025-08-21.pdf"
+  }
+  ```
+
+**Best Practices:**
+- Use long-lived cache headers for immutable assets and short-lived headers for frequently updated reports.
+- Invalidate CDN cache when reports are regenerated or updated.
+- Use versioned or timestamped filenames for reports to avoid stale cache issues.
+- Monitor CDN analytics for asset delivery performance and cache hit rates.
+- Ensure all report downloads and static assets are served over HTTPS.
+
+**Example:**
+```typescript
+// After generating a report, upload to CDN and return the URL
+const reportUrl = `https://${process.env.CDN_DOMAIN}/reports/${filename}`
+res.json({ reportUrl })
+```
+
+**Supported Providers:** Cloudflare, AWS CloudFront, Azure CDN, Vercel, and others.

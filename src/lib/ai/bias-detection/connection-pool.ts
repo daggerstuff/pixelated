@@ -128,7 +128,24 @@ export class ConnectionPool {
       activeConnections: Array.from(this.connections.values()).filter(c => c.inUse).length,
       queueLength: this.queue.length,
       totalRequests: Array.from(this.connections.values()).reduce((sum, c) => sum + c.requests, 0),
+      maxConnections: this.config.maxConnections,
+      idleTimeout: this.config.idleTimeout,
+      connectionTimeout: this.config.connectionTimeout,
     }
+  }
+
+  /**
+   * Health check for the connection pool.
+   * Returns true if the pool is operating within safe limits.
+   */
+  isHealthy(): boolean {
+    const stats = this.getStats()
+    // Consider healthy if not at max connections and queue is not overloaded
+    const queueThreshold = 2 * stats.maxConnections
+    return (
+      stats.totalConnections < stats.maxConnections &&
+      stats.queueLength < queueThreshold
+    )
   }
 
   async dispose(): Promise<void> {

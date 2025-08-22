@@ -17,7 +17,7 @@ dependencies = [
   "fairlearn",
   "shap>=0.41.0",
   "lime",
-  "transformers",
+  "transformers>=4.42.0",
   "spacy",
   "nltk",
   "evaluate",
@@ -51,7 +51,7 @@ dependencies = [
   "wandb>=0.21.1",
   # Training dependencies
   "datasets>=2.19.0",
-  "accelerate>=0.33.0", 
+  "accelerate>=0.33.0",
   "bitsandbytes>=0.43.0",
   "peft>=0.11.0",
   "trl>=0.9.6",
@@ -62,6 +62,7 @@ dependencies = [
   # GGUF conversion
   "llama-cpp-python>=0.2.90",
   "gguf>=0.10.0",
+  "ruff>=0.12.5",
 ]
 
 [project.optional-dependencies]

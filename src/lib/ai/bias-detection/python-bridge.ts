@@ -6,6 +6,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { ConnectionPool, ConnectionPoolConfig, PooledConnection } from './connection-pool'
 import type {
   TherapeuticSession,
   PreprocessingAnalysisResult,
@@ -76,18 +77,20 @@ export class PythonBiasDetectionBridge {
     cacheMisses: 0,
     deduplicatedRequests: 0,
   }
+  private connectionPool: ConnectionPool
 
   constructor(
     public url: string = 'http://localhost:5000',
     public timeoutMs: number = 30000,
+    connectionPool?: ConnectionPool,
+    poolConfig?: Partial<ConnectionPoolConfig>
   ) {
     this.baseUrl = url.replace(/\/$/, '') // Remove trailing slash
     this.timeout = timeoutMs
     this.authToken = process.env['BIAS_DETECTION_AUTH_TOKEN']
-    
+    this.connectionPool = connectionPool || new ConnectionPool(poolConfig)
     // Start queue processor
     this.processQueue()
-    
     // Start health monitoring
     this.startHealthMonitoring()
   }
@@ -202,10 +205,13 @@ export class PythonBiasDetectionBridge {
     }
 
     let lastError: Error | null = null
+    let pooledConnection: PooledConnection | null = null
 
     // Retry logic
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
+        // Acquire a pooled connection for this request
+        pooledConnection = await this.connectionPool.acquireConnection()
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
         )
@@ -233,6 +239,12 @@ export class PythonBiasDetectionBridge {
           await new Promise((resolve) =>
             setTimeout(resolve, this.retryDelay * attempt),
           )
+        }
+      } finally {
+        // Always release the connection if it was acquired
+        if (pooledConnection) {
+          this.connectionPool.releaseConnection(pooledConnection)
+          pooledConnection = null
         }
       }
     }
