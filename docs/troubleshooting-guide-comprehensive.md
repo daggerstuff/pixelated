@@ -1,5 +1,43 @@
 # Comprehensive Troubleshooting Guide
 # ==================================
+## Bias Detection Engine: Common Issues & Troubleshooting
+
+### Configuration and Initialization Errors
+- **Symptom:** "Invalid threshold configuration" or similar error on startup.
+- **Diagnosis:** Check that `warningLevel < highLevel < criticalLevel` in your config. Review error messages for actual/expected values.
+- **Solution:** Update your config to use valid, ascending threshold values.
+
+### Engine Initialization Fails
+- **Symptom:** Engine fails to initialize, hangs, or throws.
+- **Diagnosis:** Ensure all required environment variables are set. Check for missing or invalid config fields.
+- **Solution:** Run diagnostics (`pnpm run diagnostics`). Review `.env.local` and config files.
+
+### Python Backend Service Issues
+- **Symptom:** "Service unavailable", timeouts, or connection errors.
+- **Diagnosis:** Ensure Python backend is running (`python bias_detection_service.py`). Check service URL and port.
+- **Solution:** Restart the backend. Check logs for errors. Verify dependencies are installed (`pip install -r requirements.txt`).
+
+### Test Failures (MSW, Mocking, Environment)
+- **Symptom:** Tests fail with MSW import errors or mocking issues.
+- **Diagnosis:** Check `vitest.config.ts` for correct MSW alias (`msw/node` → `msw/lib/node/index.js`).
+- **Solution:** Update config, reinstall dependencies, and retry.
+
+### Linting and Type Checking
+- **Symptom:** Linter/type errors, unused variable warnings, or property access issues.
+- **Diagnosis:** Run `pnpm lint` and `pnpm typecheck`. Review error output for details.
+- **Solution:** Fix unused variables, use correct property access (dot vs. bracket), and update type definitions as needed.
+
+### Error Handling Best Practices
+- Use descriptive error messages for config/threshold validation.
+- Always throw `Error` instances, not plain objects.
+- Catch and log errors in async code, especially for backend service calls.
+
+### Where to Get Help
+- Review this guide and the [Developer Setup Guide](./bias-detection-engine-setup.md).
+- Check the [API Documentation](./bias-detection-api.md) for request/response errors.
+- Create an issue in the repository or contact the development team for persistent problems.
+
+---
 
 ## Application Issues
 

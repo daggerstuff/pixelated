@@ -1,0 +1,146 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Pixelated Empathy Bias Detection API",
+    "version": "2.0.0",
+    "description": "RESTful API for bias analysis in therapeutic AI training scenarios. Integrates multiple ML toolkits for multi-layer bias detection."
+  },
+  "servers": [
+    { "url": "https://api.pixelatedempathy.com" },
+    { "url": "http://localhost:3000" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "SessionAnalysisRequest": {
+        "type": "object",
+        "properties": {
+          "session_id": { "type": "string" },
+          "participant_demographics": { "type": "object" },
+          "training_scenario": { "type": "object" },
+          "content": { "type": "object" },
+          "ai_responses": { "type": "array", "items": { "type": "object" } },
+          "expected_outcomes": { "type": "array", "items": { "type": "object" } },
+          "transcripts": { "type": "array", "items": { "type": "object" } },
+          "metadata": { "type": "object" }
+        },
+        "required": ["session_id", "participant_demographics", "training_scenario", "content", "ai_responses"]
+      },
+      "SessionAnalysisResponse": {
+        "type": "object",
+        "properties": {
+          "session_id": { "type": "string" },
+          "overall_bias_score": { "type": "number" },
+          "confidence": { "type": "number" },
+          "alert_level": { "type": "string" },
+          "analysis_timestamp": { "type": "string", "format": "date-time" },
+          "processing_time_ms": { "type": "integer" },
+          "layer_results": { "type": "array", "items": { "type": "object" } },
+          "recommendations": { "type": "array", "items": { "type": "string" } },
+          "compliance": { "type": "object" }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/api/bias-detection/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Check service health and availability.",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bias-detection/analyze": {
+      "post": {
+        "summary": "Analyze Session",
+        "description": "Analyze a training session for bias indicators.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SessionAnalysisRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analysis result",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionAnalysisResponse" }
+              }
+            }
+          },
+          "400": { "description": "Invalid request" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/bias-detection/dashboard": {
+      "get": {
+        "summary": "Dashboard Data",
+        "description": "Retrieve aggregated bias detection data for dashboard visualization.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "start_date", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "end_date", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "group_by", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard data",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/bias-detection/export": {
+      "post": {
+        "summary": "Export Data",
+        "description": "Export bias detection data in various formats.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Export initiated",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    }
+  }
+}

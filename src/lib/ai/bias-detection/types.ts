@@ -73,6 +73,13 @@ export interface BiasDetectionConfig {
   hipaaCompliant?: boolean
   dataMaskingEnabled?: boolean
   auditLogging?: boolean
+  // Batch processing defaults
+  batchProcessingConfig?: {
+    concurrency?: number
+    batchSize?: number
+    retries?: number
+    timeoutMs?: number
+  }
   // Missing properties that are used in config.ts
   loggingConfig?: {
     level?: string

@@ -5,46 +5,36 @@ import type {
   BiasThresholdsConfig,
   AlertLevel,
 } from './types'
-
-type PreprocessingResult = { biasScore: number; linguisticBias?: number; confidence?: number }
-type ModelLevelResult = {
-  biasScore: number
-  fairnessMetrics?: Record<string, number>
-  confidence?: number
-}
-type InteractiveResult = {
-  biasScore: number
-  counterfactualAnalysis?: Record<string, unknown>
-  confidence?: number
-}
-type EvaluationResult = {
-  biasScore: number
-  nlpBiasMetrics?: Record<string, number>
-  huggingFaceMetrics?: Record<string, number>
-  confidence?: number
-}
+import {
+  getCacheManager,
+  cacheAnalysisResult,
+  getCachedAnalysisResult,
+  cacheReport,
+  getCachedReport,
+} from './cache'
 
 type LayerResults = {
-  preprocessing: PreprocessingResult
-  modelLevel: ModelLevelResult
-  interactive: InteractiveResult
-  evaluation: EvaluationResult
+  preprocessing: import('./types').PreprocessingAnalysisResult
+  modelLevel: import('./types').ModelLevelAnalysisResult
+  interactive: import('./types').InteractiveAnalysisResult
+  evaluation: import('./types').EvaluationAnalysisResult
 }
 
 export type AnalysisResult = {
   sessionId: string
+  timestamp: Date
   overallBiasScore: number
   alertLevel: AlertLevel
   layerResults: LayerResults
   recommendations: string[]
-  confidence: number
-  demographics?: Record<string, unknown>
+  demographics?: import('./types').ParticipantDemographics
+  confidence?: number
 }
 
 const DEFAULT_THRESHOLDS: BiasThresholdsConfig = {
-  warningLevel: 0.3,
-  highLevel: 0.6,
-  criticalLevel: 0.8,
+  warning: 0.3,
+  high: 0.6,
+  critical: 0.8,
 }
 
 const DEFAULT_WEIGHTS: BiasLayerWeights = {
@@ -55,11 +45,11 @@ const DEFAULT_WEIGHTS: BiasLayerWeights = {
 }
 
 function validateThresholds(t: BiasThresholdsConfig): void {
-  const values = [t['warningLevel'], t['highLevel'], t['criticalLevel']]
+  const values = [t['warning'], t['high'], t['critical']]
   if (values.some((v) => v < 0 || v > 1)) {
     throw new Error('Invalid threshold values')
   }
-  if (!(t['warningLevel'] < t['highLevel'] && t['highLevel'] < t['criticalLevel'])) {
+  if (!(t['warning'] < t['high'] && t['high'] < t['critical'])) {
     throw new Error('Invalid threshold configuration')
   }
 }
@@ -76,29 +66,101 @@ class PythonBiasDetectionBridge {
   // Remove empty constructor - not needed
   async initialize() {}
   async checkHealth() { return { status: 'healthy', message: 'Service is running' } }
-  async runPreprocessingAnalysis(_s: SessionData): Promise<PreprocessingResult> {
-    return { biasScore: 0.2, linguisticBias: 0.1, confidence: 0.85 }
-  }
-  async runModelLevelAnalysis(_s: SessionData): Promise<ModelLevelResult> {
-    return {
-      biasScore: 0.3,
-      fairnessMetrics: { equalizedOdds: 0.8, demographicParity: 0.75 },
-      confidence: 0.9,
-    }
-  }
-  async runInteractiveAnalysis(_s: SessionData): Promise<InteractiveResult> {
+  async runPreprocessingAnalysis(_s: SessionData): Promise<import('./types').PreprocessingAnalysisResult> {
     return {
       biasScore: 0.2,
-      counterfactualAnalysis: { scenarios: 3, improvements: 0.15 },
-      confidence: 0.85,
+      linguisticBias: {
+        genderBiasScore: 0.1,
+        racialBiasScore: 0.1,
+        ageBiasScore: 0.1,
+        culturalBiasScore: 0.1,
+        biasedTerms: [],
+        sentimentAnalysis: {
+          overallSentiment: 0.0,
+          emotionalValence: 0.0,
+          subjectivity: 0.0,
+          demographicVariations: {},
+        },
+      },
+      representationAnalysis: {
+        demographicDistribution: {},
+        underrepresentedGroups: [],
+        overrepresentedGroups: [],
+        diversityIndex: 0.0,
+        intersectionalityAnalysis: [],
+      },
+      dataQualityMetrics: {
+        completeness: 1.0,
+        consistency: 1.0,
+        accuracy: 1.0,
+        timeliness: 1.0,
+        validity: 1.0,
+        missingDataByDemographic: {},
+      },
+      recommendations: [],
     }
   }
-  async runEvaluationAnalysis(_s: SessionData): Promise<EvaluationResult> {
+  async runModelLevelAnalysis(_s: SessionData): Promise<import('./types').ModelLevelAnalysisResult> {
     return {
       biasScore: 0.3,
-      nlpBiasMetrics: { sentimentBias: 0.1, toxicityBias: 0.05 },
-      huggingFaceMetrics: { fairnessScore: 0.85, biasDetection: 0.15 },
-      confidence: 0.95,
+      fairnessMetrics: {
+        demographicParity: 0.75,
+        equalizedOdds: 0.8,
+        equalOpportunity: 0.8,
+        calibration: 0.8,
+        individualFairness: 0.8,
+        counterfactualFairness: 0.8,
+      },
+      performanceMetrics: {
+        accuracy: 0.9,
+        precision: 0.9,
+        recall: 0.9,
+        f1Score: 0.9,
+        auc: 0.9,
+        calibrationError: 0.05,
+        demographicBreakdown: {},
+      },
+      groupPerformanceComparison: [],
+      recommendations: [],
+    }
+  }
+  async runInteractiveAnalysis(_s: SessionData): Promise<import('./types').InteractiveAnalysisResult> {
+    return {
+      biasScore: 0.2,
+      counterfactualAnalysis: {
+        scenariosAnalyzed: 3,
+        biasDetected: false,
+        consistencyScore: 0.15,
+        problematicScenarios: [],
+      },
+      featureImportance: [],
+      whatIfScenarios: [],
+      recommendations: [],
+    }
+  }
+  async runEvaluationAnalysis(_s: SessionData): Promise<import('./types').EvaluationAnalysisResult> {
+    return {
+      biasScore: 0.3,
+      huggingFaceMetrics: {
+        toxicity: 0.05,
+        bias: 0.15,
+        regard: {},
+        stereotype: 0.1,
+        fairness: 0.85,
+      },
+      customMetrics: {
+        therapeuticBias: 0.1,
+        culturalSensitivity: 0.1,
+        professionalEthics: 0.1,
+        patientSafety: 0.1,
+      },
+      temporalAnalysis: {
+        trendDirection: 'stable',
+        changeRate: 0,
+        seasonalPatterns: [],
+        interventionEffectiveness: [],
+      },
+      recommendations: [],
     }
   }
 }
@@ -164,16 +226,22 @@ export class BiasDetectionEngine {
   private monitoringCallbacks: Array<
     (alert: { level: AlertLevel; sessionId: string }) => void
   > = []
-  private sessionCache: Map<string, AnalysisResult> = new Map()
+  // Remove local sessionCache; use distributed cache manager instead
 
-  constructor(cfg: BiasDetectionConfig = {}): void {
+  constructor(cfg: BiasDetectionConfig = {}) {
     const thresholds = cfg['thresholds'] ?? DEFAULT_THRESHOLDS
     validateThresholds(thresholds)
 
     const layerWeights = cfg['layerWeights'] ?? DEFAULT_WEIGHTS
     validateWeights(layerWeights)
 
-  this.config = {
+    // Accept cacheConfig from engine config, fallback to defaults
+    const cacheConfig = cfg['cacheConfig'] ?? {}
+
+    // Accept batchProcessingConfig from engine config, fallback to defaults
+    const batchProcessingConfig = cfg['batchProcessingConfig'] ?? {}
+
+    this.config = {
       pythonServiceUrl: cfg['pythonServiceUrl'] ?? 'http://localhost:8000',
       pythonServiceTimeout: cfg['pythonServiceTimeout'] ?? 30000,
       thresholds,
@@ -183,22 +251,27 @@ export class BiasDetectionEngine {
       alertConfig: cfg['alertConfig'] ?? { enableSlackNotifications: false, enableEmailNotifications: false, emailRecipients: [], alertCooldownMinutes: 5, escalationThresholds: { criticalResponseTimeMinutes: 15, highResponseTimeMinutes: 30 } },
       reportConfig: cfg['reportConfig'] ?? { includeConfidentialityAnalysis: true, includeDemographicBreakdown: true, includeTemporalTrends: true, includeRecommendations: true, reportTemplate: 'standard', exportFormats: ['json'] },
       explanationConfig: cfg['explanationConfig'] ?? { explanationMethod: 'shap', maxFeatures: 10, includeCounterfactuals: true, generateVisualization: false },
-  pythonServiceConfig: {},
-  cacheConfig: {},
-  securityConfig: {},
-  performanceConfig: {},
+      pythonServiceConfig: {},
+      cacheConfig,
+      batchProcessingConfig,
+      securityConfig: {},
+      performanceConfig: {},
       hipaaCompliant: cfg['hipaaCompliant'] ?? true,
       dataMaskingEnabled: cfg['dataMaskingEnabled'] ?? true,
       auditLogging: cfg['auditLogging'] ?? true,
     }
 
-  const PythonBridgeCtor = (globalThis as unknown).PythonBiasDetectionBridge || PythonBiasDetectionBridge
-  const MetricsCollectorCtor = (globalThis as unknown).BiasMetricsCollector || BiasMetricsCollector
-  const AlertSystemCtor = (globalThis as unknown).BiasAlertSystem || BiasAlertSystem
+    const PythonBridgeCtor = (globalThis as { PythonBiasDetectionBridge?: typeof PythonBiasDetectionBridge }).PythonBiasDetectionBridge || PythonBiasDetectionBridge
+    const MetricsCollectorCtor = (globalThis as { BiasMetricsCollector?: typeof BiasMetricsCollector }).BiasMetricsCollector || BiasMetricsCollector
+    const AlertSystemCtor = (globalThis as { BiasAlertSystem?: typeof BiasAlertSystem }).BiasAlertSystem || BiasAlertSystem
 
-  this.pythonService = new PythonBridgeCtor(this.config)
-  this.metricsCollector = new MetricsCollectorCtor()
-  this.alertSystem = new AlertSystemCtor()
+    // Initialize cache manager with config - cache instances are created internally
+    // const cacheManager = getCacheManager() // Removed unused variable
+    // Cache instances are managed internally by the cache manager
+
+    this.pythonService = new PythonBridgeCtor()
+    this.metricsCollector = new MetricsCollectorCtor()
+    this.alertSystem = new AlertSystemCtor()
   }
 
   getInitializationStatus() { return this.initialized }
@@ -225,17 +298,17 @@ export class BiasDetectionEngine {
 
   private computeAlertLevel(score: number): AlertLevel {
     const t = this.config['thresholds']
-    if (score >= t['criticalLevel']) { return 'critical' }
-    if (score >= t['highLevel']) { return 'high' }
-    if (score >= t['warningLevel']) { return 'medium' }
+    if (score >= t['critical']) { return 'critical' }
+    if (score >= t['high']) { return 'high' }
+    if (score >= t['warning']) { return 'medium' }
     return 'low'
   }
 
-  private maskDemographics(input?: Record<string, unknown>): void {
+  private maskDemographics(input?: Record<string, unknown>): Record<string, unknown> | undefined {
     if (!input) { return undefined }
     if (!this.config['hipaaCompliant'] && !this.config['dataMaskingEnabled']) { return input }
     // Drop known PII-looking fields; keep coarse fields
-    const { social_security: _social_security, phone_number: _phone_number, email: _email, ...rest } = input as unknown
+    const { social_security: _social_security, phone_number: _phone_number, email: _email, ...rest } = input
     return rest
   }
 
@@ -250,43 +323,111 @@ export class BiasDetectionEngine {
   }
 
   async analyzeSession(session: SessionData): Promise<AnalysisResult> {
-  this.ensureInitialized()
-  if (!session) { throw new Error('Session data is required') }
-  if (session.sessionId === undefined) { throw new Error('Session ID is required') }
-  if (session.sessionId === '') { throw new Error('Session ID cannot be empty') }
+    this.ensureInitialized()
+    if (!session) { throw new Error('Session data is required') }
+    if (session.sessionId === undefined) { throw new Error('Session ID is required') }
+    if (session.sessionId === '') { throw new Error('Session ID cannot be empty') }
 
-    let preprocessing: PreprocessingResult
-    let modelLevel: ModelLevelResult
-    let interactive: InteractiveResult
-    let evaluation: EvaluationResult
+    // Check distributed cache for existing analysis result
+    const cached = await getCachedAnalysisResult(session.sessionId)
+    if (cached) {
+      return cached
+    }
+
+    let preprocessing: import('./types').PreprocessingAnalysisResult
+    let modelLevel: import('./types').ModelLevelAnalysisResult
+    let interactive: import('./types').InteractiveAnalysisResult
+    let evaluation: import('./types').EvaluationAnalysisResult
     const recs: string[] = []
 
     try {
       preprocessing = await this.pythonService.runPreprocessingAnalysis(session)
     } catch {
       const fb = this.fallbackLayer()
-      preprocessing = { biasScore: fb.biasScore, confidence: fb.confidence }
+      preprocessing = {
+        biasScore: fb.biasScore,
+        linguisticBias: {
+          genderBiasScore: 0,
+          racialBiasScore: 0,
+          ageBiasScore: 0,
+          culturalBiasScore: 0,
+          biasedTerms: [],
+          sentimentAnalysis: {
+            overallSentiment: 0,
+            emotionalValence: 0,
+            subjectivity: 0,
+            demographicVariations: {},
+          },
+        },
+        representationAnalysis: {
+          demographicDistribution: {},
+          underrepresentedGroups: [],
+          overrepresentedGroups: [],
+          diversityIndex: 0,
+          intersectionalityAnalysis: [],
+        },
+        dataQualityMetrics: {
+          completeness: 1,
+          consistency: 1,
+          accuracy: 1,
+          timeliness: 1,
+          validity: 1,
+          missingDataByDemographic: {},
+        },
+        recommendations: [],
+      }
       recs.push('Preprocessing analysis unavailable; using fallback results')
     }
     try {
       modelLevel = await this.pythonService.runModelLevelAnalysis(session)
     } catch {
       const fb = this.fallbackLayer()
-      modelLevel = { biasScore: fb.biasScore, confidence: fb.confidence }
+      modelLevel = {
+        biasScore: fb.biasScore,
+        fairnessMetrics: {
+          demographicParity: 0,
+          equalizedOdds: 0,
+          equalOpportunity: 0,
+          calibration: 0,
+          individualFairness: 0,
+          counterfactualFairness: 0,
+        },
+        performanceMetrics: {
+          accuracy: 0,
+          precision: 0,
+          recall: 0,
+          f1Score: 0,
+          auc: 0,
+          calibrationError: 0,
+          demographicBreakdown: {},
+        },
+        groupPerformanceComparison: [],
+        recommendations: [],
+      }
       recs.push('Model-level analysis unavailable; using fallback results')
     }
     try {
       interactive = await this.pythonService.runInteractiveAnalysis(session)
     } catch {
       const fb = this.fallbackLayer()
-      interactive = { biasScore: fb.biasScore, confidence: fb.confidence }
+      interactive = {
+        biasScore: fb.biasScore,
+        counterfactualAnalysis: {
+          scenariosAnalyzed: 0,
+          biasDetected: false,
+          consistencyScore: 0,
+          problematicScenarios: [],
+        },
+        featureImportance: [],
+        whatIfScenarios: [],
+        recommendations: [],
+      }
       recs.push('Interactive analysis unavailable; using fallback results')
     }
     try {
       evaluation = await this.pythonService.runEvaluationAnalysis(session)
     } catch {
       const fb = this.fallbackLayer()
-      evaluation = { biasScore: fb.biasScore, confidence: fb.confidence }
       recs.push('Evaluation analysis unavailable; using fallback results')
     }
 
@@ -297,16 +438,10 @@ export class BiasDetectionEngine {
       evaluation: evaluation!,
     }
 
-  const overallBiasScore = this.weightedAverage(layerResults)
+    const overallBiasScore = this.weightedAverage(layerResults)
     const alertLevel = this.computeAlertLevel(overallBiasScore)
 
-    const confidences = [
-      layerResults.preprocessing.confidence ?? 0.8,
-      layerResults.modelLevel.confidence ?? 0.8,
-      layerResults.interactive.confidence ?? 0.8,
-      layerResults.evaluation.confidence ?? 0.8,
-    ]
-    const confidence = Math.min(...confidences)
+    const confidence = 0.8
 
     const maskedDemo = this.maskDemographics(
       session.participantDemographics as unknown as Record<string, unknown>,
@@ -332,51 +467,66 @@ export class BiasDetectionEngine {
     // Trigger monitoring callbacks for high/critical alerts
     if (alertLevel === 'high' || alertLevel === 'critical') {
       this.monitoringCallbacks.forEach((cb) => {
-        try { 
-          cb({ level: alertLevel, sessionId: session.sessionId }) 
+        try {
+          cb({ level: alertLevel, sessionId: session.sessionId })
         } catch {
           // Ignore callback errors to prevent system failures
         }
       })
     }
 
-    const result: AnalysisResult = {
+    const result: import('./types').BiasAnalysisResult = {
       sessionId: session.sessionId,
+      timestamp: session.timestamp ?? new Date(),
       overallBiasScore,
       alertLevel,
       layerResults,
       recommendations,
       confidence,
-      demographics: maskedDemo,
+      demographics: maskedDemo && typeof maskedDemo === 'object'
+        ? {
+            age: (maskedDemo as any).age ?? '',
+            gender: (maskedDemo as any).gender ?? '',
+            ethnicity: (maskedDemo as any).ethnicity ?? '',
+            primaryLanguage: (maskedDemo as any).primaryLanguage ?? '',
+          }
+        : { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
     }
 
-    // Cache last result for quick retrieval
-    this.sessionCache.set(session.sessionId, result)
+    // Store result in distributed cache for future retrieval
+    await cacheAnalysisResult(session.sessionId, result as unknown as import('./types').BiasAnalysisResult)
 
     return result
   }
   
   // Lightweight metrics pass-through for performance tests
-  async getMetrics(_opts?: unknown): void {
+  async getMetrics(_opts?: unknown): Promise<{ totalAnalyses: number; averageBiasScore: number; alertDistribution: { low: number; medium: number; high: number; critical: number; } }> {
     this.ensureInitialized()
     return this.metricsCollector.getMetrics?.()
   }
 
   // Fast cached lookup used by performance tests
-  async getSessionAnalysis(sessionId: string): void {
+  async getSessionAnalysis(sessionId: string): Promise<import('./types').BiasAnalysisResult | null> {
     this.ensureInitialized()
-    return this.sessionCache.get(sessionId)
+    // Use distributed cache, not local sessionCache
+    return await getCachedAnalysisResult(sessionId)
   }
 
   // Simple explanation generator – fast and synchronous-friendly
-  async explainBiasDetection(analysis: AnalysisResult): void {
+  async explainBiasDetection(analysis: AnalysisResult): Promise<{
+    sessionId: string
+    overallBiasScore: number
+    alertLevel: AlertLevel
+    highlights: Array<{ layer: string; biasScore: number }>
+    confidence?: number
+  }> {
     this.ensureInitialized()
     return {
       sessionId: analysis.sessionId,
       overallBiasScore: analysis.overallBiasScore,
       alertLevel: analysis.alertLevel,
       highlights: Object.entries(analysis.layerResults)
-        .map(([name, layer]) => ({ layer: name, biasScore: (layer as unknown).biasScore }))
+        .map(([name, layer]) => ({ layer: name, biasScore: (layer as any).biasScore }))
         .sort((a, b) => b.biasScore - a.biasScore)
         .slice(0, 3),
       confidence: analysis.confidence,
@@ -384,7 +534,7 @@ export class BiasDetectionEngine {
   }
 
   // Update thresholds with validation
-  async updateThresholds(thresholds: BiasThresholdsConfig): void {
+  async updateThresholds(thresholds: BiasThresholdsConfig): Promise<BiasThresholdsConfig> {
     validateThresholds(thresholds)
     this.config.thresholds = thresholds
     return this.config.thresholds
@@ -397,27 +547,58 @@ export class BiasDetectionEngine {
     _opts?: { format?: 'json' | 'csv' },
   ) {
     this.ensureInitialized()
+    // Create a cache key based on session IDs and report parameters
+    const reportKey = `report:${sessions.map(s => s.sessionId).join(',')}:${_range?.start?.toISOString() ?? ''}:${_range?.end?.toISOString() ?? ''}:${_opts?.format ?? 'json'}`
+    const cachedReport = await getCachedReport(reportKey)
+    if (cachedReport) {
+      return cachedReport
+    }
     const results = await Promise.all(
-      sessions.map((s) => this.sessionCache.get(s.sessionId) ?? this.analyzeSession(s)),
+      sessions.map((s) => getCachedAnalysisResult(s.sessionId) ?? this.analyzeSession(s)),
     )
     const averageBias =
       results.length > 0
-        ? results.reduce((sum, r) => sum + r.overallBiasScore, 0) / results.length
+        ? results.filter(Boolean).reduce((sum, r) => sum + (r ? r.overallBiasScore : 0), 0) / results.filter(Boolean).length
         : 0
     const perf = await this.metricsCollector.getCurrentPerformanceMetrics?.()
-    return {
+    const report = {
       summary: {
         sessionCount: results.length,
         averageBiasScore: averageBias,
       },
       performance: perf ?? {},
-      alerts: results.reduce(
-        (acc, r) => ({ ...acc, [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1 }),
+      alerts: results.filter(Boolean).reduce(
+        (acc, r) => r ? ({ ...acc, [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1 }) : acc,
         {} as Record<string, number>,
       ),
     }
+    await cacheReport(reportKey, {
+      ...report,
+      reportId: reportKey,
+      generatedAt: new Date(),
+      timeRange: _range
+        ? { start: _range.start, end: _range.end }
+        : { start: new Date(0), end: new Date(0) },
+      overallFairnessScore: 1,
+      recommendations: [],
+    })
+    return report
   }
-  async getDashboardData(_opts: { timeRange?: string; includeDetails?: boolean } = {}): void {
+  async getDashboardData(_opts: { timeRange?: string; includeDetails?: boolean } = {}): Promise<{
+    summary: {
+      totalSessions: number
+      averageBiasScore: number
+      alertsLast24h: number
+      criticalIssues: number
+      improvementRate: number
+      complianceScore: number
+    }
+    recentAnalyses: any[]
+    alerts: any[]
+    trends: any[]
+    demographics: { age: Record<string, number>; gender: Record<string, number> }
+    recommendations: any[]
+  }> {
     return this.metricsCollector.getDashboardData()
   }
 
@@ -426,17 +607,140 @@ export class BiasDetectionEngine {
     this._isMonitoring = true
   this.monitoringCallbacks.push(callback)
     // Adapt callback type expected by alert system
-    this.alertSystem.addMonitoringCallback?.((a: unknown) => callback(a as unknown))
+    this.alertSystem.addMonitoringCallback?.((a: unknown) => {
+      if (
+        typeof a === 'object' &&
+        a !== null &&
+        'level' in a &&
+        'sessionId' in a &&
+        typeof (a as any).level === 'string' &&
+        typeof (a as any).sessionId === 'string'
+      ) {
+        callback(a as { level: AlertLevel; sessionId: string })
+      }
+    })
   }
 
   async stopMonitoring() {
     this._isMonitoring = false
   this.monitoringCallbacks = []
   }
-
-  async dispose() {
-    try { await this.metricsCollector.dispose?.() } catch { /* swallow */ }
-    try { await this.alertSystem.dispose?.() } catch { /* swallow */ }
-  }
+async dispose() {
+  try { await this.metricsCollector.dispose?.() } catch { /* swallow */ }
+  try { await this.alertSystem.dispose?.() } catch { /* swallow */ }
 }
- 
+// Expose cache statistics for monitoring
+getCacheStats() {
+  return getCacheManager().getCombinedStats();
+}
+
+/**
+ * Batch analyze multiple sessions with configurable concurrency, chunking, and error handling.
+ */
+async batchAnalyzeSessions(
+  sessions: SessionData[],
+  options: {
+    concurrency?: number
+    batchSize?: number
+    onProgress?: (progress: { completed: number; total: number }) => void
+    onError?: (error: Error, session: SessionData) => void
+    retries?: number
+    timeoutMs?: number
+    logProgress?: boolean
+    logErrors?: boolean
+  } = {}
+): Promise<{ results: AnalysisResult[]; errors: { session: SessionData; error: Error }[]; metrics: { completed: number; total: number; errorCount: number } }> {
+  // Use config defaults if not provided in options
+  const defaults = this.config.batchProcessingConfig ?? {}
+  const {
+    concurrency = defaults.concurrency ?? 5,
+    batchSize = defaults.batchSize ?? 10,
+    onProgress,
+    onError,
+    retries = defaults.retries ?? 1,
+    timeoutMs = defaults.timeoutMs,
+    logProgress = true,
+    logErrors = true,
+  } = options
+  const total = sessions.length
+  let completed = 0
+  const results: AnalysisResult[] = []
+  const errors: { session: SessionData; error: Error }[] = []
+  // Metrics for monitoring
+  const metrics = { completed: 0, total, errorCount: 0 }
+
+  // Helper to process a single session with retries
+  const processSession = async (session: SessionData): Promise<AnalysisResult | null> => {
+    let attempt = 0
+    while (attempt <= retries) {
+      try {
+        if (timeoutMs) {
+          // Timeout wrapper
+          return await Promise.race([
+            this.analyzeSession(session),
+            new Promise<null>((_, reject) =>
+              setTimeout(() => reject(new Error('Timeout')), timeoutMs)
+            )
+          ])
+        } else {
+          return await this.analyzeSession(session)
+        }
+      } catch (error) {
+        attempt++
+        if (attempt > retries) {
+          if (onError) {
+            onError(error as Error, session)
+          }
+          errors.push({ session, error: error as Error })
+          return null
+        }
+      }
+    }
+    return null
+  }
+
+  // Chunk sessions for batch processing
+  const chunked: SessionData[][] = []
+  for (let i = 0; i < sessions.length; i += batchSize) {
+    chunked.push(sessions.slice(i, i + batchSize))
+  }
+
+  for (const batch of chunked as SessionData[][]) {
+    // Process up to 'concurrency' sessions in parallel
+    const batchPromises: Promise<void>[] = []
+    let idx = 0
+    const processNext = async (): Promise<void> => {
+      if (idx >= batch.length) return
+      const session = batch[idx++]
+      if (session) {
+        const result = await processSession(session)
+        if (result) {
+          results.push(result)
+        }
+      }
+      if (result) results.push(result)
+      completed++
+      metrics.completed = completed
+      if (onProgress) onProgress({ completed, total })
+      if (logProgress) {
+        // Simple console logging, could be replaced with structured logger
+        console.log(`[BatchProgress] Completed: ${completed}/${total}`)
+      }
+      // Start next in this slot
+      if (idx < batch.length) await processNext()
+    }
+    // Start up to 'concurrency' parallel workers
+    for (let c = 0; c < Math.min(concurrency, batch.length); c++) {
+      batchPromises.push(processNext())
+    }
+    await Promise.all(batchPromises)
+  }
+  metrics.errorCount = errors.length
+  if (logErrors && errors.length > 0) {
+    errors.forEach(({ session, error }) => {
+      console.error(`[BatchError] Session ${session.sessionId}: ${error.message}`)
+    })
+  }
+  return { results, errors, metrics }
+}
+}

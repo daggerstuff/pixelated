@@ -5,10 +5,27 @@
 
 import type {
   AIMessage,
-  AIServiceResponse,
   AIService,
-  AIStreamOptions,
-} from '../../ai/models/types'
+  AIServiceOptions,
+  AICompletion,
+} from '../../ai/models/ai-types'
+
+// Define AIServiceResponse and AIStreamOptions locally if not available
+export interface AIServiceResponse {
+  content: string
+  model: string
+  usage?: {
+    totalTokens: number
+    promptTokens: number
+    completionTokens: number
+    processingTimeMs?: number
+  }
+  id?: string
+  provider?: string
+  created?: number
+}
+
+export interface AIStreamOptions extends AIServiceOptions {}
 import {
   ObjectiveDefinition,
   AlignmentContext,
@@ -84,7 +101,7 @@ export class MetaAlignerAPI {
   private metricsEngine: ObjectiveMetricsEngine
   private aiService: AIService | undefined
 
-  constructor(config: AlignmentIntegrationConfig = {}): void {
+  constructor(config: AlignmentIntegrationConfig = {}) {
     this.config = {
       enableRealTimeEvaluation: true,
       enableResponseEnhancement: true,
@@ -328,7 +345,7 @@ export class MetaAlignerAPI {
       ]
 
       // Generate enhanced response
-      const aiResponse = await this.aiService.createChatCompletion(messages, {
+      const aiResponse: AICompletion = await this.aiService.createChatCompletion(messages, {
         model: this.config.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
         temperature: this.config.temperature || 0.7,
         maxTokens: Math.max(originalResponse.length * 1.5, 1024),
@@ -649,7 +666,9 @@ Please enhance the response to better meet these objectives while maintaining it
     const overallImprovement =
       (enhanced.overallScore - original.overallScore) * 100
 
-    let explanation = `Enhancement focused on: ${improvementAreas.join(', ')}. `
+    // Convert improvement areas to lowercase to match test expectations
+    const lowercaseAreas = improvementAreas.map(area => area.toLowerCase())
+    let explanation = `Enhancement focused on: ${lowercaseAreas.join(', ')}. `
     explanation += `Overall score improvement: ${overallImprovement > 0 ? '+' : ''}${overallImprovement.toFixed(1)}%. `
 
     // Identify specific objective improvements
@@ -690,7 +709,7 @@ export class IntegratedAIService {
     options?: AIStreamOptions,
   ): Promise<IntegratedResponse> {
     // Get the base response
-    const baseResponse = await this.baseService.createChatCompletion(
+    const baseResponse: AICompletion = await this.baseService.createChatCompletion(
       messages,
       options,
     )

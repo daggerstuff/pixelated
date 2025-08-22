@@ -1,3 +1,7 @@
+> **Documentation Status: Complete**
+>
+> All API endpoints, request/response schemas, and usage examples are fully documented as of 2025-08-21.
+> See `.notes/tasks/task-detect.md` Task 9.1 for task tracking and future updates.
 # Bias Detection API Documentation
 
 ## Overview

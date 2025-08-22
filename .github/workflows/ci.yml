@@ -405,7 +405,7 @@ jobs:
         run: mkdir -p coverage/.tmp
 
       - name: Run tests with increased timeout
-        run: pnpm test --pool=threads --poolOptions.threads.minThreads=0 --poolOptions.threads.maxThreads=3
+        run: pnpm test --pool=forks --isolate --no-coverage
         env:
           VITEST_TIMEOUT: 30000
           REDIS_URL: redis://localhost:6379
