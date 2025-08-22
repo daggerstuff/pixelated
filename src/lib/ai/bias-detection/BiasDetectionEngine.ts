@@ -581,6 +581,52 @@ export class BiasDetectionEngine {
         : { start: new Date(0), end: new Date(0) },
       overallFairnessScore: 1,
       recommendations: [],
+      executiveSummary: {
+        summary: '',
+        keyFindings: [],
+        recommendations: [],
+      },
+      detailedAnalysis: {
+        demographicAnalysis: {
+          representation: {},
+          performanceGaps: [],
+          intersectionalAnalysis: [],
+          riskGroups: [],
+        },
+        temporalTrends: {
+          overallTrend: 'stable',
+          monthlyMetrics: [],
+          seasonalPatterns: [],
+          correlationAnalysis: [],
+        },
+        performanceAnalysis: {
+          overallMetrics: {
+            accuracy: 0,
+            precision: 0,
+            recall: 0,
+            f1Score: 0,
+            auc: 0,
+            calibrationError: 0,
+            demographicBreakdown: {},
+          },
+          demographicBreakdown: {},
+          fairnessMetrics: {
+            demographicParity: 0,
+            equalizedOdds: 0,
+            equalOpportunity: 0,
+            calibration: 0,
+            individualFairness: 0,
+            counterfactualFairness: 0,
+          },
+          benchmarkComparison: [],
+        },
+        interventionAnalysis: {
+          implementedInterventions: [],
+          effectivenessAnalysis: [],
+          recommendedInterventions: [],
+        },
+      },
+      appendices: [],
     })
     return report
   }
@@ -718,7 +764,7 @@ async batchAnalyzeSessions(
           results.push(result)
         }
       }
-      if (result) results.push(result)
+      // result is only defined inside the previous block, so remove this line
       completed++
       metrics.completed = completed
       if (onProgress) onProgress({ completed, total })
