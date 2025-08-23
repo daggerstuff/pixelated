@@ -7,12 +7,12 @@ name: CodeQL
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
+    branches: [ master ]
   schedule:
-    - cron: 0 0 * * 0
+  - cron: 0 0 * * 0
 
 permissions: read-all # Set restrictive default at workflow level
 
@@ -28,63 +28,63 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [javascript, python]
+        language: [ javascript, python ]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+    - name: Checkout repository
+      uses: actions/checkout@v4.2.2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: 22.16.0
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: 22.16.0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: 10.14.0
-          run_install: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: 10.15.0
+        run_install: false
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+    - name: Get pnpm store directory
+      shell: bash
+      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
-      # IMPORTANT: If this fails with "CodeQL analyses from advanced configurations cannot be processed when the default setup is enabled"
-      # Go to: https://github.com/nochadisfaction/pixel/settings/security_analysis
-      # Under "Code scanning" section, disable "Default setup" to allow advanced configuration
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3.29.1
-        with:
-          languages: ${{ matrix.language }}
-          config-file: ./.github/codeql/codeql-config.yml
-          queries: security-extended,security-and-quality
+    # IMPORTANT: If this fails with "CodeQL analyses from advanced configurations cannot be processed when the default setup is enabled"
+    # Go to: https://github.com/nochadisfaction/pixel/settings/security_analysis
+    # Under "Code scanning" section, disable "Default setup" to allow advanced configuration
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3.29.1
+      with:
+        languages: ${{ matrix.language }}
+        config-file: ./.github/codeql/codeql-config.yml
+        queries: security-extended,security-and-quality
 
-      # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-      # If this step fails, then you should remove it and run the build manually (see below)
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3.29.1
+    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+    # If this step fails, then you should remove it and run the build manually (see below)
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3.29.1
 
-      # ℹ️ Command-line programs to run using the OS shell.
-      # 📚 https://git.io/JvXDl
+    # ℹ️ Command-line programs to run using the OS shell.
+    # 📚 https://git.io/JvXDl
 
-      # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
-      #    and modify them (or add more) to build your code if your project
-      #    uses a compiled language
+    # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
+    #    and modify them (or add more) to build your code if your project
+    #    uses a compiled language
 
-      #- run: |
-      #   make bootstrap
-      #   make release
+    #- run: |
+    #   make bootstrap
+    #   make release
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3.29.1
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3.29.1

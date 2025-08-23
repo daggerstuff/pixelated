@@ -7,16 +7,17 @@ permissions:
 on:
   # Schedule daily validation runs
   schedule:
-    - cron: 0 0 * * * # Every day at midnight UTC
+  - cron: 0 0 * * * # Every day at midnight UTC
 
   # Run on completed deployments
   workflow_run:
-    workflows: [Deploy to Staging, Deploy to Production]
+    workflows: [ Deploy to Staging, Deploy to Production ]
     types:
-      - completed
+    - completed
 
   # Allow manual runs for debugging
   workflow_dispatch:
+
 
 jobs:
   validate-ai-models:
@@ -28,213 +29,213 @@ jobs:
       ENV_NAME: ${{ inputs.ENV_NAME }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: 22.16.0
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: 22.16.0
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: 10.14.0
-          run_install: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: 10.15.0
+        run_install: false
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Install system tools (jq, bc)
-        run: |
-          sudo apt-get update
-          # Ensure TLS root certs and openssl are present for curl/openssl diagnostics
-          sudo apt-get install -y jq bc ca-certificates openssl
-          sudo update-ca-certificates || true
+    - name: Install system tools (jq, bc)
+      run: |
+        sudo apt-get update
+        # Ensure TLS root certs and openssl are present for curl/openssl diagnostics
+        sudo apt-get install -y jq bc ca-certificates openssl
+        sudo update-ca-certificates || true
 
-      - name: Set environment variables
-        run: |
-          # Default environment if not provided
-          if [[ -z "${ENV_NAME}" ]]; then
-            echo "ENV_NAME=staging" >> $GITHUB_ENV
-          fi
+    - name: Set environment variables
+      run: |
+        # Default environment if not provided
+        if [[ -z "${ENV_NAME}" ]]; then
+          echo "ENV_NAME=staging" >> $GITHUB_ENV
+        fi
 
-          # Set environment-specific URLs (add more as needed)
-          if [[ "$ENV_NAME" == "production" ]]; then
-            echo "APP_URL=https://pixelatedempathy.com" >> $GITHUB_ENV
-          elif [[ "$ENV_NAME" == "staging" ]]; then
-            echo "APP_URL=https://pixelatedempathy.tech" >> $GITHUB_ENV
-          else
-            echo "APP_URL=https://pixelatedempathy.tech" >> $GITHUB_ENV
-          fi
+        # Set environment-specific URLs (add more as needed)
+        if [[ "$ENV_NAME" == "production" ]]; then
+          echo "APP_URL=https://pixelatedempathy.com" >> $GITHUB_ENV
+        elif [[ "$ENV_NAME" == "staging" ]]; then
+          echo "APP_URL=https://pixelatedempathy.tech" >> $GITHUB_ENV
+        else
+          echo "APP_URL=https://pixelatedempathy.tech" >> $GITHUB_ENV
+        fi
 
-      - name: Run model validation
-        id: validation
-        run: |
-          # Generate webhook validation token
-          WEBHOOK_TOKEN=$(openssl rand -base64 32)
-          echo "WEBHOOK_TOKEN=${WEBHOOK_TOKEN}" >> $GITHUB_ENV
+    - name: Run model validation
+      id: validation
+      run: |
+        # Generate webhook validation token
+        WEBHOOK_TOKEN=$(openssl rand -base64 32)
+        echo "WEBHOOK_TOKEN=${WEBHOOK_TOKEN}" >> $GITHUB_ENV
 
-          # Trigger validation via webhook
-          echo "Triggering validation via webhook..."
-          # Disable 'exit on error' just for this call to capture curl failures without aborting the step
+        # Trigger validation via webhook
+        echo "Triggering validation via webhook..."
+        # Disable 'exit on error' just for this call to capture curl failures without aborting the step
+        set +e
+        STATUS_CODE=$(
+          curl --insecure --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS \
+            -o response.json -w "%{http_code}" \
+            -X POST "${APP_URL}/api/ai/validation/webhook" \
+            -H "Content-Type: application/json" \
+            -H "x-github-event: workflow_dispatch" \
+            -H "x-hub-signature-256: ${WEBHOOK_TOKEN}" \
+            -d '{"action":"validate","environment":"'"${ENV_NAME}"'"}')
+        CURL_EXIT=$?
+        set -e
+
+        if [[ ${CURL_EXIT} -ne 0 ]]; then
+          echo "success=false" >> "$GITHUB_OUTPUT"
+          echo "Validation trigger request failed (curl exit ${CURL_EXIT})."
+          # Show verbose diagnostics on TLS/connection errors
+          echo "Diagnosing with curl --verbose (redacting body)..."
           set +e
-          STATUS_CODE=$(
-            curl --insecure --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS \
-              -o response.json -w "%{http_code}" \
-              -X POST "${APP_URL}/api/ai/validation/webhook" \
-              -H "Content-Type: application/json" \
-              -H "x-github-event: workflow_dispatch" \
-              -H "x-hub-signature-256: ${WEBHOOK_TOKEN}" \
-              -d '{"action":"validate","environment":"'"${ENV_NAME}"'"}')
-          CURL_EXIT=$?
+          curl --insecure --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
+            -X POST "${APP_URL}/api/ai/validation/webhook" \
+            -H "Content-Type: application/json" \
+            -H "x-github-event: workflow_dispatch" \
+            -H "x-hub-signature-256: REDACTED" \
+            -d '{"action":"validate","environment":"REDACTED"}' || true
+          echo "Attempting TLS 1.3 as fallback (verbosity, redacted body)..."
+          curl --insecure --http1.1 -4 --tlsv1.3 --max-time 15 -v -o /dev/null \
+            -X POST "${APP_URL}/api/ai/validation/webhook" \
+            -H "Content-Type: application/json" \
+            -H "x-github-event: workflow_dispatch" \
+            -H "x-hub-signature-256: REDACTED" \
+            -d '{"action":"validate","environment":"REDACTED"}' || true
           set -e
+        elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
+          echo "success=true" >> "$GITHUB_OUTPUT"
+          echo "Validation triggered successfully (HTTP ${STATUS_CODE})"
+          cat response.json
+        else
+          echo "success=false" >> "$GITHUB_OUTPUT"
+          echo "Validation trigger failed (HTTP ${STATUS_CODE})"
+          cat response.json
+          # Continue the workflow anyway, don't fail the build
+        fi
 
-          if [[ ${CURL_EXIT} -ne 0 ]]; then
-            echo "success=false" >> "$GITHUB_OUTPUT"
-            echo "Validation trigger request failed (curl exit ${CURL_EXIT})."
-            # Show verbose diagnostics on TLS/connection errors
-            echo "Diagnosing with curl --verbose (redacting body)..."
-            set +e
-            curl --insecure --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
-              -X POST "${APP_URL}/api/ai/validation/webhook" \
-              -H "Content-Type: application/json" \
-              -H "x-github-event: workflow_dispatch" \
-              -H "x-hub-signature-256: REDACTED" \
-              -d '{"action":"validate","environment":"REDACTED"}' || true
-            echo "Attempting TLS 1.3 as fallback (verbosity, redacted body)..."
-            curl --insecure --http1.1 -4 --tlsv1.3 --max-time 15 -v -o /dev/null \
-              -X POST "${APP_URL}/api/ai/validation/webhook" \
-              -H "Content-Type: application/json" \
-              -H "x-github-event: workflow_dispatch" \
-              -H "x-hub-signature-256: REDACTED" \
-              -d '{"action":"validate","environment":"REDACTED"}' || true
-            set -e
-          elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
-            echo "success=true" >> "$GITHUB_OUTPUT"
-            echo "Validation triggered successfully (HTTP ${STATUS_CODE})"
-            cat response.json
-          else
-            echo "success=false" >> "$GITHUB_OUTPUT"
-            echo "Validation trigger failed (HTTP ${STATUS_CODE})"
-            cat response.json
-            # Continue the workflow anyway, don't fail the build
-          fi
+    - name: Wait for validation to complete
+      if: steps.validation.outputs.success == 'true'
+      run: |
+        echo "Waiting for validation to complete (120 seconds)..."
+        sleep 120
 
-      - name: Wait for validation to complete
-        if: steps.validation.outputs.success == 'true'
-        run: |
-          echo "Waiting for validation to complete (120 seconds)..."
-          sleep 120
+    - name: Fetch validation results
+      if: steps.validation.outputs.success == 'true'
+      id: results
+      env:
+        VALIDATION_API_TOKEN: ${{ secrets.VALIDATION_API_TOKEN }}
+      run: |
+        # Get validation history and results
+        set +e
+        STATUS_CODE=$(curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS -o validation_history.json -w "%{http_code}" \
+          "${APP_URL}/api/ai/validation/history?limit=1" \
+          -H "Authorization: Bearer $VALIDATION_API_TOKEN")
+        CURL_EXIT=$?
+        set -e
 
-      - name: Fetch validation results
-        if: steps.validation.outputs.success == 'true'
-        id: results
-        env:
-          VALIDATION_API_TOKEN: ${{ secrets.VALIDATION_API_TOKEN }}
-        run: |
-          # Get validation history and results
+        if [[ ${CURL_EXIT} -ne 0 ]]; then
+          echo "success=false" >> "$GITHUB_OUTPUT"
+          echo "Failed to fetch validation results (curl exit ${CURL_EXIT})"
+          echo "Diagnosing fetch with curl --verbose (redacted token)..."
           set +e
-          STATUS_CODE=$(curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS -o validation_history.json -w "%{http_code}" \
+          curl --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
             "${APP_URL}/api/ai/validation/history?limit=1" \
-            -H "Authorization: Bearer $VALIDATION_API_TOKEN")
-          CURL_EXIT=$?
+            -H "Authorization: Bearer REDACTED" || true
           set -e
+        elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
+          echo "success=true" >> "$GITHUB_OUTPUT"
+          # Extract success rate and last run info
+          PASS_RATE=$(jq -r '.history[0].passedCount / .history[0].resultsCount * 100' validation_history.json)
+          RUN_ID=$(jq -r '.history[0].runId' validation_history.json)
+          RUN_SUCCESS=$(jq -r '.history[0].success' validation_history.json)
+          echo "Last validation run: ${RUN_ID}, Success: ${RUN_SUCCESS}, Pass rate: ${PASS_RATE}%"
 
-          if [[ ${CURL_EXIT} -ne 0 ]]; then
-            echo "success=false" >> "$GITHUB_OUTPUT"
-            echo "Failed to fetch validation results (curl exit ${CURL_EXIT})"
-            echo "Diagnosing fetch with curl --verbose (redacted token)..."
-            set +e
-            curl --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
-              "${APP_URL}/api/ai/validation/history?limit=1" \
-              -H "Authorization: Bearer REDACTED" || true
-            set -e
-          elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
-            echo "success=true" >> "$GITHUB_OUTPUT"
-            # Extract success rate and last run info
-            PASS_RATE=$(jq -r '.history[0].passedCount / .history[0].resultsCount * 100' validation_history.json)
-            RUN_ID=$(jq -r '.history[0].runId' validation_history.json)
-            RUN_SUCCESS=$(jq -r '.history[0].success' validation_history.json)
-            echo "Last validation run: ${RUN_ID}, Success: ${RUN_SUCCESS}, Pass rate: ${PASS_RATE}%"
-
-            # Store metrics for the summary
-            echo "PASS_RATE=${PASS_RATE}" >> $GITHUB_ENV
-            echo "RUN_ID=${RUN_ID}" >> $GITHUB_ENV
-            echo "RUN_SUCCESS=${RUN_SUCCESS}" >> $GITHUB_ENV
-            
-            # Check if pass rate is below threshold for alerting
-            if (( $(echo "${PASS_RATE} < 85" | bc -l) )); then
-              echo "needs_alert=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "needs_alert=false" >> "$GITHUB_OUTPUT"
-            fi
+          # Store metrics for the summary
+          echo "PASS_RATE=${PASS_RATE}" >> $GITHUB_ENV
+          echo "RUN_ID=${RUN_ID}" >> $GITHUB_ENV
+          echo "RUN_SUCCESS=${RUN_SUCCESS}" >> $GITHUB_ENV
+          
+          # Check if pass rate is below threshold for alerting
+          if (( $(echo "${PASS_RATE} < 85" | bc -l) )); then
+            echo "needs_alert=true" >> "$GITHUB_OUTPUT"
           else
-            echo "success=false" >> "$GITHUB_OUTPUT"
             echo "needs_alert=false" >> "$GITHUB_OUTPUT"
-            echo "Failed to fetch validation results (HTTP ${STATUS_CODE})"
           fi
+        else
+          echo "success=false" >> "$GITHUB_OUTPUT"
+          echo "needs_alert=false" >> "$GITHUB_OUTPUT"
+          echo "Failed to fetch validation results (HTTP ${STATUS_CODE})"
+        fi
 
-      - name: Create summary
-        run: |
-          echo "# AI Model Validation Results" >> $GITHUB_STEP_SUMMARY
+    - name: Create summary
+      run: |
+        echo "# AI Model Validation Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [[ "${{ steps.validation.outputs.success }}" == "true" && "${{ steps.results.outputs.success }}" == "true" ]]; then
+          echo "✅ **Validation completed successfully**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** ${ENV_NAME}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run ID:** ${RUN_ID}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Success Rate:** ${PASS_RATE}%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View AI Validation Dashboard](${APP_URL}/admin/ai/validation-pipeline)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Validation process encountered issues**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please check the validation pipeline manually to verify model accuracy." >> $GITHUB_STEP_SUMMARY
+          echo "[AI Validation Dashboard](${APP_URL}/admin/ai/validation-pipeline)" >> $GITHUB_STEP_SUMMARY
+        fi
 
-          if [[ "${{ steps.validation.outputs.success }}" == "true" && "${{ steps.results.outputs.success }}" == "true" ]]; then
-            echo "✅ **Validation completed successfully**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **Environment:** ${ENV_NAME}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Run ID:** ${RUN_ID}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Success Rate:** ${PASS_RATE}%" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "[View AI Validation Dashboard](${APP_URL}/admin/ai/validation-pipeline)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ **Validation process encountered issues**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Please check the validation pipeline manually to verify model accuracy." >> $GITHUB_STEP_SUMMARY
-            echo "[AI Validation Dashboard](${APP_URL}/admin/ai/validation-pipeline)" >> $GITHUB_STEP_SUMMARY
-          fi
+    - name: Send notification on validation issues
+      if: ${{ steps.results.outputs.needs_alert == 'true' }}
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.G_TOKEN }}
+        script: |
+          const { repo, owner } = context.repo;
+          github.rest.issues.create({
+            owner,
+            repo,
+            title: `⚠️ AI Model Validation Alert: ${process.env.PASS_RATE}% success rate`,
+            body: `
+            # AI Model Validation Alert
 
-      - name: Send notification on validation issues
-        if: ${{ steps.results.outputs.needs_alert == 'true' }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.G_TOKEN }}
-          script: |
-            const { repo, owner } = context.repo;
-            github.rest.issues.create({
-              owner,
-              repo,
-              title: `⚠️ AI Model Validation Alert: ${process.env.PASS_RATE}% success rate`,
-              body: `
-              # AI Model Validation Alert
+            A recent validation run found potential issues with AI model accuracy.
 
-              A recent validation run found potential issues with AI model accuracy.
+            - **Environment:** ${process.env.ENV_NAME}
+            - **Run ID:** ${process.env.RUN_ID}
+            - **Success Rate:** ${process.env.PASS_RATE}%
+            - **Threshold:** 85%
 
-              - **Environment:** ${process.env.ENV_NAME}
-              - **Run ID:** ${process.env.RUN_ID}
-              - **Success Rate:** ${process.env.PASS_RATE}%
-              - **Threshold:** 85%
+            Please investigate this issue by checking the [AI Validation Dashboard](${process.env.APP_URL}/admin/ai/validation-pipeline).
 
-              Please investigate this issue by checking the [AI Validation Dashboard](${process.env.APP_URL}/admin/ai/validation-pipeline).
-
-              This issue was automatically created by the AI validation pipeline.
-              `
-            });
+            This issue was automatically created by the AI validation pipeline.
+            `
+          });

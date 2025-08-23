@@ -6,14 +6,15 @@ permissions:
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
   workflow_dispatch:
+
 
 env:
   NODE_VERSION: 22.16.0
-  PNPM_VERSION: 10.14.0
+  PNPM_VERSION: 10.15.0
   NODE_ENV: test
   DISABLE_AUTH: 'true'
   CLERK_PUBLISHABLE_KEY: pk_test_dummy
@@ -27,295 +28,295 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: 10.14.0
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: 10.15.0
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+    - name: Install Playwright browsers
+      run: pnpm exec playwright install --with-deps
 
-      - name: Build project
-        run: pnpm run build
+    - name: Build project
+      run: pnpm run build
 
-      - name: Run browser tests
-        run: pnpm exec playwright test tests/browser/** tests/cross-browser/** tests/browser-compatibility.spec.ts --reporter=html,list
-        env:
-          DISABLE_WEB_FONTS: 'true'
-          PUBLIC_SITE_URL: http://localhost:4321
-          NODE_ENV: test
-          SKIP_KEYSTATIC: 'true'
-          SKIP_MSW: 'true'
-          DISABLE_AUTH: 'true'
-          CLERK_PUBLISHABLE_KEY: pk_test_dummy
-          PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
-          CLERK_SECRET_KEY: sk_test_dummy
+    - name: Run browser tests
+      run: pnpm exec playwright test tests/browser/** tests/cross-browser/** tests/browser-compatibility.spec.ts --reporter=html,list
+      env:
+        DISABLE_WEB_FONTS: 'true'
+        PUBLIC_SITE_URL: http://localhost:4321
+        NODE_ENV: test
+        SKIP_KEYSTATIC: 'true'
+        SKIP_MSW: 'true'
+        DISABLE_AUTH: 'true'
+        CLERK_PUBLISHABLE_KEY: pk_test_dummy
+        PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+        CLERK_SECRET_KEY: sk_test_dummy
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-test-results-${{ github.run_id }}
-          path: |
-            playwright-report/
-            public/test-results/
-          retention-days: 30
-          if-no-files-found: warn
-          compression-level: 6
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: browser-test-results-${{ github.run_id }}
+        path: |
+          playwright-report/
+          public/test-results/
+        retention-days: 30
+        if-no-files-found: warn
+        compression-level: 6
 
   visual-tests:
     name: Visual Regression Tests
     runs-on: ubuntu-latest
-    needs: [browser-tests]
+    needs: [ browser-tests ]
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: 10.14.0
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: 10.15.0
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+    - name: Install Playwright browsers
+      run: pnpm exec playwright install --with-deps
 
-      - name: Build project
-        run: pnpm run build
+    - name: Build project
+      run: pnpm run build
 
-      - name: Run visual comparison tests
-        run: pnpm exec playwright test tests/browser/** tests/cross-browser/** tests/browser-compatibility.spec.ts --reporter=html,list
-        env:
-          CI: true
-          NODE_ENV: test
-          DISABLE_WEB_FONTS: 'true'
-          PUBLIC_SITE_URL: http://localhost:4321
-          SKIP_KEYSTATIC: 'true'
-          SKIP_MSW: 'true'
-          DISABLE_AUTH: 'true'
-          CLERK_PUBLISHABLE_KEY: pk_test_dummy
-          PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
-          CLERK_SECRET_KEY: sk_test_dummy
-        id: visual-tests
+    - name: Run visual comparison tests
+      run: pnpm exec playwright test tests/browser/** tests/cross-browser/** tests/browser-compatibility.spec.ts --reporter=html,list
+      env:
+        CI: true
+        NODE_ENV: test
+        DISABLE_WEB_FONTS: 'true'
+        PUBLIC_SITE_URL: http://localhost:4321
+        SKIP_KEYSTATIC: 'true'
+        SKIP_MSW: 'true'
+        DISABLE_AUTH: 'true'
+        CLERK_PUBLISHABLE_KEY: pk_test_dummy
+        PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+        CLERK_SECRET_KEY: sk_test_dummy
+      id: visual-tests
 
-      - name: Upload visual test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: visual-test-results-${{ github.run_id }}
-          path: |
-            playwright-report/
-            public/test-results/
-            browser-compatibility/
-          retention-days: 30
-          if-no-files-found: warn
-          compression-level: 6
+    - name: Upload visual test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: visual-test-results-${{ github.run_id }}
+        path: |
+          playwright-report/
+          public/test-results/
+          browser-compatibility/
+        retention-days: 30
+        if-no-files-found: warn
+        compression-level: 6
 
   generate-report:
     name: Generate Test Report
     runs-on: ubuntu-latest
-    needs: [browser-tests, visual-tests]
+    needs: [ browser-tests, visual-tests ]
     if: always()
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Download all test artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: all-test-results
-          pattern: '*-test-results-*'
-          merge-multiple: true
+    - name: Download all test artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: all-test-results
+        pattern: '*-test-results-*'
+        merge-multiple: true
 
-      - name: Generate comprehensive HTML report
-        id: generate_report
-        run: |
-          # Create consolidated report
-          cat > report.html << 'EOF'
-          <!DOCTYPE html>
-          <html>
-          <head>
-              <title>Browser Compatibility Test Report</title>
-              <style>
-                  body { font-family: Arial, sans-serif; margin: 20px; }
-                  .header { background: #f5f5f5; padding: 20px; border-radius: 5px; }
-                  .summary { background: #e8f4fd; padding: 15px; margin: 10px 0; border-radius: 5px; }
-                  .issues { background: #fff2f2; padding: 15px; margin: 10px 0; border-radius: 5px; }
-                  .success { background: #f0f8f0; padding: 15px; margin: 10px 0; border-radius: 5px; }
-                  pre { background: #f8f8f8; padding: 10px; border-radius: 3px; overflow-x: auto; }
-                  .issue-item { margin: 5px 0; padding: 5px; background: #ffebee; border-left: 3px solid #f44336; }
-              </style>
-          </head>
-          <body>
-              <div class="header">
-                  <h1>🧪 Browser Compatibility Test Results</h1>
-                  <p><strong>Generated:</strong> $(date)</p>
-                  <p><strong>Repository:</strong> ${{ github.repository }}</p>
-                  <p><strong>Branch:</strong> ${{ github.ref_name }}</p>
-                  <p><strong>Commit:</strong> ${{ github.sha }}</p>
-                  <p><strong>Workflow Run:</strong> <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a></p>
-              </div>
-          EOF
+    - name: Generate comprehensive HTML report
+      id: generate_report
+      run: |
+        # Create consolidated report
+        cat > report.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Browser Compatibility Test Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { background: #f5f5f5; padding: 20px; border-radius: 5px; }
+                .summary { background: #e8f4fd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+                .issues { background: #fff2f2; padding: 15px; margin: 10px 0; border-radius: 5px; }
+                .success { background: #f0f8f0; padding: 15px; margin: 10px 0; border-radius: 5px; }
+                pre { background: #f8f8f8; padding: 10px; border-radius: 3px; overflow-x: auto; }
+                .issue-item { margin: 5px 0; padding: 5px; background: #ffebee; border-left: 3px solid #f44336; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🧪 Browser Compatibility Test Results</h1>
+                <p><strong>Generated:</strong> $(date)</p>
+                <p><strong>Repository:</strong> ${{ github.repository }}</p>
+                <p><strong>Branch:</strong> ${{ github.ref_name }}</p>
+                <p><strong>Commit:</strong> ${{ github.sha }}</p>
+                <p><strong>Workflow Run:</strong> <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a></p>
+            </div>
+        EOF
 
-          # Count issues and generate summary
-          ISSUE_COUNT=0
-          TOTAL_TESTS=0
-          PASSED_TESTS=0
+        # Count issues and generate summary
+        ISSUE_COUNT=0
+        TOTAL_TESTS=0
+        PASSED_TESTS=0
 
-          # Process test results if available
-          if find all-test-results -name "*.json" -type f | head -1 > /dev/null 2>&1; then
-              echo '<div class="summary">' >> report.html
-              echo '<h2>📊 Test Summary</h2>' >> report.html
-              
-              # Extract basic metrics from any JSON files
-              for json_file in $(find all-test-results -name "*.json" -type f); do
-                  if command -v jq >/dev/null 2>&1; then
-                      # Use jq if available
-                      FAILED=$(jq -r 'try (.failures // []) | length' "$json_file" 2>/dev/null || echo "0")
-                      PASSED=$(jq -r 'try (.passes // []) | length' "$json_file" 2>/dev/null || echo "0")
-                  else
-                      # Fallback to grep-based parsing
-                      FAILED=$(grep -o '"failures":\s*\[[^]]*\]' "$json_file" 2>/dev/null | wc -l || echo "0")
-                      PASSED=$(grep -o '"passes":\s*\[[^]]*\]' "$json_file" 2>/dev/null | wc -l || echo "0")
-                  fi
-                  
-                  ISSUE_COUNT=$((ISSUE_COUNT + FAILED))
-                  PASSED_TESTS=$((PASSED_TESTS + PASSED))
-                  TOTAL_TESTS=$((TOTAL_TESTS + FAILED + PASSED))
-              done
-              
-              echo "<p><strong>Total Tests:</strong> $TOTAL_TESTS</p>" >> report.html
-              echo "<p><strong>Passed:</strong> $PASSED_TESTS</p>" >> report.html
-              echo "<p><strong>Failed:</strong> $ISSUE_COUNT</p>" >> report.html
-              echo '</div>' >> report.html
-          else
-              echo '<div class="summary">' >> report.html
-              echo '<h2>⚠️ No Test Results Found</h2>' >> report.html
-              echo '<p>No test result files were found in the artifacts.</p>' >> report.html
-              echo '</div>' >> report.html
-          fi
+        # Process test results if available
+        if find all-test-results -name "*.json" -type f | head -1 > /dev/null 2>&1; then
+            echo '<div class="summary">' >> report.html
+            echo '<h2>📊 Test Summary</h2>' >> report.html
+            
+            # Extract basic metrics from any JSON files
+            for json_file in $(find all-test-results -name "*.json" -type f); do
+                if command -v jq >/dev/null 2>&1; then
+                    # Use jq if available
+                    FAILED=$(jq -r 'try (.failures // []) | length' "$json_file" 2>/dev/null || echo "0")
+                    PASSED=$(jq -r 'try (.passes // []) | length' "$json_file" 2>/dev/null || echo "0")
+                else
+                    # Fallback to grep-based parsing
+                    FAILED=$(grep -o '"failures":\s*\[[^]]*\]' "$json_file" 2>/dev/null | wc -l || echo "0")
+                    PASSED=$(grep -o '"passes":\s*\[[^]]*\]' "$json_file" 2>/dev/null | wc -l || echo "0")
+                fi
+                
+                ISSUE_COUNT=$((ISSUE_COUNT + FAILED))
+                PASSED_TESTS=$((PASSED_TESTS + PASSED))
+                TOTAL_TESTS=$((TOTAL_TESTS + FAILED + PASSED))
+            done
+            
+            echo "<p><strong>Total Tests:</strong> $TOTAL_TESTS</p>" >> report.html
+            echo "<p><strong>Passed:</strong> $PASSED_TESTS</p>" >> report.html
+            echo "<p><strong>Failed:</strong> $ISSUE_COUNT</p>" >> report.html
+            echo '</div>' >> report.html
+        else
+            echo '<div class="summary">' >> report.html
+            echo '<h2>⚠️ No Test Results Found</h2>' >> report.html
+            echo '<p>No test result files were found in the artifacts.</p>' >> report.html
+            echo '</div>' >> report.html
+        fi
 
-          # Add issues section
-          if [ "$ISSUE_COUNT" -gt 0 ]; then
-              echo '<div class="issues">' >> report.html
-              echo '<h2>🚨 Detected Issues</h2>' >> report.html
-              echo "<p>Found <strong>$ISSUE_COUNT</strong> compatibility issues that need attention.</p>" >> report.html
-              echo '</div>' >> report.html
-          else
-              echo '<div class="success">' >> report.html
-              echo '<h2>✅ All Tests Passed</h2>' >> report.html
-              echo '<p>No compatibility issues detected. Great work!</p>' >> report.html
-              echo '</div>' >> report.html
-          fi
+        # Add issues section
+        if [ "$ISSUE_COUNT" -gt 0 ]; then
+            echo '<div class="issues">' >> report.html
+            echo '<h2>🚨 Detected Issues</h2>' >> report.html
+            echo "<p>Found <strong>$ISSUE_COUNT</strong> compatibility issues that need attention.</p>" >> report.html
+            echo '</div>' >> report.html
+        else
+            echo '<div class="success">' >> report.html
+            echo '<h2>✅ All Tests Passed</h2>' >> report.html
+            echo '<p>No compatibility issues detected. Great work!</p>' >> report.html
+            echo '</div>' >> report.html
+        fi
 
-          # Add artifacts info
-          echo '<div class="summary">' >> report.html
-          echo '<h2>📁 Available Artifacts</h2>' >> report.html
-          echo '<p>The following test artifacts are available for download:</p>' >> report.html
-          echo '<ul>' >> report.html
-          echo '<li>Browser Test Results - Playwright reports and screenshots</li>' >> report.html
-          echo '<li>Visual Test Results - Visual regression test outputs</li>' >> report.html
-          echo '<li>Browser Compatibility Report - This consolidated report</li>' >> report.html
-          echo '</ul>' >> report.html
-          echo '</div>' >> report.html
+        # Add artifacts info
+        echo '<div class="summary">' >> report.html
+        echo '<h2>📁 Available Artifacts</h2>' >> report.html
+        echo '<p>The following test artifacts are available for download:</p>' >> report.html
+        echo '<ul>' >> report.html
+        echo '<li>Browser Test Results - Playwright reports and screenshots</li>' >> report.html
+        echo '<li>Visual Test Results - Visual regression test outputs</li>' >> report.html
+        echo '<li>Browser Compatibility Report - This consolidated report</li>' >> report.html
+        echo '</ul>' >> report.html
+        echo '</div>' >> report.html
 
-          echo '</body></html>' >> report.html
+        echo '</body></html>' >> report.html
 
-          # Set outputs for use in subsequent steps
-          echo "ISSUE_COUNT=$ISSUE_COUNT" >> $GITHUB_ENV
-          echo "issue_count=$ISSUE_COUNT" >> $GITHUB_OUTPUT
-          echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
-          echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
+        # Set outputs for use in subsequent steps
+        echo "ISSUE_COUNT=$ISSUE_COUNT" >> $GITHUB_ENV
+        echo "issue_count=$ISSUE_COUNT" >> $GITHUB_OUTPUT
+        echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+        echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
 
-      - name: Upload consolidated report
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-compatibility-report-${{ github.run_id }}
-          path: report.html
-          retention-days: 90
-          if-no-files-found: error
+    - name: Upload consolidated report
+      uses: actions/upload-artifact@v4
+      with:
+        name: browser-compatibility-report-${{ github.run_id }}
+        path: report.html
+        retention-days: 90
+        if-no-files-found: error
 
-      - name: Send notifications
-        if: ${{ steps.generate_report.outputs.issue_count > 0 && !cancelled() }}
-        env:
-          ISSUE_COUNT: ${{ steps.generate_report.outputs.issue_count }}
-          TOTAL_TESTS: ${{ steps.generate_report.outputs.total_tests }}
-          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          # Prepare notification content
-          cat > notification.txt << EOF
-          🚨 Browser Compatibility Issues Detected
+    - name: Send notifications
+      if: ${{ steps.generate_report.outputs.issue_count > 0 && !cancelled() }}
+      env:
+        ISSUE_COUNT: ${{ steps.generate_report.outputs.issue_count }}
+        TOTAL_TESTS: ${{ steps.generate_report.outputs.total_tests }}
+        WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        # Prepare notification content
+        cat > notification.txt << EOF
+        🚨 Browser Compatibility Issues Detected
 
-          Repository: ${{ github.repository }}
-          Branch: ${{ github.ref_name }}
-          Commit: ${{ github.sha }}
+        Repository: ${{ github.repository }}
+        Branch: ${{ github.ref_name }}
+        Commit: ${{ github.sha }}
 
-          Test Results:
-          - Total Tests: ${TOTAL_TESTS:-Unknown}
-          - Failed Tests: ${ISSUE_COUNT}
-          - Workflow: ${WORKFLOW_URL}
+        Test Results:
+        - Total Tests: ${TOTAL_TESTS:-Unknown}
+        - Failed Tests: ${ISSUE_COUNT}
+        - Workflow: ${WORKFLOW_URL}
 
-          Please review the test results and address any compatibility issues.
-          EOF
+        Please review the test results and address any compatibility issues.
+        EOF
 
-          # Send Slack notification if webhook is configured
-          if [ -n "${SLACK_WEBHOOK:-}" ]; then
-            echo "Sending Slack notification..."
-            curl -X POST -H 'Content-type: application/json' \
-              --data "{\"text\":\"$(cat notification.txt | sed 's/"/\\"/g' | tr '\n' ' ')\"}" \
-              "${SLACK_WEBHOOK}" || echo "Failed to send Slack notification"
-          else
-            echo "SLACK_WEBHOOK not configured, skipping Slack notification"
-          fi
+        # Send Slack notification if webhook is configured
+        if [ -n "${SLACK_WEBHOOK:-}" ]; then
+          echo "Sending Slack notification..."
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"$(cat notification.txt | sed 's/"/\\"/g' | tr '\n' ' ')\"}" \
+            "${SLACK_WEBHOOK}" || echo "Failed to send Slack notification"
+        else
+          echo "SLACK_WEBHOOK not configured, skipping Slack notification"
+        fi
 
-          # Send email notification if configured
-          if [ -n "${EMAIL_API_KEY:-}" ] && [ -n "${TEAM_EMAIL:-}" ]; then
-            echo "Sending email notification..."
-            curl -X POST https://api.resend.com/emails \
-              -H "Authorization: Bearer ${EMAIL_API_KEY}" \
-              -H "Content-Type: application/json" \
-              -d "{
-                \"from\": \"ci@pixelatedempathy.com\",
-                \"to\": \"${TEAM_EMAIL}\",
-                \"subject\": \"🚨 Browser Compatibility Issues Detected\",
-                \"text\": \"$(cat notification.txt | sed 's/"/\\"/g' | tr '\n' ' ')\"
-              }" || echo "Failed to send email notification"
-          else
-            echo "Email configuration not complete, skipping email notification"
-          fi
+        # Send email notification if configured
+        if [ -n "${EMAIL_API_KEY:-}" ] && [ -n "${TEAM_EMAIL:-}" ]; then
+          echo "Sending email notification..."
+          curl -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer ${EMAIL_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"from\": \"ci@pixelatedempathy.com\",
+              \"to\": \"${TEAM_EMAIL}\",
+              \"subject\": \"🚨 Browser Compatibility Issues Detected\",
+              \"text\": \"$(cat notification.txt | sed 's/"/\\"/g' | tr '\n' ' ')\"
+            }" || echo "Failed to send email notification"
+        else
+          echo "Email configuration not complete, skipping email notification"
+        fi
 
-          echo "Notification process completed"
+        echo "Notification process completed"

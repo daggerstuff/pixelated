@@ -17,7 +17,7 @@ on:
 
 env:
   NODE_VERSION: 22.16.0
-  PNPM_VERSION: 10.14.0
+  PNPM_VERSION: 10.15.0
   AZURE_RESOURCE_GROUP: pixelated-rg
   AZURE_LOCATION: eastus
   AZURE_APP_NAME: pixelatedempathy
