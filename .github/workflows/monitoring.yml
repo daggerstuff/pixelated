@@ -11,7 +11,7 @@ permissions: read-all
 
 env:
   NODE_VERSION: 22.16.0
-  PNPM_VERSION: 10.14.0
+  PNPM_VERSION: 10.15.0
   NODE_ENV: production
 
 jobs:

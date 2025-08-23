@@ -116,7 +116,7 @@ To see these additional updates run: apt list --upgradable
 
 
 [VPS] Installing project dependencies...
- WARN  Unsupported engine: wanted: {"node":"22"} (current: {"node":"v20.19.4","pnpm":"10.14.0"})
+ WARN  Unsupported engine: wanted: {"node":"22"} (current: {"node":"v20.19.4","pnpm":"10.15.0"})
 Lockfile is up to date, resolution step is skipped
  WARN  Broken lockfile: no entry for 'astro@5.12.3(@capacitor/preferences@7.0.1(@capacitor/core@7.4.2))(@types/node@22.16.5)(@upstash/redis@1.35.1)(@vercel/kv@1.0.1)(idb-keyval@6.2.2)(ioredis@5.6.1)(jiti@2.5.0)(lightningcss@1.30.1)(rollup@4.45.1)(terser@5.43.1)(tsx@4.20.3)(typescript@5.8.3)(yaml@2.8.0)' in pnpm-lock.yaml
  ERR_PNPM_LOCKFILE_MISSING_DEPENDENCY  The lockfile is broken! Resolution step will be performed to fix it.
@@ -149,9 +149,9 @@ Progress: resolved 2877, reused 2734, downloaded 0, added 0, done
   ├── ✕ unmet peer pg@8.11.3: found 8.16.0
   └── ✕ unmet peer redis@^4.6.13: found 5.1.0
 
-Done in 22.6s using pnpm v10.14.0
+Done in 22.6s using pnpm v10.15.0
 [VPS] Building project...
- WARN  Unsupported engine: wanted: {"node":"22"} (current: {"node":"v20.19.4","pnpm":"10.14.0"})
+ WARN  Unsupported engine: wanted: {"node":"22"} (current: {"node":"v20.19.4","pnpm":"10.15.0"})
 
 > pixelated@0.0.1 build /root/pixelated
 > astro build

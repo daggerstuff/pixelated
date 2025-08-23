@@ -74,7 +74,7 @@ class PythonBiasDetectionBridge {
   async checkHealth() { return { status: 'healthy', message: 'Service is running' } }
   async runPreprocessingAnalysis(_s: SessionData): Promise<import('./types').PreprocessingAnalysisResult> {
     return {
-      biasScore: 0.2,
+      biasScore: 0.5,
       linguisticBias: {
         genderBiasScore: 0.1,
         racialBiasScore: 0.1,
@@ -108,7 +108,7 @@ class PythonBiasDetectionBridge {
   }
   async runModelLevelAnalysis(_s: SessionData): Promise<import('./types').ModelLevelAnalysisResult> {
     return {
-      biasScore: 0.3,
+      biasScore: 0.5,
       fairnessMetrics: {
         demographicParity: 0.75,
         equalizedOdds: 0.8,
@@ -132,7 +132,7 @@ class PythonBiasDetectionBridge {
   }
   async runInteractiveAnalysis(_s: SessionData): Promise<import('./types').InteractiveAnalysisResult> {
     return {
-      biasScore: 0.2,
+      biasScore: 0.5,
       counterfactualAnalysis: {
         scenariosAnalyzed: 3,
         biasDetected: false,
@@ -146,7 +146,7 @@ class PythonBiasDetectionBridge {
   }
   async runEvaluationAnalysis(_s: SessionData): Promise<import('./types').EvaluationAnalysisResult> {
     return {
-      biasScore: 0.3,
+      biasScore: 0.5,
       huggingFaceMetrics: {
         toxicity: 0.05,
         bias: 0.15,
@@ -300,11 +300,14 @@ export class BiasDetectionEngine {
           maxConcurrency: this.config.batchProcessingConfig?.concurrency || 5,
           timeoutMs: this.config.batchProcessingConfig?.timeoutMs || 30000,
           retryAttempts: this.config.batchProcessingConfig?.retries || 2,
+          enablePrioritization: true,
         },
         cache: {
           enableCompression: this.config.cacheConfig?.compressionEnabled !== false,
+          compressionThreshold: this.config.cacheConfig?.compressionThreshold || 1024,
           defaultTtl: (this.config.cacheConfig?.ttl || 300000) / 1000, // Convert to seconds
           maxCacheSize: this.config.cacheConfig?.maxSize || 1000,
+          enableDistributedCache: this.config.cacheConfig?.enableDistributedCache !== false,
         }
       })
     } catch (error) {
@@ -354,11 +357,18 @@ export class BiasDetectionEngine {
 
   private weightedAverage(results: LayerResults): number {
     const w = this.config['layerWeights']
+    
+    // Safely access bias scores with fallback values
+    const preprocessingScore = results['preprocessing']?.biasScore ?? 0.5
+    const modelLevelScore = results['modelLevel']?.biasScore ?? 0.5
+    const interactiveScore = results['interactive']?.biasScore ?? 0.5
+    const evaluationScore = results['evaluation']?.biasScore ?? 0.5
+    
     return (
-      results['preprocessing']['biasScore'] * w['preprocessing'] +
-      results['modelLevel']['biasScore'] * w['modelLevel'] +
-      results['interactive']['biasScore'] * w['interactive'] +
-      results['evaluation']['biasScore'] * w['evaluation']
+      preprocessingScore * w['preprocessing'] +
+      modelLevelScore * w['modelLevel'] +
+      interactiveScore * w['interactive'] +
+      evaluationScore * w['evaluation']
     )
   }
 
@@ -467,6 +477,30 @@ export class BiasDetectionEngine {
     try {
       evaluation = await this.pythonService.runEvaluationAnalysis(session)
     } catch {
+      const fb = this.fallbackLayer()
+      evaluation = {
+        biasScore: fb.biasScore,
+        huggingFaceMetrics: {
+          toxicity: 0.05,
+          bias: 0.15,
+          regard: {},
+          stereotype: 0.1,
+          fairness: 0.85,
+        },
+        customMetrics: {
+          therapeuticBias: 0.1,
+          culturalSensitivity: 0.1,
+          professionalEthics: 0.1,
+          patientSafety: 0.1,
+        },
+        temporalAnalysis: {
+          trendDirection: 'stable',
+          changeRate: 0,
+          seasonalPatterns: [],
+          interventionEffectiveness: [],
+        },
+        recommendations: [],
+      }
       recs.push('Evaluation analysis unavailable; using fallback results')
     }
 
@@ -480,7 +514,11 @@ export class BiasDetectionEngine {
     const overallBiasScore = this.weightedAverage(layerResults)
     const alertLevel = this.computeAlertLevel(overallBiasScore)
 
-    const confidence = 0.8
+    // Calculate confidence based on how many layers had fallbacks
+    const fallbackCount = recs.length
+    const baseConfidence = 0.8
+    const confidencePenalty = fallbackCount * 0.15 // Reduce confidence by 15% per fallback
+    const confidence = Math.max(0.1, baseConfidence - confidencePenalty)
 
     const maskedDemo = this.maskDemographics(
       session.participantDemographics as unknown as Record<string, unknown>,
@@ -838,12 +876,16 @@ async batchAnalyzeSessions(
         timeout: options.timeoutMs,
         retries: options.retries,
         priority: options.priority,
-        onProgress: options.onProgress,
+        onProgress: options.onProgress
+          ? (completed, total) => options.onProgress!({ completed, total })
+          : undefined,
         onError: options.onError
+          ? (error, item) => options.onError!(error, item as SessionData)
+          : undefined,
       }
     )
     analysisResults = result.results
-    errors = result.errors.map(({ item: session, error }) => ({ session, error }))
+    errors = result.errors.map(({ item, error }) => ({ session: item as SessionData, error }))
   } else {
     // Fallback to original batch processing implementation
     analysisResults = []
@@ -875,7 +917,7 @@ async batchAnalyzeSessions(
   }
   
   if (options.logErrors !== false && errors.length > 0) {
-    errors.forEach(({ item: session, error }) => {
+    errors.forEach(({ session, error }) => {
       console.error(`[BatchError] Session ${session.sessionId}: ${error.message}`)
     })
   }

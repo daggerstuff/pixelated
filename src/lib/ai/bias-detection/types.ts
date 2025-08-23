@@ -147,6 +147,8 @@ export interface CacheConfig {
   ttl?: number // milliseconds
   maxSize?: number
   compressionEnabled?: boolean
+  compressionThreshold?: number
+  enableDistributedCache?: boolean
 }
 
 export interface SecurityConfig {
