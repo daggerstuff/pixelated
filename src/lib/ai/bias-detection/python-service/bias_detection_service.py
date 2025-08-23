@@ -1370,7 +1370,12 @@ def analyze_session():
         if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
             g.user_id = "development-user"
 
-        data = request.get_json()
+        # Handle JSON parsing errors
+        try:
+            data = request.get_json()
+        except Exception:
+            return jsonify({"error": "No data provided"}), 400
+
         if not data:
             return jsonify({"error": "No data provided"}), 400
 

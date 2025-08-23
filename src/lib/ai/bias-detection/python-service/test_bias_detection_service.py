@@ -12,7 +12,7 @@ import os
 import tempfile
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 # Top-level imports for tests (avoid import-inside-function warnings)
 import jwt
@@ -187,15 +187,18 @@ class TestAuditLogger(unittest.TestCase):
         if os.path.exists(self.audit_logger.audit_file):
             os.remove(self.audit_logger.audit_file)
 
-    @pytest.mark.asyncio
-    async def test_log_event_non_sensitive(self):
+    def test_log_event_non_sensitive(self):
         """Test logging non-sensitive events"""
-        await self.audit_logger.log_event(
-            event_type="analysis_started",
-            session_id="test_session",
-            user_id="test_user",
-            details={"analysis_type": "comprehensive"},
-            sensitive_data=False,
+        import asyncio
+
+        asyncio.run(
+            self.audit_logger.log_event(
+                event_type="analysis_started",
+                session_id="test_session",
+                user_id="test_user",
+                details={"analysis_type": "comprehensive"},
+                sensitive_data=False,
+            )
         )
 
         # Verify log file was created and contains entry
@@ -208,15 +211,18 @@ class TestAuditLogger(unittest.TestCase):
         assert log_entry["user_id"] == "test_user"
         assert log_entry["details"]["analysis_type"] == "comprehensive"
 
-    @pytest.mark.asyncio
-    async def test_log_event_sensitive(self):
+    def test_log_event_sensitive(self):
         """Test logging sensitive events with encryption"""
-        await self.audit_logger.log_event(
-            event_type="analysis_completed",
-            session_id="test_session",
-            user_id="test_user",
-            details={"bias_score": 0.75, "patient_id": "12345"},
-            sensitive_data=True,
+        import asyncio
+
+        asyncio.run(
+            self.audit_logger.log_event(
+                event_type="analysis_completed",
+                session_id="test_session",
+                user_id="test_user",
+                details={"bias_score": 0.75, "patient_id": "12345"},
+                sensitive_data=True,
+            )
         )
 
         with open(self.audit_logger.audit_file) as f:
@@ -379,12 +385,13 @@ class TestBiasDetectionService(unittest.TestCase):
         critical_recs = [r for r in recommendations if "CRITICAL" in r]
         assert critical_recs
 
-    @pytest.mark.asyncio
-    async def test_analyze_session_full(self):
+    def test_analyze_session_full(self):
         """Test full session analysis"""
+        import asyncio
+
         # Mock the audit logger to avoid file operations
         with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
-            result = await self.service.analyze_session(self.test_session_data, "test_user")
+            result = asyncio.run(self.service.analyze_session(self.test_session_data, "test_user"))
 
             # Verify result structure
             assert "session_id" in result

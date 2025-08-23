@@ -335,6 +335,18 @@ export class BiasDetectionEngine {
     }
   }
 
+  /**
+   * Returns constant fallback values for bias layer analysis.
+   *
+   * If any layer analysis fails (Python service error, timeout, or invalid result),
+   * the BiasDetectionEngine will assign this fallback value for biasScore (0.5) and confidence (0.4).
+   *
+   * The fallback biasScore is chosen as a neutral midpoint (range 0–1), signaling uncertainty and
+   * preventing bias overestimation or underestimation in error scenarios.
+   *
+   * Note: All integration and error-handling tests should expect a fallback biasScore of 0.5
+   * for failed layers. Any changes to this value require test and documentation updates.
+   */
   private fallbackLayer(): { biasScore: number; confidence: number } {
     return { biasScore: 0.5, confidence: 0.4 }
   }

@@ -210,30 +210,30 @@ describe('BiasDashboard', () => {
   })
 
   it('handles WebSocket connection', async () => {
-    const mockWs = {
-      send: vi.fn(),
-      close: vi.fn(),
-      addEventListener: vi.fn(),
-    }
-    MockWebSocketConstructor.mockImplementation(
-      () => mockWs as MockWebSocketInstance,
-    )
+    let mockWebSocket: MockWebSocketInstance;
 
-    render(<BiasDashboard enableRealTimeUpdates={true} />)
+    // Use the same robust mock setup as Enhanced WebSocket tests
+    MockWebSocketConstructor.mockImplementation(() => {
+      const ws = createMockWebSocket();
+      mockWebSocket = ws;
+      return ws;
+    });
+
+    render(<BiasDashboard enableRealTimeUpdates={true} />);
 
     await waitFor(() => {
-      expect(MockWebSocketConstructor).toHaveBeenCalled()
-    })
+      expect(MockWebSocketConstructor).toHaveBeenCalled();
+    });
 
-    // Simulate WebSocket connection
-    const openCall = mockWs.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'open',
-    )
-    if (openCall && typeof openCall[1] === 'function') {
-      openCall[1]()
-    }
+    // Simulate WebSocket 'onopen' event as the component does not use addEventListener for it
+    act(() => {
+      mockWebSocket.onopen?.(new Event('open'));
+    });
 
-    expect(screen.getByText(/Live updates connected/)).toBeInTheDocument()
+    // Wait for the text to appear in the DOM after state update
+    await waitFor(() => {
+      expect(screen.getByText(/live updates connected/i)).toBeInTheDocument();
+    });
   })
 
   it('handles WebSocket errors gracefully', async () => {
