@@ -41,7 +41,7 @@ validate-runner:
   script:
     - set -e
     - echo "Validating GitLab runner capabilities..."
-    - apk add --no-cache openssh-client git
+    - apt-get update -y && apt-get install -y openssh-client git
     - if ! command -v docker &> /dev/null; then
         echo "Docker not found or failed to install." ; exit 1
       fi
@@ -65,7 +65,7 @@ build-frontend:
     DOCKER_BUILDKIT: 1
   before_script:
     # Set up SSH for Git operations
-    - apk add --no-cache openssh-client git
+    - apt-get update -y && apt-get install -y openssh-client git
     - eval $(ssh-agent -s)
     - echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
