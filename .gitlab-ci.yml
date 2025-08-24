@@ -5,7 +5,7 @@ qodana:
     - merge_requests
   image:
     name: jetbrains/qodana-js
-    entrypoint: [""]
+    entrypoint: [ "" ]
   variables:
     QODANA_TOKEN: $qodana_token
     GIT_STRATEGY: fetch
@@ -185,8 +185,8 @@ deploy-vps:
         docker rm pixelated-app 2>/dev/null || true
 
         # Set up environment variables for container
-        PUBLIC_URL="http://$VPS_HOST"
-        CORS_ORIGINS="http://$VPS_HOST,https://$VPS_HOST"
+        PUBLIC_URL="http://$VPS_HOST:4321"
+        CORS_ORIGINS="http://$VPS_HOST:4321,https://$VPS_HOST:4321"
 
         if [[ -n "$VPS_DOMAIN" ]]; then
             PUBLIC_URL="https://$VPS_DOMAIN"
