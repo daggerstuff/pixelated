@@ -89,19 +89,45 @@ stages:
 
           - script: |
               # Ensure cache directories exist before cache task
-              mkdir -p node_modules/.astro .astro
+              mkdir -p node_modules/.astro .astro "$(Agent.WorkFolder)/.astro-fallback" "$(Agent.WorkFolder)/.astro-cache-fallback"
               echo "Created cache directories for Astro build artifacts"
-            displayName: Create cache directories
+
+              # Clean up any malformed cache files that might exist
+              echo "Cleaning up potential malformed cache files..."
+              find node_modules/.astro -name "*\n*" -delete 2>/dev/null || true
+              find .astro -name "*\n*" -delete 2>/dev/null || true
+              find "$(Agent.WorkFolder)/.astro-fallback" -name "*\n*" -delete 2>/dev/null || true
+              find "$(Agent.WorkFolder)/.astro-cache-fallback" -name "*\n*" -delete 2>/dev/null || true
+
+              # Validate and clean cache directories
+              echo "Validating cache directories..."
+              for dir in "node_modules/.astro" ".astro" "$(Agent.WorkFolder)/.astro-fallback" "$(Agent.WorkFolder)/.astro-cache-fallback"; do
+                if [ -d "$dir" ]; then
+                  echo "$dir directory exists"
+                  ls -la "$dir"/ 2>/dev/null || echo "Unable to list directory contents"
+                else
+                  echo "Creating $dir directory"
+                  mkdir -p "$dir"
+                fi
+              done
+
+              echo "Cache directory validation completed"
+            displayName: Prepare and validate cache directories
 
           - task: Cache@2
             displayName: Cache Astro build artifacts
             inputs:
-              key: 'astro-build | "$(Agent.OS)" | package.json | pnpm-lock.yaml'
+              key: 'astro-build-v2 | "$(Agent.OS)" | $(Build.SourceBranch) | $(Build.SourceVersion) | package.json | pnpm-lock.yaml'
               restoreKeys: |
+                astro-build-v2 | "$(Agent.OS)" | $(Build.SourceBranch)
+                astro-build-v2 | "$(Agent.OS)"
                 astro-build | "$(Agent.OS)"
               path: |
                 node_modules/.astro
                 .astro
+                $(Agent.WorkFolder)/.astro-fallback
+                $(Agent.WorkFolder)/.astro-cache-fallback
+            continueOnError: true
 
           - script: |
               # Build with optimizations and cache configuration
