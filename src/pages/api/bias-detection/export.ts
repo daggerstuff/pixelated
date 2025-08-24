@@ -1,8 +1,7 @@
 import { BiasDetectionEngine } from '../../../lib/ai/bias-detection/index'
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('BiasExportAPI')
-
 
 interface CsvSession {
   sessionId: string

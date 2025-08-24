@@ -3,7 +3,7 @@ import { getSession } from '../../../lib/auth/session'
 import { ExportFormat, ExportService } from '../../../lib/export'
 import { fheService } from '../../../lib/fhe'
 import { EncryptionMode } from '../../../lib/fhe/types'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')

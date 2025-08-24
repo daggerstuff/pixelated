@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "openmemory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "openmemory"
+      ],
+      "env": {
+        "CLIENT_NAME": "openmemory",
+        "OPENMEMORY_API_KEY": "om-8u4kpiwqmus434epjpsdeuk86o7mnrgg"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "mcp_openmemory_search_memories",
+        "mcp_openmemory_add_memory"
+      ]
+    }
+  },
+  "enabled": true,
+  "contextIntegration": {
+    "searchOnNewChat": true,
+    "addMemoryOnCompletion": true,
+    "autoContextRetrieval": true
+  }
+}

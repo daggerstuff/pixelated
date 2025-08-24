@@ -125,3 +125,82 @@ deploy/
 /scripts/deploy-oracle-automated.sh
 /scripts/deploy-oracle-cloud.sh
 /scripts/deployment-memory-manager.sh
+
+# Additional heavy directories to exclude
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+.coverage
+.coveragerc
+htmlcov/
+.tox/
+.cache
+.mypy_cache
+.dmypy.json
+dmypy.json
+
+# AI/ML training data and models (if not needed for runtime)
+ai/datasets/
+ai/data/
+ai/database/
+ai/pipelines/data/
+ai/models/training/
+ai/dataset_pipeline/
+ai/temporal_analysis_data*.jsonl
+ai/*.jsonl
+ai/*.csv
+ai/*.npy
+ai/*.db
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+
+# Large config and data files
+terraform/
+kubernetes/
+helm/
+monitoring/
+infra/
+.github/
+.gitlab-ci.yml
+azure-pipelines.yml
+
+# Test files
+tests/
+test/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+playwright-report/
+test-results/
+
+# Performance and analysis files
+lighthouse-report.html
+lighthouse-audit.json
+stats.html
+reports/
+performance/
+
+# Development databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Large binary files
+*.zip
+*.tar.gz
+*.rar
+*.7z

@@ -11,8 +11,8 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
     name: 'Standard'
   }
   properties: {
-    adminUserEnabled: false
-    publicNetworkAccess: 'Disabled'
+    adminUserEnabled: true
+    publicNetworkAccess: 'Enabled'
   }
 }
 
@@ -30,7 +30,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   kind: 'linux'
   properties: {
     reserved: true
-    zoneRedundant: true
+    zoneRedundant: false
   }
 }
 
@@ -45,15 +45,13 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       name: 'standard'
     }
     enableRbacAuthorization: true
-    publicNetworkAccess: 'Disabled'
-    enablePurgeProtection: true
+    publicNetworkAccess: 'Enabled'
+    enablePurgeProtection: false
     enableSoftDelete: true
-    softDeleteRetentionInDays: 90
+    softDeleteRetentionInDays: 7
     networkAcls: {
       bypass: 'AzureServices'
-      defaultAction: 'Deny'
-      ipRules: []
-      virtualNetworkRules: []
+      defaultAction: 'Allow'
     }
   }
 }
@@ -80,19 +78,12 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     configuration: {
       ingress: {
         external: true
-        targetPort: 4321
+        targetPort: 3000
       }
       registries: [
         {
           server: acr.properties.loginServer
-          username: acr.listCredentials().username
-          passwordSecretRef: 'acr-password'
-        }
-      ]
-      secrets: [
-        {
-          name: 'acr-password'
-          value: acr.listCredentials().passwords[0].value
+          identity: 'system'
         }
       ]
     }
@@ -100,10 +91,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: containerAppName
-          image: '${acr.properties.loginServer}/${containerAppName}:latest'
+          image: '${acr.properties.loginServer}/pixelated:latest'
           resources: {
-            cpu: 1
-            memory: '1Gi'
+            cpu: json('1.0')
+            memory: '2Gi'
           }
           env: [
             {
@@ -112,7 +103,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'PORT'
-              value: '4321'
+              value: '3000'
             }
           ]
         }
@@ -123,16 +114,19 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       }
     }
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
 }
 
 resource appService 'Microsoft.Web/sites@2023-01-01' = {
   name: appServiceName
   location: azureLocation
-  kind: 'app'
+  kind: 'app,linux,container'
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
-    clientCertEnabled: true
+    clientCertEnabled: false
     siteConfig: {
       minTlsVersion: '1.2'
       appSettings: [
@@ -142,11 +136,11 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'PORT'
-          value: '4321'
+          value: '3000'
         }
         {
           name: 'WEBSITES_PORT'
-          value: '4321'
+          value: '3000'
         }
         {
           name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
@@ -156,19 +150,41 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
           name: 'DOCKER_REGISTRY_SERVER_URL'
           value: 'https://${acr.properties.loginServer}'
         }
-        {
-          name: 'DOCKER_REGISTRY_SERVER_USERNAME'
-          value: acr.listCredentials().username
-        }
-        {
-          name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
-          value: acr.listCredentials().passwords[0].value
-        }
       ]
-      linuxFxVersion: 'DOCKER|${acr.properties.loginServer}/${containerAppName}:latest'
-      healthCheckPath: '/health'
+      linuxFxVersion: 'DOCKER|${acr.properties.loginServer}/pixelated:latest'
+      healthCheckPath: '/api/health'
       ftpsState: 'Disabled'
+      acrUseManagedIdentityCreds: true
     }
+  }
+  identity: {
+    type: 'SystemAssigned'
+  }
+}
+
+// Role assignments for ACR access
+resource acrPullRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: '7f951dda-4ed3-4680-a7ca-43fe172d538d' // AcrPull role
+}
+
+resource containerAppAcrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: acr
+  name: guid(acr.id, containerApp.id, acrPullRoleDefinition.id)
+  properties: {
+    roleDefinitionId: acrPullRoleDefinition.id
+    principalId: containerApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource appServiceAcrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: acr
+  name: guid(acr.id, appService.id, acrPullRoleDefinition.id)
+  properties: {
+    roleDefinitionId: acrPullRoleDefinition.id
+    principalId: appService.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 

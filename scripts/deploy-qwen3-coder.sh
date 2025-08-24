@@ -3,9 +3,9 @@ set -euo pipefail
 
 # Deploy Qwen Coder (Ollama + LiteLLM) to a remote VPS
 # Usage: scripts/deploy-qwen3-coder.sh [IP] [USER] [KEY_PATH]
-# Defaults: IP=209.208.79.191 USER=root KEY_PATH=~/.ssh/planet
+# Defaults: IP=45.55.211.39 USER=root KEY_PATH=~/.ssh/planet
 
-IP=${1:-209.208.79.191}
+IP=${1:-45.55.211.39}
 USER=${2:-root}
 KEY=${3:-$HOME/.ssh/planet}
 SRC_DIR="infra/qwen3-coder"

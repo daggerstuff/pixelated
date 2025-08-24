@@ -1,5 +1,5 @@
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import type { EmotionAnalysis } from '@/lib/ai/emotions/types'
 

@@ -3,7 +3,7 @@ import type { IncomingMessage } from 'node:http'
 import type { Socket } from 'node:net'
 import type { AuthUser } from './lib/auth'
 import type { AuthRole } from './config/auth.config'
-import { createBuildSafeLogger } from './lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Initialize logger for PHI audit logging
 const logger = createBuildSafeLogger('phi-audit')

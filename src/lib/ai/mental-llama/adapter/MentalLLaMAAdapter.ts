@@ -609,7 +609,7 @@ export class MentalLLaMAAdapter {
   }
 
   // EvidenceService wrapper methods for advanced use/testing
-  public async extractDetailedEvidence(text: string, category: string): void {
+  public async extractDetailedEvidence(text: string, category: string) {
     return this.evidenceService.extractSupportingEvidence(text, category)
   }
   public getEvidenceMetrics() {

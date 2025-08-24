@@ -1,5 +1,5 @@
 import type { APIRoute, APIContext } from 'astro'
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
 
 function getBearerToken(request: Request): string | null {
