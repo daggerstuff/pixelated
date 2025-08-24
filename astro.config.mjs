@@ -52,7 +52,24 @@ export default defineConfig({
           'mongodb',
           'recharts',
           'chart.js'
-        ]
+        ],
+        onwarn(warning, warn) {
+          if (
+            warning.code === "SOURCEMAP_ERROR" ||
+            (warning.message && warning.message.includes("didn't generate a sourcemap"))
+          ) {
+            return // suppress sourcemap warnings (astro:transitions, etc.)
+          }
+          // Suppress Vite 'externalized for browser compatibility' and Unocss icon '-' warnings
+          if (warning.message && (
+            warning.message.includes('externalized for browser compatibility') ||
+            warning.message.includes('icon "-"') ||
+            warning.message.includes('failed to load icon \'-\'')
+          )) {
+            return
+          }
+          warn(warning)
+        }
       }
     },
     plugins: [visualizer()],

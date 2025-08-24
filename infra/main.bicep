@@ -11,8 +11,8 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
     name: 'Standard'
   }
   properties: {
-    adminUserEnabled: true
-    publicNetworkAccess: 'Enabled'
+    adminUserEnabled: false
+    publicNetworkAccess: 'Disabled'
   }
 }
 
@@ -30,7 +30,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   kind: 'linux'
   properties: {
     reserved: true
-    zoneRedundant: false
+    zoneRedundant: true
   }
 }
 
@@ -45,13 +45,13 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       name: 'standard'
     }
     enableRbacAuthorization: true
-    publicNetworkAccess: 'Enabled'
-    enablePurgeProtection: false
+    publicNetworkAccess: 'Disabled'
+    enablePurgeProtection: true
     enableSoftDelete: true
     softDeleteRetentionInDays: 7
     networkAcls: {
       bypass: 'AzureServices'
-      defaultAction: 'Allow'
+      defaultAction: 'Deny'
     }
   }
 }

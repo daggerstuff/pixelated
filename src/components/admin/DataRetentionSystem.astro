@@ -1,7 +1,7 @@
 ---
 // DataRetentionSystem.astro
 // Component for managing data retention policies under HIPAA compliance
-import { Icon } from 'astro-icon/components'
+import { Trash as IconTrash, Plus as IconPlus, Pencil as IconPencil, Archive as IconArchive, Calendar as IconCalendar } from 'lucide-react'
 
 interface Props {
   title?: string
@@ -112,9 +112,8 @@ const archivingActions = [
         <div
           class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg flex items-center"
         >
-          <Icon
-            name="calendar"
-            class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"
+          <IconCalendar
+            className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"
           />
           <span class="text-blue-700 dark:text-blue-300 text-sm"
             >Configurable retention periods</span
@@ -124,9 +123,8 @@ const archivingActions = [
         <div
           class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg flex items-center"
         >
-          <Icon
-            name="archive"
-            class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2"
+          <IconArchive
+            className="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2"
           />
           <span class="text-purple-700 dark:text-purple-300 text-sm"
             >Automated archiving</span
@@ -136,9 +134,8 @@ const archivingActions = [
         <div
           class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg flex items-center"
         >
-          <Icon
-            name="trash"
-            class="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
+          <IconTrash
+            className="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
           />
           <span class="text-green-700 dark:text-green-300 text-sm"
             >Secure destruction</span
@@ -157,7 +154,7 @@ const archivingActions = [
           type="button"
           class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
         >
-          <Icon name="plus" class="w-4 h-4 mr-1" />
+          <IconPlus className="w-4 h-4 mr-1" />
           Add Policy
         </button>
       </div>
@@ -208,14 +205,14 @@ const archivingActions = [
                         class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                         aria-label="Edit policy"
                       >
-                        <Icon name="pencil" class="w-5 h-5" />
+                        <IconPencil className="w-5 h-5" />
                       </button>
                       <button
                         type="button"
                         class="font-medium text-gray-600 dark:text-gray-500 hover:underline"
                         aria-label="Archive now"
                       >
-                        <Icon name="archive" class="w-5 h-5" />
+                        <IconArchive className="w-5 h-5" />
                       </button>
                     </div>
                   </td>
@@ -237,7 +234,7 @@ const archivingActions = [
           type="button"
           class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
         >
-          <Icon name="plus" class="w-4 h-4 mr-1" />
+          <IconPlus className="w-4 h-4 mr-1" />
           Schedule Action
         </button>
       </div>

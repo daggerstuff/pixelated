@@ -131,8 +131,8 @@
         "name": "Standard"
       },
       "properties": {
-        "adminUserEnabled": true,
-        "publicNetworkAccess": "Enabled",
+        "adminUserEnabled": false,
+        "publicNetworkAccess": "Disabled",
         "dataEndpointEnabled": false
       }
     },

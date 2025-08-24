@@ -158,10 +158,19 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       onwarn(warning, warn) {
+        // Suppress SORUCEMAP warnings
         if (warning.code === 'SOURCEMAP_ERROR') {
           return
         }
-        if (warning.message.includes('Failed to load source map')) {
+        if (warning.message && warning.message.includes('Failed to load source map')) {
+          return
+        }
+        // Suppress Vite 'externalized for browser compatibility' and Unocss icon '-' warnings
+        if (warning.message && (
+          warning.message.includes('externalized for browser compatibility') ||
+          warning.message.includes('icon "-"') ||
+          warning.message.includes('failed to load icon \'-\'')
+        )) {
           return
         }
         warn(warning)

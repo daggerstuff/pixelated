@@ -45,8 +45,7 @@ data "aws_eks_cluster_auth" "cluster" {
 
 # VPC Module
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-  version = "3.19.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=f2c37c9d0b1dba6e6c0d7d7df8f6a1f65a2e24f2"
 
   name = "${var.project_name}-vpc"
   cidr = var.vpc_cidr
@@ -65,8 +64,7 @@ module "vpc" {
 
 # EKS Cluster Module
 module "eks" {
-  source = "terraform-aws-modules/eks/aws"
-  version = "19.20.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=fa81e9f685df383e0245c8f6639c2d34985f8bd2"
 
   cluster_name    = "${var.project_name}-cluster"
   cluster_version = var.kubernetes_version
@@ -222,6 +220,11 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_s3_bucket" "assets" {
   bucket = "${var.project_name}-assets-${random_string.bucket_suffix.result}"
 
+  # Enable versioning for replication
+  versioning {
+    enabled = true
+  }
+
   tags = var.common_tags
 }
 
@@ -253,12 +256,22 @@ resource "aws_s3_bucket_logging" "assets" {
 resource "aws_s3_bucket_replication_configuration" "assets" {
   bucket = aws_s3_bucket.assets.id
   role   = var.s3_replication_role_arn
+
   rules {
     id     = "replication"
     status = "Enabled"
+    # Replicate all objects. You may add filter as needed.
+    source_selection_criteria {
+      sse_kms_encrypted_objects {
+        enabled = true
+      }
+    }
     destination {
       bucket        = var.s3_replication_dest_arn
       storage_class = "STANDARD"
+      encryption_configuration {
+        replica_kms_key_id = var.s3_replication_kms_key_id
+      }
     }
     filter {
       prefix = ""
@@ -297,15 +310,7 @@ resource "aws_s3_bucket_versioning" "assets" {
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "assets" {
-  bucket = aws_s3_bucket.assets.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
+# Removed duplicate default AES256 encryption block to ensure only KMS encryption is set
 
 resource "random_string" "bucket_suffix" {
   length  = 8

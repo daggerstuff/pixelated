@@ -1,7 +1,7 @@
 ---
 // TransferAuditLog.astro
 // Component for tracking and displaying data transfer audit logs
-import { Icon } from 'astro-icon/components'
+import SafeIcon from '../ui/SafeIcon.astro'
 function formatDate(dateInput: any, options: any = {}) {
   if (!dateInput) return '-';
   const date = new Date(dateInput);
@@ -125,7 +125,7 @@ const getEncryptionClass = (verified: boolean) => {
             <div
               class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
             >
-              <Icon
+              <SafeIcon
                 name="search"
                 class="w-5 h-5 text-gray-500 dark:text-gray-400"
               />
@@ -219,12 +219,12 @@ const getEncryptionClass = (verified: boolean) => {
                   >
                     {entry.encryptionVerified ? (
                       <span class="flex items-center">
-                        <Icon name="check-circle" class="w-4 h-4 mr-1" />
+                        <SafeIcon name="check-circle" class="w-4 h-4 mr-1" />
                         Verified
                       </span>
                     ) : (
                       <span class="flex items-center">
-                        <Icon name="x-circle" class="w-4 h-4 mr-1" />
+                        <SafeIcon name="x-circle" class="w-4 h-4 mr-1" />
                         Failed
                       </span>
                     )}
@@ -237,14 +237,14 @@ const getEncryptionClass = (verified: boolean) => {
                       class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       aria-label="View details"
                     >
-                      <Icon name="eye" class="w-5 h-5" />
+                      <SafeIcon name="eye" class="w-5 h-5" />
                     </button>
                     <button
                       type="button"
                       class="font-medium text-gray-600 dark:text-gray-500 hover:underline"
                       aria-label="Download report"
                     >
-                      <Icon name="download" class="w-5 h-5" />
+                      <SafeIcon name="download" class="w-5 h-5" />
                     </button>
                   </div>
                 </td>

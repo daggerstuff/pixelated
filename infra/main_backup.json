@@ -135,7 +135,7 @@
       },
       "properties": {
         "adminUserEnabled": false,
-        "publicNetworkAccess": "Enabled",
+        "publicNetworkAccess": "Disabled",
         "dataEndpointEnabled": false
       }
     },

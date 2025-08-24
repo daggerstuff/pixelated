@@ -3,6 +3,18 @@
 // Import types from React for HTML attributes (if needed in the future)
 import "./src/env.d.ts"
 
+// Type declarations for astro-icon
+declare module 'astro-icon/components' {
+  interface IconProps {
+    name: string
+    class?: string
+    [key: string]: any
+  }
+
+  const Icon: (props: IconProps) => any
+  export { Icon }
+}
+
 // Ensure Astro recognizes HTML attributes
 declare namespace astroHTML.JSX {
   interface HTMLAttributes {
