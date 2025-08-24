@@ -45,7 +45,8 @@ data "aws_eks_cluster_auth" "cluster" {
 
 # VPC Module
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws?ref=v3.19.0"
+  source = "terraform-aws-modules/vpc/aws"
+  version = "3.19.0"
 
   name = "${var.project_name}-vpc"
   cidr = var.vpc_cidr
@@ -64,7 +65,8 @@ module "vpc" {
 
 # EKS Cluster Module
 module "eks" {
-  source = "terraform-aws-modules/eks/aws?ref=v19.20.0"
+  source = "terraform-aws-modules/eks/aws"
+  version = "19.20.0"
 
   cluster_name    = "${var.project_name}-cluster"
   cluster_version = var.kubernetes_version
@@ -178,7 +180,7 @@ resource "aws_security_group" "rds" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = []
+    cidr_blocks = [var.vpc_cidr]
   }
 
   tags = var.common_tags
@@ -202,7 +204,7 @@ resource "aws_security_group" "redis" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = []
+    cidr_blocks = [var.vpc_cidr]
   }
 
   tags = var.common_tags
@@ -231,11 +233,13 @@ resource "aws_s3_bucket_public_access_block" "assets" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "assets_kms" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "assets" {
   bucket = aws_s3_bucket.assets.id
+
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      kms_master_key_id = var.s3_kms_key_id
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -273,7 +277,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "assets" {
     expiration {
       days = 365
     }
-    abort_incomplete_multipart_upload_days = 7
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
   }
 }
 

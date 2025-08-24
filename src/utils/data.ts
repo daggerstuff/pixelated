@@ -42,7 +42,7 @@ export function matchLogo(
 /**
  * Extracts the package name (before the `@` version part) from a `tagName`.
  */
-export function extractPackageName(tagName: string): void {
+export function extractPackageName(tagName: string): string {
   const match = tagName.match(/(^@?[^@]+)@/)
   if (match) {
     return match[1]
@@ -53,7 +53,7 @@ export function extractPackageName(tagName: string): void {
 /**
  * Extracts the version number from a `tagName`.
  */
-export function extractVersionNum(tagName: string): void {
+export function extractVersionNum(tagName: string): string {
   // Use a more specific pattern to avoid backtracking
   const match = tagName.match(/^\D*(\d+\.\d+\.\d+(?:-[a-z0-9.]+)?)/i)
   if (match) {

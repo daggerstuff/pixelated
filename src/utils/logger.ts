@@ -34,45 +34,52 @@ let currentLogLevel =
 /**
  * Creates a logger with the given context
  */
-export function createLogger(options: LogOptions = {}): void {
-  const opts = { ...DEFAULT_OPTIONS, ...options }
+export function createLogger(options: LogOptions = {}): {
+  debug: (message: string, ...args: unknown[]) => void;
+  info: (message: string, ...args: unknown[]) => void;
+  warn: (message: string, ...args: unknown[]) => void;
+  error: (message: string | Error, ...args: unknown[]) => void;
+  setLevel: (level: LogLevel) => void;
+  getLevel: () => LogLevel;
+} {
+  const opts = { ...DEFAULT_OPTIONS, ...options };
 
   return {
     debug: (message: string, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.DEBUG) {
-        logMessage(LogLevel.DEBUG, opts, message, ...args)
+        logMessage(LogLevel.DEBUG, opts, message, ...args);
       }
     },
 
     info: (message: string, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.INFO) {
-        logMessage(LogLevel.INFO, opts, message, ...args)
+        logMessage(LogLevel.INFO, opts, message, ...args);
       }
     },
 
     warn: (message: string, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.WARN) {
-        logMessage(LogLevel.WARN, opts, message, ...args)
+        logMessage(LogLevel.WARN, opts, message, ...args);
       }
     },
 
     error: (message: string | Error, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.ERROR) {
         if (message instanceof Error) {
-          logMessage(LogLevel.ERROR, opts, message.message, ...args)
-          console.error(message.stack)
+          logMessage(LogLevel.ERROR, opts, message.message, ...args);
+          console.error(message.stack);
         } else {
-          logMessage(LogLevel.ERROR, opts, message, ...args)
+          logMessage(LogLevel.ERROR, opts, message, ...args);
         }
       }
     },
 
     setLevel: (level: LogLevel) => {
-      currentLogLevel = level
+      currentLogLevel = level;
     },
 
     getLevel: () => currentLogLevel,
-  }
+  };
 }
 
 /**

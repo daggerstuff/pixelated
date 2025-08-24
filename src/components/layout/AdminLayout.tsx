@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, FC } from 'react'
 import React from 'react'
 
 interface AdminLayoutProps {
@@ -15,30 +15,38 @@ interface AdminLayoutProps {
 const AdminLayout: FC<AdminLayoutProps> = ({
   title = 'Admin Dashboard',
   children,
-}) => {
+}: AdminLayoutProps) => {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
   return (
     <div className="admin-layout">
+      {/* Mobile sidebar toggle: absolutely placed top-left */}
+      <button
+        className="mobile-sidebar-toggle md:hidden fixed top-4 left-4 z-[51] flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 text-gray-700 dark:text-gray-300 transition-all"
+        aria-label="Toggle sidebar"
+        aria-controls="admin-sidebar"
+        aria-expanded={sidebarOpen}
+        type="button"
+        onClick={() => setSidebarOpen((v) => !v)}
+        style={{ display: 'block' }}
+      >
+        {/* Hamburger/X icon */}
+        <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d={sidebarOpen
+              ? 'M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+              : 'M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'}
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+
       {/* Header would normally be added by the Astro AdminLayout */}
       <header className="bg-white dark:bg-gray-800 shadow-md py-4 px-6 sticky top-0 z-30">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">{title}</h1>
           <div className="flex items-center gap-4">
-            <button className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                ></path>
-              </svg>
-            </button>
             <div className="relative">
               <button className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <img
@@ -46,7 +54,6 @@ const AdminLayout: FC<AdminLayoutProps> = ({
                   src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
                   alt="Admin"
                 />
-
                 <span className="hidden md:inline">Admin</span>
               </button>
             </div>
@@ -55,7 +62,17 @@ const AdminLayout: FC<AdminLayoutProps> = ({
       </header>
 
       {/* Sidebar */}
-      <aside className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 md:translate-x-0">
+      <aside
+        id="admin-sidebar"
+        className={`
+          sidebar dashboard-sidebar
+          fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
+          ${sidebarOpen ? 'translate-x-0 expanded' : '-translate-x-full'}
+          md:translate-x-0 md:expanded
+        `}
+        aria-label="Admin sidebar"
+        aria-hidden={sidebarOpen ? 'false' : 'true'}
+      >
         <div className="h-full px-3 py-4 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center mb-5 p-2">
@@ -135,10 +152,20 @@ const AdminLayout: FC<AdminLayoutProps> = ({
       </aside>
 
       {/* Main content */}
-      <div className="p-4 md:ml-64 pt-20 w-full">
+      <div className="p-4 pt-20 w-full md:ml-64">
         <div className="p-4 border-2 border-gray-200 dark:border-gray-700 border-dashed rounded-lg">
           {children}
         </div>
+        {/* Overlay for sidebar on mobile */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar overlay"
+            tabIndex={-1}
+            role="button"
+          />
+        )}
       </div>
     </div>
   )

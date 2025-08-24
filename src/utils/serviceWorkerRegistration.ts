@@ -32,7 +32,7 @@ export class ServiceWorkerManager {
   private debug: boolean
   private config: typeof defaultConfig
 
-  constructor(config = defaultConfig): void {
+  constructor(config = defaultConfig) {
     this.config = config
     this.debug = config.debug.enabled
   }

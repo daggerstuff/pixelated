@@ -47,51 +47,51 @@ const DEVICE_PRESETS = [
 ]
 
 // Skip mobile compatibility tests in CI environment
-const skipTests = process.env.SKIP_BROWSER_COMPAT_TESTS === 'true'
+const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
 
 // Use conditional test execution for describe blocks
 ;(skipTests ? describe.skip : describe)('Mobile Device Compatibility', () => {
   // Test each device preset on the homepage
   DEVICE_PRESETS.forEach((device) => {
-    test(`Homepage should render properly on ${device.name}`, async ({
-      browser,
-    }) => {
-      const context = await browser.newContext({
-        ...device,
-      })
-      const page = await context.newPage()
-
-      await page.goto(TEST_URLS.home)
-
-      // Verify key elements are visible
-      await expect(page.locator('header')).toBeVisible()
-      await expect(page.locator('footer')).toBeVisible()
-
-      // Check for mobile navigation
-      const isMobile = device.viewport.width < BREAKPOINTS.md
-      if (isMobile) {
-        // Mobile menu button should be visible on small screens
-        await expect(
-          page.locator('button[aria-label="Toggle menu"]'),
-        ).toBeVisible()
-
-        // Nav links should be hidden initially on mobile
-        await expect(page.locator('nav ul')).not.toBeVisible()
-
-        // Test mobile menu opens when clicked
-        await page.locator('button[aria-label="Toggle menu"]').click()
-        await expect(page.locator('nav ul')).toBeVisible()
-      } else {
-        // Nav links should be visible directly on larger screens
-        await expect(page.locator('nav ul')).toBeVisible()
-      }
-
-      // Take a screenshot for visual verification
-      await page.screenshot({
-        path: `./test-results/mobile/${device.name.replace(/\s+/g, '-')}-home.png`,
+      test(`Homepage should render properly on ${device['name']}`, async ({
+        browser,
+      }) => {
+        const context = await browser.newContext({
+          ...device,
+        })
+        const page = await context.newPage()
+  
+        await page.goto(TEST_URLS.home)
+  
+        // Verify key elements are visible
+        await expect(page.locator('header')).toBeVisible()
+        await expect(page.locator('footer')).toBeVisible()
+  
+        // Check for mobile navigation
+        const isMobile = device.viewport.width < BREAKPOINTS.md
+        if (isMobile) {
+          // Mobile menu button should be visible on small screens
+          await expect(
+            page.locator('button[aria-label="Toggle menu"]'),
+          ).toBeVisible()
+  
+          // Nav links should be hidden initially on mobile
+          await expect(page.locator('nav ul')).not.toBeVisible()
+  
+          // Test mobile menu opens when clicked
+          await page.locator('button[aria-label="Toggle menu"]').click()
+          await expect(page.locator('nav ul')).toBeVisible()
+        } else {
+          // Nav links should be visible directly on larger screens
+          await expect(page.locator('nav ul')).toBeVisible()
+        }
+  
+        // Take a screenshot for visual verification
+        await page.screenshot({
+          path: `./test-results/mobile/${device['name'].replace(/\s+/g, '-')}-home.png`,
+        })
       })
     })
-  })
 
   // Test documentation page on mobile (critical for readability)
   test(`Documentation page should be usable on mobile devices`, async ({

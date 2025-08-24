@@ -44,6 +44,15 @@
 - Relaxed network ACL policies
 - Disabled purge protection for development
 
+### 5. Parameter Mismatch in ARM Template
+
+**Problem**: The parameters file didn't match the parameters defined in the Bicep template, causing validation failures.
+
+**Fix**:
+
+- Updated parameters file to match the actual parameters in the Bicep template
+- Added missing parameters: azureLocation, environment, containerRegistryName, containerAppName, appServiceName
+
 ## Key Changes Made
 
 ### infra/main.bicep
@@ -55,6 +64,11 @@
 - ✅ Relaxed Key Vault network policies
 - ✅ Fixed zone redundancy settings
 
+### infra/main.parameters.json
+
+- ✅ Updated parameters to match the Bicep template
+- ✅ Added all required parameters with appropriate values
+
 ### .github/workflows/azure-deployment.yml
 
 - ✅ Removed deployment slot configuration
@@ -65,6 +79,11 @@
 
 - ✅ Updated port configuration to 3000
 - ✅ Updated health check endpoint
+
+### scripts/validate-bicep.sh
+
+- ✅ Improved error handling
+- ✅ Updated to use parameters file directly
 
 ## Testing
 

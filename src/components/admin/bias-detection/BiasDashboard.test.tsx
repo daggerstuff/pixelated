@@ -329,7 +329,10 @@ describe('BiasDashboard', () => {
     fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/New high bias alert/)).toBeInTheDocument()
+      // Use a more flexible matcher since the text might be split across elements
+      expect(screen.getByText((content, element) => {
+        return content.includes('New high bias alert')
+      })).toBeInTheDocument()
     })
   })
 

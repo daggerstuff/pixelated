@@ -16,7 +16,7 @@ export class RateLimiter {
   private redis: typeof kv
   private options: RateLimiterOptions
 
-  constructor(options: RateLimiterOptions): void {
+  constructor(options: RateLimiterOptions) {
     this.options = options
     this.redis = kv
   }

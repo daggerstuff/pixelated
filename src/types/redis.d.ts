@@ -9,12 +9,6 @@ declare module 'ioredis' {
 
     // Sorted set methods
     zadd(key: string, ...args: (number | string | Buffer)[]): Promise<number>
-    zrangebyscore(
-      key: string,
-      min: number | string,
-      max: number | string,
-      withScores?: 'WITHSCORES',
-    ): Promise<string[]>
     zremrangebyscore(
       key: string,
       min: number | string,

@@ -17,7 +17,7 @@ const CLEANUP_INTERVAL = 60 * 60 * 1000 // 1 hour (align with tests)
 function resolveWsPort(): number {
   try {
     // In test environment, check for mocked env values
-    if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+    if (process.env['NODE_ENV'] === 'test' || process.env['VITEST']) {
       const mocked = env as unknown as { ANALYTICS_WS_PORT?: string | number }
       const val = mocked?.ANALYTICS_WS_PORT
       if (val !== undefined) {
@@ -117,7 +117,7 @@ async function startWorker() {
       }
       
       // In test environment, don't auto-schedule the next call to avoid timer issues
-      if (!(process.env.NODE_ENV === 'test' || process.env.VITEST)) {
+      if (!(process.env['NODE_ENV'] === 'test' || process.env['VITEST'])) {
         setTimeout(processEvents, PROCESSING_INTERVAL)
       }
     }
@@ -131,7 +131,7 @@ async function startWorker() {
       }
       
       // In test environment, don't auto-schedule the next call to avoid timer issues
-      if (!(process.env.NODE_ENV === 'test' || process.env.VITEST)) {
+      if (!(process.env['NODE_ENV'] === 'test' || process.env['VITEST'])) {
         setTimeout(cleanup, CLEANUP_INTERVAL)
       }
     }
@@ -140,7 +140,7 @@ async function startWorker() {
     processEvents()
     
     // In test environment, set up cleanup timer manually to avoid recursion issues
-    if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+    if (process.env['NODE_ENV'] === 'test' || process.env['VITEST']) {
       setTimeout(cleanup, CLEANUP_INTERVAL)
     } else {
       cleanup()
@@ -162,7 +162,7 @@ async function shutdown(signal: string): void {
     wss?.close()
 
     // In test environment, exit immediately to avoid timing issues
-    if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+    if (process.env['NODE_ENV'] === 'test' || process.env['VITEST']) {
       process.exit(0)
       return
     }

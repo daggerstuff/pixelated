@@ -153,3 +153,13 @@ variable "common_tags" {
     ManagedBy   = "terraform"
   }
 }
+
+variable "s3_kms_key_id" {
+  description = "KMS key ID for S3 bucket encryption"
+  type        = string
+}
+
+variable "s3_replication_dest_arn" {
+  description = "ARN of the destination S3 bucket for replication"
+  type        = string
+}

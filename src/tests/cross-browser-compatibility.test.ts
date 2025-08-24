@@ -39,7 +39,7 @@ interface CompatibilityResults {
 }
 
 // Skip browser compatibility tests in CI environment
-const skipTests = process.env.SKIP_BROWSER_COMPAT_TESTS === 'true'
+const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
 
 // Use conditional test execution with Playwright's test.describe
 const testGroup = skipTests ? test.describe.skip : test.describe

@@ -12,12 +12,8 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { ConnectionPool, type ConnectionPoolConfig } from './connection-pool'
 import { getCacheService } from '../../services/cacheService'
-import type { 
-  TherapeuticSession, 
-  BiasAnalysisResult, 
-  BiasDetectionConfig,
-  PerformanceMetrics 
-} from './types'
+
+const logger = createBuildSafeLogger('PerformanceOptimizer')
 
 const logger = createBuildSafeLogger('PerformanceOptimizer')
 
@@ -827,7 +823,7 @@ export class PerformanceOptimizer {
    * Get comprehensive performance statistics
    */
   async getPerformanceStats(): Promise<PerformanceStats> {
-    const connectionHealth = await this.connectionManager.healthCheck()
+    const _connectionHealth = await this.connectionManager.healthCheck()
     const memoryStats = this.memoryOptimizer.getStats()
     
     return {
@@ -835,29 +831,37 @@ export class PerformanceOptimizer {
         http: {
           total: 0, // Will be populated from actual pool stats
           active: 0,
-          idle: 0,
-          queue: 0
+          pending: 0,
+          queued: 0,
+          errors: 0
         },
-        redis: {
-          total: 0, // Will be populated from Redis service
+        python: {
+          total: 0,
           active: 0,
-          idle: 0
+          pending: 0,
+          queued: 0,
+          errors: 0
+        },
+        database: {
+          total: 0,
+          active: 0,
+          pending: 0,
+          queued: 0,
+          errors: 0
         }
       },
-      cache: this.cacheManager.getStats(),
-      batch: this.batchProcessor.getStats(),
-      memory: {
-        heapUsed: memoryStats.currentUsage.heapUsed,
-        heapTotal: memoryStats.currentUsage.heapTotal,
-        external: memoryStats.currentUsage.external,
-        rss: memoryStats.currentUsage.rss,
-        gcCount: memoryStats.gcCount
+      memory: memoryStats,
+      cache: {
+        hitRate: this.cacheService.getHitRate(),
+        memoryUsage: this.cacheService.getMemoryUsage(),
+        itemCount: this.cacheService.getItemCount(),
+        evictionCount: this.cacheService.getEvictionCount()
       },
-      performance: {
-        averageResponseTime: 0, // Will be calculated from metrics
-        throughput: 0,
-        errorRate: 0,
-        slowQueries: 0
+      processing: {
+        activeJobs: this.getActiveJobCount(),
+        queueSize: this.getQueueSize(),
+        averageProcessingTime: this.getAverageProcessingTime(),
+        throughput: this.getThroughput()
       }
     }
   }
