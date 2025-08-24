@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 
 const logger = createBuildSafeLogger('auth-verify')

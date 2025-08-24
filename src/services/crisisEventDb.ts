@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Define a specific interface for the crisis event data
 export interface CrisisEventData {

@@ -1,6 +1,6 @@
 
 import { protectRoute } from '../../../../lib/auth/serverAuth'
-import { createBuildSafeLogger } from '../../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createResourceAuditLog, AuditEventType } from '../../../../lib/audit'
 
 export const prerender = false

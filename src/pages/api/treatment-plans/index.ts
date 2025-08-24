@@ -1,6 +1,6 @@
 // import type { APIRoute } from 'astro'
 import { z } from 'zod'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import type { TreatmentPlan } from '../../../types/treatment'
 
 const logger = createBuildSafeLogger('treatment-plans-index')
@@ -46,7 +46,7 @@ const treatmentPlanClientSchema = z.object({
 export const GET = async ({ locals }) => {
   try {
     // TODO: Replace with actual authentication check
-    const user = locals.user
+    const { user } = locals
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
@@ -75,7 +75,7 @@ export const GET = async ({ locals }) => {
 export const POST = async ({ request, locals }) => {
   try {
     // TODO: Replace with actual authentication check
-    const user = locals.user
+    const { user } = locals
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
@@ -105,38 +105,44 @@ export const POST = async ({ request, locals }) => {
 
     // TODO: Replace with actual database implementation
     // For now, return a mock created plan
+    const planId = `plan-${Date.now()}`
+    const currentTime = new Date().toISOString()
+
     const newPlan: TreatmentPlan = {
-      id: `plan-${Date.now()}`,
-      client_id: user.id,
-      therapist_id: user.id,
+      id: planId,
+      clientId: user.id,
+      therapistId: user.id,
       title: planData.title,
       diagnosis: planData.diagnosis || null,
-      start_date: planData.startDate || new Date().toISOString(),
-      end_date: planData.endDate || null,
+      startDate: planData.startDate || currentTime,
+      endDate: planData.endDate || null,
       status: planData.status,
-      general_notes: planData.generalNotes || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      goals: planData.goals.map((goal, index) => ({
-        id: `goal-${Date.now()}-${index}`,
-        treatment_plan_id: `plan-${Date.now()}`,
-        description: goal.description,
-        target_date: goal.targetDate,
-        status: goal.status,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        objectives: goal.objectives.map((objective, objIndex) => ({
-          id: `obj-${Date.now()}-${index}-${objIndex}`,
-          treatment_goal_id: `goal-${Date.now()}-${index}`,
-          description: objective.description,
-          target_date: objective.targetDate,
-          status: objective.status,
-          interventions: objective.interventions,
-          progress_notes: objective.progressNotes,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })),
-      })),
+      generalNotes: planData.generalNotes || null,
+      createdAt: currentTime,
+      updatedAt: currentTime,
+      goals: planData.goals.map((goal, index) => {
+        const goalId = `goal-${Date.now()}-${index}`
+        return {
+          id: goalId,
+          treatmentPlanId: planId,
+          description: goal.description,
+          targetDate: goal.targetDate || null,
+          status: goal.status,
+          createdAt: currentTime,
+          updatedAt: currentTime,
+          objectives: goal.objectives.map((objective, objIndex) => ({
+            id: `obj-${Date.now()}-${index}-${objIndex}`,
+            treatmentGoalId: goalId,
+            description: objective.description,
+            targetDate: objective.targetDate || null,
+            status: objective.status,
+            interventions: objective.interventions,
+            progressNotes: objective.progressNotes || null,
+            createdAt: currentTime,
+            updatedAt: currentTime,
+          })),
+        }
+      }),
     }
 
     return new Response(JSON.stringify(newPlan), { status: 201 })

@@ -3,7 +3,7 @@ import { EmotionLlamaProvider } from '../../lib/ai/providers/EmotionLlamaProvide
 import { fheService } from '../../lib/fhe'
 import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
 import { useSimulatorContext } from '../context/SimulatorContext'
-import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('useEmotionDetection')
 

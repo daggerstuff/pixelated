@@ -1,11 +1,11 @@
 /// <reference types="vitest/globals" />
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
 import type {
-  TherapeuticSession as SessionData,
-  BiasMetricsConfig,
   BiasAlertConfig,
-  BiasReportConfig,
   BiasExplanationConfig,
+  BiasMetricsConfig,
+  BiasReportConfig,
+  TherapeuticSession as SessionData,
 } from '../types'
 
 // Local type for engine config (matches mockConfig structure)
@@ -603,19 +603,20 @@ describe('BiasDetectionEngine', () => {
   describe('Error Handling', () => {
     it('should handle Python service errors gracefully', async () => {
       await biasEngine.initialize()
-      // Mock all layer methods to reject to simulate Python service failure
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Python service unavailable'))
-      biasEngine.pythonService.runModelLevelAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Python service unavailable'))
-      biasEngine.pythonService.runInteractiveAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Python service unavailable'))
-      biasEngine.pythonService.runEvaluationAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Python service unavailable'))
+
+      // Override methods to throw errors using a different approach
+      biasEngine.pythonService.runPreprocessingAnalysis = async () => {
+        throw new Error('Python service unavailable')
+      }
+      biasEngine.pythonService.runModelLevelAnalysis = async () => {
+        throw new Error('Python service unavailable')
+      }
+      biasEngine.pythonService.runInteractiveAnalysis = async () => {
+        throw new Error('Python service unavailable')
+      }
+      biasEngine.pythonService.runEvaluationAnalysis = async () => {
+        throw new Error('Python service unavailable')
+      }
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)
@@ -633,24 +634,27 @@ describe('BiasDetectionEngine', () => {
       // Overall bias score should be 0.5 (weighted average of all 0.5s)
       expect(result.overallBiasScore).toBe(0.5)
       // Should include fallback recommendations
-      expect(result.recommendations.some(rec => rec.includes('fallback'))).toBe(true)
+      expect(
+        result.recommendations.some((rec) => rec.includes('fallback')),
+      ).toBe(true)
     })
 
     it('should provide fallback analysis when toolkits are unavailable', async () => {
       await biasEngine.initialize()
-      // Mock toolkit unavailability by making services fail, which triggers fallback
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Toolkit unavailable'))
-      biasEngine.pythonService.runModelLevelAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Toolkit unavailable'))
-      biasEngine.pythonService.runInteractiveAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Toolkit unavailable'))
-      biasEngine.pythonService.runEvaluationAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Toolkit unavailable'))
+
+      // Override methods to throw errors using direct function assignment
+      biasEngine.pythonService.runPreprocessingAnalysis = async () => {
+        throw new Error('Toolkit unavailable')
+      }
+      biasEngine.pythonService.runModelLevelAnalysis = async () => {
+        throw new Error('Toolkit unavailable')
+      }
+      biasEngine.pythonService.runInteractiveAnalysis = async () => {
+        throw new Error('Toolkit unavailable')
+      }
+      biasEngine.pythonService.runEvaluationAnalysis = async () => {
+        throw new Error('Toolkit unavailable')
+      }
 
       const result = await biasEngine.analyzeSession(mockSessionData)
 
@@ -851,26 +855,20 @@ describe('BiasDetectionEngine', () => {
   describe('Service Communication Errors', () => {
     it('should handle network timeout errors', async () => {
       await biasEngine.initialize()
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockRejectedValue(
-          new Error('TIMEOUT: Request timed out after 30 seconds'),
-        )
-      biasEngine.pythonService.runModelLevelAnalysis = vi
-        .fn()
-        .mockRejectedValue(
-          new Error('TIMEOUT: Request timed out after 30 seconds'),
-        )
-      biasEngine.pythonService.runInteractiveAnalysis = vi
-        .fn()
-        .mockRejectedValue(
-          new Error('TIMEOUT: Request timed out after 30 seconds'),
-        )
-      biasEngine.pythonService.runEvaluationAnalysis = vi
-        .fn()
-        .mockRejectedValue(
-          new Error('TIMEOUT: Request timed out after 30 seconds'),
-        )
+
+      // Override methods to throw errors using direct function assignment
+      biasEngine.pythonService.runPreprocessingAnalysis = async () => {
+        throw new Error('TIMEOUT: Request timed out after 30 seconds')
+      }
+      biasEngine.pythonService.runModelLevelAnalysis = async () => {
+        throw new Error('TIMEOUT: Request timed out after 30 seconds')
+      }
+      biasEngine.pythonService.runInteractiveAnalysis = async () => {
+        throw new Error('TIMEOUT: Request timed out after 30 seconds')
+      }
+      biasEngine.pythonService.runEvaluationAnalysis = async () => {
+        throw new Error('TIMEOUT: Request timed out after 30 seconds')
+      }
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)
@@ -890,11 +888,11 @@ describe('BiasDetectionEngine', () => {
 
     it('should handle partial layer failures', async () => {
       await biasEngine.initialize()
-      // Only preprocessing fails, others succeed
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('Preprocessing service unavailable'))
-      // Other layers work normally (keep default mocks)
+
+      // Only preprocessing fails, others succeed (keep default mocks)
+      biasEngine.pythonService.runPreprocessingAnalysis = async () => {
+        throw new Error('Preprocessing service unavailable')
+      }
 
       const result = await biasEngine.analyzeSession(mockSessionData)
 
@@ -908,11 +906,10 @@ describe('BiasDetectionEngine', () => {
 
     it('should handle malformed Python service responses', async () => {
       await biasEngine.initialize()
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockRejectedValue(
-          new Error('Invalid response format: missing required fields'),
-        )
+
+      biasEngine.pythonService.runPreprocessingAnalysis = async () => {
+        throw new Error('Invalid response format: missing required fields')
+      }
 
       const result = await biasEngine.analyzeSession(mockSessionData)
 
@@ -925,12 +922,11 @@ describe('BiasDetectionEngine', () => {
 
     it('should handle service overload scenarios', async () => {
       await biasEngine.initialize()
+
       // Mock 503 Service Unavailable
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockRejectedValue(
-          new Error('503: Service temporarily overloaded, please retry'),
-        )
+      biasEngine.pythonService.runPreprocessingAnalysis = async () => {
+        throw new Error('503: Service temporarily overloaded, please retry')
+      }
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)
@@ -942,9 +938,10 @@ describe('BiasDetectionEngine', () => {
 
     it('should handle authentication failures', async () => {
       await biasEngine.initialize()
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockRejectedValue(new Error('401: Authentication required'))
+
+      biasEngine.pythonService.runPreprocessingAnalysis = async () => {
+        throw new Error('401: Authentication required')
+      }
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)
@@ -1208,10 +1205,10 @@ describe('BiasDetectionEngine', () => {
 
     it('should create audit logs when enabled', async () => {
       await biasEngine.initialize()
-      
+
       // Ensure the mock method exists and is callable
       expect(biasEngine['metricsCollector'].storeAnalysisResult).toBeDefined()
-      
+
       await biasEngine.analyzeSession(mockSessionData)
 
       // Verify analysis was recorded (which may include audit logs)
@@ -1225,13 +1222,16 @@ describe('BiasDetectionEngine', () => {
       })
       await noAuditEngine.initialize()
 
-      // Ensure the mock method exists and is callable
-      expect(noAuditEngine['metricsCollector'].storeAnalysisResult).toBeDefined()
+      // Create a spy on the specific engine's metrics collector
+      const storeAnalysisResultSpy = vi.spyOn(
+        noAuditEngine['metricsCollector'],
+        'storeAnalysisResult',
+      )
 
       await noAuditEngine.analyzeSession(mockSessionData)
 
-      // Should still store analysis results
-      expect(mockMetricsCollector.storeAnalysisResult).toHaveBeenCalled()
+      // Should still store analysis results (the engine's metrics collector should be called)
+      expect(storeAnalysisResultSpy).toHaveBeenCalled()
     })
   })
 
@@ -1348,9 +1348,9 @@ describe('BiasDetectionEngine', () => {
         fixtureScenarios.elderlyPatient,
       )
 
-  expect(result.demographics).toBeDefined()
-  expect(result.demographics?.['age']).toBeDefined()
-  expect(result.demographics?.['gender']).toBeDefined()
+      expect(result.demographics).toBeDefined()
+      expect(result.demographics?.['age']).toBeDefined()
+      expect(result.demographics?.['gender']).toBeDefined()
       expect(result.layerResults).toBeDefined()
       expect(result.recommendations).toBeDefined()
     })

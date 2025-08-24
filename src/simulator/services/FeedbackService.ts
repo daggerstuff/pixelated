@@ -7,7 +7,7 @@ import { TherapeuticTechnique, FeedbackType } from '../types'
 // TensorFlow.js imports moved to dynamic imports to reduce bundle size
 // import * as tf from '@tensorflow/tfjs'
 // import { loadLayersModel } from '@tensorflow/tfjs-layers'
-import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createMentalLLaMAFromEnv } from '../../lib/ai/mental-llama'
 import { createTogetherAIService } from '../../lib/ai/services/together'
 import type { MentalLLaMAAdapter } from '../../lib/ai/mental-llama/MentalLLaMAAdapter'

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '../../../lib/auth'
 
 // Create logger instance

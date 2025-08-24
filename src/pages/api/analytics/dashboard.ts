@@ -5,7 +5,7 @@
  * with proper error handling, validation, and HIPAA compliance.
  */
 
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
 import { EventType } from '@/lib/services/analytics/analytics-types'
 import type {

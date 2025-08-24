@@ -1,0 +1,21 @@
+{
+  "initialized": true,
+  "version": "1.0.0",
+  "workspace": {
+    "name": "pixelated-empathy",
+    "type": "fullstack",
+    "framework": "astro",
+    "language": "typescript"
+  },
+  "preferences": {
+    "autoSave": true,
+    "formatOnSave": true,
+    "linting": true
+  },
+  "features": {
+    "steering": true,
+    "hooks": true,
+    "specs": true,
+    "mcp": true
+  }
+}

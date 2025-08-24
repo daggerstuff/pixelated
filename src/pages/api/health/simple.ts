@@ -5,7 +5,7 @@ export const prerender = false
  * Returns basic service status without external dependencies
  */
 export const GET = async () => {
-  const startTime = performance.now()
+  const startTime = Date.now()
 
   try {
     // Basic health response without external dependencies
@@ -14,12 +14,15 @@ export const GET = async () => {
       timestamp: new Date().toISOString(),
       service: 'pixelated-astro-app',
       version: '1.0.0',
-      uptime: process.uptime(),
-      memory: {
-        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-      },
-      responseTimeMs: Math.round(performance.now() - startTime),
+      uptime: typeof process !== 'undefined' ? process.uptime() : 0,
+      memory:
+        typeof process !== 'undefined'
+          ? {
+              used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+              total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+            }
+          : { used: 0, total: 0 },
+      responseTimeMs: Date.now() - startTime,
     }
 
     return new Response(JSON.stringify(healthStatus, null, 2), {
@@ -34,8 +37,8 @@ export const GET = async () => {
       JSON.stringify({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? String(error) : String(error),
-        responseTimeMs: Math.round(performance.now() - startTime),
+        error: error instanceof Error ? error.message : String(error),
+        responseTimeMs: Date.now() - startTime,
       }),
       {
         status: 503,

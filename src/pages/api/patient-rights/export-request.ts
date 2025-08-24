@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { protectApi } from '../../../lib/auth/apiAuth'
 import type { ExportFormat } from '../../../lib/services/patient-rights/dataPortabilityService'
 import { createDataExportRequest } from '../../../lib/services/patient-rights/dataPortabilityService'

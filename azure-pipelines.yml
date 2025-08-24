@@ -82,6 +82,17 @@ stages:
                 pnpm | "$(Agent.OS)"
               path: $(Agent.WorkFolder)/.pnpm-store
 
+          - script: |
+              # Install dependencies with optimizations
+              pnpm install --frozen-lockfile --prefer-offline
+            displayName: Install dependencies
+
+          - script: |
+              # Ensure cache directories exist before cache task
+              mkdir -p node_modules/.astro .astro
+              echo "Created cache directories for Astro build artifacts"
+            displayName: Create cache directories
+
           - task: Cache@2
             displayName: Cache Astro build artifacts
             inputs:
@@ -91,11 +102,6 @@ stages:
               path: |
                 node_modules/.astro
                 .astro
-
-          - script: |
-              # Install dependencies with optimizations
-              pnpm install --frozen-lockfile --prefer-offline
-            displayName: Install dependencies
 
           - script: |
               # Build with optimizations and cache configuration

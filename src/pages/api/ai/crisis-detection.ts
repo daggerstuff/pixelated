@@ -13,7 +13,7 @@ import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
 import { getAIServiceByProvider } from '@/lib/ai/providers'
 import { getSession } from '@/lib/auth/session'
 import type { SessionData } from '@/lib/auth/session'
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   createAuditLog,
   AuditEventType,

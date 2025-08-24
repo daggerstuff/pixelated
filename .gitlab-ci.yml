@@ -43,12 +43,12 @@ validate-runner:
     - docker --version
     - docker info
     - echo "✅ Docker is available and working"
-    - echo "Runner: $CI_RUNNER_DESCRIPTION"
-    - echo "Executor: $CI_RUNNER_EXECUTOR"
+    - echo "Runner:" $CI_RUNNER_DESCRIPTION
+    - echo "Executor:" $CI_RUNNER_EXECUTOR
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
     - if: '$CI_COMMIT_BRANCH == "main"'
-    - if: '$CI_MERGE_REQUEST_ID'
+    - if: "$CI_MERGE_REQUEST_ID"
 
 # Build frontend container
 build-frontend:

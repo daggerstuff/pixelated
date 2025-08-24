@@ -26,8 +26,8 @@ ENV NODE_ENV="production"
 ENV ASTRO_TELEMETRY_DISABLED=1
 ENV ASTRO_CACHE_DIR=/tmp/.astro
 ENV VITE_CACHE_DIR=/tmp/.vite
-ENV PORT=4321
-ENV WEBSITES_PORT=4321
+ENV PORT=3000
+ENV WEBSITES_PORT=3000
 
 RUN groupadd --gid 1001 astro && \
     useradd --uid 1001 --gid astro --shell /bin/bash --create-home astro
@@ -49,7 +49,7 @@ RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
 FROM base
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:4321/api/health/simple || exit 1
+    CMD curl -f http://localhost:3000/api/health/simple || exit 1
 
 USER astro
 
@@ -59,6 +59,6 @@ RUN mkdir -p /app/node_modules/.astro /tmp/.astro && \
     chown -R astro:astro /app /tmp/.astro && \
     chmod -R 777 /app/node_modules/.astro /tmp/.astro
 
-EXPOSE 4321
+EXPOSE 3000
 
 CMD ["node", "scripts/robust-server.js"]

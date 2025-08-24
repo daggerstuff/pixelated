@@ -1,0 +1,120 @@
+# syntax = docker/dockerfile:1
+
+ARG NODE_VERSION=22
+FROM node:${NODE_VERSION}-alpine AS base
+
+LABEL org.opencontainers.image.description="Pixelated Empathy - Production"
+
+# Install pnpm
+ARG PNPM_VERSION=10.15.0
+RUN npm install -g pnpm@$PNPM_VERSION
+
+# Install only essential system dependencies
+RUN apk add --no-cache \
+    curl \
+    ca-certificates \
+    && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+ENV NODE_ENV="production"
+ENV ASTRO_TELEMETRY_DISABLED=1
+ENV ASTRO_CACHE_DIR=/tmp/.astro
+ENV VITE_CACHE_DIR=/tmp/.vite
+ENV PORT=4321
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+# Create non-root user
+RUN addgroup -g 1001 -S astro && \
+    adduser -S astro -u 1001 -G astro
+
+FROM base AS deps
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Create minimal package.json for production dependencies only
+RUN node -e "
+const pkg = require('./package.json');
+const prodPkg = {
+  name: pkg.name,
+  version: pkg.version,
+  type: pkg.type,
+  dependencies: {
+    // Core runtime dependencies only
+    'astro': pkg.dependencies.astro || pkg.devDependencies.astro,
+    '@astrojs/node': pkg.dependencies['@astrojs/node'],
+    '@astrojs/react': pkg.dependencies['@astrojs/react'],
+    'react': pkg.dependencies.react,
+    'react-dom': pkg.dependencies['react-dom'],
+    // Essential utilities
+    'clsx': pkg.dependencies.clsx,
+    'nanoid': pkg.dependencies.nanoid,
+    'zod': pkg.dependencies.zod,
+    // Database connections
+    'mongodb': pkg.dependencies.mongodb,
+    'redis': pkg.dependencies.redis,
+    'pg': pkg.dependencies.pg,
+    // Security
+    'bcryptjs': pkg.dependencies.bcryptjs,
+    'jsonwebtoken': pkg.dependencies.jsonwebtoken,
+    // HTTP client
+    'axios': pkg.dependencies.axios,
+    // Date utilities
+    'date-fns': pkg.dependencies['date-fns']
+  },
+  scripts: {
+    start: pkg.scripts.start
+  }
+};
+require('fs').writeFileSync('./package.prod.json', JSON.stringify(prodPkg, null, 2));
+"
+
+# Install only production dependencies
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm config set store-dir /pnpm/store && \
+    mv package.prod.json package.json && \
+    pnpm install --frozen-lockfile --prod
+
+FROM base AS build
+
+# Copy full dependencies for build
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm config set store-dir /pnpm/store && \
+    pnpm install --frozen-lockfile
+
+# Copy source files
+COPY src ./src
+COPY public ./public
+COPY astro.config.mjs ./
+COPY tsconfig.json ./
+COPY tailwind.config.ts ./
+COPY uno.config.ts ./
+
+# Build the application
+RUN pnpm build
+
+FROM base AS runtime
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:4321/api/health/simple || exit 1
+
+USER astro
+
+# Copy production dependencies
+COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules
+COPY --from=deps --chown=astro:astro /app/package.json ./
+
+# Copy built application
+COPY --from=build --chown=astro:astro /app/dist ./dist
+
+# Create minimal start script
+RUN echo '#!/bin/sh\nnode ./dist/server/entry.mjs' > start.sh && \
+    chmod +x start.sh
+
+EXPOSE 4321
+
+CMD ["./start.sh"]

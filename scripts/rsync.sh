@@ -6,13 +6,13 @@
 set -e
 
 # Configuration
-VPS_HOST=${1:-"209.208.79.191"}
-VPS_USER=${2:-"vivi"}
+VPS_HOST=${1:-"45.55.211.39"}
+VPS_USER=${2:-"root"}
 VPS_PORT=${3:-"22"}
-SSH_KEY=${4:-""}
+SSH_KEY=${4:-"~/.ssh/planet"}
 DOMAIN=${5:-"pixelatedempathy.com"}
 LOCAL_PROJECT_DIR="/home/vivi/pixelated"
-REMOTE_PROJECT_DIR="/home/vivi/pixelated"
+REMOTE_PROJECT_DIR="/root/pixelated"
 
 # Colors
 RED='\033[0;31m'
@@ -33,7 +33,7 @@ show_usage() {
     echo "Examples:"
     echo "  $0"
     echo "  $0 208.117.84.253 root 22"
-    echo "  $0 208.117.84.253 root 22 ~/.ssh/atlanta pixelatedempathy.com"
+    echo "  $0 208.117.84.253 root 22 ~/.ssh/planet pixelatedempathy.com"
     echo ""
     echo "This script syncs the entire project to VPS and sets up deployment"
     exit 1
@@ -96,6 +96,26 @@ ai/*.pkl
 docker-compose.override.yml
 temp/
 tmp/
+# Exclude massive AI training data files
+ai/datasets/
+ai/data/
+ai/database/
+ai/pipelines/data/
+ai/dataset_pipeline/
+ai/temporal_analysis_data*.jsonl
+ai/*.jsonl
+ai/*.csv
+ai/*.npy
+ai/*.db
+ai/*.sqlite
+ai/*.sqlite3
+# Exclude other large files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.bak
+*.backup
 EOF
 
 print_status "✅ Rsync exclusions prepared"

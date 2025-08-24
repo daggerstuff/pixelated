@@ -1,7 +1,10 @@
+import * as loggerModule from '../../../logging/build-safe-logger'
 import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { WebSocket } from 'ws'
 import { AnalyticsService } from '../AnalyticsService'
-import { EventPriority, EventType, EventDataSchema } from '../analytics-types'
+import { EventDataSchema, EventPriority, EventType } from '../analytics-types'
+// Import mocks after they're defined
+import * as redisModule from '@/lib/redis'
 
 // Mock dependencies first to avoid hoisting issues
 vi.mock('@/lib/redis', () => {
@@ -43,18 +46,43 @@ vi.mock('@/lib/utils/logger', () => {
   }
 })
 
+vi.mock('../../../logging/build-safe-logger', () => {
+  const mockLogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  }
+
+  return {
+    createBuildSafeLogger: vi.fn(() => mockLogger),
+    mockLogger, // Export for test use
+  }
+})
+
 // Mock WebSocket
 class MockWebSocket {
   public readonly url: string
   public readyState: number = 1
+  private eventHandlers: Map<string, Function[]> = new Map()
 
   constructor(url: string): void {
     this.url = url
   }
 
   public send = vi.fn()
-  public emit = vi.fn()
-  public on = vi.fn()
+
+  public emit = vi.fn((event: string, ...args: any[]) => {
+    const handlers = this.eventHandlers.get(event) || []
+    handlers.forEach((handler) => handler(...args))
+  })
+
+  public on = vi.fn((event: string, handler: Function) => {
+    if (!this.eventHandlers.has(event)) {
+      this.eventHandlers.set(event, [])
+    }
+    this.eventHandlers.get(event)!.push(handler)
+  })
 }
 
 vi.mock('ws', () => ({
@@ -63,8 +91,6 @@ vi.mock('ws', () => ({
     .mockImplementation((url: string) => new MockWebSocket(url)),
 }))
 
-// Import mocks after they're defined
-import * as redisModule from '@/lib/redis'
 type MockRedisClient = {
   lpush: ReturnType<typeof vi.fn>
   rpoplpush: ReturnType<typeof vi.fn>
@@ -83,6 +109,14 @@ type MockRedisClient = {
 }
 const { mockRedisClient } = vi.mocked(redisModule) as unknown as {
   mockRedisClient: MockRedisClient
+}
+const { mockLogger } = vi.mocked(loggerModule) as unknown as {
+  mockLogger: {
+    info: ReturnType<typeof vi.fn>
+    error: ReturnType<typeof vi.fn>
+    warn: ReturnType<typeof vi.fn>
+    debug: ReturnType<typeof vi.fn>
+  }
 }
 
 describe('analyticsService', () => {
@@ -125,7 +159,7 @@ describe('analyticsService', () => {
       const testData = { type: EventType.USER_ACTION }
       console.log('EventType.USER_ACTION:', EventType.USER_ACTION)
       console.log('Test data:', testData)
-      
+
       try {
         const result = EventDataSchema.parse(testData)
         console.log('Schema validation result:', result)
@@ -267,8 +301,7 @@ describe('analyticsService', () => {
 
       await analyticsService.processEvents()
 
-      const logger = createBuildSafeLogger('analytics')
-      expect(logger.error).toHaveBeenCalledWith(
+      expect(mockLogger.error).toHaveBeenCalledWith(
         'Error processing event:',
         expect.any(Error),
       )
@@ -398,9 +431,10 @@ describe('analyticsService', () => {
         new Error('Cleanup error'),
       )
 
-      await expect(analyticsService.cleanup()).rejects.toThrow('Cleanup error')
-      const logger = createBuildSafeLogger('analytics')
-      expect(logger.error).toHaveBeenCalledWith(
+      await expect(analyticsService.cleanup()).rejects.toThrow(
+        'Cleanup operation failed',
+      )
+      expect(mockLogger.error).toHaveBeenCalledWith(
         'Error in analytics cleanup:',
         expect.any(Error),
       )

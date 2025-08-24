@@ -4,7 +4,7 @@ set -euo pipefail
 # Qwen3 terminal CLI for your OpenAI-compatible endpoint (LiteLLM)
 # Requirements:
 #   - export QWEN_API_KEY=... (required)
-#   - export QWEN_API_BASE=http://209.208.79.191:8080/v1 (optional; default below)
+#   - export QWEN_API_BASE=http://45.55.211.39:8080/v1 (optional; default below)
 #   - jq installed
 # Usage:
 #   scripts/qwen-cli.sh "Your prompt here"
@@ -14,7 +14,7 @@ set -euo pipefail
 #   scripts/qwen-cli.sh --file path/to/file.py "Review this file"
 #   scripts/qwen-cli.sh --repl
 
-API_BASE=${QWEN_API_BASE:-"http://209.208.79.191:8080/v1"}
+API_BASE=${QWEN_API_BASE:-"http://45.55.211.39:8080/v1"}
 MODEL=${QWEN_MODEL:-"qwen3-coder"}
 SYSTEM=${QWEN_SYSTEM:-""}
 STREAM=0

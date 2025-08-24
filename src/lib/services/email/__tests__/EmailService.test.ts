@@ -1,5 +1,14 @@
 import { EmailService } from '../EmailService'
 
+// Mock environment configuration
+vi.mock('@/lib/env', () => ({
+  env: {
+    email: {
+      resendApiKey: vi.fn(() => 'test-api-key')
+    }
+  }
+}))
+
 // Create mock implementation of Redis methods
 const mockRedisMethods = {
   lpush: vi.fn(),

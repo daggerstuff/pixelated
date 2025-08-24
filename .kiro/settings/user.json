@@ -1,0 +1,14 @@
+{
+  "setupComplete": true,
+  "lastSetupVersion": "1.0.0",
+  "setupTimestamp": "2025-01-23T00:00:00.000Z",
+  "preferences": {
+    "theme": "dark",
+    "fontSize": 14,
+    "tabSize": 2,
+    "wordWrap": true
+  },
+  "extensions": {
+    "enabled": []
+  }
+}
