@@ -1,0 +1,16 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  name?: string;
+  [key: string]: any;
+}
+
+const { name, ...rest } = Astro.props as Props;
+const safeName =
+  !name || name === '-' || typeof name !== "string" || name.trim() === ''
+    ? "i-uil:question"
+    : name;
+---
+
+<Icon name={safeName} {...rest} />

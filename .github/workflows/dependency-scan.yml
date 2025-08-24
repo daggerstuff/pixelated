@@ -61,4 +61,4 @@ jobs:
         run: uv pip install --upgrade pip pip-audit
 
       - name: Run pip-audit
-        run: uv run pip-audit
+        run: uv run pip-audit --format=columns

@@ -27,6 +27,10 @@
 # -----------------------------------------------------------
 name: Deploy to VPS
 
+permissions:
+  contents: read
+  id-token: write
+
 on:
   push:
     branches:

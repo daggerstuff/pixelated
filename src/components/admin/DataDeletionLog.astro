@@ -1,6 +1,6 @@
 ---
 // DataDeletionLog.astro - Tracks all data deletion requests and their outcomes
-import { Icon } from 'astro-icon/components'
+import SafeIcon from '../ui/SafeIcon.astro'
 import DataDeletionRequestForm from './DataDeletionRequestForm.astro'
 
 // Define types for request data
@@ -126,7 +126,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
       </p>
       <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">7</p>
       <div class="flex items-center mt-4 text-green-500 dark:text-green-400">
-        <Icon name="trending-up" class="w-4 h-4 mr-1" />
+        <SafeIcon name="trending-up" class="w-4 h-4 mr-1" />
         <span class="text-sm font-medium">+3 from last month</span>
       </div>
     </div>
@@ -149,7 +149,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
         1.8 days
       </p>
       <div class="flex items-center mt-4 text-green-500 dark:text-green-400">
-        <Icon name="trending-down" class="w-4 h-4 mr-1" />
+        <SafeIcon name="trending-down" class="w-4 h-4 mr-1" />
         <span class="text-sm font-medium">-0.5 days from last month</span>
       </div>
     </div>
@@ -173,7 +173,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
       class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-700 dark:hover:bg-red-600 flex items-center"
       aria-label="Create new deletion request"
     >
-      <Icon name="plus" class="w-5 h-5 mr-2" />
+      <SafeIcon name="plus" class="w-5 h-5 mr-2" />
       New Deletion Request
     </button>
   </div>
@@ -186,7 +186,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
       <div
         class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
       >
-        <Icon name="search" class="h-5 w-5 text-gray-400" />
+        <SafeIcon name="search" class="h-5 w-5 text-gray-400" />
       </div>
       <input
         type="text"
@@ -224,7 +224,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
         type="button"
         class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
       >
-        <Icon name="calendar" class="w-5 h-5 mr-2" />
+        <SafeIcon name="calendar" class="w-5 h-5 mr-2" />
         Date Range
       </button>
     </div>
@@ -335,7 +335,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
                     class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                     aria-label="View details"
                   >
-                    <Icon name="eye" class="w-5 h-5" />
+                    <SafeIcon name="eye" class="w-5 h-5" />
                   </button>
 
                   {request.status === 'pending' && (
@@ -346,7 +346,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
                       data-request-id={request.id}
                       data-action="approve"
                     >
-                      <Icon name="check" class="w-5 h-5" />
+                      <SafeIcon name="check" class="w-5 h-5" />
                     </button>
                   )}
 
@@ -358,7 +358,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
                       data-request-id={request.id}
                       data-action="deny"
                     >
-                      <Icon name="x" class="w-5 h-5" />
+                      <SafeIcon name="x" class="w-5 h-5" />
                     </button>
                   )}
                 </div>
@@ -434,7 +434,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
           aria-label="Close modal"
         >
           <span class="sr-only">Close</span>
-          <Icon name="x" class="h-6 w-6" />
+          <SafeIcon name="x" class="h-6 w-6" />
         </button>
       </div>
 
@@ -487,7 +487,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
     })
 
     // Escape key closes modal
-    document.addEventListener('keydown', (event: Event) => {
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !modal?.classList.contains('hidden')) {
         modal?.classList.add('hidden')
         document.body.classList.remove('overflow-hidden')

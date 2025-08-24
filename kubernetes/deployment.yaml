@@ -32,26 +32,7 @@ spec:
         env:
         - name: NODE_ENV
           value: "production"
-        - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: pixelated-secrets
-              key: db-host
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: pixelated-secrets
-              key: db-password
-        - name: REDIS_HOST
-          valueFrom:
-            secretKeyRef:
-              name: pixelated-secrets
-              key: redis-host
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: pixelated-secrets
-              key: jwt-secret
+        # Remove all secretKeyRef env and instead mount pixelated-secrets as a volume at /app/secrets
         resources:
           requests:
             memory: "256Mi"
@@ -77,6 +58,9 @@ spec:
         - name: config-volume
           mountPath: /app/config
           readOnly: true
+        - name: secrets-volume
+          mountPath: /app/secrets
+          readOnly: true
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -89,6 +73,9 @@ spec:
       - name: config-volume
         configMap:
           name: pixelated-config
+      - name: secrets-volume
+        secret:
+          secretName: pixelated-secrets
       imagePullSecrets:
       - name: regcred
       automountServiceAccountToken: false

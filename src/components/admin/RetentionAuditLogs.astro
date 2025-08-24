@@ -1,7 +1,7 @@
 ---
 // RetentionAuditLogs.astro
 // Component for displaying audit logs related to data retention, archiving, and destruction
-import { Icon } from 'astro-icon/components'
+import SafeIcon from '../ui/SafeIcon.astro'
 function formatDate(dateInput: any, options: any = {}) {
   if (!dateInput) return '-';
   const date = new Date(dateInput);
@@ -221,7 +221,7 @@ const getStatusBadge = (status: string) => {
             type="button"
             class="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
           >
-            <Icon name="download" class="w-4 h-4 mr-1" />
+            <SafeIcon name="download" class="w-4 h-4 mr-1" />
             Export Logs
           </button>
 
@@ -229,7 +229,7 @@ const getStatusBadge = (status: string) => {
             type="button"
             class="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
           >
-            <Icon name="refresh" class="w-4 h-4 mr-1" />
+            <SafeIcon name="refresh" class="w-4 h-4 mr-1" />
             Refresh
           </button>
         </div>
@@ -262,7 +262,7 @@ const getStatusBadge = (status: string) => {
                 </td>
                 <td class="py-3 px-4">
                   <div class="flex items-center">
-                    <Icon
+                    <SafeIcon
                       name={getActionIcon(log.action)}
                       class="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400"
                     />
@@ -303,7 +303,7 @@ const getStatusBadge = (status: string) => {
                     data-log-id={log.id}
                     aria-label="View details"
                   >
-                    <Icon name="eye" class="w-5 h-5" />
+                    <SafeIcon name="eye" class="w-5 h-5" />
                   </button>
                 </td>
               </tr>

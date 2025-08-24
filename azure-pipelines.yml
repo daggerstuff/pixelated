@@ -169,7 +169,7 @@ stages:
           name: "azure-infrastructure"
         pool:
           name: "Default"
-        container: mcr.microsoft.com/azure-cli:2.73.0
+        container: mcr.microsoft.com/azure-cli@sha256:eb77b4c7844d8a6c7e8a7ba0a3f1041c5b8359af52d7cffc3c6b6fa804a82940
         strategy:
           runOnce:
             deploy:
@@ -267,7 +267,7 @@ stages:
         displayName: Build and Push Docker Image
         pool:
           name: "Default"
-        container: mcr.microsoft.com/azure-cli:2.73.0
+        container: mcr.microsoft.com/azure-cli@sha256:eb77b4c7844d8a6c7e8a7ba0a3f1041c5b8359af52d7cffc3c6b6fa804a82940
         steps:
           - script: |
               set -e
@@ -535,7 +535,7 @@ stages:
           name: azure-production
         pool:
           name: "Default"
-        container: mcr.microsoft.com/azure-cli:2.73.0
+        container: mcr.microsoft.com/azure-cli@sha256:eb77b4c7844d8a6c7e8a7ba0a3f1041c5b8359af52d7cffc3c6b6fa804a82940
         strategy:
           runOnce:
             deploy:
@@ -806,7 +806,7 @@ stages:
           name: azure-production
         pool:
           name: "Default"
-        container: mcr.microsoft.com/azure-cli:2.73.0
+        container: mcr.microsoft.com/azure-cli@sha256:eb77b4c7844d8a6c7e8a7ba0a3f1041c5b8359af52d7cffc3c6b6fa804a82940
         strategy:
           runOnce:
             deploy:
