@@ -4,7 +4,7 @@ services:
     environment:
       - NODE_ENV=production
     ports:
-      - "3000:3000"
+      - "4321:4321"
     deploy:
       replicas: 3
       resources:
@@ -19,7 +19,7 @@ services:
         delay: 5s
         max_attempts: 3
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:4321/api/health/simple"]
       interval: 30s
       timeout: 10s
       retries: 3
