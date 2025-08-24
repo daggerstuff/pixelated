@@ -7,7 +7,7 @@ import { join } from 'node:path'
 /**
  * Slugify a string
  */
-export function slug(text: string): void {
+export function slug(text: string): string {
   return text
     .toString()
     .toLowerCase()
@@ -138,7 +138,7 @@ export function unescapeHTML(node: VNode): VNode {
 /**
  * Validate navbar layout
  */
-export function validateNavBarLayout(layout: NavBarLayout): void {
+export function validateNavBarLayout(layout: NavBarLayout): { isValid: boolean; message: string } {
   const totalItems = layout.left.length + layout.right.length
   return {
     isValid: totalItems > 0 && totalItems <= 5,

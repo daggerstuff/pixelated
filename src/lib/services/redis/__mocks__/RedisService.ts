@@ -257,24 +257,6 @@ export class RedisService extends EventEmitter implements IRedisService {
     return existed ? 0 : 1
   }
 
-  async zrangebyscore(key: string, min: string | number, max: string | number): void {
-    const zset = zsetStore.get(key)
-    if (!zset) {
-      return []
-    }
-
-    const minScore = min === '-inf' ? Number.NEGATIVE_INFINITY : Number(min)
-    const maxScore = max === '+inf' ? Number.POSITIVE_INFINITY : Number(max)
-
-    const result: string[] = []
-    zset.forEach((score, member) => {
-      if (score >= minScore && score <= maxScore) {
-        result.push(member)
-      }
-    })
-
-    return result
-  }
 
   async zremrangebyscore(
     key: string,

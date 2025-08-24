@@ -24,6 +24,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
+
+// Lazy load the charts component to reduce initial bundle size
+// const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
+// Note: Removing lazy import as it's currently commented out
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -155,7 +159,7 @@ interface TooltipProps {
   label?: string
 }
 
-export const BiasDashboard: FC<BiasDashboardProps> = ({
+export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   className = '',
   refreshInterval = 30000, // 30 seconds
   enableRealTimeUpdates = true,
@@ -821,17 +825,17 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
 
         ws.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data) as unknown
+            const data: any = JSON.parse(event.data);
 
             // Handle different types of real-time updates
-            switch (data.type) {
+            switch (data['type']) {
               case 'bias_alert':
                 // Add new alert to the list
                 setDashboardData((prev: BiasDashboardData | null) => {
                   if (!prev) {
                     return prev
                   }
-                  const newAlert = data.alert
+                  const newAlert = data['alert']
                   // Show notification if high/critical
                   if (newAlert.level === 'high' || newAlert.level === 'critical') {
                     setNewHighBiasAlert(newAlert)
@@ -856,7 +860,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
                   if (!prev) {
                     return prev
                   }
-                  const updatedSession = data.session
+                  const updatedSession = data['session']
                   return {
                     ...prev,
                     recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
@@ -867,7 +871,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
                   }
                 })
                 announceToScreenReader(
-                  `Session ${data.session.sessionId} updated`,
+                  `Session ${data['session'].sessionId} updated`,
                 )
                 break
 
@@ -881,7 +885,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
                     ...prev,
                     summary: {
                       ...prev.summary,
-                      ...data.metrics,
+                      ...data['metrics'],
                     },
                   }
                 })
@@ -896,7 +900,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
                   }
                   return {
                     ...prev,
-                    trends: data.trends || prev.trends,
+                    trends: data['trends'] || prev.trends,
                   }
                 })
                 announceToScreenReader('Trend data updated')
@@ -904,11 +908,11 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
 
               case 'connection_status':
                 // Handle connection status updates
-                if (data.status === 'authenticated') {
+                if (data['status'] === 'authenticated') {
                   logger.info('WebSocket authenticated successfully')
-                } else if (data.status === 'error') {
+                } else if (data['status'] === 'error') {
                   logger.error('WebSocket authentication failed', {
-                    error: data.error,
+                    error: data['error'],
                   })
                 }
                 break
@@ -922,7 +926,7 @@ export const BiasDashboard: FC<BiasDashboardProps> = ({
 
               default:
                 logger.warn('Unknown WebSocket message type', {
-                  type: data.type,
+                  type: data['type'],
                   data,
                 })
             }

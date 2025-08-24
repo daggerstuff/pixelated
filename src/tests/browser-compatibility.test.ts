@@ -30,7 +30,7 @@ interface CompatibilityResults {
 }
 
 // Skip browser compatibility tests in CI environment
-const skipTests = process.env.SKIP_BROWSER_COMPAT_TESTS === 'true'
+const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
 
 // Create a separate test suite
 ;(skipTests ? test.describe.skip : test.describe)(
@@ -49,10 +49,10 @@ const skipTests = process.env.SKIP_BROWSER_COMPAT_TESTS === 'true'
       for (const [featureKey, feature] of Object.entries(FEATURES)) {
         const detectionCode = feature.detectionFn.toString()
         const result = await page.evaluate(`(${detectionCode})()`)
-        compatibilityResults.browsers.chromium = {
-          ...compatibilityResults.browsers.chromium,
+        compatibilityResults.browsers['chromium'] = {
+          ...compatibilityResults.browsers['chromium'],
           features: {
-            ...compatibilityResults.browsers.chromium?.features,
+            ...compatibilityResults.browsers['chromium']?.features,
             [featureKey]: Boolean(result),
           },
         }

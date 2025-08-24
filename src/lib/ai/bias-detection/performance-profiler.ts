@@ -10,38 +10,37 @@ type ProfilerResult = {
   timestamp: string
 }
 
-export class PerformanceProfiler {
-  static async profile<T>(
-    label: string,
-    fn: () => Promise<T>
-  ): Promise<{ result: T; profile: ProfilerResult }> {
-    const memoryBefore = PerformanceProfiler.getMemoryUsage()
-    const start = process.hrtime.bigint()
-    const result = await fn()
-    const end = process.hrtime.bigint()
-    const memoryAfter = PerformanceProfiler.getMemoryUsage()
-    const durationMs = Number(end - start) / 1e6
-    const memoryDelta = memoryAfter - memoryBefore
-    const profile: ProfilerResult = {
-      label,
-      durationMs,
-      memoryBefore,
-      memoryAfter,
-      memoryDelta,
-      timestamp: new Date().toISOString(),
-    }
-    PerformanceProfiler.logProfile(profile)
-    return { result, profile }
+export async function profile<T>(
+  label: string,
+  fn: () => Promise<T>
+): Promise<{ result: T; profile: ProfilerResult }> {
+  const memoryBefore = getMemoryUsage()
+  const start = process.hrtime.bigint()
+  const result = await fn()
+  const end = process.hrtime.bigint()
+  const memoryAfter = getMemoryUsage()
+  const durationMs = Number(end - start) / 1e6
+  const memoryDelta = memoryAfter - memoryBefore
+  const profile: ProfilerResult = {
+    label,
+    durationMs,
+    memoryBefore,
+    memoryAfter,
+    memoryDelta,
+    timestamp: new Date().toISOString(),
   }
-
-  static getMemoryUsage(): number {
-    return process.memoryUsage().heapUsed
-  }
-
-  static logProfile(profile: ProfilerResult) {
-    console.info('[PerformanceProfiler]', profile)
-  }
+  
+  return { result, profile }
 }
 
-// Example usage:
-// const { result, profile } = await PerformanceProfiler.profile('analyzeSession', () => engine.analyzeSession(sessionData))
+function getMemoryUsage(): number {
+  const used = process.memoryUsage()
+  return Math.round((used.heapUsed / 1024 / 1024) * 100) / 100
+}
+
+export function formatProfile(profile: ProfilerResult): string {
+  return `[${profile.timestamp}] ${profile.label}: ${profile.durationMs.toFixed(2)}ms | Memory: ${profile.memoryBefore}MB → ${profile.memoryAfter}MB (Δ${profile.memoryDelta >= 0 ? '+' : ''}${profile.memoryDelta}MB)`
+}
+
+// Export the type for external use
+export type { ProfilerResult }

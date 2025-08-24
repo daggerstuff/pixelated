@@ -746,109 +746,35 @@ describe('BiasDetectionEngine', () => {
 
     it('should handle boundary threshold values', async () => {
       await biasEngine.initialize()
-      // Test exactly at warning threshold - set all layers to 0.3
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
+
+      // Mock all layers to return exactly 0.3 (warning threshold)
+      biasEngine.pythonService.analyze_session = vi
         .fn()
         .mockResolvedValue({
-          biasScore: 0.3,
-          linguisticBias: {
-            genderBiasScore: 0.3,
-            racialBiasScore: 0.3,
-            ageBiasScore: 0.3,
-            culturalBiasScore: 0.3,
-            biasedTerms: [],
-            sentimentAnalysis: {
-              overallSentiment: 0.0,
-              emotionalValence: 0.0,
-              subjectivity: 0.0,
-              demographicVariations: {},
-            },
+          session_id: 'test-session',
+          overall_bias_score: 0.3,
+          alert_level: 'medium',
+          layer_results: {
+            preprocessing: { bias_score: 0.3 },
+            model_level: { bias_score: 0.3 },
+            interactive: { bias_score: 0.3 },
+            evaluation: { bias_score: 0.3 },
           },
-          representationAnalysis: {
-            demographicDistribution: {},
-            underrepresentedGroups: [],
-            overrepresentedGroups: [],
-            diversityIndex: 0.0,
-            intersectionalityAnalysis: [],
+          demographics: {
+            age: 'masked',
+            gender: 'masked',
+            ethnicity: 'masked',
           },
-          dataQualityMetrics: {
-            completeness: 1.0,
-            consistency: 1.0,
-            accuracy: 1.0,
-            timeliness: 1.0,
-            validity: 1.0,
-            missingDataByDemographic: {},
-          },
-          recommendations: [],
-        })
-      biasEngine.pythonService.runModelLevelAnalysis = vi
-        .fn()
-        .mockResolvedValue({
-          biasScore: 0.3,
-          fairnessMetrics: {
-            demographicParity: 0.7,
-            equalizedOdds: 0.7,
-            equalOpportunity: 0.7,
-            calibration: 0.7,
-            individualFairness: 0.7,
-            counterfactualFairness: 0.7,
-          },
-          performanceMetrics: {
-            accuracy: 0.9,
-            precision: 0.9,
-            recall: 0.9,
-            f1Score: 0.9,
-            auc: 0.9,
-            calibrationError: 0.05,
-            demographicBreakdown: {},
-          },
-          groupPerformanceComparison: [],
-          recommendations: [],
-        })
-      biasEngine.pythonService.runInteractiveAnalysis = vi
-        .fn()
-        .mockResolvedValue({
-          biasScore: 0.3,
-          counterfactualAnalysis: {
-            scenariosAnalyzed: 3,
-            biasDetected: false,
-            consistencyScore: 0.15,
-            problematicScenarios: [],
-          },
-          featureImportance: [],
-          whatIfScenarios: [],
-          recommendations: [],
-        })
-      biasEngine.pythonService.runEvaluationAnalysis = vi
-        .fn()
-        .mockResolvedValue({
-          biasScore: 0.3,
-          huggingFaceMetrics: {
-            toxicity: 0.05,
-            bias: 0.15,
-            regard: {},
-            stereotype: 0.1,
-            fairness: 0.85,
-          },
-          customMetrics: {
-            therapeuticBias: 0.1,
-            culturalSensitivity: 0.1,
-            professionalEthics: 0.1,
-            patientSafety: 0.1,
-          },
-          temporalAnalysis: {
-            trendDirection: 'stable',
-            changeRate: 0,
-            seasonalPatterns: [],
-            interventionEffectiveness: [],
-          },
-          recommendations: [],
+          confidence: 0.9,
+          recommendations: ['System performing within acceptable parameters'],
         })
 
       const result = await biasEngine.analyzeSession(mockSessionData)
       // With all layers at 0.3 (exactly at warning threshold), should be 'medium'
       expect(result.overallBiasScore).toBe(0.3)
       expect(result.alertLevel).toBe('medium')
+      // Confidence should reflect accurate threshold detection
+      expect(result.confidence).toBeGreaterThan(0.8)
     })
   })
 
@@ -883,7 +809,16 @@ describe('BiasDetectionEngine', () => {
       expect(result.layerResults.interactive.biasScore).toBe(0.5)
       expect(result.layerResults.evaluation).toBeDefined()
       expect(result.layerResults.evaluation.biasScore).toBe(0.5)
+      // Overall bias score should be average of all layers (0.5)
       expect(result.overallBiasScore).toBe(0.5)
+      // Confidence should be reduced due to service failures
+      expect(result.confidence).toBeLessThan(0.8)
+      // Should include appropriate fallback recommendations
+      expect(
+        result.recommendations.some((rec) =>
+          rec.includes('Limited analysis available'),
+        ),
+      ).toBe(true)
     })
 
     it('should handle partial layer failures', async () => {
@@ -918,6 +853,11 @@ describe('BiasDetectionEngine', () => {
       expect(result.layerResults.preprocessing).toHaveProperty('biasScore')
       expect(result.layerResults.preprocessing.biasScore).toBe(0.5)
       expect(result.confidence).toBeLessThan(1.0)
+      expect(
+        result.recommendations.some((rec) =>
+          rec.includes('Incomplete analysis due to service issues'),
+        ),
+      ).toBe(true)
     })
 
     it('should handle service overload scenarios', async () => {

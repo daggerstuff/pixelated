@@ -45,7 +45,7 @@ validate-runner:
     - apk add --no-cache openssh-client git
     - docker --version
     - docker info
-    - echo "✅ Docker is available and working"
+    - echo "Docker is available and working"
     - echo "Runner:" $CI_RUNNER_DESCRIPTION
     - echo "Executor:" $CI_RUNNER_EXECUTOR
   rules:

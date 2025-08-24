@@ -18,18 +18,26 @@ fi
 
 # Validate the Bicep template
 echo "📋 Validating main.bicep..."
-az deployment group validate \
+if az deployment group validate \
     --resource-group "${AZURE_RESOURCE_GROUP:-pixelated-rg}" \
     --template-file infra/main.bicep \
-    --parameters environment=staging azureLocation=eastus
-
-echo "✅ Bicep template validation passed!"
+    --parameters infra/main.parameters.json; then
+    echo "✅ Bicep template validation passed!"
+else
+    echo "❌ Bicep template validation failed!"
+    exit 1
+fi
 
 # Optional: What-if analysis
 echo "🔮 Running what-if analysis..."
-az deployment group what-if \
+if az deployment group what-if \
     --resource-group "${AZURE_RESOURCE_GROUP:-pixelated-rg}" \
     --template-file infra/main.bicep \
-    --parameters environment=staging azureLocation=eastus
+    --parameters infra/main.parameters.json; then
+    echo "✅ What-if analysis completed!"
+else
+    echo "❌ What-if analysis failed!"
+    exit 1
+fi
 
 echo "✅ Validation complete!"

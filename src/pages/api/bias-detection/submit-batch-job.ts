@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server'
 import { BiasDetectionEngine } from '../../../lib/ai/bias-detection/BiasDetectionEngine'
-import { JobQueue, Job } from '../../../lib/ai/bias-detection/job-queue'
+import { JobQueue } from '../../../lib/ai/bias-detection/job-queue'
 import type { TherapeuticSession } from '../../../lib/ai/bias-detection/types'
+import type { BatchAnalysisResult } from '../../../lib/ai/bias-detection/types'
 
 const engine = new BiasDetectionEngine()
-const batchJobQueue = new JobQueue<TherapeuticSession[], any>(async (sessions, update) => {
+const batchJobQueue = new JobQueue<TherapeuticSession[], BatchAnalysisResult>(async (sessions, update) => {
   // Use batchAnalyzeSessions with progress callback
   const { results, errors, metrics } = await engine.batchAnalyzeSessions(sessions, {
     onProgress: ({ completed, total }) => update(completed / total),
@@ -20,13 +21,13 @@ export default async function handler(req: NextRequest): Promise<Response> {
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 })
   }
-  let body: any
+  let body: unknown
   try {
     body = await req.json()
   } catch {
     return new Response('Invalid JSON', { status: 400 })
   }
-  const { sessions } = body ?? {}
+  const { sessions } = body as { sessions?: TherapeuticSession[] }
   if (!Array.isArray(sessions) || sessions.length === 0) {
     return new Response('Missing or invalid sessions array', { status: 400 })
   }

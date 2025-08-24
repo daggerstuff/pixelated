@@ -122,7 +122,7 @@ describe('performance Tests', () => {
     browser = await chromium.launch({ headless: true })
     results = {
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env['NODE_ENV'] || 'development',
       pages: {},
       api: {},
     }
@@ -144,7 +144,7 @@ describe('performance Tests', () => {
   })
 
   // Skip performance tests in CI environment
-  const skipTests = process.env.SKIP_PERFORMANCE_TESTS === 'true'
+  const skipTests = process.env['SKIP_PERFORMANCE_TESTS'] === 'true'
   ;(skipTests ? describe.skip : describe)('core Web Vitals', () => {
     // Test Core Web Vitals and other metrics for each page
     TEST_PAGES.forEach(({ path, name }) => {

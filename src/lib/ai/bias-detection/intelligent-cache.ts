@@ -302,7 +302,7 @@ export class IntelligentCache {
   /**
    * Batch get operation
    */
-  async mget<T>(keys: string[], strategy?: string): Promise<Record<string, T | null>> {
+  async mget<T>(keys: string[], _strategy?: string): Promise<Record<string, T | null>> {
     const results: Record<string, T | null> = {}
     
     // Try to get all from memory first
@@ -720,7 +720,7 @@ export class IntelligentCache {
   }
   
   // Batching methods
-  private async batchGet<T>(key: string, strategy?: string): Promise<T | null> {
+  private async batchGet<T>(key: string, _strategy?: string): Promise<T | null> {
     return new Promise((resolve, reject) => {
       this.batchQueue.push({
         operation: 'get',

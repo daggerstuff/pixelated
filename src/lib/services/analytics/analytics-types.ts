@@ -56,7 +56,6 @@ export interface RedisClient {
   lrange(key: string, start: number, stop: number): Promise<string[]>
   lrem(key: string, count: number, value: string): Promise<void>
   zadd(key: string, score: number, member: string): Promise<void>
-  zrangebyscore(key: string, min: number | string, max: number | string, ...args: string[]): Promise<string[]>
   zremrangebyscore(key: string, min: number, max: number): Promise<void>
   hset(key: string, field: string, value: string): Promise<void>
   keys(pattern: string): Promise<string[]>

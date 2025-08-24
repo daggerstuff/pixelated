@@ -176,14 +176,11 @@ export class AnalyticsService {
 
     try {
       // Get events from time series
-      const eventJsons = await this.redisClient.zrangebyscore(
+      const eventJsons = await this.redisClient.zrange(
         `analytics:events:time:${type}`,
         options.startTime ?? 0,
         options.endTime ?? '+inf',
-        'WITHSCORES',
-        'LIMIT',
-        offset.toString(),
-        limit.toString(),
+        { BY: 'SCORE', LIMIT: { offset, count: limit } }
       )
 
       return eventJsons
@@ -217,11 +214,11 @@ export class AnalyticsService {
 
     try {
       // Get metrics from time series
-      const metricJsons = await this.redisClient.zrangebyscore(
+      const metricJsons = await this.redisClient.zrange(
         `analytics:metrics:${name}`,
         options.startTime ?? 0,
         options.endTime ?? '+inf',
-        'WITHSCORES',
+        { BY: 'SCORE' }
       )
 
       const metrics = metricJsons
