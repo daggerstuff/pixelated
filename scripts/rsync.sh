@@ -120,6 +120,26 @@ EOF
 
 print_status "✅ Rsync exclusions prepared"
 
+# Archive old repo in root home (VPS) BEFORE syncing
+print_header "Archiving old repo in /root/pixelated on VPS..."
+$SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
+set -e
+
+print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
+print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
+
+if [ -d "/root/pixelated" ]; then
+    print_status "Stopping Caddy and Docker containers using /root/pixelated..."
+    sudo systemctl stop caddy || true
+    sudo docker stop pixelated-app || true
+    print_status "Archiving /root/pixelated to /root/pixelated-backup..."
+    sudo mv /root/pixelated /root/pixelated-backup
+    print_status "Archive complete."
+else
+    print_status "/root/pixelated does not exist, nothing to archive."
+fi
+EOF
+
 # Sync project files
 print_header "Syncing project files to VPS..."
 print_status "This may take a few minutes for the initial sync..."
@@ -340,25 +360,6 @@ docker build -t pixelated-empathy:latest .
 print_status "✅ Project setup complete"
 EOF
 
-# Archive old repo in root home (VPS)
-print_header "Archiving old repo in /root/pixelated on VPS..."
-$SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
-set -e
-
-print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
-print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
-
-if [ -d "/root/pixelated" ]; then
-    print_status "Stopping Caddy and Docker containers using /root/pixelated..."
-    sudo systemctl stop caddy || true
-    sudo docker stop pixelated-app || true
-    print_status "Archiving /root/pixelated to /root/pixelated-backup..."
-    sudo mv /root/pixelated /root/pixelated-backup
-    print_status "Archive complete."
-else
-    print_status "/root/pixelated does not exist, nothing to archive."
-fi
-EOF
 
 # Deploy the application
 print_header "Deploying application..."
