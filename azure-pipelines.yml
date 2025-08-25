@@ -90,19 +90,19 @@ stages:
 
           - script: |
               # Ensure cache directories exist before cache task
-              mkdir -p node_modules/.astro .astro "$(Agent.WorkFolder)/.astro-fallback" "$(Agent.WorkFolder)/.astro-cache-fallback"
+              mkdir -p node_modules/.astro .astro "$(Agent.WorkFolder)/.astro-cache" "$(Agent.WorkFolder)/.vite-cache"
               echo "Created cache directories for Astro build artifacts"
 
               # Clean up any malformed cache files that might exist
               echo "Cleaning up potential malformed cache files..."
               find node_modules/.astro -name "*\n*" -delete 2>/dev/null || true
               find .astro -name "*\n*" -delete 2>/dev/null || true
-              find "$(Agent.WorkFolder)/.astro-fallback" -name "*\n*" -delete 2>/dev/null || true
-              find "$(Agent.WorkFolder)/.astro-cache-fallback" -name "*\n*" -delete 2>/dev/null || true
+              find "$(Agent.WorkFolder)/.astro-cache" -name "*\n*" -delete 2>/dev/null || true
+              find "$(Agent.WorkFolder)/.vite-cache" -name "*\n*" -delete 2>/dev/null || true
 
               # Validate and clean cache directories
               echo "Validating cache directories..."
-              for dir in "node_modules/.astro" ".astro" "$(Agent.WorkFolder)/.astro-fallback" "$(Agent.WorkFolder)/.astro-cache-fallback"; do
+              for dir in "node_modules/.astro" ".astro" "$(Agent.WorkFolder)/.astro-cache" "$(Agent.WorkFolder)/.vite-cache"; do
                 if [ -d "$dir" ]; then
                   echo "$dir directory exists"
                   ls -la "$dir"/ 2>/dev/null || echo "Unable to list directory contents"
@@ -118,16 +118,16 @@ stages:
           - task: Cache@2
             displayName: Cache Astro build artifacts
             inputs:
-              key: 'astro-build-v2 | "$(Agent.OS)" | $(Build.SourceBranch) | $(Build.SourceVersion) | package.json | pnpm-lock.yaml'
+              key: 'astro-build-v2 | "$(Agent.OS)" | $(Build.SourceBranchName) | $(Build.SourceVersion) | package.json | pnpm-lock.yaml'
               restoreKeys: |
-                astro-build-v2 | "$(Agent.OS)" | $(Build.SourceBranch)
+                astro-build-v2 | "$(Agent.OS)" | $(Build.SourceBranchName)
                 astro-build-v2 | "$(Agent.OS)"
                 astro-build | "$(Agent.OS)"
               path: |
                 node_modules/.astro
                 .astro
-                $(Agent.WorkFolder)/.astro-fallback
-                $(Agent.WorkFolder)/.astro-cache-fallback
+                $(Agent.WorkFolder)/.astro-cache
+                $(Agent.WorkFolder)/.vite-cache
             continueOnError: true
 
           - script: |
@@ -554,7 +554,7 @@ stages:
       - Build
       - Infrastructure
       - DockerBuild
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main')))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'main')))
     jobs:
       - deployment: ContainerAppDeployment
         displayName: Deploy to Container Apps
@@ -825,7 +825,7 @@ stages:
       - Build
       - Infrastructure
       - DockerBuild
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
     jobs:
       - deployment: AppServiceDeployment
         displayName: Deploy to App Service

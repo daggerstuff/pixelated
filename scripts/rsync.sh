@@ -133,6 +133,13 @@ if [ -d "/root/pixelated" ]; then
     sudo systemctl stop caddy || true
     sudo docker stop pixelated-app || true
     print_status "Archiving /root/pixelated to /root/pixelated-backup..."
+
+    # Remove any existing backup directory to avoid mv errors
+    if [ -d "/root/pixelated-backup" ]; then
+        print_status "Removing previous backup at /root/pixelated-backup..."
+        sudo rm -rf /root/pixelated-backup
+    fi
+
     sudo mv /root/pixelated /root/pixelated-backup
     print_status "Archive complete."
 else

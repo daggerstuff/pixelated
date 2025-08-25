@@ -162,6 +162,18 @@ jobs:
         OUTPUTS='${{ steps.bicep.outputs.deploymentOutputs }}'
         echo "Raw deployment outputs: $OUTPUTS"
 
+        # Validate outputs are present and valid JSON
+        if [[ -z "$OUTPUTS" || "$OUTPUTS" == "null" ]]; then
+          echo "ERROR: Deployment outputs are empty (deployment may have failed validation or encountered an error)"
+          exit 1
+        fi
+        echo "$OUTPUTS" | jq . >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+          echo "ERROR: Deployment outputs are not valid JSON. Actual output:"
+          echo "$OUTPUTS"
+          exit 1
+        fi
+
         # Extract specific outputs (must exist in infra/main.bicep)
         KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value // empty')
         REGISTRY_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value // empty')
