@@ -21,7 +21,7 @@ const TEST_DEVICES = [
 const TEST_PAGES = [
   { url: '/', name: 'Home' },
   { url: '/blog', name: 'Blog' },
-  { url: '/admin', name: 'Admin' },
+  { url: '/admin/dashboard', name: 'Admin' },
 ]
 
 // Basic test for all device/page combinations

@@ -22,7 +22,7 @@ import type React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Lazy load the charts component to reduce initial bundle size
-// const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
+// const BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
 
 // Lazy load the charts component to reduce initial bundle size
@@ -1431,8 +1431,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           data-testid="new-high-bias-alert"
         >
           <div>
-            <span className="font-bold text-orange-700 text-sm">
-              {`New high bias alert: ${newHighBiasAlert.message}`}
+            <span className="font-bold text-orange-700 mr-2">New high bias alert</span>
+            <span className="text-sm text-orange-800">
+              {newHighBiasAlert.message}
             </span>
           </div>
           <button

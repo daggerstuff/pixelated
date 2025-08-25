@@ -100,6 +100,7 @@ tmp/
 ai/datasets/
 ai/data/
 ai/database/
+ai/models
 ai/pipelines/data/
 ai/dataset_pipeline/
 ai/temporal_analysis_data*.jsonl
@@ -109,6 +110,9 @@ ai/*.npy
 ai/*.db
 ai/*.sqlite
 ai/*.sqlite3
+ai/training
+ai/research
+ai/youtube_transcripts
 # Exclude other large files
 *.zip
 *.tar.gz
@@ -281,7 +285,7 @@ EOF
 
 # Set up project on VPS
 print_header "Setting up project on VPS..."
-$SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
+$SSH_CMD "$VPS_USER@$VPS_HOST" <<'EOF'
 set -e
 
 # Colors for remote output
@@ -366,6 +370,7 @@ docker build -t pixelated-empathy:latest .
 
 print_status "✅ Project setup complete"
 EOF
+
 
 
 # Deploy the application

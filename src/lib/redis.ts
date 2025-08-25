@@ -38,6 +38,14 @@ function createMockRedisClient() {
     quit: async () => 'OK',
     disconnect: () => {},
     status: 'ready',
+    zrangebyscore: async () => [],
+    lpush: async () => 1,
+    lRange: async () => [],
+    lrem: async () => 1,
+    zadd: async () => 1,
+    hset: async () => 1,
+    zremrangebyscore: async () => 1,
+    keys: async () => [],
   }
 }
 

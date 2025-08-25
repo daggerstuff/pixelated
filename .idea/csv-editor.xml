@@ -3,6 +3,41 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/ai/datasets/Empathy-Mental-Health/dataset/emotional-reactions-reddit.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/ai/datasets/Empathy-Mental-Health/dataset/explorations-reddit.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/ai/datasets/Empathy-Mental-Health/dataset/interpretations-reddit.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/ai/datasets/formatted_annotated_addiction_counseling_csv_SFT/formatted_annotated_addiction_counseling_csv_SFT (1).csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/ai/datasets/formatted_annotated_addiction_counseling_csv_SFT/formatted_annotated_addiction_counseling_csv_SFT.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/ai/models/MERTools/MER2024/ov_store/check-openset.csv">
           <value>
             <Attribute>

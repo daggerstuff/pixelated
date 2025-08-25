@@ -14,7 +14,7 @@ const TEST_URLS = {
   home: '/',
   blog: '/blog',
   documentation: '/docs',
-  dashboard: '/admin',
+  dashboard: '/admin/dashboard',
   simulator: '/simulator',
 }
 

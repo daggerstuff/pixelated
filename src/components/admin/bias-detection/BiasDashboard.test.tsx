@@ -276,14 +276,12 @@ describe('BiasDashboard', () => {
   })
 
   it('updates data when receiving WebSocket messages', async () => {
-    const mockWs = {
-      send: vi.fn(),
-      close: vi.fn(),
-      addEventListener: vi.fn(),
-    }
-    MockWebSocketConstructor.mockImplementation(
-      () => mockWs as MockWebSocketInstance,
-    )
+    let mockWebSocket: MockWebSocketInstance
+    MockWebSocketConstructor.mockImplementation(() => {
+      const ws = createMockWebSocket()
+      mockWebSocket = ws
+      return ws
+    })
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
 
@@ -292,12 +290,9 @@ describe('BiasDashboard', () => {
     })
 
     // First simulate connection
-    const openCall = mockWs.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'open',
-    )
-    if (openCall && typeof openCall[1] === 'function') {
-      openCall[1]()
-    }
+    act(() => {
+      mockWebSocket.onopen?.(new Event('open'))
+    })
 
     // Wait for dashboard to load
     await waitFor(() => {
@@ -305,33 +300,34 @@ describe('BiasDashboard', () => {
     })
 
     // Simulate WebSocket message with proper alert structure
-    const messageCall = mockWs.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'message',
-    )
-    if (messageCall && typeof messageCall[1] === 'function') {
-      messageCall[1]({
-        data: JSON.stringify({
-          type: 'bias_alert',
-          alert: {
-            alertId: '2',
-            type: 'high_bias',
-            message: 'New high bias alert',
-            timestamp: new Date().toISOString(),
-            level: 'high',
-            sessionId: 'session-123',
-          },
+    act(() => {
+      mockWebSocket.onmessage?.(
+        new MessageEvent('message', {
+          data: JSON.stringify({
+            type: 'bias_alert',
+            alert: {
+              alertId: '2',
+              type: 'high_bias',
+              message: 'New high bias alert',
+              timestamp: new Date().toISOString(),
+              level: 'high',
+              sessionId: 'session-123',
+            },
+          }),
         }),
-      })
-    }
+      )
+    })
 
     // Navigate to alerts tab to see the new alert
     fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
 
     await waitFor(() => {
       // Use a more flexible matcher since the text might be split across elements
-      expect(screen.getByText((content, element) => {
-        return content.includes('New high bias alert')
-      })).toBeInTheDocument()
+      expect(
+        screen.getByText((content, element) => {
+          return content.includes('New high bias alert')
+        }),
+      ).toBeInTheDocument()
     })
   })
 

@@ -1,0 +1,7 @@
+{
+  "importProcessor": {
+    "enabled": false
+  },
+  "packageManager": "pnpm",
+  "nodeModulesPath": "node_modules"
+}

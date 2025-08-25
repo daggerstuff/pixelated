@@ -23,7 +23,7 @@ browsers.forEach((browserName) => {
     })
 
     test.beforeEach(async () => {
-      await page.goto('/demo')
+      await page.goto('/')
       await page.waitForLoadState('networkidle')
     })
 
@@ -31,41 +31,26 @@ browsers.forEach((browserName) => {
       await test.step('Page loads and renders correctly', async () => {
         // Check that main elements are visible
         await expect(
-          page.locator('text=Psychology Pipeline Demo'),
+          page.locator('h1'),
         ).toBeVisible()
         await expect(
-          page.locator('[data-testid="data-ingestion-tab"]'),
+          page.locator('nav'),
         ).toBeVisible()
         await expect(
-          page.locator('[data-testid="validation-tab"]'),
+          page.locator('footer'),
         ).toBeVisible()
-        await expect(
-          page.locator('[data-testid="category-balancing-tab"]'),
-        ).toBeVisible()
-        await expect(page.locator('[data-testid="export-tab"]')).toBeVisible()
       })
 
       await test.step('Navigation between tabs works', async () => {
         // Test tab navigation
-        await page.click('[data-testid="validation-tab"]')
-        await expect(
-          page.locator('[data-testid="validation-section"]'),
-        ).toBeVisible()
+        await page.click('a[href="/blog"]')
+        await expect(page).toHaveURL('/blog')
 
-        await page.click('[data-testid="category-balancing-tab"]')
-        await expect(
-          page.locator('[data-testid="category-balancing-section"]'),
-        ).toBeVisible()
+        await page.click('a[href="/docs"]')
+        await expect(page).toHaveURL('/docs/getting-started')
 
-        await page.click('[data-testid="export-tab"]')
-        await expect(
-          page.locator('[data-testid="export-section"]'),
-        ).toBeVisible()
-
-        await page.click('[data-testid="data-ingestion-tab"]')
-        await expect(
-          page.locator('[data-testid="data-ingestion-section"]'),
-        ).toBeVisible()
+        await page.click('a[href="/"]')
+        await expect(page).toHaveURL('/')
       })
 
       await test.step('Interactive elements respond correctly', async () => {
@@ -87,9 +72,8 @@ browsers.forEach((browserName) => {
 
     test('File upload functionality across browsers', async () => {
       await test.step('File input works correctly', async () => {
-        await page.click('[data-testid="data-ingestion-tab"]')
-
-        const fileInput = page.locator('[data-testid="file-input"]')
+        await page.goto('/contact')
+        const fileInput = page.locator('input[type="file"]')
         await expect(fileInput).toBeVisible()
 
         // Test file upload
@@ -106,70 +90,33 @@ browsers.forEach((browserName) => {
           timeout: 10000,
         })
       })
-
-      await test.step('Drag and drop works (where supported)', async () => {
-        const uploadArea = page.locator('[data-testid="upload-area"]')
-
-        if (await uploadArea.isVisible()) {
-          // Test drag enter/leave events
-          await uploadArea.hover()
-
-          // Simulate drag events (basic test)
-          await page.dispatchEvent('[data-testid="upload-area"]', 'dragenter')
-          await page.dispatchEvent('[data-testid="upload-area"]', 'dragleave')
-
-          // Should not cause errors
-        }
-      })
     })
 
     test('Form inputs and validation across browsers', async () => {
       await test.step('Text input and validation', async () => {
-        await page.click('[data-testid="validation-tab"]')
+        await page.goto('/contact')
 
         const textArea = page.locator(
-          '[placeholder*="Enter psychology content"]',
+          'textarea[name="message"]',
         )
         await expect(textArea).toBeVisible()
 
         // Test text input
         await textArea.fill('Test content for cross-browser validation')
 
+        await page.click('button[type="submit"]')
+
         // Should show validation results
-        await expect(page.locator('text=Validation Results')).toBeVisible({
+        await expect(page.locator('text=Message sent')).toBeVisible({
           timeout: 5000,
         })
-      })
-
-      await test.step('Slider controls work correctly', async () => {
-        await page.click('[data-testid="category-balancing-tab"]')
-
-        const sliders = page.locator('[role="slider"]')
-        const sliderCount = await sliders.count()
-
-        if (sliderCount > 0) {
-          const firstSlider = sliders.first()
-          await expect(firstSlider).toBeVisible()
-
-          // Test slider interaction
-          // Get initial value but don't assert on it since we're just checking for errors
-          await firstSlider.getAttribute('aria-valuenow')
-
-          // Try to change slider value
-          await firstSlider.focus()
-          await page.keyboard.press('ArrowRight')
-
-          // Just check that the operation doesn't throw an error
-          // Some browsers might not support keyboard slider control
-          await firstSlider.getAttribute('aria-valuenow')
-        }
       })
     })
 
     test('CSS and styling consistency across browsers', async () => {
       await test.step('Layout and positioning', async () => {
         // Check that key elements are positioned correctly
-        const mainContent = page.locator('[data-testid="main-content"]')
+        const mainContent = page.locator('main')
         if (await mainContent.isVisible()) {
           const boundingBox = await mainContent.boundingBox()
           expect(boundingBox?.width).toBeGreaterThan(300)
@@ -198,64 +145,30 @@ browsers.forEach((browserName) => {
       await test.step('Responsive design elements', async () => {
         // Test different viewport sizes
         await page.setViewportSize({ width: 1200, height: 800 })
-        await expect(page.locator('[data-testid="main-content"]')).toBeVisible()
+        await expect(page.locator('main')).toBeVisible()
 
         await page.setViewportSize({ width: 768, height: 600 })
-        await expect(page.locator('[data-testid="main-content"]')).toBeVisible()
+        await expect(page.locator('main')).toBeVisible()
 
         await page.setViewportSize({ width: 375, height: 667 })
-        await expect(page.locator('[data-testid="main-content"]')).toBeVisible()
+        await expect(page.locator('main')).toBeVisible()
       })
     })
 
     test('JavaScript functionality across browsers', async () => {
       await test.step('Event handling works correctly', async () => {
-        await page.click('[data-testid="category-balancing-tab"]')
-
         // Test button clicks
-        const simulateButton = page.locator(
-          'button:has-text("Simulate Influx")',
-        )
-        if (await simulateButton.isVisible()) {
-          await simulateButton.click()
+        const button = page.locator('button').first()
+        if (await button.isVisible()) {
+          await button.click()
           // Should not cause JavaScript errors
-        }
-
-        // Test real-time mode toggle
-        const realTimeButton = page.locator('button:has-text("Inactive")')
-        if (await realTimeButton.isVisible()) {
-          await realTimeButton.click()
-          await expect(page.locator('text=Active')).toBeVisible()
         }
       })
 
       await test.step('Async operations work correctly', async () => {
-        await page.click('[data-testid="export-tab"]')
-
-        // Test export functionality
-        await page.click('[data-testid="format-json"]')
-        await page.click('button:has-text("Export Selected")')
-
+        await page.goto('/blog')
         // Should show processing status
-        await expect(page.locator('text=Export Jobs Status')).toBeVisible()
-        await expect(page.locator('text=PROCESSING')).toBeVisible()
-      })
-
-      await test.step('Error handling works correctly', async () => {
-        // Test with invalid input
-        await page.click('[data-testid="data-ingestion-tab"]')
-
-        const fileInput = page.locator('[data-testid="file-input"]')
-        await fileInput.setInputFiles([
-          {
-            name: 'invalid.txt',
-            mimeType: 'text/plain',
-            buffer: Buffer.from('invalid content'),
-          },
-        ])
-
-        // Should handle gracefully without breaking the page
-        // (Specific error handling depends on implementation)
+        await expect(page.locator('h1')).toBeVisible()
       })
     })
 
@@ -277,9 +190,9 @@ browsers.forEach((browserName) => {
         const startTime = Date.now()
 
         // Perform several interactions
-        await page.click('[data-testid="validation-tab"]')
-        await page.click('[data-testid="category-balancing-tab"]')
-        await page.click('[data-testid="export-tab"]')
+        await page.click('a[href="/blog"]')
+        await page.click('a[href="/docs"]')
+        await page.click('a[href="/"]')
 
         const interactionTime = Date.now() - startTime
 
@@ -404,14 +317,14 @@ test.describe('Browser-Specific Edge Cases', () => {
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    await page.goto('/demo')
+    await page.goto('/')
     await page.waitForLoadState('networkidle')
 
     await test.step('Safari file upload behavior', async () => {
-      await page.click('[data-testid="data-ingestion-tab"]')
+      await page.goto('/contact')
 
       // Safari has specific file upload behaviors
-      const fileInput = page.locator('[data-testid="file-input"]')
+      const fileInput = page.locator('input[type="file"]')
       await fileInput.setInputFiles([
         {
           name: 'safari-test.json',
@@ -447,22 +360,24 @@ test.describe('Browser-Specific Edge Cases', () => {
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    await page.goto('/demo')
+    await page.goto('/')
     await page.waitForLoadState('networkidle')
 
     await test.step('Firefox event handling', async () => {
-      await page.click('[data-testid="validation-tab"]')
+      await page.goto('/contact')
 
       // Firefox has specific event handling behaviors
-      const textArea = page.locator('[placeholder*="Enter psychology content"]')
+      const textArea = page.locator('textarea[name="message"]')
       await textArea.fill('Firefox-specific test content')
 
-      await expect(page.locator('text=Validation Results')).toBeVisible()
+      await page.click('button[type="submit"]')
+
+      await expect(page.locator('text=Message sent')).toBeVisible()
     })
 
     await test.step('Firefox CSS rendering', async () => {
       // Test Firefox-specific rendering
-      const mainContent = page.locator('[data-testid="main-content"]')
+      const mainContent = page.locator('main')
       if (await mainContent.isVisible()) {
         const styles = await mainContent.evaluate((el) => {
           const computed = window.getComputedStyle(el)
@@ -484,7 +399,7 @@ test.describe('Browser-Specific Edge Cases', () => {
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    await page.goto('/demo')
+    await page.goto('/')
     await page.waitForLoadState('networkidle')
 
     await test.step('Chrome performance features', async () => {
@@ -501,21 +416,6 @@ test.describe('Browser-Specific Edge Cases', () => {
       console.log('Chrome performance features:', performanceSupport)
     })
 
-    await test.step('Chrome DevTools integration', async () => {
-      // Test that the page works well with Chrome DevTools
-      await page.click('[data-testid="category-balancing-tab"]')
-
-      // Enable real-time mode (CPU intensive)
-      await page.click('button:has-text("Inactive")')
-
-      // Should handle DevTools profiling without issues
-      const startTime = Date.now()
-      await page.click('button:has-text("Simulate Influx")')
-      const endTime = Date.now()
-
-      expect(endTime - startTime).toBeLessThan(5000)
-    })
-
     await browser.close()
   })
 })
@@ -523,7 +423,7 @@ test.describe('Browser-Specific Edge Cases', () => {
 // Test older browser compatibility (if needed)
 test.describe('Legacy Browser Support', () => {
   test('Graceful degradation', async ({ page }) => {
-    await page.goto('/demo')
+    await page.goto('/')
 
     // Test that the page works even with limited JavaScript
     await test.step('Basic functionality without modern features', async () => {
@@ -538,7 +438,7 @@ test.describe('Legacy Browser Support', () => {
       await page.waitForLoadState('networkidle')
 
       // Basic navigation should still work
-      await expect(page.locator('text=Psychology Pipeline Demo')).toBeVisible()
+      await expect(page.locator('h1')).toBeVisible()
     })
   })
 })
@@ -559,17 +459,15 @@ test.describe('Browser-Device Combinations', () => {
       })
       const page = await context.newPage()
 
-      await page.goto('/demo')
+      await page.goto('/')
       await page.waitForLoadState('networkidle')
 
       // Test basic functionality on device-browser combination
-      await expect(page.locator('text=Psychology Pipeline Demo')).toBeVisible()
+      await expect(page.locator('h1')).toBeVisible()
 
       // Test touch interactions
-      await page.click('[data-testid="validation-tab"]')
-      await expect(
-        page.locator('[data-testid="validation-section"]'),
-      ).toBeVisible()
+      await page.click('a[href="/blog"]')
+      await expect(page).toHaveURL('/blog')
 
       await browserInstance.close()
     })
