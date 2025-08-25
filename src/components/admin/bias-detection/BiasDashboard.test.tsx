@@ -23,14 +23,14 @@ vi.mock('@/lib/ai/bias-detection/BiasDetectionEngine', () => ({
   BiasDetectionEngine: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     analyzeBias: vi.fn().mockResolvedValue({
-      overallBiasScore: 0.3,
+      overallBiasScore: 0.5,
       layerAnalyses: [],
       alerts: [],
     }),
     getDashboardData: vi.fn().mockResolvedValue({
       summary: {
         totalSessions: 100,
-        averageBiasScore: 0.3,
+        averageBiasScore: 0.5,
         highBiasSessions: 5,
         totalAlerts: 10,
         complianceScore: 0.85,
@@ -49,7 +49,7 @@ vi.mock('@/lib/ai/bias-detection/BiasDetectionEngine', () => ({
       recentAnalyses: [
         {
           sessionId: 'session-1',
-          overallBiasScore: 0.3,
+          overallBiasScore: 0.5,
           timestamp: new Date().toISOString(),
           alertLevel: 'medium',
         },
@@ -160,7 +160,7 @@ describe('BiasDashboard', () => {
       json: vi.fn().mockResolvedValue({
         summary: {
           totalSessions: 100,
-          averageBiasScore: 0.3,
+          averageBiasScore: 0.5,
           highBiasSessions: 5,
           totalAlerts: 10,
           complianceScore: 0.85,
