@@ -1,7 +1,12 @@
 /// <reference types="vitest/globals" />
-import { setTimeout } from 'vitest'
-setTimeout(20000)
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
+// Increase default test timeout for slow operations (Vitest: use vi.setTimeout OR setTimeout on global)
+if (typeof vi !== 'undefined' && typeof vi.setTimeout === 'function') {
+  vi.setTimeout(20000)
+} else if (typeof setTimeout === 'function') {
+  // Only set if global setTimeout exists, for compatibility
+  setTimeout(() => {}, 20000)
+}
 import type {
   BiasAlertConfig,
   BiasExplanationConfig,

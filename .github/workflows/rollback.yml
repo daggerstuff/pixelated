@@ -37,26 +37,6 @@ jobs:
     - name: Fetch all tags
       run: git fetch --tags --force
 
-    - name: Determine rollback tag
-      id: get-tag
-      run: |
-        # Install dependencies for tag manager
-        pnpm install --no-frozen-lockfile
-
-        # Use the tag manager to validate and get rollback tag
-        if node scripts/tag-manager.js validate staging; then
-          TAGS=$(git tag -l "staging-*" --sort=-committerdate)
-          TAG=$(echo "$TAGS" | sed -n '2p')
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Rolling back to: $TAG"
-          git checkout $TAG
-        else
-          echo "::warning::Cannot rollback - insufficient staging tags"
-          echo "::notice::Creating initial staging tags for future rollbacks"
-          node scripts/tag-manager.js create staging --message="Initial staging tag for rollback capability" --push
-          echo "::error::Rollback not possible - this appears to be the first deployment"
-          exit 1
-        fi
     - name: Setup Node.js
       uses: actions/setup-node@v4.4.0
       with:
@@ -82,6 +62,24 @@ jobs:
 
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
+
+    - name: Determine rollback tag
+      id: get-tag
+      run: |
+        # Use the tag manager to validate and get rollback tag
+        if node scripts/tag-manager.js validate staging; then
+          TAGS=$(git tag -l "staging-*" --sort=-committerdate)
+          TAG=$(echo "$TAGS" | sed -n '2p')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Rolling back to: $TAG"
+          git checkout $TAG
+        else
+          echo "::warning::Cannot rollback - insufficient staging tags"
+          echo "::notice::Creating initial staging tags for future rollbacks"
+          node scripts/tag-manager.js create staging --message="Initial staging tag for rollback capability" --push
+          echo "::error::Rollback not possible - this appears to be the first deployment"
+          exit 1
+        fi
 
     - name: Build application
       run: pnpm build
@@ -114,26 +112,6 @@ jobs:
     - name: Fetch all tags
       run: git fetch --tags --force
 
-    - name: Determine rollback tag
-      id: get-tag
-      run: |
-        # Install dependencies for tag manager
-        pnpm install --no-frozen-lockfile
-
-        # Use the tag manager to validate and get rollback tag
-        if node scripts/tag-manager.js validate production; then
-          TAGS=$(git tag -l "production-*" --sort=-committerdate)
-          TAG=$(echo "$TAGS" | sed -n '2p')
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Rolling back to: $TAG"
-          git checkout $TAG
-        else
-          echo "::warning::Cannot rollback - insufficient production tags"
-          echo "::notice::Creating initial production tags for future rollbacks"
-          node scripts/tag-manager.js create production --message="Initial production tag for rollback capability" --push
-          echo "::error::Rollback not possible - this appears to be the first deployment"
-          exit 1
-        fi
     - name: Setup Node.js
       uses: actions/setup-node@v4.4.0
       with:
@@ -159,6 +137,24 @@ jobs:
 
     - name: Install dependencies
       run: pnpm install
+
+    - name: Determine rollback tag
+      id: get-tag
+      run: |
+        # Use the tag manager to validate and get rollback tag
+        if node scripts/tag-manager.js validate production; then
+          TAGS=$(git tag -l "production-*" --sort=-committerdate)
+          TAG=$(echo "$TAGS" | sed -n '2p')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Rolling back to: $TAG"
+          git checkout $TAG
+        else
+          echo "::warning::Cannot rollback - insufficient production tags"
+          echo "::notice::Creating initial production tags for future rollbacks"
+          node scripts/tag-manager.js create production --message="Initial production tag for rollback capability" --push
+          echo "::error::Rollback not possible - this appears to be the first deployment"
+          exit 1
+        fi
 
     - name: Build application
       run: pnpm build

@@ -7,28 +7,42 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   name: containerRegistryName
   location: azureLocation
   sku: {
-    name: 'Standard'
+    name: 'Premium'  // Required for security features
   }
   properties: {
     adminUserEnabled: false
     publicNetworkAccess: 'Disabled'
+    policies: {
+      quarantinePolicy: {
+        status: 'enabled'
+      }
+      retentionPolicy: {
+        status: 'enabled'
+        days: 30
+      }
+      trustPolicy: {
+        status: 'enabled'
+        type: 'Notary'
+      }
+    }
   }
 }
 
-// App Service Plan (Linux) - Using Consumption tier (serverless, no VM quota)
+// App Service Plan (Linux) - Using Premium V3 tier for zone redundancy and better performance
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: '${appServiceName}-plan'
   location: azureLocation
   sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
-    size: 'Y1'
-    family: 'Y'
-    capacity: 0
+    name: 'P1V3'
+    tier: 'PremiumV3'
+    size: 'P1V3'
+    family: 'Pv3'
+    capacity: 1
   }
   kind: 'linux'
   properties: {
     reserved: true
+    zoneRedundant: true  // Enable zone redundancy for high availability
   }
 }
 
@@ -95,6 +109,7 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
       healthCheckPath: '/api/health'
       ftpsState: 'Disabled'
       acrUseManagedIdentityCreds: true
+      minimumElasticInstanceCount: 2  // Minimum instances for failover
     }
   }
   identity: {
