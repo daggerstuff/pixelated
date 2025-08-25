@@ -42,6 +42,8 @@ jobs:
     needs: [ setup ]
     permissions:
       contents: read
+    outputs:
+      lint-status: ${{ steps.lint-check.outputs.lint-status }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
@@ -97,13 +99,13 @@ jobs:
       continue-on-error: true
       run: |
         echo "Running lint check..."
-        pnpm lint || {
+        if pnpm lint; then
+          echo "✅ Lint check passed"
+          echo "lint-status=passed" >> $GITHUB_OUTPUT
+        else
           echo "❌ Lint check found issues but continuing workflow"
           echo "lint-status=failed" >> $GITHUB_OUTPUT
-          exit 0
-        }
-        echo "✅ Lint check passed"
-        echo "lint-status=passed" >> $GITHUB_OUTPUT
+        fi
 
   typecheck:
     name: TypeScript Check
@@ -111,6 +113,8 @@ jobs:
     needs: [ setup ]
     permissions:
       contents: read
+    outputs:
+      typecheck-status: ${{ steps.typecheck-check.outputs.typecheck-status }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
@@ -132,8 +136,7 @@ jobs:
         run_install: false
 
     - name: Ensure Directories Exist
-      run: mkdir -p /home/runner/work/pixelated/pixelated/node_modules/supabase/bin
-
+      run: mkdir -p "$GITHUB_WORKSPACE/node_modules/supabase/bin"
     - name: Validate Environment
       run: |
         echo "Node.js version: $(node --version)"
@@ -174,13 +177,13 @@ jobs:
       continue-on-error: true
       run: |
         echo "Running TypeScript type check..."
-        pnpm check || {
+        if pnpm check; then
+          echo "✅ TypeScript check passed"
+          echo "typecheck-status=passed" >> $GITHUB_OUTPUT
+        else
           echo "❌ TypeScript check found issues but continuing workflow"
           echo "typecheck-status=failed" >> $GITHUB_OUTPUT
-          exit 0
-        }
-        echo "✅ TypeScript check passed"
-        echo "typecheck-status=passed" >> $GITHUB_OUTPUT
+        fi
 
   security-audit:
     name: Dependency Vulnerability Check
@@ -324,16 +327,7 @@ jobs:
         sudo service redis-server status || echo "Redis service status check failed"
 
     - name: Verify accessibility testing dependencies
-      run: |
-        echo "Ensuring axe-core is installed..."
-        if ! pnpm list axe-core --depth=0 | grep -q "axe-core"; then
-          echo "axe-core not found, installing..."
-          pnpm add -D axe-core
-        else
-          echo "✅ axe-core is already installed"
-        fi
-
-    - name: Rebuild Supabase binary
+      # axe-core should be pinned in package.json as a devDependency; no ad-hoc installs in CI
       run: pnpm rebuild supabase
 
     - name: Fix Playwright version conflicts
@@ -345,11 +339,13 @@ jobs:
         PLAYWRIGHT_VERSIONS=$(find node_modules -path "*playwright*" -type d -maxdepth 2 | sort)
         echo "Found Playwright installations:"
         echo "$PLAYWRIGHT_VERSIONS"
-        # Remove any playwright packages from node_modules
-        echo "Ensuring consistent Playwright version..."
-        rm -rf node_modules/playwright
-        # Reinstall the specific version we want
-        pnpm install @playwright/test@1.52.0 --save-dev
+        # Ensure consistent Playwright version without modifying package.json/lockfile
+        REQUIRED_PW="@playwright/test@1.52.0"
+        echo "Requiring $REQUIRED_PW"
+        if ! pnpm ls --depth=0 @playwright/test | grep -q "1.52.0"; then
+          echo "❌ Expected $REQUIRED_PW is not installed. Please pin it in package.json and update lockfile."
+          exit 1
+        fi
 
     - name: Prepare mock directories and files
       run: |
@@ -447,8 +443,20 @@ jobs:
         echo "## Code Quality Status" >> $GITHUB_STEP_SUMMARY
         echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
         echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-        echo "| Lint | ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed (non-blocking)' }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| TypeCheck | ${{ needs.typecheck.result == 'success' && '✅ Passed' || '❌ Failed (non-blocking)' }} |" >> $GITHUB_STEP_SUMMARY
+        if [[ "${{ needs.lint.outputs.lint-status }}" == "passed" ]]; then
+          echo "| Lint | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        elif [[ "${{ needs.lint.outputs.lint-status }}" == "failed" ]]; then
+          echo "| Lint | ❌ Failed (non-blocking) |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| Lint | ⚠️ Unknown |" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [[ "${{ needs.typecheck.outputs.typecheck-status }}" == "passed" ]]; then
+          echo "| TypeCheck | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        elif [[ "${{ needs.typecheck.outputs.typecheck-status }}" == "failed" ]]; then
+          echo "| TypeCheck | ❌ Failed (non-blocking) |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| TypeCheck | ⚠️ Unknown |" >> $GITHUB_STEP_SUMMARY
+        fi
         echo "| Tests | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
         echo ""
         echo "🚀 Continuing with build despite code quality issues..."
@@ -510,22 +518,18 @@ jobs:
         PLAYWRIGHT_VERSIONS=$(find node_modules -path "*playwright*" -type d -maxdepth 2 | sort)
         echo "Found Playwright installations:"
         echo "$PLAYWRIGHT_VERSIONS"
-        # Remove any playwright packages from node_modules
-        echo "Ensuring consistent Playwright version..."
-        rm -rf node_modules/playwright
-        # Reinstall the specific version we want
-        pnpm install @playwright/test@1.52.0 --save-dev
+        # Ensure consistent Playwright version without modifying package.json/lockfile
+        REQUIRED_PW="@playwright/test@1.52.0"
+        echo "Requiring $REQUIRED_PW"
+        if ! pnpm ls --depth=0 @playwright/test | grep -q "1.52.0"; then
+          echo "❌ Expected $REQUIRED_PW is not installed. Please pin it in package.json and update lockfile."
+          exit 1
+        fi
 
     - name: Rebuild Supabase binary
       run: pnpm rebuild supabase
 
-    - name: Ensure UI component directories exist
-      run: |
-        mkdir -p src/components/ui/button
-
-        echo 'export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from "../button"' \
-          > src/components/ui/button/index.ts
-        echo 'export { default } from "../button"' >> src/components/ui/button/index.ts
+    # Removed step that created src/components/ui/button/index.ts to avoid circular/self-import and overwriting existing barrel file
 
     - name: Build
       run: pnpm build
