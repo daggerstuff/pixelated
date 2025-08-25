@@ -64,7 +64,7 @@ validate-runner:
 # Build frontend container
 build-frontend:
   stage: build
-  image: ubuntu:latest
+  image: docker:24.0.5
   services:
     - name: docker:24.0.5-dind
       alias: docker
@@ -74,37 +74,35 @@ build-frontend:
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    # Set up SSH for Git operations
-    - apt-get update -y && apt-get install -y openssh-client git
-    - eval $(ssh-agent -s)
-    - echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H gitlab.com >> ~/.ssh/known_hosts
-    - ssh-keyscan -H git.pixelatedempathy.tech >> ~/.ssh/known_hosts
-    # Login to container registry
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    # Test registry connectivity before attempting login
+    - echo "🔍 Testing registry connectivity..."
+    - timeout 30 bash -c 'until nc -zv git.pixelatedempathy.tech 5050 2>/dev/null; do echo "⏳ Waiting for registry..."; sleep 5; done' || echo "⚠️  Registry connectivity test timed out, proceeding anyway..."
+    - echo "🔐 Attempting Docker registry login..."
+    - |
+      timeout 60 docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY || {
+        echo "❌ Docker login failed, retrying with stdin method...";
+        echo $CI_REGISTRY_PASSWORD | timeout 60 docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY;
+      }
+    - echo "✅ Docker login successful"
   script:
-    - echo "Building Pixelated Empathy frontend container..."
-    # Manually clone the repository via SSH
-    # Clone via SSH (new instance)
-    - git clone git@git.pixelatedempathy.tech:pixeltech/pixelated.git .
-    # For HTTPS cloning, use: https://git.pixelatedempathy.tech/pixeltech/pixelated.git
+    - echo "🏗️ Building Pixelated Empathy frontend container..."
     - ls -la
+    # Check if Dockerfile exists
+    - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
     # Enable Docker layer caching for faster builds
     - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
-    # If using npm/pnpm/yarn, cache dependencies for faster installs
-    - if [ -f package-lock.json ]; then echo "Restoring npm cache..."; npm ci --cache .npm --prefer-offline; fi
-    - if [ -f pnpm-lock.yaml ]; then echo "Restoring pnpm cache..."; pnpm install --frozen-lockfile --store-dir .pnpm-store; fi
-    - docker push $CONTAINER_IMAGE
-    - docker push $CONTAINER_IMAGE_LATEST
+    # If using npm/pnpm/yarn, cache dependencies for faster installs (build handles this)
+    - echo "📤 Pushing container to GitLab Container Registry..."
+    - timeout 300 docker push $CONTAINER_IMAGE
+    - timeout 300 docker push $CONTAINER_IMAGE_LATEST
     - echo "✅ Frontend container pushed to GitLab Container Registry"
-    - echo "Image SHA $CONTAINER_IMAGE"
-    - echo "Latest $CONTAINER_IMAGE_LATEST"
+    - |
+      echo "📦 Image SHA: $CONTAINER_IMAGE"
+      echo "🏷️  Latest: $CONTAINER_IMAGE_LATEST"
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_MERGE_REQUEST_ID
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: "$CI_MERGE_REQUEST_ID"
 
 # Test container health
 test-container:
@@ -149,8 +147,43 @@ deploy-vps:
   before_script:
     - apk add --no-cache openssh-client curl git
     - eval $(ssh-agent -s)
-    # Decode base64 SSH key and add to ssh-agent
-    - echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d | tr -d '\r' | ssh-add -
+    - |
+      # Decode and validate SSH private key
+      if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
+        echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
+        exit 1
+      fi
+
+      echo "🔑 Setting up SSH private key..."
+
+      # Create temporary file for the key
+      SSH_KEY_FILE=$(mktemp)
+      trap "rm -f $SSH_KEY_FILE" EXIT
+
+      # Decode the base64 key and write to temp file
+      if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
+        echo "❌ Failed to decode base64 SSH key"
+        exit 1
+      fi
+
+      # Validate the key format
+      if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
+        echo "❌ Invalid SSH key format - missing BEGIN marker"
+        echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
+        exit 1
+      fi
+
+      # Set correct permissions and add to ssh-agent
+      chmod 600 "$SSH_KEY_FILE"
+      if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
+        echo "❌ Failed to add SSH key to agent"
+        echo "Key details:"
+        head -n 2 "$SSH_KEY_FILE"
+        tail -n 2 "$SSH_KEY_FILE"
+        exit 1
+      fi
+
+      echo "✅ SSH key successfully added to agent"
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
@@ -181,7 +214,7 @@ deploy-vps:
         fi
 
         # Install Caddy if not present and domain is configured
-        if [[ -n "$VPS_DOMAIN" ]] && ! command -v caddy &> /dev/null; then
+        if [ -n "$VPS_DOMAIN" ] && ! command -v caddy &> /dev/null; then
             print_status "Installing Caddy..."
             apt-get update
             apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
@@ -209,7 +242,7 @@ deploy-vps:
         PUBLIC_URL="http://$VPS_HOST:4321"
         CORS_ORIGINS="http://$VPS_HOST:4321,https://$VPS_HOST:4321"
 
-        if [[ -n "$VPS_DOMAIN" ]]; then
+        if [ -n "$VPS_DOMAIN" ]; then
             PUBLIC_URL="https://$VPS_DOMAIN"
             CORS_ORIGINS="$CORS_ORIGINS,http://$VPS_DOMAIN,https://$VPS_DOMAIN"
         fi
@@ -389,7 +422,43 @@ rollback:
   before_script:
     - apk add --no-cache openssh-client
     - eval $(ssh-agent -s)
-    - echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d | tr -d '\r' | ssh-add -
+    - |
+      # Decode and validate SSH private key
+      if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
+        echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
+        exit 1
+      fi
+
+      echo "🔑 Setting up SSH private key..."
+
+      # Create temporary file for the key
+      SSH_KEY_FILE=$(mktemp)
+      trap "rm -f $SSH_KEY_FILE" EXIT
+
+      # Decode the base64 key and write to temp file
+      if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
+        echo "❌ Failed to decode base64 SSH key"
+        exit 1
+      fi
+
+      # Validate the key format
+      if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
+        echo "❌ Invalid SSH key format - missing BEGIN marker"
+        echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
+        exit 1
+      fi
+
+      # Set correct permissions and add to ssh-agent
+      chmod 600 "$SSH_KEY_FILE"
+      if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
+        echo "❌ Failed to add SSH key to agent"
+        echo "Key details:"
+        head -n 2 "$SSH_KEY_FILE"
+        tail -n 2 "$SSH_KEY_FILE"
+        exit 1
+      fi
+
+      echo "✅ SSH key successfully added to agent"
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
@@ -452,7 +521,43 @@ deploy-staging:
   before_script:
     - apk add --no-cache openssh-client curl git
     - eval $(ssh-agent -s)
-    - echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d | tr -d '\r' | ssh-add -
+    - |
+      # Decode and validate SSH private key
+      if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
+        echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
+        exit 1
+      fi
+
+      echo "🔑 Setting up SSH private key..."
+
+      # Create temporary file for the key
+      SSH_KEY_FILE=$(mktemp)
+      trap "rm -f $SSH_KEY_FILE" EXIT
+
+      # Decode the base64 key and write to temp file
+      if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
+        echo "❌ Failed to decode base64 SSH key"
+        exit 1
+      fi
+
+      # Validate the key format
+      if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
+        echo "❌ Invalid SSH key format - missing BEGIN marker"
+        echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
+        exit 1
+      fi
+
+      # Set correct permissions and add to ssh-agent
+      chmod 600 "$SSH_KEY_FILE"
+      if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
+        echo "❌ Failed to add SSH key to agent"
+        echo "Key details:"
+        head -n 2 "$SSH_KEY_FILE"
+        tail -n 2 "$SSH_KEY_FILE"
+        exit 1
+      fi
+
+      echo "✅ SSH key successfully added to agent"
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts

@@ -1,11 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@/test/setup-react19'
 // Defer importing BiasDashboard until after globals are stubbed
 let BiasDashboard: (typeof import('./BiasDashboard'))['BiasDashboard']
 import { vi } from 'vitest'
-import { setTimeout } from 'vitest'
-setTimeout(20000)
 import '@testing-library/jest-dom'
 
 // Keep original fetch to restore after tests
