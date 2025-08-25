@@ -77,6 +77,8 @@
       <excludeFolder url="file://$MODULE_DIR$/tests/coverage/home/vivi/pixelated/htmlcov" />
       <excludeFolder url="file://$MODULE_DIR$/tests/coverage/home/vivi/pixelated/src/integrations/react/dist" />
       <excludeFolder url="file://$MODULE_DIR$/tests/htmlcov" />
+      <excludeFolder url="file://$MODULE_DIR$/playwright-report" />
+      <excludeFolder url="file://$MODULE_DIR$/test-results" />
     </content>
     <orderEntry type="jdk" jdkName="uv (pixelated)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

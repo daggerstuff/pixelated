@@ -39,8 +39,14 @@ jobs:
           output_format: sarif
           output_file_path: checkov-results.sarif
           baseline: security-baseline.json
-          # Avoid setting policy_metadata, policy-metadata, policy_metadata_filter, or policy_metadata_filter_exception
           # Only standard documented inputs are set here to prevent CLI ambiguity
+
+      - name: Ensure Checkov SARIF file exists
+        run: |
+          if [ ! -f checkov-results.sarif ]; then
+            echo "Checkov SARIF file not found. Security scan failed."
+            exit 1
+          fi
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
