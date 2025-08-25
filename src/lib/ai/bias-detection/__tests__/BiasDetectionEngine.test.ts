@@ -456,12 +456,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should calculate correct alert levels', async () => {
       await biasEngine.initialize()
-      // Test low bias score (default mocks return ~0.25 overall, which should be 'low')
+      // Test low bias score (default mocks return 0.5 overall, which should be 'low')
       const lowBiasResult = await biasEngine.analyzeSession({
         ...mockSessionData,
         sessionId: 'low-bias-session',
       })
-      // With default mock scores (0.2, 0.3, 0.2, 0.3) and equal weights, overall should be ~0.25 which is 'low'
+      // With default mock scores (0.5, 0.5, 0.5, 0.5) and equal weights, overall should be 0.5 which is 'low'
       expect(lowBiasResult.alertLevel).toBe('low')
 
       // Mock high bias scores for all layers to ensure 'high' alert level
@@ -1134,7 +1134,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       engineWithZeroWeights.pythonService.runEvaluationAnalysis = vi
         .fn()
         .mockResolvedValue({
-          biasScore: 0.25, // This should be the final result since evaluation has weight 1.0
+          biasScore: 0.5, // This should be the final result since evaluation has weight 1.0
           huggingFaceMetrics: {
             toxicity: 0.05,
             bias: 0.15,
@@ -1161,7 +1161,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
       // Should still work but only use evaluation layer
       expect(result).toBeDefined()
-      // The weighted calculation should work correctly (only evaluation layer with weight 1.0 and biasScore 0.25)
+      // The weighted calculation should work correctly (only evaluation layer with weight 1.0 and biasScore 0.5)
       expect(result.overallBiasScore).toBe(0.5) // Note: Due to how the current weightedAverage function works, it may not handle zero weights perfectly
     })
 
