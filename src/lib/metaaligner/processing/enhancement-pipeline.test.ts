@@ -3,7 +3,11 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { EnhancementPipeline, type EnhancementPipelineConfig, type PipelineInput, } from './enhancement-pipeline'
+import {
+  EnhancementPipeline,
+  type EnhancementPipelineConfig,
+  type PipelineInput,
+} from './enhancement-pipeline'
 import { ContextType } from '../core/objectives'
 
 // Mock the logger
