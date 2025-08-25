@@ -3,6 +3,31 @@ const fs = require('fs');
 try {
   const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
+  // Gather all Astro, @astrojs, and astro- extensions that may be required at runtime.
+  const astroIncludePrefixes = [
+    '@astrojs/',
+    'astro-',
+    'astro'
+  ];
+  const extraAstroDeps = {};
+  Object.keys(pkg.dependencies || {}).forEach(dep => {
+    if (
+      astroIncludePrefixes.some(prefix => dep.startsWith(prefix)) &&
+      !['astro', '@astrojs/node', '@astrojs/react'].includes(dep)
+    ) {
+      extraAstroDeps[dep] = pkg.dependencies[dep];
+    }
+  });
+  // Also check for key astro extensions in devDependencies if "astro-*" or "@astrojs/*"
+  Object.keys(pkg.devDependencies || {}).forEach(dep => {
+    if (
+      astroIncludePrefixes.some(prefix => dep.startsWith(prefix)) &&
+      !(dep in extraAstroDeps)
+    ) {
+      extraAstroDeps[dep] = pkg.devDependencies[dep];
+    }
+  });
+
   const prodPkg = {
     name: pkg.name,
     version: pkg.version,
@@ -12,6 +37,7 @@ try {
       'astro': pkg.dependencies?.astro || pkg.devDependencies?.astro,
       '@astrojs/node': pkg.dependencies?.['@astrojs/node'],
       '@astrojs/react': pkg.dependencies?.['@astrojs/react'],
+      ...extraAstroDeps,
       'react': pkg.dependencies?.react,
       'react-dom': pkg.dependencies?.['react-dom'],
       // Essential utilities

@@ -1,0 +1,24 @@
+{{- if .Values.security.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "pixelated-empathy.fullname" . }}-default-deny
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "pixelated-empathy.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}
+      # Allow same-namespace traffic (can be tightened as needed)
+  egress:
+    - to:
+        - podSelector: {}
+      # Allow same-namespace egress (can be tightened as needed)
+{{- end }}

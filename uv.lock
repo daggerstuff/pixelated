@@ -2999,6 +2999,7 @@ dependencies = [
     { name = "trl" },
     { name = "wandb" },
     { name = "werkzeug" },
+    { name = "yamllint" },
 ]
 
 [package.optional-dependencies]
@@ -3083,6 +3084,7 @@ requires-dist = [
     { name = "trl", specifier = ">=0.9.6" },
     { name = "wandb", specifier = ">=0.21.1" },
     { name = "werkzeug" },
+    { name = "yamllint", specifier = ">=1.37.1" },
 ]
 provides-extras = ["test", "dev"]
 
@@ -5275,6 +5277,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/1f/6d/c61e0668943a034abc3a569cdc5aeae37d686d9da7e39cf2ed621d533e36/xxhash-3.5.0-cp313-cp313-win32.whl", hash = "sha256:53a068fe70301ec30d868ece566ac90d873e3bb059cf83c32e76012c889b8637", size = 30172, upload-time = "2024-08-17T09:19:04.355Z" },
     { url = "https://files.pythonhosted.org/packages/96/14/8416dce965f35e3d24722cdf79361ae154fa23e2ab730e5323aa98d7919e/xxhash-3.5.0-cp313-cp313-win_amd64.whl", hash = "sha256:80babcc30e7a1a484eab952d76a4f4673ff601f54d5142c26826502740e70b43", size = 30041, upload-time = "2024-08-17T09:19:05.435Z" },
     { url = "https://files.pythonhosted.org/packages/27/ee/518b72faa2073f5aa8e3262408d284892cb79cf2754ba0c3a5870645ef73/xxhash-3.5.0-cp313-cp313-win_arm64.whl", hash = "sha256:4811336f1ce11cac89dcbd18f3a25c527c16311709a89313c3acaf771def2d4b", size = 26801, upload-time = "2024-08-17T09:19:06.547Z" },
+]
+
+[[package]]
+name = "yamllint"
+version = "1.37.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pathspec" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/46/f2/cd8b7584a48ee83f0bc94f8a32fea38734cefcdc6f7324c4d3bfc699457b/yamllint-1.37.1.tar.gz", hash = "sha256:81f7c0c5559becc8049470d86046b36e96113637bcbe4753ecef06977c00245d", size = 141613, upload-time = "2025-05-04T08:25:54.355Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dd/b9/be7a4cfdf47e03785f657f94daea8123e838d817be76c684298305bd789f/yamllint-1.37.1-py3-none-any.whl", hash = "sha256:364f0d79e81409f591e323725e6a9f4504c8699ddf2d7263d8d2b539cd66a583", size = 68813, upload-time = "2025-05-04T08:25:52.552Z" },
 ]
 
 [[package]]

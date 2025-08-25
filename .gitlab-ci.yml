@@ -42,9 +42,11 @@ validate-runner:
     - set -e
     - echo "Validating GitLab runner capabilities..."
     - apk add --no-cache openssh-client git
-    - if ! command -v docker &> /dev/null; then
-        echo "Docker not found or failed to install." ; exit 1
-      fi
+    - |
+        if ! command -v docker &> /dev/null; then
+          echo "Docker not found or failed to install."
+          exit 1
+        fi
     - docker --version
     - docker info
     - echo "Docker is available and working"

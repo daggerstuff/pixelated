@@ -9,10 +9,7 @@
       "value": "production"
     },
     "containerRegistryName": {
-      "value": "pixelatedcr"
-    },
-    "containerAppName": {
-      "value": "pixelated-web"
+      "value": "pixelatedbox"
     },
     "appServiceName": {
       "value": "pixelated"

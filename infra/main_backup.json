@@ -114,9 +114,10 @@
         "enablePurgeProtection": true,
         "softDeleteRetentionInDays": 7,
         "networkAcls": {
-          "bypass": "AzureServices",
-          "defaultAction": "Allow"
-        }
+          "bypass": "None",
+          "defaultAction": "Deny"
+        },
+        "publicNetworkAccess": "Disabled"
       }
     },
     {
@@ -136,7 +137,16 @@
       "properties": {
         "adminUserEnabled": false,
         "publicNetworkAccess": "Disabled",
-        "dataEndpointEnabled": false
+        "dataEndpointEnabled": false,
+        "policies": {
+          "quarantinePolicy": {
+            "status": "enabled"
+          },
+          "trustPolicy": {
+            "type": "NotaryV2",
+            "status": "enabled"
+          }
+        }
       }
     },
     {
