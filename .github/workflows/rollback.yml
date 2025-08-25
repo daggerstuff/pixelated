@@ -87,6 +87,8 @@ jobs:
     - name: Create rollback tag
       run: |
         TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
         git tag rollback-staging-$TIMESTAMP
         git push origin rollback-staging-$TIMESTAMP
 
@@ -162,5 +164,7 @@ jobs:
     - name: Create rollback tag
       run: |
         TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
         git tag rollback-production-$TIMESTAMP
         git push origin rollback-production-$TIMESTAMP

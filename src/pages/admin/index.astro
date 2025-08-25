@@ -1,15 +1,19 @@
 ---
-// Temporary placeholder page for build
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import AdminLayout from '../../components/admin/AdminLayout.astro'
 ---
 
-<BaseLayout title="Placeholder Page">
+<AdminLayout title="Admin Dashboard" activeItem="dashboard">
   <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold">Placeholder Page</h1>
-    <p>
-      This page is temporarily replaced during the build process to avoid null
-      byte issues.
-    </p>
-    <p>The original page will be restored after the build.</p>
+    <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+    <p>Welcome to the Admin Dashboard. Use the controls below to manage system operations.</p>
+    <div class="admin-controls mt-6">
+      <!-- Admin controls and widgets will be rendered here -->
+      <ul>
+        <li><a href="/admin/users" class="underline text-blue-600">Manage Users</a></li>
+        <li><a href="/admin/audit-logs" class="underline text-blue-600">View Audit Logs</a></li>
+        <li><a href="/admin/performance-dashboard" class="underline text-blue-600">Performance Dashboard</a></li>
+        <!-- Add more admin links as needed -->
+      </ul>
+    </div>
   </div>
-</BaseLayout>
+</AdminLayout>

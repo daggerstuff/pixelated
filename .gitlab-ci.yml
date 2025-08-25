@@ -77,8 +77,12 @@ build-frontend:
   - set -Eeuo pipefail
   # Test registry connectivity before attempting login
   - echo "🔍 Testing registry connectivity..."
-  - >
-    registry_host="git.pixelatedempathy.tech" registry_port="5050" registry_url="https://${registry_host}:${registry_port}/v2/" COUNT=0 until nc -zv $registry_host $registry_port 2>/dev/null; do
+  - |
+    registry_host="git.pixelatedempathy.tech"
+    registry_port="5050"
+    registry_url="https://${registry_host}:${registry_port}/v2/"
+    COUNT=0
+    until nc -zv $registry_host $registry_port 2>/dev/null; do
       echo "⏳ Waiting for registry at $registry_host:$registry_port..."
       sleep 5
       COUNT=$((COUNT + 5))
@@ -96,7 +100,26 @@ build-frontend:
       echo "⚠️  curl not available; skipped direct HTTP(s) smoke test."
     fi
   - echo "🔐 Attempting Docker registry login..."
+
   - |
+    # Wait for real registry HTTP(S) connectivity before login
+    echo "🔍 Verifying registry endpoint responsiveness before Docker login..."
+    registry_url="https://git.pixelatedempathy.tech:5050/v2/"
+    MAX_RETRIES=6
+    RETRY_DELAY=5
+    for attempt in $(seq 1 $MAX_RETRIES); do
+      if curl -k -sSL -o /dev/null -w "%{http_code}" "$registry_url" | grep -Eq "^(200|401|404)$"; then
+        echo "✅ Registry endpoint $registry_url is accessible (HTTP status 200/401/404)"
+        break
+      else
+        echo "⏳ [$attempt/$MAX_RETRIES] Registry endpoint not reachable yet, retrying in $RETRY_DELAY sec..."
+        sleep $RETRY_DELAY
+      fi
+      if [ "$attempt" -eq "$MAX_RETRIES" ]; then
+        echo "⚠️  Registry still unreachable after ${MAX_RETRIES} attempts, will proceed with Docker login but likely to fail."
+      fi
+    done
+
     if echo "$CI_REGISTRY_PASSWORD" | timeout 60 docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"; then
       echo "✅ Docker login successful"
     else

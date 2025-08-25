@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@/test/setup-react19'
 // Defer importing BiasDashboard until after globals are stubbed
 let BiasDashboard: (typeof import('./BiasDashboard'))['BiasDashboard']
-import { vi } from 'vitest'
 import '@testing-library/jest-dom'
 
 // Keep original fetch to restore after tests
@@ -1608,7 +1607,7 @@ describe('BiasDashboard', () => {
       // Assert on deterministic SR announcement which is always emitted
       await waitFor(() => {
         expect(
-          screen.getByText(/new high bias alert:\s*real-time high bias detected/i),
+          screen.getByText('New high bias alert: Real-time high bias detected'),
         ).toBeInTheDocument()
       })
     })
