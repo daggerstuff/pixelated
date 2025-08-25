@@ -1,0 +1,354 @@
+# Default values for pixelated-empathy Helm chart
+
+# PostgreSQL settings
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "changeme123"
+    username: "pixelated"
+    password: "changeme123"
+    database: "pixelated_empathy"
+  architecture: standalone
+  primary:
+    initdb:
+      scripts:
+        init.sql: |
+          CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+          CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+# Redis settings
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    password: "changeme123"
+  master:
+    persistence:
+      enabled: false
+
+# Caddy Ingress Controller settings
+ingress:
+  enabled: true
+
+caddy-ingress-controller:
+  enabled: true
+
+  # Caddy-specific configuration
+  config: |
+    # Global configuration
+    {
+      email admin@pixelatedempathy.com
+      acme_ca https://acme-v02.api.letsencrypt.org/directory
+    }
+
+    # Main API ingress
+    api.pixelatedempathy.com {
+      reverse_proxy pixelated-empathy-api:3000
+
+      # Security headers
+      header {
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        X-XSS-Protection "1; mode=block"
+      }
+
+      # Rate limiting
+      rate_limit {
+        zone static {
+          key {remote_host}
+          window 1m
+          events 100
+        }
+      }
+
+      # Request logging
+      log {
+        output file /var/log/caddy/api.log {
+          roll_size 10mb
+          roll_keep 5
+        }
+        format json
+      }
+
+      # Health check endpoint (no auth required)
+      @health {
+        path /api/health
+        path /api/health/simple
+      }
+
+      # API endpoints with authentication
+      @api {
+        path /api/*
+      }
+
+      # JWT authentication for API endpoints
+      jwt @api {
+        primary yes
+        trusted_tokens {
+          static_secret {
+            token_name "access_token"
+            secret "your-jwt-secret-here"
+            alg HS256
+          }
+        }
+        allow roles auth
+      }
+
+      # CORS configuration
+      @cors_preflight {
+        method OPTIONS
+      }
+
+      header @cors_preflight {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+        Access-Control-Max-Age "86400"
+        Vary "Origin"
+      }
+
+      handle @cors_preflight {
+        respond 200
+      }
+
+      # WebSocket support for real-time features
+      @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+      }
+
+      reverse_proxy @websocket pixelated-empathy-ws:3001
+    }
+
+    # Static assets with caching
+    static.pixelatedempathy.com {
+      reverse_proxy pixelated-empathy-static:3000
+
+      # Aggressive caching for static assets
+      @static {
+        path *.js
+        path *.css
+        path *.png
+        path *.jpg
+        path *.jpeg
+        path *.gif
+        path *.svg
+        path *.ico
+        path *.woff
+        path *.woff2
+      }
+
+      header @static {
+        Cache-Control "public, max-age=31536000, immutable"
+        X-Frame-Options "SAMEORIGIN"
+      }
+
+      # Security headers
+      header {
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+      }
+
+      # Compression
+      encode gzip zstd
+
+      # Logging
+      log {
+        output file /var/log/caddy/static.log {
+          roll_size 10mb
+          roll_keep 3
+        }
+        format json
+      }
+    }
+
+  # Resource limits
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Service configuration
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "your-certificate-arn"
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+
+  # Node selector and tolerations for security
+  nodeSelector:
+    workload: ingress
+
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "ingress"
+      effect: "NoSchedule"
+
+  # Pod security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+  # Pod disruption budget
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# Application deployment
+pixelated-empathy:
+  image:
+    repository: pixelatedempathy/pixelated-empathy
+    tag: "latest"
+    pullPolicy: Always
+
+  replicaCount: 3
+
+  # Environment variables
+  env:
+    - name: NODE_ENV
+      value: "production"
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: pixelated-empathy-secrets
+          key: database-url
+    - name: REDIS_URL
+      valueFrom:
+        secretKeyRef:
+          name: pixelated-empathy-secrets
+          key: redis-url
+    - name: JWT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: pixelated-empathy-secrets
+          key: jwt-secret
+
+  # Resource limits
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /api/health
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /api/health/simple
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+  # Node selector and tolerations
+  nodeSelector:
+    workload: application
+
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "application"
+      effect: "NoSchedule"
+
+  # Service account
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/pixelated-empathy-service-account"
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    ports:
+      - name: http
+        port: 3000
+        targetPort: 3000
+      - name: websocket
+        port: 3001
+        targetPort: 3001
+
+  # Ingress configuration (handled by Caddy)
+  ingress:
+    enabled: false  # Using Caddy ingress controller
+
+  # Static file service
+  static:
+    enabled: true
+    image:
+      repository: nginx
+      tag: "alpine"
+    service:
+      type: ClusterIP
+      port: 80
+
+# Monitoring and logging
+monitoring:
+  enabled: true
+
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+  grafana:
+    enabled: false  # Use external Grafana
+
+  loki:
+    enabled: true
+
+# Security settings
+security:
+  networkPolicy:
+    enabled: true
+
+  podSecurityPolicy:
+    enabled: false
+
+  secrets:
+    enabled: true
+    backend: "secrets-manager"  # or "parameter-store"
+
+# Backup configuration
+backup:
+  enabled: true
+
+  postgresql:
+    schedule: "0 2 * * *"
+    retention: "30d"
+
+  redis:
+    schedule: "0 3 * * *"
+    retention: "7d"

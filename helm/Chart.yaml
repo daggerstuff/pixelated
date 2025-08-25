@@ -4,12 +4,12 @@ description: A Helm chart for Pixelated Empathy application
 type: application
 version: 1.0.0
 appVersion: "1.0.0"
-home: https://pixelated-empathy.com
+home: https://pixelatedempathy.com
 sources:
-  - https://github.com/pixelated-empathy/pixelated-empathy
+  - https://github.com/pixelatedempathy/pixelated
 maintainers:
   - name: Pixelated Empathy Team
-    email: devops@pixelated-empathy.com
+    email: devops@pixelatedempathy.com
 keywords:
   - ai
   - empathy
@@ -24,7 +24,7 @@ dependencies:
     version: "17.x.x"
     repository: https://charts.bitnami.com/bitnami
     condition: redis.enabled
-  - name: nginx-ingress
-    version: "4.x.x"
-    repository: https://kubernetes.github.io/ingress-nginx
+  - name: caddy-ingress-controller
+    version: "1.0.0"
+    repository: https://caddyserver.github.io/ingress/
     condition: ingress.enabled

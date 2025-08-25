@@ -34,42 +34,9 @@ FROM base AS deps
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Create minimal package.json for production dependencies only
-RUN node -e "
-const pkg = require('./package.json');
-const prodPkg = {
-  name: pkg.name,
-  version: pkg.version,
-  type: pkg.type,
-  dependencies: {
-    // Core runtime dependencies only
-    'astro': pkg.dependencies.astro || pkg.devDependencies.astro,
-    '@astrojs/node': pkg.dependencies['@astrojs/node'],
-    '@astrojs/react': pkg.dependencies['@astrojs/react'],
-    'react': pkg.dependencies.react,
-    'react-dom': pkg.dependencies['react-dom'],
-    // Essential utilities
-    'clsx': pkg.dependencies.clsx,
-    'nanoid': pkg.dependencies.nanoid,
-    'zod': pkg.dependencies.zod,
-    // Database connections
-    'mongodb': pkg.dependencies.mongodb,
-    'redis': pkg.dependencies.redis,
-    'pg': pkg.dependencies.pg,
-    // Security
-    'bcryptjs': pkg.dependencies.bcryptjs,
-    'jsonwebtoken': pkg.dependencies.jsonwebtoken,
-    // HTTP client
-    'axios': pkg.dependencies.axios,
-    // Date utilities
-    'date-fns': pkg.dependencies['date-fns']
-  },
-  scripts: {
-    start: pkg.scripts.start
-  }
-};
-require('fs').writeFileSync('./package.prod.json', JSON.stringify(prodPkg, null, 2));
-"
+# Create production package.json using a separate script to avoid parsing issues
+COPY scripts/create-prod-package.js ./
+RUN node create-prod-package.js
 
 # Install only production dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \

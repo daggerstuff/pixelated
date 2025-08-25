@@ -124,7 +124,7 @@ resource "aws_db_instance" "main" {
   auto_minor_version_upgrade = true
   deletion_protection = true
   copy_tags_to_snapshot = true
-  parameter_group_name = "default.postgres15"
+  parameter_group_name = aws_db_parameter_group.main.name
   final_snapshot_identifier = "${var.project_name}-db-final-snapshot"
   skip_final_snapshot = false
 
@@ -203,6 +203,54 @@ resource "aws_security_group" "redis" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = [var.vpc_cidr]
+  }
+
+  tags = var.common_tags
+}
+
+# DB Parameter Group for enhanced logging
+resource "aws_db_parameter_group" "main" {
+  family = "postgres15"
+  name   = "${var.project_name}-db-params"
+
+  parameter {
+    name  = "log_statement"
+    value = "all"
+  }
+
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "1000"  # Log queries taking longer than 1 second
+  }
+
+  parameter {
+    name  = "log_connections"
+    value = "1"
+  }
+
+  parameter {
+    name  = "log_disconnections"
+    value = "1"
+  }
+
+  parameter {
+    name  = "log_line_prefix"
+    value = "%t [%p-%l] %q%u@%d "
+  }
+
+  parameter {
+    name  = "log_lock_waits"
+    value = "1"
+  }
+
+  parameter {
+    name  = "log_temp_files"
+    value = "0"
+  }
+
+  parameter {
+    name  = "track_functions"
+    value = "all"
   }
 
   tags = var.common_tags
