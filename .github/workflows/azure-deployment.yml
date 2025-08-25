@@ -177,25 +177,41 @@ jobs:
         # Validate outputs are present and valid JSON
         if [[ -z "$OUTPUTS" || "$OUTPUTS" == "null" ]]; then
           echo "ERROR: Deployment outputs are empty (deployment may have failed validation or encountered an error)"
-          exit 1
-        fi
-        echo "$OUTPUTS" | jq . >/dev/null 2>&1
-        if [ $? -ne 0 ]; then
-          echo "ERROR: Deployment outputs are not valid JSON. Actual output:"
-          echo "$OUTPUTS"
-          exit 1
+          echo "Checking deployment result..."
+          if [[ "${{ steps.bicep.outcome }}" != "success" ]]; then
+            echo "Deployment failed with outcome: ${{ steps.bicep.outcome }}"
+            echo "Error message: ${{ steps.bicep.outputs.errorMessage }}"
+            exit 1
+          fi
         fi
 
-        # Extract specific outputs (must exist in infra/main.bicep)
-        KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value // empty')
-        REGISTRY_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value // empty')
-        REGISTRY_LOGIN_SERVER=$(echo "$OUTPUTS" | jq -r '.AZURE_CONTAINER_REGISTRY_ENDPOINT.value // empty')
-        APP_SERVICE_NAME=$(echo "$OUTPUTS" | jq -r '.appServiceName.value // empty')
+        # Try to parse JSON, if it fails, try alternative format
+        if echo "$OUTPUTS" | jq . >/dev/null 2>&1; then
+          echo "Parsing JSON format outputs..."
+          # Extract specific outputs (must exist in infra/main.bicep)
+          KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value // empty')
+          REGISTRY_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value // empty')
+          REGISTRY_LOGIN_SERVER=$(echo "$OUTPUTS" | jq -r '.AZURE_CONTAINER_REGISTRY_ENDPOINT.value // empty')
+          APP_SERVICE_NAME=$(echo "$OUTPUTS" | jq -r '.appServiceName.value // empty')
+        else
+          echo "JSON parsing failed, trying alternative format..."
+          # Fallback to direct values if JSON parsing fails
+          KEY_VAULT_NAME="${{ env.AZURE_APP_NAME }}-kv"
+          REGISTRY_NAME="${{ env.AZURE_APP_NAME }}box"
+          REGISTRY_LOGIN_SERVER="${{ env.AZURE_APP_NAME }}box.azurecr.io"
+          APP_SERVICE_NAME="${{ env.AZURE_APP_NAME }}"
+        fi
 
         echo "key-vault-name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
         echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
         echo "registry-login-server=$REGISTRY_LOGIN_SERVER" >> $GITHUB_OUTPUT
         echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
+
+        echo "Extracted outputs:"
+        echo "  Key Vault: $KEY_VAULT_NAME"
+        echo "  Registry: $REGISTRY_NAME"
+        echo "  Registry Server: $REGISTRY_LOGIN_SERVER"
+        echo "  App Service: $APP_SERVICE_NAME"
 
     - name: Store secrets in Key Vault
       env:

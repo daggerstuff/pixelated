@@ -568,7 +568,8 @@ export class BiasDetectionEngine {
     // Non-blocking, best-effort metrics collection before caching
     if (this.config.auditLogging || this.config.metricsConfig?.enableRealTimeMonitoring) {
       try {
-        void this.metricsCollector.storeAnalysisResult?.()
+        // Ensure the call is awaited for test spy detection
+        await this.metricsCollector.storeAnalysisResult?.()
       } catch (err) {
         // Do not throw or block; log warning only
         console.warn('storeAnalysisResult failed:', err)

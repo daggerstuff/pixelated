@@ -183,8 +183,8 @@ stages:
           astro-build-v2 | "$(Agent.OS)"
           astro-build | "$(Agent.OS)"
         path: |
-          node_modules/.astro
-          .astro
+          $(Build.SourcesDirectory)/node_modules/.astro
+          $(Build.SourcesDirectory)/.astro
           $(Agent.WorkFolder)/.astro-cache
           $(Agent.WorkFolder)/.vite-cache
         # Ensure cache directories exist before attempting to cache them
@@ -264,6 +264,12 @@ stages:
           steps:
           - script: |
               set -e
+              # Ensure Node.js is available inside the container for node-based scripts
+              echo "Installing Node.js (LTS 22.x) for container agent..."
+              apt-get update -qq && apt-get install -y curl ca-certificates
+              curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+              apt-get install -y nodejs
+              node --version
               # Removed redundant Azure CLI install: agent container already has az
               export PYTHONWARNINGS="ignore::FutureWarning"
               export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
@@ -646,6 +652,12 @@ stages:
           steps:
           - script: |
               set -eo pipefail
+              # Ensure Node.js (22.x) is available inside the container for any Node-based steps
+              echo "Installing Node.js (LTS 22.x) for container agent..."
+              apt-get update -qq && apt-get install -y curl ca-certificates
+              curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+              apt-get install -y nodejs
+              node --version
               echo "Ensuring Azure CLI is available..."
 
               # Set environment variables to suppress warnings
