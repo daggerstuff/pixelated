@@ -76,12 +76,33 @@ build-frontend:
   before_script:
     # Test registry connectivity before attempting login
     - echo "🔍 Testing registry connectivity..."
-    - timeout 30 bash -c 'until nc -zv git.pixelatedempathy.tech 5050 2>/dev/null; do echo "⏳ Waiting for registry..."; sleep 5; done' || echo "⚠️  Registry connectivity test timed out, proceeding anyway..."
-    - echo "🔐 Attempting Docker registry login..."
+    - >
+      registry_host="git.pixelatedempathy.tech"
+      registry_port="5050"
+      registry_url="https://${registry_host}:${registry_port}/v2/"
+      COUNT=0
+      until nc -zv $registry_host $registry_port 2>/dev/null; do
+        echo "⏳ Waiting for registry at $registry_host:$registry_port..."
+        sleep 5
+        COUNT=$((COUNT + 5))
+        [ $COUNT -ge 30 ] && echo "⚠️  Registry connectivity test timed out, proceeding anyway..." && break
+      done
     - |
-      timeout 60 docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY || {
+      echo "🌐 Verifying Docker registry HTTP connectivity..."
+      if apk add --no-cache curl > /dev/null 2>&1; then
+        if ! curl -sSL -o /dev/null -w "%{http_code}" "$registry_url" | grep -Eq "^(200|401|404)$"; then
+          echo "❌ HTTP connectivity to $registry_url failed - check runner network, registry status, or firewalls."
+        else
+          echo "✅ Registry HTTP(s) check passed (expected code: 200, 401, or 404)."
+        fi
+      else
+        echo "⚠️  curl not available; skipped direct HTTP(s) smoke test."
+      fi
+    - echo "🔐 Attempting Docker registry login..."
+    - >
+      timeout 60 docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY" || {
         echo "❌ Docker login failed, retrying with stdin method...";
-        echo $CI_REGISTRY_PASSWORD | timeout 60 docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY;
+        echo "$CI_REGISTRY_PASSWORD" | timeout 60 docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY";
       }
     - echo "✅ Docker login successful"
   script:
