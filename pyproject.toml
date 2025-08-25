@@ -37,7 +37,7 @@ dependencies = [
   "chardet>=5.2.0",
   "pydub>=0.25.1",
   "sourcery>=1.37.0",
-  "torch==2.7.1",
+  "torch>=2.8.0",
   "torchvision",
   "torchaudio",
   "pyarrow>=21.0.0",
@@ -165,3 +165,8 @@ index-strategy = "unsafe-best-match"
 
 [tool.uv.sources.pytorch-cpu]
 url = "https://download.pytorch.org/whl/cpu"
+
+[dependency-groups]
+dev = [
+    "pip-audit>=2.9.0",
+]

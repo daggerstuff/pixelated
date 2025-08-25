@@ -114,6 +114,27 @@ stages:
 
               echo "Cache directory validation completed"
             displayName: Prepare and validate cache directories
+          - script: |
+              echo "==== Cache Directory Diagnostics Before Cache@2 Step ===="
+              echo "Current working directory: $(pwd)"
+              for dir in node_modules/.astro .astro "$(Agent.WorkFolder)/.astro-cache" "$(Agent.WorkFolder)/.vite-cache"; do
+                echo "Checking: $dir"
+                if [ -d "$dir" ]; then
+                  ls -lna "$dir"
+                  stat "$dir"
+                  find "$dir" | head -20
+                else
+                  echo "$dir does NOT exist"
+                fi
+              done
+              echo "Listing parent directories for .astro-cache and .vite-cache:"
+              ls -lna "$(dirname "$(Agent.WorkFolder)/.astro-cache")"
+              ls -lna "$(dirname "$(Agent.WorkFolder)/.vite-cache")"
+              echo "Full disk usage:"
+              df -h
+              echo "Current user: $(id)"
+              echo "==== End Diagnostics ===="
+            displayName: "Verbose diagnostics on Astro/Vite cache paths before Cache@2"
 
           - task: Cache@2
             displayName: Cache Astro build artifacts
@@ -196,7 +217,7 @@ stages:
           name: "azure-infrastructure"
         pool:
           name: "Default"
-        container: mcr.microsoft.com/azure-cli:latest
+        container: mcr.microsoft.com/azure-cli:2.61.0
         strategy:
           runOnce:
             deploy:

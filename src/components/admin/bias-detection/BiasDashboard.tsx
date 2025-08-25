@@ -1431,9 +1431,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           data-testid="new-high-bias-alert"
         >
           <div>
-            <span className="font-bold text-orange-700 mr-2">New high bias alert</span>
-            <span className="text-sm text-orange-800">
-              {newHighBiasAlert.message}
+            <span className="font-bold text-orange-700 text-sm">
+              {`New high bias alert: ${newHighBiasAlert.message}`}
             </span>
           </div>
           <button

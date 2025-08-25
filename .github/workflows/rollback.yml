@@ -10,7 +10,7 @@ permissions: read-all # Set restrictive default at workflow level
 
 # Environment variables can be defined here
 env:
-  NODE_VERSION: 22.16.0
+  NODE_VERSION: 22.18.0
   PNPM_VERSION: 10.15.0
   NODE_ENV: production
 
@@ -57,8 +57,6 @@ jobs:
           echo "::error::Rollback not possible - this appears to be the first deployment"
           exit 1
         fi
-      shell: /usr/bin/bash -e {0}
-
     - name: Setup Node.js
       uses: actions/setup-node@v4.4.0
       with:
@@ -97,7 +95,7 @@ jobs:
   rollback-production:
     name: Rollback Production
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     concurrency:
       group: production_environment
       cancel-in-progress: true
@@ -136,8 +134,6 @@ jobs:
           echo "::error::Rollback not possible - this appears to be the first deployment"
           exit 1
         fi
-      shell: /usr/bin/bash -e {0}
-
     - name: Setup Node.js
       uses: actions/setup-node@v4.4.0
       with:

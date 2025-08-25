@@ -10,8 +10,8 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
     name: 'Standard'
   }
   properties: {
-    adminUserEnabled: true
-    publicNetworkAccess: 'Enabled'
+    adminUserEnabled: false
+    publicNetworkAccess: 'Disabled'
   }
 }
 
@@ -91,6 +91,7 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
         }
       ]
       linuxFxVersion: 'DOCKER|${acr.properties.loginServer}/pixelated:latest'
+      alwaysOn: true
       healthCheckPath: '/api/health'
       ftpsState: 'Disabled'
       acrUseManagedIdentityCreds: true

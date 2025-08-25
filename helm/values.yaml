@@ -4,10 +4,12 @@
 postgresql:
   enabled: true
   auth:
-    postgresPassword: "changeme123"
     username: "pixelated"
-    password: "changeme123"
     database: "pixelated_empathy"
+    existingSecret: "pixelated-postgres-secret" # secret must provide: postgres-password, password
+    secretKeys:
+      adminPasswordKey: "postgres-password"
+      userPasswordKey: "password"
   architecture: standalone
   primary:
     initdb:
@@ -21,7 +23,8 @@ redis:
   enabled: true
   architecture: standalone
   auth:
-    password: "changeme123"
+    existingSecret: "pixelated-redis-secret" # secret must provide: redis-password
+    existingSecretPasswordKey: "redis-password"
   master:
     persistence:
       enabled: false
@@ -43,7 +46,7 @@ caddy-ingress-controller:
 
     # Main API ingress
     api.pixelatedempathy.com {
-      reverse_proxy pixelated-empathy-api:3000
+      reverse_proxy {{ tpl "{{ include \"pixelated-empathy.fullname\" . }}:3000" . }}
 
       # Security headers
       header {
@@ -65,10 +68,7 @@ caddy-ingress-controller:
 
       # Request logging
       log {
-        output file /var/log/caddy/api.log {
-          roll_size 10mb
-          roll_keep 5
-        }
+        output stdout
         format json
       }
 
@@ -77,10 +77,14 @@ caddy-ingress-controller:
         path /api/health
         path /api/health/simple
       }
+      handle @health {
+        # No authentication for health endpoints
+        respond 200
+      }
 
-      # API endpoints with authentication
+      # API endpoints with authentication (exclude health endpoints)
       @api {
-        path /api/*
+        path_regexp ^/api/(?!health($|/simple$)).*
       }
 
       # JWT authentication for API endpoints
@@ -89,7 +93,7 @@ caddy-ingress-controller:
         trusted_tokens {
           static_secret {
             token_name "access_token"
-            secret "your-jwt-secret-here"
+            secret "{$JWT_SECRET}"
             alg HS256
           }
         }
@@ -118,13 +122,12 @@ caddy-ingress-controller:
         header Connection *Upgrade*
         header Upgrade websocket
       }
-
-      reverse_proxy @websocket pixelated-empathy-ws:3001
+      reverse_proxy @websocket {{ tpl "{{ include \"pixelated-empathy.fullname\" . }}:3001" . }}
     }
 
     # Static assets with caching
     static.pixelatedempathy.com {
-      reverse_proxy pixelated-empathy-static:3000
+      reverse_proxy {{ tpl "{{ include \"pixelated-empathy-static.fullname\" . }}:80" . }}
 
       # Aggressive caching for static assets
       @static {
@@ -157,10 +160,7 @@ caddy-ingress-controller:
 
       # Logging
       log {
-        output file /var/log/caddy/static.log {
-          roll_size 10mb
-          roll_keep 3
-        }
+        output stdout
         format json
       }
     }
@@ -188,11 +188,10 @@ caddy-ingress-controller:
     workload: ingress
 
   tolerations:
-    - key: "workload"
-      operator: "Equal"
-      value: "ingress"
-      effect: "NoSchedule"
-
+  - key: "workload"
+    operator: "Equal"
+    value: "ingress"
+    effect: "NoSchedule"
   # Pod security context
   securityContext:
     runAsNonRoot: true
@@ -208,32 +207,29 @@ caddy-ingress-controller:
 # Application deployment
 pixelated-empathy:
   image:
-    repository: pixelatedempathy/pixelated-empathy
-    tag: "latest"
-    pullPolicy: Always
-
-  replicaCount: 3
+    repository: pixelatedempathy/pixelated
+    tag: "v1.4.3"        # pin a real release
+    pullPolicy: IfNotPresent
 
   # Environment variables
   env:
-    - name: NODE_ENV
-      value: "production"
-    - name: DATABASE_URL
-      valueFrom:
-        secretKeyRef:
-          name: pixelated-empathy-secrets
-          key: database-url
-    - name: REDIS_URL
-      valueFrom:
-        secretKeyRef:
-          name: pixelated-empathy-secrets
-          key: redis-url
-    - name: JWT_SECRET
-      valueFrom:
-        secretKeyRef:
-          name: pixelated-empathy-secrets
-          key: jwt-secret
-
+  - name: NODE_ENV
+    value: "production"
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: pixelated-empathy-secrets
+        key: database-url
+  - name: REDIS_URL
+    valueFrom:
+      secretKeyRef:
+        name: pixelated-empathy-secrets
+        key: redis-url
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: pixelated-empathy-secrets
+        key: jwt-secret
   # Resource limits
   resources:
     limits:
@@ -271,18 +267,17 @@ pixelated-empathy:
     readOnlyRootFilesystem: true
     capabilities:
       drop:
-        - ALL
+      - ALL
 
   # Node selector and tolerations
   nodeSelector:
     workload: application
 
   tolerations:
-    - key: "workload"
-      operator: "Equal"
-      value: "application"
-      effect: "NoSchedule"
-
+  - key: "workload"
+    operator: "Equal"
+    value: "application"
+    effect: "NoSchedule"
   # Service account
   serviceAccount:
     create: true
@@ -293,23 +288,23 @@ pixelated-empathy:
   service:
     type: ClusterIP
     ports:
-      - name: http
-        port: 3000
-        targetPort: 3000
-      - name: websocket
-        port: 3001
-        targetPort: 3001
+    - name: http
+      port: 3000
+      targetPort: 3000
+    - name: websocket
+      port: 3001
+      targetPort: 3001
 
   # Ingress configuration (handled by Caddy)
   ingress:
-    enabled: false  # Using Caddy ingress controller
+    enabled: false # Using Caddy ingress controller
 
   # Static file service
   static:
     enabled: true
     image:
-      repository: nginx
-      tag: "alpine"
+      repository: caddy
+      tag: "2-alpine"
     service:
       type: ClusterIP
       port: 80
@@ -324,7 +319,7 @@ monitoring:
       enabled: true
 
   grafana:
-    enabled: false  # Use external Grafana
+    enabled: false # Use external Grafana
 
   loki:
     enabled: true
@@ -339,7 +334,7 @@ security:
 
   secrets:
     enabled: true
-    backend: "secrets-manager"  # or "parameter-store"
+    backend: "secrets-manager" # or "parameter-store"
 
 # Backup configuration
 backup:
