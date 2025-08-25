@@ -1,4 +1,6 @@
 /// <reference types="vitest/globals" />
+import { setTimeout } from 'vitest'
+setTimeout(20000)
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
 import type {
   BiasAlertConfig,

@@ -156,6 +156,18 @@ jobs:
         parameters: infra/main.parameters.json
         failOnStdErr: false
 
+    - name: Capture ARM Deployment Logs
+      if: failure()
+      run: |
+        echo "===== STDOUT and STDERR from ARM Deploy Step ====="
+        cat $GITHUB_WORKSPACE/azure-arm-deploy.log || echo "No log file present"
+        echo "===== Step output variables ====="
+        echo "bicep.outputs.deploymentOutputs=${{ steps.bicep.outputs.deploymentOutputs }}"
+        echo "bicep.outcome=${{ steps.bicep.outcome }}"
+        echo "bicep.outputs.deploymentName=${{ steps.bicep.outputs.deploymentName }}"
+        echo "bicep.outputs.errorMessage=${{ steps.bicep.outputs.errorMessage }}"
+        echo "azure/arm-deploy@v2 documented failure details above. See full GitHub Actions job log for further trace."
+
     - name: Get deployment outputs
       id: deployment
       run: |

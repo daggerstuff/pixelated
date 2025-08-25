@@ -13,6 +13,9 @@
     },
     "appServiceName": {
       "value": "pixelated"
+    },
+    "keyVaultName": {
+      "value": "pixelated-key"
     }
   }
 }

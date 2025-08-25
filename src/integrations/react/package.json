@@ -69,5 +69,8 @@
     "build:ci": "astro-scripts build \"src/**/*.ts\"",
     "dev": "astro-scripts dev \"src/**/*.ts\"",
     "test": "astro-scripts test \"test/**/*.test.js\""
+  },
+  "overrides": {
+    "esbuild": "0.25.0"
   }
 }

@@ -803,8 +803,8 @@ export class PythonBiasDetectionBridge {
       alert_level: 'medium' as AlertLevel,
       layer_results: {
         preprocessing: {
-          bias_score: 0.4,
-          metrics: { linguistic_bias: { overall_bias_score: 0.4 } },
+          bias_score: 0.5,
+          metrics: { linguistic_bias: { overall_bias_score: 0.5 } },
           detected_biases: ['service_unavailable'],
           recommendations: [
             'Python service unavailable - using fallback analysis',
@@ -814,7 +814,7 @@ export class PythonBiasDetectionBridge {
         model_level: {
           bias_score: 0.5,
           metrics: {
-            fairness: { equalized_odds: 0.7, demographic_parity: 0.6 },
+            fairness: { equalized_odds: 0.5, demographic_parity: 0.5 },
           },
           detected_biases: ['service_unavailable'],
           recommendations: [
@@ -823,7 +823,7 @@ export class PythonBiasDetectionBridge {
           layer: 'model_level',
         },
         interactive: {
-          bias_score: 0.6,
+          bias_score: 0.5,
           metrics: { interaction_patterns: { pattern_consistency: 3 } },
           detected_biases: ['service_unavailable'],
           recommendations: [
@@ -832,10 +832,10 @@ export class PythonBiasDetectionBridge {
           layer: 'interactive',
         },
         evaluation: {
-          bias_score: 0.3,
+          bias_score: 0.5,
           metrics: {
-            outcome_fairness: { bias_score: 0.3 },
-            performance_disparities: { bias_score: 0.2 },
+            outcome_fairness: { bias_score: 0.5 },
+            performance_disparities: { bias_score: 0.5 },
           },
           detected_biases: ['service_unavailable'],
           recommendations: [

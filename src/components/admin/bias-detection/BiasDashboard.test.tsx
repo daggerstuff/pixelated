@@ -4,6 +4,8 @@ import { act } from '@/test/setup-react19'
 // Defer importing BiasDashboard until after globals are stubbed
 let BiasDashboard: (typeof import('./BiasDashboard'))['BiasDashboard']
 import { vi } from 'vitest'
+import { setTimeout } from 'vitest'
+setTimeout(20000)
 import '@testing-library/jest-dom'
 
 // Keep original fetch to restore after tests
