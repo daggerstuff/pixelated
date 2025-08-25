@@ -176,12 +176,26 @@ export class AnalyticsService {
 
     try {
       // Get events from time series
-      const eventJsons = await this.redisClient.zRange(
-        `analytics:events:time:${type}`,
-        options.startTime ?? 0,
-        options.endTime ?? '+inf',
-        { BY: 'SCORE', LIMIT: { offset, count: limit } }
-      )
+      // ioredis compatibility: use zrangebyscore and limit as needed
+      const start = typeof options.startTime === 'number' ? options.startTime : '-inf'
+      const end = typeof options.endTime === 'number' ? options.endTime : '+inf'
+      let eventJsons: string[] = []
+      if (typeof offset === 'number' && typeof limit === 'number') {
+        eventJsons = await this.redisClient.zrangebyscore(
+          `analytics:events:time:${type}`,
+          start,
+          end,
+          'LIMIT',
+          offset,
+          limit
+        )
+      } else {
+        eventJsons = await this.redisClient.zrangebyscore(
+          `analytics:events:time:${type}`,
+          start,
+          end
+        )
+      }
 
       return eventJsons
         .map((json) => {
@@ -214,11 +228,13 @@ export class AnalyticsService {
 
     try {
       // Get metrics from time series
-      const metricJsons = await this.redisClient.zRange(
+      // ioredis compatibility: use zrangebyscore
+      const start = typeof options.startTime === 'number' ? options.startTime : '-inf'
+      const end = typeof options.endTime === 'number' ? options.endTime : '+inf'
+      const metricJsons = await this.redisClient.zrangebyscore(
         `analytics:metrics:${name}`,
-        options.startTime ?? 0,
-        options.endTime ?? '+inf',
-        { BY: 'SCORE' }
+        start,
+        end
       )
 
       const metrics = metricJsons

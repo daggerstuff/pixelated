@@ -1,4 +1,5 @@
 import json
+import logging
 import sys
 
 # Usage: python fix_sarif_ruleindex.py <input_file> <output_file>
@@ -6,12 +7,12 @@ import sys
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: python fix_sarif_ruleindex.py <input_file> <output_file>")
+        logging.error("Usage: python fix_sarif_ruleindex.py <input_file> <output_file>")
         sys.exit(1)
     input_file = sys.argv[1]
     output_file = sys.argv[2]
 
-    with open(input_file, "r", encoding="utf-8") as f:
+    with open(input_file, encoding="utf-8") as f:
         sarif = json.load(f)
 
     for run in sarif.get("runs", []):

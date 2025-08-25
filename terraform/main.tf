@@ -253,6 +253,12 @@ resource "aws_db_parameter_group" "main" {
     value = "all"
   }
 
+  # Enforce SSL for PostgreSQL: require clients to use TLS connections
+  parameter {
+    name  = "rds.force_ssl"
+    value = "1"
+  }
+
   tags = var.common_tags
 }
 
@@ -308,6 +314,7 @@ resource "aws_s3_bucket_replication_configuration" "assets" {
   rules {
     id     = "replication"
     status = "Enabled"
+    priority = 1
     # Replicate all objects. You may add filter as needed.
     source_selection_criteria {
       sse_kms_encrypted_objects {
@@ -320,6 +327,9 @@ resource "aws_s3_bucket_replication_configuration" "assets" {
       encryption_configuration {
         replica_kms_key_id = var.s3_replication_kms_key_id
       }
+    }
+    delete_marker_replication {
+      status = "Enabled"
     }
     filter {
       prefix = ""
