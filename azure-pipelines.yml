@@ -51,7 +51,7 @@ variables:
     value: "1"
 
 pool:
-  vmImage: ubuntu-latest
+  name: Default
 
 stages:
   - stage: Build
@@ -60,7 +60,7 @@ stages:
       - job: BuildApp
         displayName: Build Node.js Application
         pool:
-          vmImage: ubuntu-latest
+          name: Default
         steps:
           - checkout: self
           - task: NodeTool@0
@@ -246,7 +246,7 @@ stages:
         environment:
           name: "azure-infrastructure"
         pool:
-          vmImage: ubuntu-latest
+          name: Default
         container: mcr.microsoft.com/azure-cli:2.61.0
         strategy:
           runOnce:
@@ -328,7 +328,7 @@ stages:
       - job: BuildDockerImage
         displayName: Build and Push Docker Image
         pool:
-          vmImage: ubuntu-latest
+          name: Default
         container: mcr.microsoft.com/azure-cli:2.73.0
         steps:
           - script: |
@@ -626,7 +626,7 @@ stages:
         environment:
           name: azure-production
         pool:
-          vmImage: ubuntu-latest
+          name: Default
         container: mcr.microsoft.com/azure-cli:2.73.0
         strategy:
           runOnce:
@@ -927,7 +927,7 @@ stages:
         environment:
           name: azure-production
         pool:
-          name: "Default"
+          name: Default
         container: mcr.microsoft.com/azure-cli:2.73.0@sha256:c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2g3h4
         strategy:
           runOnce:
@@ -1030,7 +1030,7 @@ stages:
       - job: HealthCheck
         displayName: Health Check Both Deployments
         pool:
-          name: "Default"
+          name: Default
         steps:
           - script: |
               # Install Azure CLI with Python 3.13 compatibility fixes
@@ -1142,7 +1142,7 @@ stages:
       - job: CleanupOldApps
         displayName: Clean Up Old Container Apps Only
         pool:
-          name: "Default"
+          name: Default
         steps:
           - script: |
               # Install Azure CLI with Python 3.13 compatibility fixes

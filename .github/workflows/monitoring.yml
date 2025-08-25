@@ -4,13 +4,14 @@ on:
   schedule:
   # Reduced to once per day instead of every 15 minutes!
   # This saves ~95% of GitHub Actions costs
-  - cron: '0 12 * * *'  # Noon UTC daily
+  - cron: '0 12 * * *' # Noon UTC daily
   workflow_dispatch:
+
 
 permissions: read-all
 
 env:
-  NODE_VERSION: 22.16.0
+  NODE_VERSION: 22.18.0
   PNPM_VERSION: 10.15.0
   NODE_ENV: production
 
@@ -22,197 +23,197 @@ jobs:
     env:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
+        run_install: false
 
-      - name: Get pnpm store directory
-        id: get-pnpm-store-path
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: get-pnpm-store-path
+      shell: bash
+      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Resolve APP_URL (Production)
-        id: resolve-app-url-prod
-        run: |
-          BASE_URL="${{ vars.APP_URL }}"
-          if [ -z "$BASE_URL" ]; then
-            BASE_URL="${{ secrets.APP_URL }}"
-          fi
-          if [ -z "$BASE_URL" ]; then
-            echo "::error::APP_URL is not set. Define repository/environment variable 'APP_URL' or secret 'APP_URL' for Production."
-            exit 1
-          fi
-          echo "Using BASE_URL: $BASE_URL"
-          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
+    - name: Resolve APP_URL (Production)
+      id: resolve-app-url-prod
+      run: |
+        BASE_URL="${{ vars.APP_URL }}"
+        if [ -z "$BASE_URL" ]; then
+          BASE_URL="${{ secrets.APP_URL }}"
+        fi
+        if [ -z "$BASE_URL" ]; then
+          echo "::error::APP_URL is not set. Define repository/environment variable 'APP_URL' or secret 'APP_URL' for Production."
+          exit 1
+        fi
+        echo "Using BASE_URL: $BASE_URL"
+        echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
 
-      - name: Run health checks
-        id: health-check
-        run: |
-          echo "🏥 Running PRODUCTION health checks against $BASE_URL"
-          echo "ℹ️  Production failures will trigger alerts and notifications"
+    - name: Run health checks
+      id: health-check
+      run: |
+        echo "🏥 Running PRODUCTION health checks against $BASE_URL"
+        echo "ℹ️  Production failures will trigger alerts and notifications"
 
-          # Function to perform robust HTTP check with retries
-          check_endpoint() {
-            local url="$1"
-            local endpoint_name="$2"
-            local max_retries=3
-            local timeout=30
-            local retry_delay=10
+        # Function to perform robust HTTP check with retries
+        check_endpoint() {
+          local url="$1"
+          local endpoint_name="$2"
+          local max_retries=3
+          local timeout=30
+          local retry_delay=10
+          
+          for attempt in $(seq 1 $max_retries); do
+            echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
             
-            for attempt in $(seq 1 $max_retries); do
-              echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
-              
-              # Use curl with explicit timeout and connection timeout
-              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-                --connect-timeout 15 \
-                --max-time $timeout \
-                --retry 0 \
-                "$url" 2>/dev/null || echo "000")
-              
-              echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
-              
-              if [[ "$HTTP_STATUS" == "200" ]]; then
-                echo "✅ $endpoint_name check successful"
-                return 0
-              elif [[ "$HTTP_STATUS" == "000" ]]; then
-                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
-              else
-                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
-              fi
-              
-              if [[ $attempt -lt $max_retries ]]; then
-                echo "⏳ Waiting ${retry_delay}s before retry..."
-                sleep $retry_delay
-              fi
-            done
+            # Use curl with explicit timeout and connection timeout
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --connect-timeout 15 \
+              --max-time $timeout \
+              --retry 0 \
+              "$url" 2>/dev/null || echo "000")
             
-            return 1
-          }
+            echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
+            
+            if [[ "$HTTP_STATUS" == "200" ]]; then
+              echo "✅ $endpoint_name check successful"
+              return 0
+            elif [[ "$HTTP_STATUS" == "000" ]]; then
+              echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+            else
+              echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+            fi
+            
+            if [[ $attempt -lt $max_retries ]]; then
+              echo "⏳ Waiting ${retry_delay}s before retry..."
+              sleep $retry_delay
+            fi
+          done
+          
+          return 1
+        }
 
-          # Basic endpoint check with retries
-          if check_endpoint "$BASE_URL" "Main Site"; then
-            MAIN_STATUS="passing"
-          else
-            echo "::error::PRODUCTION site is down or returning errors after $max_retries attempts"
-            echo "status=failing" >> $GITHUB_OUTPUT
-            exit 1
-          fi
+        # Basic endpoint check with retries
+        if check_endpoint "$BASE_URL" "Main Site"; then
+          MAIN_STATUS="passing"
+        else
+          echo "::error::PRODUCTION site is down or returning errors after $max_retries attempts"
+          echo "status=failing" >> $GITHUB_OUTPUT
+          exit 1
+        fi
 
-          # API health check with retries (non-blocking)
-          if check_endpoint "$BASE_URL/api/health" "API Health"; then
-            API_STATUS="passing"
-          else
-            echo "::warning::API health endpoint is not responding after retries"
-            API_STATUS="failing"
-          fi
+        # API health check with retries (non-blocking)
+        if check_endpoint "$BASE_URL/api/health" "API Health"; then
+          API_STATUS="passing"
+        else
+          echo "::warning::API health endpoint is not responding after retries"
+          API_STATUS="failing"
+        fi
 
-          echo "✅ PRODUCTION health checks passed"
-          echo "status=passing" >> $GITHUB_OUTPUT
+        echo "✅ PRODUCTION health checks passed"
+        echo "status=passing" >> $GITHUB_OUTPUT
 
-      - name: Create temporary config
-        if: steps.health-check.outputs.status == 'passing'
-        run: |
-          cat > temp-playwright.config.js << 'EOF'
-          export default {
-            testDir: './tests/monitoring',
-            use: {
-              baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
-            },
-            projects: [
-              {
-                name: 'chromium',
-                use: {
-                  browserName: 'chromium',
-                },
-              },
-            ],
-            reporter: ['html', 'list'],
-            timeout: 60000,
-            retries: 1,
-          };
-          EOF
-
-      - name: Run Playwright tests
-        id: run-tests
-        if: steps.health-check.outputs.status == 'passing'
-        run: |
-          pnpm exec playwright install --with-deps chromium
-          echo "Running Playwright tests against PRODUCTION: $BASE_URL"
-
-          # Run tests and store exit code to determine if any tests failed
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js || true
-
-          echo "✅ PRODUCTION monitoring tests completed"
-          echo "status=success" >> $GITHUB_OUTPUT
-
-      - name: Upload test results
-        if: always() && steps.health-check.outputs.status == 'passing'
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-test-results-production
-          path: playwright-report/
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Set Slack enabled output (production)
-        id: set-slack-enabled-prod
-        run: |
-          if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
-            echo "slack_enabled=true" >> $GITHUB_OUTPUT
-          else
-            echo "slack_enabled=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Notify failure
-        if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
-        uses: slackapi/slack-github-action@v1.25.0
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        with:
-          payload: |
+    - name: Create temporary config
+      if: steps.health-check.outputs.status == 'passing'
+      run: |
+        cat > temp-playwright.config.js << 'EOF'
+        export default {
+          testDir: './tests/monitoring',
+          use: {
+            baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
+          },
+          projects: [
             {
-              "text": "🚨 *PRODUCTION MONITORING FAILED*",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "🚨 *PRODUCTION MONITORING FAILED*\n\n*Environment:* Production (Critical Alert)\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis is a PRODUCTION failure requiring immediate attention.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
-                  }
-                }
-              ]
-            }
-        continue-on-error: true
+              name: 'chromium',
+              use: {
+                browserName: 'chromium',
+              },
+            },
+          ],
+          reporter: ['html', 'list'],
+          timeout: 60000,
+          retries: 1,
+        };
+        EOF
 
-      - name: Log notification skip
-        if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'false'
-        run: |
-          echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
-          echo "::warning::Production monitoring failed but no notification was sent"
+    - name: Run Playwright tests
+      id: run-tests
+      if: steps.health-check.outputs.status == 'passing'
+      run: |
+        pnpm exec playwright install --with-deps chromium
+        echo "Running Playwright tests against PRODUCTION: $BASE_URL"
+
+        # Run tests and store exit code to determine if any tests failed
+        NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
+          pnpm exec playwright test --config=temp-playwright.config.js || true
+
+        echo "✅ PRODUCTION monitoring tests completed"
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: Upload test results
+      if: always() && steps.health-check.outputs.status == 'passing'
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-test-results-production
+        path: playwright-report/
+        if-no-files-found: warn
+        retention-days: 30
+
+    - name: Set Slack enabled output (production)
+      id: set-slack-enabled-prod
+      run: |
+        if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
+          echo "slack_enabled=true" >> $GITHUB_OUTPUT
+        else
+          echo "slack_enabled=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Notify failure
+      if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
+      uses: slackapi/slack-github-action@v1.25.0
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      with:
+        payload: |
+          {
+            "text": "🚨 *PRODUCTION MONITORING FAILED*",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "🚨 *PRODUCTION MONITORING FAILED*\n\n*Environment:* Production (Critical Alert)\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis is a PRODUCTION failure requiring immediate attention.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
+                }
+              }
+            ]
+          }
+      continue-on-error: true
+
+    - name: Log notification skip
+      if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'false'
+      run: |
+        echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
+        echo "::warning::Production monitoring failed but no notification was sent"
 
   health-check-staging:
     name: Staging Health Check
@@ -221,167 +222,166 @@ jobs:
     env:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
+        run_install: false
 
-      - name: Get pnpm store directory
-        id: get-pnpm-store-path
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: get-pnpm-store-path
+      shell: bash
+      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      - name: Resolve APP_URL (Staging)
-        id: resolve-app-url-staging
-        run: |
-          BASE_URL="${{ vars.APP_URL }}"
-          if [ -z "$BASE_URL" ]; then
-            BASE_URL="${{ secrets.APP_URL }}"
-          fi
-          if [ -z "$BASE_URL" ]; then
-            BASE_URL="https://pixelatedempathy.com"
-            echo "::notice::APP_URL not set for Staging; defaulting to $BASE_URL"
-          fi
-          echo "Using BASE_URL: $BASE_URL"
-          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
+    - name: Resolve APP_URL (Staging)
+      id: resolve-app-url-staging
+      run: |
+        BASE_URL="${{ vars.APP_URL }}"
+        if [ -z "$BASE_URL" ]; then
+          BASE_URL="${{ secrets.APP_URL }}"
+        fi
+        if [ -z "$BASE_URL" ]; then
+          BASE_URL="https://pixelatedempathy.com"
+          echo "::notice::APP_URL not set for Staging; defaulting to $BASE_URL"
+        fi
+        echo "Using BASE_URL: $BASE_URL"
+        echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
 
-      - name: Run health checks
-        id: health-check
-        run: |
-          echo "🏥 Running STAGING health checks against $BASE_URL"
-          echo "ℹ️  Staging failures will warn but not trigger critical alerts"
+    - name: Run health checks
+      id: health-check
+      run: |
+        echo "🏥 Running STAGING health checks against $BASE_URL"
+        echo "ℹ️  Staging failures will warn but not trigger critical alerts"
 
-          # Function to perform robust HTTP check with retries
-          check_endpoint() {
-            local url="$1"
-            local endpoint_name="$2"
-            local max_retries=2  # Fewer retries for staging
-            local timeout=20     # Shorter timeout for staging
-            local retry_delay=5  # Shorter delay for staging
+        # Function to perform robust HTTP check with retries
+        check_endpoint() {
+          local url="$1"
+          local endpoint_name="$2"
+          local max_retries=2  # Fewer retries for staging
+          local timeout=20     # Shorter timeout for staging
+          local retry_delay=5  # Shorter delay for staging
+          
+          for attempt in $(seq 1 $max_retries); do
+            echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
             
-            for attempt in $(seq 1 $max_retries); do
-              echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
-              
-              # Use curl with explicit timeout and connection timeout
-              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-                --connect-timeout 10 \
-                --max-time $timeout \
-                --retry 0 \
-                "$url" 2>/dev/null || echo "000")
-              
-              echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
-              
-              if [[ "$HTTP_STATUS" == "200" ]]; then
-                echo "✅ $endpoint_name check successful"
-                return 0
-              elif [[ "$HTTP_STATUS" == "000" ]]; then
-                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
-              else
-                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
-              fi
-              
-              if [[ $attempt -lt $max_retries ]]; then
-                echo "⏳ Waiting ${retry_delay}s before retry..."
-                sleep $retry_delay
-              fi
-            done
+            # Use curl with explicit timeout and connection timeout
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time $timeout \
+              --retry 0 \
+              "$url" 2>/dev/null || echo "000")
             
-            return 1
-          }
+            echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
+            
+            if [[ "$HTTP_STATUS" == "200" ]]; then
+              echo "✅ $endpoint_name check successful"
+              return 0
+            elif [[ "$HTTP_STATUS" == "000" ]]; then
+              echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+            else
+              echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+            fi
+            
+            if [[ $attempt -lt $max_retries ]]; then
+              echo "⏳ Waiting ${retry_delay}s before retry..."
+              sleep $retry_delay
+            fi
+          done
+          
+          return 1
+        }
 
-          # Basic endpoint check with retries
-          if check_endpoint "$BASE_URL" "Main Site"; then
-            MAIN_STATUS="passing"
-            echo "status=passing" >> $GITHUB_OUTPUT
-          else
-            echo "::warning::STAGING site is down or returning errors after retries"
-            echo "::notice::This is a staging environment failure, not affecting production"
-            echo "status=warning" >> $GITHUB_OUTPUT
-            MAIN_STATUS="warning"
-          fi
+        # Basic endpoint check with retries
+        if check_endpoint "$BASE_URL" "Main Site"; then
+          MAIN_STATUS="passing"
+          echo "status=passing" >> $GITHUB_OUTPUT
+        else
+          echo "::warning::STAGING site is down or returning errors after retries"
+          echo "::notice::This is a staging environment failure, not affecting production"
+          echo "status=warning" >> $GITHUB_OUTPUT
+          MAIN_STATUS="warning"
+        fi
 
-          # API health check with retries (non-blocking)
-          if check_endpoint "$BASE_URL/api/health" "API Health"; then
-            API_STATUS="passing"
-          else
-            echo "::warning::API health endpoint is not responding after retries"
-            API_STATUS="failing"
-          fi
+        # API health check with retries (non-blocking)
+        if check_endpoint "$BASE_URL/api/health" "API Health"; then
+          API_STATUS="passing"
+        else
+          echo "::warning::API health endpoint is not responding after retries"
+          API_STATUS="failing"
+        fi
 
-          if [[ "$MAIN_STATUS" == "warning" ]]; then
-            echo "⚠️  STAGING health checks completed with warnings"
-          else
-            echo "✅ STAGING health checks passed"
-          fi
+        if [[ "$MAIN_STATUS" == "warning" ]]; then
+          echo "⚠️  STAGING health checks completed with warnings"
+        else
+          echo "✅ STAGING health checks passed"
+        fi
 
-      - name: Create temporary config
-        if: steps.health-check.outputs.status == 'passing'
-        run: |
-          cat > temp-playwright.config.js << 'EOF'
-          export default {
-            testDir: './tests/monitoring',
-            use: {
-              baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
-            },
-            projects: [
-              {
-                name: 'chromium',
-                use: {
-                  browserName: 'chromium',
-                },
+    - name: Create temporary config
+      if: steps.health-check.outputs.status == 'passing'
+      run: |
+        cat > temp-playwright.config.js << 'EOF'
+        export default {
+          testDir: './tests/monitoring',
+          use: {
+            baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
+          },
+          projects: [
+            {
+              name: 'chromium',
+              use: {
+                browserName: 'chromium',
               },
-            ],
-            reporter: ['html', 'list'],
-            timeout: 60000,
-            retries: 1,
-          };
-          EOF
+            },
+          ],
+          reporter: ['html', 'list'],
+          timeout: 60000,
+          retries: 1,
+        };
+        EOF
 
-      - name: Run Playwright tests
-        id: run-tests
-        if: steps.health-check.outputs.status == 'passing'
-        run: |
-          pnpm exec playwright install --with-deps chromium
-          echo "Running Playwright tests against STAGING: $BASE_URL"
+    - name: Run Playwright tests
+      id: run-tests
+      if: steps.health-check.outputs.status == 'passing'
+      run: |
+        pnpm exec playwright install --with-deps chromium
+        echo "Running Playwright tests against STAGING: $BASE_URL"
 
-          # Run tests and store exit code to determine if any tests failed
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js || true
+        # Run tests and store exit code to determine if any tests failed
+        NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
+          pnpm exec playwright test --config=temp-playwright.config.js || true
 
-          echo "✅ STAGING monitoring tests completed"
-          echo "status=success" >> $GITHUB_OUTPUT
+        echo "✅ STAGING monitoring tests completed"
+        echo "status=success" >> $GITHUB_OUTPUT
 
-      - name: Upload test results
-        if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-test-results-staging
-          path: playwright-report/
-          if-no-files-found: warn
-          retention-days: 30
-
-      # No Slack notification for staging failures - they're non-critical
+    - name: Upload test results
+      if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-test-results-staging
+        path: playwright-report/
+        if-no-files-found: warn
+        retention-days: 30
+    # No Slack notification for staging failures - they're non-critical
 
   health-check-preview:
     name: Preview Health Check
@@ -390,342 +390,341 @@ jobs:
     env:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
+        run_install: false
 
-      - name: Get pnpm store directory
-        id: get-pnpm-store-path
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: get-pnpm-store-path
+      shell: bash
+      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Resolve APP_URL (Preview)
-        id: resolve-app-url-preview
-        run: |
-          BASE_URL="${{ vars.APP_URL }}"
-          if [ -z "$BASE_URL" ]; then
-            BASE_URL="${{ secrets.APP_URL }}"
-          fi
-          if [ -z "$BASE_URL" ]; then
-            BASE_URL="https://pixelatedempathy.com"
-            echo "::notice::APP_URL not set for Preview; defaulting to $BASE_URL"
-          fi
-          echo "Using BASE_URL: $BASE_URL"
-          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
+    - name: Resolve APP_URL (Preview)
+      id: resolve-app-url-preview
+      run: |
+        BASE_URL="${{ vars.APP_URL }}"
+        if [ -z "$BASE_URL" ]; then
+          BASE_URL="${{ secrets.APP_URL }}"
+        fi
+        if [ -z "$BASE_URL" ]; then
+          BASE_URL="https://pixelatedempathy.com"
+          echo "::notice::APP_URL not set for Preview; defaulting to $BASE_URL"
+        fi
+        echo "Using BASE_URL: $BASE_URL"
+        echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
 
-      - name: Run health checks
-        id: health-check
-        run: |
-          echo "🏥 Running PREVIEW health checks against $BASE_URL"
-          echo "ℹ️  Preview failures will warn but not trigger alerts - this is expected for preview builds"
-          echo "ℹ️  Preview sites may be temporarily unavailable during deployments or restarts"
+    - name: Run health checks
+      id: health-check
+      run: |
+        echo "🏥 Running PREVIEW health checks against $BASE_URL"
+        echo "ℹ️  Preview failures will warn but not trigger alerts - this is expected for preview builds"
+        echo "ℹ️  Preview sites may be temporarily unavailable during deployments or restarts"
 
-          # Function to perform robust HTTP check with retries
-          check_endpoint() {
-            local url="$1"
-            local endpoint_name="$2"
-            local max_retries=1  # Single retry for preview
-            local timeout=15     # Short timeout for preview
-            local retry_delay=3  # Very short delay for preview
+        # Function to perform robust HTTP check with retries
+        check_endpoint() {
+          local url="$1"
+          local endpoint_name="$2"
+          local max_retries=1  # Single retry for preview
+          local timeout=15     # Short timeout for preview
+          local retry_delay=3  # Very short delay for preview
+          
+          for attempt in $(seq 1 $max_retries); do
+            echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
             
-            for attempt in $(seq 1 $max_retries); do
-              echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
-              
-              # Use curl with explicit timeout and connection timeout
-              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-                --connect-timeout 8 \
-                --max-time $timeout \
-                --retry 0 \
-                "$url" 2>/dev/null || echo "000")
-              
-              echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
-              
-              if [[ "$HTTP_STATUS" == "200" ]]; then
-                echo "✅ $endpoint_name check successful"
-                return 0
-              elif [[ "$HTTP_STATUS" == "000" ]]; then
-                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
-              else
-                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
-              fi
-              
-              if [[ $attempt -lt $max_retries ]]; then
-                echo "⏳ Waiting ${retry_delay}s before retry..."
-                sleep $retry_delay
-              fi
-            done
+            # Use curl with explicit timeout and connection timeout
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --connect-timeout 8 \
+              --max-time $timeout \
+              --retry 0 \
+              "$url" 2>/dev/null || echo "000")
             
-            return 1
-          }
+            echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
+            
+            if [[ "$HTTP_STATUS" == "200" ]]; then
+              echo "✅ $endpoint_name check successful"
+              return 0
+            elif [[ "$HTTP_STATUS" == "000" ]]; then
+              echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+            else
+              echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+            fi
+            
+            if [[ $attempt -lt $max_retries ]]; then
+              echo "⏳ Waiting ${retry_delay}s before retry..."
+              sleep $retry_delay
+            fi
+          done
+          
+          return 1
+        }
 
-          # Basic endpoint check with retries
-          if check_endpoint "$BASE_URL" "Main Site"; then
-            MAIN_STATUS="passing"
-            echo "status=passing" >> $GITHUB_OUTPUT
-          else
-            echo "::warning::Preview site is down or returning errors after retries"
-            echo "::notice::This is a PREVIEW environment failure, not affecting production"
-            echo "::notice::Preview deployments may be restarting or temporarily unavailable"
-            echo "status=warning" >> $GITHUB_OUTPUT
-            MAIN_STATUS="warning"
-          fi
+        # Basic endpoint check with retries
+        if check_endpoint "$BASE_URL" "Main Site"; then
+          MAIN_STATUS="passing"
+          echo "status=passing" >> $GITHUB_OUTPUT
+        else
+          echo "::warning::Preview site is down or returning errors after retries"
+          echo "::notice::This is a PREVIEW environment failure, not affecting production"
+          echo "::notice::Preview deployments may be restarting or temporarily unavailable"
+          echo "status=warning" >> $GITHUB_OUTPUT
+          MAIN_STATUS="warning"
+        fi
 
-          # API health check with retries (non-blocking)
-          if check_endpoint "$BASE_URL/api/health" "API Health"; then
-            API_STATUS="passing"
-          else
-            echo "::warning::API health endpoint is not responding after retries"
-            echo "::notice::API may not be fully initialized in preview environment"
-            API_STATUS="failing"
-          fi
+        # API health check with retries (non-blocking)
+        if check_endpoint "$BASE_URL/api/health" "API Health"; then
+          API_STATUS="passing"
+        else
+          echo "::warning::API health endpoint is not responding after retries"
+          echo "::notice::API may not be fully initialized in preview environment"
+          API_STATUS="failing"
+        fi
 
-          if [[ "$MAIN_STATUS" == "warning" ]]; then
-            echo "⚠️  PREVIEW health checks completed with warnings (this is normal for preview builds)"
-          else
-            echo "✅ PREVIEW health checks passed"
-          fi
+        if [[ "$MAIN_STATUS" == "warning" ]]; then
+          echo "⚠️  PREVIEW health checks completed with warnings (this is normal for preview builds)"
+        else
+          echo "✅ PREVIEW health checks passed"
+        fi
 
-      - name: Create temporary config
-        if: steps.health-check.outputs.status == 'passing'
-        run: |
-          cat > temp-playwright.config.js << 'EOF'
-          export default {
-            testDir: './tests/monitoring',
-            use: {
-              baseURL: process.env.BASE_URL,
-            },
-            projects: [
-              {
-                name: 'chromium',
-                use: {
-                  browserName: 'chromium',
-                },
+    - name: Create temporary config
+      if: steps.health-check.outputs.status == 'passing'
+      run: |
+        cat > temp-playwright.config.js << 'EOF'
+        export default {
+          testDir: './tests/monitoring',
+          use: {
+            baseURL: process.env.BASE_URL,
+          },
+          projects: [
+            {
+              name: 'chromium',
+              use: {
+                browserName: 'chromium',
               },
-            ],
-            reporter: ['html', 'list'],
-            timeout: 60000,
-            retries: 2, // More retries for preview builds
-          };
-          EOF
+            },
+          ],
+          reporter: ['html', 'list'],
+          timeout: 60000,
+          retries: 2, // More retries for preview builds
+        };
+        EOF
 
-      - name: Run Playwright tests
-        id: run-tests
-        if: steps.health-check.outputs.status == 'passing'
-        continue-on-error: true
-        run: |
-          # Ensure this step never fails the job even if tests fail
-          set +e
-          pnpm exec playwright install --with-deps chromium
-          echo "Running Playwright tests against PREVIEW: $BASE_URL"
-          echo "Note: Preview test failures are informational and do not indicate production issues"
+    - name: Run Playwright tests
+      id: run-tests
+      if: steps.health-check.outputs.status == 'passing'
+      continue-on-error: true
+      run: |
+        # Ensure this step never fails the job even if tests fail
+        set +e
+        pnpm exec playwright install --with-deps chromium
+        echo "Running Playwright tests against PREVIEW: $BASE_URL"
+        echo "Note: Preview test failures are informational and do not indicate production issues"
 
-          # Run tests and store exit code to determine if any tests failed
-          TEST_EXIT_CODE=0
-          if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js > playwright-output.log 2>&1; then
-            TEST_EXIT_CODE=$?
-          fi
+        # Run tests and store exit code to determine if any tests failed
+        TEST_EXIT_CODE=0
+        if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
+          pnpm exec playwright test --config=temp-playwright.config.js > playwright-output.log 2>&1; then
+          TEST_EXIT_CODE=$?
+        fi
 
-          # Display the output regardless of exit code
-          cat playwright-output.log
+        # Display the output regardless of exit code
+        cat playwright-output.log
 
-          # Set simple success/failure indicator
-          if [ $TEST_EXIT_CODE -eq 0 ]; then
-            echo "status=success" >> $GITHUB_OUTPUT
-            echo "✅ All PREVIEW tests passed successfully!"
-          else
-            echo "status=failure" >> $GITHUB_OUTPUT
-            echo "::warning::Some PREVIEW tests failed - this is informational only and does not affect production"
-          fi
+        # Set simple success/failure indicator
+        if [ $TEST_EXIT_CODE -eq 0 ]; then
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "✅ All PREVIEW tests passed successfully!"
+        else
+          echo "status=failure" >> $GITHUB_OUTPUT
+          echo "::warning::Some PREVIEW tests failed - this is informational only and does not affect production"
+        fi
 
-          # Always exit successfully from this step
-          exit 0
+        # Always exit successfully from this step
+        exit 0
 
-      - name: Upload test results
-        if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-test-results-preview
-          path: playwright-report/
-          if-no-files-found: warn
-          retention-days: 7 # Shorter retention for preview results
-
-      # No Slack notification for preview failures - they're informational only
+    - name: Upload test results
+      if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-test-results-preview
+        path: playwright-report/
+        if-no-files-found: warn
+        retention-days: 7 # Shorter retention for preview results
+    # No Slack notification for preview failures - they're informational only
 
   check-performance:
     name: Performance Check
     runs-on: ubuntu-latest
-    needs: [health-check-production]
+    needs: [ health-check-production ]
     # Only run performance checks for production
     permissions:
       contents: read
     env:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Resolve APP_URL (Performance)
-        id: resolve-perf
-        run: |
-          BASE_URL_INITIAL="${{ env.BASE_URL }}"
-          if [ -z "$BASE_URL_INITIAL" ]; then
-            BASE_URL_INITIAL="${{ secrets.APP_URL }}"
-          fi
-          if [ -z "$BASE_URL_INITIAL" ]; then
-            echo "::notice::APP_URL not configured; skipping Lighthouse performance checks."
-            echo "skip_lhci=true" >> $GITHUB_OUTPUT
-          else
-            echo "Using BASE_URL for Lighthouse: $BASE_URL_INITIAL"
-            echo "BASE_URL=$BASE_URL_INITIAL" >> $GITHUB_ENV
-            echo "skip_lhci=false" >> $GITHUB_OUTPUT
-          fi
+    - name: Resolve APP_URL (Performance)
+      id: resolve-perf
+      run: |
+        BASE_URL_INITIAL="${{ env.BASE_URL }}"
+        if [ -z "$BASE_URL_INITIAL" ]; then
+          BASE_URL_INITIAL="${{ secrets.APP_URL }}"
+        fi
+        if [ -z "$BASE_URL_INITIAL" ]; then
+          echo "::notice::APP_URL not configured; skipping Lighthouse performance checks."
+          echo "skip_lhci=true" >> $GITHUB_OUTPUT
+        else
+          echo "Using BASE_URL for Lighthouse: $BASE_URL_INITIAL"
+          echo "BASE_URL=$BASE_URL_INITIAL" >> $GITHUB_ENV
+          echo "skip_lhci=false" >> $GITHUB_OUTPUT
+        fi
 
-      - name: Probe Lighthouse URLs (wait for healthy)
-        id: build-urls
-        if: steps.resolve-perf.outputs.skip_lhci == 'false'
-        run: |
-          # Candidate URLs to test
-          CANDIDATES=(
-            "${BASE_URL}"
-            "${BASE_URL}/login"
-          )
+    - name: Probe Lighthouse URLs (wait for healthy)
+      id: build-urls
+      if: steps.resolve-perf.outputs.skip_lhci == 'false'
+      run: |
+        # Candidate URLs to test
+        CANDIDATES=(
+          "${BASE_URL}"
+          "${BASE_URL}/login"
+        )
 
-          OK_URLS=()
-          for u in "${CANDIDATES[@]}"; do
-            # wait until healthy or timeout
-            ATTEMPTS=0
-            code=000
-            until [ "$code" = "200" ] || [ $ATTEMPTS -ge 15 ]; do
-              code=$(curl -s -o /dev/null -w "%{http_code}" "$u")
-              if [ "$code" != "200" ]; then
-                echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/15"
-                sleep 5
-              fi
-              ATTEMPTS=$((ATTEMPTS+1))
-            done
-            echo "Probing $u -> HTTP $code"
-            if [ "$code" = "200" ]; then
-              OK_URLS+=("$u")
-            else
-              echo "::warning::Skipping Lighthouse for $u (HTTP $code)"
+        OK_URLS=()
+        for u in "${CANDIDATES[@]}"; do
+          # wait until healthy or timeout
+          ATTEMPTS=0
+          code=000
+          until [ "$code" = "200" ] || [ $ATTEMPTS -ge 15 ]; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$u")
+            if [ "$code" != "200" ]; then
+              echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/15"
+              sleep 5
             fi
+            ATTEMPTS=$((ATTEMPTS+1))
           done
-
-          if [ ${#OK_URLS[@]} -eq 0 ]; then
-            echo "::notice::No URLs are healthy (HTTP 200); skipping Lighthouse performance checks."
-            echo "skip_lhci_urls=true" >> $GITHUB_OUTPUT
+          echo "Probing $u -> HTTP $code"
+          if [ "$code" = "200" ]; then
+            OK_URLS+=("$u")
           else
-            {
-              echo "skip_lhci_urls=false"
-              echo "urls<<EOF"
-              printf "%s\n" "${OK_URLS[@]}"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
+            echo "::warning::Skipping Lighthouse for $u (HTTP $code)"
           fi
+        done
 
-      - name: Prepare Lighthouse auth headers (optional)
-        id: prep-lh-headers
-        if: steps.resolve-perf.outputs.skip_lhci == 'false'
-        run: |
-          if [ -n "${{ secrets.LH_AUTH_COOKIE }}" ]; then
-            # Provide extraHeaders to Lighthouse via environment override
-            # Expect cookie like: "session=abc; other=value"
-            EH='{"Cookie":"'"${{ secrets.LH_AUTH_COOKIE }}"'"}'
-            echo "LHCI_COLLECT__SETTINGS__EXTRA_HEADERS=$EH" >> $GITHUB_ENV
-            echo "has_auth=true" >> $GITHUB_OUTPUT
-            echo "Set LHCI extraHeaders for authenticated pages"
-          else
-            echo "has_auth=false" >> $GITHUB_OUTPUT
-            echo "No LH_AUTH_COOKIE secret set; skipping authenticated URLs"
-          fi
-
-      - name: Add protected URLs (optional)
-        id: add-protected
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.prep-lh-headers.outputs.has_auth == 'true'
-        run: |
+        if [ ${#OK_URLS[@]} -eq 0 ]; then
+          echo "::notice::No URLs are healthy (HTTP 200); skipping Lighthouse performance checks."
+          echo "skip_lhci_urls=true" >> $GITHUB_OUTPUT
+        else
           {
-            echo "extra_urls<<EOF"
-            echo "${BASE_URL}/dashboard?perf=1"
+            echo "skip_lhci_urls=false"
+            echo "urls<<EOF"
+            printf "%s\n" "${OK_URLS[@]}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+        fi
 
-      - name: Run Lighthouse CI
-        id: lhci
-        uses: treosh/lighthouse-ci-action@v12
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
-        with:
-          urls: |
-            ${{ steps.build-urls.outputs.urls }}
-            ${{ steps.add-protected.outputs.extra_urls }}
-          configPath: ./.github/lighthouse-config.json
-          budgetPath: ./.github/lighthouse-budget.json
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+    - name: Prepare Lighthouse auth headers (optional)
+      id: prep-lh-headers
+      if: steps.resolve-perf.outputs.skip_lhci == 'false'
+      run: |
+        if [ -n "${{ secrets.LH_AUTH_COOKIE }}" ]; then
+          # Provide extraHeaders to Lighthouse via environment override
+          # Expect cookie like: "session=abc; other=value"
+          EH='{"Cookie":"'"${{ secrets.LH_AUTH_COOKIE }}"'"}'
+          echo "LHCI_COLLECT__SETTINGS__EXTRA_HEADERS=$EH" >> $GITHUB_ENV
+          echo "has_auth=true" >> $GITHUB_OUTPUT
+          echo "Set LHCI extraHeaders for authenticated pages"
+        else
+          echo "has_auth=false" >> $GITHUB_OUTPUT
+          echo "No LH_AUTH_COOKIE secret set; skipping authenticated URLs"
+        fi
 
-      - name: Check for critical performance issues
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
-        run: echo "Analyzing performance metrics for PRODUCTION..."
+    - name: Add protected URLs (optional)
+      id: add-protected
+      if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.prep-lh-headers.outputs.has_auth == 'true'
+      run: |
+        {
+          echo "extra_urls<<EOF"
+          echo "${BASE_URL}/dashboard?perf=1"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
 
-      - name: Set Slack enabled output (performance)
-        id: set-slack-enabled-perf
-        run: |
-          if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
-            echo "slack_enabled=true" >> $GITHUB_OUTPUT
-          else
-            echo "slack_enabled=false" >> $GITHUB_OUTPUT
-          fi
+    - name: Run Lighthouse CI
+      id: lhci
+      uses: treosh/lighthouse-ci-action@v12
+      if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
+      with:
+        urls: |
+          ${{ steps.build-urls.outputs.urls }}
+          ${{ steps.add-protected.outputs.extra_urls }}
+        configPath: ./.github/lighthouse-config.json
+        budgetPath: ./.github/lighthouse-budget.json
+        uploadArtifacts: true
+        temporaryPublicStorage: true
 
-      - name: Skip notice
-        if: steps.resolve-perf.outputs.skip_lhci == 'true' || steps.build-urls.outputs.skip_lhci_urls == 'true'
-        run: echo "Skipping Lighthouse run due to missing APP_URL or no healthy URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to enable."
+    - name: Check for critical performance issues
+      if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
+      run: echo "Analyzing performance metrics for PRODUCTION..."
 
-      - name: Notify performance issues
-        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
-        uses: slackapi/slack-github-action@v1.25.0
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        with:
-          payload: |
-            {
-              "text": "⚠️ *Performance Issues Detected in PRODUCTION*",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "⚠️ *Performance Issues Detected in PRODUCTION*\n\n*Environment:* Production\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis affects production performance and should be reviewed.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
-                  }
+    - name: Set Slack enabled output (performance)
+      id: set-slack-enabled-perf
+      run: |
+        if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
+          echo "slack_enabled=true" >> $GITHUB_OUTPUT
+        else
+          echo "slack_enabled=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Skip notice
+      if: steps.resolve-perf.outputs.skip_lhci == 'true' || steps.build-urls.outputs.skip_lhci_urls == 'true'
+      run: echo "Skipping Lighthouse run due to missing APP_URL or no healthy URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to enable."
+
+    - name: Notify performance issues
+      if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
+      uses: slackapi/slack-github-action@v1.25.0
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      with:
+        payload: |
+          {
+            "text": "⚠️ *Performance Issues Detected in PRODUCTION*",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "⚠️ *Performance Issues Detected in PRODUCTION*\n\n*Environment:* Production\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis affects production performance and should be reviewed.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
                 }
-              ]
-            }
-        continue-on-error: true
+              }
+            ]
+          }
+      continue-on-error: true
 
-      - name: Log performance notification skip
-        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'false'
-        run: |
-          echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
-          echo "::warning::Performance issues detected but no notification was sent"
+    - name: Log performance notification skip
+      if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'false'
+      run: |
+        echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
+        echo "::warning::Performance issues detected but no notification was sent"
