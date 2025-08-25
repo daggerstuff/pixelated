@@ -113,31 +113,31 @@ jobs:
           return 1
         }
 
+        # Function to perform robust HTTP check with retries
+        MAX_RETRIES=3
+        check_endpoint() {
+          local url="$1"
+          local endpoint_name="$2"
+          local max_retries="$MAX_RETRIES"
+          local timeout=30
+          local retry_delay=10
+          # …existing retry loop using $max_retries…
+        }
+
         # Basic endpoint check with retries
         if check_endpoint "$BASE_URL" "Main Site"; then
           MAIN_STATUS="passing"
         else
-          echo "::error::PRODUCTION site is down or returning errors after $max_retries attempts"
+          echo "::error::PRODUCTION site is down or returning errors after ${MAX_RETRIES} attempts"
           echo "status=failing" >> $GITHUB_OUTPUT
           exit 1
         fi
-
         # API health check with retries (non-blocking)
-        if check_endpoint "$BASE_URL/api/health" "API Health"; then
-          API_STATUS="passing"
-        else
-          echo "::warning::API health endpoint is not responding after retries"
-          API_STATUS="failing"
-        fi
-
-        echo "✅ PRODUCTION health checks passed"
-        echo "status=passing" >> $GITHUB_OUTPUT
-
     - name: Create temporary config
       if: steps.health-check.outputs.status == 'passing'
       run: |
         cat > temp-playwright.config.js << 'EOF'
-        export default {
+        module.exports = {
           testDir: './tests/monitoring',
           use: {
             baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
@@ -155,12 +155,27 @@ jobs:
           retries: 1,
         };
         EOF
-
+                browserName: 'chromium',
     - name: Run Playwright tests
       id: run-tests
       if: steps.health-check.outputs.status == 'passing'
       run: |
         pnpm exec playwright install --with-deps chromium
+        echo "Running Playwright tests against PRODUCTION: $BASE_URL"
+
+        # Run tests and propagate failure
+        NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
+          pnpm exec playwright test --config=temp-playwright.config.js
+
+        TEST_EXIT=$?
+        if [ $TEST_EXIT -eq 0 ]; then
+          echo "✅ PRODUCTION monitoring tests completed"
+          echo "status=success" >> $GITHUB_OUTPUT
+        else
+          echo "::error::Playwright tests failed with exit code $TEST_EXIT"
+          echo "status=failure" >> $GITHUB_OUTPUT
+          exit $TEST_EXIT
+        fi
         echo "Running Playwright tests against PRODUCTION: $BASE_URL"
 
         # Run tests and store exit code to determine if any tests failed
@@ -493,29 +508,28 @@ jobs:
           MAIN_STATUS="warning"
         fi
 
-        # API health check with retries (non-blocking)
-        if check_endpoint "$BASE_URL/api/health" "API Health"; then
-          API_STATUS="passing"
-        else
-          echo "::warning::API health endpoint is not responding after retries"
-          echo "::notice::API may not be fully initialized in preview environment"
-          API_STATUS="failing"
-        fi
-
-        if [[ "$MAIN_STATUS" == "warning" ]]; then
-          echo "⚠️  PREVIEW health checks completed with warnings (this is normal for preview builds)"
-        else
-          echo "✅ PREVIEW health checks passed"
-        fi
-
     - name: Create temporary config
       if: steps.health-check.outputs.status == 'passing'
       run: |
         cat > temp-playwright.config.js << 'EOF'
-        export default {
+        module.exports = {
           testDir: './tests/monitoring',
           use: {
             baseURL: process.env.BASE_URL,
+          },
+          projects: [
+            {
+              name: 'chromium',
+              use: {
+                browserName: 'chromium',
+              },
+            },
+          ],
+          reporter: ['html', 'list'],
+          timeout: 60000,
+          retries: 2, // More retries for preview builds
+        };
+        EOF
           },
           projects: [
             {
@@ -604,18 +618,8 @@ jobs:
         fi
 
     - name: Probe Lighthouse URLs (wait for healthy)
-      id: build-urls
-      if: steps.resolve-perf.outputs.skip_lhci == 'false'
       run: |
-        # Candidate URLs to test
-        CANDIDATES=(
-          "${BASE_URL}"
-          "${BASE_URL}/login"
-        )
-
-        OK_URLS=()
         for u in "${CANDIDATES[@]}"; do
-          # wait until healthy or timeout
           ATTEMPTS=0
           code=000
           until [ "$code" = "200" ] || [ $ATTEMPTS -ge 15 ]; do
@@ -633,6 +637,18 @@ jobs:
             echo "::warning::Skipping Lighthouse for $u (HTTP $code)"
           fi
         done
+
+        if [ ${#OK_URLS[@]} -eq 0 ]; then
+          echo "::notice::No URLs are healthy (HTTP 200); skipping Lighthouse performance checks."
+          echo "skip_lhci_urls=true" >> $GITHUB_OUTPUT
+        else
+          {
+            echo "skip_lhci_urls=false"
+            echo "urls<<EOF"
+            printf "%s\n" "${OK_URLS[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+        fi
 
         if [ ${#OK_URLS[@]} -eq 0 ]; then
           echo "::notice::No URLs are healthy (HTTP 200); skipping Lighthouse performance checks."

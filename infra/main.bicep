@@ -33,11 +33,10 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: '${appServiceName}-plan'
   location: azureLocation
   sku: {
-    name: 'P1V3'
+    name: 'P1v3'
     tier: 'PremiumV3'
-    size: 'P1V3'
-    family: 'Pv3'
-    capacity: 1
+    size: 'P1v3'
+    capacity: 2
   }
   kind: 'linux'
   properties: {
