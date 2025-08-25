@@ -440,7 +440,7 @@ export class SupportContextIdentifier {
     }
   } {
     return {
-      immediateActions: this.getImmediateActions(result),
+      immediateActions: this.getImmediateActions(result).slice(),
       longerTermStrategies: this.getLongerTermStrategies(result),
       resources: this.getRelevantResources(result),
       responseStyle: this.determineResponseStyle(result),
