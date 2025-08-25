@@ -688,7 +688,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
           throw new Error('Python service unavailable')
         }
         async initialize() {}
-        async checkHealth() { return { status: 'error', message: 'Service failed' } }
+        async checkHealth() {
+          return { status: 'error', message: 'Service failed' }
+        }
       }
 
       const failingService = new FailingPythonService()
@@ -712,7 +714,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       expect(result.overallBiasScore).toBe(0.5)
       // Should include fallback recommendations
       expect(
-        result.recommendations.some((rec) => rec.includes('Limited analysis available')),
+        result.recommendations.some((rec) =>
+          rec.includes('Limited analysis available'),
+        ),
       ).toBe(true)
 
       // Restore original service
@@ -830,43 +834,130 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       // Mock individual layer methods to return exactly 0.3 (warning threshold)
       const mockPreprocessingResponse = (biasScore: number) => ({
         biasScore,
-        linguisticBias: { genderBiasScore: 0.1, racialBiasScore: 0.1, ageBiasScore: 0.1, culturalBiasScore: 0.1, biasedTerms: [], sentimentAnalysis: { overallSentiment: 0.0, emotionalValence: 0.0, subjectivity: 0.0, demographicVariations: {} } },
-        representationAnalysis: { demographicDistribution: {}, underrepresentedGroups: [], overrepresentedGroups: [], diversityIndex: 0.0, intersectionalityAnalysis: [] },
-        dataQualityMetrics: { completeness: 1.0, consistency: 1.0, accuracy: 1.0, timeliness: 1.0, validity: 1.0, missingDataByDemographic: {} },
+        linguisticBias: {
+          genderBiasScore: 0.1,
+          racialBiasScore: 0.1,
+          ageBiasScore: 0.1,
+          culturalBiasScore: 0.1,
+          biasedTerms: [],
+          sentimentAnalysis: {
+            overallSentiment: 0.0,
+            emotionalValence: 0.0,
+            subjectivity: 0.0,
+            demographicVariations: {},
+          },
+        },
+        representationAnalysis: {
+          demographicDistribution: {},
+          underrepresentedGroups: [],
+          overrepresentedGroups: [],
+          diversityIndex: 0.0,
+          intersectionalityAnalysis: [],
+        },
+        dataQualityMetrics: {
+          completeness: 1.0,
+          consistency: 1.0,
+          accuracy: 1.0,
+          timeliness: 1.0,
+          validity: 1.0,
+          missingDataByDemographic: {},
+        },
         recommendations: [],
-      });
-      
+      })
+
       const mockModelLevelResponse = (biasScore: number) => ({
         biasScore,
-        fairnessMetrics: { demographicParity: 0.75, equalizedOdds: 0.8, equalOpportunity: 0.8, calibration: 0.8, individualFairness: 0.8, counterfactualFairness: 0.8 },
-        performanceMetrics: { accuracy: 0.9, precision: 0.9, recall: 0.9, f1Score: 0.9, auc: 0.9, calibrationError: 0.05, demographicBreakdown: {} },
+        fairnessMetrics: {
+          demographicParity: 0.75,
+          equalizedOdds: 0.8,
+          equalOpportunity: 0.8,
+          calibration: 0.8,
+          individualFairness: 0.8,
+          counterfactualFairness: 0.8,
+        },
+        performanceMetrics: {
+          accuracy: 0.9,
+          precision: 0.9,
+          recall: 0.9,
+          f1Score: 0.9,
+          auc: 0.9,
+          calibrationError: 0.05,
+          demographicBreakdown: {},
+        },
         groupPerformanceComparison: [],
         recommendations: [],
-      });
-      
+      })
+
       const mockInteractiveResponse = (biasScore: number) => ({
         biasScore,
-        counterfactualAnalysis: { scenariosAnalyzed: 3, biasDetected: false, consistencyScore: 0.15, problematicScenarios: [] },
+        counterfactualAnalysis: {
+          scenariosAnalyzed: 3,
+          biasDetected: false,
+          consistencyScore: 0.15,
+          problematicScenarios: [],
+        },
         featureImportance: [],
         whatIfScenarios: [],
         recommendations: [],
-      });
-      
+      })
+
       const mockEvaluationResponse = (biasScore: number) => ({
         biasScore,
-        huggingFaceMetrics: { toxicity: 0.05, bias: 0.15, regard: {}, stereotype: 0.1, fairness: 0.85 },
-        customMetrics: { therapeuticBias: 0.1, culturalSensitivity: 0.1, professionalEthics: 0.1, patientSafety: 0.1 },
-        temporalAnalysis: { trendDirection: 'stable', changeRate: 0, seasonalPatterns: [], interventionEffectiveness: [] },
+        huggingFaceMetrics: {
+          toxicity: 0.05,
+          bias: 0.15,
+          regard: {},
+          stereotype: 0.1,
+          fairness: 0.85,
+        },
+        customMetrics: {
+          therapeuticBias: 0.1,
+          culturalSensitivity: 0.1,
+          professionalEthics: 0.1,
+          patientSafety: 0.1,
+        },
+        temporalAnalysis: {
+          trendDirection: 'stable',
+          changeRate: 0,
+          seasonalPatterns: [],
+          interventionEffectiveness: [],
+        },
         recommendations: [],
-      });
+      })
 
-      biasEngine.pythonService.runPreprocessingAnalysis = vi.fn().mockResolvedValue(mockPreprocessingResponse(0.3))
-      biasEngine.pythonService.runModelLevelAnalysis = vi.fn().mockResolvedValue(mockModelLevelResponse(0.3))
-      biasEngine.pythonService.runInteractiveAnalysis = vi.fn().mockResolvedValue(mockInteractiveResponse(0.3))
-      biasEngine.pythonService.runEvaluationAnalysis = vi.fn().mockResolvedValue(mockEvaluationResponse(0.3))
-
+      biasEngine.pythonService.runPreprocessingAnalysis = vi
+        .fn()
+        .mockResolvedValue(mockPreprocessingResponse(0.3))
+      biasEngine.pythonService.runModelLevelAnalysis = vi
+        .fn()
+        .mockResolvedValue(mockModelLevelResponse(0.3))
+      biasEngine.pythonService.runInteractiveAnalysis = vi
+        .fn()
+        .mockResolvedValue(mockInteractiveResponse(0.3))
+      biasEngine.pythonService.runEvaluationAnalysis = vi
+        .fn()
+        .mockResolvedValue(mockEvaluationResponse(0.3))
 
       const result = await biasEngine.analyzeSession(mockSessionData)
+      console.log('DEBUG: Layer results:')
+      console.log(
+        '  Preprocessing biasScore:',
+        result.layerResults.preprocessing.biasScore,
+      )
+      console.log(
+        '  ModelLevel biasScore:',
+        result.layerResults.modelLevel.biasScore,
+      )
+      console.log(
+        '  Interactive biasScore:',
+        result.layerResults.interactive.biasScore,
+      )
+      console.log(
+        '  Evaluation biasScore:',
+        result.layerResults.evaluation.biasScore,
+      )
+      console.log('  Layer weights:', biasEngine.config.layerWeights)
+      console.log('  Calculated overallBiasScore:', result.overallBiasScore)
       // With all layers at 0.3 and equal weights (0.25 each), overall should be 0.3
       expect(result.overallBiasScore).toBeCloseTo(0.3, 5) // Allow for small floating point differences
       expect(result.alertLevel).toBe('medium')
@@ -880,18 +971,26 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       await biasEngine.initialize()
 
       // Override methods to throw errors - this should trigger fallback values
-      biasEngine.pythonService.runPreprocessingAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('TIMEOUT: Request timed out after 30 seconds')
-      })
-      biasEngine.pythonService.runModelLevelAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('TIMEOUT: Request timed out after 30 seconds')
-      })
-      biasEngine.pythonService.runInteractiveAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('TIMEOUT: Request timed out after 30 seconds')
-      })
-      biasEngine.pythonService.runEvaluationAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('TIMEOUT: Request timed out after 30 seconds')
-      })
+      biasEngine.pythonService.runPreprocessingAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('TIMEOUT: Request timed out after 30 seconds')
+        })
+      biasEngine.pythonService.runModelLevelAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('TIMEOUT: Request timed out after 30 seconds')
+        })
+      biasEngine.pythonService.runInteractiveAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('TIMEOUT: Request timed out after 30 seconds')
+        })
+      biasEngine.pythonService.runEvaluationAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('TIMEOUT: Request timed out after 30 seconds')
+        })
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)
@@ -922,9 +1021,11 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       await biasEngine.initialize()
 
       // Only preprocessing fails, others succeed (keep default mocks)
-      biasEngine.pythonService.runPreprocessingAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('Preprocessing service unavailable')
-      })
+      biasEngine.pythonService.runPreprocessingAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('Preprocessing service unavailable')
+        })
 
       const result = await biasEngine.analyzeSession(mockSessionData)
 
@@ -940,9 +1041,11 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     it('should handle malformed Python service responses', async () => {
       await biasEngine.initialize()
 
-      biasEngine.pythonService.runPreprocessingAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('Invalid response format: missing required fields')
-      })
+      biasEngine.pythonService.runPreprocessingAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('Invalid response format: missing required fields')
+        })
 
       const result = await biasEngine.analyzeSession(mockSessionData)
 
@@ -962,9 +1065,11 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       await biasEngine.initialize()
 
       // Mock 503 Service Unavailable
-      biasEngine.pythonService.runPreprocessingAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('503: Service temporarily overloaded, please retry')
-      })
+      biasEngine.pythonService.runPreprocessingAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('503: Service temporarily overloaded, please retry')
+        })
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)
@@ -977,9 +1082,11 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     it('should handle authentication failures', async () => {
       await biasEngine.initialize()
 
-      biasEngine.pythonService.runPreprocessingAnalysis = vi.fn().mockImplementation(() => {
-        throw new Error('401: Authentication required')
-      })
+      biasEngine.pythonService.runPreprocessingAnalysis = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('401: Authentication required')
+        })
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)

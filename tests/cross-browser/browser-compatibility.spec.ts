@@ -1,5 +1,5 @@
-import { test, expect, devices } from '@playwright/test'
 import type { Browser, BrowserContext, Page } from '@playwright/test'
+import { devices, expect, test } from '@playwright/test'
 
 // Define browsers to test
 const browsers = ['chromium', 'firefox', 'webkit'] as const
@@ -30,15 +30,9 @@ browsers.forEach((browserName) => {
     test('Basic page functionality works across browsers', async () => {
       await test.step('Page loads and renders correctly', async () => {
         // Check that main elements are visible
-        await expect(
-          page.locator('h1'),
-        ).toBeVisible()
-        await expect(
-          page.locator('nav'),
-        ).toBeVisible()
-        await expect(
-          page.locator('footer'),
-        ).toBeVisible()
+        await expect(page.locator('h1')).toBeVisible()
+        await expect(page.locator('nav')).toBeVisible()
+        await expect(page.locator('footer')).toBeVisible()
       })
 
       await test.step('Navigation between tabs works', async () => {
@@ -96,9 +90,7 @@ browsers.forEach((browserName) => {
       await test.step('Text input and validation', async () => {
         await page.goto('/contact')
 
-        const textArea = page.locator(
-          'textarea[name="message"]',
-        )
+        const textArea = page.locator('textarea[name="message"]')
         await expect(textArea).toBeVisible()
 
         // Test text input
@@ -446,9 +438,21 @@ test.describe('Legacy Browser Support', () => {
 // Test browser-specific device combinations
 test.describe('Browser-Device Combinations', () => {
   const deviceBrowserCombinations = [
-    { deviceName: 'iPhone 12', device: devices['iPhone 12'], browser: 'webkit' as const },
-    { deviceName: 'Pixel 5', device: devices['Pixel 5'], browser: 'chromium' as const },
-    { deviceName: 'iPad Pro', device: devices['iPad Pro'], browser: 'webkit' as const },
+    {
+      deviceName: 'iPhone 12',
+      device: devices['iPhone 12'],
+      browser: 'webkit' as const,
+    },
+    {
+      deviceName: 'Pixel 5',
+      device: devices['Pixel 5'],
+      browser: 'chromium' as const,
+    },
+    {
+      deviceName: 'iPad Pro',
+      device: devices['iPad Pro'],
+      browser: 'webkit' as const,
+    },
   ]
 
   deviceBrowserCombinations.forEach(({ deviceName, device, browser }) => {
