@@ -13,6 +13,7 @@ import {
   getCachedReport,
 } from './cache'
 import { getPerformanceOptimizer, type PerformanceOptimizer } from './performance-optimizer'
+import { getAuditLogger } from './audit'
 
 type LayerResults = {
   preprocessing: import('./types').PreprocessingAnalysisResult
@@ -586,6 +587,22 @@ export class BiasDetectionEngine {
 
     // Store result in distributed cache for future retrieval
     await cacheAnalysisResult(session.sessionId, result as unknown as import('./types').BiasAnalysisResult)
+
+    // Patch: Create HIPAA-compliant audit log if enabled (call audit.ts API)
+    if (this.config.auditLogging) {
+      const auditLogger = getAuditLogger();
+      await auditLogger.logBiasAnalysis({
+        sessionId: session.sessionId,
+        userId: (session as any).userId || '',
+        timestamp: session.timestamp ?? new Date(),
+        demographics: maskedDemo,
+        biasScore: overallBiasScore,
+        alertLevel,
+        recommendations,
+        confidence,
+        requestMeta: (session as any).requestMeta || {},
+      });
+    }
 
     return result
   }
