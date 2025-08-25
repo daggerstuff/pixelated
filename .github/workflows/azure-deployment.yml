@@ -7,15 +7,16 @@ permissions:
 on:
   push:
     branches:
-      - master
-      - develop
+    - master
+    - develop
   pull_request:
     branches:
-      - master
+    - master
   workflow_dispatch:
 
+
 env:
-  NODE_VERSION: 22.16.0
+  NODE_VERSION: 22.18.0
   PNPM_VERSION: 10.15.0
   AZURE_RESOURCE_GROUP: pixelated-rg
   AZURE_LOCATION: eastus
@@ -29,98 +30,98 @@ jobs:
       environment: ${{ steps.set-env.outputs.environment }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+    - name: Checkout code
+      uses: actions/checkout@v5
 
-      - name: Set environment
-        id: set-env
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "environment=production" >> $GITHUB_ENV
-            echo "environment=production" >> $GITHUB_OUTPUT
-          else
-            echo "environment=staging" >> $GITHUB_ENV
-            echo "environment=staging" >> $GITHUB_OUTPUT
-          fi
+    - name: Set environment
+      id: set-env
+      run: |
+        if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+          echo "environment=production" >> $GITHUB_ENV
+          echo "environment=production" >> $GITHUB_OUTPUT
+        else
+          echo "environment=staging" >> $GITHUB_ENV
+          echo "environment=staging" >> $GITHUB_OUTPUT
+        fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
+        run_install: false
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Run linting
-        continue-on-error: true
-        run: pnpm run lint
+    - name: Run linting
+      continue-on-error: true
+      run: pnpm run lint
 
-      - name: Run type checking
-        continue-on-error: true
-        run: |
-          echo "Running type checking..."
-          pnpm run type-check || {
-            echo "❌ Type checking found issues but continuing deployment"
-            exit 0
-          }
-          echo "✅ Type checking passed"
+    - name: Run type checking
+      continue-on-error: true
+      run: |
+        echo "Running type checking..."
+        pnpm run type-check || {
+          echo "❌ Type checking found issues but continuing deployment"
+          exit 0
+        }
+        echo "✅ Type checking passed"
 
-      - name: Run tests
-        continue-on-error: true
-        run: |
-          echo "Running tests..."
-          pnpm test || {
-            echo "❌ Tests failed but continuing deployment"
-            exit 0
-          }
-          echo "✅ Tests passed"
+    - name: Run tests
+      continue-on-error: true
+      run: |
+        echo "Running tests..."
+        pnpm test || {
+          echo "❌ Tests failed but continuing deployment"
+          exit 0
+        }
+        echo "✅ Tests passed"
 
-      - name: Build application
-        run: |
-          export NODE_ENV=production
-          # Use Azure-specific Astro config if present; otherwise fallback to default
-          if [ -f astro.config.azure.mjs ]; then
-            export ASTRO_CONFIG_FILE=astro.config.azure.mjs
-            echo "Using astro.config.azure.mjs"
-          else
-            echo "astro.config.azure.mjs not found; using default astro.config.mjs"
-          fi
-          export AZURE_DEPLOYMENT_TYPE=server
-          pnpm build
+    - name: Build application
+      run: |
+        export NODE_ENV=production
+        # Use Azure-specific Astro config if present; otherwise fallback to default
+        if [ -f astro.config.azure.mjs ]; then
+          export ASTRO_CONFIG_FILE=astro.config.azure.mjs
+          echo "Using astro.config.azure.mjs"
+        else
+          echo "astro.config.azure.mjs not found; using default astro.config.mjs"
+        fi
+        export AZURE_DEPLOYMENT_TYPE=server
+        pnpm build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            dist/
-            package.json
-            astro.config.azure.mjs
-          if-no-files-found: ignore
-          retention-days: 1
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          dist/
+          package.json
+          astro.config.azure.mjs
+        if-no-files-found: ignore
+        retention-days: 1
 
   # Deploy Infrastructure
   deploy-infrastructure:
@@ -134,85 +135,80 @@ jobs:
       key-vault-name: ${{ steps.deployment.outputs.key-vault-name }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+    - name: Checkout code
+      uses: actions/checkout@v5
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy Bicep template
-        id: bicep
-        uses: azure/arm-deploy@v2
-        with:
-          scope: resourcegroup
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-          template: infra/main.bicep
-          parameters: |
-            environment=${{ needs.build.outputs.environment }}
-            azureLocation=${{ env.AZURE_LOCATION }}
-            containerRegistryName=pixelatedcr
-            containerAppName=pixelated-web
-            appServiceName=pixelated
-          failOnStdErr: false
+    - name: Deploy Bicep template
+      id: bicep
+      uses: azure/arm-deploy@v2
+      with:
+        scope: resourcegroup
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+        template: infra/main.bicep
+        parameters: infra/main.parameters.json
+        failOnStdErr: false
 
-      - name: Get deployment outputs
-        id: deployment
-        run: |
-          OUTPUTS='${{ steps.bicep.outputs.deploymentOutputs }}'
-          echo "Raw deployment outputs: $OUTPUTS"
+    - name: Get deployment outputs
+      id: deployment
+      run: |
+        OUTPUTS='${{ steps.bicep.outputs.deploymentOutputs }}'
+        echo "Raw deployment outputs: $OUTPUTS"
 
-          # Extract specific outputs (must exist in infra/main.bicep)
-          KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value // empty')
-          REGISTRY_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value // empty')
-          REGISTRY_LOGIN_SERVER=$(echo "$OUTPUTS" | jq -r '.AZURE_CONTAINER_REGISTRY_ENDPOINT.value // empty')
-          APP_SERVICE_NAME=$(echo "$OUTPUTS" | jq -r '.appServiceName.value // empty')
+        # Extract specific outputs (must exist in infra/main.bicep)
+        KEY_VAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value // empty')
+        REGISTRY_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value // empty')
+        REGISTRY_LOGIN_SERVER=$(echo "$OUTPUTS" | jq -r '.AZURE_CONTAINER_REGISTRY_ENDPOINT.value // empty')
+        APP_SERVICE_NAME=$(echo "$OUTPUTS" | jq -r '.appServiceName.value // empty')
 
-          echo "key-vault-name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
-          echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
-          echo "registry-login-server=$REGISTRY_LOGIN_SERVER" >> $GITHUB_OUTPUT
-          echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
+        echo "key-vault-name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
+        echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
+        echo "registry-login-server=$REGISTRY_LOGIN_SERVER" >> $GITHUB_OUTPUT
+        echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
 
-      - name: Store secrets in Key Vault
-        env:
-          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
-        run: |
-          # Store Azure OpenAI secrets
-          if [[ -n "$AZURE_OPENAI_API_KEY" ]]; then
-            az keyvault secret set \
-              --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
-              --name "azure-openai-api-key" \
-              --value "$AZURE_OPENAI_API_KEY"
-          fi
+    - name: Store secrets in Key Vault
+      env:
+        AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+        AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
+      run: |
+        # Store Azure OpenAI secrets
+        if [[ -n "$AZURE_OPENAI_API_KEY" ]]; then
+          az keyvault secret set \
+            --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
+            --name "azure-openai-api-key" \
+            --value "$AZURE_OPENAI_API_KEY"
+        fi
 
-          if [[ -n "$AZURE_OPENAI_ENDPOINT" ]]; then
-            az keyvault secret set \
-              --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
-              --name "azure-openai-endpoint" \
-              --value "$AZURE_OPENAI_ENDPOINT"
-          fi
+        if [[ -n "$AZURE_OPENAI_ENDPOINT" ]]; then
+          az keyvault secret set \
+            --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
+            --name "azure-openai-endpoint" \
+            --value "$AZURE_OPENAI_ENDPOINT"
+        fi
 
-          # Store MongoDB Atlas secrets
-          if [[ -n "$MONGODB_URI" ]]; then
-            az keyvault secret set \
-              --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
-              --name "mongodb-uri" \
-              --value "$MONGODB_URI"
-          fi
+        # Store MongoDB Atlas secrets
+        if [[ -n "$MONGODB_URI" ]]; then
+          az keyvault secret set \
+            --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
+            --name "mongodb-uri" \
+            --value "$MONGODB_URI"
+        fi
 
-          if [[ -n "$MONGODB_DB_NAME" ]]; then
-            az keyvault secret set \
-              --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
-              --name "mongodb-db-name" \
-              --value "$MONGODB_DB_NAME"
-          fi
+        if [[ -n "$MONGODB_DB_NAME" ]]; then
+          az keyvault secret set \
+            --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
+            --name "mongodb-db-name" \
+            --value "$MONGODB_DB_NAME"
+        fi
 
   # Build and Push Docker Image
   docker-build:
@@ -221,57 +217,57 @@ jobs:
     if: ${{ always() && needs.build.result == 'success' && needs.deploy-infrastructure.result == 'success' }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+    - name: Checkout code
+      uses: actions/checkout@v5
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v5
-        with:
-          name: build-artifacts
+    - name: Download build artifacts
+      uses: actions/download-artifact@v5
+      with:
+        name: build-artifacts
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get container registry details
-        id: acr
-        run: |
-          # Get ACR details from infrastructure deployment outputs
-          REGISTRY_NAME="${{ needs.deploy-infrastructure.outputs.registry-name }}"
-          LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
-          
-          # Validate that we got the required values from the infrastructure deployment
-          if [[ -z "$REGISTRY_NAME" || "$REGISTRY_NAME" == "null" ]]; then
-            echo "Failed to get Azure Container Registry name from infrastructure deployment"
-            exit 1
-          fi
-          
-          if [[ -z "$LOGIN_SERVER" || "$LOGIN_SERVER" == "null" ]]; then
-            echo "Failed to get Azure Container Registry login server from infrastructure deployment"
-            exit 1
-          fi
-          
-          echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
-          echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
+    - name: Get container registry details
+      id: acr
+      run: |
+        # Get ACR details from infrastructure deployment outputs
+        REGISTRY_NAME="${{ needs.deploy-infrastructure.outputs.registry-name }}"
+        LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
 
-      - name: Login to Azure Container Registry
-        run: |
-          az acr login --name ${{ steps.acr.outputs.registry-name }}
+        # Validate that we got the required values from the infrastructure deployment
+        if [[ -z "$REGISTRY_NAME" || "$REGISTRY_NAME" == "null" ]]; then
+          echo "Failed to get Azure Container Registry name from infrastructure deployment"
+          exit 1
+        fi
 
-      - name: Build and push Docker image
-        run: |
-          IMAGE_TAG="${{ needs.build.outputs.environment }}-${{ github.sha }}"
+        if [[ -z "$LOGIN_SERVER" || "$LOGIN_SERVER" == "null" ]]; then
+          echo "Failed to get Azure Container Registry login server from infrastructure deployment"
+          exit 1
+        fi
 
-          docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG .
-          docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }} .
-          docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:latest .
+        echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
+        echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
 
-          docker push ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG
-          docker push ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
-          docker push ${{ steps.acr.outputs.login-server }}/pixelated:latest
+    - name: Login to Azure Container Registry
+      run: |
+        az acr login --name ${{ steps.acr.outputs.registry-name }}
+
+    - name: Build and push Docker image
+      run: |
+        IMAGE_TAG="${{ needs.build.outputs.environment }}-${{ github.sha }}"
+
+        docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG .
+        docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }} .
+        docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:latest .
+
+        docker push ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG
+        docker push ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
+        docker push ${{ steps.acr.outputs.login-server }}/pixelated:latest
 
   # Deploy to App Service
   deploy-app-service:
@@ -280,72 +276,72 @@ jobs:
     if: ${{ always() && needs.docker-build.result == 'success' }}
 
     steps:
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get deployment details
-        id: details
-        run: |
-          # Get app service name from infrastructure outputs
-          APP_SERVICE_NAME="${{ needs.deploy-infrastructure.outputs.app-service-name }}"
-          LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
-          
-          # Validate that we got the required values
-          if [[ -z "$APP_SERVICE_NAME" || "$APP_SERVICE_NAME" == "null" ]]; then
-            echo "Failed to get App Service name from infrastructure deployment"
-            exit 1
-          fi
-          
-          if [[ -z "$LOGIN_SERVER" || "$LOGIN_SERVER" == "null" ]]; then
-            echo "Failed to get Container Registry login server from infrastructure deployment"
-            exit 1
-          fi
+    - name: Get deployment details
+      id: details
+      run: |
+        # Get app service name from infrastructure outputs
+        APP_SERVICE_NAME="${{ needs.deploy-infrastructure.outputs.app-service-name }}"
+        LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
 
-          echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
-          echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
+        # Validate that we got the required values
+        if [[ -z "$APP_SERVICE_NAME" || "$APP_SERVICE_NAME" == "null" ]]; then
+          echo "Failed to get App Service name from infrastructure deployment"
+          exit 1
+        fi
 
-      - name: Deploy to App Service
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ steps.details.outputs.app-service-name }}
-          images: ${{ steps.details.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
+        if [[ -z "$LOGIN_SERVER" || "$LOGIN_SERVER" == "null" ]]; then
+          echo "Failed to get Container Registry login server from infrastructure deployment"
+          exit 1
+        fi
 
-      - name: Configure App Service settings
-        env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
-        run: |
-          # Base settings
+        echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
+        echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
+
+    - name: Deploy to App Service
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ steps.details.outputs.app-service-name }}
+        images: ${{ steps.details.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
+
+    - name: Configure App Service settings
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
+      run: |
+        # Base settings
+        az webapp config appsettings set \
+          --name ${{ steps.details.outputs.app-service-name }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --settings \
+            NODE_ENV=${{ needs.build.outputs.environment }} \
+            WEBSITES_PORT=3000 \
+            WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
+
+        # MongoDB settings (apply only if provided)
+        if [[ -n "$MONGODB_URI" ]]; then
           az webapp config appsettings set \
             --name ${{ steps.details.outputs.app-service-name }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --settings \
-              NODE_ENV=${{ needs.build.outputs.environment }} \
-              WEBSITES_PORT=3000 \
-              WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
+              MONGODB_URI="$MONGODB_URI" \
+              MONGO_URI="$MONGODB_URI"
+        fi
 
-          # MongoDB settings (apply only if provided)
-          if [[ -n "$MONGODB_URI" ]]; then
-            az webapp config appsettings set \
-              --name ${{ steps.details.outputs.app-service-name }} \
-              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-              --settings \
-                MONGODB_URI="$MONGODB_URI" \
-                MONGO_URI="$MONGODB_URI"
-          fi
-
-          if [[ -n "$MONGODB_DB_NAME" ]]; then
-            az webapp config appsettings set \
-              --name ${{ steps.details.outputs.app-service-name }} \
-              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-              --settings \
-                MONGODB_DB_NAME="$MONGODB_DB_NAME" \
-                MONGO_DB_NAME="$MONGODB_DB_NAME"
-          fi
+        if [[ -n "$MONGODB_DB_NAME" ]]; then
+          az webapp config appsettings set \
+            --name ${{ steps.details.outputs.app-service-name }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --settings \
+              MONGODB_DB_NAME="$MONGODB_DB_NAME" \
+              MONGO_DB_NAME="$MONGODB_DB_NAME"
+        fi
 
   # Post-deployment tests
   post-deployment-tests:
@@ -354,48 +350,48 @@ jobs:
     if: ${{ always() && needs.deploy-app-service.result == 'success' }}
 
     steps:
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get App Service URL
-        id: app-url
-        run: |
-          APP_SERVICE_NAME=$(az webapp list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
-          APP_URL="https://$(az webapp show --name $APP_SERVICE_NAME --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query 'defaultHostName' -o tsv)"
-          echo "app-url=$APP_URL" >> $GITHUB_OUTPUT
+    - name: Get App Service URL
+      id: app-url
+      run: |
+        APP_SERVICE_NAME=$(az webapp list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv)
+        APP_URL="https://$(az webapp show --name $APP_SERVICE_NAME --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query 'defaultHostName' -o tsv)"
+        echo "app-url=$APP_URL" >> $GITHUB_OUTPUT
 
-      - name: Health check
-        run: |
-          echo "Testing application health at: ${{ steps.app-url.outputs.app-url }}"
+    - name: Health check
+      run: |
+        echo "Testing application health at: ${{ steps.app-url.outputs.app-url }}"
 
-          # Wait for application to be ready
-          sleep 60
+        # Wait for application to be ready
+        sleep 60
 
-          # Health check
-          response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }}/api/health)
-          if [ $response -eq 200 ]; then
-            echo "✅ Health check passed"
-          else
-            echo "❌ Health check failed with status: $response"
-            exit 1
-          fi
+        # Health check
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }}/api/health)
+        if [ $response -eq 200 ]; then
+          echo "✅ Health check passed"
+        else
+          echo "❌ Health check failed with status: $response"
+          exit 1
+        fi
 
-          # Basic functionality test
-          response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }})
-          if [ $response -eq 200 ]; then
-            echo "✅ Application is responding"
-          else
-            echo "❌ Application not responding with status: $response"
-            exit 1
-          fi
+        # Basic functionality test
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }})
+        if [ $response -eq 200 ]; then
+          echo "✅ Application is responding"
+        else
+          echo "❌ Application not responding with status: $response"
+          exit 1
+        fi
 
-      - name: Deployment summary
-        run: |
-          echo "🎉 Deployment completed successfully!"
-          echo "Environment: ${{ needs.build.outputs.environment }}"
-          echo "App URL: ${{ steps.app-url.outputs.app-url }}"
-          echo "Resource Group: ${{ env.AZURE_RESOURCE_GROUP }}"
+    - name: Deployment summary
+      run: |
+        echo "🎉 Deployment completed successfully!"
+        echo "Environment: ${{ needs.build.outputs.environment }}"
+        echo "App URL: ${{ steps.app-url.outputs.app-url }}"
+        echo "Resource Group: ${{ env.AZURE_RESOURCE_GROUP }}"

@@ -41,7 +41,7 @@ validate-runner:
   script:
     - set -e
     - echo "Validating GitLab runner capabilities..."
-    - apt-get update -y && apt-get install -y openssh-client git
+    - apk add --no-cache openssh-client git
     - if ! command -v docker &> /dev/null; then
         echo "Docker not found or failed to install." ; exit 1
       fi

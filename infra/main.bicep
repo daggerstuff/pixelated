@@ -4,7 +4,7 @@ param containerRegistryName string = 'pixelatedcr'
 param containerAppName string = 'pixelated-web'
 param appServiceName string = 'pixelated'
 
-resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
+resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   name: containerRegistryName
   location: azureLocation
   sku: {
@@ -21,16 +21,17 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: '${appServiceName}-plan'
   location: azureLocation
   sku: {
-    name: 'B1'
-    tier: 'Basic'
-    size: 'B1'
-    family: 'B'
-    capacity: 1
+    name: 'P1V3'
+    tier: 'PremiumV3'
+    size: 'P1V3'
+    family: 'Pv3'
+    capacity: 2
   }
   kind: 'linux'
   properties: {
     reserved: true
     zoneRedundant: true
+    targetWorkerCount: 2
   }
 }
 
@@ -126,9 +127,11 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
-    clientCertEnabled: false
+    clientCertEnabled: true
+    publicNetworkAccess: 'Disabled'
     siteConfig: {
       minTlsVersion: '1.2'
+      http20Enabled: true
       appSettings: [
         {
           name: 'NODE_ENV'

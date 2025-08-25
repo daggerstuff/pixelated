@@ -551,7 +551,9 @@ export class BiasDetectionEngine {
         ]
       : ['System performing within acceptable parameters']
 
-    await this.metricsCollector.storeAnalysisResult?.()
+    if (this.config.auditLogging) {
+      await this.metricsCollector.storeAnalysisResult?.()
+    }
 
     // Trigger monitoring callbacks for high/critical alerts
     if (alertLevel === 'high' || alertLevel === 'critical') {

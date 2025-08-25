@@ -118,7 +118,7 @@ export class AnalyticsService {
   async processEvents(): Promise<void> {
     try {
       // Process events in batches
-      const events = await this.redisClient.lrange(
+      const events = await this.redisClient.lRange(
         'analytics:events:queue',
         0,
         this.batchSize - 1,
@@ -176,7 +176,7 @@ export class AnalyticsService {
 
     try {
       // Get events from time series
-      const eventJsons = await this.redisClient.zrange(
+      const eventJsons = await this.redisClient.zRange(
         `analytics:events:time:${type}`,
         options.startTime ?? 0,
         options.endTime ?? '+inf',
@@ -214,7 +214,7 @@ export class AnalyticsService {
 
     try {
       // Get metrics from time series
-      const metricJsons = await this.redisClient.zrange(
+      const metricJsons = await this.redisClient.zRange(
         `analytics:metrics:${name}`,
         options.startTime ?? 0,
         options.endTime ?? '+inf',

@@ -163,3 +163,34 @@ variable "s3_replication_dest_arn" {
   description = "ARN of the destination S3 bucket for replication"
   type        = string
 }
+
+variable "s3_replication_role_arn" {
+  description = "ARN of the IAM role for S3 replication"
+  type        = string
+}
+
+variable "s3_replication_kms_key_id" {
+  description = "KMS key ID for S3 replication encryption"
+  type        = string
+}
+
+variable "s3_logging_bucket" {
+  description = "S3 bucket for access logging"
+  type        = string
+}
+
+variable "rds_performance_insights_kms_key_id" {
+  description = "KMS key ID for RDS Performance Insights"
+  type        = string
+}
+
+variable "redis_kms_key_id" {
+  description = "KMS key ID for Redis encryption"
+  type        = string
+}
+
+variable "redis_auth_token" {
+  description = "Redis authentication token"
+  type        = string
+  sensitive   = true
+}
