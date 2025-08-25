@@ -120,3 +120,7 @@ instance/
 .webassets-cache
 
 .scrapy
+
+# Ignore SARIF security scan results
+checkov-final-results.sarif/
+*.sarif
