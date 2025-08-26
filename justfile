@@ -1,6 +1,10 @@
 set dotenv-load := false
 set export := true
 
+# Run the Bias Detection Python service via uv
+bias_py:
+    uv run --python 3.11 python src/lib/ai/bias-detection/python-service/bias_detection_service.py
+
 # Provide a default name for any new projects
 name := "new-project"
 

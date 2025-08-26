@@ -1,4 +1,13 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi, } from 'vitest'
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from '@/test/setup-react19'
 import '@testing-library/jest-dom'

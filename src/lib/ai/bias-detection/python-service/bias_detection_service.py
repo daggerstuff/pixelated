@@ -29,10 +29,41 @@ from datetime import datetime, timezone
 from functools import wraps
 from typing import Any
 
+# Reduce TensorFlow verbosity early to avoid startup banners
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+# Targeted filter only for the functorch.vmap deprecation originating from inFairness
+import warnings, importlib
+warnings.filterwarnings(
+    "ignore",
+    category=FutureWarning,
+    message=r".*functorch\.vmap.*deprecated.*",
+    module=r".*inFairness\.utils\.ndcg.*",
+)
+
+# Pre-import and patch inFairness ndcg as early as possible
+try:
+    import torch  # type: ignore
+    has_torch_vmap = hasattr(torch, "vmap")
+except Exception:
+    has_torch_vmap = False
+
+if has_torch_vmap:
+    def _compat_vmap(fn, in_dims=0, out_dims=0):
+        return torch.vmap(fn, in_dims=in_dims, out_dims=out_dims)
+    try:
+        import inFairness.utils.ndcg as _early_ndcg  # type: ignore
+        if hasattr(_early_ndcg, "vmap"):
+            _early_ndcg.vmap = _compat_vmap  # type: ignore
+        # Reload to ensure patched symbol is bound everywhere within the module
+        importlib.reload(_early_ndcg)
+    except Exception:
+        pass
+
 import jwt
 import numpy as np
 import pandas as pd
-from flask import Flask, Response, g, jsonify, request
+from flask import Flask, Response, g, jsonify, request, has_request_context
 from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
 from werkzeug.exceptions import Unauthorized
@@ -59,24 +90,79 @@ except ImportError as e:
 # Hugging Face tooling
 try:
     from transformers.pipelines import pipeline
-
     HF_EVALUATE_AVAILABLE = True
 except ImportError as e:
     HF_EVALUATE_AVAILABLE = False
     pipeline = None
     logging.warning(f"Hugging Face pipeline not available: {e}")
 
+# Compatibility shim for functorch -> torch.vmap to prevent FutureWarnings in dependencies
+import warnings
+try:
+    import torch  # type: ignore
+    has_torch_vmap = hasattr(torch, "vmap")
+except Exception:
+    has_torch_vmap = False
+
+_compat_vmap = None
+if has_torch_vmap:
+    def _compat_vmap(fn, in_dims=0, out_dims=0):
+        return torch.vmap(fn, in_dims=in_dims, out_dims=out_dims)
+    try:
+        import functorch as _functorch  # type: ignore
+        if hasattr(_functorch, "vmap"):
+            _functorch.vmap = _compat_vmap  # type: ignore
+    except Exception:
+        pass
+    # Force-import and patch inFairness ndcg early
+    try:
+        import inFairness.utils.ndcg as _ndcg  # type: ignore
+        if hasattr(_ndcg, "vmap"):
+            _ndcg.vmap = _compat_vmap  # type: ignore
+    except Exception:
+        pass
+
+# Targeted filter only for the functorch.vmap deprecation originating from inFairness
+warnings.filterwarnings(
+    "ignore",
+    category=FutureWarning,
+    message=r".*functorch\.vmap.*deprecated.*",
+    module=r".*inFairness\.utils\.ndcg.*",
+)
+
 # NLP libraries
+# Try to load NLP stack components individually to support partial availability
+NLP_AVAILABLE = False
+NLTK_AVAILABLE = False
+SPACY_AVAILABLE = False
+TEXTBLOB_AVAILABLE = False
 try:
     import nltk
-    import spacy
     from nltk.sentiment import SentimentIntensityAnalyzer
+    NLTK_AVAILABLE = True
+except Exception:
+    NLTK_AVAILABLE = False
+try:
+    import spacy
+    SPACY_AVAILABLE = True
+except Exception:
+    SPACY_AVAILABLE = False
+try:
     from textblob import TextBlob
+    TEXTBLOB_AVAILABLE = True
+except Exception:
+    TEXTBLOB_AVAILABLE = False
 
-    NLP_AVAILABLE = True
-except ImportError as e:
-    NLP_AVAILABLE = False
-    logging.warning(f"NLP libraries not available: {e}")
+# Consider NLP available if at least one backend is present
+NLP_AVAILABLE = NLTK_AVAILABLE or SPACY_AVAILABLE or TEXTBLOB_AVAILABLE
+if not NLP_AVAILABLE:
+    logging.warning("NLP libraries not available: no VADER, spaCy, or TextBlob present")
+else:
+    have = []
+    if NLTK_AVAILABLE: have.append('VADER')
+    if SPACY_AVAILABLE: have.append('spaCy')
+    if TEXTBLOB_AVAILABLE: have.append('TextBlob')
+    logging.info(f"NLP backends available: {', '.join(have)}")
 
 # Model interpretability (feature flag only; avoid heavy imports until needed)
 try:
@@ -137,14 +223,13 @@ if (not flask_secret_key or not jwt_secret_key) and IS_NON_PROD:
         jwt_secret_key = "insecure-test-jwt-secret"
         logging.warning("Using insecure default JWT_SECRET_KEY for testing/development.")
 
-if not flask_secret_key:
-    raise RuntimeError(
-        "FLASK_SECRET_KEY environment variable is not set. Refusing to start for security reasons."
-    )
-if not jwt_secret_key:
-    raise RuntimeError(
-        "JWT_SECRET_KEY environment variable is not set. Refusing to start for security reasons."
-    )
+# Defer hard failure until app actually needs to run in production context
+if not flask_secret_key or not jwt_secret_key:
+    if not IS_NON_PROD:
+        raise RuntimeError(
+            "FLASK_SECRET_KEY/JWT_SECRET_KEY not set. Refusing to start for security reasons."
+        )
+    # In non-prod, keep insecure defaults to avoid import-time crashes
 
 app.config["SECRET_KEY"] = flask_secret_key
 app.config["JWT_SECRET_KEY"] = jwt_secret_key
@@ -252,14 +337,26 @@ class AuditLogger:
         sensitive_data: bool = False,
     ):
         """Log audit event with encryption for sensitive data"""
+        # Safely capture request metadata if a request context exists
+        try:
+            if has_request_context():
+                ip_address = getattr(request, "remote_addr", None) or "system"
+                user_agent = request.headers.get("User-Agent", "system")
+            else:
+                ip_address = "system"
+                user_agent = "system"
+        except Exception:
+            ip_address = "system"
+            user_agent = "system"
+
         audit_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "session_id_hash": self.security_manager.hash_session_id(session_id),
             "user_id": user_id,
             "details": "ENCRYPTED" if sensitive_data else details,
-            "ip_address": request.remote_addr if request else "system",
-            "user_agent": request.headers.get("User-Agent") if request else "system",
+            "ip_address": ip_address,
+            "user_agent": user_agent,
         }
 
         if sensitive_data:
@@ -283,28 +380,45 @@ class BiasDetectionService:
         self.audit_logger = AuditLogger(self.security_manager)
         self.nlp = None
         self.sentiment_analyzer = None
+        self._textblob = None
         self.bias_classifier = None
+        self._bias_classifier_initialized = False
         self._initialize_components()
 
     def _initialize_components(self):
-        """Initialize NLP and ML components"""
+        """Initialize NLP components (lazy-init heavy models later)"""
         try:
-            # Initialize NLP components
             if NLP_AVAILABLE:
-                self.nlp = spacy.load("en_core_web_sm")
-                nltk.download("vader_lexicon", quiet=True)
-                self.sentiment_analyzer = SentimentIntensityAnalyzer()
-                logger.info("NLP components initialized")
+                # spaCy
+                try:
+                    self.nlp = spacy.load("en_core_web_sm")
+                    logger.info("spaCy model loaded")
+                except Exception as e:
+                    self.nlp = None
+                    logger.info(f"spaCy model not available, continuing without it: {e}")
 
-            # Initialize bias detection models
-            if HF_EVALUATE_AVAILABLE and pipeline is not None:
-                self.bias_classifier = pipeline(
-                    "text-classification",
-                    model="unitary/toxic-bert",
-                    device=-1,  # Use CPU
-                )
-                logger.info("Bias classification model initialized")
+                # VADER (NLTK)
+                try:
+                    nltk.download("vader_lexicon", quiet=True)
+                    self.sentiment_analyzer = SentimentIntensityAnalyzer()
+                    logger.info("NLTK VADER sentiment initialized")
+                except Exception as e:
+                    self.sentiment_analyzer = None
+                    logger.info(f"NLTK sentiment not available, will fall back to TextBlob if present: {e}")
 
+                # TextBlob fallback
+                if self.sentiment_analyzer is None and TEXTBLOB_AVAILABLE:
+                    try:
+                        from textblob import TextBlob as _TB
+                        self._textblob = _TB
+                        logger.info("TextBlob sentiment fallback initialized")
+                    except Exception as e:
+                        self._textblob = None
+                        logger.info(f"TextBlob not available for sentiment: {e}")
+
+                logger.info("NLP components initialized (best effort)")
+            # Defer bias detection model initialization; done lazily on first use
+            self._bias_classifier_initialized = False
         except Exception as e:
             logger.error(f"Failed to initialize components: {e}")
 
@@ -673,9 +787,10 @@ class BiasDetectionService:
                     "error": "Insufficient data for Fairlearn analysis",
                 }
 
-            data["df"].drop(columns=data["label_names"])
-            y = data["df"][data["label_names"][0]]
-            sensitive_features = data["df"][data["protected_attributes"]]
+            # Do not drop label columns before constructing targets
+            df = data["df"]
+            y = df[data["label_names"][0]]
+            sensitive_features = df[data["protected_attributes"]]
 
             # Calculate fairness metrics
             y_pred = np.random.choice([0, 1], size=len(y))  # Placeholder predictions
@@ -865,28 +980,46 @@ class BiasDetectionService:
         """Analyze sentiment of text"""
         try:
             if not self.sentiment_analyzer:
-                return self._extracted_from__analyze_sentiment_(text)
+                return self._fallback_sentiment(text)
             scores = self.sentiment_analyzer.polarity_scores(text)
             return {
-                "compound": scores["compound"],
-                "positive": scores["pos"],
-                "negative": scores["neg"],
-                "neutral": scores["neu"],
+                "compound": float(scores.get("compound", 0.0)),
+                "positive": float(scores.get("pos", 0.0)),
+                "negative": float(scores.get("neg", 0.0)),
+                "neutral": float(scores.get("neu", 0.0)),
+                "source": "vader",
             }
         except Exception as e:
             logger.error(f"Sentiment analysis failed: {e}")
             return {"error": str(e)}
 
-    # TODO Rename this here and in `_analyze_sentiment`
-    def _extracted_from__analyze_sentiment_(self, text):
-        # Fallback to TextBlob
-        blob = TextBlob(text)
-        sentiment_obj = getattr(blob, "sentiment", None)
-        if not sentiment_obj:
-            return {"polarity": 0.0, "subjectivity": 0.0}
-        polarity = getattr(sentiment_obj, "polarity", 0.0)
-        subjectivity = getattr(sentiment_obj, "subjectivity", 0.0)
-        return {"polarity": float(polarity), "subjectivity": float(subjectivity)}
+    def _fallback_sentiment(self, text: str) -> dict[str, Any]:
+        """Fallback to TextBlob, normalized to VADER-like keys"""
+        try:
+            blob = TextBlob(text)
+            sentiment_obj = getattr(blob, "sentiment", None)
+            if not sentiment_obj:
+                polarity = 0.0
+                subjectivity = 0.0
+            else:
+                polarity = float(getattr(sentiment_obj, "polarity", 0.0))
+                subjectivity = float(getattr(sentiment_obj, "subjectivity", 0.0))
+            # Map TextBlob to approximate VADER outputs
+            compound = polarity
+            pos = max(0.0, compound)
+            neg = max(0.0, -compound)
+            neu = max(0.0, 1.0 - abs(compound))
+            return {
+                "compound": compound,
+                "positive": pos,
+                "negative": neg,
+                "neutral": neu,
+                "polarity": polarity,
+                "subjectivity": subjectivity,
+                "source": "textblob",
+            }
+        except Exception as e:
+            return {"compound": 0.0, "positive": 0.0, "negative": 0.0, "neutral": 1.0, "error": str(e), "source": "textblob"}
 
     def _detect_biased_terms(self, doc) -> list[dict[str, Any]]:
         """Detect potentially biased terms in text"""
