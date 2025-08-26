@@ -374,7 +374,6 @@
     "path-browserify": "^1.0.1",
     "path-to-regexp": "8.2.0",
     "picomatch": "^4.0.3",
-
     "postcss": "^8.5.6",
     "postcss-import": "^16.1.1",
     "postinstall-postinstall": "^2.1.0",
@@ -513,5 +512,8 @@
     "postinstall-postinstall",
     "protobufjs",
     "unrs-resolver"
-  ]
+  ],
+  "overrides": {
+    "esbuild": "^0.25.9"
+  }
 }
