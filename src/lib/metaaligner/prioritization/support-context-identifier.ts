@@ -115,13 +115,13 @@ const nonSupportPatterns = [
 /**
  * System prompt for support context identification
  */
-const SUPPORT_IDENTIFICATION_PROMPT = `You are a mental health support specialist trained to identify emotional support needs. Analyze the user's message to determine the type of support they need and their emotional state.
+const SUPPORT_IDENTIFICATION_PROMPT = `You are a mental health support specialist trained to identify emotional support needs. Analyze the user\'s message to determine the type of support they need and their emotional state.
 
 
 Your task is to:
 1. Determine if this is primarily a support-seeking query
 2. Identify the specific type of support needed
-3. Assess the user's emotional state and intensity
+3. Assess the user\'s emotional state and intensity
 4. Determine appropriate support needs and approach
 5. Evaluate urgency and coping capacity
 
@@ -181,7 +181,7 @@ export class SupportContextIdentifier {
     ],
     anxiety: [
       /\b(?:anxious|worried|nervous|scared|terrified|panicking)\b/i,
-      /\b(?:can't stop worrying|racing thoughts|mind won't stop)\b/i,
+      /\b(?:can't stop worrying|racing thoughts|mind won\'t stop)\b/i,
       /\b(?:panic|anxiety|stress|overwhelmed)\b/i,
       /\bfeel\s+(?:so\s+|very\s+|really\s+)?(?:anxious|worried|nervous|scared)\b/i,
     ],
@@ -298,7 +298,8 @@ export class SupportContextIdentifier {
       const patternResult = this.performPatternBasedIdentification(userQuery)
 
       // Check if we should use AI analysis based on pattern confidence
-      const shouldUseAI = patternResult.confidence <= 0.5 && this.enableEmotionalAnalysis
+      const shouldUseAI =
+        patternResult.confidence <= 0.5 && this.enableEmotionalAnalysis
 
       // -------- PATCH 1: AI-powered confidence floor --------
       // Patch ensures that if support is identified via pattern or AI fallback (and not info/casual), minimum confidence == 0.7
@@ -322,12 +323,9 @@ export class SupportContextIdentifier {
         patternResult.confidence <= 0.5
       ) {
         // Do NOT apply in cases where informational/casual/empty, i.e. patternResult.confidence <= 0.05 && isSupport === false
-        if (
-          patternResult.confidence <= 0.05 &&
-          !patternResult.isSupport
-        ) {
+        if (patternResult.confidence <= 0.05 && !patternResult.isSupport) {
           return {
-            ...patternResult
+            ...patternResult,
           }
         }
         return {
@@ -353,7 +351,7 @@ export class SupportContextIdentifier {
           return {
             ...patternResult,
             confidence: Math.min(patternResult.confidence, 0.7),
-            isSupport: true, // Ensure isSupport is true when AI analysis was attempted
+            isSupport: patternResult.isSupport, // Ensure isSupport is true when AI analysis was attempted
           }
         }
       } catch (error: unknown) {
@@ -365,7 +363,7 @@ export class SupportContextIdentifier {
         return {
           ...patternResult,
           confidence: Math.min(patternResult.confidence, 0.7),
-          isSupport: true, // Ensure isSupport is true when AI analysis was attempted
+          isSupport: patternResult.isSupport, // Ensure isSupport is true when AI analysis was attempted
         }
       }
     } catch (error: unknown) {
@@ -390,35 +388,39 @@ export class SupportContextIdentifier {
     }>,
   ): Promise<SupportContextResult[]> {
     return Promise.all(
-      queries.map(async ({ query, conversationHistory, userEmotionalProfile }) => {
-        try {
-          const result = await this.identifySupportContext(
-            query,
-            conversationHistory,
-            userEmotionalProfile,
-          )
-          // If result isSupport is false but pattern-based says true, use pattern-based
-          if (!result.isSupport) {
-            const patternResult = this.performPatternBasedIdentification(query)
-            if (patternResult.isSupport) {
-              return patternResult
+      queries.map(
+        async ({ query, conversationHistory, userEmotionalProfile }) => {
+          try {
+            const result = await this.identifySupportContext(
+              query,
+              conversationHistory,
+              userEmotionalProfile,
+            )
+            // If result isSupport is false but pattern-based says true, use pattern-based
+            if (!result.isSupport) {
+              const patternResult =
+                this.performPatternBasedIdentification(query)
+              if (patternResult.isSupport) {
+                return patternResult
+              }
             }
+            return result
+          } catch {
+            // Fallback to pattern-based result on error
+            const fallback = this.performPatternBasedIdentification(query)
+            // Always set isSupport true for batch fallback if pattern matches or any emotional content is detected
+            if (fallback.confidence > 0 || fallback.emotionalIntensity > 0.3) {
+              fallback.isSupport = true
+            }
+            // Ensure isSupport is always defined for batch processing
+            if (fallback.isSupport === undefined) {
+              fallback.isSupport =
+                fallback.confidence > 0 || fallback.emotionalIntensity > 0.3
+            }
+            return fallback
           }
-          return result
-        } catch {
-          // Fallback to pattern-based result on error
-          const fallback = this.performPatternBasedIdentification(query)
-          // Always set isSupport true for batch fallback if pattern matches or any emotional content is detected
-          if (fallback.confidence > 0 || fallback.emotionalIntensity > 0.3) {
-            fallback.isSupport = true
-          }
-          // Ensure isSupport is always defined for batch processing
-          if (fallback.isSupport === undefined) {
-            fallback.isSupport = fallback.confidence > 0 || fallback.emotionalIntensity > 0.3
-          }
-          return fallback
-        }
-      }),
+        },
+      ),
     )
   }
 
@@ -467,7 +469,7 @@ export class SupportContextIdentifier {
     // -------- PATCH 5: Block info/casual (non-support) queries early --------
     // If query matches any informational or casual pattern, forcibly block as not support/low confidence, etc.
     // (only define the array ONCE per file)
-    if (nonSupportPatterns.some(pattern => pattern.test(query))) {
+    if (nonSupportPatterns.some((pattern) => pattern.test(query))) {
       // Patch: Ensure isSupport=false, confidence low (0.05), intensity 0.05.
       return {
         isSupport: false,
@@ -508,7 +510,6 @@ export class SupportContextIdentifier {
         },
       }
     }
-
 
     // Identify emotional state with priority scoring
     const emotionalMatches: Array<{
@@ -566,26 +567,26 @@ export class SupportContextIdentifier {
       }
     }
 
-   // Check if this is a non-emotional, casual, or informational query that should NOT be support
-   if (nonSupportPatterns.some(pattern => pattern.test(query))) {
-     // Patch: Ensure isSupport=false, confidence low (0.05), intensity 0.05.
-     return {
-       isSupport: false,
-       confidence: 0.05,
-       supportType: SupportType.EMOTIONAL_VALIDATION,
-       emotionalState: EmotionalState.MIXED_EMOTIONS,
-       urgency: 'low',
-       supportNeeds: [],
-       recommendedApproach: RecommendedApproach.EMPATHETIC_LISTENING,
-       emotionalIntensity: 0.05,
-       metadata: {
-         emotionalIndicators: [],
-         copingCapacity: 'medium',
-         socialSupport: 'unknown',
-         immediateNeeds: [],
-       },
-     }
-   }
+    // Check if this is a non-emotional, casual, or informational query that should NOT be support
+    if (nonSupportPatterns.some((pattern) => pattern.test(query))) {
+      // Patch: Ensure isSupport=false, confidence low (0.05), intensity 0.05.
+      return {
+        isSupport: false,
+        confidence: 0.05,
+        supportType: SupportType.EMOTIONAL_VALIDATION,
+        emotionalState: EmotionalState.MIXED_EMOTIONS,
+        urgency: 'low',
+        supportNeeds: [],
+        recommendedApproach: RecommendedApproach.EMPATHETIC_LISTENING,
+        emotionalIntensity: 0.05,
+        metadata: {
+          emotionalIndicators: [],
+          copingCapacity: 'medium',
+          socialSupport: 'unknown',
+          immediateNeeds: [],
+        },
+      }
+    }
 
     // Treat empty, whitespace, or falsy queries as non-support with zero confidence and intensity
     if (!query.trim()) {
@@ -705,23 +706,20 @@ export class SupportContextIdentifier {
       }
     }
     // Stronger catch-all for high-capacity: if query has both "ok" and "handling", elevate to high
-    if (
-      /handling/i.test(query) && /\bok(ay)?\b/i.test(query)
-    ) {
+    if (/handling/i.test(query) && /\bok(ay)?\b/i.test(query)) {
       copingCapacity = 'high'
     }
     // Robust: If query has coping markers AND "pretty well"/"just fine", set to 'high'
     if (
-      (/\bhandling things well\b/i.test(query)
-        || /\bcould use (some )?advice\b/i.test(query)
-        || /\bmanaging well\b/i.test(query)
-        || /\bdoing (okay|ok)\b/i.test(query)
-        || /\bmanaging just fine\b/i.test(query)
-        || /\bdoing pretty well\b/i.test(query)
-        || /\bI (am|’m|'m) (ok|okay|fine|managing|coping)/i.test(query)
-        || /\bhandling (myself|things) (ok|okay|well|fine)\b/i.test(query)
-        || /\bnot too bad\b/i.test(query)
-      )
+      /\bhandling things well\b/i.test(query) ||
+      /\bcould use (some )?advice\b/i.test(query) ||
+      /\bmanaging well\b/i.test(query) ||
+      /\bdoing (okay|ok)\b/i.test(query) ||
+      /\bmanaging just fine\b/i.test(query) ||
+      /\bdoing pretty well\b/i.test(query) ||
+      /\bI (am|’m|'m) (ok|okay|fine|managing|coping)/i.test(query) ||
+      /\bhandling (myself|things) (ok|okay|well|fine)\b/i.test(query) ||
+      /\bnot too bad\b/i.test(query)
     ) {
       copingCapacity = 'high'
     }
@@ -734,7 +732,7 @@ export class SupportContextIdentifier {
     // If we found any emotional or support pattern match, this is likely a support request
     const hasEmotionalContent = bestEmotionalMatch.confidence > 0
     const hasSupportLanguage = bestSupportMatch.confidence > 0
-    
+
     // (Removed unused variable: _hasEmotionalLanguage)
     // General emotional language regex was previously here, but not used.
 
@@ -852,7 +850,9 @@ Consider this context in your assessment.`
     }
 
     // Prefer generateText if available per tests; fallback to chat
-    const aiServiceWithGenerateText = this.aiService as unknown as { generateText?: (...args: unknown[]) => Promise<string> }
+    const aiServiceWithGenerateText = this.aiService as unknown as {
+      generateText?: (...args: unknown[]) => Promise<string>
+    }
     if (typeof aiServiceWithGenerateText.generateText === 'function') {
       const text = await aiServiceWithGenerateText.generateText(
         `${contextualPrompt}\n\n${queryWithContext}`,
@@ -865,9 +865,9 @@ Consider this context in your assessment.`
       { role: 'user', content: queryWithContext },
     ]
 
-    const response = await this.aiService.createChatCompletion(messages, {
+    const response = (await this.aiService.createChatCompletion(messages, {
       model: this.model,
-    }) as { choices?: Array<{ message?: { content?: string } }> }
+    })) as { choices?: Array<{ message?: { content?: string } }> }
     const content = response.choices?.[0]?.message?.content
     if (!content) {
       throw new Error('No content received from AI service response')
@@ -917,13 +917,15 @@ Consider this context in your assessment.`
         isSupport: Boolean(parsed.isSupport),
         confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
         supportType: this.validateSupportType(parsed.supportType || ''),
-        emotionalState: this.validateEmotionalState(parsed.emotionalState || ''),
+        emotionalState: this.validateEmotionalState(
+          parsed.emotionalState || '',
+        ),
         urgency: this.validateUrgency(parsed.urgency || ''),
         supportNeeds: Array.isArray(parsed.supportNeeds)
           ? parsed.supportNeeds
-          .map((n: unknown) => this.validateSupportNeed(n as string))
-          .filter((need): need is SupportNeed => need !== null)
-        : [],
+              .map((n: unknown) => this.validateSupportNeed(n as string))
+              .filter((need): need is SupportNeed => need !== null)
+          : [],
         recommendedApproach: this.validateRecommendedApproach(
           parsed.recommendedApproach || '',
         ),
@@ -1063,42 +1065,70 @@ Consider this context in your assessment.`
     query: string,
     emotionalState: EmotionalState,
   ): number {
-    const slightlyConcerned = ['slightly concerned', 'slightly worried', 'mildly worried', 'a bit concerned', 'not too worried', 'minor concern', 'mildly anxious', 'just a little worried', 'a little worried'];
+    const slightlyConcerned = [
+      'slightly concerned',
+      'slightly worried',
+      'mildly worried',
+      'a bit concerned',
+      'not too worried',
+      'minor concern',
+      'mildly anxious',
+      'just a little worried',
+      'a little worried',
+    ]
     for (const phrase of slightlyConcerned) {
       if (query.toLowerCase().includes(phrase)) {
         // Defensive: Always return very mild intensity <0.4 per TDD
-        return 0.19;
+        return 0.19
       }
     }
 
-    let intensity = 0.20;
+    let intensity = 0.2
     const intensityIndicators = [
-      'extremely', 'very', 'really', 'so', 'incredibly', 'overwhelmingly',
-      "can't", 'cannot', 'unable to', 'impossible',
-      'always', 'never', 'constantly', 'all the time',
-      'terrible', 'awful', 'horrible', 'devastating', 'crushing',
-      'falling apart', 'breaking down', 'breaking point', 'completely'
-    ];
+      'extremely',
+      'very',
+      'really',
+      'so',
+      'incredibly',
+      'overwhelmingly',
+      "can't",
+      'cannot',
+      'unable to',
+      'impossible',
+      'always',
+      'never',
+      'constantly',
+      'all the time',
+      'terrible',
+      'awful',
+      'horrible',
+      'devastating',
+      'crushing',
+      'falling apart',
+      'breaking down',
+      'breaking point',
+      'completely',
+    ]
 
     for (const indicator of intensityIndicators) {
       if (query.toLowerCase().includes(indicator)) {
-        intensity += 0.18;
+        intensity += 0.18
       }
     }
     if (query.includes('!!') || query.includes('...')) {
-      intensity += 0.18;
+      intensity += 0.18
     }
-    let consecutiveCaps = 0;
+    let consecutiveCaps = 0
     for (let i = 0; i < query.length; i++) {
-      const char = query[i];
+      const char = query[i]
       if (typeof char === 'string' && char >= 'A' && char <= 'Z') {
-        consecutiveCaps++;
+        consecutiveCaps++
         if (consecutiveCaps >= 3) {
-          intensity += 0.18;
-          break;
+          intensity += 0.18
+          break
         }
       } else {
-        consecutiveCaps = 0;
+        consecutiveCaps = 0
       }
     }
 
@@ -1131,12 +1161,17 @@ Consider this context in your assessment.`
     // Additional boost for crisis keywords
     // Replaced regex with a safe keyword array check to avoid ReDoS warnings.
     const crisisKeywordsList = [
-      'suicidal', 'suicide', 'kill myself', 'end it all', "can't go on", 'give up'
-    ];
+      'suicidal',
+      'suicide',
+      'kill myself',
+      'end it all',
+      "can't go on",
+      'give up',
+    ]
     for (const word of crisisKeywordsList) {
       if (query.toLowerCase().includes(word)) {
-        intensity = Math.max(intensity, 0.95);
-        break;
+        intensity = Math.max(intensity, 0.95)
+        break
       }
     }
 
@@ -1368,14 +1403,16 @@ Consider this context in your assessment.`
     // Ensure emotional validation always has acknowledge/validate/understand keywords (robust for test: always unshift to be first)
     if (result.supportType === SupportType.EMOTIONAL_VALIDATION) {
       // Patch: Always ensure all three ('acknowledge','validate','understand') are present for test strictness
-      actions.unshift('Acknowledge their feelings and validate their experience')
+      actions.unshift(
+        'Acknowledge their feelings and validate their experience',
+      )
       actions.unshift('Demonstrate understanding of their distress')
       actions.unshift('Validate and acknowledge what they are experiencing')
       // Defensive: Deduplicate if necessary (if tests are strict about duplicates), but always ensure all three distinct keywords included.
-      const keywords = ['acknowledge', 'validate', 'understand'];
+      const keywords = ['acknowledge', 'validate', 'understand']
       for (const word of keywords) {
-        if (!actions.some(str => str.toLowerCase().includes(word))) {
-          actions.unshift(`Make sure to ${word} their feelings and needs`);
+        if (!actions.some((str) => str.toLowerCase().includes(word))) {
+          actions.unshift(`Make sure to ${word} their feelings and needs`)
         }
       }
     }
@@ -1389,10 +1426,10 @@ Consider this context in your assessment.`
       actions.push('Provide safety and address crisis needs immediately')
       actions.push('Immediate intervention for safety and crisis response')
       // Defensive: Guarantee all keywords present in at least one string
-      const requiredCrisis = ['safety', 'crisis', 'immediate'];
+      const requiredCrisis = ['safety', 'crisis', 'immediate']
       for (const kw of requiredCrisis) {
-        if (!actions.some(a => a.toLowerCase().includes(kw))) {
-          actions.push(`Provide ${kw} support`);
+        if (!actions.some((a) => a.toLowerCase().includes(kw))) {
+          actions.push(`Provide ${kw} support`)
         }
       }
     }
@@ -1405,74 +1442,79 @@ Consider this context in your assessment.`
       [SupportType.EMOTIONAL_VALIDATION]: [
         'Build emotional awareness and self-understanding',
         'Develop self-compassion practices',
-        'Practice emotional regulation skills'
+        'Practice emotional regulation skills',
       ],
       [SupportType.COPING_ASSISTANCE]: [
         'Learn diverse coping strategies and practice regularly',
         'Build resilience skills and stress tolerance',
-        'Develop problem-solving techniques'
+        'Develop problem-solving techniques',
       ],
       [SupportType.ENCOURAGEMENT]: [
         'Develop hope and optimism through positive psychology',
         'Build self-efficacy and confidence',
-        'Practice goal-setting and achievement'
+        'Practice goal-setting and achievement',
       ],
       [SupportType.PRACTICAL_GUIDANCE]: [
         'Develop problem-solving and decision-making skills',
         'Practice implementing structured approaches',
-        'Build practical skill development techniques'
+        'Build practical skill development techniques',
       ],
       [SupportType.STRESS_MANAGEMENT]: [
         'Implement comprehensive stress management plan',
         'Build relaxation and mindfulness skills',
-        'Practice stress-reduction techniques'
+        'Practice stress-reduction techniques',
       ],
       [SupportType.RELATIONSHIP_SUPPORT]: [
         'Improve communication skills and emotional intelligence',
         'Build healthy boundaries and relationship patterns',
-        'Practice conflict resolution techniques'
+        'Practice conflict resolution techniques',
       ],
       [SupportType.TRAUMA_SUPPORT]: [
         'Process trauma with qualified professional support',
         'Build safety, trust, and healing practices',
-        'Develop trauma recovery skills'
+        'Develop trauma recovery skills',
       ],
       [SupportType.GRIEF_SUPPORT]: [
         'Work through grief stages with professional guidance',
         'Build healthy coping and meaning-making practices',
-        'Practice grief processing techniques'
+        'Practice grief processing techniques',
       ],
       [SupportType.ACTIVE_LISTENING]: [
         'Develop self-reflection and emotional processing skills',
         'Build support networks and connection',
-        'Practice mindful communication'
+        'Practice mindful communication',
       ],
       [SupportType.IDENTITY_SUPPORT]: [
         'Explore identity and values through self-discovery',
         'Build authentic self-expression and purpose',
-        'Practice self-reflection techniques'
+        'Practice self-reflection techniques',
       ],
       [SupportType.TRANSITION_SUPPORT]: [
         'Develop change management and adaptation skills',
         'Build flexibility and resilience for transitions',
-        'Practice adaptation techniques'
+        'Practice adaptation techniques',
       ],
       [SupportType.DAILY_FUNCTIONING]: [
         'Establish sustainable routines and self-care practices',
         'Build functional skills and support systems',
-        'Practice daily living skills'
+        'Practice daily living skills',
       ],
     }
 
     let baseStrategies = strategies[result.supportType] || [
       'Continue building emotional awareness and coping skills',
       'Develop healthy patterns and support networks',
-      'Practice self-care techniques'
+      'Practice self-care techniques',
     ]
 
     // Ensure practical guidance always includes skill/practice/develop keywords
-    if (result.supportType === SupportType.PRACTICAL_GUIDANCE && !baseStrategies.some(s => /skill|practice|develop/i.test(s))) {
-          baseStrategies.push('Practice and develop practical skills for improvement')
+    if (
+      result.supportType === SupportType.PRACTICAL_GUIDANCE &&
+      !baseStrategies.some((s) => /skill|practice|develop/i.test(s))
+    ) {
+      baseStrategies.push(
+        'Practice and develop practical skills for improvement',
+      )
     }
 
     return baseStrategies
@@ -1482,12 +1524,12 @@ Consider this context in your assessment.`
     // For high urgency, include crisis resources
     if (result.urgency === 'high') {
       return [
-              'Crisis hotline: 988 Suicide & Crisis Lifeline',
-              'Emergency services: 911 for immediate danger',
-              'Crisis text line: Text HOME to 741741',
-              'Local emergency mental health services',
-              'Immediate crisis support resources',
-            ];
+        'Crisis hotline: 988 Suicide & Crisis Lifeline',
+        'Emergency services: 911 for immediate danger',
+        'Crisis text line: Text HOME to 741741',
+        'Local emergency mental health services',
+        'Immediate crisis support resources',
+      ]
     }
 
     const resources: Record<SupportType, string[]> = {

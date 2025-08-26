@@ -150,11 +150,7 @@ jobs:
           az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location ${{ env.AZURE_LOCATION }}
 
       - name: Validate Bicep template
-        run: |
-          az deployment group validate \
-            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --template-file infra/main.bicep \
-            --parameters @infra/main.parameters.json
+        run: az deployment group validate --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file infra/main.bicep --parameters @infra/main.parameters.json
 
       - name: Deploy Bicep template
         id: bicep

@@ -299,6 +299,24 @@ function evaluateProfessionalism(
 }
 
 function evaluateEmpathy(response: string, context: AlignmentContext): number {
+  const supportiveKeywords = [
+    'understand',
+    'feel',
+    'sounds like',
+    'difficult',
+    'challenging',
+    'support',
+    'that must be',
+  ]
+  const hasSupportiveLanguage = supportiveKeywords.some((keyword) =>
+    response.toLowerCase().includes(keyword),
+  )
+
+  // Low score for very short responses that lack any supportive keywords.
+  if (response.length < 25 && !hasSupportiveLanguage) {
+    return 0.1
+  }
+
   let score = 0
   const criteria =
     CORE_MENTAL_HEALTH_OBJECTIVES.find((obj) => obj.id === 'empathy')
