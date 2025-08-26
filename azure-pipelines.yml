@@ -92,6 +92,17 @@ stages:
             displayName: Install dependencies
 
           - script: |
+              # Ensure Node.js 22.x is installed in the container
+              set -e
+              echo "Installing Node.js 22.x in container..."
+              curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+              apt-get install -y nodejs
+              node --version
+              which node
+              echo "Node.js installation complete."
+            displayName: "Install Node.js 22.x in container (pre-build)"
+
+          - script: |
               # Ensure cache directories exist before cache task with robust path handling
               echo "Setting up cache directories for Astro build artifacts..."
               
@@ -168,18 +179,10 @@ stages:
             displayName: "Verbose diagnostics on Astro/Vite cache paths before Cache@2"
 
           - script: |
-              # [CRITICAL] Guarantee all Astro/Vite cache directories AND their parents exist before Cache@2
-              # Azure DevOps 'Cache@2' fails if any path doesn't exist, so we MUST ensure parent folders exist.
-              # 1. Ensure parent directories exist even on a clean agent:
-              mkdir -p node_modules
-              mkdir -p .astro
-              mkdir -p "$(Agent.WorkFolder)/.astro-cache"
-              mkdir -p "$(Agent.WorkFolder)/.vite-cache"
-              # 2. Now create each cache directory specifically:
-              mkdir -p node_modules/.astro
-              # 3. Touch placeholder files so directories are non-empty:
-              touch node_modules/.astro/.gitkeep .astro/.gitkeep "$(Agent.WorkFolder)/.astro-cache/.gitkeep" "$(Agent.WorkFolder)/.vite-cache/.gitkeep"
-            displayName: "Final robust cache dirs+parents before Cache@2"
+              # Guarantee all Astro/Vite cache directories AND their parents exist before Cache@2
+              mkdir -p "$(Build.SourcesDirectory)/node_modules/.astro" "$(Build.SourcesDirectory)/.astro" "$(Agent.WorkFolder)/.astro-cache" "$(Agent.WorkFolder)/.vite-cache"
+              touch "$(Build.SourcesDirectory)/node_modules/.astro/.gitkeep" "$(Build.SourcesDirectory)/.astro/.gitkeep" "$(Agent.WorkFolder)/.astro-cache/.gitkeep" "$(Agent.WorkFolder)/.vite-cache/.gitkeep"
+            displayName: "Ensure cache directories exist and are non-empty (absolute paths) before Cache@2"
 
             # The Cache@2 task below will fail if any path listed does not exist, so the previous step MUST remain directly above.
           - task: Cache@2
@@ -195,8 +198,7 @@ stages:
                 $(Build.SourcesDirectory)/.astro
                 $(Agent.WorkFolder)/.astro-cache
                 $(Agent.WorkFolder)/.vite-cache
-              # Do NOT move or remove the directory-creation step above, or Cache@2 will break on CI agents!
-            continueOnError: true
+            continueOnError: false
 
           - script: |
               # Build with optimizations and cache configuration

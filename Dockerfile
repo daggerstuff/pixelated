@@ -57,6 +57,7 @@ COPY --chown=astro:astro tsconfig.json ./
 COPY --chown=astro:astro tailwind.config.ts ./
 COPY --chown=astro:astro uno.config.ts ./
 COPY --chown=astro:astro scripts ./scripts
+COPY --chown=astro:astro instrument.mjs ./
 
 # Copy the astro directory needed for tsconfig extends
 COPY --chown=astro:astro astro ./astro
@@ -106,6 +107,7 @@ COPY --from=build --chown=astro:astro /app/dist ./dist
 COPY --from=build --chown=astro:astro /app/node_modules ./node_modules
 COPY --from=build --chown=astro:astro /app/package.json ./
 COPY --from=build --chown=astro:astro /app/scripts ./scripts
+COPY --from=build --chown=astro:astro /app/instrument.mjs ./
 
 RUN mkdir -p /tmp/.astro && \
     chmod -R 755 /tmp/.astro
