@@ -219,8 +219,10 @@ const mockAlertSystem = {
 // Use a factory function that returns the same mock instance each time
 vi.mock('../python-bridge', () => {
   // Create a factory that returns the same instance
-  const PythonBiasDetectionBridge = vi.fn().mockImplementation(() => mockPythonBridge);
-  return { PythonBiasDetectionBridge };
+  const PythonBiasDetectionBridge = vi
+    .fn()
+    .mockImplementation(() => mockPythonBridge)
+  return { PythonBiasDetectionBridge }
 })
 
 vi.mock('../metrics-collector', () => ({
@@ -268,16 +270,16 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
   beforeEach(() => {
     // Reset all mock implementations to their default values
-    // Clear all mocks first
-    vi.clearAllMocks();
-    
-    // Reset each mock function to its default behavior
-    mockPythonBridge.initialize.mockResolvedValue(undefined);
-    mockPythonBridge.checkHealth.mockResolvedValue({
+    // Reset all mocks to clear both call history and implementations
+    vi.resetAllMocks()
+
+    // Recreate all mock functions with default implementations
+    mockPythonBridge.initialize = vi.fn().mockResolvedValue(undefined)
+    mockPythonBridge.checkHealth = vi.fn().mockResolvedValue({
       status: 'healthy',
       message: 'Service is running',
-    });
-    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({
+    })
+    mockPythonBridge.runPreprocessingAnalysis = vi.fn().mockResolvedValue({
       biasScore: 0.5,
       linguisticBias: {
         genderBiasScore: 0.1,
@@ -308,8 +310,8 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         missingDataByDemographic: {},
       },
       recommendations: [],
-    });
-    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({
+    })
+    mockPythonBridge.runModelLevelAnalysis = vi.fn().mockResolvedValue({
       biasScore: 0.5,
       fairnessMetrics: {
         demographicParity: 0.75,
@@ -330,8 +332,8 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       },
       groupPerformanceComparison: [],
       recommendations: [],
-    });
-    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({
+    })
+    mockPythonBridge.runInteractiveAnalysis = vi.fn().mockResolvedValue({
       biasScore: 0.5,
       counterfactualAnalysis: {
         scenariosAnalyzed: 3,
@@ -342,8 +344,8 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       featureImportance: [],
       whatIfScenarios: [],
       recommendations: [],
-    });
-    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({
+    })
+    mockPythonBridge.runEvaluationAnalysis = vi.fn().mockResolvedValue({
       biasScore: 0.5,
       huggingFaceMetrics: {
         toxicity: 0.05,
@@ -365,6 +367,8 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         interventionEffectiveness: [],
       },
       recommendations: [],
+    })
+
     mockConfig = {
       pythonServiceUrl: 'http://localhost:8000',
       pythonServiceTimeout: 30000,
@@ -379,7 +383,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         interactive: 0.25,
         evaluation: 0.25,
       },
-      evaluationMetrics: ['demographic_parity', 'equalized_odds'],
+      evaluationMetrics: ['demographic_parity'],
       metricsConfig: {
         enableRealTimeMonitoring: true,
         metricsRetentionDays: 30,
@@ -556,13 +560,127 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
 
     it('should calculate correct alert levels', async () => {
+      // Mock high bias scores for all layers to ensure 'high' alert level BEFORE initializing
+      mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({
+        biasScore: 0.7,
+        linguisticBias: 0.6,
+        confidence: 0.9,
+      })
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({
+        biasScore: 0.8,
+        fairnessMetrics: { equalizedOdds: 0.5, demographicParity: 0.4 },
+        confidence: 0.9,
+      })
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({
+        biasScore: 0.7,
+        counterfactualAnalysis: { scenarios: 3, improvements: 0.4 },
+        confidence: 0.9,
+      })
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({
+        biasScore: 0.75,
+        nlpBiasMetrics: { sentimentBias: 0.6, toxicityBias: 0.7 },
+        confidence: 0.9,
+      })
+
       await biasEngine.initialize()
+
       // Test low bias score (default mocks return 0.5 overall, which should be 'medium')
+      // Reset mocks to default values for low bias test
+      mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({
+        biasScore: 0.5,
+        linguisticBias: {
+          genderBiasScore: 0.1,
+          racialBiasScore: 0.1,
+          ageBiasScore: 0.1,
+          culturalBiasScore: 0.1,
+          biasedTerms: [],
+          sentimentAnalysis: {
+            overallSentiment: 0.0,
+            emotionalValence: 0.0,
+            subjectivity: 0.0,
+            demographicVariations: {},
+          },
+        },
+        representationAnalysis: {
+          demographicDistribution: {},
+          underrepresentedGroups: [],
+          overrepresentedGroups: [],
+          diversityIndex: 0.0,
+          intersectionalityAnalysis: [],
+        },
+        dataQualityMetrics: {
+          completeness: 1.0,
+          consistency: 1.0,
+          accuracy: 1.0,
+          timeliness: 1.0,
+          validity: 1.0,
+          missingDataByDemographic: {},
+        },
+        recommendations: [],
+      })
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({
+        biasScore: 0.5,
+        fairnessMetrics: {
+          demographicParity: 0.75,
+          equalizedOdds: 0.8,
+          equalOpportunity: 0.8,
+          calibration: 0.8,
+          individualFairness: 0.8,
+          counterfactualFairness: 0.8,
+        },
+        performanceMetrics: {
+          accuracy: 0.9,
+          precision: 0.9,
+          recall: 0.9,
+          f1Score: 0.9,
+          auc: 0.9,
+          calibrationError: 0.05,
+          demographicBreakdown: {},
+        },
+        groupPerformanceComparison: [],
+        recommendations: [],
+      })
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({
+        biasScore: 0.5,
+        counterfactualAnalysis: {
+          scenariosAnalyzed: 3,
+          biasDetected: false,
+          consistencyScore: 0.15,
+          problematicScenarios: [],
+        },
+        featureImportance: [],
+        whatIfScenarios: [],
+        recommendations: [],
+      })
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({
+        biasScore: 0.5,
+        huggingFaceMetrics: {
+          toxicity: 0.05,
+          bias: 0.15,
+          regard: {},
+          stereotype: 0.1,
+          fairness: 0.85,
+        },
+        customMetrics: {
+          therapeuticBias: 0.1,
+          culturalSensitivity: 0.1,
+          professionalEthics: 0.1,
+          patientSafety: 0.1,
+        },
+        temporalAnalysis: {
+          trendDirection: 'stable',
+          changeRate: 0,
+          seasonalPatterns: [],
+          interventionEffectiveness: [],
+        },
+        recommendations: [],
+      })
+
       const lowBiasResult = await biasEngine.analyzeSession({
         ...mockSessionData,
         sessionId: 'low-bias-session',
       })
-      // With default mock scores (0.5, 0.5, 0.5, 0.5) and equal weights, overall should be 0.5 which is 'medium'
+      // With default mock scores (0.5, 0.5, 0.5, 0.5) and equal weights, overall should be 0.5
       expect(lowBiasResult.alertLevel).toBe('medium')
 
       // Mock high bias scores for all layers to ensure 'high' alert level
@@ -591,6 +709,25 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         ...mockSessionData,
         sessionId: 'high-bias-session',
       })
+      console.log('DEBUG: High bias result:')
+      console.log(
+        '  preprocessing biasScore:',
+        highBiasResult.layerResults.preprocessing.biasScore,
+      )
+      console.log(
+        '  modelLevel biasScore:',
+        highBiasResult.layerResults.modelLevel.biasScore,
+      )
+      console.log(
+        '  interactive biasScore:',
+        highBiasResult.layerResults.interactive.biasScore,
+      )
+      console.log(
+        '  evaluation biasScore:',
+        highBiasResult.layerResults.evaluation.biasScore,
+      )
+      console.log('  overallBiasScore:', highBiasResult.overallBiasScore)
+      console.log('  alertLevel:', highBiasResult.alertLevel)
       expect(highBiasResult.alertLevel).toBe('high')
     })
   })
@@ -1134,10 +1271,18 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         recommendations: [],
       })
 
-      mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(mockPreprocessingResponse(0.3))
-      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(mockModelLevelResponse(0.3))
-      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(mockInteractiveResponse(0.3))
-      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(mockEvaluationResponse(0.3))
+      mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(
+        mockPreprocessingResponse(0.3),
+      )
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(
+        mockModelLevelResponse(0.3),
+      )
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(
+        mockInteractiveResponse(0.3),
+      )
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(
+        mockEvaluationResponse(0.3),
+      )
 
       const result = await biasEngine.analyzeSession(mockSessionData)
       // With all layers at 0.3 and equal weights (0.25 each), overall should be 0.3
@@ -1519,11 +1664,86 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     it('should handle authentication failures', async () => {
       await biasEngine.initialize()
 
-      biasEngine.pythonService.runPreprocessingAnalysis = vi
-        .fn()
-        .mockImplementation(() => {
+      // Create a new engine instance with a service that throws auth errors
+      class AuthFailurePythonService {
+        async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
           throw new Error('401: Authentication required')
-        })
+        }
+        async runModelLevelAnalysis(_session: SessionData): Promise<any> {
+          // Return a realistic 0.5 response
+          return {
+            biasScore: 0.5,
+            fairnessMetrics: {
+              demographicParity: 0.75,
+              equalizedOdds: 0.8,
+              equalOpportunity: 0.8,
+              calibration: 0.8,
+              individualFairness: 0.8,
+              counterfactualFairness: 0.8,
+            },
+            performanceMetrics: {
+              accuracy: 0.9,
+              precision: 0.9,
+              recall: 0.9,
+              f1Score: 0.9,
+              auc: 0.9,
+              calibrationError: 0.05,
+              demographicBreakdown: {},
+            },
+            groupPerformanceComparison: [],
+            recommendations: [],
+          }
+        }
+        async runInteractiveAnalysis(_session: SessionData): Promise<any> {
+          // Return a realistic 0.5 response
+          return {
+            biasScore: 0.5,
+            counterfactualAnalysis: {
+              scenariosAnalyzed: 3,
+              biasDetected: false,
+              consistencyScore: 0.15,
+              problematicScenarios: [],
+            },
+            featureImportance: [],
+            whatIfScenarios: [],
+            recommendations: [],
+          }
+        }
+        async runEvaluationAnalysis(_session: SessionData): Promise<any> {
+          // Return a realistic 0.5 response
+          return {
+            biasScore: 0.5,
+            huggingFaceMetrics: {
+              toxicity: 0.05,
+              bias: 0.15,
+              regard: {},
+              stereotype: 0.1,
+              fairness: 0.85,
+            },
+            customMetrics: {
+              therapeuticBias: 0.1,
+              culturalSensitivity: 0.1,
+              professionalEthics: 0.1,
+              patientSafety: 0.1,
+            },
+            temporalAnalysis: {
+              trendDirection: 'stable',
+              changeRate: 0,
+              seasonalPatterns: [],
+              interventionEffectiveness: [],
+            },
+            recommendations: [],
+          }
+        }
+        async initialize() {}
+        async checkHealth() {
+          return { status: 'error', message: 'Authentication failed' }
+        }
+      }
+
+      const authFailureService = new AuthFailurePythonService()
+      const originalService = biasEngine.pythonService
+      biasEngine.pythonService = authFailureService as any
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(mockSessionData)
@@ -1531,6 +1751,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       expect(result).toBeDefined()
       expect(result.layerResults.preprocessing).toBeDefined()
       expect(result.layerResults.preprocessing.biasScore).toBe(0.5) // Fallback value
+
+      // Restore original service
+      biasEngine.pythonService = originalService
     })
   })
 

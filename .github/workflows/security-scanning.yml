@@ -31,15 +31,14 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Run Checkov scan
-        # Updated to avoid ambiguous --policy-metadata params that may be inherited
-        uses: bridgecrewio/checkov-action@master
+        # Pin to stable version and remove ambiguous baseline input
+        uses: bridgecrewio/checkov-action@v12
         with:
           directory: .
           framework: all
           output_format: sarif
           output_file_path: checkov-results.sarif
-          baseline: security-baseline.json
-          # Only standard documented inputs are set here to prevent CLI ambiguity
+          # baseline input removed due to ambiguity issues
 
       - name: Ensure Checkov SARIF file exists
         run: |

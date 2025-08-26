@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="45.55.211.39" id="20f9183f-290f-44ec-82cf-c4d053871f21" keyPath="$PROJECT_DIR$/../.ssh/planet" port="22" customName="mandy" nameFormat="CUSTOM" username="root" useOpenSSHConfig="true">
+        <option name="customName" value="mandy" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

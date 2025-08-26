@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="85892be3-3cc1-4fcb-b20d-b3ec0c9ae774" name="mandy" url="http://pixelatedempathy.com">
+        <fileTransfer rootFolder="/root/pixelated" accessType="SFTP" host="45.55.211.39" port="22" sshConfigId="20f9183f-290f-44ec-82cf-c4d053871f21" sshConfig="mandy" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+    <groups>
+      <group>
+        <name>VPS</name>
+        <servers>
+          <name value="mandy" />
+        </servers>
+      </group>
+    </groups>
+  </component>
+</project>

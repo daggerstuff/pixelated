@@ -95,8 +95,8 @@ stages:
               # Ensure Node.js 22.x is installed in the container
               set -e
               echo "Installing Node.js 22.x in container..."
-              curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-              apt-get install -y nodejs
+              curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+              sudo apt-get install -y nodejs
               node --version
               which node
               echo "Node.js installation complete."
@@ -117,7 +117,7 @@ stages:
               # Create cache directories with error handling
               for dir in "${CACHE_DIRS[@]}"; do
                 # Clean the path and ensure it exists
-                clean_dir=$(echo "$dir" | tr -d '\n' | sed 's/\\n//g')
+                clean_dir=$(echo "$dir" | tr -d '\\n' | sed 's/\\\\n//g')
                 echo "Creating cache directory: $clean_dir"
                 mkdir -p "$clean_dir" || {
                   echo "Warning: Failed to create $clean_dir, but continuing..."
@@ -136,16 +136,16 @@ stages:
               # Clean up any malformed cache files that might exist
               echo "Cleaning up potential malformed cache files..."
               for dir in "${CACHE_DIRS[@]}"; do
-                clean_dir=$(echo "$dir" | tr -d '\n' | sed 's/\\n//g')
+                clean_dir=$(echo "$dir" | tr -d '\\n' | sed 's/\\\\n//g')
                 if [ -d "$clean_dir" ]; then
-                  find "$clean_dir" -name "*\n*" -delete 2>/dev/null || true
+                  find "$clean_dir" -name "*\\n*" -delete 2>/dev/null || true
                 fi
               done
               
               # Final validation
               echo "Cache directory validation:"
               for dir in "${CACHE_DIRS[@]}"; do
-                clean_dir=$(echo "$dir" | tr -d '\n' | sed 's/\\n//g')
+                clean_dir=$(echo "$dir" | tr -d '\\n' | sed 's/\\\\n//g')
                 if [ -d "$clean_dir" ]; then
                   echo "✓ $clean_dir exists and is accessible"
                   ls -la "$clean_dir" 2>/dev/null | head -3 || echo "  (directory is empty or not listable)"
@@ -277,9 +277,9 @@ stages:
                     set -e
                     # Ensure Node.js is available inside the container for node-based scripts
                     echo "Installing Node.js (LTS 22.x) for container agent..."
-                    apt-get update -qq && apt-get install -y curl ca-certificates
-                    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-                    apt-get install -y nodejs
+                    sudo apt-get update -qq && sudo apt-get install -y curl ca-certificates
+                    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+                    sudo apt-get install -y nodejs
                     node --version
                     # Removed redundant Azure CLI install: agent container already has az
                     export PYTHONWARNINGS="ignore::FutureWarning"
@@ -296,7 +296,7 @@ stages:
                       echo "Resource Group: $(resourceGroupName)"
                       echo "Azure Location: $(azureLocation)"
                       echo "Environment: $(environment)"
-                      echo "============================"
+                      echo "============================="
                       
                       # Try primary deployment method
                       chmod +x scripts/deploy-infrastructure.sh
@@ -363,9 +363,9 @@ stages:
           - script: |
               set -e
               echo "Installing Docker CLI in container..."
-              apt-get update -qq
+              sudo apt-get update -qq
               # Prefer docker.io for Debian/Ubuntu-based images
-              apt-get install -y docker.io
+              sudo apt-get install -y docker.io
               
               # Verify Docker daemon is accessible
               if ! docker version >/dev/null 2>&1; then
@@ -667,9 +667,9 @@ stages:
                     set -eo pipefail
                     # Ensure Node.js (22.x) is available inside the container for any Node-based steps
                     echo "Installing Node.js (LTS 22.x) for container agent..."
-                    apt-get update -qq && apt-get install -y curl ca-certificates
-                    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-                    apt-get install -y nodejs
+                    sudo apt-get update -qq && sudo apt-get install -y curl ca-certificates
+                    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+                    sudo apt-get install -y nodejs
                     node --version
                     echo "Ensuring Azure CLI is available..."
                     
