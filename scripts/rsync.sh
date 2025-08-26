@@ -126,8 +126,13 @@ print_status "✅ Rsync exclusions prepared"
 
 # Archive old repo in root home (VPS) BEFORE syncing
 print_header "Archiving old repo in /root/pixelated on VPS..."
-$SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
 set -e
+
+# Colors for remote output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
 print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
 print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
@@ -168,7 +173,7 @@ fi
 
 # Set up VPS environment
 print_header "Setting up VPS environment..."
-$SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
 set -e
 
 # Colors for remote output
@@ -231,20 +236,20 @@ if [[ "\$NODE_VERSION" != "v22"* ]]; then
     if [[ -s "\$HOME/.nvm/nvm.sh" ]]; then
         print_status "nvm already installed, loading existing installation..."
         export NVM_DIR="\$HOME/.nvm"
-        [ -s "\$NVM_DIR/nvm.sh" ] && \\. "\$NVM_DIR/nvm.sh"
-        [ -s "\$NVM_DIR/bash_completion" ] && \\. "\$NVM_DIR/bash_completion"
+        [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+        [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
     else
         print_status "Installing nvm (first time setup)..."
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
         export NVM_DIR="\$HOME/.nvm"
-        [ -s "\$NVM_DIR/nvm.sh" ] && \\. "\$NVM_DIR/nvm.sh"
-        [ -s "\$NVM_DIR/bash_completion" ] && \\. "\$NVM_DIR/bash_completion"
+        [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+        [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 
         # Add nvm to bashrc for future sessions
         if ! grep -q "NVM_DIR" ~/.bashrc; then
             echo 'export NVM_DIR="\$HOME/.nvm"' >> ~/.bashrc
-            echo '[ -s "\$NVM_DIR/nvm.sh" ] && \\. "\$NVM_DIR/nvm.sh"' >> ~/.bashrc
-            echo '[ -s "\$NVM_DIR/bash_completion" ] && \\. "\$NVM_DIR/bash_completion"' >> ~/.bashrc
+            echo '[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"' >> ~/.bashrc
+            echo '[ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"' >> ~/.bashrc
         fi
     fi
 
@@ -285,7 +290,7 @@ EOF
 
 # Set up project on VPS
 print_header "Setting up project on VPS..."
-$SSH_CMD "$VPS_USER@$VPS_HOST" <<'EOF'
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash <<EOF
 set -e
 
 # Colors for remote output
@@ -312,8 +317,8 @@ pnpm store prune || true
 # Load nvm environment and ensure Node 22 is active
 print_status "Loading Node.js environment..."
 export NVM_DIR="\$HOME/.nvm"
-[ -s "\$NVM_DIR/nvm.sh" ] && \\. "\$NVM_DIR/nvm.sh"
-[ -s "\$NVM_DIR/bash_completion" ] && \\. "\$NVM_DIR/bash_completion"
+[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+[ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 
 # Force reload nvm and switch to Node 22
 print_status "Switching to Node 22..."
@@ -375,7 +380,7 @@ EOF
 
 # Deploy the application
 print_header "Deploying application..."
-$SSH_CMD "$VPS_USER@$VPS_HOST" << EOF
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
 set -e
 
 print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
@@ -399,23 +404,23 @@ fi
 
 # Run new container
 print_status "Starting new container..."
-docker run -d \\
-  --name pixelated-app \\
-  --restart unless-stopped \\
-  -p 4321:4321 \\
-  -e NODE_ENV=production \\
-  -e PORT=4321 \\
-  -e WEB_PORT=4321 \\
-  -e LOG_LEVEL=info \\
-  -e ENABLE_RATE_LIMITING=true \\
-  -e RATE_LIMIT_WINDOW=60 \\
-  -e RATE_LIMIT_MAX_REQUESTS=100 \\
-  -e ENABLE_HIPAA_COMPLIANCE=true \\
-  -e ENABLE_AUDIT_LOGGING=true \\
-  -e ENABLE_DATA_MASKING=true \\
-  -e ASTRO_TELEMETRY_DISABLED=1 \\
-  -e PUBLIC_URL="\$PUBLIC_URL" \\
-  -e CORS_ORIGINS="\$CORS_ORIGINS" \\
+docker run -d \
+  --name pixelated-app \
+  --restart unless-stopped \
+  -p 4321:4321 \
+  -e NODE_ENV=production \
+  -e PORT=4321 \
+  -e WEB_PORT=4321 \
+  -e LOG_LEVEL=info \
+  -e ENABLE_RATE_LIMITING=true \
+  -e RATE_LIMIT_WINDOW=60 \
+  -e RATE_LIMIT_MAX_REQUESTS=100 \
+  -e ENABLE_HIPAA_COMPLIANCE=true \
+  -e ENABLE_AUDIT_LOGGING=true \
+  -e ENABLE_DATA_MASKING=true \
+  -e ASTRO_TELEMETRY_DISABLED=1 \
+  -e PUBLIC_URL="\$PUBLIC_URL" \
+  -e CORS_ORIGINS="\$CORS_ORIGINS" \
   pixelated-empathy:latest
 
 # Wait for container to start
@@ -434,36 +439,22 @@ fi
 # Configure Caddy if domain is set
 if [[ -n "$DOMAIN" ]]; then
     print_status "Configuring Caddy for domain: $DOMAIN"
-    sudo tee /etc/caddy/Caddyfile > /dev/null << 'CADDY_EOF'
+    sudo tee /etc/caddy/Caddyfile > /dev/null << CADDY_EOF
 $DOMAIN {
-    reverse_proxy localhost:4321
-
-    # Enable compression
     encode gzip
 
     # Security headers
     header {
-        # Enable HSTS
-        Strict-Transport-Security max-age=31536000;
-        # Prevent MIME sniffing
-        X-Content-Type-Options nosniff
-        # Prevent clickjacking
-        X-Frame-Options DENY
-        # XSS protection
-        X-XSS-Protection "1; mode=block"
-        # Referrer policy
-        Referrer-Policy strict-origin-when-cross-origin
-    }
-
-    # Health check endpoint
-    handle /api/health* {
-        reverse_proxy localhost:4321
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
     }
 
     # Static assets with long cache
     handle /assets/* {
-        reverse_proxy localhost:4321
         header Cache-Control "public, max-age=31536000, immutable"
+        reverse_proxy localhost:4321
     }
 
     # All other requests
@@ -476,6 +467,10 @@ goat.pixelatedempathy.tech {
     reverse_proxy localhost:11434
 }
 CADDY_EOF
+
+    # Auto-format Caddyfile to ensure consistency
+    print_status "Formatting Caddyfile..."
+    sudo caddy fmt --overwrite /etc/caddy/Caddyfile
 
     # Test and reload Caddy
     print_status "Testing Caddy configuration..."
