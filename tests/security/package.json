@@ -29,5 +29,8 @@
     "@typescript-eslint/parser": "^8.32.0",
     "eslint": "^9.26.0",
     "prettier": "^3.5.3"
+  },
+  "overrides": {
+    "esbuild": "^0.25.9"
   }
 }
