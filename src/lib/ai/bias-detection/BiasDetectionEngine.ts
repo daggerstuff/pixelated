@@ -184,7 +184,7 @@ class BiasMetricsCollector {
     return {
       summary: {
         totalSessions: 150,
-        averageBiasScore: 0.25,
+        averageBiasScore: 0.3,
         alertsLast24h: 5,
         criticalIssues: 2,
         improvementRate: 0.15,

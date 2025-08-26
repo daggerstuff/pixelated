@@ -65,6 +65,9 @@ dependencies = [
   "gguf>=0.10.0",
   "ruff>=0.12.5",
   "yamllint>=1.37.1",
+  "aif360[infairness]>=0.6.1",
+  "tf-keras>=2.15.0",
+  "textblob>=0.19.0",
 ]
 
 [project.optional-dependencies]
