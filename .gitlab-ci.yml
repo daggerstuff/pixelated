@@ -13,9 +13,6 @@ qodana:
     - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana
   allow_failure: true
 
-# GitLab CI/CD Pipeline for Pixelated Empathy
-# Builds and pushes frontend container to GitLab Container Registry
-
 stages:
   - validate
   - build
@@ -27,10 +24,8 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
-  # Force SSH URL for repository checkout
   CI_REPOSITORY_URL: git@git.pixelatedempathy.tech:pixeltech/pixelated.git
 
-# Validate runner capabilities
 validate-runner:
   stage: validate
   image: docker:24.0.5
@@ -61,7 +56,6 @@ validate-runner:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: "$CI_MERGE_REQUEST_ID"
 
-# Build frontend container
 build-frontend:
   stage: build
   image: docker:24.0.5
@@ -82,11 +76,8 @@ build-frontend:
   script:
     - echo "🏗️ Building Pixelated Empathy frontend container..."
     - ls -la
-    # Check if Dockerfile exists
     - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
-    # Enable Docker layer caching for faster builds
     - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
-    # If using npm/pnpm/yarn, cache dependencies for faster installs (build handles this)
     - echo "📤 Pushing container to GitLab Container Registry..."
     - timeout 300 docker push $CONTAINER_IMAGE
     - timeout 300 docker push $CONTAINER_IMAGE_LATEST
@@ -99,7 +90,6 @@ build-frontend:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: "$CI_MERGE_REQUEST_ID"
 
-# Test container health
 test-container:
   stage: test
   image: docker:24.0.5
@@ -123,7 +113,6 @@ test-container:
     - sleep 30
     - docker logs test-container
     - |
-      # Test if container is responding
       if docker exec test-container curl -f http://localhost:4321 > /dev/null 2>&1; then
         echo "✅ Container health check passed"
       else
@@ -139,7 +128,6 @@ test-container:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "main"
 
-# Deploy to VPS (manual trigger)
 deploy-vps:
   stage: deploy
   image: alpine:latest
@@ -147,7 +135,6 @@ deploy-vps:
     - apk add --no-cache openssh-client curl git
     - eval $(ssh-agent -s)
     - |
-      # Decode and validate SSH private key
       if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
         echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
         exit 1
@@ -155,24 +142,20 @@ deploy-vps:
       
       echo "🔑 Setting up SSH private key..."
       
-      # Create temporary file for the key
       SSH_KEY_FILE=$(mktemp)
       trap "rm -f $SSH_KEY_FILE" EXIT
       
-      # Decode the base64 key and write to temp file
       if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
         echo "❌ Failed to decode base64 SSH key"
         exit 1
       fi
       
-      # Validate the key format
       if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
         echo "❌ Invalid SSH key format - missing BEGIN marker"
         echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
         exit 1
       fi
       
-      # Set correct permissions and add to ssh-agent
       chmod 600 "$SSH_KEY_FILE"
       if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
         echo "❌ Failed to add SSH key to agent"

@@ -35,11 +35,11 @@ To transform mental health education by eliminating barriers between training an
 - **Cloud Services**: AWS (S3, DynamoDB, KMS)
 
 ### Key Dependencies
-- **AI/ML**: @ai-sdk/openai, @google/genai, transformers, torch
-- **UI Components**: @headlessui/react, @radix-ui/react, lucide-react
-- **3D Graphics**: three.js, @react-three/fiber, @react-three/drei
-- **Monitoring**: @sentry/astro, @sentry/node
-- **Data Processing**: pandas, numpy, scikit-learn
+- **AI/ML**: @ai-sdk/openai && @google/genai && transformers && torch
+- **UI Components**: @headlessui/react && @radix-ui/react && lucide-react
+- **3D Graphics**: three.js && @react-three/fiber && @react-three/drei
+- **Monitoring**: @sentry/astro && @sentry/node
+- **Data Processing**: pandas && numpy && scikit-learn
 
 ## Core Architecture
 

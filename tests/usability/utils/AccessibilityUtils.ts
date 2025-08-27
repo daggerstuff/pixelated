@@ -2,16 +2,15 @@ import { Page, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 export class AccessibilityUtils {
-  static async runAxeAnalysis(page: Page, options?: any) {
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-      .analyze();
-    
-    return accessibilityScanResults;
+  static async runAxeAnalysis(page: Page, _options?: any) {
+    // Fix: Use AxeBuilder(page) to avoid Playwright type mismatch between packages
+    return await new AxeBuilder({ page: page as any })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+          .analyze();
   }
 
   static async checkColorContrast(page: Page) {
-    const results = await new AxeBuilder({ page })
+    const results = await new AxeBuilder({ page: page as any })
       .include('body')
       .withRules(['color-contrast'])
       .analyze();
@@ -34,7 +33,7 @@ export class AccessibilityUtils {
   }
 
   static async checkAriaLabels(page: Page) {
-    const results = await new AxeBuilder({ page })
+    const results = await new AxeBuilder({ page: page as any })
       .withRules(['aria-labels', 'button-name', 'link-name', 'label'])
       .analyze();
     
@@ -44,7 +43,7 @@ export class AccessibilityUtils {
 
   static async checkHeadingStructure(page: Page) {
     const headings = await page.locator('h1, h2, h3, h4, h5, h6').all();
-    const headingLevels = [];
+    const headingLevels: number[] = [];
     
     for (const heading of headings) {
       const tagName = await heading.evaluate(el => el.tagName.toLowerCase());
@@ -58,7 +57,11 @@ export class AccessibilityUtils {
       const previousLevel = headingLevels[i - 1];
       
       // Heading levels should not skip more than one level
-      if (currentLevel > previousLevel + 1) {
+      if (
+        typeof currentLevel === 'number' &&
+        typeof previousLevel === 'number' &&
+        currentLevel > previousLevel + 1
+      ) {
         throw new Error(`Heading hierarchy violation: h${previousLevel} followed by h${currentLevel}`);
       }
     }
@@ -148,7 +151,7 @@ export class AccessibilityUtils {
     };
     
     // Save report
-    const reportPath = `tests/usability/reports/accessibility-${testName}-${Date.now()}.json`;
+    // const _reportPath = ... // Removed unused variable
     await page.context().browser()?.close();
     
     return report;

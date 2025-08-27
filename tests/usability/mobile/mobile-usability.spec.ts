@@ -152,16 +152,21 @@ test.describe('Mobile Usability', () => {
     const buttons = await page.locator('button, a').all();
     
     for (let i = 0; i < buttons.length - 1; i++) {
-      const currentBox = await buttons[i].boundingBox();
-      const nextBox = await buttons[i + 1].boundingBox();
+      const currentButton = buttons[i];
+      const nextButton = buttons[i + 1];
       
-      if (currentBox && nextBox) {
-        // Calculate distance between elements
-        const distance = Math.abs(nextBox.y - (currentBox.y + currentBox.height));
+      if (currentButton && nextButton) {
+        const currentBox = await currentButton.boundingBox();
+        const nextBox = await nextButton.boundingBox();
+      
+        if (currentBox && nextBox) {
+          // Calculate distance between elements
+          const distance = Math.abs(nextBox.y - (currentBox.y + currentBox.height));
         
-        // Should have at least 8px spacing between interactive elements
-        if (distance < 100) { // Only check if elements are close vertically
-          expect(distance).toBeGreaterThanOrEqual(8);
+          // Should have at least 8px spacing between interactive elements
+          if (distance < 100) { // Only check if elements are close vertically
+            expect(distance).toBeGreaterThanOrEqual(8);
+          }
         }
       }
     }

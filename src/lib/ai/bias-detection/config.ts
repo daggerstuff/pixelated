@@ -252,153 +252,11 @@ export function mergeWithDefaults(
   userConfig?: Partial<BiasDetectionConfig>,
 ): BiasDetectionConfig {
   if (!userConfig) {
-    return { ...DEFAULT_CONFIG }
+    return { ...DEFAULT_CONFIG };
   }
-
-  // Validate before merging
-  validateConfig(userConfig)
-
-  // Deep merge configuration objects
-  const mergedConfig: BiasDetectionConfig = {
-    ...DEFAULT_CONFIG,
-    ...userConfig,
-    thresholds: {
-      warning:
-        userConfig.thresholds?.warning ??
-        DEFAULT_CONFIG.thresholds?.warning ??
-        0.3,
-      high:
-        userConfig.thresholds?.high ??
-        DEFAULT_CONFIG.thresholds?.high ??
-        0.6,
-      critical:
-        userConfig.thresholds?.critical ??
-        DEFAULT_CONFIG.thresholds?.critical ??
-        0.8,
-    },
-    layerWeights: {
-      preprocessing:
-        userConfig.layerWeights?.preprocessing ??
-        DEFAULT_CONFIG.layerWeights?.preprocessing ??
-        0.25,
-      modelLevel:
-        userConfig.layerWeights?.modelLevel ??
-        DEFAULT_CONFIG.layerWeights?.modelLevel ??
-        0.3,
-      interactive:
-        userConfig.layerWeights?.interactive ??
-        DEFAULT_CONFIG.layerWeights?.interactive ??
-        0.2,
-      evaluation:
-        userConfig.layerWeights?.evaluation ??
-        DEFAULT_CONFIG.layerWeights?.evaluation ??
-        0.25,
-    },
-    metricsConfig: {
-      enableRealTimeMonitoring:
-        userConfig.metricsConfig?.enableRealTimeMonitoring ??
-        DEFAULT_CONFIG.metricsConfig?.enableRealTimeMonitoring ??
-        true,
-      metricsRetentionDays:
-        userConfig.metricsConfig?.metricsRetentionDays ??
-        DEFAULT_CONFIG.metricsConfig?.metricsRetentionDays ??
-        30,
-      aggregationIntervals:
-        userConfig.metricsConfig?.aggregationIntervals ??
-        DEFAULT_CONFIG.metricsConfig?.aggregationIntervals ??
-        ['1h', '1d', '1w', '1m'],
-      dashboardRefreshRate:
-        userConfig.metricsConfig?.dashboardRefreshRate ??
-        DEFAULT_CONFIG.metricsConfig?.dashboardRefreshRate ??
-        60,
-      exportFormats:
-        userConfig.metricsConfig?.exportFormats ??
-        DEFAULT_CONFIG.metricsConfig?.exportFormats ??
-        ['json', 'csv', 'pdf'],
-    },
-    alertConfig: {
-      enableSlackNotifications:
-        userConfig.alertConfig?.enableSlackNotifications ??
-        DEFAULT_CONFIG.alertConfig?.enableSlackNotifications ??
-        false,
-      enableEmailNotifications:
-        userConfig.alertConfig?.enableEmailNotifications ??
-        DEFAULT_CONFIG.alertConfig?.enableEmailNotifications ??
-        false,
-      slackWebhookUrl:
-        userConfig.alertConfig?.slackWebhookUrl ??
-        DEFAULT_CONFIG.alertConfig?.slackWebhookUrl ??
-        '',
-      emailRecipients:
-        userConfig.alertConfig?.emailRecipients ??
-        DEFAULT_CONFIG.alertConfig?.emailRecipients ??
-        [],
-      alertCooldownMinutes:
-        userConfig.alertConfig?.alertCooldownMinutes ??
-        DEFAULT_CONFIG.alertConfig?.alertCooldownMinutes ??
-        1,
-      escalationThresholds: {
-        criticalResponseTimeMinutes:
-          userConfig.alertConfig?.escalationThresholds
-            ?.criticalResponseTimeMinutes ??
-          DEFAULT_CONFIG.alertConfig?.escalationThresholds
-            ?.criticalResponseTimeMinutes ??
-          15,
-        highResponseTimeMinutes:
-          userConfig.alertConfig?.escalationThresholds
-            ?.highResponseTimeMinutes ??
-          DEFAULT_CONFIG.alertConfig?.escalationThresholds
-            ?.highResponseTimeMinutes ??
-          60,
-      },
-    },
-    reportConfig: {
-      includeConfidentialityAnalysis:
-        userConfig.reportConfig?.includeConfidentialityAnalysis ??
-        DEFAULT_CONFIG.reportConfig?.includeConfidentialityAnalysis ??
-        true,
-      includeDemographicBreakdown:
-        userConfig.reportConfig?.includeDemographicBreakdown ??
-        DEFAULT_CONFIG.reportConfig?.includeDemographicBreakdown ??
-        true,
-      includeTemporalTrends:
-        userConfig.reportConfig?.includeTemporalTrends ??
-        DEFAULT_CONFIG.reportConfig?.includeTemporalTrends ??
-        true,
-      includeRecommendations:
-        userConfig.reportConfig?.includeRecommendations ??
-        DEFAULT_CONFIG.reportConfig?.includeRecommendations ??
-        true,
-      reportTemplate:
-        userConfig.reportConfig?.reportTemplate ??
-        DEFAULT_CONFIG.reportConfig?.reportTemplate ??
-        'standard',
-      exportFormats:
-        userConfig.reportConfig?.exportFormats ??
-        DEFAULT_CONFIG.reportConfig?.exportFormats ??
-        ['json', 'pdf'],
-    },
-    explanationConfig: {
-      explanationMethod:
-        userConfig.explanationConfig?.explanationMethod ??
-        DEFAULT_CONFIG.explanationConfig?.explanationMethod ??
-        'shap',
-      maxFeatures:
-        userConfig.explanationConfig?.maxFeatures ??
-        DEFAULT_CONFIG.explanationConfig?.maxFeatures ??
-        10,
-      includeCounterfactuals:
-        userConfig.explanationConfig?.includeCounterfactuals ??
-        DEFAULT_CONFIG.explanationConfig?.includeCounterfactuals ??
-        true,
-      generateVisualization:
-        userConfig.explanationConfig?.generateVisualization ??
-        DEFAULT_CONFIG.explanationConfig?.generateVisualization ??
-        true,
-    },
-  }
-
-  return mergedConfig
+  validateConfig(userConfig);
+  const mergedConfig: BiasDetectionConfig = deepMergeConfigs(DEFAULT_CONFIG, userConfig) as BiasDetectionConfig;
+  return mergedConfig;
 }
 
 /**
@@ -859,13 +717,8 @@ export class BiasDetectionConfigManager {
 /**
  * Global configuration instance
  */
-export const biasDetectionConfig = BiasDetectionConfigManager.getInstance()
-
-/**
- * Convenience function to get current configuration
- */
 export function getBiasDetectionConfig(): BiasDetectionConfig {
-  return biasDetectionConfig.getConfig()
+  return BiasDetectionConfigManager.getInstance().getConfig()
 }
 
 /**

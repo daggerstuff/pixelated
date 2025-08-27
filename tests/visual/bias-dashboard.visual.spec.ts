@@ -282,7 +282,6 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
       await expect(
         page.locator('[data-testid="bias-dashboard"]'),
       ).toHaveScreenshot('dashboard-normal-desktop.png', {
-        fullPage: true,
         threshold: 0.2,
       })
     })
@@ -296,7 +295,6 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
       await expect(
         page.locator('[data-testid="bias-dashboard"]'),
       ).toHaveScreenshot('dashboard-critical-alerts-desktop.png', {
-        fullPage: true,
         threshold: 0.2,
       })
     })
@@ -386,7 +384,6 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
       await expect(
         page.locator('[data-testid="bias-dashboard"]'),
       ).toHaveScreenshot('dashboard-normal-mobile.png', {
-        fullPage: true,
         threshold: 0.2,
       })
     })
@@ -423,7 +420,6 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
       await expect(
         page.locator('[data-testid="bias-dashboard"]'),
       ).toHaveScreenshot('dashboard-normal-tablet.png', {
-        fullPage: true,
         threshold: 0.2,
       })
     })
@@ -610,7 +606,6 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
       await expect(
         page.locator('[data-testid="bias-dashboard"]'),
       ).toHaveScreenshot('dashboard-dark-mode.png', {
-        fullPage: true,
         threshold: 0.2,
       })
     })

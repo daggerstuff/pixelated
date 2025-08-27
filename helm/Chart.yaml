@@ -25,6 +25,6 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     condition: redis.enabled
   - name: caddy-ingress-controller
-    version: "1.0.0"
+    version: "1.0.1"
     repository: https://caddyserver.github.io/ingress/
     condition: ingress.enabled

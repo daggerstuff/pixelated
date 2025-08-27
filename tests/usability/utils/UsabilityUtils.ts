@@ -9,7 +9,7 @@ export class UsabilityUtils {
   }
 
   static async checkResponsiveDesign(page: Page, breakpoints: Array<{width: number, height: number, name: string}>) {
-    const results = [];
+    const results: Array<{breakpoint: string, width: number, height: number, hasHorizontalScroll: boolean, mainContentVisible: boolean, passed: boolean}> = [];
     
     for (const breakpoint of breakpoints) {
       await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
@@ -46,7 +46,7 @@ export class UsabilityUtils {
       fieldsAccessible: true,
       validationWorks: true,
       submitWorks: true,
-      errors: []
+      errors: [] as string[]
     };
     
     try {
@@ -54,7 +54,6 @@ export class UsabilityUtils {
       const inputs = await form.locator('input, textarea, select').all();
       
       for (const input of inputs) {
-        const type = await input.getAttribute('type');
         const required = await input.getAttribute('required');
         
         // Test focus
@@ -91,7 +90,7 @@ export class UsabilityUtils {
       breadcrumbsPresent: false,
       searchFunctional: false,
       skipLinksPresent: false,
-      errors: []
+      errors: [] as string[]
     };
     
     try {
@@ -133,7 +132,7 @@ export class UsabilityUtils {
       textReadable: true,
       contentFitsViewport: true,
       mobileMenuWorks: true,
-      errors: []
+      errors: [] as string[]
     };
     
     try {
@@ -197,24 +196,22 @@ export class UsabilityUtils {
   }
 
   static async generateUsabilityReport(page: Page, testName: string, testResults: any) {
-    const report = {
-      testName,
-      url: page.url(),
-      timestamp: new Date().toISOString(),
-      viewport: await page.viewportSize(),
-      userAgent: await page.evaluate(() => navigator.userAgent),
-      results: testResults,
-      summary: {
-        totalTests: Object.keys(testResults).length,
-        passed: Object.values(testResults).filter(result => 
-          typeof result === 'boolean' ? result : result.passed
-        ).length,
-        failed: Object.values(testResults).filter(result => 
-          typeof result === 'boolean' ? !result : !result.passed
-        ).length
-      }
-    };
-    
-    return report;
+    return {
+          testName,
+          url: page.url(),
+          timestamp: new Date().toISOString(),
+          viewport: await page.viewportSize(),
+          userAgent: await page.evaluate(() => navigator.userAgent),
+          results: testResults,
+          summary: {
+            totalTests: Object.keys(testResults).length,
+            passed: Object.values(testResults).filter(result =>
+              typeof result === 'boolean' ? result : (result as any).passed
+            ).length,
+            failed: Object.values(testResults).filter(result =>
+              typeof result === 'boolean' ? !result : !(result as any).passed
+            ).length
+          }
+        };
   }
 }

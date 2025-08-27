@@ -14,7 +14,7 @@ test.describe('Regression Test Suite', () => {
     await testUtils.setupTestEnvironment();
   });
 
-  test.afterEach(async ({ page }) => {
+  test.afterEach(async ({ page: _page }) => {
     await testUtils.cleanupTestEnvironment();
   });
 
@@ -238,7 +238,7 @@ test.describe('Regression Test Suite', () => {
       await expect(page.locator('.message-bubble').last()).toContainText('<script>');
       
       // No alert should have been triggered
-      page.on('dialog', dialog => {
+      page.on('dialog', _dialog => {
         throw new Error('XSS alert was triggered');
       });
     });
@@ -276,7 +276,7 @@ export class RegressionTestUtils {
   static async simulateMemoryPressure(page: any) {
     await page.evaluate(() => {
       // Create memory pressure
-      const arrays = [];
+      const arrays: any[] = [];
       for (let i = 0; i < 100; i++) {
         arrays.push(new Array(10000).fill('memory-pressure-test'));
       }

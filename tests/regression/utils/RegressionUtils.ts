@@ -137,10 +137,10 @@ export class RegressionUtils {
           performance.measure('test-duration', 'test-start', 'test-end');
           
           const measure = performance.getEntriesByName('test-duration')[0];
-          const memory = (performance as any).memory;
+          const {memory} = performance as any;
           
           return {
-            duration: measure.duration,
+            duration: measure ? measure.duration : 0,
             memory: memory ? {
               used: memory.usedJSHeapSize,
               total: memory.totalJSHeapSize,

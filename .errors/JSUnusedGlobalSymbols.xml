@@ -1,0 +1,482 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>708</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>742</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>766</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>780</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>806</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>873</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>876</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>879</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>882</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>886</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>926</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>929</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>932</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>935</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>939</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1180</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1183</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1186</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1189</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1193</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1235</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1238</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1263</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1278</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1305</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1341</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1344</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1369</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1384</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1411</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1442</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1445</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1470</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1485</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1512</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1547</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runPreprocessingAnalysis</description>
+  <highlighted_element>runPreprocessingAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>24</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1550</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runModelLevelAnalysis</description>
+  <highlighted_element>runModelLevelAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1575</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runInteractiveAnalysis</description>
+  <highlighted_element>runInteractiveAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>22</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1590</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method runEvaluationAnalysis</description>
+  <highlighted_element>runEvaluationAnalysis</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>21</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts</file>
+  <line>1617</line>
+  <module>pixelated</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts" />
+  <problem_class id="JSUnusedGlobalSymbols" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused global symbol</problem_class>
+  <description>Unused method checkHealth</description>
+  <highlighted_element>checkHealth</highlighted_element>
+  <language>JavaScript</language>
+  <offset>14</offset>
+  <length>11</length>
+</problem>
+</problems>

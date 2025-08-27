@@ -20,47 +20,8 @@ import BrainVisualization from '@/components/ui/BrainVisualization'
 //   type EnhancedMentalHealthAnalysis as ComponentEnhancedMentalHealthAnalysis,
 // } from '@/components/MentalHealthInsights'
 
-// Temporary placeholder types until MentalHealthInsights component is available
-type ComponentEnhancedMentalHealthAnalysis = {
-  timestamp: number
-  category: string
-  explanation: string
-  expertGuided: boolean
-  scores: Record<string, number>
-  summary: string
-  hasMentalHealthIssue: boolean
-  confidence: number
-  supportingEvidence: string[]
-  riskLevel: string
-}
-
-// Placeholder components
-const MentalHealthInsights = ({
-  analysis,
-}: {
-  analysis: ComponentEnhancedMentalHealthAnalysis
-}) => (
-  <div className="p-3 bg-gray-50 rounded-lg">
-    <p className="text-sm font-medium mb-2">Analysis: {analysis.category}</p>
-    <p className="text-xs text-gray-600 mb-2">{analysis.explanation}</p>
-    <p className="text-xs">
-      Confidence: {Math.round(analysis.confidence * 100)}%
-    </p>
-  </div>
-)
-
-const MentalHealthHistoryChart = ({
-  analysisHistory,
-}: {
-  analysisHistory: ComponentEnhancedMentalHealthAnalysis[]
-}) => (
-  <div className="p-3 bg-gray-50 rounded-lg">
-    <p className="text-sm font-medium mb-2">Analysis History</p>
-    <p className="text-xs text-gray-600">
-      {analysisHistory.length} analyses recorded
-    </p>
-  </div>
-)
+import { MentalHealthInsights } from '@/components/MentalHealthInsights'
+import type { MentalHealthInsights as MentalHealthInsightsType } from '@/simulator/services/FeedbackService'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
 import type {
@@ -69,8 +30,7 @@ import type {
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 
-// Use the imported interface type
-type EnhancedMentalHealthAnalysis = ComponentEnhancedMentalHealthAnalysis
+type EnhancedMentalHealthAnalysis = MentalHealthInsightsType
 
 // Extended analysis result that might include additional fields
 interface ExtendedMentalHealthAnalysisResult
@@ -1082,7 +1042,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                       </p>
                     </div>
                     <MentalHealthInsights
-                      analysis={enhanceAnalysis(m.mentalHealthAnalysis)!}
+                      insights={enhanceAnalysis(m.mentalHealthAnalysis)!}
                     />
                   </div>
                 ))}
@@ -1130,9 +1090,12 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 </div>
               </div>
 
-              <MentalHealthHistoryChart
-                analysisHistory={enhancedAnalysisHistory}
-              />
+              {/* If available, use the imported MentalHealthInsights with array feature for history; otherwise leave as future improvement */}
+              <div className="mt-4">
+                {enhancedAnalysisHistory.map((insight, idx) => (
+                  <MentalHealthInsights key={idx} insights={insight} />
+                ))}
+              </div>
 
               {enhancedAnalysisHistory.length === 0 && (
                 <Card className="w-full bg-slate-50 shadow-sm">

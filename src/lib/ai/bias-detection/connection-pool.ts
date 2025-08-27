@@ -31,6 +31,7 @@ export class ConnectionPool {
   }> = []
   private config: ConnectionPoolConfig
   private cleanupIntervalId?: ReturnType<typeof setInterval>
+  private disposed: boolean = false
 
   constructor(config: Partial<ConnectionPoolConfig> = {}) {
     this.config = {
@@ -47,6 +48,11 @@ export class ConnectionPool {
   }
 
   async acquireConnection(): Promise<PooledConnection> {
+    // Check if the pool has been disposed
+    if (this.disposed) {
+      throw new Error('Connection pool disposed')
+    }
+
     // Try to find an available connection
     for (const [_id, connection] of this.connections) {
       if (!connection.inUse) {
@@ -81,6 +87,10 @@ export class ConnectionPool {
   }
 
   releaseConnection(connection: PooledConnection): void {
+    if (this.disposed) {
+      return
+    }
+
     connection.inUse = false
     connection.lastUsed = new Date()
 
@@ -94,6 +104,10 @@ export class ConnectionPool {
   }
 
   private createConnection(): PooledConnection {
+    if (this.disposed) {
+      throw new Error('Connection pool disposed')
+    }
+
     const id = `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     return {
       id,
@@ -105,6 +119,10 @@ export class ConnectionPool {
   }
 
   private cleanupIdleConnections() {
+    if (this.disposed) {
+      return
+    }
+
     const now = new Date()
     const toRemove: string[] = []
 
@@ -149,6 +167,8 @@ export class ConnectionPool {
   }
 
   async dispose(): Promise<void> {
+    this.disposed = true
+
     // Clear cleanup interval
     if (this.cleanupIntervalId) {
       clearInterval(this.cleanupIntervalId)

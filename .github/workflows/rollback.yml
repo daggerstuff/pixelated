@@ -9,7 +9,6 @@ on:
 permissions:
   contents: write
 
-# Environment variables can be defined here
 env:
   NODE_VERSION: 22.18.0
   PNPM_VERSION: 10.15.0
@@ -101,10 +100,10 @@ jobs:
       group: production_environment
       cancel-in-progress: true
     permissions:
-      contents: write # Required for git operations (checkout, tag, push)
-      deployments: write # Required for deployment operations
-      actions: read # Required for reading workflow runs
-      id-token: write # Required for authentication
+      contents: write
+      deployments: write
+      actions: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5

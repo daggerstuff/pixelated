@@ -348,11 +348,22 @@ export class ObjectiveWeightingEngine {
       case ContextType.CRISIS:
         priorities.push('safety', 'empathy')
         break
+      case ContextType.SUPPORT:
+        priorities.push('empathy', 'safety')
+        break
+      case ContextType.INFORMATIONAL:
+        priorities.push('correctness', 'informativeness')
+        break
       case ContextType.CLINICAL_ASSESSMENT:
         priorities.push('correctness', 'professionalism')
         break
       case ContextType.EDUCATIONAL:
         priorities.push('informativeness', 'correctness')
+        break
+      case ContextType.GENERAL:
+      default:
+        // GENERAL and fallback: Make all objectives equal priority to encourage balanced evaluation.
+        priorities.push('empathy', 'safety', 'correctness', 'professionalism', 'informativeness')
         break
     }
 

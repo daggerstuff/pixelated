@@ -521,13 +521,6 @@ jobs:
         PLAYWRIGHT_VERSIONS=$(find node_modules -path "*playwright*" -type d -maxdepth 2 | sort)
         echo "Found Playwright installations:"
         echo "$PLAYWRIGHT_VERSIONS"
-          echo "❌ Expected $REQUIRED_PW is not installed. Please pin it in package.json and update lockfile."
-          exit 1
-        fi
-
-    # MongoDB Atlas: No build step required. Add setup/connection steps here if needed.
-
-    # Removed step that created src/components/ui/button/index.ts to avoid circular/self-import and overwriting existing barrel file
 
     - name: Build
       run: pnpm build
