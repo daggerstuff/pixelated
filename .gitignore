@@ -120,6 +120,8 @@ instance/
 .webassets-cache
 
 .scrapy
+.claude-flow/
+volumes/
 
 # Ignore SARIF security scan results
 checkov-final-results.sarif/
