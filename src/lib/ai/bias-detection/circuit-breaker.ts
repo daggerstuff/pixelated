@@ -40,7 +40,7 @@ export class CircuitBreaker {
   private requestWindow: Array<{ timestamp: Date; success: boolean }> = []
   private config: CircuitBreakerConfig
 
-  constructor(config: Partial<CircuitBreakerConfig> = {}): void {
+  constructor(config: Partial<CircuitBreakerConfig> = {}) {
     this.config = {
       failureThreshold: 5,
       recoveryTimeout: 60000, // 1 minute
@@ -146,7 +146,7 @@ export class CircuitBreaker {
   }
 
   private shouldAttemptReset(): boolean {
-    if (!this.lastFailureTime) return true
+    if (!this.lastFailureTime) { return true }
     
     const timeSinceLastFailure = Date.now() - this.lastFailureTime.getTime()
     return timeSinceLastFailure >= this.config.recoveryTimeout

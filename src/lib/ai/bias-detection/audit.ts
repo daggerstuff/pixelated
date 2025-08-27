@@ -509,7 +509,9 @@ export class BiasDetectionAuditLogger {
         socioeconomicStatus: demographics.socioeconomicStatus,
       }),
       // Explicitly redact region for privacy instead of omitting
-      ...(demographics as unknown).region !== undefined && { region: 'REDACTED' },
+      ...(demographics && 'region' in demographics && demographics.region !== undefined
+        ? { region: 'REDACTED' }
+        : {}),
     }
     return result
   }

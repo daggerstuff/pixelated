@@ -10,35 +10,24 @@ import { ConnectionPool, ConnectionPoolConfig, PooledConnection } from './connec
 import type {
   TherapeuticSession,
   PreprocessingAnalysisResult,
-  ModelLevelAnalysisResult,
-  InteractiveAnalysisResult,
-  EvaluationAnalysisResult,
-  BiasReport,
-  BiasDetectionConfig,
-  BiasAnalysisResult,
-  DemographicGroup,
 } from './types'
 import type {
-  PythonSessionData,
   PythonAnalysisResult,
   PythonHealthResponse,
-  MetricData,
   MetricsBatchResponse,
-  DashboardOptions,
   DashboardMetrics,
   PerformanceMetrics,
   AlertData,
-  AlertRegistration,
   AlertResponse,
-  AlertAcknowledgment,
-  AlertEscalation,
   AlertStatistics,
+  DashboardOptions,
+  MetricData,
+  AlertRegistration,
+  AlertEscalation,
+  AlertAcknowledgment,
   NotificationData,
   SystemNotificationData,
   TimeRange,
-  ReportGenerationOptions,
-  FallbackAnalysisResult,
-  AlertLevel,
 } from './bias-detection-interfaces'
 
 const logger = createBuildSafeLogger('PythonBiasDetectionBridge')
@@ -67,7 +56,6 @@ export class PythonBiasDetectionBridge {
   private lastHealthCheck = new Date()
   private healthCheckInterval = 30000 // 30 seconds
   private consecutiveFailures = 0
-  private pendingRequests = new Map<string, Promise<unknown>>()
   private metrics = {
     totalRequests: 0,
     successfulRequests: 0,
@@ -139,7 +127,9 @@ export class PythonBiasDetectionBridge {
   }
 
   private async processQueue(): Promise<void> {
-    if (this.processingQueue) return
+    if (this.processingQueue) {
+      return
+    }
     this.processingQueue = true
 
     while (this.requestQueue.length > 0 || this.activeRequests > 0) {
@@ -258,90 +248,131 @@ export class PythonBiasDetectionBridge {
     sessionData: TherapeuticSession,
   ): Promise<PreprocessingAnalysisResult> {
     try {
-      const result = (await this.analyze_session(
-        sessionData,
-      )) as PythonAnalysisResult
-      const layerResult = result.layer_results?.preprocessing
-
+      // Should call another method, like makeRequest, to get the analysis from Python service
+      const result = (await this.makeRequest('/analyze/preprocessing', 'POST', sessionData)) as PythonAnalysisResult
+      const layerResult = result?.layer_results?.preprocessing
       if (layerResult) {
         // Map Python response structure to TypeScript expectations
+        // Ensure all expected properties and TypeScript fields are filled
+        // Defensively hydrate all intermediate metric objects to avoid undefined access errors
+        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
+        const ling = (metrics['linguistic_bias'] ?? {}) as Record<string, any>;
+        const sentiment = (ling['sentiment_analysis'] ?? {}) as Record<string, any>;
+        const rep = (metrics['representation_analysis'] ?? {}) as Record<string, any>;
+        const dq = (metrics['data_quality_metrics'] ?? {}) as Record<string, any>;
         return {
-      overall_bias_score: 0.5, // Neutral fallback score
-      confidence: 0.3, // Low confidence for fallback
-      alert_level: 'medium' as AlertLevel,
-      layer_results: {
-        preprocessing: { bias_score: 0.5, metrics: { linguistic_bias: { overall_bias_score: 0.5 } }, detected_biases: ['service_unavailable'], recommendations: ['Python service unavailable - using fallback analysis'], layer: 'preprocessing' },
-        model_level:  { bias_score: 0.5, metrics: { fairness: { equalized_odds: 0.5, demographic_parity: 0.5 } }, detected_biases: ['service_unavailable'], recommendations: ['Python service unavailable - using fallback analysis'], layer: 'model_level' },
-        interactive:  { bias_score: 0.5, metrics: { interaction_patterns: { pattern_consistency: 3 } }, detected_biases: ['service_unavailable'], recommendations: ['Python service unavailable - using fallback analysis'], layer: 'interactive' },
-        evaluation:   { bias_score: 0.5, metrics: { outcome_fairness: { bias_score: 0.5 }, performance_disparities: { bias_score: 0.5 } }, detected_biases: ['service_unavailable'], recommendations: ['Python service unavailable - using fallback analysis'], layer: 'evaluation' },
-      },
-      recommendations: [
-        'Python bias detection service is currently unavailable',
-        'Results are based on fallback analysis with limited accuracy',
-        'Please retry analysis when service is restored',
-      ],
-      timestamp: new Date().toISOString(),
-      session_id: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
-      fallback_mode: true,
-      service_error: error instanceof Error ? String(error) : String(error),
-    } },
-          detected_biases: ['service_unavailable'],
-          recommendations: [
-            'Python service unavailable - using fallback analysis',
-          ],
-          layer: 'preprocessing',
-        },
-        model_level: {
-          bias_score: 0.5,
-          metrics: {
-            fairness: { equalized_odds: 0.5, demographic_parity: 0.5 },
+          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          linguisticBias: {
+            genderBiasScore: ling['gender_bias_score'] ?? 0.5,
+            racialBiasScore: ling['racial_bias_score'] ?? 0.5,
+            ageBiasScore: ling['age_bias_score'] ?? 0.5,
+            culturalBiasScore: ling['cultural_bias_score'] ?? 0.5,
+            overallBiasScore: ling['overall_bias_score'] ?? 0.5,
+            biasedTerms: ling['biased_terms'] ?? [],
+            sentimentAnalysis: {
+              positive: sentiment['positive'] ?? 0,
+              neutral: sentiment['neutral'] ?? 1,
+              negative: sentiment['negative'] ?? 0,
+              overallSentiment: sentiment['overallSentiment'] ?? 0,
+              emotionalValence: sentiment['emotionalValence'] ?? 0,
+              subjectivity: sentiment['subjectivity'] ?? 0,
+              demographicVariations: sentiment['demographicVariations'] ?? {},
+            },
           },
-          detected_biases: ['service_unavailable'],
-          recommendations: [
-            'Python service unavailable - using fallback analysis',
-          ],
-          layer: 'model_level',
-        },
-        interactive: {
-          bias_score: 0.5,
-          metrics: { interaction_patterns: { pattern_consistency: 3 } },
-          detected_biases: ['service_unavailable'],
-          recommendations: [
-            'Python service unavailable - using fallback analysis',
-          ],
-          layer: 'interactive',
-        },
-        evaluation: {
-          bias_score: 0.5,
-          metrics: {
-            outcome_fairness: { bias_score: 0.5 },
-            performance_disparities: { bias_score: 0.5 },
+          representationAnalysis: {
+            representationParity: rep['representation_parity'] ?? 0.5,
+            minorityGroupScore: rep['minority_group_score'] ?? 0.5,
+            demographicDistribution: rep['demographic_distribution'] ?? {},
+            underrepresentedGroups: rep['underrepresented_groups'] ?? [],
+            overrepresentedGroups: rep['overrepresented_groups'] ?? [],
+            diversityIndex: rep['diversity_index'] ?? 0,
+            intersectionalityAnalysis: rep['intersectionality_analysis'] ?? []
           },
-          detected_biases: ['service_unavailable'],
-          recommendations: [
-            'Python service unavailable - using fallback analysis',
-          ],
-          layer: 'evaluation',
-        },
-      },
-      recommendations: [
-        'Python bias detection service is currently unavailable',
-        'Results are based on fallback analysis with limited accuracy',
-        'Please retry analysis when service is restored',
-      ],
-      timestamp: new Date().toISOString(),
-      session_id: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
-      fallback_mode: true,
-      service_error: error instanceof Error ? String(error) : String(error),
+          dataQualityMetrics: {
+            completeness: dq['completeness'] ?? 1,
+            consistency: dq['consistency'] ?? 1,
+            coverage: dq['coverage'] ?? 1,
+            accuracy: dq['accuracy'] ?? 1,
+            timeliness: dq['timeliness'] ?? 1,
+            validity: dq['validity'] ?? 1,
+            missingDataByDemographic: dq['missingDataByDemographic'] ?? {},
+          },
+          detectedBiases: layerResult.detected_biases ?? ['service_unavailable'],
+          recommendations: layerResult.recommendations ?? ['Python service unavailable - using fallback analysis'],
+          layer: layerResult.layer ?? 'preprocessing',
+          timestamp: result.timestamp ?? new Date().toISOString(),
+          sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
+          fallbackMode: false,
+          serviceError: undefined,
+        } as PreprocessingAnalysisResult;
+      }
+      // Fallback: construct and return PreprocessingAnalysisResult with neutral values
+      return this.createFallbackPreprocessingResult(sessionData)
+    } catch (error: unknown) {
+      logger.warn("Error in runPreprocessingAnalysis, returning fallback", { error })
+      return this.createFallbackPreprocessingResult(sessionData, error)
     }
+  }
+
+  private createFallbackPreprocessingResult(
+    sessionData: TherapeuticSession,
+    error?: unknown
+  ): PreprocessingAnalysisResult {
+    return {
+      biasScore: 0.5,
+      linguisticBias: {
+        genderBiasScore: 0.5,
+        racialBiasScore: 0.5,
+        ageBiasScore: 0.5,
+        culturalBiasScore: 0.5,
+        overallBiasScore: 0.5,
+        biasedTerms: [],
+        sentimentAnalysis: {
+          positive: 0,
+          neutral: 1,
+          negative: 0,
+          overallSentiment: 0,
+          emotionalValence: 0,
+          subjectivity: 0,
+          demographicVariations: {},
+        },
+      },
+      representationAnalysis: {
+        representationParity: 0.5,
+        minorityGroupScore: 0.5,
+        demographicDistribution: {},
+        underrepresentedGroups: [],
+        overrepresentedGroups: [],
+        diversityIndex: 0,
+        intersectionalityAnalysis: [],
+      },
+      dataQualityMetrics: {
+        completeness: 1,
+        consistency: 1,
+        coverage: 1,
+        accuracy: 1,
+        timeliness: 1,
+        validity: 1,
+        missingDataByDemographic: {},
+      },
+      detectedBiases: ['service_unavailable'],
+      recommendations: [
+        'Python bias detection service is currently unavailable',
+        'Results are based on fallback analysis with limited accuracy',
+        'Please retry analysis when service is restored',
+      ],
+      layer: 'preprocessing',
+      timestamp: new Date().toISOString(),
+      sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
+      fallbackMode: true,
+      serviceError: error ? String(error instanceof Error ? error.message : error) : 'Python service unavailable',
+    } as PreprocessingAnalysisResult;
   }
 
   // Metrics-specific public methods
   async sendMetricsBatch(metrics: MetricData[]): Promise<MetricsBatchResponse> {
     try {
-      return (await this.makeRequest('/metrics/batch', 'POST', {
-        metrics,
-      })) as MetricsBatchResponse
+      return (await this.makeRequest('/metrics/batch', 'POST', { metrics })) as MetricsBatchResponse;
     } catch (error: unknown) {
       logger.warn('Failed to send metrics batch to Python service', {
         error,
@@ -351,7 +382,7 @@ export class PythonBiasDetectionBridge {
         success: false,
         processed: 0,
         errors: [error instanceof Error ? String(error) : String(error)],
-      }
+      };
     }
   }
 
@@ -524,18 +555,6 @@ export class PythonBiasDetectionBridge {
     }, this.healthCheckInterval)
   }
 
-  private updateMetrics(responseTime: number, success: boolean): void {
-    if (success) {
-      this.metrics.successfulRequests++
-    } else {
-      this.metrics.failedRequests++
-    }
-    
-    // Update average response time using exponential moving average
-    const alpha = 0.1 // Smoothing factor
-    this.metrics.averageResponseTime = 
-      this.metrics.averageResponseTime * (1 - alpha) + responseTime * alpha
-  }
 
   getMetrics(): typeof this.metrics {
     return { ...this.metrics }

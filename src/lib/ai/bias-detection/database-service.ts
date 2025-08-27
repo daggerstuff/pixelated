@@ -14,6 +14,8 @@ import type {
   BiasTrendData,
   DemographicBreakdown,
 } from './types'
+import mongodb from '../../../config/mongodb.config'
+import { ObjectId } from 'mongodb'
 
 const logger = createBuildSafeLogger('BiasDetectionDatabase')
 
@@ -26,9 +28,22 @@ export class BiasDetectionDatabaseService {
     processingTimeMs?: number,
   ): Promise<void> {
     try {
-      // TODO: Replace with MongoDB implementation
-      logger.debug('Analysis result stored successfully (Supabase removed)', {
+      const db = await mongodb.connect()
+      const collection = db.collection('bias_analyses')
+
+      const document = {
+        _id: new ObjectId(),
+        ...result,
+        processingTimeMs,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      await collection.insertOne(document)
+
+      logger.debug('Analysis result stored successfully', {
         sessionId: result.sessionId,
+        analysisId: document._id,
         processingTimeMs,
       })
     } catch (error: unknown) {
@@ -45,10 +60,24 @@ export class BiasDetectionDatabaseService {
    */
   async storeAlert(alert: BiasAlert, _analysisId?: string): Promise<void> {
     try {
-      // TODO: Replace with MongoDB implementation
-      logger.debug('Alert stored successfully (Supabase removed)', {
+      const db = await mongodb.connect()
+      const collection = db.collection('bias_alerts')
+
+      const document = {
+        _id: new ObjectId(),
+        ...alert,
+        acknowledged: alert.acknowledged || false,
+        resolvedAt: alert.resolvedAt || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      await collection.insertOne(document)
+
+      logger.debug('Alert stored successfully', {
         alertId: alert.alertId,
         level: alert.level,
+        acknowledged: alert.acknowledged,
       })
     } catch (error: unknown) {
       logger.error('Failed to store alert', {
@@ -111,17 +140,50 @@ export class BiasDetectionDatabaseService {
   /**
    * Get summary statistics
    */
-  private async getSummaryStats(_cutoffTime: Date): Promise<BiasSummaryStats> {
+  private async getSummaryStats(cutoffTime: Date): Promise<BiasSummaryStats> {
     try {
-      // Get total sessions and average bias score
-      // TODO: Replace with MongoDB implementation
+      const db = await mongodb.connect()
+
+      // Get total sessions in the time range
+      const totalSessions = await db.collection('bias_analyses')
+        .countDocuments({ createdAt: { $gte: cutoffTime } })
+
+      // Get average bias score
+      const avgResult = await db.collection('bias_analyses')
+        .aggregate([
+          { $match: { createdAt: { $gte: cutoffTime } } },
+          { $group: { _id: null, avgScore: { $avg: '$overallBiasScore' } } }
+        ]).toArray()
+
+      const averageBiasScore = avgResult[0]?.['avgScore'] || 0
+
+      // Get alerts in the last 24 hours
+      const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000)
+      const alertsLast24h = await db.collection('bias_alerts')
+        .countDocuments({ createdAt: { $gte: last24h } })
+
+      // Get critical alerts
+      const criticalIssues = await db.collection('bias_alerts')
+        .countDocuments({
+          level: 'critical',
+          createdAt: { $gte: cutoffTime }
+        })
+
+      // Calculate improvement rate (simplified)
+      const improvementRate = Math.max(0, Math.min(1, 1 - averageBiasScore))
+
+      // Calculate compliance score based on alerts and bias scores
+      const complianceScore = Math.max(0, Math.min(100,
+        100 - (averageBiasScore * 50) - (criticalIssues * 5)
+      ))
+
       return {
-        totalSessions: 0,
-        averageBiasScore: 0,
-        alertsLast24h: 0,
-        criticalIssues: 0,
-        improvementRate: 0,
-        complianceScore: 0,
+        totalSessions,
+        averageBiasScore,
+        alertsLast24h,
+        criticalIssues,
+        improvementRate,
+        complianceScore,
       }
     } catch (error: unknown) {
       logger.error('Failed to get summary stats', {
@@ -135,12 +197,29 @@ export class BiasDetectionDatabaseService {
    * Get recent alerts
    */
   private async getRecentAlerts(
-    _cutoffTime: Date,
-    _limit: number = 50,
+    cutoffTime: Date,
+    limit: number = 50,
   ): Promise<BiasAlert[]> {
     try {
-      // TODO: Replace with MongoDB implementation
-      return []
+      const db = await mongodb.connect()
+      const collection = db.collection('bias_alerts')
+
+      const alerts = await collection
+        .find({ createdAt: { $gte: cutoffTime } })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .toArray()
+
+      return alerts.map(alert => ({
+        alertId: alert['alertId'],
+        timestamp: alert['timestamp'],
+        level: alert['level'],
+        type: alert['type'],
+        message: alert['message'],
+        sessionId: alert['sessionId'],
+        acknowledged: alert['acknowledged'] || false,
+        resolvedAt: alert['resolvedAt'] || undefined,
+      }))
     } catch (error: unknown) {
       logger.error('Failed to get recent alerts', {
         error: error instanceof Error ? String(error) : String(error),
@@ -154,15 +233,59 @@ export class BiasDetectionDatabaseService {
    */
   private async getTrendData(timeRange: string): Promise<BiasTrendData[]> {
     try {
+      const db = await mongodb.connect()
+      const collection = db.collection('bias_analyses')
+
       const hoursBack = this.parseTimeRange(timeRange)
       const points = Math.min(24, hoursBack) // Max 24 data points
+      const intervalHours = Math.max(1, Math.floor(hoursBack / points))
 
       const trends: BiasTrendData[] = []
 
       for (let i = points - 1; i >= 0; i--) {
+        const endTime = new Date(Date.now() - (i * intervalHours * 60 * 60 * 1000))
+        const startTime = new Date(endTime.getTime() - (intervalHours * 60 * 60 * 1000))
+
         // Get analyses for this time period
-        // TODO: Replace with MongoDB implementation - will calculate time ranges and intervals for queries
-        continue
+        const analyses = await collection
+          .find({
+            createdAt: {
+              $gte: startTime,
+              $lt: endTime
+            }
+          })
+          .toArray()
+
+        const alertCount = await db.collection('bias_alerts')
+          .countDocuments({
+            createdAt: {
+              $gte: startTime,
+              $lt: endTime
+            }
+          })
+
+        // Calculate average bias score for this period
+        const avgScore = analyses.length > 0
+          ? analyses.reduce((sum, analysis) => sum + analysis['overallBiasScore'], 0) / analyses.length
+          : 0
+
+        // Get demographic breakdown for this period
+        const demographicBreakdown: Record<string, number> = {}
+        analyses.forEach(analysis => {
+          const demo = analysis['demographics']
+          if (demo) {
+            // (Previously unused) key could be used for grouping if needed
+            // No-op: placeholder for future demographic aggregation
+          }
+        })
+
+        trends.push({
+          date: endTime,
+          biasScore: avgScore,
+          sessionCount: analyses.length,
+          alertCount,
+          demographicBreakdown,
+        })
       }
 
       return trends
@@ -179,16 +302,60 @@ export class BiasDetectionDatabaseService {
    * Get demographic breakdown
    */
   private async getDemographicBreakdown(
-    _cutoffTime: Date,
+    cutoffTime: Date,
   ): Promise<DemographicBreakdown> {
     try {
-      // TODO: Replace with MongoDB implementation
+      const db = await mongodb.connect()
+
+      const analyses = await db.collection('bias_analyses')
+        .find({ createdAt: { $gte: cutoffTime } })
+        .toArray()
+
+      const age: Record<string, number> = {}
+      const gender: Record<string, number> = {}
+      const ethnicity: Record<string, number> = {}
+      const language: Record<string, number> = {}
+      const intersectional: Array<{
+        groups: string[]
+        representation: number
+        biasScore: number
+        sampleSize: number
+      }> = []
+
+      analyses.forEach(analysis => {
+        const demo = analysis['demographics']
+        if (demo) {
+          // Count demographics
+          Object.assign(age, { [demo.age]: (age[demo.age] ?? 0) + 1 })
+          Object.assign(gender, { [demo.gender]: (gender[demo.gender] ?? 0) + 1 })
+          Object.assign(ethnicity, { [demo.ethnicity]: (ethnicity[demo.ethnicity] ?? 0) + 1 })
+          Object.assign(language, { [demo.primaryLanguage]: (language[demo.primaryLanguage] ?? 0) + 1 })
+
+          // Calculate intersectional representation
+          const existingIntersection = intersectional.find(item =>
+            JSON.stringify(item.groups.sort()) === JSON.stringify([demo.age, demo.gender, demo.ethnicity].sort())
+          )
+
+          if (existingIntersection) {
+            existingIntersection.sampleSize++
+            Object.assign(existingIntersection, { representation: analyses.length > 0 ? existingIntersection.sampleSize / analyses.length : 0 })
+          } else {
+            intersectional.push({
+              groups: [demo.age, demo.gender, demo.ethnicity],
+              representation: analyses.length > 0 ? 1 / analyses.length : 0,
+              biasScore: analysis['overallBiasScore'],
+              sampleSize: 1,
+            })
+          }
+        }
+      })
+
       return {
-        age: {},
-        gender: {},
-        ethnicity: {},
-        language: {},
-        intersectional: [],
+        age,
+        gender,
+        ethnicity,
+        language,
+        intersectional,
       }
     } catch (error: unknown) {
       logger.error('Failed to get demographic breakdown', {
@@ -208,12 +375,30 @@ export class BiasDetectionDatabaseService {
    * Get recent analyses
    */
   private async getRecentAnalyses(
-    _cutoffTime: Date,
-    _limit: number,
+    cutoffTime: Date,
+    limit: number,
   ): Promise<BiasAnalysisResult[]> {
     try {
-      // TODO: Replace with MongoDB implementation
-      return []
+      const db = await mongodb.connect()
+      const collection = db.collection('bias_analyses')
+
+      const analyses = await collection
+        .find({ createdAt: { $gte: cutoffTime } })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .toArray()
+
+      return analyses.map(analysis => ({
+        sessionId: analysis['sessionId'],
+        timestamp: analysis['timestamp'],
+        overallBiasScore: analysis['overallBiasScore'],
+        layerResults: analysis['layerResults'],
+        demographics: analysis['demographics'],
+        recommendations: analysis['recommendations'] || [],
+        alertLevel: analysis['alertLevel'],
+        explanation: analysis['explanation'],
+        confidence: analysis['confidence'],
+      }))
     } catch (error: unknown) {
       logger.error('Failed to get recent analyses', {
         error: error instanceof Error ? String(error) : String(error),
@@ -236,7 +421,14 @@ export class BiasDetectionDatabaseService {
     action: string
     estimatedImpact: string
   }> {
-    const recommendations = []
+    const recommendations: Array<{
+      id: string
+      priority: 'low' | 'medium' | 'high' | 'critical'
+      title: string
+      description: string
+      action: string
+      estimatedImpact: string
+    }> = []
 
     if (summary.criticalIssues > 0) {
       recommendations.push({
@@ -303,8 +495,26 @@ export class BiasDetectionDatabaseService {
     sessionId: string,
   ): Promise<BiasAnalysisResult | null> {
     try {
-      // TODO: Replace with MongoDB implementation
-      return null
+      const db = await mongodb.connect()
+      const collection = db.collection('bias_analyses')
+
+      const analysis = await collection.findOne({ sessionId })
+
+      if (!analysis) {
+        return null
+      }
+
+      return {
+        sessionId: analysis['sessionId'],
+        timestamp: analysis['timestamp'],
+        overallBiasScore: analysis['overallBiasScore'],
+        layerResults: analysis['layerResults'],
+        demographics: analysis['demographics'],
+        recommendations: analysis['recommendations'] || [],
+        alertLevel: analysis['alertLevel'],
+        explanation: analysis['explanation'],
+        confidence: analysis['confidence'],
+      }
     } catch (error: unknown) {
       logger.error('Failed to get session analysis', {
         error: error instanceof Error ? String(error) : String(error),
@@ -317,7 +527,7 @@ export class BiasDetectionDatabaseService {
   /**
    * Record system metrics
    */
-  async recordSystemMetrics(_metrics: {
+  async recordSystemMetrics(metrics: {
     responseTimeMs: number
     memoryUsageMb: number
     cpuUsagePercent: number
@@ -330,7 +540,22 @@ export class BiasDetectionDatabaseService {
     errorRate: number
   }): Promise<void> {
     try {
-      // TODO: Replace with MongoDB implementation
+      const db = await mongodb.connect()
+      const collection = db.collection('system_metrics')
+
+      const document = {
+        _id: new ObjectId(),
+        ...metrics,
+        timestamp: new Date(),
+        createdAt: new Date(),
+      }
+
+      await collection.insertOne(document)
+
+      logger.debug('System metrics recorded successfully', {
+        overallHealth: metrics.overallHealth,
+        responseTimeMs: metrics.responseTimeMs,
+      })
     } catch (error: unknown) {
       logger.error('Failed to record system metrics', {
         error: error instanceof Error ? String(error) : String(error),
@@ -354,7 +579,26 @@ export class BiasDetectionDatabaseService {
     retentionPeriodDays?: number
   }): Promise<void> {
     try {
-      // TODO: Replace with MongoDB implementation
+      const db = await mongodb.connect()
+      const collection = db.collection('audit_logs')
+
+      const document = {
+        _id: new ObjectId(),
+        ...entry,
+        timestamp: new Date(),
+        createdAt: new Date(),
+        retentionExpiry: entry.retentionPeriodDays
+          ? new Date(Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000)
+          : null,
+      }
+
+      await collection.insertOne(document)
+
+      logger.debug('Audit log entry recorded successfully', {
+        action: entry.action,
+        userId: entry.userId,
+        sessionId: entry.sessionId,
+      })
     } catch (error: unknown) {
       logger.error('Failed to record audit log', {
         error: error instanceof Error ? String(error) : String(error),

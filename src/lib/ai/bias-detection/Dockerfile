@@ -1,5 +1,5 @@
 # Dockerfile for Bias Detection Service
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
@@ -35,4 +35,3 @@ COPY gunicorn_config.py .
 CMD ["gunicorn", "-c", "gunicorn_config.py", "start-python-service:app"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl -f http://localhost:5001/health || exit 1
-

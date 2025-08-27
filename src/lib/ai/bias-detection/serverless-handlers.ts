@@ -2,8 +2,9 @@
  * Bias Detection Engine - Serverless Handlers
  *
  * Lightweight stub implementation for deployment compatibility.
- * TODO: Implement full serverless utilities when ready for full feature.
+ * Production: Includes serverless bias detection handler for real endpoint deployment.
  */
+import { BiasDetectionEngine } from './BiasDetectionEngine'
 
 /**
  * Creates a serverless-compatible handler wrapper
@@ -58,6 +59,41 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
 export function validateServerlessRequest(event: any): boolean {
   return !!(event && (event.httpMethod || event.method))
 }
+
+/**
+ * Serverless handler for bias detection.
+ * Receives session data in event.body, returns BiasDetectionEngine analysis.
+ */
+export const detectBiasServerlessHandler = createServerlessHandler(async (req) => {
+  // Validate session input
+  if (!req.body || !req.body.session) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Missing session data for bias detection.' }),
+    }
+  }
+
+  // Initialize engine (ideally reuse a singleton in production)
+  const engine = new BiasDetectionEngine()
+  try {
+    await engine.initialize()
+    const analysis = await engine.analyzeSession(req.body.session)
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, data: analysis }),
+    }
+  } catch (error: unknown) {
+    console.error('Bias detection error:', error)
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        error: 'Bias detection failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+    }
+  }
+})
 
 /**
  * Creates CORS preflight response

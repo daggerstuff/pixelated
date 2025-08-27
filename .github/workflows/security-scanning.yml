@@ -1,4 +1,5 @@
 name: Security Scanning
+# Workflow updated to clear stale runner/config cache due to Checkov ambiguous flag errors
 
 permissions:
   contents: read

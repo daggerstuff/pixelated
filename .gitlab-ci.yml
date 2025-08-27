@@ -74,6 +74,10 @@ build-frontend:
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - "echo === Diagnostic: Network connectivity to registry ==="
+    - ping -c 4 git.pixelatedempathy.tech || true
+    - nslookup git.pixelatedempathy.tech || true
+    - curl -v https://git.pixelatedempathy.tech || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "🏗️ Building Pixelated Empathy frontend container..."
@@ -107,6 +111,10 @@ test-container:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - "echo === Diagnostic: Network connectivity to registry ==="
+    - ping -c 4 git.pixelatedempathy.tech || true
+    - nslookup git.pixelatedempathy.tech || true
+    - curl -v https://git.pixelatedempathy.tech || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Testing container health..."
@@ -353,6 +361,10 @@ build-ai-backend:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - "echo === Diagnostic: Network connectivity to registry ==="
+    - ping -c 4 git.pixelatedempathy.tech || true
+    - nslookup git.pixelatedempathy.tech || true
+    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Building AI backend components..."
@@ -382,6 +394,10 @@ security-scan:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - "echo === Diagnostic: Network connectivity to registry ==="
+    - ping -c 4 git.pixelatedempathy.tech || true
+    - nslookup git.pixelatedempathy.tech || true
+    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Running security scan on container..."
@@ -578,6 +594,10 @@ tag-image:
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - "echo === Diagnostic: Network connectivity to registry ==="
+    - ping -c 4 git.pixelatedempathy.tech || true
+    - nslookup git.pixelatedempathy.tech || true
+    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script: |
     echo "Tagging image with branch and build number..."
@@ -627,6 +647,10 @@ cleanup:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - "echo === Diagnostic: Network connectivity to registry ==="
+    - ping -c 4 git.pixelatedempathy.tech || true
+    - nslookup git.pixelatedempathy.tech || true
+    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Cleaning up old container images..."

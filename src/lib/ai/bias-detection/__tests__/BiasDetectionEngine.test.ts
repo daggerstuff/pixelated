@@ -155,14 +155,14 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   beforeEach(() => {
     // Reset all mock implementations to their default values
     // Clear all mocks first
-    vi.clearAllMocks();
-    
+    vi.clearAllMocks()
+
     // Set up default mock implementations
-    mockPythonBridge.initialize.mockResolvedValue(undefined);
+    mockPythonBridge.initialize.mockResolvedValue(undefined)
     mockPythonBridge.checkHealth.mockResolvedValue({
       status: 'healthy',
       message: 'Service is running',
-    });
+    })
     mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({
       biasScore: 0.5,
       linguisticBias: {
@@ -194,7 +194,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         missingDataByDemographic: {},
       },
       recommendations: [],
-    });
+    })
     mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({
       biasScore: 0.5,
       fairnessMetrics: {
@@ -216,7 +216,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       },
       groupPerformanceComparison: [],
       recommendations: [],
-    });
+    })
     mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({
       biasScore: 0.5,
       counterfactualAnalysis: {
@@ -228,7 +228,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       featureImportance: [],
       whatIfScenarios: [],
       recommendations: [],
-    });
+    })
     mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({
       biasScore: 0.5,
       huggingFaceMetrics: {
@@ -251,7 +251,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         interventionEffectiveness: [],
       },
       recommendations: [],
-    });
+    })
     mockPythonBridge.analyze_session.mockResolvedValue({
       session_id: 'test-session',
       overall_bias_score: 0.25,
@@ -264,7 +264,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       },
       recommendations: ['System performing within acceptable parameters'],
       confidence: 0.85,
-    });
+    })
 
     mockConfig = {
       pythonServiceUrl: 'http://localhost:8000',
@@ -606,7 +606,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         ...mockSessionData,
         sessionId: 'high-bias-session',
       })
-                                                expect(highBiasResult.alertLevel).toBe('high')
+      expect(highBiasResult.alertLevel).toBe('high')
     })
   })
 

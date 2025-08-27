@@ -1,9 +1,9 @@
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
+import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 
 // Allow CI to skip performance-heavy tests
 const SKIP_PERF = process.env['SKIP_PERFORMANCE_TESTS'] === 'true'
 const ddescribe = SKIP_PERF ? describe.skip : describe
-import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 
 // Performance testing utilities
 interface PerformanceMetrics {
@@ -192,26 +192,30 @@ const mockPythonBridge = {
       confidence: 0.9 + Math.random() * 0.1,
     }
   }),
-  analyze_session: vi.fn().mockImplementation(async () => {
-    await new Promise((resolve) =>
-      setTimeout(resolve, Math.random() * 200 + 50),
-    )
-    const biasScore = Math.random() * 0.6
-    return {
-      session_id: 'test-session',
-      overall_bias_score: biasScore,
-      alert_level:
-        biasScore < 0.3 ? 'low' : biasScore < 0.6 ? 'medium' : 'high',
-      layer_results: {
-        preprocessing: { bias_score: Math.random() * 0.5 },
-        model_level: { bias_score: Math.random() * 0.6 },
-        interactive: { bias_score: Math.random() * 0.4 },
-        evaluation: { bias_score: Math.random() * 0.5 },
-      },
-      recommendations: ['System performing within acceptable parameters'],
-      confidence: 0.8 + Math.random() * 0.2,
-    }
-  }),
+  analyze_session: vi
+    .fn()
+    .mockImplementation(async (session: TherapeuticSession) => {
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.random() * 200 + 50),
+      )
+      const biasScore = Math.random() * 0.6
+      // Use the session parameter to avoid unused variable warning
+      void session
+      return {
+        session_id: 'test-session',
+        overall_bias_score: biasScore,
+        alert_level:
+          biasScore < 0.3 ? 'low' : biasScore < 0.6 ? 'medium' : 'high',
+        layer_results: {
+          preprocessing: { bias_score: Math.random() * 0.5 },
+          model_level: { bias_score: Math.random() * 0.6 },
+          interactive: { bias_score: Math.random() * 0.4 },
+          evaluation: { bias_score: Math.random() * 0.5 },
+        },
+        recommendations: ['System performing within acceptable parameters'],
+        confidence: 0.8 + Math.random() * 0.2,
+      }
+    }),
   healthCheck: vi
     .fn()
     .mockResolvedValue({ status: 'healthy', latency: Math.random() * 50 + 10 }),
@@ -297,9 +301,9 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
   beforeEach(async () => {
     mockConfig = {
       thresholds: {
-        warningLevel: 0.3,
-        highLevel: 0.6,
-        criticalLevel: 0.8,
+        warning: 0.3,
+        high: 0.6,
+        critical: 0.8,
       },
       hipaaCompliant: true,
       auditLogging: true,
@@ -504,9 +508,9 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
 
     it('should benchmark updateThresholds method performance', async () => {
       const newThresholds = {
-        warningLevel: 0.35,
-        highLevel: 0.65,
-        criticalLevel: 0.85,
+        warning: 0.35,
+        high: 0.65,
+        critical: 0.85,
       }
 
       const result = await PerformanceBenchmark.measureMethod(

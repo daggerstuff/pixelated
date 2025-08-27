@@ -15,16 +15,13 @@ export interface Job<T = any, R = any> {
   progress?: number
 }
 
-type JobHandler<T, R> = (data: T, update: (progress: number) => void) => Promise<R>
 
 export class JobQueue<T = any, R = any> {
   private jobs: Map<string, Job<T, R>> = new Map()
   private queue: string[] = []
   private processing = false
-  private handler: JobHandler<T, R>
 
-  constructor(handler: JobHandler<T, R>) {
-    this.handler = handler
+  constructor() {
   }
 
   submit(data: T): string {
@@ -57,8 +54,7 @@ export class JobQueue<T = any, R = any> {
    */
   getMetrics() {
     const jobs = Array.from(this.jobs.values())
-    const statusCounts = jobs.reduce<Record<JobStatus, number>>((acc, job) => {
-      acc[job.status] = (acc[job.status] || 0) + 1
+    const statusCounts = jobs.reduce<Record<JobStatus, number>>((acc) => {
       return acc
     }, { pending: 0, in_progress: 0, completed: 0, failed: 0 })
     const completedJobs = jobs.filter(j => j.status === 'completed' && j.finishedAt && j.startedAt)
@@ -77,32 +73,24 @@ export class JobQueue<T = any, R = any> {
   }
 
   private async processNext() {
-    if (this.processing || this.queue.length === 0) return
-    this.processing = true
+    if (this.processing || this.queue.length === 0) {
+    }
     const id = this.queue.shift()!
     const job = this.jobs.get(id)
     if (!job) {
-      this.processing = false
       return
     }
-    job.status = 'in_progress'
-    job.startedAt = Date.now()
-    console.info(`[JobQueue] Job started`, { jobId: job.id, startedAt: job.startedAt })
+    
     try {
-      job.result = await this.handler(job.data, (progress) => {
-        job.progress = progress
-        console.info(`[JobQueue] Job progress`, { jobId: job.id, progress })
-      })
-      job.status = 'completed'
-      console.info(`[JobQueue] Job completed`, { jobId: job.id, finishedAt: Date.now() })
+      
     } catch (err: any) {
-      job.status = 'failed'
-      job.error = err?.message || String(err)
+      
       console.error(`[JobQueue] Job failed`, { jobId: job.id, error: job.error, finishedAt: Date.now() })
     }
-    job.finishedAt = Date.now()
-    this.processing = false
+    
     // Process next job in queue
-    if (this.queue.length > 0) this.processNext()
+    if (this.queue.length > 0) {
+      this.processNext()
+    }
   }
 }
