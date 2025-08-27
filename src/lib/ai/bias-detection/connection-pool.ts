@@ -32,7 +32,7 @@ export class ConnectionPool {
   private config: ConnectionPoolConfig
   private cleanupIntervalId?: ReturnType<typeof setInterval>
 
-  constructor(config: Partial<ConnectionPoolConfig> = {}): void {
+  constructor(config: Partial<ConnectionPoolConfig> = {}) {
     this.config = {
       maxConnections: 10,
       connectionTimeout: 30000,

@@ -30,11 +30,11 @@ jobs:
       node-version: ${{ steps.set-versions.outputs.node-version }}
       pnpm-version: ${{ steps.set-versions.outputs.pnpm-version }}
     steps:
-      - name: Set Node.js and pnpm versions
-        id: set-versions
-        run: |
-          echo "node-version=22.18.0" >> $GITHUB_OUTPUT
-          echo "pnpm-version=10.15.0" >> $GITHUB_OUTPUT
+    - name: Set Node.js and pnpm versions
+      id: set-versions
+      run: |
+        echo "node-version=22.18.0" >> $GITHUB_OUTPUT
+        echo "pnpm-version=10.15.0" >> $GITHUB_OUTPUT
 
   lint:
     name: Lint
@@ -45,67 +45,67 @@ jobs:
     outputs:
       lint-status: ${{ steps.lint-check.outputs.lint-status }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          submodules: false
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        submodules: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ needs.setup.outputs.node-version }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ needs.setup.outputs.node-version }}
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ needs.setup.outputs.pnpm-version }}
-          run_install: false
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ needs.setup.outputs.pnpm-version }}
+        run_install: false
 
-      - name: Set PNPM_HOME to PATH
-        run: |
-          mkdir -p $PNPM_HOME
-          echo "$PNPM_HOME" >> $GITHUB_PATH
+    - name: Set PNPM_HOME to PATH
+      run: |
+        mkdir -p $PNPM_HOME
+        echo "$PNPM_HOME" >> $GITHUB_PATH
 
-      - name: Verify pnpm installation
-        run: |
-          which pnpm || echo "pnpm not found in PATH"
-          pnpm --version
-          echo "PNPM_HOME: $PNPM_HOME"
-          echo "PATH: $PATH"
+    - name: Verify pnpm installation
+      run: |
+        which pnpm || echo "pnpm not found in PATH"
+        pnpm --version
+        echo "PNPM_HOME: $PNPM_HOME"
+        echo "PATH: $PATH"
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Lint
-        id: lint-check
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        run: |
-          echo "Running lint check..."
-          if pnpm lint; then
-            echo "✅ Lint check passed"
-            echo "lint-status=passed" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Lint check found issues but continuing workflow"
-            echo "lint-status=failed" >> $GITHUB_OUTPUT
-          fi
+    - name: Lint
+      id: lint-check
+      if: github.event_name == 'pull_request'
+      continue-on-error: true
+      run: |
+        echo "Running lint check..."
+        if pnpm lint; then
+          echo "✅ Lint check passed"
+          echo "lint-status=passed" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Lint check found issues but continuing workflow"
+          echo "lint-status=failed" >> $GITHUB_OUTPUT
+        fi
 
   typecheck:
     name: TypeScript Check
@@ -116,74 +116,74 @@ jobs:
     outputs:
       typecheck-status: ${{ steps.typecheck-check.outputs.typecheck-status }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          submodules: false
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        submodules: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ needs.setup.outputs.node-version }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ needs.setup.outputs.node-version }}
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ needs.setup.outputs.pnpm-version }}
-          run_install: false
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ needs.setup.outputs.pnpm-version }}
+        run_install: false
 
-      - name: Ensure Directories Exist
-        run: mkdir -p "$GITHUB_WORKSPACE/node_modules/supabase/bin"
-      - name: Validate Environment
-        run: |
-          echo "Node.js version: $(node --version)"
-          echo "pnpm version: $(pnpm --version)"
+    - name: Ensure Directories Exist
+      run: mkdir -p "$GITHUB_WORKSPACE/node_modules/supabase/bin"
+    - name: Validate Environment
+      run: |
+        echo "Node.js version: $(node --version)"
+        echo "pnpm version: $(pnpm --version)"
 
-      - name: Set PNPM_HOME to PATH
-        run: |
-          mkdir -p $PNPM_HOME
-          echo "$PNPM_HOME" >> $GITHUB_PATH
+    - name: Set PNPM_HOME to PATH
+      run: |
+        mkdir -p $PNPM_HOME
+        echo "$PNPM_HOME" >> $GITHUB_PATH
 
-      - name: Verify pnpm installation
-        run: |
-          which pnpm || echo "pnpm not found in PATH"
-          pnpm --version
-          echo "PNPM_HOME: $PNPM_HOME"
-          echo "PATH: $PATH"
+    - name: Verify pnpm installation
+      run: |
+        which pnpm || echo "pnpm not found in PATH"
+        pnpm --version
+        echo "PNPM_HOME: $PNPM_HOME"
+        echo "PATH: $PATH"
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Type check
-        id: typecheck-check
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        run: |
-          echo "Running TypeScript type check..."
-          if pnpm check; then
-            echo "✅ TypeScript check passed"
-            echo "typecheck-status=passed" >> $GITHUB_OUTPUT
-          else
-            echo "❌ TypeScript check found issues but continuing workflow"
-            echo "typecheck-status=failed" >> $GITHUB_OUTPUT
-          fi
+    - name: Type check
+      id: typecheck-check
+      if: github.event_name == 'pull_request'
+      continue-on-error: true
+      run: |
+        echo "Running TypeScript type check..."
+        if pnpm check; then
+          echo "✅ TypeScript check passed"
+          echo "typecheck-status=passed" >> $GITHUB_OUTPUT
+        else
+          echo "❌ TypeScript check found issues but continuing workflow"
+          echo "typecheck-status=failed" >> $GITHUB_OUTPUT
+        fi
 
   security-audit:
     name: Dependency Vulnerability Check
@@ -192,57 +192,57 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          submodules: false
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        submodules: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ needs.setup.outputs.node-version }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ needs.setup.outputs.node-version }}
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ needs.setup.outputs.pnpm-version }}
-          run_install: false
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ needs.setup.outputs.pnpm-version }}
+        run_install: false
 
-      - name: Set PNPM_HOME to PATH
-        run: |
-          mkdir -p $PNPM_HOME
-          echo "$PNPM_HOME" >> $GITHUB_PATH
+    - name: Set PNPM_HOME to PATH
+      run: |
+        mkdir -p $PNPM_HOME
+        echo "$PNPM_HOME" >> $GITHUB_PATH
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Run PNPM Audit
-        continue-on-error: true
-        run: |
-          echo "Running security audit..."
-          pnpm audit --audit-level=high || {
-            echo "❌ Security audit found vulnerabilities but continuing workflow"
-            echo "Audit failures are often due to transitive dependencies that require upstream fixes"
-            exit 0
-          }
-          echo "✅ Security audit passed"
+    - name: Run PNPM Audit
+      continue-on-error: true
+      run: |
+        echo "Running security audit..."
+        pnpm audit --audit-level=high || {
+          echo "❌ Security audit found vulnerabilities but continuing workflow"
+          echo "Audit failures are often due to transitive dependencies that require upstream fixes"
+          exit 0
+        }
+        echo "✅ Security audit passed"
 
   test:
     name: Test
@@ -254,175 +254,173 @@ jobs:
       redis:
         image: redis:latest
         ports:
-          - 6379:6379
+        - 6379:6379
         options: >-
           --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5 --name redis-service
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          submodules: false
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        submodules: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ needs.setup.outputs.node-version }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ needs.setup.outputs.node-version }}
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ needs.setup.outputs.pnpm-version }}
-          run_install: false
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ needs.setup.outputs.pnpm-version }}
+        run_install: false
 
-      - name: Fix Supabase CLI path issues
-        run: |
-          mkdir -p node_modules/supabase/bin
-          chmod +x node_modules/supabase/bin
+    - name: Fix Supabase CLI path issues
+      run: |
+        mkdir -p node_modules/supabase/bin
+        chmod +x node_modules/supabase/bin
 
-      - name: Set PNPM_HOME to PATH
-        run: |
-          mkdir -p $PNPM_HOME
-          echo "$PNPM_HOME" >> $GITHUB_PATH
+    - name: Set PNPM_HOME to PATH
+      run: |
+        mkdir -p $PNPM_HOME
+        echo "$PNPM_HOME" >> $GITHUB_PATH
 
-      - name: Verify pnpm installation
-        run: |
-          which pnpm || echo "pnpm not found in PATH"
-          pnpm --version
-          echo "PNPM_HOME: $PNPM_HOME"
-          echo "PATH: $PATH"
+    - name: Verify pnpm installation
+      run: |
+        which pnpm || echo "pnpm not found in PATH"
+        pnpm --version
+        echo "PNPM_HOME: $PNPM_HOME"
+        echo "PATH: $PATH"
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile --reporter=verbose
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile --reporter=verbose
 
-      - name: Install redis-cli
-        run: sudo apt-get update && sudo apt-get install -y redis-tools
+    - name: Install redis-cli
+      run: sudo apt-get update && sudo apt-get install -y redis-tools
 
-      - name: Verify Redis connection
-        run: |
-          echo "Checking Redis connection..."
-          redis-cli -h localhost ping
-          echo "Redis server info:"
-          redis-cli -h localhost info server | grep redis_version
-          echo "Testing Redis connection with CLI commands..."
-          redis-cli -h localhost set test:connection-check "connected" || echo "Failed to set key"
-          redis-cli -h localhost get test:connection-check || echo "Failed to get key"
-          echo "Checking Redis service status..."
-          sudo service redis-server status || echo "Redis service status check failed"
+    - name: Verify Redis connection
+      run: |
+        echo "Checking Redis connection..."
+        redis-cli -h localhost ping
+        echo "Redis server info:"
+        redis-cli -h localhost info server | grep redis_version
+        echo "Testing Redis connection with CLI commands..."
+        redis-cli -h localhost set test:connection-check "connected" || echo "Failed to set key"
+        redis-cli -h localhost get test:connection-check || echo "Failed to get key"
+        echo "Checking Redis service status..."
+        sudo service redis-server status || echo "Redis service status check failed"
 
-      - name: Verify accessibility testing dependencies
-        # axe-core should be pinned in package.json as a devDependency; no ad-hoc installs in CI
-        run: pnpm rebuild supabase
+    - name: Verify accessibility testing dependencies
+      # axe-core should be pinned in package.json as a devDependency; no ad-hoc installs in CI
+      run: pnpm rebuild supabase
 
-      - name: Fix Playwright version conflicts
-        run: |
-          echo "Checking for multiple Playwright versions..."
-          pnpm list @playwright/test --depth=0 || echo "No conflicts found in direct dependencies"
-          pnpm list playwright --depth=0 || echo "No playwright package found in direct dependencies"
-          # Check for any duplicate installations
-          PLAYWRIGHT_VERSIONS=$(find node_modules -path "*playwright*" -type d -maxdepth 2 | sort)
-          echo "Found Playwright installations:"
-          echo "$PLAYWRIGHT_VERSIONS"
-          # Ensure consistent Playwright version without modifying package.json/lockfile
-          REQUIRED_PW="@playwright/test@1.52.0"
-          echo "Requiring $REQUIRED_PW"
-          if ! pnpm ls --depth=0 @playwright/test | grep -q "1.52.0"; then
-            echo "❌ Expected $REQUIRED_PW is not installed. Please pin it in package.json and update lockfile."
-            exit 1
-          fi
+    - name: Check Playwright version
+      run: |
+        echo "Checking installed @playwright/test version..."
+        EXPECTED_VERSION="1.52.0"
+        INSTALLED_VERSION=$(node -p "require('@playwright/test/package.json').version")
+        if [ "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]; then
+          echo "❌ Installed @playwright/test version is $INSTALLED_VERSION, but $EXPECTED_VERSION is required. Please pin the correct version in package.json and update pnpm-lock.yaml."
+          exit 1
+        fi
+        echo "✅ @playwright/test version $EXPECTED_VERSION is correctly installed."
+        # Check for any duplicate installations
+        PLAYWRIGHT_VERSIONS=$(find node_modules -path "*playwright*" -type d -maxdepth 2 | sort)
+        echo "Found Playwright installations:"
+        echo "$PLAYWRIGHT_VERSIONS"
 
-      - name: Prepare mock directories and files
-        run: |
-          # Create mock directories if they don't exist
-          mkdir -p src/lib/utils/__mocks__
-          mkdir -p src/lib/services/redis/__mocks__
-          mkdir -p src/lib/fhe/__mocks__
-          
-          # Copy basic logger mock
-          echo 'export const logger = {
-            info: vi.fn(),
-            error: vi.fn(),
-            warn: vi.fn(),
-            debug: vi.fn(),
-          };
-          
-          export const getLogger = vi.fn(() => logger);
-          
-          export default {
-            logger,
-            getLogger,
-          };' > src/lib/utils/__mocks__/logger.ts
-          
-          # Ensure Redis mock exists
-          if [ -f src/lib/services/redis/__mocks__/redis.mock.ts ]; then
-            echo "✅ Redis mock already exists"
-          else
-            echo "Creating Redis mock file"
-            cp -f vitest.setup.ts src/lib/services/redis/__mocks__/redis.mock.ts
-          fi
-          
-          # Create FHE mocks for tests
-          echo 'export const mockFHEService = {
-            encrypt: vi.fn((data) => Promise.resolve(`encrypted-${data}`)),
-            decrypt: vi.fn((data) => Promise.resolve(data.replace("encrypted-", ""))),
-            verifySender: vi.fn(() => Promise.resolve(true)),
-            processEncrypted: vi.fn(() => Promise.resolve({
-              success: true,
-              metadata: { operation: "test" }
-            })),
-          };
-          
-          export default mockFHEService;' > src/lib/fhe/__mocks__/fhe-service.ts
+    - name: Prepare mock directories and files
+      run: |
+        # Create mock directories if they don't exist
+        mkdir -p src/lib/utils/__mocks__
+        mkdir -p src/lib/services/redis/__mocks__
+        mkdir -p src/lib/fhe/__mocks__
 
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        # Copy basic logger mock
+        echo 'export const logger = {
+          info: vi.fn(),
+          error: vi.fn(),
+          warn: vi.fn(),
+          debug: vi.fn(),
+        };
 
-      - name: Ensure coverage directory exists
-        run: mkdir -p coverage/.tmp
+        export const getLogger = vi.fn(() => logger);
 
-      - name: Run tests with increased timeout
-        run: pnpm test --pool=forks --isolate --no-coverage
-        env:
-          VITEST_TIMEOUT: 30000
-          REDIS_URL: redis://localhost:6379
-          REDIS_KEY_PREFIX: 'test:'
-          NODE_ENV: test
-          SKIP_REDIS_TESTS: 'true'
-          SKIP_FHE_TESTS: 'true'
-          # Skip performance and browser compatibility tests in CI
-          SKIP_PERFORMANCE_TESTS: 'true'
-          SKIP_BROWSER_COMPAT_TESTS: 'true'
-          SKIP_CRYPTO_ROTATION_TEST: 'true'
+        export default {
+          logger,
+          getLogger,
+        };' > src/lib/utils/__mocks__/logger.ts
 
-      - name: Check for Playwright version conflicts
-        run: |
-          echo "Checking for multiple Playwright versions..."
-          pnpm list @playwright/test || echo "No conflicts found in direct dependencies"
-          pnpm list playwright || echo "No conflicts found in direct dependencies"
-          # Look for conflicts in node_modules
-          echo "Installed Playwright packages:"
-          find node_modules -path "*playwright*" -type d -maxdepth 2 | sort
+        # Ensure Redis mock exists
+        if [ -f src/lib/services/redis/__mocks__/redis.mock.ts ]; then
+          echo "✅ Redis mock already exists"
+        else
+          echo "Creating Redis mock file"
+          cp -f vitest.setup.ts src/lib/services/redis/__mocks__/redis.mock.ts
+        fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ needs.setup.outputs.node-version }}
+        # Create FHE mocks for tests
+        echo 'export const mockFHEService = {
+          encrypt: vi.fn((data) => Promise.resolve(`encrypted-${data}`)),
+          decrypt: vi.fn((data) => Promise.resolve(data.replace("encrypted-", ""))),
+          verifySender: vi.fn(() => Promise.resolve(true)),
+          processEncrypted: vi.fn(() => Promise.resolve({
+            success: true,
+            metadata: { operation: "test" }
+          })),
+        };
+
+        export default mockFHEService;' > src/lib/fhe/__mocks__/fhe-service.ts
+
+    - name: Install Playwright browsers
+      run: pnpm exec playwright install --with-deps
+
+    - name: Ensure coverage directory exists
+      run: mkdir -p coverage/.tmp
+
+    - name: Run tests with increased timeout
+      run: pnpm test --pool=forks --isolate --no-coverage
+      env:
+        VITEST_TIMEOUT: 30000
+        REDIS_URL: redis://localhost:6379
+        REDIS_KEY_PREFIX: 'test:'
+        NODE_ENV: test
+        SKIP_REDIS_TESTS: 'true'
+        SKIP_FHE_TESTS: 'true'
+        # Skip performance and browser compatibility tests in CI
+        SKIP_PERFORMANCE_TESTS: 'true'
+        SKIP_BROWSER_COMPAT_TESTS: 'true'
+        SKIP_CRYPTO_ROTATION_TEST: 'true'
+
+    - name: Check for Playwright version conflicts
+      run: |
+        echo "Checking for multiple Playwright versions..."
+        pnpm list @playwright/test || echo "No conflicts found in direct dependencies"
+        pnpm list playwright || echo "No conflicts found in direct dependencies"
+        # Look for conflicts in node_modules
+        echo "Installed Playwright packages:"
+        find node_modules -path "*playwright*" -type d -maxdepth 2 | sort
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ needs.setup.outputs.node-version }}
 
   build:
     name: Build
@@ -438,111 +436,111 @@ jobs:
       contents: read
       actions: read
     steps:
-      - name: Check lint and typecheck status
-        run: |
-          echo "## Code Quality Status" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ needs.lint.outputs.lint-status }}" == "passed" ]]; then
-            echo "| Lint | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.lint.outputs.lint-status }}" == "failed" ]]; then
-            echo "| Lint | ❌ Failed (non-blocking) |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Lint | ⚠️ Unknown |" >> $GITHUB_STEP_SUMMARY
-          fi
-          if [[ "${{ needs.typecheck.outputs.typecheck-status }}" == "passed" ]]; then
-            echo "| TypeCheck | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.typecheck.outputs.typecheck-status }}" == "failed" ]]; then
-            echo "| TypeCheck | ❌ Failed (non-blocking) |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| TypeCheck | ⚠️ Unknown |" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "| Tests | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo ""
-          echo "🚀 Continuing with build despite code quality issues..."
+    - name: Check lint and typecheck status
+      run: |
+        echo "## Code Quality Status" >> $GITHUB_STEP_SUMMARY
+        echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+        if [[ "${{ needs.lint.outputs.lint-status }}" == "passed" ]]; then
+          echo "| Lint | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        elif [[ "${{ needs.lint.outputs.lint-status }}" == "failed" ]]; then
+          echo "| Lint | ❌ Failed (non-blocking) |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| Lint | ⚠️ Unknown |" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [[ "${{ needs.typecheck.outputs.typecheck-status }}" == "passed" ]]; then
+          echo "| TypeCheck | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        elif [[ "${{ needs.typecheck.outputs.typecheck-status }}" == "failed" ]]; then
+          echo "| TypeCheck | ❌ Failed (non-blocking) |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| TypeCheck | ⚠️ Unknown |" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "| Tests | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+        echo ""
+        echo "🚀 Continuing with build despite code quality issues..."
 
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          submodules: false
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        submodules: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ needs.setup.outputs.node-version }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ needs.setup.outputs.node-version }}
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ needs.setup.outputs.pnpm-version }}
-          run_install: false
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ needs.setup.outputs.pnpm-version }}
+        run_install: false
 
-      - name: Set PNPM_HOME to PATH
-        run: |
-          mkdir -p $PNPM_HOME
-          echo "$PNPM_HOME" >> $GITHUB_PATH
+    - name: Set PNPM_HOME to PATH
+      run: |
+        mkdir -p $PNPM_HOME
+        echo "$PNPM_HOME" >> $GITHUB_PATH
 
-      - name: Verify pnpm installation
-        run: |
-          which pnpm || echo "pnpm not found in PATH"
-          pnpm --version
-          echo "PNPM_HOME: $PNPM_HOME"
-          echo "PATH: $PATH"
+    - name: Verify pnpm installation
+      run: |
+        which pnpm || echo "pnpm not found in PATH"
+        pnpm --version
+        echo "PNPM_HOME: $PNPM_HOME"
+        echo "PATH: $PATH"
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile --reporter=verbose
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile --reporter=verbose
 
-      - name: Fix Playwright version conflicts
-        run: |
-          echo "Checking for multiple Playwright versions..."
-          pnpm list @playwright/test --depth=0 || echo "No conflicts found in direct dependencies"
-          pnpm list playwright --depth=0 || echo "No playwright package found in direct dependencies"
-          # Check for any duplicate installations
-          PLAYWRIGHT_VERSIONS=$(find node_modules -path "*playwright*" -type d -maxdepth 2 | sort)
-          echo "Found Playwright installations:"
-          echo "$PLAYWRIGHT_VERSIONS"
-          # Ensure consistent Playwright version without modifying package.json/lockfile
-          REQUIRED_PW="@playwright/test@1.52.0"
-          echo "Requiring $REQUIRED_PW"
-          if ! pnpm ls --depth=0 @playwright/test | grep -q "1.52.0"; then
-            echo "❌ Expected $REQUIRED_PW is not installed. Please pin it in package.json and update lockfile."
-            exit 1
-          fi
+    - name: Check Playwright version
+      run: |
+        echo "Checking installed @playwright/test version..."
+        EXPECTED_VERSION="1.52.0"
+        INSTALLED_VERSION=$(node -p "require('@playwright/test/package.json').version")
+        if [ "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]; then
+          echo "❌ Installed @playwright/test version is $INSTALLED_VERSION, but $EXPECTED_VERSION is required. Please pin the correct version in package.json and update pnpm-lock.yaml."
+          exit 1
+        fi
+        echo "✅ @playwright/test version $EXPECTED_VERSION is correctly installed."
+        # Check for any duplicate installations
+        PLAYWRIGHT_VERSIONS=$(find node_modules -path "*playwright*" -type d -maxdepth 2 | sort)
+        echo "Found Playwright installations:"
+        echo "$PLAYWRIGHT_VERSIONS"
+          echo "❌ Expected $REQUIRED_PW is not installed. Please pin it in package.json and update lockfile."
+          exit 1
+        fi
 
-      - name: Rebuild Supabase binary
-        run: pnpm rebuild supabase
+    # MongoDB Atlas: No build step required. Add setup/connection steps here if needed.
 
-      # Removed step that created src/components/ui/button/index.ts to avoid circular/self-import and overwriting existing barrel file
+    # Removed step that created src/components/ui/button/index.ts to avoid circular/self-import and overwriting existing barrel file
 
-      - name: Build
-        run: pnpm build
-        env:
-          SKIP_REDIS_TESTS: 'true'
-          SKIP_FHE_TESTS: 'true'
-          REDIS_URL: redis://localhost:6379
-          REDIS_KEY_PREFIX: 'test:'
-          SKIP_BROWSER_COMPAT_TESTS: 'true'
+    - name: Build
+      run: pnpm build
+      env:
+        SKIP_REDIS_TESTS: 'true'
+        SKIP_FHE_TESTS: 'true'
+        REDIS_URL: redis://localhost:6379
+        REDIS_KEY_PREFIX: 'test:'
+        SKIP_BROWSER_COMPAT_TESTS: 'true'
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: dist
-          retention-days: 7
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: dist
+        retention-days: 7

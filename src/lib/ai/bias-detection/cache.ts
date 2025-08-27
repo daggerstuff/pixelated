@@ -108,7 +108,7 @@ export class BiasDetectionCache {
     }
   }
 
-  constructor(config: Partial<CacheConfig> = {}): void {
+  constructor(config: Partial<CacheConfig> = {}) {
     this.config = {
       maxSize: 1000,
       defaultTtl: 30 * 60 * 1000, // 30 minutes
@@ -369,7 +369,7 @@ export class BiasDetectionCache {
       }
 
       // Parse with Date revival
-      const cacheData = JSON.parse(cached, (key, value): any => {
+      const cacheData = JSON.parse(cached, (_key, value): any => {
         // Revive Date objects from ISO strings
         if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/.test(value)) {
           return new Date(value)
@@ -447,7 +447,7 @@ export class BiasDetectionCache {
           ? await this.cacheService.get(redisKey)
           : null
         if (cached) {
-          const cacheData = JSON.parse(cached) as unknown
+          const cacheData = JSON.parse(cached) as { expiresAt: string }
           return new Date(cacheData.expiresAt) >= new Date()
         }
       } catch (error: unknown) {
@@ -731,7 +731,7 @@ export class BiasDetectionCache {
       const base64Data = data.substring(COMPRESSION_PREFIX.length)
       const buffer = Buffer.from(base64Data, 'base64')
       const decompressed = await inflate(buffer)
-      return JSON.parse(decompressed.toString() as unknown)
+      return JSON.parse(decompressed.toString()) as T
     } catch (error: unknown) {
       logger.error('Failed to decompress data', { error })
       return data as T // Return original (potentially still compressed) data if decompression fails
@@ -784,7 +784,7 @@ export class BiasDetectionCache {
 export class BiasAnalysisCache {
   private cache: BiasDetectionCache
 
-  constructor(config?: Partial<CacheConfig>): void {
+  constructor(config?: Partial<CacheConfig>) {
     this.cache = new BiasDetectionCache({
       maxSize: 500,
       defaultTtl: 60 * 60 * 1000, // 1 hour
@@ -964,7 +964,7 @@ export class BiasAnalysisCache {
 export class DashboardCache {
   private cache: BiasDetectionCache
 
-  constructor(config?: Partial<CacheConfig>): void {
+  constructor(config?: Partial<CacheConfig>) {
     this.cache = new BiasDetectionCache({
       maxSize: 100,
       defaultTtl: 5 * 60 * 1000, // 5 minutes for dashboard data
@@ -1026,7 +1026,7 @@ export class DashboardCache {
 export class ReportCache {
   private cache: BiasDetectionCache
 
-  constructor(config?: Partial<CacheConfig>): void {
+  constructor(config?: Partial<CacheConfig>) {
     this.cache = new BiasDetectionCache({
       maxSize: 50,
       defaultTtl: 24 * 60 * 60 * 1000, // 24 hours for reports
