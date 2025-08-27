@@ -497,7 +497,7 @@ test.describe('Pipeline Performance Tests', () => {
     await test.step('Multiple Tab Performance', async () => {
       // Open multiple tabs to simulate concurrent users
       const context = page.context()
-      const tabs = []
+      const tabs: Page[] = []
 
       // Create 3 additional tabs
       for (let i = 0; i < 3; i++) {

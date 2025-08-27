@@ -211,7 +211,7 @@ test.describe('Health Check Monitoring', () => {
       .locator('nav a, header a, .nav a, .navbar a, .navigation a')
       .all()
 
-    const mainNavLinks = []
+    const mainNavLinks: Array<{href: string, text: string}> = []
     for (const link of navigationItems) {
       const href = await link.getAttribute('href')
       if (
@@ -244,17 +244,22 @@ test.describe('Health Check Monitoring', () => {
       await page.goto(baseUrl)
 
       // Use a full URL if the href is relative
-      const fullUrl = mainNavLinks[i]?.href.startsWith('/')
-        ? `${baseUrl}${mainNavLinks[i]?.href}`
-        : mainNavLinks[i]?.href
+      const link = mainNavLinks[i];
+      if (!link) {
+        continue;
+      }
+      
+      const fullUrl = link.href.startsWith('/')
+        ? `${baseUrl}${link.href}`
+        : link.href
 
-      console.log(`Testing navigation to ${fullUrl} (${mainNavLinks[i]?.text})`)
+      console.log(`Testing navigation to ${fullUrl} (${link.text})`)
 
       try {
         await page.goto(fullUrl, { timeout: 10000 })
 
         // Success if we can navigate to the page
-        expect(page.url()).toContain(mainNavLinks[i]?.href)
+        expect(page.url()).toContain(link.href)
       } catch (_error) {
         console.error(`Failed to navigate to ${fullUrl}:`, _error)
       }

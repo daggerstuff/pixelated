@@ -479,7 +479,7 @@ function generateReport(results: TestResultOutput[]): string {
 async function runTests() {
   console.log('Starting AI security tests...')
 
-  const results = []
+  const results: TestResultOutput[] = []
 
   for (const suite of testSuites) {
     // Run the test and capture results
@@ -535,8 +535,8 @@ async function runTests() {
     try {
       const data = JSON.parse(result.output) as TestItem[]
       data.forEach((item: TestItem) => {
-        if (item.severity in severityCounts) {
-          severityCounts[item.severity]++
+        if (item.severity && item.severity in severityCounts) {
+          severityCounts[item.severity] = (severityCounts[item.severity] || 0) + 1
         }
       })
     } catch {

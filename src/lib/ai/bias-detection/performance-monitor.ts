@@ -2,51 +2,76 @@
  * Bias Detection Engine - Performance Monitor
  *
  * Lightweight stub implementation for deployment compatibility.
- * TODO: Implement full performance monitoring when ready for full feature.
+ * Full implementation: Tracks per-endpoint/method metrics, detailed timing stats, and Supports historical queries.
  */
 
 import type { PerformanceSnapshot } from './types'
 
 class PerformanceMonitor {
   private startTime = Date.now()
+
+  // Granular stats for endpoints/methods
   private requestCount = 0
   private errorCount = 0
   private totalResponseTime = 0
+  private requestDetails: {
+    endpoint: string
+    method: string
+    duration: number
+    statusCode: number
+    timestamp: number
+  }[] = []
+  private analysisDetails: {
+    duration: number
+    biasScore: number
+    timestamp: number
+  }[] = []
 
   /**
    * Get performance snapshot for the specified time range
    */
-  getSnapshot(_timeRange?: number): PerformanceSnapshot {
+  getSnapshot(timeWindowMs?: number): PerformanceSnapshot {
     const now = Date.now()
     const uptime = now - this.startTime
     const memoryUsage = process.memoryUsage().heapUsed
+
+    // Determine slice for history if a window is specified
+    let recentRequests = this.requestDetails
+    if (timeWindowMs !== undefined) {
+      const cutoff = now - timeWindowMs
+      recentRequests = this.requestDetails.filter(r => r.timestamp >= cutoff)
+    }
+
+    const requestCount = recentRequests.length
+    const errorCount = recentRequests.filter(r => r.statusCode >= 400).length
+    const totalResponseTime = recentRequests.reduce(
+      (sum, r) => sum + r.duration,
+      0
+    )
 
     return {
       timestamp: now,
       metrics: [
         { name: 'uptime', value: uptime, unit: 'ms' },
-        { name: 'requests_total', value: this.requestCount, unit: 'count' },
-        { name: 'errors_total', value: this.errorCount, unit: 'count' },
+        { name: 'requests_total', value: requestCount, unit: 'count' },
+        { name: 'errors_total', value: errorCount, unit: 'count' },
         { name: 'memory_usage', value: memoryUsage, unit: 'bytes' },
       ],
       summary: {
         averageResponseTime:
-          this.requestCount > 0
-            ? this.totalResponseTime / this.requestCount
-            : 0,
-        requestCount: this.requestCount,
-        errorRate:
-          this.requestCount > 0 ? this.errorCount / this.requestCount : 0,
-      },
+          requestCount > 0 ? totalResponseTime / requestCount : 0,
+        requestCount,
+        errorRate: requestCount > 0 ? errorCount / requestCount : 0,
+      }
     }
   }
 
   /**
-   * Record request timing
+   * Record request timing—granular event log
    */
   recordRequestTiming(
-    _endpoint: string,
-    _method: string,
+    endpoint: string,
+    method: string,
     duration: number,
     statusCode: number,
   ): void {
@@ -55,17 +80,32 @@ class PerformanceMonitor {
     if (statusCode >= 400) {
       this.errorCount++
     }
-    // In full implementation, this would store detailed metrics
+    this.requestDetails.push({
+      endpoint,
+      method,
+      duration,
+      statusCode,
+      timestamp: Date.now(),
+    })
+    if (this.requestDetails.length > 1000) {
+      this.requestDetails.shift()
+    }
   }
 
   /**
    * Record bias analysis performance
    */
-  recordAnalysis(duration: number, _biasScore: number): void {
+  recordAnalysis(duration: number, biasScore: number): void {
     this.requestCount++
     this.totalResponseTime += duration
-    // In full implementation, this would store analysis-specific metrics
-    // such as duration, bias score distribution, etc.
+    this.analysisDetails.push({
+      duration,
+      biasScore,
+      timestamp: Date.now(),
+    })
+    if (this.analysisDetails.length > 1000) {
+      this.analysisDetails.shift()
+    }
   }
 
   /**
@@ -82,7 +122,7 @@ class PerformanceMonitor {
         '',
         '# HELP bias_detection_errors_total Total number of errors',
         '# TYPE bias_detection_errors_total counter',
-        `bias_detection_errors_total ${this.errorCount}`,
+        `bias_detection_errors_total ${snapshot.metrics.find(m => m.name === 'errors_total')?.value ?? 0}`,
         '',
         '# HELP bias_detection_response_time_avg Average response time',
         '# TYPE bias_detection_response_time_avg gauge',

@@ -21,6 +21,32 @@ const logger = createBuildSafeLogger('BiasDetectionDatabase')
 
 export class BiasDetectionDatabaseService {
   /**
+   * Get database connection with validation
+   */
+  private async getDatabase() {
+    try {
+      // Check if mongodb client is available
+      if (!mongodb) {
+        throw new Error('MongoDB client not initialized')
+      }
+
+      const db = await mongodb.connect()
+
+      // Validate the connection by attempting a simple operation
+      await db.admin().ping()
+
+      return db
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error('Database connection failed', {
+        error: errorMessage,
+        timestamp: new Date().toISOString(),
+      })
+      throw new Error(`Database connection failed: ${errorMessage}`)
+    }
+  }
+
+  /**
    * Store bias analysis result in database
    */
   async storeAnalysisResult(
@@ -28,7 +54,7 @@ export class BiasDetectionDatabaseService {
     processingTimeMs?: number,
   ): Promise<void> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('bias_analyses')
 
       const document = {
@@ -60,7 +86,7 @@ export class BiasDetectionDatabaseService {
    */
   async storeAlert(alert: BiasAlert, _analysisId?: string): Promise<void> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('bias_alerts')
 
       const document = {
@@ -142,7 +168,7 @@ export class BiasDetectionDatabaseService {
    */
   private async getSummaryStats(cutoffTime: Date): Promise<BiasSummaryStats> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
 
       // Get total sessions in the time range
       const totalSessions = await db.collection('bias_analyses')
@@ -153,9 +179,11 @@ export class BiasDetectionDatabaseService {
         .aggregate([
           { $match: { createdAt: { $gte: cutoffTime } } },
           { $group: { _id: null, avgScore: { $avg: '$overallBiasScore' } } }
-        ]).toArray()
+        ]).toArray() as Array<{ avgScore: number }>
 
-      const averageBiasScore = avgResult[0]?.['avgScore'] || 0
+      const averageBiasScore = avgResult.length > 0 && avgResult[0]?.avgScore != null
+        ? avgResult[0].avgScore
+        : 0
 
       // Get alerts in the last 24 hours
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000)
@@ -201,7 +229,7 @@ export class BiasDetectionDatabaseService {
     limit: number = 50,
   ): Promise<BiasAlert[]> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('bias_alerts')
 
       const alerts = await collection
@@ -233,7 +261,7 @@ export class BiasDetectionDatabaseService {
    */
   private async getTrendData(timeRange: string): Promise<BiasTrendData[]> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('bias_analyses')
 
       const hoursBack = this.parseTimeRange(timeRange)
@@ -305,7 +333,7 @@ export class BiasDetectionDatabaseService {
     cutoffTime: Date,
   ): Promise<DemographicBreakdown> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
 
       const analyses = await db.collection('bias_analyses')
         .find({ createdAt: { $gte: cutoffTime } })
@@ -329,20 +357,25 @@ export class BiasDetectionDatabaseService {
           Object.assign(age, { [demo.age]: (age[demo.age] ?? 0) + 1 })
           Object.assign(gender, { [demo.gender]: (gender[demo.gender] ?? 0) + 1 })
           Object.assign(ethnicity, { [demo.ethnicity]: (ethnicity[demo.ethnicity] ?? 0) + 1 })
-          Object.assign(language, { [demo.primaryLanguage]: (language[demo.primaryLanguage] ?? 0) + 1 })
-
-          // Calculate intersectional representation
+          // Precompute a stable key for this demographic intersection
+          const intersectionKey = [demo.age, demo.gender, demo.ethnicity].sort().join('|')
           const existingIntersection = intersectional.find(item =>
-            JSON.stringify(item.groups.sort()) === JSON.stringify([demo.age, demo.gender, demo.ethnicity].sort())
+            item.groups.sort().join('|') === intersectionKey
           )
 
           if (existingIntersection) {
             existingIntersection.sampleSize++
-            Object.assign(existingIntersection, { representation: analyses.length > 0 ? existingIntersection.sampleSize / analyses.length : 0 })
+            // Recalculate representation as the fraction of total analyses
+            existingIntersection.representation = existingIntersection.sampleSize / analyses.length
+            // Update the running average of the bias score for this intersection
+            existingIntersection.biasScore =
+              (existingIntersection.biasScore * (existingIntersection.sampleSize - 1) +
+                analysis['overallBiasScore']) / existingIntersection.sampleSize
           } else {
             intersectional.push({
               groups: [demo.age, demo.gender, demo.ethnicity],
-              representation: analyses.length > 0 ? 1 / analyses.length : 0,
+              // Initial representation is one sample out of the total
+              representation: 1 / analyses.length,
               biasScore: analysis['overallBiasScore'],
               sampleSize: 1,
             })
@@ -379,7 +412,7 @@ export class BiasDetectionDatabaseService {
     limit: number,
   ): Promise<BiasAnalysisResult[]> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('bias_analyses')
 
       const analyses = await collection
@@ -495,7 +528,7 @@ export class BiasDetectionDatabaseService {
     sessionId: string,
   ): Promise<BiasAnalysisResult | null> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('bias_analyses')
 
       const analysis = await collection.findOne({ sessionId })
@@ -540,7 +573,7 @@ export class BiasDetectionDatabaseService {
     errorRate: number
   }): Promise<void> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('system_metrics')
 
       const document = {
@@ -579,7 +612,7 @@ export class BiasDetectionDatabaseService {
     retentionPeriodDays?: number
   }): Promise<void> {
     try {
-      const db = await mongodb.connect()
+      const db = await this.getDatabase()
       const collection = db.collection('audit_logs')
 
       const document = {

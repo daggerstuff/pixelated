@@ -26,6 +26,7 @@ console.log('SENTRY_ORG:', process.env.SENTRY_ORG);
 console.log('SENTRY_PROJECT:', process.env.SENTRY_PROJECT);
 
 export default defineConfig({
+  cacheDir: process.env.CI ? '$(Agent.WorkFolder)/.vite-cache' : 'node_modules/.vite',
   server: {
     watch: {
       ignored: [

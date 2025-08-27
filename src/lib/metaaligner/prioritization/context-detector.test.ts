@@ -100,15 +100,7 @@ describe('ContextDetector', () => {
           completionTokens: 20,
           totalTokens: 30,
         },
-        provider: 'test',
-        content: JSON.stringify({
-          detectedContext: 'general',
-          confidence: 0.5,
-          contextualIndicators: [],
-          needsSpecialHandling: false,
-          urgency: 'low',
-          metadata: {},
-        }),
+        provider: 'test'
       }
 
       vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
@@ -204,21 +196,7 @@ describe('ContextDetector', () => {
             completionTokens: 20,
             totalTokens: 30,
           },
-          provider: 'test',
-          content: JSON.stringify({
-            detectedContext: 'educational',
-            confidence: 0.8,
-            contextualIndicators: [
-              {
-                type: 'question_pattern',
-                description: 'Educational question detected',
-                confidence: 0.8,
-              },
-            ],
-            needsSpecialHandling: false,
-            urgency: 'low',
-            metadata: {},
-          }),
+          provider: 'test'
         }
 
         mockDetectCrisis.mockResolvedValue(crisisResult)
@@ -271,23 +249,9 @@ describe('ContextDetector', () => {
             completionTokens: 20,
             totalTokens: 30,
           },
-          provider: 'test',
-          content: JSON.stringify({
-            detectedContext: 'educational',
-            confidence: 0.85,
-            contextualIndicators: [
-              {
-                type: 'question_pattern',
-                description: 'Educational question about mental health',
-                confidence: 0.8,
-              },
-            ],
-            needsSpecialHandling: false,
-            urgency: 'low',
-            metadata: { topic: 'anxiety' },
-          }),
+          provider: 'test'
         }
-
+ 
         const crisisResult: CrisisDetectionResult = {
           isCrisis: false,
           confidence: 0.1,
@@ -299,19 +263,72 @@ describe('ContextDetector', () => {
           timestamp: new Date().toISOString(),
           content: 'What are the symptoms of anxiety?',
         }
-
+ 
         mockDetectCrisis.mockResolvedValue(crisisResult)
         vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
           aiResponse,
         )
-
+ 
         const result = await contextDetector.detectContext(
           'What are the symptoms of anxiety?',
         )
-
+ 
         expect(result.detectedContext).toBe(ContextType.EDUCATIONAL)
         expect(result.confidence).toBe(0.85)
         expect(result.urgency).toBe('low')
+      })
+
+      it('should detect clinical assessment context by pattern', async () => {
+        const clinicalQueries = [
+          'Can you diagnose depression for me?',
+          'Do I need a clinical assessment for anxiety?',
+          'I want an official diagnosis for ADHD.',
+          'What is my diagnosis based on these symptoms?',
+        ]
+        for (const q of clinicalQueries) {
+          mockDetectCrisis.mockResolvedValue({
+            isCrisis: false,
+            confidence: 0.05,
+            category: 'general_concern',
+            riskLevel: 'low',
+            urgency: 'low',
+            detectedTerms: [],
+            suggestedActions: [],
+            timestamp: new Date().toISOString(),
+            content: q,
+          })
+          const result = await contextDetector.detectContext(q)
+          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
+          expect(result.confidence).toBeGreaterThanOrEqual(0.9)
+          expect(result.contextualIndicators?.[0]?.type).toMatch(/clinical_assessment/i)
+        }
+      })
+
+      it('should detect informational context by pattern', async () => {
+        const informationalQueries = [
+          'Where can I find support group resources?',
+          'What number to call for crisis counseling?',
+          'How do I sign up for mental health services?',
+          'Info on affordable counseling options.',
+          'What are the hours of operation for the hotline?'
+        ]
+        for (const q of informationalQueries) {
+          mockDetectCrisis.mockResolvedValue({
+            isCrisis: false,
+            confidence: 0.05,
+            category: 'general_concern',
+            riskLevel: 'low',
+            urgency: 'low',
+            detectedTerms: [],
+            suggestedActions: [],
+            timestamp: new Date().toISOString(),
+            content: q,
+          })
+          const result = await contextDetector.detectContext(q)
+          expect(result.detectedContext).toBe(ContextType.INFORMATIONAL)
+          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+          expect(result.contextualIndicators?.[0]?.type).toMatch(/informational/i)
+        }
       })
     })
 
@@ -359,8 +376,7 @@ describe('ContextDetector', () => {
             completionTokens: 20,
             totalTokens: 30,
           },
-          provider: 'test',
-          content: 'This is not valid JSON',
+          provider: 'test'
         }
 
         mockDetectCrisis.mockResolvedValue({
@@ -434,14 +450,7 @@ describe('ContextDetector', () => {
           completionTokens: 20,
           totalTokens: 30,
         },
-        provider: 'test',
-        content: JSON.stringify({
-          ...ctx,
-          contextualIndicators: [],
-          needsSpecialHandling: false,
-          urgency: 'low',
-          metadata: {},
-        }),
+        provider: 'test'
       }))
 
       vi.mocked(mockAIService.createChatCompletion)

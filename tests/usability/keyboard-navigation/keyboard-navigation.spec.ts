@@ -53,14 +53,16 @@ test.describe('Keyboard Navigation', () => {
     
     if (buttons.length > 0) {
       const firstButton = buttons[0];
-      await firstButton.focus();
+      if (firstButton) {
+        await firstButton.focus();
       
-      // Test Enter key
-      await page.keyboard.press('Enter');
+        // Test Enter key
+        await page.keyboard.press('Enter');
       
-      // Test Space key
-      await firstButton.focus();
-      await page.keyboard.press('Space');
+        // Test Space key
+        await firstButton.focus();
+        await page.keyboard.press('Space');
+      }
     }
   });
 
@@ -69,18 +71,20 @@ test.describe('Keyboard Navigation', () => {
     
     if (forms.length > 0) {
       const form = forms[0];
-      const inputs = await form.locator('input, textarea, select').all();
+      if (form) {
+        const inputs = await form.locator('input, textarea, select').all();
       
-      if (inputs.length > 0) {
-        // Focus first input
-        await inputs[0].focus();
+        if (inputs.length > 0 && inputs[0]) {
+          // Focus first input
+          await inputs[0].focus();
         
-        // Navigate through form fields
-        for (let i = 1; i < inputs.length; i++) {
-          await page.keyboard.press('Tab');
+          // Navigate through form fields
+          for (let i = 1; i < inputs.length; i++) {
+            await page.keyboard.press('Tab');
           
-          const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
-          expect(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON']).toContain(focusedElement);
+            const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
+            expect(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON']).toContain(focusedElement);
+          }
         }
       }
     }
@@ -133,8 +137,6 @@ test.describe('Keyboard Navigation', () => {
     const skipLinks = page.locator('a[href*="#main"], a[href*="#content"], .skip-link');
     
     if (await skipLinks.count() > 0) {
-      const skipLink = skipLinks.first();
-      
       // Focus skip link (usually first tab stop)
       await page.keyboard.press('Tab');
       

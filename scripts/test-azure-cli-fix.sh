@@ -1,26 +1,35 @@
 #!/bin/bash
 
 # Test script to verify Azure CLI Python 3.13 compatibility fix
-echo "🧪 Testing Azure CLI Python 3.13 compatibility fix..."
+echo "🧪 Testing Azure CLI Python 3.13 compatibility fix with uv..."
 
 # Set environment variables to suppress warnings
 export PYTHONWARNINGS="ignore::FutureWarning"
-export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
 
 echo "Environment variables set:"
 echo "  PYTHONWARNINGS=$PYTHONWARNINGS"
-echo "  AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=$AZURE_CLI_DISABLE_CONNECTION_VERIFICATION"
 
 # Check current Python version
 echo "Current Python version:"
 python3 --version
 
-# Try conda first with specific Python version
-if command -v conda &> /dev/null && conda install -c conda-forge azure-cli python=3.11 -y; then
-    echo "✅ Azure CLI installed via conda with Python 3.11"
-    conda run -n base az version
+# Try uv first with Python 3.11
+if command -v uv &> /dev/null; then
+    echo "Installing Azure CLI via uv with Python 3.11..."
+    
+    # Create a virtual environment with Python 3.11 using uv
+    uv venv ~/azure-cli-env --python 3.11
+    
+    # Activate the virtual environment
+    source ~/azure-cli-env/bin/activate
+    
+    # Install Azure CLI using uv
+    uv pip install azure-cli==2.73.0
+    
+    echo "✅ Azure CLI installed via uv with Python 3.11"
+    ~/azure-cli-env/bin/az version
 else
-    echo "Conda installation failed, using pip with Python 3.11"
+    echo "uv not available, falling back to pip with Python 3.11"
     
     # Install Python 3.11 if not available
     if ! command -v python3.11 &> /dev/null; then
@@ -46,3 +55,5 @@ echo "🎉 Azure CLI compatibility test completed!"
 echo ""
 echo "If you see the Azure CLI version without Python warnings, the fix is working!"
 echo "You can now run your Azure DevOps pipeline without the FutureWarning messages."
+echo ""
+echo "Note: This script now uses uv for faster Python package management."

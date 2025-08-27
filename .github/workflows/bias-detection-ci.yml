@@ -163,7 +163,6 @@ jobs:
         }
         echo "✅ Code formatting is correct"
 
-  # TypeScript unit and integration tests
   typescript-tests:
     name: TypeScript Tests
     runs-on: ubuntu-latest
@@ -250,7 +249,6 @@ jobs:
         flags: typescript
         name: typescript-coverage
 
-  # Python ML service tests
   python-tests:
     name: Python ML Tests
     runs-on: ubuntu-latest
@@ -314,7 +312,6 @@ jobs:
         flags: python
         name: python-coverage
 
-  # End-to-end tests
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -437,7 +434,6 @@ jobs:
           test-results/
           playwright-report/
 
-  # Performance testing
   performance-tests:
     name: Performance Tests
     runs-on: ubuntu-latest
@@ -498,7 +494,6 @@ jobs:
       env:
         NODE_ENV: production
 
-  # Build and deployment
   build-and-deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
@@ -580,7 +575,6 @@ jobs:
           echo "PRODUCTION_HEALTH_CHECK_URL not configured, skipping health checks"
         fi
 
-  # Notification job
   notify:
     name: Notify
     runs-on: ubuntu-latest
