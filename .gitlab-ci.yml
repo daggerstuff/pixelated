@@ -25,6 +25,8 @@ variables:
   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   CI_REPOSITORY_URL: git@git.pixelatedempathy.tech:pixeltech/pixelated.git
+  # Override CI_REGISTRY to use correct port (registry runs on 443, not 5050)
+  CI_REGISTRY: https://git.pixelatedempathy.tech
 
 validate-runner:
   stage: validate
