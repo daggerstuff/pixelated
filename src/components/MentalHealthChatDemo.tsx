@@ -23,7 +23,7 @@ import BrainVisualization from '@/components/ui/BrainVisualization'
 import { MentalHealthInsights } from '@/components/MentalHealthInsights'
 import type { MentalHealthInsights as MentalHealthInsightsType } from '@/simulator/services/FeedbackService'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
+import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
@@ -301,7 +301,7 @@ How are you feeling today? I'm here to listen and help.`,
         logger.info('Initializing production MentalLLaMA service...')
 
         // Initialize the production-grade MentalLLaMA components
-        const { adapter } = await createMentalLLaMAFromEnv()
+        const { adapter } = await createMentalLLaMAFromEnvSafe()
         const clinicalKnowledge = new ClinicalKnowledgeBase()
 
         setMentalHealthService({

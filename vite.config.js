@@ -87,7 +87,9 @@ export default defineConfig({
       resolveId(id) {
         if (
           id.includes('/server-only/') ||
-          id.includes('MentalLLaMAPythonBridge')
+          id.includes('MentalLLaMAPythonBridge') ||
+          id === 'mongodb' ||
+          id.includes('mongodb')
         ) {
           return false
         }
@@ -141,6 +143,8 @@ export default defineConfig({
       'zlib': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'net': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'tls': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
+      // Alias MongoDB to a client-safe polyfill
+      'mongodb': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       '@lib': path.resolve(__dirname, 'src/lib'),
       '@/hooks/useMentalHealthAnalysis': path.resolve(
         './src/hooks/useMentalHealthAnalysis.ts',
@@ -181,6 +185,10 @@ export default defineConfig({
           id.includes('/server-only/') ||
           id.includes('MentalLLaMAPythonBridge')
         ) {
+          return true
+        }
+        // Exclude MongoDB from client-side bundles
+        if (id === 'mongodb' || id.includes('mongodb')) {
           return true
         }
         const nodeBuiltins = [
@@ -348,7 +356,8 @@ export default defineConfig({
       'async_hooks',
       'process',
       '@fastify/otel',
-      'path-to-regexp'
+      'path-to-regexp',
+      'mongodb'
     ],
   },
 })
