@@ -305,7 +305,7 @@ function ProfessionalTherapistWorkspace() {
       setMessages((prev) => [
         ...prev,
         {
-          role: 'assistant',
+          role: 'bot',
           content: aiResponse,
           name: '',
         } as ExtendedMessage,
@@ -359,7 +359,7 @@ function ProfessionalTherapistWorkspace() {
     try {
       // Convert messages to the format expected by generatePatientResponse
       const conversationMessages = messages.map((msg) => ({
-        role: msg.role === 'assistant' ? 'patient' : 'therapist',
+        role: msg.role === 'bot' ? 'patient' : 'therapist',
         content: msg.content,
       }))
 
@@ -381,14 +381,14 @@ function ProfessionalTherapistWorkspace() {
         )
 
       // Generate response
-      // Convert the array to the correct type with explicit roles
+      // Only propagate 'user' or 'bot' role for AI
       const typedConversationMessages = conversationMessages.map((msg) => ({
         role:
-          msg.role === 'therapist' || msg.role === 'patient'
-            ? (msg.role as 'therapist' | 'patient')
-            : msg.role === 'user'
-              ? 'patient'
-              : 'therapist', // Map other roles appropriately
+          msg.role === 'therapist'
+            ? 'user'
+            : msg.role === 'patient'
+              ? 'bot'
+              : msg.role, // Only allow 'user' or 'bot' roles in chat contract
         content: msg.content,
       }))
 

@@ -77,9 +77,9 @@ export class BiasDetectionEngine {
     
     // Normalize threshold property names for backward compatibility
     const normalizedThresholds = {
-      warning: thresholds['warning'] ?? ('warningLevel' in thresholds ? (thresholds as Record<string, number>).warningLevel : undefined) ?? DEFAULT_THRESHOLDS.warning,
-      high: thresholds['high'] ?? ('highLevel' in thresholds ? (thresholds as Record<string, number>).highLevel : undefined) ?? DEFAULT_THRESHOLDS.high,
-      critical: thresholds['critical'] ?? ('criticalLevel' in thresholds ? (thresholds as Record<string, number>).criticalLevel : undefined) ?? DEFAULT_THRESHOLDS.critical,
+      warning: thresholds['warning'] ?? ('warningLevel' in thresholds ? (thresholds as Record<string, number>)['warningLevel'] : undefined) ?? DEFAULT_THRESHOLDS.warning,
+      high: thresholds['high'] ?? ('highLevel' in thresholds ? (thresholds as Record<string, number>)['highLevel'] : undefined) ?? DEFAULT_THRESHOLDS.high,
+      critical: thresholds['critical'] ?? ('criticalLevel' in thresholds ? (thresholds as Record<string, number>)['criticalLevel'] : undefined) ?? DEFAULT_THRESHOLDS.critical,
     }
     
     this.config = {
@@ -429,10 +429,10 @@ export class BiasDetectionEngine {
       confidence,
       demographics: maskedDemo && typeof maskedDemo === 'object'
         ? {
-            age: (maskedDemo as Record<string, unknown>).age as string ?? '',
-            gender: (maskedDemo as Record<string, unknown>).gender as string ?? '',
-            ethnicity: (maskedDemo as Record<string, unknown>).ethnicity as string ?? '',
-            primaryLanguage: (maskedDemo as Record<string, unknown>).primaryLanguage as string ?? '',
+            age: (maskedDemo as Record<string, unknown>)['age'] as string ?? '',
+            gender: (maskedDemo as Record<string, unknown>)['gender'] as string ?? '',
+            ethnicity: (maskedDemo as Record<string, unknown>)['ethnicity'] as string ?? '',
+            primaryLanguage: (maskedDemo as Record<string, unknown>)['primaryLanguage'] as string ?? '',
           }
         : { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
     }
@@ -890,4 +890,5 @@ async batchAnalyzeSessions(
       errorCount: errors.length
     }
   }
+}
 }

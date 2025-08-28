@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPersonaMessage, getPersonaContext } from './PersonaService'
+import { ChatShell } from './ChatShell'
 
 export interface ChatMessage {
   id: string;
@@ -42,15 +43,10 @@ const BrutalistChatDemo: FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [sessionActive, setSessionActive] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Use unified scroll context from ChatShell
+  const { messagesEndRef } = React.useContext(ChatShell.Context);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || !sessionActive) {
@@ -159,9 +155,10 @@ const BrutalistChatDemo: FC = () => {
         </div>
 
         {/* Messages Area - Made Much Larger */}
-        <div className="h-96 overflow-y-auto p-6 space-y-4 bg-slate-50/30">
-          {messages.map((message) => (
-            <div key={message.id} className="space-y-2">
+       <ChatShell autoScrollDeps={[messages]}>
+       <div className="h-96 overflow-y-auto p-6 space-y-4 bg-slate-50/30">
+         {messages.map((message) => (
+           <div key={message.id} className="space-y-2">
               <div className={`max-w-[85%] ${
                 message.role === 'user' ? 'ml-auto' :
                 message.role === 'system' ? 'mx-auto' :
@@ -250,6 +247,7 @@ const BrutalistChatDemo: FC = () => {
           
           <div ref={messagesEndRef} />
         </div>
+        </ChatShell>
 
         {/* Chat Input - Streamlined */}
         <div className="border-t border-slate-200 p-4 bg-white">

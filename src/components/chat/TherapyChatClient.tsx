@@ -9,6 +9,7 @@ import { useSecurity } from '@/hooks/useSecurity'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { useEffect, useRef, useState } from 'react'
 import AnalyticsDashboardReact from './AnalyticsDashboardReact'
+import { ChatShell } from './ChatShell'
 import { ChatInput } from './ChatInput'
 import { ChatMessage } from './ChatMessage'
 import { ScenarioSelector } from './ScenarioSelector'
@@ -38,9 +39,8 @@ export function TherapyChatClient() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [sessionId] = useState(() => crypto.randomUUID())
 
-  // Refs
-  const chatContainerRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  // Refs now provided by ChatShell
+  const { chatContainerRef, messagesEndRef } = React.useContext(ChatShell.Context)
 
   // Hooks
   const { securityLevel, encryptionEnabled, fheInitialized } = useSecurity()
@@ -177,9 +177,10 @@ export function TherapyChatClient() {
   }
 
   return (
-    <div className={`${isExpanded ? 'fixed inset-0 z-50' : ''}`}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4 bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 rounded-t-lg p-3">
+    <ChatShell autoScrollDeps={[messages]}>
+      <div className={`${isExpanded ? 'fixed inset-0 z-50' : ''}`}>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4 bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 rounded-t-lg p-3">
         <h1 className="text-xl font-bold">Pixelated Empathy Therapy Chat</h1>
         <div className="flex items-center space-x-2">
           <SecurityBadge
@@ -240,8 +241,8 @@ export function TherapyChatClient() {
       <div
         ref={chatContainerRef}
         className={`overflow-y-auto ${
-          isExpanded ? 'h-[calc(100vh-200px)]' : 'h-[65vh]'
-        } border border-purple-800 rounded-lg bg-black bg-opacity-40 p-4 mb-4`}
+          isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
+        } border border-purple-900 rounded-md bg-black bg-opacity-50 p-2 mb-2 shadow-sm transition-all duration-200`}
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">

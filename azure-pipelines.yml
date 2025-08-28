@@ -257,7 +257,7 @@ stages:
 
 - stage: DockerBuild
   displayName: Build Docker Image
-  dependsOn: Infrastructure
+  dependsOn: Build
   jobs:
   - job: BuildDockerImage
     displayName: Build and Push Docker Image
@@ -552,7 +552,6 @@ stages:
   displayName: Deploy Container App
   dependsOn:
   - Build
-  - Infrastructure
   - DockerBuild
   condition: and(succeeded(), or(eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'main')))
   jobs:
@@ -855,6 +854,8 @@ stages:
                 fi
 
 - stage: DeployAppService
+  displayName: Deploy to App Service
+  dependsOn: DockerBuild
   condition: and(succeeded(), or(eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'main')))
   jobs:
   - deployment: AppServiceDeployment

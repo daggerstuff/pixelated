@@ -124,7 +124,7 @@ export function ChatContainer({
             {isLoading && (
               <ChatMessage
                 message={{
-                  role: 'assistant',
+                  role: 'bot',
                   content: '',
                   name: 'Assistant',
                 }}
@@ -135,7 +135,7 @@ export function ChatContainer({
             {error && (
               <ChatMessage
                 message={{
-                  role: 'assistant',
+                  role: 'bot',
                   content: `Error: ${error}`,
                   name: 'Assistant',
                 }}
