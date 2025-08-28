@@ -1,0 +1,127 @@
+# Metricbeat configuration for Pixelated Empathy
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+# Elasticsearch output
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  index: "pixelated-metricbeat-%{+yyyy.MM.dd}"
+
+# Setup template and ILM
+setup.template.enabled: true
+setup.template.name: "pixelated-metricbeat"
+setup.template.pattern: "pixelated-metricbeat-*"
+setup.ilm.enabled: false
+
+# Modules configuration
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - process
+    - process_summary
+    - socket_summary
+    - entropy
+    - core
+    - diskio
+    - socket
+    - service
+    - users
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  process.include_top_n:
+    by_cpu: 5
+    by_memory: 5
+
+- module: docker
+  metricsets:
+    - container
+    - cpu
+    - diskio
+    - event
+    - healthcheck
+    - info
+    - memory
+    - network
+    - network_summary
+    - stats
+  hosts: ["unix:///var/run/docker.sock"]
+  enabled: true
+  period: 10s
+  containers:
+    ids: ["*"]
+  containers.names: ["*"]
+
+- module: redis
+  metricsets:
+    - info
+    - keyspace
+    - key
+  hosts: ["redis:6379"]
+  enabled: true
+  period: 10s
+  password: "${REDIS_PASSWORD:-}"
+
+- module: postgresql
+  metricsets:
+    - activity
+    - bgwriter
+    - database
+    - statement
+  hosts: ["postgres://pixelated:${POSTGRES_PASSWORD:-dev_password_change_in_prod}@postgres:5432/pixelated_empathy?sslmode=disable"]
+  enabled: true
+  period: 10s
+
+# HTTP endpoint for health checks
+http.enabled: true
+http.host: 0.0.0.0
+http.port: 5067
+
+# Logging configuration
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /usr/share/metricbeat/logs
+  name: metricbeat
+  keepfiles: 7
+  permissions: 0644
+
+# Monitoring
+monitoring.enabled: false
+
+# Processors
+processors:
+- add_host_metadata: ~
+- add_cloud_metadata: ~
+- add_docker_metadata: ~
+- add_kubernetes_metadata: ~
+- add_fields:
+    target: ''
+    fields:
+      environment: production
+      application: pixelated-empathy
+      datacenter: "${DATACENTER:-unknown}"
+
+# Queue settings
+queue.mem:
+  events: 4096
+  flush.min_events: 512
+  flush.timeout: 5s
+
+# Autodiscover for Docker
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      hints.default_config:
+        type: container
+        paths:
+          - '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+        processors:
+        - add_docker_metadata:
+            host: "unix:///var/run/docker.sock"

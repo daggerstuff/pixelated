@@ -347,7 +347,7 @@ build-ai-backend:
     - "echo === Diagnostic: Network connectivity to registry ==="
     - ping -c 4 git.pixelatedempathy.tech || true
     - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
+    - curl -v https://git.pixelatedempathy.tech/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Building AI backend components..."
@@ -380,7 +380,7 @@ security-scan:
     - "echo === Diagnostic: Network connectivity to registry ==="
     - ping -c 4 git.pixelatedempathy.tech || true
     - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
+    - curl -v https://git.pixelatedempathy.tech/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Running security scan on container..."
@@ -580,7 +580,7 @@ tag-image:
     - "echo === Diagnostic: Network connectivity to registry ==="
     - ping -c 4 git.pixelatedempathy.tech || true
     - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
+    - curl -v https://git.pixelatedempathy.tech/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script: |
     echo "Tagging image with branch and build number..."
@@ -633,7 +633,7 @@ cleanup:
     - "echo === Diagnostic: Network connectivity to registry ==="
     - ping -c 4 git.pixelatedempathy.tech || true
     - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech:5050/v2/ || true
+    - curl -v https://git.pixelatedempathy.tech/v2/ || true
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - echo "Cleaning up old container images..."

@@ -20,8 +20,8 @@ route:
 receivers:
   - name: 'web.hook'
     webhook_configs:
-      - url: 'http://localhost:5001/'
-  
+      - url: 'http://alert-receiver:5001/'
+
   - name: 'critical-alerts'
     slack_configs:
       - api_url: 'YOUR_SLACK_WEBHOOK_URL_HERE'
@@ -29,7 +29,7 @@ receivers:
         title: '🚨 CRITICAL: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
         text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
         send_resolved: true
-  
+
   - name: 'warning-alerts'
     slack_configs:
       - api_url: 'YOUR_SLACK_WEBHOOK_URL_HERE'

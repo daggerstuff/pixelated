@@ -1,0 +1,54 @@
+# Elasticsearch configuration for Pixelated Empathy
+cluster.name: pixelated-empathy-cluster
+node.name: elasticsearch-node-1
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# Network settings
+network.host: 0.0.0.0
+http.port: 9200
+discovery.seed_hosts: ["127.0.0.1:9300"]
+cluster.initial_master_nodes: ["elasticsearch-node-1"]
+
+# Memory settings (handled via ES_JAVA_OPTS in docker-compose)
+# bootstrap.memory_lock: true
+
+# Security settings (disabled for development)
+xpack.security.enabled: false
+xpack.monitoring.enabled: false
+xpack.graph.enabled: false
+xpack.watcher.enabled: false
+xpack.ml.enabled: false
+
+# Performance settings
+indices.query.bool.max_clause_count: 1024
+search.max_async_search_hop_count: 10
+
+# Index settings
+index.number_of_shards: 1
+index.number_of_replicas: 0
+
+# Thread pools
+thread_pool.search.size: 4
+thread_pool.search.queue_size: 100
+thread_pool.index.size: 4
+thread_pool.index.queue_size: 100
+
+# Circuit breaker settings
+indices.breaker.total.limit: 70%
+indices.breaker.fielddata.limit: 40%
+indices.breaker.request.limit: 40%
+
+# Refresh interval
+index.refresh_interval: 30s
+
+# Translog settings
+index.translog.durability: async
+index.translog.sync_interval: 5s
+
+# Logging
+logger.level: INFO
+logger.org.elasticsearch.deprecation: WARN
+
+# Action auto-create settings
+action.auto_create_index: .monitoring*,.watcher*,pixelated-*

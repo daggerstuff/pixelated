@@ -14,6 +14,9 @@ import {
 } from './cache'
 import { getPerformanceOptimizer, type PerformanceOptimizer } from './performance-optimizer'
 import { getAuditLogger } from './audit'
+import { PythonBiasDetectionBridge } from './python-bridge'
+import { BiasMetricsCollector } from './metrics-collector'
+import { BiasAlertSystem } from './alerts-system'
 
 type LayerResults = {
   preprocessing: import('./types').PreprocessingAnalysisResult
@@ -46,178 +49,11 @@ const DEFAULT_WEIGHTS: BiasLayerWeights = {
   evaluation: 0.25,
 }
 
-function validateThresholds(t: BiasThresholdsConfig): void {
-  // Handle both old and new threshold property names for backward compatibility
-  const warning = t['warning'] ?? (t as any)['warningLevel']
-  const high = t['high'] ?? (t as any)['highLevel']
-  const critical = t['critical'] ?? (t as any)['criticalLevel']
-  
-  const values = [warning, high, critical]
-  if (values.some((v) => v === undefined || v < 0 || v > 1)) {
-    throw new Error('Invalid threshold values')
-  }
-  if (!(warning < high && high < critical)) {
-    throw new Error('Invalid threshold configuration')
-  }
-}
-
 function validateWeights(w: BiasLayerWeights): void {
   const sum = w['preprocessing'] + w['modelLevel'] + w['interactive'] + w['evaluation']
   if (Math.abs(sum - 1) > 1e-6) {
     throw new Error('Layer weights must sum to 1.0')
   }
-}
-
-// Minimal interfaces for mocked systems (in tests they’re replaced by vi.mock)
-class PythonBiasDetectionBridge {
-  // Remove empty constructor - not needed
-  async initialize() {}
-  async checkHealth() { return { status: 'healthy', message: 'Service is running' } }
-  async runPreprocessingAnalysis(_s: SessionData): Promise<import('./types').PreprocessingAnalysisResult> {
-    return {
-      biasScore: 0.5,
-      linguisticBias: {
-        genderBiasScore: 0.1,
-        racialBiasScore: 0.1,
-        ageBiasScore: 0.1,
-        culturalBiasScore: 0.1,
-        biasedTerms: [],
-        sentimentAnalysis: {
-          overallSentiment: 0.0,
-          emotionalValence: 0.0,
-          subjectivity: 0.0,
-          demographicVariations: {},
-        },
-      },
-      representationAnalysis: {
-        demographicDistribution: {},
-        underrepresentedGroups: [],
-        overrepresentedGroups: [],
-        diversityIndex: 0.0,
-        intersectionalityAnalysis: [],
-      },
-      dataQualityMetrics: {
-        completeness: 1.0,
-        consistency: 1.0,
-        accuracy: 1.0,
-        timeliness: 1.0,
-        validity: 1.0,
-        missingDataByDemographic: {},
-      },
-      recommendations: [],
-    }
-  }
-  async runModelLevelAnalysis(_s: SessionData): Promise<import('./types').ModelLevelAnalysisResult> {
-    return {
-      biasScore: 0.5,
-      fairnessMetrics: {
-        demographicParity: 0.75,
-        equalizedOdds: 0.8,
-        equalOpportunity: 0.8,
-        calibration: 0.8,
-        individualFairness: 0.8,
-        counterfactualFairness: 0.8,
-      },
-      performanceMetrics: {
-        accuracy: 0.9,
-        precision: 0.9,
-        recall: 0.9,
-        f1Score: 0.9,
-        auc: 0.9,
-        calibrationError: 0.05,
-        demographicBreakdown: {},
-      },
-      groupPerformanceComparison: [],
-      recommendations: [],
-    }
-  }
-  async runInteractiveAnalysis(_s: SessionData): Promise<import('./types').InteractiveAnalysisResult> {
-    return {
-      biasScore: 0.5,
-      counterfactualAnalysis: {
-        scenariosAnalyzed: 3,
-        biasDetected: false,
-        consistencyScore: 0.15,
-        problematicScenarios: [],
-      },
-      featureImportance: [],
-      whatIfScenarios: [],
-      recommendations: [],
-    }
-  }
-  async runEvaluationAnalysis(_s: SessionData): Promise<import('./types').EvaluationAnalysisResult> {
-    return {
-      biasScore: 0.5,
-      huggingFaceMetrics: {
-        toxicity: 0.05,
-        bias: 0.15,
-        regard: {},
-        stereotype: 0.1,
-        fairness: 0.85,
-      },
-      customMetrics: {
-        therapeuticBias: 0.1,
-        culturalSensitivity: 0.1,
-        professionalEthics: 0.1,
-        patientSafety: 0.1,
-      },
-      temporalAnalysis: {
-        trendDirection: 'stable',
-        changeRate: 0,
-        seasonalPatterns: [],
-        interventionEffectiveness: [],
-      },
-      recommendations: [],
-    }
-  }
-}
-
-class BiasMetricsCollector {
-  async initialize() {}
-  async recordAnalysis() {}
-  async storeAnalysisResult() {}
-  async getActiveAnalysesCount() { return 5 }
-  async getCurrentPerformanceMetrics() {
-    return { responseTime: 250, throughput: 45, errorRate: 0.02, activeConnections: 12 }
-  }
-  async getDashboardData() {
-    return {
-      summary: {
-        totalSessions: 150,
-        averageBiasScore: 0.3,
-        alertsLast24h: 5,
-        criticalIssues: 2,
-        improvementRate: 0.15,
-        complianceScore: 0.85,
-      },
-      recentAnalyses: [],
-      alerts: [],
-      trends: [],
-      demographics: {
-        age: { '18-25': 0.2, '26-35': 0.3, '36-45': 0.25, '46+': 0.25 },
-        gender: { male: 0.4, female: 0.5, other: 0.1 },
-      },
-      recommendations: [],
-    }
-  }
-  async getMetrics() {
-    return {
-      totalAnalyses: 100,
-      averageBiasScore: 0.3,
-      alertDistribution: { low: 60, medium: 30, high: 8, critical: 2 },
-    }
-  }
-  async dispose() {}
-}
-
-class BiasAlertSystem {
-  async initialize() {}
-  async checkAlerts() {}
-  async getActiveAlerts() { return [] as unknown[] }
-  async getRecentAlerts() { return [] as unknown[] }
-  async dispose() {}
-  async processAlert() {}
-  addMonitoringCallback(_cb: (a: unknown) => void) {}
 }
 
 export class BiasDetectionEngine {
@@ -241,35 +77,24 @@ export class BiasDetectionEngine {
     
     // Normalize threshold property names for backward compatibility
     const normalizedThresholds = {
-      warning: thresholds['warning'] ?? (thresholds as any)['warningLevel'] ?? DEFAULT_THRESHOLDS.warning,
-      high: thresholds['high'] ?? (thresholds as any)['highLevel'] ?? DEFAULT_THRESHOLDS.high,
-      critical: thresholds['critical'] ?? (thresholds as any)['criticalLevel'] ?? DEFAULT_THRESHOLDS.critical,
+      warning: thresholds['warning'] ?? ('warningLevel' in thresholds ? (thresholds as Record<string, number>).warningLevel : undefined) ?? DEFAULT_THRESHOLDS.warning,
+      high: thresholds['high'] ?? ('highLevel' in thresholds ? (thresholds as Record<string, number>).highLevel : undefined) ?? DEFAULT_THRESHOLDS.high,
+      critical: thresholds['critical'] ?? ('criticalLevel' in thresholds ? (thresholds as Record<string, number>).criticalLevel : undefined) ?? DEFAULT_THRESHOLDS.critical,
     }
     
-    validateThresholds(normalizedThresholds)
-
-    const layerWeights = cfg['layerWeights'] ?? DEFAULT_WEIGHTS
-    validateWeights(layerWeights)
-
-    // Accept cacheConfig from engine config, fallback to defaults
-    const cacheConfig = cfg['cacheConfig'] ?? {}
-
-    // Accept batchProcessingConfig from engine config, fallback to defaults
-    const batchProcessingConfig = cfg['batchProcessingConfig'] ?? {}
-
     this.config = {
       pythonServiceUrl: cfg['pythonServiceUrl'] ?? 'http://localhost:8000',
       pythonServiceTimeout: cfg['pythonServiceTimeout'] ?? 30000,
       thresholds: normalizedThresholds,
-      layerWeights,
+      layerWeights: cfg['layerWeights'] ?? DEFAULT_WEIGHTS,
       evaluationMetrics: cfg['evaluationMetrics'] ?? ['demographic_parity', 'equalized_odds'],
       metricsConfig: cfg['metricsConfig'] ?? { enableRealTimeMonitoring: true, metricsRetentionDays: 30, aggregationIntervals: ['1h', '1d'], dashboardRefreshRate: 60, exportFormats: ['json'] },
       alertConfig: cfg['alertConfig'] ?? { enableSlackNotifications: false, enableEmailNotifications: false, emailRecipients: [], alertCooldownMinutes: 5, escalationThresholds: { criticalResponseTimeMinutes: 15, highResponseTimeMinutes: 30 } },
       reportConfig: cfg['reportConfig'] ?? { includeConfidentialityAnalysis: true, includeDemographicBreakdown: true, includeTemporalTrends: true, includeRecommendations: true, reportTemplate: 'standard', exportFormats: ['json'] },
       explanationConfig: cfg['explanationConfig'] ?? { explanationMethod: 'shap', maxFeatures: 10, includeCounterfactuals: true, generateVisualization: false },
       pythonServiceConfig: {},
-      cacheConfig,
-      batchProcessingConfig,
+      cacheConfig: cfg['cacheConfig'] ?? {},
+      batchProcessingConfig: cfg['batchProcessingConfig'] ?? {},
       securityConfig: {},
       performanceConfig: {},
       hipaaCompliant: cfg['hipaaCompliant'] ?? true,
@@ -277,17 +102,26 @@ export class BiasDetectionEngine {
       auditLogging: cfg['auditLogging'] ?? true,
     }
 
-    const PythonBridgeCtor = (globalThis as { PythonBiasDetectionBridge?: typeof PythonBiasDetectionBridge }).PythonBiasDetectionBridge || PythonBiasDetectionBridge
-    const MetricsCollectorCtor = (globalThis as { BiasMetricsCollector?: typeof BiasMetricsCollector }).BiasMetricsCollector || BiasMetricsCollector
-    const AlertSystemCtor = (globalThis as { BiasAlertSystem?: typeof BiasAlertSystem }).BiasAlertSystem || BiasAlertSystem
+    // Validate thresholds configuration
+    this.config.thresholds = this.validateThresholds(this.config.thresholds)
+
+    // Validate layer weights configuration
+    validateWeights(this.config.layerWeights)
 
     // Initialize cache manager with config - cache instances are created internally
     // const cacheManager = getCacheManager() // Removed unused variable
     // Cache instances are managed internally by the cache manager
 
-    this.pythonService = new PythonBridgeCtor()
-    this.metricsCollector = new MetricsCollectorCtor()
-    this.alertSystem = new AlertSystemCtor()
+    this.pythonService = new PythonBiasDetectionBridge(
+      this.config.pythonServiceUrl || 'http://localhost:5000',
+      this.config.pythonServiceTimeout || 30000
+    )
+    this.metricsCollector = new BiasMetricsCollector(this.config, this.pythonService)
+    this.alertSystem = new BiasAlertSystem({
+      pythonServiceUrl: this.config.pythonServiceUrl || 'http://localhost:5000',
+      timeout: this.config.pythonServiceTimeout || 30000,
+      notifications: this.config.alertConfig?.enableSlackNotifications ? { slack: { enabled: true } } : undefined
+    }, this.pythonService)
     
     // Initialize performance optimizer with engine configuration (optional for backward compatibility)
     try {
@@ -313,9 +147,25 @@ export class BiasDetectionEngine {
       })
     } catch (error) {
       // Fallback to null if performance optimizer fails to initialize
-      this.performanceOptimizer = null as any
+      this.performanceOptimizer = null
       console.warn('Performance optimizer initialization failed, using fallback mode:', error)
     }
+  }
+
+  private validateThresholds(thresholds: BiasThresholdsConfig): BiasThresholdsConfig {
+    const validated = { ...DEFAULT_THRESHOLDS }
+
+    // Handle both new and legacy property names for backward compatibility
+    validated.warning = thresholds.warning ?? ('warningLevel' in thresholds ? (thresholds as Record<string, number>)['warningLevel'] : undefined) ?? DEFAULT_THRESHOLDS.warning
+    validated.high = thresholds.high ?? ('highLevel' in thresholds ? (thresholds as Record<string, number>)['highLevel'] : undefined) ?? DEFAULT_THRESHOLDS.high
+    validated.critical = thresholds.critical ?? ('criticalLevel' in thresholds ? (thresholds as Record<string, number>)['criticalLevel'] : undefined) ?? DEFAULT_THRESHOLDS.critical
+
+    // Ensure thresholds are in valid range and properly ordered
+    if (validated.warning >= validated.high || validated.high >= validated.critical) {
+      throw new Error('Invalid threshold configuration: warning < high < critical required')
+    }
+
+    return validated
   }
 
   getInitializationStatus() { return this.initialized }
@@ -325,7 +175,6 @@ export class BiasDetectionEngine {
   async initialize() {
   // Be tolerant of mocks that don't provide initialize
   await this.pythonService.initialize?.()
-    await this.metricsCollector.initialize?.()
     await this.alertSystem.initialize?.()
     this.initialized = true
   }
@@ -537,7 +386,7 @@ export class BiasDetectionEngine {
       layerResults.modelLevel,
       layerResults.interactive,
       layerResults.evaluation,
-    ].some((r: any) => r && r.fallback === true)
+    ].some((r) => r && 'fallback' in r && (r as { fallback: boolean }).fallback === true)
 
     // Enhanced fallback messages for error scenarios to satisfy various tests
     let recommendations: string[];
@@ -558,15 +407,6 @@ export class BiasDetectionEngine {
       recommendations = ['System performing within acceptable parameters'];
     }
 
-
-    // Only collect metrics when auditLogging is turned OFF (per tests)
-    if (!this.config.auditLogging) {
-      try {
-        await this.metricsCollector.storeAnalysisResult?.()
-      } catch (err) {
-        console.warn('storeAnalysisResult failed:', err)
-      }
-    }
 
     // Trigger monitoring callbacks for high/critical alerts
     if (alertLevel === 'high' || alertLevel === 'critical') {
@@ -589,12 +429,21 @@ export class BiasDetectionEngine {
       confidence,
       demographics: maskedDemo && typeof maskedDemo === 'object'
         ? {
-            age: (maskedDemo as any).age ?? '',
-            gender: (maskedDemo as any).gender ?? '',
-            ethnicity: (maskedDemo as any).ethnicity ?? '',
-            primaryLanguage: (maskedDemo as any).primaryLanguage ?? '',
+            age: (maskedDemo as Record<string, unknown>).age as string ?? '',
+            gender: (maskedDemo as Record<string, unknown>).gender as string ?? '',
+            ethnicity: (maskedDemo as Record<string, unknown>).ethnicity as string ?? '',
+            primaryLanguage: (maskedDemo as Record<string, unknown>).primaryLanguage as string ?? '',
           }
         : { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
+    }
+
+    // Only collect metrics when auditLogging is turned OFF (per tests)
+    if (!this.config.auditLogging) {
+      try {
+        await this.metricsCollector.storeAnalysisResult?.(result)
+      } catch (err) {
+        console.warn('storeAnalysisResult failed:', err)
+      }
     }
 
     // Store result in distributed cache for future retrieval
@@ -637,7 +486,24 @@ export class BiasDetectionEngine {
   // Lightweight metrics pass-through for performance tests
   async getMetrics(_opts?: unknown): Promise<{ totalAnalyses: number; averageBiasScore: number; alertDistribution: { low: number; medium: number; high: number; critical: number; } }> {
     this.ensureInitialized()
-    return this.metricsCollector.getMetrics?.()
+    const dashboardMetrics = await this.metricsCollector.getMetrics?.()
+    if (dashboardMetrics && dashboardMetrics.overall_stats) {
+      return {
+        totalAnalyses: dashboardMetrics.overall_stats.total_sessions,
+        averageBiasScore: dashboardMetrics.overall_stats.average_bias_score,
+        alertDistribution: {
+          low: dashboardMetrics.overall_stats.alert_distribution.low || 0,
+          medium: dashboardMetrics.overall_stats.alert_distribution.medium || 0,
+          high: dashboardMetrics.overall_stats.alert_distribution.high || 0,
+          critical: dashboardMetrics.overall_stats.alert_distribution.critical || 0,
+        }
+      }
+    }
+    return {
+      totalAnalyses: 0,
+      averageBiasScore: 0,
+      alertDistribution: { low: 0, medium: 0, high: 0, critical: 0 }
+    }
   }
 
   // Fast cached lookup used by performance tests
@@ -670,8 +536,7 @@ export class BiasDetectionEngine {
 
   // Update thresholds with validation
   async updateThresholds(thresholds: BiasThresholdsConfig): Promise<BiasThresholdsConfig> {
-    validateThresholds(thresholds)
-    this.config.thresholds = thresholds
+    this.config.thresholds = this.validateThresholds(thresholds)
     return this.config.thresholds
   }
 
@@ -781,7 +646,39 @@ export class BiasDetectionEngine {
     demographics: { age: Record<string, number>; gender: Record<string, number> }
     recommendations: any[]
   }> {
-    return this.metricsCollector.getDashboardData()
+    const dashboardMetrics = await this.metricsCollector.getDashboardData()
+    if (dashboardMetrics) {
+      return {
+        summary: {
+          totalSessions: dashboardMetrics.overall_stats?.total_sessions || 0,
+          averageBiasScore: dashboardMetrics.overall_stats?.average_bias_score || 0,
+          alertsLast24h: dashboardMetrics.recent_alerts?.length || 0,
+          criticalIssues: dashboardMetrics.overall_stats?.alert_distribution?.critical || 0,
+          improvementRate: 0, // Not available in DashboardMetrics
+          complianceScore: 0, // Not available in DashboardMetrics
+        },
+        recentAnalyses: [], // Not available in DashboardMetrics
+        alerts: dashboardMetrics.recent_alerts || [],
+        trends: dashboardMetrics.trend_data || [],
+        demographics: { age: {}, gender: {} }, // Not available in DashboardMetrics
+        recommendations: [], // Not available in DashboardMetrics
+      }
+    }
+    return {
+      summary: {
+        totalSessions: 0,
+        averageBiasScore: 0,
+        alertsLast24h: 0,
+        criticalIssues: 0,
+        improvementRate: 0,
+        complianceScore: 0,
+      },
+      recentAnalyses: [],
+      alerts: [],
+      trends: [],
+      demographics: { age: {}, gender: {} },
+      recommendations: [],
+    }
   }
 
   async startMonitoring(callback: (alert: { level: AlertLevel; sessionId: string }) => void) {
@@ -981,7 +878,8 @@ async batchAnalyzeSessions(
   }
   
   // Store batch processing metrics
-  await this.metricsCollector.recordAnalysis?.()
+  // Note: recordAnalysis expects individual analysis results, not batch metrics
+  // await this.metricsCollector.recordAnalysis?.()
   
   return {
     results: analysisResults,
@@ -992,6 +890,4 @@ async batchAnalyzeSessions(
       errorCount: errors.length
     }
   }
-}
-
 }

@@ -58,6 +58,10 @@ flake8
 gunicorn
 gevent
 
+# Distributed task processing
+celery[redis]
+redis
+
 # Demographic analysis (optional)
 face-recognition
 

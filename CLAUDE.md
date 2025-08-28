@@ -21,7 +21,6 @@
 
 **Claude Code's Task tool is the PRIMARY way to spawn agents:**
 ```javascript
-// ✅ CORRECT: Use Claude Code's Task tool for parallel agent execution
 [Single Message]:
   Task("Research agent", "Analyze requirements and patterns...", "researcher")
   Task("Coder agent", "Implement core features...", "coder")
@@ -141,7 +140,6 @@ This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Co
 ## 🚀 Quick Setup
 
 ```bash
-# Add Claude Flow MCP server
 claude mcp add claude-flow npx claude-flow@alpha mcp start
 ```
 
@@ -174,7 +172,6 @@ claude mcp add claude-flow npx claude-flow@alpha mcp start
 ### Example Full-Stack Development:
 
 ```javascript
-// Single message with all agent spawning via Claude Code's Task tool
 [Parallel Agent Execution]:
   Task("Backend Developer", "Build REST API with Express. Use hooks for coordination.", "backend-dev")
   Task("Frontend Developer", "Create React UI. Coordinate with backend via memory.", "coder")
@@ -183,10 +180,8 @@ claude mcp add claude-flow npx claude-flow@alpha mcp start
   Task("DevOps Engineer", "Setup Docker and CI/CD. Document in memory.", "cicd-engineer")
   Task("Security Auditor", "Review authentication. Report findings via hooks.", "reviewer")
   
-  // All todos batched together
   TodoWrite { todos: [...8-10 todos...] }
   
-  // All file operations together
   Write "backend/server.js"
   Write "frontend/App.jsx"
   Write "database/schema.sql"
@@ -219,23 +214,19 @@ npx claude-flow@alpha hooks session-end --export-metrics true
 ### ✅ CORRECT WORKFLOW: MCP Coordinates, Claude Code Executes
 
 ```javascript
-// Step 1: MCP tools set up coordination (optional, for complex tasks)
 [Single Message - Coordination Setup]:
   mcp__claude-flow__swarm_init { topology: "mesh", maxAgents: 6 }
   mcp__claude-flow__agent_spawn { type: "researcher" }
   mcp__claude-flow__agent_spawn { type: "coder" }
   mcp__claude-flow__agent_spawn { type: "tester" }
 
-// Step 2: Claude Code Task tool spawns ACTUAL agents that do the work
 [Single Message - Parallel Agent Execution]:
-  // Claude Code's Task tool spawns real agents concurrently
   Task("Research agent", "Analyze API requirements and best practices. Check memory for prior decisions.", "researcher")
   Task("Coder agent", "Implement REST endpoints with authentication. Coordinate via hooks.", "coder")
   Task("Database agent", "Design and implement database schema. Store decisions in memory.", "code-analyzer")
   Task("Tester agent", "Create comprehensive test suite with 90% coverage.", "tester")
   Task("Reviewer agent", "Review code quality and security. Document findings.", "reviewer")
   
-  // Batch ALL todos in ONE call
   TodoWrite { todos: [
     {id: "1", content: "Research API patterns", status: "in_progress", priority: "high"},
     {id: "2", content: "Design database schema", status: "in_progress", priority: "high"},
@@ -247,7 +238,6 @@ npx claude-flow@alpha hooks session-end --export-metrics true
     {id: "8", content: "Performance optimization", status: "pending", priority: "low"}
   ]}
   
-  // Parallel file operations
   Bash "mkdir -p app/{src,tests,docs,config}"
   Write "app/package.json"
   Write "app/src/server.js"
@@ -261,7 +251,6 @@ Message 1: mcp__claude-flow__swarm_init
 Message 2: Task("agent 1")
 Message 3: TodoWrite { todos: [single todo] }
 Message 4: Write "file.js"
-// This breaks parallel coordination!
 ```
 
 ## Performance Benefits

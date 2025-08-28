@@ -68,6 +68,9 @@ from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
 from werkzeug.exceptions import Unauthorized
 
+# Celery integration (will be initialized after logger setup)
+CELERY_AVAILABLE = False
+
 # IBM AIF360 (import only what we use)
 try:
     from aif360.datasets import BinaryLabelDataset
@@ -201,6 +204,21 @@ logging.basicConfig(
     ],
 )
 logger = logging.getLogger(__name__)
+
+# Initialize Celery integration after logger setup
+try:
+    from tasks import (
+        analyze_session_async,
+        batch_analyze_sessions,
+        validate_dataset_quality,
+        export_dataset_chunk,
+        distribute_task
+    )
+    CELERY_AVAILABLE = True
+    logger.info("Celery distributed processing initialized successfully")
+except ImportError as e:
+    CELERY_AVAILABLE = False
+    logger.warning(f"Celery not available - distributed processing disabled: {e}")
 
 # Flask app initialization
 app = Flask(__name__)
@@ -1633,6 +1651,195 @@ def export_data():
 
     except Exception as e:
         logger.error(f"Export endpoint error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+# Celery-enabled distributed processing endpoints
+@app.route("/analyze/async", methods=["POST"])
+@require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
+def analyze_session_async_endpoint():
+    """Submit bias analysis task for asynchronous distributed processing"""
+    if not CELERY_AVAILABLE:
+        return jsonify({"error": "Distributed processing not available"}), 503
+
+    try:
+        # Set default user_id only in development
+        if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
+            g.user_id = "development-user"
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        # Validate required fields
+        required_fields = ["session_id", "participant_demographics", "content"]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+
+        # Submit task to Celery
+        task = analyze_session_async.delay(data, getattr(g, "user_id", "unknown"))
+
+        return jsonify({
+            "task_id": task.id,
+            "status": "submitted",
+            "message": "Bias analysis submitted for distributed processing",
+            "check_status_url": f"/task/{task.id}"
+        })
+
+    except Exception as e:
+        logger.error(f"Async analysis endpoint error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/batch/analyze", methods=["POST"])
+@require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
+def batch_analyze_sessions_endpoint():
+    """Submit batch analysis for distributed processing across multiple workers"""
+    if not CELERY_AVAILABLE:
+        return jsonify({"error": "Distributed processing not available"}), 503
+
+    try:
+        # Set default user_id only in development
+        if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
+            g.user_id = "development-user"
+
+        data = request.get_json()
+        if not data or "sessions" not in data:
+            return jsonify({"error": "No sessions data provided"}), 400
+
+        sessions_data = data["sessions"]
+        batch_size = data.get("batch_size", 10)
+
+        if not isinstance(sessions_data, list) or len(sessions_data) == 0:
+            return jsonify({"error": "Sessions must be a non-empty list"}), 400
+
+        # Submit batch task to Celery
+        task = batch_analyze_sessions.delay(
+            sessions_data,
+            getattr(g, "user_id", "unknown"),
+            batch_size
+        )
+
+        return jsonify({
+            "task_id": task.id,
+            "status": "submitted",
+            "message": f"Batch analysis of {len(sessions_data)} sessions submitted for distributed processing",
+            "check_status_url": f"/task/{task.id}",
+            "estimated_workers_needed": min(len(sessions_data) // batch_size + 1, 10)
+        })
+
+    except Exception as e:
+        logger.error(f"Batch analysis endpoint error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/dataset/validate", methods=["POST"])
+@require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
+def validate_dataset_quality_endpoint():
+    """Submit dataset quality validation for distributed processing"""
+    if not CELERY_AVAILABLE:
+        return jsonify({"error": "Distributed processing not available"}), 503
+
+    try:
+        # Set default user_id only in development
+        if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
+            g.user_id = "development-user"
+
+        data = request.get_json()
+        if not data or "dataset_path" not in data:
+            return jsonify({"error": "No dataset_path provided"}), 400
+
+        dataset_path = data["dataset_path"]
+        quality_threshold = data.get("quality_threshold", 0.7)
+
+        # Submit validation task to Celery
+        task = validate_dataset_quality.delay(dataset_path, quality_threshold)
+
+        return jsonify({
+            "task_id": task.id,
+            "status": "submitted",
+            "message": f"Dataset quality validation submitted for distributed processing",
+            "check_status_url": f"/task/{task.id}"
+        })
+
+    except Exception as e:
+        logger.error(f"Dataset validation endpoint error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/task/<task_id>", methods=["GET"])
+@require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
+def get_task_status(task_id):
+    """Get the status and result of a distributed task"""
+    if not CELERY_AVAILABLE:
+        return jsonify({"error": "Distributed processing not available"}), 503
+
+    try:
+        from celery_config import app as celery_app
+
+        # Get task result
+        result = celery_app.AsyncResult(task_id)
+
+        response = {
+            "task_id": task_id,
+            "status": result.status,
+            "current": result.info if result.info else None,
+        }
+
+        if result.state == "PENDING":
+            response["message"] = "Task is waiting for execution"
+        elif result.state == "PROGRESS":
+            response["message"] = "Task is in progress"
+            response["progress"] = result.info
+        elif result.state == "SUCCESS":
+            response["message"] = "Task completed successfully"
+            response["result"] = result.result
+        elif result.state == "FAILURE":
+            response["message"] = "Task failed"
+            response["error"] = str(result.info)
+
+        return jsonify(response)
+
+    except Exception as e:
+        logger.error(f"Task status endpoint error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/workers/status", methods=["GET"])
+@require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
+def get_workers_status():
+    """Get status of distributed workers"""
+    if not CELERY_AVAILABLE:
+        return jsonify({"error": "Distributed processing not available"}), 503
+
+    try:
+        from celery_config import app as celery_app
+
+        # Get active workers (simplified - in production you'd use flower or custom monitoring)
+        inspect = celery_app.control.inspect()
+
+        active_tasks = inspect.active() or {}
+        scheduled_tasks = inspect.scheduled() or {}
+        reserved_tasks = inspect.reserved() or {}
+
+        workers_status = {}
+        for worker_name in set(active_tasks.keys()) | set(scheduled_tasks.keys()) | set(reserved_tasks.keys()):
+            workers_status[worker_name] = {
+                "active_tasks": len(active_tasks.get(worker_name, [])),
+                "scheduled_tasks": len(scheduled_tasks.get(worker_name, [])),
+                "reserved_tasks": len(reserved_tasks.get(worker_name, [])),
+                "status": "active"
+            }
+
+        return jsonify({
+            "total_workers": len(workers_status),
+            "workers": workers_status,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+
+    except Exception as e:
+        logger.error(f"Workers status endpoint error: {e}")
         return jsonify({"error": str(e)}), 500
 
 

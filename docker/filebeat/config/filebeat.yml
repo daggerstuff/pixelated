@@ -1,0 +1,97 @@
+# Filebeat configuration for Pixelated Empathy
+filebeat.inputs:
+- type: container
+  paths:
+    - '/var/lib/docker/containers/*/*.log'
+  processors:
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+      match_source: true
+      match_source_index: 4
+      match_short_source: false
+      cleanup_timeout: 60
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+      overwrite_keys: true
+      add_error_key: true
+  - drop_fields:
+      fields: ["json", "input.type", "ecs.version", "agent.ephemeral_id", "agent.hostname", "agent.id", "agent.type", "agent.version"]
+
+- type: log
+  enabled: true
+  paths:
+    - '/usr/share/logstash/logs/bias_detection.log'
+    - '/usr/share/logstash/logs/celery*.log'
+  fields:
+    service: bias_detection
+  fields_under_root: true
+  processors:
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+      overwrite_keys: true
+      add_error_key: true
+  - drop_fields:
+      fields: ["json"]
+
+# Elasticsearch output
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  index: "pixelated-filebeat-%{+yyyy.MM.dd}"
+  indices:
+    - index: "pixelated-bias-%{+yyyy.MM.dd}"
+      when.contains:
+        service: "bias_detection"
+    - index: "pixelated-celery-%{+yyyy.MM.dd}"
+      when.contains:
+        module: "celery"
+
+# Logging configuration
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /usr/share/filebeat/logs
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+
+# Monitoring
+monitoring.enabled: false
+
+# HTTP endpoint for health checks
+http.enabled: true
+http.host: 0.0.0.0
+http.port: 5066
+
+# Processors
+processors:
+- add_host_metadata:
+    when.not.contains.tags: forwarded
+- add_cloud_metadata: ~
+- add_docker_metadata: ~
+- add_kubernetes_metadata: ~
+- add_fields:
+    target: ''
+    fields:
+      environment: production
+      application: pixelated-empathy
+
+# Queue settings
+queue.mem:
+  events: 4096
+  flush.min_events: 512
+  flush.timeout: 5s
+
+# Autodiscover for Docker
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      hints.default_config:
+        type: container
+        paths:
+          - '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+        processors:
+        - add_docker_metadata:
+            host: "unix:///var/run/docker.sock"

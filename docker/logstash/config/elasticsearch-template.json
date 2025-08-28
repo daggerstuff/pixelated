@@ -1,0 +1,210 @@
+{
+  "index_patterns": ["pixelated-*"],
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "refresh_interval": "30s",
+    "index.codec": "best_compression",
+    "analysis": {
+      "analyzer": {
+        "pixelated_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "stop", "porter2"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": {
+        "type": "date",
+        "format": "strict_date_optional_time||yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd"
+      },
+      "service": {
+        "type": "keyword"
+      },
+      "level": {
+        "type": "keyword"
+      },
+      "module": {
+        "type": "keyword"
+      },
+      "message": {
+        "type": "text",
+        "analyzer": "pixelated_analyzer",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "session_id": {
+        "type": "keyword"
+      },
+      "bias_score": {
+        "type": "float"
+      },
+      "task_id": {
+        "type": "keyword"
+      },
+      "task_name": {
+        "type": "keyword"
+      },
+      "processing_node": {
+        "type": "keyword"
+      },
+      "client_ip": {
+        "type": "ip"
+      },
+      "user_agent": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "http_status": {
+        "type": "integer"
+      },
+      "response_time": {
+        "type": "long"
+      },
+      "request_size": {
+        "type": "long"
+      },
+      "response_size": {
+        "type": "long"
+      },
+      "error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "text"
+          },
+          "stack_trace": {
+            "type": "text"
+          },
+          "code": {
+            "type": "keyword"
+          }
+        }
+      },
+      "performance": {
+        "type": "object",
+        "properties": {
+          "cpu_usage": {
+            "type": "float"
+          },
+          "memory_usage": {
+            "type": "long"
+          },
+          "disk_usage": {
+            "type": "long"
+          },
+          "network_in": {
+            "type": "long"
+          },
+          "network_out": {
+            "type": "long"
+          }
+        }
+      },
+      "environment": {
+        "type": "keyword"
+      },
+      "application": {
+        "type": "keyword"
+      },
+      "datacenter": {
+        "type": "keyword"
+      },
+      "host": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "keyword"
+          },
+          "ip": {
+            "type": "ip"
+          },
+          "architecture": {
+            "type": "keyword"
+          },
+          "os": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "version": {
+                "type": "keyword"
+              },
+              "family": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      },
+      "docker": {
+        "type": "object",
+        "properties": {
+          "container": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              },
+              "image": {
+                "type": "keyword"
+              },
+              "labels": {
+                "type": "object",
+                "dynamic": true
+              }
+            }
+          }
+        }
+      },
+      "kubernetes": {
+        "type": "object",
+        "properties": {
+          "pod": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "namespace": {
+                "type": "keyword"
+              },
+              "labels": {
+                "type": "object",
+                "dynamic": true
+              }
+            }
+          },
+          "node": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "labels": {
+                "type": "object",
+                "dynamic": true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

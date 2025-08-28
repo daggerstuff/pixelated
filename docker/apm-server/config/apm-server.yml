@@ -1,0 +1,85 @@
+# APM Server configuration for Pixelated Empathy
+apm-server:
+  host: "0.0.0.0:8200"
+  secret_token: "${APM_SECRET_TOKEN:-}"
+  api_key.enabled: false
+  kibana:
+    enabled: false
+
+# Elasticsearch output
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  username: ""
+  password: ""
+  index: "pixelated-apm-%{+yyyy.MM.dd}"
+
+# Logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /usr/share/apm-server/logs
+  name: apm-server
+  keepfiles: 7
+  permissions: 0644
+
+# HTTP server
+http.enabled: true
+http.host: 0.0.0.0
+http.port: 8200
+http.timeout: 30s
+http.max_header_size: 1048576
+http.max_event_size: 1048576
+
+# RUM (Real User Monitoring) - disabled for now
+rum:
+  enabled: false
+
+# Instrumentation
+instrumentation:
+  enabled: false
+
+# Agent configuration
+agent.config.cache.expiration: 30s
+
+# Data streams
+data_streams.enabled: true
+
+# Queue settings
+queue.mem:
+  events: 4096
+  flush.min_events: 512
+  flush.timeout: 5s
+
+# Processors
+processors:
+- add_host_metadata: ~
+- add_cloud_metadata: ~
+- add_docker_metadata: ~
+- add_kubernetes_metadata: ~
+- add_fields:
+    target: ''
+    fields:
+      environment: production
+      application: pixelated-empathy
+
+# Monitoring
+monitoring.enabled: false
+
+# Setup
+setup.template.enabled: true
+setup.template.name: "pixelated-apm"
+setup.template.pattern: "pixelated-apm-*"
+setup.ilm.enabled: false
+
+# Default service environment
+default_service_environment: production
+
+# Event rate limit
+event_rate:
+  limit: 300
+  burst: 300
+  lru_size: 1000
+
+# Concurrent requests
+max_concurrent_decoders: 10
+max_request_queue_time: 2s
