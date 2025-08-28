@@ -126,6 +126,7 @@ export class BiasAlertSystem {
     escalationDelay: number
     recipients: string[]
   }> = []
+  getAlertHistory: any
 
   constructor(
     public config: AlertSystemConfig,

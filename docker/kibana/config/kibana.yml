@@ -1,0 +1,61 @@
+# Kibana configuration for Pixelated Empathy
+server.name: kibana-pixelated
+server.host: "0.0.0.0"
+server.port: 5601
+
+# Elasticsearch configuration
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: ""
+elasticsearch.password: ""
+elasticsearch.ssl.verificationMode: none
+
+# Kibana settings
+kibana.index: ".kibana"
+kibana.defaultAppId: "discover"
+
+# Security settings (disabled for development)
+xpack.security.enabled: false
+xpack.monitoring.enabled: false
+xpack.graph.enabled: false
+xpack.watcher.enabled: false
+xpack.ml.enabled: false
+xpack.reporting.enabled: false
+
+# Logging settings
+logging.dest: /usr/share/kibana/logs/kibana.log
+logging.level: info
+logging.json: true
+
+# Performance settings
+ops.interval: 5000
+server.maxPayloadBytes: 1048576
+server.compression.enabled: true
+
+# UI settings
+kibana.branding.logoUrl: ""
+kibana.branding.faviconUrl: ""
+
+# Default route
+server.defaultRoute: /app/discover
+
+# Timezone
+kibana.timezone: UTC
+
+# Session settings
+server.sessionTimeout: 3600000
+server.sessionKeepAlive: true
+
+# CORS settings
+server.cors: true
+server.cors.origin: ["*"]
+
+# News feed (disable for production)
+newsfeed.enabled: false
+
+# Telemetry (disable for privacy)
+telemetry.enabled: false
+telemetry.optIn: false
+telemetry.allowChangingOptInStatus: false
+
+# Data usage collection (disable for privacy)
+data.usageCollector.enabled: false

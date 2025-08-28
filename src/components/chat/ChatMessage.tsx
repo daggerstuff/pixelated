@@ -3,6 +3,8 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { markdownToHtml } from '@/lib/markdown'
 import { formatTimestamp } from '@/lib/dates'
+import { useContext } from 'react'
+import { ThemeContext } from '@/contexts/ThemeContext'
 
 // Define the MentalHealthAnalysis interface with the properties we need
 interface MentalHealthAnalysis {
@@ -73,10 +75,16 @@ export function ChatMessage({
         className={cn(
           'relative mb-6 max-w-[80%] rounded-lg p-4 shadow-sm',
           isUser
-            ? 'bg-blue-600 text-white'
+            ? theme?.isDark
+              ? 'bg-blue-600 text-white'
+              : 'bg-blue-600 text-white'
             : isBotMessage
-              ? 'bg-gray-50 text-gray-900 border border-gray-200'
-              : 'bg-gray-100 text-gray-600 italic border border-gray-200',
+              ? theme?.isDark
+                ? 'bg-gray-900 text-gray-100 border border-gray-700'
+                : 'bg-gray-50 text-gray-900 border border-gray-200'
+              : theme?.isDark
+                ? 'bg-gray-800 text-gray-300 italic border border-gray-700'
+                : 'bg-gray-100 text-gray-600 italic border border-gray-200',
           isTyping && 'animate-pulse',
         )}
       >
@@ -86,10 +94,16 @@ export function ChatMessage({
             className={cn(
               'rounded-full px-2 py-1 text-xs',
               isUser
-                ? 'bg-blue-800 text-blue-200'
+                ? theme?.isDark
+                  ? 'bg-blue-900 text-blue-100'
+                  : 'bg-blue-800 text-blue-200'
                 : isBotMessage
-                  ? 'bg-gray-200 text-gray-700'
-                  : 'bg-gray-300 text-gray-600',
+                  ? theme?.isDark
+                    ? 'bg-gray-800 text-gray-200'
+                    : 'bg-gray-200 text-gray-700'
+                  : theme?.isDark
+                    ? 'bg-gray-700 text-gray-400'
+                    : 'bg-gray-300 text-gray-600',
             )}
           >
             {isUser ? 'You' : isBotMessage ? 'AI' : 'System'}

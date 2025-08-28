@@ -14,7 +14,9 @@ export $(grep '^DROPBOX_TOKEN=' .env | xargs)
 REMOTE_NAME="dropbox"
 REMOTE_PATH="${REMOTE_NAME}:backup/home"
 LOCAL_PATH="$HOME"
-EXCLUDES=( "**/.cache" "**/.local/share/Trash" "**/node_modules" "**/Downloads" "**/.venv" )
+EXCLUDES=( "**/uvx --from git+https://github.com/oraios/serena serena-mcp-server
+
+.cache" "**/.local/share/Trash" "**/node_modules" "**/Downloads" "**/.venv" )
 
 EXCLUDE_FLAGS=""
 for EX in "${EXCLUDES[@]}"; do

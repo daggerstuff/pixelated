@@ -1,0 +1,17 @@
+# PgBouncer user authentication file
+# Format: "username" "password_hash"
+# Passwords should be MD5 hashed: md5(password + username)
+
+# Main application user
+"pixelated" "md5$(echo -n 'dev_password_change_in_prodpixelated' | md5sum | cut -d' ' -f1)"
+
+# Service-specific users
+"bias_detection_user" "md5$(echo -n 'bias_detection_passbias_detection_user' | md5sum | cut -d' ' -f1)"
+"ai_service_user" "md5$(echo -n 'ai_service_passai_service_user' | md5sum | cut -d' ' -f1)"
+"analytics_user" "md5$(echo -n 'analytics_passanalytics_user' | md5sum | cut -d' ' -f1)"
+
+# PgBouncer admin user
+"pgbouncer" "md5$(echo -n 'pgbouncer_admin_passwordpgbouncer' | md5sum | cut -d' ' -f1)"
+
+# Stats user
+"stats" "md5$(echo -n 'stats_passwordstats' | md5sum | cut -d' ' -f1)"

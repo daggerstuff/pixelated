@@ -10,24 +10,13 @@ import { ConnectionPool, ConnectionPoolConfig, PooledConnection } from './connec
 import type {
   TherapeuticSession,
   PreprocessingAnalysisResult,
+  ModelLevelAnalysisResult,
+  InteractiveAnalysisResult,
+  EvaluationAnalysisResult,
 } from './types'
 import type {
   PythonAnalysisResult,
   PythonHealthResponse,
-  MetricsBatchResponse,
-  DashboardMetrics,
-  PerformanceMetrics,
-  AlertData,
-  AlertResponse,
-  AlertStatistics,
-  DashboardOptions,
-  MetricData,
-  AlertRegistration,
-  AlertEscalation,
-  AlertAcknowledgment,
-  NotificationData,
-  SystemNotificationData,
-  TimeRange,
 } from './bias-detection-interfaces'
 
 const logger = createBuildSafeLogger('PythonBiasDetectionBridge')
@@ -66,6 +55,7 @@ export class PythonBiasDetectionBridge {
     deduplicatedRequests: 0,
   }
   private connectionPool: ConnectionPool
+  private healthCheckTimer?: NodeJS.Timeout
 
   constructor(
     public url: string = 'http://localhost:5000',
@@ -81,6 +71,45 @@ export class PythonBiasDetectionBridge {
     this.processQueue()
     // Start health monitoring
     this.startHealthMonitoring()
+  }
+
+  private startHealthMonitoring(): void {
+    this.healthCheckTimer = setInterval(async () => {
+      try {
+        const healthResponse = await this.checkHealth()
+        this.lastHealthCheck = new Date()
+
+        if (healthResponse.status === 'healthy') {
+          this.healthStatus = 'healthy'
+          this.consecutiveFailures = 0
+          this.metrics.successfulRequests++
+        } else if (healthResponse.status === 'degraded') {
+          this.healthStatus = 'degraded'
+          this.consecutiveFailures = 0
+          this.metrics.successfulRequests++
+        } else {
+          this.healthStatus = 'unhealthy'
+          this.consecutiveFailures++
+          this.metrics.failedRequests++
+        }
+
+        logger.debug('Health check completed', {
+          status: this.healthStatus,
+          consecutiveFailures: this.consecutiveFailures,
+          timestamp: healthResponse.timestamp,
+        })
+      } catch (error: unknown) {
+        this.healthStatus = 'unhealthy'
+        this.consecutiveFailures++
+        this.metrics.failedRequests++
+        this.lastHealthCheck = new Date()
+
+        logger.warn('Health check failed', {
+          error: error instanceof Error ? error.message : String(error),
+          consecutiveFailures: this.consecutiveFailures,
+        })
+      }
+    }, this.healthCheckInterval)
   }
 
   async initialize(): Promise<void> {
@@ -214,10 +243,14 @@ export class PythonBiasDetectionBridge {
         }
 
         const result = await response.json()
+        this.metrics.totalRequests++
+        this.metrics.successfulRequests++
         logger.debug(`Request successful: ${method} ${endpoint}`)
         return result
       } catch (error: unknown) {
         lastError = error instanceof Error ? error : new Error(String(error))
+        this.metrics.totalRequests++
+        this.metrics.failedRequests++
         logger.warn(`Request attempt ${attempt} failed: ${lastError.message}`, {
           url,
           method,
@@ -369,220 +402,228 @@ export class PythonBiasDetectionBridge {
     } as PreprocessingAnalysisResult;
   }
 
-  // Metrics-specific public methods
-  async sendMetricsBatch(metrics: MetricData[]): Promise<MetricsBatchResponse> {
+  async runModelLevelAnalysis(
+    sessionData: TherapeuticSession,
+  ): Promise<ModelLevelAnalysisResult> {
     try {
-      return (await this.makeRequest('/metrics/batch', 'POST', { metrics })) as MetricsBatchResponse;
-    } catch (error: unknown) {
-      logger.warn('Failed to send metrics batch to Python service', {
-        error,
-        metricsCount: metrics.length,
-      })
-      return {
-        success: false,
-        processed: 0,
-        errors: [error instanceof Error ? String(error) : String(error)],
-      };
-    }
-  }
+      const result = (await this.makeRequest('/analyze/model_level', 'POST', sessionData)) as PythonAnalysisResult
+      const layerResult = result?.layer_results?.model_level
+      if (layerResult) {
+        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
+        const fairness = (metrics['fairness_metrics'] ?? {}) as Record<string, any>;
+        const performance = (metrics['performance_metrics'] ?? {}) as Record<string, any>;
+        const groupComp = (metrics['group_performance_comparison'] ?? []) as any[];
 
-  async sendAnalysisMetric(metricData: MetricData): Promise<void> {
-    await this.makeRequest('/metrics/analysis', 'POST', metricData)
-  }
-
-  async getDashboardMetrics(
-    options?: DashboardOptions,
-  ): Promise<DashboardMetrics> {
-    // Always use GET method for dashboard data retrieval
-    // Convert options to query parameters for consistent REST API design
-    if (options) {
-      const queryParams = new URLSearchParams({
-        time_range: options.time_range || '24h',
-        include_details: options.include_details?.toString() || 'false',
-        aggregation_type: options.aggregation_type || 'hourly',
-      }).toString()
-      return (await this.makeRequest(
-        `/dashboard?${queryParams}`,
-        'GET',
-      )) as DashboardMetrics
-    }
-    return (await this.makeRequest('/dashboard', 'GET')) as DashboardMetrics
-  }
-
-  async recordReportMetric(reportData: MetricData): Promise<void> {
-    await this.makeRequest('/metrics/report', 'POST', reportData)
-  }
-
-  async getPerformanceMetrics(): Promise<PerformanceMetrics> {
-    return (await this.makeRequest(
-      '/metrics/performance',
-      'GET',
-    )) as PerformanceMetrics
-  }
-
-  async getSessionData(sessionId: string): Promise<TherapeuticSession> {
-    return (await this.makeRequest(
-      `/sessions/${sessionId}`,
-      'GET',
-    )) as TherapeuticSession
-  }
-
-  async storeMetrics(storeData: MetricData[]): Promise<void> {
-    await this.makeRequest('/metrics/store', 'POST', { metrics: storeData })
-  }
-
-  // Alert-specific public methods
-  async registerAlertSystem(
-    registrationData: AlertRegistration,
-  ): Promise<AlertResponse> {
-    return (await this.makeRequest(
-      '/alerts/register',
-      'POST',
-      registrationData,
-    )) as AlertResponse
-  }
-
-  async checkAlerts(alertData: AlertData): Promise<AlertResponse[]> {
-    return (await this.makeRequest(
-      '/alerts/check',
-      'POST',
-      alertData,
-    )) as AlertResponse[]
-  }
-
-  async storeAlerts(alertsData: AlertData[]): Promise<void> {
-    await this.makeRequest('/alerts/store', 'POST', { alerts: alertsData })
-  }
-
-  async escalateAlert(escalationData: AlertEscalation): Promise<AlertResponse> {
-    return (await this.makeRequest(
-      '/alerts/escalate',
-      'POST',
-      escalationData,
-    )) as AlertResponse
-  }
-
-  async getActiveAlerts(): Promise<AlertData[]> {
-    return (await this.makeRequest('/alerts/active', 'GET')) as AlertData[]
-  }
-
-  async acknowledgeAlert(
-    acknowledgeData: AlertAcknowledgment,
-  ): Promise<AlertResponse> {
-    return (await this.makeRequest(
-      '/alerts/acknowledge',
-      'POST',
-      acknowledgeData,
-    )) as AlertResponse
-  }
-
-  async getRecentAlerts(timeRangeData: TimeRange): Promise<AlertData[]> {
-    return (await this.makeRequest(
-      '/alerts/recent',
-      'POST',
-      timeRangeData,
-    )) as AlertData[]
-  }
-
-  async getAlertStatistics(
-    statisticsData: TimeRange,
-  ): Promise<AlertStatistics> {
-    return (await this.makeRequest(
-      '/alerts/statistics',
-      'POST',
-      statisticsData,
-    )) as AlertStatistics
-  }
-
-  async unregisterAlertSystem(unregisterData: {
-    system_id: string
-  }): Promise<AlertResponse> {
-    return (await this.makeRequest(
-      '/alerts/unregister',
-      'POST',
-      unregisterData,
-    )) as AlertResponse
-  }
-
-  // Notification-specific public methods
-  async sendNotification(notificationData: NotificationData): Promise<void> {
-    await this.makeRequest('/notifications/send', 'POST', notificationData)
-  }
-
-  async sendSystemNotification(
-    systemNotificationData: SystemNotificationData,
-  ): Promise<void> {
-    await this.makeRequest(
-      '/notifications/system',
-      'POST',
-      systemNotificationData,
-    )
-  }
-
-  private startHealthMonitoring() {
-    setInterval(async () => {
-      try {
-        const startTime = Date.now()
-        const response = await this.executeRequest('/health', 'GET')
-        const responseTime = Date.now() - startTime
-        
-        if (response && typeof response === 'object' && response !== null && 'status' in response && (response as { status: string }).status === 'healthy') {
-          this.consecutiveFailures = 0
-          this.healthStatus = responseTime > 5000 ? 'degraded' : 'healthy'
-        } else {
-          this.consecutiveFailures++
-          this.healthStatus = this.consecutiveFailures > 3 ? 'unhealthy' : 'degraded'
+        return {
+          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          fairnessMetrics: {
+            demographicParity: fairness['demographic_parity'] ?? 0.5,
+            equalizedOdds: fairness['equalized_odds'] ?? 0.5,
+            equalOpportunity: fairness['equal_opportunity'] ?? 0.5,
+            calibration: fairness['calibration'] ?? 0.5,
+            individualFairness: fairness['individual_fairness'] ?? 0.5,
+            counterfactualFairness: fairness['counterfactual_fairness'] ?? 0.5,
+          },
+          performanceMetrics: {
+            accuracy: performance['accuracy'] ?? 0.5,
+            precision: performance['precision'] ?? 0.5,
+            recall: performance['recall'] ?? 0.5,
+            f1Score: performance['f1_score'] ?? 0.5,
+            auc: performance['auc'] ?? 0.5,
+            calibrationError: performance['calibration_error'] ?? 0.1,
+            demographicBreakdown: performance['demographic_breakdown'] ?? {},
+          },
+          groupPerformanceComparison: groupComp,
+          recommendations: layerResult.recommendations ?? [],
         }
-        
-        this.lastHealthCheck = new Date()
-        
-        logger.debug('Health check completed', {
-          status: this.healthStatus,
-          responseTime,
-          consecutiveFailures: this.consecutiveFailures,
-        })
-      } catch (error: unknown) {
-        this.consecutiveFailures++
-        this.healthStatus = this.consecutiveFailures > 3 ? 'unhealthy' : 'degraded'
-        this.lastHealthCheck = new Date()
-        
-        logger.warn('Health check failed', {
-          error: error instanceof Error ? String(error) : String(error),
-          consecutiveFailures: this.consecutiveFailures,
-          status: this.healthStatus,
-        })
       }
-    }, this.healthCheckInterval)
+      return this.createFallbackModelLevelResult(sessionData)
+    } catch (error: unknown) {
+      logger.warn("Error in runModelLevelAnalysis, returning fallback", { error })
+      return this.createFallbackModelLevelResult(sessionData, error)
+    }
   }
 
+  async runInteractiveAnalysis(
+    sessionData: TherapeuticSession,
+  ): Promise<InteractiveAnalysisResult> {
+    try {
+      const result = (await this.makeRequest('/analyze/interactive', 'POST', sessionData)) as PythonAnalysisResult
+      const layerResult = result?.layer_results?.interactive
+      if (layerResult) {
+        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
+        const counterfactual = (metrics['counterfactual_analysis'] ?? {}) as Record<string, any>;
+        const featureImp = (metrics['feature_importance'] ?? []) as any[];
+        const whatIf = (metrics['what_if_scenarios'] ?? []) as any[];
 
-  getMetrics(): typeof this.metrics {
-    return { ...this.metrics }
+        return {
+          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          counterfactualAnalysis: {
+            scenariosAnalyzed: counterfactual['scenarios_analyzed'] ?? 0,
+            biasDetected: counterfactual['bias_detected'] ?? false,
+            consistencyScore: counterfactual['consistency_score'] ?? 0.5,
+            problematicScenarios: counterfactual['problematic_scenarios'] ?? [],
+          },
+          featureImportance: featureImp,
+          whatIfScenarios: whatIf,
+          recommendations: layerResult.recommendations ?? [],
+        }
+      }
+      return this.createFallbackInteractiveResult(sessionData)
+    } catch (error: unknown) {
+      logger.warn("Error in runInteractiveAnalysis, returning fallback", { error })
+      return this.createFallbackInteractiveResult(sessionData, error)
+    }
   }
 
-  getHealthStatus(): {
-    status: 'healthy' | 'degraded' | 'unhealthy'
-    lastCheck: Date
-    consecutiveFailures: number
-    queueLength: number
-    activeRequests: number
-  } {
+  async runEvaluationAnalysis(
+    sessionData: TherapeuticSession,
+  ): Promise<EvaluationAnalysisResult> {
+    try {
+      const result = (await this.makeRequest('/analyze/evaluation', 'POST', sessionData)) as PythonAnalysisResult
+      const layerResult = result?.layer_results?.evaluation
+      if (layerResult) {
+        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
+        const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<string, any>;
+        const custom = (metrics['custom_metrics'] ?? {}) as Record<string, any>;
+        const temporal = (metrics['temporal_analysis'] ?? {}) as Record<string, any>;
+
+        return {
+          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          huggingFaceMetrics: {
+            toxicity: huggingFace['toxicity'] ?? 0.1,
+            bias: huggingFace['bias'] ?? 0.2,
+            regard: huggingFace['regard'] ?? {},
+            stereotype: huggingFace['stereotype'] ?? 0.1,
+            fairness: huggingFace['fairness'] ?? 0.8,
+          },
+          customMetrics: {
+            therapeuticBias: custom['therapeutic_bias'] ?? 0.1,
+            culturalSensitivity: custom['cultural_sensitivity'] ?? 0.1,
+            professionalEthics: custom['professional_ethics'] ?? 0.1,
+            patientSafety: custom['patient_safety'] ?? 0.1,
+          },
+          temporalAnalysis: {
+            trendDirection: temporal['trend_direction'] ?? 'stable',
+            changeRate: temporal['change_rate'] ?? 0,
+            seasonalPatterns: temporal['seasonal_patterns'] ?? [],
+            interventionEffectiveness: temporal['intervention_effectiveness'] ?? [],
+          },
+          recommendations: layerResult.recommendations ?? [],
+        }
+      }
+      return this.createFallbackEvaluationResult(sessionData)
+    } catch (error: unknown) {
+      logger.warn("Error in runEvaluationAnalysis, returning fallback", { error })
+      return this.createFallbackEvaluationResult(sessionData, error)
+    }
+  }
+
+  private createFallbackModelLevelResult(
+    sessionData: TherapeuticSession,
+    error?: unknown
+  ): ModelLevelAnalysisResult {
+    logger.warn("Creating fallback model level result", { sessionId: sessionData.sessionId, error })
+    return {
+      biasScore: 0.5,
+      fairnessMetrics: {
+        demographicParity: 0.5,
+        equalizedOdds: 0.5,
+        equalOpportunity: 0.5,
+        calibration: 0.5,
+        individualFairness: 0.5,
+        counterfactualFairness: 0.5,
+      },
+      performanceMetrics: {
+        accuracy: 0.5,
+        precision: 0.5,
+        recall: 0.5,
+        f1Score: 0.5,
+        auc: 0.5,
+        calibrationError: 0.1,
+        demographicBreakdown: {},
+      },
+      groupPerformanceComparison: [],
+      recommendations: ['Model-level analysis unavailable; using fallback results'],
+    }
+  }
+
+  private createFallbackInteractiveResult(
+    sessionData: TherapeuticSession,
+    error?: unknown
+  ): InteractiveAnalysisResult {
+    logger.warn("Creating fallback interactive result", { sessionId: sessionData.sessionId, error })
+    return {
+      biasScore: 0.5,
+      counterfactualAnalysis: {
+        scenariosAnalyzed: 0,
+        biasDetected: false,
+        consistencyScore: 0.5,
+        problematicScenarios: [],
+      },
+      featureImportance: [],
+      whatIfScenarios: [],
+      recommendations: ['Interactive analysis unavailable; using fallback results'],
+    }
+  }
+
+  private createFallbackEvaluationResult(
+    sessionData: TherapeuticSession,
+    error?: unknown
+  ): EvaluationAnalysisResult {
+    logger.warn("Creating fallback evaluation result", { sessionId: sessionData.sessionId, error })
+    return {
+      biasScore: 0.5,
+      huggingFaceMetrics: {
+        toxicity: 0.1,
+        bias: 0.2,
+        regard: {},
+        stereotype: 0.1,
+        fairness: 0.8,
+      },
+      customMetrics: {
+        therapeuticBias: 0.1,
+        culturalSensitivity: 0.1,
+        professionalEthics: 0.1,
+        patientSafety: 0.1,
+      },
+      temporalAnalysis: {
+        trendDirection: 'stable',
+        changeRate: 0,
+        seasonalPatterns: [],
+        interventionEffectiveness: [],
+      },
+      recommendations: ['Evaluation analysis unavailable; using fallback results'],
+    }
+  }
+
+  async checkHealth(): Promise<PythonHealthResponse> {
+    try {
+      const result = await this.makeRequest('/health', 'GET')
+      return result as PythonHealthResponse
+    } catch (error: unknown) {
+      logger.warn("Error checking health, returning unhealthy status", { error })
+      return { status: 'unhealthy', message: 'Service unavailable', timestamp: new Date().toISOString() }
+    }
+  }
+
+  stopHealthMonitoring(): void {
+    if (this.healthCheckTimer) {
+      clearInterval(this.healthCheckTimer)
+      this.healthCheckTimer = undefined
+      logger.info('Health monitoring stopped')
+    }
+  }
+
+  getHealthStatus(): { status: string; lastCheck: Date; consecutiveFailures: number } {
     return {
       status: this.healthStatus,
       lastCheck: this.lastHealthCheck,
       consecutiveFailures: this.consecutiveFailures,
-      queueLength: this.requestQueue.length,
-      activeRequests: this.activeRequests,
     }
   }
 
-  async dispose(): Promise<void> {
-    // Clear the request queue
-    this.requestQueue.forEach(req => {
-      req.reject(new Error('Service is being disposed'))
-    })
-    this.requestQueue.length = 0
-    
-    logger.info('PythonBiasDetectionBridge disposed')
+  getMetrics() {
+    return { ...this.metrics }
   }
 }

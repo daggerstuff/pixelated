@@ -5,12 +5,12 @@ global:
 rule_files:
   - "alert-rules.yml"
 
-# Send alerts directly to webhook instead of Alertmanager to avoid vulnerabilities
+# AlertManager configuration for proper alert routing and management
 alerting:
   alertmanagers:
     - static_configs:
         - targets:
-          - alert-receiver:9093
+          - alertmanager:9093
 
 scrape_configs:
   # Prometheus itself

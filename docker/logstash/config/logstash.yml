@@ -1,0 +1,35 @@
+# Logstash configuration for Pixelated Empathy
+node.name: pixelated-logstash
+path.data: /usr/share/logstash/data
+path.logs: /usr/share/logstash/logs
+path.config: /usr/share/logstash/pipeline
+
+# Pipeline settings
+pipeline.workers: 2
+pipeline.batch.size: 125
+pipeline.batch.delay: 50
+
+# HTTP API settings
+http.host: "0.0.0.0"
+http.port: 9600
+
+# Dead letter queue settings
+dead_letter_queue.enable: true
+path.dead_letter_queue: /usr/share/logstash/data/dead_letter_queue
+
+# Monitoring settings
+xpack.monitoring.enabled: false
+
+# Logging settings
+log.level: info
+log.format: "%{yyyy-MM-dd HH:mm:ss.SSS} %{level} %{module} %{message}"
+
+# Queue settings
+queue.type: persisted
+path.queue: /usr/share/logstash/data/queue
+queue.page_capacity: 64mb
+queue.max_events: 0
+queue.max_bytes: 1024mb
+queue.checkpoint.acks: 1024
+queue.checkpoint.writes: 1024
+queue.checkpoint.interval: 1000

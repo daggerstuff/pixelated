@@ -86,6 +86,7 @@ __pycache__/
 .mypy_cache/
 venv/
 .venv/
+volumes/
 ai/venv/
 ai/.venv/
 ai/*.pt

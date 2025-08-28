@@ -222,17 +222,17 @@ export class IntelligentCache {
     }
     
     try {
-      let optStrategy: CacheStrategy | undefined = undefined;
+      let optStrategy: CacheStrategy | undefined;
       if (options.strategy && this.strategies.has(options.strategy)) {
-        ;
+        optStrategy = this.strategies.get(options.strategy)!
       }
       // Only pass strategy if it's a CacheStrategy, never null or string
       const { strategy: _, ...restOptions } = options;
       // Cast is required for type compatibility: CacheOptions (with string strategy) -> internal with CacheStrategy.
-      const internalOptions =
-        optStrategy ? { ...restOptions, strategy: optStrategy } : { ...restOptions };
+      const internalOptions = optStrategy
+        ? { ...restOptions, strategy: optStrategy }
+        : { ...restOptions };
       await this.setToTiers(key, value, internalOptions as any);
-
     } catch (error) {
       logger.error('Cache set error', { key, error })
     }
