@@ -7,8 +7,38 @@ import type {
 } from './types'
 import type { TherapySession } from '../../ai/models/ai-types'
 import type { EmotionAnalysis } from '../../ai/emotions/types'
-import mongodb from '../../../config/mongodb.config'
-import { ObjectId } from 'mongodb'
+// Use conditional imports to prevent MongoDB from being bundled on client side
+let mongodb: any
+let ObjectId: any
+
+if (typeof window === 'undefined') {
+  // Server side - import real MongoDB dependencies
+  try {
+    mongodb = require('../../../config/mongodb.config').default
+    const mongodbLib = require('mongodb')
+    ObjectId = mongodbLib.ObjectId
+  } catch {
+    // Fallback if MongoDB is not available
+    mongodb = null
+    ObjectId = class MockObjectId {
+      constructor(id?: string) {
+        this.id = id || 'mock-object-id'
+      }
+      toString() { return this.id }
+      toHexString() { return this.id }
+    }
+  }
+} else {
+  // Client side - use mocks
+  mongodb = null
+  ObjectId = class MockObjectId {
+    constructor(id?: string) {
+      this.id = id || 'mock-object-id'
+    }
+    toString() { return this.id }
+    toHexString() { return this.id }
+  }
+}
 // TODO: Create these service interfaces when services are implemented
 interface EfficacyFeedback {
   recommendationId: string
@@ -188,6 +218,10 @@ interface BiasReport {
  */
 export class AIRepository {
   private async getDatabase() {
+    if (!mongodb) {
+      throw new Error('MongoDB not available on client side')
+    }
+    
     try {
       return mongodb.getDb()
     } catch {

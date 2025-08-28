@@ -1,4 +1,5 @@
-import type { ObjectId } from 'mongodb'
+// Use conditional import to prevent MongoDB from being bundled on client side
+type ObjectId = any
 import type { Json } from '../types/json'
 
 // MongoDB Document Base Interface

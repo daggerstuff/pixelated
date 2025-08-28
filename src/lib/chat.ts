@@ -4,7 +4,7 @@
  */
 
 import { MentalHealthService } from './mental-health/service'
-import { createMentalLLaMAFromEnv } from './ai/mental-llama'
+import { createMentalLLaMAFromEnvSafe } from './ai/mental-llama/client-adapter'
 import { RecommendationService } from './ai/services/RecommendationService'
 import { createBuildSafeLogger } from './logging/build-safe-logger'
 import type { MentalHealthAnalysis as MHAnalysis } from './mental-health/types'
@@ -237,7 +237,7 @@ export function createMentalHealthChat(
 
       // Initialize MentalLLaMA for advanced analysis (if available)
       try {
-        const mentalLLaMAFactory = await createMentalLLaMAFromEnv()
+        const mentalLLaMAFactory = await createMentalLLaMAFromEnvSafe()
         mentalLLaMAAdapter = mentalLLaMAFactory.adapter
         logger.info('MentalLLaMA adapter initialized successfully')
       } catch (error: unknown) {

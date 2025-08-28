@@ -1,5 +1,39 @@
-import { Collection, ObjectId } from 'mongodb'
-import mongodb from '@/config/mongodb.config'
+// Use conditional imports to prevent MongoDB from being bundled on client side
+let mongodb: any
+let ObjectId: any
+let Collection: any
+
+if (typeof window === 'undefined') {
+  // Server side - import real MongoDB dependencies
+  try {
+    mongodb = require('@/config/mongodb.config').default
+    const mongodbLib = require('mongodb')
+    ObjectId = mongodbLib.ObjectId
+    Collection = mongodbLib.Collection
+  } catch {
+    // Fallback if MongoDB is not available
+    mongodb = null
+    ObjectId = class MockObjectId {
+      constructor(id?: string) {
+        this.id = id || 'mock-object-id'
+      }
+      toString() { return this.id }
+      toHexString() { return this.id }
+    }
+    Collection = class MockCollection {}
+  }
+} else {
+  // Client side - use mocks
+  mongodb = null
+  ObjectId = class MockObjectId {
+    constructor(id?: string) {
+      this.id = id || 'mock-object-id'
+    }
+    toString() { return this.id }
+    toHexString() { return this.id }
+  }
+  Collection = class MockCollection {}
+}
 import type {
   AIMetrics,
   BiasDetection,

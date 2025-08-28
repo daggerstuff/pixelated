@@ -1,6 +1,41 @@
-import mongodb from '@/config/mongodb.config'
-import { mongoAuthService } from '@/services/mongoAuth.service'
-import { ObjectId } from 'mongodb'
+// Use conditional imports to prevent MongoDB from being bundled on client side
+let mongodb: any
+let mongoAuthService: any
+let ObjectId: any
+
+if (typeof window === 'undefined') {
+  // Server side - import real MongoDB dependencies
+  try {
+    mongodb = require('@/config/mongodb.config').default
+    mongoAuthService = require('@/services/mongoAuth.service').mongoAuthService
+    const mongodbLib = require('mongodb')
+    ObjectId = mongodbLib.ObjectId
+  } catch {
+    // Fallback if MongoDB is not available
+    mongodb = null
+    mongoAuthService = null
+    ObjectId = class MockObjectId {
+      constructor(id?: string) {
+        this.id = id || 'mock-object-id'
+      }
+      toString() { return this.id }
+      toHexString() { return this.id }
+      static isValid() { return true }
+    }
+  }
+} else {
+  // Client side - use mocks
+  mongodb = null
+  mongoAuthService = null
+  ObjectId = class MockObjectId {
+    constructor(id?: string) {
+      this.id = id || 'mock-object-id'
+    }
+    toString() { return this.id }
+    toHexString() { return this.id }
+    static isValid() { return true }
+  }
+}
 import {
   azureADAuth,
   type AzureADUser,
@@ -102,6 +137,10 @@ export class AzureMongoIntegration {
     const { user: azureUser } = azureResult
 
     try {
+      if (!mongodb) {
+        throw new Error('MongoDB not available on client side')
+      }
+      
       const db = await mongodb.connect()
       const usersCollection = db.collection('users')
 
@@ -202,6 +241,10 @@ export class AzureMongoIntegration {
     azureResult: AzureADAuthResult,
   ): Promise<AuthSession> {
     try {
+      if (!mongoAuthService) {
+        throw new Error('MongoDB auth service not available on client side')
+      }
+      
       // Create session using MongoDB auth service
       const authResult = await mongoAuthService.signIn(user.email, 'azure-ad-placeholder')
       

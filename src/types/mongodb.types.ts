@@ -1,4 +1,5 @@
-import { ObjectId } from 'mongodb'
+// Use conditional import to prevent MongoDB from being bundled on client side
+declare const ObjectId: any
 
 export interface User {
   id: string

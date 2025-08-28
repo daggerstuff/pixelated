@@ -1,4 +1,31 @@
-import { ObjectId } from 'mongodb'
+// Use conditional import to prevent MongoDB from being bundled on client side
+let ObjectId: any
+
+if (typeof window === 'undefined') {
+  // Server side - import real MongoDB ObjectId
+  try {
+    const mongodb = require('mongodb')
+    ObjectId = mongodb.ObjectId
+  } catch {
+    // Fallback if MongoDB is not available
+    ObjectId = class MockObjectId {
+      constructor(id?: string) {
+        this.id = id || 'mock-object-id'
+      }
+      toString() { return this.id }
+      toHexString() { return this.id }
+    }
+  }
+} else {
+  // Client side - use mock ObjectId
+  ObjectId = class MockObjectId {
+    constructor(id?: string) {
+      this.id = id || 'mock-object-id'
+    }
+    toString() { return this.id }
+    toHexString() { return this.id }
+  }
+}
 
 export interface User {
   _id?: ObjectId
