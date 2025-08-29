@@ -23,7 +23,7 @@ export class RedisService extends EventEmitter implements IRedisService {
   private healthCheckInterval: NodeJS.Timeout | null = null
   private readonly config: RedisServiceConfig
 
-  constructor(config: RedisServiceConfig = { url: '' }): void {
+  constructor(config: RedisServiceConfig = { url: '' }) {
     super()
     this.config = {
       maxRetries: 3,
@@ -177,7 +177,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       if (process.env['NODE_ENV'] === 'development') {
         logger.warn('Using mock Redis client in development')
         // Create a mock client that implements basic Redis methods
-        return this.createMockClient()
+        return this.createMockClient() as Redis
       }
 
       throw new RedisServiceError(
@@ -307,7 +307,7 @@ export class RedisService extends EventEmitter implements IRedisService {
           return []
         }
         const sorted = Array.from(zset.entries()).sort((a, b) => a[1] - b[1])
-        const slice = sorted.slice(start, stop === -1 ? undefined : stop + 1)
+        const slice = stop === -1 ? sorted.slice(start) : sorted.slice(start, stop + 1)
 
         if (withScores === 'WITHSCORES') {
           return slice.flatMap(([member, score]) => [{ value: member, score }])
@@ -392,6 +392,8 @@ export class RedisService extends EventEmitter implements IRedisService {
         return pipeline
       },
     } as unknown as Redis
+
+    return mockClient
   }
 
   private createClient(): Redis {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { EmotionDataPoint, useSessionAnalytics } from '../../hooks/useSessionAnalytics'
 import EmotionTrackingChart from './EmotionTrackingChart'
 
 // Define an interface matching EmotionTimelineData from EmotionTrackingChart

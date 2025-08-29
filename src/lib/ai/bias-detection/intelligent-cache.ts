@@ -18,6 +18,7 @@ import type {
   BiasReport,
   BiasDashboardData 
 } from './types'
+import type { CacheOptions } from './cache'
 import * as zlib from 'zlib'
 import { promisify } from 'util'
 
@@ -101,10 +102,47 @@ export interface CacheStrategy {
 }
 
 /**
+ * Default configuration for IntelligentCache
+ */
+const DEFAULT_CONFIG: IntelligentCacheConfig = {
+  // Multi-tier configuration
+  enableMemoryCache: true,
+  enableRedisCache: true,
+  enableCDNCache: false,
+
+  // Memory cache settings
+  memoryMaxSize: 1000,
+  memoryTtl: 300, // 5 minutes
+
+  // Redis cache settings
+  redisTtl: 3600, // 1 hour
+  redisKeyPrefix: 'intelligent-cache:',
+
+  // Compression settings
+  enableCompression: true,
+  compressionThreshold: 1024, // 1KB
+  compressionLevel: 6,
+
+  // Prefetching and warming
+  enablePrefetching: true,
+  prefetchThreshold: 10,
+  warmupOnStart: false,
+
+  // Performance optimization
+  enableBatching: true,
+  batchSize: 10,
+  batchDelay: 100, // 100ms
+
+  // Analytics
+  enableAnalytics: true,
+  analyticsInterval: 60000, // 1 minute
+}
+
+/**
  * Multi-tier Intelligent Cache
  */
 export class IntelligentCache {
-  private config!: IntelligentCacheConfig
+  private config: IntelligentCacheConfig
   private memoryCache = new Map<string, CacheEntry<unknown>>()
   private redisPool = getRedisPoolManager().createPool('intelligent-cache')
   private cacheService = getCacheService()
@@ -171,8 +209,10 @@ export class IntelligentCache {
     }]
   ])
 
-  
-  
+  constructor(config: Partial<IntelligentCacheConfig> = {}) {
+    this.config = { ...DEFAULT_CONFIG, ...config }
+  }
+
   /**
    * Get value from cache with intelligent tier selection
    */
@@ -339,7 +379,7 @@ export class IntelligentCache {
     // Fill in nulls for missing keys
     for (const key of keys) {
       if (!(key in results)) {
-        
+        results[key] = null
         this.analytics.misses++
       }
     }
@@ -355,12 +395,12 @@ export class IntelligentCache {
     
     // Invalidate memory cache
     if (this.config.enableMemoryCache) {
-      for (const [key, entry] of this.memoryCache) {
+      this.memoryCache.forEach((entry, key) => {
         if (entry.tags.some(tag => tags.includes(tag))) {
           this.memoryCache.delete(key)
           invalidated++
         }
-      }
+      })
     }
     
     // Invalidate Redis cache
@@ -493,6 +533,7 @@ export class IntelligentCache {
       return null
     }
     entry.accessCount++
+    entry.lastAccessed = new Date()
     return entry.value
   }
   
@@ -569,8 +610,9 @@ export class IntelligentCache {
       if (compress) {
         const serialized = JSON.stringify(value)
         if (serialized.length > this.config.compressionThreshold) {
-          
-          
+          const compressedData = zlib.gzipSync(Buffer.from(serialized))
+          serializedValue = compressedData.toString('base64') as unknown as T
+          compressed = true
         }
       }
 
@@ -624,14 +666,16 @@ export class IntelligentCache {
   }
   
   private evictLRU(): void {
+    let oldestTime = Date.now()
     let oldestKey: string | null = null
-    let oldestTime = Infinity
-    for (const [, entry] of this.memoryCache) {
-      if (entry.lastAccessed.getTime() < oldestTime) {
-        
-        
+    
+    this.memoryCache.forEach((entry, key) => {
+      const t = entry.lastAccessed.getTime()
+      if (t < oldestTime) {
+        oldestTime = t
+        oldestKey = key
       }
-    }
+    })
     if (oldestKey !== null) {
       this.memoryCache.delete(oldestKey)
       this.analytics.evictions++
@@ -721,10 +765,13 @@ export class IntelligentCache {
   
   private scheduleBatch(): void {
     if (this.batchTimer) {
-      return
+      return // Already scheduled
     }
-    // Use NodeJS.Timeout for type compatibility
     
+    this.batchTimer = setTimeout(() => {
+      this.batchTimer = undefined
+      void this.processBatch()
+    }, this.config.batchDelay)
   }
   
   private async processBatch(): Promise<void> {
@@ -745,17 +792,22 @@ export class IntelligentCache {
           op.resolve(results[op.key])
         })
       }
-      // Process sets individually (could be optimized further)
-      for (const op of sets) {
-        try {
-          let safeOptions = { ...op.options }
-          const { strategy: origStrategy, ...rest } = safeOptions;
-          let optionsForSet = { ...rest };
-          await this.setToTiers(op.key, op.value, optionsForSet as any);
-          op.resolve(undefined)
-        } catch (error) {
-          op.reject(error as Error)
-        }
+      // Process sets in batch
+      if (sets.length > 0) {
+        await Promise.all(sets.map(async op => {
+          try {
+            const safeOptions = { ...(op.options || {}) }
+            const str = safeOptions.strategy && this.strategies.has(safeOptions.strategy)
+              ? this.strategies.get(safeOptions.strategy)!
+              : undefined
+            const { strategy: _drop, ...rest } = safeOptions
+            const internalOptions = str ? { ...rest, strategy: str } : rest
+            await this.setToTiers(op.key, op.value, internalOptions as any)
+            op.resolve(undefined)
+          } catch (error) {
+            op.reject(error as Error)
+          }
+        }))
       }
       // Process deletes in batch
       if (deletes.length > 0) {
@@ -784,21 +836,25 @@ export class IntelligentCache {
    */
   private updateAnalytics(): void {
     // Calculate hit rate
-
+    const { totalRequests, hits } = this.analytics
+    if (totalRequests > 0) {
+      this.analytics.hitRate = hits.total / totalRequests
+    }
 
     // Calculate memory usage in bytes (sum of all in-memory entry sizes)
     let memUsage = 0
-    for (const entry of this.memoryCache.values()) {
+    Array.from(this.memoryCache.values()).forEach(entry => {
       memUsage += typeof entry.size === "number" ? entry.size : 0
-    }
-    
+    })
+    this.analytics.memoryUsage = memUsage
 
     // Calculate compression ratio for memory cache (# compressed memory entries / total memory entries)
     let compressed = 0, total = 0
-    for (const entry of this.memoryCache.values()) {
+    Array.from(this.memoryCache.values()).forEach(entry => {
       total++
-      if (entry.compressed) { compressed++; }
-    }
+      if (entry.compressed) { compressed++ }
+    })
+    this.analytics.compressionRatio = total > 0 ? compressed / total : 0
   }
 
   /**
@@ -854,17 +910,7 @@ export class IntelligentCache {
     }
     
     await this.redisPool.dispose()
-    
-    logger.info('Intelligent cache disposed')
   }
-}
-
-export interface CacheOptions {
-  ttl?: number
-  tags?: string[]
-  compress?: boolean
-  tier?: 'memory' | 'redis' | 'cdn' | 'all'
-  strategy?: string
 }
 
 // Singleton instance
@@ -872,8 +918,7 @@ let intelligentCache: IntelligentCache | null = null
 
 export function getIntelligentCache(): IntelligentCache {
   if (!intelligentCache) {
-    ;
-    ;
+    intelligentCache = new IntelligentCache(DEFAULT_CONFIG);
   }
   // The '!' assures TypeScript intelligentCache is not null here.
   return intelligentCache!;
