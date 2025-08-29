@@ -247,14 +247,6 @@ stages:
       env:
         ASTRO_CACHE_DIR: $(Agent.WorkFolder)/.astro-cache
 
-    - task: PublishBuildArtifacts@1
-      displayName: Publish build artifacts
-      inputs:
-        PathtoPublish: "dist"
-        ArtifactName: "dist"
-        publishLocation: "Container"
-    container: mcr.microsoft.com/azure-cli:2.73.0
-
 - stage: DockerBuild
   displayName: Build Docker Image
   dependsOn: Build
@@ -285,7 +277,7 @@ stages:
 
         echo "✅ Docker CLI installed and daemon accessible"
         docker version
-      displayName: "Install Docker CLI (inside container)"
+      displayName: "Install Docker CLI (host system)"
     - task: DownloadBuildArtifacts@0
       displayName: Download build artifacts
       inputs:
@@ -561,19 +553,19 @@ stages:
       name: azure-production
     pool:
       name: Default
-    container: mcr.microsoft.com/azure-cli:2.73.0
     strategy:
       runOnce:
         deploy:
           steps:
           - script: |
               set -eo pipefail
-              # Ensure Node.js (22.x) is available inside the container for any Node-based steps
+              # Ensure Node.js (LTS 22.x) is available for any Node-based steps
               echo "Installing Node.js (LTS 22.x) for container agent..."
               sudo apt-get update -qq && sudo apt-get install -y curl ca-certificates
               curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
               sudo apt-get install -y nodejs
               node --version
+
               echo "Ensuring Azure CLI is available..."
 
               # Set environment variables to suppress warnings
@@ -864,7 +856,6 @@ stages:
       name: azure-production
     pool:
       name: Default
-    container: mcr.microsoft.com/azure-cli:2.73.0@sha256:c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2g3h4
     strategy:
       runOnce:
         deploy:
@@ -966,7 +957,6 @@ stages:
     displayName: Health Check Both Deployments
     pool:
       name: Default
-    container: mcr.microsoft.com/azure-cli:2.73.0
     steps:
     - script: |
         # Verify Azure CLI is available in container
@@ -1031,7 +1021,6 @@ stages:
     displayName: Clean Up Old Container Apps Only
     pool:
       name: Default
-    container: mcr.microsoft.com/azure-cli:2.73.0
     steps:
     - script: |
         # Verify Azure CLI is available in container

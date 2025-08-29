@@ -1,7 +1,7 @@
 # Checkov Configuration
 # This file configures Checkov scanning rules and exclusions
 
-policy-metadata:
+policy-metadata-filter:
   # Exclude false positive secret detections in Helm values
   exclude:
     - CKV_SECRET_6
@@ -45,12 +45,8 @@ soft-fail: false
 download-external-modules: false
 
 # Secrets scanning configuration
-secrets:
+skip-path:
   # Disable secrets scanning for Helm values files as they contain configuration
-  skip-path:
-    - helm/values.yaml
+  - helm/values.yaml
 
-# Azure Pipelines specific configuration
-azure-pipelines:
-  # Skip certain checks that are not applicable to our setup
-  skip-check: []
+# Azure Pipelines specific configuration removed - not a valid Checkov config section

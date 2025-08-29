@@ -53,6 +53,7 @@ export interface CacheOptions {
   priority?: 'low' | 'medium' | 'high' // Cache priority
   useRedisOnly?: boolean // Store only in Redis, not memory
   skipMemoryCache?: boolean // Skip memory cache for this entry
+  strategy?: string // Cache strategy name
 }
 
 // =============================================================================

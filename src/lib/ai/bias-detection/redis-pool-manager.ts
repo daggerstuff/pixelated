@@ -360,8 +360,8 @@ export class RedisConnectionPool {
         stats: this.stats
       })
       
-      // Emit metrics event
-      process.emit('redis-pool-metrics', {
+      // Emit metrics event (using console for now - could be replaced with EventEmitter)
+      console.log('redis-pool-metrics', {
         pool: this.name,
         stats: this.stats
       })
@@ -425,7 +425,7 @@ export class RedisConnectionPool {
     
     // Destroy all connections
     await Promise.all(
-      Array.from(this.connections.values()).map(conn => this.destroyConnection(conn))
+      [...this.connections.values()].map(conn => this.destroyConnection(conn))
     )
     
     logger.info('Redis connection pool disposed', { pool: this.name })
@@ -478,9 +478,9 @@ export class RedisPoolManager {
   getAllStats(): Record<string, RedisPoolStats> {
     const stats: Record<string, RedisPoolStats> = {}
     
-    for (const [name, pool] of this.pools) {
+    this.pools.forEach((pool, name) => {
       stats[name] = pool.getStats()
-    }
+    })
     
     return stats
   }
@@ -492,11 +492,13 @@ export class RedisPoolManager {
     const pools: Record<string, boolean> = {}
     let allHealthy = true
     
-    for (const [name, pool] of this.pools) {
+    this.pools.forEach((pool, name) => {
       const healthy = pool.isHealthy()
       pools[name] = healthy
-      if (!healthy) allHealthy = false
-    }
+      if (!healthy) {
+        allHealthy = false
+      }
+    })
     
     return { healthy: allHealthy, pools }
   }
@@ -506,7 +508,7 @@ export class RedisPoolManager {
    */
   async dispose(): Promise<void> {
     await Promise.all(
-      Array.from(this.pools.values()).map(pool => pool.dispose())
+      [...this.pools.values()].map(pool => pool.dispose())
     )
     
     this.pools.clear()

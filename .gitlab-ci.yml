@@ -1,8 +1,8 @@
 qodana:
   stage: test
   only:
-    - master
-    - merge_requests
+  - master
+  - merge_requests
   image:
     name: jetbrains/qodana-js
     entrypoint: [ "" ]
@@ -10,14 +10,14 @@ qodana:
     QODANA_TOKEN: $qodana_token
     GIT_STRATEGY: fetch
   script:
-    - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana
+  - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana
   allow_failure: true
 
 stages:
-  - validate
-  - build
-  - test
-  - deploy
+- validate
+- build
+- test
+- deploy
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -32,305 +32,306 @@ validate-runner:
   stage: validate
   image: docker:24.0.5
   services:
-    - name: docker:24.0.5-dind
-      alias: docker
-      command: [ "--tls=false" ]
+  - name: docker:24.0.5-dind
+    alias: docker
+    command: [ "--tls=false" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   script:
-    - set -e
-    - echo "Validating GitLab runner capabilities..."
-    - apk add --no-cache openssh-client git
-    - |
-      if ! command -v docker &> /dev/null; then
-        echo "Docker not found or failed to install."
-        exit 1
-      fi
-    - docker --version
-    - docker info
-    - echo "Docker is available and working"
-    - echo "Runner:" $CI_RUNNER_DESCRIPTION
-    - echo "Executor:" $CI_RUNNER_EXECUTOR
+  - set -e
+  - echo "Validating GitLab runner capabilities..."
+  - apk add --no-cache openssh-client git
+  - |
+    if ! command -v docker &> /dev/null; then
+      echo "Docker not found or failed to install."
+      exit 1
+    fi
+  - docker --version
+  - docker info
+  - echo "Docker is available and working"
+  - echo "Runner:" $CI_RUNNER_DESCRIPTION
+  - echo "Executor:" $CI_RUNNER_EXECUTOR
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - if: "$CI_MERGE_REQUEST_ID"
+  - if: '$CI_COMMIT_BRANCH == "master"'
+  - if: '$CI_COMMIT_BRANCH == "main"'
+  - if: "$CI_MERGE_REQUEST_ID"
 
 build-frontend:
   stage: build
   image: docker:24.0.5
   services:
-    - name: docker:24.0.5-dind
-      alias: docker
-      command: [ "--tls=false" ]
+  - name: docker:24.0.5-dind
+    alias: docker
+    command: [ "--tls=false", "--experimental" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - "echo === Diagnostic: Network connectivity to registry ==="
-    - ping -c 4 git.pixelatedempathy.tech || true
-    - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech || true
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - "echo === Diagnostic: Network connectivity to registry ==="
+  - ping -c 4 git.pixelatedempathy.tech || true
+  - nslookup git.pixelatedempathy.tech || true
+  - curl -v https://git.pixelatedempathy.tech || true
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - echo "🏗️ Building Pixelated Empathy frontend container..."
-    - ls -la
-    - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
-    - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
-    - echo "📤 Pushing container to GitLab Container Registry..."
-    - timeout 300 docker push $CONTAINER_IMAGE
-    - timeout 300 docker push $CONTAINER_IMAGE_LATEST
-    - echo "✅ Frontend container pushed to GitLab Container Registry"
-    - |
-      echo "📦 Image SHA: $CONTAINER_IMAGE"
-      echo "🏷️  Latest: $CONTAINER_IMAGE_LATEST"
+  - echo "🏗️ Building Pixelated Empathy frontend container..."
+  - ls -la
+  - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
+  - docker buildx create --use --name multiarch-builder || docker buildx use multiarch-builder
+  - docker buildx build --load --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+  - echo "📤 Pushing container to GitLab Container Registry..."
+  - timeout 300 docker push $CONTAINER_IMAGE
+  - timeout 300 docker push $CONTAINER_IMAGE_LATEST
+  - echo "✅ Frontend container pushed to GitLab Container Registry"
+  - |
+    echo "📦 Image SHA: $CONTAINER_IMAGE"
+    echo "🏷️  Latest: $CONTAINER_IMAGE_LATEST"
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - if: "$CI_MERGE_REQUEST_ID"
+  - if: '$CI_COMMIT_BRANCH == "master"'
+  - if: '$CI_COMMIT_BRANCH == "main"'
+  - if: "$CI_MERGE_REQUEST_ID"
 
 test-container:
   stage: test
   image: docker:24.0.5
   services:
-    - name: docker:24.0.5-dind
-      alias: docker
-      command: [ "--tls=false" ]
+  - name: docker:24.0.5-dind
+    alias: docker
+    command: [ "--tls=false" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - "echo === Diagnostic: Network connectivity to registry ==="
-    - ping -c 4 git.pixelatedempathy.tech || true
-    - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech || true
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - "echo === Diagnostic: Network connectivity to registry ==="
+  - ping -c 4 git.pixelatedempathy.tech || true
+  - nslookup git.pixelatedempathy.tech || true
+  - curl -v https://git.pixelatedempathy.tech || true
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - echo "Testing container health..."
-    - docker pull $CONTAINER_IMAGE
-    - docker run -d --name test-container $CONTAINER_IMAGE
-    - sleep 30
-    - docker logs test-container
-    - |
-      if docker exec test-container curl -f http://localhost:4321 > /dev/null 2>&1; then
-        echo "✅ Container health check passed"
-      else
-        echo "❌ Container health check failed"
-        docker logs test-container
-        exit 1
-      fi
-    - docker stop test-container
-    - docker rm test-container
+  - echo "Testing container health..."
+  - docker pull $CONTAINER_IMAGE
+  - docker run -d --name test-container $CONTAINER_IMAGE
+  - sleep 30
+  - docker logs test-container
+  - |
+    if docker exec test-container curl -f http://localhost:4321 > /dev/null 2>&1; then
+      echo "✅ Container health check passed"
+    else
+      echo "❌ Container health check failed"
+      docker logs test-container
+      exit 1
+    fi
+  - docker stop test-container
+  - docker rm test-container
   dependencies:
-    - build-frontend
+  - build-frontend
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
 
 deploy-vps:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk add --no-cache openssh-client curl git
-    - eval $(ssh-agent -s)
-    - |
-      if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
-        echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
-        exit 1
-      fi
-      
-      echo "🔑 Setting up SSH private key..."
-      
-      SSH_KEY_FILE=$(mktemp)
-      trap "rm -f $SSH_KEY_FILE" EXIT
-      
-      if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
-        echo "❌ Failed to decode base64 SSH key"
-        exit 1
-      fi
-      
-      if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
-        echo "❌ Invalid SSH key format - missing BEGIN marker"
-        echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
-        exit 1
-      fi
-      
-      chmod 600 "$SSH_KEY_FILE"
-      if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
-        echo "❌ Failed to add SSH key to agent"
-        echo "Key details:"
-        head -n 2 "$SSH_KEY_FILE"
-        tail -n 2 "$SSH_KEY_FILE"
-        exit 1
-      fi
-      
-      echo "✅ SSH key successfully added to agent"
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+  - apk add --no-cache openssh-client curl git
+  - eval $(ssh-agent -s)
+  - |
+    if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
+      echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
+      exit 1
+    fi
+
+    echo "🔑 Setting up SSH private key..."
+
+    SSH_KEY_FILE=$(mktemp)
+    trap "rm -f $SSH_KEY_FILE" EXIT
+
+    if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
+      echo "❌ Failed to decode base64 SSH key"
+      exit 1
+    fi
+
+    if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
+      echo "❌ Invalid SSH key format - missing BEGIN marker"
+      echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
+      exit 1
+    fi
+
+    chmod 600 "$SSH_KEY_FILE"
+    if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
+      echo "❌ Failed to add SSH key to agent"
+      echo "Key details:"
+      head -n 2 "$SSH_KEY_FILE"
+      tail -n 2 "$SSH_KEY_FILE"
+      exit 1
+    fi
+
+    echo "✅ SSH key successfully added to agent"
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "Deploying to VPS..."
-    - |
-      ssh $VPS_USER@$VPS_HOST << 'EOF'
-        set -e
-      
-        # Colors for remote output
-        RED='\033[0;31m'
-        GREEN='\033[0;32m'
-        YELLOW='\033[1;33m'
-        BLUE='\033[0;34m'
-        NC='\033[0m'
-      
-        print_status() { echo -e "${GREEN}[VPS]${NC} $1"; }
-        print_error() { echo -e "${RED}[VPS ERROR]${NC} $1"; }
-      
-        print_status "Starting GitLab container deployment..."
-      
-        # Install Docker if not present
-        if ! command -v docker &> /dev/null; then
-            print_status "Installing Docker..."
-            curl -fsSL https://get.docker.com | sh
-            systemctl start docker
-            systemctl enable docker
-        fi
-      
-        # Install Caddy if not present and domain is configured
-        if [ -n "$VPS_DOMAIN" ] && ! command -v caddy &> /dev/null; then
-            print_status "Installing Caddy..."
-            apt-get update
-            apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
-            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-            apt-get update
-            apt-get install -y caddy
-            systemctl enable caddy
-        fi
-      
-        # Login to GitLab Container Registry
-        print_status "Logging into GitLab Container Registry..."
-        echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-      
-        # Pull latest image from GitLab
-        print_status "Pulling latest image from GitLab Container Registry..."
-        docker pull $CONTAINER_IMAGE_LATEST
-      
-        # Stop existing container
-        print_status "Stopping existing container..."
-        docker stop pixelated-app 2>/dev/null || true
-        docker rm pixelated-app 2>/dev/null || true
-      
-        # Set up environment variables for container
-        PUBLIC_URL="http://$VPS_HOST:4321"
-        CORS_ORIGINS="http://$VPS_HOST:4321,https://$VPS_HOST:4321"
-      
-        if [ -n "$VPS_DOMAIN" ]; then
-            PUBLIC_URL="https://$VPS_DOMAIN"
-            CORS_ORIGINS="$CORS_ORIGINS,http://$VPS_DOMAIN,https://$VPS_DOMAIN"
-        fi
-      
-        # Run new container
-        print_status "Starting new container from GitLab image..."
-        docker run -d \
-          --name pixelated-app \
-          --restart unless-stopped \
-          -p 4321:4321 \
-          -e NODE_ENV=production \
-          -e PORT=4321 \
-          -e WEB_PORT=4321 \
-          -e LOG_LEVEL=info \
-          -e ENABLE_RATE_LIMITING=true \
-          -e RATE_LIMIT_WINDOW=60 \
-          -e RATE_LIMIT_MAX_REQUESTS=100 \
-          -e ENABLE_HIPAA_COMPLIANCE=true \
-          -e ENABLE_AUDIT_LOGGING=true \
-          -e ENABLE_DATA_MASKING=true \
-          -e ASTRO_TELEMETRY_DISABLED=1 \
-          -e PUBLIC_URL="$PUBLIC_URL" \
-          -e CORS_ORIGINS="$CORS_ORIGINS" \
-          $CONTAINER_IMAGE_LATEST
-      
-        # Wait for container to start
-        sleep 15
-      
-        # Check container status
-        if docker ps | grep -q pixelated-app; then
-            print_status "✅ Container is running"
-            docker logs --tail 10 pixelated-app
-        else
-            print_error "❌ Container failed to start"
-            docker logs pixelated-app
-            exit 1
-        fi
-      
-        # Configure Caddy if domain is set
-        if [[ -n "$VPS_DOMAIN" ]]; then
-            print_status "Configuring Caddy for domain: $VPS_DOMAIN"
-            cat > /etc/caddy/Caddyfile << 'CADDY_EOF'
-        $VPS_DOMAIN {
-            reverse_proxy localhost:4321
-      
-            # Enable compression
-            encode gzip
-      
-            # Security headers
-            header {
-                # Enable HSTS
-                Strict-Transport-Security max-age=31536000;
-                # Prevent MIME sniffing
-                X-Content-Type-Options nosniff
-                # Prevent clickjacking
-                X-Frame-Options DENY
-                # XSS protection
-                X-XSS-Protection "1; mode=block"
-                # Referrer policy
-                Referrer-Policy strict-origin-when-cross-origin
-            }
-      
-            # Health check endpoint
-            handle /api/health* {
-                reverse_proxy localhost:4321
-            }
-      
-            # Static assets with long cache
-            handle /assets/* {
-                reverse_proxy localhost:4321
-                header Cache-Control "public, max-age=31536000, immutable"
-            }
-      
-            # All other requests
-            handle {
-                reverse_proxy localhost:4321
-            }
-        }
-        CADDY_EOF
-      
-            # Test and reload Caddy
-            print_status "Testing Caddy configuration..."
-            caddy validate --config /etc/caddy/Caddyfile
-      
-            print_status "Starting Caddy..."
-            systemctl restart caddy
-        fi
-      
-        print_status "✅ VPS deployment completed!"
-      
-        # Show access URLs
-        print_status "Application URLs:"
-        print_status "  Direct: https://$VPS_HOST:4321"
-        if [[ -n "$VPS_DOMAIN" ]]; then
-            print_status "  Domain: https://$VPS_DOMAIN"
-        fi
-      EOF
+  - echo "Deploying to VPS..."
+  - |
+    ssh $VPS_USER@$VPS_HOST << 'EOF'
+      set -e
+
+      # Colors for remote output
+      RED='\033[0;31m'
+      GREEN='\033[0;32m'
+      YELLOW='\033[1;33m'
+      BLUE='\033[0;34m'
+      NC='\033[0m'
+
+      print_status() { echo -e "${GREEN}[VPS]${NC} $1"; }
+      print_error() { echo -e "${RED}[VPS ERROR]${NC} $1"; }
+
+      print_status "Starting GitLab container deployment..."
+
+      # Install Docker if not present
+      if ! command -v docker &> /dev/null; then
+          print_status "Installing Docker..."
+          curl -fsSL https://get.docker.com | sh
+          systemctl start docker
+          systemctl enable docker
+      fi
+
+      # Install Caddy if not present and domain is configured
+      if [ -n "$VPS_DOMAIN" ] && ! command -v caddy &> /dev/null; then
+          print_status "Installing Caddy..."
+          apt-get update
+          apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
+          curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+          curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+          apt-get update
+          apt-get install -y caddy
+          systemctl enable caddy
+      fi
+
+      # Login to GitLab Container Registry
+      print_status "Logging into GitLab Container Registry..."
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+
+      # Pull latest image from GitLab
+      print_status "Pulling latest image from GitLab Container Registry..."
+      docker pull $CONTAINER_IMAGE_LATEST
+
+      # Stop existing container
+      print_status "Stopping existing container..."
+      docker stop pixelated-app 2>/dev/null || true
+      docker rm pixelated-app 2>/dev/null || true
+
+      # Set up environment variables for container
+      PUBLIC_URL="http://$VPS_HOST:4321"
+      CORS_ORIGINS="http://$VPS_HOST:4321,https://$VPS_HOST:4321"
+
+      if [ -n "$VPS_DOMAIN" ]; then
+          PUBLIC_URL="https://$VPS_DOMAIN"
+          CORS_ORIGINS="$CORS_ORIGINS,http://$VPS_DOMAIN,https://$VPS_DOMAIN"
+      fi
+
+      # Run new container
+      print_status "Starting new container from GitLab image..."
+      docker run -d \
+        --name pixelated-app \
+        --restart unless-stopped \
+        -p 4321:4321 \
+        -e NODE_ENV=production \
+        -e PORT=4321 \
+        -e WEB_PORT=4321 \
+        -e LOG_LEVEL=info \
+        -e ENABLE_RATE_LIMITING=true \
+        -e RATE_LIMIT_WINDOW=60 \
+        -e RATE_LIMIT_MAX_REQUESTS=100 \
+        -e ENABLE_HIPAA_COMPLIANCE=true \
+        -e ENABLE_AUDIT_LOGGING=true \
+        -e ENABLE_DATA_MASKING=true \
+        -e ASTRO_TELEMETRY_DISABLED=1 \
+        -e PUBLIC_URL="$PUBLIC_URL" \
+        -e CORS_ORIGINS="$CORS_ORIGINS" \
+        $CONTAINER_IMAGE_LATEST
+
+      # Wait for container to start
+      sleep 15
+
+      # Check container status
+      if docker ps | grep -q pixelated-app; then
+          print_status "✅ Container is running"
+          docker logs --tail 10 pixelated-app
+      else
+          print_error "❌ Container failed to start"
+          docker logs pixelated-app
+          exit 1
+      fi
+
+      # Configure Caddy if domain is set
+      if [[ -n "$VPS_DOMAIN" ]]; then
+          print_status "Configuring Caddy for domain: $VPS_DOMAIN"
+          cat > /etc/caddy/Caddyfile << 'CADDY_EOF'
+      $VPS_DOMAIN {
+          reverse_proxy localhost:4321
+
+          # Enable compression
+          encode gzip
+
+          # Security headers
+          header {
+              # Enable HSTS
+              Strict-Transport-Security max-age=31536000;
+              # Prevent MIME sniffing
+              X-Content-Type-Options nosniff
+              # Prevent clickjacking
+              X-Frame-Options DENY
+              # XSS protection
+              X-XSS-Protection "1; mode=block"
+              # Referrer policy
+              Referrer-Policy strict-origin-when-cross-origin
+          }
+
+          # Health check endpoint
+          handle /api/health* {
+              reverse_proxy localhost:4321
+          }
+
+          # Static assets with long cache
+          handle /assets/* {
+              reverse_proxy localhost:4321
+              header Cache-Control "public, max-age=31536000, immutable"
+          }
+
+          # All other requests
+          handle {
+              reverse_proxy localhost:4321
+          }
+      }
+      CADDY_EOF
+
+          # Test and reload Caddy
+          print_status "Testing Caddy configuration..."
+          caddy validate --config /etc/caddy/Caddyfile
+
+          print_status "Starting Caddy..."
+          systemctl restart caddy
+      fi
+
+      print_status "✅ VPS deployment completed!"
+
+      # Show access URLs
+      print_status "Application URLs:"
+      print_status "  Direct: https://$VPS_HOST:4321"
+      if [[ -n "$VPS_DOMAIN" ]]; then
+          print_status "  Domain: https://$VPS_DOMAIN"
+      fi
+    EOF
   dependencies:
-    - test-container
+  - test-container
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-      when: manual
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
+  - if: $CI_COMMIT_BRANCH == "master"
+    when: manual
+  - if: $CI_COMMIT_BRANCH == "main"
+    when: manual
   environment:
     name: production
 
@@ -339,32 +340,33 @@ build-ai-backend:
   stage: build
   image: docker:24.0.5
   services:
-    - name: docker:24.0.5-dind
-      alias: docker
-      command: [ "--tls=false" ]
+  - name: docker:24.0.5-dind
+    alias: docker
+    command: [ "--tls=false" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - "echo === Diagnostic: Network connectivity to registry ==="
-    - ping -c 4 git.pixelatedempathy.tech || true
-    - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech/v2/ || true
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - "echo === Diagnostic: Network connectivity to registry ==="
+  - ping -c 4 git.pixelatedempathy.tech || true
+  - nslookup git.pixelatedempathy.tech || true
+  - curl -v https://git.pixelatedempathy.tech/v2/ || true
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - echo "Building AI backend components..."
-    - cd ai
-    - docker build -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
-    - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
-    - docker push $CI_REGISTRY_IMAGE/ai:latest
-    - echo "✅ AI backend container pushed to GitLab Container Registry"
+  - echo "Building AI backend components..."
+  - cd ai
+  - docker buildx create --use --name ai-builder || docker buildx use ai-builder
+  - docker buildx build --load -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
+  - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
+  - docker push $CI_REGISTRY_IMAGE/ai:latest
+  - echo "✅ AI backend container pushed to GitLab Container Registry"
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-      changes:
-        - ai/**/*
-    - if: $CI_COMMIT_BRANCH == "main"
-      changes:
-        - ai/**/*
+  - if: $CI_COMMIT_BRANCH == "master"
+    changes:
+    - ai/**/*
+  - if: $CI_COMMIT_BRANCH == "main"
+    changes:
+    - ai/**/*
   allow_failure: true # Allow failure since AI backend is large
 
 # Security scan
@@ -372,39 +374,39 @@ security-scan:
   stage: test
   image: docker:24.0.5
   services:
-    - name: docker:24.0.5-dind
-      alias: docker
-      command: [ "--tls=false" ]
+  - name: docker:24.0.5-dind
+    alias: docker
+    command: [ "--tls=false" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - "echo === Diagnostic: Network connectivity to registry ==="
-    - ping -c 4 git.pixelatedempathy.tech || true
-    - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech/v2/ || true
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - "echo === Diagnostic: Network connectivity to registry ==="
+  - ping -c 4 git.pixelatedempathy.tech || true
+  - nslookup git.pixelatedempathy.tech || true
+  - curl -v https://git.pixelatedempathy.tech/v2/ || true
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - echo "Running security scan on container..."
-    - docker pull $CONTAINER_IMAGE
-    - |
-      # Basic security checks
-      echo "Checking for non-root user..."
-      if docker run --rm $CONTAINER_IMAGE whoami | grep -v root; then
-        echo "✅ Container runs as non-root user"
-      else
-        echo "⚠️  Container may be running as root"
-      fi
-      
-      echo "Checking exposed ports..."
-      docker run --rm $CONTAINER_IMAGE netstat -tlnp 2>/dev/null || echo "netstat not available"
-      
-      echo "✅ Security scan completed"
+  - echo "Running security scan on container..."
+  - docker pull $CONTAINER_IMAGE
+  - |
+    # Basic security checks
+    echo "Checking for non-root user..."
+    if docker run --rm $CONTAINER_IMAGE whoami | grep -v root; then
+      echo "✅ Container runs as non-root user"
+    else
+      echo "⚠️  Container may be running as root"
+    fi
+
+    echo "Checking exposed ports..."
+    docker run --rm $CONTAINER_IMAGE netstat -tlnp 2>/dev/null || echo "netstat not available"
+
+    echo "✅ Security scan completed"
   dependencies:
-    - build-frontend
+  - build-frontend
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
 
 # Automated Rollback (if deploy fails)
@@ -412,61 +414,61 @@ rollback:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk add --no-cache openssh-client
-    - eval $(ssh-agent -s)
-    - |
-      # Decode and validate SSH private key
-      if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
-        echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
-        exit 1
-      fi
-      
-      echo "🔑 Setting up SSH private key..."
-      
-      # Create temporary file for the key
-      SSH_KEY_FILE=$(mktemp)
-      trap "rm -f $SSH_KEY_FILE" EXIT
-      
-      # Decode the base64 key and write to temp file
-      if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
-        echo "❌ Failed to decode base64 SSH key"
-        exit 1
-      fi
-      
-      # Validate the key format
-      if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
-        echo "❌ Invalid SSH key format - missing BEGIN marker"
-        echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
-        exit 1
-      fi
-      
-      # Set correct permissions and add to ssh-agent
-      chmod 600 "$SSH_KEY_FILE"
-      if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
-        echo "❌ Failed to add SSH key to agent"
-        echo "Key details:"
-        head -n 2 "$SSH_KEY_FILE"
-        tail -n 2 "$SSH_KEY_FILE"
-        exit 1
-      fi
-      
-      echo "✅ SSH key successfully added to agent"
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+  - apk add --no-cache openssh-client
+  - eval $(ssh-agent -s)
+  - |
+    # Decode and validate SSH private key
+    if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
+      echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
+      exit 1
+    fi
+
+    echo "🔑 Setting up SSH private key..."
+
+    # Create temporary file for the key
+    SSH_KEY_FILE=$(mktemp)
+    trap "rm -f $SSH_KEY_FILE" EXIT
+
+    # Decode the base64 key and write to temp file
+    if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
+      echo "❌ Failed to decode base64 SSH key"
+      exit 1
+    fi
+
+    # Validate the key format
+    if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
+      echo "❌ Invalid SSH key format - missing BEGIN marker"
+      echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
+      exit 1
+    fi
+
+    # Set correct permissions and add to ssh-agent
+    chmod 600 "$SSH_KEY_FILE"
+    if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
+      echo "❌ Failed to add SSH key to agent"
+      echo "Key details:"
+      head -n 2 "$SSH_KEY_FILE"
+      tail -n 2 "$SSH_KEY_FILE"
+      exit 1
+    fi
+
+    echo "✅ SSH key successfully added to agent"
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "Rolling back to previous container version..."
-    - |
-      ssh $VPS_USER@$VPS_HOST << 'EOF'
-        echo "Performing rollback on VPS..."
-        docker pull $CONTAINER_IMAGE_LATEST_PREV || echo "No previous image found"
-        docker stop pixelated-app || true
-        docker rm pixelated-app || true
-        docker run -d --name pixelated-app --restart unless-stopped -p 4321:4321 $CONTAINER_IMAGE_LATEST_PREV
-        echo "✅ Rollback complete"
-      EOF
+  - echo "Rolling back to previous container version..."
+  - |
+    ssh $VPS_USER@$VPS_HOST << 'EOF'
+      echo "Performing rollback on VPS..."
+      docker pull $CONTAINER_IMAGE_LATEST_PREV || echo "No previous image found"
+      docker stop pixelated-app || true
+      docker rm pixelated-app || true
+      docker run -d --name pixelated-app --restart unless-stopped -p 4321:4321 $CONTAINER_IMAGE_LATEST_PREV
+      echo "✅ Rollback complete"
+    EOF
   rules:
-    - when: manual
+  - when: manual
   allow_failure: true
 
 # Health Check & Notification
@@ -474,93 +476,93 @@ health-check:
   stage: deploy
   image: alpine:latest
   script:
-    - apk add --no-cache curl
-    - echo "Running post-deploy health check..."
-    - |
-      if curl -f https://$VPS_DOMAIN/api/health; then
-        echo "Health check passed";
-      else
-        echo "Health check failed";
-        # Add Slack/email notification integration here
-        exit 1;
-      fi
+  - apk add --no-cache curl
+  - echo "Running post-deploy health check..."
+  - |
+    if curl -f https://$VPS_DOMAIN/api/health; then
+      echo "Health check passed";
+    else
+      echo "Health check failed";
+      # Add Slack/email notification integration here
+      exit 1;
+    fi
   dependencies:
-    - deploy-vps
+  - deploy-vps
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
 
 # Artifact/Log Retention
 retain-logs:
   stage: test
   image: alpine:latest
   script:
-    - mkdir -p artifacts
-    - cp /var/log/* artifacts/ || true
-    - echo "Logs retained for debugging"
+  - mkdir -p artifacts
+  - cp /var/log/* artifacts/ || true
+  - echo "Logs retained for debugging"
   artifacts:
     paths:
-      - artifacts/
+    - artifacts/
     expire_in: 7 days
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
 
 # Staging Environment
 deploy-staging:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk add --no-cache openssh-client curl git
-    - eval $(ssh-agent -s)
-    - |
-      # Decode and validate SSH private key
-      if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
-        echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
-        exit 1
-      fi
-      
-      echo "🔑 Setting up SSH private key..."
-      
-      # Create temporary file for the key
-      SSH_KEY_FILE=$(mktemp)
-      trap "rm -f $SSH_KEY_FILE" EXIT
-      
-      # Decode the base64 key and write to temp file
-      if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
-        echo "❌ Failed to decode base64 SSH key"
-        exit 1
-      fi
-      
-      # Validate the key format
-      if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
-        echo "❌ Invalid SSH key format - missing BEGIN marker"
-        echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
-        exit 1
-      fi
-      
-      # Set correct permissions and add to ssh-agent
-      chmod 600 "$SSH_KEY_FILE"
-      if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
-        echo "❌ Failed to add SSH key to agent"
-        echo "Key details:"
-        head -n 2 "$SSH_KEY_FILE"
-        tail -n 2 "$SSH_KEY_FILE"
-        exit 1
-      fi
-      
-      echo "✅ SSH key successfully added to agent"
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+  - apk add --no-cache openssh-client curl git
+  - eval $(ssh-agent -s)
+  - |
+    # Decode and validate SSH private key
+    if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
+      echo "❌ VPS_SSH_PRIVATE_KEY_B64 environment variable is not set"
+      exit 1
+    fi
+
+    echo "🔑 Setting up SSH private key..."
+
+    # Create temporary file for the key
+    SSH_KEY_FILE=$(mktemp)
+    trap "rm -f $SSH_KEY_FILE" EXIT
+
+    # Decode the base64 key and write to temp file
+    if ! echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE" 2>/dev/null; then
+      echo "❌ Failed to decode base64 SSH key"
+      exit 1
+    fi
+
+    # Validate the key format
+    if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
+      echo "❌ Invalid SSH key format - missing BEGIN marker"
+      echo "Key should start with: -----BEGIN RSA PRIVATE KEY----- or -----BEGIN OPENSSH PRIVATE KEY-----"
+      exit 1
+    fi
+
+    # Set correct permissions and add to ssh-agent
+    chmod 600 "$SSH_KEY_FILE"
+    if ! ssh-add "$SSH_KEY_FILE" 2>/dev/null; then
+      echo "❌ Failed to add SSH key to agent"
+      echo "Key details:"
+      head -n 2 "$SSH_KEY_FILE"
+      tail -n 2 "$SSH_KEY_FILE"
+      exit 1
+    fi
+
+    echo "✅ SSH key successfully added to agent"
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "Deploying to staging VPS..."
+  - echo "Deploying to staging VPS..."
   # Add staging deployment logic here
   environment:
     name: staging
   rules:
-    - if: $CI_COMMIT_BRANCH == "staging"
-      when: manual
+  - if: $CI_COMMIT_BRANCH == "staging"
+    when: manual
 
 # Secret Management (comment)
 # Use GitLab CI/CD protected variables for all secrets and tokens.
@@ -571,19 +573,19 @@ tag-image:
   stage: build
   image: docker:24.0.5
   services:
-    - name: docker:24.0.5-dind
-      alias: docker
-      command: [ "--tls=false" ]
+  - name: docker:24.0.5-dind
+    alias: docker
+    command: [ "--tls=false", "--experimental" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - "echo === Diagnostic: Network connectivity to registry ==="
-    - ping -c 4 git.pixelatedempathy.tech || true
-    - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech/v2/ || true
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - "echo === Diagnostic: Network connectivity to registry ==="
+  - ping -c 4 git.pixelatedempathy.tech || true
+  - nslookup git.pixelatedempathy.tech || true
+  - curl -v https://git.pixelatedempathy.tech/v2/ || true
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script: |
     echo "Tagging image with branch and build number..."
     docker pull $CONTAINER_IMAGE
@@ -591,60 +593,60 @@ tag-image:
     docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
     echo "✅ Image tagged and pushed: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID"
   dependencies:
-    - build-frontend
+  - build-frontend
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
 
 # Advanced Security Scanning
 trivy-scan:
   stage: test
   image: aquasec/trivy:latest
   script:
-    - trivy image $CONTAINER_IMAGE
+  - trivy image $CONTAINER_IMAGE
   dependencies:
-    - build-frontend
+  - build-frontend
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
 
 # Dependency Caching (using GitLab cache)
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - .npm/
-    - .pnpm-store/
-    - .cache/
-    - ai/.cache/
-    - node_modules/
-    - ai/node_modules/
+  - .npm/
+  - .pnpm-store/
+  - .cache/
+  - ai/.cache/
+  - node_modules/
+  - ai/node_modules/
 
 # Automated Cleanup (improved)
 cleanup:
   stage: deploy
   image: docker:24.0.5
   services:
-    - name: docker:24.0.5-dind
-      alias: docker
-      command: [ "--tls=false" ]
+  - name: docker:24.0.5-dind
+    alias: docker
+    command: [ "--tls=false" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - "echo === Diagnostic: Network connectivity to registry ==="
-    - ping -c 4 git.pixelatedempathy.tech || true
-    - nslookup git.pixelatedempathy.tech || true
-    - curl -v https://git.pixelatedempathy.tech/v2/ || true
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - "echo === Diagnostic: Network connectivity to registry ==="
+  - ping -c 4 git.pixelatedempathy.tech || true
+  - nslookup git.pixelatedempathy.tech || true
+  - curl -v https://git.pixelatedempathy.tech/v2/ || true
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - echo "Cleaning up old container images..."
-    - docker image prune -af --filter "until=24h"
-    - docker system prune -f --filter "until=24h"
-    - echo "✅ Old images and containers removed"
+  - echo "Cleaning up old container images..."
+  - docker image prune -af --filter "until=24h"
+  - docker system prune -f --filter "until=24h"
+  - echo "✅ Old images and containers removed"
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-      when: manual
+  - if: $CI_COMMIT_BRANCH == "master"
+    when: manual
   allow_failure: true
 
 # Documentation (see docs/ci-cd/pipeline-variables.md for variable setup and troubleshooting)
