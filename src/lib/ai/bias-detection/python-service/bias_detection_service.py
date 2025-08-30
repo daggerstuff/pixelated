@@ -34,6 +34,7 @@ os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 
 # Targeted filter only for the functorch.vmap deprecation originating from inFairness
 import warnings, importlib
+
 warnings.filterwarnings(
     "ignore",
     category=FutureWarning,
@@ -44,15 +45,19 @@ warnings.filterwarnings(
 # Pre-import and patch inFairness ndcg as early as possible
 try:
     import torch  # type: ignore
+
     has_torch_vmap = hasattr(torch, "vmap")
 except Exception:
     has_torch_vmap = False
 
 if has_torch_vmap:
+
     def _compat_vmap(fn, in_dims=0, out_dims=0):
         return torch.vmap(fn, in_dims=in_dims, out_dims=out_dims)
+
     try:
         import inFairness.utils.ndcg as _early_ndcg  # type: ignore
+
         if hasattr(_early_ndcg, "vmap"):
             _early_ndcg.vmap = _compat_vmap  # type: ignore
         # Reload to ensure patched symbol is bound everywhere within the module
@@ -93,6 +98,7 @@ except ImportError as e:
 # Hugging Face tooling
 try:
     from transformers.pipelines import pipeline
+
     HF_EVALUATE_AVAILABLE = True
 except ImportError as e:
     HF_EVALUATE_AVAILABLE = False
@@ -101,18 +107,23 @@ except ImportError as e:
 
 # Compatibility shim for functorch -> torch.vmap to prevent FutureWarnings in dependencies
 import warnings
+
 try:
     import torch  # type: ignore
+
     has_torch_vmap = hasattr(torch, "vmap")
 except Exception:
     has_torch_vmap = False
 
 _compat_vmap = None
 if has_torch_vmap:
+
     def _compat_vmap(fn, in_dims=0, out_dims=0):
         return torch.vmap(fn, in_dims=in_dims, out_dims=out_dims)
+
     try:
         import functorch as _functorch  # type: ignore
+
         if hasattr(_functorch, "vmap"):
             _functorch.vmap = _compat_vmap  # type: ignore
     except Exception:
@@ -120,6 +131,7 @@ if has_torch_vmap:
     # Force-import and patch inFairness ndcg early
     try:
         import inFairness.utils.ndcg as _ndcg  # type: ignore
+
         if hasattr(_ndcg, "vmap"):
             _ndcg.vmap = _compat_vmap  # type: ignore
     except Exception:
@@ -142,16 +154,19 @@ TEXTBLOB_AVAILABLE = False
 try:
     import nltk
     from nltk.sentiment import SentimentIntensityAnalyzer
+
     NLTK_AVAILABLE = True
 except Exception:
     NLTK_AVAILABLE = False
 try:
     import spacy
+
     SPACY_AVAILABLE = True
 except Exception:
     SPACY_AVAILABLE = False
 try:
     from textblob import TextBlob
+
     TEXTBLOB_AVAILABLE = True
 except Exception:
     TEXTBLOB_AVAILABLE = False
@@ -162,9 +177,12 @@ if not NLP_AVAILABLE:
     logging.warning("NLP libraries not available: no VADER, spaCy, or TextBlob present")
 else:
     have = []
-    if NLTK_AVAILABLE: have.append('VADER')
-    if SPACY_AVAILABLE: have.append('spaCy')
-    if TEXTBLOB_AVAILABLE: have.append('TextBlob')
+    if NLTK_AVAILABLE:
+        have.append("VADER")
+    if SPACY_AVAILABLE:
+        have.append("spaCy")
+    if TEXTBLOB_AVAILABLE:
+        have.append("TextBlob")
     logging.info(f"NLP backends available: {', '.join(have)}")
 
 # Model interpretability (feature flag only; avoid heavy imports until needed)
@@ -212,8 +230,9 @@ try:
         batch_analyze_sessions,
         validate_dataset_quality,
         export_dataset_chunk,
-        distribute_task
+        distribute_task,
     )
+
     CELERY_AVAILABLE = True
     logger.info("Celery distributed processing initialized successfully")
 except ImportError as e:
@@ -422,12 +441,15 @@ class BiasDetectionService:
                     logger.info("NLTK VADER sentiment initialized")
                 except Exception as e:
                     self.sentiment_analyzer = None
-                    logger.info(f"NLTK sentiment not available, will fall back to TextBlob if present: {e}")
+                    logger.info(
+                        f"NLTK sentiment not available, will fall back to TextBlob if present: {e}"
+                    )
 
                 # TextBlob fallback
                 if self.sentiment_analyzer is None and TEXTBLOB_AVAILABLE:
                     try:
                         from textblob import TextBlob as _TB
+
                         self._textblob = _TB
                         logger.info("TextBlob sentiment fallback initialized")
                     except Exception as e:
@@ -1037,7 +1059,14 @@ class BiasDetectionService:
                 "source": "textblob",
             }
         except Exception as e:
-            return {"compound": 0.0, "positive": 0.0, "negative": 0.0, "neutral": 1.0, "error": str(e), "source": "textblob"}
+            return {
+                "compound": 0.0,
+                "positive": 0.0,
+                "negative": 0.0,
+                "neutral": 1.0,
+                "error": str(e),
+                "source": "textblob",
+            }
 
     def _detect_biased_terms(self, doc) -> list[dict[str, Any]]:
         """Detect potentially biased terms in text"""
@@ -1680,12 +1709,14 @@ def analyze_session_async_endpoint():
         # Submit task to Celery
         task = analyze_session_async.delay(data, getattr(g, "user_id", "unknown"))
 
-        return jsonify({
-            "task_id": task.id,
-            "status": "submitted",
-            "message": "Bias analysis submitted for distributed processing",
-            "check_status_url": f"/task/{task.id}"
-        })
+        return jsonify(
+            {
+                "task_id": task.id,
+                "status": "submitted",
+                "message": "Bias analysis submitted for distributed processing",
+                "check_status_url": f"/task/{task.id}",
+            }
+        )
 
     except Exception as e:
         logger.error(f"Async analysis endpoint error: {e}")
@@ -1716,18 +1747,18 @@ def batch_analyze_sessions_endpoint():
 
         # Submit batch task to Celery
         task = batch_analyze_sessions.delay(
-            sessions_data,
-            getattr(g, "user_id", "unknown"),
-            batch_size
+            sessions_data, getattr(g, "user_id", "unknown"), batch_size
         )
 
-        return jsonify({
-            "task_id": task.id,
-            "status": "submitted",
-            "message": f"Batch analysis of {len(sessions_data)} sessions submitted for distributed processing",
-            "check_status_url": f"/task/{task.id}",
-            "estimated_workers_needed": min(len(sessions_data) // batch_size + 1, 10)
-        })
+        return jsonify(
+            {
+                "task_id": task.id,
+                "status": "submitted",
+                "message": f"Batch analysis of {len(sessions_data)} sessions submitted for distributed processing",
+                "check_status_url": f"/task/{task.id}",
+                "estimated_workers_needed": min(len(sessions_data) // batch_size + 1, 10),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Batch analysis endpoint error: {e}")
@@ -1756,12 +1787,14 @@ def validate_dataset_quality_endpoint():
         # Submit validation task to Celery
         task = validate_dataset_quality.delay(dataset_path, quality_threshold)
 
-        return jsonify({
-            "task_id": task.id,
-            "status": "submitted",
-            "message": f"Dataset quality validation submitted for distributed processing",
-            "check_status_url": f"/task/{task.id}"
-        })
+        return jsonify(
+            {
+                "task_id": task.id,
+                "status": "submitted",
+                "message": f"Dataset quality validation submitted for distributed processing",
+                "check_status_url": f"/task/{task.id}",
+            }
+        )
 
     except Exception as e:
         logger.error(f"Dataset validation endpoint error: {e}")
@@ -1824,19 +1857,23 @@ def get_workers_status():
         reserved_tasks = inspect.reserved() or {}
 
         workers_status = {}
-        for worker_name in set(active_tasks.keys()) | set(scheduled_tasks.keys()) | set(reserved_tasks.keys()):
+        for worker_name in (
+            set(active_tasks.keys()) | set(scheduled_tasks.keys()) | set(reserved_tasks.keys())
+        ):
             workers_status[worker_name] = {
                 "active_tasks": len(active_tasks.get(worker_name, [])),
                 "scheduled_tasks": len(scheduled_tasks.get(worker_name, [])),
                 "reserved_tasks": len(reserved_tasks.get(worker_name, [])),
-                "status": "active"
+                "status": "active",
             }
 
-        return jsonify({
-            "total_workers": len(workers_status),
-            "workers": workers_status,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        })
+        return jsonify(
+            {
+                "total_workers": len(workers_status),
+                "workers": workers_status,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Workers status endpoint error: {e}")
