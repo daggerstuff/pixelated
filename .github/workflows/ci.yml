@@ -33,7 +33,7 @@ jobs:
     - name: Set Node.js and pnpm versions
       id: set-versions
       run: |
-        echo "node-version=22.18.0" >> $GITHUB_OUTPUT
+        echo "node-version=24.18.0" >> $GITHUB_OUTPUT
         echo "pnpm-version=10.15.0" >> $GITHUB_OUTPUT
 
   lint:

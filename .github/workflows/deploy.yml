@@ -177,10 +177,10 @@ jobs:
               sudo usermod -aG docker $VPS_USER 2>/dev/null || true
             fi
 
-            # Install Node.js 22 via nvm
+            # Install Node.js 24 via nvm
             NODE_VERSION=$(command -v node && node --version || echo "none")
-            if [[ "$NODE_VERSION" != "v22"* ]]; then
-              print_status "Current Node version: $NODE_VERSION, upgrading to Node.js 22 via nvm..."
+            if [[ "$NODE_VERSION" != "v24"* ]]; then
+              print_status "Current Node version: $NODE_VERSION, upgrading to Node.js 24 via nvm..."
               if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
                 export NVM_DIR="$HOME/.nvm"
                 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -196,12 +196,12 @@ jobs:
                   echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> ~/.bashrc
                 fi
               fi
-              nvm install 22
-              nvm use 22
-              nvm alias default 22
-              print_status "Node.js 22 installation completed"
+              nvm install 24
+              nvm use 24
+              nvm alias default 24
+              print_status "Node.js 24 installation completed"
             else
-              print_status "Node.js 22 already installed: $NODE_VERSION"
+              print_status "Node.js 24 already installed: $NODE_VERSION"
             fi
 
             # Install pnpm if not present

@@ -23,7 +23,7 @@ variables:
 - name: buildConfiguration
   value: Release
 - name: nodeVersion
-  value: 22.x
+  value: 24.x
 - name: dockerTag
   value: $(Build.BuildId)
 - name: azureSubscription
@@ -89,18 +89,18 @@ stages:
       displayName: Install dependencies
 
     - script: |
-        # Install Node.js 22.x in container using nvm (no sudo)
+        # Install Node.js 24.x in container using nvm (no sudo)
         set -e
         export NVM_DIR="$HOME/.nvm"
         mkdir -p $NVM_DIR
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
         . $NVM_DIR/nvm.sh
-        nvm install 22
-        nvm use 22
+        nvm install 24
+        nvm use 24
         node --version
         which node
         echo "Node.js installation complete."
-      displayName: "Install Node.js 22.x in container (pre-build)"
+      displayName: "Install Node.js 24.x in container (pre-build)"
 
     - script: |
         # Ensure cache directories exist before cache task with robust path handling
@@ -462,7 +462,7 @@ stages:
               --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
               --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
               --build-arg BUILDKIT_INLINE_CACHE=1 \
-              --build-arg NODE_VERSION=22 \
+              --build-arg NODE_VERSION=24 \
               --build-arg PNPM_VERSION=10.15.0 \
               -t "$ACR_LOGIN_SERVER/$(imageName):cache-base" \
               . || echo "Base stage build failed, continuing..."
@@ -479,7 +479,7 @@ stages:
               --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
               --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
               --build-arg BUILDKIT_INLINE_CACHE=1 \
-              --build-arg NODE_VERSION=22 \
+              --build-arg NODE_VERSION=24 \
               --build-arg PNPM_VERSION=10.15.0 \
               -t "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
               . || echo "Build stage build failed, continuing..."
@@ -495,9 +495,9 @@ stages:
             --cache-from "$ACR_LOGIN_SERVER/$(imageName):cache-build" \
             --cache-from "$ACR_LOGIN_SERVER/$(imageName):latest" \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --build-arg NODE_VERSION=22 \
-            --build-arg PNPM_VERSION=10.15.0 \
-            -t "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" \
+          --build-arg NODE_VERSION=24 \
+          --build-arg PNPM_VERSION=10.15.0 \
+          -t "$ACR_LOGIN_SERVER/$(imageName):$(dockerTag)" \
             -t "$ACR_LOGIN_SERVER/$(imageName):latest" \
             .
 
@@ -559,10 +559,10 @@ stages:
           steps:
           - script: |
               set -eo pipefail
-              # Ensure Node.js (LTS 22.x) is available for any Node-based steps
-              echo "Installing Node.js (LTS 22.x) for container agent..."
+              # Ensure Node.js (LTS 24.x) is available for any Node-based steps
+              echo "Installing Node.js (LTS 24.x) for container agent..."
               sudo apt-get update -qq && sudo apt-get install -y curl ca-certificates
-              curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+              curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
               sudo apt-get install -y nodejs
               node --version
 

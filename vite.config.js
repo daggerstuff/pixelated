@@ -157,7 +157,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
   },
   build: {
-    target: 'node22',
+    target: 'node24',
     minify: false,
     emptyOutDir: false,
     sourcemap: true,
@@ -296,7 +296,7 @@ export default defineConfig({
   optimizeDeps: {
     esbuildOptions: {
       platform: 'node',
-      target: 'node22',
+      target: 'node24',
       define: {
         'process.env.BUILDING_FOR_AWS': JSON.stringify('1'),
         'process.env.NODE_ENV': JSON.stringify(
