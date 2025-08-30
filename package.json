@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.15.0",
   "license": "MIT",
   "engines": {
-    "node": "22"
+    "node": "24"
   },
   "scripts": {
     "bias:py": "uv run --python 3.11 python src/lib/ai/bias-detection/python-service/bias_detection_service.py",
