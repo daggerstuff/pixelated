@@ -2,6 +2,14 @@
  * Azure AI Agent Service for Pixelated Empathy
  * Connects to our specialized clinical AI agent for therapeutic scenario generation
  */
+
+export interface AgentResponse {
+  success: boolean;
+  response: string | null;
+  error?: string;
+  metadata?: Record<string, unknown>;
+  conversation_id?: string;
+}
 export class PixelatedEmpathyAgent {
   private readonly agentEndpoint: string;
   private readonly apiKey: string;
@@ -25,7 +33,7 @@ export class PixelatedEmpathyAgent {
     difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
     population?: 'adolescent' | 'adult' | 'geriatric' | 'cultural_minority' | 'lgbtq' | 'veteran';
     learningObjectives?: string[];
-  }) {
+  }): Promise<AgentResponse> {
     const prompt = `Generate a ${request.difficulty} level training scenario for ${request.condition}${
       request.population ? ` with a ${request.population} client` : ''
     }.${
@@ -40,7 +48,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Get bias detection analysis
    */
-  async analyzeBias(conversationTranscript: string): void {
+  async analyzeBias(conversationTranscript: string): Promise<AgentResponse> {
     const prompt = `Analyze this therapeutic conversation for potential biases (cultural, gender, racial, socioeconomic): ${conversationTranscript}`;
     return this.sendMessage(prompt, 'bias_detection');
   }
@@ -52,7 +60,7 @@ export class PixelatedEmpathyAgent {
     experience: 'beginner' | 'intermediate' | 'advanced';
     specializations: string[];
     weakAreas?: string[];
-  }) {
+  }): Promise<AgentResponse> {
     const prompt = `Recommend training modules for a ${therapistProfile.experience} therapist specializing in ${therapistProfile.specializations.join(', ')}${
       therapistProfile.weakAreas ? ` who needs improvement in ${therapistProfile.weakAreas.join(', ')}` : ''
     }`;
@@ -62,7 +70,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Get platform status and metrics
    */
-  async getPlatformStatus() {
+  async getPlatformStatus(): Promise<AgentResponse> {
     const prompt = 'Check the current status of Pixelated Empathy platform services and provide a summary of recent metrics';
     return this.sendMessage(prompt, 'platform_status');
   }
@@ -70,7 +78,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Generate assessment criteria for a scenario
    */
-  async generateAssessment(scenarioId: string, difficulty: string): void {
+  async generateAssessment(scenarioId: string, difficulty: string): Promise<AgentResponse> {
     const prompt = `Generate assessment criteria and rubric for scenario ${scenarioId} at ${difficulty} difficulty level`;
     return this.sendMessage(prompt, 'assessment_generation');
   }
@@ -78,7 +86,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Send message to the Azure AI Agent
    */
-  async sendMessage(message: string, context: string): void {
+  async sendMessage(message: string, context: string): Promise<AgentResponse> {
     try {
       const response = await fetch(`${this.agentEndpoint}/chat`, {
         method: 'POST',
@@ -120,7 +128,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Stream conversation with the agent (for real-time interactions)
    */
-  async *streamConversation(message: string, context: string = 'general'): void {
+  async *streamConversation(message: string, context: string = 'general'): AsyncGenerator<any, void, unknown> {
     try {
       const response = await fetch(`${this.agentEndpoint}/stream`, {
         method: 'POST',

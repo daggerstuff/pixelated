@@ -57,7 +57,7 @@ export function CognitiveModelSelector({
           setModels(modelList)
 
           // Set the first model as selected if none is selected
-          if (!selectedModelId && onSelectModel) {
+          if (!selectedModelId && onSelectModel && modelList[0]) {
             onSelectModel(modelList[0].id)
           }
 

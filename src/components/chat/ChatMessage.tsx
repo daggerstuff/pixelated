@@ -30,6 +30,8 @@ export function ChatMessage({
   className,
   isTyping = false,
 }: ChatMessageProps) {
+  const theme = useContext(ThemeContext)
+  const isDark = theme?.resolvedTheme === 'dark'
   const isUser = message.role === 'user'
   const isBotMessage = message.role === 'assistant'
   const isSystemMessage = message.role === 'system'
@@ -75,14 +77,14 @@ export function ChatMessage({
         className={cn(
           'relative mb-6 max-w-[80%] rounded-lg p-4 shadow-sm',
           isUser
-            ? theme?.isDark
+            ? isDark
               ? 'bg-blue-600 text-white'
               : 'bg-blue-600 text-white'
             : isBotMessage
-              ? theme?.isDark
+              ? isDark
                 ? 'bg-gray-900 text-gray-100 border border-gray-700'
                 : 'bg-gray-50 text-gray-900 border border-gray-200'
-              : theme?.isDark
+              : isDark
                 ? 'bg-gray-800 text-gray-300 italic border border-gray-700'
                 : 'bg-gray-100 text-gray-600 italic border border-gray-200',
           isTyping && 'animate-pulse',
@@ -94,14 +96,14 @@ export function ChatMessage({
             className={cn(
               'rounded-full px-2 py-1 text-xs',
               isUser
-                ? theme?.isDark
+                ? isDark
                   ? 'bg-blue-900 text-blue-100'
                   : 'bg-blue-800 text-blue-200'
                 : isBotMessage
-                  ? theme?.isDark
+                  ? isDark
                     ? 'bg-gray-800 text-gray-200'
                     : 'bg-gray-200 text-gray-700'
-                  : theme?.isDark
+                  : isDark
                     ? 'bg-gray-700 text-gray-400'
                     : 'bg-gray-300 text-gray-600',
             )}

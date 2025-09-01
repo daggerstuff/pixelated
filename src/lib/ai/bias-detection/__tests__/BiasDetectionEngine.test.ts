@@ -387,10 +387,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     // Initialize the bias engine
     biasEngine = new BiasDetectionEngine(mockConfig)
+  })
+
+  it('should analyze bias levels (low, high, critical) with default mocks', async () => {
     await biasEngine.initialize()
 
     // Test low bias score (default mocks return 0.5 overall, which should be 'medium')
-    // Reset mocks to default values for low bias test
     mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult())
     mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult())
     mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult())
@@ -415,7 +417,6 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
 
     // Test high bias score (default mocks return 0.5 overall, which should be 'medium')
-    // Reset mocks to default values for high bias test
     mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult())
     mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult())
     mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult())
@@ -440,7 +441,6 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
 
     // Test critical bias score (default mocks return 0.5 overall, which should be 'medium')
-    // Reset mocks to default values for critical bias test
     mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult())
     mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult())
     mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult())
@@ -5356,3 +5356,4 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 })
+

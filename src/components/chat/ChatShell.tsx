@@ -8,7 +8,7 @@ interface ChatShellProps {
     messagesEndRef: React.RefObject<HTMLDivElement | null>;
     showScrollButton: boolean;
   }) => React.ReactNode;
-  autoScrollDeps: any[]; // e.g. [messages, isTyping]
+  autoScrollDeps: unknown[]; // e.g. [messages, isTyping]
 }
 
 export function ChatShell({ children, autoScrollDeps }: ChatShellProps) {
