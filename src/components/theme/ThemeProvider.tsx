@@ -19,6 +19,8 @@ export function useTheme() {
   return context
 }
 
+export { ThemeContext }
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   // Initialize with dark as default
   const [theme, setThemeState] = useState<Theme>('dark')
@@ -62,10 +64,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     updateResolvedTheme()
 
-    // Listen for system theme changes
+    // Listen for system theme changes only when theme is 'system'
     if (theme === 'system') {
       mediaQuery.addEventListener('change', updateResolvedTheme)
-      return () => mediaQuery.removeEventListener('change', updateResolvedTheme)
+    }
+
+    // Always return cleanup function
+    return () => {
+      if (theme === 'system') {
+        mediaQuery.removeEventListener('change', updateResolvedTheme)
+      }
     }
   }, [theme])
 
@@ -74,8 +82,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
-      {children}
+    <ThemeContext.Provider value={ { theme, setTheme, resolvedTheme } }>
+      { children }
     </ThemeContext.Provider>
   )
 }
