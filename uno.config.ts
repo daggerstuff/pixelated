@@ -4,7 +4,7 @@ import {
   presetAttributify,
   presetTypography,
 } from 'unocss'
-import { presetWind3 } from '@unocss/preset-wind3';
+import { presetWind3 } from '@unocss/preset-wind3'
 
 export default defineConfig({
   // Workaround: filter out accidental i- or i-- icon classes that cause failed icon "-" lookups
@@ -43,26 +43,40 @@ export default defineConfig({
       warn: true,
       collections: {
         // Only include icon collections that are actually used in the codebase
-        ri: () => import('@iconify-json/ri/icons.json').then(i => i.default),
-        uil: () => import('@iconify-json/uil/icons.json').then(i => i.default),
-        lucide: () => import('@iconify-json/lucide/icons.json').then(i => i.default),
-        bx: () => import('@iconify-json/bx/icons.json').then(i => i.default),
-        'grommet-icons': () => import('@iconify-json/grommet-icons/icons.json').then(i => i.default),
+        'ri': () =>
+          import('@iconify-json/ri/icons.json').then((i) => i.default),
+        'uil': () =>
+          import('@iconify-json/uil/icons.json').then((i) => i.default),
+        'lucide': () =>
+          import('@iconify-json/lucide/icons.json').then((i) => i.default),
+        'bx': () =>
+          import('@iconify-json/bx/icons.json').then((i) => i.default),
+        'grommet-icons': () =>
+          import('@iconify-json/grommet-icons/icons.json').then(
+            (i) => i.default,
+          ),
         // Removed unused collections to reduce bundle size:
         // - carbon: Only used in external link plugin, not in actual UI
         // - fa-solid: Not used anywhere in the codebase
       },
       customizations: {
-        customize(defaultCustomizations: Required<IconifyIconCustomisations>, data: IconifyIcon, name: string): Required<IconifyIconCustomisations> | undefined {
+        customize(defaultCustomizations: any, name: any): any {
           // Hardened: type guard and block empty, dash, double-dash, multiple dashes, or invalid values
-          if (typeof name !== 'string' || !name || name === '-' || name === '--' || name.startsWith('--') || /^-+$/.test(name)) {
+          if (
+            typeof name !== 'string' ||
+            !name ||
+            name === '-' ||
+            name === '--' ||
+            (typeof name === 'string' && name.startsWith('--')) ||
+            /^-+$/.test(name)
+          ) {
             // Block invalid icon names by returning undefined (prevents rendering)
-            return undefined;
+            return undefined
           }
           // No additional customization, return defaults
-          return defaultCustomizations;
-        }
-      }
+          return defaultCustomizations
+        },
+      },
     }),
     presetTypography(),
   ],
