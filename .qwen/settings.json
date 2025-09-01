@@ -11,29 +11,6 @@
         "OPENMEMORY_API_KEY": "om-8u4kpiwqmus434epjpsdeuk86o7mnrgg",
         "CLIENT_NAME": "openmemory"
       }
-    },
-    "OpenMemory-2": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "openmemory"
-      ],
-      "env": {
-        "OPENMEMORY_API_KEY": "om-8u4kpiwqmus434epjpsdeuk86o7mnrgg",
-        "CLIENT_NAME": "cursor"
-      }
-    },
-    "claude-context": {
-      "command": "npx",
-      "args": [
-        "@zilliz/claude-context-mcp@latest"
-      ],
-      "env": {
-        "EMBEDDING_PROVIDER": "Ollama",
-        "EMBEDDING_MODEL": "nomic-embed-text",
-        "OLLAMA_HOST": "https://goat.pixelatedempathy.tech",
-        "MILVUS_ADDRESS": "localhost:19530"
-      }
     }
   }
 }

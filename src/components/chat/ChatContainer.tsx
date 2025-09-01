@@ -1,11 +1,12 @@
 import type { Message } from '@/types/chat'
 import type { ChangeEvent, FormEvent } from 'react'
 import { cn } from '@/lib/utils'
-import { useEffect, useRef, useState, useContext } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChatInput } from './ChatInput'
 import { ChatMessage } from './ChatMessage'
 import { IconBrain, IconChevronDown } from './icons'
-import { ThemeContext } from '@/contexts/ThemeContext'
+import { useTheme } from '@/components/theme/ThemeProvider'
+// If error persists, verify ThemeProvider file actually exports ThemeContext as a named export: "export const ThemeContext = ..."
 
 export interface ChatContainerProps {
   messages: Message[]
@@ -27,7 +28,8 @@ export function ChatContainer({
   inputPlaceholder,
   disabled = false,
 }: ChatContainerProps) {
-  const theme = useContext(ThemeContext)
+  const { resolvedTheme } = useTheme()
+  // Use resolvedTheme === 'dark' for dark mode checks
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
@@ -83,21 +85,21 @@ export function ChatContainer({
         ref={containerRef}
         className={cn(
           'flex-1 space-y-4 overflow-y-auto rounded-lg border p-6 shadow-sm',
-          theme?.isDark
+          resolvedTheme === 'dark'
             ? 'border-gray-700 bg-black'
             : 'border-gray-200 bg-white'
         )}
       >
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
-            <div className={theme?.isDark ? 'rounded-full bg-blue-900 p-4' : 'rounded-full bg-blue-50 p-4'}>
-              <IconBrain className={theme?.isDark ? 'h-8 w-8 text-blue-400' : 'h-8 w-8 text-blue-600'} />
+            <div className={resolvedTheme === 'dark' ? 'rounded-full bg-blue-900 p-4' : 'rounded-full bg-blue-50 p-4'}>
+              <IconBrain className={resolvedTheme === 'dark' ? 'h-8 w-8 text-blue-400' : 'h-8 w-8 text-blue-600'} />
             </div>
             <div className="max-w-sm space-y-2">
-              <h3 className={theme?.isDark ? 'text-lg font-semibold text-gray-200' : 'text-lg font-semibold text-gray-900'}>
+              <h3 className={resolvedTheme === 'dark' ? 'text-lg font-semibold text-gray-200' : 'text-lg font-semibold text-gray-900'}>
                 Start a Conversation
               </h3>
-              <p className={theme?.isDark ? 'text-sm text-gray-400' : 'text-sm text-gray-600'}>
+              <p className={resolvedTheme === 'dark' ? 'text-sm text-gray-400' : 'text-sm text-gray-600'}>
                 Begin your therapy session by sending a message. The AI will
                 respond in a supportive and empathetic manner.
               </p>
@@ -153,7 +155,7 @@ export function ChatContainer({
           onClick={scrollToBottom}
           className={cn(
             'absolute bottom-20 right-4 rounded-full p-2 shadow-lg transition-colors',
-            theme?.isDark
+            resolvedTheme === 'dark'
               ? 'bg-blue-800 text-white hover:bg-blue-900'
               : 'bg-blue-600 text-white hover:bg-blue-700'
           )}
@@ -166,7 +168,7 @@ export function ChatContainer({
       {/* Input area */}
       <div className={cn(
         'sticky bottom-0 py-4',
-        theme?.isDark
+        resolvedTheme === 'dark'
           ? 'bg-gradient-to-t from-black to-transparent'
           : 'bg-gradient-to-t from-white to-transparent')}>
         <ChatInput

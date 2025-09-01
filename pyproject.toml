@@ -110,6 +110,8 @@ pythonVersion = "3.11"
 target-version = "py311"
 line-length = 100
 exclude = ["node_modules", "stubs", "venv", "env", "build", "dist"]
+
+[tool.ruff.lint]
 select = [
   "E",
   "F",
@@ -134,7 +136,7 @@ select = [
 ]
 ignore = ["E501", "UP017", "PLR2004"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["ai", "src", "api"]
 combine-as-imports = true
 force-single-line = false
