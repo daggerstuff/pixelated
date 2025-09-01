@@ -284,6 +284,7 @@
     "@iconify-json/ri": "^1.2.5",
     "@iconify-json/uil": "^1.2.3",
     "@iconify/json": "^2.2.360",
+    "@iconify/types": "^2.0.0",
     "@keystatic/astro": "^5.0.6",
     "@playwright/test": "1.52.0",
     "@testing-library/dom": "10.4.0",
