@@ -43,7 +43,7 @@ export function createPersonaMessage(
     role: 'user' | 'bot' | 'system'
     baseId?: string | number
     config?: PersonaServiceConfig
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
     // Optionally override timestamp if desired
     timestamp?: Date
   }

@@ -1,19 +1,15 @@
 import { useRef, useEffect, useState, useMemo } from 'react'
-// Dynamic imports for Three.js to reduce bundle size
-// import * as THREE from 'three'
-// import { Object3D, Sphere } from 'three'
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { cn } from '../../lib/utils.js'
+import * as THREE from 'three'
+import type { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 // Dynamic Three.js imports to reduce bundle size
-async function loadThree() {
-  const THREE = await import('three')
-  return THREE
-}
-
-async function loadOrbitControls() {
-  const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls')
-  return { OrbitControls }
+async function loadThreeWithTypes() {
+  const [THREE, { OrbitControls }] = await Promise.all([
+    import('three'),
+    import('three/addons/controls/OrbitControls.js'),
+  ])
+  return { THREE, OrbitControls }
 }
 
 // Types for dimensional emotion data and patterns
@@ -43,14 +39,7 @@ interface MultidimensionalPattern {
   // Add more fields as needed
 }
 
-// Define Three.js types to fix TypeScript namespace errors (using unknown for dynamic imports)
-type WebGLRenderer = object // typeof THREE.WebGLRenderer.prototype
-type Scene = object // typeof THREE.Scene.prototype
-type PerspectiveCamera = object // typeof THREE.PerspectiveCamera.prototype
-type Points = object // typeof THREE.Points.prototype
-
-type Frustum = object // typeof THREE.Frustum.prototype
-type Vector3 = object // typeof THREE.Vector3.prototype
+// Three.js types are now properly imported above
 
 interface MultidimensionalEmotionChartProps {
   dimensionalMaps: DimensionalEmotionMap[]
@@ -121,16 +110,16 @@ export default function MultidimensionalEmotionChart({
 }: MultidimensionalEmotionChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [viewMode, setViewMode] = useState<'3d' | 'patterns'>('3d')
-  const rendererRef = useRef<WebGLRenderer | null>(null)
-  const sceneRef = useRef<Scene | null>(null)
-  const cameraRef = useRef<PerspectiveCamera | null>(null)
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+  const sceneRef = useRef<THREE.Scene | null>(null)
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const controlsRef = useRef<OrbitControls | null>(null)
-  const pointsRef = useRef<Points | null>(null)
-  const labelsRef = useRef<Object3D[]>([])
-  const objectPoolRef = useRef<Map<string, Object3D[]>>(new Map())
+  const pointsRef = useRef<THREE.Points | null>(null)
+  const labelsRef = useRef<THREE.Object3D[]>([])
+  const objectPoolRef = useRef<Map<string, THREE.Object3D[]>>(new Map())
   const animationFrameRef = useRef<number | null>(null)
 
-  const frustrumRef = useRef<Frustum | null>(null)
+  const frustrumRef = useRef<THREE.Frustum | null>(null)
   const { fps, measure } = usePerformanceMonitor()
 
   // Determine level of detail based on point count
@@ -148,20 +137,23 @@ export default function MultidimensionalEmotionChart({
   // Memoize sorted maps to avoid recomputation
   const sortedMaps = useMemo(() => {
     return [...dimensionalMaps].sort(
-      (a, b) => new Date(a['timestamp']).getTime() - new Date(b['timestamp']).getTime()
+      (a, b) =>
+        new Date(a['timestamp']).getTime() - new Date(b['timestamp']).getTime(),
     )
   }, [dimensionalMaps])
 
   // Object pooling logic
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getOrCreateObject = (type: string, creator: () => any) => {
+  const getOrCreateObject = <T extends THREE.Object3D>(
+    type: string,
+    creator: () => T,
+  ): T => {
     if (!objectPoolRef.current.has(type)) {
       objectPoolRef.current.set(type, [])
     }
 
     const pool = objectPoolRef.current.get(type)!
     if (pool.length > 0) {
-      return pool.pop()!
+      return pool.pop()! as T
     }
 
     return creator()
@@ -170,13 +162,12 @@ export default function MultidimensionalEmotionChart({
   // Initialize and set up the 3D scene
   useEffect(() => {
     // Capture ref values for cleanup closure
-    const cleanupRenderer = rendererRef.current;
-    const cleanupContainer = containerRef.current;
+    const cleanupRenderer = rendererRef.current
+    const cleanupContainer = containerRef.current
 
     const initScene = async () => {
-      // Dynamically load Three.js
-      const THREE = await loadThree()
-      const { OrbitControls } = await loadOrbitControls()
+      // Dynamically load Three.js with proper types
+      const { THREE, OrbitControls } = await loadThreeWithTypes()
 
       // Copy refs to local variables for cleanup
       const initialContainer = containerRef.current
@@ -189,384 +180,387 @@ export default function MultidimensionalEmotionChart({
         return
       }
 
-    // Clean up any existing scene
-    if (rendererRef.current) {
-      initialContainer.removeChild(rendererRef.current.domElement)
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
-    }
-
-    // Scene setup
-    const scene = new THREE.Scene()
-    sceneRef.current = scene
-    scene.background = new THREE.Color(0xf8fafc) // slate-50
-
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      (containerRef.current?.clientWidth ?? 1) /
-        (containerRef.current?.clientHeight ?? 1),
-      0.1,
-      1000,
-    )
-    cameraRef.current = camera
-    camera.position.z = 2
-
-    // Renderer setup with optimized parameters
-    const renderer = new THREE.WebGLRenderer({
-      antialias: detailLevel === 'high', // Only use antialiasing for high detail
-      powerPreference: 'high-performance',
-      precision: detailLevel === 'high' ? 'highp' : 'mediump',
-    })
-    rendererRef.current = renderer
-    renderer.setSize(
-      containerRef.current?.clientWidth ?? 1,
-      containerRef.current?.clientHeight ?? 1,
-    )
-    renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1) // Limit pixel ratio
-
-    // Enable frustum culling
-    frustrumRef.current = new THREE.Frustum()
-
-    containerRef.current?.appendChild(renderer.domElement)
-
-    // Controls setup
-    const controls = new OrbitControls(camera, renderer.domElement)
-    controlsRef.current = controls;
-    (controls as { enableDamping?: boolean })['enableDamping'] = true;
-    (controls as { dampingFactor?: number })['dampingFactor'] = 0.25;
-
-    // Optimize controls based on detail level
-    if (detailLevel !== 'high') {
-      (controls as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).enableZoom = true;
-      (controls as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).zoomSpeed = 0.5;
-      (controls as { enableZoom?: boolean; zoomSpeed?: number; rotateSpeed?: number }).rotateSpeed = 0.5;
-    }
-
-    // Add axis helper - simplified for performance on lower detail
-    if (detailLevel !== 'low') {
-      const axisHelper = new THREE.AxesHelper(1.2)
-      scene.add(axisHelper)
-    } else {
-      // Simplified axis representation for low detail
-      const axisGeometry = new THREE.BufferGeometry()
-      const axisVertices = new Float32Array([
-        0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 1.2,
-      ])
-      axisGeometry.setAttribute(
-        'position',
-        new THREE.Float32BufferAttribute(axisVertices, 3),
-      )
-      const axisMaterial = new THREE.LineBasicMaterial({ color: 0x888888 })
-      const axisLines = new THREE.LineSegments(axisGeometry, axisMaterial)
-      scene.add(axisLines)
-    }
-
-    // Add axis labels - only for high and medium detail
-    if (detailLevel !== 'low') {
-      const createLabel = (text: string, position: Vector3, color: string) => {
-        // Use object pooling for labels
-        return getOrCreateObject('label', () => {
-          const canvas = document.createElement('canvas')
-          const context = canvas.getContext('2d')
-          if (!context) {
-            return new Object3D() // Empty fallback
-          }
-
-          // Optimize canvas size based on detail level
-          const canvasSize = detailLevel === 'high' ? 128 : 64
-          canvas.width = canvasSize
-          canvas.height = canvasSize / 2
-
-          context.fillStyle = '#ffffff'
-          context.fillRect(0, 0, canvas.width, canvas.height)
-
-          context.font = detailLevel === 'high' ? '24px Arial' : '16px Arial'
-          context.fillStyle = color
-          context.textAlign = 'center'
-          context.textBaseline = 'middle'
-          context.fillText(text, canvas.width / 2, canvas.height / 2)
-
-          const texture = new THREE.Texture(canvas)
-          texture.needsUpdate = true
-
-          const material = new THREE.SpriteMaterial({ map: texture })
-          const sprite = new THREE.Sprite(material);
-          (sprite.position as { copy: (v: Vector3) => void }).copy(position);
-          (sprite.scale as { set: (x: number, y: number, z: number) => void }).set(0.3, 0.15, 1);
-
-          return sprite
-        })
-      }
-
-      // Add axis labels
-      const xLabel = createLabel(
-        'Valence',
-        new THREE.Vector3(1.3, 0, 0),
-        '#ef4444',
-      ) // red-500
-      const yLabel = createLabel(
-        'Arousal',
-        new THREE.Vector3(0, 1.3, 0),
-        '#22c55e',
-      ) // green-600
-      const zLabel = createLabel(
-        'Dominance',
-        new THREE.Vector3(0, 0, 1.3),
-        '#3b82f6',
-      ) // blue-500
-
-      if (xLabel) {
-        scene.add(xLabel)
-      }
-      if (yLabel) {
-        scene.add(yLabel)
-      }
-      if (zLabel) {
-        scene.add(zLabel)
-      }
-
-      labelsRef.current = [xLabel, yLabel, zLabel].filter(Boolean) as Object3D[]
-    }
-
-    // Add grid helper - simplify for lower detail
-    if (detailLevel === 'high') {
-      const gridHelper = new THREE.GridHelper(2, 20)
-      gridHelper.rotation.x = Math.PI / 2
-      scene.add(gridHelper)
-    } else if (detailLevel === 'medium') {
-      const gridHelper = new THREE.GridHelper(2, 10)
-      gridHelper.rotation.x = Math.PI / 2
-      scene.add(gridHelper)
-    } else {
-      // For low detail, use a minimal grid
-      const gridHelper = new THREE.GridHelper(2, 4)
-      gridHelper.rotation.x = Math.PI / 2
-      scene.add(gridHelper)
-    }
-
-    // Create the points geometry - optimize based on detail level
-    const vertices: number[] = []
-    const colors: number[] = []
-    const sizes: number[] = []
-
-    dimensionalMaps.forEach((map) => {
-      // Add point for primary vector
-      const vector = map['primaryVector']
-      vertices.push(vector['valence'], vector['arousal'], vector['dominance'])
-      // Color based on quadrant
-      const color = new THREE.Color(getQuadrantColor(map['quadrant']))
-      colors.push(color.r, color.g, color.b)
-
-      // Vary point size based on time recency for visual interest
-      const age = Date.now() - new Date(map['timestamp']).getTime()
-      const maxAge = 30 * 24 * 60 * 60 * 1000 // 30 days in ms
-      const normalizedAge = Math.min(age / maxAge, 1)
-      const size = 0.05 * (1 - normalizedAge * 0.7) // Newer points are bigger
-      sizes.push(size)
-    })
-
-    const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(vertices, 3),
-    )
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
-
-    // Only add size attribute for high detail (variable point sizes)
-    if (detailLevel === 'high') {
-      geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1))
-    }
-
-    // Create points material with optimizations
-    const material = new THREE.PointsMaterial({
-      size:
-        detailLevel === 'high' ? 0.05 : detailLevel === 'medium' ? 0.04 : 0.03,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.8,
-      sizeAttenuation: detailLevel !== 'low', // disable for low detail
-    })
-
-    // Use shader customization for high detail only
-    if (detailLevel === 'high') {
-      // Custom vertex shader to use the size attribute
-      material.onBeforeCompile = (shader: unknown) => {
-        // Type assertion for Three.js Shader object
-        const typedShader = shader as { vertexShader: string }
-        typedShader.vertexShader = typedShader.vertexShader
-          .replace(
-            'uniform float size;',
-            'uniform float size; attribute float size;',
-          )
-          .replace('gl_PointSize = size;', 'gl_PointSize = size * size;')
-      }
-    }
-
-    // Create points and add to scene
-    const points = new THREE.Points(geometry, material)
-    pointsRef.current = points
-    scene.add(points)
-
-    // Add time trajectory line
-    if (dimensionalMaps.length > 1) {
-      const lineVertices: number[] = []
-
-      // For performance, limit the number of line segments based on detail level
-      const stride =
-        detailLevel === 'high' ? 1 : detailLevel === 'medium' ? 2 : 4
-
-      for (let i = 0; i < sortedMaps.length; i += stride) {
-        const map = sortedMaps[i]
-        if (map && map['primaryVector']) {
-          const { valence, arousal, dominance } = map['primaryVector']
-          lineVertices.push(valence, arousal, dominance)
+      // Clean up any existing scene
+      if (rendererRef.current) {
+        initialContainer.removeChild(rendererRef.current.domElement)
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current)
         }
       }
 
-      const lineGeometry = new THREE.BufferGeometry()
-      lineGeometry.setAttribute(
-        'position',
-        new THREE.Float32BufferAttribute(lineVertices, 3),
-      )
+      // Scene setup
+      const scene = new THREE.Scene()
+      sceneRef.current = scene
+      scene.background = new THREE.Color(0xf8fafc) // slate-50
 
-      const lineMaterial = new THREE.LineBasicMaterial({
-        color: 0x888888,
-        linewidth: 1,
-        opacity: 0.6,
-        transparent: true,
+      // Camera setup
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        (containerRef.current?.clientWidth ?? 1) /
+          (containerRef.current?.clientHeight ?? 1),
+        0.1,
+        1000,
+      )
+      cameraRef.current = camera
+      camera.position.z = 2
+
+      // Renderer setup with optimized parameters
+      const renderer = new THREE.WebGLRenderer({
+        antialias: detailLevel === 'high', // Only use antialiasing for high detail
+        powerPreference: 'high-performance',
+        precision: detailLevel === 'high' ? 'highp' : 'mediump',
       })
-
-      const line = new THREE.Line(lineGeometry, lineMaterial)
-      scene.add(line)
-    }
-
-    // Add origin point (0,0,0) - simpler for low detail
-    if (detailLevel !== 'low') {
-      const originGeometry = new THREE.SphereGeometry(
-        0.02,
-        detailLevel === 'high' ? 16 : 8,
-        detailLevel === 'high' ? 16 : 8,
+      rendererRef.current = renderer
+      renderer.setSize(
+        containerRef.current?.clientWidth ?? 1,
+        containerRef.current?.clientHeight ?? 1,
       )
-      const originMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 })
-      const origin = new THREE.Mesh(originGeometry, originMaterial)
-      scene.add(origin)
-    }
+      renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1) // Limit pixel ratio
 
-    // Add render frames
-    if (detailLevel === 'high') {
-      // Use instanced rendering for frame edges in high detail mode
-      const edgeGeometry = new THREE.BoxGeometry(2, 2, 2)
-      const edgesMaterial = new THREE.LineBasicMaterial({
-        color: 0x888888,
-        linewidth: 1,
-        opacity: 0.3,
-        transparent: true,
-      })
+      // Enable frustum culling
+      frustrumRef.current = new THREE.Frustum()
 
-      const boxEdges = new THREE.LineSegments(
-        new THREE.EdgesGeometry(edgeGeometry),
-        edgesMaterial,
-      )
-      scene.add(boxEdges)
-    }
+      containerRef.current?.appendChild(renderer.domElement)
 
-    // Throttled animation loop for better performance
-    let lastFrameTime = 0
-    const targetFPS = 60
-    const frameInterval = 1000 / targetFPS
+      // Controls setup
+      const controls = new OrbitControls(camera, renderer.domElement)
+      controlsRef.current = controls
+      controls.enableDamping = true
+      controls.dampingFactor = 0.25
 
-    // Animation loop
-    const animate = (now: number) => {
-      animationFrameRef.current = requestAnimationFrame(animate)
-
-      // Measure performance
-      measure()
-
-      // Skip frames to maintain target FPS
-      const elapsed = now - lastFrameTime
-      if (elapsed < frameInterval) {
-        return
+      // Optimize controls based on detail level
+      if (detailLevel !== 'high') {
+        controls.enableZoom = true
+        controls.zoomSpeed = 0.5
+        controls.rotateSpeed = 0.5
       }
 
-      // Update time tracking
-      lastFrameTime = now - (elapsed % frameInterval)
-
-      if (controlsRef.current) {
-        controlsRef.current.update()
-      }
-
-      // Update frustum for culling
-      if (cameraRef.current && frustrumRef.current) {
-        const frustum = frustrumRef.current
-        frustum.setFromProjectionMatrix(
-          new THREE.Matrix4().multiplyMatrices(
-            cameraRef.current['projectionMatrix'],
-            cameraRef.current['matrixWorldInverse'],
-          ),
+      // Add axis helper - simplified for performance on lower detail
+      if (detailLevel !== 'low') {
+        const axisHelper = new THREE.AxesHelper(1.2)
+        scene.add(axisHelper)
+      } else {
+        // Simplified axis representation for low detail
+        const axisGeometry = new THREE.BufferGeometry()
+        const axisVertices = new Float32Array([
+          0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 1.2,
+        ])
+        axisGeometry.setAttribute(
+          'position',
+          new THREE.Float32BufferAttribute(axisVertices, 3),
         )
-        scene.traverse((object: unknown) => {
-          if (
-            typeof object === 'object' &&
-            object !== null &&
-            'userData' in object
-          ) {
-            const { userData } = object as { userData?: { isCullable?: boolean; boundingSphere?: unknown } }
-            if (userData?.isCullable) {
-              const { boundingSphere: sphere } = userData
-              if (sphere && typeof frustum.intersectsSphere === 'function') {
-                (object as { visible: boolean }).visible = frustum.intersectsSphere(sphere)
+        const axisMaterial = new THREE.LineBasicMaterial({ color: 0x888888 })
+        const axisLines = new THREE.LineSegments(axisGeometry, axisMaterial)
+        scene.add(axisLines)
+      }
+
+      // Add axis labels - only for high and medium detail
+      if (detailLevel !== 'low') {
+        const createLabel = (
+          text: string,
+          position: THREE.Vector3,
+          color: string,
+        ) => {
+          // Use object pooling for labels
+          return getOrCreateObject('label', () => {
+            const canvas = document.createElement('canvas')
+            const context = canvas.getContext('2d')
+            if (!context) {
+              return new THREE.Object3D() // Empty fallback
+            }
+
+            // Optimize canvas size based on detail level
+            const canvasSize = detailLevel === 'high' ? 128 : 64
+            canvas.width = canvasSize
+            canvas.height = canvasSize / 2
+
+            context.fillStyle = '#ffffff'
+            context.fillRect(0, 0, canvas.width, canvas.height)
+
+            context.font = detailLevel === 'high' ? '24px Arial' : '16px Arial'
+            context.fillStyle = color
+            context.textAlign = 'center'
+            context.textBaseline = 'middle'
+            context.fillText(text, canvas.width / 2, canvas.height / 2)
+
+            const texture = new THREE.Texture(canvas)
+            texture.needsUpdate = true
+
+            const material = new THREE.SpriteMaterial({ map: texture })
+            const sprite = new THREE.Sprite(material)
+            sprite.position.copy(position)
+            sprite.scale.set(0.3, 0.15, 1)
+
+            return sprite
+          })
+        }
+
+        // Add axis labels
+        const xLabel = createLabel(
+          'Valence',
+          new THREE.Vector3(1.3, 0, 0),
+          '#ef4444',
+        ) // red-500
+        const yLabel = createLabel(
+          'Arousal',
+          new THREE.Vector3(0, 1.3, 0),
+          '#22c55e',
+        ) // green-600
+        const zLabel = createLabel(
+          'Dominance',
+          new THREE.Vector3(0, 0, 1.3),
+          '#3b82f6',
+        ) // blue-500
+
+        if (xLabel) {
+          scene.add(xLabel)
+        }
+        if (yLabel) {
+          scene.add(yLabel)
+        }
+        if (zLabel) {
+          scene.add(zLabel)
+        }
+
+        labelsRef.current = [xLabel, yLabel, zLabel].filter(
+          Boolean,
+        ) as THREE.Object3D[]
+      }
+
+      // Add grid helper - simplify for lower detail
+      if (detailLevel === 'high') {
+        const gridHelper = new THREE.GridHelper(2, 20)
+        gridHelper.rotation.x = Math.PI / 2
+        scene.add(gridHelper)
+      } else if (detailLevel === 'medium') {
+        const gridHelper = new THREE.GridHelper(2, 10)
+        gridHelper.rotation.x = Math.PI / 2
+        scene.add(gridHelper)
+      } else {
+        // For low detail, use a minimal grid
+        const gridHelper = new THREE.GridHelper(2, 4)
+        gridHelper.rotation.x = Math.PI / 2
+        scene.add(gridHelper)
+      }
+
+      // Create the points geometry - optimize based on detail level
+      const vertices: number[] = []
+      const colors: number[] = []
+      const sizes: number[] = []
+
+      dimensionalMaps.forEach((map) => {
+        // Add point for primary vector
+        const vector = map['primaryVector']
+        vertices.push(vector['valence'], vector['arousal'], vector['dominance'])
+        // Color based on quadrant
+        const color = new THREE.Color(getQuadrantColor(map['quadrant']))
+        colors.push(color.r, color.g, color.b)
+
+        // Vary point size based on time recency for visual interest
+        const age = Date.now() - new Date(map['timestamp']).getTime()
+        const maxAge = 30 * 24 * 60 * 60 * 1000 // 30 days in ms
+        const normalizedAge = Math.min(age / maxAge, 1)
+        const size = 0.05 * (1 - normalizedAge * 0.7) // Newer points are bigger
+        sizes.push(size)
+      })
+
+      const geometry = new THREE.BufferGeometry()
+      geometry.setAttribute(
+        'position',
+        new THREE.Float32BufferAttribute(vertices, 3),
+      )
+      geometry.setAttribute(
+        'color',
+        new THREE.Float32BufferAttribute(colors, 3),
+      )
+
+      // Only add size attribute for high detail (variable point sizes)
+      if (detailLevel === 'high') {
+        geometry.setAttribute(
+          'size',
+          new THREE.Float32BufferAttribute(sizes, 1),
+        )
+      }
+
+      // Create points material with optimizations
+      const material = new THREE.PointsMaterial({
+        size:
+          detailLevel === 'high'
+            ? 0.05
+            : detailLevel === 'medium'
+              ? 0.04
+              : 0.03,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        sizeAttenuation: detailLevel !== 'low', // disable for low detail
+      })
+
+      // Use shader customization for high detail only
+      if (detailLevel === 'high') {
+        // Custom vertex shader to use the size attribute
+        material.onBeforeCompile = (shader) => {
+          shader.vertexShader = shader.vertexShader
+            .replace(
+              'uniform float size;',
+              'uniform float size; attribute float size;',
+            )
+            .replace('gl_PointSize = size;', 'gl_PointSize = size * size;')
+        }
+      }
+
+      // Create points and add to scene
+      const points = new THREE.Points(geometry, material)
+      pointsRef.current = points
+      scene.add(points)
+
+      // Add time trajectory line
+      if (dimensionalMaps.length > 1) {
+        const lineVertices: number[] = []
+
+        // For performance, limit the number of line segments based on detail level
+        const stride =
+          detailLevel === 'high' ? 1 : detailLevel === 'medium' ? 2 : 4
+
+        for (let i = 0; i < sortedMaps.length; i += stride) {
+          const map = sortedMaps[i]
+          if (map && map['primaryVector']) {
+            const { valence, arousal, dominance } = map['primaryVector']
+            lineVertices.push(valence, arousal, dominance)
+          }
+        }
+
+        const lineGeometry = new THREE.BufferGeometry()
+        lineGeometry.setAttribute(
+          'position',
+          new THREE.Float32BufferAttribute(lineVertices, 3),
+        )
+
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: 0x888888,
+          linewidth: 1,
+          opacity: 0.6,
+          transparent: true,
+        })
+
+        const line = new THREE.Line(lineGeometry, lineMaterial)
+        scene.add(line)
+      }
+
+      // Add origin point (0,0,0) - simpler for low detail
+      if (detailLevel !== 'low') {
+        const originGeometry = new THREE.SphereGeometry(
+          0.02,
+          detailLevel === 'high' ? 16 : 8,
+          detailLevel === 'high' ? 16 : 8,
+        )
+        const originMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 })
+        const origin = new THREE.Mesh(originGeometry, originMaterial)
+        scene.add(origin)
+      }
+
+      // Add render frames
+      if (detailLevel === 'high') {
+        // Use instanced rendering for frame edges in high detail mode
+        const edgeGeometry = new THREE.BoxGeometry(2, 2, 2)
+        const edgesMaterial = new THREE.LineBasicMaterial({
+          color: 0x888888,
+          linewidth: 1,
+          opacity: 0.3,
+          transparent: true,
+        })
+
+        const boxEdges = new THREE.LineSegments(
+          new THREE.EdgesGeometry(edgeGeometry),
+          edgesMaterial,
+        )
+        scene.add(boxEdges)
+      }
+
+      // Throttled animation loop for better performance
+      let lastFrameTime = 0
+      const targetFPS = 60
+      const frameInterval = 1000 / targetFPS
+
+      // Animation loop
+      const animate = (now: number) => {
+        animationFrameRef.current = requestAnimationFrame(animate)
+
+        // Measure performance
+        measure()
+
+        // Skip frames to maintain target FPS
+        const elapsed = now - lastFrameTime
+        if (elapsed < frameInterval) {
+          return
+        }
+
+        // Update time tracking
+        lastFrameTime = now - (elapsed % frameInterval)
+
+        if (controlsRef.current) {
+          controlsRef.current.update()
+        }
+
+        // Update frustum for culling
+        if (cameraRef.current && frustrumRef.current) {
+          const frustum = frustrumRef.current
+          frustum.setFromProjectionMatrix(
+            new THREE.Matrix4().multiplyMatrices(
+              cameraRef.current.projectionMatrix,
+              cameraRef.current.matrixWorldInverse,
+            ),
+          )
+          scene.traverse((object) => {
+            if (object.userData?.['isCullable']) {
+              const { boundingSphere: sphere } = object.userData
+              if (sphere) {
+                object.visible = frustum.intersectsSphere(
+                  sphere as THREE.Sphere,
+                )
               } else {
-                (object as { visible: boolean }).visible = true
+                object.visible = true
               }
             }
-          }
-        })
+          })
+        }
+
+        // Make labels always face the camera - only in higher detail modes
+        if (detailLevel !== 'low') {
+          labelsRef.current.forEach((label) => {
+            if (label && cameraRef.current) {
+              label.lookAt(cameraRef.current.position)
+            }
+          })
+        }
+
+        if (rendererRef.current && sceneRef.current && cameraRef.current) {
+          rendererRef.current.render(sceneRef.current, cameraRef.current)
+        }
       }
 
-      // Make labels always face the camera - only in higher detail modes
-      if (detailLevel !== 'low') {
-        labelsRef.current.forEach((label) => {
-          if (
-            label &&
-            typeof label === 'object' &&
-            'lookAt' in label &&
-            cameraRef.current &&
-            'position' in cameraRef.current
-          ) {
-            (label as { lookAt: (pos: unknown) => void }).lookAt(
-              (cameraRef.current as { position: unknown }).position
-            )
-          }
-        })
+      animate(performance.now())
+
+      // Handle window resize
+      const handleResize = () => {
+        if (
+          !containerRef.current ||
+          !cameraRef.current ||
+          !rendererRef.current
+        ) {
+          return
+        }
+
+        const width = containerRef.current.clientWidth
+        const height = containerRef.current.clientHeight
+
+        cameraRef.current.aspect = width / height
+        cameraRef.current.updateProjectionMatrix()
+
+        rendererRef.current.setSize(width, height)
       }
 
-      if (rendererRef.current && sceneRef.current && cameraRef.current) {
-        rendererRef.current.render(sceneRef.current, cameraRef.current)
-      }
-    }
-
-    animate(performance.now())
-
-    // Handle window resize
-    const handleResize = () => {
-      if (!containerRef.current || !cameraRef.current || !rendererRef.current) {
-        return
-      }
-
-      const width = containerRef.current.clientWidth
-      const height = containerRef.current.clientHeight
-
-      if (cameraRef.current && 'aspect' in cameraRef.current && 'updateProjectionMatrix' in cameraRef.current) {
-        (cameraRef.current as { aspect: number }).aspect = width / height;
-        (cameraRef.current as { updateProjectionMatrix: () => void }).updateProjectionMatrix();
-      }
-
-      rendererRef.current.setSize(width, height)
-    }
-
-    window.addEventListener('resize', handleResize)
+      window.addEventListener('resize', handleResize)
     } // End of initScene async function
 
     // Call the async initialization function
@@ -582,73 +576,34 @@ export default function MultidimensionalEmotionChart({
         cancelAnimationFrame(animationFrame)
       }
 
-     if (cleanupRenderer && cleanupContainer) {
-       if (
-         cleanupRenderer &&
-         typeof cleanupRenderer === 'object' &&
-         'dispose' in cleanupRenderer &&
-         typeof (cleanupRenderer as { dispose: () => void }).dispose === 'function'
-       ) {
-         (cleanupRenderer as { dispose: () => void }).dispose()
-       }
-       if (
-         cleanupRenderer &&
-         'domElement' in cleanupRenderer &&
-         (cleanupRenderer as { domElement: { parentNode: unknown } }).domElement.parentNode === cleanupContainer
-       ) {
-         cleanupContainer.removeChild((cleanupRenderer as { domElement: HTMLElement }).domElement)
-       }
-     }
+      if (cleanupRenderer && cleanupContainer) {
+        cleanupRenderer.dispose()
+        if (cleanupRenderer.domElement.parentNode === cleanupContainer) {
+          cleanupContainer.removeChild(cleanupRenderer.domElement)
+        }
+      }
 
       if (controlsRef.current) {
-        if (
-          controlsRef.current &&
-          typeof controlsRef.current === 'object' &&
-          'dispose' in controlsRef.current &&
-          typeof (controlsRef.current as { dispose: () => void }).dispose === 'function'
-        ) {
-          (controlsRef.current as { dispose: () => void }).dispose()
-        }
+        controlsRef.current.dispose()
       }
 
       if (sceneRef.current) {
-        if (
-          sceneRef.current &&
-          typeof sceneRef.current === 'object' &&
-          'traverse' in sceneRef.current &&
-          typeof (sceneRef.current as { traverse: (cb: (obj: unknown) => void) => void }).traverse === 'function'
-        ) {
-          (sceneRef.current as { traverse: (cb: (obj: unknown) => void) => void }).traverse((object: unknown) => {
-            // Only dispose if object is a Mesh
-            if (
-              typeof window !== 'undefined' &&
-              (window as { THREE?: { Mesh?: unknown } }).THREE &&
-              (window as { THREE?: { Mesh?: unknown } }).THREE.Mesh &&
-              // Safe instanceof check to avoid unsafe optional chaining
-              object instanceof ((window as { THREE: { Mesh: unknown } }).THREE.Mesh)
-            ) {
-              if ('geometry' in object && object.geometry) {
-                (object.geometry as { dispose?: () => void }).dispose?.()
-              }
-              if ('material' in object && object.material) {
-                if (Array.isArray(object.material)) {
-                  (object.material as { dispose?: () => void }[]).forEach(
-                    (material) => material.dispose?.(),
-                  )
-                } else {
-                  (object.material as { dispose?: () => void }).dispose?.()
-                }
-              }
+        sceneRef.current.traverse((object) => {
+          if (object instanceof THREE.Mesh) {
+            object.geometry?.dispose()
+            if (Array.isArray(object.material)) {
+              object.material.forEach((material) => material.dispose())
+            } else {
+              object.material?.dispose()
             }
-          })
-        }
+          }
+        })
       }
 
       // Clear object pools
-      ;(window as { initialObjectPool?: { clear?: () => void } })?.initialObjectPool?.clear?.()
+      objectPoolRef.current.clear()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dimensionalMaps, isLoading, viewMode, detailLevel, sortedMaps])
+  }, [dimensionalMaps, isLoading, viewMode, detailLevel, sortedMaps, measure])
 
   // Loading state
   if (isLoading) {

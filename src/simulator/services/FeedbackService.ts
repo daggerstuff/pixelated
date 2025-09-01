@@ -13,7 +13,7 @@ import { createTogetherAIService } from '../../lib/ai/services/together'
 import type { MentalLLaMAAdapter } from '../../lib/ai/mental-llama/MentalLLaMAAdapter'
 import type { TogetherAIService } from '../../lib/ai/services/together'
 
-interface MentalHealthInsights {
+export interface MentalHealthInsights {
   hasMentalHealthIssue: boolean
   mentalHealthCategory?: string | null
   explanation?: string

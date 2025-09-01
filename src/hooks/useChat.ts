@@ -12,7 +12,16 @@ interface LocalMessage {
   isError?: boolean
 }
 
-export function useChat(options: ChatOptions): void {
+interface UseChatReturn {
+  messages: LocalMessage[]
+  input: string
+  handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void
+  handleSubmit: (e: React.FormEvent) => Promise<void>
+  isLoading: boolean
+  setMessages: React.Dispatch<React.SetStateAction<LocalMessage[]>>
+}
+
+export function useChat(options: ChatOptions): UseChatReturn {
   const {
     initialMessages = [],
     api = '/api/chat',
@@ -29,7 +38,7 @@ export function useChat(options: ChatOptions): void {
     setInput(e.target.value)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
 
     if (!input.trim()) {
@@ -44,7 +53,7 @@ export function useChat(options: ChatOptions): void {
       name: 'User',
     }
 
-    setMessages((prev) => [...prev, userMessage])
+    setMessages((prev: LocalMessage[]) => [...prev, userMessage])
     setIsLoading(true)
     setInput('')
 
@@ -88,7 +97,7 @@ export function useChat(options: ChatOptions): void {
         name: 'Assistant',
       }
 
-      setMessages((prev) => [...prev, assistantMessage])
+      setMessages((prev: LocalMessage[]) => [...prev, assistantMessage])
     } catch (error: unknown) {
       console.error('Error in chat:', error)
 
@@ -101,7 +110,7 @@ export function useChat(options: ChatOptions): void {
         name: 'Error',
       }
 
-      setMessages((prev) => [...prev, errorMessage])
+      setMessages((prev: LocalMessage[]) => [...prev, errorMessage])
 
       if (onError) {
         onError(error as Error)

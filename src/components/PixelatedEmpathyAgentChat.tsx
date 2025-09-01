@@ -1,15 +1,7 @@
 import React, { useState, useRef, useEffect, FC } from 'react';
-import { createPixelatedEmpathyAgent, type TherapeuticScenario, type BiasAnalysis } from '../lib/ai/PixelatedEmpathyAgent';
+import { createPixelatedEmpathyAgent, type TherapeuticScenario, type BiasAnalysis, type AgentResponse } from '../lib/ai/PixelatedEmpathyAgent';
 
 type AgentContext = 'scenario_generation' | 'bias_detection' | 'training_recommendation' | 'general';
-
-interface AgentResponse {
-  success: boolean;
-  response: string | null;
-  error?: string;
-  metadata?: Record<string, unknown>;
-  conversation_id?: string;
-}
 
 interface Message {
   id: string;
@@ -44,7 +36,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     try {
       agent.current = createPixelatedEmpathyAgent();
       setIsConnected(true);
-      
+
       // Add welcome message
       setMessages([{
         id: 'welcome',
@@ -88,7 +80,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
 
     try {
       let response: AgentResponse;
-      
+
       // Use specialized methods for specific contexts
       switch (context) {
         case 'scenario_generation':
@@ -102,18 +94,18 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
             response = await agent.current.sendMessage(input, context);
           }
           break;
-          
+
         case 'bias_detection':
           response = await agent.current.analyzeBias(input);
           break;
-          
+
         case 'training_recommendation':
           response = await agent.current.recommendTraining({
             experience: extractExperience(input),
             specializations: extractSpecializations(input)
           });
           break;
-          
+
         default:
           response = await agent.current.sendMessage(input, context);
       }
@@ -126,7 +118,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
           timestamp: new Date(),
           context
         };
-        
+
         setMessages(prev => [...prev, agentMessage]);
 
         // Handle specific response types
@@ -182,16 +174,16 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
   ];
 
   return (
-    <div className={`flex flex-col h-full max-w-4xl mx-auto bg-white border border-gray-200 rounded-lg shadow-lg ${className}`}>
-      {/* Header */}
+    <div className={ `flex flex-col h-full max-w-4xl mx-auto bg-white border border-gray-200 rounded-lg shadow-lg ${className}` }>
+      {/* Header */ }
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-50">
         <div className="flex items-center space-x-3">
-          <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+          <div className={ `w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}` } />
           <h3 className="text-lg font-semibold text-gray-800">Pixelated Empathy AI Assistant</h3>
         </div>
-        <select 
-          value={context} 
-          onChange={(e) => setContext(e.target.value as AgentContext)}
+        <select
+          value={ context }
+          onChange={ (e) => setContext(e.target.value as AgentContext) }
           className="px-3 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="general">General</option>
@@ -201,51 +193,49 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
         </select>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions */ }
       <div className="p-3 border-b border-gray-100 bg-gray-50">
         <div className="flex flex-wrap gap-2">
-          {quickActions.map((action) => (
+          { quickActions.map((action) => (
             <button
-              key={action.label}
-              onClick={() => {
+              key={ action.label }
+              onClick={ () => {
                 setContext(action.context as AgentContext);
                 action.action();
-              }}
+              } }
               className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
             >
-              {action.label}
+              { action.label }
             </button>
-          ))}
+          )) }
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Messages */ }
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        { messages.map((message) => (
           <div
-            key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            key={ message.id }
+            className={ `flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}` }
           >
             <div
-              className={`max-w-3xl p-3 rounded-lg ${
-                message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : message.context === 'error'
+              className={ `max-w-3xl p-3 rounded-lg ${message.role === 'user'
+                ? 'bg-blue-600 text-white'
+                : message.context === 'error'
                   ? 'bg-red-100 text-red-800 border border-red-200'
                   : 'bg-gray-100 text-gray-800'
-              }`}
+                }` }
             >
-              <div className="whitespace-pre-wrap">{message.content}</div>
-              <div className={`text-xs mt-2 ${
-                message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
-              }`}>
-                {message.timestamp.toLocaleTimeString()}
-                {message.context && ` • ${message.context}`}
+              <div className="whitespace-pre-wrap">{ message.content }</div>
+              <div className={ `text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                }` }>
+                { message.timestamp.toLocaleTimeString() }
+                { message.context && ` • ${message.context}` }
               </div>
             </div>
           </div>
-        ))}
-        {isLoading && (
+        )) }
+        { isLoading && (
           <div className="flex justify-start">
             <div className="bg-gray-100 text-gray-800 p-3 rounded-lg">
               <div className="flex items-center space-x-2">
@@ -254,25 +244,25 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
               </div>
             </div>
           </div>
-        )}
-        <div ref={messagesEndRef} />
+        ) }
+        <div ref={ messagesEndRef } />
       </div>
 
-      {/* Input */}
+      {/* Input */ }
       <div className="p-4 border-t border-gray-200">
         <div className="flex space-x-3">
           <input
             type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder={`Ask about ${context.replace('_', ' ')}...`}
+            value={ input }
+            onChange={ (e) => setInput(e.target.value) }
+            onKeyDown={ (e) => e.key === 'Enter' && handleSend() }
+            placeholder={ `Ask about ${context.replace('_', ' ')}...` }
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={!isConnected || isLoading}
+            disabled={ !isConnected || isLoading }
           />
           <button
-            onClick={handleSend}
-            disabled={!input.trim() || !isConnected || isLoading}
+            onClick={ handleSend }
+            disabled={ !input.trim() || !isConnected || isLoading }
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             Send
@@ -335,13 +325,13 @@ function extractExperience(input: string): 'beginner' | 'intermediate' | 'advanc
 function extractSpecializations(input: string): string[] {
   const specializations: string[] = [];
   const lower = input.toLowerCase();
-  
+
   if (lower.includes('depression')) specializations.push('Depression');
   if (lower.includes('anxiety')) specializations.push('Anxiety');
   if (lower.includes('trauma') || lower.includes('ptsd')) specializations.push('Trauma');
   if (lower.includes('addiction') || lower.includes('substance')) specializations.push('Substance Use');
   if (lower.includes('family')) specializations.push('Family Therapy');
   if (lower.includes('group')) specializations.push('Group Therapy');
-  
+
   return specializations.length > 0 ? specializations : ['General Practice'];
 }

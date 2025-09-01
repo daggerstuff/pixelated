@@ -4,12 +4,10 @@
  */
 
 import { getAiServiceLogger } from '@/lib/logging/standardized-logger';
-import { getAiServiceLogger } from '@/lib/logging/standardized-logger';
 import type { UnifiedProcessingResponse } from '../api/unified-api';
 
 const logger = getAiServiceLogger('error-handler');
 
-const logger = getAiServiceLogger('error-handler');
 
 /**
  * Base class for custom errors.
@@ -107,5 +105,4 @@ export class ErrorHandler implements IErrorHandler {
     // Placeholder for sending errors to a monitoring service like Sentry or Datadog.
     logger.info('Sending error to monitoring service', { error });
   }
-}
 }
