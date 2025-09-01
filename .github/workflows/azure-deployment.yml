@@ -16,7 +16,7 @@ on:
 
 
 env:
-  NODE_VERSION: 22.18.0
+  NODE_VERSION: 24.18.0
   PNPM_VERSION: 10.15.0
   AZURE_RESOURCE_GROUP: pixelated-rg
   AZURE_LOCATION: eastus
@@ -148,7 +148,19 @@ jobs:
           az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location ${{ env.AZURE_LOCATION }}
 
       - name: Validate Bicep template
-        run: az deployment group validate --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file infra/main.bicep --parameters @infra/main.parameters.json
+        run: |
+          az deployment group validate \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --template-file infra/main.bicep \
+            --parameters @infra/main.parameters.json \
+            1> $GITHUB_WORKSPACE/bicep-validate-stdout.log \
+            2> $GITHUB_WORKSPACE/bicep-validate-stderr.log || {
+                echo "Validation failed. STDOUT:"
+                cat $GITHUB_WORKSPACE/bicep-validate-stdout.log
+                echo "STDERR:"
+                cat $GITHUB_WORKSPACE/bicep-validate-stderr.log
+                exit 1
+            }
 
       - name: Deploy Bicep template
         id: bicep

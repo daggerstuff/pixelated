@@ -7,6 +7,12 @@ import {
 import { presetWind3 } from '@unocss/preset-wind3';
 
 export default defineConfig({
+  // Workaround: filter out accidental i- or i-- icon classes that cause failed icon "-" lookups
+  rules: [
+    // Match 'i-', 'i--', or single dash icon classes and ignore them
+    [/^i-(-)?$/, () => ({})],
+    [/^i--.*/, () => ({})],
+  ],
   shortcuts: [
     [
       'btn',
@@ -46,6 +52,13 @@ export default defineConfig({
         // - carbon: Only used in external link plugin, not in actual UI
         // - fa-solid: Not used anywhere in the codebase
       },
+      customizations: {
+        customize(name: string, _c: any) {
+          // Hardened: block empty, dash, double-dash, multiple dashes, or any accidental output that is not a valid icon name
+          if (!name || name === '-' || name === '--' || name.startsWith('--') || /^-+$/.test(name)) return false
+          return true
+        }
+      }
     }),
     presetTypography(),
   ],
