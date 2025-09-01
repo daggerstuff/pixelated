@@ -1281,6 +1281,121 @@ retry_with_backoff() {
     return $exit_code
 }
 
+# Node.js environment setup function
+setup_nodejs_environment() {
+    local target_node_version="24.7.0"
+    local target_pnpm_version="10.15.0"
+    
+    log_deployment_event "ENVIRONMENT" "INFO" "Setting up Node.js ${target_node_version} and pnpm ${target_pnpm_version}" "nodejs_setup"
+    
+    # Execute Node.js setup on remote server
+    ssh -i ~/.ssh/planet -o StrictHostKeyChecking=no root@45.55.211.39 bash << EOF
+set -e
+
+# Colors for remote output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+print_status() { echo -e "\${GREEN}[VPS-ENV]\${NC} \$1"; }
+print_error() { echo -e "\${RED}[VPS-ENV ERROR]\${NC} \$1"; }
+print_warning() { echo -e "\${YELLOW}[VPS-ENV WARNING]\${NC} \$1"; }
+
+# Function to install nvm if not present
+install_nvm() {
+    if [[ ! -s "\$HOME/.nvm/nvm.sh" ]]; then
+        print_status "Installing nvm (Node Version Manager)..."
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        
+        # Add nvm to bashrc for persistent sessions
+        if ! grep -q "NVM_DIR" ~/.bashrc; then
+            print_status "Adding nvm to ~/.bashrc for persistent sessions..."
+            echo 'export NVM_DIR="\$HOME/.nvm"' >> ~/.bashrc
+            echo '[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"' >> ~/.bashrc
+            echo '[ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"' >> ~/.bashrc
+        fi
+    else
+        print_status "nvm already installed, loading existing installation..."
+    fi
+    
+    # Load nvm for current session
+    export NVM_DIR="\$HOME/.nvm"
+    [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+    [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
+}
+
+# Function to install and configure Node.js
+install_nodejs() {
+    print_status "Installing Node.js ${target_node_version}..."
+    
+    # Install specific Node.js version
+    nvm install ${target_node_version}
+    nvm use ${target_node_version}
+    nvm alias default ${target_node_version}
+    
+    print_status "Node.js ${target_node_version} installation completed"
+}
+
+# Function to install pnpm
+install_pnpm() {
+    print_status "Installing pnpm ${target_pnpm_version}..."
+    
+    # Install pnpm globally
+    npm install -g pnpm@${target_pnpm_version}
+    
+    print_status "pnpm ${target_pnpm_version} installation completed"
+}
+
+# Function to verify installations
+verify_installations() {
+    print_status "Verifying installations..."
+    
+    local node_version=\$(node --version)
+    local npm_version=\$(npm --version)
+    local pnpm_version=\$(pnpm --version)
+    
+    print_status "Node.js version: \$node_version"
+    print_status "npm version: \$npm_version"
+    print_status "pnpm version: \$pnpm_version"
+    
+    # Verify versions match expectations
+    if [[ "\$node_version" == "v${target_node_version}" ]]; then
+        print_status "✅ Node.js version verified"
+    else
+        print_error "❌ Node.js version mismatch. Expected: v${target_node_version}, Got: \$node_version"
+        exit 1
+    fi
+    
+    if [[ "\$pnpm_version" == "${target_pnpm_version}" ]]; then
+        print_status "✅ pnpm version verified"
+    else
+        print_error "❌ pnpm version mismatch. Expected: ${target_pnpm_version}, Got: \$pnpm_version"
+        exit 1
+    fi
+}
+
+# Main execution
+print_status "Starting Node.js environment setup..."
+
+install_nvm
+install_nodejs
+install_pnpm
+verify_installations
+
+print_status "✅ Node.js environment setup completed successfully"
+EOF
+
+    local exit_code=$?
+    if [ $exit_code -eq 0 ]; then
+        log_deployment_event "ENVIRONMENT" "INFO" "Node.js environment setup completed successfully" "nodejs_success"
+        return 0
+    else
+        log_deployment_event "ENVIRONMENT" "ERROR" "Node.js environment setup failed with exit code $exit_code" "nodejs_failure"
+        return $exit_code
+    fi
+}
+
 # Enhanced environment setup with error handling
 setup_nodejs_environment_with_retry() {
     local max_retries=3
@@ -5931,558 +6046,648 @@ EOF
 # Execute the main deployment orchestration
 execute_main_deployment
 
-# Task 11.2: Final validation and user feedback functions
-
-# Create comprehensive deployment completion reporting
-create_deployment_completion_report() {
-    local deployment_status="$1"
-    local validation_status="$2"
-    
-    log_deployment_event "REPORTING" "INFO" "Creating deployment completion report" "completion_report"
-    
-    local completion_report="/tmp/deployment-completion-$(date +%Y%m%d-%H%M%S).txt"
-    
-    cat > "$completion_report" << EOF
-=== Pixelated Empathy Deployment Completion Report ===
-Generated: $(date -Iseconds)
-Deployment Status: $deployment_status
-Validation Status: $validation_status
-Context: $DEPLOYMENT_CONTEXT
-
-=== Deployment Configuration ===
-Target Host: $VPS_HOST:$VPS_PORT
-User: $VPS_USER
-Domain: ${DOMAIN:-"IP-based access only"}
-SSH Key: $SSH_KEY
-Local Directory: $LOCAL_PROJECT_DIR
-Remote Directory: $REMOTE_PROJECT_DIR
-
-=== Application Access ===
-Direct Access: http://$VPS_HOST:4321
+# Create rsync exclude file
+print_header "Preparing rsync exclusions..."
+cat > /tmp/rsync-exclude << 'EOF'
+node_modules/
+.next/
+.nuxt/
+dist/
+build/
+coverage/
+.cache/
+*.log
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+venv/
+.venv/
+volumes/
+ai/venv/
+ai/.venv/
+ai/*.pt
+ai/*.pth
+ai/*.model
+ai/*.pkl
+.docker/
+docker-compose.override.yml
+temp/
+tmp/
+# Exclude massive AI training data files
+ai/datasets/
+ai/data/
+ai/database/
+ai/models
+ai/pipelines/data/
+ai/dataset_pipeline/
+ai/temporal_analysis_data*.jsonl
+ai/*.jsonl
+ai/*.csv
+ai/*.npy
+ai/*.db
+ai/*.sqlite
+ai/*.sqlite3
+ai/training
+ai/research
+ai/youtube_transcripts
+# Exclude other large files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.bak
+*.backup
 EOF
 
-    if [[ -n "$DOMAIN" ]]; then
-        cat >> "$completion_report" << EOF
-Domain Access: https://$DOMAIN
-EOF
+print_status "✅ Rsync exclusions prepared"
+
+# Archive old repo in root home (VPS) BEFORE syncing
+print_header "Archiving old repo in /root/pixelated on VPS..."
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
+set -e
+
+# Colors for remote output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
+print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
+
+if [ -d "/root/pixelated" ]; then
+    print_status "Stopping Caddy and Docker containers using /root/pixelated..."
+    sudo systemctl stop caddy || true
+    sudo docker stop pixelated-app || true
+    print_status "Archiving /root/pixelated to /root/pixelated-backup..."
+
+    # Remove any existing backup directory to avoid mv errors
+    if [ -d "/root/pixelated-backup" ]; then
+        print_status "Removing previous backup at /root/pixelated-backup..."
+        sudo rm -rf /root/pixelated-backup
     fi
 
-    cat >> "$completion_report" << EOF
-
-=== Deployment Features ===
-✅ Node.js 24.7.0 Environment
-✅ pnpm 10.15.0 Package Manager
-✅ Docker Container Deployment
-✅ Blue-Green Deployment Strategy
-✅ Comprehensive Health Checks
-✅ Backup Management System
-✅ Structured Logging and Monitoring
+    sudo mv /root/pixelated /root/pixelated-backup
+    print_status "Archive complete."
+else
+    print_status "/root/pixelated does not exist, nothing to archive."
+fi
 EOF
 
-    if [[ "$GIT_SYNC_SUCCESS" == "true" ]]; then
-        cat >> "$completion_report" << EOF
-✅ Git Repository Synchronization
-EOF
+# Sync project files
+print_header "Syncing project files to VPS..."
+print_status "This may take a few minutes for the initial sync..."
+
+if eval rsync -avz --progress --delete \
+    --exclude-from=/tmp/rsync-exclude \
+    "$LOCAL_PROJECT_DIR/" \
+    "$VPS_USER@$VPS_HOST:$REMOTE_PROJECT_DIR/" \
+    "$RSYNC_SSH_OPTS"; then
+    print_status "✅ Project files synced successfully"
+else
+    print_error "❌ Rsync failed"
+    exit 1
+fi
+
+# Sync git repository
+print_header "Synchronizing git repository..."
+GIT_SYNC_SUCCESS="false"
+if sync_git_directory "$VPS_HOST" "$VPS_USER" "$SSH_KEY" "$VPS_PORT" "$LOCAL_PROJECT_DIR" "$REMOTE_PROJECT_DIR"; then
+    print_status "✅ Git repository synced successfully"
+    
+    # Verify git functionality on VPS
+    if verify_git_functionality_on_vps "$VPS_HOST" "$VPS_USER" "$SSH_KEY" "$VPS_PORT" "$REMOTE_PROJECT_DIR"; then
+        print_status "✅ Git functionality verified on VPS"
+        GIT_SYNC_SUCCESS="true"
     else
-        cat >> "$completion_report" << EOF
-⚠️  Git Repository Synchronization (degraded)
-EOF
+        handle_git_sync_failure "Git functionality verification failed"
     fi
+else
+    handle_git_sync_failure "Git directory sync failed"
+fi
 
-    # Add registry information
-    cat >> "$completion_report" << EOF
+# Set up VPS environment
+print_header "Setting up VPS environment..."
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
+set -e
 
-=== Container Registry ===
-EOF
+# Colors for remote output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-    if [[ -f /tmp/registry-images.log ]] && [[ -s /tmp/registry-images.log ]]; then
-        cat >> "$completion_report" << EOF
-✅ Container pushed to GitLab registry
-Latest Image: $(tail -n 1 /tmp/registry-images.log)
-Registry URL: https://git.pixelatedempathy.tech/pixelated-empathy/container_registry
-EOF
+print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
+print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
+
+print_status "Setting up VPS environment..."
+
+# Update system
+print_status "Updating system packages..."
+sudo apt-get update -y
+sudo apt-get upgrade -y
+
+# Install security basics
+print_status "Installing security packages (ufw, fail2ban, unattended-upgrades)..."
+sudo apt-get install -y ufw fail2ban unattended-upgrades
+
+# Configure UFW firewall
+print_status "Configuring UFW firewall rules..."
+sudo ufw allow $VPS_PORT/tcp    # Allow SSH
+sudo ufw allow 80/tcp           # Allow HTTP
+sudo ufw allow 443/tcp          # Allow HTTPS
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw --force enable
+# Enable and start fail2ban
+print_status "Enabling fail2ban for SSH brute-force protection..."
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+
+# SSH hardening reminder
+print_status "Review SSH configuration for security:"
+print_status "  - Disable root login (PermitRootLogin no)"
+print_status "  - Disable password authentication (PasswordAuthentication no)"
+print_status "  - Change SSH port if desired"
+print_status "  - Use key-based authentication only"
+print_status "  - Edit /etc/ssh/sshd_config and restart sshd: systemctl restart sshd"
+
+# Install Docker if not present
+if ! command -v docker &> /dev/null; then
+    print_status "Installing Docker..."
+    curl -fsSL https://get.docker.com | sudo sh
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo usermod -aG docker $VPS_USER 2>/dev/null || true
+fi
+
+# Install Node.js if not present or wrong version
+NODE_VERSION=\$(command -v node && node --version || echo "none")
+if [[ "\$NODE_VERSION" != "v24"* ]]; then
+    print_status "Current Node version: \$NODE_VERSION, upgrading to Node.js 24 via nvm..."
+
+    # Check if nvm is already installed
+    if [[ -s "\$HOME/.nvm/nvm.sh" ]]; then
+        print_status "nvm already installed, loading existing installation..."
+        export NVM_DIR="\$HOME/.nvm"
+        [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+        [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
     else
-        cat >> "$completion_report" << EOF
-⚠️  Container not pushed to registry (check authentication)
-Registry URL: https://git.pixelatedempathy.tech/pixelated-empathy/container_registry
-EOF
-    fi
+        print_status "Installing nvm (first time setup)..."
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        export NVM_DIR="\$HOME/.nvm"
+        [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+        [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 
-    # Add performance metrics if available
-    if [[ -f "$DEPLOYMENT_METRICS" ]]; then
-        local total_time_ms=$(jq -r '.deployment.start_time // 0' "$DEPLOYMENT_METRICS" 2>/dev/null || echo "0")
-        local current_time_ms=$(date +%s%3N)
-        local deployment_duration_ms=$((current_time_ms - total_time_ms))
-        local deployment_duration_sec=$((deployment_duration_ms / 1000))
-        
-        cat >> "$completion_report" << EOF
-
-=== Performance Metrics ===
-Total Deployment Time: ${deployment_duration_sec}s (${deployment_duration_ms}ms)
-EOF
-    fi
-
-    # Add log file references
-    cat >> "$completion_report" << EOF
-
-=== Log Files and Documentation ===
-Main Deployment Log: $DEPLOYMENT_LOG
-Deployment Metrics: $DEPLOYMENT_METRICS
-Error Log: $ERROR_LOG
-Warning Log: $WARNING_LOG
-Completion Report: $completion_report
-EOF
-
-    if [[ -f "/tmp/latest-deployment-archive.txt" ]]; then
-        local archive_file=$(cat "/tmp/latest-deployment-archive.txt")
-        cat >> "$completion_report" << EOF
-Deployment Archive: $archive_file
-EOF
-    fi
-
-    cat >> "$completion_report" << EOF
-
-=== Next Steps and Recommendations ===
-1. Verify application functionality at the provided URLs
-2. Test critical application features and API endpoints
-3. Monitor application logs for any issues: docker logs pixelated-app
-4. Set up monitoring and alerting for production use
-5. Review security settings and SSL certificate status
-EOF
-
-    if [[ "$GIT_SYNC_SUCCESS" == "true" ]]; then
-        cat >> "$completion_report" << EOF
-6. Use git-based updates for quick changes: ssh $VPS_USER@$VPS_HOST 'cd $REMOTE_PROJECT_DIR && git pull'
-EOF
-    else
-        cat >> "$completion_report" << EOF
-6. Use full deployment script for future updates
-EOF
-    fi
-
-    cat >> "$completion_report" << EOF
-
-=== Support and Troubleshooting ===
-SSH Access: ssh $VPS_USER@$VPS_HOST
-Container Status: docker ps | grep pixelated-app
-Application Logs: docker logs pixelated-app
-System Status: systemctl status caddy docker
-EOF
-
-    # Store completion report path
-    echo "$completion_report" > "/tmp/latest-completion-report.txt"
-    
-    log_deployment_event "REPORTING" "INFO" "Deployment completion report created: $completion_report" "completion_report_created"
-    
-    return 0
-}
-
-# Add user guidance for post-deployment operations and git usage
-provide_post_deployment_guidance() {
-    local git_available="$1"
-    
-    log_deployment_event "GUIDANCE" "INFO" "Providing post-deployment guidance" "post_deployment_guidance"
-    
-    print_header "📋 Post-Deployment Operations Guide"
-    print_status ""
-    print_status "Your Pixelated Empathy application has been successfully deployed!"
-    print_status ""
-    
-    print_status "🌐 Application Access:"
-    print_status "  Direct: http://$VPS_HOST:4321"
-    if [[ -n "$DOMAIN" ]]; then
-        print_status "  Domain: https://$DOMAIN"
-    fi
-    print_status ""
-    
-    print_status "🔧 System Management:"
-    print_status "  SSH Access: ssh $VPS_USER@$VPS_HOST"
-    print_status "  Container Status: docker ps | grep pixelated-app"
-    print_status "  Application Logs: docker logs pixelated-app"
-    print_status "  System Services: systemctl status caddy docker"
-    print_status ""
-    
-    if [[ "$git_available" == "true" ]]; then
-        print_status "🚀 Quick Updates (Git-based):"
-        print_status "  1. SSH to VPS: ssh $VPS_USER@$VPS_HOST"
-        print_status "  2. Navigate to project: cd $REMOTE_PROJECT_DIR"
-        print_status "  3. Pull latest changes: git pull"
-        print_status "  4. Rebuild and restart: pnpm build && docker restart pixelated-app"
-        print_status ""
-        print_status "  ⚠️  Note: Git-based updates skip health checks and backup creation"
-        print_status "      Use full deployment script for production-critical updates"
-        print_status ""
-    fi
-    
-    print_status "🔄 Full Deployment Updates:"
-    print_status "  Run this script again: $0 $VPS_HOST $VPS_USER $VPS_PORT $SSH_KEY $DOMAIN"
-    print_status "  Benefits: Health checks, backup management, rollback preparation"
-    print_status ""
-    
-    print_status "📦 Registry-based Deployment:"
-    print_status "  1. List available versions:"
-    print_status "     curl -s 'https://git.pixelatedempathy.tech/v2/pixelated-empathy/tags/list' | jq -r '.tags[]?' | head -5"
-    print_status "  2. Deploy specific version (replace TAG):"
-    print_status "     docker pull git.pixelatedempathy.tech/pixelated-empathy:TAG"
-    print_status "     docker stop pixelated-app && docker rm pixelated-app"
-    print_status "     docker run -d --name pixelated-app --restart unless-stopped -p 4321:4321 git.pixelatedempathy.tech/pixelated-empathy:TAG"
-    print_status ""
-    
-    print_status "🔒 Security Recommendations:"
-    print_status "  1. Change SSH port from default 22 (edit /etc/ssh/sshd_config)"
-    print_status "  2. Disable password authentication (use key-based only)"
-    print_status "  3. Set up firewall rules (ufw enable, allow specific ports)"
-    print_status "  4. Regular security updates: apt update && apt upgrade"
-    print_status "  5. Monitor application logs for suspicious activity"
-    print_status ""
-    
-    print_status "📊 Monitoring and Maintenance:"
-    print_status "  1. Set up log rotation for Docker containers"
-    print_status "  2. Monitor disk space usage regularly"
-    print_status "  3. Backup database and important data"
-    print_status "  4. Test rollback procedures periodically"
-    print_status "  5. Keep deployment logs for troubleshooting"
-    print_status ""
-    
-    if [[ -f "/tmp/latest-completion-report.txt" ]]; then
-        local report_file=$(cat "/tmp/latest-completion-report.txt")
-        print_status "📄 Detailed Report: $report_file"
-        print_status ""
-    fi
-    
-    return 0
-}
-
-# Write deployment failure summary with specific remediation steps
-create_deployment_failure_summary() {
-    local failure_stage="$1"
-    local exit_code="$2"
-    local error_details="$3"
-    
-    log_deployment_event "FAILURE" "ERROR" "Creating deployment failure summary" "failure_summary"
-    
-    local failure_summary="/tmp/deployment-failure-$(date +%Y%m%d-%H%M%S).txt"
-    
-    cat > "$failure_summary" << EOF
-=== Pixelated Empathy Deployment Failure Summary ===
-Generated: $(date -Iseconds)
-Failed Stage: $failure_stage
-Exit Code: $exit_code
-Context: $DEPLOYMENT_CONTEXT
-
-=== Failure Details ===
-$error_details
-
-=== System State ===
-Target Host: $VPS_HOST:$VPS_PORT
-User: $VPS_USER
-Domain: ${DOMAIN:-"IP-based access only"}
-Local Directory: $LOCAL_PROJECT_DIR
-Remote Directory: $REMOTE_PROJECT_DIR
-
-=== Immediate Actions Required ===
-EOF
-
-    case "$failure_stage" in
-        "pre_deployment")
-            cat >> "$failure_summary" << EOF
-The deployment failed during initial validation. No changes were made to production.
-
-1. Verify SSH connectivity:
-   ssh $VPS_USER@$VPS_HOST
-   
-2. Check network connectivity and DNS resolution
-3. Verify SSH key permissions and configuration
-4. Ensure target host is accessible and responsive
-
-Remediation Steps:
-- Test SSH connection manually
-- Check firewall rules on both local and remote systems
-- Verify SSH key is correct and has proper permissions (600)
-- Ensure VPS is running and accessible
-EOF
-            ;;
-        "env_variables")
-            cat >> "$failure_summary" << EOF
-The deployment failed during environment variable setup. Production unchanged.
-
-1. Check environment file encryption/decryption process
-2. Verify GPG or OpenSSL availability on VPS
-3. Check environment file permissions and content
-
-Remediation Steps:
-- Verify .env file exists and is readable
-- Test encryption/decryption process manually
-- Check VPS has required encryption tools installed
-- Verify environment file format and content
-EOF
-            ;;
-        "synchronization")
-            cat >> "$failure_summary" << EOF
-The deployment failed during code synchronization. Backup may exist.
-
-1. Check rsync connectivity and permissions
-2. Verify disk space on VPS
-3. Check for file permission issues
-4. Verify network stability during transfer
-
-Remediation Steps:
-- Test rsync manually with verbose output
-- Check available disk space: df -h
-- Verify file permissions on both systems
-- Check network connectivity and stability
-- Review rsync exclusion patterns
-EOF
-            ;;
-        "container_build")
-            cat >> "$failure_summary" << EOF
-The deployment failed during container build. Code synchronized but build failed.
-
-1. SSH to VPS and check Docker status
-2. Review build logs for specific errors
-3. Check Dockerfile and dependencies
-4. Verify Node.js and pnpm versions
-
-Remediation Steps:
-- SSH to VPS: ssh $VPS_USER@$VPS_HOST
-- Check Docker status: systemctl status docker
-- Review build logs: cat /tmp/docker-build.log
-- Test build manually: cd $REMOTE_PROJECT_DIR && docker build .
-- Check Node.js version: node --version
-- Check pnpm version: pnpm --version
-- Review Dockerfile for syntax errors
-EOF
-            ;;
-        "health_checks")
-            cat >> "$failure_summary" << EOF
-The deployment failed during health checks. Container built but failed validation.
-
-1. New container was automatically cleaned up
-2. Old container should still be running
-3. Check application configuration and dependencies
-4. Review health check failure details
-
-Remediation Steps:
-- Check if old container is still running: docker ps
-- Review application logs for startup issues
-- Test application dependencies and configuration
-- Check port bindings and network connectivity
-- Review health check endpoints and requirements
-EOF
-            ;;
-        "traffic_switch")
-            cat >> "$failure_summary" << EOF
-The deployment failed during traffic switching. Manual intervention required.
-
-1. Check container status and port bindings
-2. Verify old container availability for rollback
-3. Review traffic switching logs
-4. Manual rollback may be necessary
-
-Remediation Steps:
-- Check container status: docker ps -a
-- Review container logs: docker logs pixelated-app
-- Check port bindings: netstat -tlnp | grep 4321
-- Manual rollback if needed (see rollback section)
-EOF
-            ;;
-        *)
-            cat >> "$failure_summary" << EOF
-The deployment failed at an unknown stage. Check logs for details.
-
-1. Review deployment logs for specific error details
-2. Check system status on VPS
-3. Verify application is still running
-4. Consider manual rollback if needed
-
-Remediation Steps:
-- Review main deployment log: $DEPLOYMENT_LOG
-- Check error log: $ERROR_LOG
-- SSH to VPS and check system status
-- Verify application accessibility
-EOF
-            ;;
-    esac
-
-    cat >> "$failure_summary" << EOF
-
-=== Rollback Procedures ===
-If the production system is affected, use these rollback procedures:
-
-1. Container Rollback (if backup container exists):
-   ssh $VPS_USER@$VPS_HOST
-   docker stop pixelated-app || true
-   docker start pixelated-app-backup || echo "No backup container"
-
-2. Filesystem Rollback (if backup directory exists):
-   ssh $VPS_USER@$VPS_HOST
-   sudo systemctl stop caddy
-   docker stop pixelated-app || true
-   sudo mv $REMOTE_PROJECT_DIR $REMOTE_PROJECT_DIR-failed
-   sudo mv $REMOTE_PROJECT_DIR-backup $REMOTE_PROJECT_DIR
-   cd $REMOTE_PROJECT_DIR
-   docker build -t pixelated-app:rollback .
-   docker run -d --name pixelated-app --restart unless-stopped -p 4321:4321 pixelated-app:rollback
-   sudo systemctl start caddy
-
-3. Registry Rollback (if previous images available):
-   ssh $VPS_USER@$VPS_HOST
-   curl -s "https://git.pixelatedempathy.tech/v2/pixelated-empathy/tags/list" | jq -r '.tags[]?' | head -5
-   docker pull git.pixelatedempathy.tech/pixelated-empathy:PREVIOUS_TAG
-   docker stop pixelated-app || true
-   docker run -d --name pixelated-app-rollback --restart unless-stopped -p 4321:4321 git.pixelatedempathy.tech/pixelated-empathy:PREVIOUS_TAG
-   docker rm pixelated-app || true
-   docker rename pixelated-app-rollback pixelated-app
-
-=== Verification After Rollback ===
-curl -s -f "http://localhost:4321/" && echo "✅ Application responding"
-docker ps | grep pixelated-app && echo "✅ Container running"
-
-=== Log Files for Analysis ===
-Main Log: $DEPLOYMENT_LOG
-Error Log: $ERROR_LOG
-Warning Log: $WARNING_LOG
-Metrics: $DEPLOYMENT_METRICS
-Failure Summary: $failure_summary
-
-=== Support Information ===
-For additional support:
-1. Review all log files listed above
-2. Check system resources: df -h, free -h, docker system df
-3. Verify network connectivity and DNS resolution
-4. Test SSH and Docker functionality manually
-5. Consider running deployment with verbose logging enabled
-
-=== Prevention for Future Deployments ===
-1. Test deployment in staging environment first
-2. Verify all prerequisites before deployment
-3. Ensure adequate disk space and system resources
-4. Check network stability and connectivity
-5. Validate configuration files and environment variables
-6. Keep deployment logs for troubleshooting reference
-EOF
-
-    # Store failure summary path
-    echo "$failure_summary" > "/tmp/latest-failure-summary.txt"
-    
-    print_header "❌ Deployment Failed"
-    print_error "Deployment failed at stage: $failure_stage"
-    print_error "Exit code: $exit_code"
-    print_status ""
-    print_status "📄 Detailed failure analysis: $failure_summary"
-    print_status ""
-    cat "$failure_summary"
-    
-    log_deployment_event "FAILURE" "ERROR" "Deployment failure summary created: $failure_summary" "failure_summary_created"
-    
-    return 0
-}
-
-# Final deployment validation and success confirmation
-perform_final_deployment_validation() {
-    local deployment_status="$1"
-    
-    log_deployment_event "VALIDATION" "INFO" "Performing final deployment validation" "final_validation"
-    
-    # Validate application is responding
-    local validation_success="true"
-    local validation_errors=()
-    
-    # Test direct application access
-    log_deployment_event "VALIDATION" "INFO" "Testing direct application access" "direct_access_test"
-    if $SSH_CMD "$VPS_USER@$VPS_HOST" "curl -s -f http://localhost:4321/ >/dev/null 2>&1"; then
-        log_deployment_event "VALIDATION" "INFO" "Direct application access: PASS" "direct_access_pass"
-    else
-        log_deployment_event "VALIDATION" "ERROR" "Direct application access: FAIL" "direct_access_fail"
-        validation_errors+=("Direct application access failed")
-        validation_success="false"
-    fi
-    
-    # Test domain access if configured
-    if [[ -n "$DOMAIN" ]]; then
-        log_deployment_event "VALIDATION" "INFO" "Testing domain access: $DOMAIN" "domain_access_test"
-        if curl -s -f "https://$DOMAIN/" >/dev/null 2>&1; then
-            log_deployment_event "VALIDATION" "INFO" "Domain access: PASS" "domain_access_pass"
-        else
-            log_deployment_event "VALIDATION" "WARNING" "Domain access: FAIL (may need DNS propagation)" "domain_access_warning"
-            validation_errors+=("Domain access failed (check DNS/SSL)")
+        # Add nvm to bashrc for future sessions
+        if ! grep -q "NVM_DIR" ~/.bashrc; then
+            echo 'export NVM_DIR="\$HOME/.nvm"' >> ~/.bashrc
+            echo '[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"' >> ~/.bashrc
+            echo '[ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"' >> ~/.bashrc
         fi
     fi
+
+    # Install and use Node 24
+    nvm install 24
+    nvm use 24
+    nvm alias default 24
+    print_status "Node.js 24 installation completed"
+else
+    print_status "Node.js 24 already installed: \$NODE_VERSION"
+fi
+
+# Install pnpm if not present
+if ! command -v pnpm &> /dev/null; then
+    print_status "Installing pnpm..."
+    npm install -g pnpm
+fi
+
+# Install Git if not present
+if ! command -v git &> /dev/null; then
+    print_status "Installing Git..."
+    sudo apt-get install -y git
+fi
+
+# Install Caddy if domain is configured
+if [[ -n "$DOMAIN" ]] && ! command -v caddy &> /dev/null; then
+    print_status "Installing Caddy for domain: $DOMAIN"
+    apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+    apt-get update
+    sudo apt-get install -y caddy
+    sudo systemctl enable caddy
+fi
+
+print_status "✅ VPS environment setup complete"
+EOF
+
+# Generate container tag locally before remote execution
+print_header "Generating container tag..."
+CONTAINER_TAG=$(generate_container_tag "pixelated-empathy")
+print_status "Generated container tag: $CONTAINER_TAG"
+
+# Set up project on VPS
+print_header "Setting up project on VPS..."
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash <<EOF
+set -e
+
+# Colors for remote output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
+print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
+print_warning() { echo -e "\${YELLOW}[VPS WARNING]${NC} \$1"; }
+
+cd $REMOTE_PROJECT_DIR
+
+# Clean any cached pnpm/node state that might be causing issues
+print_status "Cleaning cached state..."
+rm -rf node_modules/.pnpm
+rm -rf ~/.pnpm-store
+rm -rf ~/.cache/pnpm
+rm -rf .astro
+pnpm store prune || true
+
+# Load nvm environment and ensure Node 24 is active
+print_status "Loading Node.js environment..."
+export NVM_DIR="\$HOME/.nvm"
+[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+[ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
+
+# Force reload nvm and switch to Node 24
+print_status "Switching to Node 24..."
+nvm use 24 || {
+    print_error "Failed to switch to Node 24"
+    nvm list
+    exit 1
+}
+
+# Update PATH to ensure Node 24 binaries are used
+export PATH="\$NVM_DIR/versions/node/v24.18.0/bin:\$PATH"
+
+# Verify Node version
+NODE_VERSION=\$(node --version)
+WHICH_NODE=\$(which node)
+print_status "Using Node version: \$NODE_VERSION from \$WHICH_NODE"
+if [[ "\$NODE_VERSION" != "v24"* ]]; then
+    print_error "Wrong Node version: \$NODE_VERSION (expected v24.x)"
+    print_error "Node path: \$WHICH_NODE"
+    print_error "PATH: \$PATH"
+    exit 1
+fi
+
+# Install pnpm with Node 24 (force reinstall to ensure it uses Node 24)
+print_status "Installing pnpm with Node 24..."
+npm install -g pnpm
+
+# Verify pnpm is using Node 24
+PNPM_VERSION=\$(pnpm --version)
+WHICH_PNPM=\$(which pnpm)
+PNPM_NODE_VERSION=\$(pnpm exec node --version)
+print_status "Using pnpm version: \$PNPM_VERSION from \$WHICH_PNPM"
+print_status "pnpm is using Node version: \$PNPM_NODE_VERSION"
+
+if [[ "\$PNPM_NODE_VERSION" != "v24"* ]]; then
+    print_error "pnpm is using wrong Node version: \$PNPM_NODE_VERSION (expected v24.x)"
+    exit 1
+fi
+
+print_status "Installing project dependencies..."
+# First try with frozen lockfile, if it fails, regenerate it
+if ! pnpm install --frozen-lockfile; then
+    print_warning "Frozen lockfile failed, regenerating lockfile..."
+    pnpm install --no-frozen-lockfile
+fi
+
+print_status "Building project..."
+# Set Node options for build
+export NODE_OPTIONS="--max-old-space-size=8192"
+pnpm build
+
+print_status "Building Docker container with proper tagging..."
+
+# Use the pre-generated container tag
+CONTAINER_TAG="$CONTAINER_TAG"
+print_status "Using container tag: \$CONTAINER_TAG"
+
+# Define container build function inline
+build_container() {
+    local container_name="\$1"
+    local tag="\$2"
+    local dockerfile_path="\${3:-.}"
+    local build_context="\${4:-.}"
     
-    # Validate container is running
-    log_deployment_event "VALIDATION" "INFO" "Validating container status" "container_status_test"
-    if $SSH_CMD "$VPS_USER@$VPS_HOST" "docker ps | grep -q pixelated-app"; then
-        log_deployment_event "VALIDATION" "INFO" "Container status: RUNNING" "container_running"
-    else
-        log_deployment_event "VALIDATION" "ERROR" "Container status: NOT RUNNING" "container_not_running"
-        validation_errors+=("Container is not running")
-        validation_success="false"
-    fi
+    print_status "Building container: \$container_name:\$tag"
     
-    # Validate git functionality if sync was successful
-    if [[ "$GIT_SYNC_SUCCESS" == "true" ]]; then
-        log_deployment_event "VALIDATION" "INFO" "Validating git functionality" "git_validation"
-        if verify_git_post_deployment "$VPS_HOST" "$VPS_USER" "$SSH_KEY" "$VPS_PORT" "$REMOTE_PROJECT_DIR"; then
-            log_deployment_event "VALIDATION" "INFO" "Git functionality: AVAILABLE" "git_available"
-        else
-            log_deployment_event "VALIDATION" "WARNING" "Git functionality: DEGRADED" "git_degraded"
-            validation_errors+=("Git functionality degraded")
-        fi
-    fi
-    
-    # Generate validation report
-    if [[ "$validation_success" == "true" ]]; then
-        log_deployment_event "VALIDATION" "INFO" "Final validation: ALL CHECKS PASSED" "validation_success"
+    if docker build -t "\$container_name:\$tag" -f "\$dockerfile_path/Dockerfile" "\$build_context" 2>&1 | tee /tmp/docker-build.log; then
+        print_status "✅ Container built successfully: \$container_name:\$tag"
         return 0
     else
-        log_deployment_event "VALIDATION" "WARNING" "Final validation: SOME CHECKS FAILED" "validation_partial"
-        for error in "${validation_errors[@]}"; do
-            log_deployment_event "VALIDATION" "WARNING" "Validation issue: $error" "validation_issue"
-        done
+        print_error "❌ Container build failed"
+        cat /tmp/docker-build.log
         return 1
     fi
 }
 
-# Main execution with integrated task 11.2 functionality
-if execute_main_deployment; then
-    # Deployment succeeded - perform final validation and reporting
-    
-    # Perform final validation
-    if perform_final_deployment_validation "success"; then
-        validation_status="passed"
-    else
-        validation_status="partial"
-    fi
-    
-    # Create completion report
-    create_deployment_completion_report "success" "$validation_status"
-    
-    # Provide user guidance
-    provide_post_deployment_guidance "$GIT_SYNC_SUCCESS"
-    
-    # Display final success message
-    print_header "🎉 Deployment Completed Successfully!"
-    print_status ""
-    print_status "✅ All deployment stages completed"
-    print_status "✅ Application is running and accessible"
-    print_status "✅ Health checks passed"
-    print_status "✅ Backup management configured"
-    print_status "✅ Monitoring and logging active"
-    
-    if [[ "$GIT_SYNC_SUCCESS" == "true" ]]; then
-        print_status "✅ Git-based updates available"
-    fi
-    
-    print_status ""
-    print_status "Your Pixelated Empathy application is now live!"
-    
-    exit 0
+# Extract just the tag part (after the colon)
+TAG_ONLY=\$(echo "\$CONTAINER_TAG" | cut -d':' -f2)
+
+# Build container with validation
+if build_container "pixelated-empathy" "\$TAG_ONLY" "." "."; then
+    print_status "✅ Container built and tagged: \$CONTAINER_TAG"
+    # Store the final tag for later use
+    echo "\$CONTAINER_TAG" > /tmp/container-tag
 else
-    # Deployment failed - create failure summary
-    deployment_exit_code=$?
-    
-    # Create failure summary with specific remediation steps
-    create_deployment_failure_summary "${CURRENT_STAGE:-unknown}" "$deployment_exit_code" "Deployment orchestration failed"
-    
-    exit $deployment_exit_code
+    print_error "❌ Container build failed"
+    exit 1
 fi
+
+print_status "✅ Project setup complete"
+EOF
+
+
+
+# Deploy the application using blue-green deployment
+print_header "Deploying application with blue-green strategy..."
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
+set -e
+
+print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
+print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
+
+cd $REMOTE_PROJECT_DIR
+
+# Get the final container tag
+if [[ -f /tmp/container-tag ]]; then
+    CONTAINER_TAG=\$(cat /tmp/container-tag)
+    print_status "Using container tag: \$CONTAINER_TAG"
+else
+    CONTAINER_TAG="pixelated-empathy:latest"
+    print_warning "No container tag found, using: \$CONTAINER_TAG"
+fi
+
+# Set up environment variables
+PUBLIC_URL="http://$VPS_HOST"
+CORS_ORIGINS="http://$VPS_HOST,https://$VPS_HOST"
+
+if [[ -n "$DOMAIN" ]]; then
+    PUBLIC_URL="https://$DOMAIN"
+    CORS_ORIGINS="\$CORS_ORIGINS,http://$DOMAIN,https://$DOMAIN"
+fi
+
+# Prepare environment variables array for blue-green deployment
+ENV_VARS=(
+    "NODE_ENV=production"
+    "PORT=4321"
+    "WEB_PORT=4321"
+    "LOG_LEVEL=info"
+    "ENABLE_RATE_LIMITING=true"
+    "RATE_LIMIT_WINDOW=60"
+    "RATE_LIMIT_MAX_REQUESTS=100"
+    "ENABLE_HIPAA_COMPLIANCE=true"
+    "ENABLE_AUDIT_LOGGING=true"
+    "ENABLE_DATA_MASKING=true"
+    "ASTRO_TELEMETRY_DISABLED=1"
+    "PUBLIC_URL=\$PUBLIC_URL"
+    "CORS_ORIGINS=\$CORS_ORIGINS"
+)
+
+# Check if this is initial deployment or update
+if docker ps --format "table {{.Names}}" | grep -q "^pixelated-app$"; then
+    print_status "Existing deployment detected, performing blue-green deployment..."
+    
+    # Perform simplified blue-green deployment
+    print_status "Starting new container..."
+    
+    # Stop and remove any existing new container
+    docker stop pixelated-app-new 2>/dev/null || true
+    docker rm pixelated-app-new 2>/dev/null || true
+    
+    # Start new container on different port
+    docker run -d --name pixelated-app-new --restart unless-stopped -p 4322:4321 \
+        -e NODE_ENV=production \
+        -e PORT=4321 \
+        -e ASTRO_TELEMETRY_DISABLED=1 \
+        -e "PUBLIC_URL=\$PUBLIC_URL" \
+        -e "CORS_ORIGINS=\$CORS_ORIGINS" \
+        "\$CONTAINER_TAG"
+    
+    # Wait for new container to be ready
+    print_status "Waiting for new container to be ready..."
+    sleep 10
+    
+    # Test new container
+    if curl -s -f "http://localhost:4322/" >/dev/null 2>&1; then
+        print_status "✅ New container is ready"
+        
+        # Switch traffic by stopping old container and starting new one on main port
+        docker stop pixelated-app 2>/dev/null || true
+        docker rm pixelated-app 2>/dev/null || true
+        
+        # Stop new container and restart on main port
+        docker stop pixelated-app-new
+        docker rm pixelated-app-new
+        
+        docker run -d --name pixelated-app --restart unless-stopped -p 4321:4321 \
+            -e NODE_ENV=production \
+            -e PORT=4321 \
+            -e ASTRO_TELEMETRY_DISABLED=1 \
+            -e "PUBLIC_URL=\$PUBLIC_URL" \
+            -e "CORS_ORIGINS=\$CORS_ORIGINS" \
+            "\$CONTAINER_TAG"
+        
+        print_status "✅ Blue-green deployment completed successfully"
+    else
+        print_error "❌ New container failed health check"
+        docker stop pixelated-app-new 2>/dev/null || true
+        docker rm pixelated-app-new 2>/dev/null || true
+        exit 1
+    fi
+else
+    print_status "Initial deployment detected, starting fresh container..."
+    
+    # Stop and remove any existing container
+    docker stop pixelated-app 2>/dev/null || true
+    docker rm pixelated-app 2>/dev/null || true
+    
+    # Start the container
+    docker run -d --name pixelated-app --restart unless-stopped -p 4321:4321 \
+        -e NODE_ENV=production \
+        -e PORT=4321 \
+        -e ASTRO_TELEMETRY_DISABLED=1 \
+        -e "PUBLIC_URL=\$PUBLIC_URL" \
+        -e "CORS_ORIGINS=\$CORS_ORIGINS" \
+        "\$CONTAINER_TAG"
+    
+    # Wait for container to be ready
+    print_status "Waiting for container to be ready..."
+    sleep 15
+    
+    # Basic health check
+    if curl -s -f "http://localhost:4321/" >/dev/null 2>&1; then
+        print_status "✅ Initial deployment completed successfully"
+    else
+        print_error "❌ Initial deployment health check failed"
+        docker logs pixelated-app
+        exit 1
+    fi
+fi
+
+# Configure Caddy if domain is set
+if [[ -n "$DOMAIN" ]]; then
+    print_status "Configuring Caddy for domain: $DOMAIN"
+    sudo tee /etc/caddy/Caddyfile > /dev/null << CADDY_EOF
+$DOMAIN {
+    encode gzip
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # Static assets with long cache
+    handle /assets/* {
+        header Cache-Control "public, max-age=31536000, immutable"
+        reverse_proxy localhost:4321
+    }
+
+    # All other requests
+    handle {
+        reverse_proxy localhost:4321
+    }
+}
+
+goat.pixelatedempathy.tech {
+    reverse_proxy localhost:11434
+}
+CADDY_EOF
+
+    # Auto-format Caddyfile to ensure consistency
+    print_status "Formatting Caddyfile..."
+    sudo caddy fmt --overwrite /etc/caddy/Caddyfile
+
+    # Test and reload Caddy
+    print_status "Testing Caddy configuration..."
+    sudo caddy validate --config /etc/caddy/Caddyfile
+
+    print_status "Starting Caddy..."
+    sudo systemctl restart caddy
+fi
+
+print_status "✅ Application deployment completed!"
+
+# Show access URLs
+print_status "Application URLs:"
+print_status "  Direct: http://$VPS_HOST:4321"
+if [[ -n "$DOMAIN" ]]; then
+    print_status "  Domain: https://$DOMAIN"
+fi
+EOF
+
+# Final git functionality verification
+if [[ "$GIT_SYNC_SUCCESS" == "true" ]]; then
+    print_header "🔍 Final git functionality verification..."
+    if verify_git_post_deployment "$VPS_HOST" "$VPS_USER" "$SSH_KEY" "$VPS_PORT" "$REMOTE_PROJECT_DIR"; then
+        print_status "✅ Git functionality confirmed - git-based updates available"
+    else
+        print_warning "⚠️  Git functionality issues detected - use full deployment for updates"
+        GIT_SYNC_SUCCESS="false"
+    fi
+fi
+
+# Clean up
+rm -f /tmp/rsync-exclude
+
+print_header "🎉 Deployment completed successfully!"
+print_status ""
+print_status "Your application is now running on:"
+print_status "  Direct access: http://$VPS_HOST:4321"
+if [[ -n "$DOMAIN" ]]; then
+    print_status "  Domain access: https://$DOMAIN"
+fi
+print_status ""
+print_status "Registry Information:"
+if [ -f /tmp/registry-images.log ] && [ -s /tmp/registry-images.log ]; then
+    print_status "  ✅ Container image pushed to GitLab registry"
+    print_status "  Latest image: $(tail -n 1 /tmp/registry-images.log)"
+    print_status "  Registry URL: https://git.pixelatedempathy.tech/pixelated-empathy/container_registry"
+else
+    print_warning "  ⚠️  Container image not pushed to registry (check authentication)"
+fi
+print_status ""
+
+# Generate and display git-based update instructions
+generate_git_update_instructions "$VPS_HOST" "$VPS_USER" "$SSH_KEY" "$VPS_PORT" "$REMOTE_PROJECT_DIR" "$GIT_SYNC_SUCCESS"
+display_git_update_instructions
+
+print_status ""
+print_status "For future updates, you can:"
+if [[ "$GIT_SYNC_SUCCESS" == "true" ]]; then
+    print_status "  1. SSH to VPS and use 'git pull' for quick updates (recommended)"
+    print_status "  2. Run this script again for full deployment with health checks"
+    print_status "  3. Deploy from registry using previous versions"
+else
+    print_status "  1. Run this script again for full deployment (recommended)"
+    print_status "  2. Deploy from registry using previous versions"
+    print_status "  3. Manual git setup may be needed for git-based updates"
+fi
+print_status ""
+print_status "SSH to your VPS: ssh $VPS_USER@$VPS_HOST"
+print_status ""
+print_header "🔄 Rollback Information"
+print_status "If you need to rollback this deployment, SSH to the VPS and run:"
+print_status ""
+
+# Generate rollback commands on the VPS
+$SSH_CMD "$VPS_USER@$VPS_HOST" bash << 'ROLLBACK_EOF'
+# Source the deployment functions
+cd /root/pixelated
+
+# Generate comprehensive rollback commands
+cat << 'ROLLBACK_COMMANDS'
+
+# ROLLBACK OPTIONS (in order of speed and reliability)
+
+## Option 1: Container Rollback (Fastest)
+docker stop pixelated-app || true
+docker start pixelated-app-backup || echo "No backup container available"
+
+## Option 2: Filesystem Rollback (Fast)
+sudo systemctl stop caddy || true
+docker stop pixelated-app || true
+sudo mv /root/pixelated /root/pixelated-failed
+sudo mv /root/pixelated-backup /root/pixelated
+cd /root/pixelated
+docker build -t pixelated-app:rollback .
+docker run -d --name pixelated-app --restart unless-stopped -p 4321:4321 pixelated-app:rollback
+sudo systemctl start caddy
+
+## Option 3: Registry Rollback (if available)
+# List available versions:
+curl -s "https://git.pixelatedempathy.tech/v2/pixelated-empathy/tags/list" | jq -r '.tags[]?' | head -5
+
+# Deploy specific version (replace TAG):
+docker pull git.pixelatedempathy.tech/pixelated-empathy:TAG
+docker stop pixelated-app || true
+docker run -d --name pixelated-app-rollback --restart unless-stopped -p 4321:4321 git.pixelatedempathy.tech/pixelated-empathy:TAG
+docker rm pixelated-app || true
+docker rename pixelated-app-rollback pixelated-app
+
+## Verification (run after any rollback)
+curl -s -f "http://localhost:4321/" && echo "✅ Application responding"
+docker ps | grep pixelated-app && echo "✅ Container running"
+
+ROLLBACK_COMMANDS
+ROLLBACK_EOF
