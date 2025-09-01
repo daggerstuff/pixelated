@@ -1,5 +1,5 @@
 # Analytics and Monitoring Service
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 
 # Install system dependencies
 RUN apt-get update -qq && \
