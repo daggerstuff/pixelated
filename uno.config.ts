@@ -53,10 +53,14 @@ export default defineConfig({
         // - fa-solid: Not used anywhere in the codebase
       },
       customizations: {
-        customize(name: string, _c: any) {
-          // Hardened: block empty, dash, double-dash, multiple dashes, or any accidental output that is not a valid icon name
-          if (!name || name === '-' || name === '--' || name.startsWith('--') || /^-+$/.test(name)) return false
-          return true
+        customize(defaultCustomizations: Required<IconifyIconCustomisations>, data: IconifyIcon, name: string): Required<IconifyIconCustomisations> | undefined {
+          // Hardened: type guard and block empty, dash, double-dash, multiple dashes, or invalid values
+          if (typeof name !== 'string' || !name || name === '-' || name === '--' || name.startsWith('--') || /^-+$/.test(name)) {
+            // Block invalid icon names by returning undefined (prevents rendering)
+            return undefined;
+          }
+          // No additional customization, return defaults
+          return defaultCustomizations;
         }
       }
     }),
