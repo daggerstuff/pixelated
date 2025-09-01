@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { markdownToHtml } from '@/lib/markdown'
 import { formatTimestamp } from '@/lib/dates'
 import { useContext } from 'react'
-import { ThemeContext } from '@/contexts/ThemeContext'
+import { ThemeContext } from '@/components/theme/ThemeProvider'
 
 // Define the MentalHealthAnalysis interface with the properties we need
 interface MentalHealthAnalysis {

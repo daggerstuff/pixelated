@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { useEffect, useRef, useContext } from 'react'
 import { IconSend } from './icons'
-import { ThemeContext } from '@/contexts/ThemeContext'
+import { ThemeContext } from '@/components/theme/ThemeProvider'
 
 export interface ChatInputProps {
   value: string
