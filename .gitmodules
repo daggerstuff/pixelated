@@ -1,4 +1,0 @@
-[submodule "ai"]
-	path = ai
-	url = ssh://git@git.pixelatedempathy.tech:pixeltech/ai.git
-	ignore = all
