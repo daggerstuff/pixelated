@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import type { FC } from 'react'
-import type { TherapyStyleId, TherapyStyle } from '../../lib/ai/types/TherapyStyles'
+import React, { useState } from 'react'
+import type { TherapyStyleId } from '../../lib/ai/types/TherapyStyles'
 import {
   therapyStyleConfigs,
   getRecommendedStyles,
@@ -47,7 +46,7 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
   }
 
   // Get the current style details to display in the panel
-  const currentStyle: TherapyStyle | undefined = therapyStyleConfigs[detailStyle]
+  const currentStyle = therapyStyleConfigs[detailStyle]
 
   return (
     <div className="therapy-style-selector">
@@ -76,10 +75,9 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
         </div>
       </div>
 
-      {currentStyle && (
-        <div className="style-details">
-          <h3>{currentStyle.name}</h3>
-          <p className="style-description">{currentStyle.description}</p>
+      <div className="style-details">
+        <h3>{currentStyle.name}</h3>
+        <p className="style-description">{currentStyle.description}</p>
 
         <div className="style-techniques">
           <h4>Techniques Used:</h4>
@@ -89,7 +87,16 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
             ))}
           </ul>
         </div>
-      )}
+
+        <div className="style-issues">
+          <h4>Recommended For:</h4>
+          <ul>
+            {currentStyle.suitableFor.map((issue) => (
+              <li key={issue}>{issue}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       <style>{`
         .therapy-style-selector {
