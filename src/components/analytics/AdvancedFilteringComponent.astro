@@ -475,8 +475,7 @@ const {
     // Tab switching
     tabButtons.forEach((button) => {
       if (button instanceof HTMLElement) {
-<<<<<<< HEAD
-        button.addEventListener('click', (event: MouseEvent) => {
+        button.addEventListener('click', (_event: MouseEvent) => {
           const tab = button.getAttribute('data-tab')
     
           // Update active tab button
@@ -501,9 +500,6 @@ const {
       }
     })
 
-=======
-        button.addEventListener('click', (_event: MouseEvent) => {
->>>>>>> 638a3c8b (feat: Fix TypeScript errors in multiple components)
     // Time range select
     if (timeRangeSelect instanceof HTMLElement) {
       timeRangeSelect.addEventListener(
@@ -554,45 +550,85 @@ const {
 
     // Date inputs
     if (startDateInput instanceof HTMLInputElement) {
-      startDateInput.addEventListener('change', (event: Event) => {
+      startDateInput.addEventListener('change', (_event: Event) => {
         options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
       })
     }
-<<<<<<< HEAD
 
     if (endDateInput instanceof HTMLInputElement) {
-      endDateInput.addEventListener('change', (event: Event) => {
+      endDateInput.addEventListener('change', (_event: Event) => {
         options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
       })
-=======
-      startDateInput.addEventListener('change', (_event: Event) => {
->>>>>>> 638a3c8b (feat: Fix TypeScript errors in multiple components)
     }
 
     // Initialize sliders
-      startDateInput.addEventListener('change', (_event: Event) => {
+    if (intensityRangeSlider && intensityRangeDisplay) {
+      initializeSlider(
+        intensityRangeSlider as HTMLElement,
+        intensityRangeDisplay as HTMLElement,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
+            const [min, max] = values
+            options.emotions.minIntensity = min
+            options.emotions.maxIntensity = max
             intensityRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
           }
         },
-      startDateInput.addEventListener('change', (_event: Event) => {
+      )
+    }
+
+    if (valenceRangeSlider instanceof HTMLElement && valenceRangeDisplay instanceof HTMLElement) {
+      initializeSlider(
+        valenceRangeSlider,
+        valenceRangeDisplay,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
             const [min, max] = values
             if (!options.emotions.dimensionalRanges) {
               options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
-      startDateInput.addEventListener('change', (_event: Event) => {
-      initializeSlider(
-        arousalRangeSlider,
-        arousalRangeDisplay,
-      startDateInput.addEventListener('change', (_event: Event) => {
+            }
+            options.emotions.dimensionalRanges.valence = [min, max]
+            valenceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
+          }
         },
       )
     }
-      startDateInput.addEventListener('change', (_event: Event) => {
+
+    if (arousalRangeSlider instanceof HTMLElement && arousalRangeDisplay instanceof HTMLElement) {
+      initializeSlider(
+        arousalRangeSlider,
+        arousalRangeDisplay,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
+            const [min, max] = values
+            if (!options.emotions.dimensionalRanges) {
+              options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
+            }
+            options.emotions.dimensionalRanges.arousal = [min, max]
+            arousalRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
+          }
+        },
+      )
+    }
+
+    if (dominanceRangeSlider instanceof HTMLElement && dominanceRangeDisplay instanceof HTMLElement) {
+      initializeSlider(
+        dominanceRangeSlider,
+        dominanceRangeDisplay,
+        (values: number[]) => {
+          if (values.length === 2 && values[0] != null && values[1] != null) {
+            const [min, max] = values
+            if (!options.emotions.dimensionalRanges) {
               options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
             }
             options.emotions.dimensionalRanges.dominance = [min, max]
             dominanceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
           }
-      endDateInput.addEventListener('change', (_event: Event) => {
+        },
+      )
+    }
+
+    if (strengthSlider instanceof HTMLElement && strengthDisplay instanceof HTMLElement) {
       initializeSlider(
         strengthSlider,
         strengthDisplay,
@@ -641,7 +677,7 @@ const {
     emotionTypeCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
         checkbox.addEventListener('change', (event: Event) => {
-          const target = e.target
+          const target = event.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'emotions', 'types')
           }
@@ -652,67 +688,85 @@ const {
     patternTypeCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
         checkbox.addEventListener('change', (event: Event) => {
-<<<<<<< HEAD
-          const target = e.target
+          const target = event.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'patterns', 'types')
           }
         })
       }
-=======
-          const target = event.target
-          const target = event.target
->>>>>>> 638a3c8b (feat: Fix TypeScript errors in multiple components)
     })
 
     patternCategoryCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
         checkbox.addEventListener('change', (event: Event) => {
-          const target = e.target
+          const target = event.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'patterns', 'categories')
           }
         })
-          const target = event.target
-          const target = event.target
+      }
+    })
+
+    // Initialize switches
+    if (showRawDataSwitch instanceof HTMLElement) {
+      initializeSwitch(showRawDataSwitch, (checked: boolean) => {
+        options.visualization.showRawData = checked
+      })
+    }
+
     if (showTrendlinesSwitch instanceof HTMLElement) {
       initializeSwitch(showTrendlinesSwitch, (checked: boolean) => {
         options.visualization.showTrendlines = checked
       })
     }
-          const target = event.target
+
+    if (showConfidenceIntervalsSwitch instanceof HTMLElement) {
+      initializeSwitch(showConfidenceIntervalsSwitch, (checked: boolean) => {
+        options.visualization.showConfidenceIntervals = checked
+      })
     }
 
     if (showAnnotationsSwitch instanceof HTMLElement) {
       initializeSwitch(showAnnotationsSwitch, (checked: boolean) => {
-          const target = event.target
-          const target = event.target
+        options.visualization.showAnnotations = checked
+      })
+    }
+
+    // Group by select
+    if (groupBySelect instanceof HTMLElement) {
+      groupBySelect.addEventListener(
+        'valueChange',
+        (e: Event) => {
+          const event = e as CustomEvent<{ value: string }>
           options.visualization.groupBy = event.detail?.value || (event.detail as any)
         },
       )
     }
 
-<<<<<<< HEAD
     // Reset button
     if (resetButton) {
-      resetButton.addEventListener('click', (event: Event) => {
+      resetButton.addEventListener('click', (_event: Event) => {
         // Reset the options object with proper types
         options.timeRange = { presetRange: undefined, startDate: undefined, endDate: undefined }
-=======
-          const target = event.target
->>>>>>> 638a3c8b (feat: Fix TypeScript errors in multiple components)
         options.emotions = { 
           types: [], 
           minIntensity: undefined, 
           maxIntensity: undefined, 
-          const target = event.target
-          const target = event.target
+          dimensionalRanges: { valence: undefined, arousal: undefined, dominance: undefined } 
+        }
+        options.patterns = { types: [], minStrength: undefined, minConfidence: undefined, categories: [] }
+        options.visualization = { 
+          groupBy: undefined, 
+          smoothing: undefined, 
+          showRawData: undefined, 
+          showTrendlines: undefined, 
+          showConfidenceIntervals: undefined, 
+          showAnnotations: undefined 
         }
 
         // Reset UI elements
         // This would require resetting all the UI elements to their default state
         // For brevity, we're not implementing the full reset here
-<<<<<<< HEAD
 
         // Dispatch change event
         dispatchOptionsChange(options)
@@ -721,39 +775,80 @@ const {
 
     // Apply button
     if (applyButton) {
-      applyButton.addEventListener('click', (event: Event) => {
-=======
-          const target = event.target
->>>>>>> 638a3c8b (feat: Fix TypeScript errors in multiple components)
+      applyButton.addEventListener('click', (_event: Event) => {
         dispatchApplyEvent()
       })
     }
 
-          const target = event.target
-          const target = event.target
+    // Helper for slider initialization
+    function initializeSlider(
+      slider: HTMLElement,
+      _display: HTMLElement,
+      onChange: (values: number[]) => void,
+      singleValue = false,
+    ): void {
+      if (!slider) return
+
+      let initialValues: number[]
       if (singleValue) {
         const value = parseFloat(slider.getAttribute('data-value') || '0')
         initialValues = [value]
       } else {
         const start = parseFloat(slider.getAttribute('data-start') || '0')
-          const target = event.target
+        const end = parseFloat(slider.getAttribute('data-end') || '1')
+        initialValues = [start, end]
+      }
+
+      // For demonstration, we'll just simulate the change event
+      onChange(initialValues)
+
+      // Add event listener for value changes
+      slider.addEventListener('sliderValueChange', (e: Event) => {
+        const event = e as CustomEvent<{ values: number[] }>
+        onChange(event.detail?.values || [])
+      })
+    }
 
     // Helper for switch initialization
     function initializeSwitch(
       switchEl: HTMLElement,
-          const target = event.target
-          const target = event.target
+      onChange: (checked: boolean) => void,
+    ): void {
+      if (!switchEl) return
+
+      // Initialize with default state
+      onChange(false)
+
+      // Add event listener for changes
+      switchEl.addEventListener('checkedChange', (e: Event) => {
+        const event = e as CustomEvent<boolean>
         onChange(event.detail)
       })
     }
 
     // Helper for checkbox array updates
-          const target = event.target
+    function updateCheckboxArray(
+      checkbox: HTMLInputElement,
+      category: keyof FilterOptions,
+      key: string,
+    ): void {
+      const value = checkbox.value
+      const checked = checkbox.checked
+
+      // Type-safe property access
+      const categoryObj = options[category] as any
+      
+      // Ensure the property exists and is an array
+      if (!Array.isArray(categoryObj[key])) {
         categoryObj[key] = []
       }
 
       const values: string[] = categoryObj[key]
-          const target = event.target
+
+      if (checked) {
+        // Add to array if not already present
+        if (!values.includes(value)) {
+          values.push(value)
         }
       } else {
         // Remove from array
@@ -764,7 +859,19 @@ const {
       dispatchOptionsChange(options)
     }
 
-          const target = event.target
+    // Dispatch options change event
+    function dispatchOptionsChange(filterOptions: FilterOptions): void {
+      if (!component) return
+
+      const event = new CustomEvent('advancedFilterOptionsChange', {
+        detail: { options: filterOptions },
+        bubbles: true,
+      })
+      component.dispatchEvent(event)
+    }
+
+    // Dispatch apply event
+    function dispatchApplyEvent(): void {
       if (!component) return
 
       const event = new CustomEvent('advancedFilterApply', {
@@ -786,7 +893,6 @@ const {
   }
 
   .tab-button:hover {
-      resetButton.addEventListener('click', (_event: Event) => {
-      applyButton.addEventListener('click', (_event: Event) => {
-      resetButton.addEventListener('click', (_event: Event) => {
-      applyButton.addEventListener('click', (_event: Event) => {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+</style>
