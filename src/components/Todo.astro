@@ -286,4 +286,13 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     // Event listeners
     addButton?.addEventListener('click', addTodo)
 
-    todoInput?.addEventListener('keydown', (e) => {
+    todoInput?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        addTodo()
+      }
+    })
+
+    // Initialize
+    renderSavedTodos()
+  })
+</script>
