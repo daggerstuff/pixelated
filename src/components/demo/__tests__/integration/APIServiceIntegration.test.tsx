@@ -388,11 +388,7 @@ describe('API Service Integration Tests', () => {
       const retryFetch = async (url: string, options: any, maxRetries = 3): Promise<Response> => {
         for (let i = 0; i < maxRetries; i++) {
           try {
-            const response = await fetch(url, options);
-            if (!response.ok && i < maxRetries - 1) {
-              throw new Error(`Attempt ${i + 1} failed`);
-            }
-            return response;
+            return await fetch(url, options)
           } catch (error: unknown) {
             if (i === maxRetries - 1) {
               throw error
@@ -402,10 +398,11 @@ describe('API Service Integration Tests', () => {
             )
           }
         }
-        throw new Error('All retries failed');
+        throw new Error('Retry logic failed to return a response.')
       }
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})
+      if (!response) throw new Error('Response is undefined')
       const data = await response.json()
 
       expect(mockFetch).toHaveBeenCalledTimes(3)
