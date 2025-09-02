@@ -76,9 +76,10 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
         </div>
       </div>
 
-      <div className="style-details">
-        <h3>{currentStyle.name}</h3>
-        <p className="style-description">{currentStyle.description}</p>
+      {currentStyle && (
+        <div className="style-details">
+          <h3>{currentStyle.name}</h3>
+          <p className="style-description">{currentStyle.description}</p>
 
         <div className="style-techniques">
           <h4>Techniques Used:</h4>
