@@ -20,7 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { apiClient, APIError } from '@/lib/api-client'
-import { DetectCrisisResult } from '@/types/api'
+import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 
 interface CrisisAssessment {
   riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent'
@@ -68,7 +68,7 @@ export default function CrisisDetectionDemo() {
     }
 
     try {
-  const resultRaw = await apiClient.detectCrisis({
+      const result: CrisisDetectionResponse = await apiClient.detectCrisis({
         content: inputText,
         contentType: 'chat_message',
         context: {
@@ -86,8 +86,6 @@ export default function CrisisDetectionDemo() {
           enableImmediateNotifications: true
         }
       })
-      // Cast the raw result to a typed interface for safer property access
-      const result = resultRaw as DetectCrisisResult
 
       const crisisAssessment: CrisisAssessment = {
         riskLevel: result.assessment.overallRisk,
@@ -117,7 +115,7 @@ export default function CrisisDetectionDemo() {
                      result.assessment.selfHarm.frequency === 'rare' ? 2 : 0
           },
           hopelessness: {
-            present: result.riskFactors.some((rf) => rf.factor.includes('hopelessness')),
+            present: result.riskFactors.some(rf => rf.factor.includes('hopelessness')),
             confidence: 0.7,
             severity: 6
           },
@@ -128,7 +126,7 @@ export default function CrisisDetectionDemo() {
                      result.assessment.agitation.severity === 'moderate' ? 6 : 3
           },
           socialIsolation: {
-            present: result.riskFactors.some((rf) => rf.factor.includes('isolation')),
+            present: result.riskFactors.some(rf => rf.factor.includes('isolation')),
             confidence: 0.6,
             severity: 5
           },
@@ -139,15 +137,14 @@ export default function CrisisDetectionDemo() {
                      result.assessment.substanceUse.impairment === 'moderate' ? 6 : 3
           }
         },
-        protectiveFactors: result.protectiveFactors.map((pf) => pf.factor),
-        immediateActions: result.recommendations.immediate.map((action) => action.action),
-        emergencyResources: result.resources.crisis.map((resource) => {
-          const r = resource
+        protectiveFactors: result.protectiveFactors.map(pf => pf.factor),
+        immediateActions: result.recommendations.immediate.map(action => action.action),
+        emergencyResources: result.resources.crisis.map(resource => {
           return {
-            type: r.name,
-            contact: r.contact,
-            description: r.specialization.join(', '),
-            available: r.availability
+            type: resource.name,
+            contact: resource.contact,
+            description: resource.specialization.join(', '),
+            available: resource.availability
           }
         }),
         confidenceLevel: result.metadata.confidenceScore / 100,

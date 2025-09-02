@@ -1,8 +1,7 @@
 // Tests contract propagation: messages passed to ChatContainer/ChatMessage have consistent roles & no stray type fields.
 
 import { render, screen } from '@testing-library/react'
-import ChatContainer from '../ChatContainer'
-
+import { ChatContainer } from '../ChatContainer'
 
 // Helpers
 const messages = [
@@ -15,11 +14,7 @@ const messages = [
 
 describe('Contract propagation in ChatContainer and ChatMessage', () => {
   it('renders only allowed roles (user, bot, system) and no type field', () => {
-    render(
-      <ThemeProvider>
-        <ChatContainer messages={messages} onSendMessage={vi.fn()} />
-      </ThemeProvider>,
-    )
+    render(<ChatContainer messages={messages} onSendMessage={vi.fn()} />)
     // Role labels in specialized chat UI
     expect(screen.getAllByText(/user|bot|system/i)).toBeTruthy()
     // Messages show up
@@ -33,12 +28,12 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
 
   it('does not propagate unintended properties to ChatMessage', () => {
     // Spy on ChatMessage to see props
-    const spy = jest.fn(() => null)
+    const spy = vi.fn(() => null)
     render(
       <ChatContainer
         messages={messages}
-        onSendMessage={jest.fn()}
-        // @ts-expect-error override for test
+        onSendMessage={vi.fn()}
+        // @ts-ignore override for test
         __ChatMessage={spy}
       />
     )
@@ -64,11 +59,7 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
           ? 'assistant'
           : msg.role,
     }))
-    render(
-      <ThemeProvider>
-        <ChatContainer messages={mapped} onSendMessage={vi.fn()} />
-      </ThemeProvider>,
-    )
+    render(<ChatContainer messages={mapped as Message[]} onSendMessage={vi.fn()} />)
     expect(screen.getByText('Therapist acting as user')).toBeInTheDocument()
     expect(screen.getByText('Patient acting as bot')).toBeInTheDocument()
     expect(screen.getByText('System message')).toBeInTheDocument()

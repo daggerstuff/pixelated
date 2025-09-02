@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, FC } from 'react';
+import { useState, useRef, useEffect, type FC } from 'react';
 import { createPixelatedEmpathyAgent, type TherapeuticScenario, type BiasAnalysis, type AgentResponse } from '../lib/ai/PixelatedEmpathyAgent';
 
 type AgentContext = 'scenario_generation' | 'bias_detection' | 'training_recommendation' | 'general';
