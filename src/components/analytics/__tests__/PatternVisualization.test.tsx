@@ -1,27 +1,12 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { PatternVisualization } from '../PatternVisualizationReact'
+import type {
+  TrendPattern,
+  CrossSessionPattern,
+  RiskCorrelation,
+} from '@/lib/fhe/pattern-recognition'
 
-// Mock the Recharts components
-vi.mock('recharts', () => ({
-  Area: vi.fn(({ children }) => <div data-testid="area-chart">{children}</div>),
-  AreaChart: vi.fn(({ children }) => (
-    <div data-testid="area-chart-container">{children}</div>
-  )),
-  CartesianGrid: vi.fn(() => <div data-testid="cartesian-grid" />),
-  Line: vi.fn(({ children }) => <div data-testid="line-chart">{children}</div>),
-  LineChart: vi.fn(({ children }) => (
-    <div data-testid="line-chart-container">{children}</div>
-  )),
-  ResponsiveContainer: vi.fn(({ children }) => (
-    <div data-testid="responsive-container">{children}</div>
-  )),
-  Tooltip: vi.fn(() => <div data-testid="tooltip" />),
-  XAxis: vi.fn(() => <div data-testid="x-axis" />),
-  YAxis: vi.fn(() => <div data-testid="y-axis" />),
-}))
-
-// Mock sample data
-const mockTrends = [
+const mockTrends: TrendPattern[] = [
   {
     id: 'trend1',
     type: 'anxiety',
@@ -34,7 +19,7 @@ const mockTrends = [
   },
 ]
 
-const mockPatterns = [
+const mockCrossSessionPatterns: CrossSessionPattern[] = [
   {
     id: 'pattern1',
     type: 'avoidance',
@@ -44,7 +29,7 @@ const mockPatterns = [
   },
 ]
 
-const mockRiskCorrelations = [
+const mockRiskCorrelations: RiskCorrelation[] = [
   {
     id: 'risk1',
     riskFactor: 'sleep disruption',
@@ -81,8 +66,7 @@ describe('PatternVisualization', () => {
     render(
       <PatternVisualization
         trends={mockTrends}
-        crossSessionPatterns={mockPatterns}
-        riskCorrelations={mockRiskCorrelations}
+        onPatternSelect={handlePatternSelect}
       />,
     )
 
@@ -142,5 +126,15 @@ describe('PatternVisualization', () => {
 
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
     expect(handlePatternSelect).toHaveBeenCalledWith(mockRiskCorrelations[0])
+  })
+
+  it('hides controls when showControls is false', () => {
+    render(<PatternVisualization showControls={false} />)
+    expect(
+      screen.queryByRole('button', { name: 'Export Patterns' }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Refresh Data' }),
+    ).not.toBeInTheDocument()
   })
 })
