@@ -3,6 +3,8 @@
 import { render, screen } from '@testing-library/react'
 import { ChatContainer } from '../ChatContainer'
 
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
 // Helpers
 const messages = [
   { role: 'user', content: 'User message', name: 'You' },

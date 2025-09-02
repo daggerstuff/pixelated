@@ -17,18 +17,27 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
 
-  const { sendMessage } = useWebSocket({
+  const { sendMessage, lastMessage } = useWebSocket({
     url: 'ws://localhost:8080', // Placeholder URL
     sessionId: 'placeholder-session', // Placeholder session ID
-    onMessage: (message) => {
-      // TODO: This is where incoming messages (lastMessage equivalent) would be handled
-      console.log('Received message:', message)
-      // For now, parsing and handling logic from the original useEffect [lastMessage] needs to be adapted here
-      // Example of how you might handle based on your previous logic:
-      // const data = JSON.parse(message.content) as unknown // Assuming message.content is the stringified data
-      // switch (data.type) { ... }
-    },
   })
+
+  useEffect(() => {
+    if (lastMessage) {
+      try {
+        const data = JSON.parse(lastMessage.data)
+        if (data.type === 'notifications') {
+          setNotifications(data.notifications)
+          setUnreadCount(data.unread)
+        } else if (data.type === 'new_notification') {
+          setNotifications((prev) => [data.notification, ...prev])
+          setUnreadCount((prev) => prev + 1)
+        }
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error)
+      }
+    }
+  }, [lastMessage])
 
   useEffect(() => {
     // Request initial notifications
@@ -92,6 +101,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         size="icon"
         className="relative"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Open notifications"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
@@ -112,6 +122,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
+              aria-label="Close"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -149,6 +160,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleMarkAsRead(notification.id)}
+                          aria-label="Mark as read"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -157,6 +169,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDismiss(notification.id)}
+                        aria-label="Dismiss"
                       >
                         <X className="h-4 w-4" />
                       </Button>

@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react'
-import { useChat } from './useChat'
-import { useMemory } from './useMemory'
+import { useState, useCallback, ChangeEvent } from 'react'
+import { useChat, UseChatReturn } from './useChat'
+import { useMemory, UseMemoryReturn } from './useMemory'
 
 import type { Message } from '@/types/chat'
 
@@ -43,6 +43,9 @@ export function useChatWithMemory(options: ChatWithMemoryOptions = {}) {
           metadata: { timestamp: new Date().toISOString() }
         })
       }
+    },
+    [chat, memory, options.enableMemory, sessionId],
+  )
 
       return response
     } catch (err) {
