@@ -60,7 +60,7 @@ export function MemoryAwareChatSystem({
     enableAnalysis,
     maxMemoryContext: 15,
   })
-  
+
   const {
     messages,
     isLoading,

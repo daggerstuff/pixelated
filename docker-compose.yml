@@ -1,66 +1,19 @@
+version: '3.8'
+
 services:
-  caddy:
-    image: caddy:2
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      frontend:
-        condition: service_healthy
-      bias-detection-service:
-        condition: service_healthy
-    restart: always
-
-  bias-detection-service:
-    build:
-      context: ./src/lib/ai/bias-detection
-      dockerfile: Dockerfile
-    environment:
-      BIAS_SERVICE_HOST: 0.0.0.0
-      BIAS_SERVICE_PORT: 5001
-      GUNICORN_WORKERS: 4
-      GUNICORN_WORKER_CLASS: gevent
-      GUNICORN_TIMEOUT: 120
-      GUNICORN_LOGLEVEL: info
-      GUNICORN_DAEMON: "false"
-      GUNICORN_PRELOAD_APP: "false"
-    restart: always
-    volumes:
-      - ./src/lib/ai/bias-detection:/app
-    healthcheck:
-      test: ["CMD", "/app/check_service_health.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-
-  frontend:
+  pixelated-app-new:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: pixelated-empathy
+    container_name: pixelated-app-new
+    ports:
+      - "3000:3000"
     environment:
-      NODE_ENV: production
-      HOST: 0.0.0.0
-      PORT: 4321
-      NEXT_PUBLIC_BIAS_API_URL: http://nginx/api/bias-detection
-    depends_on:
-      bias-detection-service:
-        condition: service_healthy
-    restart: unless-stopped
+      - NODE_ENV=production
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4321/api/health/simple"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
-
-volumes:
-  caddy_data:
-    driver: local
-  caddy_config:
-    driver: local
+      start_period: 10s
+  
