@@ -594,7 +594,7 @@ export function MemoryDashboard({
                 <p className="text-muted-foreground">No preferences found.</p>
               ) : (
                 <div className="space-y-2">
-                  {userPrefs.memories.map((pref: MemoryEntry) => (
+                  {userPrefs.memories.map((pref) => (
                     <div
                       key={pref.id || pref.content}
                       className="flex items-center justify-between p-2 border rounded"
