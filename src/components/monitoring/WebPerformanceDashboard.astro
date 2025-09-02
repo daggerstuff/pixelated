@@ -1,6 +1,4 @@
 ---
-import { getMonitoringConfig } from '@/lib/monitoring/config'
-
 interface Props {
   title: string
   description: string
@@ -265,7 +263,7 @@ const performanceBudgets = {
   </div>
 </div>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script is:inline define:vars={{ refreshInterval, performanceBudgets }}>
   // Chart instances

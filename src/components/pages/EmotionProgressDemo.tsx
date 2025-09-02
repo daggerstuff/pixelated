@@ -1,4 +1,5 @@
-import { useState, type FC } from 'react'
+import { useState } from 'react'
+import type { FC } from 'react'
 import EmotionProgressDashboard from '../../components/analytics/EmotionProgressDashboard'
 import useEmotionProgress from '../../hooks/useEmotionProgress'
 
@@ -28,8 +29,9 @@ const EmotionProgressDemo: FC = () => {
 
       {data ? (
         <EmotionProgressDashboard
-          data={data}
+          progressData={data}
           timeRange={timeRange}
+          onTimeRangeChange={setTimeRange}
           isLoading={isLoading}
           className="mb-8"
         />
