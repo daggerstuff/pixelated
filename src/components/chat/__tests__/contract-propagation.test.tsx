@@ -7,6 +7,8 @@ import { ThemeProvider } from '@/components/theme/ThemeProvider'
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
 // Helpers
 const messages = [
   { role: 'user', content: 'User message', name: 'You' },
