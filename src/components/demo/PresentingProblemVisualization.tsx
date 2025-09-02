@@ -1,12 +1,4 @@
-import { FC } from 'react'
-import type { PresentingProblemEvent } from '../../lib/types/psychology-pipeline'
-
-interface PresentingProblemVisualizationProps {
-  events: PresentingProblemEvent[]
-  presentingProblem: string
-}
-
-const PresentingProblemVisualization: FC<
+import type { FC } from 'react'
   PresentingProblemVisualizationProps
 > = ({ events, presentingProblem }) => {
   // Sort events by time (rough chronological order)
@@ -14,33 +6,17 @@ const PresentingProblemVisualization: FC<
     // Simple sorting by extracting numbers from time strings
     const getTimeValue = (timeStr: string) => {
       const match = timeStr.match(/(\d+)\s*(month|week|day|year)/i)
-      if (!match) {
-        return 0
-      }
-      const num = parseInt(match[1] || '0')
-      const unit = (match[2] || '').toLowerCase()
+      if (match && match[1] && match[2]) {
+        const num = parseInt(match[1], 10)
+        const unit = match[2].toLowerCase()
 
-      switch (unit) {
-        case 'year':
-          return num * 365
-        case 'month':
-          return num * 30
-        case 'week':
-          return num * 7
-        case 'day':
-          return num
-        default:
-          return num
-      }
-    }
-
-    return getTimeValue(b.time) - getTimeValue(a.time) // Reverse chronological
-  })
-
-  const getSeverityColor = (index: number, total: number) => {
-    const intensity = (index + 1) / total
-    if (intensity <= 0.33) {
-      return 'bg-yellow-200 border-yellow-400'
+      if (match && match[1] && match[2]) {
+        const num = parseInt(match[1], 10)
+        const unit = match[2].toLowerCase()
+        }
+      if (match && match[1] && match[2]) {
+        const num = parseInt(match[1], 10)
+        const unit = match[2].toLowerCase()
     }
     if (intensity <= 0.66) {
       return 'bg-orange-200 border-orange-400'

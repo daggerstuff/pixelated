@@ -18,8 +18,6 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
       <label className="relative inline-flex items-center cursor-pointer">
         <input
           type="checkbox"
-          role="switch"
-          aria-checked={checked}
           ref={ref}
           className="sr-only peer"
           checked={checked}
