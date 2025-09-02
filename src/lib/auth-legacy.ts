@@ -1,3 +1,4 @@
+import type { AstroCookies } from 'astro'
 import type { AuthRole } from '../config/auth.config'
 import type { AuditMetadata } from './audit/types'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
@@ -7,7 +8,7 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from './audit'
-import { mongoAuthService } from './lib/db/mongoClient'
+import { mongoAuthService } from './supabase'
 // Note: This is an Astro project, Next.js types are not needed here
 // TODO: Replace with Astro-compatible types when implementing API auth
 
@@ -25,7 +26,7 @@ export interface AuthUser {
  * Get the current authenticated user from cookies
  */
 export async function getCurrentUser(
-  cookies: any,
+  cookies: AstroCookies,
 ): Promise<AuthUser | null> {
   const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
 
@@ -40,7 +41,7 @@ export async function getCurrentUser(
     }
 
     // Assuming the decoded token contains the user ID
-    const {userId} = decoded
+    const userId = decoded.userId
 
     // Fetch user from the database
     const user = await mongoAuthService.getUserById(userId)
@@ -72,7 +73,7 @@ export async function getCurrentUser(
  * Check if the user is authenticated
  */
 export async function isAuthenticated(
-  cookies: any,
+  cookies: AstroCookies,
 ): Promise<boolean> {
   // Always return false in the browser context to prevent redirects
   if (typeof window !== 'undefined') {
@@ -102,7 +103,7 @@ export async function isAuthenticated(
  * Check if the user has the required role
  */
 export async function hasRole(
-  cookies: any,
+  cookies: AstroCookies,
   requiredRole: AuthRole,
 ): Promise<boolean> {
   const user = await getCurrentUser(cookies)
@@ -167,7 +168,7 @@ export async function requireAuth({
   redirect,
   request,
 }: {
-  cookies: any
+  cookies: AstroCookies
   redirect: (url: string) => Response
   request: Request
 }) {
@@ -191,7 +192,7 @@ export async function requireRole({
   request,
   role,
 }: {
-  cookies: any
+  cookies: AstroCookies
   redirect: (url: string) => Response
   request: Request
   role: AuthRole
@@ -220,34 +221,35 @@ export class Auth {
     return user ? { userId: user.id } : null
   }
 
-  private getCookiesFromRequest(request: Request): { get: (name: string) => { value: string } | undefined } {
-    const cookieHeader = request.headers.get('cookie') ?? ''
-    const map = new Map<string, string>()
-    for (const part of cookieHeader.split(';')) {
-      if (!part) {
-        continue
-      }
-      const eq = part.indexOf('=')
-      if (eq < 0) {
-        continue
-      }
-      const k = part.slice(0, eq).trim()
-      const v = part.slice(eq + 1).trim()
-      if (!k) {
-        continue
-      }
-      // Best-effort decoding; ignore malformed encodings
-      let dk = k, dv = v
-      try { dk = decodeURIComponent(k) } catch {}
-      try { dv = decodeURIComponent(v) } catch {}
-      map.set(dk, dv)
-    }
+  private getCookiesFromRequest(request: Request): AstroCookies {
+    const cookieHeader = request.headers.get('cookie') || ''
+    const cookies = new Map(
+      cookieHeader.split(';').map((c) => {
+        const [key, ...v] = c.trim().split('=')
+        return [key, v.join('=')]
+      }),
+    )
+
     return {
       get: (name: string) => {
-        const val = map.get(name)
-        return val !== undefined ? { value: val } : undefined
+        const value = cookies.get(name)
+        return value ? { value, json: () => JSON.parse(value) } : undefined
       },
-    }
+      has: (name: string) => cookies.has(name),
+      set: () => {
+        throw new Error('Setting cookies is not supported in this context.')
+      },
+      delete: () => {
+        throw new Error('Deleting cookies is not supported in this context.')
+      },
+      getAll: () => {
+        return Array.from(cookies.entries()).map(([name, value]) => ({
+          name,
+          value,
+        }))
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any
   }
 }
 

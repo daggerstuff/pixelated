@@ -1,4 +1,16 @@
 import { useState, useEffect, type FC } from 'react'
+import type { PatientInfo } from '../../lib/types/psychology-pipeline'
+
+interface DemographicData {
+  category: string
+  subcategory: string
+  current: number
+  target: number
+  percentage: number
+}
+
+interface DemographicBalancingDisplayProps {
+  currentProfile: PatientInfo
   onBalanceUpdate?: (balanceScore: number) => void
 }
 
@@ -277,16 +289,31 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       return acc;
     },
     {} as Record<string, DemographicData[]>,
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+  )
+
+  return (
+    <div className="demographic-balancing-display bg-white rounded-lg p-6 border shadow-sm">
+      <div className="flex justify-between items-center mb-6">
+        <h4 className="text-lg font-semibold text-gray-800">
+          Demographic Balance & Diversity
         </h4>
         <div className="flex items-center gap-2">
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+          <span className="text-sm text-gray-600">Overall Balance:</span>
+          <div
+            className={`px-3 py-1 rounded-full text-sm font-medium ${
+              overallBalance >= 85
+                ? 'bg-green-100 text-green-800'
+                : overallBalance >= 70
+                  ? 'bg-yellow-100 text-yellow-800'
                   : 'bg-red-100 text-red-800'
             }`}
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+          >
+            {overallBalance.toFixed(1)}%
+          </div>
+        </div>
+      </div>
+
+      {/* Current Profile Summary */}
       <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
         <h5 className="font-medium text-blue-800 mb-2">
           Current Profile Classification

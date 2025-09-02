@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import type { FC } from 'react'
 import MentalHealthChatDemo from './MentalHealthChatDemo'
 
 interface MindMirrorDemoProps {

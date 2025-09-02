@@ -1,4 +1,4 @@
-import React from 'react'
+import type { FC } from 'react'
 import type { PresentingProblemEvent } from '../../lib/types/psychology-pipeline'
 
 interface PresentingProblemVisualizationProps {
@@ -14,11 +14,9 @@ const PresentingProblemVisualization: FC<
     // Simple sorting by extracting numbers from time strings
     const getTimeValue = (timeStr: string) => {
       const match = timeStr.match(/(\d+)\s*(month|week|day|year)/i)
-      if (!match) {
-        return 0
-      }
-      const num = parseInt(match[1])
-      const unit = match[2].toLowerCase()
+      if (match && match[1] && match[2]) {
+        const num = parseInt(match[1], 10)
+        const unit = match[2].toLowerCase()
 
         switch (unit) {
           case 'year':

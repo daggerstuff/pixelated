@@ -716,27 +716,17 @@ export function useChatCompletion({
   }, [messages, conversationStats, tokenUsage])
 
   // Import conversation
-  type ConversationImport = { messages: unknown; stats?: unknown }
-
   const importConversation = useCallback((data: string) => {
     try {
-      const parsed = JSON.parse(data) as unknown
-
-      // runtime-validate parsed shape before casting
-      if (
-        parsed &&
-        typeof parsed === 'object' &&
-        'messages' in (parsed as Record<string, unknown>) &&
-        Array.isArray((parsed as Record<string, unknown>)['messages'])
-      ) {
-        const conv = parsed as ConversationImport
-        // assume individual message shapes are correct for now
-        setMessages(conv['messages'] as AIMessage[])
-        if ('stats' in conv && conv['stats']) {
-          setConversationStats(conv['stats'] as ConversationStats)
+      const parsed = JSON.parse(data) as {
+        messages: AIMessage[];
+        stats?: ConversationStats;
+      }
+      if (parsed.messages && Array.isArray(parsed.messages)) {
+        setMessages(parsed.messages)
+        if (parsed.stats) {
+          setConversationStats(parsed.stats)
         }
-      } else {
-        setError('Invalid conversation data format')
       }
     } catch (err: unknown) {
       console.error('Failed to import conversation:', err)
