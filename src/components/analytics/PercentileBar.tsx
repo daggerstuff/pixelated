@@ -1,4 +1,4 @@
-import React from 'react'
+import type { FC } from 'react'
 
 interface PercentileBarProps {
   rank: number
