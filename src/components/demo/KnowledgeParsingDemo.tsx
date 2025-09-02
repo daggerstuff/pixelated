@@ -212,7 +212,7 @@ export default function KnowledgeParsingDemo() {
     const savedHistory = localStorage.getItem('knowledgeParsingHistory')
     if (savedHistory) {
       try {
-        setAnalysisHistory(JSON.parse(savedHistory) as unknown)
+        setAnalysisHistory(JSON.parse(savedHistory) as AnalysisHistory[])
       } catch (e) {
         console.warn('Failed to load analysis history:', e)
       }
