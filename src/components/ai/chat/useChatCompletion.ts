@@ -718,35 +718,10 @@ export function useChatCompletion({
   // Import conversation
   const importConversation = useCallback((data: string) => {
     try {
-      const parsed = JSON.parse(data) as unknown
-      if (parsed.messages && Array.isArray(parsed.messages)) {
-        setMessages(parsed.messages)
-        if (parsed.stats) {
-          setConversationStats(parsed.stats)
-        }
+      const parsed = JSON.parse(data) as {
+        messages: AIMessage[];
+        stats?: ConversationStats;
       }
-    } catch (err: unknown) {
-      console.error('Failed to import conversation:', err)
-      setError('Invalid conversation data format')
-    }
-  }, [])
-
-  // Get message statistics
-  const getMessageStats = useCallback((): MessageStats => {
-    const lengths = messages.map(m => m.content.length)
-    
-    return {
-      longestMessage: Math.max(...lengths, 0),
-      shortestMessage: Math.min(...lengths, 0),
-      averageLength: lengths.length > 0 ? lengths.reduce((a, b) => a + b, 0) / lengths.length : 0,
-      sentimentDistribution: {}, // Would need sentiment analysis integration
-    }
-  }, [messages])
-
-  return {
-    messages,
-    isLoading,
-    isStreaming,
     isTyping,
     error,
     progress,
