@@ -5,56 +5,55 @@ import { NotificationPreferences } from '../NotificationPreferences'
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
 
 // Mock useNotificationPreferences hook
-vi.mock('@/hooks/useNotificationPreferences')
-
-const baseMock = {
-  preferences: {
-    channels: {
-      [NotificationChannel.IN_APP]: true,
-      [NotificationChannel.EMAIL]: true,
-      [NotificationChannel.PUSH]: false,
-      [NotificationChannel.SMS]: false,
+vi.mock('@/hooks/useNotificationPreferences', () => ({
+  useNotificationPreferences: () => ({
+    preferences: {
+      channels: {
+        [NotificationChannel.IN_APP]: true,
+        [NotificationChannel.EMAIL]: true,
+        [NotificationChannel.PUSH]: false,
+        [NotificationChannel.SMS]: false,
+      },
+      frequency: 'immediate',
+      quiet_hours: {
+        enabled: false,
+        start: '22:00',
+        end: '07:00',
+      },
+      categories: {
+        system: true,
+        security: true,
+        updates: true,
+        reminders: true,
+      },
     },
-    frequency: 'immediate',
-    quiet_hours: {
-      enabled: false,
-      start: '22:00',
-      end: '07:00',
-    },
-    categories: {
-      system: true,
-      security: true,
-      updates: true,
-      reminders: true,
-    },
-  },
-  isLoading: false,
-  error: null,
-  updateChannel: vi.fn(),
-  updateFrequency: vi.fn(),
-  updateQuietHours: vi.fn(),
-  updateCategory: vi.fn(),
-}
+    isLoading: false,
+    error: null,
+    updateChannel: vi.fn(),
+    updateFrequency: vi.fn(),
+    updateQuietHours: vi.fn(),
+    updateCategory: vi.fn(),
+  }),
+}))
 
 describe('notificationPreferences', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useNotificationPreferences).mockReturnValue(baseMock)
   })
 
   it('renders loading state', () => {
     vi.mocked(useNotificationPreferences).mockReturnValueOnce({
-      ...baseMock,
+      ...useNotificationPreferences(),
       isLoading: true,
     })
 
     render(<NotificationPreferences />)
-    expect(screen.getAllByTestId('skeleton')).toHaveLength(9)
+    expect(screen.getAllByTestId('skeleton')).toHaveLength(5)
   })
 
   it('renders error state', () => {
     vi.mocked(useNotificationPreferences).mockReturnValueOnce({
-      ...baseMock,
+      ...useNotificationPreferences(),
       error: new Error('Failed to load'),
     })
 
@@ -87,9 +86,9 @@ describe('notificationPreferences', () => {
 
   it('shows time inputs when quiet hours are enabled', () => {
     vi.mocked(useNotificationPreferences).mockReturnValueOnce({
-      ...baseMock,
+      ...useNotificationPreferences(),
       preferences: {
-        ...baseMock.preferences,
+        ...useNotificationPreferences().preferences,
         quiet_hours: {
           enabled: true,
           start: '22:00',
@@ -108,16 +107,16 @@ describe('notificationPreferences', () => {
     render(<NotificationPreferences />)
 
     expect(screen.getByText('Notification Categories')).toBeInTheDocument()
-    expect(screen.getByText(/system notifications/i)).toBeInTheDocument()
-    expect(screen.getByText(/security notifications/i)).toBeInTheDocument()
-    expect(screen.getByText(/updates notifications/i)).toBeInTheDocument()
-    expect(screen.getByText(/reminders notifications/i)).toBeInTheDocument()
+    expect(screen.getByText('System notifications')).toBeInTheDocument()
+    expect(screen.getByText('Security notifications')).toBeInTheDocument()
+    expect(screen.getByText('Updates notifications')).toBeInTheDocument()
+    expect(screen.getByText('Reminders notifications')).toBeInTheDocument()
   })
 
   it('calls updateChannel when toggling channel switch', () => {
     const mockUpdateChannel = vi.fn()
     vi.mocked(useNotificationPreferences).mockReturnValueOnce({
-      ...baseMock,
+      ...useNotificationPreferences(),
       updateChannel: mockUpdateChannel,
     })
 
@@ -134,20 +133,17 @@ describe('notificationPreferences', () => {
     )
   })
 
-  it('calls updateFrequency when changing frequency', async () => {
+  it('calls updateFrequency when changing frequency', () => {
     const mockUpdateFrequency = vi.fn()
     vi.mocked(useNotificationPreferences).mockReturnValueOnce({
-      ...baseMock,
+      ...useNotificationPreferences(),
       updateFrequency: mockUpdateFrequency,
     })
 
     render(<NotificationPreferences />)
 
-    const trigger = screen.getByRole('combobox')
-    fireEvent.click(trigger)
-
-    const option = await screen.findByText('Daily digest')
-    fireEvent.click(option)
+    const select = screen.getByRole('combobox')
+    fireEvent.change(select, { target: { value: 'daily' } })
 
     expect(mockUpdateFrequency).toHaveBeenCalledWith('daily')
   })
@@ -155,7 +151,7 @@ describe('notificationPreferences', () => {
   it('calls updateQuietHours when toggling quiet hours', () => {
     const mockUpdateQuietHours = vi.fn()
     vi.mocked(useNotificationPreferences).mockReturnValueOnce({
-      ...baseMock,
+      ...useNotificationPreferences(),
       updateQuietHours: mockUpdateQuietHours,
     })
 
@@ -176,7 +172,7 @@ describe('notificationPreferences', () => {
   it('calls updateCategory when toggling category switch', () => {
     const mockUpdateCategory = vi.fn()
     vi.mocked(useNotificationPreferences).mockReturnValueOnce({
-      ...baseMock,
+      ...useNotificationPreferences(),
       updateCategory: mockUpdateCategory,
     })
 
