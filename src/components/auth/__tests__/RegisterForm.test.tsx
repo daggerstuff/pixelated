@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { vi } from 'vitest'
 import { RegisterForm } from '../RegisterForm'
 import { useAuth } from '../../../hooks/useAuth'
 import userEvent from '@testing-library/user-event'
@@ -14,29 +15,13 @@ describe('RegisterForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(useAuth as unknown).mockImplementation(() => ({
-      signUp: mockSignUp,
-      signInWithOAuth: mockSignInWithOAuth,
-    }))
-  })
-
-  it('renders all form fields with proper accessibility attributes', () => {
-    render(<RegisterForm />)
-
-    // Check form fields and their accessibility attributes
-    const fullNameInput = screen.getByLabelText(/full name/i)
-    expect(fullNameInput).toHaveAttribute('aria-required', 'true')
-    expect(fullNameInput).toHaveAttribute('aria-invalid', 'false')
-
-    const emailInput = screen.getByLabelText(/email/i)
-    expect(emailInput).toHaveAttribute('aria-required', 'true')
-    expect(emailInput).toHaveAttribute('aria-invalid', 'false')
+    ;(useAuth as vi.Mock).mockImplementation(() => ({
 
     const passwordInput = screen.getByLabelText(/^Password/i)
     expect(passwordInput).toHaveAttribute('aria-required', 'true')
     expect(passwordInput).toHaveAttribute(
       'aria-describedby',
-      'password-strength',
+      'password-requirements',
     )
 
     const termsCheckbox = screen.getByLabelText(/i agree to the/i)

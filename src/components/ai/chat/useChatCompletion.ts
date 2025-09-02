@@ -718,12 +718,9 @@ export function useChatCompletion({
   // Import conversation
   const importConversation = useCallback((data: string) => {
     try {
-      const parsed = JSON.parse(data) as unknown
-      if (parsed.messages && Array.isArray(parsed.messages)) {
-        setMessages(parsed.messages)
-        if (parsed.stats) {
-          setConversationStats(parsed.stats)
-        }
+      const parsed = JSON.parse(data) as {
+        messages: AIMessage[];
+        stats?: ConversationStats;
       }
     isTyping,
     error,

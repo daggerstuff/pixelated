@@ -1,24 +1,4 @@
-import React from 'react'
-import styles from './ProgressDataDisplay.module.css'
-
-interface ProgressDataDisplayProps {
-  labels: string[]
-  userData: number[]
-  benchmarkData: number[]
-  color: string
-  title: string
-  benchmarkLabel: string
-}
-
-export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
-  labels = [],
-  userData = [],
-  benchmarkData = [],
-  color,
-  title,
-  benchmarkLabel,
-}) => {
-  // Validate input data
+import type { FC } from 'react'
   const hasValidData =
     labels.length > 0 &&
     userData.length > 0 &&
