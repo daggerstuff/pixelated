@@ -212,7 +212,7 @@ const responsiveGridStyles = () => {
   }
 </style>
 
-<script define:vars={{ columns, minCardWidth, breakpoints: defaultBreakpoints }}
+<script is:inline define:vars={{ columns, minCardWidth, breakpoints: defaultBreakpoints }}
 >
   // Apply dynamic grid styles for auto-responsive behavior
   if (typeof window !== 'undefined') {

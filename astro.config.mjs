@@ -177,7 +177,7 @@ export default defineConfig({
       svgdir: './src/icons',
     }),
     // markdoc(),
-    ...(process.env.SENTRY_DSN || true ? [
+    ...(process.env.SENTRY_DSN ? [
       sentry({
         sourceMapsUploadOptions: process.env.SENTRY_AUTH_TOKEN ? {
           project: process.env.SENTRY_PROJECT || 'pixel-astro',

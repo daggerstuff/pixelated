@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import { useState, type FC } from 'react'
 import { useParams } from 'react-router-dom'
 import MultidimensionalEmotionChart from '../dashboard/MultidimensionalEmotionChart'
 import useMultidimensionalEmotions from '../../hooks/useMultidimensionalEmotions'
+import type { EmotionData } from '../../hooks/useMultidimensionalEmotions'
+import type { EmotionDataPoint } from '../../components/dashboard/MultidimensionalEmotionChart'
 
 const EmotionVisualizationPage: FC = () => {
   const { clientId } = useParams<{ clientId: string }>()
@@ -15,6 +17,19 @@ const EmotionVisualizationPage: FC = () => {
     isLoading,
     error,
   } = useMultidimensionalEmotions(clientId || 'unknown', timeRange, dataPoints)
+
+  const transformData = (data: EmotionData[]): EmotionDataPoint[] => {
+    return data.map((item) => ({
+      id: item.id,
+      timestamp: item.timestamp,
+      valence: item.dimensions.valence,
+      arousal: item.dimensions.arousal,
+      dominance: item.dimensions.dominance,
+      emotion: item.emotion,
+    }))
+  }
+
+  const chartData = emotionData ? transformData(emotionData) : []
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,7 +85,7 @@ const EmotionVisualizationPage: FC = () => {
       <div className="bg-white rounded-lg shadow-lg p-4">
         <div className="h-[600px]">
           <MultidimensionalEmotionChart
-            emotionData={emotionData}
+            emotionData={chartData}
             isLoading={isLoading}
           />
         </div>

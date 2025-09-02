@@ -120,9 +120,21 @@ const activityLogs: DLPActivityLog[] = [
   }
 
   // Set up event listeners for relevant actions
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
+    interface RuleUpdatedDetail {
+      name: string
+      isActive: boolean
+    }
+
+    interface RuleSavedDetail {
+      isEditing: boolean
+    }
+
+    interface DlpErrorDetail {
+      message: string
+    }
     // Listen for custom events from the DLP components
-    document.addEventListener('dlp:rule-updated', ((e: CustomEvent<unknown>) => {
+    document.addEventListener('dlp:rule-updated', ((e: CustomEvent<RuleUpdatedDetail>) => {
       window.showDLPAlert(
         'success',
         `Rule "${e.detail.name}" ${e.detail.isActive ? 'enabled' : 'disabled'}`,
@@ -133,14 +145,14 @@ const activityLogs: DLPActivityLog[] = [
       window.showDLPAlert('success', 'Rule deleted successfully')
     }) as EventListener)
 
-    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<unknown>) => {
+    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<RuleSavedDetail>) => {
       window.showDLPAlert(
         'success',
         `Rule ${e.detail.isEditing ? 'updated' : 'added'} successfully`,
       )
     }) as EventListener)
 
-    document.addEventListener('dlp:error', ((e: CustomEvent<unknown>) => {
+    document.addEventListener('dlp:error', ((e: CustomEvent<DlpErrorDetail>) => {
       window.showDLPAlert('error', e.detail.message)
     }) as EventListener)
   })

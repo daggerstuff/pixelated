@@ -632,7 +632,7 @@ export default function SessionDocumentationComponent({
                 <h5 className="text-sm font-medium text-gray-700">
                   Treatment Goals
                 </h5>
-                {editableDocumentation.treatmentProgress.goals.map(
+                {editableDocumentation.treatmentProgress?.goals.map(
                   (
                     goal: {
                       description: string
@@ -653,8 +653,10 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLTextAreaElement>,
                             ) => {
                               const newGoals = [
-                                ...editableDocumentation.treatmentProgress
-                                  .goals,
+                                ...(
+                                  editableDocumentation.treatmentProgress
+                                    ?.goals || []
+                                ),
                               ]
 
                               newGoals[index] = {
@@ -688,8 +690,10 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newGoals = [
-                                ...editableDocumentation.treatmentProgress
-                                  .goals,
+                                ...(
+                                  editableDocumentation.treatmentProgress
+                                    ?.goals || []
+                                ),
                               ]
 
                               newGoals[index] = {
@@ -723,8 +727,10 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLTextAreaElement>,
                             ) => {
                               const newGoals = [
-                                ...editableDocumentation.treatmentProgress
-                                  .goals,
+                                ...(
+                                  editableDocumentation.treatmentProgress
+                                    ?.goals || []
+                                ),
                               ]
 
                               newGoals[index] = {
@@ -750,7 +756,9 @@ export default function SessionDocumentationComponent({
                   <button
                     onClick={() => {
                       const newGoals = [
-                        ...editableDocumentation.treatmentProgress.goals,
+                        ...(
+                          editableDocumentation.treatmentProgress?.goals || []
+                        ),
                         {
                           description: '',
                           progress: 0,
@@ -777,7 +785,8 @@ export default function SessionDocumentationComponent({
                 {!readOnly ? (
                   <textarea
                     value={
-                      editableDocumentation.treatmentProgress.overallAssessment
+                      editableDocumentation.treatmentProgress
+                        ?.overallAssessment || ''
                     }
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                       handleChange('treatmentProgress', {
@@ -789,11 +798,10 @@ export default function SessionDocumentationComponent({
                   />
                 ) : (
                   <p className="text-gray-700">
-                    {typeof editableDocumentation.treatmentProgress === 'object' &&
-                    editableDocumentation.treatmentProgress !== null &&
-                    'overallAssessment' in editableDocumentation.treatmentProgress
-                      ? (editableDocumentation.treatmentProgress as { overallAssessment?: string }).overallAssessment
-                      : ''}
+                    {
+                      editableDocumentation.treatmentProgress
+                        ?.overallAssessment
+                    }
                   </p>
                 )}
               </div>
@@ -1065,7 +1073,7 @@ export default function SessionDocumentationComponent({
               <h5 className="text-md font-medium text-gray-700 mb-2">
                 Treatment Goals
               </h5>
-              {editableDocumentation?.['treatmentProgress']?.['goals']?.map(
+              {editableDocumentation.treatmentProgress?.goals?.map(
                 (
                   goal: {
                     description: string
@@ -1101,7 +1109,10 @@ export default function SessionDocumentationComponent({
                 Overall Assessment
               </h5>
               <p className="text-gray-700 mb-4">
-                {editableDocumentation?.['treatmentProgress']?.['overallAssessment']}
+                {
+                  editableDocumentation.treatmentProgress
+                    ?.overallAssessment
+                }
               </p>
             </section>
 

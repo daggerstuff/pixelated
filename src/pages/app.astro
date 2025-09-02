@@ -2,14 +2,20 @@
 import { initializeApplication, shutdownApplication } from '../lib/startup'
 
 // Simple function to safely log during build/runtime
-function safeLog(level: 'info' | 'error', message: string, data?: any) {
+function safeLog(level: 'info' | 'error', message: string, data?: unknown) {
   const timestamp = new Date().toISOString()
   const prefix = '[phi-audit]'
 
   if (level === 'error') {
-    console.error(`${timestamp} ERROR ${prefix} ${message}`, data || '')
+    console.error(
+      `${timestamp} ERROR ${prefix} ${message}`,
+      data ? JSON.stringify(data, null, 2) : '',
+    )
   } else {
-    console.info(`${timestamp} INFO ${prefix} ${message}`, data || '')
+    console.info(
+      `${timestamp} INFO ${prefix} ${message}`,
+      data ? JSON.stringify(data, null, 2) : '',
+    )
   }
 }
 

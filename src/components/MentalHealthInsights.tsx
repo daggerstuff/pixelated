@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import type { FC } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { AlertTriangle, Heart, Brain, Shield, Zap } from 'lucide-react'
 
