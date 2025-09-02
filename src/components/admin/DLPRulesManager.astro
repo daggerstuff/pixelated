@@ -120,19 +120,7 @@ const activityLogs: DLPActivityLog[] = [
   }
 
   // Set up event listeners for relevant actions
-  document.addEventListener('DOMContentLoaded', () => {
-    interface RuleUpdatedDetail {
-      name: string
-      isActive: boolean
-    }
-
-    interface RuleSavedDetail {
-      isEditing: boolean
-    }
-
-    interface DlpErrorDetail {
-      message: string
-    }
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Listen for custom events from the DLP components
     document.addEventListener('dlp:rule-updated', ((e: CustomEvent<unknown>) => {
       window.showDLPAlert(

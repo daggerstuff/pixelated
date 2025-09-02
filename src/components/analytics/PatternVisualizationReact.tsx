@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC } from 'react'
 import type {
   TrendPattern,
   CrossSessionPattern,
@@ -15,55 +15,91 @@ export interface PatternVisualizationProps {
 }
 
 export const PatternVisualization: FC<PatternVisualizationProps> = ({
-  trends = [],
-  crossSessionPatterns = [],
-  riskCorrelations = [],
+  trends,
+  crossSessionPatterns,
+  riskCorrelations,
   className = '',
   showControls = true,
   onPatternSelect
 }) => {
+  const trendsData = trends || []
+  const crossSessionPatternsData = crossSessionPatterns || []
+  const riskCorrelationsData = riskCorrelations || []
+
   return (
     <div className={`pattern-visualization ${className}`}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Trends Section */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-3">Trend Patterns</h3>
-          {trends.length > 0 ? (
+          {trendsData.length > 0 ? (
             <div className="space-y-2">
-              {trends.map((trend: TrendPattern) => (
+              {trendsData.map((trend) => (
                 <button
                   key={trend.id}
                   className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
-              {trends.map((trend: TrendPattern) => (
+                  onClick={() => onPatternSelect?.(trend)}
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      onPatternSelect?.(trend)
                     }
                   }}
                   aria-label={`Select trend pattern: ${trend.description}`}
-              {trends.map((trend: TrendPattern) => (
+                  type="button"
+                >
+                  <div className="font-medium">{trend.description}</div>
+                  <div className="text-sm text-gray-600">
+                    Confidence: {(trend.confidence * 100).toFixed(1)}%
                   </div>
                   <div className="text-xs text-gray-500">
                     {trend.indicators.join(', ')}
-              {trends.map((trend: TrendPattern) => (
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
             <div className="text-gray-500 text-sm">No trends found</div>
           )}
         </div>
-              {trends.map((trend: TrendPattern) => (
+
+        {/* Cross-Session Patterns Section */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-3">Cross-Session Patterns</h3>
+          {crossSessionPatternsData.length > 0 ? (
             <div className="space-y-2">
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+              {crossSessionPatternsData.map((pattern) => (
                 <button
-              {trends.map((trend: TrendPattern) => (
+                  key={pattern.id}
+                  className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
+                  onClick={() => onPatternSelect?.(pattern)}
+                  tabIndex={0}
+                  onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+                      onPatternSelect?.(pattern)
+                    }
+                  }}
+                  aria-label={`Select cross-session pattern: ${pattern.description}`}
+                  type="button"
                 >
-              {trends.map((trend: TrendPattern) => (
+                  <div className="font-medium">{pattern.description}</div>
+                  <div className="text-sm text-gray-600">
+                    Confidence: {(pattern.confidence * 100).toFixed(1)}%
+                  </div>
+                </button>
               ))}
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+            </div>
+          ) : (
+            <div className="text-gray-500 text-sm">No cross-session patterns found</div>
+          )}
+        </div>
 
         {/* Risk Correlations Section */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-3">Risk Correlations</h3>
-          {riskCorrelations.length > 0 ? (
+          {riskCorrelationsData.length > 0 ? (
             <div className="space-y-2">
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
+              {riskCorrelationsData.map((correlation) => (
                 <button
                   key={correlation.id}
                   className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
@@ -74,23 +110,34 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                       onPatternSelect?.(correlation)
                     }
                   }}
-                  aria-label={`Select risk correlation: ${correlation.description}`}
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+                  aria-label={`Select risk correlation: ${correlation.riskFactor}`}
+                  type="button"
+                >
+                  <div className="font-medium">{correlation.riskFactor}</div>
+                  <div className="text-sm text-gray-600">
+                    Confidence: {(correlation.confidence * 100).toFixed(1)}%
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
             <div className="text-gray-500 text-sm">No risk correlations found</div>
           )}
         </div>
       </div>
 
       {showControls && (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+        <div className="mt-4 flex justify-between items-center">
+          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            Export Patterns
+          </button>
+          <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+            Refresh Data
+          </button>
+        </div>
+      )}
+    </div>
   )
 }
 
 export default PatternVisualization
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (

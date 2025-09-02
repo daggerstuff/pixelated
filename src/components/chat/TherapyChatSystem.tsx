@@ -3,7 +3,14 @@ import type { Scenario } from '@/types/scenarios'
 import { clientScenarios } from '@/data/scenarios'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
-import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
+import {
+  useEffect,
+  useState,
+  lazy,
+  Suspense,
+  useCallback,
+  FC,
+} from 'react'
 // Import this component dynamically for code splitting
 const LazyAnalyticsDashboard = lazy(() => import('./LazyAnalyticsDashboard'))
 import { ChatContainer } from './ChatContainer'
