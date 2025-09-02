@@ -1,6 +1,6 @@
 // Custom session input form for bias detection analysis
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, type FC } from 'react'
 import type {
   SessionData,
   Demographics,

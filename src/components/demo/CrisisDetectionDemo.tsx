@@ -115,7 +115,7 @@ export default function CrisisDetectionDemo() {
                      result.assessment.selfHarm.frequency === 'rare' ? 2 : 0
           },
           hopelessness: {
-            present: result.riskFactors.some((rf: unknown) => (rf as { factor: string }).factor.includes('hopelessness')),
+            present: result.riskFactors.some(rf => rf.factor.includes('hopelessness')),
             confidence: 0.7,
             severity: 6
           },
@@ -126,7 +126,7 @@ export default function CrisisDetectionDemo() {
                      result.assessment.agitation.severity === 'moderate' ? 6 : 3
           },
           socialIsolation: {
-            present: result.riskFactors.some((rf: unknown) => (rf as { factor: string }).factor.includes('isolation')),
+            present: result.riskFactors.some(rf => rf.factor.includes('isolation')),
             confidence: 0.6,
             severity: 5
           },
@@ -137,15 +137,14 @@ export default function CrisisDetectionDemo() {
                      result.assessment.substanceUse.impairment === 'moderate' ? 6 : 3
           }
         },
-        protectiveFactors: result.protectiveFactors.map((pf: unknown) => (pf as { factor: string }).factor),
-        immediateActions: result.recommendations.immediate.map((action: unknown) => (action as { action: string }).action),
-        emergencyResources: result.resources.crisis.map((resource: unknown) => {
-          const r = resource as { name: string; contact: string; specialization: string[]; availability: string }
+        protectiveFactors: result.protectiveFactors.map(pf => pf.factor),
+        immediateActions: result.recommendations.immediate.map(action => action.action),
+        emergencyResources: result.resources.crisis.map(resource => {
           return {
-            type: r.name,
-            contact: r.contact,
-            description: r.specialization.join(', '),
-            available: r.availability
+            type: resource.name,
+            contact: resource.contact,
+            description: resource.specialization.join(', '),
+            available: resource.availability
           }
         }),
         confidenceLevel: result.metadata.confidenceScore / 100,
