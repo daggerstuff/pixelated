@@ -105,12 +105,12 @@ export default function EmotionTemporalAnalysisChart({
 
   // Format data for critical points visualization
   const prepareCriticalPointsData = () => {
-    return data?.['criticalPoints']?.map((point) => ({
-      name: point?.['emotion'],
-      intensity: point?.['intensity'],
-      timestamp: point?.['timestamp']?.toLocaleString(),
-      sessionId: point?.['sessionId'],
-      color: getEmotionColor(point?.['emotion']),
+    return data?.criticalPoints?.map((point: any) => ({
+      name: point?.emotion,
+      intensity: point?.intensity,
+      timestamp: point?.timestamp?.toLocaleString(),
+      sessionId: point?.sessionId,
+      color: getEmotionColor(point?.emotion),
     })) || []
   }
 
@@ -124,22 +124,22 @@ export default function EmotionTemporalAnalysisChart({
       {
         name: 'Overall Improvement',
         value: progression?.['overallImprovement'] || 0,
-        fill: (progression?.['overallImprovement'] || 0) >= 0 ? '#22c55e' : '#ef4444',
+        fill: (progression?.['overallImprovement'] ?? 0) >= 0 ? '#22c55e' : '#ef4444',
       },
       {
         name: 'Stability Change',
         value: progression?.['stabilityChange'] || 0,
-        fill: (progression?.['stabilityChange'] || 0) >= 0 ? '#3b82f6' : '#f97316',
+        fill: (progression?.['stabilityChange'] ?? 0) >= 0 ? '#3b82f6' : '#f97316',
       },
       {
         name: 'Positive Emotion Change',
         value: progression?.['positiveEmotionChange'] || 0,
-        fill: (progression?.['positiveEmotionChange'] || 0) >= 0 ? '#4ade80' : '#f59e0b',
+        fill: (progression?.['positiveEmotionChange'] ?? 0) >= 0 ? '#4ade80' : '#f59e0b',
       },
       {
         name: 'Negative Emotion Change',
         value: progression?.['negativeEmotionChange'] || 0,
-        fill: (progression?.['negativeEmotionChange'] || 0) >= 0 ? '#8b5cf6' : '#6366f1',
+        fill: (progression?.['negativeEmotionChange'] ?? 0) >= 0 ? '#8b5cf6' : '#6366f1',
       },
     ]
   }
@@ -147,9 +147,9 @@ export default function EmotionTemporalAnalysisChart({
   // Format data for transitions visualization
   const prepareTransitionsData = () => {
     // Get top 10 most frequent transitions
-    return data?.['transitions']?.slice(0, 10)?.map((transition) => ({
-      name: `${transition?.['from']} → ${transition?.['to']}`,
-      frequency: transition?.['frequency'],
+    return data?.transitions?.slice(0, 10)?.map((transition: any) => ({
+      name: `${transition?.from} → ${transition?.to}`,
+      frequency: transition?.frequency,
       duration: transition.avgDuration / (1000 * 60), // Convert to minutes
       from: transition.from,
       to: transition.to,
@@ -160,8 +160,8 @@ export default function EmotionTemporalAnalysisChart({
 
   // Format data for relationships visualization
   const prepareRelationshipsData = () => {
-    return Array.isArray((data as { dimensionalRelationships?: unknown[] }).dimensionalRelationships)
-      ? ((data as { dimensionalRelationships: unknown[] }).dimensionalRelationships).map((rel) => {
+    return Array.isArray(data.dimensionalRelationships)
+      ? data.dimensionalRelationships.map((rel) => {
           if (
             typeof rel === 'object' &&
             rel !== null &&
@@ -204,12 +204,8 @@ export default function EmotionTemporalAnalysisChart({
   if (
     !data ||
     (Object.keys(data.trendlines || {}).length === 0 &&
-      (Array.isArray((data as { criticalPoints?: unknown[] }).criticalPoints)
-        ? (data as { criticalPoints: unknown[] }).criticalPoints.length
-        : 0) === 0 &&
-      (Array.isArray((data as { transitions?: unknown[] }).transitions)
-        ? (data as { transitions: unknown[] }).transitions.length
-        : 0) === 0)
+      (data.criticalPoints?.length ?? 0) === 0 &&
+      (data.transitions?.length ?? 0) === 0)
   ) {
     return (
       <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
@@ -320,7 +316,7 @@ export default function EmotionTemporalAnalysisChart({
           />
 
           <Legend />
-          {prepareCriticalPointsData().map((point) => (
+          {prepareCriticalPointsData().map((point: any) => (
             <Scatter
               key={`${point.name}-${point.sessionId}-${point.timestamp}`}
               name={point.name}
