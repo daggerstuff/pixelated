@@ -15,6 +15,26 @@ declare module 'astro-icon/components' {
   export { Icon }
 }
 
+// Type declarations for Astro virtual modules
+declare module 'virtual:astro:assets/fonts/internal' {
+  interface PreloadData {
+    url: string
+    type: string
+  }
+
+  interface FontData {
+    preloadData: PreloadData[]
+    css: string
+  }
+
+  interface FontsData {
+    get(cssVariable: import('astro:assets').FontFamily): FontData | undefined
+  }
+
+  const fontsData: FontsData | undefined
+  export { fontsData }
+}
+
 // Ensure Astro recognizes HTML attributes
 declare namespace astroHTML.JSX {
   interface HTMLAttributes {

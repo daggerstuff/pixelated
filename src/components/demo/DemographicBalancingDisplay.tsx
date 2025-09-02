@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, FC } from 'react'
 import type { PatientInfo } from '../../lib/types/psychology-pipeline'
 
 interface DemographicData {
@@ -284,7 +284,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       if (!acc[stat.category]) {
         acc[stat.category] = []
       }
-      acc[stat.category].push(stat)
+      acc[stat.category]!.push(stat)
       return acc
     },
     {} as Record<string, DemographicData[]>,

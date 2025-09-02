@@ -10,7 +10,7 @@ export interface ChatWithMemoryOptions {
 export function useChatWithMemory(options: ChatWithMemoryOptions = {}): void {
   const { initialMessages = [] } = options
   const [isLoading, setIsLoading] = useState(false)
-  
+
   const chat = useChat({ initialMessages })
   const memory = useMemory()
 
@@ -26,7 +26,7 @@ export function useChatWithMemory(options: ChatWithMemoryOptions = {}): void {
 
       // Send message through chat
       const response = await chat.sendMessage(message)
-      
+
       // Store response in memory
       if (response) {
         await memory.addMemory({
