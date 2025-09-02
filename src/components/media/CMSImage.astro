@@ -60,7 +60,7 @@ if (aspectRatioValue) {
 const generateSrcSet = (format: string) => {
   return breakpoints
     .map(
-      (bp) =>
+      (bp: number) =>
         `${src}?w=${bp}&format=${format}&q=${quality}&crop=entropy&fit=max ${bp}w`,
     )
     .join(', ')

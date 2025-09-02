@@ -435,7 +435,7 @@ const {
 </style>
 
 <script define:vars={{ initialTodos, storageKey }} is:inline>
-  document.addEventListener('astro:page-load', (_event: Event) => {
+  document.addEventListener('astro:page-load', (_event) => {
     // DOM elements
     const todoForm = document.getElementById('todo-form')
     const todoInput = document.getElementById('todo-input')
