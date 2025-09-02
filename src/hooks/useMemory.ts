@@ -283,8 +283,13 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   }
 }
 
+interface UseConversationMemoryReturn extends UseMemoryReturn {
+  addMessage: (message: string, role?: 'user' | 'assistant') => Promise<void>;
+  getConversationHistory: () => Promise<MemoryEntry[]>;
+}
+
 // Hook for conversation memory management
-export function useConversationMemory(userId: string, sessionId?: string): void {
+export function useConversationMemory(userId: string, sessionId?: string): UseConversationMemoryReturn {
   const memory = useMemory({
     userId,
     category: 'conversation',
@@ -319,8 +324,14 @@ export function useConversationMemory(userId: string, sessionId?: string): void 
   }
 }
 
+interface UseUserPreferencesReturn extends UseMemoryReturn {
+  setPreference: (key: string, value: unknown) => Promise<void>;
+  getPreference: (key: string) => string | number | boolean | object | null;
+  removePreference: (key: string) => Promise<void>;
+}
+
 // Hook for user preferences memory
-export function useUserPreferences(userId: string): void {
+export function useUserPreferences(userId: string): UseUserPreferencesReturn {
   const memory = useMemory({
     userId,
     category: 'preference',

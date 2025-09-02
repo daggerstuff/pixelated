@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, type FC } from 'react'
 import { ChartWidget } from '@/components/analytics/ChartWidget'
 
 interface ForecastForm {

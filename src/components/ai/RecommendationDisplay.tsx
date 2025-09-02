@@ -1,4 +1,4 @@
-import React from 'react'
+import type { FC } from 'react'
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 
 interface RecommendationDisplayProps {
@@ -105,7 +105,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
         Treatment Recommendations ({recommendations.length})
       </h2>
       
-      {recommendations.map((baseRec) => {
+      {recommendations.map((baseRec: TreatmentRecommendation) => {
         // Cast to extended type to handle additional properties
         const rec = baseRec as ExtendedTreatmentRecommendation;
         
