@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import React from 'react'
 
 // Extracted to a separate constants file for better maintainability
 export const TREND_CONFIGS = {

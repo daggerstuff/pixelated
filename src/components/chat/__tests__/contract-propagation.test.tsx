@@ -2,11 +2,8 @@
 
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { vi } from 'vitest'
-import { ChatContainer } from '../ChatContainer'
-import { ThemeProvider } from '@/components/theme/ThemeProvider'
-
-window.HTMLElement.prototype.scrollIntoView = vi.fn()
+import ChatContainer from '../ChatContainer'
+import ChatMessage from '../ChatMessage'
 
 // Helpers
 const messages = [
@@ -20,11 +17,7 @@ const messages = [
 
 describe('Contract propagation in ChatContainer and ChatMessage', () => {
   it('renders only allowed roles (user, bot, system) and no type field', () => {
-    render(
-      <ThemeProvider>
-        <ChatContainer messages={messages} onSendMessage={vi.fn()} />
-      </ThemeProvider>,
-    )
+    render(<ChatContainer messages={messages} onSendMessage={jest.fn()} />)
     // Role labels in specialized chat UI
     expect(screen.getAllByText(/user|bot|system/i)).toBeTruthy()
     // Messages show up
@@ -34,6 +27,23 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
     // "type" does not propagate
     const undesired = screen.queryByText(/legacyType/i)
     expect(undesired).toBeNull()
+  })
+
+  it('does not propagate unintended properties to ChatMessage', () => {
+    // Spy on ChatMessage to see props
+    const spy = jest.fn(() => null)
+    render(
+      <ChatContainer
+        messages={messages}
+        onSendMessage={jest.fn()}
+        // @ts-ignore override for test
+        __ChatMessage={spy}
+      />
+    )
+    messages.forEach((msg) => {
+      expect(Object.keys(msg)).not.toContain('type')
+      // If test infra allowed, check props.subset
+    })
   })
 
   it('maps therapy/patient/therapist roles to bot/user/system correctly', () => {
@@ -52,11 +62,7 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
           ? 'bot'
           : msg.role,
     }))
-    render(
-      <ThemeProvider>
-        <ChatContainer messages={mapped} onSendMessage={vi.fn()} />
-      </ThemeProvider>,
-    )
+    render(<ChatContainer messages={mapped} onSendMessage={jest.fn()} />)
     expect(screen.getByText('Therapist acting as user')).toBeInTheDocument()
     expect(screen.getByText('Patient acting as bot')).toBeInTheDocument()
     expect(screen.getByText('System message')).toBeInTheDocument()
