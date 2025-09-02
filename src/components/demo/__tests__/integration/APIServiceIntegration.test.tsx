@@ -404,7 +404,6 @@ describe('API Service Integration Tests', () => {
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})
       const data = await response.json()
-
       expect(mockFetch).toHaveBeenCalledTimes(3)
       expect(data.success).toBe(true)
     })
