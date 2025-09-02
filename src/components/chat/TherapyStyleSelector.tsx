@@ -82,7 +82,7 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
         <div className="style-techniques">
           <h4>Techniques Used:</h4>
           <ul>
-            {currentStyle.techniquesUsed.map((technique) => (
+            {currentStyle.techniques.map((technique: string) => (
               <li key={technique}>{technique}</li>
             ))}
           </ul>
