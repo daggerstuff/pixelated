@@ -1232,6 +1232,76 @@
 					"AQAAAAAAAAABAAAAGAMAAAAAAAAYAwAAAAAAAAAAAAAAAPC/"
 				]
 			]
+		},
+		{
+			"file": "/home/vivi/.claude-code-router/config.json",
+			"settings":
+			{
+				"buffer_size": 1343,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					6,
+					1,
+					"",
+					null,
+					"AQAAAEUAAAAAAAAAXwAAAAAAAAAlAAAAaHR0cHM6Ly9nb2F0LnBpeGVsYXRlZGVtcGF0aHkudGVjaC92MQ",
+					"AQAAAAAAAAABAAAARQAAAAAAAABqAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					7,
+					1,
+					"insert",
+					{
+						"characters": "v1"
+					},
+					"AgAAAF8AAAAAAAAAYAAAAAAAAAAAAAAAYAAAAAAAAABhAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAXwAAAAAAAABfAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					13,
+					1,
+					"",
+					null,
+					"AQAAABQDAAAAAAAALgMAAAAAAAAjAAAAaHR0cHM6Ly9nb2F0LnBpeGVsYXRlZGVtcGF0aHkudGVjaC8",
+					"AQAAAAAAAAABAAAAFAMAAAAAAAA3AwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					21,
+					1,
+					"",
+					null,
+					"AgAAANQDAAAAAAAA+QMAAAAAAAAAAAAA+QMAAAAAAAD5AwAAAAAAABgAAABhbGliYXlyYW0vc21vbGxtMzpsYXRlc3Q",
+					"AQAAAAAAAAABAAAA1AMAAAAAAADsAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					25,
+					1,
+					"",
+					null,
+					"AQAAANAEAAAAAAAA9QQAAAAAAAAXAAAAbGliYXlyYW0vc21vbGxtMzpsYXRlc3Q",
+					"AQAAAAAAAAABAAAA0AQAAAAAAADnBAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					29,
+					1,
+					"left_delete",
+					null,
+					"AQAAAM8EAAAAAAAAzwQAAAAAAAABAAAAYQ",
+					"AQAAAAAAAAABAAAA0AQAAAAAAADQBAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					33,
+					1,
+					"",
+					null,
+					"AQAAABIFAAAAAAAANwUAAAAAAAA2AAAAaGYuY28vdW5zbG90aC9Rd2VuMy1Db2Rlci0zMEItQTNCLUluc3RydWN0LUdHVUY6UTRfS19N",
+					"AQAAAAAAAAABAAAAEgUAAAAAAABIBQAAAAAAAAAAAAAAAPC/"
+				]
+			]
 		}
 	],
 	"build_system": "",
@@ -1516,6 +1586,38 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/home/vivi/.claude-code-router/config.json",
+					"selected": true,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1343,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1335,
+								1335
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JSON/JSON.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 204.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
