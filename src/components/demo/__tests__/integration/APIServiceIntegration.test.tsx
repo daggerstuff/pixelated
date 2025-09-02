@@ -625,7 +625,6 @@ describe('API Service Integration Tests', () => {
         }
         throw new Error('All retries failed');
       const data = await response.json()
-
       expect(mockFetch).toHaveBeenCalledTimes(3)
       expect(data.success).toBe(true)
     })
