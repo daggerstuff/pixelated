@@ -135,7 +135,11 @@ const activityLogs: DLPActivityLog[] = [
     }
 
     // Listen for custom events from the DLP components
+<<<<<<< HEAD
     document.addEventListener('dlp:rule-updated', ((e: CustomEvent<RuleUpdatedDetail>) => {
+=======
+    document.addEventListener('dlp:rule-updated', ((e: CustomEvent<any>) => {
+>>>>>>> f7980be7 (Fix Numerous TypeScript Errors and Test Failures)
       window.showDLPAlert(
         'success',
         `Rule "${e.detail.name}" ${e.detail.isActive ? 'enabled' : 'disabled'}`,
@@ -150,14 +154,22 @@ const activityLogs: DLPActivityLog[] = [
       }
     })
 
+<<<<<<< HEAD
     document.addEventListener('dlp:rule-saved', ((e: CustomEvent<RuleSavedDetail>) => {
+=======
+    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<any>) => {
+>>>>>>> f7980be7 (Fix Numerous TypeScript Errors and Test Failures)
       window.showDLPAlert(
         'success',
         `Rule ${e.detail.isEditing ? 'updated' : 'added'} successfully`,
       )
     }) as EventListener)
 
+<<<<<<< HEAD
     document.addEventListener('dlp:error', ((e: CustomEvent<DlpErrorDetail>) => {
+=======
+    document.addEventListener('dlp:error', ((e: CustomEvent<any>) => {
+>>>>>>> f7980be7 (Fix Numerous TypeScript Errors and Test Failures)
       window.showDLPAlert('error', e.detail.message)
     }) as EventListener)
   })

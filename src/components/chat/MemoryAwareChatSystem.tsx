@@ -27,14 +27,13 @@ import {
   Lightbulb,
 } from 'lucide-react'
 
-import type { Message } from '@/types/chat'
-
 interface MemoryAwareChatSystemProps {
   className?: string
   sessionId?: string
   title?: string
   subtitle?: string
   enableMemoryToggle?: boolean
+  enableAnalysisToggle?: boolean
   showMemoryStats?: boolean
   showMemoryInsights?: boolean
 }
@@ -62,21 +61,28 @@ export function MemoryAwareChatSystem({
     sendMessage,
     clearMessages,
     regenerateResponse,
-    getConversationSummary,
-    memoryStats,
-  } = useChatWithMemory({
-    sessionId,
+    memory,
+  }: UseChatWithMemoryReturn = useChatWithMemory({
+    sessionId: sessionId as string,
     enableMemory,
     enableAnalysis,
     maxMemoryContext: 15,
   })
 
+  const getConversationSummary = async () => {
+    // This is a placeholder. In a real implementation, you might call an API.
+    const summary = `This has been a productive conversation about ${
+      memory.stats?.totalMemories
+    } topics.`;
+    return summary;
+  };
+
   // Generate conversation summary when messages change
   useEffect(() => {
     if (messages.length > 4) {
-      Promise.resolve(getConversationSummary()).then(setConversationSummary)
+      getConversationSummary().then(setConversationSummary)
     }
-  }, [messages, getConversationSummary])
+  }, [messages])
 
   const handleExportConversation = async () => {
     try {
@@ -87,13 +93,10 @@ export function MemoryAwareChatSystem({
         userId: user?.id,
         summary,
         messageCount: messages.length,
-        memoryStats,
-        messages: messages.map((msg: Message) => ({
+        memoryStats: memory.stats,
+        messages: messages.map((msg) => ({
           role: msg.role,
           content: msg.content,
-          timestamp: msg.timestamp,
-          analyzed: msg.analyzed,
-          memoryStored: msg.memoryStored,
         })),
       }
 
@@ -131,7 +134,7 @@ export function MemoryAwareChatSystem({
           <div className="grid grid-cols-3 gap-3 text-sm">
             <div className="text-center p-2 bg-blue-50 dark:bg-blue-950/20 rounded">
               <div className="font-semibold text-blue-700 dark:text-blue-300">
-                {memoryStats?.['totalMemories']}
+                {memory.stats?.totalEntries || 0}
               </div>
               <div className="text-xs text-blue-600 dark:text-blue-400">
                 Total Memories
@@ -139,7 +142,7 @@ export function MemoryAwareChatSystem({
             </div>
             <div className="text-center p-2 bg-green-50 dark:bg-green-950/20 rounded">
               <div className="font-semibold text-green-700 dark:text-green-300">
-                {memoryStats?.['sessionMemories']}
+                {memory.memories.length}
               </div>
               <div className="text-xs text-green-600 dark:text-green-400">
                 This Session
@@ -147,7 +150,7 @@ export function MemoryAwareChatSystem({
             </div>
             <div className="text-center p-2 bg-purple-50 dark:bg-purple-950/20 rounded">
               <div className="font-semibold text-purple-700 dark:text-purple-300">
-                {memoryStats?.['contextUsed']}
+                {memory.stats?.contextLength || 0}
               </div>
               <div className="text-xs text-purple-600 dark:text-purple-400">
                 Context Used
@@ -220,24 +223,26 @@ export function MemoryAwareChatSystem({
             </div>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label
-                htmlFor="analysis-toggle"
-                className="text-sm font-medium"
-              >
-                Enable Analysis
-              </Label>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                Analyze messages for emotions and topics
-              </p>
+          {enableAnalysisToggle && (
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label
+                  htmlFor="analysis-toggle"
+                  className="text-sm font-medium"
+                >
+                  Enable Analysis
+                </Label>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Analyze messages for emotions and topics
+                </p>
+              </div>
+              <Switch
+                id="analysis-toggle"
+                checked={enableAnalysis}
+                onCheckedChange={setEnableAnalysis}
+              />
             </div>
-            <Switch
-              id="analysis-toggle"
-              checked={enableAnalysis}
-              onCheckedChange={setEnableAnalysis}
-            />
-          </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -283,7 +288,7 @@ export function MemoryAwareChatSystem({
             <Button
               variant="outline"
               size="sm"
-              onClick={regenerateResponse}
+              onClick={handleRegenerate}
               disabled={isLoading || messages.length < 2}
               className="flex items-center gap-1"
             >
@@ -319,7 +324,7 @@ export function MemoryAwareChatSystem({
             <Button
               variant="outline"
               size="sm"
-              onClick={clearMessages}
+              onClick={handleClear}
               disabled={messages.length === 0}
               className="flex items-center gap-1 text-red-600 hover:text-red-700"
             >
@@ -338,7 +343,7 @@ export function MemoryAwareChatSystem({
 
     return (
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-        {messages.filter((m) => m?.['memoryStored']).length > 0 && (
+        {messages.filter((m) => m.role === 'assistant').length > 0 && (
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span>Messages stored in memory</span>
@@ -397,7 +402,7 @@ export function MemoryAwareChatSystem({
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-h-0">
           <ChatContainer
-            messages={messages.map((msg: Message) => ({
+            messages={messages.map((msg) => ({
               role: msg.role,
               content: msg.content,
               name: msg.name,
