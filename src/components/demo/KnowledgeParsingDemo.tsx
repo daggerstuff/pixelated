@@ -212,7 +212,21 @@ export default function KnowledgeParsingDemo() {
     const savedHistory = localStorage.getItem('knowledgeParsingHistory')
     if (savedHistory) {
       try {
-        setAnalysisHistory(JSON.parse(savedHistory) as AnalysisHistory[])
+        const parsed = JSON.parse(savedHistory)
+        // Basic validation: check if parsed is an array and items have required keys
+        const isValidAnalysisHistoryArray = Array.isArray(parsed) && parsed.every(
+          (item) =>
+            item &&
+            typeof item === 'object' &&
+            'id' in item &&
+            'timestamp' in item &&
+            'result' in item
+        )
+        if (isValidAnalysisHistoryArray) {
+          setAnalysisHistory(parsed as AnalysisHistory[])
+        } else {
+          console.warn('Invalid analysis history structure in localStorage')
+        }
       } catch (e) {
         console.warn('Failed to load analysis history:', e)
       }
