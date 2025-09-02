@@ -1,6 +1,6 @@
-import { useState, useCallback, ChangeEvent } from 'react'
-import { useChat, UseChatReturn } from './useChat'
-import { useMemory, UseMemoryReturn } from './useMemory'
+import { useState, useCallback } from 'react'
+import { useChat } from './useChat'
+import { useMemory } from './useMemory'
 
 export interface ChatWithMemoryOptions {
   initialMessages?: Array<{ role: 'user' | 'assistant'; content: string }>
@@ -35,9 +35,12 @@ export function useChatWithMemory(options: ChatWithMemoryOptions = {}): void {
           metadata: { timestamp: new Date().toISOString() }
         })
       }
-    },
-    [chat, memory, options.enableMemory, sessionId],
-  )
+
+      return response
+    } finally {
+      setIsLoading(false)
+    }
+  }, [chat, memory])
 
       return response
     } finally {

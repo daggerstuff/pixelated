@@ -185,7 +185,7 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
             </CardContent>
           </Card>
         ) : (
-          backups.map((backup: Backup) => (
+          backups.map((backup) => (
             <Card
               key={backup.id}
               className={

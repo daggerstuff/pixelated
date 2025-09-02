@@ -144,22 +144,15 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
   }
 </style>
 
-<script>
+<script is:inline>
   // Wait for client-side hydration
-  document.addEventListener('astro:page-load', (_event: Event) => {
-    const todoInput = document.getElementById('todo-input') as HTMLInputElement
+  document.addEventListener('astro:page-load', (_event) => {
+    const todoInput = document.getElementById('todo-input')
     const addButton = document.getElementById('add-todo-btn')
     const todoList = document.getElementById('todo-list')
 
-    // Define TodoItem interface for client-side code
-    interface TodoItem {
-      id: string
-      text: string
-      completed: boolean
-    }
-
     // Load todos from localStorage
-    const loadTodos = (): TodoItem[] => {
+    const loadTodos = () => {
       try {
         const savedTodos = localStorage.getItem('todos')
         return savedTodos ? JSON.parse(savedTodos) : []
@@ -170,7 +163,7 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     }
 
     // Save todos to localStorage
-    const saveTodos = (todos: TodoItem[]): void => {
+    const saveTodos = (todos) => {
       try {
         localStorage.setItem('todos', JSON.stringify(todos))
       } catch (err) {
@@ -179,16 +172,16 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     }
 
     // Generate a unique ID for each todo
-    const generateId = (): string => {
+    const generateId = () => {
       return Date.now().toString(36) + Math.random().toString(36).substring(2)
     }
 
     // Add a new todo
-    const addTodo = (): void => {
+    const addTodo = () => {
       const text = todoInput.value.trim()
       if (!text) return
 
-      const newTodo: TodoItem = {
+      const newTodo = {
         id: generateId(),
         text,
         completed: false,
@@ -209,7 +202,7 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     }
 
     // Create a todo list item element
-    const createTodoElement = (todo: TodoItem): HTMLLIElement => {
+    const createTodoElement = (todo) => {
       const li = document.createElement('li')
       li.className = `todo-item ${todo.completed ? 'completed' : ''}`
       li.dataset['id'] = todo.id
@@ -224,12 +217,12 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
       const completeBtn = document.createElement('button')
       completeBtn.className = 'todo-button complete-button'
       completeBtn.textContent = todo.completed ? '↩️' : '✓'
-      completeBtn.addEventListener('click', (_event: Event) => toggleTodoComplete(todo.id))
+      completeBtn.addEventListener('click', (_event) => toggleTodoComplete(todo.id))
 
       const deleteBtn = document.createElement('button')
       deleteBtn.className = 'todo-button delete-button'
       deleteBtn.textContent = '×'
-      deleteBtn.addEventListener('click', (_event: Event) => deleteTodo(todo.id))
+      deleteBtn.addEventListener('click', (_event) => deleteTodo(todo.id))
 
       actionsDiv.appendChild(completeBtn)
       actionsDiv.appendChild(deleteBtn)
@@ -241,9 +234,9 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     }
 
     // Toggle todo completion status
-    const toggleTodoComplete = (id: string): void => {
+    const toggleTodoComplete = (id) => {
       const todos = loadTodos()
-      const todoIndex = todos.findIndex((t: TodoItem) => t.id === id)
+      const todoIndex = todos.findIndex((t) => t.id === id)
 
       if (todoIndex !== -1 && todos[todoIndex]) {
         todos[todoIndex].completed = !todos[todoIndex].completed
@@ -262,9 +255,9 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     }
 
     // Delete a todo
-    const deleteTodo = (id: string): void => {
+    const deleteTodo = (id) => {
       const todos = loadTodos()
-      const filteredTodos = todos.filter((t: TodoItem) => t.id !== id)
+      const filteredTodos = todos.filter((t) => t.id !== id)
       saveTodos(filteredTodos)
 
       // Update UI
@@ -278,12 +271,12 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     }
 
     // Initial render of saved todos
-    const renderSavedTodos = (): void => {
+    const renderSavedTodos = () => {
       const todos = loadTodos()
       if (todoList) {
         todoList.innerHTML = '' // Clear any existing todos
 
-        todos.forEach((todo: TodoItem) => {
+        todos.forEach((todo) => {
           const li = createTodoElement(todo)
           todoList.appendChild(li)
         })
@@ -293,13 +286,4 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     // Event listeners
     addButton?.addEventListener('click', addTodo)
 
-    todoInput?.addEventListener('keydown', (e: Event) => {
-      if (e.key === 'Enter') {
-        addTodo()
-      }
-    })
-
-    // Initialize
-    renderSavedTodos()
-  })
-</script>
+    todoInput?.addEventListener('keydown', (e) => {

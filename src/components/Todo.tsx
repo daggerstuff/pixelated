@@ -20,35 +20,7 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     const loadTodos = () => {
       try {
         const savedTodos = localStorage.getItem('todos')
-        return savedTodos ? JSON.parse(savedTodos) as unknown : initialTodos
-      } catch (err: unknown) {
-        console.error('Error loading todos:', err)
-        return initialTodos
-      }
-    }
-
-    setTodos(loadTodos())
-  }, [initialTodos])
-
-  // Save todos to localStorage whenever they change
-  useEffect(() => {
-    try {
-      localStorage.setItem('todos', JSON.stringify(todos))
-    } catch (err: unknown) {
-      console.error('Error saving todos:', err)
-    }
-  }, [todos])
-
-  // Generate a unique ID for each todo
-  const generateId = () => {
-    return Date.now().toString(36) + Math.random().toString(36).substring(2)
-  }
-
-  // Add a new todo
-  const addTodo = () => {
-    const text = inputValue.trim()
-    if (!text) {
-      return
+        return savedTodos ? JSON.parse(savedTodos) as TodoItem[] : initialTodos
     }
 
     const newTodo = {
