@@ -1,4 +1,32 @@
-import { useState, useRef, useEffect, type FC } from 'react';
+import { useState, useRef, useEffect, FC } from 'react';
+import { createPixelatedEmpathyAgent, type TherapeuticScenario, type BiasAnalysis, type AgentResponse } from '../lib/ai/PixelatedEmpathyAgent';
+
+type AgentContext = 'scenario_generation' | 'bias_detection' | 'training_recommendation' | 'general';
+
+interface Message {
+  id: string;
+  content: string;
+  role: 'user' | 'agent';
+  timestamp: Date;
+  context?: string;
+}
+
+interface AgentChatProps {
+  className?: string;
+  initialContext?: AgentContext;
+  onScenarioGenerated?: (scenario: TherapeuticScenario) => void;
+  onBiasAnalysis?: (analysis: BiasAnalysis) => void;
+}
+
+export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
+  className = '',
+  initialContext = 'general',
+  onScenarioGenerated,
+  onBiasAnalysis
+}) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [context, setContext] = useState(initialContext);
   const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
