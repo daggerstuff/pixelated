@@ -63,17 +63,26 @@
         const [nx, ny] = polar2cart(x, y, length, rad)
         ctx.beginPath()
         ctx.moveTo(x, y)
-        ctx.lineTo(nx, ny)
+        if (nx !== undefined && ny !== undefined) {
+          ctx.lineTo(nx, ny)
+        }
         ctx.stroke()
         counter.value += 1
 
         // out of bounds then return
-        if (nx < -100 || nx > width + 100 || ny < -100 || ny > height + 100)
+        if (
+          nx === undefined ||
+          ny === undefined ||
+          nx < -100 ||
+          nx > width + 100 ||
+          ny < -100 ||
+          ny > height + 100
+        )
           return
 
         // otherwise continue drawring
-        const rad1: number = rad + (random() * R15)
-        const rad2: number = rad - (random() * R15)
+        const rad1: number = rad + random() * R15
+        const rad2: number = rad - random() * R15
         const rate = counter.value <= THRESHOLD ? 0.8 : 0.5
         // left branch
         if (random() < rate)

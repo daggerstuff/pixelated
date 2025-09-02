@@ -339,7 +339,7 @@ describe('API Service Integration Tests', () => {
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
+      global.WebSocket = vi.fn(() => mockWebSocket) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -358,7 +358,7 @@ describe('API Service Integration Tests', () => {
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
+      global.WebSocket = vi.fn(() => mockWebSocket) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -385,10 +385,14 @@ describe('API Service Integration Tests', () => {
           json: () => Promise.resolve({ success: true }),
         })
 
-      const retryFetch = async (url: string, options: any, maxRetries = 3) => {
+      const retryFetch = async (url: string, options: any, maxRetries = 3): Promise<Response> => {
         for (let i = 0; i < maxRetries; i++) {
           try {
-            return await fetch(url, options)
+            const response = await fetch(url, options);
+            if (!response.ok && i < maxRetries - 1) {
+              throw new Error(`Attempt ${i + 1} failed`);
+            }
+            return response;
           } catch (error: unknown) {
             if (i === maxRetries - 1) {
               throw error
@@ -398,6 +402,7 @@ describe('API Service Integration Tests', () => {
             )
           }
         }
+        throw new Error('All retries failed');
       }
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})

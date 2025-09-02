@@ -122,8 +122,13 @@ class MongoDB {
       if (!this.db) {
         await this.connect()
       }
-  await this.db!.admin().ping()
-      return true
+      // After connect(), this.db should be non-null.
+      // We perform an explicit check to satisfy TypeScript's strict null checks.
+      if (this.db) {
+        await this.db.admin().ping()
+        return true
+      }
+      return false
     } catch (error: unknown) {
       console.error('MongoDB health check failed:', error)
       return false

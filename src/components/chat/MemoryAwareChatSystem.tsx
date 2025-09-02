@@ -27,13 +27,14 @@ import {
   Lightbulb,
 } from 'lucide-react'
 
+import type { Message } from '@/types/chat'
+
 interface MemoryAwareChatSystemProps {
   className?: string
   sessionId?: string
   title?: string
   subtitle?: string
   enableMemoryToggle?: boolean
-  enableAnalysisToggle?: boolean
   showMemoryStats?: boolean
   showMemoryInsights?: boolean
 }
@@ -43,7 +44,6 @@ export function MemoryAwareChatSystem({
   sessionId,
   title = 'AI Assistant with Memory',
   subtitle = 'Chat with an AI that learns and remembers your conversations',
-  // _placeholder is intentionally unused to suppress lint warning
   enableMemoryToggle = true,
   showMemoryStats = true,
   showMemoryInsights = true,
@@ -54,13 +54,6 @@ export function MemoryAwareChatSystem({
   const [showSettings, setShowSettings] = useState(false)
   const [conversationSummary, setConversationSummary] = useState<string>('')
 
-  const chatHook = useChatWithMemory({
-    sessionId: sessionId as string,
-    enableMemory,
-    enableAnalysis,
-    maxMemoryContext: 15,
-  })
-  
   const {
     messages,
     isLoading,
@@ -70,21 +63,17 @@ export function MemoryAwareChatSystem({
     regenerateResponse,
     getConversationSummary,
     memoryStats,
-  } = {
-    messages: chatHook?.['messages'] || [],
-    isLoading: chatHook?.['isLoading'] || false,
-    error: (chatHook as { error?: string })?.error,
-    sendMessage: chatHook?.['sendMessage'] || (() => Promise.resolve()),
-    clearMessages: (chatHook as { clearMessages?: () => void })?.clearMessages || (() => {}),
-    regenerateResponse: (chatHook as { regenerateResponse?: () => void })?.regenerateResponse || (() => {}),
-    getConversationSummary: (chatHook as { getConversationSummary?: () => Promise<string> })?.getConversationSummary || (() => ''),
-    memoryStats: (chatHook as { memoryStats?: object })?.memoryStats || {},
-  }
+  } = useChatWithMemory({
+    sessionId,
+    enableMemory,
+    enableAnalysis,
+    maxMemoryContext: 15,
+  })
 
   // Generate conversation summary when messages change
   useEffect(() => {
     if (messages.length > 4) {
-      getConversationSummary().then(setConversationSummary)
+      Promise.resolve(getConversationSummary()).then(setConversationSummary)
     }
   }, [messages, getConversationSummary])
 
@@ -94,16 +83,16 @@ export function MemoryAwareChatSystem({
       const exportData = {
         timestamp: new Date().toISOString(),
         sessionId,
-        userId: user?.['id'],
+        userId: user?.id,
         summary,
         messageCount: messages.length,
         memoryStats,
-        messages: messages.map((msg) => ({
-          role: msg['role'],
-          content: msg['content'],
-          timestamp: msg['timestamp'],
-          analyzed: msg['analyzed'],
-          memoryStored: msg['memoryStored'],
+        messages: messages.map((msg: Message) => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          analyzed: msg.analyzed,
+          memoryStored: msg.memoryStored,
         })),
       }
 
@@ -230,26 +219,24 @@ export function MemoryAwareChatSystem({
             </div>
           )}
 
-          {enableAnalysisToggle && (
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label
-                  htmlFor="analysis-toggle"
-                  className="text-sm font-medium"
-                >
-                  Enable Analysis
-                </Label>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Analyze messages for emotions and topics
-                </p>
-              </div>
-              <Switch
-                id="analysis-toggle"
-                checked={enableAnalysis}
-                onCheckedChange={setEnableAnalysis}
-              />
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label
+                htmlFor="analysis-toggle"
+                className="text-sm font-medium"
+              >
+                Enable Analysis
+              </Label>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Analyze messages for emotions and topics
+              </p>
             </div>
-          )}
+            <Switch
+              id="analysis-toggle"
+              checked={enableAnalysis}
+              onCheckedChange={setEnableAnalysis}
+            />
+          </div>
         </CardContent>
       </Card>
     )
@@ -396,7 +383,7 @@ export function MemoryAwareChatSystem({
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-h-0">
           <ChatContainer
-            messages={messages.map((msg) => ({
+            messages={messages.map((msg: Message) => ({
               role: msg.role,
               content: msg.content,
               name: msg.name,

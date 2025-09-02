@@ -1,6 +1,6 @@
 // Export controls component for bias detection analysis data
 
-import React, { useState } from 'react'
+import { useState, type FC } from 'react'
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,

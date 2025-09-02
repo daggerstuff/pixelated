@@ -101,9 +101,13 @@ class ConsoleLogger implements Logger {
         console.error(formattedMessage)
         break
       case LogLevel.WARN:
-      case LogLevel.INFO:
-      case LogLevel.DEBUG:
         console.warn(formattedMessage)
+        break
+      case LogLevel.INFO:
+        console.info(formattedMessage)
+        break
+      case LogLevel.DEBUG:
+        console.debug(formattedMessage)
         break
     }
   }

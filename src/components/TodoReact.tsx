@@ -17,10 +17,10 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
 
   // Load todos from localStorage on component mount
   useEffect(() => {
-    const loadTodos = () => {
+    const loadTodos = (): TodoItem[] => {
       try {
         const savedTodos = localStorage.getItem('todos')
-        return savedTodos ? JSON.parse(savedTodos) as unknown : initialTodos
+        return savedTodos ? JSON.parse(savedTodos) as TodoItem[] : initialTodos
       } catch (err: unknown) {
         console.error('Error loading todos:', err)
         return initialTodos
