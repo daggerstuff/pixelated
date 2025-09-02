@@ -623,9 +623,7 @@ describe('API Service Integration Tests', () => {
       }
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})
-      if (!response) throw new Error('Response is undefined')
       const data = await response.json()
-
       expect(mockFetch).toHaveBeenCalledTimes(3)
       expect(data.success).toBe(true)
     })
