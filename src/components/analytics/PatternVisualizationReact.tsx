@@ -1,4 +1,28 @@
 import type { FC } from 'react';
+import type {
+  TrendPattern,
+  CrossSessionPattern,
+  RiskCorrelation,
+} from '@/lib/fhe/pattern-recognition'
+
+export interface PatternVisualizationProps {
+  trends?: TrendPattern[]
+  crossSessionPatterns?: CrossSessionPattern[]
+  riskCorrelations?: RiskCorrelation[]
+  className?: string
+  showControls?: boolean
+  onPatternSelect?: (pattern: TrendPattern | CrossSessionPattern | RiskCorrelation) => void
+}
+
+export const PatternVisualization: FC<PatternVisualizationProps> = ({
+  trends = [],
+  crossSessionPatterns = [],
+  riskCorrelations = [],
+  className = '',
+  showControls = true,
+  onPatternSelect
+}) => {
+  return (
     <div className={`pattern-visualization ${className}`}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Trends Section */}
@@ -40,7 +64,11 @@ import type { FC } from 'react';
           {riskCorrelations.length > 0 ? (
             <div className="space-y-2">
               {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+                <button
+                  key={correlation.id}
+                  className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
+                  onClick={() => onPatternSelect?.(correlation)}
+                  tabIndex={0}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       onPatternSelect?.(correlation)

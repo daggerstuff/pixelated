@@ -1,5 +1,25 @@
 import { useState } from 'react'
 import type { FC } from 'react'
+import { ChartWidget } from '@/components/analytics/ChartWidget'
+
+interface ForecastForm {
+  sessionId: string
+  clientId: string
+  therapistId: string
+  startTime: string
+  status: string
+  securityLevel: string
+  emotionAnalysisEnabled: boolean
+  desiredOutcomes: string
+}
+
+interface ForecastResult {
+  technique: string
+  score: number
+  rationale: string
+}
+
+const initialForm: ForecastForm = {
   sessionId: '',
   clientId: '',
   therapistId: '',
