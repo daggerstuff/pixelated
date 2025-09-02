@@ -8,7 +8,7 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from './audit'
-import { mongoAuthService } from './lib/db/mongoClient'
+import { mongoAuthService } from './supabase'
 // Note: This is an Astro project, Next.js types are not needed here
 // TODO: Replace with Astro-compatible types when implementing API auth
 
