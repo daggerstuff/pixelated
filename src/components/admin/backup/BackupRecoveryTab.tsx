@@ -110,7 +110,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
     TestEnvironmentType.Sandbox,
   );
 
-  const selectedBackup = backups.find((b) => b.id === selectedBackupId);
+  const selectedBackup = backups.find((b: Backup) => b.id === selectedBackupId);
 
   const handleRunTest = async () => {
     if (!selectedBackup) {
@@ -168,7 +168,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
   };
 
   const availableBackups = backups.filter(
-    (b) => b.status === 'completed' || b.status === 'verified',
+    (b: Backup) => b.status === 'completed' || b.status === 'verified',
   );
 
   return (
@@ -198,7 +198,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableBackups.map((backup) => (
+                  {availableBackups.map((backup: Backup) => (
                     <SelectItem key={backup.id} value={backup.id}>
                       {new Date(backup.timestamp).toLocaleString()} -{' '}
                       {backup.type}
@@ -301,7 +301,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             ) : (
               <div className="divide-y">
                 {recoveryHistory.map((test) => {
-                  const backup = backups.find((b) => b.id === test.backupId);
+                  const backup = backups.find((b: Backup) => b.id === test.backupId);
 
                   return (
                     <div key={test.id}>

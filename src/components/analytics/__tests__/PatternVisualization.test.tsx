@@ -10,22 +10,23 @@ const mockTrends: TrendPattern[] = [
   {
     id: 'trend1',
     type: 'anxiety',
-    startDate: new Date('2023-01-01'),
-    endDate: new Date('2023-01-31'),
-    significance: 0.75,
-    confidence: 0.8,
     description: 'Increasing anxiety levels',
+    confidence: 0.8,
     indicators: ['stress', 'work'],
+    startDate: new Date('2023-01-01T00:00:00.000Z'),
+    endDate: new Date('2023-01-31T00:00:00.000Z'),
+    significance: 5,
   },
 ]
 
 const mockCrossSessionPatterns: CrossSessionPattern[] = [
   {
-    id: 'pattern1',
+    id: 'csp1',
     type: 'avoidance',
-    sessions: ['session1', 'session2'],
-    description: 'Topic avoidance',
+    description: 'Avoidance of trauma-related topics',
     confidence: 0.7,
+    sessions: ['session1', 'session2'],
+    significance: 7,
   },
 ]
 
@@ -33,54 +34,47 @@ const mockRiskCorrelations: RiskCorrelation[] = [
   {
     id: 'risk1',
     riskFactor: 'sleep disruption',
-    correlatedFactors: [
-      { factor: 'anxiety', strength: 0.8 },
-      { factor: 'irritability', strength: 0.6 },
-    ],
+    description: 'Correlated with anxiety and irritability',
     confidence: 0.9,
+    severityScore: 8,
+    correlatedFactors: [
+      { factor: 'anxiety', strength: 0.6 },
+      { factor: 'irritability', strength: 0.4 },
+    ],
     significance: 'high',
-    severityScore: 0.85,
-    description: 'Immediate action recommended',
   },
 ]
 
 describe('PatternVisualization', () => {
-  it('renders correctly with no data', () => {
-    render(
-      <PatternVisualization
-        trends={[]}
-        crossSessionPatterns={[]}
-        riskCorrelations={[]}
-      />,
-    )
-
-    expect(screen.getByText('Trend Patterns')).toBeInTheDocument()
-    expect(screen.getByText('No trends found')).toBeInTheDocument()
-    expect(screen.getByText('Cross-Session Patterns')).toBeInTheDocument()
-    expect(screen.getByText('No cross-session patterns found')).toBeInTheDocument()
-    expect(screen.getByText('Risk Correlations')).toBeInTheDocument()
-    expect(screen.getByText('No risk correlations found')).toBeInTheDocument()
-  })
-
-  it('renders all sections with data', () => {
+  it('renders all sections with correct titles and content', () => {
     render(
       <PatternVisualization
         trends={mockTrends}
-        onPatternSelect={handlePatternSelect}
+        crossSessionPatterns={mockCrossSessionPatterns}
+        riskCorrelations={mockRiskCorrelations}
       />,
     )
 
-    // Check trend
+    // Check for section titles
+    expect(screen.getByText('Trend Patterns')).toBeInTheDocument()
+    expect(screen.getByText('Cross-Session Patterns')).toBeInTheDocument()
+    expect(screen.getByText('Risk Correlations')).toBeInTheDocument()
+
+    // Check for content from each section
     expect(screen.getByText('Increasing anxiety levels')).toBeInTheDocument()
-
-    // Check cross-session pattern
-    expect(screen.getByText('Topic avoidance')).toBeInTheDocument()
-
-    // Check risk correlation
-    expect(screen.getByText('Immediate action recommended')).toBeInTheDocument()
+    expect(screen.getByText('stress, work')).toBeInTheDocument()
+    expect(screen.getByText('Avoidance of trauma-related topics')).toBeInTheDocument()
+    expect(screen.getByText('sleep disruption')).toBeInTheDocument()
   })
 
-  it('calls onPatternSelect when a trend is clicked', () => {
+  it('displays a message when no data is provided', () => {
+    render(<PatternVisualization />)
+    expect(screen.getByText('No trends found')).toBeInTheDocument()
+    expect(screen.getByText('No cross-session patterns found')).toBeInTheDocument()
+    expect(screen.getByText('No risk correlations found')).toBeInTheDocument()
+  })
+
+  it('calls onPatternSelect with the correct pattern when a trend is clicked', () => {
     const handlePatternSelect = vi.fn()
     render(
       <PatternVisualization
@@ -89,9 +83,7 @@ describe('PatternVisualization', () => {
       />,
     )
 
-    const trendItem = screen.getByText('Increasing anxiety levels')
-    trendItem.click()
-
+    fireEvent.click(screen.getByText('Increasing anxiety levels'))
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
     expect(handlePatternSelect).toHaveBeenCalledWith(mockTrends[0])
   })
@@ -100,16 +92,14 @@ describe('PatternVisualization', () => {
     const handlePatternSelect = vi.fn()
     render(
       <PatternVisualization
-        crossSessionPatterns={mockPatterns}
+        crossSessionPatterns={mockCrossSessionPatterns}
         onPatternSelect={handlePatternSelect}
       />,
     )
 
-    const patternItem = screen.getByText('Topic avoidance')
-    patternItem.click()
-
+    fireEvent.click(screen.getByText('Avoidance of trauma-related topics'))
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
-    expect(handlePatternSelect).toHaveBeenCalledWith(mockPatterns[0])
+    expect(handlePatternSelect).toHaveBeenCalledWith(mockCrossSessionPatterns[0])
   })
 
   it('calls onPatternSelect when a risk correlation is clicked', () => {
@@ -121,9 +111,7 @@ describe('PatternVisualization', () => {
       />,
     )
 
-    const riskItem = screen.getByText('Immediate action recommended')
-    riskItem.click()
-
+    fireEvent.click(screen.getByText('sleep disruption'))
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
     expect(handlePatternSelect).toHaveBeenCalledWith(mockRiskCorrelations[0])
   })
