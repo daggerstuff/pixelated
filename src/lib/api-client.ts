@@ -263,18 +263,24 @@ interface ChatResponse {
 }
 
 interface CrisisDetectionRequest {
-  content: string
-  contentType: 'chat_message' | 'journal_entry' | 'form_response' | 'voice_transcript'
-  context?: unknown
-  options?: unknown
+  text: string
+  sessionId?: string
+  options?: {
+    model?: 'fast' | 'accurate'
+    level?: 'low' | 'medium' | 'high'
+  }
 }
 
 interface CrisisDetectionResponse {
-  assessment: unknown
-  riskFactors: unknown[]
-  protectiveFactors: unknown[]
-  recommendations: unknown
-  resources: unknown
-  monitoring: unknown
-  metadata: unknown
+  isCrisis: boolean
+  level: 'none' | 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  details: {
+    suicidalIdeation: number
+    selfHarm: number
+    hopelessness: number
+    agitation: number
+  }
+  recommendedAction: 'monitor' | 'alert_human' | 'immediate_intervention'
+  timestamp: string
 }

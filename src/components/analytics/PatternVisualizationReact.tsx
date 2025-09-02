@@ -1,4 +1,4 @@
-import React from 'react'
+import type { FC } from 'react';
 import type {
   TrendPattern,
   CrossSessionPattern,
@@ -30,7 +30,7 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
           <h3 className="text-lg font-semibold mb-3">Trend Patterns</h3>
           {trends.length > 0 ? (
             <div className="space-y-2">
-              {trends.map((trend) => (
+              {trends.map((trend: TrendPattern) => (
                 <button
                   key={trend.id}
                   className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
@@ -64,7 +64,7 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
           <h3 className="text-lg font-semibold mb-3">Cross-Session Patterns</h3>
           {crossSessionPatterns.length > 0 ? (
             <div className="space-y-2">
-              {crossSessionPatterns.map((pattern) => (
+              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
                 <button
                   key={pattern.id}
                   className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
@@ -95,7 +95,7 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
           <h3 className="text-lg font-semibold mb-3">Risk Correlations</h3>
           {riskCorrelations.length > 0 ? (
             <div className="space-y-2">
-              {riskCorrelations.map((correlation) => (
+              {riskCorrelations.map((correlation: RiskCorrelation) => (
                 <button
                   key={correlation.id}
                   className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"

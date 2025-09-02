@@ -9,15 +9,16 @@ const frontmatter = {
   description:
     'Example: Displaying GitHub pull requests using astro-loader-github-prs',
   subtitle: '',
-  bgType: 'plum' as BgType,
+  bgType: 'plum',
   toc: false,
-  ogImage: false,
+  ogImage: '/og-image.png',
 }
 ---
 
 <BaseLayout
   title={frontmatter.title}
   description={frontmatter.description}
+  bgType={frontmatter.bgType}
 >
   <section class="py-12">
     <div class="max-w-6xl mx-auto px-4 text-center">
