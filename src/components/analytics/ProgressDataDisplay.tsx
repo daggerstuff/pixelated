@@ -1,4 +1,4 @@
-import React, { type FC } from 'react'
+import React from 'react'
 import styles from './ProgressDataDisplay.module.css'
 
 interface ProgressDataDisplayProps {
