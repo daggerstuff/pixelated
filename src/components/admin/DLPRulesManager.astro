@@ -150,12 +150,13 @@ const activityLogs: DLPActivityLog[] = [
       }
     })
 
-    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<unknown>) => {
-      window.showDLPAlert(
-        'success',
-        `Rule ${e.detail.isEditing ? 'updated' : 'added'} successfully`,
-      )
-    }) as EventListener)
+    interface DlpErrorDetail {
+      message: string
+    }
+    // Listen for custom events from the DLP components
+    document.addEventListener('dlp:rule-updated', ((e: CustomEvent<RuleUpdatedDetail>) => {
+    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<RuleSavedDetail>) => {
+    document.addEventListener('dlp:error', ((e: CustomEvent<DlpErrorDetail>) => {
 
     document.addEventListener('dlp:error', ((e: CustomEvent<unknown>) => {
       window.showDLPAlert('error', e.detail.message)
