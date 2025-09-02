@@ -67,8 +67,6 @@
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "playwright.config.ts",
-    "scripts/**/*.js",
-    "scripts/**/*.ts",
     "*.config.js",
     "*.config.ts",
     "**/.eslintrc.{js,cjs}",
