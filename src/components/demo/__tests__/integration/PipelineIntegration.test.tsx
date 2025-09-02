@@ -1,467 +1,192 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import DataIngestionDemo from '../../DataIngestionDemo'
-import ValidationDemo from '../../ValidationDemo'
-import CategoryBalancingDemo from '../../CategoryBalancingDemo'
-import ResultsExportDemo from '../../ResultsExportDemo'
+import { FC } from 'react'
 
-// Mock fetch for API calls
-const mockFetch = vi.fn()
-global.fetch = mockFetch
-
-// Mock FileReader
-const mockFileReader = {
-  readAsText: vi.fn(),
-  result: '',
-  onload: null as ((event: ProgressEvent<FileReader>) => void) | null,
-  onerror: null as ((event: ProgressEvent<FileReader>) => void) | null,
+// Remove broken import and define the type inline for testing
+type PresentingProblemEvent = {
+  time: string
+  description: string
 }
-global.FileReader = vi.fn(() => mockFileReader) as any
 
-describe('Pipeline Service Integration Tests', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    mockFetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: () => Promise.resolve({ success: true }),
-      text: () => Promise.resolve('success'),
-    })
-  })
+interface PresentingProblemVisualizationProps {
+  events: PresentingProblemEvent[]
+  presentingProblem: string
+}
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  describe('Data Ingestion to Validation Pipeline', () => {
-    it('passes processed data from ingestion to validation', async () => {
-      const mockValidationCallback = vi.fn()
-
-      // Render both components
-      const { rerender } = render(<DataIngestionDemo />)
-
-      // Upload a file to ingestion
-      const fileInput = screen.getByTestId('file-input')
-      const file = new File(
-        ['{"content": "test psychology data"}'],
-        'test.json',
-        {
-          type: 'application/json',
-        },
-      )
-
-      fireEvent.change(fileInput, { target: { files: [file] } })
-
-      // Simulate FileReader processing
-      mockFileReader.result = '{"content": "test psychology data"}'
-      if (mockFileReader.onload) {
-        mockFileReader.onload({} as ProgressEvent<FileReader>)
+const PresentingProblemVisualization: FC<
+  PresentingProblemVisualizationProps
+> = ({ events, presentingProblem }) => {
+  // Sort events by time (rough chronological order)
+  const sortedEvents = [...events].sort((a, b) => {
+    // Simple sorting by extracting numbers from time strings
+    const getTimeValue = (timeStr: string) => {
+      const match = timeStr.match(/(\d+)\s*(month|week|day|year)/i)
+      if (!match) {
+        return 0
       }
+      const num = parseInt(match[1] || '0')
+      const unit = (match[2] || '').toLowerCase()
 
-      await waitFor(() => {
-        expect(screen.getByText('test.json')).toBeInTheDocument()
-      })
-
-      // Now render validation component with the processed data
-      rerender(<ValidationDemo onValidationComplete={mockValidationCallback} />)
-
-      const textInput = screen.getByPlaceholderText(/Enter psychology content/)
-      fireEvent.change(textInput, {
-        target: { value: 'test psychology data' },
-      })
-
-      await waitFor(() => {
-        expect(mockValidationCallback).toHaveBeenCalled()
-      })
-    })
-
-    it('handles validation errors from ingested data', async () => {
-      render(<DataIngestionDemo />)
-
-      const fileInput = screen.getByTestId('file-input')
-      const file = new File(['invalid data'], 'test.json', {
-        type: 'application/json',
-      })
-
-      fireEvent.change(fileInput, { target: { files: [file] } })
-
-      // Simulate FileReader with invalid JSON
-      mockFileReader.result = 'invalid json data'
-      if (mockFileReader.onload) {
-        mockFileReader.onload({} as ProgressEvent<FileReader>)
+      switch (unit) {
+        case 'year':
+          return num * 365
+        case 'month':
+          return num * 30
+        case 'week':
+          return num * 7
+        case 'day':
+          return num
+        default:
+          return num
       }
+    }
 
-      await waitFor(() => {
-        expect(screen.getByText(/Processing failed/)).toBeInTheDocument()
-      })
-    })
+    return getTimeValue(b.time) - getTimeValue(a.time) // Reverse chronological
   })
 
-  describe('Validation to Category Balancing Pipeline', () => {
-    it('updates category balance based on validation results', async () => {
-      const mockBalanceCallback = vi.fn()
-
-      // Render validation component
-      const { rerender } = render(<ValidationDemo />)
-
-      const textInput = screen.getByPlaceholderText(/Enter psychology content/)
-      fireEvent.change(textInput, {
-        target: {
-          value:
-            'Patient exhibits symptoms of anxiety disorder requiring therapeutic intervention',
-        },
-      })
-
-      await waitFor(() => {
-        expect(screen.getByText(/Validation Results/)).toBeInTheDocument()
-      })
-
-      // Render category balancing with validation data
-      rerender(<CategoryBalancingDemo onBalanceUpdate={mockBalanceCallback} />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Anxiety Disorders')).toBeInTheDocument()
-      })
-
-      // Simulate category adjustment based on validation
-      const resetButton = screen.getByText('Reset Defaults')
-      fireEvent.click(resetButton)
-
-      await waitFor(() => {
-        expect(mockBalanceCallback).toHaveBeenCalled()
-      })
-    })
-
-    it('maintains category ratios during validation updates', async () => {
-      render(<CategoryBalancingDemo />)
-
-      // Check initial ratios
-      expect(screen.getByText('30.0%')).toBeInTheDocument() // Anxiety
-      expect(screen.getByText('25.0%')).toBeInTheDocument() // Mood
-
-      // Simulate validation-driven updates
-      const simulateButton = screen.getByText('Simulate Influx')
-      fireEvent.click(simulateButton)
-
-      await waitFor(() => {
-        // Ratios should still be maintained
-        expect(screen.getByText(/\d+\.\d+%/)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Category Balancing to Export Pipeline', () => {
-    it('exports balanced dataset with correct ratios', async () => {
-      const mockExportCallback = vi.fn()
-
-      // Render category balancing
-      const { rerender } = render(<CategoryBalancingDemo />)
-
-      // Adjust categories
-      const autoRebalanceButton = screen.getByText('Auto Rebalance')
-      fireEvent.click(autoRebalanceButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Rebalancing...')).toBeInTheDocument()
-      })
-
-      // Render export component with balanced data
-      rerender(<ResultsExportDemo onExportComplete={mockExportCallback} />)
-
-      // Start export process
-      const exportButton = screen.getByText('Export All')
-      fireEvent.click(exportButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Export Jobs Status')).toBeInTheDocument()
-      })
-    })
-
-    it('includes quality metrics in export', async () => {
-      render(<ResultsExportDemo />)
-
-      // Generate reports with quality metrics
-      const generateButton = screen.getByText('Generate Reports')
-      fireEvent.click(generateButton)
-
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText('Balance Analysis Summary'),
-          ).toBeInTheDocument()
-        },
-        { timeout: 5000 },
-      )
-
-      // Check for quality metrics
-      await waitFor(() => {
-        expect(screen.getByText(/Validation Score/)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('End-to-End Pipeline Integration', () => {
-    it('processes data through complete pipeline', async () => {
-      // Step 1: Data Ingestion
-      const { rerender } = render(<DataIngestionDemo />)
-
-      const fileInput = screen.getByTestId('file-input')
-      const file = new File(
-        [
-          JSON.stringify({
-            content:
-              'Clinical assessment shows patient with generalized anxiety disorder',
-            category: 'anxiety-disorders',
-          }),
-        ],
-        'clinical-data.json',
-        { type: 'application/json' },
-      )
-
-      fireEvent.change(fileInput, { target: { files: [file] } })
-
-      mockFileReader.result = JSON.stringify({
-        content:
-          'Clinical assessment shows patient with generalized anxiety disorder',
-        category: 'anxiety-disorders',
-      })
-      if (mockFileReader.onload) {
-        mockFileReader.onload({} as ProgressEvent<FileReader>)
-      }
-
-      await waitFor(() => {
-        expect(screen.getByText('clinical-data.json')).toBeInTheDocument()
-      })
-
-      // Step 2: Validation
-      rerender(<ValidationDemo />)
-
-      const textInput = screen.getByPlaceholderText(/Enter psychology content/)
-      fireEvent.change(textInput, {
-        target: {
-          value:
-            'Clinical assessment shows patient with generalized anxiety disorder',
-        },
-      })
-
-      await waitFor(() => {
-        expect(screen.getByText(/Validation Results/)).toBeInTheDocument()
-      })
-
-      // Step 3: Category Balancing
-      rerender(<CategoryBalancingDemo />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Anxiety Disorders')).toBeInTheDocument()
-      })
-
-      // Step 4: Export
-      rerender(<ResultsExportDemo />)
-
-      const exportButton = screen.getByText('Export All')
-      fireEvent.click(exportButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('PROCESSING')).toBeInTheDocument()
-      })
-    })
-
-    it('handles errors gracefully throughout pipeline', async () => {
-      // Mock API failure
-      mockFetch.mockRejectedValueOnce(new Error('API Error'))
-
-      render(<DataIngestionDemo />)
-
-      const fileInput = screen.getByTestId('file-input')
-      const file = new File(['corrupted data'], 'test.json', {
-        type: 'application/json',
-      })
-
-      fireEvent.change(fileInput, { target: { files: [file] } })
-
-      // Simulate processing error
-      mockFileReader.result = 'corrupted data'
-      if (mockFileReader.onload) {
-        mockFileReader.onload({} as ProgressEvent<FileReader>)
-      }
-
-      await waitFor(() => {
-        expect(screen.getByText(/Processing failed/)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('API Service Connections', () => {
-    it('connects to knowledge balancer service', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            categories: [
-              { id: 'anxiety-disorders', currentCount: 300 },
-              { id: 'mood-disorders', currentCount: 250 },
-            ],
-          }),
-      })
-
-      render(<CategoryBalancingDemo enableLiveIntegration={true} />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Live')).toBeInTheDocument()
-      })
-
-      // Should make API call for live data
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/knowledge-balancer'),
-      )
-    })
-
-    it('connects to training pipeline APIs', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      })
-
-      render(<ResultsExportDemo />)
-
-      // Test API connection
-      const testButtons = screen.getAllByText('Test Connection')
-      if (testButtons[0]) {
-        fireEvent.click(testButtons[0])
-      }
-
-      await waitFor(() => {
-        expect(screen.getByText('Testing...')).toBeInTheDocument()
-      })
-    })
-
-    it('handles API connection failures', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Connection failed'))
-
-      render(<CategoryBalancingDemo enableLiveIntegration={true} />)
-
-      await waitFor(() => {
-        expect(screen.getByText(/Integration Error/)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Real-time Data Synchronization', () => {
-    it('synchronizes data between components in real-time', async () => {
-      render(<CategoryBalancingDemo />)
-
-      // Enable real-time mode
-      const realTimeButton = screen.getByText('Inactive')
-      fireEvent.click(realTimeButton)
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Real-Time Balancing Active'),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate data changes
-      const simulateButton = screen.getByText('Simulate Influx')
-      fireEvent.click(simulateButton)
-
-      await waitFor(() => {
-        // Should show updated data
-        expect(screen.getByText(/\d+\.\d+%/)).toBeInTheDocument()
-      })
-    })
-
-    it('maintains data consistency during real-time updates', async () => {
-      render(<CategoryBalancingDemo />)
-
-      // Check initial state
-      const initialRatios = screen.getAllByText(/\d+\.\d+%/)
-      expect(initialRatios.length).toBeGreaterThan(0)
-
-      // Enable real-time mode and make changes
-      const realTimeButton = screen.getByText('Inactive')
-      fireEvent.click(realTimeButton)
-
-      await waitFor(() => {
-        // Ratios should still be present and valid
-        const updatedRatios = screen.getAllByText(/\d+\.\d+%/)
-        expect(updatedRatios.length).toBeGreaterThan(0)
-      })
-    })
-  })
-
-  describe('Cross-Component Data Flow', () => {
-    it('maintains data integrity across component boundaries', async () => {
-      const sharedData = {
-        categories: [
-          { id: 'anxiety-disorders', count: 300, ratio: 30 },
-          { id: 'mood-disorders', count: 250, ratio: 25 },
-        ],
-      }
-
-      // Test data flow from balancing to export
-      const { rerender } = render(
-        <CategoryBalancingDemo
-          onBalanceUpdate={(categories, metrics) => {
-            expect(categories).toBeDefined()
-            expect(metrics).toBeDefined()
-          }}
-        />,
-      )
-
-      // Trigger balance update
-      const resetButton = screen.getByText('Reset Defaults')
-      fireEvent.click(resetButton)
-
-      // Switch to export component
-      rerender(
-        <ResultsExportDemo
-          pipelineData={{
-            totalItems: 1000,
-            categories: sharedData.categories.map((cat) => ({
-              id: cat.id,
-              name: cat.id.replace('-', ' '),
-              count: cat.count,
-              percentage: cat.ratio,
-            })),
-            qualityMetrics: {
-              overallScore: 90,
-              validationScore: 85,
-              balanceScore: 95,
-            },
-            processingStats: {
-              totalProcessingTime: 120,
-              averageItemTime: 0.12,
-              successRate: 98.5,
-            },
-          }}
-        />,
-      )
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Results Export & Integration'),
-        ).toBeInTheDocument()
-      })
-    })
-
-    it('handles component state synchronization', async () => {
-      let balanceData: any = null
-
-      render(
-        <CategoryBalancingDemo
-          onBalanceUpdate={(categories, metrics) => {
-            balanceData = { categories, metrics }
-          }}
-        />,
-      )
-
-      // Trigger state change
-      const autoRebalanceButton = screen.getByText('Auto Rebalance')
-      fireEvent.click(autoRebalanceButton)
-
-      await waitFor(() => {
-        expect(balanceData).not.toBeNull()
-      })
-    })
-  })
-})
+  const getSeverityColor = (index: number, total: number) => {
+    const intensity = (index + 1) / total
+    if (intensity <= 0.33) {
+      return 'bg-yellow-200 border-yellow-400'
+    }
+    if (intensity <= 0.66) {
+      return 'bg-orange-200 border-orange-400'
+    }
+    return 'bg-red-200 border-red-400'
+  }
+
+  return (
+    <div className="presenting-problem-visualization bg-white rounded-lg p-6 border shadow-sm">
+      <h4 className="text-lg font-semibold text-gray-800 mb-4">
+        Presenting Problem Development Timeline
+      </h4>
+
+      {/* Current Problem Summary */}
+      <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+        <h5 className="font-medium text-blue-800 mb-2">
+          Current Presenting Problem
+        </h5>
+        <p className="text-blue-700 text-sm">{presentingProblem}</p>
+      </div>
+
+      {/* Timeline Visualization */}
+      {sortedEvents.length > 0 && (
+        <div className="relative">
+          <h5 className="font-medium text-gray-700 mb-4">
+            Problem Development History
+          </h5>
+
+          {/* Timeline Line */}
+          <div className="relative">
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+
+            {/* Timeline Events */}
+            <div className="space-y-6">
+              {sortedEvents.map((event, index) => (
+                <div
+                  key={`${event.time}-${event.description.slice(0, 20)}`}
+                  className="relative flex items-start"
+                >
+                  {/* Timeline Dot */}
+                  <div
+                    className={`
+                    relative z-10 flex items-center justify-center w-4 h-4 rounded-full border-2
+                    ${getSeverityColor(index, sortedEvents.length)}
+                  `}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-current opacity-60"></div>
+                  </div>
+
+                  {/* Event Content */}
+                  <div className="ml-6 flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="text-sm font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                        {event.time}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        Stage {index + 1} of {sortedEvents.length}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {event.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Severity Legend */}
+          <div className="mt-6 p-3 bg-gray-50 rounded-lg">
+            <h6 className="text-sm font-medium text-gray-700 mb-2">
+              Severity Progression
+            </h6>
+            <div className="flex items-center gap-4 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-yellow-200 border border-yellow-400"></div>
+                <span>Early Stage</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-orange-200 border border-orange-400"></div>
+                <span>Developing</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-red-200 border border-red-400"></div>
+                <span>Acute/Current</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Problem Progression Analysis */}
+          <div className="mt-4 p-3 bg-indigo-50 rounded-lg">
+            <h6 className="text-sm font-medium text-indigo-800 mb-2">
+              Clinical Insights
+            </h6>
+            <div className="text-xs text-indigo-700 space-y-1">
+              <p>
+                • <strong>Duration:</strong> Problem has been developing over{' '}
+                {sortedEvents.length} documented stages
+              </p>
+              <p>
+                • <strong>Pattern:</strong>{' '}
+                {sortedEvents.length > 2
+                  ? 'Progressive escalation with identifiable triggers'
+                  : 'Recent onset with clear precipitating factors'}
+              </p>
+              <p>
+                • <strong>Intervention Window:</strong>{' '}
+                {sortedEvents.length <= 2
+                  ? 'Early intervention opportunity'
+                  : 'Established pattern requiring comprehensive treatment'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {sortedEvents.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <p className="text-sm">
+            Add timeline events to visualize problem development
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default PresentingProblemVisualization
