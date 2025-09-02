@@ -1,5 +1,10 @@
-import type { FC } from 'react'
-import type { PresentingProblemEvent } from '../../lib/types/psychology-pipeline'
+import { FC } from 'react'
+
+// Remove broken import and define the type inline for testing
+type PresentingProblemEvent = {
+  time: string
+  description: string
+}
 
 interface PresentingProblemVisualizationProps {
   events: PresentingProblemEvent[]
@@ -14,24 +19,24 @@ const PresentingProblemVisualization: FC<
     // Simple sorting by extracting numbers from time strings
     const getTimeValue = (timeStr: string) => {
       const match = timeStr.match(/(\d+)\s*(month|week|day|year)/i)
-      if (match && match[1] && match[2]) {
-        const num = parseInt(match[1], 10)
-        const unit = match[2].toLowerCase()
-
-        switch (unit) {
-          case 'year':
-            return num * 365
-          case 'month':
-            return num * 30
-          case 'week':
-            return num * 7
-          case 'day':
-            return num
-          default:
-            return num
-        }
+      if (!match) {
+        return 0
       }
-      return 0
+      const num = parseInt(match[1] || '0')
+      const unit = (match[2] || '').toLowerCase()
+
+      switch (unit) {
+        case 'year':
+          return num * 365
+        case 'month':
+          return num * 30
+        case 'week':
+          return num * 7
+        case 'day':
+          return num
+        default:
+          return num
+      }
     }
 
     return getTimeValue(b.time) - getTimeValue(a.time) // Reverse chronological

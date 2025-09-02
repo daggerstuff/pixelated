@@ -1,4 +1,4 @@
-import { mongoClient } from '../../supabase'
+import { mongoClient } from '../../lib/db/mongoClient'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { createAuditLog, AuditEventType } from '../../audit'
 

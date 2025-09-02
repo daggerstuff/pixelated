@@ -22,6 +22,47 @@ import {
 import { apiClient, APIError } from '@/lib/api-client'
 import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 
+interface CrisisDetectionApiResponse {
+  assessment: {
+    overallRisk: 'none' | 'low' | 'moderate' | 'high' | 'imminent';
+    suicidalIdeation: {
+      present: boolean;
+      severity: 'with_intent' | 'with_plan' | 'active' | 'passive' | 'none';
+    };
+    selfHarm: {
+      present: boolean;
+      risk: 'high' | 'moderate' | 'low';
+      frequency: 'daily' | 'frequent' | 'occasional' | 'rare' | 'none';
+    };
+    agitation: {
+      present: boolean;
+      controllable: boolean;
+      severity: 'severe' | 'moderate' | 'low';
+    };
+    substanceUse: {
+      present: boolean;
+      acute: boolean;
+      impairment: 'severe' | 'moderate' | 'low';
+    };
+  };
+  riskFactors: { factor: string }[];
+  protectiveFactors: { factor: string }[];
+  recommendations: {
+    immediate: { action: string }[];
+  };
+  resources: {
+    crisis: {
+      name: string;
+      contact: string;
+      specialization: string[];
+      availability: string;
+    }[];
+  };
+  metadata: {
+    confidenceScore: number;
+  };
+}
+
 interface CrisisAssessment {
   riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent'
   riskScore: number
@@ -85,7 +126,7 @@ export default function CrisisDetectionDemo() {
           includeResourceRecommendations: true,
           enableImmediateNotifications: true
         }
-      })
+      }) as CrisisDetectionApiResponse
 
       const crisisAssessment: CrisisAssessment = {
         riskLevel: result.assessment.overallRisk,

@@ -368,8 +368,6 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     // Set up mock session data
     mockSessionData = {
       sessionId: 'test-session',
-      patientId: 'test-patient',
-      therapistId: 'test-therapist',
       sessionDate: new Date().toISOString(),
       sessionDuration: 60,
       sessionType: 'individual',
@@ -3629,6 +3627,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       hipaaCompliant: true,
       dataMaskingEnabled: true,
       auditLogging: true,
+    }
     }
 
     mockSessionData = {
