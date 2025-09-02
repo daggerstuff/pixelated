@@ -1,8 +1,8 @@
 // Thin MongoDB client adapter (renamed from src/lib/supabase.ts)
 // Purpose: provide a consistent export for the shared MongoDB client and related auth service.
 
-import mongodb from '../config/mongodb.config'
-import { mongoAuthService } from '../services/mongoAuth.service'
+import mongodb from '../../config/mongodb.config'
+import { mongoAuthService } from '../../services/mongoAuth.service'
 
 // MongoDB client type (re-export for convenience)
 export type MongoDBClient = typeof mongodb
