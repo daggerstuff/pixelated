@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { ThemeToggle } from '../ui/ThemeToggle'
 import { UserMenu } from '../ui/UserMenu'
 import { Navigation } from './Navigation'
 import SearchBox from '../ui/SearchBox'
@@ -150,6 +151,7 @@ export function Header({
             </div>
 
             <div className="flex items-center ml-3">
+              {showThemeToggle && <ThemeToggle />}
               {showUserMenu && <UserMenu />}
             </div>
           </div>

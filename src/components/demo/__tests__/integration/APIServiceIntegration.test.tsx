@@ -339,7 +339,7 @@ describe('API Service Integration Tests', () => {
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
+      global.WebSocket = vi.fn(() => mockWebSocket) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -358,7 +358,7 @@ describe('API Service Integration Tests', () => {
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
+      global.WebSocket = vi.fn(() => mockWebSocket) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -385,7 +385,7 @@ describe('API Service Integration Tests', () => {
           json: () => Promise.resolve({ success: true }),
         })
 
-      const retryFetch = async (url: string, options: any, maxRetries = 3) => {
+      const retryFetch = async (url: string, options: any, maxRetries = 3): Promise<Response> => {
         for (let i = 0; i < maxRetries; i++) {
           try {
             return await fetch(url, options)
@@ -398,9 +398,11 @@ describe('API Service Integration Tests', () => {
             )
           }
         }
+        throw new Error('Retry logic failed to return a response.')
       }
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})
+      if (!response) throw new Error('Response is undefined')
       const data = await response.json()
 
       expect(mockFetch).toHaveBeenCalledTimes(3)

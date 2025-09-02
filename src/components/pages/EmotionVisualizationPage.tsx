@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import type { FC } from 'react'
 import { useParams } from 'react-router-dom'
 import MultidimensionalEmotionChart from '../dashboard/MultidimensionalEmotionChart'
 import useMultidimensionalEmotions from '../../hooks/useMultidimensionalEmotions'
