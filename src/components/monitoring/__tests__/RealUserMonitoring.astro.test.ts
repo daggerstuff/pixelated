@@ -99,7 +99,7 @@ describe('RealUserMonitoring.astro', () => {
   })
 
   it('renders with default props', () => {
-    render(React.createElement(RealUserMonitoringComponent))
+    render(<RealUserMonitoringComponent />)
 
     // Check that the component renders with default title
     expect(screen.getByText('Real User Monitoring')).toBeInTheDocument()
@@ -126,14 +126,14 @@ describe('RealUserMonitoring.astro', () => {
       refreshInterval: 60000,
     }
 
-    render(React.createElement(RealUserMonitoringComponent, customProps))
+    render(<RealUserMonitoringComponent {...customProps} />)
 
     expect(screen.getByText(customTitle)).toBeInTheDocument()
     expect(screen.getByText(customDescription)).toBeInTheDocument()
   })
 
   it('starts with loading placeholders', () => {
-    render(React.createElement(RealUserMonitoringComponent))
+    render(<RealUserMonitoringComponent />)
 
     // There should be loading placeholders initially
     const loadingElements = screen.getAllByText('Loading...')
@@ -141,7 +141,7 @@ describe('RealUserMonitoring.astro', () => {
   })
 
   it('shows last updated text', () => {
-    render(React.createElement(RealUserMonitoringComponent))
+    render(<RealUserMonitoringComponent />)
 
     expect(screen.getByText('Last updated: Never')).toBeInTheDocument()
   })

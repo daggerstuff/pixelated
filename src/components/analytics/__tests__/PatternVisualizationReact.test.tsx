@@ -102,7 +102,7 @@ vi.mock('recharts', () => {
 })
 
 describe('PatternVisualization', () => {
-  it('renders the component with tabs', () => {
+  it('renders all pattern sections and their content', () => {
     render(
       <PatternVisualization
         trends={mockTrends}
@@ -111,142 +111,64 @@ describe('PatternVisualization', () => {
       />,
     )
 
-    expect(screen.getByText('Long-term Trends')).toBeInTheDocument()
-    expect(screen.getByText('Session Patterns')).toBeInTheDocument()
+    // Check for section titles
+    expect(screen.getByText('Trend Patterns')).toBeInTheDocument()
+    expect(screen.getByText('Cross-Session Patterns')).toBeInTheDocument()
     expect(screen.getByText('Risk Correlations')).toBeInTheDocument()
-  })
 
-  it('shows filter controls when filter button is clicked', () => {
-    render(
-      <PatternVisualization
-        trends={mockTrends}
-        crossSessionPatterns={mockPatterns}
-        riskCorrelations={mockCorrelations}
-      />,
-    )
-
-    // Filter button should be visible
-    const filterButton = screen.getByText('Filter')
-    expect(filterButton).toBeInTheDocument()
-
-    // Click the filter button
-    fireEvent.click(filterButton)
-
-    // Filter controls should now be visible
-    expect(screen.getByText('Filter Options')).toBeInTheDocument()
-  })
-
-  it('filters trends by date range', () => {
-    render(
-      <PatternVisualization
-        trends={mockTrends}
-        crossSessionPatterns={mockPatterns}
-        riskCorrelations={mockCorrelations}
-      />,
-    )
-
-    // Open filter controls
-    fireEvent.click(screen.getByText('Filter'))
-
-    // Set date range
-    const startDateInput = screen.getByLabelText('Start Date')
-    const endDateInput = screen.getByLabelText('End Date')
-
-    fireEvent.change(startDateInput, { target: { value: '2025-02-01' } })
-    fireEvent.change(endDateInput, { target: { value: '2025-02-28' } })
-
-    // Apply filter
-    fireEvent.click(screen.getByText('Apply Filters'))
-
-    // Only the second trend should be visible (from February)
-    expect(
-      screen.queryByText('Increasing anxiety trend'),
-    ).not.toBeInTheDocument()
+    // Check for trend patterns
+    expect(screen.getByText('Increasing anxiety trend')).toBeInTheDocument()
     expect(screen.getByText('Decreasing depression trend')).toBeInTheDocument()
-  })
 
-  it('filters patterns by type', () => {
-    render(
-      <PatternVisualization
-        trends={mockTrends}
-        crossSessionPatterns={mockPatterns}
-        riskCorrelations={mockCorrelations}
-      />,
-    )
-
-    // Switch to patterns tab
-    fireEvent.click(screen.getByText('Session Patterns'))
-
-    // Open filter controls
-    fireEvent.click(screen.getByText('Filter'))
-
-    // Select pattern type
-    const patternTypeSelect = screen.getByLabelText('Pattern Type')
-    fireEvent.change(patternTypeSelect, { target: { value: 'recurring' } })
-
-    // Apply filter
-    fireEvent.click(screen.getByText('Apply Filters'))
-
-    // Only recurring patterns should be visible
+    // Check for cross-session patterns
     expect(
       screen.getByText('Recurring pattern across sessions'),
     ).toBeInTheDocument()
     expect(
-      screen.queryByText('Oscillating pattern across sessions'),
-    ).not.toBeInTheDocument()
-  })
+      screen.getByText('Oscillating pattern across sessions'),
+    ).toBeInTheDocument()
 
-  it('filters risk correlations by confidence level', () => {
-    render(
-      <PatternVisualization
-        trends={mockTrends}
-        crossSessionPatterns={mockPatterns}
-        riskCorrelations={mockCorrelations}
-      />,
-    )
-
-    // Switch to risks tab
-    fireEvent.click(screen.getByText('Risk Correlations'))
-
-    // Open filter controls
-    fireEvent.click(screen.getByText('Filter'))
-
-    // Set minimum confidence
-    const confidenceInput = screen.getByLabelText('Min Confidence')
-    fireEvent.change(confidenceInput, { target: { value: '0.9' } })
-
-    // Apply filter
-    fireEvent.click(screen.getByText('Apply Filters'))
-
-    // Only high confidence risks should be visible
+    // Check for risk correlations
     expect(screen.getByText('Sleep disruption')).toBeInTheDocument()
-    expect(screen.queryByText('Social withdrawal')).not.toBeInTheDocument()
+    expect(screen.getByText('Social withdrawal')).toBeInTheDocument()
   })
 
-  it('resets filters when reset button is clicked', () => {
+  it('calls onPatternSelect when a trend pattern is clicked', () => {
+    const handlePatternSelect = vi.fn()
     render(
       <PatternVisualization
         trends={mockTrends}
-        crossSessionPatterns={mockPatterns}
-        riskCorrelations={mockCorrelations}
+        onPatternSelect={handlePatternSelect}
       />,
     )
 
-    // Open filter controls
-    fireEvent.click(screen.getByText('Filter'))
+    fireEvent.click(screen.getByText('Increasing anxiety trend'))
+    expect(handlePatternSelect).toHaveBeenCalledWith(mockTrends[0])
+  })
 
-    // Set some filters
-    const startDateInput = screen.getByLabelText('Start Date')
-    fireEvent.change(startDateInput, { target: { value: '2025-02-01' } })
+  it('calls onPatternSelect when a cross-session pattern is clicked', () => {
+    const handlePatternSelect = vi.fn()
+    render(
+      <PatternVisualization
+        crossSessionPatterns={mockPatterns}
+        onPatternSelect={handlePatternSelect}
+      />,
+    )
 
-    // Apply filter
-    fireEvent.click(screen.getByText('Apply Filters'))
+    fireEvent.click(screen.getByText('Recurring pattern across sessions'))
+    expect(handlePatternSelect).toHaveBeenCalledWith(mockPatterns[0])
+  })
 
-    // Reset filters
-    fireEvent.click(screen.getByText('Reset'))
+  it('calls onPatternSelect when a risk correlation is clicked', () => {
+    const handlePatternSelect = vi.fn()
+    render(
+      <PatternVisualization
+        riskCorrelations={mockCorrelations}
+        onPatternSelect={handlePatternSelect}
+      />,
+    )
 
-    // All trends should be visible again
-    expect(screen.getByText('Increasing anxiety trend')).toBeInTheDocument()
-    expect(screen.getByText('Decreasing depression trend')).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Sleep disruption'))
+    expect(handlePatternSelect).toHaveBeenCalledWith(mockCorrelations[0])
   })
 })

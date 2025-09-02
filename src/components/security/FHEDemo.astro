@@ -7,7 +7,6 @@ import Badge from '@/components/ui/Badge.astro'
 import Card from '@/components/ui/Card.astro';
 import CardContent from '@/components/ui/CardContent.astro';
 import CardDescription from '@/components/ui/CardDescription.astro';
-import CardFooter from '@/components/ui/CardFooter.astro';
 import CardHeader from '@/components/ui/CardHeader.astro';
 import CardTitle from '@/components/ui/CardTitle.astro';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -266,10 +265,7 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
     })
   }
 
-  async function mockProcess(
-    encrypted: string,
-    operation: string,
-  ): Promise<any> {
+  async function mockProcess(operation: string): Promise<any> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const results = {

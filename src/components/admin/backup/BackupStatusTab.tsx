@@ -1,4 +1,4 @@
-import React from 'react'
+import type { FC } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -185,7 +185,7 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
             </CardContent>
           </Card>
         ) : (
-          backups.map((backup) => (
+          backups.map((backup: Backup) => (
             <Card
               key={backup.id}
               className={

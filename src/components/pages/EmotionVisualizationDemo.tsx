@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import type { FC } from 'react'
 import { useMultidimensionalEmotions } from '../../hooks/useMultidimensionalEmotions'
 import MultidimensionalEmotionChart from '../../components/dashboard/MultidimensionalEmotionChart'
 
