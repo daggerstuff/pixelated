@@ -16,6 +16,10 @@ describe('RegisterForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     ;(useAuth as vi.Mock).mockImplementation(() => ({
+      signUp: mockSignUp,
+      signInWithOAuth: mockSignInWithOAuth,
+    }))
+  })
 
     const passwordInput = screen.getByLabelText(/^Password/i)
     expect(passwordInput).toHaveAttribute('aria-required', 'true')
