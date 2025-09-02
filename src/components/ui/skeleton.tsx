@@ -60,7 +60,6 @@ export function Skeleton({
     items.push(
       <span
         key={`skeleton-${i}`}
-        data-testid="skeleton"
         className={cn(baseClasses, animationClasses, shapeClasses, className)}
         style={style}
         {...props}

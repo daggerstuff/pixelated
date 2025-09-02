@@ -5,10 +5,6 @@ type PresentingProblemEvent = {
   time: string
   description: string
 }
-
-interface PresentingProblemVisualizationProps {
-  events: PresentingProblemEvent[]
-  presentingProblem: string
 }
 
 const PresentingProblemVisualization: FC<
@@ -42,6 +38,10 @@ const PresentingProblemVisualization: FC<
     return getTimeValue(b.time) - getTimeValue(a.time) // Reverse chronological
   })
 
+  const getSeverityColor = (index: number, total: number) => {
+    const intensity = (index + 1) / total
+    if (intensity <= 0.33) {
+      return 'bg-yellow-200 border-yellow-400'
   const getSeverityColor = (index: number, total: number) => {
     const intensity = (index + 1) / total
     if (intensity <= 0.33) {
