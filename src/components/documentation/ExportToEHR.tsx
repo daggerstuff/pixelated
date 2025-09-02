@@ -172,9 +172,9 @@ export function ExportToEHR({
                     ? 'Documentation exported successfully'
                     : 'Failed to export documentation'}
                 </h3>
-                {exportResult.errors && (
+                {exportResult.error && (
                   <div className="mt-2 text-sm text-red-700 dark:text-red-300">
-                    {exportResult.errors}
+                    {exportResult.error}
                   </div>
                 )}
 
@@ -185,17 +185,17 @@ export function ExportToEHR({
                     </p>
                    {typeof exportResult === 'object' &&
                      'documentId' in exportResult &&
-                     (exportResult as { documentId?: string }).documentId && (
+                     exportResult.documentId && (
                        <p className="text-sm text-green-700 dark:text-green-300">
-                         Document ID: {(exportResult as { documentId?: string }).documentId}
+                         Document ID: {exportResult.documentId as string}
                        </p>
                      )}
                    {typeof exportResult === 'object' &&
                      'documentUrl' in exportResult &&
-                     (exportResult as { documentUrl?: string }).documentUrl && (
+                     exportResult.documentUrl && (
                        <div className="mt-1">
                          <a
-                           href={(exportResult as { documentUrl?: string }).documentUrl}
+                           href={exportResult.documentUrl as string}
                            target="_blank"
                            rel="noopener noreferrer"
                            className="text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
