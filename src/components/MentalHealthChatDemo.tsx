@@ -21,6 +21,7 @@ import BrainVisualization from '@/components/ui/BrainVisualization'
 // } from '@/components/MentalHealthInsights'
 
 import { MentalHealthInsights, type EnhancedMentalHealthAnalysis } from '@/components/MentalHealthInsights'
+import type { MentalHealthInsights as MentalHealthInsightsType } from '@/simulator/services/FeedbackService'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import type {
@@ -28,6 +29,24 @@ import type {
   RoutingContext,
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
+
+// Helper function to convert MentalHealthInsights to EnhancedMentalHealthAnalysis
+const convertInsightsToEnhanced = (insights: MentalHealthInsightsType): EnhancedMentalHealthAnalysis => {
+  return {
+    timestamp: Date.now(),
+    category: mapCategoryToSeverity(insights.mentalHealthCategory ?? undefined),
+    explanation: insights.explanation || 'Analysis completed',
+    expertGuided: false,
+    scores: {},
+    summary: insights.explanation || 'Mental health analysis completed',
+    hasMentalHealthIssue: insights.hasMentalHealthIssue,
+    confidence: 0.8, // Default confidence since it's not in MentalHealthInsights
+    supportingEvidence: insights.supportingEvidence || [],
+    riskLevel: insights.hasMentalHealthIssue ? 'medium' : 'low',
+    emotions: [],
+    riskFactors: []
+  }
+}
 
 // Extended analysis result that might include additional fields
 interface ExtendedMentalHealthAnalysisResult

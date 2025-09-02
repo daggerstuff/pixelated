@@ -475,7 +475,7 @@ const {
     // Tab switching
     tabButtons.forEach((button) => {
       if (button instanceof HTMLElement) {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event: MouseEvent) => {
           const tab = button.getAttribute('data-tab')
     
           // Update active tab button
@@ -550,13 +550,13 @@ const {
 
     // Date inputs
     if (startDateInput instanceof HTMLInputElement) {
-      startDateInput.addEventListener('change', () => {
+      startDateInput.addEventListener('change', (event: Event) => {
         options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
       })
     }
 
     if (endDateInput instanceof HTMLInputElement) {
-      endDateInput.addEventListener('change', () => {
+      endDateInput.addEventListener('change', (event: Event) => {
         options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
       })
     }
@@ -676,8 +676,8 @@ const {
     // Initialize checkbox collections
     emotionTypeCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
-        checkbox.addEventListener('change', (event) => {
-          const target = event.target
+        checkbox.addEventListener('change', (event: Event) => {
+          const target = e.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'emotions', 'types')
           }
@@ -687,8 +687,8 @@ const {
 
     patternTypeCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
-        checkbox.addEventListener('change', (event) => {
-          const target = event.target
+        checkbox.addEventListener('change', (event: Event) => {
+          const target = e.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'patterns', 'types')
           }
@@ -698,8 +698,8 @@ const {
 
     patternCategoryCheckboxes.forEach((checkbox) => {
       if (checkbox instanceof HTMLInputElement) {
-        checkbox.addEventListener('change', (event) => {
-          const target = event.target
+        checkbox.addEventListener('change', (event: Event) => {
+          const target = e.target
           if (target instanceof HTMLInputElement) {
             updateCheckboxArray(target, 'patterns', 'categories')
           }
@@ -745,7 +745,7 @@ const {
 
     // Reset button
     if (resetButton) {
-      resetButton.addEventListener('click', () => {
+      resetButton.addEventListener('click', (event: Event) => {
         // Reset the options object with proper types
         options.timeRange = { presetRange: undefined, startDate: undefined, endDate: undefined }
         options.emotions = { 
@@ -775,7 +775,7 @@ const {
 
     // Apply button
     if (applyButton) {
-      applyButton.addEventListener('click', () => {
+      applyButton.addEventListener('click', (event: Event) => {
         dispatchApplyEvent()
       })
     }

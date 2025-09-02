@@ -14,7 +14,7 @@ describe('RegisterForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useAuth).mockImplementation(() => ({
+    ;(useAuth as unknown).mockImplementation(() => ({
       signUp: mockSignUp,
       signInWithOAuth: mockSignInWithOAuth,
     }))
@@ -36,7 +36,7 @@ describe('RegisterForm', () => {
     expect(passwordInput).toHaveAttribute('aria-required', 'true')
     expect(passwordInput).toHaveAttribute(
       'aria-describedby',
-      'password-strength',
+      'password-requirements',
     )
 
     const termsCheckbox = screen.getByLabelText(/i agree to the/i)
