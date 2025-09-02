@@ -9,6 +9,8 @@ interface Props {
 
 const { title, description, refreshInterval = 60000 } = Astro.props
 
+const config = getMonitoringConfig()
+
 const performanceBudgets = {
   TTFB: { good: 300, needsImprovement: 600 },
   FCP: { good: 1800, needsImprovement: 3000 },
@@ -267,7 +269,7 @@ const performanceBudgets = {
 
 <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script is:inline define:vars={{ refreshInterval, performanceBudgets }}>
+<script define:vars={{ refreshInterval, performanceBudgets }}>
   // Chart instances
   let resourceSizeChart
   let requestCountChart
@@ -694,7 +696,7 @@ const performanceBudgets = {
   }
 
   // Initialize dashboard when DOM is loaded
-  document.addEventListener('DOMContentLoaded', (_event) => {
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
     updateDashboard()
 
     // Set up refresh button click handler
@@ -708,7 +710,7 @@ const performanceBudgets = {
   })
 
   // Listen for theme changes to update chart colors
-  document.addEventListener('astro:after-swap', (_event) => {
+  document.addEventListener('astro:after-swap', (_event: Event) => {
     if (resourceSizeChart) resourceSizeChart.destroy()
     if (requestCountChart) requestCountChart.destroy()
     if (performanceTrendChart) performanceTrendChart.destroy()

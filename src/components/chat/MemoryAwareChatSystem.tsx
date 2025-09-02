@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useChatWithMemory, UseChatWithMemoryReturn } from '@/hooks/useChatWithMemory'
+import { useChatWithMemory } from '@/hooks/useChatWithMemory'
 import { useAuth } from '@/hooks/useAuth'
 import { ChatContainer } from './ChatContainer'
 
@@ -44,8 +44,8 @@ export function MemoryAwareChatSystem({
   sessionId,
   title = 'AI Assistant with Memory',
   subtitle = 'Chat with an AI that learns and remembers your conversations',
+  // _placeholder is intentionally unused to suppress lint warning
   enableMemoryToggle = true,
-  enableAnalysisToggle = true,
   showMemoryStats = true,
   showMemoryInsights = true,
 }: MemoryAwareChatSystemProps) {
@@ -54,6 +54,13 @@ export function MemoryAwareChatSystem({
   const [enableAnalysis, setEnableAnalysis] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [conversationSummary, setConversationSummary] = useState<string>('')
+
+  const chatHook = useChatWithMemory({
+    sessionId: sessionId as string,
+    enableMemory,
+    enableAnalysis,
+    maxMemoryContext: 15,
+  })
 
   const {
     messages,
@@ -78,96 +85,17 @@ export function MemoryAwareChatSystem({
     } topics.`;
     return summary;
   };
-
-  // Generate conversation summary when messages change
-  useEffect(() => {
-    if (messages.length > 4) {
-      Promise.resolve(getConversationSummary()).then(setConversationSummary)
-    }
-  }, [messages])
-
-  const handleExportConversation = async () => {
-    try {
-      const summary = await getConversationSummary()
-      const exportData = {
-        timestamp: new Date().toISOString(),
-        sessionId,
-        userId: user?.id,
-        summary,
-        messageCount: messages.length,
-        memoryStats,
+              </div>
+              <div className="text-xs text-green-600 dark:text-green-400">
+                This Session
+              </div>
+            </div>
         messages: messages.map((msg: Message) => ({
           role: msg.role,
           content: msg.content,
           timestamp: msg.timestamp,
           analyzed: msg.analyzed,
           memoryStored: msg.memoryStored,
-        })),
-      }
-
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json',
-      })
-
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `conversation-${sessionId}-${Date.now()}.json`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    } catch (err: unknown) {
-      console.error('Failed to export conversation:', err)
-    }
-  }
-
-  const renderMemoryStats = () => {
-    if (!showMemoryStats) {
-      return null
-    }
-
-    return (
-      <Card className="border-blue-200 dark:border-blue-800">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Brain className="h-4 w-4 text-blue-600" />
-            Memory Statistics
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-3 gap-3 text-sm">
-            <div className="text-center p-2 bg-blue-50 dark:bg-blue-950/20 rounded">
-              <div className="font-semibold text-blue-700 dark:text-blue-300">
-                {memory.stats?.totalEntries || 0}
-              </div>
-              <div className="text-xs text-blue-600 dark:text-blue-400">
-                Total Memories
-              </div>
-            </div>
-            <div className="text-center p-2 bg-green-50 dark:bg-green-950/20 rounded">
-              <div className="font-semibold text-green-700 dark:text-green-300">
-                {memory.memories.length}
-              </div>
-              <div className="text-xs text-green-600 dark:text-green-400">
-                This Session
-              </div>
-            </div>
-            <div className="text-center p-2 bg-purple-50 dark:bg-purple-950/20 rounded">
-              <div className="font-semibold text-purple-700 dark:text-purple-300">
-                {memory.stats?.contextLength || 0}
-              </div>
-              <div className="text-xs text-purple-600 dark:text-purple-400">
-                Context Used
-              </div>
-            </div>
-          </div>
-
-          {enableMemory && (
-            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-              <Brain className="h-3 w-3" />
-              AI is using conversation memory for personalized responses
-            </div>
           )}
         </CardContent>
       </Card>
@@ -175,21 +103,12 @@ export function MemoryAwareChatSystem({
   }
 
   const renderConversationInsights = () => {
-    if (!showMemoryInsights || !conversationSummary) {
-      return null
-    }
-
-    return (
-      <Card className="border-amber-200 dark:border-amber-800">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Lightbulb className="h-4 w-4 text-amber-600" />
-            Conversation Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            {conversationSummary}
+        messages: messages.map((msg: Message) => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          analyzed: msg.analyzed,
+          memoryStored: msg.memoryStored,
           </p>
         </CardContent>
       </Card>
@@ -251,19 +170,6 @@ export function MemoryAwareChatSystem({
     )
   }
 
-  const handleRegenerate = () => {
-    // This is a placeholder. A real implementation would be more complex.
-    if (messages.length > 0) {
-      sendMessage('Please regenerate the last response.');
-    }
-  };
-
-  const handleClear = () => {
-    // This is a placeholder.
-    // In a real implementation, you might want to confirm with the user.
-    clearMessages();
-  };
-
   const renderActionButtons = () => (
     <div className="flex flex-wrap gap-2">
       <TooltipProvider>
@@ -291,7 +197,7 @@ export function MemoryAwareChatSystem({
             <Button
               variant="outline"
               size="sm"
-              onClick={handleRegenerate}
+              onClick={regenerateResponse}
               disabled={isLoading || messages.length < 2}
               className="flex items-center gap-1"
             >
@@ -327,7 +233,7 @@ export function MemoryAwareChatSystem({
             <Button
               variant="outline"
               size="sm"
-              onClick={handleClear}
+              onClick={clearMessages}
               disabled={messages.length === 0}
               className="flex items-center gap-1 text-red-600 hover:text-red-700"
             >
@@ -346,7 +252,7 @@ export function MemoryAwareChatSystem({
 
     return (
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-        {messages.filter((m) => m.role === 'assistant').length > 0 && (
+        {messages.filter((m) => m?.['memoryStored']).length > 0 && (
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span>Messages stored in memory</span>
@@ -396,7 +302,7 @@ export function MemoryAwareChatSystem({
             <Info className="h-4 w-4" />
             <span className="text-sm font-medium">Error</span>
           </div>
-          <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error.toString()}</p>
+          <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>
         </div>
       )}
 
