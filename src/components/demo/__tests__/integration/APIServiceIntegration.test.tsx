@@ -553,6 +553,7 @@ describe('API Service Integration Tests', () => {
 
       // Mock WebSocket constructor
       global.WebSocket = vi.fn(() => mockWebSocket) as any
+      global.WebSocket = vi.fn(() => mockWebSocket) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -601,7 +602,11 @@ describe('API Service Integration Tests', () => {
           json: () => Promise.resolve({ success: true }),
         })
 
-      const retryFetch = async (url: string, options: any, maxRetries = 3): Promise<Response> => {
+      const retryFetch = async (
+        url: string,
+        options: any,
+        maxRetries = 3,
+      ): Promise<Response> => {
         for (let i = 0; i < maxRetries; i++) {
           try {
             const response = await fetch(url, options);
