@@ -16,7 +16,7 @@ const mockFileReader = {
   onload: null as ((event: ProgressEvent<FileReader>) => void) | null,
   onerror: null as ((event: ProgressEvent<FileReader>) => void) | null,
 }
-global.FileReader = vi.fn(() => mockFileReader) as unknown
+global.FileReader = vi.fn(() => mockFileReader) as any
 
 describe('Pipeline Service Integration Tests', () => {
   beforeEach(() => {
@@ -326,7 +326,9 @@ describe('Pipeline Service Integration Tests', () => {
 
       // Test API connection
       const testButtons = screen.getAllByText('Test Connection')
-      fireEvent.click(testButtons[0])
+      if (testButtons[0]) {
+        fireEvent.click(testButtons[0])
+      }
 
       await waitFor(() => {
         expect(screen.getByText('Testing...')).toBeInTheDocument()

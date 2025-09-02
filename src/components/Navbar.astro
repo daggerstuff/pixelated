@@ -282,7 +282,7 @@ const isActive = (href: string) => {
     button.addEventListener('click', toggleMenu)
 
     // Close menu on Escape key
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
+    document.addEventListener('keydown', (e: Event) => {
       if (
         e.key === 'Escape' &&
         button.getAttribute('aria-expanded') === 'true'
@@ -304,7 +304,7 @@ const isActive = (href: string) => {
     })
 
     // Trap focus within mobile menu when open
-    menu.addEventListener('keydown', (e: KeyboardEvent) => {
+    menu.addEventListener('keydown', (e: Event) => {
       if (e.key !== 'Tab') return
 
       const focusableElements = menu.querySelectorAll(

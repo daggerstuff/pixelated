@@ -24,12 +24,12 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
 
   // Get unique categories and risk levels
   const categories = useMemo(() => {
-    const cats = [...new Set(scenarios.map((s: PresetScenario) => s.category))]
+    const cats = [...new Set(scenarios.map((s) => s.category))]
     return cats.sort()
   }, [scenarios])
 
   const riskLevels = useMemo(() => {
-    const levels = [...new Set(scenarios.map((s: PresetScenario) => s.riskLevel))]
+    const levels = [...new Set(scenarios.map((s) => s.riskLevel))]
     return levels.sort((a, b) => {
       const order = { low: 1, medium: 2, high: 3, critical: 4 }
       return order[a as keyof typeof order] - order[b as keyof typeof order]
