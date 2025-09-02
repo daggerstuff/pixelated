@@ -1,6 +1,6 @@
 // Counterfactual analysis visualization component
 
-import React, { useState } from 'react'
+import { useState, type FC } from 'react'
 import type {
   CounterfactualScenario,
   SessionData,

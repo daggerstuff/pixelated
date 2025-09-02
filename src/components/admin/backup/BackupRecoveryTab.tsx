@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FC } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,

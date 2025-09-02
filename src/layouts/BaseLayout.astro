@@ -11,9 +11,10 @@ export interface Props {
   title: string
   description?: string
   bgType?: BgType
+  ogImage?: string
 }
 
-const { title, description, bgType } = Astro.props
+const { title, description, bgType, ogImage } = Astro.props
 ---
 
 <!DOCTYPE html>
@@ -25,6 +26,7 @@ const { title, description, bgType } = Astro.props
     <meta name="generator" content={Astro.generator} />
     <title>{title} | Pixelated Empathy</title>
     <meta name="description" content={description ?? 'AI-powered therapy training platform for mental health professionals.'} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
     
     <!-- Fonts: preload primary and swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

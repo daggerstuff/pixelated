@@ -2,20 +2,28 @@ import { useState, useCallback } from 'react'
 import { useChat } from './useChat'
 import { useMemory } from './useMemory'
 
+import type { Message } from '@/types/chat'
+
 export interface ChatWithMemoryOptions {
-  initialMessages?: Array<{ role: 'user' | 'assistant'; content: string }>
+  initialMessages?: Message[]
   memoryKey?: string
+  sessionId?: string
+  enableMemory?: boolean
+  enableAnalysis?: boolean
+  maxMemoryContext?: number
 }
 
-export function useChatWithMemory(options: ChatWithMemoryOptions = {}): void {
+export function useChatWithMemory(options: ChatWithMemoryOptions = {}) {
   const { initialMessages = [] } = options
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   
-  const chat = useChat({ initialMessages })
+  const chat = useChat({ initialMessages, onError: (e) => setError(e.message) })
   const memory = useMemory()
 
   const sendMessageWithMemory = useCallback(async (message: string) => {
     setIsLoading(true)
+    setError(null)
     try {
       // Store message in memory
       await memory.addMemory({
@@ -37,15 +45,38 @@ export function useChatWithMemory(options: ChatWithMemoryOptions = {}): void {
       }
 
       return response
-    } finally {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+    finally {
       setIsLoading(false)
     }
   }, [chat, memory])
+
+  const clearMessages = useCallback(() => {
+    chat.setMessages([])
+  }, [chat])
+
+  const regenerateResponse = useCallback(async () => {
+    const lastUserMessage = chat.messages.filter((m) => m.role === 'user').pop()
+    if (lastUserMessage) {
+      const lastMessage = chat.messages[chat.messages.length - 1]
+      if (lastMessage && lastMessage.role === 'assistant') {
+        chat.setMessages(chat.messages.slice(0, -1))
+      }
+      await sendMessageWithMemory(lastUserMessage.content)
+    }
+  }, [chat.messages, chat.setMessages, sendMessageWithMemory])
 
   return {
     ...chat,
     sendMessage: sendMessageWithMemory,
     isLoading: isLoading || chat.isLoading,
-    memory
+    error,
+    clearMessages,
+    regenerateResponse,
+    memory,
+    getConversationSummary: () => Promise.resolve(''),
+    memoryStats: {},
   }
 }

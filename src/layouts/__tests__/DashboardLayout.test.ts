@@ -1,6 +1,5 @@
 // Vitest is imported via globals from tsconfig
-// Use dynamic import to avoid TS resolution issues with .astro modules in some editors
-// We'll import the component within each test
+import DashboardLayout from '../DashboardLayout.astro'
 import { renderAstro } from '@/test/utils/astro'
 import '@testing-library/dom'
 
@@ -39,10 +38,7 @@ describe('DashboardLayout', () => {
   })
 
   it('renders with default props', async () => {
-    const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    // Use computed path to avoid TS attempting to statically resolve .astro module
-    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
-    const { container } = await renderAstro(DashboardLayout as unknown)
+    const { container } = await renderAstro(DashboardLayout as any)
 
     // Check basic structure
     expect(container.querySelector('html')).toBeInTheDocument()
@@ -66,9 +62,7 @@ describe('DashboardLayout', () => {
       showSidebar: false,
     }
 
-    const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
-    const { container } = await renderAstro(DashboardLayout as unknown, customProps)
+    const { container } = await renderAstro(DashboardLayout as any, customProps)
 
     // Check custom title and description
     expect(document.title).toBe('Custom Title')
@@ -84,9 +78,7 @@ describe('DashboardLayout', () => {
   })
 
   it('applies custom className to content', async () => {
-    const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
-    const { container } = await renderAstro(DashboardLayout as unknown, {
+    const { container } = await renderAstro(DashboardLayout as any, {
       contentClassName: 'custom-content-class',
     })
 
@@ -95,6 +87,9 @@ describe('DashboardLayout', () => {
   })
 
   it('renders with meta image and type', async () => {
+    await renderAstro(DashboardLayout as any, {
+      meta: { image: '/custom-image.png', type: 'article' },
+    })
     expect(document.querySelector('meta[property="og:image"]') as HTMLElement).toHaveAttribute(
       'content',
       '/custom-image.png',
@@ -106,9 +101,7 @@ describe('DashboardLayout', () => {
   })
 
   it('renders error boundary', async () => {
-    const compPath = ['..', 'DashboardLayout.astro'].join('/')
-    const { default: DashboardLayout } = (await import(compPath as unknown)) as unknown
-    const { container } = await renderAstro(DashboardLayout as unknown)
+    const { container } = await renderAstro(DashboardLayout as any)
 
     expect(container.querySelector('error-boundary')).toBeInTheDocument()
   })

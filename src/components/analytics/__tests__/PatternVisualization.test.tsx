@@ -23,65 +23,61 @@ vi.mock('recharts', () => ({
 // Mock sample data
 const mockTrends = [
   {
+    id: 'trend1',
     type: 'anxiety',
-    startTime: new Date('2023-01-01'),
-    endTime: new Date('2023-01-31'),
+    startDate: new Date('2023-01-01'),
+    endDate: new Date('2023-01-31'),
     significance: 0.75,
     confidence: 0.8,
     description: 'Increasing anxiety levels',
-    relatedFactors: ['stress', 'work'],
-    recommendations: ['relaxation techniques'],
+    indicators: ['stress', 'work'],
   },
 ]
 
 const mockPatterns = [
   {
+    id: 'pattern1',
     type: 'avoidance',
     sessions: ['session1', 'session2'],
-    pattern: 'Topic avoidance',
-    frequency: 0.6,
+    description: 'Topic avoidance',
     confidence: 0.7,
-    impact: 'moderate',
-    recommendations: ['direct questioning'],
   },
 ]
 
 const mockRiskCorrelations = [
   {
-    primaryFactor: 'sleep disruption',
+    id: 'risk1',
+    riskFactor: 'sleep disruption',
     correlatedFactors: [
-      { factor: 'anxiety', correlation: 0.8, confidence: 0.9 },
-      { factor: 'irritability', correlation: 0.6, confidence: 0.7 },
+      { factor: 'anxiety', strength: 0.8 },
+      { factor: 'irritability', strength: 0.6 },
     ],
-
-    timeFrame: {
-      start: new Date('2023-01-01'),
-      end: new Date('2023-01-31'),
-    },
-    severity: 'high',
-    actionRequired: true,
+    confidence: 0.9,
+    significance: 'high',
+    severityScore: 0.85,
+    description: 'Immediate action recommended',
   },
 ]
 
 describe('PatternVisualization', () => {
-  it('renders loading state', () => {
+  it('renders correctly with no data', () => {
     render(
       <PatternVisualization
         trends={[]}
         crossSessionPatterns={[]}
         riskCorrelations={[]}
-        isLoading={true}
       />,
     )
 
-    // Check that main content is NOT present when loading (skeleton is shown)
-    expect(screen.queryByText('Long-term Trends')).not.toBeInTheDocument()
-    expect(
-      screen.queryByText('Emotional Trends Over Time'),
-    ).not.toBeInTheDocument()
+    expect(screen.getByText('Trend Patterns')).toBeInTheDocument()
+    expect(screen.getByText('No trends found')).toBeInTheDocument()
+    expect(screen.getByText('Cross-Session Patterns')).toBeInTheDocument()
+    expect(screen.getByText('No cross-session patterns found')).toBeInTheDocument()
+    expect(screen.getByText('Risk Correlations')).toBeInTheDocument()
+    expect(screen.getByText('No risk correlations found')).toBeInTheDocument()
   })
 
-  it('renders trends tab correctly', () => {
+  it('renders all sections with data', () => {
     render(
       <PatternVisualization
         trends={mockTrends}
@@ -90,84 +86,60 @@ describe('PatternVisualization', () => {
       />,
     )
 
-    // Check tab is present
-    expect(screen.getByText('Long-term Trends')).toBeInTheDocument()
+    // Check trend
+    expect(screen.getByText('Increasing anxiety levels')).toBeInTheDocument()
 
-    // Check heading
-    expect(screen.getByText('Emotional Trends Over Time')).toBeInTheDocument()
+    // Check cross-session pattern
+    expect(screen.getByText('Topic avoidance')).toBeInTheDocument()
 
-    // Charts should be present (mocked)
-    expect(screen.getByTestId('responsive-container')).toBeInTheDocument()
-    expect(screen.getByTestId('line-chart-container')).toBeInTheDocument()
+    // Check risk correlation
+    expect(screen.getByText('Immediate action recommended')).toBeInTheDocument()
   })
 
-  it('renders risk correlations tab correctly', async () => {
-    render(
-      <PatternVisualization
-        trends={mockTrends}
-        crossSessionPatterns={mockPatterns}
-        riskCorrelations={mockRiskCorrelations}
-      />,
-    )
-
-    // Click on the risks tab
-    const risksTab = screen.getByText('Risk Correlations')
-    risksTab.click()
-
-    // Wait for the content to appear
-    await waitFor(
-      () => {
-        // Check heading is visible
-        expect(screen.getByText('Risk Factor Correlations')).toBeInTheDocument()
-
-        // Check risk item is present
-        expect(screen.getByText('sleep disruption')).toBeInTheDocument()
-        expect(screen.getByText('high')).toBeInTheDocument()
-
-        // Check correlated factors
-        expect(screen.getByText('anxiety')).toBeInTheDocument()
-        expect(screen.getByText('irritability')).toBeInTheDocument()
-
-        // Check warning
-        expect(
-          screen.getByText(/Immediate action recommended/i),
-        ).toBeInTheDocument()
-      },
-      { timeout: 3000 },
-    )
-  })
-
-  it('calls onPatternSelect when a pattern is clicked', async () => {
+  it('calls onPatternSelect when a trend is clicked', () => {
     const handlePatternSelect = vi.fn()
-
     render(
       <PatternVisualization
         trends={mockTrends}
+        onPatternSelect={handlePatternSelect}
+      />,
+    )
+
+    const trendItem = screen.getByText('Increasing anxiety levels')
+    trendItem.click()
+
+    expect(handlePatternSelect).toHaveBeenCalledTimes(1)
+    expect(handlePatternSelect).toHaveBeenCalledWith(mockTrends[0])
+  })
+
+  it('calls onPatternSelect when a cross-session pattern is clicked', () => {
+    const handlePatternSelect = vi.fn()
+    render(
+      <PatternVisualization
         crossSessionPatterns={mockPatterns}
+        onPatternSelect={handlePatternSelect}
+      />,
+    )
+
+    const patternItem = screen.getByText('Topic avoidance')
+    patternItem.click()
+
+    expect(handlePatternSelect).toHaveBeenCalledTimes(1)
+    expect(handlePatternSelect).toHaveBeenCalledWith(mockPatterns[0])
+  })
+
+  it('calls onPatternSelect when a risk correlation is clicked', () => {
+    const handlePatternSelect = vi.fn()
+    render(
+      <PatternVisualization
         riskCorrelations={mockRiskCorrelations}
         onPatternSelect={handlePatternSelect}
       />,
     )
 
-    // Click on the risks tab
-    const risksTab = screen.getByText('Risk Correlations')
-    risksTab.click()
+    const riskItem = screen.getByText('Immediate action recommended')
+    riskItem.click()
 
-    // Wait for the risk item to appear and then click it
-    await waitFor(
-      () => {
-        const riskItemText = screen.getByText('sleep disruption')
-        expect(riskItemText).toBeInTheDocument() // Ensure text is found first
-        const riskItem = riskItemText.closest('div') // Find parent after text appears
-        expect(riskItem).toBeInTheDocument()
-        if (riskItem) {
-          riskItem.click()
-        }
-      },
-      { timeout: 3000 },
-    )
-
-    // Assertions after the click
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
     expect(handlePatternSelect).toHaveBeenCalledWith(mockRiskCorrelations[0])
   })

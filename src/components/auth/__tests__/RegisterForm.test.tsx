@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { vi } from 'vitest'
 import { RegisterForm } from '../RegisterForm'
 import { useAuth } from '../../../hooks/useAuth'
 import userEvent from '@testing-library/user-event'
@@ -14,7 +15,7 @@ describe('RegisterForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(useAuth as unknown).mockImplementation(() => ({
+    ;(useAuth as vi.Mock).mockImplementation(() => ({
       signUp: mockSignUp,
       signInWithOAuth: mockSignInWithOAuth,
     }))

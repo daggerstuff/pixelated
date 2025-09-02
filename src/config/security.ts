@@ -124,7 +124,18 @@ export function buildCSP(
   isDev = false,
   nonce?: string,
 ): string {
-  const finalConfig = isDev ? { ...config, ...cspConfigDev } : config
+  let finalConfig = { ...config }
+
+  if (isDev) {
+    finalConfig = {
+      ...config,
+      ...cspConfigDev,
+      'connect-src': [
+        ...(config['connect-src'] || []),
+        ...(cspConfigDev['connect-src'] || []),
+      ],
+    }
+  }
 
   // Replace nonce placeholder with actual nonce if provided
   if (nonce) {
