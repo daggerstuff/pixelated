@@ -133,7 +133,6 @@ const activityLogs: DLPActivityLog[] = [
     interface DlpErrorDetail {
       message: string
     }
-
     // Listen for custom events from the DLP components
     document.addEventListener('dlp:rule-updated', ((e: CustomEvent<unknown>) => {
       window.showDLPAlert(
@@ -142,13 +141,9 @@ const activityLogs: DLPActivityLog[] = [
       )
     }) as EventListener)
 
-    document.addEventListener('dlp:rule-saved', (e: Event) => {
-      const detail = (e as CustomEvent<RuleSavedDetail>).detail
-      if (detail) {
-        const msg = detail.isEditing ? 'Rule updated successfully' : 'Rule created successfully'
-        window.showDLPAlert?.('success', msg)
-      }
-    })
+    document.addEventListener('dlp:rule-deleted', ((_event: Event) => {
+      window.showDLPAlert('success', 'Rule deleted successfully')
+    }) as EventListener)
 
     interface DlpErrorDetail {
       message: string
@@ -162,3 +157,4 @@ const activityLogs: DLPActivityLog[] = [
       window.showDLPAlert('error', e.detail.message)
     }) as EventListener)
   })
+</script>

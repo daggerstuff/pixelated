@@ -286,7 +286,7 @@ const { title = 'Todo List', initialTodos = [] } = Astro.props
     // Event listeners
     addButton?.addEventListener('click', addTodo)
 
-    todoInput?.addEventListener('keydown', (e: KeyboardEvent) => {
+    todoInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         addTodo()
       }
