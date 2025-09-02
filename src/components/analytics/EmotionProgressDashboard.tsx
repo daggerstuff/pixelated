@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import React from 'react'
 
 interface EmotionProgressData {
   date: string
