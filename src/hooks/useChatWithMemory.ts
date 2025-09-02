@@ -34,7 +34,7 @@ export function useChatWithMemory(options: ChatWithMemoryOptions = {}) {
 
       // Send message through chat
       const response = await chat.sendMessage(message)
-      
+
       // Store response in memory
       if (response) {
         await memory.addMemory({
