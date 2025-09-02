@@ -58,5 +58,5 @@
       }
     })
   }
-  document.addEventListener('keyup', handleKeyUp)
+  document.addEventListener('keyup', (event: Event) => handleKeyUp(event))
 </script>

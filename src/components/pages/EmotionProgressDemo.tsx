@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import type { FC } from 'react'
+import React, { useState } from 'react'
 import EmotionProgressDashboard from '../../components/analytics/EmotionProgressDashboard'
 import useEmotionProgress from '../../hooks/useEmotionProgress'
 

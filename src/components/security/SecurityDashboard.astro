@@ -228,6 +228,18 @@ const initialStats: SecurityStats = {
     },
   ]
 
+  const mockStats: SecurityStats = {
+    total: 42,
+    last24h: 8,
+    last7d: 23,
+    bySeverity: {
+      critical: 2,
+      high: 5,
+      medium: 12,
+      low: 23,
+    },
+  }
+
   function updateEvents() {
     let events = [...mockEvents]
 

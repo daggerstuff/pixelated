@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -77,11 +77,11 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
   // Calculate backup statistics
   const totalBackups = backups.length
   const successfulBackups = backups.filter(
-    (b: Backup) =>
+    (b) =>
       b.status === BackupStatus.COMPLETED || b.status === BackupStatus.VERIFIED,
   ).length
   const failedBackups = backups.filter(
-    (b: Backup) =>
+    (b) =>
       b.status === BackupStatus.FAILED ||
       b.status === BackupStatus.VERIFICATION_FAILED,
   ).length
@@ -89,15 +89,15 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
   // Calculate recovery test statistics
   const totalTests = recoveryTests.length
   const successfulTests = recoveryTests.filter(
-    (t: RecoveryTest) => t.status === RecoveryTestStatus.PASSED,
+    (t) => t.status === RecoveryTestStatus.PASSED,
   ).length
   const failedTests = recoveryTests.filter(
-    (t: RecoveryTest) => t.status === RecoveryTestStatus.FAILED,
+    (t) => t.status === RecoveryTestStatus.FAILED,
   ).length
 
   // Calculate backup storage statistics
   const totalStorageUsed = backups.reduce(
-    (total: number, backup: Backup) => total + backup.size,
+    (total, backup) => total + backup.size,
     0,
   )
 
@@ -107,7 +107,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
 
   // Count backups by type
   const backupsByType = backups.reduce(
-    (counts: Record<string, number>, backup: Backup) => {
+    (counts, backup) => {
       counts[backup.type] = (counts[backup.type] || 0) + 1
       return counts
     },
