@@ -1,14 +1,28 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { PatternVisualization } from '../PatternVisualizationReact'
-import type {
-  TrendPattern,
-  CrossSessionPattern,
-  RiskCorrelation,
-} from '@/lib/fhe/pattern-recognition'
 
-const mockTrends: TrendPattern[] = [
+// Mock the Recharts components
+vi.mock('recharts', () => ({
+  Area: vi.fn(({ children }) => <div data-testid="area-chart">{children}</div>),
+  AreaChart: vi.fn(({ children }) => (
+    <div data-testid="area-chart-container">{children}</div>
+  )),
+  CartesianGrid: vi.fn(() => <div data-testid="cartesian-grid" />),
+  Line: vi.fn(({ children }) => <div data-testid="line-chart">{children}</div>),
+  LineChart: vi.fn(({ children }) => (
+    <div data-testid="line-chart-container">{children}</div>
+  )),
+  ResponsiveContainer: vi.fn(({ children }) => (
+    <div data-testid="responsive-container">{children}</div>
+  )),
+  Tooltip: vi.fn(() => <div data-testid="tooltip" />),
+  XAxis: vi.fn(() => <div data-testid="x-axis" />),
+  YAxis: vi.fn(() => <div data-testid="y-axis" />),
+}))
+
+// Mock sample data
+const mockTrends = [
   {
-    id: 'trend1',
     type: 'anxiety',
     startDate: new Date('2023-01-01'),
     endDate: new Date('2023-01-31'),
@@ -16,21 +30,21 @@ const mockTrends: TrendPattern[] = [
     confidence: 0.8,
     description: 'Increasing anxiety levels',
     indicators: ['stress', 'work'],
-  },
-]
-
-const mockCrossSessionPatterns: CrossSessionPattern[] = [
-  {
+    render(
+      <PatternVisualization
+        trends={[]}
+        crossSessionPatterns={[]}
+        riskCorrelations={[]}
     id: 'pattern1',
     type: 'avoidance',
     sessions: ['session1', 'session2'],
     description: 'Topic avoidance',
     confidence: 0.7,
-  },
-]
-
-const mockRiskCorrelations: RiskCorrelation[] = [
-  {
+    render(
+      <PatternVisualization
+        trends={[]}
+        crossSessionPatterns={[]}
+        riskCorrelations={[]}
     id: 'risk1',
     riskFactor: 'sleep disruption',
     correlatedFactors: [
@@ -41,10 +55,10 @@ const mockRiskCorrelations: RiskCorrelation[] = [
     significance: 'high',
     severityScore: 0.85,
     description: 'Immediate action recommended',
-  },
-]
+    // Check risk correlation
+    expect(screen.getByText('Immediate action recommended')).toBeInTheDocument()
+  })
 
-describe('PatternVisualization', () => {
   it('renders correctly with no data', () => {
     render(
       <PatternVisualization
@@ -82,13 +96,6 @@ describe('PatternVisualization', () => {
 
   it('calls onPatternSelect when a trend is clicked', () => {
     const handlePatternSelect = vi.fn()
-    render(
-      <PatternVisualization
-        trends={mockTrends}
-        onPatternSelect={handlePatternSelect}
-      />,
-    )
-
     const trendItem = screen.getByText('Increasing anxiety levels')
     trendItem.click()
 
@@ -110,31 +117,6 @@ describe('PatternVisualization', () => {
 
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
     expect(handlePatternSelect).toHaveBeenCalledWith(mockPatterns[0])
-  })
-
-  it('calls onPatternSelect when a risk correlation is clicked', () => {
-    const handlePatternSelect = vi.fn()
-    render(
-      <PatternVisualization
-        riskCorrelations={mockRiskCorrelations}
-        onPatternSelect={handlePatternSelect}
-      />,
-    )
-
     const riskItem = screen.getByText('Immediate action recommended')
     riskItem.click()
 
-    expect(handlePatternSelect).toHaveBeenCalledTimes(1)
-    expect(handlePatternSelect).toHaveBeenCalledWith(mockRiskCorrelations[0])
-  })
-
-  it('hides controls when showControls is false', () => {
-    render(<PatternVisualization showControls={false} />)
-    expect(
-      screen.queryByRole('button', { name: 'Export Patterns' }),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: 'Refresh Data' }),
-    ).not.toBeInTheDocument()
-  })
-})

@@ -22,6 +22,47 @@ import {
 import { apiClient, APIError } from '@/lib/api-client'
 import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 
+interface CrisisDetectionApiResponse {
+  assessment: {
+    overallRisk: 'none' | 'low' | 'moderate' | 'high' | 'imminent';
+    suicidalIdeation: {
+      present: boolean;
+      severity: 'with_intent' | 'with_plan' | 'active' | 'passive' | 'none';
+    };
+    selfHarm: {
+      present: boolean;
+      risk: 'high' | 'moderate' | 'low';
+      frequency: 'daily' | 'frequent' | 'occasional' | 'rare' | 'none';
+    };
+    agitation: {
+      present: boolean;
+      controllable: boolean;
+      severity: 'severe' | 'moderate' | 'low';
+    };
+    substanceUse: {
+      present: boolean;
+      acute: boolean;
+      impairment: 'severe' | 'moderate' | 'low';
+    };
+  };
+  riskFactors: { factor: string }[];
+  protectiveFactors: { factor: string }[];
+  recommendations: {
+    immediate: { action: string }[];
+  };
+  resources: {
+    crisis: {
+      name: string;
+      contact: string;
+      specialization: string[];
+      availability: string;
+    }[];
+  };
+  metadata: {
+    confidenceScore: number;
+  };
+}
+
 interface CrisisAssessment {
   riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent'
   riskScore: number
@@ -85,7 +126,7 @@ export default function CrisisDetectionDemo() {
           includeResourceRecommendations: true,
           enableImmediateNotifications: true
         }
-      })
+      }) as CrisisDetectionApiResponse
 
       const crisisAssessment: CrisisAssessment = {
         riskLevel: result.assessment.overallRisk,
@@ -115,7 +156,7 @@ export default function CrisisDetectionDemo() {
                      result.assessment.selfHarm.frequency === 'rare' ? 2 : 0
           },
           hopelessness: {
-            present: result.riskFactors.some((rf: unknown) => (rf as { factor: string }).factor.includes('hopelessness')),
+            present: result.riskFactors.some(rf => rf.factor.includes('hopelessness')),
             confidence: 0.7,
             severity: 6
           },
@@ -126,7 +167,7 @@ export default function CrisisDetectionDemo() {
                      result.assessment.agitation.severity === 'moderate' ? 6 : 3
           },
           socialIsolation: {
-            present: result.riskFactors.some((rf: unknown) => (rf as { factor: string }).factor.includes('isolation')),
+            present: result.riskFactors.some(rf => rf.factor.includes('isolation')),
             confidence: 0.6,
             severity: 5
           },
@@ -147,33 +188,6 @@ export default function CrisisDetectionDemo() {
             available: resource.availability
           }
         }),
-        confidenceLevel: result.metadata.confidenceScore / 100,
-        timestamp: new Date().toISOString()
-      }
-
-      if (!isRealTime) {
-        setAssessment(crisisAssessment)
-      }
-
-      // Add to assessment history
-      setAssessmentHistory(prev => [...prev.slice(-9), crisisAssessment]) // Keep last 10
-
-      // Handle high-risk situations
-      if (crisisAssessment.riskLevel === 'imminent' || crisisAssessment.riskLevel === 'high') {
-        // Could trigger notifications, alerts, etc.
-        console.warn('HIGH RISK SITUATION DETECTED:', crisisAssessment)
-      }
-
-    } catch (error: unknown) {
-      console.error('Crisis assessment failed:', error)
-
-      if (error instanceof APIError) {
-        setError(`Assessment failed: ${String(error)}`)
-      } else {
-        setError('Assessment failed. Please try again.')
-      }
-
-      // Fallback to demo data for demonstration
       if (!isRealTime) {
         const demoAssessment: CrisisAssessment = {
           riskLevel: 'moderate',
