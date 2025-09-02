@@ -73,20 +73,3 @@
     window
       .matchMedia('(prefers-color-scheme: dark)')
       .addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
-          setTheme(e.matches ? 'dark' : 'light')
-        }
-      })
-  })
-</script>
-
-<style>
-  /* Animation for theme switcher */
-  #theme-toggle {
-    transition: transform 0.2s ease;
-  }
-
-  #theme-toggle:hover {
-    transform: rotate(15deg);
-  }
-</style>

@@ -170,7 +170,7 @@ export default function EmotionTrackingChart({
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="timestamp"
-            tickFormatter={(tick: string) =>
+            tickFormatter={(tick) =>
               new Date(tick).toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -180,7 +180,7 @@ export default function EmotionTrackingChart({
 
           <YAxis domain={[0, 10]} />
           <Tooltip
-            formatter={(value: number, name: string) => {
+            formatter={(value, name) => {
               const dimensionLabels: Record<string, string> = {
                 valence: 'Valence (Positive/Negative)',
                 arousal: 'Arousal (Calm/Excited)',
@@ -188,7 +188,7 @@ export default function EmotionTrackingChart({
               }
               return [`${value}/10`, dimensionLabels[name] || name]
             }}
-            labelFormatter={(label: string) => new Date(label).toLocaleTimeString()}
+            labelFormatter={(label) => new Date(label).toLocaleTimeString()}
           />
 
           <Legend />
