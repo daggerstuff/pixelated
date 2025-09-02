@@ -61,6 +61,9 @@
         // drawing a branch
         const length = random() * LEN
         const [nx, ny] = polar2cart(x, y, length, rad)
+
+        if (nx === undefined || ny === undefined) return
+
         ctx.beginPath()
         ctx.moveTo(x, y)
         if (nx !== undefined && ny !== undefined) {
@@ -86,10 +89,10 @@
         const rate = counter.value <= THRESHOLD ? 0.8 : 0.5
         // left branch
         if (random() < rate)
-          pendingSteps.push(() => step(nx, ny, rad1, counter || { value: 0 }))
+          pendingSteps.push(() => step(nx, ny, rad1, counter))
         // right branch
         if (random() < rate)
-          pendingSteps.push(() => step(nx, ny, rad2, counter || { value: 0 }))
+          pendingSteps.push(() => step(nx, ny, rad2, counter))
       }
 
       /* RAF callback functions */
