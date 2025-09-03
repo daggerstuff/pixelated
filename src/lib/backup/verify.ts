@@ -34,7 +34,7 @@ export class BackupVerificationService extends EventEmitter {
   private config: BackupConfig
   private backupDir: string
 
-  constructor(redis: RedisService, config: Partial<BackupConfig> = {}): void {
+  constructor(redis: RedisService, config: Partial<BackupConfig> = {}) {
     super()
     this.redis = redis
     this.config = {

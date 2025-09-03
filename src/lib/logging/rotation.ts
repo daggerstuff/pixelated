@@ -42,7 +42,7 @@ const defaultConfig: LogRotationConfig = {
 export class LogRotationService {
   private config: LogRotationConfig
 
-  constructor(config: Partial<LogRotationConfig> = {}): void {
+  constructor(config: Partial<LogRotationConfig> = {}) {
     this.config = { ...defaultConfig, ...config }
   }
 

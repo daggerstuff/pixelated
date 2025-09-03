@@ -64,7 +64,7 @@ export class PerformanceOptimizer {
   private batchQueues: Map<string, { items: unknown[]; timer: NodeJS.Timeout | null }>
   private metricsHistory: PerformanceMetrics[]
 
-  constructor(config: Partial<OptimizationConfig> = {}): void {
+  constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
       connectionPool: {
         maxConnections: 100,

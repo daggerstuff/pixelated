@@ -11,7 +11,7 @@ const authService = new MongoAuthService()
  * @param password User password
  * @returns User session or error
  */
-export async function signInWithEmail(email: string, password: string): void {
+export async function signInWithEmail(email: string, password: string) {
   try {
     const { user, token } = await authService.signIn(email, password)
 
@@ -30,7 +30,7 @@ export async function signInWithEmail(email: string, password: string): void {
  * @param provider OAuth provider (google, github)
  * @param redirectTo URL to redirect after authentication
  */
-export async function signInWithOAuth(_provider: Provider, _redirectTo?: string): void {
+export async function signInWithOAuth(_provider: Provider, _redirectTo?: string): Promise<void> {
   try {
     // This would need to be implemented based on your OAuth setup
     throw new Error(
@@ -74,7 +74,7 @@ export async function signUp(
 /**
  * Sign out the current user
  */
-export async function signOut(token: string): void {
+export async function signOut(token: string): Promise<boolean> {
   try {
     await authService.signOut(token)
     return true
@@ -88,7 +88,7 @@ export async function signOut(token: string): void {
  * Get the current user by token
  * @returns Current authenticated user or null
  */
-export async function getCurrentUser(authHeader: string): void {
+export async function getCurrentUser(authHeader: string): Promise<AuthUser | null> {
   try {
     const authInfo = await authService.verifyAuthToken(authHeader)
     const user = await authService.getUserById(authInfo['userId'])
@@ -109,7 +109,7 @@ export async function getCurrentUser(authHeader: string): void {
  * @param email User email
  * @param redirectTo URL to redirect after reset
  */
-export async function resetPassword(_email: string, _redirectTo?: string): void {
+export async function resetPassword(_email: string, _redirectTo?: string): Promise<void> {
   try {
     // For MongoDB implementation, you'd need to implement email sending
     throw new Error(
@@ -129,11 +129,12 @@ export async function resetPassword(_email: string, _redirectTo?: string): void 
  */
 export async function updatePassword(
   userId: string,
-  currentPassword: string,
+  _currentPassword: string,
   newPassword: string,
 ) {
   try {
-    await authService.changePassword(userId, currentPassword, newPassword)
+    // Only newPassword is required for Mongo
+    await authService.changePassword(userId, newPassword)
     return true
   } catch (error: unknown) {
     console.error('Error updating password:', error)
@@ -162,7 +163,7 @@ export function createAuthToken(
  * @param purpose Expected token purpose
  * @returns Verified token payload or null
  */
-export function verifyAuthToken(token: string, purpose: string): void {
+export function verifyAuthToken(token: string, purpose: string): Record<string, unknown> | null {
   const result = verifySecureToken(token)
   if (!result || result['purpose'] !== purpose) {
     return null
@@ -185,9 +186,9 @@ export function mapToAuthUser(user: User): AuthUser | null {
     email: user['email'],
     name: user['metadata']?.['fullName'] || user['fullName'] || '',
     image: user['metadata']?.['avatarUrl'] || user['avatarUrl'] || '',
-    role: user['role'] || 'user',
+    role: user['role'] as UserRole,
     fullName: user['metadata']?.['fullName'] || user['fullName'] || '',
-    roles: [user['role']],
+    roles: [user['role'] as UserRole],
     emailVerified: user['emailVerified'] || false,
     createdAt: user['createdAt']?.toISOString() || new Date().toISOString(),
     lastSignIn: user['lastLogin']?.toISOString() || null,
@@ -214,7 +215,7 @@ export async function updateProfile(
     const updatedUser = await authService.updateUser(userId, {
       fullName: profile.fullName,
       avatarUrl: profile.avatarUrl,
-      metadata: profile.metadata,
+      ...(profile.metadata ? { metadata: profile.metadata } : {}),
     })
 
     if (!updatedUser) {

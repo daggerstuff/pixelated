@@ -19,7 +19,7 @@ export class OAuth2Service {
   private tokenStore: TokenStore = {}
   private readonly EXPIRY_BUFFER = 300 // 5 minutes buffer before token expiry
 
-  constructor(private readonly logger: Console = console): void {}
+  constructor(private readonly logger: Console = console) {}
 
   async getAccessToken(provider: EHRProvider): Promise<string> {
     const storedToken = this.tokenStore[provider.id]

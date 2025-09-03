@@ -20,7 +20,7 @@ export class EHRIntegration {
    * @param fhirClient The FHIR client to use for EHR integration
    * @param options Additional options for the integration
    */
-  constructor(fhirClient: unknown, options: { auditLog?: boolean } = {}): void {
+  constructor(fhirClient: unknown, options: { auditLog?: boolean } = {}) {
     if (!fhirClient || typeof fhirClient !== 'object') {
       throw new Error('Invalid FHIR client provided.')
     }

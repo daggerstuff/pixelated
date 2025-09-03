@@ -53,7 +53,7 @@ export class KeyStorage {
    * Creates a new KeyStorage instance
    * @param options - Configuration options
    */
-  constructor(options: KeyStorageOptions): void {
+  constructor(options: KeyStorageOptions) {
     this.namespace = options.namespace
     this.useKms = options.useKms
     this.kmsKeyId = options.kmsKeyId

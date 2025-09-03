@@ -5,7 +5,7 @@ export class RedisStorageAPI implements StorageAPI {
   private client
   private connected = false
 
-  constructor(redisUrl: string): void {
+  constructor(redisUrl: string) {
     this.client = createClient({
       url: redisUrl,
     })

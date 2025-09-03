@@ -87,7 +87,7 @@ export class CrisisDetectionService {
     high: { crisis: 0.4, concern: 0.2 },
   }
 
-  constructor(config: CrisisDetectionConfig): void {
+  constructor(config: CrisisDetectionConfig) {
     this.aiService = config.aiService
     this.sensitivityLevel = config.sensitivityLevel
     this.model = config.model
