@@ -125,4 +125,3 @@ try {
 } catch (error) {
   console.error('Error reading middleware file:', error);
 }
-\n
