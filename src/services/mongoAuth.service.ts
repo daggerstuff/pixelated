@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
-import type { Db } from 'mongodb'
+// Use type-only imports for Mongo types
+import type { ObjectId as MongoObjectId, Db } from 'mongodb'
 
 // Runtime shape of our MongoDB wrapper
 type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: any }
