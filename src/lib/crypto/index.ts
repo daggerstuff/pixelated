@@ -517,24 +517,7 @@ export interface CryptoSystemOptions {
 /**
  * Comprehensive crypto system factory
  */
-/**
- * Return type for createCryptoSystem function
- */
-export interface CryptoSystem {
-  encrypt: typeof encrypt;
-  decrypt: typeof decrypt;
-  generateSecureKey: typeof generateSecureKey;
-  createHash: typeof createHash;
-  createHMAC: typeof createHMAC;
-  keyStorage: KeyStorage;
-  keyRotationManager: KeyRotationManager;
-  encryptWithKeyManagement(data: string, purpose?: string): Promise<string>;
-  decryptWithKeyManagement(encryptedData: string): Promise<string>;
-  rotateExpiredKeys(): Promise<string[]>;
-  close(): Promise<void>;
-}
-
-export function createCryptoSystem(options: CryptoSystemOptions = {}): CryptoSystem {
+export function createCryptoSystem(options: CryptoSystemOptions = {}) {
   const {
     namespace = 'app',
     useSecureStorage = false,
