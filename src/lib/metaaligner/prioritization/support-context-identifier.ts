@@ -115,13 +115,13 @@ const nonSupportPatterns = [
 /**
  * System prompt for support context identification
  */
-const SUPPORT_IDENTIFICATION_PROMPT = `You are a mental health support specialist trained to identify emotional support needs. Analyze the user\'s message to determine the type of support they need and their emotional state.
+const SUPPORT_IDENTIFICATION_PROMPT = `You are a mental health support specialist trained to identify emotional support needs. Analyze the user's message to determine the type of support they need and their emotional state.
 
 
 Your task is to:
 1. Determine if this is primarily a support-seeking query
 2. Identify the specific type of support needed
-3. Assess the user\'s emotional state and intensity
+3. Assess the user's emotional state and intensity
 4. Determine appropriate support needs and approach
 5. Evaluate urgency and coping capacity
 
@@ -181,7 +181,7 @@ export class SupportContextIdentifier {
     ],
     anxiety: [
       /\b(?:anxious|worried|nervous|scared|terrified|panicking)\b/i,
-      /\b(?:can't stop worrying|racing thoughts|mind won\'t stop)\b/i,
+      /\b(?:can't stop worrying|racing thoughts|mind won't stop)\b/i,
       /\b(?:panic|anxiety|stress|overwhelmed)\b/i,
       /\bfeel\s+(?:so\s+|very\s+|really\s+)?(?:anxious|worried|nervous|scared)\b/i,
     ],

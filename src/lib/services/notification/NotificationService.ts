@@ -415,7 +415,7 @@ export class NotificationService {
    * Mark a notification as read
    */
   async markAsRead(userId: string, notificationId: string): Promise<void> {
-    const notification = await redis.hget(
+    const notification = await (redis as unknown as RedisCommands).hget(
       `notifications:${userId}`,
       notificationId,
     )
@@ -423,7 +423,7 @@ export class NotificationService {
       throw new Error('Notification not found')
     }
 
-    const parsed = NotificationItemSchema.parse(JSON.parse(notification) as unknown)
+  const parsed = NotificationItemSchema.parse(JSON.parse(notification as string) as NotificationItem)
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
 
@@ -442,13 +442,13 @@ export class NotificationService {
     limit = 50,
     offset = 0,
   ): Promise<NotificationItem[]> {
-    const notifications = await redis.hgetall(`notifications:${userId}`)
+  const notifications = await (redis as unknown as RedisCommands).hgetall(`notifications:${userId}`)
     if (!notifications) {
       return []
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as unknown))
+      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as NotificationItem))
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(offset, offset + limit)
   }
@@ -457,13 +457,13 @@ export class NotificationService {
    * Get unread notification count for a user
    */
   async getUnreadCount(userId: string): Promise<number> {
-    const notifications = await redis.hgetall(`notifications:${userId}`)
+    const notifications = await (redis as unknown as RedisCommands).hgetall(`notifications:${userId}`)
     if (!notifications) {
       return 0
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as unknown))
+      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as NotificationItem))
       .filter((n) => n.status !== NotificationStatus.READ).length
   }
 
@@ -509,7 +509,7 @@ export class NotificationService {
     userId: string,
     subscription: PushSubscription,
   ): Promise<void> {
-    await redis.hset(this.subscriptionKey, userId, JSON.stringify(subscription))
+  await (redis as unknown as RedisCommands).hset(this.subscriptionKey, userId, JSON.stringify(subscription))
     logger.info('Push subscription stored', { userId })
   }
 
@@ -517,7 +517,7 @@ export class NotificationService {
    * Remove a push subscription for a user
    */
   async removePushSubscription(userId: string): Promise<void> {
-    await redis.hdel(this.subscriptionKey, userId)
+  await (redis as unknown as RedisCommands).hdel(this.subscriptionKey, userId)
     logger.info('Push subscription removed', { userId })
   }
 
@@ -527,11 +527,11 @@ export class NotificationService {
   private async getPushSubscription(
     userId: string,
   ): Promise<PushSubscription | null> {
-    const subscription = await redis.hget(this.subscriptionKey, userId)
+  const subscription = await (redis as unknown as RedisCommands).hget(this.subscriptionKey, userId)
     if (!subscription) {
       return null
     }
-    return JSON.parse(subscription) as unknown
+  return JSON.parse(subscription as string) as PushSubscription | null
   }
 
   /**

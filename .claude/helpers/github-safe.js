@@ -29,7 +29,7 @@ Usage:
 
 This helper prevents timeout issues with special characters like:
 - Backticks in code examples
-- Command substitution \$(...)
+- Command substitution $(...)
 - Directory paths
 - Special shell characters
 `);
@@ -80,10 +80,7 @@ if ((command === 'issue' || command === 'pr') &&
       const ghCommand = `gh ${command} ${subcommand} ${newArgs.join(' ')}`;
       console.log(`Executing: ${ghCommand}`);
       
-      const result = execSync(ghCommand, { 
-        stdio: 'inherit',
-        timeout: 30000 // 30 second timeout
-      });
+      
       
     } catch (error) {
       console.error('Error:', error.message);

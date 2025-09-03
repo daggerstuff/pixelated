@@ -628,7 +628,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       },
     }
 
-    biasEngine = new BiasDetectionEngine(mockConfig)
+    const localEngine = new BiasDetectionEngine(mockConfig)
   })
 
   it('should initialize correctly', () => {
