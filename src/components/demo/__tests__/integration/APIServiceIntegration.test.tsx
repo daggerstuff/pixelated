@@ -618,7 +618,8 @@ describe('API Service Integration Tests', () => {
             )
           }
         }
-        throw new Error('All retries failed');
+        // This should never be reached, but satisfies TypeScript's requirement for all code paths to return a value
+        throw new Error('All retries exhausted')
       }
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})

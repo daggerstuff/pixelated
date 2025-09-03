@@ -9,17 +9,15 @@ export const securityHeaders = async (context: BaseAPIContext, next: MiddlewareN
 
   let csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://*.sentry.io`,
+    `script-src 'self' 'nonce-${nonce}' https: https://*.sentry.io`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    // Restrict img-src to self, data, and any trusted image domains (add more as needed)
-    "img-src 'self' data: https://*.sentry.io", // Restrict img-src to self, data, and trusted image domains (add more as needed)
+    "img-src 'self' data: https:",
     "font-src 'self' https://fonts.gstatic.com",
     "object-src 'none'",
     "frame-ancestors 'self'",
     "base-uri 'self'",
     "form-action 'self'",
-    // Restrict connect-src to self and trusted websocket/XHR endpoints (add more as needed)
-    "connect-src 'self' https://*.sentry.io",
+    "connect-src 'self' https: wss: https://*.sentry.io",
   ];
 
   if (import.meta.env.DEV) {
@@ -27,9 +25,8 @@ export const securityHeaders = async (context: BaseAPIContext, next: MiddlewareN
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data:",
+      "img-src 'self' data: https:",
       "font-src 'self' https://fonts.gstatic.com",
-      // Allow ws: and wss: in dev for local websocket debugging
       "connect-src 'self' ws: wss:",
     ];
   }
