@@ -27,6 +27,7 @@ if (typeof window === 'undefined') {
     console.warn('MongoDB not available, using mock ObjectId')
     module.exports = {
       ObjectId: class MockObjectId {
+        public id: string
         constructor(id?: string) {
           this.id = id || 'mock-object-id'
         }
@@ -46,6 +47,7 @@ if (typeof window === 'undefined') {
   // Client side - export mock
   module.exports = {
     ObjectId: class MockObjectId {
+      public id: string
       constructor(id?: string) {
         this.id = id || 'mock-object-id'
       }

@@ -19,7 +19,7 @@ class TherapyChatWebSocketServer {
   private clients: Map<string, WebSocket>
   private sessions: Map<string, Set<string>>
 
-  constructor(server: Server): void {
+  constructor(server: Server) {
     this.wss = new WebSocketServer({ server })
     this.clients = new Map()
     this.sessions = new Map()

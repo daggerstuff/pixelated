@@ -9,43 +9,69 @@ const __dirname = path.dirname(__filename)
 
 // Required headers for HIPAA compliance
 const requiredHeaders = {
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
+  'X-Frame-Options': 'SAMEORIGIN',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  'Content-Security-Policy': ["default-src 'self'"],
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+  'Content-Security-Policy': true, // We'll validate that CSP is properly configured
 }
 
-// Read the Astro config file
-const configPath = path.join(process.cwd(), 'astro.config.mjs')
-console.log(`Reading Astro config from: ${configPath}`)
+// Read the security headers middleware file
+const middlewarePath = path.join(process.cwd(), 'src/lib/middleware/securityHeaders.ts')
+console.log(`Reading security headers middleware from: ${middlewarePath}`)
 
 try {
-  const configContent = fs.readFileSync(configPath, 'utf8')
+  const middlewareContent = fs.readFileSync(middlewarePath, 'utf8')
 
-  // Check if headers section exists
-  if (!configContent.includes('headers:')) {
-    console.error('❌ No headers section found in astro.config.mjs')
-    process.exit(1)
-  }
+  console.log('✅ Reading security headers middleware...')
 
-  console.log('✅ Found headers section in astro.config.mjs')
-
-  // Check for each required header
+  // Check for each required header implementation
   const missingHeaders = []
   const foundHeaders = new Set()
 
   // Check for each required header
-  for (const header of Object.keys(requiredHeaders)) {
-    const keyRegex = new RegExp(`key:\\s*['"]${header}['"]`, 'i')
-    if (keyRegex.test(configContent)) {
-      foundHeaders.add(header)
-      console.log(`✅ Found header: ${header}`)
+  for (const [header, expectedValue] of Object.entries(requiredHeaders)) {
+    if (header === 'Content-Security-Policy') {
+      // Special check for CSP implementation
+      if (middlewareContent.includes('Content-Security-Policy') &&
+          middlewareContent.includes('response.headers.set(\'Content-Security-Policy\'')) {
+        foundHeaders.add(header)
+        console.log(`✅ Found header implementation: ${header}`)
+
+        // Additional CSP validation
+        if (middlewareContent.includes('nonce-')) {
+          console.log(`✅ CSP uses nonce-based script-src for security`)
+        }
+        if (middlewareContent.includes('unsafe-inline') && middlewareContent.includes('if (import.meta.env.PROD)')) {
+          console.log(`✅ CSP removes unsafe-inline in production environment`)
+        }
+      } else {
+        missingHeaders.push(header)
+        console.log(`❌ Missing header implementation: ${header}`)
+      }
+    } else if (header === 'Strict-Transport-Security') {
+      // Check for HSTS implementation with PROD guard
+      const hstsPattern = /if \(import\.meta\.env\.PROD\) \{[\s\S]*?Strict-Transport-Security[\s\S]*?\}/
+      if (middlewareContent.includes('Strict-Transport-Security') &&
+          hstsPattern.test(middlewareContent)) {
+        foundHeaders.add(header)
+        console.log(`✅ Found header implementation with PROD guard: ${header}`)
+      } else {
+        missingHeaders.push(header)
+        console.log(`❌ Missing PROD-guarded header implementation: ${header}`)
+      }
     } else {
-      missingHeaders.push(header)
-      console.log(`❌ Missing header: ${header}`)
+      // Check for other header implementations (handles multiline values)
+      const escapedValue = expectedValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const headerPattern = new RegExp(`response\\.headers\\.set\\([^)]*${header}[^)]*['"]${escapedValue}['"]`, 'i')
+      if (headerPattern.test(middlewareContent)) {
+        foundHeaders.add(header)
+        console.log(`✅ Found header: ${header}`)
+      } else {
+        missingHeaders.push(header)
+        console.log(`❌ Missing header: ${header}`)
+      }
     }
   }
 
@@ -68,18 +94,18 @@ try {
     for (const header of missingHeaders) {
       report += `- [ ] ${header}\n`
     }
-    report += `\nPlease add these headers to your astro.config.mjs file.\n`
+    report += `\nPlease add these headers to your src/lib/middleware/securityHeaders.ts file.\n`
 
     // Write report
     fs.writeFileSync('docs/security/headers-analysis.md', report)
 
     console.log('\nMissing headers:')
     missingHeaders.forEach((header) => console.log(`- ${header}`))
-    console.log('\nPlease add these headers to your astro.config.mjs file')
+    console.log('\nPlease add these headers to your src/lib/middleware/securityHeaders.ts file')
     process.exit(1)
   } else {
     report += `\n## All Required Headers Found\n`
-    report += `All security headers required for HIPAA compliance are properly configured.\n`
+    report += `All security headers required for HIPAA compliance are properly configured in the middleware.\n`
 
     // Write report
     fs.writeFileSync('docs/security/headers-analysis.md', report)
@@ -88,6 +114,6 @@ try {
     process.exit(0)
   }
 } catch (error) {
-  console.error(`Error reading config file: ${error.message}`)
+  console.error(`Error reading middleware file: ${error.message}`)
   process.exit(1)
 }

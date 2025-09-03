@@ -339,7 +339,7 @@ describe('API Service Integration Tests', () => {
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
+      global.WebSocket = vi.fn(() => mockWebSocket) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -358,7 +358,7 @@ describe('API Service Integration Tests', () => {
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(() => mockWebSocket) as unknown
+      global.WebSocket = vi.fn(() => mockWebSocket) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -398,6 +398,8 @@ describe('API Service Integration Tests', () => {
             )
           }
         }
+        // This should never be reached, but satisfies TypeScript's requirement for all code paths to return a value
+        throw new Error('All retries exhausted')
       }
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})

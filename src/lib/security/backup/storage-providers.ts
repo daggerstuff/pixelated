@@ -119,7 +119,7 @@ export class FileSystemStorageProvider implements StorageProvider {
     basePath: string
   }
 
-  constructor(config: Record<string, unknown>): void {
+  constructor(config: Record<string, unknown>) {
     this.config = {
       basePath:
         (config['basePath'] as string) ||
@@ -255,7 +255,7 @@ export class MockCloudStorageProvider implements StorageProvider {
     basePath: string
   }
 
-  constructor(config: Record<string, unknown>): void {
+  constructor(config: Record<string, unknown>) {
     this.config = {
       provider: (config['provider'] as string) || 'mock-cloud',
       bucket: (config['bucket'] as string) || 'mock-bucket',

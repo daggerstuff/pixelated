@@ -1,19 +1,27 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
+// Use type-only imports for Mongo types
+import type { ObjectId as MongoObjectId, Db } from 'mongodb'
+
+// Runtime shape of our MongoDB wrapper
+type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: any }
+
 // Use conditional imports to prevent MongoDB from being bundled on client side
-let mongodb: any
+let mongodb: MongoRuntime | null = null
 let ObjectId: any
 
 if (typeof window === 'undefined') {
   // Server side - import real MongoDB dependencies
   try {
-    mongodb = require('../config/mongodb.config').default
-    const mongodbLib = require('mongodb')
-    ObjectId = mongodbLib.ObjectId
+  const mod = require('../config/mongodb.config')
+  mongodb = mod.default as MongoRuntime
+  const mongodbLib = require('mongodb')
+  ObjectId = mongodbLib.ObjectId
   } catch {
     // Fallback if MongoDB is not available
     mongodb = null
     ObjectId = class MockObjectId {
+      public id: string
       constructor(id?: string) {
         this.id = id || 'mock-object-id'
       }
@@ -25,6 +33,7 @@ if (typeof window === 'undefined') {
   // Client side - use mocks
   mongodb = null
   ObjectId = class MockObjectId {
+    public id: string
     constructor(id?: string) {
       this.id = id || 'mock-object-id'
     }
@@ -56,7 +65,7 @@ export class MongoAuthService {
     password: string,
     role: 'admin' | 'user' | 'therapist' = 'user',
   ): Promise<User> {
-    const db = await mongodb.connect()
+  const db = await mongodb!.connect()
     const usersCollection = db.collection<User>('users')
 
     // Check if user already exists
@@ -91,9 +100,9 @@ export class MongoAuthService {
   }
 
   async signIn(email: string, password: string): Promise<AuthResult> {
-    const db = await mongodb.connect()
-    const usersCollection = db.collection<User>('users')
-    const sessionsCollection = db.collection<Session>('sessions')
+  const db = await mongodb!.connect()
+  const usersCollection = db.collection<User>('users')
+  const sessionsCollection = db.collection<Session>('sessions')
 
     // Find user
     const user = await usersCollection.findOne({ email })
@@ -113,7 +122,7 @@ export class MongoAuthService {
 
     const session: Omit<Session, '_id'> = {
       userId: user._id,
-      sessionId: sessionId.toString(),
+      sessionId: String(sessionId && (sessionId as any).toString ? (sessionId as any).toString() : sessionId),
       expiresAt,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -123,7 +132,7 @@ export class MongoAuthService {
 
     // Generate JWT
     const accessToken = this.generateToken({
-      userId: user._id.toString(),
+      userId: String(user._id && (user._id as any).toString ? (user._id as any).toString() : user._id),
       email: user.email,
       role: user.role,
     })
@@ -136,7 +145,7 @@ export class MongoAuthService {
   }
 
   async signOut(sessionId: string): Promise<void> {
-    const db = await mongodb.connect()
+  const db = await mongodb!.connect()
     const sessionsCollection = db.collection<Session>('sessions')
 
     await sessionsCollection.deleteOne({ sessionId })
@@ -147,9 +156,9 @@ export class MongoAuthService {
       // Verify current token
       const payload = this.verifyToken(accessToken) as AuthTokenPayload
 
-      const db = await mongodb.connect()
-      const usersCollection = db.collection<User>('users')
-      const sessionsCollection = db.collection<Session>('sessions')
+    const db = await mongodb!.connect()
+    const usersCollection = db.collection<User>('users')
+    const sessionsCollection = db.collection<Session>('sessions')
 
       // Get user
       const user = await usersCollection.findOne({
@@ -183,7 +192,7 @@ export class MongoAuthService {
 
       // Generate new JWT
       const newAccessToken = this.generateToken({
-        userId: user._id.toString(),
+        userId: String(user._id && (user._id as any).toString ? (user._id as any).toString() : user._id),
         email: user.email,
         role: user.role,
       })
@@ -211,8 +220,8 @@ export class MongoAuthService {
   }
 
   async getUserById(userId: string): Promise<User | null> {
-    const db = await mongodb.connect()
-    const usersCollection = db.collection<User>('users')
+  const db = await mongodb!.connect()
+  const usersCollection = db.collection<User>('users')
 
     return await usersCollection.findOne({ _id: new ObjectId(userId) })
   }
@@ -221,8 +230,8 @@ export class MongoAuthService {
     userId: string,
     updates: Partial<User>,
   ): Promise<User | null> {
-    const db = await mongodb.connect()
-    const usersCollection = db.collection<User>('users')
+  const db = await mongodb!.connect()
+  const usersCollection = db.collection<User>('users')
 
     await usersCollection.updateOne(
       { _id: new ObjectId(userId) },
@@ -235,7 +244,7 @@ export class MongoAuthService {
   async changePassword(userId: string, newPassword: string): Promise<void> {
     const hashedPassword = await bcrypt.hash(newPassword, this.SALT_ROUNDS)
 
-    const db = await mongodb.connect()
+  const db = await mongodb!.connect()
     const usersCollection = db.collection<User>('users')
 
     await usersCollection.updateOne(

@@ -1,4 +1,3 @@
-import type { AstroCookies } from 'astro'
 import type { AuthRole } from '../config/auth.config'
 import type { AuditMetadata } from './audit/types'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
@@ -26,7 +25,7 @@ export interface AuthUser {
  * Get the current authenticated user from cookies
  */
 export async function getCurrentUser(
-  cookies: AstroCookies,
+  cookies: any,
 ): Promise<AuthUser | null> {
   const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
 
@@ -41,7 +40,7 @@ export async function getCurrentUser(
     }
 
     // Assuming the decoded token contains the user ID
-    const userId = decoded.userId
+    const {userId} = decoded
 
     // Fetch user from the database
     const user = await mongoAuthService.getUserById(userId)
@@ -73,7 +72,7 @@ export async function getCurrentUser(
  * Check if the user is authenticated
  */
 export async function isAuthenticated(
-  cookies: AstroCookies,
+  cookies: any,
 ): Promise<boolean> {
   // Always return false in the browser context to prevent redirects
   if (typeof window !== 'undefined') {
@@ -103,7 +102,7 @@ export async function isAuthenticated(
  * Check if the user has the required role
  */
 export async function hasRole(
-  cookies: AstroCookies,
+  cookies: any,
   requiredRole: AuthRole,
 ): Promise<boolean> {
   const user = await getCurrentUser(cookies)
@@ -168,7 +167,7 @@ export async function requireAuth({
   redirect,
   request,
 }: {
-  cookies: AstroCookies
+  cookies: any
   redirect: (url: string) => Response
   request: Request
 }) {
@@ -192,7 +191,7 @@ export async function requireRole({
   request,
   role,
 }: {
-  cookies: AstroCookies
+  cookies: any
   redirect: (url: string) => Response
   request: Request
   role: AuthRole
@@ -213,21 +212,21 @@ export async function requireRole({
 }
 
 export class Auth {
-  async verifySession(request: Request): void {
+  async verifySession(request: Request): Promise<{ userId: string } | null> {
     const cookies = this.getCookiesFromRequest(request)
     const user = await getCurrentUser(cookies)
     return user ? { userId: user.id } : null
   }
 
-  private getCookiesFromRequest(request: Request): AstroCookies {
-    // Convert Request headers to AstroCookies format
+  private getCookiesFromRequest(request: Request): any {
+    // Convert Request headers to cookies-like format
     const cookieHeader = request.headers.get('cookie') || ''
     return {
       get: (name: string) => {
         const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))
         return match ? { value: match[1] } : undefined
       },
-    } as AstroCookies
+    } as any
   }
 }
 
