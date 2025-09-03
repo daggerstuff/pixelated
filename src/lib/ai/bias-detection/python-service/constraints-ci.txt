@@ -1,4 +1,0 @@
-# Pinned constraints for CI to avoid ABI mismatches
-# Keep these in sync with supported wheels on ubuntu-latest
-numpy==2.0.*
-pandas==2.2.3
