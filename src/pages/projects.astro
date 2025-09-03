@@ -8,15 +8,16 @@ const frontmatter = {
   title: 'Projects',
   subtitle: 'Tech Stack for the Astro AntfuStyle Theme & Credits',
   description: 'Tech Stack for the Astro AntfuStyle Theme & Credits',
-  bgType: 'dot' as BgType,
+  bgType: 'dot',
   toc: true,
-  ogImage: false,
+  ogImage: '/og-image.png',
 }
 ---
 
 <BaseLayout
   title={frontmatter.title}
   description={frontmatter.description}
+  bgType={frontmatter.bgType}
 >
   <section class="py-12">
     <div class="max-w-6xl mx-auto px-4 text-center">

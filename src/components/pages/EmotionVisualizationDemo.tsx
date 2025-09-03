@@ -1,6 +1,15 @@
-import React, { useState } from 'react'
+import { useState, type FC } from 'react'
 import { useMultidimensionalEmotions } from '../../hooks/useMultidimensionalEmotions'
 import MultidimensionalEmotionChart from '../../components/dashboard/MultidimensionalEmotionChart'
+
+interface EmotionDataPoint {
+  id: string
+  timestamp: Date
+  valence: number
+  arousal: number
+  dominance: number
+  emotion?: string
+}
 
 type TimeRange = 'day' | 'week' | 'month' | 'year'
 

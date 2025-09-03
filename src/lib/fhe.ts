@@ -275,7 +275,10 @@ export class RealFHEService implements FHEService {
       const dataBuffer = encoder.encode(data)
 
       // Perform SHA-256 hashing
-      const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
+      const hashBuffer = await this.seal.crypto.subtle.digest(
+        'SHA-256',
+        dataBuffer,
+      )
 
       // Convert the hash to hex string
       const hashArray = Array.from(new Uint8Array(hashBuffer))

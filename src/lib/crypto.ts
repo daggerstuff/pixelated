@@ -94,10 +94,6 @@ export function createCryptoSystem(options: CryptoSystemOptions): CryptoSystem {
   }
 }
 
-// Example PHI audit logging - uncomment and customize as needed
-// logger.info('Accessing PHI data', {
-//   userId: 'user-id-here',
-//   action: 'read',
-//   dataType: 'patient-record',
-//   recordId: 'record-id-here'
-// });
+// This file provides a placeholder for a cryptographic system.
+// In a real-world scenario, this would be replaced with a robust
+// implementation using a standard cryptographic library.

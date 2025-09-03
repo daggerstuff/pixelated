@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Message, ChatMessage as ChatMessageType } from '@/types/chat'
+import type { ChatMessage as ChatMessageType } from '@/types/chat'
 import type { ChangeEvent } from 'react'
 import type { Scenario } from '@/types/scenarios'
 import { clientScenarios } from '@/data/scenarios'

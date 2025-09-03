@@ -24,7 +24,7 @@ export interface ChatMessage {
 const BrutalistChatDemo: FC = () => {
   // Use PersonaService for persona context
   const personaConfig: PersonaServiceConfig = { mode: 'deterministic' }; // Future: set based on UI or API
-  const _personaContext = getPersonaContext(personaConfig);
+  getPersonaContext(personaConfig);
   const [messages, setMessages] = useState<ChatMessage[]>([
     createPersonaMessage({
       baseId: '1',

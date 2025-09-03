@@ -15,7 +15,7 @@ export async function GET() {
   return rss({
     title: SITE.title,
     description: SITE.description,
-    site: SITE.website,
+    site: import.meta.env.SITE,
     customData: `
       <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
       <image>
@@ -27,9 +27,8 @@ export async function GET() {
     items: sortedBlogItems.map((item) => ({
       title: `${item.data.title}`,
       link: getUrl(`/blog/${item.slug}`),
-      pubDate: item.data.pubDate,
+      pubDate: item.data.updatedDate || item.data.pubDate,
       description: item.data.description,
-      author: SITE.author,
     })),
 
     stylesheet: getUrl('/rss-styles.xsl'),

@@ -1,6 +1,6 @@
 import type { Database } from '../../types/supabase'
 import { createAuditLog } from '../audit'
-import { mongoClient } from '../supabase'
+import { mongoClient } from './mongoClient'
 
 export type Conversation = Database['public']['Tables']['conversations']['Row']
 export type NewConversation =

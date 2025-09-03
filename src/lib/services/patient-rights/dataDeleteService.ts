@@ -1,5 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { mongoClient } from '../../supabase'
+import { mongoClient } from '../../lib/db/mongoClient'
 import { getAuditLogger } from '../../security/audit.logging'
 import { generateId } from '../../utils/ids'
 
