@@ -22,7 +22,7 @@ const middlewarePath = path.join(process.cwd(), 'src/lib/middleware/securityHead
 console.log(`Reading security headers middleware from: ${middlewarePath}`)
 
 try {
-  const middlewareContent = fs.readFileSync(middlewarePath, 'utf8')
+    const middlewareContent = fs.readFileSync(middlewarePath, 'utf8')
 
   console.log('✅ Reading security headers middleware...')
 
