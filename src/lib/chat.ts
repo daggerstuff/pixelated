@@ -433,9 +433,17 @@ export function createMentalHealthChat(
           return []
         }
 
+        // Type guard to ensure latestAnalysis is in the expected format
+        if ('indicators' in latestAnalysis) {
+          logger.warn(
+            'Cannot get recommendations from legacy analysis format.',
+          )
+          return []
+        }
+
         return await recommendationService.getRecommendationsFromAnalysis(
           config.userId,
-          latestAnalysis as unknown as MentalHealthAnalysisResult, // Type conversion needed for compatibility
+          latestAnalysis as MentalHealthAnalysisResult,
         )
       } catch (error: unknown) {
         logger.error('Error generating recommendations', { error })

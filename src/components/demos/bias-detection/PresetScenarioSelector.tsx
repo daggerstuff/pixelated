@@ -1,6 +1,6 @@
 // Interactive preset scenario selector with filtering and preview
 
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo, type FC } from 'react'
 import type { PresetScenario } from '../../../lib/types/bias-detection'
 
 interface PresetScenarioSelectorProps {
@@ -24,12 +24,12 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
 
   // Get unique categories and risk levels
   const categories = useMemo(() => {
-    const cats = [...new Set(scenarios.map((s) => s.category))]
+    const cats = [...new Set(scenarios.map((s: PresetScenario) => s.category))]
     return cats.sort()
   }, [scenarios])
 
   const riskLevels = useMemo(() => {
-    const levels = [...new Set(scenarios.map((s) => s.riskLevel))]
+    const levels = [...new Set(scenarios.map((s: PresetScenario) => s.riskLevel))]
     return levels.sort((a, b) => {
       const order = { low: 1, medium: 2, high: 3, critical: 4 }
       return order[a as keyof typeof order] - order[b as keyof typeof order]

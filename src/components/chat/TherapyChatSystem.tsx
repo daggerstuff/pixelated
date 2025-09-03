@@ -280,7 +280,7 @@ function ProfessionalTherapistWorkspace() {
       }
 
       // Check if we should use the patient simulation
-      let aiResponse
+      let aiResponse: string | undefined
       if (usePatientSimulation && currentModelId) {
         // Generate response using the cognitive model
         const patientPrompt = await handlePatientSimulationResponse(input)
@@ -305,7 +305,7 @@ function ProfessionalTherapistWorkspace() {
       setMessages((prev) => [
         ...prev,
         {
-          role: 'bot',
+          role: 'assistant',
           content: aiResponse,
           name: '',
         } as ExtendedMessage,
@@ -359,7 +359,7 @@ function ProfessionalTherapistWorkspace() {
     try {
       // Convert messages to the format expected by generatePatientResponse
       const conversationMessages = messages.map((msg) => ({
-        role: msg.role === 'bot' ? 'patient' : 'therapist',
+        role: msg.role === 'assistant' ? 'patient' : 'therapist',
         content: msg.content,
       }))
 
@@ -381,19 +381,8 @@ function ProfessionalTherapistWorkspace() {
         )
 
       // Generate response
-      // Only propagate 'user' or 'bot' role for AI
-      const typedConversationMessages = conversationMessages.map((msg) => ({
-        role:
-          msg.role === 'therapist'
-            ? 'user'
-            : msg.role === 'patient'
-              ? 'bot'
-              : msg.role, // Only allow 'user' or 'bot' roles in chat contract
-        content: msg.content,
-      }))
-
       const { prompt } = await generatePatientResponse(
-        typedConversationMessages,
+        conversationMessages,
         currentFocus.length > 0 ? currentFocus : undefined,
         1, // Session number (could be tracked in state in a more advanced implementation)
       )
