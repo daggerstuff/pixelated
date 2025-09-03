@@ -7,9 +7,9 @@ import type {
 import type { ChildProcessWithoutNullStreams } from 'child_process'
 import { spawn } from 'child_process'
 import { randomUUID } from 'crypto'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { baseLogger } from '../../../logging/baseLogger'
 
-const logger = createBuildSafeLogger('MentalLLaMA')
+const logger = baseLogger
 
 /**
  * Custom error for features not implemented or unavailable in the Python bridge.
