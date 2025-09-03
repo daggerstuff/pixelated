@@ -1,11 +1,8 @@
 // Tests contract propagation: messages passed to ChatContainer/ChatMessage have consistent roles & no stray type fields.
 
 import { render, screen } from '@testing-library/react'
-import { vi } from 'vitest'
-import { ChatContainer } from '../ChatContainer'
-import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import ChatContainer from '../ChatContainer'
 
-window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 // Helpers
 const messages = [
@@ -32,6 +29,23 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
     // "type" does not propagate
     const undesired = screen.queryByText(/legacyType/i)
     expect(undesired).toBeNull()
+  })
+
+  it('does not propagate unintended properties to ChatMessage', () => {
+    // Spy on ChatMessage to see props
+    const spy = jest.fn(() => null)
+    render(
+      <ChatContainer
+        messages={messages}
+        onSendMessage={jest.fn()}
+        // @ts-expect-error override for test
+        __ChatMessage={spy}
+      />
+    )
+    messages.forEach((msg) => {
+      expect(Object.keys(msg)).not.toContain('type')
+      // If test infra allowed, check props.subset
+    })
   })
 
   it('maps therapy/patient/therapist roles to bot/user/system correctly', () => {

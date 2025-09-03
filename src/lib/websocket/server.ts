@@ -72,9 +72,6 @@ class TherapyChatWebSocketServer {
 
     // If message is encrypted, attempt to decrypt/process via FHE if available.
     if (message.encrypted) {
-
-    // If message is encrypted, process with FHE
-    if (message.encrypted) {
       try {
         const fhe = fheService as unknown as {
           processEncrypted?: (data: string, operation: string) => Promise<{ data: string }>
