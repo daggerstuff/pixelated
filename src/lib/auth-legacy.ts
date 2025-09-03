@@ -7,7 +7,7 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from './audit'
-import { mongoAuthService } from './supabase'
+import { mongoAuthService } from './lib/db/mongoClient'
 // Note: This is an Astro project, Next.js types are not needed here
 // TODO: Replace with Astro-compatible types when implementing API auth
 
@@ -212,40 +212,44 @@ export async function requireRole({
 }
 
 export class Auth {
-  async verifySession(request: Request): Promise<{ userId: string } | null> {
+  async verifySession(
+    request: Request,
+  ): Promise<{ userId: string } | null> {
     const cookies = this.getCookiesFromRequest(request)
     const user = await getCurrentUser(cookies)
     return user ? { userId: user.id } : null
   }
 
-  private getCookiesFromRequest(request: Request): { get: (name: string) => { value: string } | undefined } {
-    const cookieHeader = request.headers.get('cookie') ?? ''
-    const map = new Map<string, string>()
-    for (const part of cookieHeader.split(';')) {
-      if (!part) {
-        continue
-      }
-      const eq = part.indexOf('=')
-      if (eq < 0) {
-        continue
-      }
-      const k = part.slice(0, eq).trim()
-      const v = part.slice(eq + 1).trim()
-      if (!k) {
-        continue
-      }
-      // Best-effort decoding; ignore malformed encodings
-      let dk = k, dv = v
-      try { dk = decodeURIComponent(k) } catch {}
-      try { dv = decodeURIComponent(v) } catch {}
-      map.set(dk, dv)
-    }
+  private getCookiesFromRequest(request: Request): any {
+    // Convert Request headers to cookies-like format
+    const cookieHeader = request.headers.get('cookie') || ''
+    const cookies = new Map(
+      cookieHeader.split(';').map((c) => {
+        const [key, ...v] = c.trim().split('=')
+        return [key, v.join('=')]
+      }),
+    )
+
     return {
       get: (name: string) => {
-        const val = map.get(name)
-        return val !== undefined ? { value: val } : undefined
+        const value = cookies.get(name)
+        return value ? { value, json: () => JSON.parse(value) } : undefined
       },
-    }
+      has: (name: string) => cookies.has(name),
+      set: () => {
+        throw new Error('Setting cookies is not supported in this context.')
+      },
+      delete: () => {
+        throw new Error('Deleting cookies is not supported in this context.')
+      },
+      getAll: () => {
+        return Array.from(cookies.entries()).map(([name, value]) => ({
+          name,
+          value,
+        }))
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any
   }
 }
 
