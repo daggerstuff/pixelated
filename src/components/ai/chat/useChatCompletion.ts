@@ -716,6 +716,8 @@ export function useChatCompletion({
   }, [messages, conversationStats, tokenUsage])
 
   // Import conversation
+  type ConversationImport = { messages: unknown; stats?: unknown }
+
   const importConversation = useCallback((data: string) => {
     try {
       const parsed = JSON.parse(data) as {

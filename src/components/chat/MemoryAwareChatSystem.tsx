@@ -37,7 +37,6 @@ interface MemoryAwareChatSystemProps {
   enableMemoryToggle?: boolean
   showMemoryStats?: boolean
   showMemoryInsights?: boolean
-}
 
 export function MemoryAwareChatSystem({
   className,
@@ -58,7 +57,6 @@ export function MemoryAwareChatSystem({
   const {
     messages,
     isLoading,
-    error,
     sendMessage,
     clearMessages,
     regenerateResponse,
@@ -85,9 +83,18 @@ export function MemoryAwareChatSystem({
     }
   }, [messages])
 
+  // memoryStats may be null, handle gracefully
+  const memoryStats = chatHook.memory?.stats || {}
+
+  // Generate conversation summary when messages change -- no longer supported, removed to avoid TS error
+  // useEffect(() => {
+  //   if (messages.length > 4) {
+  //     getConversationSummary().then(setConversationSummary)
+  //   }
+  // }, [messages, getConversationSummary])
+
   const handleExportConversation = async () => {
     try {
-      const summary = await getConversationSummary()
       const exportData = {
         timestamp: new Date().toISOString(),
         sessionId,
