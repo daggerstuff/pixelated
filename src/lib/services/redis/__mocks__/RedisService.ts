@@ -12,29 +12,23 @@ const zsetStore = new Map<string, Map<string, number>>()
  * Mock RedisService for tests
  */
 export class RedisService extends EventEmitter implements IRedisService {
-  private connected = false
   private healthy = true
 
-  constructor(_config: Record<string, unknown>): void {
+  constructor(_config: Record<string, unknown>) {
     super()
-    this.connected = false
     this.healthy = true
   }
 
   async connect() {
-    this.connected = true
     this.healthy = true
     return undefined
   }
 
   async disconnect() {
-    this.connected = false
     return undefined
   }
 
   async cleanup() {
-    // Clean up resources and close connections
-    this.connected = false
     return undefined
   }
 
@@ -51,29 +45,31 @@ export class RedisService extends EventEmitter implements IRedisService {
     }
   }
 
-  async set(key: string, value: string, _ttlMs?: number): void {
+  async set(key: string, value: string, _ttlMs?: number): Promise<void> {
     store.set(key, value)
     // Simulate TTL (no actual implementation needed for tests)
+    return
   }
 
-  async get(key: string): void {
+  async get(key: string): Promise<string | null> {
     return store.get(key) || null
   }
 
-  async del(key: string): void {
+  async del(key: string): Promise<void> {
     store.delete(key)
+    return
   }
 
-  async exists(key: string): void {
+  async exists(key: string): Promise<boolean> {
     return store.has(key)
   }
 
-  async ttl(key: string): void {
+  async ttl(key: string): Promise<number> {
     return store.has(key) ? 60 : -2 // 60 seconds if exists, -2 if not
   }
 
   // Hash operations
-  async hset(key: string, field: string, value: string): void {
+  async hset(key: string, field: string, value: string): Promise<number> {
     if (!hashStore.has(key)) {
       hashStore.set(key, new Map())
     }
@@ -83,12 +79,12 @@ export class RedisService extends EventEmitter implements IRedisService {
     return existed ? 0 : 1
   }
 
-  async hget(key: string, field: string): void {
+  async hget(key: string, field: string): Promise<string | null> {
     const hash = hashStore.get(key)
     return hash ? hash.get(field) || null : null
   }
 
-  async hdel(key: string, field: string): void {
+  async hdel(key: string, field: string): Promise<number> {
     const hash = hashStore.get(key)
     if (!hash) {
       return 0
@@ -97,7 +93,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return deleted ? 1 : 0
   }
 
-  async hgetall(key: string): void {
+  async hgetall(key: string): Promise<Record<string, string>> {
     const hash = hashStore.get(key)
     if (!hash) {
       return {}
@@ -109,8 +105,13 @@ export class RedisService extends EventEmitter implements IRedisService {
     return result
   }
 
+  async hlen(key: string): Promise<number> {
+    const hash = hashStore.get(key)
+    return hash ? hash.size : 0
+  }
+
   // List operations
-  async lpush(key: string, ...values: string[]): void {
+  async lpush(key: string, ...values: string[]): Promise<number> {
     if (!listStore.has(key)) {
       listStore.set(key, [])
     }
@@ -119,7 +120,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return list.length
   }
 
-  async rpush(key: string, ...values: string[]): void {
+  async rpush(key: string, ...values: string[]): Promise<number> {
     if (!listStore.has(key)) {
       listStore.set(key, [])
     }
@@ -128,24 +129,24 @@ export class RedisService extends EventEmitter implements IRedisService {
     return list.length
   }
 
-  async lpop(key: string): void {
+  async lpop(key: string): Promise<string | null> {
     const list = listStore.get(key)
     return list && list.length > 0 ? list.shift()! : null
   }
 
-  async rpop(key: string): void {
+  async rpop(key: string): Promise<string | null> {
     const list = listStore.get(key)
     return list && list.length > 0 ? list.pop()! : null
   }
 
-  async lrange(key: string, start: number, end: number): void {
+  async lrange(key: string, start: number, end: number): Promise<string[]> {
     const list = listStore.get(key) || []
     // Handle negative indices and convert end=-1 to the end of the array
     const adjustedEnd = end < 0 ? list.length + end + 1 : end + 1
     return list.slice(start, adjustedEnd)
   }
 
-  async lrem(key: string, count: number, value: string): void {
+  async lrem(key: string, count: number, value: string): Promise<number> {
     const list = listStore.get(key)
     if (!list) {
       return 0
@@ -180,16 +181,16 @@ export class RedisService extends EventEmitter implements IRedisService {
       }
     }
 
-    return removed
+  return removed
   }
 
-  async llen(key: string): void {
+  async llen(key: string): Promise<number> {
     const list = listStore.get(key)
     return list ? list.length : 0
   }
 
   // Set operations
-  async sadd(key: string, ...members: string[]): void {
+  async sadd(key: string, ...members: string[]): Promise<number> {
     if (!setStore.has(key)) {
       setStore.set(key, new Set())
     }
@@ -204,7 +205,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     return added
   }
 
-  async srem(key: string, ...members: string[]): void {
+  async srem(key: string, ...members: string[]): Promise<number> {
     const set = setStore.get(key)
     if (!set) {
       return 0
@@ -219,35 +220,36 @@ export class RedisService extends EventEmitter implements IRedisService {
     return removed
   }
 
-  async smembers(key: string): void {
+  async smembers(key: string): Promise<string[]> {
     const set = setStore.get(key)
     return set ? Array.from(set) : []
   }
 
   // Other operations
-  async incr(key: string): void {
+  async incr(key: string): Promise<number> {
     const value = store.get(key)
     const num = value ? parseInt(value, 10) + 1 : 1
     store.set(key, num.toString())
     return num
   }
 
-  async keys(pattern: string): void {
+  async keys(pattern: string): Promise<string[]> {
     // Simple glob pattern matching
     const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$')
     return Array.from(store.keys()).filter((key) => regex.test(key))
   }
 
   // Missing method from interface
-  async deletePattern(pattern: string): void {
+  async deletePattern(pattern: string): Promise<void> {
     const keys = await this.keys(pattern)
     for (const key of keys) {
       await this.del(key)
     }
+    return
   }
 
   // Sorted set operations
-  async zadd(key: string, score: number, member: string): void {
+  async zadd(key: string, score: number, member: string): Promise<number> {
     if (!zsetStore.has(key)) {
       zsetStore.set(key, new Map())
     }
@@ -255,6 +257,64 @@ export class RedisService extends EventEmitter implements IRedisService {
     const existed = zset.has(member)
     zset.set(member, score)
     return existed ? 0 : 1
+  }
+
+  // Additional sorted set helpers required by IRedisService
+  async zrem(key: string, member: string): Promise<number> {
+    const zset = zsetStore.get(key)
+    if (!zset) {
+      return 0
+    }
+    const existed = zset.delete(member)
+    return existed ? 1 : 0
+  }
+
+  async zrange(key: string, start: number, stop: number): Promise<string[]> {
+    const zset = zsetStore.get(key)
+    if (!zset) {
+      return []
+    }
+    // Convert to array sorted by score ascending
+    const entries = Array.from(zset.entries()).sort((a, b) => a[1] - b[1])
+    return entries.slice(start, stop + 1).map(([member]) => member);
+  }
+
+  async zpopmin(key: string): Promise<any[]> {
+    const zset = zsetStore.get(key)
+    if (!zset) {
+      return []
+    }
+    const entries = Array.from(zset.entries()).sort((a, b) => a[1] - b[1])
+    if (entries.length === 0) {
+      return []
+    }
+    const first = entries[0]
+    if (!first) {
+      return []
+    }
+    const member = first[0]
+    const score = first[1]
+    zset.delete(member)
+    return [{ value: member, score }]
+  }
+
+  async zcard(key: string): Promise<number> {
+    const zset = zsetStore.get(key)
+    return zset ? zset.size : 0
+  }
+
+  // List helper required by IRedisService
+  async rpoplpush(source: string, destination: string): Promise<string | null> {
+    const src = listStore.get(source)
+    if (!src || src.length === 0) {
+      return null
+    }
+    const value = src.pop()!
+    if (!listStore.has(destination)) {
+      listStore.set(destination, [])
+    }
+    listStore.get(destination)!.push(value)
+    return value
   }
 
 

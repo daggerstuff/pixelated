@@ -3581,55 +3581,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       layer_results: {
         preprocessing: { bias_score: 0.2 },
         model_level: { bias_score: 0.3 },
-      pythonServiceUrl: 'http://localhost:8000',
-      pythonServiceTimeout: 30000,
-      thresholds: {
-        warning: 0.3,
-        high: 0.6,
-        critical: 0.8,
+        interactive: { bias_score: 0.2 },
+        evaluation: { bias_score: 0.3 },
       },
-      layerWeights: {
-        preprocessing: 0.25,
-        modelLevel: 0.25,
-        interactive: 0.25,
-        evaluation: 0.25,
-      },
-      evaluationMetrics: ['demographic_parity'],
-      metricsConfig: {
-        enableRealTimeMonitoring: true,
-        metricsRetentionDays: 30,
-        aggregationIntervals: ['1h', '1d'],
-        dashboardRefreshRate: 60,
-        exportFormats: ['json'],
-      },
-      alertConfig: {
-        enableSlackNotifications: false,
-        enableEmailNotifications: false,
-        emailRecipients: [],
-        alertCooldownMinutes: 5,
-        escalationThresholds: {
-          criticalResponseTimeMinutes: 15,
-          highResponseTimeMinutes: 30,
-        },
-      },
-      reportConfig: {
-        includeConfidentialityAnalysis: true,
-        includeDemographicBreakdown: true,
-        includeTemporalTrends: true,
-        includeRecommendations: true,
-        reportTemplate: 'standard' as const,
-        exportFormats: ['json'],
-      },
-      explanationConfig: {
-        explanationMethod: 'shap' as const,
-        maxFeatures: 10,
-        includeCounterfactuals: true,
-        generateVisualization: false,
-      },
-      hipaaCompliant: true,
-      dataMaskingEnabled: true,
-      auditLogging: true,
-    }
+      recommendations: ['System performing within acceptable parameters'],
+      confidence: 0.85,
+    });
 
     mockSessionData = {
       sessionId: 'test-session-001',

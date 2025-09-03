@@ -1,13 +1,15 @@
-import type { APIContext, MiddlewareNext } from 'astro';
+import type { BaseAPIContext } from '../auth/apiRouteTypes';
 
-export const securityHeaders = async (context: APIContext, next: MiddlewareNext) => {
+type MiddlewareNext = () => Promise<Response>;
+
+export const securityHeaders = async (context: BaseAPIContext, next: MiddlewareNext) => {
   const response = await next();
 
-  const nonce = context.locals.cspNonce;
+  const nonce = context.locals['cspNonce'];
 
   let csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' https: https://*.sentry.io`,
+    `script-src 'self' 'nonce-${nonce}' https: https://*.sentry.io`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: https:",
     "font-src 'self' https://fonts.gstatic.com",
@@ -21,7 +23,7 @@ export const securityHeaders = async (context: APIContext, next: MiddlewareNext)
   if (import.meta.env.DEV) {
     csp = [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' https://fonts.gstatic.com",
@@ -33,7 +35,12 @@ export const securityHeaders = async (context: APIContext, next: MiddlewareNext)
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+  // Only set HSTS header in production to avoid issues during local development
+  if (import.meta.env.PROD) {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+
   response.headers.set(
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=(), payment=()'

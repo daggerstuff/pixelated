@@ -23,7 +23,7 @@ export class CacheInvalidation {
   private prefix: string
   private defaultTTL: number
 
-  constructor(options: InvalidationOptions): void {
+  constructor(options: InvalidationOptions) {
     this.redis =
       options.redis instanceof RedisService
         ? options.redis.getClient()
