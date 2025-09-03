@@ -220,36 +220,34 @@ export class Auth {
     return user ? { userId: user.id } : null
   }
 
-  private getCookiesFromRequest(request: Request): any {
-    // Convert Request headers to cookies-like format
-    const cookieHeader = request.headers.get('cookie') || ''
-    const cookies = new Map(
-      cookieHeader.split(';').map((c) => {
-        const [key, ...v] = c.trim().split('=')
-        return [key, v.join('=')]
-      }),
-    )
-
+  private getCookiesFromRequest(request: Request): { get: (name: string) => { value: string } | undefined } {
+    const cookieHeader = request.headers.get('cookie') ?? ''
+    const map = new Map<string, string>()
+    for (const part of cookieHeader.split(';')) {
+      if (!part) {
+        continue
+      }
+      const eq = part.indexOf('=')
+      if (eq < 0) {
+        continue
+      }
+      const k = part.slice(0, eq).trim()
+      const v = part.slice(eq + 1).trim()
+      if (!k) {
+        continue
+      }
+      // Best-effort decoding; ignore malformed encodings
+      let dk = k, dv = v
+      try { dk = decodeURIComponent(k) } catch {}
+      try { dv = decodeURIComponent(v) } catch {}
+      map.set(dk, dv)
+    }
     return {
       get: (name: string) => {
-        const value = cookies.get(name)
-        return value ? { value, json: () => JSON.parse(value) } : undefined
+        const val = map.get(name)
+        return val !== undefined ? { value: val } : undefined
       },
-      has: (name: string) => cookies.has(name),
-      set: () => {
-        throw new Error('Setting cookies is not supported in this context.')
-      },
-      delete: () => {
-        throw new Error('Deleting cookies is not supported in this context.')
-      },
-      getAll: () => {
-        return Array.from(cookies.entries()).map(([name, value]) => ({
-          name,
-          value,
-        }))
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any
+    }
   }
 }
 
