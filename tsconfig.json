@@ -48,7 +48,8 @@
       "@types/*": ["src/types/*"],
       "@testing/*": ["./tests/*"],
 
-      "@/types": ["src/types"]
+  "@/types": ["src/types"],
+  "@/types/*": ["src/types/*"]
     },
     "skipLibCheck": true,
     "disableSourceOfProjectReferenceRedirect": true,

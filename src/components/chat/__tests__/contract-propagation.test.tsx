@@ -3,7 +3,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import ChatContainer from '../ChatContainer'
-import ChatMessage from '../ChatMessage'
+
 
 // Helpers
 const messages = [
@@ -36,7 +36,7 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
       <ChatContainer
         messages={messages}
         onSendMessage={jest.fn()}
-        // @ts-ignore override for test
+        // @ts-expect-error override for test
         __ChatMessage={spy}
       />
     )

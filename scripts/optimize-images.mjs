@@ -131,7 +131,7 @@ async function createResponsiveImages(inputPath, outputDir) {
     
     // Calculate total savings
     const originalStats = await stat(inputPath)
-    const totalOptimizedSize = results.reduce((sum, result) => sum + result.size, 0)
+    
     const savings = ((originalStats.size - webpStats.size) / originalStats.size * 100).toFixed(1)
     
     console.log(`  Savings: ${savings}% (${getFileSizeKB(originalStats.size - webpStats.size)}KB saved)`)

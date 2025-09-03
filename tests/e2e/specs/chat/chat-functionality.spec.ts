@@ -51,7 +51,7 @@ test.describe('Chat Functionality', () => {
   test('should handle empty message submission', async ({ page }) => {
     await page.goto('/chat');
     
-    const messageInput = page.locator('[data-testid="message-input"]');
+    
     const sendButton = page.locator('[data-testid="send-button"]');
     
     // Try to send empty message

@@ -2,7 +2,7 @@ import type { ChatMessage } from '@/types/chat'
 import { WebSocketServer, WebSocket } from 'ws'
 import type { Server } from 'node:http'
 import { fheService } from '../fhe'
-import { EncryptionMode } from '../fhe/types'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
@@ -34,9 +34,10 @@ class TherapyChatWebSocketServer {
 
     logger.info(`Client connected: ${clientId}`)
 
-    ws.on('message', async (data: string) => {
+    ws.on('message', async (data: any) => {
       try {
-        const message: WebSocketMessage = JSON.parse(data) as unknown
+        const text = typeof data === 'string' ? data : data.toString()
+        const message = JSON.parse(text) as WebSocketMessage
 
         switch (message.type) {
           case 'message':
@@ -69,39 +70,22 @@ class TherapyChatWebSocketServer {
       return
     }
 
-    // If message is encrypted, process with FHE
-    if (message.encrypted) {
-
-    // If message is encrypted, process with FHE
+    // If message is encrypted, attempt to decrypt/process via FHE if available.
     if (message.encrypted) {
       try {
-        await fheService.initialize({
-          mode: EncryptionMode.FHE,
-          keySize: 2048,
-          securityLevel: 'tc128',
-        })
+        const fhe = fheService as unknown as {
+          processEncrypted?: (data: string, operation: string) => Promise<{ data: string }>
+        }
 
-        // Handle mock implementation
-        try {
-          // Try to use processEncrypted if available
-          const result = await (
-            fheService as unknown as {
-              processEncrypted: (
-                data: string,
-                operation: string,
-              ) => Promise<{ data: string }>
-            }
-          ).processEncrypted(message.data as string, 'CHAT')
+        if (typeof fhe.processEncrypted === 'function') {
+          const result = await fhe.processEncrypted(message.data as string, 'CHAT')
           message.data = result.data
-        } catch (e) {
-          // Fallback for mock implementation
-          const errorMessage = e instanceof Error ? e.message : String(e)
-          logger.info('Using mock FHE processing', { error: errorMessage })
-          // Simply keep the message data as is for mock implementation
+        } else {
+          // No processEncrypted available on fheService; treat as no-op for now
+          logger.info('FHE service processEncrypted not available; skipping processing')
         }
       } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? String(error) : String(error)
+        const errorMessage = error instanceof Error ? String(error) : String(error)
         logger.error('FHE processing error:', { error: errorMessage })
         this.sendError(this.clients.get(clientId)!, 'Encryption error')
         return
