@@ -89,7 +89,7 @@ export class MentalArenaPythonBridge {
   private isProcessing: boolean = false
   private performanceMetrics: BridgePerformanceMetrics
 
-  constructor(config: PythonBridgeConfig): void {
+  constructor(config: PythonBridgeConfig) {
     this.config = {
       timeout: 300000, // 5 minutes default
       maxRetries: 3,

@@ -63,11 +63,14 @@ class TherapyChatWebSocketServer {
     })
   }
 
-  private async handleChatMessage(clientId: string, message: WebSocketMessage): void {
+  private async handleChatMessage(clientId: string, message: WebSocketMessage): Promise<void> {
     if (!message.sessionId) {
       this.sendError(this.clients.get(clientId)!, 'Session ID required')
       return
     }
+
+    // If message is encrypted, process with FHE
+    if (message.encrypted) {
 
     // If message is encrypted, process with FHE
     if (message.encrypted) {

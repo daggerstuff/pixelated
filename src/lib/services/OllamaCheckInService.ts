@@ -45,7 +45,7 @@ export class OllamaCheckInService {
   private baseUrl: string
   private defaultModel: string
 
-  constructor(baseUrl?: string, defaultModel?: string): void {
+  constructor(baseUrl?: string, defaultModel?: string) {
     this.baseUrl =
       baseUrl ||
       getEnv('OLLAMA_BASE_URL') ||

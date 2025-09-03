@@ -250,9 +250,9 @@ class EnhancedStatePersistence {
 
     // Clear session data if too old
     if (
-      sessionState.lastActivity &&
-      typeof sessionState.lastActivity === 'number' &&
-      now - sessionState.lastActivity > sessionTimeout
+      (sessionState as any)['lastActivity'] &&
+      typeof (sessionState as any)['lastActivity'] === 'number' &&
+      now - ((sessionState as any)['lastActivity'] as number) > sessionTimeout
     ) {
       this.setStoredValue('session_state', {
         lastRoute: '/',
@@ -279,12 +279,12 @@ class EnhancedStatePersistence {
         typeof draft === 'object' &&
         draft !== null &&
         'timestamp' in draft &&
-        typeof (draft as Record<string, unknown>).timestamp === 'number'
+        typeof (draft as Record<string, unknown>)['timestamp'] === 'number'
       ) {
         const draftWithTimestamp = draft as Record<string, unknown> & {
           timestamp: number
         }
-        if (now - draftWithTimestamp.timestamp > draftTimeout) {
+  if (now - ((draftWithTimestamp as any)['timestamp'] as number) > draftTimeout) {
           delete formDrafts[key]
         }
       }

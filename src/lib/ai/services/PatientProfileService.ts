@@ -17,7 +17,7 @@ export class PatientProfileService {
   private kvStore: KVStore
   private readonly PROFILE_PREFIX = 'profile_'
 
-  constructor(kvStore: KVStore): void {
+  constructor(kvStore: KVStore) {
     this.kvStore = kvStore
   }
 

@@ -21,7 +21,7 @@ interface EncryptedData {
 export class Encryption {
   private keyStorage: KeyStorage
 
-  constructor(options: EncryptionOptions): void {
+  constructor(options: EncryptionOptions) {
     this.keyStorage = new KeyStorage({
       namespace: options.namespace,
       region: options.region,

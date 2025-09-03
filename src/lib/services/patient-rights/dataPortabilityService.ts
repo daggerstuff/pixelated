@@ -5,7 +5,7 @@ import { randomBytes } from 'crypto'
 class AuditLoggingService {
   private context: string
 
-  constructor(context: string): void {
+  constructor(context: string) {
     this.context = context
   }
 

@@ -106,7 +106,7 @@ class PIIDetectionService {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(config: Partial<PIIDetectionConfig> = {}): void {
+  private constructor(config: Partial<PIIDetectionConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config }
 
     // Initialize base patterns for detection

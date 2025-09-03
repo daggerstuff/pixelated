@@ -19,7 +19,7 @@ export class SealScheme implements FHEScheme {
    *
    * @param schemeType The SEAL scheme type (BFV, BGV, or CKKS)
    */
-  constructor(schemeType: SealSchemeType): void {
+  constructor(schemeType: SealSchemeType) {
     this.schemeType = schemeType
   }
 

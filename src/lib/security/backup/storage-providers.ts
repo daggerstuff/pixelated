@@ -424,7 +424,7 @@ export class AWSS3StorageProvider implements StorageProvider {
     }
   }
 
-  constructor(config: Record<string, unknown>): void {
+  constructor(config: Record<string, unknown>) {
     const bucket = config['bucket'] as string
     const region = (config['region'] as string) || 'us-east-1'
     const prefix = (config['prefix'] as string) || ''
@@ -692,7 +692,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     credentials?: Record<string, unknown>
   }
 
-  constructor(config: Record<string, unknown>): void {
+  constructor(config: Record<string, unknown>) {
     const bucketName = config['bucketName'] as string
     const prefix = (config['prefix'] as string) || ''
     const keyFilename = config['keyFilename'] as string | undefined
@@ -717,10 +717,10 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       // Dynamically import the GCS library
       // Note: This requires installing @google-cloud/storage as a dependency
       // if you intend to use this provider in production
-      let Storage
+      let Storage: any = undefined
       try {
         // Using dynamic import with type assertion to avoid TypeScript errors
-        const gcsModule = await import('@google-cloud/storage')
+        const gcsModule = await import('@google-cloud/storage' as string)
         Storage = gcsModule.Storage
       } catch (importError) {
         logger.error(
@@ -869,7 +869,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
     prefix: string
   }
 
-  constructor(config: Record<string, unknown>): void {
+  constructor(config: Record<string, unknown>) {
     const connectionString = config['connectionString'] as string | undefined
     const accountName = config['accountName'] as string | undefined
     const accountKey = config['accountKey'] as string | undefined

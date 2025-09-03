@@ -34,7 +34,7 @@ export class AnalyticsDataService {
   private analyticsService: AnalyticsService
   private config: AnalyticsServiceConfig
 
-  private constructor(config?: Partial<AnalyticsServiceConfig>): void {
+  private constructor(config?: Partial<AnalyticsServiceConfig>) {
     this.config = {
       apiBaseUrl: '/api/analytics',
       refreshInterval: 300000, // 5 minutes

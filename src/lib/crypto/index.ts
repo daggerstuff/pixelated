@@ -100,7 +100,7 @@ class RedisStorageProvider implements StorageProvider {
   private client: RedisClientType
   private connected = false
 
-  constructor(redisUrl: string): void {
+  constructor(redisUrl: string) {
     this.client = createClient({ url: redisUrl })
 
     this.client.on('error', (err) => {
@@ -361,7 +361,7 @@ export function createHMAC(data: string, key: string): string {
  * Key rotation manager for handling key lifecycle
  */
 export class KeyRotationManager {
-  constructor(private readonly rotationDays: number = 90): void {}
+  constructor(private readonly rotationDays: number = 90) {}
 
   needsRotation(createdAt: number): boolean {
     const ageMs = Date.now() - createdAt
@@ -517,7 +517,7 @@ export interface CryptoSystemOptions {
 /**
  * Comprehensive crypto system factory
  */
-export function createCryptoSystem(options: CryptoSystemOptions = {}): void {
+export function createCryptoSystem(options: CryptoSystemOptions = {}) {
   const {
     namespace = 'app',
     useSecureStorage = false,

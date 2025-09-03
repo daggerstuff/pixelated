@@ -112,7 +112,7 @@ interface JWEHeader {
  * Custom error class for export-related errors
  */
 class ExportError extends Error {
-  constructor(message: string): void {
+  constructor(message: string) {
     super(message)
     this.name = 'ExportError'
   }
@@ -131,7 +131,7 @@ export class ExportService {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(fheService: FHEServiceInterface): void {
+  private constructor(fheService: FHEServiceInterface) {
     this.fheService = fheService
     logger.info('Export service (browser) initialized')
     this.options = { ...DEFAULT_EXPORT_OPTIONS }
