@@ -43,7 +43,7 @@ export interface EmailResult {
 export class EmailService {
   private config: EmailConfig
 
-  constructor(config: EmailConfig): void {
+  constructor(config: EmailConfig) {
     this.config = config
     logger.info('EmailService initialized', { provider: config.provider })
   }

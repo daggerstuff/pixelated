@@ -42,7 +42,7 @@ export class UniversalDemoAnalytics {
   private eventQueue: AnalyticsEventData[]
   private isInitialized: boolean
 
-  constructor(pageName: DemoPageName): void {
+  constructor(pageName: DemoPageName) {
     this.pageName = pageName
     this.pageConfig = DEMO_PAGES_CONFIG[pageName]
     this.sessionId = this.generateSessionId()

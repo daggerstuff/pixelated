@@ -267,7 +267,7 @@ export const auditLoggingMiddleware = defineMiddleware(
     headersToLog.forEach((header) => {
       const value = request.headers.get(header)
       if (value) {
-        ;(metadata.headers as Record<string, string>)[header] = value
+        ;(metadata['headers'] as Record<string, string>)[header] = value
       }
     })
 
@@ -275,7 +275,7 @@ export const auditLoggingMiddleware = defineMiddleware(
     if (config.logRequestBodies && (isSensitivePath || method !== 'GET')) {
       const body = await getSafeRequestBody(request, config.maxBodyLength)
       if (body) {
-        metadata.requestBody = body
+        metadata['requestBody'] = body
       }
     }
 
@@ -288,13 +288,13 @@ export const auditLoggingMiddleware = defineMiddleware(
 
     // Add response metadata
     if (config.logResponseStatus && response) {
-      metadata.responseStatus = response.status
-      metadata.responseStatusText = response.statusText
+      metadata['responseStatus'] = response.status
+      metadata['responseStatusText'] = response.statusText
     }
 
     if (response && config.logResponseTiming) {
-      metadata.duration = Math.round(duration)
-      metadata.durationUnit = 'ms'
+      metadata['duration'] = Math.round(duration)
+      metadata['durationUnit'] = 'ms'
     }
 
     // Determine the security event type
@@ -307,7 +307,7 @@ export const auditLoggingMiddleware = defineMiddleware(
     // Create an audit log
     try {
       await createResourceAuditLog(
-        eventType,
+        eventType as unknown as any,
         userId,
         {
           id: path,

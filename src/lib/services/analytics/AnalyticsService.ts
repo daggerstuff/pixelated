@@ -39,7 +39,7 @@ export class AnalyticsService {
   private readonly batchSize: number
   private readonly redisClient: RedisClient
 
-  constructor(options: AnalyticsServiceOptions = {}): void {
+  constructor(options: AnalyticsServiceOptions = {}) {
     this.wsClients = new Map()
     this.retentionDays = options.retentionDays || 90 // Default 90 days retention
     this.batchSize = options.batchSize || 100

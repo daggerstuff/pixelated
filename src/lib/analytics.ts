@@ -101,7 +101,7 @@ export class AnalyticsService {
   /**
    * Private constructor (singleton pattern)
    */
-  private constructor(config: AnalyticsConfig = DEFAULT_CONFIG): void {
+  private constructor(config: AnalyticsConfig = DEFAULT_CONFIG) {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = this.generateSessionId()
     this.anonymousId = this.generateAnonymousId()

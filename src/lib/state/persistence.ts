@@ -29,7 +29,7 @@ export class StatePersistence {
   private config: PersistenceConfig
   private options: Required<StorageOptions>
 
-  constructor(config: PersistenceConfig): void {
+  constructor(config: PersistenceConfig) {
     this.config = config
     this.options = { ...defaultOptions, ...(config.options || {}) }
   }

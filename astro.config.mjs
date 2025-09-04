@@ -1,14 +1,14 @@
 import path from 'node:path';
 import process from 'node:process';
-import mdx from '@astrojs/mdx';
+
 import react from '@astrojs/react';
 import UnoCSS from '@unocss/astro';
 import { defineConfig, passthroughImageService } from 'astro/config';
-import expressiveCode from 'astro-expressive-code';
+
 import icon from 'astro-icon';
 import sentry from '@sentry/astro';
 import spotlightjs from '@spotlightjs/astro';
-import markdoc from '@astrojs/markdoc';
+
 import node from '@astrojs/node'
 
 import { visualizer } from 'rollup-plugin-visualizer';

@@ -58,7 +58,7 @@ export class RateLimiter {
   private readonly userLimits: Record<string, number>
   private storage: Map<string, number>
 
-  constructor(defaultLimit = 30, windowMs = 60 * 1000): void {
+  constructor(defaultLimit = 30, windowMs = 60 * 1000) {
     this.defaultLimit = defaultLimit
     this.windowMs = windowMs
     this.userLimits = {

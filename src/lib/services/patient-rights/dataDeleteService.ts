@@ -65,7 +65,7 @@ export async function createDataDeletionRequest(
     }
 
     // Insert into database
-    const _result = await mongoClient.db
+    const _result = await (mongoClient as any)['db']
       .collection('data_deletion_requests')
       .insertOne(deletionRequest)
 
@@ -100,7 +100,7 @@ export async function getDataDeletionRequest(
   id: string,
 ): Promise<DataDeletionRequest | null> {
   try {
-    const request = await mongoClient.db
+    const request = await (mongoClient as any)['db']
       .collection('data_deletion_requests')
       .findOne({ id })
 
@@ -123,7 +123,7 @@ export async function getAllDataDeletionRequests(filters?: {
   dataScope?: 'all' | 'specific'
 }): Promise<DataDeletionRequest[]> {
   try {
-    const query = mongoClient.db.collection('data_deletion_requests')
+  const query = (mongoClient as any)['db'].collection('data_deletion_requests')
     const filter: Record<string, unknown> = {}
     if (filters) {
       if (filters.status) {
@@ -171,7 +171,7 @@ export async function updateDataDeletionRequest(
     }
 
     // Update the request in the database
-    const result = await mongoClient.db
+    const result = await (mongoClient as any)['db']
       .collection('data_deletion_requests')
       .findOneAndUpdate(
         { id: params.id },
@@ -311,12 +311,12 @@ async function deleteAllPatientData(patientId: string): Promise<void> {
     'media_files',
   ]
 
-  const session = mongoClient.client.startSession()
+  const session = (mongoClient as any)['client'].startSession()
 
   try {
     await session.withTransaction(async () => {
       for (const collection of collections) {
-        await mongoClient.db
+        await (mongoClient as any)['db']
           .collection(collection)
           .deleteMany({ patient_id: patientId }, { session })
       }
@@ -355,8 +355,8 @@ async function deleteSpecificPatientData(
     }
 
     // Delete from each table for this category
-    for (const table of tables) {
-      await mongoClient.db
+      for (const table of tables) {
+      await (mongoClient as any)['db']
         .collection(table)
         .deleteMany({ patient_id: patientId })
     }

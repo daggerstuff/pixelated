@@ -105,7 +105,7 @@ function matchTopicArea(query: string): TopicArea {
 export class EducationalContextRecognizer {
   private config: EducationalRecognizerConfig
 
-  constructor(config: EducationalRecognizerConfig = {}): void {
+  constructor(config: EducationalRecognizerConfig = {}) {
     this.config = {
       model: config.model ?? 'gpt-4',
       includeResourceRecommendations: config.includeResourceRecommendations ?? true,
@@ -286,7 +286,7 @@ export class EducationalContextRecognizer {
     return Promise.all(queries.map(q => this.recognizeEducationalContext(q.query)))
   }
 
-  generateLearningPathway(result: EducationalContextResult): void {
+  generateLearningPathway(result: EducationalContextResult): any {
     return {
       currentTopic: `${result.educationalType} - ${result.topicArea}`,
       nextSteps: ['Learn about symptoms'],
@@ -296,7 +296,7 @@ export class EducationalContextRecognizer {
   }
 }
 
-export function createEducationalContextRecognizer(config: EducationalRecognizerConfig): void {
+export function createEducationalContextRecognizer(config: EducationalRecognizerConfig): EducationalContextRecognizer {
   return new EducationalContextRecognizer(config)
 }
 

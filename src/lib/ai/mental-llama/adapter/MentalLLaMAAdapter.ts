@@ -40,7 +40,7 @@ export class MentalLLaMAAdapter {
   // @ts-expect-error: Module may not exist in all environments
   private crisisSessionFlaggingServiceImport?: Promise<unknown>
 
-  constructor(options: MentalLLaMAAdapterOptions): void {
+  constructor(options: MentalLLaMAAdapterOptions) {
     this.modelProvider = options.modelProvider
     this.crisisNotifier = options.crisisNotifier
     this.taskRouter = options.taskRouter

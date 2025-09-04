@@ -19,7 +19,7 @@ const logger = createBuildSafeLogger('pattern-recognition')
  * Concrete implementation of PatternRecognitionService that uses FHE
  */
 class ConcretePatternRecognitionService implements PatternRecognitionService {
-  constructor(private fheService: PatternRecognitionOps): void {}
+  constructor(private fheService: PatternRecognitionOps) {}
 
   async detectCrossSessionPatterns(
     clientId: string,

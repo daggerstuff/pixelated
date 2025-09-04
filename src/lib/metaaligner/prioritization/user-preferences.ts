@@ -1,9 +1,9 @@
 // User Preferences Module for MetaAligner Objective Personalization
 // Allows contextual adaptation of objective mapping and weighting with user-defined or inferred settings.
 
-import { ContextType } from '../core/objectives'
+
 import { ObjectivePriority } from './context-objective-mapping'
-import { WeightingParams } from './objective-weighting-strategy'
+
 
 export interface UserPreferences {
   preferredSupportStyle?: 'pragmatic' | 'empathic' | 'direct' | 'reflective'
