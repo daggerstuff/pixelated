@@ -52,10 +52,7 @@ export type Metric = z.infer<typeof MetricSchema>
 
 // Redis client interface
 export interface RedisClient {
-  [x: string]: any
-  [x: string]: any
-  [x: string]: any
-  [x: string]: any
+  [x: string]: unknown
   lRange(arg0: string, arg1: number, arg2: number): unknown
   zrangebyscore(arg0: string, start: string | number, end: string | number, arg3: string, offset: number, limit: number): string[] | PromiseLike<string[]>
   lpush(key: string, value: string): Promise<void>
