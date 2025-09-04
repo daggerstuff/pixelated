@@ -25,7 +25,7 @@ export class PluginRegistry {
   private api: PluginAPI
   private events = new EventEmitter()
 
-  constructor(api: PluginAPI): void {
+  constructor(api: PluginAPI) {
     this.api = api
   }
 

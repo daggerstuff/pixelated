@@ -27,7 +27,7 @@ export class EmotionContext {
   private transitions: EmotionTransition[] = []
   private maxHistorySize = 50
 
-  constructor(sessionId: string, userId?: string): void {
+  constructor(sessionId: string, userId?: string) {
     this.state = {
       currentEmotion: null,
       emotionHistory: [],

@@ -49,7 +49,7 @@ export class BlogPublishingService {
   private scheduledJobs: Map<string, cron.ScheduledTask> = new Map()
   private posts: Map<string, PostInfo> = new Map()
 
-  constructor(contentDir = 'src/content/blog'): void {
+  constructor(contentDir = 'src/content/blog') {
     this.contentDir = contentDir
   }
 

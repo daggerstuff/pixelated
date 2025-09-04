@@ -1,3 +1,16 @@
+// Global DOM augmentations for project-wide window helpers
+export {}
+
+declare global {
+  interface Window {
+    /**
+     * Global helper used by DLP components to show a transient alert in the admin UI.
+     * @param type - one of 'success' | 'error' | 'warning'
+     * @param message - message body displayed in the alert
+     */
+    showDLPAlert?: (type: 'success' | 'error' | 'warning', message: string) => void
+  }
+}
 /// <reference types="vitest/globals" />
 /// <reference types="vite/client" />
 

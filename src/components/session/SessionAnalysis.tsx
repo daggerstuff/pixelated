@@ -1,4 +1,4 @@
-import { EmotionDataPoint, useSessionAnalytics } from '../../hooks/useSessionAnalytics'
+import { EmotionDataPoint, } from '../../hooks/useSessionAnalytics'
 import EmotionTrackingChart from './EmotionTrackingChart'
 
 // Define an interface matching EmotionTimelineData from EmotionTrackingChart

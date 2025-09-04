@@ -63,7 +63,7 @@ class ConsoleLogger implements Logger {
   private isDevelopment: boolean
   private prefix?: string
 
-  constructor(level: LogLevel = LogLevel.INFO, prefix?: string): void {
+  constructor(level: LogLevel = LogLevel.INFO, prefix?: string) {
     this.logLevel = level
     this.isDevelopment = isDevelopment
     this.prefix = prefix

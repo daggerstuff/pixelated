@@ -59,7 +59,7 @@ export class BiasWebSocketServer {
   private bannedIPs: Map<string, Date> = new Map()
   private messageRateLimits: Map<string, Array<Date>> = new Map()
 
-  constructor(private config: WebSocketServerConfig): void {}
+  constructor(private config: WebSocketServerConfig) {}
 
   async start(): Promise<void> {
     if (this.isRunning) {

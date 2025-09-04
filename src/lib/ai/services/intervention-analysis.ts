@@ -43,7 +43,7 @@ export class InterventionAnalysisService {
   private readonly model: string
   private readonly systemPrompt: string
 
-  constructor(config: InterventionAnalysisServiceConfig): void {
+  constructor(config: InterventionAnalysisServiceConfig) {
     const {
       aiService,
       model = 'mistralai/Mixtral-8x7B-Instruct-v0.2',

@@ -7,15 +7,16 @@ import type {
 import type { ChildProcessWithoutNullStreams } from 'child_process'
 import { spawn } from 'child_process'
 import { randomUUID } from 'crypto'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
-const logger = baseLogger
+const logger = createBuildSafeLogger('MentalLLaMA')
 
 /**
  * Custom error for features not implemented or unavailable in the Python bridge.
  */
 
 class PythonBridgeError extends Error {
-  constructor(message: string): void {
+  constructor(message: string) {
     super(message)
     this.name = 'PythonBridgeError'
   }
@@ -45,7 +46,7 @@ export class MentalLLaMAPythonBridge {
   private readonly REQUEST_TIMEOUT_MS = 20000
   public pythonBridgeDisabled: boolean = false
 
-  constructor(pythonScriptPath?: string): void {
+  constructor(pythonScriptPath?: string) {
     this.pythonScriptPath =
       pythonScriptPath || './scripts/mental_llama_python_handler.py'
     this.pythonBridgeDisabled = false

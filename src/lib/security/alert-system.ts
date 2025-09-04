@@ -99,7 +99,7 @@ export class RiskAlertSystem {
   /**
    * Private constructor to enforce singleton pattern
    */
-  private constructor(config: Partial<AlertConfig> = {}): void {
+  private constructor(config: Partial<AlertConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.repository = new AIRepository()
   }
@@ -117,7 +117,7 @@ export class RiskAlertSystem {
   /**
    * Configure the alert system
    */
-  public configure(config: Partial<AlertConfig>): void {
+  public configure(config: Partial<AlertConfig>) {
     this.config = { ...this.config, ...config }
     logger.info('Risk alert system configured', {
       enabledChannels: this.config.enabledChannels,
@@ -204,7 +204,7 @@ export class RiskAlertSystem {
   /**
    * Send alerts through configured channels
    */
-  private async sendAlerts(alert: AlertDetails): Promise<void> {
+  private async sendAlerts(alert: AlertDetails) {
     const { enabledChannels } = this.config
 
     // Process each enabled channel
@@ -238,7 +238,7 @@ export class RiskAlertSystem {
   /**
    * Store alert in repository for high and critical risks
    */
-  private async storeAlert(alert: AlertDetails): Promise<void> {
+  private async storeAlert(alert: AlertDetails) {
     try {
       if (!alert.userId) {
         logger.warn('Cannot store alert without user ID', {
@@ -291,7 +291,7 @@ export class RiskAlertSystem {
   /**
    * Send dashboard alert
    */
-  private async sendDashboardAlert(alert: AlertDetails): Promise<void> {
+  private async sendDashboardAlert(alert: AlertDetails) {
     // In a real implementation, this would add the alert to a real-time notification system
     // For now, we'll just log it
     logger.info('Dashboard alert sent', {
@@ -304,7 +304,7 @@ export class RiskAlertSystem {
   /**
    * Send email alert
    */
-  private async sendEmailAlert(alert: AlertDetails): Promise<void> {
+  private async sendEmailAlert(alert: AlertDetails) {
     const recipients = this.config.recipients?.email || []
     if (recipients.length === 0) {
       logger.warn('No email recipients configured for alerts')
@@ -324,7 +324,7 @@ export class RiskAlertSystem {
   /**
    * Send SMS alert
    */
-  private async sendSmsAlert(alert: AlertDetails): Promise<void> {
+  private async sendSmsAlert(alert: AlertDetails) {
     const recipients = this.config.recipients?.sms || []
     if (recipients.length === 0) {
       logger.warn('No SMS recipients configured for alerts')
@@ -344,7 +344,7 @@ export class RiskAlertSystem {
   /**
    * Send webhook alert
    */
-  private async sendWebhookAlert(alert: AlertDetails): Promise<void> {
+  private async sendWebhookAlert(alert: AlertDetails) {
     const endpoints = this.config.recipients?.webhook || []
     if (endpoints.length === 0) {
       logger.warn('No webhook endpoints configured for alerts')
@@ -380,17 +380,17 @@ export class RiskAlertSystem {
           id: result.id,
           userId: result.userId,
           level: result.riskLevel,
-          source: (metadataObject?.source as string) || 'unknown',
+          source: (metadataObject?.['source'] as string) || 'unknown',
           timestamp: result.createdAt.getTime(),
           factors: result.crisisType ? result.crisisType.split(', ') : [],
           score: result.confidence,
           description: result.text,
           requiresHumanReview:
-            (metadataObject?.requiresHumanReview as boolean) ?? true,
+            (metadataObject?.['requiresHumanReview'] as boolean) ?? true,
           status:
-            (metadataObject?.status as AlertDetails['status']) || 'pending',
-          reviewedBy: metadataObject?.reviewedBy as string | undefined,
-          reviewNotes: metadataObject?.reviewNotes as string | undefined,
+            (metadataObject?.['status'] as AlertDetails['status']) || 'pending',
+          reviewedBy: metadataObject?.['reviewedBy'] as string | undefined,
+          reviewNotes: metadataObject?.['reviewNotes'] as string | undefined,
           metadata: metadataObject,
         }
       })

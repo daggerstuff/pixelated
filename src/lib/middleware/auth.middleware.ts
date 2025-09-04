@@ -99,8 +99,8 @@ export function roleGuard(role: AuthRole): void {
       })
     }
 
-    // Check the user's role
-    const hasRequiredRole = hasRolePrivilege(user?.['role'] as AuthRole, role)
+  // Check the user's role
+  const hasRequiredRole = hasRolePrivilege((user as any)['role'] as AuthRole, role)
 
     if (!hasRequiredRole) {
       await createResourceAuditLog(
@@ -117,7 +117,7 @@ export function roleGuard(role: AuthRole): void {
           method: context.request.method,
           path: new URL(context.request.url).pathname,
           requiredRole: role,
-          userRole: user['role'],
+          userRole: (user as any)['role'],
         } as AuditMetadata,
       )
 
@@ -242,10 +242,11 @@ export function apiRoleGuard(role: AuthRole): void {
 
     // At this point we know context.user exists
     const apiContext = context as ApiContextWithUser
-    const { user } = apiContext
+    // access via bracket form because user comes from an index-signature context
+    const user = (apiContext as any)['user'] as AuthUser
 
     // Check if the user has the required role
-    if (!hasRolePrivilege(user?.['role'], role)) {
+  if (!hasRolePrivilege(user?.['role'], role)) {
       await createResourceAuditLog(
         'api_access_denied',
         user.id,
@@ -260,7 +261,7 @@ export function apiRoleGuard(role: AuthRole): void {
           method: request.method,
           path: new URL(request.url).pathname,
           requiredRole: role,
-          userRole: user.role,
+          userRole: user?.['role'],
         } as AuditMetadata,
       )
 
