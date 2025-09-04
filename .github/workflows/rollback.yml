@@ -8,9 +8,10 @@ on:
 
 permissions:
   contents: write
+  workflows: write
 
 env:
-  NODE_VERSION: 22.18.0
+  NODE_VERSION: 24.18.0
   PNPM_VERSION: 10.15.0
   NODE_ENV: production
 
@@ -21,6 +22,7 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     permissions:
       contents: write
+      workflows: write
       deployments: write
       actions: read
       id-token: write
@@ -90,7 +92,7 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git tag rollback-staging-$TIMESTAMP
-          git push origin rollback-staging-$TIMESTAMP
+          git push https://$GH_PAT@github.com/pixelatedempathy/pixelated rollback-staging-$TIMESTAMP
 
   rollback-production:
     name: Rollback Production
@@ -101,6 +103,7 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: write
+      workflows: write
       deployments: write
       actions: read
       id-token: write

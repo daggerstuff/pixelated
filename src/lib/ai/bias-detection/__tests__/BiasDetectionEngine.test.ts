@@ -3696,9 +3696,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         completionStatus: 'completed' as const,
         technicalIssues: [],
       },
-    }
 
-    biasEngine = new BiasDetectionEngine(mockConfig)
+
+    biasEngine = new BiasDetectionEngine(mockConfig);
   })
 
   // Remove the global beforeEach that initializes for all tests
@@ -5355,4 +5355,4 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 })
-
+});

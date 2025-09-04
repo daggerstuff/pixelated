@@ -27,7 +27,8 @@ variables:
   CI_REPOSITORY_URL: git@git.pixelatedempathy.tech:pixeltech/pixelated.git
   # Override CI_REGISTRY to use correct port (registry runs on 443, not 5050)
   CI_REGISTRY: https://git.pixelatedempathy.tech
-
+  # Override CI_REGISTRY_IMAGE to strip :5050 and ensure push to 443
+  CI_REGISTRY_IMAGE: git.pixelatedempathy.tech/pixeltech/pixelated
 validate-runner:
   stage: validate
   image: docker:24.0.5

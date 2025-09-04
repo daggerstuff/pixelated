@@ -1,7 +1,7 @@
 # Alternative: Use Grafana's built-in alerting instead of Alertmanager
 # This Dockerfile creates a simple webhook receiver for alerts
 
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 
 WORKDIR /app
 

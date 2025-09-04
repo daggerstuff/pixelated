@@ -13,7 +13,7 @@ on:
 
 
 env:
-  NODE_VERSION: 22.18.0
+  NODE_VERSION: 24.18.0
   PNPM_VERSION: 10.15.0
   NODE_ENV: test
   DISABLE_AUTH: 'true'
