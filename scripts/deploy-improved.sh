@@ -85,7 +85,7 @@ print_warning() { echo -e "\${YELLOW}[VPS-ENV WARNING]${NC} \$1"; }
 install_nvm() {
     if [[ ! -s "\$HOME/.nvm/nvm.sh" ]]; then
         print_status "Installing nvm (Node Version Manager)..."
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
         
         # Add nvm to bashrc for persistent sessions (Requirement 1.3)
         if ! grep -q "NVM_DIR" ~/.bashrc; then
