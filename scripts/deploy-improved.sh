@@ -474,7 +474,7 @@ main() {
     if [[ -n "$SSH_KEY" ]]; then
         SSH_CMD="$SSH_CMD -i $SSH_KEY"
     fi
-    SSH_CMD="$SSH_CMD -p $VPS_PORT -o StrictHostKeyChecking=no"
+    SSH_CMD="$SSH_CMD -p $VPS_PORT"
     VPS_CONNECTION="$VPS_USER@$VPS_HOST"
     
     # Test SSH connection
