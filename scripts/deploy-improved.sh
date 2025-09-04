@@ -9,7 +9,7 @@ set -e
 VPS_HOST=${1:-"45.55.211.39"}
 VPS_USER=${2:-"root"}
 VPS_PORT=${3:-"22"}
-SSH_KEY=${4:-"~/.ssh/planet"}
+SSH_KEY=${4:-"$HOME/.ssh/planet"}
 DOMAIN=${5:-"pixelatedempathy.com"}
 LOCAL_PROJECT_DIR="/home/vivi/pixelated"
 REMOTE_PROJECT_DIR="/root/pixelated"
