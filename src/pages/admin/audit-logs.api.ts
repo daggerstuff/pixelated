@@ -11,7 +11,7 @@ import { requirePageAuth } from '../../lib/auth';
  * Returns:
  *   A Response object indicating whether the user is authorized.
  */
-export async function GET(context: BaseAPIContext): void {
+export async function GET(context: BaseAPIContext): Promise<Response> {
   const authResult = await requirePageAuth(context, 'admin');
   if (authResult) {
     return authResult;

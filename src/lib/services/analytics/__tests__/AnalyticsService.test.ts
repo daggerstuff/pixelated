@@ -1,5 +1,5 @@
 import * as loggerModule from '../../../logging/build-safe-logger'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+
 import { WebSocket } from 'ws'
 import { AnalyticsService } from '../AnalyticsService'
 import { EventDataSchema, EventPriority, EventType } from '../analytics-types'

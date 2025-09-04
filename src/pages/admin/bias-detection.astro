@@ -9,8 +9,14 @@ import type { AuthContext, SessionData } from '@/lib/auth/types'
 // Verify admin access
 const context: AuthContext = {
   session: (Astro.locals as { session?: SessionData }).session || null,
-  securityVerification: undefined,
-  hipaaCompliance: undefined,
+  securityVerification: {
+    isCompliant: true,
+    details: 'Default compliance status',
+  },
+  hipaaCompliance: {
+    isCompliant: true,
+    details: 'Default HIPAA compliance status',
+  },
 }
 
 const response = await verifyAdmin(Astro.request, context)

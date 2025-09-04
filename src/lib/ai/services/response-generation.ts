@@ -21,7 +21,7 @@ export class ResponseGenerationService {
   private temperature: number
   private maxResponseTokens: number
 
-  constructor(config: ResponseGenerationConfig): void {
+  constructor(config: ResponseGenerationConfig) {
     this.aiService = config.aiService
     this.model = config.model
     this.temperature = config.temperature ?? 0.7

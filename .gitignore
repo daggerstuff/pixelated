@@ -153,4 +153,6 @@ claude-flow.ps1
 hive-mind-prompt-*.txt
 
 oc4vm-1.1.1.zip
-ai/
+/ai/
+QWEN.md
+roo-code-settings.json

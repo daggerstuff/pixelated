@@ -6,15 +6,16 @@ const frontmatter = {
   title: 'Highlights',
   subtitle: 'Showcase your creative work or curated posts',
   description: 'Showcase your creative work or curated posts',
-  bgType: false as const,
+  bgType: 'default',
   toc: false,
-  ogImage: false,
+  ogImage: '/og-image.png',
 }
 ---
 
 <BaseLayout
   title={frontmatter.title}
   description={frontmatter.description}
+  bgType={frontmatter.bgType}
 >
   <section class="py-12">
     <div class="max-w-6xl mx-auto px-4 text-center">

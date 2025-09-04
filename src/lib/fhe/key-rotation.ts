@@ -108,7 +108,7 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Private constructor for singleton pattern
    */
-  private constructor(options?: Partial<KeyManagementOptions>): void {
+  private constructor(options?: Partial<KeyManagementOptions>) {
     super()
     this.options = { ...HIPAA_DEFAULT_OPTIONS, ...options }
     this.nodeId = this.generateSecureId()

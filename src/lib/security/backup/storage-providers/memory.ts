@@ -11,7 +11,7 @@ export class InMemoryStorageProvider implements StorageProvider {
   private storage: Map<string, Uint8Array> = new Map()
   private initialized = false
 
-  constructor(private config: StorageProviderConfig): void {}
+  constructor(private config: StorageProviderConfig) {}
 
   async initialize(): Promise<void> {
     this.initialized = true

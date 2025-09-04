@@ -34,7 +34,7 @@ export class LocalFileSystemProvider implements StorageProvider {
   private path: PathModule | null = null;
   private initialized = false;
 
-  constructor(private config: StorageProviderConfig): void {
+  constructor(private config: StorageProviderConfig) {
     this.basePath = (config.path as string) || '';
     if (!this.basePath) {
       throw new Error('Path is required for local filesystem storage provider');

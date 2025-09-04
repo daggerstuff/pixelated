@@ -61,10 +61,10 @@ export class PerformanceOptimizer {
   private connectionPool: Map<string, unknown[]>
   private cache: Map<string, { value: unknown; timestamp: number; accessCount: number }>
   private circuitBreakers: Map<string, { failures: number; lastFailure: number; state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' }>
-  private batchQueues: Map<string, { items: unknown[]; timer: NodeJS.Timeout | null }>
+  private batchQueues: Map<string, { items: any[]; timer: NodeJS.Timeout | null }>
   private metricsHistory: PerformanceMetrics[]
 
-  constructor(config: Partial<OptimizationConfig> = {}): void {
+  constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
       connectionPool: {
         maxConnections: 100,
@@ -226,7 +226,7 @@ export class PerformanceOptimizer {
   private evictByStrategy() {
     if (this.cache.size === 0) return
 
-    let keyToEvict: string
+  let keyToEvict: string | undefined
     
     switch (this.config.cache.strategy) {
       case 'LRU':
@@ -242,7 +242,8 @@ export class PerformanceOptimizer {
         keyToEvict = this.cache.keys().next().value
     }
 
-    this.cache.delete(keyToEvict)
+  if (!keyToEvict) return
+  this.cache.delete(keyToEvict)
   }
 
   private findLRUKey(): string {
@@ -320,7 +321,7 @@ export class PerformanceOptimizer {
     }
   }
 
-  private getCircuitBreaker(serviceName: string): void {
+  private getCircuitBreaker(serviceName: string): { failures: number; lastFailure: number; state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' } {
     if (!this.circuitBreakers.has(serviceName)) {
       this.circuitBreakers.set(serviceName, {
         failures: 0,
@@ -372,7 +373,8 @@ export class PerformanceOptimizer {
       return
     }
 
-    const items = [...batch.items]
+  // stored items are any[]; cast to T[] for the processor
+  const items = [...batch.items] as unknown as T[]
     batch.items = []
     
     if (batch.timer) {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import type { FC } from 'react'
 import type {
   CrisisSessionFlag,
   UserSessionStatus,

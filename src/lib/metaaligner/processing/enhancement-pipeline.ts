@@ -329,7 +329,7 @@ export class EnhancementPipeline {
     const improvements: AlignmentImprovement[] = []
 
     // Compare overall score
-    const overallImprovement = enhanced.overallScore - original.overallScore
+    
 
     // Compare individual objective scores
     for (const [objectiveId, enhancedResult] of Object.entries(

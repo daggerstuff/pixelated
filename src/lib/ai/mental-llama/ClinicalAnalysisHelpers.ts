@@ -12,7 +12,7 @@ const logger = getClinicalAnalysisLogger('helpers')
  * recommendations generation, and quality metrics calculation.
  */
 export class ClinicalAnalysisHelpers {
-  constructor(private modelProvider?: IModelProvider): void {}
+  constructor(private modelProvider?: IModelProvider) {}
 
   /**
    * Builds clinical prompt for LLM analysis.

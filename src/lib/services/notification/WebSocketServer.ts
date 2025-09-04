@@ -51,7 +51,7 @@ export class WebSocketServer {
   private wss: WSServer
   private notificationService: NotificationService
 
-  constructor(port: number, notificationService: NotificationService): void {
+  constructor(port: number, notificationService: NotificationService) {
     this.notificationService = notificationService
     this.wss = new WSServer({ port })
 
