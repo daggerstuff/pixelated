@@ -211,7 +211,7 @@ export class EducationalContextRecognizer {
     ],
   }
 
-  constructor(config: EducationalRecognizerConfig): void {
+  constructor(config: EducationalRecognizerConfig) {
     this.aiService = config.aiService
     this.model = config.model || 'gpt-4'
     this.adaptToUserLevel = config.adaptToUserLevel ?? true

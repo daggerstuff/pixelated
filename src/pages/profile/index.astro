@@ -24,9 +24,13 @@ export async function GET(context: APIContext) {
   // Get the current user from the auth session
   const user = context.locals.user as User
 
-  return {
-    props: { user },
-  }
+  // Render the page with the user data
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html',
+    },
+  })
 }
 
 // @ts-expect-error Astro.props is injected at runtime

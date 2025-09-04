@@ -35,7 +35,6 @@ const RealUserMonitoringComponent = compileAstroComponent(componentPath)
 interface RealUserMonitoringProps {
   title?: string
   description?: string
-  refreshInterval?: number
 }
 
 describe('RealUserMonitoring.astro', () => {
@@ -123,7 +122,6 @@ describe('RealUserMonitoring.astro', () => {
     const customProps: RealUserMonitoringProps = {
       title: customTitle,
       description: customDescription,
-      refreshInterval: 60000,
     }
 
     render(React.createElement(RealUserMonitoringComponent, customProps))

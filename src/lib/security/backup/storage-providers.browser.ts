@@ -107,7 +107,7 @@ export class InMemoryStorageProvider implements StorageProvider {
 export class LocalStorageProvider implements StorageProvider {
   private prefix: string
 
-  constructor(config: Record<string, unknown>): void {
+  constructor(config: Record<string, unknown>) {
     this.prefix = (config.prefix as string) || 'backup-'
   }
 
@@ -186,7 +186,7 @@ export class IndexedDBStorageProvider implements StorageProvider {
   private storeName: string
   private db: IDBDatabase | null = null
 
-  constructor(config: Record<string, unknown>): void {
+  constructor(config: Record<string, unknown>) {
     this.dbName = (config.dbName as string) || 'backupStorage'
     this.storeName = (config.storeName as string) || 'backups'
   }

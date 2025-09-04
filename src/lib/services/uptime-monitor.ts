@@ -54,11 +54,15 @@ export class UptimeMonitor {
     const startTime = performance.now()
     
     try {
-      // Perform health check
+      // Perform health check with AbortController timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+
       const response = await fetch('http://localhost:4321/api/v1/health', {
-        timeout: 5000
+        signal: controller.signal,
       })
-      
+      clearTimeout(timeoutId)
+
       const responseTime = performance.now() - startTime
       let status: 'up' | 'down' | 'degraded' = 'up'
       
@@ -100,7 +104,7 @@ export class UptimeMonitor {
   }
 
   getStats(periodHours: number = 24): UptimeStats {
-    const cutoffTime = new Date(Date.now() - periodHours * 60 * 60 * 1000)
+  const cutoffTime = new Date(Date.now() - periodHours * 60 * 60 * 1000)
     const relevantRecords = this.records.filter(
       record => new Date(record.timestamp) >= cutoffTime
     )
@@ -137,7 +141,7 @@ export class UptimeMonitor {
       downChecks,
       degradedChecks,
       averageResponseTime: Math.round(averageResponseTime * 100) / 100,
-      lastCheck: relevantRecords[relevantRecords.length - 1],
+      lastCheck: relevantRecords[relevantRecords.length - 1]!,
       period: `${periodHours}h`
     }
   }
@@ -154,7 +158,7 @@ export class UptimeMonitor {
     try {
       if (existsSync(this.dataFile)) {
         const data = readFileSync(this.dataFile, 'utf8')
-        this.records = JSON.parse(data) as unknown
+        this.records = JSON.parse(data) as UptimeRecord[]
       }
     } catch (error: unknown) {
       console.warn('Failed to load uptime records:', error)

@@ -45,7 +45,7 @@ export class EdgeComputing {
   private taskQueue: EdgeComputeTask[] = []
   private isProcessing = false
 
-  constructor(config: EdgeComputeConfig): void {
+  constructor(config: EdgeComputeConfig) {
     this.config = config
     logger.info('EdgeComputing initialized', { config })
   }

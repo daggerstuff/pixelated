@@ -20,6 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { apiClient, APIError } from '@/lib/api-client'
+import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 
 interface CrisisAssessment {
   riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent'
@@ -67,7 +68,7 @@ export default function CrisisDetectionDemo() {
     }
 
     try {
-      const result = await apiClient.detectCrisis({
+      const result: CrisisDetectionResponse = await apiClient.detectCrisis({
         content: inputText,
         contentType: 'chat_message',
         context: {

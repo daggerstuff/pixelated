@@ -172,7 +172,7 @@ function remarkDirectiveSugar() {
           let _resolvedText = ''
           let _resolvedStyle = ''
           let _resolvedTab = ''
-          let isOrg = false
+          let _isOrg = false
 
           const { id, link, tab, style } = attributes
 
@@ -208,7 +208,7 @@ function remarkDirectiveSugar() {
           } else if (tab) {
             const match = tab.match(TAB_ORG_REGEXP)
             if (match && match[1]) {
-              isOrg = true
+              _isOrg = true
               _resolvedTab = match[1]
             } else {
               _resolvedTab = tab

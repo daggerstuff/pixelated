@@ -221,12 +221,12 @@ class EnhancedStatePersistence {
 
   private async cleanupOldData(): Promise<void> {
     // Remove oldest form drafts first
-    const formDrafts = this.getStoredValue('form_drafts', {})
+    const formDrafts = this.getStoredValue('form_drafts', {}) as Record<string, any>
     const draftEntries = Object.entries(formDrafts).sort((a, b) => {
       const timestampA =
-        ((a[1] as Record<string, unknown>)?.timestamp as number) || 0
+        ((a[1] as Record<string, any>)?.timestamp as number) || 0
       const timestampB =
-        ((b[1] as Record<string, unknown>)?.timestamp as number) || 0
+        ((b[1] as Record<string, any>)?.timestamp as number) || 0
       return timestampA - timestampB
     })
 
@@ -243,16 +243,16 @@ class EnhancedStatePersistence {
   private cleanupExpiredSessions() {
     const sessionState = this.getStoredValue('session_state', {}) as Record<
       string,
-      unknown
+      any
     >
     const now = Date.now()
     const sessionTimeout = 24 * 60 * 60 * 1000 // 24 hours
 
     // Clear session data if too old
     if (
-      sessionState.lastActivity &&
-      typeof sessionState.lastActivity === 'number' &&
-      now - sessionState.lastActivity > sessionTimeout
+  (sessionState)['lastActivity'] &&
+  typeof (sessionState)['lastActivity'] === 'number' &&
+  now - ((sessionState)['lastActivity'] as number) > sessionTimeout
     ) {
       this.setStoredValue('session_state', {
         lastRoute: '/',
@@ -267,24 +267,24 @@ class EnhancedStatePersistence {
   private cleanupOldFormDrafts() {
     const formDrafts = this.getStoredValue('form_drafts', {}) as Record<
       string,
-      unknown
+      any
     >
     const now = Date.now()
     const draftTimeout = 7 * 24 * 60 * 60 * 1000 // 7 days
 
     Object.keys(formDrafts).forEach((key) => {
-      const draft = formDrafts[key] as unknown
+      const draft = formDrafts[key]
       if (
         draft &&
         typeof draft === 'object' &&
         draft !== null &&
         'timestamp' in draft &&
-        typeof (draft as Record<string, unknown>).timestamp === 'number'
+        typeof (draft as Record<string, any>)['timestamp'] === 'number'
       ) {
-        const draftWithTimestamp = draft as Record<string, unknown> & {
+        const draftWithTimestamp = draft as Record<string, any> & {
           timestamp: number
         }
-        if (now - draftWithTimestamp.timestamp > draftTimeout) {
+  if (now - ((draftWithTimestamp)['timestamp'] as number) > draftTimeout) {
           delete formDrafts[key]
         }
       }
@@ -527,12 +527,12 @@ class EnhancedStatePersistence {
 // Hooks and Utilities
 // ============================================================================
 
-export function useFormDraft(formId: string): void {
+export function useFormDraft(formId: string) {
   const persistence = EnhancedStatePersistence.getInstance()
 
   return {
     saveDraft: (data: unknown) => persistence.saveDraft(formId, data),
-    getDraft: () => persistence.getDraft(formId),
+    getDraft: (): unknown | null => persistence.getDraft(formId),
     clearDraft: () => persistence.clearDraft(formId),
   }
 }
@@ -541,7 +541,7 @@ export function useFeatureTracking() {
   const persistence = EnhancedStatePersistence.getInstance()
 
   return {
-    trackUsage: (featureName: string) =>
+    trackUsage: (featureName: string): void =>
       persistence.trackFeatureUsage(featureName),
   }
 }
@@ -550,7 +550,7 @@ export function useOfflineQueue() {
   const persistence = EnhancedStatePersistence.getInstance()
 
   return {
-    queueAction: (type: string, payload: unknown) =>
+    queueAction: (type: string, payload: unknown): void =>
       persistence.queueOfflineAction(type, payload),
   }
 }

@@ -3,6 +3,35 @@
  */
 
 // Production-grade types
+export interface TreatmentGoal {
+  description: string;
+  progress: number;
+  notes: string;
+}
+
+export interface TreatmentProgress {
+  goals: TreatmentGoal[];
+  overallAssessment: string;
+}
+
+export interface TherapeuticTechnique {
+  name: string;
+  description: string;
+  effectiveness: number;
+}
+
+export interface EmotionalPattern {
+  pattern: string;
+  significance: string;
+}
+
+export interface OutcomePrediction {
+  technique: string;
+  predictedEfficacy: number;
+  confidence: number;
+  rationale: string;
+}
+
 export interface SessionDocumentation {
   readonly sessionId: string
   readonly clientId: string
@@ -14,18 +43,20 @@ export interface SessionDocumentation {
   readonly outcomes: readonly string[]
   readonly nextSteps: readonly string[]
   readonly riskAssessment: RiskAssessment
-  readonly metadata: SessionMetadata
+  readonly metadata: Partial<SessionMetadata>
   // Additional properties used in SessionDocumentation component
   readonly summary?: string
   readonly keyInsights?: readonly string[]
-  readonly therapeuticTechniques?: readonly string[]
-  readonly treatmentProgress?: string
-  readonly emotionalPatterns?: readonly string[]
+  readonly therapeuticTechniques?: readonly TherapeuticTechnique[]
+  readonly treatmentProgress?: TreatmentProgress
+  readonly emotionalPatterns?: readonly EmotionalPattern[]
   readonly clientStrengths?: readonly string[]
   readonly emergentIssues?: readonly string[]
   readonly recommendedFollowUp?: readonly string[]
   readonly nextSessionPlan?: string
-  readonly outcomePredictions?: readonly string[]
+  readonly outcomePredictions?: readonly OutcomePrediction[]
+  version?: number
+  lastModified?: Date
 }
 
 export interface RiskAssessment {

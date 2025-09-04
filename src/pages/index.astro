@@ -260,12 +260,18 @@ const features = [
       <script is:inline>
         // pointer-follow highlight for mosaic cards
         document.querySelectorAll('[class*="group"]').forEach((el) => {
-          el.addEventListener('pointermove', (e: Event) => {
-            const rect = el.getBoundingClientRect();
-            el.style.setProperty('--x', `${e.clientX - rect.left}px`);
-            el.style.setProperty('--y', `${e.clientY - rect.top}px`);
-          });
-        });
+          el.addEventListener('pointermove', (e: PointerEvent) => {
+            const rect = el.getBoundingClientRect()
+            ;(el as HTMLElement).style.setProperty(
+              '--x',
+              `${e.clientX - rect.left}px`,
+            )
+            ;(el as HTMLElement).style.setProperty(
+              '--y',
+              `${e.clientY - rect.top}px`,
+            )
+          })
+        })
       </script>
     </div>
   </section>

@@ -32,7 +32,7 @@ export class SealContext {
   /**
    * Create a new SealContext with the specified options
    */
-  constructor(options: SealContextOptions): void {
+  constructor(options: SealContextOptions) {
     this.contextOptions = options // Store the full options object
     this.parameters = options.params
     this.scheme = options.scheme

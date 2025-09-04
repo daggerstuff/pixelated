@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server'
 import { generateCspNonce } from './lib/middleware/csp'
+import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence } from 'astro/middleware'
 
 const isProtectedRoute = createRouteMatcher([
@@ -20,5 +21,5 @@ const AUTH_DISABLED =
 
 // Single, clean middleware sequence
 export const onRequest = AUTH_DISABLED
-  ? sequence(generateCspNonce)
-  : sequence(generateCspNonce, clerkAuthMiddleware)
+  ? sequence(generateCspNonce, securityHeaders)
+  : sequence(generateCspNonce, securityHeaders, clerkAuthMiddleware)

@@ -1,10 +1,12 @@
 // Use conditional import to prevent MongoDB from being bundled on client side
 declare const ObjectId: any
 
+type MongoObjectId = typeof ObjectId
+
 export interface User {
   id: string
   profile: unknown
-  _id: ObjectId
+  _id: MongoObjectId
   email: string
   password: string
   role: 'admin' | 'user' | 'therapist'
@@ -18,8 +20,8 @@ export interface User {
 }
 
 export interface Session {
-  _id: ObjectId
-  userId: ObjectId
+  _id: MongoObjectId
+  userId: MongoObjectId
   sessionId: string
   expiresAt: Date
   createdAt: Date
@@ -27,20 +29,20 @@ export interface Session {
 }
 
 export interface Todo {
-  _id?: ObjectId
+  _id?: MongoObjectId
   id?: string
   name: string
   description?: string
   completed: boolean
-  userId?: ObjectId // For user-specific todos
+  userId?: MongoObjectId // For user-specific todos
   createdAt: Date
   updatedAt: Date
 }
 
 export interface AIMetrics {
-  _id?: ObjectId
+  _id?: MongoObjectId
   id?: string
-  userId: ObjectId
+  userId: MongoObjectId
   sessionId: string
   modelName: string
   requestType: string
@@ -51,9 +53,9 @@ export interface AIMetrics {
 }
 
 export interface BiasDetection {
-  _id?: ObjectId
+  _id?: MongoObjectId
   id?: string
-  userId: ObjectId
+  userId: MongoObjectId
   sessionId: string
   detectedBias: string
   biasType: string
@@ -64,10 +66,10 @@ export interface BiasDetection {
 }
 
 export interface TreatmentPlan {
-  _id?: ObjectId
+  _id?: MongoObjectId
   id?: string
-  userId: ObjectId
-  therapistId: ObjectId
+  userId: MongoObjectId
+  therapistId: MongoObjectId
   title: string
   description: string
   goals: string[]
@@ -80,23 +82,23 @@ export interface TreatmentPlan {
 }
 
 export interface CrisisSessionFlag {
-  _id?: ObjectId
+  _id?: MongoObjectId
   id?: string
-  userId: ObjectId
+  userId: MongoObjectId
   sessionId: string
   flagType: 'suicide_risk' | 'self_harm' | 'crisis'
   severity: 'low' | 'medium' | 'high' | 'critical'
   description: string
   resolved: boolean
   resolvedAt?: Date
-  resolvedBy?: ObjectId
+  resolvedBy?: MongoObjectId
   createdAt: Date
 }
 
 export interface ConsentManagement {
-  _id?: ObjectId
+  _id?: MongoObjectId
   id?: string
-  userId: ObjectId
+  userId: MongoObjectId
   consentType: string
   granted: boolean
   version: string

@@ -1,6 +1,6 @@
 // Real-time bias analysis display with comprehensive metrics visualization
 
-import React from 'react'
+import type { FC } from 'react'
 import type {
   BiasAnalysisResults,
   SessionData,

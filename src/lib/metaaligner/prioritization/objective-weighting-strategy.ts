@@ -1,7 +1,7 @@
 // Dynamic Objective Weighting Algorithms for Context-Sensitive Alignment
 // Provides strategy-based weighting adjustment based on context, urgency, and extensible factors.
 
-import { ContextType } from '../core/objectives'
+
 import type { ObjectivePriority } from './context-objective-mapping'
 
 export interface WeightingParams {

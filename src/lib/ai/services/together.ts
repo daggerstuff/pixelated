@@ -84,7 +84,7 @@ class TogetherAIError extends Error {
 class RateLimitManager {
   private rateLimitInfo: RateLimitInfo
 
-  constructor(config: { requestsPerMinute: number; tokensPerMinute: number }): void {
+  constructor(config: { requestsPerMinute: number; tokensPerMinute: number }) {
     this.rateLimitInfo = {
       requestsPerMinute: config.requestsPerMinute,
       tokensPerMinute: config.tokensPerMinute,

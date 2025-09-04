@@ -309,12 +309,15 @@ export interface EncryptedData<T = unknown> {
  * Type guard for EncryptedData
  */
 export function isEncryptedData(obj: unknown): obj is EncryptedData<unknown> {
+  if (!obj || typeof obj !== 'object') {
+    return false
+  }
+  const record = obj as Record<string, unknown>
+
   return (
-    obj &&
-    typeof obj === 'object' &&
-    typeof (obj as { id?: string }).id === 'string' &&
-    'data' in (obj as { data?: unknown }) &&
-    typeof (obj as { dataType?: string }).dataType === 'string'
+    typeof record['id'] === 'string' &&
+    typeof record['dataType'] === 'string' &&
+    'data' in record
   )
 }
 
@@ -663,7 +666,7 @@ export interface TherapyHomomorphicRequest {
 
 // Export error type for use in error handling
 export class OperationError extends Error {
-  constructor(message: string): void {
+  constructor(message: string) {
     super(message)
     this.name = 'OperationError'
   }

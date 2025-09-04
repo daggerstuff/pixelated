@@ -17,7 +17,7 @@ interface LoggerOptions {
 class Logger {
   private options: LoggerOptions
 
-  constructor(options?: Partial<LoggerOptions>): void {
+  constructor(options?: Partial<LoggerOptions>) {
     this.options = {
       level: 'info',
       enabled: true,

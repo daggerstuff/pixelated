@@ -1,16 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import type { PatientInfo } from '../../lib/types/psychology-pipeline'
-
-interface DemographicData {
-  category: string
-  subcategory: string
-  current: number
-  target: number
-  percentage: number
-}
-
-interface DemographicBalancingDisplayProps {
-  currentProfile: PatientInfo
+import { useState, useEffect, type FC } from 'react'
   onBalanceUpdate?: (balanceScore: number) => void
 }
 
@@ -281,38 +269,24 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 
   const groupedStats = demographicStats.reduce(
     (acc, stat) => {
-      if (!acc[stat.category]) {
-        acc[stat.category] = []
+      const category = stat.category;
+      if (!acc[category]) {
+        acc[category] = [];
       }
-      acc[stat.category].push(stat)
-      return acc
+      (acc[category] as DemographicData[]).push(stat);
+      return acc;
     },
     {} as Record<string, DemographicData[]>,
-  )
-
-  return (
-    <div className="demographic-balancing-display bg-white rounded-lg p-6 border shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h4 className="text-lg font-semibold text-gray-800">
-          Demographic Balance & Diversity
+      (acc[category] as DemographicData[]).push(stat);
+      return acc;
         </h4>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Overall Balance:</span>
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              overallBalance >= 85
-                ? 'bg-green-100 text-green-800'
-                : overallBalance >= 70
-                  ? 'bg-yellow-100 text-yellow-800'
+      (acc[category] as DemographicData[]).push(stat);
+      return acc;
                   : 'bg-red-100 text-red-800'
             }`}
-          >
-            {overallBalance.toFixed(1)}%
-          </div>
-        </div>
-      </div>
-
-      {/* Current Profile Summary */}
+      (acc[category] as DemographicData[]).push(stat);
+      return acc;
       <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
         <h5 className="font-medium text-blue-800 mb-2">
           Current Profile Classification

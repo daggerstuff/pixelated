@@ -26,7 +26,7 @@ export class ScheduledKeyRotation {
    * Creates a new ScheduledKeyRotation instance
    * @param options - Configuration options
    */
-  constructor(options: ScheduledRotationOptions = {}): void {
+  constructor(options: ScheduledRotationOptions = {}) {
     this.keyStorage = new KeyStorage({
       namespace: options.namespace || 'app',
       useSecureStorage: options.useSecureStorage || false,

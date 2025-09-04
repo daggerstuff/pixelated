@@ -8,7 +8,7 @@ import type { CognitiveModel } from '../types/CognitiveModel'
 export type ModelIdentifier = string
 
 export class PatientModelService {
-  constructor(private kvStore: KVStore): void {}
+  constructor(private kvStore: KVStore) {}
 
   /**
    * Get all available cognitive models
