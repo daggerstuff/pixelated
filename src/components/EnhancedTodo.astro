@@ -439,17 +439,29 @@ const {
     // DOM elements
     const todoForm = document.getElementById('todo-form')
     const todoInput = document.getElementById('todo-input')
-    const categoryInput = document.getElementById('todo-category')
-    const prioritySelect = document.getElementById('todo-priority')
+    const categoryInput = document.getElementById(
+      'todo-category',
+    )
+    const prioritySelect = document.getElementById(
+      'todo-priority',
+    )
     const dueDateInput = document.getElementById('todo-due-date')
     const todoList = document.getElementById('todo-list')
     const emptyState = document.getElementById('empty-state')
     const addTodoBtn = document.getElementById('add-todo-btn')
     const cancelBtn = document.getElementById('cancel-btn')
-    const categorySelect = document.getElementById('category-select')
-    const existingCategories = document.getElementById('existing-categories')
-    const filterButtons = document.querySelectorAll('.filter-buttons button')
-    const categoryFilterContainer = document.querySelector('.category-filter')
+    const categorySelect = document.getElementById(
+      'category-select',
+    )
+    const existingCategories = document.getElementById(
+      'existing-categories',
+    )
+    const filterButtons = document.querySelectorAll(
+      '.filter-buttons button',
+    )
+    const categoryFilterContainer = document.querySelector(
+      '.category-filter',
+    )
 
     let currentFilter = 'all'
     let currentCategoryFilter = ''
@@ -460,7 +472,7 @@ const {
     errorBanner.style.display = 'none'
     errorBanner.style.color = 'red'
     errorBanner.style.marginBottom = '1rem'
-    document.querySelector('.todo-container').prepend(errorBanner)
+    document.querySelector('.todo-container')?.prepend(errorBanner)
 
     function showError(msg) {
       errorBanner.textContent = msg
@@ -477,7 +489,7 @@ const {
     function TodoItem(data) {
       return {
         id: data.id || generateId(),
-        text: data.text,
+        text: data.text || '',
         completed: data.completed || false,
 
         ...(data.category && { category: data.category }),
@@ -542,7 +554,9 @@ const {
     // Create a todo element
     const createTodoElement = (todo) => {
       const li = document.createElement('li')
-      li.className = `todo-item ${todo.completed ? 'completed' : ''} priority-${todo.priority || 'medium'}`
+      li.className = `todo-item ${todo.completed ? 'completed' : ''} priority-${
+        todo.priority || 'medium'
+      }`
       li.dataset.id = todo.id
       li.dataset.completed = todo.completed.toString()
       li.dataset.category = todo.category || ''
@@ -565,7 +579,9 @@ const {
         'aria-label',
         `Mark "${todo.text}" as ${todo.completed ? 'incomplete' : 'complete'}`,
       )
-      checkbox.addEventListener('change', (_event: Event) => toggleTodoComplete(todo.id))
+      checkbox.addEventListener('change', (_event) =>
+        toggleTodoComplete(todo.id),
+      )
 
       const label = document.createElement('label')
       label.htmlFor = `todo-${todo.id}`
@@ -579,7 +595,9 @@ const {
       deleteBtn.className = 'delete-button'
       deleteBtn.innerHTML = '×'
       deleteBtn.setAttribute('aria-label', `Delete "${todo.text}"`)
-      deleteBtn.addEventListener('click', (_event: Event) => deleteTodo(todo.id))
+      deleteBtn.addEventListener('click', (_event) =>
+        deleteTodo(todo.id),
+      )
 
       // Assemble the main section
       checkboxDiv.appendChild(checkbox)
@@ -622,9 +640,11 @@ const {
 
     // Show/hide form
     const toggleForm = (show) => {
-      todoForm.style.display = show ? 'block' : 'none'
-      addTodoBtn.style.display = show ? 'none' : 'block'
-      addTodoBtn.setAttribute('aria-expanded', show.toString())
+      if (todoForm) todoForm.style.display = show ? 'block' : 'none'
+      if (addTodoBtn) {
+        addTodoBtn.style.display = show ? 'none' : 'block'
+        addTodoBtn.setAttribute('aria-expanded', show.toString())
+      }
 
       if (show && todoInput) {
         todoInput.focus()
@@ -632,20 +652,20 @@ const {
     }
 
     // Add event listener for add button
-    addTodoBtn.addEventListener('click', (_event: Event) => {
+    addTodoBtn?.addEventListener('click', (_event) => {
       toggleForm(true)
     })
 
     // Add event listener for cancel button
-    cancelBtn.addEventListener('click', (_event: Event) => {
+    cancelBtn?.addEventListener('click', (_event) => {
       resetForm()
       toggleForm(false)
     })
 
     // Reset form fields
     const resetForm = () => {
-      todoForm.reset()
-      prioritySelect.value = 'medium'
+      todoForm?.reset()
+      if (prioritySelect) prioritySelect.value = 'medium'
     }
 
     // Add a new todo
@@ -792,7 +812,10 @@ const {
         }
 
         // Finally sort by creation date
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return (
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
+        )
       })
     }
 
@@ -815,29 +838,32 @@ const {
         })
         emptyState.style.display = 'none'
       } else {
-        emptyState.querySelector('p').textContent =
-          currentFilter !== 'all'
-            ? `No ${currentFilter} tasks found`
-            : 'No tasks yet. Add your first task!'
+        const p = emptyState.querySelector('p')
+        if (p) {
+          p.textContent =
+            currentFilter !== 'all'
+              ? `No ${currentFilter} tasks found`
+              : 'No tasks yet. Add your first task!'
+        }
         emptyState.style.display = 'block'
       }
     }
 
     // Attach event listeners
-    todoForm.addEventListener('submit', addTodo)
+    todoForm?.addEventListener('submit', addTodo)
 
     // Filter button event listeners
     filterButtons.forEach((button) => {
-      button.addEventListener('click', (_event: Event) => {
-        currentFilter = button.dataset.filter
+      button.addEventListener('click', (_event) => {
+        currentFilter = button.dataset.filter || 'all'
         updateFilterButtons()
         renderTodos()
       })
     })
 
     // Category filter event listener
-    categorySelect.addEventListener('change', (_event: Event) => {
-      currentCategoryFilter = categorySelect.value
+    categorySelect?.addEventListener('change', (_event) => {
+      currentCategoryFilter = (categorySelect as HTMLSelectElement).value
       renderTodos()
     })
 
