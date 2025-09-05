@@ -1,302 +1,250 @@
-# Astro Development Best Practices
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/*.astro', '**/astro.config.*', '**/pages/**/*', '**/components/**/*', '**/layouts/**/*']
+---
 
-You are an expert in modern web development specializing in Astro framework, with deep knowledge of JavaScript,
-TypeScript, React, and related technologies.
+# Astro Development Guidelines
 
-## Core Principles
+Expert guidance for Astro 5.x development with TypeScript, React integration, and SSR/SSG optimization.
 
-- Write concise, maintainable code following Astro's architecture and component model
-- Leverage Astro's partial hydration for optimal performance (use client:* directives judiciously)
-- Prioritize static generation and server-side rendering when possible
-- Follow TypeScript best practices with strict typing
-- Implement robust security measures throughout the application
-- Focus on accessibility and performance metrics
+## Architecture Principles
 
-## Project Structure
+- **Islands Architecture**: Use client:* directives sparingly - prefer static generation
+- **Component Hierarchy**: `.astro` for static content, React/framework components for interactivity
+- **TypeScript First**: Strict typing with proper interfaces, avoid `any` types
+- **Performance Priority**: Target Core Web Vitals, minimize client-side JavaScript
+- **Security by Design**: Input validation, XSS prevention, secure authentication patterns
 
-```text
+## File Organization
+
+```
 src/
-  components/ - Reusable components
-  layouts/ - Page layouts
-  pages/ - File-based routing
-  content/ - Content collections
-  styles/ - Global styles
-public/ - Static assets
-astro.config.mjs - Configuration
+├── components/
+│   ├── ui/           # Reusable UI components (Button, Card, Badge)
+│   ├── admin/        # Admin-specific components
+│   ├── chat/         # Chat interface components
+│   └── dashboard/    # Dashboard components
+├── layouts/          # Page layouts and templates
+├── pages/
+│   ├── api/          # API endpoints (.ts files)
+│   └── [dynamic]/    # Dynamic routes
+├── content/          # Content collections (markdown/MDX)
+├── lib/              # Utilities and shared logic
+└── styles/           # Global styles and theme system
 ```
 
-## Component Development
+## Component Patterns
 
-- Use `.astro` files for Astro components (static/minimal interaction)
-- Reserve framework components (React/Vue/Svelte) for complex interactive features
-- **CRITICAL**: Always use proper frontmatter syntax (between `---` fences)
-- Implement proper prop validation using TypeScript interfaces
-- Use client directives strategically:
-  ```astro
-  <InteractiveComponent client:load /> <!-- Immediate interactivity -->
-  <LessImportantComponent client:idle /> <!-- Load during idle time -->
-  <LazyComponent client:visible /> <!-- Load when visible -->
-  ```
-
-## Routing & Pages
-
-- Use Astro's file-based routing in `src/pages/`
-- Implement dynamic routes with `[param].astro` or `[...slug].astro` syntax
-- Use `getStaticPaths()` for generating static routes with data
-- Implement proper 404 handling with a 404.astro page
-
-## Data & Content Management
-
-- Use content collections for structured content
-- Leverage Astro's built-in Markdown/MDX support
-- Implement proper data fetching in the frontmatter section
-- Use Astro.glob() for file-based data
-
-## Styling Approaches
-
-- Use scoped styles with `<style>` tags in .astro files
-- Implement Tailwind CSS via `@astrojs/tailwind` integration
-- Never use the `@apply` directive with Tailwind
-- Use CSS variables for theming and consistency
-
-## Security Best Practices
-
-- **Input Validation**: Always validate and sanitize user input
-
-  ```astro
-  ---
-  const userInput = Astro.request.url.searchParams.get('query') || '';
-  const encodedInput = encodeURIComponent(userInput);
-  ---
-  <p>You searched for: {encodedInput}</p>
-  ```
-
-- **XSS Prevention**: Use libraries like sanitize-html for rich text content
-- **CSRF Protection**: Implement tokens for forms and verify on submission
-- **Authentication**: Use secure authentication libraries (Auth.js) with proper password hashing
-- **Data Protection**:
-    - Always use HTTPS
-    - Store sensitive data in environment variables
-    - Encrypt sensitive information at rest
-
-## Performance Optimization
-
-- Minimize client-side JavaScript through Astro's Island Architecture
-- Implement proper image optimization with responsive images
-- Use Astro's built-in asset optimization
-- Leverage View Transitions API for smooth navigation:
-
-  ```astro
-  ---
-  import { ClientRouter } from 'astro:transitions';
-  ---
-  <ClientRouter />
-
-  <!-- Use transition:name for elements that should animate between pages -->
-  <img src={item.image} transition:name={`image-${item.id}`} />
-
-  <!-- Control animation type -->
-  <main transition:animate="slide">
-    <!-- Content -->
-  </main>
-
-  <!-- Keep elements between navigations -->
-  <header transition:persist>
-    <!-- Header content -->
-  </header>
-  ```
-
-## TypeScript Guidelines
-
-- Use strict typing (avoid `any` types)
-- Define proper interfaces for component props
-- Use type guards for runtime type checking
-- Use satisfies operator for better type inference
-- Place interfaces and types at the end of files
-
-## Astro Integration Best Practices
-
-- Use official integrations:
-    - `@astrojs/tailwind` for Tailwind CSS
-    - `@astrojs/image` for image optimization
-    - `astro:transitions` for page transitions
-    - `@astrojs/sitemap` for sitemap generation
-
-## Testing & Quality Assurance
-
-- Write unit tests for utility functions and components
-- Use end-to-end testing with Playwright or Cypress
-- Implement proper accessibility testing
-- Use Lighthouse for performance auditing
-
-## Error Handling
-
-- Handle errors at the beginning of functions (early returns)
-- Implement proper error boundaries for framework components
-- Use custom error types for consistent error handling
-- Provide user-friendly error messages
-
-## File & Function Structure
-
+### Astro Component Structure
 ```astro
 ---
-// 1. Imports
-import MyComponent from '../components/MyComponent.astro';
-import type { MyProps } from '../types';
+// 1. Imports (types first, then components)
+import type { ComponentProps } from '../types';
+import Layout from '../layouts/Layout.astro';
 
-// 2. Props interface and destructuring
+// 2. Props interface and validation
 interface Props {
   title: string;
   items?: string[];
 }
 const { title, items = [] } = Astro.props;
 
-// 3. Data fetching and processing
-const data = await fetchData();
-
-// 4. Error handling
-if (!data) {
-  return new Response('Data not found', { status: 404 });
-}
-
-// 5. Component logic
-const processedItems = items.map(item => item.toUpperCase());
+// 3. Data fetching and logic
+const processedData = await fetchData();
 ---
 
-<!-- Template section -->
-<div>
-  <h1>{title}</h1>
-  <MyComponent items={processedItems} />
-</div>
+<Layout title={title}>
+  <main>
+    <h1>{title}</h1>
+    {items.map(item => <p>{item}</p>)}
+  </main>
+</Layout>
 
-<!-- Styling -->
 <style>
-  h1 {
-    color: var(--heading-color);
-  }
+  h1 { color: var(--heading-color); }
 </style>
 ```
 
-## Internationalization (i18n)
+### Client Directive Strategy
+- `client:load` - Critical interactivity (auth forms, navigation)
+- `client:idle` - Secondary features (analytics, non-essential widgets)  
+- `client:visible` - Below-fold content (lazy-loaded components)
+- `client:only` - Framework-specific components that can't SSR
 
-- Use the official `@astrojs/i18n` integration for internationalization
-- Structure content with locale-specific directories:
+## API Routes & Data Fetching
 
-  ```astro
-  src/
-    pages/
-      [lang]/  # e.g., en/, es/, fr/
-  ```
+### API Endpoint Pattern
+```typescript
+// src/pages/api/data.ts
+import type { APIRoute } from 'astro';
 
-- Implement language selection with URL patterns or cookies
-- Use translation functions for localized strings:
-
-  ```astro
-  ---
-  import { t } from '@/i18n/utils';
-  const { lang = 'en' } = Astro.params;
-  ---
-  <h1>{t(lang, 'welcome.title')}</h1>
-  ```
-
-- Handle date, number, and currency formatting with Intl API
-- Consider right-to-left (RTL) layout support for languages like Arabic
-
-## SEO Optimization
-
-- Use the built-in metadata API for SEO-friendly pages:
-
-  ```astro
-  ---
-  import { SEO } from 'astro-seo';
-  ---
-  <head>
-    <SEO
-      title="Your Page Title"
-      description="Your page description"
-      openGraph={{
-        basic: {
-          title: "Your Page Title",
-          type: "website",
-          image: "https://yourdomain.com/og-image.jpg",
-        }
-      }}
-      twitter={{
-        creator: "@username"
-      }}
-    />
-  </head>
-  ```
-
-- Implement canonical URLs for duplicate content
-- Add structured data (JSON-LD) for rich search results
-- Generate proper XML sitemaps with @astrojs/sitemap
-- Use semantic HTML for better accessibility and SEO
-- Implement proper image alt text and metadata
-
-## API Endpoints & SSR vs. SSG
-
-- Create API endpoints using `.ts` or `.js` files in the `pages/api/` directory:
-
-  ```typescript
-  // src/pages/api/data.ts
-  import type { APIRoute } from 'astro';
-
-  export const get: APIRoute = async ({ request, cookies }) => {
-    try {
-      const data = await fetchData();
-      return new Response(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-    } catch (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+export const GET: APIRoute = async ({ request, cookies }) => {
+  try {
+    // Use AstroCookies for authentication
+    const token = cookies.get('auth-token')?.value;
+    if (!token) {
+      return new Response('Unauthorized', { status: 401 });
     }
+    
+    const data = await fetchSecureData(token);
+    return Response.json(data);
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
   }
-  ```
+};
+```
 
-- Choose the right rendering strategy:
-    - Static Site Generation (SSG): For content that rarely changes
-    - Server-Side Rendering (SSR): For personalized or frequently changing content
-    - Hybrid approach: Use SSG with islands of hydrated components
-- Use `output: 'hybrid'` in `astro.config.mjs` for mixed SSG/SSR pages
+### Content Collections
+- Define schemas in `src/content/config.ts`
+- Use `getCollection()` for type-safe content queries
+- Implement proper error handling for missing content
+
+## Styling System
+
+### Theme Architecture
+```css
+/* src/styles/pixelated-theme.css */
+:root {
+  --primary: 221.2 83.2% 53.3%;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+}
+```
+
+### Component Styling Rules
+- Scoped `<style>` tags in `.astro` files for component-specific styles
+- Tailwind classes for utility-first styling (NO `@apply` directive)
+- CSS variables for consistent theming across components
+- Centralized theme system in `src/styles/` directory
+
+## Security Requirements
+
+### Input Sanitization
+```astro
+---
+import { sanitizeHtml } from 'sanitize-html';
+
+const userInput = Astro.request.url.searchParams.get('query') || '';
+const safeInput = encodeURIComponent(userInput);
+const richContent = sanitizeHtml(userContent, { allowedTags: ['p', 'strong'] });
+---
+```
+
+### Authentication Patterns
+- Use `AstroCookies` for secure session management
+- Implement role-based access with TypeScript enums
+- Validate authentication in API routes before processing
+- Store sensitive data in environment variables only
+
+## Performance Optimization
+
+### View Transitions
+```astro
+---
+import { ViewTransitions } from 'astro:transitions';
+---
+<head>
+  <ViewTransitions />
+</head>
+
+<!-- Persistent elements across navigation -->
+<header transition:persist>Navigation</header>
+
+<!-- Named transitions for specific elements -->
+<img transition:name={`hero-${id}`} src={image} alt={title} />
+```
+
+### Core Web Vitals
+- Target <50ms response times for AI interactions
+- Minimize JavaScript bundles with strategic hydration
+- Use `loading="lazy"` for below-fold images
 - Implement proper caching strategies for API responses
-- Consider edge functions for globally distributed APIs
 
-## Debugging Techniques
+## TypeScript Patterns
 
-- Use Astro's dev server for hot module replacement during development
-- Enable verbose mode for detailed error messages:
+### Component Props
+```typescript
+interface ComponentProps {
+  title: string;
+  variant?: 'primary' | 'secondary';
+  items?: readonly string[];
+}
 
-  ```bash
-  ASTRO_VERBOSE=1 astro dev
-  ```
+// Use satisfies for better inference
+const config = {
+  theme: 'dark',
+  features: ['auth', 'chat']
+} satisfies AppConfig;
+```
 
-- Debug server-side code with Node.js inspector:
+### Type Guards & Validation
+```typescript
+function isValidUser(data: unknown): data is User {
+  return typeof data === 'object' && 
+         data !== null && 
+         'id' in data && 
+         'email' in data;
+}
+```
 
-  ```bash
-  node --inspect node_modules/.bin/astro dev
-  ```
+## Error Handling Strategy
 
-- Add useful debug helpers for component inspection:
+### API Route Errors
+```typescript
+export const GET: APIRoute = async ({ request }) => {
+  try {
+    const data = await riskyOperation();
+    return Response.json(data);
+  } catch (error) {
+    console.error('API Error:', error);
+    return Response.json(
+      { error: 'Internal server error' }, 
+      { status: 500 }
+    );
+  }
+};
+```
 
-  ```astro
-  {import.meta.env.DEV && (
-    <pre class="debug">{JSON.stringify(data, null, 2)}</pre>
-  )}
-  ```
+### Component Error Boundaries
+- Use early returns for invalid props
+- Provide fallback UI for missing data
+- Log errors appropriately without exposing sensitive information
 
-- Troubleshoot hydration errors with client:only directive
-- Fix double-rendering issues by checking server vs. client contexts
-- Use browser DevTools with Elements panel for component inspection
-- Leverage performance profiling for optimizing slow pages
+## Rendering Strategy
 
-Remember to keep components focused, follow established patterns, and prioritize both security and performance in all
-Astro development work.
+### SSG vs SSR Decision Matrix
+- **SSG**: Marketing pages, documentation, blog posts
+- **SSR**: User dashboards, personalized content, real-time data
+- **Hybrid**: Use `output: 'hybrid'` with per-page `export const prerender = false`
+
+### Development Workflow
+```bash
+# Development with verbose logging
+ASTRO_VERBOSE=1 pnpm dev
+
+# Debug server-side code
+node --inspect node_modules/.bin/astro dev
+
+# Performance profiling
+pnpm build:analyze
+```
+
+## Project-Specific Patterns
+
+### Pixelated Empathy Requirements
+- Maintain <50ms response times for AI chat interactions
+- Implement HIPAA-compliant data handling in all components
+- Use centralized theme system for consistent UI across admin/user interfaces
+- Apply bias detection monitoring in AI-related components
+- Ensure accessibility compliance (WCAG AA) for all interactive elements
+
+### Component Reusability
+- Use shared UI components (Badge, Button, Card) from `components/ui/`
+- Maintain consistent styling through centralized theme variables
+- Implement proper TypeScript interfaces for all component props
+- Follow domain-driven organization in component folders

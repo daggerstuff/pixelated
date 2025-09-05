@@ -1,551 +1,374 @@
-# Optimized Shadcn/Tailwind Development Guide
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/*.tsx', '**/*.ts', '**/*.astro', '**/tailwind.config.*', '**/components.json']
+---
 
-## Core Principles
+# Shadcn/UI + Tailwind CSS Guidelines
 
-- **Type Safety**: Use strict TypeScript typing with explicit interfaces and types
-- **Component Architecture**: Create modular, reusable components with clear responsibilities
-- **Accessibility**: Ensure all UI elements are fully accessible (WCAG AA compliant)
-- **Performance**: Optimize for Core Web Vitals with proper code splitting and rendering strategies
+## Component Architecture
 
-## Component Development
-
-### Structure
-
+### Required Structure
 ```tsx
-// components/ui/Example.tsx
-import { useState, useEffect } from "react"
+// components/ui/ComponentName.tsx
+import { forwardRef } from "react"
 import { cn } from "@/lib/utils"
-import type { ExampleProps } from "@/types"
+import { type VariantProps, cva } from "class-variance-authority"
 
-export function Example({
-													children,
-													variant = "default",
-													className,
-													...props
-												}: ExampleProps) {
-	// Component logic here
+const componentVariants = cva(
+  "base-classes", // Always applied
+  {
+    variants: {
+      variant: {
+        default: "default-styles",
+        secondary: "secondary-styles",
+      },
+      size: {
+        sm: "small-styles",
+        md: "medium-styles",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+)
 
-	return (
-		<div
-			className={cn(
-				"base-styles",
-				variant === "default" && "variant-specific-styles",
-				variant === "secondary" && "secondary-variant-styles",
-				className
-			)}
-			{...props}
-		>
-			{children}
-		</div>
-	)
+interface ComponentProps 
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof componentVariants> {
+  // Additional props
 }
+
+const Component = forwardRef<HTMLDivElement, ComponentProps>(
+  ({ className, variant, size, ...props }, ref) => {
+    return (
+      <div
+        className={cn(componentVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Component.displayName = "Component"
+
+export { Component, componentVariants }
 ```
 
-### Shadcn Integration
+### Essential Patterns
+- **Always use `cn()` utility** for className merging
+- **Use `cva()` for variant management** - provides type safety and consistency
+- **Forward refs** for proper DOM access and library compatibility
+- **Export both component and variants** for external styling
+- **Keep components under 100 lines** - extract complex logic to hooks
 
-- Use `cn()` utility for class name merging
-- Follow variant pattern with sensible defaults
-- Make components extensible via `className` and spread props
-- Keep component files under 150 lines
+## Tailwind Class Organization
 
-## Tailwind Best Practices
-
-- Use semantic class ordering: layout → spacing → sizing → typography → visual
-- Extract common patterns to Tailwind components
-- Use consistent spacing scales (rem-based)
-- Leverage CSS variables for theming
-- Apply mobile-first responsive design
-
-## State Management
-
-- Use React Query for server state
-- Employ useReducer for complex local state
-- Apply Context API judiciously for shared state
-- Consider Zustand for global app state
-
-## Planning Process
-
-1. **Requirements Analysis**: Document exact functionality needed
-2. **Component Hierarchy**: Map out component relationships
-3. **Data Flow**: Identify state management needs and data sources
-4. **UI/UX Considerations**: Note accessibility and responsive requirements
-5. **Implementation Plan**: Break down into atomic implementation steps
-
-## Next.js App Router Conventions
-
-- Leverage server components for static content
-- Use client components only when interactivity is needed
-- Implement proper data fetching with Suspense boundaries
-- Follow the route group pattern for organizing complex routes
-
-## Error Handling & Validation
-
-- Implement comprehensive form validation using Zod
-- Use error boundaries to prevent cascading failures
-- Provide meaningful error messages and recovery options
-- Add proper TypeScript error interfaces
-
-## Testing Approach
-
-- Write component tests with React Testing Library
-- Test user flows, not implementation details
-- Ensure accessibility testing in component tests
-- Implement E2E tests for critical paths
-
-## Code Quality Standards
-
-- Maintain consistent file structure and naming conventions
-- Document complex logic with meaningful comments
-- Abstract reusable logic into custom hooks
-- Keep functions pure and focused on single responsibilities
-
-## Animation & Transitions
-
-### Animation Principles
-
-- **Purpose-Driven**: Use animations to enhance UX, not distract
-- **Performance-First**: Optimize for 60fps by animating only cheap properties
-- **Accessible**: Respect user preferences with `prefers-reduced-motion`
-- **Consistent**: Maintain animation timing and easing across the application
-
-### Implementation Patterns
-
+### Required Order
 ```tsx
-// 1. Tailwind classes with transitions
-<button
-	className="transform transition-all duration-300 ease-in-out hover:scale-105
-  active:scale-95 focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+// Layout → Spacing → Sizing → Typography → Visual → Interactive
+className="flex items-center gap-4 w-full h-12 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2"
+```
+
+### Project-Specific Classes
+```tsx
+// Therapeutic interface styling
+"bg-therapeutic-primary text-therapeutic-foreground" // For therapy-related UI
+"border-bias-warning" // For bias detection alerts
+"text-accessibility-high-contrast" // For WCAG AA compliance
+```
+
+## State Management Rules
+
+### Component State
+- **Local state**: `useState` for simple values, `useReducer` for complex objects
+- **Form state**: Use `react-hook-form` with Zod validation
+- **Server state**: Use `@tanstack/react-query` for all API calls
+
+### Global State (Zustand)
+```tsx
+// stores/useTherapySession.ts
+interface TherapySessionState {
+  sessionId: string | null
+  isActive: boolean
+  biasAlerts: BiasAlert[]
+  setSession: (id: string) => void
+  addBiasAlert: (alert: BiasAlert) => void
+}
+
+export const useTherapySession = create<TherapySessionState>((set) => ({
+  sessionId: null,
+  isActive: false,
+  biasAlerts: [],
+  setSession: (id) => set({ sessionId: id, isActive: true }),
+  addBiasAlert: (alert) => set((state) => ({ 
+    biasAlerts: [...state.biasAlerts, alert] 
+  })),
+}))
+```
+
+## Accessibility Requirements
+
+### WCAG AA Compliance
+- **Color contrast**: Minimum 4.5:1 for normal text, 3:1 for large text
+- **Focus management**: Visible focus indicators on all interactive elements
+- **Keyboard navigation**: Full functionality without mouse
+- **Screen reader support**: Proper ARIA labels and semantic HTML
+
+### Implementation
+```tsx
+// Required accessibility patterns
+<Button
+  aria-label="Start therapy session"
+  aria-describedby="session-help-text"
+  className="focus:ring-2 focus:ring-offset-2 focus:ring-primary"
 >
-	Click Me
-</button>
+  Start Session
+</Button>
 
-// 2. Framer Motion integration
-import { motion } from "framer-motion";
-
-const fadeIn = {
-	initial: { opacity: 0, y: 20 },
-	animate: { opacity: 1, y: 0 },
-	exit: { opacity: 0, y: -20 },
-	transition: { duration: 0.3 }
-};
-
-function AnimatedComponent() {
-	return (
-		<motion.div
-			initial="initial"
-			animate="animate"
-			exit="exit"
-			variants={fadeIn}
-		>
-			Content
-		</motion.div>
-	);
-}
-
-// 3. Reduced-motion support
-const reducedMotionVariants = {
-	initial: { opacity: 0 },
-	animate: { opacity: 1 },
-	exit: { opacity: 0 },
-	transition: { duration: 0.2 }
-};
-
-function AccessibleAnimation() {
-	const prefersReducedMotion =
-		typeof window !== 'undefined'
-			? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-			: false;
-
-	const variants = prefersReducedMotion ? reducedMotionVariants : fadeIn;
-
-	return <motion.div variants={variants}>Content</motion.div>;
-}
+// Form validation with screen reader support
+<Input
+  aria-invalid={!!error}
+  aria-describedby={error ? "error-message" : undefined}
+/>
+{error && (
+  <p id="error-message" className="text-destructive text-sm" role="alert">
+    {error.message}
+  </p>
+)}
 ```
 
-### Page Transitions
+## Performance Optimization
 
-- Use Framer Motion's `AnimatePresence` for route changes:
+### Bundle Size
+- **Use dynamic imports** for large components: `const Component = lazy(() => import('./Component'))`
+- **Tree-shake Tailwind**: Configure `content` paths precisely in `tailwind.config.ts`
+- **Optimize re-renders**: Use `memo()` for expensive components, `useMemo()`/`useCallback()` judiciously
 
+### Critical Rendering
 ```tsx
-import { AnimatePresence } from "framer-motion";
+// Prioritize above-the-fold content
+<div className="min-h-screen">
+  <Suspense fallback={<TherapySessionSkeleton />}>
+    <TherapyInterface />
+  </Suspense>
+</div>
+```
 
-function RootLayout({ children }: { children: React.ReactNode }) {
-	return (
-		<AnimatePresence mode="wait">
-			{children}
-		</AnimatePresence>
-	);
+## Animation Guidelines
+
+### Performance-First Animations
+```tsx
+// ✅ Animate cheap properties only (transform, opacity)
+className="transition-transform duration-200 hover:scale-105"
+
+// ❌ Avoid animating expensive properties
+className="transition-all duration-300" // Can cause jank
+
+// ✅ Reduced motion support (required for accessibility)
+const useReducedMotion = () => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    
+    const handler = () => setPrefersReducedMotion(mediaQuery.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+  
+  return prefersReducedMotion
 }
 ```
 
-## Dark Mode Implementation
+### Therapeutic Interface Animations
+```tsx
+// Bias alert animations (must be attention-grabbing but not jarring)
+<motion.div
+  initial={{ opacity: 0, x: 20 }}
+  animate={{ opacity: 1, x: 0 }}
+  className="border-l-4 border-bias-warning bg-bias-warning/10"
+>
+  Potential bias detected
+</motion.div>
 
-### 1. Setup with Tailwind and CSS Variables
-
-```ts
-// tailwind.config.js
-module.exports = {
-	darkMode: "class",
-	theme: {
-		extend: {
-			colors: {
-				background: "var(--background)",
-				foreground: "var(--foreground)",
-				primary: {
-					DEFAULT: "var(--primary)",
-					foreground: "var(--primary-foreground)",
-				},
-				// Additional semantic colors...
-			},
-		},
-	},
-};
+// Session state transitions
+const sessionVariants = {
+  idle: { opacity: 0.7, scale: 0.98 },
+  active: { opacity: 1, scale: 1 },
+  processing: { opacity: 0.8, scale: 1.02 }
+}
 ```
 
-```css
-/* globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+## Theme System
 
+### CSS Variables (Required)
+```css
+/* src/styles/globals.css */
 @layer base {
-    :root {
-        --background: 0 0% 100%;
-        --foreground: 222.2 84% 4.9%;
-        --primary: 221.2 83.2% 53.3%;
-        --primary-foreground: 210 40% 98%;
-        /* Additional variables... */
-    }
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --therapeutic-primary: 142 76% 36%;
+    --therapeutic-foreground: 355 7% 97%;
+    --bias-warning: 38 92% 50%;
+    --bias-destructive: 0 84% 60%;
+  }
 
-    .dark {
-        --background: 222.2 84% 4.9%;
-        --foreground: 210 40% 98%;
-        --primary: 217.2 91.2% 59.8%;
-        --primary-foreground: 222.2 47.4% 11.2%;
-        /* Additional variables... */
-    }
-}
-```
-
-### 2. Theme Provider
-
-```tsx
-// components/theme-provider.tsx
-"use client";
-
-import { createContext, useContext, useEffect, useState } from "react";
-
-type Theme = "dark" | "light" | "system";
-
-type ThemeProviderProps = {
-	children: React.ReactNode;
-	defaultTheme?: Theme;
-	storageKey?: string;
-};
-
-const ThemeProviderContext = createContext<{
-	theme: Theme;
-	setTheme: (theme: Theme) => void;
-}>({
-	theme: "system",
-	setTheme: () => null,
-});
-
-export function ThemeProvider({
-																children,
-																defaultTheme = "system",
-																storageKey = "theme",
-																...props
-															}: ThemeProviderProps) {
-	const [theme, setTheme] = useState<Theme>(defaultTheme);
-
-	useEffect(() => {
-		const root = window.document.documentElement;
-		root.classList.remove("light", "dark");
-
-		if (theme === "system") {
-			const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-				.matches
-				? "dark"
-				: "light";
-			root.classList.add(systemTheme);
-			return;
-		}
-
-		root.classList.add(theme);
-	}, [theme]);
-
-	const value = {
-		theme,
-		setTheme: (theme: Theme) => {
-			localStorage.setItem(storageKey, theme);
-			setTheme(theme);
-		},
-	};
-
-	return (
-		<ThemeProviderContext.Provider {...props} value={value}>
-			{children}
-		</ThemeProviderContext.Provider>
-	);
-}
-
-export const useTheme = () => {
-	const context = useContext(ThemeProviderContext);
-	if (!context) {
-		throw new Error("useTheme must be used within a ThemeProvider");
-	}
-	return context;
-};
-```
-
-### 3. Theme Switcher Component
-
-```tsx
-// components/theme-toggle.tsx
-"use client";
-
-import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
-
-export function ThemeToggle() {
-	const { theme, setTheme } = useTheme();
-
-	return (
-		<Button
-			variant="ghost"
-			size="icon"
-			onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-			aria-label="Toggle theme"
-		>
-			{theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
-		</Button>
-	);
-}
-```
-
-## Container Queries & Modern Responsive Techniques
-
-### Container Queries
-
-Container queries allow styling elements based on their parent container's size, not just the viewport:
-
-```tsx
-// Container query setup in components
-<div className="@container">
-	<div className="@md:grid @md:grid-cols-2 @lg:grid-cols-3">
-		{/* Content */}
-	</div>
-</div>
-```
-
-```js
-// tailwind.config.js
-module.exports = {
-  theme: {
-    extend: {
-      // Define container query breakpoints
-      containerQueryBreakpoints: {
-        sm: '480px',
-        md: '768px',
-        lg: '1024px',
-        xl: '1280px',
-      },
-    },
-  },
-  plugins: [
-    require('@tailwindcss/container-queries'),
-  ],
-}
-```
-
-### Advanced Responsive Patterns
-
-1. **Adaptive Layout Patterns**:
-
-```tsx
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-	{/* Responsive grid that scales with viewport */}
-</div>
-
-<div className="@container">
-	<div className="flex flex-col @md:flex-row @lg:items-center">
-		{/* Flex layout that adapts to container size */}
-	</div>
-</div>
-```
-
-2. **Responsive Typography**:
-
-```css
-/* globals.css */
-@layer base {
-    html {
-        font-size: clamp(14px, 0.5vw + 13px, 18px);
-    }
-
-    h1 {
-        font-size: clamp(1.75rem, 4vw + 1rem, 3.5rem);
-    }
-}
-```
-
-3. **Responsive Spacing**:
-
-```tsx
-<section className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-12">
-	{/* Content with breathing room that scales with viewport */}
-</section>
-```
-
-4. **Feature Queries**:
-
-```css
-/* Use modern features with fallbacks */
-.modern-layout {
-    display: block; /* Fallback */
-
-    @supports (display: grid) {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-}
-```
-
-## Tailwind Performance Optimization
-
-### Bundle Size Reduction
-
-1. **Content Configuration**:
-
-```js
-// tailwind.config.js
-module.exports = {
-  content: [
-    "./src/app/**/*.{js,ts,jsx,tsx}",
-    "./src/components/**/*.{js,ts,jsx,tsx}",
-  ],
-  // This precise targeting prevents including unused styles
-}
-```
-
-2. **Just-in-Time Mode** (enabled by default in Tailwind CSS v3):
-
-- Only generates the CSS you're actually using
-- Results in much smaller CSS files
-- Enables arbitrary values like `mt-[37px]`
-
-3. **PurgeCSS Integration**:
-
-```js
-// postcss.config.js
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-    ...(process.env.NODE_ENV === 'production'
-      ? {
-        '@fullhuman/postcss-purgecss': {
-          content: [
-            './src/**/*.{js,jsx,ts,tsx}',
-            './public/index.html',
-          ],
-          defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
-          safelist: ['html', 'body']
-        }
-      }
-      : {})
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --therapeutic-primary: 142 70% 45%;
+    --therapeutic-foreground: 144 61% 20%;
   }
 }
 ```
 
-### Component Design Optimization
-
-1. **Style Composition Over Class Repetition**:
-
+### Theme Implementation
 ```tsx
-// Instead of repeating long class strings
-function Button({ variant, size, className, ...props }) {
-	return (
-		<button
-			className={cn(
-				buttonBaseStyles,
-				variantStyles[variant],
-				sizeStyles[size],
-				className
-			)}
-			{...props}
-		/>
-	);
-}
+// Use existing theme provider from shadcn/ui
+import { useTheme } from "next-themes"
 
-// Define styles centrally
-const buttonBaseStyles = "font-medium rounded focus:outline-none focus:ring-2";
-const variantStyles = {
-	primary: "bg-blue-600 text-white hover:bg-blue-700",
-	secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
-};
-const sizeStyles = {
-	sm: "text-sm px-3 py-1",
-	md: "text-base px-4 py-2",
-	lg: "text-lg px-6 py-3",
-};
+// Theme-aware components
+function TherapyInterface() {
+  const { theme } = useTheme()
+  
+  return (
+    <div className={cn(
+      "bg-background text-foreground",
+      "border border-border",
+      theme === "dark" && "shadow-lg shadow-black/20"
+    )}>
+      {/* Interface content */}
+    </div>
+  )
+}
 ```
 
-2. **Extracting Component Classes**:
+## Responsive Design
 
-```js
-// tailwind.config.js
-module.exports = {
-  theme: {
-    // ...
-  },
-  plugins: [],
-  corePlugins: {
-    preflight: true,
-  },
-  // Add your own component classes
-  extend: {
-    '.btn': {
-      '@apply px-4 py-2 rounded font-medium transition-colors': {},
-      '&-primary': {
-        '@apply bg-blue-600 text-white hover:bg-blue-700': {},
-      },
+### Mobile-First Approach
+```tsx
+// ✅ Start with mobile, enhance for larger screens
+<div className="flex flex-col gap-4 md:flex-row md:gap-6 lg:gap-8">
+  <TherapyChat className="flex-1" />
+  <BiasMonitor className="w-full md:w-80" />
+</div>
+
+// ✅ Container queries for component-based responsive design
+<div className="@container">
+  <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3">
+    {sessionCards}
+  </div>
+</div>
+```
+
+### Breakpoint Strategy
+- **sm (640px)**: Tablet portrait adjustments
+- **md (768px)**: Tablet landscape, small desktop
+- **lg (1024px)**: Desktop primary layout
+- **xl (1280px)**: Large desktop enhancements
+- **@container queries**: Component-level responsive behavior
+
+## Form Handling
+
+### React Hook Form + Zod Integration
+```tsx
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+
+const therapySessionSchema = z.object({
+  clientName: z.string().min(1, "Client name is required"),
+  sessionType: z.enum(["crisis", "trauma", "personality-disorder"]),
+  duration: z.number().min(15).max(120),
+})
+
+type TherapySessionForm = z.infer<typeof therapySessionSchema>
+
+function SessionSetupForm() {
+  const form = useForm<TherapySessionForm>({
+    resolver: zodResolver(therapySessionSchema),
+    defaultValues: {
+      sessionType: "crisis",
+      duration: 60,
     },
-  },
+  })
+
+  return (
+    <Form {...form}>
+      <FormField
+        control={form.control}
+        name="clientName"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Client Name</FormLabel>
+            <FormControl>
+              <Input placeholder="Enter client name" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </Form>
+  )
 }
 ```
 
-### Build-time Optimization
+## Error Handling
 
-1. **Split CSS by Routes**:
+### Error Boundaries
+```tsx
+// components/ErrorBoundary.tsx
+import { ErrorBoundary } from "react-error-boundary"
 
-```js
-// next.config.js
-module.exports = {
-  experimental: {
-    optimizeCss: true,
-  },
+function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
+      <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
+      <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
+      <p className="text-muted-foreground text-center mb-4">
+        {error.message}
+      </p>
+      <Button onClick={resetErrorBoundary}>Try again</Button>
+    </div>
+  )
 }
+
+// Wrap critical components
+<ErrorBoundary FallbackComponent={ErrorFallback}>
+  <TherapySession />
+</ErrorBoundary>
 ```
 
-2. **Minimize Tailwind Plugins**:
+## Testing Requirements
 
-- Only include plugins you actually use
-- Consider impact of each plugin on bundle size
+### Component Testing
+```tsx
+// __tests__/BiasAlert.test.tsx
+import { render, screen } from "@testing-library/react"
+import { BiasAlert } from "@/components/BiasAlert"
 
-3. **Disable Unused Core Plugins**:
+describe("BiasAlert", () => {
+  it("displays bias warning with correct severity", () => {
+    render(
+      <BiasAlert 
+        severity="high" 
+        message="Potential gender bias detected" 
+      />
+    )
+    
+    expect(screen.getByRole("alert")).toBeInTheDocument()
+    expect(screen.getByText("Potential gender bias detected")).toBeInTheDocument()
+    expect(screen.getByTestId("bias-alert")).toHaveClass("border-destructive")
+  })
 
-```js
-// tailwind.config.js
-module.exports = {
-  // ...
-  corePlugins: {
-    float: false, // Disable if you don't use float
-    clear: false, // Disable if you don't use clear
-    skew: false, // Disable if you don't use skew
-    // ... other unused core plugins
-  }
-}
+  it("meets accessibility requirements", async () => {
+    const { container } = render(<BiasAlert severity="medium" message="Test" />)
+    const results = await axe(container)
+    expect(results).toHaveNoViolations()
+  })
+})
 ```
