@@ -1,32 +1,121 @@
-# Node.js + MongoDB + JWT + Express + React Copilot Instructions
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/api/**/*.js', '**/api/**/*.ts', '**/api/**/*.py', '**/src/pages/api/**/*', '**/backend/**/*', '**/server/**/*']
+---
 
-## Tech Stack
+# Backend API Development Guidelines
 
-- Backend: Node.js with Express.js
-- Database: MongoDB with Mongoose ODM
-- Frontend: React.js (admin panel, if required)
-- Authentication: JSON Web Tokens (JWT)
-- Version Control: Git
-- Deployment: Docker (optional)
+## Technology Stack
 
-## User Requirements & Flow
+### Core Backend Technologies
+- **Runtime**: Node.js with Express.js for API routes
+- **Database**: MongoDB with Mongoose ODM, PostgreSQL for relational data
+- **Authentication**: JWT with proper rotation and validation
+- **Python Services**: Flask microservices for AI/ML operations
+- **Caching**: Redis for session management and performance optimization
 
-- Strictly follow user flow and game rules.
-- Users browse Pools, submit up to 3 Requests per Pool, complete payment, and await admin approval.
-- Approved Requests become Entries (max 3 per Pool, numbered 1, 2, 3).
-- Users make Picks for each Entry; Picks can be updated until the deadline.
-- Scoring: Win = Entry advances, Loss = Entry eliminated. Each Entry ranked separately.
-- Pool standings show all Entries; members can view all Picks after scoring.
+### API Architecture Patterns
+- **RESTful Design**: Follow REST conventions with proper HTTP methods and status codes
+- **Microservices**: Separate AI services from main application logic
+- **Error Handling**: Consistent error response format across all endpoints
+- **Input Validation**: Comprehensive validation using Joi or Zod schemas
+- **Rate Limiting**: Implement rate limiting for API protection
 
-## Implementation Strategy
+## Data Models & Business Logic
 
-- Begin each feature with detailed pseudocode (summarize pick submission, API endpoints, and business logic before
-  coding).
-- Ensure secure, efficient, RESTful code with proper error handling and input validation.
-- Track Requests and Entries separately; limit 3 Requests per User per Pool.
-- Implement payment status tracking in Request model.
-- Create Entry only after admin approval and payment completion.
-- Admin interface for managing/approving Requests.
-- Implement state transitions: Request (pending → approved → Entry created).
+### Core Entity Relationships
+```javascript
+// Request → Entry workflow
+Request {
+  userId: ObjectId,
+  poolId: ObjectId,
+  status: 'pending' | 'approved' | 'rejected',
+  paymentStatus: 'pending' | 'completed' | 'failed',
+  createdAt: Date
+}
 
-Refer to project documentation for further details and best practices.
+Entry {
+  requestId: ObjectId,
+  userId: ObjectId,
+  poolId: ObjectId,
+  entryNumber: 1 | 2 | 3,
+  status: 'active' | 'eliminated' | 'winner'
+}
+```
+
+### Business Rules Implementation
+- **Request Limits**: Maximum 3 requests per user per pool
+- **State Transitions**: Request (pending → approved) → Entry creation
+- **Payment Validation**: Entry creation only after payment completion
+- **Pick Management**: Allow pick updates until deadline, track pick history
+
+## API Development Standards
+
+### Endpoint Structure
+```javascript
+// Standard API response format
+{
+  success: boolean,
+  data?: any,
+  error?: {
+    code: string,
+    message: string,
+    details?: any
+  },
+  meta?: {
+    pagination?: { page, limit, total },
+    timestamp: string
+  }
+}
+```
+
+### Security Implementation
+- **Authentication Middleware**: Verify JWT tokens on protected routes
+- **Authorization**: Role-based access control (user, admin, moderator)
+- **Input Sanitization**: Prevent NoSQL injection and XSS attacks
+- **CORS Configuration**: Proper CORS setup for frontend integration
+- **Audit Logging**: Log all critical operations for compliance
+
+### Database Operations
+- **Connection Management**: Use connection pooling for MongoDB/PostgreSQL
+- **Transaction Handling**: Implement transactions for multi-step operations
+- **Query Optimization**: Use proper indexing and query optimization
+- **Data Validation**: Schema validation at database and application level
+
+## Error Handling & Monitoring
+
+### Error Response Standards
+```javascript
+// Consistent error handling middleware
+app.use((error, req, res, next) => {
+  const statusCode = error.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    error: {
+      code: error.code || 'INTERNAL_ERROR',
+      message: error.message,
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+    }
+  });
+});
+```
+
+### Performance Monitoring
+- **Response Time Tracking**: Monitor API response times
+- **Database Query Performance**: Log slow queries for optimization
+- **Memory Usage**: Monitor memory consumption in long-running processes
+- **Health Check Endpoints**: Implement `/health` and `/ready` endpoints
+
+## Integration Guidelines
+
+### Frontend Integration
+- **API Client**: Centralized API client with error handling and retries
+- **State Management**: Proper state synchronization between frontend and backend
+- **Real-time Updates**: WebSocket implementation for live data updates
+- **Caching Strategy**: Implement appropriate caching for frequently accessed data
+
+### AI Service Integration
+- **Async Processing**: Use message queues for AI processing tasks
+- **Timeout Handling**: Implement proper timeouts for AI service calls
+- **Fallback Mechanisms**: Graceful degradation when AI services are unavailable
+- **Data Pipeline**: Secure data flow between main app and AI services

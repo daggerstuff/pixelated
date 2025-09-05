@@ -1,379 +1,419 @@
-# Optimized UI/UX Design Guidelines for Code Implementation
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/*.tsx', '**/*.jsx', '**/*.astro', '**/components/**/*', '**/ui/**/*']
+---
 
-## Core Design Principles
+# UI/UX Design Guidelines for Pixelated Empathy
 
-### Visual Hierarchy & Design System
+## Design System Tokens
+
+Use consistent design tokens throughout the application:
 
 ```tsx
-// Design token implementation
-const tokens = {
-	colors: {
-		primary: "#0070f3",
-		secondary: "#ff4081",
-		neutral: {
-			100: "#f5f5f5",
-			500: "#737373",
-			900: "#171717"
-		}
-	},
-	spacing: {
-		xs: "0.25rem",
-		sm: "0.5rem",
-		md: "1rem",
-		lg: "1.5rem",
-		xl: "2rem"
-	},
-	typography: {
-		fontSizes: {
-			xs: "0.75rem",
-			sm: "0.875rem",
-			md: "1rem",
-			lg: "1.25rem",
-			xl: "1.5rem"
-		}
-	}
+// src/lib/design-tokens.ts
+export const tokens = {
+  colors: {
+    primary: "hsl(var(--primary))",
+    secondary: "hsl(var(--secondary))",
+    background: "hsl(var(--background))",
+    foreground: "hsl(var(--foreground))",
+    muted: "hsl(var(--muted))",
+    accent: "hsl(var(--accent))",
+    destructive: "hsl(var(--destructive))"
+  },
+  spacing: {
+    xs: "0.25rem", sm: "0.5rem", md: "1rem", 
+    lg: "1.5rem", xl: "2rem", "2xl": "3rem"
+  }
 };
 ```
 
-### Component Architecture
+## Component Architecture
 
-- Build atomic design system (atoms → molecules → organisms → templates → pages)
-- Extract reusable components with clear interfaces
-- Use composition over inheritance
+Follow atomic design principles with clear prop interfaces:
 
 ```tsx
-// ❌ Poor component design
-function Button({ primary, size, text, onClick, disabled, icon }) {
-	// Too many props, mixed concerns
+// ✅ Proper component structure
+interface ButtonProps {
+  variant?: "primary" | "secondary" | "destructive";
+  size?: "sm" | "md" | "lg";
+  children: React.ReactNode;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
-// ✅ Better component design
-function Button({
-									variant = "primary",
-									size = "md",
-									children,
-									leftIcon,
-									rightIcon,
-									...props
-								}) {
-	return (
-		<button
-			className={`btn btn-${variant} btn-${size}`}
-			{...props}
-		>
-			{leftIcon && <span className="mr-2">{leftIcon}</span>}
-			{children}
-			{rightIcon && <span className="ml-2">{rightIcon}</span>}
-		</button>
-	);
+export function Button({ 
+  variant = "primary", 
+  size = "md", 
+  children, 
+  leftIcon, 
+  rightIcon, 
+  ...props 
+}: ButtonProps) {
+  return (
+    <button
+      className={cn(
+        "inline-flex items-center justify-center rounded-md font-medium transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        variants[variant],
+        sizes[size]
+      )}
+      {...props}
+    >
+      {leftIcon && <span className="mr-2">{leftIcon}</span>}
+      {children}
+      {rightIcon && <span className="ml-2">{rightIcon}</span>}
+    </button>
+  );
 }
 ```
 
-## Accessibility Implementation (WCAG AA)
+## Accessibility Requirements (WCAG AA)
 
-### Semantic HTML
-
-```tsx
-// ❌ Non-semantic markup
-<div onClick={handleClick} tabIndex={0}>Click me</div>
-
-// ✅ Semantic and accessible
-<button
-	onClick={handleClick}
-	aria-label="Save document"
->
-	<svg aria-hidden="true">...</svg>
-	Save
-</button>
-```
-
-### Focus Management
+All UI components must meet WCAG AA standards for healthcare applications:
 
 ```tsx
-// Trap focus in modal dialogs
-useEffect(() => {
-	const focusableElements = modalRef.current.querySelectorAll(
-		'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-	);
-	const firstElement = focusableElements[0];
-	const lastElement = focusableElements[focusableElements.length - 1];
+// ✅ Accessible form components
+export function FormField({ label, error, required, ...props }) {
+  const id = useId();
+  const errorId = error ? `${id}-error` : undefined;
+  
+  return (
+    <div className="space-y-2">
+      <label htmlFor={id} className="text-sm font-medium">
+        {label}
+        {required && <span className="text-destructive ml-1" aria-label="required">*</span>}
+      </label>
+      <input
+        id={id}
+        aria-invalid={!!error}
+        aria-describedby={errorId}
+        className={cn(
+          "flex h-10 w-full rounded-md border px-3 py-2",
+          error ? "border-destructive" : "border-input"
+        )}
+        {...props}
+      />
+      {error && (
+        <p id={errorId} className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
-	// Implement focus trap
-	function handleTabKey(e) {
-		if (e.key === 'Tab') {
-			if (e.shiftKey) { /* handle shift+tab */
-			} else { /* handle tab */
-			}
-		}
-	}
+// ✅ Modal with focus management
+export function Modal({ isOpen, onClose, children }) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const focusableElements = modalRef.current?.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements?.[0] as HTMLElement;
+    const lastElement = focusableElements?.[focusableElements.length - 1] as HTMLElement;
+    
+    firstElement?.focus();
+    
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    };
+    
+    document.addEventListener('keydown', handleTabKey);
+    return () => document.removeEventListener('keydown', handleTabKey);
+  }, [isOpen]);
+  
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+      <div
+        ref={modalRef}
+        className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
+        role="dialog"
+        aria-modal="true"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
-	document.addEventListener('keydown', handleTabKey);
-	return () => document.removeEventListener('keydown', handleTabKey);
-}, [isOpen]);
-```
+## Responsive Design Patterns
 
-### Color & Contrast
-
-- Maintain minimum contrast ratios: 4.5:1 for normal text, 3:1 for large text
-- Never rely solely on color to convey information
-- Provide visible focus indicators
-
-## Responsive Implementation
-
-### Responsive Layout Patterns
+Use mobile-first approach with Tailwind CSS breakpoints:
 
 ```tsx
-// Mobile-first with CSS-in-JS
-const Container = styled.div`
-  padding: 1rem;
+// ✅ Responsive dashboard layout
+<div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 md:gap-6 md:p-6 lg:grid-cols-3 xl:grid-cols-4">
+  {/* Cards adapt to screen size */}
+</div>
 
-  @media (min-width: 640px) {
-    padding: 1.5rem;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
+// ✅ Responsive navigation
+<nav className="flex flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0">
+  {/* Navigation items */}
+</nav>
 
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-`;
-
-// Mobile-first with Tailwind
-<div className="p-4 sm:p-6 sm:grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-6">
-	{/* Content */}
+// ✅ Chat interface responsive layout
+<div className="flex h-screen flex-col lg:flex-row">
+  <aside className="w-full border-b lg:w-64 lg:border-b-0 lg:border-r">
+    {/* Sidebar */}
+  </aside>
+  <main className="flex-1 flex flex-col">
+    {/* Chat area */}
+  </main>
 </div>
 ```
 
-### Responsive Images
+## Performance Optimization
+
+Optimize components for the real-time chat interface:
 
 ```tsx
-<picture>
-	<source
-		srcSet="/images/hero-mobile.webp"
-		media="(max-width: 640px)"
-		type="image/webp"
-	/>
-	<source
-		srcSet="/images/hero-desktop.webp"
-		media="(min-width: 641px)"
-		type="image/webp"
-	/>
-	<img
-		src="/images/hero-fallback.jpg"
-		alt="Hero description"
-		loading="lazy"
-		width="1200"
-		height="600"
-		className="w-full h-auto object-cover"
-	/>
-</picture>
-```
+// ✅ Lazy load heavy AI components
+const AIChat = React.lazy(() => import('~/components/ai/AIChat'));
+const BiasDetection = React.lazy(() => import('~/components/ai/BiasDetection'));
 
-## Performance-Optimized Components
+// ✅ Optimized chat message rendering
+const ChatMessage = memo(({ message, isTyping }) => {
+  return (
+    <div className={cn("flex gap-3 p-4", message.role === 'user' ? 'justify-end' : 'justify-start')}>
+      {message.role === 'assistant' && <Avatar />}
+      <div className={cn("max-w-[80%] rounded-lg p-3", 
+        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+      )}>
+        {isTyping ? <TypingIndicator /> : message.content}
+      </div>
+    </div>
+  );
+});
 
-### Code Splitting & Lazy Loading
+// ✅ Virtualized chat history for performance
+import { FixedSizeList as List } from 'react-window';
 
-```tsx
-// Lazy load components
-const HeavyComponent = React.lazy(() => import('./HeavyComponent'));
+function ChatHistory({ messages }) {
+  const renderMessage = useCallback(({ index, style }) => (
+    <div style={style}>
+      <ChatMessage message={messages[index]} />
+    </div>
+  ), [messages]);
 
-function App() {
-	return (
-		<Suspense fallback={<Loader />}>
-			<HeavyComponent />
-		</Suspense>
-	);
-}
-
-// Image loading optimization
-function LazyImage({ src, alt, ...props }) {
-	return (
-		<img
-			src={src}
-			alt={alt}
-			loading="lazy"
-			decoding="async"
-			onLoad={(e) => e.target.classList.add('loaded')}
-			className="transition-opacity opacity-0 duration-300"
-			{...props}
-		/>
-	);
+  return (
+    <List
+      height={600}
+      itemCount={messages.length}
+      itemSize={80}
+      itemData={messages}
+    >
+      {renderMessage}
+    </List>
+  );
 }
 ```
 
-### Animation Performance
+## User Feedback & Loading States
+
+Provide clear feedback for AI interactions and secure operations:
 
 ```tsx
-// Optimize animations for 60fps
-const optimizedAnimation = {
-	// Use transform and opacity (GPU-accelerated)
-	exit: { opacity: 0, transform: 'translateY(20px)' },
-	enter: { opacity: 1, transform: 'translateY(0px)' },
+// ✅ AI processing states
+function AIResponseButton({ isProcessing, onSubmit }) {
+  return (
+    <Button 
+      onClick={onSubmit}
+      disabled={isProcessing}
+      className="w-full"
+    >
+      {isProcessing ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          AI Processing...
+        </>
+      ) : (
+        <>
+          <Send className="mr-2 h-4 w-4" />
+          Send Message
+        </>
+      )}
+    </Button>
+  );
+}
 
-	// Avoid animating layout properties
-	// ❌ Bad: { width: '100%', height: '200px' }
-};
-```
+// ✅ Security status indicators
+function SecurityStatus({ encryptionStatus, biasScore }) {
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Shield className={cn("h-4 w-4", 
+        encryptionStatus === 'encrypted' ? 'text-green-500' : 'text-yellow-500'
+      )} />
+      <span>FHE Encrypted</span>
+      {biasScore !== null && (
+        <Badge variant={biasScore < 0.3 ? 'default' : 'destructive'}>
+          Bias: {(biasScore * 100).toFixed(1)}%
+        </Badge>
+      )}
+    </div>
+  );
+}
 
-## State Management & User Feedback
+// ✅ Error boundaries for AI components
+class AIErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
-### Loading States
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
 
-```tsx
-function SubmitButton({ isLoading, children }) {
-	return (
-		<button
-			disabled={isLoading}
-			className={`btn ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
-		>
-			{isLoading ? (
-				<>
-					<Spinner size="sm" className="mr-2" />
-					Processing...
-				</>
-			) : children}
-		</button>
-	);
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>AI Service Error</AlertTitle>
+          <AlertDescription>
+            The AI service is temporarily unavailable. Please try again.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 ```
 
-### Error Handling
+## Theme & Styling Conventions
+
+Use shadcn/ui components with consistent theming:
 
 ```tsx
-function FormField({ label, error, ...props }) {
-	const id = useId();
-	const errorId = `${id}-error`;
+// ✅ Use cn() utility for class merging
+import { cn } from "~/lib/utils";
 
-	return (
-		<div className="form-field">
-			<label htmlFor={id}>{label}</label>
-			<input
-				id={id}
-				aria-invalid={!!error}
-				aria-describedby={error ? errorId : undefined}
-				className={error ? 'border-red-500' : 'border-gray-300'}
-				{...props}
-			/>
-			{error && (
-				<p id={errorId} className="text-red-500 text-sm mt-1">
-					{error}
-				</p>
-			)}
-		</div>
-	);
+// ✅ Component variant patterns
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "underline-offset-4 hover:underline text-primary"
+      },
+      size: {
+        default: "h-10 py-2 px-4",
+        sm: "h-9 px-3 rounded-md",
+        lg: "h-11 px-8 rounded-md",
+        icon: "h-10 w-10"
+      }
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default"
+    }
+  }
+);
+
+// ✅ Dark mode support
+function ThemeProvider({ children, defaultTheme = "system" }) {
+  const [theme, setTheme] = useState(defaultTheme);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark" : "light";
+      root.classList.add(systemTheme);
+      return;
+    }
+
+    root.classList.add(theme);
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 ```
 
-## Design System Implementation
+## Component Testing Standards
 
-### Theme Provider
-
-```tsx
-function ThemeProvider({ children, theme = 'dark' }) {
-	// Apply theme CSS variables at the root
-	useEffect(() => {
-		const root = document.documentElement;
-		const tokens = themes[theme];
-
-		Object.entries(tokens).forEach(([key, value]) => {
-			root.style.setProperty(`--${key}`, value);
-		});
-	}, [theme]);
-
-	return <ThemeContext.Provider value={{ theme }}>{children}</ThemeContext.Provider>;
-}
-```
-
-### Component Variants Pattern
+Test UI components for accessibility and functionality:
 
 ```tsx
-const variants = {
-	primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-	secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
-	danger: 'bg-red-600 hover:bg-red-700 text-white',
-};
+// ✅ Accessibility testing
+import { render, screen } from '@testing-library/react';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
-const sizes = {
-	sm: 'text-sm px-2 py-1',
-	md: 'text-base px-4 py-2',
-	lg: 'text-lg px-6 py-3',
-};
+expect.extend(toHaveNoViolations);
 
-function Button({ variant = 'primary', size = 'md', ...props }) {
-	const variantClasses = variants[variant];
-	const sizeClasses = sizes[size];
+test('ChatMessage is accessible', async () => {
+  const { container } = render(
+    <ChatMessage 
+      message={{ role: 'assistant', content: 'Hello' }} 
+      isTyping={false} 
+    />
+  );
+  
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+  
+  // Test keyboard navigation
+  const message = screen.getByRole('article');
+  expect(message).toBeInTheDocument();
+});
 
-	return (
-		<button
-			className={`rounded font-medium transition-colors ${variantClasses} ${sizeClasses}`}
-			{...props}
-		/>
-	);
-}
-```
-
-## Testing & Validation
-
-### Accessibility Testing
-
-```tsx
-// Jest + Testing Library example
-test('button is accessible', async () => {
-	const { getByRole } = render(<Button>Click me</Button>);
-	const button = getByRole('button', { name: /click me/i });
-
-	// Verify it's focusable
-	userEvent.tab();
-	expect(button).toHaveFocus();
-
-	// Verify keyboard activation
-	userEvent.keyboard('{enter}');
-	expect(mockHandler).toHaveBeenCalled();
+// ✅ Responsive testing with Playwright
+test('dashboard layout adapts to screen size', async ({ page }) => {
+  await page.goto('/dashboard');
+  
+  // Mobile view
+  await page.setViewportSize({ width: 375, height: 667 });
+  await expect(page.locator('[data-testid="sidebar"]')).toHaveClass(/hidden/);
+  
+  // Desktop view
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(page.locator('[data-testid="sidebar"]')).toBeVisible();
 });
 ```
 
-### Responsive Testing
+## Healthcare UI Considerations
 
-```tsx
-// Playwright example for responsive testing
-test('layout is responsive', async ({ page }) => {
-	// Test mobile viewport
-	await page.setViewportSize({ width: 375, height: 667 });
-	await page.goto('/dashboard');
-	await expect(page.locator('nav')).toHaveClass(/mobile-menu/);
-
-	// Test desktop viewport
-	await page.setViewportSize({ width: 1280, height: 800 });
-	await expect(page.locator('nav')).toHaveClass(/desktop-menu/);
-});
-```
-
-## Framework-Specific Patterns
-
-### React Best Practices
-
-- Use functional components with hooks
-- Optimize rerenders with useMemo, useCallback, and memo
-- Implement compound components for complex UIs
-
-### Next.js Patterns
-
-- Leverage Image and Link components for performance
-- Use server components for static content
-- Implement ISR for dynamic but cacheable content
-
-### Vue Composition API
-
-- Use defineProps and defineEmits for component interfaces
-- Leverage computed properties for derived state
-- Implement provide/inject for deep component trees
+- Use calming color palettes appropriate for mental health contexts
+- Ensure high contrast for users with visual impairments
+- Provide clear visual hierarchy for complex therapeutic interfaces
+- Include progress indicators for multi-step processes
+- Design for stress-free interactions during crisis scenarios
 
 ## Anti-Patterns to Avoid
 
-- Avoid prop drilling beyond 2-3 levels (use context or state management)
-- Don't mix controlled and uncontrolled component patterns
-- Avoid browser layout thrashing with batched DOM operations
-- Don't reinvent complex UI components (accessibility is hard)
-- Never use !important in CSS without strong justification
+- Don't use red colors for non-error states (can trigger anxiety)
+- Avoid complex animations during sensitive conversations
+- Never hide critical safety information behind interactions
+- Don't use medical terminology without clear explanations
+- Avoid overwhelming interfaces during crisis interventions

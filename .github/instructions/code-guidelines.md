@@ -1,24 +1,101 @@
-# General Code Guidelines Copilot Instructions
+---
+inclusion: always
+---
 
-- Always verify information before presenting it. Do not make assumptions or speculate without clear evidence.
-- Make changes file by file and allow for review of mistakes.
-- Never use apologies or give feedback about understanding in comments or documentation.
-- Don't suggest whitespace changes or summarize changes made.
-- Only implement changes explicitly requested; do not invent changes.
-- Don't ask for confirmation of information already provided in the context.
-- Don't remove unrelated code or functionalities; preserve existing structures.
-- Provide all edits in a single chunk per file, not in multiple steps.
-- Don't ask the user to verify implementations visible in the provided context.
-- Don't suggest updates or changes to files when there are no actual modifications needed.
-- Always provide links to real files, not context-generated files.
-- Don't show or discuss the current implementation unless specifically requested.
-- Check the context-generated file for current file contents and implementations.
-- Prefer descriptive, explicit variable names for readability.
-- Adhere to the existing coding style in the project.
-- Prioritize code performance and security in suggestions.
-- Suggest or include unit tests for new or modified code.
-- Implement robust error handling and logging where necessary.
-- Encourage modular design for maintainability and reusability.
-- Ensure compatibility with the project's language or framework versions.
-- Replace hardcoded values with named constants.
-- Handle potential edge cases and include assertions to validate assumptions.
+# Pixelated Empathy Code Guidelines
+
+## Core Development Principles
+
+### Security & Privacy First
+- **HIPAA++ Compliance**: All data handling must exceed standard HIPAA requirements
+- **Zero-Knowledge Architecture**: Implement fully homomorphic encryption (FHE) with <50ms latency
+- **Bias Detection**: Integrate real-time bias monitoring in all AI interactions
+- **Audit Trails**: Log all therapeutic interactions for compliance validation
+
+### Technology Stack Adherence
+- **Frontend**: Astro 5.x + React 19.x + TypeScript, TailwindCSS 4.x + UnoCSS
+- **Backend**: Python 3.11+ with uv, PyTorch, Flask microservices
+- **Package Management**: pnpm (required), uv for Python
+- **Database**: PostgreSQL, MongoDB, Redis with encryption at rest
+
+### Performance Requirements
+- **Response Time**: <50ms for AI conversational interactions
+- **Availability**: 99.9% uptime for training sessions
+- **Memory Optimization**: Use torch.cuda.amp, gradient checkpointing, PEFT methods
+- **Bundle Optimization**: Implement code splitting, tree shaking, lazy loading
+
+## Code Quality Standards
+
+### File Organization
+```
+src/
+├── components/           # Domain-organized React components
+│   ├── admin/           # Admin dashboard components
+│   ├── ai/              # AI chat and interaction components
+│   ├── auth/            # Authentication components
+│   └── ui/              # Reusable UI components (shadcn/ui)
+├── lib/
+│   ├── ai/              # AI service integrations
+│   ├── security/        # FHE and encryption utilities
+│   ├── fhe/             # Fully homomorphic encryption
+│   └── bias-detection/  # Bias monitoring services
+ai/
+├── models/              # ML model definitions
+├── inference/           # Model inference services
+├── safety/              # Safety validation systems
+└── api/                 # Python API services
+```
+
+### Naming Conventions
+- **Components**: PascalCase (`BiasDetectionEngine.tsx`)
+- **Files**: kebab-case for pages (`mental-health-chat.astro`), camelCase for utilities
+- **Python**: snake_case (`bias_detection_engine.py`)
+- **Constants**: UPPER_SNAKE_CASE (`MILLISECONDS_PER_DAY`)
+- **Types**: PascalCase with descriptive suffixes (`TherapeuticSessionData`)
+
+### Implementation Guidelines
+- **Single Responsibility**: Functions should do one thing well (<20 lines)
+- **Immutable State**: Prefer const, minimize mutable state
+- **Error Handling**: Implement comprehensive error boundaries and validation
+- **Type Safety**: Use strict TypeScript with explicit interfaces
+- **Testing**: Maintain 70%+ coverage, focus on critical therapeutic logic
+
+### AI/ML Specific Rules
+- **Model Architecture**: Modular, configurable designs with proper memory management
+- **Training**: Use mixed precision, gradient checkpointing, distributed training
+- **Inference**: Optimize with quantization, ONNX/TorchScript for production
+- **Validation**: Comprehensive bias testing and safety validation
+
+### Security Implementation
+- **Encryption**: All sensitive data encrypted with FHE
+- **Authentication**: JWT with proper rotation and validation
+- **Input Validation**: Sanitize all user inputs, especially therapeutic content
+- **Logging**: Secure audit trails without exposing sensitive data
+
+### Component Development (shadcn/ui)
+- Use `cn()` utility for class merging
+- Follow variant patterns with sensible defaults
+- Ensure WCAG AA accessibility compliance
+- Implement proper focus management and keyboard navigation
+
+## Development Workflow
+
+### Code Changes
+- Make changes file by file for review
+- Provide complete edits in single chunks per file
+- Preserve existing functionality unless explicitly requested
+- Use descriptive commit messages following conventional commits
+
+### Quality Assurance
+- Run type checking: `pnpm typecheck`
+- Execute tests: `pnpm test` and `pytest`
+- Security scanning: `pnpm security:scan`
+- Performance testing: `./scripts/test-performance.sh`
+
+### AI Assistant Behavior
+- Verify information before presenting solutions
+- Prioritize security and performance in all suggestions
+- Include comprehensive error handling and edge case management
+- Suggest appropriate tests for new or modified code
+- Maintain compatibility with project's technology stack
+- Focus on therapeutic use case requirements and compliance needs

@@ -152,15 +152,15 @@ claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt
 
-oc4vm-1.1.1.zip
 /ai/
 QWEN.md
 roo-code-settings.json
-.clinerules/byterover-rules.md
-.kilocode/rules/byterover-rules.md
-.roo/rules/byterover-rules.md
-.windsurf/rules/byterover-rules.md
-.cursor/rules/byterover-rules.mdc
-.kiro/steering/byterover-rules.md
-.qoder/rules/byterover-rules.md
-.augment/rules/byterover-rules.md
+kilo-code-settings.json
+.clinerules/
+.kilocode/
+.roo/
+.windsurf/
+.cursor/
+.kiro/
+.qoder/
+.augment/
