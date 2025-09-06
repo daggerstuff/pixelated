@@ -1,8 +1,11 @@
-export function base64ToUint8Array(base64: string): Uint8Array {
-  const padding = '='.repeat((4 - (base64.length % 4)) % 4)
-  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/')
+/**
+ * Convert a base64 string to Uint8Array
+ */
+export function base64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
 
-  const rawData = atob(b64)
+  const rawData = atob(base64)
   const outputArray = new Uint8Array(rawData.length)
 
   for (let i = 0; i < rawData.length; ++i) {
@@ -11,9 +14,10 @@ export function base64ToUint8Array(base64: string): Uint8Array {
   return outputArray
 }
 
-export function uint8ArrayToBase64(array: Uint8Array): string {
-  return btoa(String.fromCharCode.apply(null, Array.from(array)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '')
+/**
+ * Convert a Uint8Array to base64 string
+ */
+export function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+  const base64 = btoa(String.fromCharCode.apply(null, Array.from(uint8Array)))
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }

@@ -1,10 +1,42 @@
-// Barrel export for redis service
-// The codebase imports from '@/lib/services/redis' or '../services/redis'.
-// For now re-export the mock RedisService used in tests and a shared instance
-// to satisfy imports during server build.
+import { RedisService } from './RedisService'
+import type {
+  RedisServiceConfig,
+  IRedisService,
+  RedisErrorCode,
+  RedisServiceError,
+} from './types'
+import { getEnv } from '@/lib/utils/env'
 
-import { RedisService } from './__mocks__/RedisService'
+// Export the main service class and types
+export { RedisService }
+export type {
+  RedisServiceConfig,
+  IRedisService,
+  RedisErrorCode,
+  RedisServiceError,
+}
 
-const redis = new RedisService({})
+// Environment variable resolution logic using utility function
+const redisUrl =
+  getEnv('UPSTASH_REDIS_REST_URL') ||
+  getEnv('REDIS_URL') ||
+  'redis://localhost:6379'
+const redisPrefix = getEnv('REDIS_PREFIX') || ''
 
-export { RedisService, redis }
+const config: RedisServiceConfig = {
+  url: redisUrl,
+  keyPrefix: redisPrefix,
+  maxRetries: 3, // Add other default config values if needed
+  retryDelay: 1000,
+  connectTimeout: 5000,
+  // Add other necessary config fields from RedisServiceConfig
+}
+
+// Export a configured singleton instance
+export const redis = new RedisService(config)
+
+// Optionally, connect the singleton immediately if desired
+// (consider application lifecycle implications)
+// redis.connect().catch(error => {
+//   console.error("Failed to connect singleton redis instance:", error);
+// });

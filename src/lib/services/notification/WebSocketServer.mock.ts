@@ -1,20 +1,13 @@
-import { vi } from 'vitest'
-
+/**
+ * Mock WebSocket server for notifications
+ */
 export class WebSocketServer {
-  static getInstance = vi.fn().mockReturnValue({
-    start: vi.fn(),
-    stop: vi.fn(),
-  })
-  constructor() {
-    //
-  }
-  start() {
-    //
-  }
-  stop() {
-    //
-  }
+  
+
+  /**
+   * Close the WebSocket server
+   */
   close() {
-    //
+    // Mock implementation
   }
 }

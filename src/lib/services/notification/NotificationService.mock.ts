@@ -1,17 +1,12 @@
-import { vi } from 'vitest'
-
+/**
+ * Mock Notification service for sending notifications
+ */
 export class NotificationService {
-  static getInstance = vi.fn().mockReturnValue({
-    sendCrisisAlert: vi.fn(),
-    startProcessing: vi.fn(),
-  })
-  constructor() {
-    //
-  }
-  async sendCrisisAlert() {
-    //
-  }
-  async startProcessing(interval: number) {
-    //
+  /**
+   * Start processing notifications
+   */
+  async startProcessing(_interval: number): Promise<void> {
+    // Mock implementation
+    return Promise.resolve();
   }
 }
