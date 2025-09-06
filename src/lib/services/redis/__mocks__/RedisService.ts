@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events'
-import type { IRedisService } from '../types'
 
 // Create a simple in-memory store for mock Redis
 const store = new Map<string, string>()
@@ -11,7 +10,7 @@ const zsetStore = new Map<string, Map<string, number>>()
 /**
  * Mock RedisService for tests
  */
-export class RedisService extends EventEmitter implements IRedisService {
+export class RedisService extends EventEmitter {
   private healthy = true
 
   constructor(_config: Record<string, unknown>) {
@@ -305,15 +304,19 @@ export class RedisService extends EventEmitter implements IRedisService {
 
   // List helper required by IRedisService
   async rpoplpush(source: string, destination: string): Promise<string | null> {
-    const src = listStore.get(source)
-    if (!src || src.length === 0) {
+    const sourceList = listStore.get(source)
+    if (!sourceList || sourceList.length === 0) {
       return null
     }
-    const value = src.pop()!
+
+    const value = sourceList.pop()!
+
     if (!listStore.has(destination)) {
       listStore.set(destination, [])
     }
-    listStore.get(destination)!.push(value)
+    const destList = listStore.get(destination)!
+    destList.unshift(value)
+
     return value
   }
 

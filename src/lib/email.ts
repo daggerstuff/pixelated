@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from './logging/build-safe-logger'
 
-const logger = createBuildSafeLogger('default')
+const logger = createBuildSafeLogger({ prefix: 'EmailService' })
 
 export interface EmailConfig {
   provider: 'smtp' | 'sendgrid' | 'aws-ses' | 'resend'
@@ -268,6 +268,49 @@ export class EmailService {
       .replace(/&gt;/g, '>')
       .replace(/&amp;/g, '&')
       .trim()
+  }
+
+  /**
+   * Upsert an email template
+   */
+  async upsertTemplate(template: {
+    alias: string
+    subject: string
+    htmlBody: string
+    from: string
+  }): Promise<void> {
+    // In a real implementation, this would store the template in a database
+    // For now, we'll just log it
+    logger.info('Email template upserted', { alias: template.alias })
+  }
+
+  /**
+   * Queue an email for sending
+   */
+  async queueEmail(email: {
+    to: string
+    templateAlias: string
+    templateModel: Record<string, any>
+  }): Promise<void> {
+    // In a real implementation, this would queue the email for processing
+    // For now, we'll simulate sending it immediately
+    logger.info('Email queued', {
+      to: email.to,
+      templateAlias: email.templateAlias
+    })
+
+    // Simulate immediate sending
+    await this.sendEmail({
+      to: email.to,
+      subject: `Template: ${email.templateAlias}`,
+      htmlContent: `<p>Template: ${email.templateAlias}</p><pre>${JSON.stringify(email.templateModel, null, 2)}</pre>`,
+      textContent: `Template: ${email.templateAlias}\n${JSON.stringify(email.templateModel, null, 2)}`
+    })
+  }
+
+  async startProcessing(interval: number): Promise<void> {
+    logger.info('Email processing started', { interval })
+    // In a real implementation, this would start a loop to process the email queue
   }
 }
 

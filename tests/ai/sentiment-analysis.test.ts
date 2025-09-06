@@ -1,5 +1,5 @@
-import type { AIService } from '../../lib/ai/models/types'
-import { SentimentAnalysisService } from '../../lib/ai/services/sentiment-analysis'
+import type { AIService } from '@/lib/ai/models/types'
+import { SentimentAnalysisService } from '@/lib/ai/services/sentiment-analysis'
 
 // Mock AI service with type assertion to handle incompatible interfaces
 const mockAIService = {

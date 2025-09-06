@@ -1,5 +1,5 @@
-import type { AIMessage } from '../../../lib/ai/index'
-import type { AIStreamChunk } from '../../../lib/ai/models/ai-types'
+import type { AIMessage, AIStreamChunk } from '@/lib/ai/AIService'
+import { logger } from '@/lib/logger'
 import { useCallback, useState, useRef, useEffect } from 'react'
 
 interface UseChatCompletionOptions {
@@ -162,6 +162,12 @@ export function useChatCompletion({
     avgResponseTime: 0,
     totalDuration: 0,
     startTime: initialMessages.length > 0 ? new Date() : null,
+  })
+  const [messageStats, setMessageStats] = useState<MessageStats>({
+    longestMessage: 0,
+    shortestMessage: 0,
+    averageLength: 0,
+    sentimentDistribution: {},
   })
 
   // Store last user message for retry functionality
@@ -722,11 +728,33 @@ export function useChatCompletion({
         messages: AIMessage[];
         stats?: ConversationStats;
       }
-    isTyping,
+      setMessages(parsed.messages)
+      if (parsed.stats) {
+        setConversationStats(parsed.stats)
+      }
+    } catch (err) {
+      logger.error('Failed to import conversation', { err })
+    }
+  }, [])
+
+  // Get message stats
+  const getMessageStats = useCallback((): MessageStats => {
+    // This is a placeholder implementation.
+    // A real implementation would calculate this based on the messages.
+    return messageStats
+  }, [messageStats])
+
+  return {
+    // Core state
+    messages,
     error,
-    progress,
-    tokenUsage,
+    isLoading,
+    // Extended state
+    isStreaming,
+    isTyping,
     conversationStats,
+    tokenUsage,
+    // Extended methods
     sendMessage,
     sendStreamingMessage,
     editMessage,
@@ -740,5 +768,6 @@ export function useChatCompletion({
     importConversation,
     stopGeneration,
     getMessageStats,
+    progress,
   }
 }

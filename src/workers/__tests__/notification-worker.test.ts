@@ -1,7 +1,7 @@
 import { env } from '@/config/env.config'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
 import { WebSocketServer } from '@/lib/services/notification/WebSocketServer'
-import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // Extend the WebSocketServer interface for testing
 declare module '@/lib/services/notification/WebSocketServer' {
   interface WebSocketServer {
@@ -42,7 +42,7 @@ describe('notification-worker', () => {
     vi.resetModules()
 
     // Reset environment variables
-    ;(vi.mocked(env) as unknown).NOTIFICATION_WS_PORT = '8082'
+    ;(vi.mocked(env) as any).NOTIFICATION_WS_PORT = '8082'
 
     // Initialize mocks
     mockNotificationService = new NotificationService()
@@ -62,7 +62,7 @@ describe('notification-worker', () => {
       await vi.runAllTimersAsync()
 
       expect(
-        createBuildSafeLogger('notification-worker').info,
+        createBuildSafeLogger({ prefix: 'notification-worker' }).info,
       ).toHaveBeenCalledWith(
         expect.stringContaining('Starting notification worker'),
       )
@@ -87,7 +87,7 @@ describe('notification-worker', () => {
       await import('../notification-worker.js')
 
       expect(
-        createBuildSafeLogger('notification-worker').error,
+        createBuildSafeLogger({ prefix: 'notification-worker' }).error,
       ).toHaveBeenCalledWith(
         expect.stringContaining('Error starting notification worker'),
         expect.any(Error),
@@ -108,7 +108,7 @@ describe('notification-worker', () => {
       await vi.runAllTimersAsync()
 
       expect(
-        createBuildSafeLogger('notification-worker').error,
+        createBuildSafeLogger({ prefix: 'notification-worker' }).error,
       ).toHaveBeenCalledWith(
         expect.stringContaining('Error processing notifications'),
         expect.any(Error),
@@ -125,7 +125,7 @@ describe('notification-worker', () => {
       process.emit('SIGTERM', 'SIGTERM')
 
       expect(
-        createBuildSafeLogger('notification-worker').info,
+        createBuildSafeLogger({ prefix: 'notification-worker' }).info,
       ).toHaveBeenCalledWith(
         expect.stringContaining('Shutting down notification worker'),
       )
@@ -140,7 +140,7 @@ describe('notification-worker', () => {
       process.emit('SIGINT', 'SIGINT')
 
       expect(
-        createBuildSafeLogger('notification-worker').info,
+        createBuildSafeLogger({ prefix: 'notification-worker' }).info,
       ).toHaveBeenCalledWith(
         expect.stringContaining('Shutting down notification worker'),
       )
@@ -161,7 +161,7 @@ describe('notification-worker', () => {
   describe('environment configuration', () => {
     it('should use default WebSocket port if not configured', async () => {
       // Remove port from environment
-      ;(vi.mocked(env) as unknown).NOTIFICATION_WS_PORT = undefined
+      ;(vi.mocked(env) as any).NOTIFICATION_WS_PORT = undefined
 
       // Import worker module
       await import('../notification-worker.js')
@@ -174,7 +174,7 @@ describe('notification-worker', () => {
 
     it('should use configured WebSocket port', async () => {
       // Set custom port in environment
-      ;(vi.mocked(env) as unknown).NOTIFICATION_WS_PORT = '8090'
+      ;(vi.mocked(env) as any).NOTIFICATION_WS_PORT = '8090'
 
       // Import worker module
       await import('../notification-worker.js')
@@ -201,7 +201,7 @@ describe('notification-worker', () => {
 
       expect(mockNotificationService.processQueue).toHaveBeenCalledTimes(2)
       expect(
-        createBuildSafeLogger('notification-worker').error,
+        createBuildSafeLogger({ prefix: 'notification-worker' }).error,
       ).toHaveBeenCalledWith(
         expect.stringContaining('Error processing notifications'),
         expect.any(Error),
@@ -217,7 +217,7 @@ describe('notification-worker', () => {
       await import('../notification-worker.js')
 
       expect(
-        createBuildSafeLogger('notification-worker').error,
+        createBuildSafeLogger({ prefix: 'notification-worker' }).error,
       ).toHaveBeenCalledWith(
         expect.stringContaining('WebSocket server error'),
         mockError,

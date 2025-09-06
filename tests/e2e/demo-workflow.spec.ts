@@ -331,10 +331,10 @@ test.describe('Psychology Pipeline Demo - Complete Workflow', () => {
     // Test screen reader compatibility
     await test.step('Screen Reader Compatibility', async () => {
       // Check for proper ARIA labels
-      await expect(page.locator('[aria-label]')).toHaveCount({ min: 5 })
+      await expect(page.locator('[aria-label]')).toHaveCount(5)
 
       // Check for proper heading structure
-      await expect(page.locator('h1, h2, h3')).toHaveCount({ min: 3 })
+      await expect(page.locator('h1, h2, h3')).toHaveCount(3)
 
       // Check for alt text on images
       const images = page.locator('img')

@@ -21,6 +21,16 @@ describe('RegisterForm', () => {
     }))
   })
 
+  it('renders the form with proper accessibility attributes', () => {
+    render(<RegisterForm />)
+
+    // Check that all form elements have the correct aria attributes
+    const nameInput = screen.getByLabelText(/full name/i)
+    expect(nameInput).toHaveAttribute('aria-required', 'true')
+
+    const emailInput = screen.getByLabelText(/email/i)
+    expect(emailInput).toHaveAttribute('aria-required', 'true')
+
     const passwordInput = screen.getByLabelText(/^Password/i)
     expect(passwordInput).toHaveAttribute('aria-required', 'true')
     expect(passwordInput).toHaveAttribute(

@@ -16,14 +16,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 USER root
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/qdrant/qdrant"]
-FROM qdrant/qdrant:v1.9.0
 
-# Install curl in a small layer; the base image is Debian/Ubuntu based so apt-get should work.
-USER root
-RUN set -eux \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends curl \
-  && rm -rf /var/lib/apt/lists/*
-
-# Return to default user if the base image had one (qdrant image uses "qdrant" user normally).
-USER 1000
+# Health check for Qdrant service
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:6333/health || exit 1

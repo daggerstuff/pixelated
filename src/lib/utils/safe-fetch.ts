@@ -44,7 +44,7 @@ export const validateUrlForSSRF = (urlString: string): boolean => {
       !urlString.includes('%2e%2e') && // URL-encoded '..'
       !urlString.includes('%5c') && // URL-encoded '\'
       !urlString.includes('..%2f') && // Double encoded path traversal
-      /^[a-zA-Z0-9\-_.\/&=?]*$/.test(urlString)
+      /^[a-zA-Z0-9\-_./&=?]*$/.test(urlString)
     ) // Only safe characters
   }
 }

@@ -1,4 +1,6 @@
-import type { BaseAPIContext } from '../auth/apiRouteTypes';
+type BaseAPIContext = {
+  locals: Record<string, unknown>
+};
 
 type MiddlewareNext = () => Promise<Response>;
 

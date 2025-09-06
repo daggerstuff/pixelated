@@ -172,5 +172,58 @@ stages:
       env:
         ASTRO_CACHE_DIR: $(Agent.WorkFolder)/.astro-cache
 
-# ...[No further changes have been made to the file content]...
-  
+- stage: DockerBuild
+  displayName: Build Docker Image
+  dependsOn: Build
+  jobs:
+    - job: BuildDockerImage
+      displayName: Build and Push Docker Image
+      steps:
+        - checkout: self
+        - script: |
+            docker build -f Dockerfile.azure -t $(containerRegistryPrefix).azurecr.io/$(imageName):$(dockerTag) .
+            echo "Docker image built."
+          displayName: Build Docker image
+        - script: |
+            echo "Logging in to Azure Container Registry..."
+            az acr login --name $(containerRegistryPrefix)
+            docker push $(containerRegistryPrefix).azurecr.io/$(imageName):$(dockerTag)
+            echo "Docker image pushed."
+          displayName: Push Docker image to ACR
+
+- stage: Deploy
+  displayName: Deploy to Azure App Service
+  dependsOn: DockerBuild
+  jobs:
+    - deployment: DeployWebApp
+      displayName: Deploy Container to Azure Web App
+      environment: $(environment)
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - task: AzureFunctionAppContainer@1
+                displayName: Deploy to Azure Function App
+                inputs:
+                  azureSubscription: $(azureSubscription)
+                  appName: $(appServiceName)
+                  imageName: $(containerRegistryPrefix).azurecr.io/$(imageName):$(dockerTag)
+                  resourceGroupName: $(resourceGroupName)
+                  containerCommand: ""
+                  configurationStrings: |
+                    WEBSITES_PORT=3000
+                    WEBSITE_NODE_DEFAULT_VERSION=24.x
+
+- stage: PostDeployTests
+  displayName: Run Post-Deployment Tests
+  dependsOn: Deploy
+  jobs:
+    - job: PostDeployE2E
+      displayName: Run E2E Tests on Deployed App
+      steps:
+        - checkout: self
+        - script: |
+            pnpm install --frozen-lockfile
+            pnpm e2e
+          displayName: Run Playwright E2E tests

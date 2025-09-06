@@ -55,9 +55,9 @@ export class APITestUtils {
     });
 
     if (response.ok) {
-      const data = await response.json();
-      this.testUsers.set('primary', { ...data.user, token: data.token });
-      return data.token;
+      // const data = await response.json();
+      this.testUsers.set('primary', { ...response, token: response.token });
+      return response.token;
     }
 
     throw new Error('Failed to get valid token');
@@ -213,7 +213,9 @@ export class APITestUtils {
    */
   private async cleanupTestConversations(): Promise<void> {
     const token = await this.getValidToken().catch(() => null);
-    if (!token) return;
+    if (!token) {
+      return
+    }
 
     for (const conversationId of this.testConversations) {
       try {
@@ -235,7 +237,9 @@ export class APITestUtils {
    */
   private async cleanupTestFiles(): Promise<void> {
     const token = await this.getValidToken().catch(() => null);
-    if (!token) return;
+    if (!token) {
+      return
+    }
 
     for (const fileId of this.testFiles) {
       try {
@@ -365,7 +369,7 @@ export class APITestUtils {
     for (let i = 0; i < requests.length; i += concurrency) {
       const batch = requests.slice(i, i + concurrency);
       const batchResults = await Promise.all(batch.map(req => req()));
-      results.push(...batchResults);
+      results.push(...(batchResults as any));
     }
     
     return results;

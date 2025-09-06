@@ -1,3 +1,3 @@
-export { createBuildSafeLogger, getStartupLogger } from '@/lib/logging/build-safe-logger'
+export { getLogger as createBuildSafeLogger } from './index'
 
 

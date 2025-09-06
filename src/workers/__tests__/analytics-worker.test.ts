@@ -68,7 +68,7 @@ describe('analytics-worker', () => {
     vi.resetModules()
 
     // Reset environment variables
-    vi.mocked(env).ANALYTICS_WS_PORT = '8083'
+    ;(env as any).ANALYTICS_WS_PORT = '8083'
 
     // Initialize mocks for services used BY the worker
     mockAnalyticsService = new AnalyticsService()
@@ -186,7 +186,7 @@ describe('analytics-worker', () => {
   describe('environment configuration', () => {
     it('should use default WebSocket port if not configured', async () => {
       // Remove port from environment
-      vi.mocked(env).ANALYTICS_WS_PORT = undefined
+      ;(env as any).ANALYTICS_WS_PORT = undefined
 
       // Import worker module
       await import('../analytics-worker')
@@ -198,7 +198,7 @@ describe('analytics-worker', () => {
 
     it('should use configured WebSocket port', async () => {
       // Set custom port in environment
-      vi.mocked(env).ANALYTICS_WS_PORT = '8090'
+      ;(env as any).ANALYTICS_WS_PORT = '8090'
 
       // Import worker module
       await import('../analytics-worker')
@@ -223,7 +223,7 @@ describe('analytics-worker', () => {
       const messageHandler = vi
         .mocked(mockWsClient.once)
         .mock.calls.find(
-          (call: [string, (...args: unknown[]) => void]) =>
+          (call: [string | symbol, (...args: unknown[]) => void]) =>
             call[0] === 'message',
         )?.[1]
 
@@ -232,7 +232,8 @@ describe('analytics-worker', () => {
       }
 
       // Simulate authentication message
-      messageHandler(
+      messageHandler.call(
+        mockWsClient,
         JSON.stringify({
           type: 'authenticate',
           userId: 'test-user',
@@ -256,14 +257,14 @@ describe('analytics-worker', () => {
       const messageHandler = vi
         .mocked(mockWsClient.once)
         .mock.calls.find(
-          (call: [string, (...args: unknown[]) => void]) =>
+          (call: [string | symbol, (...args: unknown[]) => void]) =>
             call[0] === 'message',
         )?.[1]
       if (!messageHandler) {
         throw new Error('Message handler not attached')
       }
 
-      messageHandler(JSON.stringify({ type: 'invalid' }))
+      messageHandler.call(mockWsClient, JSON.stringify({ type: 'invalid' }))
 
       expect(mockAnalyticsService.registerClient).not.toHaveBeenCalled()
       expect(mockWsClient.close).toHaveBeenCalled()

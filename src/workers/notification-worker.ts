@@ -1,6 +1,6 @@
-import { NotificationService } from '../lib/services/notification/NotificationService.mock'
-import { WebSocketServer } from '../lib/services/notification/WebSocketServer.mock'
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger.mock'
+import { NotificationService } from '@/lib/services/notification/NotificationService.mock'
+import { WebSocketServer } from '@/lib/services/notification/WebSocketServer.mock'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger.mock'
 
 // Create logger
 const logger = createBuildSafeLogger('notification-worker')
