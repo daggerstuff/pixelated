@@ -163,27 +163,35 @@ test.describe('Color Contrast Accessibility Tests', () => {
             }
 
             function calculateLuminance(rgb: number[] | null) {
-              if (!rgb) return 0;
-              
-              // Convert RGB to relative luminance
-              const r = rgb[0];
-              const g = rgb[1];
-              const b = rgb[2];
-              
+              if (!rgb) {
+                return 0
+              }
+              const r = rgb[0]
+              const g = rgb[1]
+              const b = rgb[2]
+
               const sRGB = [r, g, b].map((v) => {
+                if (v === undefined) {
+                  return 0
+                }
                 const val = v / 255
                 return val <= 0.03928
                   ? val / 12.92
                   : Math.pow((val + 0.055) / 1.055, 2.4)
               })
 
+              if (sRGB[0] === undefined || sRGB[1] === undefined || sRGB[2] === undefined) {
+                return 0
+              }
+
               return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
             }
 
             function calculateContrastRatio(bg: number[] | null, fg: number[] | null) {
-              if (!bg || !fg) return 0;
-              
-              // Calculate contrast ratio
+              if (!bg || !fg) {
+                return 0
+              }
+
               const bgLuminance = calculateLuminance(bg)
               const fgLuminance = calculateLuminance(fg)
 
@@ -314,25 +322,34 @@ test.describe('Color Contrast Accessibility Tests', () => {
         }
 
         function calculateLuminance(rgb: number[] | null) {
-          if (!rgb) return 0;
-          
-          const r = rgb[0];
-          const g = rgb[1];
-          const b = rgb[2];
-          
+          if (!rgb) {
+            return 0
+          }
+          const r = rgb[0]
+          const g = rgb[1]
+          const b = rgb[2]
+
           const sRGB = [r, g, b].map((v) => {
+            if (v === undefined) {
+              return 0
+            }
             const val = v / 255
             return val <= 0.03928
               ? val / 12.92
               : Math.pow((val + 0.055) / 1.055, 2.4)
           })
 
+          if (sRGB[0] === undefined || sRGB[1] === undefined || sRGB[2] === undefined) {
+            return 0
+          }
+
           return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
         }
 
         function calculateContrastRatio(bg: number[] | null, fg: number[] | null) {
-          if (!bg || !fg) return 0;
-          
+          if (!bg || !fg) {
+            return 0
+          }
           const bgLuminance = calculateLuminance(bg)
           const fgLuminance = calculateLuminance(fg)
 
@@ -438,25 +455,34 @@ test.describe('Color Contrast Accessibility Tests', () => {
         }
 
         function calculateLuminance(rgb: number[] | null) {
-          if (!rgb) return 0;
-          
-          const r = rgb[0];
-          const g = rgb[1];
-          const b = rgb[2];
-          
+          if (!rgb) {
+            return 0
+          }
+          const r = rgb[0]
+          const g = rgb[1]
+          const b = rgb[2]
+
           const sRGB = [r, g, b].map((v) => {
+            if (v === undefined) {
+              return 0
+            }
             const val = v / 255
             return val <= 0.03928
               ? val / 12.92
               : Math.pow((val + 0.055) / 1.055, 2.4)
           })
 
+          if (sRGB[0] === undefined || sRGB[1] === undefined || sRGB[2] === undefined) {
+            return 0
+          }
+
           return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
         }
 
         function calculateContrastRatio(bg: number[] | null, fg: number[] | null) {
-          if (!bg || !fg) return 0;
-          
+          if (!bg || !fg) {
+            return 0
+          }
           const bgLuminance = calculateLuminance(bg)
           const fgLuminance = calculateLuminance(fg)
 
@@ -493,14 +519,16 @@ test.describe('Color Contrast Accessibility Tests', () => {
         const focusOutlineColor = hasFocusOutline ? style.outlineColor : null
 
         // Calculate contrast ratio for the focus outline if present
-        let outlineContrastRatio = undefined;
+        let outlineContrastRatio: number | undefined = undefined;
         let outlineHasValidContrast = true
 
         if (hasFocusOutline && focusOutlineColor) {
           const outlineRgb = parseRgb(focusOutlineColor)
           if (outlineRgb) {
-            outlineContrastRatio = calculateContrastRatio(bgRgb, outlineRgb)
-            outlineHasValidContrast = outlineContrastRatio >= 3.0 // Focus indicator should have at least 3:1
+            outlineContrastRatio = calculateContrastRatio(bgRgb, outlineRgb) || 0
+            if (outlineContrastRatio !== undefined) {
+              outlineHasValidContrast = outlineContrastRatio >= 3.0 // Focus indicator should have at least 3:1
+            }
           }
         }
 
@@ -571,7 +599,9 @@ test.describe('Color Contrast Accessibility Tests', () => {
     }
 
     // Click the dark mode toggle
-    await hasDarkModeToggle[0].click()
+    if (hasDarkModeToggle[0]) {
+      await hasDarkModeToggle[0].click()
+    }
 
     // Wait for theme change to take effect
     await page.waitForTimeout(500)

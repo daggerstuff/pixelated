@@ -7,43 +7,44 @@
 
 set -e
 
-# Configuration
-VPS_HOST=${1:-"45.55.211.39"}
-VPS_USER=${2:-"root"}
-VPS_PORT=${3:-"22"}
-SSH_KEY=${4:-"~/.ssh/planet"}
-DOMAIN=${5:-"pixelatedempathy.com"}
-LOCAL_PROJECT_DIR="/home/vivi/pixelated"
-REMOTE_PROJECT_DIR="/root/pixelated"
+#!/bin/bash
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# Rsync script for Pixelated Empathy
 
-print_status() { echo -e "${GREEN}[INFO]${NC} $1"; }
-print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
-print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
-print_header() { echo -e "${BLUE}[STEP]${NC} $1"; }
+set -e
 
-# Error Categories and Exit Codes
-readonly ERROR_ENVIRONMENT_SETUP=10
-readonly ERROR_SYNCHRONIZATION=20
-readonly ERROR_BUILD_FAILURE=30
-readonly ERROR_HEALTH_CHECK=40
-readonly ERROR_REGISTRY=50
-readonly ERROR_NETWORK=60
-readonly ERROR_PERMISSION=70
-readonly ERROR_DISK_SPACE=80
-readonly ERROR_UNKNOWN=99
+# Usage: ./rsync.sh <source> <destination>
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <source> <destination>"
+    exit 1
+fi
 
-# Global error tracking
-DEPLOYMENT_ERRORS=()
-DEPLOYMENT_WARNINGS=()
-ERROR_LOG="/tmp/deployment-errors.log"
-WARNING_LOG="/tmp/deployment-warnings.log"
+SOURCE="$1"
+DEST="$2"
+
+# Exclude files and folders
+EXCLUDES=(
+    ".git/"
+    "node_modules/"
+    "__pycache__/"
+    "*.log"
+    "*.db"
+    "backups/"
+    "test-results/"
+    "playwright-report/"
+    "pixelated.egg-info/"
+)
+
+EXCLUDE_ARGS=""
+for EXCLUDE in "${EXCLUDES[@]}"; do
+    EXCLUDE_ARGS+="--exclude=$EXCLUDE "
+done
+
+# Run rsync
+echo "Running rsync from $SOURCE to $DEST..."
+rsync -avz $EXCLUDE_ARGS "$SOURCE" "$DEST"
+echo "Rsync complete."
+# Removed call to print_header (was causing command not found error)
 
 # Enhanced structured logging system
 DEPLOYMENT_LOG="/tmp/deployment-$(date +%Y%m%d-%H%M%S).log"
@@ -136,7 +137,7 @@ log_deployment_event() {
             print_warning "$message"
             ;;
         "INFO")
-            print_status "$message"
+            echo "$message"
             ;;
         "DEBUG")
             # Only show debug messages if verbose mode is enabled
@@ -212,7 +213,7 @@ start_deployment_stage() {
     STAGE_STATUS["$stage_name"]="in_progress"
     
     log_deployment_event "STAGE" "INFO" "Started: $stage_description" "$stage_name" "$stage_name"
-    print_header "🚀 $stage_description"
+    echo "🚀 $stage_description"
 }
 
 end_deployment_stage() {
@@ -241,7 +242,7 @@ end_deployment_stage() {
     fi
     
     log_deployment_event "STAGE" "$level" "Completed: $stage_description (${duration_sec}s)" "$stage_name" "$stage_name"
-    print_status "$status_icon $stage_description completed in ${duration_sec}s"
+    echo "$status_icon $stage_description completed in ${duration_sec}s"
     
     # Update metrics with stage timing
     update_stage_metrics "$stage_name" "$status" "$duration_ms"
@@ -432,7 +433,7 @@ EOF
     generate_json_summary "$json_summary" "$deployment_status" "$total_duration_ms"
     
     # Display summary to user
-    print_header "📊 Deployment Summary"
+    echo "📊 Deployment Summary"
     cat "$summary_file"
     
     # Store summary file path for later reference
@@ -697,7 +698,7 @@ EOF
 
 # Display deployment timing information
 show_deployment_timing() {
-    print_header "⏱️  Deployment Timing Analysis"
+    echo "⏱️  Deployment Timing Analysis"
     
     local total_time=0
     local slowest_stage=""
@@ -769,32 +770,32 @@ finalize_deployment_logging() {
     # Display final status
     case "$final_status" in
         "success")
-            print_header "🎉 Deployment Completed Successfully"
-            print_status "Total time: ${total_duration_sec}s"
+            echo "🎉 Deployment Completed Successfully"
+            echo "Total time: ${total_duration_sec}s"
             ;;
         "failed")
-            print_header "❌ Deployment Failed"
+            echo "❌ Deployment Failed"
             print_error "Total time: ${total_duration_sec}s"
-            print_status "Check logs for details: $DEPLOYMENT_LOG"
+            echo "Check logs for details: $DEPLOYMENT_LOG"
             ;;
         "warning")
-            print_header "⚠️  Deployment Completed with Warnings"
+            echo "⚠️  Deployment Completed with Warnings"
             print_warning "Total time: ${total_duration_sec}s"
-            print_status "Review warnings in: $WARNING_LOG"
+            echo "Review warnings in: $WARNING_LOG"
             ;;
     esac
     
     # Show log file locations
-    print_status ""
-    print_status "📋 Log Files:"
-    print_status "  Main Log: $DEPLOYMENT_LOG"
-    print_status "  Metrics: $DEPLOYMENT_METRICS"
-    print_status "  Errors: $ERROR_LOG"
-    print_status "  Warnings: $WARNING_LOG"
+    echo ""
+    echo "📋 Log Files:"
+    echo "  Main Log: $DEPLOYMENT_LOG"
+    echo "  Metrics: $DEPLOYMENT_METRICS"
+    echo "  Errors: $ERROR_LOG"
+    echo "  Warnings: $WARNING_LOG"
     
     if [[ -f "/tmp/latest-deployment-archive.txt" ]]; then
         local archive_file=$(cat "/tmp/latest-deployment-archive.txt")
-        print_status "  Archive: $archive_file"
+    echo "  Archive: $archive_file"
     fi
 }
 
@@ -879,22 +880,22 @@ handle_environment_setup_error() {
     case "$error_message" in
         *"node"*|*"nvm"*)
             print_error "Node.js installation failed"
-            print_status "Troubleshooting steps:"
-            print_status "1. Check internet connectivity"
-            print_status "2. Verify nvm installation"
-            print_status "3. Check available disk space"
+            echo "Troubleshooting steps:"
+            echo "1. Check internet connectivity"
+            echo "2. Verify nvm installation"
+            echo "3. Check available disk space"
             
             if [ $retry_count -lt $max_retries ]; then
-                print_status "Retrying Node.js setup (attempt $((retry_count + 1))/$max_retries)..."
+                echo "Retrying Node.js setup (attempt $((retry_count + 1))/$max_retries)..."
                 return 0  # Allow retry
             fi
             ;;
         *"pnpm"*)
             print_error "pnpm installation failed"
-            print_status "Troubleshooting steps:"
-            print_status "1. Ensure Node.js is properly installed"
-            print_status "2. Check npm registry connectivity"
-            print_status "3. Try manual installation: npm install -g pnpm"
+            echo "Troubleshooting steps:"
+            echo "1. Ensure Node.js is properly installed"
+            echo "2. Check npm registry connectivity"
+            echo "3. Try manual installation: npm install -g pnpm"
             
             if [ $retry_count -lt $max_retries ]; then
                 print_status "Retrying pnpm setup (attempt $((retry_count + 1))/$max_retries)..."
@@ -1440,7 +1441,7 @@ sync_with_error_handling() {
     local max_retries=3
     local retry_delay=10
     
-    print_header "📁 Synchronizing files with error handling"
+    echo "📁 Synchronizing files with error handling"
     
     # Create a wrapper function for the sync operation
     perform_sync() {
@@ -1450,12 +1451,12 @@ sync_with_error_handling() {
     }
     
     if retry_with_backoff $max_retries $retry_delay "file_synchronization" perform_sync; then
-        print_status "✅ File synchronization completed successfully"
+    echo "✅ File synchronization completed successfully"
         return 0
     else
         log_error "SYNC" "File synchronization failed after $max_retries attempts" "final_attempt"
         print_error "❌ Failed to synchronize files"
-        print_status "Check network connectivity and VPS accessibility"
+    echo "Check network connectivity and VPS accessibility"
         return $ERROR_SYNCHRONIZATION
     fi
 }
@@ -1467,7 +1468,7 @@ build_container_with_error_handling() {
     local dockerfile_path="${3:-.}"
     local build_context="${4:-.}"
     
-    print_header "🐳 Building container with error handling: $container_name:$tag"
+    echo "🐳 Building container with error handling: $container_name:$tag"
     
     # Wrapper function for container build
     perform_container_build() {
@@ -1932,7 +1933,7 @@ perform_comprehensive_health_check() {
     local port="$2"
     local api_endpoints=("${@:3}")
     
-    print_header "🔍 Performing comprehensive health check..."
+    echo "🔍 Performing comprehensive health check..."
     
     local health_check_results="/tmp/health-check-results.json"
     local health_check_log="/tmp/health-check-detailed.log"
@@ -1967,7 +1968,7 @@ HEALTH_INIT
     local total_response_time=0
     
     # 1. Basic connectivity and application readiness
-    print_status "Running Stage 1-2: Connectivity and Readiness Checks"
+    echo "Running Stage 1-2: Connectivity and Readiness Checks"
     check_count=$((check_count + 1))
     
     local readiness_start=$(date +%s%3N)
@@ -1995,11 +1996,11 @@ HEALTH_INIT
         echo "Container status: $container_status" >> "$health_check_log"
         
         # If readiness fails, we should still continue with other checks for diagnostic purposes
-        print_warning "⚠️  Continuing with remaining checks for diagnostic purposes"
+    echo "⚠️  Continuing with remaining checks for diagnostic purposes"
     fi
     
     # 2. Root endpoint test
-    print_status "Running Stage 3: Root Endpoint Validation"
+    echo "Running Stage 3: Root Endpoint Validation"
     check_count=$((check_count + 1))
     
     local root_start=$(date +%s%3N)
@@ -2024,7 +2025,7 @@ HEALTH_INIT
     fi
     
     # 3. API endpoints test
-    print_status "Running Stage 4: API Endpoint Validation"
+    echo "Running Stage 4: API Endpoint Validation"
     check_count=$((check_count + 1))
     
     local api_start=$(date +%s%3N)
@@ -2059,7 +2060,7 @@ HEALTH_INIT
     fi
     
     # 4. Static assets test
-    print_status "Running Stage 5: Static Asset Validation"
+    echo "Running Stage 5: Static Asset Validation"
     check_count=$((check_count + 1))
     
     local assets_start=$(date +%s%3N)
@@ -2112,7 +2113,7 @@ HEALTH_INIT
         handle_health_check_failure "$container_name" "$health_check_results" "$health_check_log"
         return 1
     else
-        print_status "✅ All health checks passed - deployment validated successfully"
+    echo "✅ All health checks passed - deployment validated successfully"
         return 0
     fi
 }
@@ -2124,7 +2125,7 @@ generate_health_check_report() {
     local log_file="$2"
     local report_file="/tmp/health-check-report.txt"
     
-    print_header "📊 Comprehensive Health Check Report"
+    echo "📊 Comprehensive Health Check Report"
     
     # Extract key metrics from results
     local overall_status=$(jq -r '.overall_status' "$results_file" 2>/dev/null || echo "unknown")
@@ -2219,7 +2220,7 @@ REC_EOF
     # Save report with timestamp for future reference
     local timestamped_report="/tmp/health-check-report-$(date +%Y%m%d-%H%M%S).txt"
     cp "$report_file" "$timestamped_report"
-    print_status "📄 Detailed report saved: $timestamped_report"
+    echo "📄 Detailed report saved: $timestamped_report"
 }
 
 handle_health_check_failure() {
@@ -2228,10 +2229,10 @@ handle_health_check_failure() {
     local log_file="$3"
     local port="${4:-4321}"
     
-    print_header "🚨 Health Check Failure - Initiating Automated Rollback"
+    echo "🚨 Health Check Failure - Initiating Automated Rollback"
     
     # Attempt immediate rollback first
-    print_status "🔄 Attempting immediate automated rollback..."
+    echo "🔄 Attempting immediate automated rollback..."
     
     if perform_immediate_rollback "$container_name" "${container_name}-backup" "$port" "health_check_failure"; then
         print_status "✅ Immediate rollback completed successfully"
@@ -2776,7 +2777,7 @@ perform_immediate_rollback() {
     local port="$3"
     local context="${4:-health_check_failure}"
     
-    print_header "🔄 Performing immediate rollback due to $context"
+    echo "🔄 Performing immediate rollback due to $context"
     
     local rollback_log="/tmp/immediate-rollback-$(date +%Y%m%d-%H%M%S).log"
     echo "=== IMMEDIATE ROLLBACK LOG ===" > "$rollback_log"
@@ -2787,97 +2788,97 @@ perform_immediate_rollback() {
     echo "==============================" >> "$rollback_log"
     
     # Step 1: Terminate failed container
-    print_status "🛑 Step 1: Terminating failed container: $failed_container"
+    echo "    🛑 Step 1: Terminating failed container: $failed_container"
     
     if docker stop "$failed_container" >/dev/null 2>&1; then
-        print_status "✅ Failed container stopped"
+    echo "        ✅ Failed container stopped"
         echo "[$(date -Iseconds)] SUCCESS: Failed container stopped" >> "$rollback_log"
     else
-        print_warning "⚠️  Failed to stop container gracefully, forcing termination"
+    echo "        ⚠️  Failed to stop container gracefully, forcing termination"
         docker kill "$failed_container" >/dev/null 2>&1 || true
         echo "[$(date -Iseconds)] WARNING: Forced container termination" >> "$rollback_log"
     fi
     
     if docker rm "$failed_container" >/dev/null 2>&1; then
-        print_status "✅ Failed container removed"
+    echo "        ✅ Failed container removed"
         echo "[$(date -Iseconds)] SUCCESS: Failed container removed" >> "$rollback_log"
     else
-        print_warning "⚠️  Failed to remove container (may not exist)"
+    echo "        ⚠️  Failed to remove container (may not exist)"
         echo "[$(date -Iseconds)] WARNING: Container removal failed" >> "$rollback_log"
     fi
     
     # Step 2: Check if backup container exists and is healthy
-    print_status "🔍 Step 2: Checking backup container availability"
+    echo "    🔍 Step 2: Checking backup container availability"
     
     if docker ps -a --format "table {{.Names}}" | grep -q "^${backup_container}$"; then
-        print_status "✅ Backup container found: $backup_container"
+    echo "        ✅ Backup container found: $backup_container"
         echo "[$(date -Iseconds)] SUCCESS: Backup container found" >> "$rollback_log"
         
         # Check if backup container is running
         if docker ps --format "table {{.Names}}" | grep -q "^${backup_container}$"; then
-            print_status "✅ Backup container is already running"
+            echo "            ✅ Backup container is already running"
             echo "[$(date -Iseconds)] SUCCESS: Backup container already running" >> "$rollback_log"
         else
-            print_status "🔄 Starting backup container"
+            echo "            🔄 Starting backup container"
             if docker start "$backup_container" >/dev/null 2>&1; then
-                print_status "✅ Backup container started successfully"
+                echo "                ✅ Backup container started successfully"
                 echo "[$(date -Iseconds)] SUCCESS: Backup container started" >> "$rollback_log"
                 
                 # Wait for backup container to be ready
-                print_status "⏳ Waiting for backup container to be ready..."
+                echo "                ⏳ Waiting for backup container to be ready..."
                 if wait_for_application_ready "$backup_container" "$port" 30; then
-                    print_status "✅ Backup container is ready"
+                    echo "                    ✅ Backup container is ready"
                     echo "[$(date -Iseconds)] SUCCESS: Backup container ready" >> "$rollback_log"
                 else
-                    print_error "❌ Backup container failed to become ready"
+                    echo "                    ❌ Backup container failed to become ready"
                     echo "[$(date -Iseconds)] ERROR: Backup container not ready" >> "$rollback_log"
                     return 1
                 fi
             else
-                print_error "❌ Failed to start backup container"
+                echo "                ❌ Failed to start backup container"
                 echo "[$(date -Iseconds)] ERROR: Failed to start backup container" >> "$rollback_log"
                 return 1
             fi
         fi
         
         # Rename backup container to primary name
-        print_status "🔄 Promoting backup container to primary"
+    echo "        🔄 Promoting backup container to primary"
         if docker rename "$backup_container" "$failed_container" >/dev/null 2>&1; then
-            print_status "✅ Backup container promoted to primary"
+            echo "            ✅ Backup container promoted to primary"
             echo "[$(date -Iseconds)] SUCCESS: Container renamed to primary" >> "$rollback_log"
         else
-            print_warning "⚠️  Failed to rename container, but rollback successful"
+            echo "            ⚠️  Failed to rename container, but rollback successful"
             echo "[$(date -Iseconds)] WARNING: Container rename failed" >> "$rollback_log"
         fi
         
     else
-        print_error "❌ No backup container available for immediate rollback"
+    echo "        ❌ No backup container available for immediate rollback"
         echo "[$(date -Iseconds)] ERROR: No backup container available" >> "$rollback_log"
         
         # Try to restore from filesystem backup
-        print_status "🔄 Attempting filesystem-based rollback"
+    echo "        🔄 Attempting filesystem-based rollback"
         if perform_filesystem_rollback "$failed_container" "$port"; then
-            print_status "✅ Filesystem rollback completed"
+            echo "            ✅ Filesystem rollback completed"
             echo "[$(date -Iseconds)] SUCCESS: Filesystem rollback completed" >> "$rollback_log"
         else
-            print_error "❌ Filesystem rollback also failed"
+            echo "            ❌ Filesystem rollback also failed"
             echo "[$(date -Iseconds)] ERROR: Filesystem rollback failed" >> "$rollback_log"
             return 1
         fi
     fi
     
     # Step 3: Verify rollback success
-    print_status "✅ Step 3: Verifying rollback success"
+    echo "    ✅ Step 3: Verifying rollback success"
     
     if perform_basic_connectivity_test "$port" 10 "$failed_container"; then
-        print_status "✅ Immediate rollback completed successfully"
+    echo "        ✅ Immediate rollback completed successfully"
         echo "[$(date -Iseconds)] SUCCESS: Rollback verification passed" >> "$rollback_log"
         
         # Log rollback success
         log_rollback_success "immediate" "$failed_container" "$backup_container" "$rollback_log"
         return 0
     else
-        print_error "❌ Rollback verification failed"
+    echo "        ❌ Rollback verification failed"
         echo "[$(date -Iseconds)] ERROR: Rollback verification failed" >> "$rollback_log"
         return 1
     fi
@@ -2890,7 +2891,7 @@ perform_filesystem_rollback() {
     local backup_path="${3:-/root/pixelated-backup}"
     local project_path="${4:-/root/pixelated}"
     
-    print_header "🔄 Performing filesystem rollback"
+    echo "    🔄 Performing filesystem rollback"
     
     local rollback_log="/tmp/filesystem-rollback-$(date +%Y%m%d-%H%M%S).log"
     echo "=== FILESYSTEM ROLLBACK LOG ===" > "$rollback_log"
@@ -3470,7 +3471,7 @@ switch_traffic() {
   local new_port="$4"
   local domain="$5"
 
-  print_header "🔄 Switching traffic from $old_container_name to $new_container_name"
+    echo "  🔄 Switching traffic from $old_container_name to $new_container_name"
 
   # Validate new container is healthy before switching
   if ! docker ps --format "table {{.Names}}" | grep -q "^${new_container_name}$"; then
@@ -3480,7 +3481,7 @@ switch_traffic() {
 
   # Update Caddy configuration if domain is configured
   if [[ -n "$domain" ]]; then
-      print_status "Updating Caddy configuration for domain: $domain"
+    echo "      Updating Caddy configuration for domain: $domain"
 
       # Create new Caddyfile with updated port
       sudo tee /etc/caddy/Caddyfile > /dev/null << CADDY_EOF
@@ -3515,26 +3516,26 @@ CADDY_EOF
       # Test and reload Caddy configuration
       if sudo caddy validate --config /etc/caddy/Caddyfile; then
           if sudo systemctl reload caddy; then
-              print_status "✅ Caddy configuration updated and reloaded"
+              echo "          ✅ Caddy configuration updated and reloaded"
           else
-              print_error "❌ Failed to reload Caddy"
+              echo "          ❌ Failed to reload Caddy"
               return 1
           fi
       else
-          print_error "❌ Invalid Caddy configuration"
+          echo "          ❌ Invalid Caddy configuration"
           return 1
       fi
   fi
 
   # Verify traffic is flowing to new container
-  print_status "Verifying traffic switch..."
+    echo "  Verifying traffic switch..."
   sleep 3
 
   if curl -s -f "http://localhost:${new_port}/" >/dev/null 2>&1; then
-      print_status "✅ Traffic successfully switched to new container"
+    echo "      ✅ Traffic successfully switched to new container"
       return 0
   else
-      print_error "❌ Traffic switch verification failed"
+    echo "      ❌ Traffic switch verification failed"
       return 1
   fi
 }
@@ -3543,34 +3544,34 @@ cleanup_old_container() {
   local old_container_name="$1"
   local grace_period="${2:-30}"
 
-  print_status "Cleaning up old container: $old_container_name (grace period: ${grace_period}s)"
+    echo "  Cleaning up old container: $old_container_name (grace period: ${grace_period}s)"
 
   # Check if old container exists
   if ! docker ps -a --format "table {{.Names}}" | grep -q "^${old_container_name}$"; then
-      print_status "Old container $old_container_name does not exist, nothing to clean up"
+    echo "      Old container $old_container_name does not exist, nothing to clean up"
       return 0
   fi
 
   # Give some time for any remaining connections to drain
   if [ "$grace_period" -gt 0 ]; then
-      print_status "Waiting ${grace_period}s for connection draining..."
+    echo "      Waiting ${grace_period}s for connection draining..."
       sleep "$grace_period"
   fi
 
   # Stop the old container gracefully
-  print_status "Stopping old container: $old_container_name"
+    echo "  Stopping old container: $old_container_name"
   if docker stop "$old_container_name" 2>/dev/null; then
-      print_status "✅ Old container stopped"
+    echo "      ✅ Old container stopped"
   else
-      print_warning "Old container was already stopped or doesn't exist"
+    echo "      Old container was already stopped or doesn't exist"
   fi
 
   # Remove the old container
-  print_status "Removing old container: $old_container_name"
+    echo "  Removing old container: $old_container_name"
   if docker rm "$old_container_name" 2>/dev/null; then
-      print_status "✅ Old container removed"
+    echo "      ✅ Old container removed"
   else
-      print_warning "Old container was already removed or doesn't exist"
+    echo "      Old container was already removed or doesn't exist"
   fi
 
   return 0
@@ -3581,39 +3582,39 @@ handle_container_failure() {
   local old_container_name="$2"
   local old_port="$3"
 
-  print_error "🚨 Container failure detected: $failed_container_name"
+    echo "  🚨 Container failure detected: $failed_container_name"
 
   # Stop and remove the failed container
-  print_status "Cleaning up failed container..."
+    echo "  Cleaning up failed container..."
   docker stop "$failed_container_name" 2>/dev/null || true
   docker rm "$failed_container_name" 2>/dev/null || true
 
   # Show logs from failed container for debugging
-  print_error "Failed container logs:"
+    echo "  Failed container logs:"
   docker logs "$failed_container_name" 2>/dev/null || echo "No logs available"
 
   # Ensure old container is still running
   if docker ps --format "table {{.Names}}" | grep -q "^${old_container_name}$"; then
-      print_status "✅ Old container $old_container_name is still running"
+    echo "      ✅ Old container $old_container_name is still running"
   else
-      print_warning "⚠️  Old container $old_container_name is not running, attempting to restart..."
+    echo "      ⚠️  Old container $old_container_name is not running, attempting to restart..."
 
       # Try to restart the old container
       if docker start "$old_container_name" 2>/dev/null; then
-          print_status "✅ Old container restarted successfully"
+          echo "          ✅ Old container restarted successfully"
       else
-          print_error "❌ Failed to restart old container"
-          print_error "Manual intervention required!"
+          echo "          ❌ Failed to restart old container"
+          echo "          Manual intervention required!"
           return 1
       fi
   fi
 
   # Verify old container is responding
   if curl -s -f "http://localhost:${old_port}/" >/dev/null 2>&1; then
-      print_status "✅ Service restored on old container"
+    echo "      ✅ Service restored on old container"
       return 0
   else
-      print_error "❌ Old container is not responding"
+    echo "      ❌ Old container is not responding"
       return 1
   fi
 }
@@ -3625,7 +3626,7 @@ perform_blue_green_deployment() {
   local domain="$4"
   local env_vars=("${@:5}")
 
-  print_header "🔵🟢 Starting Blue-Green Deployment"
+    echo "  🔵🟢 Starting Blue-Green Deployment"
 
   # Generate new container name
   local new_container="${current_container}-new"
@@ -4851,12 +4852,12 @@ deploy_environment_variables_securely() {
     local env_file="${5:-.env}"
     local passphrase="$6"
     
-    print_header "🔐 Deploying Environment Variables Securely"
+    echo "    🔐 Deploying Environment Variables Securely"
     
     # Validate inputs
     if [[ -z "$passphrase" ]]; then
-        print_error "Passphrase is required for secure environment deployment"
-        print_status "Set DEPLOYMENT_PASSPHRASE environment variable or provide as argument"
+    echo "        Passphrase is required for secure environment deployment"
+    echo "        Set DEPLOYMENT_PASSPHRASE environment variable or provide as argument"
         return 1
     fi
     
@@ -4864,92 +4865,92 @@ deploy_environment_variables_securely() {
     local temp_files=()
     
     # Step 1: Encrypt environment file
-    print_status "Step 1: Encrypting environment file..."
+    echo "    Step 1: Encrypting environment file..."
     local encrypted_file="${env_file}.encrypted"
     if encrypt_environment_file "$env_file" "$passphrase" "$encrypted_file"; then
         temp_files+=("$encrypted_file" "${encrypted_file}.sha256")
-        print_status "✅ Environment file encrypted"
+    echo "        ✅ Environment file encrypted"
     else
-        print_error "❌ Environment file encryption failed"
+    echo "        ❌ Environment file encryption failed"
         return 1
     fi
     
     # Step 2: Create secure transfer package
-    print_status "Step 2: Creating secure transfer package..."
+    echo "    Step 2: Creating secure transfer package..."
     local transfer_package="${env_file}.transfer"
     if create_secure_transfer_package "$encrypted_file" "$transfer_package"; then
         temp_files+=("$transfer_package" "${transfer_package}.sha256")
-        print_status "✅ Transfer package created"
+    echo "        ✅ Transfer package created"
     else
-        print_error "❌ Transfer package creation failed"
+    echo "        ❌ Transfer package creation failed"
         deployment_success=false
     fi
     
     # Step 3: Transfer to VPS
     if [[ "$deployment_success" == "true" ]]; then
-        print_status "Step 3: Transferring to VPS..."
+    echo "    Step 3: Transferring to VPS..."
         if transfer_encrypted_environment "$transfer_package" "$vps_host" "$vps_user" "$ssh_key" "$vps_port"; then
-            print_status "✅ Environment transferred to VPS"
+            echo "        ✅ Environment transferred to VPS"
         else
-            print_error "❌ Environment transfer failed"
+            echo "        ❌ Environment transfer failed"
             deployment_success=false
         fi
     fi
     
     # Step 4: Decrypt on VPS
     if [[ "$deployment_success" == "true" ]]; then
-        print_status "Step 4: Decrypting on VPS..."
+    echo "    Step 4: Decrypting on VPS..."
         if decrypt_environment_file_on_vps "$vps_host" "$vps_user" "$ssh_key" "$passphrase" "$vps_port"; then
-            print_status "✅ Environment decrypted on VPS"
+            echo "        ✅ Environment decrypted on VPS"
         else
-            print_error "❌ Environment decryption failed on VPS"
+            echo "        ❌ Environment decryption failed on VPS"
             deployment_success=false
         fi
     fi
     
     # Step 5: Load and validate environment variables
     if [[ "$deployment_success" == "true" ]]; then
-        print_status "Step 5: Loading environment variables..."
+    echo "    Step 5: Loading environment variables..."
         if load_environment_variables_on_vps "$vps_host" "$vps_user" "$ssh_key" "/tmp/env.decrypted" "$vps_port"; then
-            print_status "✅ Environment variables loaded"
+            echo "        ✅ Environment variables loaded"
             
             # Validate environment variables
             if validate_environment_variables_on_vps "$vps_host" "$vps_user" "$ssh_key" "/tmp/env_vars.sh" "$vps_port"; then
-                print_status "✅ Environment variables validated"
+                echo "            ✅ Environment variables validated"
             else
-                print_warning "⚠️  Environment validation completed with warnings"
+                echo "            ⚠️  Environment validation completed with warnings"
             fi
         else
-            print_error "❌ Environment variable loading failed"
+            echo "        ❌ Environment variable loading failed"
             deployment_success=false
         fi
     fi
     
     # Step 6: Set up secure storage
     if [[ "$deployment_success" == "true" ]]; then
-        print_status "Step 6: Setting up secure storage..."
+    echo "    Step 6: Setting up secure storage..."
         if secure_environment_storage_on_vps "$vps_host" "$vps_user" "$ssh_key" "/tmp/env_vars.sh" "$vps_port"; then
-            print_status "✅ Secure storage configured"
+            echo "        ✅ Secure storage configured"
         else
-            print_error "❌ Secure storage setup failed"
+            echo "        ❌ Secure storage setup failed"
             deployment_success=false
         fi
     fi
     
     # Step 7: Create backup for rollback
     if [[ "$deployment_success" == "true" ]]; then
-        print_status "Step 7: Creating rollback backup..."
+    echo "    Step 7: Creating rollback backup..."
         backup_environment_variables_for_rollback "$vps_host" "$vps_user" "$ssh_key" "/root/.env_secure/current_env.sh" "$vps_port"
     fi
     
     # Step 8: Create rotation script
     if [[ "$deployment_success" == "true" ]]; then
-        print_status "Step 8: Setting up rotation capabilities..."
+    echo "    Step 8: Setting up rotation capabilities..."
         create_environment_variable_rotation_script "$vps_host" "$vps_user" "$ssh_key" "$vps_port"
     fi
     
     # Step 9: Clean up temporary files
-    print_status "Step 9: Cleaning up temporary files..."
+    echo "    Step 9: Cleaning up temporary files..."
     
     # Clean up local temporary files
     cleanup_temporary_encrypted_files "$env_file" "true" "false"
@@ -4959,14 +4960,14 @@ deploy_environment_variables_securely() {
     
     # Final status
     if [[ "$deployment_success" == "true" ]]; then
-        print_header "✅ Secure Environment Variable Deployment Completed"
-        print_status "Environment variables are now securely deployed and ready for use"
-        print_status "Access via: source /root/.env_secure/access_env.sh"
-        print_status "Rotate via: /root/.env_secure/rotate_env.sh <new_env_file>"
+    echo "        ✅ Secure Environment Variable Deployment Completed"
+    echo "        Environment variables are now securely deployed and ready for use"
+    echo "        Access via: source /root/.env_secure/access_env.sh"
+    echo "        Rotate via: /root/.env_secure/rotate_env.sh <new_env_file>"
         return 0
     else
-        print_header "❌ Secure Environment Variable Deployment Failed"
-        print_error "Environment variables were not deployed successfully"
+    echo "        ❌ Secure Environment Variable Deployment Failed"
+    echo "        Environment variables were not deployed successfully"
         print_error "Check the logs above for specific error details"
         return 1
     fi
@@ -5662,11 +5663,11 @@ show_usage() {
     exit 1
 }
 
-print_header "🚀 Deploying Pixelated Empathy to VPS via rsync"
-print_status "Target: $VPS_USER@$VPS_HOST:$VPS_PORT"
-print_status "Domain: ${DOMAIN:-"IP-based access"}"
-print_status "Local dir: $LOCAL_PROJECT_DIR"
-print_status "Remote dir: $REMOTE_PROJECT_DIR"
+echo "🚀 Deploying Pixelated Empathy to VPS via rsync"
+echo "Target: $VPS_USER@$VPS_HOST:$VPS_PORT"
+echo "Domain: ${DOMAIN:-"IP-based access"}"
+echo "Local dir: $LOCAL_PROJECT_DIR"
+echo "Remote dir: $REMOTE_PROJECT_DIR"
 
     # Build SSH command
     SSH_CMD="ssh -t"
@@ -6601,9 +6602,9 @@ Warnings: $WARNING_LOG
 Rollback Instructions: $rollback_file
 EOF
     
-    print_header "🔄 Rollback Instructions Generated"
-    print_status "Rollback instructions saved to: $rollback_file"
-    print_status ""
+    echo "🔄 Rollback Instructions Generated"
+    echo "Rollback instructions saved to: $rollback_file"
+    echo ""
     cat "$rollback_file"
     
     return 0
@@ -6620,7 +6621,7 @@ fi
 execute_main_deployment
 
 # Create rsync exclude file
-print_header "Preparing rsync exclusions..."
+echo "Preparing rsync exclusions..."
 cat > /tmp/rsync-exclude << 'EOF'
 .git/
 node_modules/
@@ -6677,10 +6678,10 @@ ai/youtube_transcripts
 *.backup
 EOF
 
-print_status "✅ Rsync exclusions prepared"
+echo "✅ Rsync exclusions prepared"
 
 # Archive old repo in root home (VPS) BEFORE syncing
-print_header "Archiving old repo in /root/pixelated on VPS..."
+echo "Archiving old repo in /root/pixelated on VPS..."
 $SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
 set -e
 
@@ -6693,41 +6694,41 @@ print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
 print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
 
 if [ -d "/root/pixelated" ]; then
-    print_status "Stopping Caddy and Docker containers using /root/pixelated..."
+    echo "Stopping Caddy and Docker containers using /root/pixelated..."
     sudo systemctl stop caddy || true
     sudo docker stop pixelated-app || true
-    print_status "Archiving /root/pixelated to /root/pixelated-backup..."
+    echo "Archiving /root/pixelated to /root/pixelated-backup..."
 
     # Remove any existing backup directory to avoid mv errors
     if [ -d "/root/pixelated-backup" ]; then
-        print_status "Removing previous backup at /root/pixelated-backup..."
-        sudo rm -rf /root/pixelated-backup
+    echo "Removing previous backup at /root/pixelated-backup..."
+    sudo rm -rf /root/pixelated-backup
     fi
 
     sudo mv /root/pixelated /root/pixelated-backup
-    print_status "Archive complete."
+    echo "Archive complete."
 else
-    print_status "/root/pixelated does not exist, nothing to archive."
+    echo "/root/pixelated does not exist, nothing to archive."
 fi
 EOF
 
 # Sync project files
-print_header "Syncing project files to VPS..."
-print_status "This may take a few minutes for the initial sync..."
+echo "Syncing project files to VPS..."
+echo "This may take a few minutes for the initial sync..."
 
 if eval rsync -avz --progress --delete \
     --exclude-from=/tmp/rsync-exclude \
     "$LOCAL_PROJECT_DIR/" \
     "$VPS_USER@$VPS_HOST:$REMOTE_PROJECT_DIR/" \
     "$RSYNC_SSH_OPTS"; then
-    print_status "✅ Project files synced successfully"
+    echo "✅ Project files synced successfully"
 else
-    print_error "❌ Rsync failed"
+    echo "❌ Rsync failed"
     exit 1
 fi
 
 # Set up VPS environment
-print_header "Setting up VPS environment..."
+echo "Setting up VPS environment..."
 $SSH_CMD "$VPS_USER@$VPS_HOST" bash << EOF
 set -e
 
@@ -6741,19 +6742,19 @@ NC='\033[0m'
 print_status() { echo -e "\${GREEN}[VPS]${NC} \$1"; }
 print_error() { echo -e "\${RED}[VPS ERROR]${NC} \$1"; }
 
-print_status "Setting up VPS environment..."
+    echo "Setting up VPS environment..."
 
 # Update system
-print_status "Updating system packages..."
+    echo "Updating system packages..."
 sudo apt-get update -y
 sudo apt-get upgrade -y
 
 # Install security basics
-print_status "Installing security packages (ufw, fail2ban, unattended-upgrades)..."
+    echo "Installing security packages (ufw, fail2ban, unattended-upgrades)..."
 sudo apt-get install -y ufw fail2ban unattended-upgrades
 
 # Configure UFW firewall
-print_status "Configuring UFW firewall rules..."
+    echo "Configuring UFW firewall rules..."
 sudo ufw allow $VPS_PORT/tcp    # Allow SSH
 sudo ufw allow 80/tcp           # Allow HTTP
 sudo ufw allow 443/tcp          # Allow HTTPS
@@ -6761,12 +6762,12 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw --force enable
 # Enable and start fail2ban
-print_status "Enabling fail2ban for SSH brute-force protection..."
+    echo "Enabling fail2ban for SSH brute-force protection..."
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
 # SSH hardening reminder
-print_status "Review SSH configuration for security:"
+    echo "Review SSH configuration for security:"
 print_status "  - Disable root login (PermitRootLogin no)"
 print_status "  - Disable password authentication (PasswordAuthentication no)"
 print_status "  - Change SSH port if desired"
@@ -7024,40 +7025,40 @@ goat.pixelatedempathy.tech {
 CADDY_EOF
 
     # Auto-format Caddyfile to ensure consistency
-    print_status "Formatting Caddyfile..."
+    echo "Formatting Caddyfile..."
     sudo caddy fmt --overwrite /etc/caddy/Caddyfile
 
     # Test and reload Caddy
-    print_status "Testing Caddy configuration..."
+    echo "Testing Caddy configuration..."
     sudo caddy validate --config /etc/caddy/Caddyfile
 
-    print_status "Starting Caddy..."
+    echo "Starting Caddy..."
     sudo systemctl restart caddy
 fi
 
-print_status "✅ Application deployment completed!"
+echo "✅ Application deployment completed!"
 
 # Show access URLs
-print_status "Application URLs:"
-print_status "  Direct: http://$VPS_HOST:4321"
+echo "Application URLs:"
+echo "  Direct: http://$VPS_HOST:4321"
 if [[ -n "$DOMAIN" ]]; then
-    print_status "  Domain: https://$DOMAIN"
+    echo "  Domain: https://$DOMAIN"
 fi
 EOF
 
 # Clean up
 rm -f /tmp/rsync-exclude
 
-print_header "🎉 Deployment completed successfully!"
-print_status ""
-print_status "Your application is now running on:"
-print_status "  Direct access: http://$VPS_HOST:4321"
+echo "🎉 Deployment completed successfully!"
+echo ""
+echo "Your application is now running on:"
+echo "  Direct access: http://$VPS_HOST:4321"
 if [[ -n "$DOMAIN" ]]; then
-    print_status "  Domain access: https://$DOMAIN"
+    echo "  Domain access: https://$DOMAIN"
 fi
-print_status ""
-print_status "For future updates, you can either:"
-print_status "  1. Run this script again to sync all changes"
-print_status "  2. SSH to the VPS and use 'git pull' in $REMOTE_PROJECT_DIR"
-print_status ""
-print_status "SSH to your VPS: ssh $VPS_USER@$VPS_HOST"
+echo ""
+echo "For future updates, you can either:"
+echo "  1. Run this script again to sync all changes"
+echo "  2. SSH to the VPS and use 'git pull' in $REMOTE_PROJECT_DIR"
+echo ""
+echo "SSH to your VPS: ssh $VPS_USER@$VPS_HOST"

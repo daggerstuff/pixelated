@@ -1,4 +1,20 @@
 import { useState, useEffect, type FC } from 'react'
+
+interface DemographicData {
+  category: string
+  subcategory: string
+  current: number
+  target: number
+  percentage: number
+}
+
+interface DemographicBalancingDisplayProps {
+  currentProfile: {
+    age: number
+    gender: string
+    occupation: string
+    background: string
+  }
   onBalanceUpdate?: (balanceScore: number) => void
 }
 
@@ -269,24 +285,40 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 
   const groupedStats = demographicStats.reduce(
     (acc, stat) => {
-      const category = stat.category;
+      const category = stat.category
       if (!acc[category]) {
-        acc[category] = [];
+        acc[category] = []
       }
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+      ;(acc[category] as DemographicData[]).push(stat)
+      return acc
     },
     {} as Record<string, DemographicData[]>,
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+  )
+
+  return (
+    <div className="p-4 bg-gray-100 rounded-lg">
+      <div className="flex justify-between items-center mb-4">
+        <h4 className="text-xl font-bold text-gray-800">
+          Dataset Demographic Balance
         </h4>
         <div className="flex items-center gap-2">
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+          <span className="text-sm font-medium text-gray-600">
+            Overall Balance:
+          </span>
+          <span
+            className={`text-lg font-bold px-3 py-1 rounded-full ${
+              overallBalance > 85
+                ? 'bg-green-100 text-green-800'
+                : overallBalance > 70
+                  ? 'bg-yellow-100 text-yellow-800'
                   : 'bg-red-100 text-red-800'
             }`}
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+          >
+            {overallBalance.toFixed(1)}%
+          </span>
+        </div>
+      </div>
+
       <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
         <h5 className="font-medium text-blue-800 mb-2">
           Current Profile Classification

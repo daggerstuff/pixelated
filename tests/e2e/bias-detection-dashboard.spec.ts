@@ -112,7 +112,7 @@ test.describe('Bias Detection Dashboard', () => {
 
       // Verify at least one chart canvas is rendered
       const chartCanvases = page.locator('canvas')
-      await expect(chartCanvases).toHaveCount({ min: 1 })
+      await expect(chartCanvases).toHaveCount(1)
 
       // Verify chart legends and labels
       await expect(page.locator('.recharts-legend')).toBeVisible()
@@ -636,7 +636,7 @@ test.describe('Bias Detection Dashboard', () => {
 
       // Verify headings structure
       const headings = page.locator('h1, h2, h3, h4, h5, h6')
-      await expect(headings).toHaveCount({ min: 1 })
+      await expect(headings).toHaveCount(1)
 
       // Verify form controls have labels
       const formControls = page.locator('input, select, button')
@@ -657,7 +657,7 @@ test.describe('Bias Detection Dashboard', () => {
       }
 
       // Verify live regions for dynamic content
-      await expect(page.locator('[aria-live]')).toHaveCount({ min: 1 })
+      await expect(page.locator('[aria-live]')).toHaveCount(1)
     })
 
     test('high contrast and reduced motion support', async ({ page }) => {

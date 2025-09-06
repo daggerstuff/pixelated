@@ -55,7 +55,7 @@ async function startWorker() {
     // If running under tests with a mocked class, prefer the first mock instance
     const mockedInstances = (AnalyticsService as unknown as { mock?: { instances: AnalyticsService[] } })?.mock?.instances
     if (mockedInstances && mockedInstances.length > 0) {
-      analyticsService = mockedInstances[0]
+      analyticsService = mockedInstances[0]!
     }
 
     // Resolve port dynamically at startup time
@@ -73,7 +73,7 @@ async function startWorker() {
         // Wait for authentication message
         ws.once('message', async (data) => {
           try {
-            const message = JSON.parse(data.toString() as unknown)
+            const message = JSON.parse(data.toString())
             if (message.type === 'authenticate' && message.userId) {
               // Register client for real-time updates
               serviceRef.registerClient(message.userId, ws)
@@ -154,7 +154,7 @@ async function startWorker() {
 }
 
 // Handle shutdown signals
-async function shutdown(signal: string): void {
+async function shutdown(signal: string): Promise<void> {
   logger.info(`Shutting down analytics worker (signal: ${signal})`)
 
   try {

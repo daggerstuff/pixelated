@@ -1,8 +1,8 @@
-import type { AIMessage } from '../../lib/ai/models/types.ts'
-// Import AIService type to make sure our mock is compatible
-import type { AIService } from '../../lib/ai/models/types.ts'
+import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
 
-import { InterventionAnalysisService } from '../../lib/ai/services/intervention-analysis.ts'
+import {
+  InterventionAnalysisService,
+} from '@/lib/ai/services/intervention-analysis'
 
 // Define types for mocked responses
 interface AIServiceResponse {
@@ -352,8 +352,11 @@ describe('interventionAnalysisService', () => {
 
       // Verify the results
       expect(results).toHaveLength(2)
-      expect(results[0].score).toBe(8)
-      expect(results[1].score).toBe(6)
+      const result1 = results[0]
+      const result2 = results[1]
+
+      expect(result1?.effectiveness_score).toBe(8)
+      expect(result2?.effectiveness_score).toBe(6)
 
       // Verify the AI service was called twice
       expect(mockAIService.createChatCompletion).toHaveBeenCalledTimes(2)

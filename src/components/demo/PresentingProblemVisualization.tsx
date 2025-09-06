@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import type { PresentingProblemEvent } from '../../lib/types/psychology-pipeline'
 
 interface PresentingProblemVisualizationProps {
@@ -17,23 +17,21 @@ const PresentingProblemVisualization: FC<
       if (!match) {
         return 0
       }
-      const num = parseInt(match[1])
+      const num = parseInt(match[1], 10)
       const unit = match[2].toLowerCase()
 
-        switch (unit) {
-          case 'year':
-            return num * 365
-          case 'month':
-            return num * 30
-          case 'week':
-            return num * 7
-          case 'day':
-            return num
-          default:
-            return num
-        }
+      switch (unit) {
+        case 'year':
+          return num * 365
+        case 'month':
+          return num * 30
+        case 'week':
+          return num * 7
+        case 'day':
+          return num
+        default:
+          return num
       }
-      return 0
     }
 
     return getTimeValue(b.time) - getTimeValue(a.time) // Reverse chronological

@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC } from 'react'
 import type {
   TrendPattern,
   CrossSessionPattern,
@@ -11,7 +11,9 @@ export interface PatternVisualizationProps {
   riskCorrelations?: RiskCorrelation[]
   className?: string
   showControls?: boolean
-  onPatternSelect?: (pattern: TrendPattern | CrossSessionPattern | RiskCorrelation) => void
+  onPatternSelect?: (
+    pattern: TrendPattern | CrossSessionPattern | RiskCorrelation,
+  ) => void
 }
 
 export const PatternVisualization: FC<PatternVisualizationProps> = ({
@@ -20,8 +22,14 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
   riskCorrelations = [],
   className = '',
   showControls = true,
-  onPatternSelect
+  onPatternSelect,
 }) => {
+  const handleSelect = (
+    pattern: TrendPattern | CrossSessionPattern | RiskCorrelation,
+  ) => {
+    onPatternSelect?.(pattern)
+  }
+
   return (
     <div className={`pattern-visualization ${className}`}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -34,29 +42,60 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                 <button
                   key={trend.id}
                   className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
-              {trends.map((trend: TrendPattern) => (
+                  onClick={() => handleSelect(trend)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleSelect(trend)
                     }
                   }}
                   aria-label={`Select trend pattern: ${trend.description}`}
-              {trends.map((trend: TrendPattern) => (
-                  </div>
+                >
+                  <div className="font-medium">{trend.description}</div>
                   <div className="text-xs text-gray-500">
                     {trend.indicators.join(', ')}
-              {trends.map((trend: TrendPattern) => (
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
             <div className="text-gray-500 text-sm">No trends found</div>
           )}
         </div>
-              {trends.map((trend: TrendPattern) => (
+
+        {/* Cross-Session Patterns Section */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-3">
+            Cross-Session Patterns
+          </h3>
+          {crossSessionPatterns.length > 0 ? (
             <div className="space-y-2">
               {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
                 <button
-              {trends.map((trend: TrendPattern) => (
+                  key={pattern.id}
+                  className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
+                  onClick={() => handleSelect(pattern)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+                      handleSelect(pattern)
+                    }
+                  }}
+                  aria-label={`Select cross-session pattern: ${pattern.description}`}
                 >
-              {trends.map((trend: TrendPattern) => (
+                  <div className="font-medium">{pattern.description}</div>
+                  <div className="text-xs text-gray-500">
+                    Sessions: {pattern.sessionIds.length}, Span: {pattern.timeSpanDays} days
+                  </div>
+                </button>
               ))}
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+            </div>
+          ) : (
+            <div className="text-gray-500 text-sm">
+              No cross-session patterns found
+            </div>
+          )}
+        </div>
 
         {/* Risk Correlations Section */}
         <div className="bg-white p-4 rounded-lg shadow">
@@ -67,30 +106,39 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                 <button
                   key={correlation.id}
                   className="p-2 border rounded cursor-pointer hover:bg-gray-50 text-left w-full"
-                  onClick={() => onPatternSelect?.(correlation)}
+                  onClick={() => handleSelect(correlation)}
                   tabIndex={0}
-                  onKeyDown={e => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                      onPatternSelect?.(correlation)
+                      handleSelect(correlation)
                     }
                   }}
                   aria-label={`Select risk correlation: ${correlation.description}`}
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
-            <div className="text-gray-500 text-sm">No risk correlations found</div>
+                >
+                  <div className="font-medium">{correlation.description}</div>
+                  <div className="text-xs text-gray-500">
+                    Strength: {correlation.strength.toFixed(2)}
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500 text-sm">
+              No risk correlations found
+            </div>
           )}
         </div>
       </div>
 
       {showControls && (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Controls are visible.
+          </p>
+        </div>
+      )}
+    </div>
   )
 }
 
 export default PatternVisualization
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (
-              {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
-              {riskCorrelations.map((correlation: RiskCorrelation) => (

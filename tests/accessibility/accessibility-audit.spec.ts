@@ -83,7 +83,12 @@ test.describe('Accessibility Audit and Compliance', () => {
       // Start from the beginning
       await page.keyboard.press('Tab')
 
-      const interactiveElements = []
+      const interactiveElements: {
+        tagName: string
+        role: string | null
+        ariaLabel: string | null
+        text: string | null
+      }[] = []
       let currentElement = await page.locator(':focus').first()
 
       // Navigate through all tabbable elements
@@ -238,7 +243,7 @@ test.describe('Accessibility Audit and Compliance', () => {
       expect(headingCount).toBeGreaterThan(0)
 
       // Check heading hierarchy
-      const headingLevels = []
+      const headingLevels: { level: number; text: string | null }[] = []
       for (let i = 0; i < headingCount; i++) {
         const heading = headings.nth(i)
         const tagName = await heading.evaluate((el) => el.tagName.toLowerCase())
@@ -254,8 +259,8 @@ test.describe('Accessibility Audit and Compliance', () => {
 
         // Check for proper nesting (no skipping levels)
         for (let i = 1; i < headingLevels.length; i++) {
-          const currentLevel = (headingLevels[i] as any)?.level
-          const previousLevel = (headingLevels[i - 1] as any)?.level
+          const currentLevel = headingLevels[i]?.level
+          const previousLevel = headingLevels[i - 1]?.level
 
           if (currentLevel !== undefined && previousLevel !== undefined) {
             // Should not skip more than one level

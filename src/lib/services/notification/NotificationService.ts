@@ -1,28 +1,16 @@
 import type { WebSocket } from 'ws'
 import { config } from '@/config/env.config'
-import { EmailService } from '@/lib/services/email/EmailService'
+import { EmailService, type EmailConfig } from '@/lib/email'
 import { redis } from '@/lib/redis'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-
-// Add minimal RedisCommands interface for type safety
-interface RedisCommands {
-  lpush(key: string, value: string): Promise<number>
-  rpoplpush(source: string, destination: string): Promise<string | null>
-  lrem(key: string, count: number, value: string): Promise<number>
-  hset(key: string, field: string, value: string): Promise<number>
-  hget(key: string, field: string): Promise<string | null>
-  hgetall(key: string): Promise<Record<string, string> | null>
-  hdel(key: string, field: string): Promise<number>
-  disconnect(): Promise<void>
-}
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
 import { z } from 'zod'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'
 import type { PushSubscription } from './pushUtils'
 import { sendSMS, isValidPhoneNumber } from './smsUtils'
-import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
 
 // Create a logger instance
-const logger = createBuildSafeLogger('NotificationService')
+const logger = createBuildSafeLogger({ prefix: 'NotificationService' })
 
 // Crisis Alert Template ID
 const CRISIS_ALERT_TEMPLATE_ID = 'crisis_alert_v1'
@@ -148,7 +136,10 @@ export interface CrisisAlertContext extends RoutingContext {
   timestamp: string // ISO 8601 timestamp
   textSample: string // A sample of the text that triggered the crisis
   decisionDetails?: Record<string, unknown> // Details from the routing decision
-  // Add other relevant fields like internal user ID, session ID if available and permissible
+  userId: string
+  sessionId: string
+  sessionType: string
+  explicitTaskHint: string
 }
 
 /**
@@ -173,14 +164,20 @@ export class NotificationService {
   private emailService: EmailService
   private wsClients: Map<string, WebSocket>
   private templates: Map<string, NotificationTemplate>
-  private queueKey = 'notification:queue'
-  private processingKey = 'notification:processing'
-  private isProcessing = false
-  private subscriptionKey = 'push:subscriptions'
   private vapidKeys: { publicKey: string; privateKey: string } | null = null
 
   constructor() {
-    this.emailService = new EmailService()
+    const emailConfig: EmailConfig = {
+      provider: 'smtp',
+      fromEmail: config.email.from(),
+      fromName: 'Pixelated Empathy',
+      smtpHost: process.env['SMTP_HOST'],
+      smtpPort: Number.parseInt(process.env['SMTP_PORT'] || '587'),
+      smtpUser: process.env['SMTP_USER'],
+      smtpPassword: process.env['SMTP_PASSWORD'],
+      apiKey: process.env['EMAIL_API_KEY'],
+    }
+    this.emailService = new EmailService(emailConfig)
     this.wsClients = new Map()
     this.templates = new Map()
     this.initializeVAPIDKeys()
@@ -468,24 +465,6 @@ export class NotificationService {
   }
 
   /**
-   * Start queue processing
-   */
-  async startProcessing(interval = 1000): Promise<void> {
-    this.isProcessing = true
-    while (this.isProcessing) {
-      await this.processQueue()
-      await new Promise((resolve) => setTimeout(resolve, interval))
-    }
-  }
-
-  /**
-   * Stop queue processing
-   */
-  stopProcessing() {
-    this.isProcessing = false
-  }
-
-  /**
    * Deliver notification via WebSocket
    */
   private async deliverInApp(notification: NotificationItem): Promise<void> {
@@ -626,7 +605,9 @@ export class NotificationService {
    */
   async sendCrisisAlert(alertContext: CrisisAlertContext): Promise<void> {
     logger.warn('Dispatching crisis alert via NotificationService:', {
-      alertContext,
+      userId: alertContext.userId,
+      sessionId: alertContext.sessionId,
+      timestamp: alertContext.timestamp,
     })
 
     const {
@@ -644,7 +625,7 @@ export class NotificationService {
       // Or, if it's about a specific user, use their ID for context, but the notification itself goes to admins.
       // For this implementation, let's assume the template handles targeting admins.
       // If no specific admin user ID, we rely on the template's channel configuration (e.g., admin email).
-      userId: 'system_crisis_monitoring', // A placeholder user ID for system-generated alerts
+      userId: userId || 'system_crisis_monitoring', // Use provided userId or fallback
       templateId: CRISIS_ALERT_TEMPLATE_ID,
       data: {
         userId: userId || 'N/A',

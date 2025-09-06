@@ -1,4 +1,4 @@
-import { useState, useCallback, ChangeEvent } from 'react'
+import { useState, useCallback } from 'react'
 import { useChat, UseChatReturn } from './useChat'
 import { useMemory, UseMemoryReturn } from './useMemory'
 
@@ -11,24 +11,6 @@ export interface ChatWithMemoryOptions {
   maxMemoryContext?: number
 }
 
-<<<<<<< HEAD
-export function useChatWithMemory(options: ChatWithMemoryOptions = {}): void {
-  const { initialMessages = [] } = options
-  const [isLoading, setIsLoading] = useState(false)
-
-  const chat = useChat({ initialMessages })
-  const memory = useMemory()
-
-  const sendMessageWithMemory = useCallback(async (message: string) => {
-    setIsLoading(true)
-    try {
-      // Store message in memory
-      await memory.addMemory({
-        content: message,
-        type: 'user_message',
-        metadata: { timestamp: new Date().toISOString() }
-      })
-=======
 export type UseChatWithMemoryReturn = UseChatReturn & {
   memory: UseMemoryReturn
   sendMessage: (message: string) => Promise<string | undefined>
@@ -46,9 +28,8 @@ export function useChatWithMemory(
     category: 'conversation',
     autoLoad: true,
   })
->>>>>>> 243f975 (Fix numerous TypeScript errors across the codebase)
 
-  const sendMessageWithMemory = useCallback(
+  const sendMessage = useCallback(
     async (message: string) => {
       setIsLoading(true)
       try {
@@ -62,9 +43,12 @@ export function useChatWithMemory(
           )
         }
 
-        const response = await chat.handleSubmit({
+        // This is a bit of a hack to get the form submission to work
+        // without a form event.
+        const fakeEvent = {
           preventDefault: () => {},
-        } as unknown as React.FormEvent)
+        } as unknown as React.FormEvent<HTMLFormElement>
+        await chat.handleSubmit(fakeEvent)
 
         const lastMessage = chat.messages[chat.messages.length - 1]
         const responseContent = lastMessage?.content
@@ -83,33 +67,14 @@ export function useChatWithMemory(
       } finally {
         setIsLoading(false)
       }
-<<<<<<< HEAD
-
-      return response
-    } finally {
-      setIsLoading(false)
-    }
-  }, [chat, memory])
-
-      return response
-    } finally {
-      setIsLoading(false)
-    }
-  }, [chat, memory])
-=======
     },
     [chat, memory, options.enableMemory, sessionId],
   )
->>>>>>> 243f975 (Fix numerous TypeScript errors across the codebase)
 
   return {
     ...chat,
-    sendMessage: sendMessageWithMemory,
+    sendMessage,
     isLoading: isLoading || chat.isLoading,
-<<<<<<< HEAD
-    memory
-=======
     memory,
->>>>>>> 243f975 (Fix numerous TypeScript errors across the codebase)
   }
 }

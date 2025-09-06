@@ -1,3 +1,4 @@
+/* jshint esversion: 6 */
 // Minimal Node.js app for pixelated-app
 const express = require('express');
 const app = express();

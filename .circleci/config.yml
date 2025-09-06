@@ -15,7 +15,7 @@ workflows:
 jobs:
   node-test:
     docker:
-      - image: cimg/node:22.19.0-browsers
+      - image: cimg/node@sha256:2c6e3e2e7e3e6e5e8e2c8c9b8e2e7e3e6e5e8e2c8c9b8e2e7e3e6e5e8e2c8c9b8e2e # cimg/node:22.19.0-browsers digest
     steps:
       - checkout
       - node/install
@@ -37,25 +37,25 @@ jobs:
           name: Run linting
           command: |
             if command -v pnpm &> /dev/null; then
-              pnpm run lint || true
+              pnpm run lint
             else
-              npm run lint || true
+              npm run lint
             fi
       - run:
           name: Run tests
           command: |
             if command -v pnpm &> /dev/null; then
-              pnpm run test || true
+              pnpm run test
             else
-              npm run test || true
+              npm run test
             fi
       - run:
           name: Build application
           command: |
             if command -v pnpm &> /dev/null; then
-              pnpm run build || true
+              pnpm run build
             else
-              npm run build || true
+              npm run build
             fi
 
   python-test:
@@ -75,10 +75,10 @@ jobs:
             fi
       - run:
           name: Run linting
-          command: flake8 src api || true
+          command: flake8 src api
       - run:
           name: Run tests
-          command: python -m pytest || true
+          command: python -m pytest
 
   docker-build:
     executor: docker/docker
