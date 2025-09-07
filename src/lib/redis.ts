@@ -55,9 +55,8 @@ function createMockRedisClient() {
  */
 function createRedisClient() {
   const { restUrl, restToken } = getRedisConfig()
-  const hasValidCredentials = Boolean(restUrl && restToken)
 
-  if (hasValidCredentials) {
+  if (restUrl) {
     // Initialize ioredis client with credentials
     return new Redis(restUrl, {
       password: restToken,

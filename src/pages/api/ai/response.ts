@@ -1,20 +1,16 @@
-import type { APIRoute } from 'astro'
-import type {
-  AIMessage,
-  AIService,
-  AIServiceOptions,
-  AIStreamChunk,
-  TherapeuticResponse,
-} from '../../../lib/ai/models/ai-types.js'
-import { ResponseGenerationService } from '../../../lib/ai/services/response-generation.js'
-import { createTogetherAIService } from '../../../lib/ai/services/together.js'
+import type { APIContext } from 'astro'
+import {
+  createStreamingAIResponse,
+  createJsonAIResponse,
+} from '../../../lib/ai/streaming.js'
+import { getApiEndpointLogger } from '@/lib/logging/standardized-logger'
 import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
 } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session'
-import { aiRepository } from '../../../lib/db/ai/index.js'
+import { aiRepository } from '@/lib/db/ai'
 
 /**
  * GET handler - returns information about the AI response endpoint
@@ -84,7 +80,11 @@ export const GET: APIRoute = async ({ request }) => {
 /**
  * API route for therapeutic response generation
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: (context: APIContext) => Promise<Response> = async ({
+  request,
+}) => {
+  const logger = getApiEndpointLogger('/api/ai/response')
+
   let session: Awaited<ReturnType<typeof getSession>> | null = null
 
   try {

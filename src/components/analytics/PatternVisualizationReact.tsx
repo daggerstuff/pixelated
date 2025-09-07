@@ -1,9 +1,27 @@
 import type { FC } from 'react'
-import type {
-  TrendPattern,
-  CrossSessionPattern,
-  RiskCorrelation,
-} from '@/lib/fhe/pattern-recognition'
+/**
+ * TEMP LOCAL PATCH: Placeholder types for TrendPattern, CrossSessionPattern, RiskCorrelation.
+ * Remove when project types module is restored.
+ */
+export interface TrendPattern {
+  id: string;
+  description: string;
+  indicators: string[];
+}
+
+export interface CrossSessionPattern {
+  id: string;
+  description: string;
+  sessionIds: string[];
+  timeSpanDays: number;
+}
+
+export interface RiskCorrelation {
+  id: string;
+  description: string;
+  strength: number;
+}
+
 
 export interface PatternVisualizationProps {
   trends?: TrendPattern[]

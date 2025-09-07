@@ -1,0 +1,3 @@
+from typing import Any
+
+def load_dataset(name: str, *args: Any, **kwargs: Any) -> Any: ...

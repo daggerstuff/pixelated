@@ -4,7 +4,7 @@
  * Provides authentication and permission checks for admin routes.
  */
 
-import type { APIContext } from 'astro'
+import type { BaseAPIContext } from '../auth/apiRouteTypes'
 import type { AdminPermission } from './index'
 import { AdminService } from './index'
 
@@ -23,7 +23,7 @@ declare module 'astro' {
  * Verify that the request is from an authenticated admin user
  */
 export async function verifyAdmin(
-  context: APIContext,
+  context: BaseAPIContext,
   requiredPermission?: AdminPermission,
 ): Promise<{
   userId: string
@@ -74,8 +74,8 @@ export async function verifyAdmin(
  * Admin middleware factory
  * Returns a middleware function that checks for admin status and required permission
  */
-export function adminGuard(requiredPermission?: AdminPermission): void {
-  return async (context: APIContext) => {
+export function adminGuard(requiredPermission?: AdminPermission) {
+  return async (context: BaseAPIContext, next: () => Promise<Response>) => {
     const admin = await verifyAdmin(context, requiredPermission)
 
     if (!admin) {
@@ -97,8 +97,8 @@ export function adminGuard(requiredPermission?: AdminPermission): void {
 
     // Continue with the request
     // Apply the admin context to the request for use in the route handler
-    ;(context.locals as unknown as import('astro').Locals).admin = admin
+    context.locals.admin = admin
 
-    return null // Allow the request to proceed
+    return next()
   }
 }

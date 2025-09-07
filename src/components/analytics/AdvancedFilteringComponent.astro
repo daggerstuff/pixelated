@@ -475,7 +475,7 @@ const {
     // Tab switching
     tabButtons.forEach((button) => {
       if (button instanceof HTMLElement) {
-        button.addEventListener('click', (_event: MouseEvent) => {
+        button.addEventListener('click', (_event) => {
           const tab = button.getAttribute('data-tab')
     
           // Update active tab button
@@ -550,13 +550,13 @@ const {
 
     // Date inputs
     if (startDateInput instanceof HTMLInputElement) {
-      startDateInput.addEventListener('change', (_event: Event) => {
+      startDateInput.addEventListener('change', (_event) => {
         options.timeRange.startDate = startDateInput.valueAsDate ?? undefined
       })
     }
 
     if (endDateInput instanceof HTMLInputElement) {
-      endDateInput.addEventListener('change', (_event: Event) => {
+      endDateInput.addEventListener('change', (_event) => {
         options.timeRange.endDate = endDateInput.valueAsDate ?? undefined
       })
     }
@@ -745,7 +745,7 @@ const {
 
     // Reset button
     if (resetButton) {
-      resetButton.addEventListener('click', (_event: Event) => {
+      resetButton.addEventListener('click', (_event) => {
         // Reset the options object with proper types
         options.timeRange = { presetRange: undefined, startDate: undefined, endDate: undefined }
         options.emotions = { 
@@ -775,7 +775,7 @@ const {
 
     // Apply button
     if (applyButton) {
-      applyButton.addEventListener('click', (_event: Event) => {
+      applyButton.addEventListener('click', (_event) => {
         dispatchApplyEvent()
       })
     }

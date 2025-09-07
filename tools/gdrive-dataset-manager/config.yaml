@@ -1,0 +1,52 @@
+google_drive:
+  # Your Google Drive folder ID where datasets are stored
+  folder_id: "YOUR_GOOGLE_DRIVE_FOLDER_ID"
+  
+  # Path to your Google API credentials JSON file
+  credentials_file: "credentials.json"
+  
+  # Application name for Google API
+  application_name: "Pixelated Dataset Manager"
+
+local:
+  # Local path to datasets directory
+  datasets_path: "../../ai/datasets"
+  
+  # Local path to processed data directory
+  processed_path: "../../ai/data/processed"
+  
+  # Temporary download directory
+  temp_path: "./temp"
+
+download:
+  # Chunk size for downloads (in bytes)
+  chunk_size: 1048576  # 1MB
+  
+  # Maximum retries for failed downloads
+  max_retries: 3
+  
+  # Timeout for download operations (seconds)
+  timeout: 300
+
+upload:
+  # Chunk size for uploads (in bytes)
+  chunk_size: 1048576  # 1MB
+  
+  # Maximum file size for upload (in bytes)
+  max_file_size: 10737418240  # 10GB
+  
+  # Compress datasets before upload
+  compress: true
+
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
+  
+  # Log file path
+  file: "gdrive_manager.log"
+  
+  # Max log file size (bytes)
+  max_file_size: 10485760  # 10MB
+  
+  # Number of backup log files
+  backup_count: 5

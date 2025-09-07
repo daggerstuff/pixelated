@@ -12,7 +12,7 @@ interface UseMemoryOptions {
   category?: string
 }
 
-interface UseMemoryReturn {
+export interface UseMemoryReturn {
   memories: MemoryEntry[]
   isLoading: boolean
   error: string | null
@@ -43,19 +43,7 @@ interface UseMemoryReturn {
   // Memory management
   clearMemories: () => void
   getMemoryHistory: () => Promise<MemoryHistoryItem[]>
-}
-
-// Define a type for memory history items
-interface MemoryHistoryItem {
-  id: string
-  timestamp: string
-  operation: string
-  memoryId: string
-  content?: string
-  metadata?: Record<string, unknown>
-}
-
-export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
+} {
   const { userId = 'default', autoLoad = true, category } = options
 
   const [memories, setMemories] = useState<MemoryEntry[]>([])
