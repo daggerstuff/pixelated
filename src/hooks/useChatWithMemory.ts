@@ -1,9 +1,10 @@
+import type { Message } from '@/types/chat'
 import { useState, useCallback } from 'react'
-import { useChat, UseChatReturn } from './useChat'
-import { useMemory, UseMemoryReturn } from './useMemory'
+import { useChat, type UseChatReturn } from './useChat'
+import { useMemory, type UseMemoryReturn } from './useMemory'
 
 export interface ChatWithMemoryOptions {
-  initialMessages?: Array<{ role: 'user' | 'assistant'; content: string }>
+  initialMessages?: Message[]
   memoryKey?: string
   sessionId?: string
   enableMemory?: boolean

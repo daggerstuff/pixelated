@@ -1,12 +1,16 @@
 // import type { APIRoute, APIContext } from 'astro'
 import type { AIMessage } from '../../../lib/ai/models/ai-types.js'
 // Import the type expected by InterventionAnalysisService
-import type { AIService } from '../../../lib/ai/models/types.js'
 import { InterventionAnalysisService } from '../../../lib/ai/services/intervention-analysis'
 import { createTogetherAIService } from '../../../lib/ai/services/together'
 import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
-import { aiRepository } from '../../../lib/db/ai/index.js'
+import { aiRepository } from '@/lib/db/ai'
+import { AIService } from '@/lib/ai/models/ai-types'
+
+/**
+ * @typedef {import('astro').APIContext} APIContext
+ */
 
 /**
  * API route for intervention effectiveness analysis

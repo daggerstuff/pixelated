@@ -1,351 +1,335 @@
-# Pixelated Empathy - Development Guidelines
+# Pixelated - AI-Powered Mental Health & Empathy Platform
 
-*Last updated: 2025-07-29*
+**Pixelated** is a comprehensive full-stack Astro application focused on AI-powered mental health support, empathy training, and bias detection. The platform combines modern web technologies with advanced AI capabilities to deliver ethical, secure, and accessible mental health solutions.
 
-This document provides comprehensive development guidelines for the Pixelated Empathy project, covering build processes, testing infrastructure, and code style conventions.
+## 🎯 Project Overview
 
-## Project Overview
+- **Type**: Full-stack web application built with Astro + React
+- **Primary Purpose**: AI-powered mental health platform with bias detection and empathy training
+- **Target**: Mental health professionals, researchers, and end-users seeking support
+- **Architecture**: Server-side rendered (SSR) with standalone Node.js adapter
+- **Database**: MongoDB with Redis caching
+- **AI Integration**: Multiple AI services including OpenAI, Google GenAI, and custom models
+- **Security**: HIPAA-compliant with FHE (Fully Homomorphic Encryption) support
 
-Pixelated Empathy is a complex full-stack application combining:
-- **Frontend**: Astro framework with TypeScript/React components
-- **AI/ML Backend**: Python-based bias detection and mental health processing
-- **Data Pipeline**: Comprehensive dataset processing for mental health AI training
-- **Deployment**: Multi-environment setup with Docker and Azure pipelines
+## 🏗️ Architecture & Stack
 
-## Build & Configuration Instructions
+### Frontend
+- **Framework**: Astro 5.x with React 19 integration
+- **Styling**: TailwindCSS 4.x + UnoCSS for utility-first CSS
+- **UI Components**: Headless UI + Radix UI primitives
+- **Icons**: Lucide React + Iconify collections
+- **3D Graphics**: Three.js + React Three Fiber
+- **Charts**: Chart.js + Recharts for data visualization
 
-### Prerequisites
+### Backend & Services
+- **Runtime**: Node.js 24 with TypeScript
+- **Database**: MongoDB with Mongoose ODM
+- **Caching**: Redis (ioredis) for session and performance caching  
+- **Authentication**: Clerk for user management and auth
+- **File Storage**: AWS S3, Google Cloud Storage, Azure Blob
+- **AI Services**: OpenAI GPT, Google GenAI, custom TensorFlow models
+- **Security**: bcryptjs, jsonwebtoken, rate limiting
 
-- **Node.js**: Version 22 (specified in package.json engines)
-- **Python**: Version 3.11+ (specified in pyproject.toml)
-- **Package Manager**: pnpm  (specified in package.json packageManager)
-- **Docker**: For containerized deployment
+### DevOps & Tools
+- **Package Manager**: pnpm with Node 24
+- **Build Tool**: Vite 7.x with enhanced configurations
+- **Testing**: Vitest (unit), Playwright (E2E), Axe (accessibility)
+- **Linting**: ESLint 9.x + oxlint for fast linting
+- **Formatting**: Prettier with Astro plugin
+- **CI/CD**: GitHub Actions + deployment scripts
+- **Monitoring**: Sentry for error tracking and performance
 
-### Environment Setup
+## 📁 Project Structure
 
-1. **Install Dependencies**:
-   ```bash
-   # Install Node.js dependencies
-   pnpm install
-   
-   # Install Python dependencies (using uv for faster installs)
-   uv pip install -e .
-   ```
-
-2. **Development Server**:
-   ```bash
-   # Start Astro development server
-   pnpm dev
-   
-   # Start all services (includes AI services, analytics, worker)
-   pnpm dev:all-services
-   ```
-
-3. **Build Process**:
-   ```bash
-   # Standard build
-   pnpm build
-   
-   # Vercel-optimized build (with increased memory)
-   pnpm build:vercel
-   
-   # Docker build
-   pnpm docker:build
-   ```
-
-### Key Configuration Files
-
-- **package.json**: Node.js dependencies and scripts
-- **pyproject.toml**: Python dependencies and tool configurations
-- **astro.config.mjs**: Astro framework configuration
-- **Dockerfile**: Multi-stage container build with security best practices
-- **azure-pipelines.yml**: CI/CD pipeline with Qodana code quality checks
-
-### Docker Configuration
-
-The project uses a multi-stage Docker build:
-- **Base**: Node.js 22 slim with pnpm and system dependencies
-- **Build Stage**: Installs dependencies and builds the application
-- **Runtime**: Optimized production image with non-root user
-- **Health Check**: Built-in endpoint monitoring on port 4321
-
-## Testing Infrastructure
-
-### Test Types & Frameworks
-
-1. **Unit Tests (Vitest)**:
-   - **Framework**: Vitest with jsdom environment
-   - **Coverage**: V8 provider with multiple reporters
-   - **Configuration**: `vitest.config.ts`
-   - **Run**: `pnpm test` or `pnpm test:unit`
-
-2. **End-to-End Tests (Playwright)**:
-   - **Browsers**: Chromium, Firefox, WebKit
-   - **Configuration**: `playwright.config.ts`
-   - **Run**: `pnpm e2e` or `pnpm test:e2e`
-
-3. **Python Tests (pytest)**:
-   - **Framework**: pytest with asyncio support
-   - **Location**: AI/ML components in `src/lib/ai/`
-   - **Run**: `python -m pytest`
-
-### Test Configuration Details
-
-#### Vitest Setup
-- **Environment**: jsdom for DOM testing
-- **Setup Files**: `./src/test/setup.ts`, `./vitest.setup.ts`
-- **Coverage**: Enabled with text, json, html, cobertura reporters
-- **CI Optimization**: Different timeouts and thread pools for CI vs local
-- **Exclusions**: E2E, browser, accessibility, performance tests excluded from unit tests
-
-#### Playwright Setup
-- **Base URL**: http://localhost:4321
-- **Auto Server**: Starts dev server automatically
-- **Debugging**: Trace on first retry, screenshots on failure
-- **CI Settings**: 2 retries, single worker in CI environment
-
-#### Python Testing
-- **Patterns**: Both unittest and pytest styles supported
-- **Location**: Tests in `src/lib/ai/bias-detection/python-service/`
-- **Coverage**: Configured in pyproject.toml with branch coverage
-
-### Running Tests
-
-```bash
-# JavaScript/TypeScript unit tests
-pnpm test                           # Watch mode
-pnpm test:unit                      # Run once with coverage
-pnpm vitest run src/test-demo.test.ts  # Specific file
-
-# End-to-end tests
-pnpm e2e                           # All E2E tests
-pnpm e2e:smoke                     # Smoke tests only
-pnpm e2e:ui                        # Interactive UI mode
-
-# Python tests
-python -m pytest test_demo.py -v   # Verbose output
-python -m pytest --cov=src         # With coverage
-
-# All tests
-pnpm test:all                      # Comprehensive test suite
-```
-
-### Test Examples
-
-#### JavaScript/TypeScript Test Pattern
-```typescript
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-
-describe('Component Tests', () => {
-  beforeEach(() => {
-    // Setup code
-  })
-
-  it('should test functionality', () => {
-    expect(result).toBe(expected)
-  })
-
-  it('should handle async operations', async () => {
-    vi.useFakeTimers()
-    const promise = asyncFunction()
-    vi.advanceTimersByTime(100)
-    const result = await promise
-    expect(result).toBeDefined()
-    vi.useRealTimers()
-  })
-})
-```
-
-#### Python Test Pattern
-```python
-import pytest
-import unittest
-from unittest.mock import MagicMock, patch
-
-class TestComponent(unittest.TestCase):
-    def setUp(self):
-        self.test_data = {"key": "value"}
-    
-    def test_functionality(self):
-        self.assertEqual(result, expected)
-    
-    @patch('module.dependency')
-    def test_with_mock(self, mock_dep):
-        mock_dep.return_value = "mocked"
-        result = function_under_test()
-        self.assertEqual(result, "expected")
-
-def test_pytest_style():
-    assert result == expected
-```
-
-## Code Style & Development Practices
-
-### JavaScript/TypeScript Standards
-
-#### ESLint Configuration
-- **Config**: Modern flat config format in `eslint.config.js`
-- **Rules**: TypeScript recommended + React rules
-- **Multi-language**: Supports JS, TS, JSX, JSON, Markdown, CSS
-- **Key Rules**:
-  - No unused variables (with underscore prefix exception)
-  - React JSX without React imports
-  - TypeScript-aware linting
-
-#### Prettier Configuration
-- **Line Width**: 80 characters
-- **Indentation**: 2 spaces (no tabs)
-- **Quotes**: Single quotes for JS/TS, double for JSX
-- **Semicolons**: Disabled
-- **Trailing Commas**: Always
-- **Special Handling**: Astro files with prettier-plugin-astro
-
-#### Code Formatting Commands
-```bash
-# Format all files
-pnpm format
-
-# Check formatting without changes
-pnpm format:check
-
-# Lint and fix issues
-pnpm lint:fix
-
-# Type checking
-pnpm typecheck
-
-# All quality checks
-pnpm check:all
-```
-
-### Python Standards
-
-#### Tool Configuration (pyproject.toml)
-- **Black**: Line length 100, Python 3.11 target
-- **Ruff**: Comprehensive rule set with line length 100
-- **MyPy**: Type checking with ignore missing imports
-- **PyRight**: Basic type checking mode
-
-#### Key Python Rules
-- **Line Length**: 100 characters
-- **Import Sorting**: First-party modules (ai, src, api)
-- **Type Checking**: Enabled for src, tests, ai, api directories
-- **Coverage**: Branch coverage enabled
-
-### File Organization
-
-#### Directory Structure
 ```
 pixelated/
-├── src/                    # Frontend source code
-│   ├── components/         # Astro/React components
-│   ├── lib/               # Utility libraries
-│   │   └── ai/            # AI/ML components
-│   └── test/              # Test utilities
-├── ai/                    # AI/ML pipeline code
-│   └── dataset_pipeline/  # Dataset processing scripts
-├── tests/                 # Test files
-│   ├── e2e/              # End-to-end tests
-│   ├── integration/      # Integration tests
-│   └── accessibility/    # Accessibility tests
-├── infra/                # Infrastructure code
-└── docs/                 # Documentation
+├── src/
+│   ├── components/          # React/Astro components
+│   │   ├── admin/          # Admin dashboard components
+│   │   ├── ai/             # AI-related UI components
+│   │   ├── auth/           # Authentication components  
+│   │   ├── chat/           # Chat interface components
+│   │   └── mental-health/  # Mental health specific UI
+│   ├── lib/                # Core business logic
+│   │   ├── ai/             # AI services and models
+│   │   ├── auth.ts         # Authentication utilities
+│   │   ├── redis.ts        # Redis connection and utilities
+│   │   ├── security.ts     # Security and encryption
+│   │   └── memory.ts       # Memory management
+│   ├── pages/              # Astro pages (file-based routing)
+│   │   ├── admin/          # Admin dashboard pages
+│   │   ├── api/            # API endpoints
+│   │   └── docs/           # Documentation pages
+│   └── layouts/            # Page layouts
+├── scripts/                # Build and utility scripts
+├── tests/                  # Test suites
+├── .claude/                # Claude AI configuration
+├── .clinerules/            # Code guidelines and rules
+└── docker-compose.yml      # Development environment
 ```
 
-#### Naming Conventions
-- **Files**: kebab-case for components, camelCase for utilities
-- **Components**: PascalCase for React/Astro components
-- **Variables**: camelCase for JavaScript, snake_case for Python
-- **Constants**: UPPER_SNAKE_CASE
-- **Types/Interfaces**: PascalCase with descriptive names
+## 🚀 Development Workflow
 
-### Git Workflow
+### Essential Commands
 
-#### Commit Standards
-- Use conventional commits format
-- Include type prefixes: feat, fix, docs, style, refactor, test, chore
-- Keep commits atomic and descriptive
-
-#### Branch Strategy
-- **main**: Production-ready code
-- **develop**: Integration branch
-- **feature/***: Feature development
-- **hotfix/***: Critical fixes
-
-### Development Tools
-
-#### Recommended VS Code Extensions
-- Astro (astro-build.astro-vscode)
-- Prettier (esbenp.prettier-vscode)
-- ESLint (dbaeumer.vscode-eslint)
-- Python (ms-python.python)
-- TypeScript (ms-vscode.vscode-typescript-next)
-
-#### IDE Configuration
-- Enable format on save
-- Configure ESLint and Prettier integration
-- Set up Python type checking with PyRight/MyPy
-
-### Performance Considerations
-
-#### Build Optimization
-- Use `pnpm build:vercel` for memory-intensive builds
-- Docker multi-stage builds for production
-- Asset optimization through Astro's build process
-
-#### Development Performance
-- Use `pnpm dev:all-services` only when needed
-- File watcher limits may require system configuration
-- Consider using `vitest run` instead of watch mode for large test suites
-
-### Security Practices
-
-#### Code Security
-- Regular dependency updates via `pnpm update`
-- Security scanning with `pnpm security:scan`
-- Credential sanitization scripts available
-- Docker runs with non-root user
-
-#### AI/ML Security
-- Bias detection service with audit logging
-- Encrypted session data handling
-- JWT token verification
-- HIPAA compliance testing available
-
-### Deployment
-
-#### Environment Configuration
-- **Development**: `pnpm dev`
-- **Staging**: `pnpm deploy`
-- **Production**: `pnpm deploy:prod`
-- **Vercel**: `pnpm deploy:vercel`
-
-#### CI/CD Pipeline
-- Azure DevOps with multi-stage pipeline
-- Qodana code quality checks
-- Automated testing and deployment
-- Container registry integration
-
-### Troubleshooting
-
-#### Common Issues
-1. **File Watcher Limits**: Use `vitest run` instead of watch mode
-2. **Memory Issues**: Use `pnpm build:vercel` for large builds
-3. **Python Dependencies**: Ensure Python 3.11+ and proper virtual environment
-4. **Docker Issues**: Check port 4321 availability and Docker daemon
-
-#### Debug Commands
 ```bash
-# Test specific services
-pnpm ai:test
-pnpm redis:check
-pnpm memory:test
+# Development server
+pnpm dev                    # Start dev server on http://localhost:4321
 
-# Performance testing
-pnpm performance:test
+# Build & Preview
+pnpm build                  # Production build
+pnpm preview               # Preview production build
 
-# Security checks
-pnpm security:check
+# Code Quality
+pnpm lint                  # Run oxlint on src/
+pnpm lint:fix              # Auto-fix linting issues
+pnpm format                # Format with prettier
+pnpm typecheck             # TypeScript type checking
+
+# Testing
+pnpm test                  # Run Vitest unit tests
+pnpm test:coverage         # Run tests with coverage
+pnpm e2e                   # Run Playwright E2E tests
+pnpm e2e:ui                # Playwright UI mode
+pnpm test:all              # Run all test suites
+
+# Specialized Commands
+pnpm ai:test               # Test AI services
+pnpm bias:py               # Run bias detection Python service
+pnpm security:scan         # Run security vulnerability scan
+pnpm performance:test      # Performance benchmarking
 ```
 
-This document should be updated as the project evolves and new practices are established.
+### Database & Services
+
+```bash
+# MongoDB operations
+pnpm mongodb:init          # Initialize MongoDB setup
+pnpm mongodb:seed          # Seed development data
+pnpm mongodb:migrate       # Run database migrations
+
+# Redis operations
+pnpm redis:check           # Check Redis connection health
+
+# Service management
+pnpm dev:all-services      # Start all services concurrently
+pnpm dev:bias-detection    # Start bias detection service
+pnpm dev:ai-service        # Start AI service server
+pnpm dev:analytics         # Start analytics server
+```
+
+### Docker Development
+
+```bash
+# Container management
+pnpm docker:up             # Start all services with docker-compose
+pnpm docker:down           # Stop all containers  
+pnpm docker:logs           # View container logs
+pnpm docker:restart        # Restart services
+pnpm docker:reset          # Reset development environment
+pnpm setup:dev             # Initial development setup
+```
+
+## 🔧 Configuration Files
+
+### Key Configuration Files
+- `astro.config.mjs` - Main Astro configuration with SSR setup
+- `package.json` - Dependencies and scripts
+- `tsconfig.json` - TypeScript configuration  
+- `tailwind.config.js` - TailwindCSS configuration
+- `uno.config.ts` - UnoCSS utility configuration
+- `playwright.config.ts` - E2E testing configuration
+- `vitest.config.ts` - Unit testing configuration
+- `.eslintrc.js` - ESLint rules and plugins
+
+### Environment Variables
+```bash
+# Core Application
+PUBLIC_SITE_URL=https://pixelatedempathy.com
+NODE_ENV=development
+WEBSITES_PORT=4321
+
+# Database & Cache  
+MONGODB_URI=mongodb://localhost:27017/pixelated
+REDIS_URL=redis://localhost:6379
+
+# Authentication (Clerk)
+CLERK_SECRET_KEY=sk_live_...
+PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...
+
+# AI Services
+OPENAI_API_KEY=sk-...
+GOOGLE_AI_API_KEY=...
+HUGGINGFACE_TOKEN=hf_...
+
+# Storage Providers
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=us-east-1
+GOOGLE_CLOUD_PROJECT=...
+
+# Monitoring & Analytics
+SENTRY_DSN=https://...
+SENTRY_AUTH_TOKEN=...
+WANDB_API_KEY=...
+```
+
+## 🧪 Testing Strategy
+
+### Test Structure
+- **Unit Tests**: `src/**/*.test.ts` using Vitest
+- **Integration Tests**: `tests/integration/` for API and service testing
+- **E2E Tests**: `tests/e2e/` using Playwright
+- **Performance Tests**: `tests/performance/` for load testing
+- **Security Tests**: `scripts/security-scan.sh` for vulnerability scanning
+
+### Testing Commands
+```bash
+pnpm test:unit             # Unit tests with coverage
+pnpm test:integration      # Integration test suite
+pnpm e2e:smoke             # Smoke tests for critical paths
+pnpm e2e:browser           # Cross-browser compatibility tests
+pnpm test:security         # Security vulnerability tests
+pnpm test:bias-detection   # AI bias detection tests
+pnpm test:performance      # K6 performance testing
+```
+
+## 🔒 Security & Compliance
+
+### Security Features
+- **HIPAA Compliance**: Healthcare data protection standards
+- **FHE Support**: Fully Homomorphic Encryption for sensitive data
+- **Rate Limiting**: API protection with rate-limiter-flexible
+- **Input Sanitization**: HTML sanitization with sanitize-html
+- **Credential Management**: Automated credential scanning and cleanup
+- **Audit Logging**: Comprehensive audit trail for all operations
+
+### Security Commands
+```bash
+pnpm security:check       # Check for exposed credentials
+pnpm security:fix         # Sanitize and fix security issues
+pnpm security:sanitize-logs # Clean build logs of sensitive data
+```
+
+## 🤖 AI & Machine Learning
+
+### AI Capabilities
+- **Multi-Model Support**: OpenAI GPT, Google GenAI, local TensorFlow models
+- **Bias Detection**: Python-based bias detection service with ML pipeline
+- **Mental Health Analysis**: Specialized models for mental health insights
+- **Dialogue Generation**: Automated conversation and training dialogue creation
+- **Performance Monitoring**: Real-time AI model performance tracking
+
+### AI-Specific Commands
+```bash
+pnpm initialize-models     # Initialize cognitive AI models
+pnpm generate-dialogues    # Generate training dialogues
+pnpm batch-generate-dialogues # Batch dialogue generation
+pnpm validate-dialogues    # Validate dialogue quality
+pnpm dialogue-pipeline     # Run full dialogue processing pipeline
+pnpm test:performance      # Load test bias detection service
+```
+
+## 📊 Analytics & Monitoring
+
+### Monitoring Stack
+- **Error Tracking**: Sentry for real-time error monitoring
+- **Performance**: Built-in Astro performance monitoring
+- **Analytics**: Custom analytics service with privacy focus
+- **Health Checks**: Automated service health monitoring
+- **Audit Logs**: Comprehensive logging for compliance
+
+### Performance Tools
+```bash
+pnpm performance:lighthouse # Generate Lighthouse reports
+pnpm performance:audit     # Automated performance auditing
+pnpm build:analyze         # Bundle size analysis
+pnpm analyze:bundle        # Detailed bundle analysis
+pnpm benchmark             # Performance benchmarking
+```
+
+## 🚢 Deployment
+
+### Deployment Targets
+- **Staging**: `pnpm deploy` - Deploy to staging environment
+- **Production**: `pnpm deploy:prod` - Deploy to production
+- **Vercel**: `pnpm deploy:vercel` - Deploy to Vercel platform
+- **Enhanced Deploy**: Enhanced deployment with rollback support
+
+### Deployment Commands
+```bash
+pnpm deploy                # Deploy to staging
+pnpm deploy:prod          # Deploy to production  
+pnpm deploy:enhanced      # Enhanced deployment to staging
+pnpm rollback             # Rollback staging deployment
+pnpm rollback:prod        # Rollback production deployment
+```
+
+## 📝 Content Management
+
+### Blog & Documentation
+```bash
+pnpm blog                 # Start blog management interface
+pnpm blog-publisher       # Publish blog posts
+pnpm schedule-posts       # Schedule blog post publishing
+```
+
+### Version & Tag Management
+```bash
+pnpm version:release      # Create new version release
+pnpm version:info         # Display version information
+pnpm tags:create          # Create content tags
+pnpm tags:list            # List all tags  
+pnpm tags:validate        # Validate tag structure
+pnpm tags:cleanup         # Cleanup unused tags
+pnpm tags:maintenance     # Full tag maintenance
+```
+
+## 🔄 Development Best Practices
+
+### Code Quality
+- **TypeScript Strict Mode**: Full type safety across the codebase
+- **ESLint + Prettier**: Consistent code formatting and linting
+- **Pre-commit Hooks**: Automated quality checks before commits
+- **Code Guidelines**: Detailed guidelines in `.clinerules/`
+
+### AI Ethics & Bias Prevention
+- **Bias Detection Pipeline**: Automated bias detection in AI responses
+- **Ethical Guidelines**: Built-in ethical constraints for AI interactions
+- **Privacy by Design**: Data minimization and user privacy protection
+- **Accessibility**: Full WCAG compliance with axe-core testing
+
+### Performance Optimization
+- **Bundle Splitting**: Optimized code splitting for better load times  
+- **Image Optimization**: Automated image optimization pipeline
+- **Caching Strategy**: Multi-layer caching with Redis and CDN
+- **Memory Management**: Efficient memory usage patterns
+
+## 🤝 Contributing
+
+### Development Setup
+1. **Clone and Install**: `pnpm install` to install dependencies
+2. **Environment Setup**: Copy `.env.example` to `.env` and configure
+3. **Database Setup**: Run `pnpm mongodb:init` to initialize MongoDB
+4. **Start Services**: Run `pnpm dev:all-services` to start all services
+5. **Run Tests**: Execute `pnpm test:all` to verify setup
+
+### Code Guidelines
+- Follow the established patterns in `src/lib/` for business logic
+- Use TypeScript strict mode for all new code
+- Write tests for new features and bug fixes
+- Follow the component structure patterns in `src/components/`
+- Document AI-related code thoroughly due to complexity
+
+## 📚 Documentation
+
+- **API Documentation**: Available at `/docs` route when running locally
+- **Component Documentation**: Inline JSDoc comments throughout components
+- **Architecture Decisions**: Documented in `.notes/` directory
+- **Security Guidelines**: See `scripts/security-scan.sh` and related docs
+- **AI Model Documentation**: In `src/lib/ai/` with detailed implementation notes
+
+---
+
+This project represents a comprehensive approach to AI-powered mental health technology with strong emphasis on ethics, security, and user privacy. The modular architecture supports both development efficiency and production scalability.

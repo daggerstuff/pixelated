@@ -82,7 +82,7 @@ const activityLogs: DLPActivityLog[] = [
 
 <script>
   // Global alert handling for DLP components
-  window.showDLPAlert = (
+  ;(window as any).showDLPAlert = (
     type: 'success' | 'error' | 'warning',
     message: string,
   ) => {
@@ -134,6 +134,19 @@ const activityLogs: DLPActivityLog[] = [
       message: string
     }
     // Listen for custom events from the DLP components
-    document.addEventListener('dlp:rule-updated', ((e: CustomEvent<RuleUpdatedDetail>) => {
-    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<RuleSavedDetail>) => {
-    document.addEventListener('dlp:error', ((e: CustomEvent<DlpErrorDetail>) => {
+    document.addEventListener('dlp:rule-updated', (e) => {
+      const detail = (e as CustomEvent<RuleUpdatedDetail>).detail;
+      (window as any).showDLPAlert('success', `Rule "${detail.name}" has been ${detail.isActive ? 'enabled' : 'disabled'}.`);
+    });
+
+    document.addEventListener('dlp:rule-saved', (e) => {
+      const detail = (e as CustomEvent<RuleSavedDetail>).detail;
+      (window as any).showDLPAlert('success', `Rule has been ${detail.isEditing ? 'updated' : 'created'} successfully.`);
+    });
+
+    document.addEventListener('dlp:error', (e) => {
+      const detail = (e as CustomEvent<DlpErrorDetail>).detail;
+      (window as any).showDLPAlert('error', detail.message);
+    });
+  });
+</script>

@@ -12,7 +12,7 @@ interface LocalMessage {
   isError?: boolean
 }
 
-interface UseChatReturn {
+export interface UseChatReturn {
   messages: LocalMessage[]
   input: string
   handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void
@@ -22,6 +22,10 @@ interface UseChatReturn {
   sendMessage: (content: string) => Promise<string | undefined>
 }
 
+/**
+ * Custom React hook for chat messaging interface.
+ * @param options ChatOptions for initialization and API hooks.
+ */
 export function useChat(options: ChatOptions): UseChatReturn {
   const {
     initialMessages = [],
@@ -114,6 +118,7 @@ export function useChat(options: ChatOptions): UseChatReturn {
       if (onError) {
         onError(error as Error)
       }
+      return undefined
     } finally {
       setIsLoading(false)
     }

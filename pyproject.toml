@@ -167,7 +167,10 @@ show_missing = true
 skip_covered = true
 
 [tool.uv.workspace]
-members = ["./"]
+members = [
+    "./",
+    "tools/gdrive-dataset-manager",
+]
 
 [tool.uv]
 index-strategy = "unsafe-best-match"
