@@ -36,7 +36,7 @@ interface SlackMessagePayload {
 export class SlackNotificationService implements ICrisisNotificationHandler {
   private webhookUrl: string
 
-  constructor(webhookUrl?: string): void {
+  constructor(webhookUrl?: string) {
     const url = webhookUrl || config.notifications.slackWebhookUrl()
     if (!url) {
       const errorMsg =

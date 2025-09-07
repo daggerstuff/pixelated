@@ -55,14 +55,14 @@ export interface SecurityMonitoringConfig {
  * Custom error types
  */
 export class SecurityMonitoringError extends Error {
-  constructor(message: string): void {
+  constructor(message: string) {
     super(message)
     this.name = 'SecurityMonitoringError'
   }
 }
 
 export class DatabaseError extends SecurityMonitoringError {
-  constructor(message: string): void {
+  constructor(message: string) {
     super(message)
     this.name = 'DatabaseError'
   }
@@ -91,7 +91,7 @@ export class SecurityMonitoringService {
   private lockedAccounts: Map<string, Date> = new Map<string, Date>()
   private cleanupInterval: NodeJS.Timeout
 
-  constructor(config: Partial<SecurityMonitoringConfig> = {}): void {
+  constructor(config: Partial<SecurityMonitoringConfig> = {}) {
     this.config = { ...defaultConfig, ...config }
     this.cleanupInterval = setInterval(() => this.cleanupStaleRecords(), 60000)
   }

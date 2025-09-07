@@ -1,5 +1,3 @@
-# syntax = docker/dockerfile:1
-
 ARG NODE_VERSION=24
 FROM node:${NODE_VERSION}-slim AS base
 
@@ -20,7 +18,12 @@ RUN apt-get update -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-WORKDIR /app
+LABEL org.opencontainers.image.authors="Vivi <vivi@pixelatedempathy.com>"
+LABEL org.opencontainers.image.title="Pixelated Empathy Node"
+LABEL org.opencontainers.image.description="Secure Node.js app using a minimal base image for reduced vulnerabilities."
+
+# Application Healthcheck: verifies service health (only one HEALTHCHECK allowed per stage)
+  WORKDIR /app
 
 ENV NODE_ENV="production"
 ENV ASTRO_TELEMETRY_DISABLED=1
@@ -111,7 +114,3 @@ COPY --from=build --chown=astro:astro /app/instrument.mjs ./
 
 RUN mkdir -p /tmp/.astro && \
     chmod -R 755 /tmp/.astro
-
-EXPOSE 4321
-
-CMD ["node", "scripts/start-server.js"]

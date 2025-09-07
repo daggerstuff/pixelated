@@ -13,7 +13,7 @@ export abstract class BaseEHRProvider implements EHRProvider {
   protected client: FHIRClient | null = null
   protected logger: Console
 
-  constructor(logger: Console = console): void {
+  constructor(logger: Console = console) {
     this.logger = logger
   }
 

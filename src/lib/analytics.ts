@@ -101,7 +101,7 @@ export class AnalyticsService {
   /**
    * Private constructor (singleton pattern)
    */
-  private constructor(config: AnalyticsConfig = DEFAULT_CONFIG): void {
+  private constructor(config: AnalyticsConfig = DEFAULT_CONFIG) {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = this.generateSessionId()
     this.anonymousId = this.generateAnonymousId()
@@ -304,7 +304,7 @@ export class AnalyticsService {
       // Get existing events
       const existingEventsJson = localStorage.getItem('analytics_events')
       const existingEvents: AnalyticsEvent[] = existingEventsJson
-        ? JSON.parse(existingEventsJson) as unknown
+        ? (JSON.parse(existingEventsJson) as AnalyticsEvent[])
         : []
 
       // Add new events
@@ -636,7 +636,7 @@ export class AnalyticsService {
 
     try {
       const eventsJson = localStorage.getItem('analytics_events')
-      return eventsJson ? JSON.parse(eventsJson) as unknown : []
+      return eventsJson ? (JSON.parse(eventsJson) as AnalyticsEvent[]) : []
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error

@@ -44,7 +44,7 @@ test.describe('Dashboard Journey', () => {
 
     // Check that at least one chart is rendered
     const chartElements = page.locator('canvas')
-    await expect(chartElements).toHaveCount({ min: 1 })
+    await expect(chartElements).toHaveCount(1)
   })
 
   // Sidebar navigation
@@ -71,6 +71,7 @@ test.describe('Dashboard Journey', () => {
     // Skip the first two we already tested (dashboard and profile)
     for (let i = 2; i < Math.min(sidebarLinks.length, 4); i++) {
       const link = sidebarLinks[i]
+      if (!link) continue
       const href = await link.getAttribute('href')
 
       if (href && !href.includes('logout')) {
@@ -91,7 +92,7 @@ test.describe('Dashboard Journey', () => {
     const charts = page.locator('canvas')
 
     // Verify charts are visible
-    await expect(charts).toHaveCount({ min: 1 })
+    await expect(charts).toHaveCount(1)
 
     // Attempt to interact with the first chart
     const firstChart = charts.first()
@@ -180,7 +181,7 @@ test.describe('Dashboard Journey', () => {
 
     // Verify charts are still visible and properly sized
     const charts = page.locator('canvas')
-    await expect(charts).toHaveCount({ min: 1 })
+    await expect(charts).toHaveCount(1)
 
     // Click outside to close sidebar (if that's how your UI works)
     await page.click('h1')

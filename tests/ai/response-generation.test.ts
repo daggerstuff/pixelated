@@ -1,5 +1,8 @@
-import type { AIMessage, AIService } from '../../lib/ai/models/ai-types.ts'
-import { ResponseGenerationService } from '../../lib/ai/services/response-generation.ts'
+import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
+import {
+  ResponseGenerationService,
+  type ResponseGenerationConfig,
+} from '@/lib/ai/services/response-generation'
 
 // Mock AI service
 const mockAIService: AIService = {
@@ -47,7 +50,7 @@ describe('responseGenerationService', () => {
       ]
 
       const result =
-        await responseService.generateResponseFromMessages(messages)
+        await responseService.generateResponse(messages)
 
       // Verify the result
       expect(result).toEqual({
@@ -83,7 +86,7 @@ describe('responseGenerationService', () => {
         { role: 'user', content: 'Hello, how are you?', name: 'user' },
       ]
 
-      await responseService.generateResponseToConversation(messages, {
+      await responseService.generateResponse(messages, {
         temperature: 0.2,
       })
 
@@ -120,7 +123,7 @@ describe('responseGenerationService', () => {
         { role: 'user', content: 'Hello, how are you?', name: 'user' },
       ]
 
-      await responseService.generateResponseToConversation(messages, {
+      await responseService.generateResponse(messages, {
         maxResponseTokens: 500,
       })
 
@@ -178,7 +181,7 @@ describe('responseGenerationService', () => {
       ]
 
       await expect(
-        responseService.generateResponseFromMessages(messages),
+        responseService.generateResponse(messages),
       ).rejects.toThrow('AI service error')
     })
 
@@ -215,7 +218,7 @@ describe('responseGenerationService', () => {
         },
       ]
 
-      await responseService.generateResponseFromMessages(messages)
+      await responseService.generateResponse(messages)
 
       // Just verify the AI service was called
       expect(mockAIService.createChatCompletion).toHaveBeenCalled()
@@ -295,7 +298,10 @@ describe('responseGenerationService', () => {
       // Create a mock callback
       const mockCallback = vi.fn()
 
-      await responseService.generateStreamingResponse(messages, mockCallback)
+      await responseService.generateResponse(messages, {
+        stream: true,
+        onStream: mockCallback,
+      })
 
       // Just verify the streaming chat completion was called
       expect(mockAIService.createStreamingChatCompletion).toHaveBeenCalled()
@@ -317,7 +323,10 @@ describe('responseGenerationService', () => {
       const mockCallback = vi.fn()
 
       await expect(
-        responseService.generateStreamingResponse(messages, mockCallback),
+        responseService.generateResponse(messages, {
+          stream: true,
+          onStream: mockCallback,
+        }),
       ).rejects.toThrow('Streaming error')
     })
   })
@@ -337,33 +346,30 @@ describe('responseGenerationService', () => {
     it('should use default temperature if not provided', () => {
       const service = new ResponseGenerationService({
         aiService: mockAIService,
+        model: 'test-model',
       })
 
-      expect((service as unknown as { temperature: number }).temperature).toBe(
-        0.7,
-      )
+      expect((service as any).temperature).toBe(0.7)
     })
 
     it('should use default max tokens if not provided', () => {
       const service = new ResponseGenerationService({
         aiService: mockAIService,
+        model: 'test-model',
       })
 
-      expect(
-        (service as unknown as { maxResponseTokens: number }).maxResponseTokens,
-      ).toBe(1024)
+      expect((service as any).maxResponseTokens).toBe(1024)
     })
 
     it('should use custom system prompt if provided', () => {
       const customPrompt = 'Custom system prompt'
       const service = new ResponseGenerationService({
         aiService: mockAIService,
+        model: 'test-model',
         systemPrompt: customPrompt,
       })
 
-      expect(
-        (service as unknown as { systemPrompt: string }).systemPrompt,
-      ).toBe(customPrompt)
+      expect((service as any).systemPrompt).toBe(customPrompt)
     })
   })
 })

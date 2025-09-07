@@ -71,6 +71,7 @@ dependencies = [
   "litellm>=1.76.0",
   "omnara>=1.5.7",
   "morphcloud>=0.1.91",
+  "unsloth>=2025.8.10",
 ]
 
 [project.optional-dependencies]
@@ -166,7 +167,10 @@ show_missing = true
 skip_covered = true
 
 [tool.uv.workspace]
-members = ["./"]
+members = [
+    "./",
+    "tools/gdrive-dataset-manager",
+]
 
 [tool.uv]
 index-strategy = "unsafe-best-match"

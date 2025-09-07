@@ -1,6 +1,6 @@
-import { EmailService } from '@/lib/services/email/EmailService'
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
-const logger = createBuildSafeLogger('default')
+import { getEmailService } from '@/lib/email'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+const logger = createBuildSafeLogger({ prefix: 'email-worker' })
 
 const WORKER_ID = crypto.randomUUID()
 const PROCESSING_INTERVAL = 1000 // 1 second
@@ -8,7 +8,7 @@ const PROCESSING_INTERVAL = 1000 // 1 second
 async function startWorker() {
   logger.info('Starting email worker', { workerId: WORKER_ID })
 
-  const emailService = new EmailService()
+  const emailService = getEmailService()
 
   try {
     await emailService.startProcessing(PROCESSING_INTERVAL)

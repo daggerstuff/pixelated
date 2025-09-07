@@ -5,7 +5,7 @@ import { randomBytes } from 'crypto'
 class AuditLoggingService {
   private context: string
 
-  constructor(context: string): void {
+  constructor(context: string) {
     this.context = context
   }
 
@@ -27,12 +27,12 @@ function getAuditLogger(context: string): AuditLoggingService {
 
 // Import the generateId function from ids.ts instead of idUtils
 
-import { db } from '../../db'
+import { mongoClient as db } from '../../db/mongoClient'
 import { v4 as uuidv4 } from 'uuid'
 
 // Replace missing permissions module with a stub
 // Setup logging
-const logger = createBuildSafeLogger('data-portability-service')
+const logger = createBuildSafeLogger({ context: 'data-portability-service' })
 const auditLogger = getAuditLogger('data-transfer')
 
 // Types for data portability and export

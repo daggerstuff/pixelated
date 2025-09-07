@@ -213,21 +213,43 @@ export async function requireRole({
 }
 
 export class Auth {
-  async verifySession(request: Request): void {
+  async verifySession(
+    request: Request,
+  ): Promise<{ userId: string } | null> {
     const cookies = this.getCookiesFromRequest(request)
     const user = await getCurrentUser(cookies)
     return user ? { userId: user.id } : null
   }
 
   private getCookiesFromRequest(request: Request): AstroCookies {
-    // Convert Request headers to AstroCookies format
     const cookieHeader = request.headers.get('cookie') || ''
+    const cookies = new Map(
+      cookieHeader.split(';').map((c) => {
+        const [key, ...v] = c.trim().split('=')
+        return [key, v.join('=')]
+      }),
+    )
+
     return {
       get: (name: string) => {
-        const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))
-        return match ? { value: match[1] } : undefined
+        const value = cookies.get(name)
+        return value ? { value, json: () => JSON.parse(value) } : undefined
       },
-    } as AstroCookies
+      has: (name: string) => cookies.has(name),
+      set: () => {
+        throw new Error('Setting cookies is not supported in this context.')
+      },
+      delete: () => {
+        throw new Error('Deleting cookies is not supported in this context.')
+      },
+      getAll: () => {
+        return Array.from(cookies.entries()).map(([name, value]) => ({
+          name,
+          value,
+        }))
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any
   }
 }
 

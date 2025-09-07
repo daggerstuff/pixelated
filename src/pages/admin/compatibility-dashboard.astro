@@ -183,7 +183,7 @@ function formatDate(dateString: string): string {
 </BaseLayout>
 
 <script>
-  import type { ChartConfiguration, TooltipCallbacks } from 'chart.js'
+  import type { ChartConfiguration, TooltipItem } from 'chart.js'
   import { Chart } from 'chart.js/auto'
 
   // Initialize charts once the page has loaded
@@ -242,7 +242,7 @@ function formatDate(dateString: string): string {
               },
               tooltip: {
                 callbacks: {
-                  label: function (context: any) {
+                  label: function (context: TooltipItem<'bar'>) {
                     return `${context.raw}% of users`
                   },
                 },
@@ -308,7 +308,7 @@ function formatDate(dateString: string): string {
             plugins: {
               tooltip: {
                 callbacks: {
-                  label: function (context: any) {
+                  label: function (context: TooltipItem<'doughnut'>) {
                     return `${context.label}: ${context.raw}%`
                   },
                 },
@@ -353,7 +353,7 @@ function formatDate(dateString: string): string {
             plugins: {
               tooltip: {
                 callbacks: {
-                  label: function (context: any) {
+                  label: function (context: TooltipItem<'line'>) {
                     return `${context.raw}% of sessions`
                   },
                 },
@@ -412,7 +412,7 @@ function formatDate(dateString: string): string {
             plugins: {
               tooltip: {
                 callbacks: {
-                  label: function (context: any) {
+                  label: function (context: TooltipItem<'pie'>) {
                     return `${context.label}: ${context.raw}%`
                   },
                 },

@@ -58,8 +58,10 @@ export function createEnhancedRateLimiter(
     const key = `ratelimit:${identifier}:${path}:${role}`
 
     try {
+      // Cast redis to any to call runtime methods that may not be present on union type
+      const r = redis as any
       // Use Redis transaction to ensure atomic operations
-      const multi = redis.multi()
+      const multi = r.multi()
       multi.get(key)
       multi.ttl(key)
       const [countStr, ttl] = await multi.exec()
@@ -67,8 +69,8 @@ export function createEnhancedRateLimiter(
       const count = parseInt((countStr as string) || '0', 10)
 
       // If key doesn't exist or has expired, create new entry
-      if (ttl < 0) {
-        await redis.setex(key, Math.ceil(effectiveWindowMs / 1000), '1')
+  if (ttl < 0) {
+  await r.setex(key, Math.ceil(effectiveWindowMs / 1000), '1')
         return {
           allowed: true,
           limit,
@@ -100,7 +102,7 @@ export function createEnhancedRateLimiter(
       }
 
       // Increment counter
-      await redis.incr(key)
+  await r.incr(key)
 
       return {
         allowed: true,

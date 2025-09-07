@@ -3,3 +3,14 @@
 
 /// <reference types="astro/client" />
 /// <reference types="vite/client" />
+
+declare module 'global' {
+  namespace NodeJS {
+    interface Global {
+      showDLPAlert: (
+        type: 'success' | 'error' | 'warning',
+        message: string,
+      ) => void
+    }
+  }
+}

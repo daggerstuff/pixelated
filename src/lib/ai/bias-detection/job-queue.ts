@@ -21,8 +21,7 @@ export class JobQueue<T = any, R = any> {
   private queue: string[] = []
   private processing = false
 
-  constructor() {
-  }
+  
 
   submit(data: T): string {
     const id = Math.random().toString(36).slice(2) + Date.now()

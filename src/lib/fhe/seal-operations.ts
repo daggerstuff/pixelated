@@ -20,7 +20,7 @@ const logger = createBuildSafeLogger('seal-operations')
 export class SealOperations {
   private service: SealService
 
-  constructor(service?: SealService): void {
+  constructor(service?: SealService) {
     this.service = service || SealService.getInstance()
   }
 

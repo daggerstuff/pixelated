@@ -55,7 +55,7 @@ export class DocumentationSystem extends EventEmitter {
    * @param repository The repository to use for session data
    * @param aiService The AI service to use for NLP-based summary generation
    */
-  constructor(repository: AIRepository, _aiService: AIService): void {
+  constructor(repository: AIRepository, _aiService: AIService) {
     super()
     this.repository = repository
     this.initializeRealTimeUpdates()

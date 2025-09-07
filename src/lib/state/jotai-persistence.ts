@@ -51,7 +51,7 @@ class EncryptedJotaiStorage<Value> {
     Pick<PersistenceOptions, 'migration'>
   private syncListeners: Set<() => void> = new Set()
 
-  constructor(key: string, options: PersistenceOptions = {}): void {
+  constructor(key: string, options: PersistenceOptions = {}) {
     this.key = `jotai_${key}`
     this.options = {
       encrypt: false,

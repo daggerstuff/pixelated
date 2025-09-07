@@ -1,11 +1,12 @@
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { mongoClient } from '../../supabase'
-import { getAuditLogger } from '../../security/audit.logging'
-import { generateId } from '../../utils/ids'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import mongoClient from '../../db/mongoClient'
+import type {
+  DataDeletionRequest as DeletionRequest,
+} from './dataDeleteService'
+import { getAuditLogger } from '../../ai/bias-detection/audit'
 
-// Setup logging
-const logger = createBuildSafeLogger('data-delete-service')
-const auditLogger = getAuditLogger('patient-rights')
+const logger = createBuildSafeLogger()
+const auditLogger = getAuditLogger()
 
 // Types for deletion requests
 export interface DataDeletionRequest {
@@ -65,23 +66,9 @@ export async function createDataDeletionRequest(
     }
 
     // Insert into database
-    const _result = await mongoClient.db
-      .collection('data_deletion_requests')
-      .insertOne(deletionRequest)
-
-    // Log the action for audit purposes
-    auditLogger.log({
-      action: 'create_deletion_request',
-      resource: 'patient_data',
-      resourceId: params.patientId,
-      userId: params.requestedBy,
-      details: {
-        requestId,
-        dataScope: params.dataScope,
-        reason: params.reason,
-        categories: params.dataCategories,
-      },
-    })
+    const db = mongoClient.getDb()
+    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
+    await collection.insertOne(deletionRequest)
 
     return deletionRequest
   } catch (error: unknown) {
@@ -100,9 +87,9 @@ export async function getDataDeletionRequest(
   id: string,
 ): Promise<DataDeletionRequest | null> {
   try {
-    const request = await mongoClient.db
-      .collection('data_deletion_requests')
-      .findOne({ id })
+    const db = mongoClient.getDb()
+    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
+    const request = await collection.findOne({ id })
 
     return request as DataDeletionRequest | null
   } catch (error: unknown) {
@@ -122,25 +109,25 @@ export async function getAllDataDeletionRequests(filters?: {
   patientId?: string
   dataScope?: 'all' | 'specific'
 }): Promise<DataDeletionRequest[]> {
-  try {
-    const query = mongoClient.db.collection('data_deletion_requests')
-    const filter: Record<string, unknown> = {}
-    if (filters) {
-      if (filters.status) {
-        filter.status = filters.status
-      }
-      if (filters.patientId) {
-        filter.patientId = filters.patientId
-      }
-      if (filters.dataScope) {
-        filter.dataScope = filters.dataScope
-      }
-    }
+  const query: any = {}
 
-    const requests = await query
-      .find(filter)
-      .sort({ dateRequested: -1 })
-      .toArray()
+  if (filters) {
+    // Use bracket notation for index signature properties
+    if (filters['status']) {
+      query.status = filters['status']
+    }
+    if (filters['patientId']) {
+      query.patientId = filters['patientId']
+    }
+    if (filters['dataScope']) {
+      query.dataScope = filters['dataScope']
+    }
+  }
+
+  try {
+    const db = mongoClient.getDb()
+    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
+    const requests = await collection.find(query).toArray()
 
     return requests as DataDeletionRequest[]
   } catch (error: unknown) {
@@ -170,34 +157,35 @@ export async function updateDataDeletionRequest(
       updateData.dateProcessed = new Date().toISOString()
     }
 
-    // Update the request in the database
-    const result = await mongoClient.db
-      .collection('data_deletion_requests')
-      .findOneAndUpdate(
-        { id: params.id },
-        { $set: updateData },
-        { returnDocument: 'after' },
-      )
+    const db = mongoClient.getDb()
+    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
 
-    if (!result.value) {
+    // Update the request in the database
+    const result = await collection.findOneAndUpdate(
+      { id: params.id },
+      { $set: updateData },
+      { returnDocument: 'after' },
+    )
+
+    if (!result) {
       throw new Error('Failed to update data deletion request')
     }
 
     // Get the full request data for audit logging
-    const updatedRequest = result.value as DataDeletionRequest
+    const updatedRequest = result as DataDeletionRequest
 
     // Log the action for audit purposes
-    auditLogger.log({
-      action: 'update_deletion_request',
-      resource: 'patient_data',
-      resourceId: updatedRequest.patientId,
-      userId: params.processedBy,
-      details: {
+    auditLogger.logAction(
+      { userId: params.processedBy, role: 'system' as const },
+      'update_deletion_request',
+      'patient_data',
+      {
         requestId: params.id,
         newStatus: params.status,
         notes: params.processingNotes || 'No notes provided',
       },
-    })
+      { ipAddress: '::1', userAgent: 'system' },
+    )
 
     // If the request is completed, actually perform the data deletion
     if (params.status === 'completed') {
@@ -254,18 +242,18 @@ async function executeDataDeletion(
     }
 
     // Log the deletion action for audit purposes
-    auditLogger.log({
-      action: 'execute_data_deletion',
-      resource: 'patient_data',
-      resourceId: request.patientId,
-      userId: processedBy,
-      details: {
+    auditLogger.logAction(
+      { userId: processedBy, role: 'system' as const },
+      'execute_data_deletion',
+      'patient_data',
+      {
         requestId: request.id,
         dataScope: request.dataScope,
         categories: request.dataCategories,
         reason: request.reason,
       },
-    })
+      { ipAddress: '::1', userAgent: 'system' },
+    )
   } catch (error: unknown) {
     logger.error('Error executing data deletion', {
       error: error instanceof Error ? String(error) : String(error),
@@ -277,16 +265,16 @@ async function executeDataDeletion(
     // Instead, we log the error and continue
 
     // Log the failure for audit purposes
-    auditLogger.log({
-      action: 'data_deletion_error',
-      resource: 'patient_data',
-      resourceId: request.patientId,
-      userId: processedBy,
-      details: {
+    auditLogger.logAction(
+      { userId: processedBy, role: 'system' as const },
+      'data_deletion_error',
+      'patient_data',
+      {
         requestId: request.id,
         error: error instanceof Error ? String(error) : String(error),
       },
-    })
+      { ipAddress: '::1', userAgent: 'system' },
+    )
   }
 }
 
@@ -311,13 +299,15 @@ async function deleteAllPatientData(patientId: string): Promise<void> {
     'media_files',
   ]
 
-  const session = mongoClient.client.startSession()
+  const db = mongoClient.getDb()
+  const { client } = db
+  const session = client.startSession()
 
   try {
     await session.withTransaction(async () => {
-      for (const collection of collections) {
-        await mongoClient.db
-          .collection(collection)
+      for (const collectionName of collections) {
+        await db
+          .collection(collectionName)
           .deleteMany({ patient_id: patientId }, { session })
       }
     })
@@ -354,11 +344,20 @@ async function deleteSpecificPatientData(
       continue
     }
 
+    const db = mongoClient.getDb()
+
     // Delete from each table for this category
     for (const table of tables) {
-      await mongoClient.db
-        .collection(table)
-        .deleteMany({ patient_id: patientId })
+      await db.collection(table).deleteMany({ patient_id: patientId })
     }
   }
+}
+
+function generateId(length: number): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
 }

@@ -12,7 +12,7 @@ export class EHRServiceImpl implements EHRService {
   private clients: Map<string, FHIRClient> = new Map()
   private logger: Console
 
-  constructor(logger: Console = console): void {
+  constructor(logger: Console = console) {
     this.logger = logger
   }
 

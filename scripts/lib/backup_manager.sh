@@ -377,7 +377,7 @@ FILESYSTEM_ROLLBACK
     fi
     
     print_status "Restoring from current backup..."
-    sudo cp -r "$current_backup" "$PROJECT_DIR"
+    sudo cp -a "$current_backup" "$PROJECT_DIR"
     
 CURRENT_BACKUP_ROLLBACK
         elif [[ -n "$latest_archived" && -d "$latest_archived" ]]; then
@@ -391,7 +391,7 @@ CURRENT_BACKUP_ROLLBACK
     fi
     
     print_status "Restoring from archived backup..."
-    sudo cp -r "$latest_archived" "$PROJECT_DIR"
+    sudo cp -a "$latest_archived" "$PROJECT_DIR"
     
 ARCHIVED_BACKUP_ROLLBACK
         else

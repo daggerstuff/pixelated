@@ -52,6 +52,9 @@ export type Metric = z.infer<typeof MetricSchema>
 
 // Redis client interface
 export interface RedisClient {
+  [x: string]: unknown
+  lRange(arg0: string, arg1: number, arg2: number): unknown
+  zrangebyscore(arg0: string, start: string | number, end: string | number, arg3: string, offset: number, limit: number): string[] | PromiseLike<string[]>
   lpush(key: string, value: string): Promise<void>
   lrange(key: string, start: number, stop: number): Promise<string[]>
   lrem(key: string, count: number, value: string): Promise<void>
@@ -141,14 +144,14 @@ export class AnalyticsError extends Error {
 }
 
 export class ValidationError extends AnalyticsError {
-  constructor(message: string, details?: unknown): void {
+  constructor(message: string, details?: unknown) {
     super(message, 'VALIDATION_ERROR', details)
     this.name = 'ValidationError'
   }
 }
 
 export class ProcessingError extends AnalyticsError {
-  constructor(message: string, details?: unknown): void {
+  constructor(message: string, details?: unknown) {
     super(message, 'PROCESSING_ERROR', details)
     this.name = 'ProcessingError'
   }

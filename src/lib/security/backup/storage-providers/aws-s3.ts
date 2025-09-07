@@ -70,7 +70,7 @@ export class S3StorageProvider implements StorageProvider {
   private bucketName: string;
   private initialized = false;
 
-  constructor(private config: StorageProviderConfig): void {
+  constructor(private config: StorageProviderConfig) {
     this.bucketName = (config.bucket as string) || '';
     if (!this.bucketName) {
       throw new Error('Bucket name is required for S3 storage provider');
@@ -80,14 +80,44 @@ export class S3StorageProvider implements StorageProvider {
   async initialize(): Promise<void> {
     try {
       // Dynamically import AWS SDK to prevent bundling with client code
-      const { S3 } = await import('@aws-sdk/client-s3');
-
+      const { S3, ListObjectsCommand, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = await import('@aws-sdk/client-s3');
       // Create S3 instance with provided credentials
-      this.s3 = new S3({
+      const s3Instance = new S3({
         credentials: this.config.credentials as S3Credentials,
         region: this.config.region as string,
         ...this.config.options as Partial<S3Config>,
       });
+
+      // Shim to match our strict S3Client interface
+      this.s3 = {
+        listObjects: async (params) => {
+          const result = await s3Instance.send(new ListObjectsCommand(params));
+          // Map and coerce the result shape to our type, filtering undefined keys
+          return {
+            Contents: (result.Contents || [])
+              .filter((item): item is Required<typeof item> => !!item.Key && !!item.LastModified && !!item.Size && !!item.ETag)
+              .map(item => ({
+                Key: item.Key!,
+                LastModified: item.LastModified instanceof Date ? item.LastModified : new Date(item.LastModified!),
+                Size: typeof item.Size === 'number' ? item.Size : 0,
+                ETag: item.ETag!,
+              })),
+          };
+        },
+        putObject: async (params) => {
+          await s3Instance.send(new PutObjectCommand(params));
+        },
+        getObject: async (params) => {
+          const result = await s3Instance.send(new GetObjectCommand(params));
+          if (!result.Body || typeof result.Body.transformToByteArray !== 'function') {
+            throw new Error('Unexpected S3 getObject Body output');
+          }
+          return { Body: result.Body };
+        },
+        deleteObject: async (params) => {
+          await s3Instance.send(new DeleteObjectCommand(params));
+        }
+      };
 
       this.initialized = true;
 

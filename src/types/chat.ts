@@ -53,6 +53,9 @@ export interface Message {
   encrypted?: boolean
   verified?: boolean
   isError?: boolean
+  memoryStored?: boolean
+  analyzed?: boolean
+  timestamp?: string
 }
 
 export interface ChatOptions {

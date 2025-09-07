@@ -8,6 +8,10 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@lib/*": ["src/lib/*"]
+    },
     "allowJs": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -38,18 +42,6 @@
     "allowUmdGlobalAccess": false,
     "types": ["astro/client", "node", "react", "react-dom", "vitest/globals"],
     "typeRoots": ["./node_modules/@types"],
-    "paths": {
-      "~/*": ["./src/*"],
-      "@/*": ["src/*"],
-      "@components/*": ["./src/components/*"],
-      "@layouts/*": ["./src/layouts/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@types/*": ["src/types/*"],
-      "@testing/*": ["./tests/*"],
-
-      "@/types": ["src/types"]
-    },
     "skipLibCheck": true,
     "disableSourceOfProjectReferenceRedirect": true,
     "disableSolutionSearching": true,
@@ -66,8 +58,6 @@
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "playwright.config.ts",
-    "scripts/**/*.js",
-    "scripts/**/*.ts",
     "*.config.js",
     "*.config.ts",
     "**/.eslintrc.{js,cjs}",

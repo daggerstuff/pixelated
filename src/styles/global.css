@@ -1,5 +1,4 @@
 @import './browser-fixes.css';
-@import 'tailwindcss';
 @import 'tw-animate-css';
 
 /* Use self-hosted KaTeX CSS to avoid font resolution issues */

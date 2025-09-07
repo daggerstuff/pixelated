@@ -9,7 +9,7 @@ set -e
 VPS_HOST=${1:-"45.55.211.39"}
 VPS_USER=${2:-"root"}
 VPS_PORT=${3:-"22"}
-SSH_KEY=${4:-"~/.ssh/planet"}
+SSH_KEY=${4:-"$HOME/.ssh/planet"}
 DOMAIN=${5:-"pixelatedempathy.com"}
 LOCAL_PROJECT_DIR="/home/vivi/pixelated"
 REMOTE_PROJECT_DIR="/root/pixelated"
@@ -85,7 +85,7 @@ print_warning() { echo -e "\${YELLOW}[VPS-ENV WARNING]${NC} \$1"; }
 install_nvm() {
     if [[ ! -s "\$HOME/.nvm/nvm.sh" ]]; then
         print_status "Installing nvm (Node Version Manager)..."
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
         
         # Add nvm to bashrc for persistent sessions (Requirement 1.3)
         if ! grep -q "NVM_DIR" ~/.bashrc; then
@@ -474,7 +474,7 @@ main() {
     if [[ -n "$SSH_KEY" ]]; then
         SSH_CMD="$SSH_CMD -i $SSH_KEY"
     fi
-    SSH_CMD="$SSH_CMD -p $VPS_PORT -o StrictHostKeyChecking=no"
+    SSH_CMD="$SSH_CMD -p $VPS_PORT"
     VPS_CONNECTION="$VPS_USER@$VPS_HOST"
     
     # Test SSH connection

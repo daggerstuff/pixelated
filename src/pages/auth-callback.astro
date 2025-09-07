@@ -2,7 +2,6 @@
 export const prerender = false // Enable SSR for this page
 
 import Layout from '@/layouts/AuthLayout.astro'
-import { AuthService } from '@/services/auth.service'
 
 // Get query parameters
 const token = Astro.url.searchParams.get('token')

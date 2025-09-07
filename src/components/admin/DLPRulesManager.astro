@@ -82,7 +82,7 @@ const activityLogs: DLPActivityLog[] = [
 
 <script>
   // Global alert handling for DLP components
-  window.showDLPAlert = (
+  ;(window as any).showDLPAlert = (
     type: 'success' | 'error' | 'warning',
     message: string,
   ) => {
@@ -120,28 +120,33 @@ const activityLogs: DLPActivityLog[] = [
   }
 
   // Set up event listeners for relevant actions
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
+    interface RuleUpdatedDetail {
+      name: string
+      isActive: boolean
+    }
+
+    interface RuleSavedDetail {
+      isEditing: boolean
+    }
+
+    interface DlpErrorDetail {
+      message: string
+    }
     // Listen for custom events from the DLP components
-    document.addEventListener('dlp:rule-updated', ((e: CustomEvent<unknown>) => {
-      window.showDLPAlert(
-        'success',
-        `Rule "${e.detail.name}" ${e.detail.isActive ? 'enabled' : 'disabled'}`,
-      )
-    }) as EventListener)
+    document.addEventListener('dlp:rule-updated', (e) => {
+      const detail = (e as CustomEvent<RuleUpdatedDetail>).detail;
+      (window as any).showDLPAlert('success', `Rule "${detail.name}" has been ${detail.isActive ? 'enabled' : 'disabled'}.`);
+    });
 
-    document.addEventListener('dlp:rule-deleted', ((_event: Event) => {
-      window.showDLPAlert('success', 'Rule deleted successfully')
-    }) as EventListener)
+    document.addEventListener('dlp:rule-saved', (e) => {
+      const detail = (e as CustomEvent<RuleSavedDetail>).detail;
+      (window as any).showDLPAlert('success', `Rule has been ${detail.isEditing ? 'updated' : 'created'} successfully.`);
+    });
 
-    document.addEventListener('dlp:rule-saved', ((e: CustomEvent<unknown>) => {
-      window.showDLPAlert(
-        'success',
-        `Rule ${e.detail.isEditing ? 'updated' : 'added'} successfully`,
-      )
-    }) as EventListener)
-
-    document.addEventListener('dlp:error', ((e: CustomEvent<unknown>) => {
-      window.showDLPAlert('error', e.detail.message)
-    }) as EventListener)
-  })
+    document.addEventListener('dlp:error', (e) => {
+      const detail = (e as CustomEvent<DlpErrorDetail>).detail;
+      (window as any).showDLPAlert('error', detail.message);
+    });
+  });
 </script>

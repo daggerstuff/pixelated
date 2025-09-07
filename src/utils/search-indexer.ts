@@ -1,4 +1,3 @@
-import type { SearchDocument } from '../lib/search'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -35,7 +34,7 @@ async function getCollection(
 
     // Read all files in the directory
     const files = await fs.readdir(contentDir, { withFileTypes: true })
-    const entries = []
+    const entries: CollectionEntry[] = []
 
     for (const file of files) {
       if (
@@ -110,6 +109,19 @@ export interface IndexableContent {
   category?: string
   publishDate?: Date
   updatedDate?: Date
+}
+
+/**
+ * Search document interface
+ */
+export interface SearchDocument {
+  id: string
+  title: string
+  content: string
+  url: string
+  tags?: string[]
+  category?: string
+  // Add other fields if needed
 }
 
 /**

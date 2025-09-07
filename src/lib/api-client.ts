@@ -1,4 +1,6 @@
-// Enhanced API Client with retry logic and error handling
+// Enhanced API Client with retry logic and type-safe error handling
+import { parseApiResponse, ValidationResult, validateAnalysisResults, validateCrisisDetectionResponse } from './utils/json-validator'
+
 export class EnterpriseAPIClient {
   private baseURL: string
   private maxRetries: number = 3
@@ -22,20 +24,21 @@ export class EnterpriseAPIClient {
       if (attempt >= this.maxRetries) {
         throw error
       }
-      
+
       const delay = this.retryDelay * Math.pow(2, attempt - 1) // Exponential backoff
       console.warn(`API request failed (attempt ${attempt}/${this.maxRetries}), retrying in ${delay}ms...`, error)
-      
+
       await this.wait(delay)
       return this.retryWithBackoff(operation, attempt + 1)
     }
   }
 
-  async request<T = unknown>(
+  async request<T>(
     endpoint: string,
     options: RequestInit & {
       timeout?: number
       retryOn?: number[]
+      validator?: (obj: unknown) => ValidationResult<T>
     } = {}
   ): Promise<T> {
     const { timeout = 30000, retryOn = [408, 429, 500, 502, 503, 504], ...fetchOptions } = options
@@ -60,12 +63,21 @@ export class EnterpriseAPIClient {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-          
+
           if (retryOn.includes(response.status)) {
             throw new APIRetryableError(`HTTP ${response.status}: ${errorData.error || response.statusText}`, response.status)
           }
-          
+
           throw new APIError(`HTTP ${response.status}: ${errorData.error || response.statusText}`, response.status, errorData)
+        }
+
+        // Use validator if provided, otherwise fallback to direct parsing
+        if (options.validator) {
+          const validation = await parseApiResponse(response, options.validator)
+          if (!validation.success) {
+            throw new APIError(`Response validation failed: ${validation.error}`, 422)
+          }
+          return validation.data
         }
 
         return await response.json()
@@ -263,18 +275,24 @@ interface ChatResponse {
 }
 
 interface CrisisDetectionRequest {
-  content: string
-  contentType: 'chat_message' | 'journal_entry' | 'form_response' | 'voice_transcript'
-  context?: unknown
-  options?: unknown
+  text: string
+  sessionId?: string
+  options?: {
+    model?: 'fast' | 'accurate'
+    level?: 'low' | 'medium' | 'high'
+  }
 }
 
 interface CrisisDetectionResponse {
-  assessment: unknown
-  riskFactors: unknown[]
-  protectiveFactors: unknown[]
-  recommendations: unknown
-  resources: unknown
-  monitoring: unknown
-  metadata: unknown
+  isCrisis: boolean
+  level: 'none' | 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  details: {
+    suicidalIdeation: number
+    selfHarm: number
+    hopelessness: number
+    agitation: number
+  }
+  recommendedAction: 'monitor' | 'alert_human' | 'immediate_intervention'
+  timestamp: string
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import type { PresentingProblemEvent } from '../../lib/types/psychology-pipeline'
 
 interface PresentingProblemVisualizationProps {
@@ -17,7 +17,7 @@ const PresentingProblemVisualization: FC<
       if (!match) {
         return 0
       }
-      const num = parseInt(match[1])
+      const num = parseInt(match[1], 10)
       const unit = match[2].toLowerCase()
 
       switch (unit) {

@@ -80,7 +80,7 @@ const MAX_COLLECTED_LOGS = 1000
 export class Logger {
   private options: LoggerOptions
 
-  constructor(options?: Partial<LoggerOptions>): void {
+  constructor(options?: Partial<LoggerOptions>) {
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,

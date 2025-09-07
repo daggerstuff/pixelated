@@ -60,7 +60,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   private bucketName: string;
   private initialized = false;
 
-  constructor(private config: StorageProviderConfig): void {
+  constructor(private config: StorageProviderConfig) {
     this.bucketName = (config.bucket as string) || '';
     if (!this.bucketName) {
       throw new Error(

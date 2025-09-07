@@ -8,29 +8,27 @@
 // Mock implementations since Presidio is a Python package, not JavaScript
 // In production, you would need to call a Python service
 class Analyzer {
-  async loadDefaultPiiRecognizer() {
+  async loadDefaultPiiRecognizer(): Promise<void> {
     return Promise.resolve()
   }
 
-  async analyze(text: string, options: { language: string }): void {
+  async analyze(text: string, options: { language: string }): Promise<AnalyzeResult[]> {
     // Use text and options parameters to avoid unused variable warnings
     console.log(
       `Analyzing text with length ${text.length} in language ${options.language}`,
     )
-    return Promise.resolve([])
+    return Promise.resolve([] as AnalyzeResult[])
   }
 }
 
 class Anonymizer {
-  async anonymize(payload: { text: string }): void {
-    return { text: payload.text }
+  async anonymize(payload: any): Promise<{ text: string }>{
+    return Promise.resolve({ text: payload.text })
   }
 }
 
 // Mock implementation of memoize since the original is not accessible
-function memoize<T extends (...args: Parameters<T>) => ReturnType<T>>(
-  fn: T,
-): (...args: Parameters<T>) => ReturnType<T> {
+function memoize<T extends (...args: any[]) => any>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>()
 
   return ((...args: Parameters<T>): ReturnType<T> => {
@@ -40,14 +38,14 @@ function memoize<T extends (...args: Parameters<T>) => ReturnType<T>>(
       return cache.get(key) as ReturnType<T>
     }
 
-    const result = fn(...args)
-    cache.set(key, result)
-    return result
+    const result = fn(...(args as any))
+    cache.set(key, result as ReturnType<T>)
+    return result as ReturnType<T>
   }) as T
 }
 
 // Mock implementation of createLogger
-function createLogger(name: string): void {
+function createLogger(name: string): { info: (message: string) => void; warn: (message: string, meta?: unknown) => void; error: (message: string, meta?: unknown) => void } {
   return {
     info: (message: string) => console.log(`[INFO] ${name}: ${message}`),
     warn: (message: string, meta?: unknown) =>

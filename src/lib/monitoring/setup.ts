@@ -29,7 +29,7 @@ export class MonitoringService extends EventEmitter {
   private initialized: boolean = false
   private metrics: Metric[] = []
 
-  constructor(redis: RedisService, config: Partial<MonitoringConfig> = {}): void {
+  constructor(redis: RedisService, config: Partial<MonitoringConfig> = {}) {
     super()
     this.redis = redis
     this.analytics = new AnalyticsService(redis)
