@@ -288,19 +288,19 @@ export class PythonBiasDetectionBridge {
         // Map Python response structure to TypeScript expectations
         // Ensure all expected properties and TypeScript fields are filled
         // Defensively hydrate all intermediate metric objects to avoid undefined access errors
-        const metrics = typeof layerResult.metrics === 'object' && layerResult.metrics !== null
+        const metrics = typeof layerResult.metrics === 'object' && layerResult.metrics
           ? layerResult.metrics as Record<string, any>
           : {};
-        const ling = typeof metrics['linguistic_bias'] === 'object' && metrics['linguistic_bias'] !== null
+        const ling = typeof metrics['linguistic_bias'] === 'object' && metrics['linguistic_bias']
           ? metrics['linguistic_bias'] as Record<string, any>
           : {};
-        const sentiment = typeof ling['sentiment_analysis'] === 'object' && ling['sentiment_analysis'] !== null
+        const sentiment = typeof ling['sentiment_analysis'] === 'object' && ling['sentiment_analysis']
           ? ling['sentiment_analysis'] as Record<string, any>
           : {};
-        const rep = typeof metrics['representation_analysis'] === 'object' && metrics['representation_analysis'] !== null
+        const rep = typeof metrics['representation_analysis'] === 'object' && metrics['representation_analysis']
           ? metrics['representation_analysis'] as Record<string, any>
           : {};
-        const dq = typeof metrics['data_quality_metrics'] === 'object' && metrics['data_quality_metrics'] !== null
+        const dq = typeof metrics['data_quality_metrics'] === 'object' && metrics['data_quality_metrics']
           ? metrics['data_quality_metrics'] as Record<string, any>
           : {};
         return {
@@ -408,8 +408,8 @@ export class PythonBiasDetectionBridge {
       timestamp: new Date().toISOString(),
       sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
       fallbackMode: true,
-      serviceError: error ? String(error instanceof Error ? error.message : error) : 'Python service unavailable',
-  } as PreprocessingLayerResult;
+      serviceError: error instanceof Error ? error.message : error ? String(error) : 'Python service unavailable',
+    } as PreprocessingLayerResult;
   }
 
   async runModelLevelAnalysis(
@@ -419,7 +419,7 @@ export class PythonBiasDetectionBridge {
       const result = (await this.makeRequest('/analyze/model_level', 'POST', sessionData)) as PythonAnalysisResult
       const layerResult = result?.layer_results?.model_level
       if (layerResult) {
-        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
+  const metrics = layerResult.metrics || {} as Record<string, any>;
         const fairness = (metrics['fairness_metrics'] ?? {}) as Record<string, any>;
         const performance = (metrics['performance_metrics'] ?? {}) as Record<string, any>;
         const groupComp = (metrics['group_performance_comparison'] ?? []) as any[];
@@ -461,7 +461,7 @@ export class PythonBiasDetectionBridge {
       const result = (await this.makeRequest('/analyze/interactive', 'POST', sessionData)) as PythonAnalysisResult
       const layerResult = result?.layer_results?.interactive
       if (layerResult) {
-        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
+  const metrics = layerResult.metrics || {} as Record<string, any>;
         const counterfactual = (metrics['counterfactual_analysis'] ?? {}) as Record<string, any>;
         const featureImp = (metrics['feature_importance'] ?? []) as any[];
         const whatIf = (metrics['what_if_scenarios'] ?? []) as any[];
@@ -493,7 +493,7 @@ export class PythonBiasDetectionBridge {
       const result = (await this.makeRequest('/analyze/evaluation', 'POST', sessionData)) as PythonAnalysisResult
       const layerResult = result?.layer_results?.evaluation
       if (layerResult) {
-        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
+  const metrics = layerResult.metrics || {} as Record<string, any>;
         const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<string, any>;
         const custom = (metrics['custom_metrics'] ?? {}) as Record<string, any>;
         const temporal = (metrics['temporal_analysis'] ?? {}) as Record<string, any>;
@@ -618,11 +618,7 @@ export class PythonBiasDetectionBridge {
   }
 
   stopHealthMonitoring(): void {
-    if (this.healthCheckTimer) {
-      clearInterval(this.healthCheckTimer)
-      this.healthCheckTimer = undefined
-      logger.info('Health monitoring stopped')
-    }
+  this.healthCheckTimer ? (clearInterval(this.healthCheckTimer), this.healthCheckTimer = undefined, logger.info('Health monitoring stopped')) : void 0;
   }
 
   getHealthStatus(): { status: string; lastCheck: Date; consecutiveFailures: number } {
