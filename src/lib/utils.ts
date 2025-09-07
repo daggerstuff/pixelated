@@ -1,5 +1,43 @@
 import { clsx, type ClassValue } from 'clsx'
-import { randomBytes } from 'crypto'
+
+/**
+ * Gets random bytes using Web Crypto API (browser) or Node.js crypto (server)
+ * @param size - Number of bytes to generate
+ * @returns Uint8Array of random bytes
+ */
+function getRandomBytes(size: number): Uint8Array {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+    // Browser environment - use Web Crypto API
+    const bytes = new Uint8Array(size)
+    window.crypto.getRandomValues(bytes)
+    return bytes
+  } else {
+    // Node.js environment
+    try {
+      const { randomBytes } = require('crypto')
+      return new Uint8Array(randomBytes(size))
+    } catch {
+      // Fallback to Math.random (not cryptographically secure)
+      const bytes = new Uint8Array(size)
+      for (let i = 0; i < size; i++) {
+        bytes[i] = Math.floor(Math.random() * 256)
+      }
+      return bytes
+    }
+  }
+}
+
+/**
+ * Converts bytes to a 32-bit unsigned integer (big-endian)
+ * @param bytes - Byte array (at least 4 bytes)
+ * @returns 32-bit unsigned integer
+ */
+function bytesToUint32BE(bytes: Uint8Array): number {
+    if (bytes.length < 4) {
+      throw new Error('bytesToUint32BE: input must have at least 4 bytes')
+    }
+    return (bytes[0]! << 24) | (bytes[1]! << 16) | (bytes[2]! << 8) | bytes[3]!
+}
 
 /**
  * Cryptographically secure random integer in [0, maxExclusive)
@@ -14,7 +52,8 @@ function secureRandomInt(maxExclusive: number): number {
   // Find rejection sampling threshold: only accept random values < rangeLimit
   const rangeLimit = Math.floor(maxUint32 / maxExclusive) * maxExclusive;
   while (true) {
-    const randUint = randomBytes(4).readUInt32BE(0);
+    const bytes = getRandomBytes(4);
+    const randUint = bytesToUint32BE(bytes);
     if (randUint < rangeLimit) {
       return randUint % maxExclusive;
     }
@@ -44,7 +83,25 @@ export function cn(...inputs: ClassValue[]): string {
  * @returns A unique UUID string
  */
 export function generateUniqueId(): string {
-  return crypto.randomUUID()
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+    // Browser environment with Web Crypto API
+    return window.crypto.randomUUID()
+  } else if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    // Node.js environment (18+)
+    return crypto.randomUUID()
+  } else {
+    // Fallback UUID generation
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const bytes = getRandomBytes(1);
+      const byte = bytes[0];
+      if (byte === undefined) {
+        throw new Error('generateUniqueId: Unexpected undefined byte');
+      }
+      const r = byte & 0xf;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 }
 
 /**
@@ -54,8 +111,8 @@ export function generateUniqueId(): string {
  */
 export function generateSimpleId(prefix = 'id'): string {
   // Use crypto for random value
-  const bytes = randomBytes(4);
-  const randPart = bytes.toString('hex');
+  const bytes = getRandomBytes(4);
+  const randPart = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
   return `${prefix}_${Date.now()}_${randPart}`;
 }
 
@@ -68,10 +125,12 @@ export function generateShortId(length = 8): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   let result = ''
   // Secure random index selection, safely guard bytes access
-  const bytes = randomBytes(length)
+  const bytes = getRandomBytes(length)
   for (let i = 0; i < length; i++) {
     const byte = bytes[i];
-    if (byte === undefined) throw new Error('generateShortId: Unexpected undefined byte');
+    if (byte === undefined) {
+      throw new Error('generateShortId: Unexpected undefined byte');
+    }
     result += chars.charAt(byte % chars.length);
   }
   return result
@@ -222,6 +281,18 @@ export function groupBy<T, K extends string | number | symbol>(
 }
 
 /**
+ * Asserts that an array is dense (no holes), otherwise throws.
+ * The main value is to type-narrow arr from (T | undefined)[] to T[] for strict TypeScript assignment.
+ */
+const assertDense: <U>(array: (U | undefined)[]) => asserts array is U[] = <U>(array: (U | undefined)[]): asserts array is U[] => {
+  for (let i = 0; i < array.length; ++i) {
+    if (!(i in array)) {
+      throw new Error(`Sparse array detected at index ${i}`);
+    }
+  }
+};
+
+/**
  * Returns a shuffled copy of the input using Fisher-Yates and crypto secure random.
  * @param input - The array to shuffle (never mutated)
  * @returns New shuffled array
@@ -235,17 +306,6 @@ export function shuffle<T>(input: readonly T[]): T[] {
   assertDense(arr);
   const denseArr = arr as T[]; // TS type-narrow after runtime assertion
 
-  /**
-   * Asserts that an array is dense (no holes), otherwise throws.
-   * The main value is to type-narrow arr from (T | undefined)[] to T[] for strict TypeScript assignment.
-   */
-  function assertDense<U>(array: (U | undefined)[]): asserts array is U[] {
-    for (let i = 0; i < array.length; ++i) {
-      if (!(i in array)) {
-        throw new Error(`Sparse array detected at index ${i}`);
-      }
-    }
-  }
   for (let i = denseArr.length - 1; i > 0; i--) {
     // Secure, bias-free random int between 0 and i (inclusive)
     const j = secureRandomInt(i + 1);
@@ -784,8 +844,8 @@ export function randomInt(min: number, max: number): number {
   }
   const range = max - min + 1;
   // Use crypto to get random integer in range
-  const randomBuffer = randomBytes(4);
-  const randUint = randomBuffer.readUInt32BE(0);
+  const randomBuffer = getRandomBytes(4);
+  const randUint = bytesToUint32BE(randomBuffer);
   return min + (randUint % range);
 }
 
