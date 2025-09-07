@@ -9,10 +9,10 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { ConnectionPool, ConnectionPoolConfig, PooledConnection } from './connection-pool'
 import type {
   TherapeuticSession,
-  PreprocessingAnalysisResult,
-  ModelLevelAnalysisResult,
-  InteractiveAnalysisResult,
-  EvaluationAnalysisResult,
+  PreprocessingLayerResult,
+  ModelLevelLayerResult,
+  InteractiveLayerResult,
+  EvaluationLayerResult,
 } from './types'
 import type {
   PythonAnalysisResult,
@@ -279,7 +279,7 @@ export class PythonBiasDetectionBridge {
 
   async runPreprocessingAnalysis(
     sessionData: TherapeuticSession,
-  ): Promise<PreprocessingAnalysisResult> {
+  ): Promise<PreprocessingLayerResult> {
     try {
       // Should call another method, like makeRequest, to get the analysis from Python service
       const result = (await this.makeRequest('/analyze/preprocessing', 'POST', sessionData)) as PythonAnalysisResult
@@ -288,11 +288,21 @@ export class PythonBiasDetectionBridge {
         // Map Python response structure to TypeScript expectations
         // Ensure all expected properties and TypeScript fields are filled
         // Defensively hydrate all intermediate metric objects to avoid undefined access errors
-        const metrics = (layerResult.metrics ?? {}) as Record<string, any>;
-        const ling = (metrics['linguistic_bias'] ?? {}) as Record<string, any>;
-        const sentiment = (ling['sentiment_analysis'] ?? {}) as Record<string, any>;
-        const rep = (metrics['representation_analysis'] ?? {}) as Record<string, any>;
-        const dq = (metrics['data_quality_metrics'] ?? {}) as Record<string, any>;
+        const metrics = typeof layerResult.metrics === 'object' && layerResult.metrics !== null
+          ? layerResult.metrics as Record<string, any>
+          : {};
+        const ling = typeof metrics['linguistic_bias'] === 'object' && metrics['linguistic_bias'] !== null
+          ? metrics['linguistic_bias'] as Record<string, any>
+          : {};
+        const sentiment = typeof ling['sentiment_analysis'] === 'object' && ling['sentiment_analysis'] !== null
+          ? ling['sentiment_analysis'] as Record<string, any>
+          : {};
+        const rep = typeof metrics['representation_analysis'] === 'object' && metrics['representation_analysis'] !== null
+          ? metrics['representation_analysis'] as Record<string, any>
+          : {};
+        const dq = typeof metrics['data_quality_metrics'] === 'object' && metrics['data_quality_metrics'] !== null
+          ? metrics['data_quality_metrics'] as Record<string, any>
+          : {};
         return {
           biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
           linguisticBias: {
@@ -337,10 +347,10 @@ export class PythonBiasDetectionBridge {
           sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
           fallbackMode: false,
           serviceError: undefined,
-        } as PreprocessingAnalysisResult;
+  } as PreprocessingLayerResult;
       }
       // Fallback: construct and return PreprocessingAnalysisResult with neutral values
-      return this.createFallbackPreprocessingResult(sessionData)
+  return this.createFallbackPreprocessingResult(sessionData)
     } catch (error: unknown) {
       logger.warn("Error in runPreprocessingAnalysis, returning fallback", { error })
       return this.createFallbackPreprocessingResult(sessionData, error)
@@ -350,7 +360,7 @@ export class PythonBiasDetectionBridge {
   private createFallbackPreprocessingResult(
     sessionData: TherapeuticSession,
     error?: unknown
-  ): PreprocessingAnalysisResult {
+  ): PreprocessingLayerResult {
     return {
       biasScore: 0.5,
       linguisticBias: {
@@ -399,12 +409,12 @@ export class PythonBiasDetectionBridge {
       sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
       fallbackMode: true,
       serviceError: error ? String(error instanceof Error ? error.message : error) : 'Python service unavailable',
-    } as PreprocessingAnalysisResult;
+  } as PreprocessingLayerResult;
   }
 
   async runModelLevelAnalysis(
     sessionData: TherapeuticSession,
-  ): Promise<ModelLevelAnalysisResult> {
+  ): Promise<ModelLevelLayerResult> {
     try {
       const result = (await this.makeRequest('/analyze/model_level', 'POST', sessionData)) as PythonAnalysisResult
       const layerResult = result?.layer_results?.model_level
@@ -446,7 +456,7 @@ export class PythonBiasDetectionBridge {
 
   async runInteractiveAnalysis(
     sessionData: TherapeuticSession,
-  ): Promise<InteractiveAnalysisResult> {
+  ): Promise<InteractiveLayerResult> {
     try {
       const result = (await this.makeRequest('/analyze/interactive', 'POST', sessionData)) as PythonAnalysisResult
       const layerResult = result?.layer_results?.interactive
@@ -478,7 +488,7 @@ export class PythonBiasDetectionBridge {
 
   async runEvaluationAnalysis(
     sessionData: TherapeuticSession,
-  ): Promise<EvaluationAnalysisResult> {
+  ): Promise<EvaluationLayerResult> {
     try {
       const result = (await this.makeRequest('/analyze/evaluation', 'POST', sessionData)) as PythonAnalysisResult
       const layerResult = result?.layer_results?.evaluation
@@ -522,7 +532,7 @@ export class PythonBiasDetectionBridge {
   private createFallbackModelLevelResult(
     sessionData: TherapeuticSession,
     error?: unknown
-  ): ModelLevelAnalysisResult {
+  ): ModelLevelLayerResult {
     logger.warn("Creating fallback model level result", { sessionId: sessionData.sessionId, error })
     return {
       biasScore: 0.5,
@@ -551,7 +561,7 @@ export class PythonBiasDetectionBridge {
   private createFallbackInteractiveResult(
     sessionData: TherapeuticSession,
     error?: unknown
-  ): InteractiveAnalysisResult {
+  ): InteractiveLayerResult {
     logger.warn("Creating fallback interactive result", { sessionId: sessionData.sessionId, error })
     return {
       biasScore: 0.5,
@@ -570,7 +580,7 @@ export class PythonBiasDetectionBridge {
   private createFallbackEvaluationResult(
     sessionData: TherapeuticSession,
     error?: unknown
-  ): EvaluationAnalysisResult {
+  ): EvaluationLayerResult {
     logger.warn("Creating fallback evaluation result", { sessionId: sessionData.sessionId, error })
     return {
       biasScore: 0.5,

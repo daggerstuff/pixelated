@@ -65,11 +65,24 @@ export function validateServerlessRequest(event: any): boolean {
  * Receives session data in event.body, returns BiasDetectionEngine analysis.
  */
 export const detectBiasServerlessHandler = createServerlessHandler(async (req) => {
-  // Validate session input
-  if (!req.body || !req.body.session) {
+  // CORS preflight and method guard
+  if (req.method === 'OPTIONS') {
+    return createCorsResponse()
+  }
+  if (req.method !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: { Allow: 'POST, OPTIONS' },
+      body: JSON.stringify({ success: false, error: 'Method Not Allowed' }),
+    }
+  }
+
+  // Defensive body parsing + validation
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  if (!body || typeof body !== 'object' || !('session' in body)) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Missing session data for bias detection.' }),
+      body: JSON.stringify({ success: false, error: 'Missing session data for bias detection.' }),
     }
   }
 
@@ -77,8 +90,9 @@ export const detectBiasServerlessHandler = createServerlessHandler(async (req) =
   const engine = new BiasDetectionEngine()
   try {
     await engine.initialize()
-    const analysis = await engine.analyzeSession(req.body.session)
+    const analysis = await engine.analyzeSession(body.session)
     return {
+      // ...rest of the original response
       statusCode: 200,
       body: JSON.stringify({ success: true, data: analysis }),
     }

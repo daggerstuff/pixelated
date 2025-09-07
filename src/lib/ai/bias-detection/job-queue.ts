@@ -53,7 +53,8 @@ export class JobQueue<T = any, R = any> {
    */
   getMetrics() {
     const jobs = Array.from(this.jobs.values())
-    const statusCounts = jobs.reduce<Record<JobStatus, number>>((acc) => {
+    const statusCounts = jobs.reduce<Record<JobStatus, number>>((acc, j) => {
+      acc[j.status] = (acc[j.status] ?? 0) + 1
       return acc
     }, { pending: 0, in_progress: 0, completed: 0, failed: 0 })
     const completedJobs = jobs.filter(j => j.status === 'completed' && j.finishedAt && j.startedAt)
