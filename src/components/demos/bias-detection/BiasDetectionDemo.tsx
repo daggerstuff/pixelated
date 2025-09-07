@@ -1,6 +1,6 @@
 // Main bias detection demo component with comprehensive analysis interface
 
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback, type FC } from 'react'
 import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
 import { PresetScenarioSelector } from './PresetScenarioSelector'
 import { CounterfactualAnalysis } from './CounterfactualAnalysis'
@@ -132,7 +132,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
         }
 
         // Generate counterfactual scenarios
-        const scenarios = generateCounterfactualScenarios(data, biasFactors)
+        const scenarios = generateCounterfactualScenarios(biasFactors)
 
         // Generate historical comparison if enabled
         let historical: HistoricalComparison | null = null

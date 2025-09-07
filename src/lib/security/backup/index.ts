@@ -211,7 +211,7 @@ export class BackupSecurityManager {
   private recoveryTestingManager?: RecoveryTestingManager
   private storageProviders: Map<StorageLocation, StorageProvider> = new Map()
 
-  constructor(config?: Partial<BackupConfig>): void {
+  constructor(config?: Partial<BackupConfig>) {
     // Default configuration
     this.config = {
       backupTypes: {

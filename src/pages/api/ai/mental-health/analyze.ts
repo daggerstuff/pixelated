@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { createMentalLLaMAFromEnv } from '../../../../lib/ai/mental-llama/index.js'
+import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
 import { getApiEndpointLogger } from '@/lib/logging/standardized-logger'
 import type { RoutingContext } from '../../../../lib/ai/mental-llama/types/mentalLLaMATypes.js'
 

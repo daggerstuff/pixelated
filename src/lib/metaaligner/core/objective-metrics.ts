@@ -126,7 +126,7 @@ export class ObjectiveMetricsEngine {
   private config: MetricsConfig
   private baselines: Map<string, number> = new Map()
 
-  constructor(config: MetricsConfig): void {
+  constructor(config: MetricsConfig) {
     this.config = config
     this.evaluationHistory = {
       evaluations: [],

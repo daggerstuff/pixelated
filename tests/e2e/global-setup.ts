@@ -1,12 +1,12 @@
 import { chromium, FullConfig } from '@playwright/test';
 
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   console.log('🚀 Starting global E2E test setup...');
   
   // Launch browser for setup
   const browser = await chromium.launch();
   const context = await browser.newContext();
-  const page = await context.newPage();
+  await context.newPage();
   
   try {
     // Perform any global setup tasks
@@ -18,11 +18,12 @@ async function globalSetup(config: FullConfig) {
     // await page.fill('[data-testid="password"]', 'testpassword');
     // await page.click('[data-testid="login-button"]');
     // await page.waitForURL('/dashboard');
-    // await context.storageState({ path: 'tests/e2e/auth.json' });
     
-    console.log('  ✅ Global setup completed');
+    // Save authentication state to a file
+    // await page.context().storageState({ path: 'storageState.json' });
     
-  } catch (error: unknown) {
+    console.log('  ✅ Test environment setup complete.');
+  } catch (error) {
     console.error('❌ Global setup failed:', error);
     throw error;
   } finally {

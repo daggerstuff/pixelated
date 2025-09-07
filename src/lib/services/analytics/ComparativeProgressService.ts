@@ -17,7 +17,7 @@ interface Logger {
 export class ComparativeProgressService {
   private logger: Logger
 
-  constructor(logger: Logger): void {
+  constructor(logger: Logger) {
     this.logger = logger
   }
 

@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { DemoOne } from '@/components/ui/rubiks-cube-demo';
+import { DemoOne as RubiksCubeDemo } from '@/components/ui/rubiks-cube-demo';
 ---
 
 <BaseLayout title="You Found It!" description="An interactive easter egg.">
-  <DemoOne client:load />
+  <RubiksCubeDemo client:load />
 </BaseLayout>

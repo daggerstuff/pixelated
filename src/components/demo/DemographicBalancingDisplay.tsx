@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import type { PatientInfo } from '../../lib/types/psychology-pipeline'
+import { useState, useEffect, type FC } from 'react'
 
 interface DemographicData {
   category: string
@@ -10,7 +9,12 @@ interface DemographicData {
 }
 
 interface DemographicBalancingDisplayProps {
-  currentProfile: PatientInfo
+  currentProfile: {
+    age: number
+    gender: string
+    occupation: string
+    background: string
+  }
   onBalanceUpdate?: (balanceScore: number) => void
 }
 
@@ -281,38 +285,40 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 
   const groupedStats = demographicStats.reduce(
     (acc, stat) => {
-      if (!acc[stat.category]) {
-        acc[stat.category] = []
+      const category = stat.category
+      if (!acc[category]) {
+        acc[category] = []
       }
-      acc[stat.category].push(stat)
+      ;(acc[category] as DemographicData[]).push(stat)
       return acc
     },
     {} as Record<string, DemographicData[]>,
   )
 
   return (
-    <div className="demographic-balancing-display bg-white rounded-lg p-6 border shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h4 className="text-lg font-semibold text-gray-800">
-          Demographic Balance & Diversity
+    <div className="p-4 bg-gray-100 rounded-lg">
+      <div className="flex justify-between items-center mb-4">
+        <h4 className="text-xl font-bold text-gray-800">
+          Dataset Demographic Balance
         </h4>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Overall Balance:</span>
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              overallBalance >= 85
+          <span className="text-sm font-medium text-gray-600">
+            Overall Balance:
+          </span>
+          <span
+            className={`text-lg font-bold px-3 py-1 rounded-full ${
+              overallBalance > 85
                 ? 'bg-green-100 text-green-800'
-                : overallBalance >= 70
+                : overallBalance > 70
                   ? 'bg-yellow-100 text-yellow-800'
                   : 'bg-red-100 text-red-800'
             }`}
           >
             {overallBalance.toFixed(1)}%
-          </div>
+          </span>
         </div>
       </div>
 
-      {/* Current Profile Summary */}
       <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
         <h5 className="font-medium text-blue-800 mb-2">
           Current Profile Classification

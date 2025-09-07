@@ -1,29 +1,19 @@
+
 services:
   qdrant:
     image: qdrant/qdrant:v1.9.0
-    restart: unless-stopped
-    environment:
-      QDRANT__LOG_LEVEL: INFO
-      QDRANT__SERVICE__HOST: 0.0.0.0
-      QDRANT__STORAGE__DIR: /qdrant/storage
+    container_name: pixelated-qdrant
     ports:
       - "6333:6333"
     volumes:
-      - qdrant_storage:/qdrant/storage
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: "0.5"
-        reservations:
-          memory: 512M
-    labels:
-      - "maintainer=roo"
-      - "app.context=codebase_search"
+      - qdrant_storage:/qdrant/storage:rw
+    command: ["/bin/sh", "-c", "chown -R 1000:1000 /qdrant/storage || true; chmod -R u+rwX /qdrant/storage || true; exec /qdrant/qdrant"]
+    environment:
+      QDRANT__LOG_LEVEL: "INFO"
+      QDRANT__SERVICE__HOST: "0.0.0.0"
+      QDRANT__STORAGE__DIR: "/qdrant/storage"
+    restart: unless-stopped
+
 volumes:
   qdrant_storage:
+    name: pixelated_qdrant_storage

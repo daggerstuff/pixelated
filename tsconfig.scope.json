@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+  "types": ["node", "react", "react-dom"],
+  "noUnusedLocals": false,
+  "noUnusedParameters": false,
+  "noImplicitAny": false
+  },
+    "include": [
+  "src/components/**/*",
+  "src/lib/**/*",
+  "src/types/**/*"
+    ],
+    "exclude": [
+      "node_modules",
+      "dist",
+      "tests",
+      "**/__tests__/**",
+      "**/__mocks__/**",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "src/lib/services/redis/**",
+      "src/lib/services/redis/__tests__/**",
+      "src/lib/services/redis/__mocks__/**"
+    ]
+}

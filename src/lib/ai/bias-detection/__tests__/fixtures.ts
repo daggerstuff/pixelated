@@ -115,3 +115,57 @@ export function getComparativeBiasScenarios(): [
 
   return [[favorableScenario, unfavorableScenario]]
 }
+
+// =======================
+// TEST MOCKS FOR BIAS ENGINE UNIT TESTS – ADDED FOR TYPE ERRORS
+// =======================
+
+export const mockPythonBridge = {
+  initialize: jest.fn(),
+  checkHealth: jest.fn(),
+  runPreprocessingAnalysis: jest.fn(),
+  runModelLevelAnalysis: jest.fn(),
+  runInteractiveAnalysis: jest.fn(),
+  runEvaluationAnalysis: jest.fn(),
+  analyze_session: jest.fn(),
+}
+
+export function createDefaultAnalysisResult() {
+  return {
+    biasScore: 0.5,
+    linguisticBias: { genderBiasScore: 0, racialBiasScore: 0, ageBiasScore: 0, culturalBiasScore: 0, biasedTerms: [], sentimentAnalysis: { overallSentiment: 0, emotionalValence: 0, subjectivity: 0, demographicVariations: {} } },
+    representationAnalysis: { demographicDistribution: {}, underrepresentedGroups: [], overrepresentedGroups: [], diversityIndex: 0, intersectionalityAnalysis: [] },
+    dataQualityMetrics: { completeness: 1, consistency: 1, accuracy: 1, timeliness: 1, validity: 1, missingDataByDemographic: {} },
+    recommendations: [],
+  }
+}
+
+export function createModelLevelAnalysisResult() {
+  return {
+    biasScore: 0.5,
+    fairnessMetrics: { demographicParity: 0.5, equalizedOdds: 0.5, equalOpportunity: 0.5, calibration: 0.5, individualFairness: 0.5, counterfactualFairness: 0.5 },
+    performanceMetrics: { accuracy: 0.5, precision: 0.5, recall: 0.5, f1Score: 0.5, auc: 0.5, calibrationError: 0, demographicBreakdown: {} },
+    groupPerformanceComparison: [],
+    recommendations: [],
+  }
+}
+
+export function createInteractiveAnalysisResult() {
+  return {
+    biasScore: 0.5,
+    counterfactualAnalysis: { scenariosAnalyzed: 2, biasDetected: false, consistencyScore: 0, problematicScenarios: [] },
+    featureImportance: [],
+    whatIfScenarios: [],
+    recommendations: [],
+  }
+}
+
+export function createEvaluationAnalysisResult() {
+  return {
+    biasScore: 0.5,
+    huggingFaceMetrics: { toxicity: 0, bias: 0, regard: {}, stereotype: 0, fairness: 0 },
+    customMetrics: { therapeuticBias: 0, culturalSensitivity: 0, professionalEthics: 0, patientSafety: 0 },
+    temporalAnalysis: { trendDirection: "stable", changeRate: 0, seasonalPatterns: [], interventionEffectiveness: [] },
+    recommendations: [],
+  }
+}

@@ -12,15 +12,20 @@ interface LocalMessage {
   isError?: boolean
 }
 
-interface UseChatReturn {
+export interface UseChatReturn {
   messages: LocalMessage[]
   input: string
   handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void
   handleSubmit: (e: React.FormEvent) => Promise<void>
   isLoading: boolean
   setMessages: React.Dispatch<React.SetStateAction<LocalMessage[]>>
+  sendMessage: (content: string) => Promise<string | undefined>
 }
 
+/**
+ * Custom React hook for chat messaging interface.
+ * @param options ChatOptions for initialization and API hooks.
+ */
 export function useChat(options: ChatOptions): UseChatReturn {
   const {
     initialMessages = [],
@@ -38,10 +43,8 @@ export function useChat(options: ChatOptions): UseChatReturn {
     setInput(e.target.value)
   }
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault()
-
-    if (!input.trim()) {
+  const sendMessage = async (content: string): Promise<string | undefined> => {
+    if (!content.trim()) {
       return
     }
 
@@ -49,13 +52,12 @@ export function useChat(options: ChatOptions): UseChatReturn {
     const userMessage: LocalMessage = {
       id: crypto.randomUUID(),
       role: 'user',
-      content: input,
+      content,
       name: 'User',
     }
 
     setMessages((prev: LocalMessage[]) => [...prev, userMessage])
     setIsLoading(true)
-    setInput('')
 
     try {
       // Prepare the request
@@ -98,6 +100,7 @@ export function useChat(options: ChatOptions): UseChatReturn {
       }
 
       setMessages((prev: LocalMessage[]) => [...prev, assistantMessage])
+      return assistantMessage.content
     } catch (error: unknown) {
       console.error('Error in chat:', error)
 
@@ -115,9 +118,16 @@ export function useChat(options: ChatOptions): UseChatReturn {
       if (onError) {
         onError(error as Error)
       }
+      return undefined
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault()
+    await sendMessage(input)
+    setInput('')
   }
 
   return {
@@ -127,5 +137,6 @@ export function useChat(options: ChatOptions): UseChatReturn {
     handleSubmit,
     isLoading,
     setMessages,
+    sendMessage,
   }
 }

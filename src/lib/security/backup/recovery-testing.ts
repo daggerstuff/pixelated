@@ -139,7 +139,7 @@ export class RecoveryTestingManager {
   private testEnvironments: Map<string, TestEnvironment> = new Map()
   private testCases: Map<string, TestCase> = new Map()
 
-  constructor(config: RecoveryTestConfig): void {
+  constructor(config: RecoveryTestConfig) {
     this.config = config
     this.initialize()
   }

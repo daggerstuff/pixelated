@@ -14,7 +14,7 @@ const logger = baseLogger
  */
 
 class PythonBridgeError extends Error {
-  constructor(message: string): void {
+  constructor(message: string) {
     super(message)
     this.name = 'PythonBridgeError'
   }
@@ -44,7 +44,7 @@ export class MentalLLaMAPythonBridge {
   private readonly REQUEST_TIMEOUT_MS = 20000
   public pythonBridgeDisabled: boolean = false
 
-  constructor(pythonScriptPath?: string): void {
+  constructor(pythonScriptPath?: string) {
     this.pythonScriptPath =
       pythonScriptPath || './scripts/mental_llama_python_handler.py'
     this.pythonBridgeDisabled = false

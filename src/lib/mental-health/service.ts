@@ -14,7 +14,7 @@ export class MentalHealthService {
   private conversationHistory: Map<string, ChatMessage[]> = new Map()
   private analysisHistory: Map<string, MentalHealthAnalysis[]> = new Map()
 
-  constructor(config: Partial<AnalysisConfig> = {}): void {
+  constructor(config: Partial<AnalysisConfig> = {}) {
     this.analyzer = new MentalHealthAnalyzer()
     this.therapist = new TherapeuticResponseGenerator()
     this.config = {
@@ -176,7 +176,7 @@ export class MentalHealthService {
     this.analysisHistory.delete(conversationId)
   }
 
-  getStats(conversationId: string): void {
+  getStats(conversationId: string) {
     const messages = this.conversationHistory.get(conversationId) || []
     const analyses = this.analysisHistory.get(conversationId) || []
 
@@ -189,7 +189,7 @@ export class MentalHealthService {
         ? analyses.reduce((sum, a) => sum + a.confidence, 0) / analyses.length
         : 0
 
-    return {
+  return {
       totalMessages: messages.length,
       userMessages: userMessages.length,
       analyzedMessages: analyzedMessages.length,

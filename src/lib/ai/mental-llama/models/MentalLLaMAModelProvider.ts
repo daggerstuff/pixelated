@@ -59,7 +59,7 @@ export class MentalLLaMAModelProvider implements IModelProvider {
    * @param {('7B' | '13B' | string)} [modelTier='7B'] - The model tier to use (e.g., '7B', '13B').
    * @throws Error if essential configuration (API key, endpoint URL for the tier) is missing.
    */
-  constructor(modelTier: '7B' | '13B' | string = '7B'): void {
+  constructor(modelTier: '7B' | '13B' | string = '7B') {
     this.modelTier = modelTier
 
     // Read configuration from environment

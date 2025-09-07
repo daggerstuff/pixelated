@@ -5,7 +5,7 @@ export class RedisStorageAPI implements StorageAPI {
   private client
   private connected = false
 
-  constructor(redisUrl: string): void {
+  constructor(redisUrl: string) {
     this.client = createClient({
       url: redisUrl,
     })
@@ -34,10 +34,13 @@ export class RedisStorageAPI implements StorageAPI {
     }
   }
 
-  async get(key: string): Promise<unknown> {
+  async get<T = unknown>(key: string): Promise<T> {
     await this.ensureConnection()
     const value = await this.client.get(key)
-    return value ? JSON.parse(value) as unknown : null
+    if (value === null) {
+      throw new Error(`Key not found: ${key}`)
+    }
+    return JSON.parse(value) as T
   }
 
   async set(key: string, value: unknown): Promise<void> {

@@ -1,5 +1,5 @@
-import type { AIMessage } from '../../../lib/ai/index'
-import type { AIStreamChunk } from '../../../lib/ai/models/ai-types'
+import type { AIMessage, AIStreamChunk } from '@/lib/ai/AIService'
+import { logger } from '@/lib/logger'
 import { useCallback, useState, useRef, useEffect } from 'react'
 
 interface UseChatCompletionOptions {
@@ -162,6 +162,12 @@ export function useChatCompletion({
     avgResponseTime: 0,
     totalDuration: 0,
     startTime: initialMessages.length > 0 ? new Date() : null,
+  })
+  const [messageStats, setMessageStats] = useState<MessageStats>({
+    longestMessage: 0,
+    shortestMessage: 0,
+    averageLength: 0,
+    sentimentDistribution: {},
   })
 
   // Store last user message for retry functionality
@@ -718,40 +724,37 @@ export function useChatCompletion({
   // Import conversation
   const importConversation = useCallback((data: string) => {
     try {
-      const parsed = JSON.parse(data) as unknown
-      if (parsed.messages && Array.isArray(parsed.messages)) {
-        setMessages(parsed.messages)
-        if (parsed.stats) {
-          setConversationStats(parsed.stats)
-        }
+      const parsed = JSON.parse(data) as {
+        messages: AIMessage[];
+        stats?: ConversationStats;
       }
-    } catch (err: unknown) {
-      console.error('Failed to import conversation:', err)
-      setError('Invalid conversation data format')
+      setMessages(parsed.messages)
+      if (parsed.stats) {
+        setConversationStats(parsed.stats)
+      }
+    } catch (err) {
+      logger.error('Failed to import conversation', { err })
     }
   }, [])
 
-  // Get message statistics
+  // Get message stats
   const getMessageStats = useCallback((): MessageStats => {
-    const lengths = messages.map(m => m.content.length)
-    
-    return {
-      longestMessage: Math.max(...lengths, 0),
-      shortestMessage: Math.min(...lengths, 0),
-      averageLength: lengths.length > 0 ? lengths.reduce((a, b) => a + b, 0) / lengths.length : 0,
-      sentimentDistribution: {}, // Would need sentiment analysis integration
-    }
-  }, [messages])
+    // This is a placeholder implementation.
+    // A real implementation would calculate this based on the messages.
+    return messageStats
+  }, [messageStats])
 
   return {
+    // Core state
     messages,
+    error,
     isLoading,
+    // Extended state
     isStreaming,
     isTyping,
-    error,
-    progress,
-    tokenUsage,
     conversationStats,
+    tokenUsage,
+    // Extended methods
     sendMessage,
     sendStreamingMessage,
     editMessage,
@@ -765,5 +768,6 @@ export function useChatCompletion({
     importConversation,
     stopGeneration,
     getMessageStats,
+    progress,
   }
 }

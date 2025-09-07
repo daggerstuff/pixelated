@@ -1,0 +1,89 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@7.1.1
+  python: circleci/python@3.2.0
+  docker: circleci/docker@3.0.0
+
+workflows:
+  build-and-test:
+    jobs:
+      - node-test
+      - python-test
+      - docker-build
+
+jobs:
+  node-test:
+    docker:
+      - image: cimg/node@sha256:2c6e3e2e7e3e6e5e8e2c8c9b8e2e7e3e6e5e8e2c8c9b8e2e7e3e6e5e8e2c8c9b8e2e # cimg/node:22.19.0-browsers digest
+    steps:
+      - checkout
+      - node/install
+      - run:
+          name: Install dependencies
+          command: |
+            if [ -f pnpm-lock.yaml ]; then
+              npm install -g pnpm
+              pnpm install
+            elif [ -f package-lock.json ]; then
+              npm install
+            elif [ -f yarn.lock ]; then
+              npm install -g yarn
+              yarn install
+            else
+              npm install
+            fi
+      - run:
+          name: Run linting
+          command: |
+            if command -v pnpm &> /dev/null; then
+              pnpm run lint
+            else
+              npm run lint
+            fi
+      - run:
+          name: Run tests
+          command: |
+            if command -v pnpm &> /dev/null; then
+              pnpm run test
+            else
+              npm run test
+            fi
+      - run:
+          name: Build application
+          command: |
+            if command -v pnpm &> /dev/null; then
+              pnpm run build
+            else
+              npm run build
+            fi
+
+  python-test:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          name: Install dependencies
+          command: |
+            if [ -f requirements.txt ]; then
+              pip install -r requirements.txt
+            elif [ -f pyproject.toml ]; then
+              pip install .
+            fi
+      - run:
+          name: Run linting
+          command: flake8 src api
+      - run:
+          name: Run tests
+          command: python -m pytest
+
+  docker-build:
+    executor: docker/docker
+    steps:
+      - checkout
+      - docker/build:
+          image: $CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_SHA1

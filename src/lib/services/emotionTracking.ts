@@ -170,7 +170,13 @@ export function calculateEmotionSummary(
  * Custom hook that returns emotion data for a session with additional processing
  * This is a placeholder that would integrate with your state management
  */
-export function useSessionEmotions(sessionId: string): void {
+export type UseSessionEmotionsReturn = {
+  data: EmotionDataPoint[]
+  isLoading: boolean
+  summary: EmotionSummary
+}
+
+export function useSessionEmotions(sessionId: string): UseSessionEmotionsReturn {
   // This would ideally use your existing data fetching patterns
   // For example, if using a data fetching library:
   // const data = useQuery(['sessions', sessionId, 'emotions'], () => fetchSessionEmotionData(sessionId));

@@ -206,7 +206,7 @@ async function checkPerformanceStandards(): Promise<ProductionReadinessCheck> {
 async function checkReliabilityStandards(): Promise<ProductionReadinessCheck> {
   try {
     const uptimeStats = uptimeMonitor.getStats(24)
-    const uptime = uptimeStats.uptime
+    const {uptime} = uptimeStats
     
     return {
       id: 'reliability',
@@ -342,7 +342,7 @@ async function checkUsabilityStandards(): Promise<ProductionReadinessCheck> {
       existsSync('./src/components'),
       existsSync('./src/pages'),
       existsSync('./src/layouts'),
-      existsSync('./tailwind.config.ts') || existsSync('./tailwind.config.js')
+      existsSync('./uno.config.ts') || existsSync('./uno.config.js')
     ]
     
     const usabilityScore = (usabilityChecks.filter(Boolean).length / usabilityChecks.length) * 100

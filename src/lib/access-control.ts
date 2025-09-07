@@ -129,7 +129,11 @@ export async function isAdmin(cookies: AstroCookies): Promise<boolean> {
  * Check if the current user is staff or admin
  */
 export async function isStaffOrAdmin(cookies: AstroCookies): Promise<boolean> {
-  return hasRole(cookies, ROLES.STAFF)
+  const user = await getCurrentUser(cookies)
+  if (!user) {
+    return false
+  }
+  return hasRole(cookies, ROLES.STAFF) || hasRole(cookies, ROLES.ADMIN)
 }
 
 /**

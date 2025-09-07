@@ -1,9 +1,9 @@
-import { mongoClient } from '../../supabase'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { createAuditLog, AuditEventType } from '../../audit'
+import { createBuildSafeLogger } from '@lib/logging/build-safe-logger';
+import { createAuditLog, AuditEventType } from '@lib/audit';
+import mongodb from '@lib/db/mongoClient';
+import { ObjectId } from 'mongodb';
 
-const logger = createBuildSafeLogger('crisis-session-flagging')
-
+const logger = createBuildSafeLogger('crisis-session-flagging');
 
 export interface FlagSessionRequest {
   userId: string
@@ -95,50 +95,94 @@ export class CrisisSessionFlaggingService {
         sessionId: request.sessionId,
         crisisId: request.crisisId,
         severity: request.severity,
-      })
+      });
 
       // Validate input
       if (!request.userId || !request.sessionId || !request.crisisId) {
-        throw new Error(
-          'Missing required fields: userId, sessionId, or crisisId',
-        )
+        throw new Error('Missing required fields: userId, sessionId, or crisisId');
       }
 
       if (request.confidence < 0 || request.confidence > 1) {
-        throw new Error('Confidence must be between 0 and 1')
+        throw new Error('Confidence must be between 0 and 1');
       }
 
-      // Insert crisis session flag into MongoDB
-      const insertResult = await db.collection('crisis_session_flags').insertOne({
+      // Insert crisis session flag into MongoDB, ensuring a string 'id' field is created
+      const db = await mongodb.connect();
+      const now = new Date().toISOString();
+      const tempId = new ObjectId();
+      // Sanitize and validate all request fields before insert to prevent injection
+      if (typeof request.userId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(request.userId)) {
+        throw new Error('Invalid userId');
+      }
+      if (typeof request.sessionId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(request.sessionId)) {
+        throw new Error('Invalid sessionId');
+      }
+      if (typeof request.crisisId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(request.crisisId)) {
+        throw new Error('Invalid crisisId');
+      }
+      if (!['low', 'medium', 'high', 'critical'].includes(String(request.severity))) {
+        throw new Error('Invalid severity');
+      }
+      if (typeof request.reason !== 'string') {
+        throw new Error('Invalid reason');
+      }
+      if (typeof request.confidence !== 'number' || request.confidence < 0 || request.confidence > 1) {
+        throw new Error('Invalid confidence');
+      }
+
+      const safeDetectedRisks = Array.isArray(request.detectedRisks)
+        ? request.detectedRisks.filter(risk => typeof risk === 'string')
+        : [];
+      const safeTextSample =
+        request.textSample !== undefined
+          ? (typeof request.textSample === 'string' ? request.textSample : '')
+          : undefined;
+      const safeRoutingDecision =
+        request.routingDecision !== undefined && typeof request.routingDecision === 'object'
+          ? request.routingDecision
+          : undefined;
+      const safeMetadata =
+        request.metadata !== undefined && typeof request.metadata === 'object' && !Array.isArray(request.metadata)
+          ? request.metadata
+          : {};
+      const safeTimestamp =
+        typeof request.timestamp === 'string' && request.timestamp.length < 50 ? request.timestamp : now;
+
+      const insertDoc = {
+        _id: tempId,
+        id: tempId.toString(),
         user_id: request.userId,
         session_id: request.sessionId,
         crisis_id: request.crisisId,
         reason: request.reason,
         severity: request.severity,
         confidence: request.confidence,
-        detected_risks: request.detectedRisks,
-        text_sample: request.textSample,
-        routing_decision: request.routingDecision,
-        metadata: request.metadata || {},
+        detected_risks: safeDetectedRisks,
+        text_sample: safeTextSample,
+        routing_decision: safeRoutingDecision,
+        metadata: safeMetadata,
         status: 'pending',
-        flagged_at: request.timestamp,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+        flagged_at: safeTimestamp,
+        created_at: now,
+        updated_at: now,
+      };
+      const insertResult = await db.collection('crisis_session_flags').insertOne(insertDoc);
 
       if (!insertResult.insertedId) {
-        throw new Error('Failed to insert crisis session flag')
+        throw new Error('Failed to insert crisis session flag');
       }
 
+      // To prevent any potential NoSQL injection, we query using the ObjectId
+      // generated in this function scope, rather than the result from the insert operation.
       const flagData = await db
         .collection('crisis_session_flags')
-        .findOne({ _id: insertResult.insertedId })
+        .findOne({ _id: tempId });
 
       if (!flagData) {
-        throw new Error('Failed to retrieve inserted crisis session flag')
+        throw new Error('Failed to retrieve inserted crisis session flag');
       }
 
-      // Create audit log
+      // Create audit log, including string ID
       await createAuditLog(
         AuditEventType.SECURITY_ALERT,
         'crisis_session_flagged',
@@ -146,28 +190,29 @@ export class CrisisSessionFlaggingService {
         request.sessionId,
         {
           crisisId: request.crisisId,
+          flagId: flagData['id'],
           severity: request.severity,
           reason: request.reason,
           confidence: request.confidence,
           detectedRisks: request.detectedRisks,
         },
-      )
+      );
 
       logger.info('Session flagged successfully', {
-        flagId: flagData.id,
+        flagId: flagData['id'],
         userId: request.userId,
         sessionId: request.sessionId,
         crisisId: request.crisisId,
-      })
+      });
 
-      return this.mapFlagFromDb(flagData)
+      return this.mapFlagFromDb(flagData);
     } catch (error: unknown) {
       logger.error('Error flagging session for review', {
         error: error instanceof Error ? String(error) : String(error),
         userId: request.userId,
         sessionId: request.sessionId,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
@@ -181,12 +226,12 @@ export class CrisisSessionFlaggingService {
       logger.info('Updating crisis flag status', {
         flagId: request.flagId,
         status: request.status,
-      })
+      });
 
       const updateData: CrisisSessionFlagUpdateData = {
         status: request.status,
         updated_at: new Date().toISOString(),
-      }
+      };
 
       // Set timestamps based on status
       if (request.status === 'under_review' && request.assignedTo) {
@@ -197,66 +242,59 @@ export class CrisisSessionFlaggingService {
         updateData.reviewed_at = new Date().toISOString()
       }
 
-      if (request && request.status === 'resolved') {
+      if (request.status === 'resolved') {
         updateData.resolved_at = new Date().toISOString()
       }
 
-      if (request && request.reviewerNotes) {
+      if (request.reviewerNotes) {
         updateData.reviewer_notes = request.reviewerNotes
       }
 
-      if (request && request.resolutionNotes) {
+      if (request.resolutionNotes) {
         updateData.resolution_notes = request.resolutionNotes
       }
 
-      if (request && request.metadata) {
+      if (request.metadata) {
         updateData.metadata = request.metadata
       }
 
-      // Explicitly check for null/undefined before optional chaining to satisfy no-unsafe-optional-chaining
-      const mongo = mongoClient as unknown as { from?: (table: string) => unknown }
-      if (!mongo || typeof mongo.from !== 'function') {
-        throw new Error('mongoClient.from is not available')
-      }
-      const fromResult = mongo.from('crisis_session_flags')
+      const db = await mongodb.connect();
+      // Validate flagId as a sanitized string and attempt ObjectId construction
       if (
-        !fromResult ||
-        typeof fromResult.update !== 'function' ||
-        typeof fromResult.eq !== 'function' ||
-        typeof fromResult.select !== 'function'
+        typeof request.flagId !== 'string' ||
+        !/^[a-f\d]{24}$/i.test(request.flagId)
       ) {
-        throw new Error('fromResult missing required methods')
+        throw new Error('Invalid flagId provided.');
       }
-      const updateResult = fromResult.update(updateData)
-      const eqResult = typeof updateResult.eq === 'function'
-        ? updateResult.eq('id', request && request.flagId)
-        : undefined
-      const selectResult = eqResult && typeof eqResult.select === 'function'
-        ? eqResult.select()
-        : undefined
-      const singleResult = selectResult && typeof selectResult.single === 'function'
-        ? await selectResult.single()
-        : { data: undefined, error: { message: 'single() not available' } }
-      const { data, error } = singleResult
+      let objectId: ObjectId;
+      try {
+        objectId = new ObjectId(request.flagId);
+      } catch (e) {
+        throw new Error('flagId is not a valid ObjectId.');
+      }
+      const updateResult = await db.collection('crisis_session_flags').findOneAndUpdate(
+        { _id: objectId },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
 
-      if (error) {
+      if (!updateResult?.['value']) {
         logger.error('Failed to update crisis flag status', {
-          error,
-          flagId: request && request.flagId,
-        })
-        throw new Error(`Failed to update flag status: ${String(error)}`)
+          flagId: request.flagId,
+        });
+        throw new Error(`Failed to update flag status: flag not found`);
       }
 
       logger.info('Crisis flag status updated successfully', {
-        flagId: request && request.flagId,
-        status: request && request.status,
-      })
+        flagId: request.flagId,
+        status: request.status,
+      });
 
-      return this.mapFlagFromDb(data)
+      return this.mapFlagFromDb(updateResult['value']);
     } catch (error: unknown) {
       logger.error('Error updating flag status', {
         error: error instanceof Error ? String(error) : String(error),
-        flagId: request && request.flagId,
+        flagId: request.flagId,
       })
       throw error
     }
@@ -270,237 +308,54 @@ export class CrisisSessionFlaggingService {
     includeResolved: boolean = false,
   ): Promise<CrisisSessionFlag[]> {
     try {
-      let query = (mongoClient as unknown as {
-        from?: (table: string) => unknown
-      })
-        ?.from?.('crisis_session_flags')
-        ?.select?.('*')
-        ?.eq?.('user_id', userId)
-        ?.order?.('flagged_at', { ascending: false })
+      const db = await mongodb.connect();
+
+      if (
+        typeof userId !== 'string' ||
+        !/^[a-zA-Z0-9-_]+$/.test(userId)
+      ) {
+        throw new Error('Invalid userId provided.');
+      }
+      const query: any = { user_id: userId };
 
       if (!includeResolved) {
-        query = query.not('status', 'in', '(resolved,dismissed)')
+        query.status = { $nin: ['resolved', 'dismissed'] };
       }
 
-      const { data, error } = await query
+      const flags = await db.collection('crisis_session_flags').find(query).sort({ flagged_at: -1 }).toArray();
 
-      if (error) {
-        logger.error('Failed to get user crisis flags', {
-          error,
-          userId,
-        })
-        throw new Error(`Failed to get crisis flags: ${String(error)}`)
-      }
-
-      return data.map((flag) => this.mapFlagFromDb(flag))
+      return flags.map((flag) => this.mapFlagFromDb(flag));
     } catch (error: unknown) {
       logger.error('Error getting user crisis flags', {
         error: error instanceof Error ? String(error) : String(error),
         userId,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
-  /**
-   * Get user session status
-   */
-  async getUserSessionStatus(
-    userId: string,
-  ): Promise<UserSessionStatus | null> {
-    try {
-      // Explicitly check for null/undefined before optional chaining to satisfy no-unsafe-optional-chaining
-      const mongo = mongoClient as unknown as { from?: (table: string) => unknown }
-      if (!mongo || typeof mongo.from !== 'function') {
-        throw new Error('mongoClient.from is not available')
-      }
-      const fromResult = mongo.from('user_session_status')
-      if (
-        !fromResult ||
-        typeof fromResult.select !== 'function' ||
-        typeof fromResult.eq !== 'function'
-      ) {
-        throw new Error('fromResult missing required methods')
-      }
-      const selectResult = fromResult.select('*')
-      const eqResult = typeof selectResult.eq === 'function'
-        ? selectResult.eq('user_id', userId)
-        : undefined
-      const singleResult = eqResult && typeof eqResult.single === 'function'
-        ? await eqResult.single()
-        : { data: undefined, error: { message: 'single() not available' } }
-      const { data, error } = singleResult
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // No record found
-          return null
-        }
-        logger.error('Failed to get user session status', {
-          error,
-          userId,
-        })
-        throw new Error(`Failed to get session status: ${String(error)}`)
-      }
-
-      return this.mapStatusFromDb(data)
-    } catch (error: unknown) {
-      logger.error('Error getting user session status', {
-        error: error instanceof Error ? String(error) : String(error),
-        userId,
-      })
-      throw error
-    }
-  }
-
-  /**
-   * Get all pending crisis flags for review
-   */
-  async getPendingCrisisFlags(
-    limit: number = 50,
-  ): Promise<CrisisSessionFlag[]> {
-    try {
-      // Explicitly check for null/undefined before optional chaining to satisfy no-unsafe-optional-chaining
-      const mongo = mongoClient as unknown as { from?: (table: string) => unknown }
-      if (!mongo || typeof mongo.from !== 'function') {
-        throw new Error('mongoClient.from is not available')
-      }
-      const fromResult = mongo.from('crisis_session_flags')
-      if (
-        !fromResult ||
-        typeof fromResult.select !== 'function' ||
-        typeof fromResult.in !== 'function' ||
-        typeof fromResult.order !== 'function' ||
-        typeof fromResult.limit !== 'function'
-      ) {
-        throw new Error('fromResult missing required methods')
-      }
-      const selectResult = fromResult.select('*')
-      const inResult = typeof selectResult.in === 'function'
-        ? selectResult.in('status', ['pending', 'under_review'])
-        : undefined
-      const orderResult = inResult && typeof inResult.order === 'function'
-        ? inResult.order('flagged_at', { ascending: true })
-        : undefined
-      const limitResult = orderResult && typeof orderResult.limit === 'function'
-        ? orderResult.limit(limit)
-        : undefined
-      const { data, error } = limitResult
-
-      if (error) {
-        logger.error('Failed to get pending crisis flags', { error })
-        throw new Error(`Failed to get pending flags: ${String(error)}`)
-      }
-
-      return data.map((flag) => this.mapFlagFromDb(flag))
-    } catch (error: unknown) {
-      logger.error('Error getting pending crisis flags', {
-        error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
-    }
-  }
-
-  /**
-   * Map database record to CrisisSessionFlag interface
-   */
-  private mapFlagFromDb(data: unknown): CrisisSessionFlag {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid database record for crisis session flag')
-    }
-
-    const record = data as Record<string, unknown>
-
-    const result: CrisisSessionFlag = {
-      id: String(record['id']),
-      userId: String(record['user_id']),
-      sessionId: String(record['session_id']),
-      crisisId: String(record['crisis_id']),
-      reason: String(record['reason']),
-      severity: String(record['severity']) as
-        | 'low'
-        | 'medium'
-        | 'high'
-        | 'critical',
-      confidence: Number(record['confidence']),
-      detectedRisks: Array.isArray(record['detected_risks'])
-        ? (record['detected_risks'] as string[])
-        : [],
-      status: String(record['status']) as
-        | 'pending'
-        | 'under_review'
-        | 'reviewed'
-        | 'resolved'
-        | 'escalated'
-        | 'dismissed',
-      flaggedAt: String(record['flagged_at']),
-      routingDecision: record['routing_decision'],
-      metadata:
-        record['metadata'] && typeof record['metadata'] === 'object'
-          ? (record['metadata'] as Record<string, unknown>)
-          : {},
-      createdAt: String(record['created_at']),
-      updatedAt: String(record['updated_at']),
-    }
-
-    // Only set optional properties if they have values
-    if (record['text_sample']) {
-      result.textSample = String(record['text_sample'])
-    }
-    if (record['reviewed_at']) {
-      result.reviewedAt = String(record['reviewed_at'])
-    }
-    if (record['resolved_at']) {
-      result.resolvedAt = String(record['resolved_at'])
-    }
-    if (record['assigned_to']) {
-      result.assignedTo = String(record['assigned_to'])
-    }
-    if (record['reviewer_notes']) {
-      result.reviewerNotes = String(record['reviewer_notes'])
-    }
-    if (record['resolution_notes']) {
-      result.resolutionNotes = String(record['resolution_notes'])
-    }
-
-    return result
-  }
-
-  /**
-   * Map database record to UserSessionStatus interface
-   */
-  private mapStatusFromDb(data: unknown): UserSessionStatus {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid database record for user session status')
-    }
-
-    const record = data as Record<string, unknown>
-
-    const result: UserSessionStatus = {
-      id: String(record['id']),
-      userId: String(record['user_id']),
-      isFlaggedForReview: Boolean(record['is_flagged_for_review']),
-      currentRiskLevel: String(record['current_risk_level']) as
-        | 'low'
-        | 'medium'
-        | 'high'
-        | 'critical',
-      totalCrisisFlags: Number(record['total_crisis_flags']),
-      activeCrisisFlags: Number(record['active_crisis_flags']),
-      resolvedCrisisFlags: Number(record['resolved_crisis_flags']),
-      metadata:
-        record['metadata'] && typeof record['metadata'] === 'object'
-          ? (record['metadata'] as Record<string, unknown>)
-          : {},
-      createdAt: String(record['created_at']),
-      updatedAt: String(record['updated_at']),
-    }
-
-    // Only set optional properties if they have values
-    if (record['last_crisis_event_at']) {
-      result.lastCrisisEventAt = String(record['last_crisis_event_at'])
-    }
-
-    return result
+  private mapFlagFromDb(flagData: any): CrisisSessionFlag {
+    return {
+      id: flagData.id || (flagData._id ? flagData._id.toString() : ''),
+      userId: flagData.user_id,
+      sessionId: flagData.session_id,
+      crisisId: flagData.crisis_id,
+      reason: flagData.reason,
+      severity: flagData.severity,
+      confidence: flagData.confidence,
+      detectedRisks: flagData.detected_risks,
+      textSample: flagData.text_sample,
+      status: flagData.status,
+      flaggedAt: flagData.flagged_at,
+      reviewedAt: flagData.reviewed_at,
+      resolvedAt: flagData.resolved_at,
+      assignedTo: flagData.assigned_to,
+      reviewerNotes: flagData.reviewer_notes,
+      resolutionNotes: flagData.resolution_notes,
+      routingDecision: flagData.routing_decision,
+      metadata: flagData.metadata,
+      createdAt: flagData.created_at,
+      updatedAt: flagData.updated_at,
+    };
   }
 }

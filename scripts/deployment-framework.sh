@@ -246,7 +246,7 @@ build_ssh_command() {
     ssh_cmd="$ssh_cmd -p ${SSH_CONFIG["port"]}"
     
     # Add connection options
-    ssh_cmd="$ssh_cmd -o StrictHostKeyChecking=${SSH_CONFIG["strict_host_checking"]}"
+    ssh_cmd="$ssh_cmd -o ConnectTimeout=${SSH_CONFIG["connect_timeout"]}"
     ssh_cmd="$ssh_cmd -o ConnectTimeout=${SSH_CONFIG["connect_timeout"]}"
     ssh_cmd="$ssh_cmd -o ServerAliveInterval=${SSH_CONFIG["server_alive_interval"]}"
     ssh_cmd="$ssh_cmd -o ServerAliveCountMax=${SSH_CONFIG["server_alive_count_max"]}"

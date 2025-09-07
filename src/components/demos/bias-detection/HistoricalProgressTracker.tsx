@@ -1,6 +1,6 @@
 // Historical progress tracking dashboard component
 
-import React from 'react'
+import type { FC } from 'react'
 import type { HistoricalComparison } from '../../../lib/types/bias-detection'
 
 interface HistoricalProgressTrackerProps {

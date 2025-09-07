@@ -1,5 +1,5 @@
 // Create a mock function for the Astro global
-const Astro = {
+const mockAstro = {
   url: new URL('https://example.com/docs/page'),
   site: new URL('https://example.com'),
 }
@@ -40,7 +40,7 @@ test('DocumentationLayout renders with correct title and content', async () => {
     description: 'Test Description',
     image: '/test-image.jpg',
     canonicalURL: 'https://example.com/docs/test',
-    Astro,
+    Astro: mockAstro,
     children: '<div id="test-content">Test Content</div>',
   }
 
@@ -81,7 +81,7 @@ test('DocumentationLayout uses frontmatter props when available', async () => {
       description: 'Frontmatter Description',
       image: '/frontmatter-image.jpg',
     },
-    Astro,
+    Astro: mockAstro,
     children: '<div>Test Content</div>',
   }
 

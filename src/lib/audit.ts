@@ -293,7 +293,7 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
     // Get existing logs
     const existingLogsJson = localStorage.getItem('hipaa-audit-logs')
     const existingLogs: AuditLogEntry[] = existingLogsJson
-      ? JSON.parse(existingLogsJson) as unknown
+      ? (JSON.parse(existingLogsJson) as AuditLogEntry[])
       : []
 
     // Add new log
@@ -450,7 +450,7 @@ export function getAuditLogs(): AuditLogEntry[] {
 
   try {
     const logsJson = localStorage.getItem('hipaa-audit-logs')
-    return logsJson ? JSON.parse(logsJson) as unknown : []
+    return logsJson ? (JSON.parse(logsJson) as AuditLogEntry[]) : []
   } catch (error: unknown) {
     logger.error(
       'Failed to retrieve audit logs',
@@ -513,7 +513,7 @@ export async function createResourceAuditLog(
   resource: { id: string; type: string },
   details?: AuditDetails,
   status: AuditEventStatus = AuditEventStatus.SUCCESS,
-): Promise<AuditLogEntry | undefined> {
+): Promise<AuditLogEntry> {
   logger.warn(
     'createResourceAuditLog is a placeholder and needs full implementation.',
     {
@@ -525,18 +525,20 @@ export async function createResourceAuditLog(
     },
   )
 
-  if (config.enabled) {
-    return createHIPAACompliantAuditLog({
-      userId,
-      action: `resource_action_placeholder:${resource.type}:${resource.id}`,
-      resource: resource.id,
-      eventType,
-      status,
-      ...(details !== undefined ? { details } : {}),
-      notes: 'Placeholder log from createResourceAuditLog stub',
-    })
-  }
-  return Promise.resolve(undefined)
+  return createHIPAACompliantAuditLog({
+    userId,
+    action: `${eventType}:${resource.type}`,
+    resource: resource.type,
+    resourceId: resource.id,
+    eventType,
+    status,
+    details: {
+      ...details,
+      resourceType: resource.type,
+      resourceId: resource.id,
+    },
+    notes: 'Log created from createResourceAuditLog placeholder function.',
+  })
 }
 
 // Auto-initialize the service
