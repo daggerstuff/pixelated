@@ -27,7 +27,7 @@ async function initializeDependencies() {
         serverDepsPromise = (async () => {
             try {
                 const mod = await import('@/config/mongodb.config');
-                mongodb = mod.default as unknown as MongoRuntime;
+                mongodb = mod.default as MongoRuntime;
                 const mongodbLib = await import('mongodb');
                 ObjectId = mongodbLib.ObjectId;
             } catch {
@@ -122,16 +122,11 @@ export class TodoDAO {
 
 export class AIMetricsDAO {
   private async getCollection(): Promise<MongoCollection<AIMetrics>> {
-    console.log('Initializing dependencies for AI Metrics DAO...');
     await initializeDependencies();
-    console.log('Dependencies initialized. MongoDB client status:', mongodb ? 'defined' : 'undefined');
     if (!mongodb) {
-      console.error('MongoDB client not initialized in AI Metrics DAO');
       throw new Error('MongoDB client not initialized');
     }
-    console.log('Attempting to connect to MongoDB for AI Metrics...');
     const db = await mongodb.connect();
-    console.log('MongoDB connected successfully for AI Metrics DAO');
     return db.collection<AIMetrics>('ai_metrics');
   }
 
@@ -202,7 +197,6 @@ export class BiasDetectionDAO {
   private async getCollection(): Promise<MongoCollection<BiasDetection>> {
     await initializeDependencies();
     if (!mongodb) {
-      // Defensive: initialization failed, do not call connect()
       throw new Error('MongoDB dependency is null: initialization failed or misconfigured. Did not attempt mongodb.connect().');
     }
     const db = await mongodb.connect();

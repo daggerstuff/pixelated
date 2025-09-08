@@ -842,120 +842,93 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               return
             }
             const message = data
-            // Handle different types of real-time updates
-            switch (message.type) {
-              case 'bias_alert':
-                // Add new alert to the list
-                if ('alert' in message && typeof (message as any).alert === 'object' && (message as any).alert !== null) {
-                  const newAlert = (message as any).alert
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    // Show notification if high/critical
-                    if (newAlert.level === 'high' || newAlert.level === 'critical') {
-                      setNewHighBiasAlert(newAlert)
-                    }
-                    announceToScreenReader(
-                      `New ${newAlert.level} bias alert: ${newAlert.message}`,
-                    )
-                    return {
-                      ...prev,
-                      alerts: [newAlert, ...(prev.alerts || [])],
-                      summary: {
-                        ...prev.summary,
-                        alertsLast24h: prev.summary.alertsLast24h + 1,
-                      },
-                    }
-                  })
-                }
-                break
-              case 'session_update':
-                // Update session data
-                if ('session' in message && typeof (message as any).session === 'object' && (message as any).session !== null) {
-                  const updatedSession = (message as any).session
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    return {
-                      ...prev,
-                      recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
-                        session.sessionId === updatedSession.sessionId
-                          ? updatedSession
-                          : session,
-                      ),
-                    }
-                  })
-                  announceToScreenReader(
-                    `Session updated: ${updatedSession.sessionId}`,
-                  )
-                }
-                break
+            ws.onmessage = (event) => {
+              try {
+                const data = JSON.parse(event.data)
 
-              case 'metrics_update':
-                // Update summary metrics
-                if ('metrics' in message && typeof (message as any).metrics === 'object' && (message as any).metrics !== null) {
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    return {
-                      ...prev,
-                      summary: {
-                        ...prev.summary,
-                        ...(message as any).metrics,
-                      },
-                    }
-                  })
-                  announceToScreenReader('Dashboard metrics updated')
-                }
-                break
-
-              case 'trends_update':
-                // Update trend data
-                if ('trends' in message && ((message as any).trends !== undefined)) {
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    return {
-                      ...prev,
-                      trends: (message as any).trends || prev.trends,
-                    }
-                  })
-                  announceToScreenReader('Trend data updated')
-                }
-                break
-
-              case 'connection_status':
-                // Handle connection status updates
-                if ('status' in message && typeof (message as any).status === 'string') {
-                  if ((message as any).status === 'authenticated') {
-                    logger.info('WebSocket authenticated successfully')
-                  } else if ((message as any).status === 'error') {
-                    logger.error('WebSocket authentication failed', {
-                      error: 'error' in message ? (message as any).error : undefined,
+                // Handle different types of real-time updates
+                switch (data.type) {
+                  case 'bias_alert': {
+                    setDashboardData((prev: BiasDashboardData | null) => {
+                      if (!prev) { return prev }
+                      const newAlert = data.alert
+                      if (newAlert.level === 'high' || newAlert.level === 'critical') {
+                        setNewHighBiasAlert(newAlert)
+                      }
+                      announceToScreenReader(`New ${newAlert.level} bias alert: ${newAlert.message}`)
+                      return {
+                        ...prev,
+                        alerts: [newAlert, ...(prev.alerts || [])],
+                        summary: {
+                          ...prev.summary,
+                          alertsLast24h: prev.summary.alertsLast24h + 1,
+                        },
+                      }
                     })
+                    break
+                  }
+                  case 'session_update': {
+                    setDashboardData((prev: BiasDashboardData | null) => {
+                      if (!prev) { return prev }
+                      const updatedSession = data.session
+                      return {
+                        ...prev,
+                        recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
+                          session.sessionId === updatedSession.sessionId ? updatedSession : session
+                        ),
+                      }
+                    })
+                    announceToScreenReader(`Session ${data.session.sessionId} updated`)
+                    break
+                  }
+                  case 'metrics_update': {
+                    setDashboardData((prev: BiasDashboardData | null) => {
+                      if (!prev) { return prev }
+                      return {
+                        ...prev,
+                        summary: {
+                          ...prev.summary,
+                          ...data.metrics,
+                        },
+                      }
+                    })
+                    announceToScreenReader('Dashboard metrics updated')
+                    break
+                  }
+                  case 'trends_update': {
+                    setDashboardData((prev: BiasDashboardData | null) => {
+                      if (!prev) { return prev }
+                      return {
+                        ...prev,
+                        trends: data.trends || prev.trends,
+                      }
+                    })
+                    announceToScreenReader('Trend data updated')
+                    break
+                  }
+                  case 'connection_status': {
+                    if (data.status === 'authenticated') {
+                      logger.info('WebSocket authenticated successfully')
+                    } else if (data.status === 'error') {
+                      logger.error('WebSocket authentication failed', { error: data.error })
+                    }
+                    break
+                  }
+                  case 'heartbeat': {
+                    if (ws.readyState === WebSocket.OPEN) {
+                      ws.send(JSON.stringify({ type: 'heartbeat_response' }))
+                    }
+                    break
+                  }
+                  default: {
+                    logger.warn('Unknown WebSocket message type', { type: data.type, data })
                   }
                 }
-                break
-
-              case 'heartbeat':
-                // Respond to heartbeat to keep connection alive
-                if (ws.readyState === WebSocket.OPEN) {
-                  ws.send(JSON.stringify({ type: 'heartbeat_response' }))
-                }
-                break
-
-              default:
-                logger.warn('Unknown WebSocket message type', {
-                  type: data.type,
-                  data,
-                })
+                setLastUpdated(new Date())
+              } catch (error: unknown) {
+                logger.error('Failed to process WebSocket message', { error, rawData: event.data })
+              }
             }
-
-            // Update last updated timestamp
             setLastUpdated(new Date())
           } catch (error: unknown) {
             logger.error('Failed to process WebSocket message', {
