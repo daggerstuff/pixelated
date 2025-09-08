@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 
 interface RawEmotionDataItem {
-  timestamp?: string | number
+  timestamp: string
   dimensions?: {
-    valence?: number
-    arousal?: number
-    dominance?: number
+    valence: number
+    arousal: number
+    dominance: number
   }
   valence?: number
   arousal?: number

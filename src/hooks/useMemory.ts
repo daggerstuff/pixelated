@@ -55,6 +55,9 @@ export interface UseMemoryReturn {
   const { userId = 'default', autoLoad = true, category } = options
 
 export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
+  const { userId = 'default', autoLoad = true, category } = options
+
+export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   const { userId, category, autoLoad = false } = options
   const [memories, setMemories] = useState<MemoryEntry[]>([])
   const [isLoading, setIsLoading] = useState(false)
