@@ -1,34 +1,7 @@
-// Use conditional import to prevent MongoDB from being bundled on client side
-let _ObjectId: any
-
-if (typeof window === 'undefined') {
-  // Server side - import real MongoDB ObjectId
-  try {
-    const mongodb = require('mongodb')
-    _ObjectId = mongodb.ObjectId
-  } catch {
-    // Fallback if MongoDB is not available
-    _ObjectId = class MockObjectId {
-      constructor(id?: string) {
-        this.id = id || 'mock-object-id'
-      }
-      toString() { return this.id }
-      toHexString() { return this.id }
-    }
-  }
-} else {
-  // Client side - use mock ObjectId
-  _ObjectId = class MockObjectId {
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() { return this.id }
-    toHexString() { return this.id }
-  }
-}
+import type { ObjectId as RealObjectId } from 'mongodb';
 
 export interface User {
-  _id?: ObjectId
+  _id?: RealObjectId
   id?: string
   email: string
   password?: string // hashed password
@@ -49,8 +22,8 @@ export interface User {
 }
 
 export interface Session {
-  _id?: ObjectId
-  userId: ObjectId
+  _id?: RealObjectId
+  userId: RealObjectId
   token: string
   expiresAt: Date
   createdAt: Date
@@ -59,20 +32,20 @@ export interface Session {
 }
 
 export interface Todo {
-  _id?: ObjectId
+  _id?: RealObjectId
   id?: string
   name: string
   description?: string
   completed: boolean
-  userId?: ObjectId // For user-specific todos
+  userId?: RealObjectId // For user-specific todos
   createdAt: Date
   updatedAt: Date
 }
 
 export interface AIMetrics {
-  _id?: ObjectId
+  _id?: RealObjectId
   id?: string
-  userId: ObjectId
+  userId: RealObjectId
   sessionId: string
   modelName: string
   requestType: string
@@ -83,9 +56,9 @@ export interface AIMetrics {
 }
 
 export interface BiasDetection {
-  _id?: ObjectId
+  _id?: RealObjectId
   id?: string
-  userId: ObjectId
+  userId: RealObjectId
   sessionId: string
   detectedBias: string
   biasType: string
@@ -96,10 +69,10 @@ export interface BiasDetection {
 }
 
 export interface TreatmentPlan {
-  _id?: ObjectId
+  _id?: RealObjectId
   id?: string
-  userId: ObjectId
-  therapistId: ObjectId
+  userId: RealObjectId
+  therapistId: RealObjectId
   title: string
   description: string
   goals: string[]
@@ -112,23 +85,23 @@ export interface TreatmentPlan {
 }
 
 export interface CrisisSessionFlag {
-  _id?: ObjectId
+  _id?: RealObjectId
   id?: string
-  userId: ObjectId
+  userId: RealObjectId
   sessionId: string
   flagType: 'suicide_risk' | 'self_harm' | 'crisis'
   severity: 'low' | 'medium' | 'high' | 'critical'
   description: string
   resolved: boolean
   resolvedAt?: Date
-  resolvedBy?: ObjectId
+  resolvedBy?: RealObjectId
   createdAt: Date
 }
 
 export interface ConsentManagement {
-  _id?: ObjectId
+  _id?: RealObjectId
   id?: string
-  userId: ObjectId
+  userId: RealObjectId
   consentType: string
   granted: boolean
   version: string

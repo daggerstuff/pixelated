@@ -4,7 +4,7 @@
 
 declare global {
   /** Alias for React.FC */
-  type FC<P = {}> = import('react').FC<P>
+  type FC<P = Record<string, unknown>> = import('react').FC<P>
 
   /** Alias for React.ReactNode */
   type ReactNode = import('react').ReactNode

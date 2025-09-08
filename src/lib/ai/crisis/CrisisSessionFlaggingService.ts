@@ -82,6 +82,36 @@ interface CrisisSessionFlagUpdateData {
   metadata?: Record<string, unknown>
 }
 
+interface CrisisSessionFlagDbData {
+  _id?: ObjectId
+  id?: string
+  user_id: string
+  session_id: string
+  crisis_id: string
+  reason: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  detected_risks: string[]
+  text_sample?: string
+  status:
+    | 'pending'
+    | 'under_review'
+    | 'reviewed'
+    | 'resolved'
+    | 'escalated'
+    | 'dismissed'
+  flagged_at: string
+  reviewed_at?: string
+  resolved_at?: string
+  assigned_to?: string
+  reviewer_notes?: string
+  resolution_notes?: string
+  routing_decision?: unknown
+  metadata?: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
 export class CrisisSessionFlaggingService {
   /**
    * Flag a user session for immediate review due to crisis detection
@@ -269,7 +299,7 @@ export class CrisisSessionFlaggingService {
       let objectId: ObjectId;
       try {
         objectId = new ObjectId(request.flagId);
-      } catch (e) {
+      } catch (_e) {
         throw new Error('flagId is not a valid ObjectId.');
       }
       const updateResult = await db.collection('crisis_session_flags').findOneAndUpdate(
@@ -316,7 +346,7 @@ export class CrisisSessionFlaggingService {
       ) {
         throw new Error('Invalid userId provided.');
       }
-      const query: any = { user_id: userId };
+      const query: Record<string, unknown> = { user_id: userId };
 
       if (!includeResolved) {
         query.status = { $nin: ['resolved', 'dismissed'] };
@@ -334,7 +364,7 @@ export class CrisisSessionFlaggingService {
     }
   }
 
-  private mapFlagFromDb(flagData: any): CrisisSessionFlag {
+  private mapFlagFromDb(flagData: CrisisSessionFlagDbData): CrisisSessionFlag {
     return {
       id: flagData.id || (flagData._id ? flagData._id.toString() : ''),
       userId: flagData.user_id,

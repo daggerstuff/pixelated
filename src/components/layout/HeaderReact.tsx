@@ -5,14 +5,12 @@ import SearchBox from '../ui/SearchBox'
 import { cn } from '@/lib/utils'
 
 export interface HeaderProps {
-  showThemeToggle?: boolean
   showUserMenu?: boolean
   className?: string
   position?: 'fixed' | 'sticky' | 'static'
 }
 
 export function Header({
-  showThemeToggle = true,
   showUserMenu = true,
   className,
   position = 'fixed',

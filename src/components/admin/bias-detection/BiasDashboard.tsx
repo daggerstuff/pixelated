@@ -825,17 +825,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
         ws.onmessage = (event) => {
           try {
-            const data: any = JSON.parse(event.data);
+            const data = JSON.parse(event.data)
 
             // Handle different types of real-time updates
-            switch (data['type']) {
+            switch (data.type) {
               case 'bias_alert':
                 // Add new alert to the list
                 setDashboardData((prev: BiasDashboardData | null) => {
                   if (!prev) {
                     return prev
                   }
-                  const newAlert = data['alert']
+                  const newAlert = data.alert
                   // Show notification if high/critical
                   if (newAlert.level === 'high' || newAlert.level === 'critical') {
                     setNewHighBiasAlert(newAlert)
@@ -860,7 +860,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   if (!prev) {
                     return prev
                   }
-                  const updatedSession = data['session']
+                  const updatedSession = data.session
                   return {
                     ...prev,
                     recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
@@ -885,7 +885,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     ...prev,
                     summary: {
                       ...prev.summary,
-                      ...data['metrics'],
+                      ...data.metrics,
                     },
                   }
                 })
@@ -900,7 +900,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   }
                   return {
                     ...prev,
-                    trends: data['trends'] || prev.trends,
+                    trends: data.trends || prev.trends,
                   }
                 })
                 announceToScreenReader('Trend data updated')
@@ -908,11 +908,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
               case 'connection_status':
                 // Handle connection status updates
-                if (data['status'] === 'authenticated') {
+                if (data.status === 'authenticated') {
                   logger.info('WebSocket authenticated successfully')
-                } else if (data['status'] === 'error') {
+                } else if (data.status === 'error') {
                   logger.error('WebSocket authentication failed', {
-                    error: data['error'],
+                    error: data.error,
                   })
                 }
                 break
@@ -926,7 +926,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
               default:
                 logger.warn('Unknown WebSocket message type', {
-                  type: data['type'],
+                  type: data.type,
                   data,
                 })
             }

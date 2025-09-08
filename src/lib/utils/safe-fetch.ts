@@ -121,13 +121,13 @@ export const safeFetch = async (
 // SSRF-protected retry fetch function
 export const retryFetchWithSSRFProtection = async (
   url: string,
-  options: any,
+  options: RequestInit & { timeout?: number; maxResponseSize?: number },
   maxRetries = 3,
 ): Promise<Response> => {
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await safeFetch(url, options)
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (i === maxRetries - 1) {
         throw error
       }

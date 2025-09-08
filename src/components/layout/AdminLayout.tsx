@@ -158,12 +158,12 @@ const AdminLayout: FC<AdminLayoutProps> = ({
         </div>
         {/* Overlay for sidebar on mobile */}
         {sidebarOpen && (
-          <div
+          <button
+            type="button"
             className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar overlay"
             tabIndex={-1}
-            role="button"
           />
         )}
       </div>

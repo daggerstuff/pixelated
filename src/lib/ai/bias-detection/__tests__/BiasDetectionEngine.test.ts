@@ -21,31 +21,6 @@ import type {
 
 vi.mock('../python-bridge')
 
-const createFailingPythonService = () =>
-  class FailingPythonService {
-    async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-      throw new Error('Python service unavailable')
-    }
-    async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-      throw new Error('Python service unavailable')
-    }
-    async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-      throw new Error('Python service unavailable')
-    }
-    async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-      throw new Error('Python service unavailable')
-    }
-    async initialize() {}
-    async checkHealth() {
-      return { status: 'error', message: 'Service failed' }
-    }
-    async analyze_session(
-      _sessionData: SessionData,
-    ): Promise<BiasAnalysisResult> {
-      throw new Error('Python service unavailable')
-    }
-  }
-
 const createPartialFailingPythonService = () =>
   class PartialFailingPythonService {
     async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
@@ -424,38 +399,6 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       dataMaskingEnabled: true,
       auditLogging: true,
     }
-
-    const mockSession: TherapeuticSession = {
-      sessionId: 'test-session',
-      sessionDate: new Date().toISOString(),
-      participantDemographics: {
-        age: '30',
-        gender: 'male',
-        ethnicity: 'hispanic',
-        primaryLanguage: 'en',
-      },
-      scenario: {
-        scenarioId: 'scenario-1',
-        type: 'anxiety',
-      },
-      content: {
-        transcript: 'User: I feel anxious. AI: Tell me more.',
-        aiResponses: ['Tell me more.'],
-        userInputs: ['I feel anxious.'],
-      },
-      aiResponses: [],
-      expectedOutcomes: [],
-      transcripts: [],
-      userInputs: [],
-      metadata: {
-        sessionStartTime: new Date(),
-        sessionEndTime: new Date(),
-        location: 'US',
-        device: 'desktop',
-      },
-    }
-    // Do not assign TherapeuticSession to SessionData-typed variable
-    const mockTherapeuticSession = sessionDataToTherapeuticSession(mockSessionData)
 
     biasEngine = new BiasDetectionEngine(mockConfig)
   })
@@ -1056,88 +999,6 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     it('should handle partial layer failures', async () => {
       await biasEngine.initialize()
 
-      // Create a new engine instance with a service where only preprocessing fails
-      class PartialFailingPythonService {
-        async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-          throw new Error('Preprocessing service unavailable')
-        }
-        async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            fairnessMetrics: {
-              demographicParity: 0.75,
-              equalizedOdds: 0.8,
-              equalOpportunity: 0.8,
-              calibration: 0.8,
-              individualFairness: 0.8,
-              counterfactualFairness: 0.8,
-            },
-            performanceMetrics: {
-              accuracy: 0.9,
-              precision: 0.9,
-              recall: 0.9,
-              f1Score: 0.9,
-              auc: 0.9,
-              calibrationError: 0.05,
-              demographicBreakdown: {},
-            },
-            groupPerformanceComparison: [],
-            recommendations: [],
-          }
-        }
-        async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            counterfactualAnalysis: {
-              scenariosAnalyzed: 3,
-              biasDetected: false,
-              consistencyScore: 0.15,
-              problematicScenarios: [],
-            },
-            featureImportance: [],
-            whatIfScenarios: [],
-            recommendations: [],
-          }
-        }
-        async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            huggingFaceMetrics: {
-              toxicity: 0.05,
-              bias: 0.15,
-              regard: {},
-              stereotype: 0.1,
-              fairness: 0.85,
-            },
-            customMetrics: {
-              therapeuticBias: 0.1,
-              culturalSensitivity: 0.1,
-              professionalEthics: 0.1,
-              patientSafety: 0.1,
-            },
-            temporalAnalysis: {
-              trendDirection: 'stable',
-              changeRate: 0,
-              seasonalPatterns: [],
-              interventionEffectiveness: [],
-            },
-            recommendations: [],
-          }
-        }
-        async initialize() {}
-        async checkHealth() {
-          return { status: 'error', message: 'Service failed' }
-        }
-        async analyze_session(
-          _sessionData: SessionData,
-        ): Promise<BiasAnalysisResult> {
-          throw new Error('Python service unavailable')
-        }
-      }
-
       const failingService = new (createPartialFailingPythonService())()
       const originalService = biasEngine.pythonService
       biasEngine.pythonService = failingService as any
@@ -1272,31 +1133,6 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should handle service overload scenarios', async () => {
       await biasEngine.initialize()
-
-      // Create a new engine instance with a service that throws overload errors
-      class OverloadPythonService {
-        async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-          throw new Error('SERVICE OVERLOAD: Too many requests')
-        }
-        async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-          throw new Error('SERVICE OVERLOAD: Too many requests')
-        }
-        async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-          throw new Error('SERVICE OVERLOAD: Too many requests')
-        }
-        async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-          throw new Error('SERVICE OVERLOAD: Too many requests')
-        }
-        async initialize() {}
-        async checkHealth() {
-          return { status: 'error', message: 'Service overloaded' }
-        }
-        async analyze_session(
-          _sessionData: SessionData,
-        ): Promise<BiasAnalysisResult> {
-          throw new Error('Python service unavailable')
-        }
-      }
 
       const createOverloadPythonService = () => class OverloadPythonService { analyzePython() { throw new Error("Overload!"); } };
       const overloadService = new (createOverloadPythonService())()

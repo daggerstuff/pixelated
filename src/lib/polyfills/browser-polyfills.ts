@@ -145,48 +145,6 @@ export const crypto = {
   },
 }
 
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
-
 // Path polyfill with basic functionality
 export const path = {
   join: (...paths: string[]) => paths.join('/').replace(/\/+/g, '/'),
@@ -225,48 +183,6 @@ export const path = {
     return rootPath ? `${rootPath}/${fileName}` : fileName
   },
 }
-
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
 
 // FS promises polyfill (stub implementation)
 export const fs = {
@@ -326,48 +242,6 @@ export const fs = {
   },
 }
 
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
-
 // Child process polyfill (stub implementation)
 export const child_process = {
   spawn: (command: string, _args?: string[], _options?: unknown) => {
@@ -416,48 +290,6 @@ export const child_process = {
   },
 }
 
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
-
 // Stream polyfill (minimal implementation)
 export const stream = {
   Readable: class {
@@ -493,48 +325,6 @@ export const stream = {
     }
   },
 }
-
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
 
 // Events polyfill
 export const events = {
@@ -577,48 +367,6 @@ export const events = {
   },
 }
 
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
-
 // Util polyfill
 export const util = {
   promisify: (fn: (...args: unknown[]) => unknown) => {
@@ -644,48 +392,6 @@ export const util = {
     isRegExp: (value: unknown): value is RegExp => value instanceof RegExp,
   },
 }
-
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
 
 // OS polyfill
 export const os = {
@@ -722,48 +428,6 @@ export const http = {
   },
 }
 
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
-
 // HTTPS polyfill (minimal implementation)
 export const https = {
   createServer: () => {
@@ -787,48 +451,6 @@ export const https = {
     }
   },
 }
-
-// MongoDB polyfill (stub implementation for client-side)
-export const mongodb = {
-  ObjectId: class MockObjectId {
-    id: string
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() {
-      return this.id
-    }
-    toHexString() {
-      return this.id
-    }
-    static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
-    }
-  },
-  MongoClient: class MockMongoClient {
-    static connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-    connect() {
-      console.warn('MongoDB is not supported in browser environment')
-      throw new Error('MongoDB is not supported in browser environment')
-    }
-  },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
-  },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
-  },
-}
-
-// Named export for MongoDB ObjectId
-export const { ObjectId } = mongodb
 
 // Default export for all polyfills
 export default {

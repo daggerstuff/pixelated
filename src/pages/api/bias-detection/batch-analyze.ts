@@ -8,14 +8,14 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 })
   }
 
-  let body: any
+  let body: unknown
   try {
     body = await req.json()
   } catch {
     return new Response('Invalid JSON', { status: 400 })
   }
 
-  const { sessions, options } = body ?? {}
+  const { sessions, options } = (body as { sessions?: SessionData[], options?: unknown }) ?? {}
   if (!Array.isArray(sessions) || sessions.length === 0) {
     return new Response('Missing or invalid sessions array', { status: 400 })
   }

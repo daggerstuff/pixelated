@@ -611,12 +611,12 @@ export class SealPatternRecognitionService implements FHEService {
   ): number[][] {
     // Get weight values in consistent order
     const weightValues = [
-      (weights as any)['depression'] || 1,
-      (weights as any)['anxiety'] || 1,
-      (weights as any)['helplessness'] || 1,
-      (weights as any)['suicidal'] || 1,
-      (weights as any)['substance_use'] || 1,
-      (weights as any)['isolation'] || 1,
+      weights['depression'] || 1,
+      weights['anxiety'] || 1,
+      weights['helplessness'] || 1,
+      weights['suicidal'] || 1,
+      weights['substance_use'] || 1,
+      weights['isolation'] || 1,
     ]
 
     // Apply weights to each factor

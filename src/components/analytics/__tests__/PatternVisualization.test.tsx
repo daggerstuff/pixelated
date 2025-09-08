@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { PatternVisualization } from '../PatternVisualizationReact'
 import type {
   TrendPattern,
@@ -100,7 +100,7 @@ describe('PatternVisualization', () => {
     const handlePatternSelect = vi.fn()
     render(
       <PatternVisualization
-        crossSessionPatterns={mockPatterns}
+        crossSessionPatterns={mockCrossSessionPatterns}
         onPatternSelect={handlePatternSelect}
       />,
     )
@@ -109,7 +109,7 @@ describe('PatternVisualization', () => {
     patternItem.click()
 
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
-    expect(handlePatternSelect).toHaveBeenCalledWith(mockPatterns[0])
+    expect(handlePatternSelect).toHaveBeenCalledWith(mockCrossSessionPatterns[0])
   })
 
   it('calls onPatternSelect when a risk correlation is clicked', () => {
