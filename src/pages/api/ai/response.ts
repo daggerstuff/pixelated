@@ -1,10 +1,5 @@
 import type { APIContext } from 'astro'
 import {
-  createStreamingAIResponse,
-  createJsonAIResponse,
-} from '../../../lib/ai/streaming.js'
-import { getApiEndpointLogger } from '@/lib/logging/standardized-logger'
-import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
@@ -83,8 +78,6 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: (context: APIContext) => Promise<Response> = async ({
   request,
 }) => {
-  const logger = getApiEndpointLogger('/api/ai/response')
-
   let session: Awaited<ReturnType<typeof getSession>> | null = null
 
   try {

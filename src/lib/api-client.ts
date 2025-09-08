@@ -1,5 +1,5 @@
 // Enhanced API Client with retry logic and type-safe error handling
-import { parseApiResponse, ValidationResult, validateAnalysisResults, validateCrisisDetectionResponse } from './utils/json-validator'
+import { parseApiResponse, ValidationResult } from './utils/json-validator'
 
 export class EnterpriseAPIClient {
   private baseURL: string

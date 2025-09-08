@@ -1,6 +1,5 @@
 import {
   safeFetch,
-  retryFetchWithSSRFProtection,
   validateUrlForSSRF,
 } from '@/lib/utils/safe-fetch'
 import { ALLOWED_DOMAINS } from '@/lib/constants'
@@ -25,13 +24,6 @@ const ALLOWED_DOMAINS = [
   // Add any additional domains your application needs here
   // 'your-domain.com',
   // 'api.your-service.com',
-]
-
-// IP-based whitelist (resolve these domains to prevent DNS rebinding)
-const ALLOWED_IPS = [
-  // Hugging Face IPs (resolve from huggingface.co)
-  '185.92.25.0/24', // Example CIDR - in real implementation, use actual resolved IPs
-  // Add actual resolved IPs for each service
 ]
 
 // Build hostname to IP mapping at runtime or use a static list
@@ -190,7 +182,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => header === 'content-length' ? '500' : null
+          get: (_header: string) => _header === 'content-length' ? '500' : null
         },
         json: () => Promise.resolve(mockResponse),
         body: new ReadableStream({
@@ -239,7 +231,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () => Promise.resolve({ success: true, syncId: 'sync-123' }),
         body: new ReadableStream({
@@ -285,7 +277,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 201,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () =>
             Promise.resolve({
@@ -315,7 +307,7 @@ describe('API Service Integration Tests', () => {
           ok: false,
           status: 401,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({ error: 'Invalid token' }),
         })
@@ -347,7 +339,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({ experiment_id: 'exp-123' }),
         })
@@ -379,7 +371,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({}),
         })
@@ -412,7 +404,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () =>
             Promise.resolve({
@@ -450,7 +442,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 201,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () =>
             Promise.resolve({
@@ -491,7 +483,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 202,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () =>
           Promise.resolve({
@@ -517,7 +509,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () =>
           Promise.resolve({
@@ -596,7 +588,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({ success: true }),
         })
@@ -647,7 +639,7 @@ describe('API Service Integration Tests', () => {
         ok: false,
         status: 503,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () =>
           Promise.resolve({
@@ -694,7 +686,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null,
+            get: (_header: string) => null,
           },
           json: () => Promise.resolve({ success: true }),
           body: new ReadableStream({
@@ -717,7 +709,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
@@ -743,7 +735,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
@@ -767,7 +759,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () =>
           Promise.resolve({
@@ -807,7 +799,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
@@ -833,7 +825,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
@@ -857,7 +849,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () =>
           Promise.resolve({

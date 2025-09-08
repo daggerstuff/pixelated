@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useChatWithMemory, UseChatWithMemoryReturn } from '@/hooks/useChatWithMemory'
 import { useAuth } from '@/hooks/useAuth'
 import { ChatContainer } from './ChatContainer'
@@ -45,7 +45,6 @@ export function MemoryAwareChatSystem({
   title = 'AI Assistant with Memory',
   subtitle = 'Chat with an AI that learns and remembers your conversations',
   enableMemoryToggle = true,
-  enableAnalysisToggle = true,
   showMemoryStats = true,
   showMemoryInsights = true,
 }: MemoryAwareChatSystemProps) {
@@ -61,7 +60,6 @@ export function MemoryAwareChatSystem({
     error,
     sendMessage,
     clearMessages,
-    regenerateResponse,
     memory,
   }: UseChatWithMemoryReturn = useChatWithMemory({
     sessionId: sessionId as string,
@@ -83,7 +81,7 @@ export function MemoryAwareChatSystem({
     if (messages.length > 4) {
       Promise.resolve(getConversationSummary()).then(setConversationSummary)
     }
-  }, [messages])
+  }, [messages, getConversationSummary])
 
   const handleExportConversation = async () => {
     try {

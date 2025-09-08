@@ -61,7 +61,7 @@ export class PerformanceOptimizer {
   private connectionPool: Map<string, unknown[]>
   private cache: Map<string, { value: unknown; timestamp: number; accessCount: number }>
   private circuitBreakers: Map<string, { failures: number; lastFailure: number; state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' }>
-  private batchQueues: Map<string, { items: any[]; timer: NodeJS.Timeout | null }>
+  private batchQueues: Map<string, { items: unknown[]; timer: NodeJS.Timeout | null }>
   private metricsHistory: PerformanceMetrics[]
 
   constructor(config: Partial<OptimizationConfig> = {}) {

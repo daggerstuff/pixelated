@@ -618,7 +618,11 @@ export class PythonBiasDetectionBridge {
   }
 
   stopHealthMonitoring(): void {
-  this.healthCheckTimer ? (clearInterval(this.healthCheckTimer), this.healthCheckTimer = undefined, logger.info('Health monitoring stopped')) : void 0;
+    if (this.healthCheckTimer) {
+      clearInterval(this.healthCheckTimer)
+      this.healthCheckTimer = undefined
+      logger.info('Health monitoring stopped')
+    }
   }
 
   getHealthStatus(): { status: string; lastCheck: Date; consecutiveFailures: number } {

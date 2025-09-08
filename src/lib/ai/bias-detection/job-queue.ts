@@ -74,6 +74,7 @@ export class JobQueue<T = any, R = any> {
 
   private async processNext() {
     if (this.processing || this.queue.length === 0) {
+      return
     }
     const id = this.queue.shift()!
     const job = this.jobs.get(id)
@@ -82,8 +83,8 @@ export class JobQueue<T = any, R = any> {
     }
     
     try {
-      
-    } catch (err: any) {
+      // Job processing logic would go here
+    } catch (_err: any) {
       
       console.error(`[JobQueue] Job failed`, { jobId: job.id, error: job.error, finishedAt: Date.now() })
     }

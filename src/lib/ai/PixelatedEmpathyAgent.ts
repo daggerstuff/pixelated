@@ -128,7 +128,7 @@ export class PixelatedEmpathyAgent {
   /**
    * Stream conversation with the agent (for real-time interactions)
    */
-  async *streamConversation(message: string, context: string = 'general'): AsyncGenerator<any, void, unknown> {
+  async *streamConversation(message: string, context: string = 'general'): AsyncGenerator<unknown, void, unknown> {
     try {
       const response = await fetch(`${this.agentEndpoint}/stream`, {
         method: 'POST',

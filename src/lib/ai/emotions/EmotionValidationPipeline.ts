@@ -36,6 +36,7 @@ interface EmotionValidationResult {
   biasScore?: number
   biasAnalysis?: BiasAnalysisResult
   emotionConsistency: number
+  authenticityScore?: number
   contextualAppropriate: boolean
   recommendations: string[]
 }
@@ -291,7 +292,7 @@ class EmotionValidationPipeline {
         // Example mitigation: redact or neutralize flagged bias patterns in response
         if (emotionData.responseText) {
           let mitigatedText = emotionData.responseText
-          for (const biasType of patternBias.patterns) {
+          if (patternBias.patterns.length > 0) {
             // Real mitigation could use an external rewriter; here use simple replacement
             mitigatedText = mitigatedText.replace(/aggressive|angry|hostile|emotional|sensitive|caring|rational|logical|analytical|irrational|unstable/gi, '[BIAS-MITIGATED]')
           }
@@ -365,7 +366,7 @@ class EmotionValidationPipeline {
         )
       }
       // Add additional trace for authenticity scoring
-      (result as any).authenticityScore = authenticityScore
+      result.authenticityScore = authenticityScore
 
       // Add biasAnalysis only if it exists
       if (biasAnalysis) {

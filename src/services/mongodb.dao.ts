@@ -2,44 +2,45 @@
 import type { Collection as MongoCollection, ObjectId as MongoObjectId, Db } from 'mongodb'
 
 // Runtime shape of our MongoDB wrapper (from src/config/mongodb.config.ts)
-type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: any }
+type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: unknown }
 
-// Use conditional imports to prevent MongoDB from being bundled on client side
-let mongodb: MongoRuntime | null = null
-let ObjectId: any
-
-if (typeof window === 'undefined') {
-  // Server side - import real MongoDB dependencies
-  try {
-  const mod = require('@/config/mongodb.config')
-  mongodb = mod.default as MongoRuntime
-  const mongodbLib = require('mongodb')
-  ObjectId = mongodbLib.ObjectId
-  } catch {
-    // Fallback if MongoDB is not available
-    mongodb = null
-    ObjectId = class MockObjectId {
-      public id: string
-      constructor(id?: string) {
-        this.id = id || 'mock-object-id'
-      }
-      toString() { return this.id }
-      toHexString() { return this.id }
-    }
-  // No runtime Collection value needed in this module
-  }
-} else {
-  // Client side - use mocks
-  mongodb = null
-  ObjectId = class MockObjectId {
+class MockObjectId {
     public id: string
     constructor(id?: string) {
-      this.id = id || 'mock-object-id'
+        this.id = id || 'mock-object-id'
     }
     toString() { return this.id }
     toHexString() { return this.id }
-  }
-  // No runtime Collection value needed in this module
+}
+
+// Use conditional imports to prevent MongoDB from being bundled on client side
+let mongodb: MongoRuntime | null = null
+let ObjectId: typeof MongoObjectId | typeof MockObjectId | null = null;
+
+let serverDepsPromise: Promise<void> | null = null;
+
+async function initializeDependencies() {
+    if (serverDepsPromise) {
+        return serverDepsPromise;
+    }
+    if (typeof window === 'undefined') {
+        serverDepsPromise = (async () => {
+            try {
+                const mod = await import('@/config/mongodb.config');
+                mongodb = mod.default as MongoRuntime;
+                const mongodbLib = await import('mongodb');
+                ObjectId = mongodbLib.ObjectId;
+            } catch {
+                mongodb = null;
+                ObjectId = MockObjectId;
+            }
+        })();
+    } else {
+        mongodb = null;
+        ObjectId = MockObjectId;
+        serverDepsPromise = Promise.resolve();
+    }
+    return serverDepsPromise;
 }
 import type {
   AIMetrics,
@@ -52,7 +53,8 @@ import type {
 
 export class TodoDAO {
   private async getCollection(): Promise<MongoCollection<Todo>> {
-  const db = await mongodb!.connect()
+    await initializeDependencies();
+    const db = await mongodb!.connect()
     return db.collection<Todo>('todos')
   }
 
@@ -117,7 +119,8 @@ export class TodoDAO {
 
 export class AIMetricsDAO {
   private async getCollection(): Promise<MongoCollection<AIMetrics>> {
-  const db = await mongodb!.connect()
+    await initializeDependencies();
+    const db = await mongodb!.connect()
     return db.collection<AIMetrics>('ai_metrics')
   }
 
@@ -186,7 +189,8 @@ export class AIMetricsDAO {
 
 export class BiasDetectionDAO {
   private async getCollection(): Promise<MongoCollection<BiasDetection>> {
-  const db = await mongodb!.connect()
+    await initializeDependencies();
+    const db = await mongodb!.connect()
     return db.collection<BiasDetection>('bias_detection')
   }
 
@@ -221,7 +225,8 @@ export class BiasDetectionDAO {
 
 export class TreatmentPlanDAO {
   private async getCollection(): Promise<MongoCollection<TreatmentPlan>> {
-  const db = await mongodb!.connect()
+    await initializeDependencies();
+    const db = await mongodb!.connect()
     return db.collection<TreatmentPlan>('treatment_plans')
   }
 
@@ -284,7 +289,8 @@ export class TreatmentPlanDAO {
 
 export class CrisisSessionFlagDAO {
   private async getCollection(): Promise<MongoCollection<CrisisSessionFlag>> {
-  const db = await mongodb!.connect()
+    await initializeDependencies();
+    const db = await mongodb!.connect()
     return db.collection<CrisisSessionFlag>('crisis_session_flags')
   }
 
@@ -346,7 +352,8 @@ export class CrisisSessionFlagDAO {
 
 export class ConsentManagementDAO {
   private async getCollection(): Promise<MongoCollection<ConsentManagement>> {
-  const db = await mongodb!.connect()
+    await initializeDependencies();
+    const db = await mongodb!.connect()
     return db.collection<ConsentManagement>('consent_management')
   }
 

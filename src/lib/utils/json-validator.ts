@@ -70,10 +70,7 @@ export function parseJsonSafely<T>(
   }
 }
 
-/**
- * Validates AnalysisResults structure
- */
-export function validateAnalysisResults(obj: unknown): ValidationResult<{
+export type AnalysisResults = {
   entities: Array<{
     text: string
     type: string
@@ -103,7 +100,12 @@ export function validateAnalysisResults(obj: unknown): ValidationResult<{
     insight: string
     confidence: number
   }>
-}> {
+}
+
+/**
+ * Validates AnalysisResults structure
+ */
+export function validateAnalysisResults(obj: unknown): ValidationResult<AnalysisResults> {
   if (!obj || typeof obj !== 'object') {
     return { success: false, error: 'Expected an object' }
   }
@@ -183,13 +185,10 @@ export function validateAnalysisResults(obj: unknown): ValidationResult<{
     }
   }
 
-  return { success: true, data: data as any }
+  return { success: true, data: data as AnalysisResults }
 }
 
-/**
- * Validates CrisisDetectionApiResponse structure
- */
-export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<{
+export type CrisisDetectionResponseData = {
   assessment: {
     overallRisk: 'none' | 'low' | 'moderate' | 'high' | 'imminent'
     suicidalIdeation: {
@@ -228,8 +227,13 @@ export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<
   metadata: {
     confidenceScore: number
   }
-}> {
-  const validation = validateObjectShape(obj as any, {
+}
+
+/**
+ * Validates CrisisDetectionApiResponse structure
+ */
+export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<CrisisDetectionResponseData> {
+  const validation = validateObjectShape(obj, {
     assessment: 'object',
     riskFactors: 'array',
     protectiveFactors: 'array',
@@ -271,7 +275,7 @@ export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<
     return { success: false, error: `metadata.${metadataShape.error}` }
   }
 
-  return { success: true, data: data as any }
+  return { success: true, data: data as CrisisDetectionResponseData }
 }
 
 /**

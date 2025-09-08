@@ -43,7 +43,9 @@ export interface UseMemoryReturn {
   // Memory management
   clearMemories: () => void
   getMemoryHistory: () => Promise<MemoryHistoryItem[]>
-} {
+}
+
+export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   const { userId = 'default', autoLoad = true, category } = options
 
   const [memories, setMemories] = useState<MemoryEntry[]>([])

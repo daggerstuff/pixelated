@@ -14,6 +14,7 @@ function getRandomBytes(size: number): Uint8Array {
   } else {
     // Node.js environment
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { randomBytes } = require('crypto')
       return new Uint8Array(randomBytes(size))
     } catch {
@@ -343,7 +344,7 @@ export function deepClone<T>(obj: T): T {
   if (typeof obj === 'object') {
     const clonedObj = {} as T
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         clonedObj[key] = deepClone(obj[key])
       }
     }
@@ -618,8 +619,10 @@ export function isValidEmail(email: string): boolean {
  */
 export function isValidUrl(url: string): boolean {
   try {
-    new URL(url)
-    return true
+    // The construction of the URL object is the validation.
+    // If it doesn't throw, the URL is valid.
+    const validUrl = new URL(url)
+    return !!validUrl
   } catch {
     return false
   }

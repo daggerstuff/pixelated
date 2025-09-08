@@ -1,41 +1,4 @@
-// Use conditional imports to prevent MongoDB from being bundled on client side
-let mongodb: any
-let mongoAuthService: any
-let ObjectId: any
-
-if (typeof window === 'undefined') {
-  // Server side - import real MongoDB dependencies
-  try {
-    mongodb = require('@/config/mongodb.config').default
-    mongoAuthService = require('@/services/mongoAuth.service').mongoAuthService
-    const mongodbLib = require('mongodb')
-    ObjectId = mongodbLib.ObjectId
-  } catch {
-    // Fallback if MongoDB is not available
-    mongodb = null
-    mongoAuthService = null
-    ObjectId = class MockObjectId {
-      constructor(id?: string) {
-        this.id = id || 'mock-object-id'
-      }
-      toString() { return this.id }
-      toHexString() { return this.id }
-      static isValid() { return true }
-    }
-  }
-} else {
-  // Client side - use mocks
-  mongodb = null
-  mongoAuthService = null
-  ObjectId = class MockObjectId {
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() { return this.id }
-    toHexString() { return this.id }
-    static isValid() { return true }
-  }
-}
+import type { Db, ObjectId as MongoObjectIdType } from 'mongodb'
 import {
   azureADAuth,
   type AzureADUser,
@@ -44,6 +7,75 @@ import {
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('azure-mongodb-integration')
+
+// Define a reusable mock for ObjectId
+class MockObjectId {
+  private id: string
+  constructor(id?: string) {
+    this.id = id || 'mock-object-id'
+  }
+  toString() {
+    return this.id
+  }
+  toHexString() {
+    return this.id
+  }
+  static isValid() {
+    return true
+  }
+}
+
+// Type definitions for dynamically loaded modules
+type MongoConnection = {
+  connect: () => Promise<Db>
+  getDb: () => Db
+  client?: unknown
+}
+
+type MongoAuthService = {
+  signIn: (
+    email: string,
+    password_placeholder: string,
+  ) => Promise<{ accessToken: string; refreshToken: string }>
+}
+
+let mongodb: MongoConnection | null = null
+let mongoAuthService: MongoAuthService | null = null
+let ObjectId: typeof MongoObjectIdType | typeof MockObjectId | null = null
+
+let serverDepsPromise: Promise<void> | null = null
+
+function initializeDependencies() {
+  if (serverDepsPromise) {
+    return serverDepsPromise
+  }
+
+  if (typeof window === 'undefined') {
+    // Server-side: dynamically import dependencies
+    serverDepsPromise = (async () => {
+      try {
+        mongodb = (await import('@/config/mongodb.config')).default
+        mongoAuthService = (await import('@/services/mongoAuth.service'))
+          .mongoAuthService
+        const mongodbLib = await import('mongodb')
+        ObjectId = mongodbLib.ObjectId
+      } catch (err) {
+        // Fallback for server-side if imports fail
+        logger.error('Failed to load server-side MongoDB dependencies', err)
+        mongodb = null
+        mongoAuthService = null
+        ObjectId = MockObjectId
+      }
+    })()
+  } else {
+    // Client-side: use mock implementations
+    mongodb = null
+    mongoAuthService = null
+    ObjectId = MockObjectId
+    serverDepsPromise = Promise.resolve()
+  }
+  return serverDepsPromise
+}
 
 // Utility to validate ObjectId strings
 function isValidObjectId(id: string): boolean {
@@ -100,6 +132,7 @@ export class AzureMongoIntegration {
     code: string,
     redirectUri?: string,
   ): Promise<AuthSession> {
+    await initializeDependencies()
     try {
       // Authenticate with Azure AD
       const azureResult = await azureADAuth.authenticate(code, redirectUri)
@@ -137,8 +170,8 @@ export class AzureMongoIntegration {
     const { user: azureUser } = azureResult
 
     try {
-      if (!mongodb) {
-        throw new Error('MongoDB not available on client side')
+      if (!mongodb || !ObjectId) {
+        throw new Error('MongoDB not available')
       }
       
       const db = await mongodb.connect()
@@ -242,7 +275,7 @@ export class AzureMongoIntegration {
   ): Promise<AuthSession> {
     try {
       if (!mongoAuthService) {
-        throw new Error('MongoDB auth service not available on client side')
+        throw new Error('MongoDB auth service not available')
       }
       
       // Create session using MongoDB auth service
@@ -267,6 +300,7 @@ export class AzureMongoIntegration {
    * Refresh authentication session
    */
   async refreshSession(refreshToken: string): Promise<AuthSession> {
+    await initializeDependencies()
     try {
       // Refresh Azure AD token
       const newTokens = await azureADAuth.refreshAccessToken(refreshToken)
@@ -275,6 +309,9 @@ export class AzureMongoIntegration {
       const azureUser = await azureADAuth.getUserInfo(newTokens.accessToken)
 
       // Update user in MongoDB
+      if (!mongodb) {
+        throw new Error('MongoDB not available')
+      }
       const db = await mongodb.connect()
       const usersCollection = db.collection('users')
       
@@ -331,11 +368,18 @@ export class AzureMongoIntegration {
     userId: string,
     postLogoutRedirectUri?: string,
   ): Promise<string> {
+    await initializeDependencies()
     try {
       // Update last logout in MongoDB
+      if (!mongodb) {
+        throw new Error('MongoDB not available')
+      }
       const db = await mongodb.connect()
       const usersCollection = db.collection('users')
       
+      if (!ObjectId) {
+        throw new Error('ObjectId not available')
+      }
       await usersCollection.updateOne(
         { _id: isValidObjectId(userId) ? new ObjectId(userId) : undefined },
         {
@@ -369,14 +413,21 @@ export class AzureMongoIntegration {
    * Validates the ObjectId before querying to prevent NoSQL injection.
    */
   async getUserById(userId: string): Promise<IntegratedUser | null> {
+    await initializeDependencies()
     try {
       if (!isValidObjectId(userId)) {
         logger.warn('Attempted to fetch user with invalid ObjectId', { userId });
         return null;
       }
+      if (!mongodb) {
+        throw new Error('MongoDB not available')
+      }
       const db = await mongodb.connect()
       const usersCollection = db.collection('users')
       
+      if (!ObjectId) {
+        throw new Error('ObjectId not available')
+      }
       const user = await usersCollection.findOne({ _id: new ObjectId(userId) })
   
       if (!user) {

@@ -221,12 +221,12 @@ class EnhancedStatePersistence {
 
   private async cleanupOldData(): Promise<void> {
     // Remove oldest form drafts first
-    const formDrafts = this.getStoredValue('form_drafts', {}) as Record<string, any>
+    const formDrafts = this.getStoredValue('form_drafts', {}) as Record<string, unknown>
     const draftEntries = Object.entries(formDrafts).sort((a, b) => {
       const timestampA =
-        ((a[1] as Record<string, any>)?.timestamp as number) || 0
+        ((a[1] as Record<string, unknown>)?.timestamp as number) || 0
       const timestampB =
-        ((b[1] as Record<string, any>)?.timestamp as number) || 0
+        ((b[1] as Record<string, unknown>)?.timestamp as number) || 0
       return timestampA - timestampB
     })
 
@@ -243,7 +243,7 @@ class EnhancedStatePersistence {
   private cleanupExpiredSessions() {
     const sessionState = this.getStoredValue('session_state', {}) as Record<
       string,
-      any
+      unknown
     >
     const now = Date.now()
     const sessionTimeout = 24 * 60 * 60 * 1000 // 24 hours
@@ -267,7 +267,7 @@ class EnhancedStatePersistence {
   private cleanupOldFormDrafts() {
     const formDrafts = this.getStoredValue('form_drafts', {}) as Record<
       string,
-      any
+      unknown
     >
     const now = Date.now()
     const draftTimeout = 7 * 24 * 60 * 60 * 1000 // 7 days
@@ -279,9 +279,9 @@ class EnhancedStatePersistence {
         typeof draft === 'object' &&
         draft !== null &&
         'timestamp' in draft &&
-        typeof (draft as Record<string, any>)['timestamp'] === 'number'
+        typeof (draft as Record<string, unknown>)['timestamp'] === 'number'
       ) {
-        const draftWithTimestamp = draft as Record<string, any> & {
+        const draftWithTimestamp = draft as Record<string, unknown> & {
           timestamp: number
         }
   if (now - ((draftWithTimestamp)['timestamp'] as number) > draftTimeout) {

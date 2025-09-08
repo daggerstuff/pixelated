@@ -1,7 +1,13 @@
 // Minimal supabase-like Database type shim used by a few DB helper files
 // This avoids pulling a full Supabase generated types dependency into the project
 
-export type Json = any
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json }
+  | Json[]
 
 export interface Database {
   public: {

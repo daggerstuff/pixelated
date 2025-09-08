@@ -1,5 +1,18 @@
 import { useState, useEffect } from 'react'
 
+interface RawEmotionDataItem {
+  timestamp: string
+  dimensions?: {
+    valence: number
+    arousal: number
+    dominance: number
+  }
+  valence?: number
+  arousal?: number
+  dominance?: number
+  dominantEmotion?: string
+}
+
 interface EmotionDataPoint {
   timestamp: string
   valence: number
@@ -48,7 +61,7 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
 
         const data = await response.json()
         const formattedData = Array.isArray(data)
-          ? data.map((item: any) => {
+          ? data.map((item: RawEmotionDataItem) => {
               const baseData = {
                 timestamp: item.timestamp
                   ? new Date(item.timestamp).toISOString()
