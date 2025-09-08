@@ -1,3 +1,20 @@
+# ---------------------------------------------------------------------------------
+# PRODUCTION AZURE PIPELINES ENVIRONMENT REQUIREMENT
+#
+# NOTE: The stage "DeployWebApp" requires an Environment resource named "production"
+# to be created and authorized in Azure DevOps>Environments with proper approval
+# and security controls. If not present or not authorized, deployment will fail:
+#
+#   "Job DeployWebApp: Environment production could not be found. The environment does not exist or has not been authorized for use."
+#
+# To resolve:
+#   1. Go to Azure DevOps > Pipelines > Environments.
+#   2. Create an Environment named "production" or verify that it exists.
+#   3. Authorize this pipeline to access the environment (approve if prompted).
+#   4. (For RBAC) Ensure the pipeline's Service Connection has Deploy permissions.
+#
+# Reference: https://learn.microsoft.com/en-us/azure/devops/pipelines/process/environments
+# ---------------------------------------------------------------------------------
 trigger:
   branches:
     include:
@@ -41,7 +58,7 @@ variables:
 - name: azureLocation
   value: eastus
 - name: environment
-  value: production
+  value: azure-infrastructure
 - name: customDomain
   value: "pixelatedempathy.com"
 - name: PYTHONWARNINGS

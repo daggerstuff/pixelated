@@ -57,7 +57,6 @@ COPY src ./src
 COPY public ./public
 COPY astro.config.mjs ./
 COPY tsconfig.json ./
-COPY tailwind.config.ts ./
 COPY uno.config.ts ./
 
 # Build the application

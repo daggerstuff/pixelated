@@ -33,7 +33,8 @@ from typing import Any
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 
 # Targeted filter only for the functorch.vmap deprecation originating from inFairness
-import warnings, importlib
+import importlib
+import warnings
 
 warnings.filterwarnings(
     "ignore",
@@ -68,7 +69,7 @@ if has_torch_vmap:
 import jwt
 import numpy as np
 import pandas as pd
-from flask import Flask, Response, g, jsonify, request, has_request_context
+from flask import Flask, Response, g, has_request_context, jsonify, request
 from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
 from werkzeug.exceptions import Unauthorized
@@ -228,9 +229,9 @@ try:
     from tasks import (
         analyze_session_async,
         batch_analyze_sessions,
-        validate_dataset_quality,
-        export_dataset_chunk,
         distribute_task,
+        export_dataset_chunk,
+        validate_dataset_quality,
     )
 
     CELERY_AVAILABLE = True
