@@ -6077,7 +6077,7 @@ main_deployment_orchestration() {
     local container_tag=$(generate_simple_container_tag)
     log_deployment_event "BUILD" "INFO" "Building container remotely on VPS with tag: $container_tag" "build_start"
     
-    # Build container on VPS using SSH
+# Build container on VPS using SSH
     if ! build_container_on_vps "$container_tag"; then
         log_deployment_event "BUILD" "ERROR" "Remote container build failed" "build_failure"
         end_deployment_stage "container_build" "failed" "Remote Container Build on VPS"

@@ -7,7 +7,7 @@
 
 // Import dependencies
 import { createInterface } from 'readline'
-import { execSync } from 'child_process'
+import { spawnSync } from 'child_process'
 
 // ANSI colors for pretty output
 const colors = {
@@ -64,19 +64,68 @@ function error(message) {
 }
 
 // Run blog publisher command safely
+// Lightweight arg parser that respects single and double quotes
+function parseArgs(command) {
+  const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g
+  const args = []
+  let m
+  while ((m = re.exec(command)) !== null) {
+    args.push(m[1] ?? m[2] ?? m[0])
+  }
+  return args
+}
+
+function isSafeToken(token) {
+  if (typeof token !== 'string' || token.length === 0) {
+    return false
+  }
+  // disallow shell metacharacters and control/newline characters
+  return !/[;&|$`<>\\\n\r]/.test(token)
+}
+
+const ALLOWED_TOP_LEVEL = new Set([
+  'status',
+  'series',
+  'upcoming',
+  'overdue',
+  'report',
+  'generate',
+  'publish',
+])
+
 function runCommand(command) {
   try {
-    const output = execSync(`pnpm run blog-publisher -- ${command}`, {
-      encoding: 'utf8',
-      stdio: 'pipe',
-    })
-    return { success: true, output: output.trim() }
-  } catch (err) {
-    return {
-      success: false,
-      error: err.message,
-      output: err.stdout?.trim() || '',
+    const tokens = parseArgs(command)
+    if (tokens.length === 0) {
+      return { success: false, error: 'Empty command' }
     }
+
+    const top = tokens[0]
+    if (!ALLOWED_TOP_LEVEL.has(top)) {
+      return { success: false, error: `Disallowed command: ${top}` }
+    }
+
+    // validate tokens
+    for (const t of tokens) {
+      if (!isSafeToken(t)) {
+        return { success: false, error: 'Invalid characters in arguments' }
+      }
+    }
+
+    const args = ['run', 'blog-publisher', '--', ...tokens]
+    const proc = spawnSync('pnpm', args, { encoding: 'utf8', stdio: 'pipe', shell: false })
+
+    if (proc.error) {
+      return { success: false, error: proc.error.message }
+    }
+
+    if (proc.status === 0) {
+      return { success: true, output: (proc.stdout || '').toString().trim() }
+    }
+
+    return { success: false, error: (proc.stderr || proc.error || 'Unknown error').toString(), output: (proc.stdout || '').toString().trim() }
+  } catch (err) {
+    return { success: false, error: err.message }
   }
 }
 
