@@ -8,8 +8,8 @@ from typing import Any
 
 from celery.exceptions import SoftTimeLimitExceeded
 
-from bias_detection_service import BiasDetectionService, BiasDetectionConfig, SessionData
 from celery_config import app
+from bias_detection_service import BiasDetectionConfig, BiasDetectionService, SessionData
 
 logger = logging.getLogger(__name__)
 

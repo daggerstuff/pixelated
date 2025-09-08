@@ -3,8 +3,16 @@ FROM node:${NODE_VERSION}-slim AS base
 
 LABEL org.opencontainers.image.description="Astro"
 
+# Install pnpm with retries and fallbacks (no DNS modification needed)
 ARG PNPM_VERSION=10.15.0
-RUN npm install -g pnpm@$PNPM_VERSION
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set fetch-timeout 300000 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    (npm install -g pnpm@$PNPM_VERSION || \
+     npm install -g pnpm@$PNPM_VERSION --registry=https://registry.npmmirror.com || \
+     (curl -fsSL https://get.pnpm.io/install.sh | sh - && \
+      mv ~/.local/share/pnpm/pnpm /usr/local/bin/))
 
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
@@ -14,6 +22,7 @@ RUN apt-get update -qq && \
     python-is-python3=* \
     git=* \
     curl=* \
+    tini=* \
     ca-certificates=* && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -42,8 +51,7 @@ FROM base AS deps
 COPY --chown=astro:astro package.json pnpm-lock.yaml ./
 
 # Install dependencies with optimizations
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm config set store-dir /pnpm/store && \
+RUN pnpm config set store-dir /pnpm/store && \
     pnpm install --frozen-lockfile --prod=false
 
 FROM base AS build
@@ -57,7 +65,6 @@ COPY --chown=astro:astro src ./src
 COPY --chown=astro:astro public ./public
 COPY --chown=astro:astro astro.config.mjs ./
 COPY --chown=astro:astro tsconfig.json ./
-COPY --chown=astro:astro tailwind.config.ts ./
 COPY --chown=astro:astro uno.config.ts ./
 COPY --chown=astro:astro scripts ./scripts
 COPY --chown=astro:astro instrument.mjs ./
@@ -114,3 +121,6 @@ COPY --from=build --chown=astro:astro /app/instrument.mjs ./
 
 RUN mkdir -p /tmp/.astro && \
     chmod -R 755 /tmp/.astro
+
+# Use tini to handle signals and zombie processes
+ENTRYPOINT ["/usr/bin/tini", "--", "node", "dist/server/entry.mjs"]
