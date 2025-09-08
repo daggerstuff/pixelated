@@ -5,7 +5,7 @@
  * No frills, just works
  */
 
-const { execSync } = require('child_process')
+const { spawnSync } = require('child_process')
 
 // ANSI colors
 const colors = {
@@ -29,19 +29,56 @@ function error(message) {
   console.log(`${colors.red}✗ ${message}${colors.reset}`)
 }
 
+function parseArgs(command) {
+  const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g
+  const args = []
+  let m
+  while ((m = re.exec(command)) !== null) {
+    args.push(m[1] || m[2] || m[0])
+  }
+  return args
+}
+
+function isSafeToken(token) {
+  if (typeof token !== 'string' || token.length === 0) {
+    return false
+  }
+  return !/[;&|$`<>\\\n\r]/.test(token)
+}
+
+const ALLOWED_TOP_LEVEL = new Set(['status', 'series', 'upcoming', 'overdue', 'report', 'generate', 'publish'])
+
 function runBlogCommand(command) {
   try {
-    const result = execSync(`pnpm run blog-publisher -- ${command}`, {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
-    return { success: true, output: result }
-  } catch (err) {
-    return {
-      success: false,
-      error: err.message,
-      output: err.stdout || '',
+    const tokens = parseArgs(command)
+    if (tokens.length === 0) {
+      return { success: false, error: 'Empty command' }
     }
+
+    const top = tokens[0]
+    if (!ALLOWED_TOP_LEVEL.has(top)) {
+      return { success: false, error: `Disallowed command: ${top}` }
+    }
+
+    for (const t of tokens) {
+      if (!isSafeToken(t)) {
+        return { success: false, error: 'Invalid characters in arguments' }
+      }
+    }
+
+    const args = ['run', 'blog-publisher', '--', ...tokens]
+    const proc = spawnSync('pnpm', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false })
+    if (proc.error) {
+      return { success: false, error: proc.error.message }
+    }
+
+    if (proc.status === 0) {
+      return { success: true, output: proc.stdout }
+    }
+
+    return { success: false, error: proc.stderr || 'Unknown error', output: proc.stdout || '' }
+  } catch (err) {
+    return { success: false, error: err.message }
   }
 }
 

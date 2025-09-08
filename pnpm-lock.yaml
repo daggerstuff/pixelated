@@ -83,6 +83,9 @@ importers:
       '@sentry/browser':
         specifier: ^10.10.0
         version: 10.10.0
+      '@sentry/profiling-node':
+        specifier: ^10.10.0
+        version: 10.10.0
       '@sentry/vite-plugin':
         specifier: ^4.3.0
         version: 4.3.0
@@ -267,6 +270,9 @@ importers:
       '@playwright/test':
         specifier: ^1.55.0
         version: 1.55.0
+      '@sentry/node':
+        specifier: ^10.10.0
+        version: 10.10.0
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -2891,6 +2897,10 @@ packages:
     resolution: {integrity: sha512-oSU4F/ebOsJA9Eof0me9hLpSDTSelpnEY6gmhU9sHyIG+U7hJRuCfeGICxQOzBtteepWRhAaZEv4s9ZBh3iD2w==}
     engines: {node: '>=18'}
 
+  '@sentry-internal/node-cpu-profiler@2.2.0':
+    resolution: {integrity: sha512-oLHVYurqZfADPh5hvmQYS5qx8t0UZzT2u6+/68VXsFruQEOnYJTODKgU3BVLmemRs3WE6kCJjPeFdHVYOQGSzQ==}
+    engines: {node: '>=18'}
+
   '@sentry-internal/replay-canvas@10.10.0':
     resolution: {integrity: sha512-mJBNB0EBbE3vzL7lgd8lDoWWhRaRwxXdI4Kkx3r39u2+1qTdJP/xHbJDihyemCaw7gRL1FR/GC44JLipzEfkKQ==}
     engines: {node: '>=18'}
@@ -3021,6 +3031,11 @@ packages:
       '@opentelemetry/instrumentation': ^0.57.1
       '@opentelemetry/sdk-trace-base': ^1.30.1
       '@opentelemetry/semantic-conventions': ^1.28.0
+
+  '@sentry/profiling-node@10.10.0':
+    resolution: {integrity: sha512-VAsXdIKEGpfYoXPxQVCH8277t/C7I27ZK+oLxar336dCTpBa85B000zVTQl073u/zW6r/eCKg4s6cO0Db2ytQA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@sentry/vite-plugin@4.3.0':
     resolution: {integrity: sha512-MeTAHMmTOgBPMAjeW7/ONyXwgScZdaFFtNiALKcAODnVqC7eoHdSRIWeH5mkLr2Dvs7nqtBaDpKxRjUBgfm9LQ==}
@@ -6913,6 +6928,10 @@ packages:
 
   nlcst-to-string@4.0.0:
     resolution: {integrity: sha512-YKLBCcUYKAg0FNlOBT6aI91qFmSiFKiluk655WzPF+DDMA02qIyy8uiRqI8QXtcFpEvll12LpL5MXqEmAZ+dcA==}
+
+  node-abi@3.77.0:
+    resolution: {integrity: sha512-DSmt0OEcLoK4i3NuscSbGjOf3bqiDEutejqENSplMSFA/gmB8mkED9G4pKWnPl7MDU4rSHebKPHeitpDfyH0cQ==}
+    engines: {node: '>=10'}
 
   node-cron@4.2.1:
     resolution: {integrity: sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==}
@@ -12306,6 +12325,11 @@ snapshots:
     dependencies:
       '@sentry/core': 10.10.0
 
+  '@sentry-internal/node-cpu-profiler@2.2.0':
+    dependencies:
+      detect-libc: 2.0.4
+      node-abi: 3.77.0
+
   '@sentry-internal/replay-canvas@10.10.0':
     dependencies:
       '@sentry-internal/replay': 10.10.0
@@ -12512,6 +12536,14 @@ snapshots:
       '@opentelemetry/sdk-trace-base': 1.30.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       '@sentry/core': 8.55.0
+
+  '@sentry/profiling-node@10.10.0':
+    dependencies:
+      '@sentry-internal/node-cpu-profiler': 2.2.0
+      '@sentry/core': 10.10.0
+      '@sentry/node': 10.10.0
+    transitivePeerDependencies:
+      - supports-color
 
   '@sentry/vite-plugin@4.3.0':
     dependencies:
@@ -17543,6 +17575,10 @@ snapshots:
   nlcst-to-string@4.0.0:
     dependencies:
       '@types/nlcst': 2.0.3
+
+  node-abi@3.77.0:
+    dependencies:
+      semver: 7.7.2
 
   node-cron@4.2.1: {}
 
