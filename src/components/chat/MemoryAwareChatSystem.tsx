@@ -58,7 +58,6 @@ export function MemoryAwareChatSystem({
     messages,
     isLoading,
     sendMessage,
-    clearMessages,
     memory,
   }: UseChatWithMemoryReturn = useChatWithMemory({
     sessionId: sessionId as string,

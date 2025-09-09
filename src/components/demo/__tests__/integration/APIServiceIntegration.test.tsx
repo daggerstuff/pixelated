@@ -1,8 +1,3 @@
-import {
-  safeFetch,
-  validateUrlForSSRF,
-} from '@/lib/utils/safe-fetch'
-import { ALLOWED_DOMAINS } from '@/lib/constants'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 // Mock fetch for API calls
@@ -18,19 +13,13 @@ const ALLOWED_DOMAINS = [
   'mlflow.company.com',
 ];
 
-// Build hostname to IP mapping at runtime or use a static list
-const hostnameToIPMap: Record<string, string[]> = {
-  // Populate with actual DNS resolutions to prevent DNS rebinding attacks
-}
-
-const validateUrlForSSRF = (urlString: string): boolean => {
-  try {
-    const url = new URL(urlString)
-
-    // Exact domain match only - no subdomain allowance for security
-    const hostname = url.hostname.toLowerCase()
-    if (!ALLOWED_DOMAINS.includes(hostname)) {
-      return false
+const safeFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  const url = input.toString();
+  if (url.startsWith('http')) {
+    const hostnameMatch = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/im);
+    const domain = hostnameMatch && hostnameMatch[1] ? hostnameMatch[1].toLowerCase() : '';
+    if (!domain || !ALLOWED_DOMAINS.some(d => domain.endsWith(d))) {
+      throw new Error(`${url} is not allowed. Only whitelisted domains are permitted to prevent SSRF attacks.`);
     }
   }
   // Create abort controller if not provided

@@ -23,7 +23,6 @@ export function ChatShell({ children, autoScrollDeps }: ChatShellProps) {
   // Scroll to bottom when new messages etc.
   useEffect(() => {
     scrollToBottom();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...autoScrollDeps, scrollToBottom]);
 
   // Toggle scroll-to-bottom button on scroll
