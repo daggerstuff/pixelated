@@ -15,6 +15,21 @@
 #
 # Reference: https://learn.microsoft.com/en-us/azure/devops/pipelines/process/environments
 # ---------------------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# IMPORTANT: Node.js Version in Azure Pipelines
+# ---------------------------------------------
+# Due to Azure Pipelines shell isolation between steps, Node.js and pnpm
+# environment is NOT persisted. Any usage of node, npm, or pnpm in a Bash
+# or script step MUST explicitly source nvm and use the correct Node version.
+#
+# Example for each Bash step:
+#   export NVM_DIR="$HOME/.nvm"
+#   . "$NVM_DIR/nvm.sh"
+#   nvm use 24
+#   # Now you can safely use node, npm, pnpm
+#
+# See https://gist.github.com/vivi-ai/9c23fcb2c7f234a6d7271c88fc4b5d9d for rationale.
+# ----------------------------------------------------------------------
 trigger:
   branches:
     include:
@@ -102,6 +117,9 @@ stages:
 
     - script: |
         # Install dependencies with optimizations
+        export NVM_DIR="$HOME/.nvm"
+        . "$NVM_DIR/nvm.sh"
+        nvm use 24
         pnpm install --frozen-lockfile --prefer-offline
       displayName: Install dependencies
 
@@ -143,6 +161,9 @@ stages:
 
     - script: |
         # Build with optimizations and cache configuration
+        export NVM_DIR="$HOME/.nvm"
+        . "$NVM_DIR/nvm.sh"
+        nvm use 24
         export NODE_OPTIONS="--max-old-space-size=4096"
         export ASTRO_CACHE_DIR="$(Agent.WorkFolder)/.astro-cache"
         export CI=true
@@ -241,6 +262,9 @@ stages:
       steps:
         - checkout: self
         - script: |
+            export NVM_DIR="$HOME/.nvm"
+            . "$NVM_DIR/nvm.sh"
+            nvm use 24
             pnpm install --frozen-lockfile
             pnpm e2e
           displayName: Run Playwright E2E tests
