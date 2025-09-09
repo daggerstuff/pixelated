@@ -834,108 +834,110 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
         ws.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data) as unknown
+            const data: unknown = JSON.parse(event.data)
             const hasType = (v: unknown): v is { type: string } =>
-              !!v && typeof (v as any).type === 'string'
+              !!v && typeof v === 'object' && v !== null && 'type' in v && typeof (v as any).type === 'string'
             if (!hasType(data)) {
               logger.warn('WS message missing type', { data })
               return
             }
-
-            const message: WebSocketMessage = data as WebSocketMessage;
-  
+            const message = data
             // Handle different types of real-time updates
             switch (message.type) {
               case 'bias_alert':
                 // Add new alert to the list
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  const newAlert = message.alert
-                  // Show notification if high/critical
-                  if (newAlert.level === 'high' || newAlert.level === 'critical') {
-                    setNewHighBiasAlert(newAlert)
-                  }
-                  case 'metrics_update': {
-                    setDashboardData((prev: BiasDashboardData | null) => {
-                      if (!prev) { return prev }
-                      return {
-                        ...prev,
-                        summary: {
-                          ...prev.summary,
-                          ...data.metrics,
-                        },
-                      }
-                    })
-                    announceToScreenReader('Dashboard metrics updated')
-                    break
-                  }
-                  case 'trends_update': {
-                    setDashboardData((prev: BiasDashboardData | null) => {
-                      if (!prev) { return prev }
-                      return {
-                        ...prev,
-                        trends: data.trends || prev.trends,
-                      }
-                    })
-                    announceToScreenReader('Trend data updated')
-                    break
-                  }
-                  const updatedSession = message.session
-                  return {
-                    ...prev,
-                    recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
-                      session.sessionId === updatedSession.sessionId
-                        ? updatedSession
-                        : session,
-                    ),
-                  }
-                })
-                announceToScreenReader(
-                  `Session ${message.session.sessionId} updated`,
-                )
+                if ('alert' in message && typeof (message as any).alert === 'object' && (message as any).alert !== null) {
+                  const newAlert = (message as any).alert
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    // Show notification if high/critical
+                    if (newAlert.level === 'high' || newAlert.level === 'critical') {
+                      setNewHighBiasAlert(newAlert)
+                    }
+                    announceToScreenReader(
+                      `New ${newAlert.level} bias alert: ${newAlert.message}`,
+                    )
+                    return {
+                      ...prev,
+                      alerts: [newAlert, ...(prev.alerts || [])],
+                      summary: {
+                        ...prev.summary,
+                        alertsLast24h: prev.summary.alertsLast24h + 1,
+                      },
+                    }
+                  })
+                }
+                break
+              case 'session_update':
+                // Update session data
+                if ('session' in message && typeof (message as any).session === 'object' && (message as any).session !== null) {
+                  const updatedSession = (message as any).session
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    return {
+                      ...prev,
+                      recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
+                        session.sessionId === updatedSession.sessionId
+                          ? updatedSession
+                          : session,
+                      ),
+                    }
+                  })
+                  announceToScreenReader(
+                    `Session updated: ${updatedSession.sessionId}`,
+                  )
+                }
                 break
 
               case 'metrics_update':
                 // Update summary metrics
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  return {
-                    ...prev,
-                    summary: {
-                      ...prev.summary,
-                      ...message.metrics,
-                    },
-                  }
-                })
-                announceToScreenReader('Dashboard metrics updated')
+                if ('metrics' in message && typeof (message as any).metrics === 'object' && (message as any).metrics !== null) {
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    return {
+                      ...prev,
+                      summary: {
+                        ...prev.summary,
+                        ...(message as any).metrics,
+                      },
+                    }
+                  })
+                  announceToScreenReader('Dashboard metrics updated')
+                }
                 break
 
               case 'trends_update':
                 // Update trend data
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  return {
-                    ...prev,
-                    trends: message.trends || prev.trends,
-                  }
-                })
-                announceToScreenReader('Trend data updated')
+                if ('trends' in message && ((message as any).trends !== undefined)) {
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    return {
+                      ...prev,
+                      trends: (message as any).trends || prev.trends,
+                    }
+                  })
+                  announceToScreenReader('Trend data updated')
+                }
                 break
 
               case 'connection_status':
                 // Handle connection status updates
-                if (message.status === 'authenticated') {
-                  logger.info('WebSocket authenticated successfully')
-                } else if (message.status === 'error') {
-                  logger.error('WebSocket authentication failed', {
-                    error: message.error,
-                  })
+                if ('status' in message && typeof (message as any).status === 'string') {
+                  if ((message as any).status === 'authenticated') {
+                    logger.info('WebSocket authenticated successfully')
+                  } else if ((message as any).status === 'error') {
+                    logger.error('WebSocket authentication failed', {
+                      error: 'error' in message ? (message as any).error : undefined,
+                    })
+                  }
                 }
                 setLastUpdated(new Date())
               } catch (error: unknown) {
