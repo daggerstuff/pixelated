@@ -10,10 +10,12 @@ const isBatchBody = (val: unknown): val is BatchBody => {
     typeof val === 'object' &&
     val !== null &&
     !Array.isArray(val) &&
-    (
-      !('sessions' in val) ||
-      (Array.isArray((val as BatchBody).sessions))
-    )
+    (!('sessions' in val) || Array.isArray((val as BatchBody).sessions)) &&
+    (!('options' in val) || (
+      typeof (val as Record<string, unknown>)['options'] === 'object' &&
+      (val as Record<string, unknown>)['options'] !== null &&
+      !Array.isArray((val as Record<string, unknown>)['options'])
+    ))
   )
 }
 
@@ -28,12 +30,13 @@ export default async function handler(
     return
   }
 
- let body: unknown
- try {
-   body = await req.json()
- } catch {
-   return new Response('Invalid JSON', { status: 400 })
- }
+  let body: unknown
+  try {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  } catch {
+    res.status(400).json({ error: 'Invalid JSON' })
+    return
+  }
 
  if (!isBatchBody(body)) {
    return new Response('Request body does not match BatchBody shape', { status: 400 })
