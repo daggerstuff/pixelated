@@ -65,9 +65,7 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
         const formattedData = Array.isArray(data)
           ? data.map((item: RawEmotionDataItem) => {
               const baseData = {
-                timestamp: item.timestamp
-                  ? new Date(item.timestamp).toISOString()
-                  : '',
+                timestamp: toIsoString(item.timestamp),
                 valence:
                   item.dimensions?.valence != null && typeof item.dimensions.valence === 'number'
                     ? item.dimensions.valence
@@ -121,3 +119,12 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
     error
   }
 }
+
+  // Helper to safely convert timestamp to ISO string
+  function toIsoString(ts?: string | number): string {
+    if (ts == null) {
+      return ''
+    }
+    const d = new Date(ts)
+    return Number.isNaN(d.getTime()) ? '' : d.toISOString()
+  }
