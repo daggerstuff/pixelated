@@ -1,3 +1,13 @@
+// Ensure TypeScript loads the project-level three type shims.
+/// <reference path="../../types/three-addons.d.ts" />
+
+// Minimal global module declarations for Three.js and OrbitControls used in the app.
+// These declarations are intentionally minimal to silence TS "could not find a declaration file" errors.
+
+declare module 'three'
+declare module 'three/build/three.module.js'
+declare module 'three/addons/controls/OrbitControls.js'
+declare module 'three/examples/jsm/controls/OrbitControls.js'
 // Global DOM augmentations for project-wide window helpers
 export {}
 

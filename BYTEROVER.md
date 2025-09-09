@@ -69,6 +69,14 @@ To simplify imports, the project uses path aliases configured in `tsconfig.json`
 - Docker Compose for local development (`docker-compose.yml`).
 - Kubernetes manifests for production deployment.
 
+### Serena (SSE) Integration
+
+- **Purpose**: Server-Sent Events (SSE) endpoint used for event streaming, notifications, and onboarding coordination with developer tooling.
+- **Endpoint**: `https://serena.pixelatedempathy.tech/sse`
+- **Type**: `http` (SSE)
+- **Usage**: Tools and MCP clients may subscribe to this endpoint for real-time project events. If onboarding is required, POST requests or a specialized onboarding message may be accepted by the Serena service (check service docs).
+- **Notes**: The project stores a reference to this endpoint in user/editor `mcp.json` settings. Ensure network access and any required tokens or proxies are configured for CI and developer machines.
+
 ### Known Issues & Workarounds
 - **Astro `APIContext` Bug**: Due to a type inheritance bug in Astro 5.x, the native `APIContext` is missing the `request` property. **Do not import `APIContext` from `astro`**. Instead, use the custom `BaseAPIContext` defined in `src/lib/auth/apiRouteTypes.ts`.
 
