@@ -51,6 +51,7 @@ export interface UseMemoryReturn {
   // Memory management
   clearMemories: () => void
     getMemoryHistory: () => Promise<unknown[]>
+    getMemoryHistory: () => Promise<unknown[]>
 }
 
 export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
@@ -186,7 +187,6 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   )
 
   const addUserPreference = useCallback(
-    async (preference: string, value: unknown): Promise<void> => {
   async (preference: string, value: unknown): Promise<void> => {
       await memoryManager.addUserPreference(userId, preference, value)
       await refreshMemories()
@@ -240,6 +240,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
     setError(null)
   }, [])
 
+    const getMemoryHistory = useCallback(async (): Promise<unknown[]> => {
     const getMemoryHistory = useCallback(async (): Promise<unknown[]> => {
     try {
       return await memoryManager.getMemoryHistory(userId)
@@ -366,15 +367,6 @@ export function useUserPreferences(userId: string): UseUserPreferencesReturn {
       if (prefMemory) {
         try {
           const match = prefMemory.content.match(/= (.+)$/)
-          if (match && match[1]) {
-            try {
-              const parsed = JSON.parse(match[1])
-              return (parsed as unknown) as string | number | boolean | object
-            } catch {
-              return null
-            }
-          }
-          return null
           return match && match[1] ? JSON.parse(match[1]) as string | number | boolean | object | null : null
         } catch {
           return null
