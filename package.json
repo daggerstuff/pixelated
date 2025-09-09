@@ -321,7 +321,7 @@
     "url-polyfill": "^1.1.13",
     "util": "^0.12.5",
     "vfile": "^6.0.3",
-    "vite": "^7.0.5",
+    "vite": "^7.1.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "vue": "^3.5.18",
