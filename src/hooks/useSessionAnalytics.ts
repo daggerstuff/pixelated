@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 
 interface RawEmotionDataItem {
-  timestamp: string
+  timestamp?: string | number
   dimensions?: {
-    valence: number
-    arousal: number
-    dominance: number
+    valence?: number
+    arousal?: number
+    dominance?: number
   }
   valence?: number
   arousal?: number
@@ -40,13 +40,15 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
 
   useEffect(() => {
     let isMounted = true
-    if (!sessionId) return
+    if (!sessionId) {
+      return
+    }
 
     setIsLoading(true)
     setError(null)
 
     // Async analytics retrieval (side effect, never blocking render)
-    async function fetchAllAnalytics() {
+    const fetchAllAnalytics = async () => {
       try {
         const url = new URL(
           '/api/emotions/session-analysis',
@@ -67,19 +69,19 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
                   ? new Date(item.timestamp).toISOString()
                   : '',
                 valence:
-                  item.dimensions && typeof item.dimensions.valence === 'number'
+                  item.dimensions?.valence != null && typeof item.dimensions.valence === 'number'
                     ? item.dimensions.valence
                     : typeof item.valence === 'number'
                       ? item.valence
                       : 0,
                 arousal:
-                  item.dimensions && typeof item.dimensions.arousal === 'number'
+                  item.dimensions?.arousal != null && typeof item.dimensions.arousal === 'number'
                     ? item.dimensions.arousal
                     : typeof item.arousal === 'number'
                       ? item.arousal
                       : 0,
                 dominance:
-                  item.dimensions && typeof item.dimensions.dominance === 'number'
+                  item.dimensions?.dominance != null && typeof item.dimensions.dominance === 'number'
                     ? item.dimensions.dominance
                     : typeof item.dominance === 'number'
                       ? item.dominance
@@ -91,7 +93,9 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
             })
           : []
 
-        if (isMounted) setEmotionData(formattedData)
+        if (isMounted) {
+          setEmotionData(formattedData)
+        }
       } catch (err: unknown) {
         if (isMounted) {
           setError(
@@ -99,7 +103,9 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
           )
         }
       } finally {
-        if (isMounted) setIsLoading(false)
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 

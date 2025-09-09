@@ -34,3 +34,19 @@ export interface TherapyAnalysis {
   insights: string[]
   recommendations: string[]
 }
+
+export interface Emotion {
+  type: string
+  confidence: number
+  intensity?: number
+}
+
+export interface RiskFactor {
+  type: string
+  severity: number
+}
+
+export interface EmotionAnalysis {
+  emotions: Emotion[]
+  riskFactors: RiskFactor[]
+}

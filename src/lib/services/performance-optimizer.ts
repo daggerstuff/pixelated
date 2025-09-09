@@ -224,7 +224,9 @@ export class PerformanceOptimizer {
   }
 
   private evictByStrategy() {
-    if (this.cache.size === 0) return
+    if (this.cache.size === 0) {
+      return
+    }
 
   let keyToEvict: string | undefined
     
@@ -242,7 +244,9 @@ export class PerformanceOptimizer {
         keyToEvict = this.cache.keys().next().value
     }
 
-  if (!keyToEvict) return
+  if (!keyToEvict) {
+    return
+  }
   this.cache.delete(keyToEvict)
   }
 

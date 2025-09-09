@@ -1,0 +1,26 @@
+{
+  "name": "pixelated",
+  "root": "/home/vivi/pixelated",
+  "description": "Pixelated Empathy full-stack application",
+  "type": "web-app",
+  "languages": ["typescript", "python"],
+  "entry": "src/",
+  "servers": {
+    "byterover-mcp": {
+      "type": "http",
+      "url": "https://mcp.byterover.dev/mcp?machineId=1f0861d2-010c-6970-b51c-3d276d45a5ed"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
+    "serena": {
+      "type": "http",
+      "url": "https://serena.pixelatedempathy.tech/sse"
+    }
+  }
+}
