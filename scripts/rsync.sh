@@ -1,43 +1,110 @@
-#!/bin/bash
+#!/usr/bin/env bash
+mkdir -p /tmp
 
-# Deploy Pixelated Empathy to VPS using rsync
-# This uploads the entire project and sets up the environment
-# Usage: ./rsync.sh [host] [user] [port] [ssh_key] [domain] [--dry-run]
-
-set -e
-
-# Parse dry-run flag
-DRY_RUN=false
-for arg in "$@"; do
-    if [[ "$arg" == "--dry-run" ]]; then
-        DRY_RUN=true
-        break
-    fi
-done
-
-# Configuration (excluding --dry-run from positional params)
-args=()
-for arg in "$@"; do
-    if [[ "$arg" != "--dry-run" ]]; then
-        args+=("$arg")
-    fi
-done
-
-VPS_HOST=${args[0]:-"45.55.211.39"}
-VPS_USER=${args[1]:-"root"}
-VPS_PORT=${args[2]:-"22"}
-SSH_KEY=${args[3]:-"~/.ssh/planet"}
-DOMAIN=${args[4]:-"pixelatedempathy.com"}
-LOCAL_PROJECT_DIR="/home/vivi/pixelated"
-REMOTE_PROJECT_DIR="/root/pixelated"
-
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
+
+VPS_HOST="45.55.211.39"
+VPS_USER="root"
+VPS_PORT="22"
+SSH_KEY="~/.ssh/planet"
+DOMAIN="pixelatedempathy.com"
+LOCAL_PROJECT_DIR="/home/vivi/pixelated"
+REMOTE_PROJECT_DIR="/root/pixelated"
+
+# Build container remotely on VPS
+build_container_on_vps() {
+    local container_tag="$1"
+    local container_name=$(echo "$container_tag" | cut -d: -f1)
+    local tag=$(echo "$container_tag" | cut -d: -f2)
+    
+    log_deployment_event "BUILD" "INFO" "Starting remote Docker build on VPS" "remote_build_start"
+    
+    # Build container on VPS
+    ssh -i "$SSH_KEY" -p "$VPS_PORT" -o StrictHostKeyChecking=no "$VPS_USER@$VPS_HOST" bash << 'EOF'
+set -e
+
+# Source nvm for non-interactive shells
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" 2>/dev/null || true
+
+# Ensure Node.js and pnpm are available
+if ! command -v node >/dev/null 2>&1; then
+    echo "❌ Node.js not found. nvm environment may not be properly set up."
+    exit 1
+fi
+
+if ! command -v pnpm >/dev/null 2>&1; then
+    echo "❌ pnpm not found. Installing pnpm globally..."
+    npm install -g pnpm@10.15.0
+fi
+
+cd "/root/pixelated"
+
+echo "🔧 Starting Docker build on VPS with real-time output..."
+echo "Build context: $(du -sh . | cut -f1)"
+echo "Node.js version: $(node --version)"
+echo "pnpm version: $(pnpm --version)"
+
+# Set BASH_ENV for Docker builds to source nvm
+export BASH_ENV="$HOME/.bash_env"
+
+# Use legacy docker build for compatibility
+DOCKER_BUILDKIT=0 timeout 600 docker build \
+    --network=host \
+    --build-arg BASH_ENV="$HOME/.bash_env" \
+    -t "pixelated-box:090825-03" \
+    . 2>&1 | tee /tmp/pixelated-docker-build.log
+
+build_result=${PIPESTATUS[0]}
+
+if [ $build_result -eq 0 ]; then
+    echo "✅ Container build completed successfully: pixelated-box:090825-03"
+    
+    # Stop and remove any existing container with the new name
+    if docker ps -a --format '{{.Names}}' | grep -q "^pixelated-app-new$"; then
+        echo "🛑 Stopping existing pixelated-app-new container..."
+        docker stop pixelated-app-new || true
+        docker rm pixelated-app-new || true
+    fi
+    
+    # Start the new container
+    echo "🚀 Starting new container: pixelated-app-new"
+    docker run -d \
+        --name pixelated-app-new \
+        --restart unless-stopped \
+        -p 4321:4321 \
+        "pixelated-box:090825-03"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Container started successfully"
+        exit 0
+    else
+        echo "❌ Failed to start container"
+        exit 1
+    fi
+else
+    echo "❌ Container build failed with exit code: $build_result"
+    exit 1
+fi
+EOF
+    
+    local build_exit_code=$?
+    if [[ $build_exit_code -eq 0 ]]; then
+        log_deployment_event "BUILD" "INFO" "Remote container build and deployment successful" "remote_build_success"
+        return 0
+    else
+        log_deployment_event "BUILD" "ERROR" "Remote container build failed with exit code: $build_exit_code" "remote_build_failure"
+        return 1
+    fi
+}
+
+# ...existing code...
 
 print_status() { echo -e "${GREEN}[INFO]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
@@ -97,16 +164,10 @@ readonly ERROR_DISK_SPACE=80
 readonly ERROR_UNKNOWN=99
 
 # Global error tracking
-DEPLOYMENT_ERRORS=()
-DEPLOYMENT_WARNINGS=()
-ERROR_LOG="/tmp/deployment-errors.log"
-WARNING_LOG="/tmp/deployment-warnings.log"
 
 # Enhanced structured logging system
 DEPLOYMENT_LOG="/tmp/deployment-$(date +%Y%m%d-%H%M%S).log"
-DEPLOYMENT_METRICS="/tmp/deployment-metrics-$(date +%Y%m%d-%H%M%S).json"
-DEPLOYMENT_START_TIME=""
-DEPLOYMENT_CONTEXT=""
+
 
 # Disk space cleanup function
 cleanup_disk_space() {
@@ -168,9 +229,9 @@ cleanup_disk_space() {
         # Find all backup directories and sort by modification time (newest first)
         backup_dirs=$(find /root -name "*backup*" -type d -printf '%T@ %p\n' 2>/dev/null | sort -nr | cut -d' ' -f2-)
         backup_count=$(echo "$backup_dirs" | wc -l)
-        
+
+        # Always keep only the current and two previous backups (max 3)
         if [ "$backup_count" -gt 3 ]; then
-            # Keep first 3, remove the rest
             echo "$backup_dirs" | tail -n +4 | while read -r backup_dir; do
                 if [ -n "$backup_dir" ] && [ -d "$backup_dir" ]; then
                     echo "Removing old backup: $backup_dir"
@@ -212,8 +273,7 @@ CURRENT_STAGE=""
 
 # Initialize structured logging system
 initialize_structured_logging() {
-    DEPLOYMENT_START_TIME=$(date +%s%3N)
-    DEPLOYMENT_CONTEXT=$(generate_deployment_context)
+    # Create main deployment log with header
     
     # Create main deployment log with header
     cat > "$DEPLOYMENT_LOG" << EOF
@@ -251,23 +311,6 @@ EOF
     log_deployment_event "SYSTEM" "INFO" "Structured logging initialized" "deployment_start"
 }
 
-# Generate deployment context information
-generate_deployment_context() {
-    local timestamp=$(date +%Y%m%d-%H%M%S)
-    local commit_hash=""
-    local branch=""
-    
-    # Try to get git information
-    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-        commit_hash=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-        branch=$(git branch --show-current 2>/dev/null || echo "unknown")
-    else
-        commit_hash="nogit"
-        branch="nogit"
-    fi
-    
-    echo "${timestamp}-${branch}-${commit_hash}"
-}
 
 # Generate simple container tag: pixelated-box:MMDDYY-NN
 generate_simple_container_tag() {
@@ -289,6 +332,32 @@ generate_simple_container_tag() {
     
     echo "pixelated-box:${date_part}-${build_num_formatted}"
 }
+
+# Generate simple backup tag: pixelated-back:MMDDYY-NN
+generate_simple_backup_tag() {
+    local date_part=$(date +%m%d%y)
+    local build_counter_file="/tmp/pixelated-backup-counter-$(date +%Y%m%d)"
+    local build_num=1
+    if [[ -f "$build_counter_file" ]]; then
+        build_num=$(cat "$build_counter_file")
+        build_num=$((build_num + 1))
+    fi
+    echo "$build_num" > "$build_counter_file"
+    local build_num_formatted=$(printf "%02d" "$build_num")
+    echo "pixelated-back:${date_part}-${build_num_formatted}"
+}
+## Archive creation for failed deployments removed
+cat > "$DEPLOYMENT_LOG" << EOF
+=== Pixelated Empathy Deployment Log ===
+Timestamp: $(date -Iseconds)
+Host: $VPS_HOST
+User: $VPS_USER
+Domain: $DOMAIN
+Context: $DEPLOYMENT_CONTEXT
+Log Level: INFO
+=== Deployment Started ===
+
+EOF
 
 # Enhanced deployment event logging with structured format
 log_deployment_event() {
