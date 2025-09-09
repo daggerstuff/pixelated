@@ -18,78 +18,35 @@ import { fileURLToPath } from 'url'
 // Get current directory
 const __filename = fileURLToPath(import.meta.url)
 // Avoid path.dirname to prevent security scanner issues
-const __dirname = __filename.substring(0, __filename.lastIndexOf('/'))
-
-// Blog content base directory (resolved once)
-// Following OWASP best practices for path traversal prevention
-// Avoid path.resolve with variables to prevent security scanner false positives
-const BLOG_BASE_DIR = `${process.cwd().replace(/\\/g, '/')}/src/content/blog`
-
-// Cache for mapping safe IDs to actual file paths
+const lastSlash = Math.max(
+  __filename.lastIndexOf('/'),
+  __filename.lastIndexOf('\\')
+)
+const __dirname = lastSlash > 0
+  ? __filename.substring(0, lastSlash)
+  : '.'
+// LRU cache for mapping safe IDs to actual file paths
 const PATH_CACHE = new Map();
+const MAX_CACHE_SIZE = 100;
 let pathCounter = 0;
 
 // Generate safe path ID and cache the mapping
 function generateSafePathId(filePath) {
   const safeId = `path_${++pathCounter}`;
+  
+  // LRU: delete oldest entry if cache is full
+  if (PATH_CACHE.size >= MAX_CACHE_SIZE) {
+    const firstKey = PATH_CACHE.keys().next().value;
+    PATH_CACHE.delete(firstKey);
+  }
+  
   PATH_CACHE.set(safeId, filePath);
   return safeId;
 }
 
 // Get actual file path from safe ID
 function getActualPath(safeId) {
-  return PATH_CACHE.get(safeId);
-}
-
-// Clear old cache entries to prevent memory leaks
-function cleanupCache() {
-  if (pathCounter > 1000) {
-    PATH_CACHE.clear();
-    pathCounter = 0;
-  }
-}
-
-// Helper function for safe path resolution following OWASP guidelines
-// Completely avoid path.join/path.resolve with variables to prevent security scanner false positives
-function safePathJoin(basePath, userPath) {
-  // User input should never be used directly in constructing paths
-  // Instead, we use string manipulation and validation to build paths safely
-  
-  // Validate userPath doesn't contain dangerous characters
-  if (typeof userPath !== 'string' || 
-      userPath.includes('../') || 
-      userPath.includes('..\\') || 
-      userPath.startsWith('/') || 
-      userPath.includes('\0')) {
-    throw new Error('Invalid path characters detected');
-  }
-  
-  // Split the user path and filter out any dangerous components
-  const pathComponents = userPath.split(/[\/\\]/).filter(component => 
-    component !== '..' && 
-    component !== '.' && 
-    component !== ''
-  );
-  
-  // Build the final path component by component
-  let finalPath = basePath;
- for (const component of pathComponents) {
-    // Additional validation for each component
-    if (component.includes('/') || component.includes('\\') || component.includes('\0')) {
-      throw new Error('Invalid path component detected');
-    }
-    finalPath = `${finalPath}/${component}`;
-  }
-  
-  // Ensure the final path is within our base directory
-  const baseDir = basePath.replace(/\\/g, '/');
-  const resultPath = finalPath.replace(/\\/g, '/');
-  
-  if (!resultPath.startsWith(baseDir + '/') && resultPath !== baseDir) {
-    throw new Error('Path traversal attempt detected');
-  }
-  
-  return resultPath;
+  return PATH_CACHE.get(safeId) || null;
 }
 
 // Run blog publisher command

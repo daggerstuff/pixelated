@@ -1,3 +1,4 @@
+import { secureTimestampId, secureToken } from '../security/random'
 export * from './middleware'
 // Re-export session functions
 export { createSession, endSession, getSession } from './session'

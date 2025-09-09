@@ -29,28 +29,24 @@ function error(message) {
   console.log(`${colors.red}✗ ${message}${colors.reset}`)
 }
 
+// at top of file, ensure string-argv is installed (npm install string-argv)
+const toArgv = require('string-argv')
+
 function parseArgs(command) {
-  const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g
-  const args = []
-  let m
-  while ((m = re.exec(command)) !== null) {
-    args.push(m[1] || m[2] || m[0])
-  }
-  return args
+  return toArgv(command ?? '')
 }
 
 function isSafeToken(token) {
   if (typeof token !== 'string' || token.length === 0) {
     return false
   }
-  return !/[;&|$`<>\\\n\r]/.test(token)
+  // Disallow only control/newline/null; shell is disabled.
+  return !/[\0\n\r]/.test(token)
 }
-
-const ALLOWED_TOP_LEVEL = new Set(['status', 'series', 'upcoming', 'overdue', 'report', 'generate', 'publish'])
 
 function runBlogCommand(command) {
   try {
-    const tokens = parseArgs(command)
+    const tokens = Array.isArray(command) ? command : parseArgs(command || '')
     if (tokens.length === 0) {
       return { success: false, error: 'Empty command' }
     }
@@ -84,10 +80,9 @@ function runBlogCommand(command) {
 
 // Get command line arguments
 const args = process.argv.slice(2)
-const command = args.join(' ')
 
 // Show help if no command
-if (!command || command === 'help') {
+if (args.length === 0 || args[0] === 'help') {
   log('')
   log(`${colors.cyan}Blog Management Commands:${colors.reset}`)
   log('')
@@ -120,7 +115,7 @@ if (!command || command === 'help') {
 }
 
 // Run the command
-const result = runBlogCommand(command)
+const result = runBlogCommand(args)
 
 if (result.success) {
   log(result.output)

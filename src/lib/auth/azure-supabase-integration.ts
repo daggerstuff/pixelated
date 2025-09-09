@@ -15,12 +15,20 @@ if (typeof window === 'undefined') {
     mongodb = null
     mongoAuthService = null
     ObjectId = class MockObjectId {
+      id: string
       constructor(id?: string) {
         this.id = id || 'mock-object-id'
       }
       toString() { return this.id }
       toHexString() { return this.id }
-      static isValid() { return true }
+      /**
+       * Simulates ObjectId validation by checking for a 24-character hex string.
+       * This is a mock and may not cover all edge cases of real ObjectId validation.
+       * Client-side consumers should not rely on this for production validation.
+       */
+      static isValid(id: string): boolean {
+        return typeof id === 'string' && /^[a-fA-F0-9]{24}$/.test(id)
+      }
     }
   }
 } else {
@@ -28,6 +36,7 @@ if (typeof window === 'undefined') {
   mongodb = null
   mongoAuthService = null
   ObjectId = class MockObjectId {
+    id: string
     constructor(id?: string) {
       this.id = id || 'mock-object-id'
     }
