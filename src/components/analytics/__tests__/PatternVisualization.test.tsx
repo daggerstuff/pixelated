@@ -63,7 +63,8 @@ describe('PatternVisualization', () => {
   })
 
   it('renders all sections with data', () => {
-    render(
+  const handlePatternSelect = vi.fn()
+  render(
       <PatternVisualization
         trends={mockTrends}
         onPatternSelect={handlePatternSelect}

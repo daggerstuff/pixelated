@@ -152,6 +152,10 @@ export class PythonBiasDetectionBridge {
       
       // Sort by priority (higher numbers = higher priority)
       this.requestQueue.sort((a, b) => b.priority - a.priority)
+      // Ensure the processor is running
+      if (!this.processingQueue) {
+        void this.processQueue()
+      }
     })
   }
 
