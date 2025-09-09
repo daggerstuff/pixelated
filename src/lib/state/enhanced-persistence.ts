@@ -233,10 +233,8 @@ class EnhancedStatePersistence {
     // Remove oldest form drafts first
     const formDrafts = this.getStoredValue('form_drafts', {}) as Record<string, unknown>
     const draftEntries = Object.entries(formDrafts).sort((a, b) => {
-      const timestampA =
-        ((a[1] as Record<string, unknown>)?.timestamp as number) || 0
-      const timestampB =
-        ((b[1] as Record<string, unknown>)?.timestamp as number) || 0
+      const timestampA = hasTimestamp(a[1]) ? a[1].timestamp : 0
+      const timestampB = hasTimestamp(b[1]) ? b[1].timestamp : 0
       return timestampA - timestampB
     })
 

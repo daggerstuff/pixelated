@@ -297,14 +297,17 @@ class EmotionValidationPipeline {
       if (patternBias.detected && emotionData.responseText) {
         let mitigatedText = emotionData.responseText
         if (patternBias.patterns.length > 0) {
+          // Use class-level regex to avoid partial matches and recompilation
           mitigatedText = mitigatedText.replace(
             EmotionValidationPipeline.MITIGATION_REGEX,
             '[BIAS-MITIGATED]',
           )
         }
         if (mitigatedText !== emotionData.responseText) {
+          // Mutate a copy of emotionData for further analysis
           emotionData = { ...emotionData, responseText: mitigatedText }
           biasMitigated = true
+          // Rerun bias pattern detection to confirm mitigation
           patternBias = this.detectBiasPatterns(emotionData)
         }
       }

@@ -28,7 +28,7 @@ async function initializeDependencies() {
         serverDepsPromise = (async () => {
             try {
                 const mod = await import('../config/mongodb.config');
-                mongodb = mod.default as MongoRuntime;
+                mongodb = mod.default as unknown as MongoRuntime;
                 const mongodbLib = await import('mongodb');
                 ObjectId = mongodbLib.ObjectId;
             } catch {
@@ -66,8 +66,11 @@ export class MongoAuthService {
     password: string,
     role: 'admin' | 'user' | 'therapist' = 'user',
   ): Promise<User> {
-    await initializeDependencies();
-    const db = await mongodb!.connect()
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB not available')
+    }
+    const db = await mongodb.connect()
     const usersCollection = db.collection<User>('users')
 
     // Check if user already exists
@@ -101,55 +104,12 @@ export class MongoAuthService {
     return user
   }
 
-  async signIn(email: string, password: string): Promise<AuthResult> {
-    await initializeDependencies();
-    const db = await mongodb!.connect()
-    const usersCollection = db.collection<User>('users')
-    const sessionsCollection = db.collection<Session>('sessions')
-
-    // Find user
-    const user = await usersCollection.findOne({ email })
-    if (!user) {
-      throw new Error('Invalid credentials')
-    }
-
-    // Verify password
-    const isValid = await bcrypt.compare(password, user.password)
-    if (!isValid) {
-      throw new Error('Invalid credentials')
-    }
-
-    // Create session
-    const sessionId = new ObjectId()
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-
-    const session: Omit<Session, '_id'> = {
-      userId: user._id,
-      sessionId: sessionId.toString(),
-      expiresAt,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-
-    await sessionsCollection.insertOne({ ...session, _id: sessionId })
-
-    // Generate JWT
-    const accessToken = this.generateToken({
-      userId: user._id.toString(),
-      email: user.email,
-      role: user.role,
-    })
-
-    return {
-      user,
-      session: { ...session, _id: sessionId },
-      accessToken,
-    }
-  }
-
   async signOut(sessionId: string): Promise<void> {
     await initializeDependencies();
-    const db = await mongodb!.connect()
+    if (!mongodb) {
+      throw new Error('MongoDB not available');
+    }
+    const db = await mongodb.connect()
     const sessionsCollection = db.collection<Session>('sessions')
 
     await sessionsCollection.deleteOne({ sessionId })
@@ -157,11 +117,14 @@ export class MongoAuthService {
 
   async refreshSession(accessToken: string): Promise<AuthResult> {
     await initializeDependencies();
+    if (!mongodb) {
+      throw new Error('MongoDB not available');
+    }
     try {
       // Verify current token
       const payload = this.verifyToken(accessToken) as AuthTokenPayload
 
-      const db = await mongodb!.connect()
+      const db = await mongodb.connect()
       const usersCollection = db.collection<User>('users')
       const sessionsCollection = db.collection<Session>('sessions')
 
@@ -230,7 +193,10 @@ export class MongoAuthService {
 
   async getUserById(userId: string): Promise<User | null> {
     await initializeDependencies();
-    const db = await mongodb!.connect()
+    if (!mongodb) {
+      throw new Error('MongoDB not available');
+    }
+    const db = await mongodb.connect()
     const usersCollection = db.collection<User>('users')
 
     if (!ObjectId) {
@@ -244,7 +210,11 @@ export class MongoAuthService {
     updates: Partial<User>,
   ): Promise<User | null> {
     await initializeDependencies();
-    const db = await mongodb!.connect()
+    if (!mongodb) {
+      // Defensive: ensure updateUser never proceeds without initialized DB client
+      throw new Error('MongoDB not initialized in updateUser; dependencies missing or not loaded.');
+    }
+    const db = await mongodb.connect()
     const usersCollection = db.collection<User>('users')
 
     if (!ObjectId) {
@@ -260,9 +230,12 @@ export class MongoAuthService {
 
   async changePassword(userId: string, newPassword: string): Promise<void> {
     await initializeDependencies();
+    if (!mongodb) {
+      throw new Error('MongoDB not available');
+    }
     const hashedPassword = await bcrypt.hash(newPassword, this.SALT_ROUNDS)
 
-    const db = await mongodb!.connect()
+    const db = await mongodb.connect()
     const usersCollection = db.collection<User>('users')
 
     if (!ObjectId) {
