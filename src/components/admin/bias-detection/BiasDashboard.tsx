@@ -135,6 +135,15 @@ interface AlertItem extends BaseFilterableItem {
   status?: string
 }
 
+type WebSocketMessage =
+  | { type: 'bias_alert'; alert: AlertItem }
+  | { type: 'session_update'; session: BiasAnalysisResult }
+  | { type: 'metrics_update'; metrics: Partial<BiasDashboardData['summary']> }
+  | { type: 'trends_update'; trends: TrendItem[] }
+  | { type: 'connection_status'; status: string; error?: string }
+  | { type: 'heartbeat' }
+  | { type: 'heartbeat_response' };
+
 interface TrendItem extends BaseFilterableItem {
   biasScore: number
   sessionCount: number
@@ -535,7 +544,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             }
             return {
               ...prev,
-              alerts: prev.alerts.map((alert) => {
+              alerts: prev.alerts.map((alert: AlertItem) => {
                 if (alert.alertId === alertId) {
                   // Ensure timestamp is a Date and all BiasAlert fields are present
                   return {
@@ -825,17 +834,25 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
         ws.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data)
+            const data = JSON.parse(event.data) as unknown
+            const hasType = (v: unknown): v is { type: string } =>
+              !!v && typeof (v as any).type === 'string'
+            if (!hasType(data)) {
+              logger.warn('WS message missing type', { data })
+              return
+            }
 
+            const message: WebSocketMessage = data as WebSocketMessage;
+  
             // Handle different types of real-time updates
-            switch (data.type) {
+            switch (message.type) {
               case 'bias_alert':
                 // Add new alert to the list
                 setDashboardData((prev: BiasDashboardData | null) => {
                   if (!prev) {
                     return prev
                   }
-                  const newAlert = data.alert
+                  const newAlert = message.alert
                   // Show notification if high/critical
                   if (newAlert.level === 'high' || newAlert.level === 'critical') {
                     setNewHighBiasAlert(newAlert)
@@ -860,7 +877,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   if (!prev) {
                     return prev
                   }
-                  const updatedSession = data.session
+                  const updatedSession = message.session
                   return {
                     ...prev,
                     recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
@@ -871,7 +888,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   }
                 })
                 announceToScreenReader(
-                  `Session ${data['session'].sessionId} updated`,
+                  `Session ${message.session.sessionId} updated`,
                 )
                 break
 
@@ -885,7 +902,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     ...prev,
                     summary: {
                       ...prev.summary,
-                      ...data.metrics,
+                      ...message.metrics,
                     },
                   }
                 })
@@ -900,7 +917,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   }
                   return {
                     ...prev,
-                    trends: data.trends || prev.trends,
+                    trends: message.trends || prev.trends,
                   }
                 })
                 announceToScreenReader('Trend data updated')
@@ -908,11 +925,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
               case 'connection_status':
                 // Handle connection status updates
-                if (data.status === 'authenticated') {
+                if (message.status === 'authenticated') {
                   logger.info('WebSocket authenticated successfully')
-                } else if (data.status === 'error') {
+                } else if (message.status === 'error') {
                   logger.error('WebSocket authentication failed', {
-                    error: data.error,
+                    error: message.error,
                   })
                 }
                 break
@@ -3127,7 +3144,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 </CardContent>
               </Card>
             ) : (
-              filteredAlerts.map((alert) => {
+              filteredAlerts.map((alert: AlertItem) => {
                 const isSelected = selectedAlerts.has(alert.alertId)
                 const actions = alertActions.get(alert.alertId) || []
                 const lastAction = actions[actions.length - 1]
@@ -3162,7 +3179,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                   {alert.message}
                                 </p>
                                 <p className="text-xs text-muted-foreground mt-2">
-                                  Session: {alert['sessionId']} •{' '}
+                                  Session: {alert.sessionId} •{' '}
                                   {alert.timestamp
                                     ? new Date(alert.timestamp).toLocaleString()
                                     : 'Unknown time'}
@@ -3200,10 +3217,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 )}
 
                                 {/* Alert Notes */}
-                                {alertNotes.has(alert['alertId']) && (
+                                {alertNotes.has(alert.alertId) && (
                                   <div className="mt-2 p-2 bg-muted rounded text-sm">
                                     <strong>Notes:</strong>{' '}
-                                    {alertNotes.get(alert['alertId'])}
+                                    {alertNotes.get(alert.alertId)}
                                   </div>
                                 )}
                               </div>
@@ -3211,14 +3228,14 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
                             {/* Action Buttons */}
                             <div className="flex items-center space-x-2">
-                              {!alert['acknowledged'] && (
+                              {!alert.acknowledged && (
                                 <>
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={() =>
                                       handleAlertAction(
-                                        alert['alertId'],
+                                        alert.alertId,
                                         'acknowledge',
                                       )
                                     }
@@ -3235,7 +3252,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                         'Add notes (optional):',
                                       )
                                       handleAlertAction(
-                                        alert['alertId'],
+                                        alert.alertId,
                                         'escalate',
                                         notes || undefined,
                                       )
@@ -3256,7 +3273,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                     setAlertNotes(
                                       (prev) =>
                                         new Map(
-                                          prev.set(alert['alertId'], notes),
+                                          prev.set(alert.alertId, notes),
                                         ),
                                     )
                                   }
@@ -3270,7 +3287,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 size="sm"
                                 variant="outline"
                                 onClick={() =>
-                                  handleAlertAction(alert['alertId'], 'dismiss')
+                                  handleAlertAction(alert.alertId, 'dismiss')
                                 }
                               >
                                 <X className="h-4 w-4 mr-1" />

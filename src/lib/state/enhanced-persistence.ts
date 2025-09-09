@@ -13,6 +13,16 @@ import { atomWithStorage } from 'jotai/utils'
 import { logger } from '@/lib/logger'
 
 // ============================================================================
+// Type guard for timestamped objects
+type Timestamped = { timestamp: number }
+function hasTimestamp(v: unknown): v is Timestamped {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'timestamp' in v &&
+    typeof (v as Record<string, unknown>)["timestamp"] === 'number'
+  )
+}
 // Enhanced Atoms with Persistence
 // ============================================================================
 
@@ -223,10 +233,8 @@ class EnhancedStatePersistence {
     // Remove oldest form drafts first
     const formDrafts = this.getStoredValue('form_drafts', {}) as Record<string, unknown>
     const draftEntries = Object.entries(formDrafts).sort((a, b) => {
-      const timestampA =
-        ((a[1] as Record<string, unknown>)?.timestamp as number) || 0
-      const timestampB =
-        ((b[1] as Record<string, unknown>)?.timestamp as number) || 0
+      const timestampA = hasTimestamp(a[1]) ? a[1].timestamp : 0
+      const timestampB = hasTimestamp(b[1]) ? b[1].timestamp : 0
       return timestampA - timestampB
     })
 
@@ -376,7 +384,7 @@ class EnhancedStatePersistence {
       unknown
     >
     const draft = drafts[formId] as Record<string, unknown> | undefined
-    return draft?.data || null
+    return draft ? draft["data"] : null
   }
 
   clearDraft(formId: string): void {

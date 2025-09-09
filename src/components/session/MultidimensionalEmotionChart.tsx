@@ -601,7 +601,8 @@ export default function MultidimensionalEmotionChart({
         })
       }
 
-      // Clear object pools
+      // Clear object pools using captured reference for reliability.
+      // This prevents memory leaks by guaranteeing the intended object pool is cleared.
       cleanupObjectPool.clear()
     }
   }, [dimensionalMaps, isLoading, viewMode, detailLevel, sortedMaps, measure])

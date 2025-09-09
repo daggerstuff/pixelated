@@ -5,7 +5,7 @@ tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'githubRepo',
 ---
 # Create LLMs.txt File from Repository Structure
 
-Create a new `llms.txt` file from scratch in the root of the repository following the official llms.txt specification at https://llmstxt.org/. This file provides high-level guidance to large language models (LLMs) on where to find relevant content for understanding the repository's purpose and specifications.
+Create a new `llms.txt` file from scratch in the root of the repository following the official llms.txt specification at [llms.txt specification](https://llmstxt.org/). This file provides high-level guidance to large language models (LLMs) on where to find relevant content for understanding the repository's purpose and specifications.
 
 ## Primary Directive
 
@@ -17,7 +17,7 @@ Before creating the `llms.txt` file, you must complete a thorough analysis:
 
 ### Step 1: Review llms.txt Specification
 
-- Review the official specification at https://llmstxt.org/ to ensure full compliance
+- Review the official specification at [llms.txt specification](https://llmstxt.org/) to ensure full compliance
 - Understand the required format structure and guidelines
 - Note the specific markdown structure requirements
 
@@ -130,7 +130,7 @@ Exclude files that:
 5. Ensure all links are valid relative paths
 
 ### Step 4: Validation
-1. Verify compliance with https://llmstxt.org/ specification
+1. Verify compliance with [llms.txt specification](https://llmstxt.org/) 
 2. Check that all links are valid and accessible
 3. Ensure the file serves as an effective LLM navigation tool
 4. Confirm the file is both human and machine readable
@@ -156,7 +156,7 @@ Exclude files that:
 
 ### Specification Compliance
 
-- ✅ Follows https://llmstxt.org/ format exactly
+- ✅ Follows [llms.txt specification](https://llmstxt.org/) format exactly
 - ✅ Uses required markdown structure
 - ✅ Implements optional sections appropriately
 - ✅ File located at repository root (`/llms.txt`)
@@ -164,37 +164,33 @@ Exclude files that:
 ## Example Structure Template
 
 ```txt
-# [Repository Name]
+# Pixelated - AI-Powered Mental Health & Empathy Platform
 
-> [Concise description of the repository's purpose and scope]
-
-[Optional additional context paragraphs without headings]
+> Comprehensive full-stack Astro application focused on AI-powered mental health support, empathy training, and bias detection with HIPAA-compliant security.
 
 ## Documentation
 
-- [Main README](README.md): Primary project documentation and getting started guide
-- [Contributing Guide](CONTRIBUTING.md): Guidelines for contributing to the project
-- [Code of Conduct](CODE_OF_CONDUCT.md): Community guidelines and expectations
-
-## Specifications
-
-- [Technical Specification](spec/technical-spec.md): Detailed technical requirements and constraints
-- [API Specification](spec/api-spec.md): Interface definitions and data contracts
-
-## Examples
-
-- [Basic Example](examples/basic-usage.md): Simple usage demonstration
-- [Advanced Example](examples/advanced-usage.md): Complex implementation patterns
+- [Project README](../../README.md): Primary project overview, setup instructions, and development workflow
+- [Project Documentation](../../docs/PERFORMANCE_OPTIMIZATION.md): Detailed project structure, architecture, and best practices
 
 ## Configuration
 
-- [Setup Guide](docs/setup.md): Installation and configuration instructions
-- [Deployment Guide](docs/deployment.md): Production deployment guidelines
+- [Astro Configuration](../../astro.config.mjs): Main Astro configuration with SSR setup
+- [Package Dependencies](../../package.json): Dependencies and npm scripts
+- [TypeScript Config](../../tsconfig.json): TypeScript configuration settings
+- [UnoCSS Config](../../uno.config.ts): Styling configuration with UnoCSS
 
-## Optional
+## Core Implementation
 
-- [Architecture Documentation](docs/architecture.md): Detailed system architecture
-- [Design Decisions](docs/decisions.md): Historical design decision records
+- [AI Services](../../src/lib/ai/index.ts): AI integration including OpenAI, Google GenAI, and bias detection models
+- [Authentication Utils](../../src/lib/auth/index.ts): Clerk-based authentication utilities
+- [Security Module](../../src/lib/security.ts): HIPAA-compliant security and FHE support
+- [Redis Caching](../../src/lib/redis.ts): Session and performance caching implementation
+
+## Deployment & DevOps
+
+- [Docker Compose](../../docker-compose.yml): Development environment orchestration
+- [Deployment Docs](../../docs/DUAL_DEPLOYMENT_GUIDE.md): Production deployment guidelines and infrastructure docs
 ```
 
 ## Success Criteria
