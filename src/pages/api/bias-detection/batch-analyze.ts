@@ -1,5 +1,6 @@
 import { BiasDetectionEngine } from '../../../lib/ai/bias-detection/BiasDetectionEngine'
 import type { TherapeuticSession as SessionData } from '../../../lib/ai/bias-detection/types'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 type BatchBody = { sessions?: SessionData[]; options?: Record<string, unknown> }
 
@@ -9,54 +10,52 @@ const isBatchBody = (val: unknown): val is BatchBody => {
     typeof val === 'object' &&
     val !== null &&
     !Array.isArray(val) &&
-    (
-      !('sessions' in val) ||
-      (Array.isArray((val as BatchBody).sessions))
-    )
+    (!('sessions' in val) || Array.isArray((val as BatchBody).sessions)) &&
+    (!('options' in val) || (
+      typeof (val as Record<string, unknown>)['options'] === 'object' &&
+      (val as Record<string, unknown>)['options'] !== null &&
+      !Array.isArray((val as Record<string, unknown>)['options'])
+    ))
   )
 }
 
 export const runtime = 'nodejs'
 
-export default async function handler(req: Request): Promise<Response> {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> {
   if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 })
+    res.status(405).json({ error: 'Method Not Allowed' })
+    return
   }
 
- let body: unknown
- try {
-   body = await req.json()
- } catch {
-   return new Response('Invalid JSON', { status: 400 })
- }
+  let body: unknown
+  try {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  } catch {
+    res.status(400).json({ error: 'Invalid JSON' })
+    return
+  }
 
   if (!body || typeof body !== 'object') {
-    return new Response('Invalid request body', { status: 400 })
+    res.status(400).json({ error: 'Invalid request body' })
+    return
   }
 
- const { sessions, options } = body as { 
-    sessions?: unknown[]; 
-    options?: {
-      concurrency?: number;
-      batchSize?: number;
-      onProgress?: (progress: { completed: number; total: number }) => void;
-      onError?: (error: Error, session: any) => void;
-      retries?: number;
-      timeoutMs?: number;
-      logProgress?: boolean;
-      logErrors?: boolean;
-      priority?: 'low' | 'medium' | 'high';
-    }
-  }
-  if (!Array.isArray(sessions) || sessions.length === 0) {
-    return new Response('Missing or invalid sessions array', { status: 400 })
+  const { sessions, options } = body as BatchBody
+  const MAX_BATCH = 100
+  if (!Array.isArray(sessions) || sessions.length === 0 || sessions.length > MAX_BATCH) {
+    res.status(400).json({ error: 'Missing or invalid sessions array' })
+    return
   }
 
   // Prefer forNext utility if available, otherwise use for-of loop
   // forNext(sessions, (session) => { ... })
   for (const session of sessions) {
     if (!session || typeof session !== 'object' || !('sessionId' in session)) {
-      return new Response('Invalid session object in array', { status: 400 })
+  res.status(400).json({ error: 'Invalid session object in array' })
+  return
     }
   }
 
@@ -68,14 +67,12 @@ export default async function handler(req: Request): Promise<Response> {
       sessions as SessionData[],
       options
     )
-    return new Response(
-      JSON.stringify({ results, errors }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    )
+  res.setHeader('Cache-Control', 'no-store')
+  res.status(200).json({ results, errors })
+  return
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: (error as Error).message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    )
+  res.setHeader('Cache-Control', 'no-store')
+  res.status(500).json({ error: (error as Error).message })
+  return
   }
 }
