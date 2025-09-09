@@ -91,24 +91,39 @@ const metricsMiddleware = (req, res, next) => {
   // Increment active connections
   activeConnections.inc();
   
+  // Helper to sanitize label values and limit cardinality
+  const sanitizeLabel = (val, maxLen = 100) => {
+    if (val == null) {
+      return 'unknown'
+    }
+    let s = typeof val === 'string' ? val : String(val)
+    s = s.split('?')[0] // drop querystring if present
+    s = s.trim().slice(0, maxLen)
+    // Only allow a safe subset of characters; replace others with '_'
+    s = s.replace(/[^A-Za-z0-9_\-./]/g, '_')
+    return s || 'unknown'
+  }
+
   // Override res.end to capture metrics
-  const originalEnd = res.end;
+  const originalEnd = res.end
   res.end = function(...args) {
-    const duration = (Date.now() - start) / 1000;
-    const route = req.route ? req.route.path : req.path;
-    const method = req.method;
-    const statusCode = res.statusCode.toString();
-    
-    // Record metrics
-    httpRequestsTotal.inc({ method, route, status_code: statusCode });
-    httpRequestDuration.observe({ method, route, status_code: statusCode }, duration);
-    
+    const duration = (Date.now() - start) / 1000
+    // Derive route safely: prefer route.path when available, else use req.path
+    const rawRoute = req && req.route && req.route.path ? req.route.path : req && req.path ? req.path : 'unknown'
+    const route = sanitizeLabel(rawRoute)
+    const method = sanitizeLabel(req && req.method ? req.method.toUpperCase() : 'UNKNOWN')
+    const statusCode = sanitizeLabel(res.statusCode ? res.statusCode.toString() : '0')
+
+    // Record metrics (labels are sanitized)
+    httpRequestsTotal.inc({ method, route, status_code: statusCode })
+    httpRequestDuration.observe({ method, route, status_code: statusCode }, duration)
+
     // Decrement active connections
-    activeConnections.dec();
-    
+    activeConnections.dec()
+
     // Call original end
-    originalEnd.apply(this, args);
-  };
+    originalEnd.apply(this, args)
+  }
   
   next();
 };

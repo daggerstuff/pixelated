@@ -72,6 +72,7 @@ dependencies = [
   "omnara>=1.5.7",
   "morphcloud>=0.1.91",
   "unsloth>=2025.8.10",
+  "sentry-sdk>=2.37.0",
 ]
 
 [project.optional-dependencies]
