@@ -566,6 +566,7 @@ export function generateSessionId(): string {
     window.crypto.getRandomValues(array);
   } else if (typeof process !== 'undefined' && process.versions && process.versions.node) {
     // Node.js fallback
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const crypto = require('crypto');
     const buf = crypto.randomBytes(8);
     array[0] = buf.readUInt32LE(0);

@@ -64,7 +64,7 @@ vi.mock('../../../logging/build-safe-logger', () => {
 class MockWebSocket {
   public readonly url: string
   public readyState: number = 1
-  private eventHandlers: Map<string, Function[]> = new Map()
+  private eventHandlers: Map<string, ((...args: any[]) => void)[]> = new Map()
 
   constructor(url: string): void {
     this.url = url
@@ -77,7 +77,7 @@ class MockWebSocket {
     handlers.forEach((handler) => handler(...args))
   })
 
-  public on = vi.fn((event: string, handler: Function) => {
+  public on = vi.fn((event: string, handler: (...args: any[]) => void) => {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, [])
     }

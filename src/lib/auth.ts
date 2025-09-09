@@ -1,11 +1,10 @@
 // Minimal placeholder for requirePageAuth
 import type { AstroCookies } from 'astro'
-import { createAuditLog, AuditEventType } from '../lib/audit'
-import { ROLES, type Role } from './access-control'
+import { type Role } from './access-control'
 
 export async function requirePageAuth(
-  context: { request: Request },
-  role: string,
+  _context: { request: Request },
+  _role: string,
 ): Promise<Response | null> {
   // Simulate always passing auth for now
   return null

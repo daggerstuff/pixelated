@@ -13,7 +13,6 @@
 
 import javascript
 
-// Detect FHIR resource access
 predicate isFHIRResourceAccess(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -29,7 +28,6 @@ predicate isFHIRResourceAccess(CallExpr call) {
   )
 }
 
-// Detect validation calls
 predicate hasValidation(CallExpr call) {
   exists(CallExpr validateCall |
     validateCall.getCalleeName().matches("%validate%") or
@@ -38,7 +36,6 @@ predicate hasValidation(CallExpr call) {
   )
 }
 
-// Main query
 from CallExpr resourceCall
 where
   isFHIRResourceAccess(resourceCall) and
@@ -61,7 +58,6 @@ select resourceCall,
 
 import javascript
 
-// Detect FHIR operations
 predicate isFHIROperation(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -75,7 +71,6 @@ predicate isFHIROperation(CallExpr call) {
   )
 }
 
-// Detect security context
 predicate hasSecurityContext(CallExpr call) {
   exists(CallExpr securityCall |
     securityCall.getCalleeName().matches("%authorize%") or
@@ -84,7 +79,6 @@ predicate hasSecurityContext(CallExpr call) {
   )
 }
 
-// Main query
 from CallExpr fhirOp
 where
   isFHIROperation(fhirOp) and
@@ -107,7 +101,6 @@ select fhirOp,
 
 import javascript
 
-// Detect FHIR client initialization
 predicate isFHIRClientInit(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -119,7 +112,6 @@ predicate isFHIRClientInit(CallExpr call) {
   )
 }
 
-// Detect version checks
 predicate hasVersionCheck(CallExpr call) {
   exists(CallExpr versionCall |
     versionCall.getCalleeName().matches("%version%") or
@@ -128,7 +120,6 @@ predicate hasVersionCheck(CallExpr call) {
   )
 }
 
-// Main query
 from CallExpr clientInit
 where
   isFHIRClientInit(clientInit) and
@@ -151,7 +142,6 @@ select clientInit,
 
 import javascript
 
-// Detect FHIR search operations
 predicate isFHIRSearch(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -163,7 +153,6 @@ predicate isFHIRSearch(CallExpr call) {
   )
 }
 
-// Detect input sanitization
 predicate hasInputSanitization(CallExpr call) {
   exists(CallExpr sanitizeCall |
     sanitizeCall.getCalleeName().matches("%sanitize%") or
@@ -172,7 +161,6 @@ predicate hasInputSanitization(CallExpr call) {
   )
 }
 
-// Main query
 from CallExpr searchOp
 where
   isFHIRSearch(searchOp) and

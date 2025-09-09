@@ -13,7 +13,6 @@
 
 import javascript
 
-// Detect unencrypted data transmission
 predicate isDataTransmissionCall(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -26,7 +25,6 @@ predicate isDataTransmissionCall(CallExpr call) {
   )
 }
 
-// Detect EHR-related variables
 predicate isEHRData(DataFlow::Node node) {
   exists(string name |
     name = node.asExpr().toString().toLowerCase() and
@@ -41,7 +39,6 @@ predicate isEHRData(DataFlow::Node node) {
   )
 }
 
-// Main query
 from CallExpr call, DataFlow::Node data
 where
   isDataTransmissionCall(call) and
@@ -68,7 +65,6 @@ select call,
 
 import javascript
 
-// Detect authentication methods
 predicate isAuthenticationMethod(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -80,7 +76,6 @@ predicate isAuthenticationMethod(CallExpr call) {
   )
 }
 
-// Detect weak authentication patterns
 from CallExpr authCall
 where
   isAuthenticationMethod(authCall) and
@@ -107,7 +102,6 @@ select authCall,
 
 import javascript
 
-// Detect EHR operations
 predicate isEHROperation(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -120,7 +114,6 @@ predicate isEHROperation(CallExpr call) {
   )
 }
 
-// Detect logging calls
 predicate hasLogging(CallExpr call) {
   exists(CallExpr logCall |
     logCall.getCalleeName().matches("%log%") or
@@ -128,7 +121,6 @@ predicate hasLogging(CallExpr call) {
   )
 }
 
-// Main query
 from CallExpr ehrOp
 where
   isEHROperation(ehrOp) and

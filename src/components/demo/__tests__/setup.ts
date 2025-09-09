@@ -49,9 +49,9 @@ document.createRange = vi.fn(() => ({
   cloneContents: vi.fn(() => document.createElement('div')),
   selectNodeContents: vi.fn(),
   collapse: vi.fn(),
-})) as any
+})) as unknown as () => Range
 
 // Mock getComputedStyle
 window.getComputedStyle = vi.fn(() => ({
   getPropertyValue: vi.fn(() => ''),
-})) as any
+})) as unknown as (elt: Element) => CSSStyleDeclaration

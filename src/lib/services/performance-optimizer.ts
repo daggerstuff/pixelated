@@ -56,13 +56,15 @@ export interface OptimizationConfig {
 }
 
 export class PerformanceOptimizer {
+  private metricsIntervalId: NodeJS.Timeout | null
   private config: OptimizationConfig
   private metrics: PerformanceMetrics
   private connectionPool: Map<string, unknown[]>
   private cache: Map<string, { value: unknown; timestamp: number; accessCount: number }>
   private circuitBreakers: Map<string, { failures: number; lastFailure: number; state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' }>
-  private batchQueues: Map<string, { items: any[]; timer: NodeJS.Timeout | null }>
+  private batchQueues: Map<string, { items: unknown[]; timer: NodeJS.Timeout | null }>
   private metricsHistory: PerformanceMetrics[]
+  private activeCounts: Map<string, number>
 
   constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
@@ -116,6 +118,8 @@ export class PerformanceOptimizer {
     this.circuitBreakers = new Map()
     this.batchQueues = new Map()
     this.metricsHistory = []
+  this.activeCounts = new Map()
+  this.metricsIntervalId = null
 
     this.startMonitoring()
   }
@@ -127,41 +131,42 @@ export class PerformanceOptimizer {
     if (!this.connectionPool.has(poolName)) {
       this.connectionPool.set(poolName, [])
     }
-
+    if (!this.activeCounts.has(poolName)) {
+      this.activeCounts.set(poolName, 0)
+    }
     const pool = this.connectionPool.get(poolName)!
-    
+    const getActive = () => this.activeCounts.get(poolName) ?? 0
     // Return existing connection if available
     if (pool.length > 0) {
+      this.activeCounts.set(poolName, getActive() + 1)
       return pool.pop()
     }
-
     // Create new connection if under limit
-    if (pool.length < this.config.connectionPool.maxConnections) {
+    if (getActive() + pool.length < this.config.connectionPool.maxConnections) {
       try {
         const connection = await factory()
         logger.debug(`Created new connection for pool: ${poolName}`)
+        this.activeCounts.set(poolName, getActive() + 1)
         return connection
       } catch (error: unknown) {
         logger.error(`Failed to create connection for pool: ${poolName}`, { error })
         throw error
       }
     }
-
     // Wait for available connection
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error(`Connection acquire timeout for pool: ${poolName}`))
       }, this.config.connectionPool.acquireTimeout)
-
       const checkForConnection = () => {
         if (pool.length > 0) {
           clearTimeout(timeout)
+          this.activeCounts.set(poolName, getActive() + 1)
           resolve(pool.pop())
         } else {
           setTimeout(checkForConnection, 10)
         }
       }
-
       checkForConnection()
     })
   }
@@ -172,6 +177,10 @@ export class PerformanceOptimizer {
     }
 
     const pool = this.connectionPool.get(poolName)!
+  const active = this.activeCounts.get(poolName) ?? 0
+    if (active > 0) {
+      this.activeCounts.set(poolName, active - 1)
+    }
     if (pool.length < this.config.connectionPool.maxConnections) {
       pool.push(connection)
     }
@@ -224,7 +233,9 @@ export class PerformanceOptimizer {
   }
 
   private evictByStrategy() {
-    if (this.cache.size === 0) return
+    if (this.cache.size === 0) {
+      return
+    }
 
   let keyToEvict: string | undefined
     
@@ -242,7 +253,9 @@ export class PerformanceOptimizer {
         keyToEvict = this.cache.keys().next().value
     }
 
-  if (!keyToEvict) return
+  if (!keyToEvict) {
+    return
+  }
   this.cache.delete(keyToEvict)
   }
 
@@ -393,7 +406,7 @@ export class PerformanceOptimizer {
    * Performance Monitoring
    */
   private startMonitoring() {
-    setInterval(() => {
+    this.metricsIntervalId = setInterval(() => {
       this.updateMetrics()
       this.checkAlerts()
     }, this.config.monitoring.metricsInterval)
@@ -503,6 +516,11 @@ export class PerformanceOptimizer {
       if (batch.timer) {
         clearTimeout(batch.timer)
       }
+    }
+
+    if (this.metricsIntervalId) {
+      clearInterval(this.metricsIntervalId)
+      this.metricsIntervalId = null
     }
 
     // Clear caches

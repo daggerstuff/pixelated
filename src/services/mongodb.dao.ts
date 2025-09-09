@@ -2,44 +2,45 @@
 import type { Collection as MongoCollection, ObjectId as MongoObjectId, Db } from 'mongodb'
 
 // Runtime shape of our MongoDB wrapper (from src/config/mongodb.config.ts)
-type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: any }
+type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: unknown }
 
-// Use conditional imports to prevent MongoDB from being bundled on client side
-let mongodb: MongoRuntime | null = null
-let ObjectId: any
-
-if (typeof window === 'undefined') {
-  // Server side - import real MongoDB dependencies
-  try {
-  const mod = require('@/config/mongodb.config')
-  mongodb = mod.default as MongoRuntime
-  const mongodbLib = require('mongodb')
-  ObjectId = mongodbLib.ObjectId
-  } catch {
-    // Fallback if MongoDB is not available
-    mongodb = null
-    ObjectId = class MockObjectId {
-      public id: string
-      constructor(id?: string) {
-        this.id = id || 'mock-object-id'
-      }
-      toString() { return this.id }
-      toHexString() { return this.id }
-    }
-  // No runtime Collection value needed in this module
-  }
-} else {
-  // Client side - use mocks
-  mongodb = null
-  ObjectId = class MockObjectId {
+class MockObjectId {
     public id: string
     constructor(id?: string) {
-      this.id = id || 'mock-object-id'
+        this.id = id || 'mock-object-id'
     }
     toString() { return this.id }
     toHexString() { return this.id }
-  }
-  // No runtime Collection value needed in this module
+}
+
+// Use conditional imports to prevent MongoDB from being bundled on client side
+let mongodb: MongoRuntime | null = null
+let ObjectId: typeof MongoObjectId | typeof MockObjectId | null = null;
+
+let serverDepsPromise: Promise<void> | null = null;
+
+async function initializeDependencies() {
+    if (serverDepsPromise) {
+        return serverDepsPromise;
+    }
+    if (typeof window === 'undefined') {
+        serverDepsPromise = (async () => {
+            try {
+                const mod = await import('@/config/mongodb.config');
+                mongodb = mod.default as unknown as MongoRuntime;
+                const mongodbLib = await import('mongodb');
+                ObjectId = mongodbLib.ObjectId;
+            } catch {
+                mongodb = null;
+                ObjectId = MockObjectId;
+            }
+        })();
+    } else {
+        mongodb = null;
+        ObjectId = MockObjectId;
+        serverDepsPromise = Promise.resolve();
+    }
+    return serverDepsPromise;
 }
 import type {
   AIMetrics,
@@ -52,8 +53,12 @@ import type {
 
 export class TodoDAO {
   private async getCollection(): Promise<MongoCollection<Todo>> {
-  const db = await mongodb!.connect()
-    return db.collection<Todo>('todos')
+    await initializeDependencies();
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized');
+    }
+    const db = await mongodb.connect();
+    return db.collection<Todo>('todos');
   }
 
   async create(
@@ -78,7 +83,7 @@ export class TodoDAO {
 
   async findAll(userId?: string): Promise<Todo[]> {
     const collection = await this.getCollection()
-    const filter = userId ? { userId: new ObjectId(userId) } : {}
+    const filter = userId ? { userId: new ObjectId!(userId) } : {}
     const todos = await collection
       .find(filter)
       .sort({ createdAt: -1 })
@@ -89,7 +94,7 @@ export class TodoDAO {
 
   async findById(id: string): Promise<Todo | null> {
     const collection = await this.getCollection()
-    const todo = await collection.findOne({ _id: new ObjectId(id) })
+    const todo = await collection.findOne({ _id: new ObjectId!(id) })
 
     return todo ? { ...todo, id: todo._id?.toString() } : null
   }
@@ -99,7 +104,7 @@ export class TodoDAO {
     const { _id, id: _, ...safeUpdates } = updates
 
     const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      { _id: new ObjectId!(id) },
       { $set: { ...safeUpdates, updatedAt: new Date() } },
       { returnDocument: 'after' },
     )
@@ -109,7 +114,7 @@ export class TodoDAO {
 
   async delete(id: string): Promise<boolean> {
     const collection = await this.getCollection()
-    const result = await collection.deleteOne({ _id: new ObjectId(id) })
+    const result = await collection.deleteOne({ _id: new ObjectId!(id) })
 
     return result.deletedCount > 0
   }
@@ -117,8 +122,17 @@ export class TodoDAO {
 
 export class AIMetricsDAO {
   private async getCollection(): Promise<MongoCollection<AIMetrics>> {
-  const db = await mongodb!.connect()
-    return db.collection<AIMetrics>('ai_metrics')
+    console.log('Initializing dependencies for AI Metrics DAO...');
+    await initializeDependencies();
+    console.log('Dependencies initialized. MongoDB client status:', mongodb ? 'defined' : 'undefined');
+    if (!mongodb) {
+      console.error('MongoDB client not initialized in AI Metrics DAO');
+      throw new Error('MongoDB client not initialized');
+    }
+    console.log('Attempting to connect to MongoDB for AI Metrics...');
+    const db = await mongodb.connect();
+    console.log('MongoDB connected successfully for AI Metrics DAO');
+    return db.collection<AIMetrics>('ai_metrics');
   }
 
   async create(metrics: Omit<AIMetrics, '_id'>): Promise<AIMetrics> {
@@ -136,7 +150,7 @@ export class AIMetricsDAO {
   async findByUserId(userId: string, limit = 100): Promise<AIMetrics[]> {
     const collection = await this.getCollection()
     const metrics = await collection
-      .find({ userId: new ObjectId(userId) })
+      .find({ userId: new ObjectId!(userId) })
       .sort({ timestamp: -1 })
       .limit(limit)
       .toArray()
@@ -157,7 +171,7 @@ export class AIMetricsDAO {
     const pipeline = [
       {
         $match: {
-          userId: new ObjectId(userId),
+          userId: new ObjectId!(userId),
           timestamp: { $gte: startDate, $lte: endDate },
         },
       },
@@ -186,8 +200,13 @@ export class AIMetricsDAO {
 
 export class BiasDetectionDAO {
   private async getCollection(): Promise<MongoCollection<BiasDetection>> {
-  const db = await mongodb!.connect()
-    return db.collection<BiasDetection>('bias_detection')
+    await initializeDependencies();
+    if (!mongodb) {
+      // Defensive: initialization failed, do not call connect()
+      throw new Error('MongoDB dependency is null: initialization failed or misconfigured. Did not attempt mongodb.connect().');
+    }
+    const db = await mongodb.connect();
+    return db.collection<BiasDetection>('bias_detection');
   }
 
   async create(detection: Omit<BiasDetection, '_id'>): Promise<BiasDetection> {
@@ -207,7 +226,7 @@ export class BiasDetectionDAO {
   async findByUserId(userId: string, limit = 50): Promise<BiasDetection[]> {
     const collection = await this.getCollection()
     const detections = await collection
-      .find({ userId: new ObjectId(userId) })
+      .find({ userId: new ObjectId!(userId) })
       .sort({ timestamp: -1 })
       .limit(limit)
       .toArray()
@@ -221,8 +240,12 @@ export class BiasDetectionDAO {
 
 export class TreatmentPlanDAO {
   private async getCollection(): Promise<MongoCollection<TreatmentPlan>> {
-  const db = await mongodb!.connect()
-    return db.collection<TreatmentPlan>('treatment_plans')
+    await initializeDependencies();
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized');
+    }
+    const db = await mongodb.connect();
+    return db.collection<TreatmentPlan>('treatment_plans');
   }
 
   async create(
@@ -248,7 +271,7 @@ export class TreatmentPlanDAO {
   async findByUserId(userId: string): Promise<TreatmentPlan[]> {
     const collection = await this.getCollection()
     const plans = await collection
-      .find({ userId: new ObjectId(userId) })
+      .find({ userId: new ObjectId!(userId) })
       .sort({ createdAt: -1 })
       .toArray()
 
@@ -258,7 +281,7 @@ export class TreatmentPlanDAO {
   async findByTherapistId(therapistId: string): Promise<TreatmentPlan[]> {
     const collection = await this.getCollection()
     const plans = await collection
-      .find({ therapistId: new ObjectId(therapistId) })
+      .find({ therapistId: new ObjectId!(therapistId) })
       .sort({ createdAt: -1 })
       .toArray()
 
@@ -273,7 +296,7 @@ export class TreatmentPlanDAO {
     const { _id, id: _, ...safeUpdates } = updates
 
     const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      { _id: new ObjectId!(id) },
       { $set: { ...safeUpdates, updatedAt: new Date() } },
       { returnDocument: 'after' },
     )
@@ -284,8 +307,12 @@ export class TreatmentPlanDAO {
 
 export class CrisisSessionFlagDAO {
   private async getCollection(): Promise<MongoCollection<CrisisSessionFlag>> {
-  const db = await mongodb!.connect()
-    return db.collection<CrisisSessionFlag>('crisis_session_flags')
+    await initializeDependencies();
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized');
+    }
+    const db = await mongodb.connect();
+    return db.collection<CrisisSessionFlag>('crisis_session_flags');
   }
 
   async create(
@@ -311,7 +338,7 @@ export class CrisisSessionFlagDAO {
     const collection = await this.getCollection()
   const filter: { resolved: boolean; userId?: MongoObjectId } = { resolved: false }
     if (userId) {
-      filter.userId = new ObjectId(userId)
+      filter.userId = new ObjectId!(userId) as any
     }
 
     const flags = await collection
@@ -329,12 +356,12 @@ export class CrisisSessionFlagDAO {
     const collection = await this.getCollection()
 
     const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      { _id: new ObjectId!(id) },
       {
         $set: {
           resolved: true,
           resolvedAt: new Date(),
-          resolvedBy: new ObjectId(resolvedBy),
+          resolvedBy: new ObjectId!(resolvedBy),
         },
       },
       { returnDocument: 'after' },
@@ -346,8 +373,12 @@ export class CrisisSessionFlagDAO {
 
 export class ConsentManagementDAO {
   private async getCollection(): Promise<MongoCollection<ConsentManagement>> {
-  const db = await mongodb!.connect()
-    return db.collection<ConsentManagement>('consent_management')
+    await initializeDependencies();
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized (null or undefined)');
+    }
+    const db = await mongodb.connect();
+    return db.collection<ConsentManagement>('consent_management');
   }
 
   async create(
@@ -367,7 +398,7 @@ export class ConsentManagementDAO {
   async findByUserId(userId: string): Promise<ConsentManagement[]> {
     const collection = await this.getCollection()
     const consents = await collection
-      .find({ userId: new ObjectId(userId) })
+      .find({ userId: new ObjectId!(userId) })
       .sort({ grantedAt: -1 })
       .toArray()
 
@@ -399,7 +430,7 @@ export class ConsentManagementDAO {
     }
 
     const result = await collection.findOneAndUpdate(
-      { userId: new ObjectId(userId), consentType },
+      { userId: new ObjectId!(userId), consentType },
       { $set: updateData },
       { upsert: true, returnDocument: 'after' },
     )

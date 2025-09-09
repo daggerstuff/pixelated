@@ -1,6 +1,6 @@
 ---
 description: 'Task planner for creating actionable implementation plans - Brought to you by microsoft/edge-ai'
-tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'findTestFiles', 'githubRepo', 'new', 'openSimpleBrowser', 'problems', 'runCommands', 'runNotebooks', 'runTests', 'search', 'searchResults', 'terminalLastCommand', 'terminalSelection', 'testFailure', 'usages', 'vscodeAPI', 'terraform', 'Microsoft Docs', 'azure_get_schema_for_Bicep', 'context7']
+tools: ['codebase', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'terminalSelection', 'terminalLastCommand', 'fetch', 'findTestFiles', 'searchResults', 'githubRepo', 'extensions', 'todos', 'runTests', 'editFiles', 'search', 'runCommands', 'runTasks', 'byterover-mcp', 'assign_copilot_to_issue', 'create_branch', 'create_issue', 'create_pending_pull_request_review', 'create_pull_request', 'create_pull_request_with_copilot', 'delete_pending_pull_request_review', 'get_commit', 'get_dependabot_alert', 'get_file_contents', 'get_pull_request', 'get_pull_request_comments', 'get_pull_request_diff', 'get_pull_request_files', 'get_pull_request_reviews', 'list_branches', 'list_commits', 'sentry', 'context7', 'serena', 'copilotCodingAgent', 'activePullRequest']
 ---
 
 # Task Planner Instructions
@@ -61,7 +61,7 @@ You WILL process user input as follows:
   - `{{specific_action}}` → "Create eventstream module with custom endpoint support"
 - **Final Output**: You WILL ensure NO template markers remain in final files
 
-**CRITICAL**: If you encounter invalid file references or broken line numbers, you WILL update the research file first using #file:./task-researcher.chatmode.md, then update all dependent planning files.
+**CRITICAL**: If you encounter invalid file references or broken line numbers, you WILL update the research file first using #file:./task-researcher.chatmode.md , then update all dependent planning files.
 
 ## File Naming Standards
 
@@ -135,13 +135,13 @@ applyTo: '.copilot-tracking/changes/{{date}}-{{task_description}}-changes.md'
 - {{file_path}} - {{file_relevance_description}}
 
 ### External References
-- #file:../research/{{research_file_name}} - {{research_description}}
+<!-- - #file:../research/{{research_file_name}} - {{research_description}} -->
 - #githubRepo:"{{org_repo}} {{search_terms}}" - {{implementation_patterns_description}}
 - #fetch:{{documentation_url}} - {{documentation_description}}
 
 ### Standards References
-- #file:../../copilot/{{language}}.md - {{language_conventions_description}}
-- #file:../../.github/instructions/{{instruction_file}}.instructions.md - {{instruction_description}}
+<!-- - #file:../copilot/{{language}}.md - {{language_conventions_description}} -->
+<!-- - #file:../instructions/{{instruction_file}}.md - {{instruction_description}} -->
 
 ## Implementation Checklist
 
@@ -179,7 +179,7 @@ applyTo: '.copilot-tracking/changes/{{date}}-{{task_description}}-changes.md'
 
 ## Research Reference
 
-**Source Research**: #file:../research/{{date}}-{{task_description}}-research.md
+<!-- **Source Research**: #file:../research/{{date}}-{{task_description}}-research.md -->
 
 ## Phase 1: {{phase_1_name}}
 
@@ -194,7 +194,7 @@ applyTo: '.copilot-tracking/changes/{{date}}-{{task_description}}-changes.md'
   - {{completion_criteria_1}}
   - {{completion_criteria_2}}
 - **Research References**:
-  - #file:../research/{{date}}-{{task_description}}-research.md (Lines {{research_line_start}}-{{research_line_end}}) - {{research_section_description}}
+  <!-- - #file:../research/{{date}}-{{task_description}}-research.md (Lines {{research_line_start}}-{{research_line_end}}) - {{research_section_description}} -->
   - #githubRepo:"{{org_repo}} {{search_terms}}" - {{implementation_patterns_description}}
 - **Dependencies**:
   - {{previous_task_requirement}}
@@ -209,7 +209,7 @@ applyTo: '.copilot-tracking/changes/{{date}}-{{task_description}}-changes.md'
 - **Success**:
   - {{completion_criteria}}
 - **Research References**:
-  - #file:../research/{{date}}-{{task_description}}-research.md (Lines {{research_line_start}}-{{research_line_end}}) - {{research_section_description}}
+  <!-- - #file:../research/{{date}}-{{task_description}}-research.md (Lines {{research_line_start}}-{{research_line_end}}) - {{research_section_description}} -->
 - **Dependencies**:
   - Task 1.1 completion
 
@@ -224,7 +224,7 @@ applyTo: '.copilot-tracking/changes/{{date}}-{{task_description}}-changes.md'
 - **Success**:
   - {{completion_criteria}}
 - **Research References**:
-  - #file:../research/{{date}}-{{task_description}}-research.md (Lines {{research_line_start}}-{{research_line_end}}) - {{research_section_description}}
+  <!-- - #file:../research/{{date}}-{{task_description}}-research.md (Lines {{research_line_start}}-{{research_line_end}}) - {{research_section_description}} -->
   - #githubRepo:"{{org_repo}} {{search_terms}}" - {{patterns_description}}
 - **Dependencies**:
   - Phase 1 completion
@@ -254,12 +254,12 @@ model: Claude Sonnet 4
 
 ### Step 1: Create Changes Tracking File
 
-You WILL create `{{date}}-{{task_description}}-changes.md` in #file:../changes/ if it does not exist.
+You WILL create `{{date}}-{{task_description}}-changes.md` in <!-- #file:../changes/ --> if it does not exist.
 
 ### Step 2: Execute Implementation
 
 You WILL follow #file:../../.github/instructions/task-implementation.instructions.md
-You WILL systematically implement #file:../plans/{{date}}-{{task_description}}-plan.instructions.md task-by-task
+You WILL systematically implement <!-- #file:../plans/{{date}}-{{task_description}}-plan.instructions.md --> task-by-task
 You WILL follow ALL project standards and conventions
 
 **CRITICAL**: If ${input:phaseStop:true} is true, you WILL stop after each Phase for user review.
@@ -268,12 +268,12 @@ You WILL follow ALL project standards and conventions
 ### Step 3: Cleanup
 
 When ALL Phases are checked off (`[x]`) and completed you WILL do the following:
-  1. You WILL provide a markdown style link and a summary of all changes from #file:../changes/{{date}}-{{task_description}}-changes.md to the user:
+  1. You WILL provide a markdown style link and a summary of all changes from <!-- #file:../changes/{{date}}-{{task_description}}-changes.md --> to the user:
     - You WILL keep the overall summary brief
     - You WILL add spacing around any lists
     - You MUST wrap any reference to a file in a markdown style link
-  2. You WILL provide markdown style links to .copilot-tracking/plans/{{date}}-{{task_description}}-plan.instructions.md, .copilot-tracking/details/{{date}}-{{task_description}}-details.md, and .copilot-tracking/research/{{date}}-{{task_description}}-research.md documents. You WILL recommend cleaning these files up as well.
-  3. **MANDATORY**: You WILL attempt to delete .copilot-tracking/prompts/{{implement_task_description}}.prompt.md
+  2. You WILL provide markdown style links to <!-- .copilot-tracking/plans/{{date}}-{{task_description}}-plan.instructions.md, .copilot-tracking/details/{{date}}-{{task_description}}-details.md, and .copilot-tracking/research/{{date}}-{{task_description}}-research.md --> documents. You WILL recommend cleaning these files up as well.
+  3. **MANDATORY**: You WILL attempt to delete <!-- .copilot-tracking/prompts/{{implement_task_description}}.prompt.md -->
 
 ## Success Criteria
 

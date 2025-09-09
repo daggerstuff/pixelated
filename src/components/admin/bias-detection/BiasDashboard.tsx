@@ -135,6 +135,15 @@ interface AlertItem extends BaseFilterableItem {
   status?: string
 }
 
+type WebSocketMessage =
+  | { type: 'bias_alert'; alert: AlertItem }
+  | { type: 'session_update'; session: BiasAnalysisResult }
+  | { type: 'metrics_update'; metrics: Partial<BiasDashboardData['summary']> }
+  | { type: 'trends_update'; trends: TrendItem[] }
+  | { type: 'connection_status'; status: string; error?: string }
+  | { type: 'heartbeat' }
+  | { type: 'heartbeat_response' };
+
 interface TrendItem extends BaseFilterableItem {
   biasScore: number
   sessionCount: number
@@ -535,7 +544,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             }
             return {
               ...prev,
-              alerts: prev.alerts.map((alert) => {
+              alerts: prev.alerts.map((alert: AlertItem) => {
                 if (alert.alertId === alertId) {
                   // Ensure timestamp is a Date and all BiasAlert fields are present
                   return {
@@ -825,113 +834,116 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
         ws.onmessage = (event) => {
           try {
-            const data: any = JSON.parse(event.data);
-
+            const data: unknown = JSON.parse(event.data)
+            const hasType = (v: unknown): v is { type: string } =>
+              !!v && typeof v === 'object' && v !== null && 'type' in v && typeof (v as any).type === 'string'
+            if (!hasType(data)) {
+              logger.warn('WS message missing type', { data })
+              return
+            }
+            const message = data
             // Handle different types of real-time updates
-            switch (data['type']) {
+            switch (message.type) {
               case 'bias_alert':
                 // Add new alert to the list
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  const newAlert = data['alert']
-                  // Show notification if high/critical
-                  if (newAlert.level === 'high' || newAlert.level === 'critical') {
-                    setNewHighBiasAlert(newAlert)
-                  }
-                  announceToScreenReader(
-                    `New ${newAlert.level} bias alert: ${newAlert.message}`,
-                  )
-                  return {
-                    ...prev,
-                    alerts: [newAlert, ...(prev.alerts || [])],
-                    summary: {
-                      ...prev.summary,
-                      alertsLast24h: prev.summary.alertsLast24h + 1,
-                    },
-                  }
-                })
+                if ('alert' in message && typeof (message as any).alert === 'object' && (message as any).alert !== null) {
+                  const newAlert = (message as any).alert
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    // Show notification if high/critical
+                    if (newAlert.level === 'high' || newAlert.level === 'critical') {
+                      setNewHighBiasAlert(newAlert)
+                    }
+                    announceToScreenReader(
+                      `New ${newAlert.level} bias alert: ${newAlert.message}`,
+                    )
+                    return {
+                      ...prev,
+                      alerts: [newAlert, ...(prev.alerts || [])],
+                      summary: {
+                        ...prev.summary,
+                        alertsLast24h: prev.summary.alertsLast24h + 1,
+                      },
+                    }
+                  })
+                }
                 break
-
               case 'session_update':
                 // Update session data
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  const updatedSession = data['session']
-                  return {
-                    ...prev,
-                    recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
-                      session.sessionId === updatedSession.sessionId
-                        ? updatedSession
-                        : session,
-                    ),
-                  }
-                })
-                announceToScreenReader(
-                  `Session ${data['session'].sessionId} updated`,
-                )
+                if ('session' in message && typeof (message as any).session === 'object' && (message as any).session !== null) {
+                  const updatedSession = (message as any).session
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    return {
+                      ...prev,
+                      recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
+                        session.sessionId === updatedSession.sessionId
+                          ? updatedSession
+                          : session,
+                      ),
+                    }
+                  })
+                  announceToScreenReader(
+                    `Session updated: ${updatedSession.sessionId}`,
+                  )
+                }
                 break
 
               case 'metrics_update':
                 // Update summary metrics
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  return {
-                    ...prev,
-                    summary: {
-                      ...prev.summary,
-                      ...data['metrics'],
-                    },
-                  }
-                })
-                announceToScreenReader('Dashboard metrics updated')
+                if ('metrics' in message && typeof (message as any).metrics === 'object' && (message as any).metrics !== null) {
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    return {
+                      ...prev,
+                      summary: {
+                        ...prev.summary,
+                        ...(message as any).metrics,
+                      },
+                    }
+                  })
+                  announceToScreenReader('Dashboard metrics updated')
+                }
                 break
 
               case 'trends_update':
                 // Update trend data
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  return {
-                    ...prev,
-                    trends: data['trends'] || prev.trends,
-                  }
-                })
-                announceToScreenReader('Trend data updated')
+                if ('trends' in message && ((message as any).trends !== undefined)) {
+                  setDashboardData((prev: BiasDashboardData | null) => {
+                    if (!prev) {
+                      return prev
+                    }
+                    return {
+                      ...prev,
+                      trends: (message as any).trends || prev.trends,
+                    }
+                  })
+                  announceToScreenReader('Trend data updated')
+                }
                 break
 
               case 'connection_status':
                 // Handle connection status updates
-                if (data['status'] === 'authenticated') {
-                  logger.info('WebSocket authenticated successfully')
-                } else if (data['status'] === 'error') {
-                  logger.error('WebSocket authentication failed', {
-                    error: data['error'],
-                  })
+                if ('status' in message && typeof (message as any).status === 'string') {
+                  if ((message as any).status === 'authenticated') {
+                    logger.info('WebSocket authenticated successfully')
+                  } else if ((message as any).status === 'error') {
+                    logger.error('WebSocket authentication failed', {
+                      error: 'error' in message ? (message as any).error : undefined,
+                    })
+                  }
                 }
-                break
-
-              case 'heartbeat':
-                // Respond to heartbeat to keep connection alive
-                if (ws.readyState === WebSocket.OPEN) {
-                  ws.send(JSON.stringify({ type: 'heartbeat_response' }))
-                }
-                break
-
-              default:
-                logger.warn('Unknown WebSocket message type', {
-                  type: data['type'],
-                  data,
-                })
+                setLastUpdated(new Date())
+              } catch (error: unknown) {
+                logger.error('Failed to process WebSocket message', { error, rawData: event.data })
+              }
             }
-
-            // Update last updated timestamp
             setLastUpdated(new Date())
           } catch (error: unknown) {
             logger.error('Failed to process WebSocket message', {
@@ -3127,7 +3139,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 </CardContent>
               </Card>
             ) : (
-              filteredAlerts.map((alert) => {
+              filteredAlerts.map((alert: AlertItem) => {
                 const isSelected = selectedAlerts.has(alert.alertId)
                 const actions = alertActions.get(alert.alertId) || []
                 const lastAction = actions[actions.length - 1]
@@ -3162,7 +3174,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                   {alert.message}
                                 </p>
                                 <p className="text-xs text-muted-foreground mt-2">
-                                  Session: {alert['sessionId']} •{' '}
+                                  Session: {alert.sessionId} •{' '}
                                   {alert.timestamp
                                     ? new Date(alert.timestamp).toLocaleString()
                                     : 'Unknown time'}
@@ -3200,10 +3212,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 )}
 
                                 {/* Alert Notes */}
-                                {alertNotes.has(alert['alertId']) && (
+                                {alertNotes.has(alert.alertId) && (
                                   <div className="mt-2 p-2 bg-muted rounded text-sm">
                                     <strong>Notes:</strong>{' '}
-                                    {alertNotes.get(alert['alertId'])}
+                                    {alertNotes.get(alert.alertId)}
                                   </div>
                                 )}
                               </div>
@@ -3211,14 +3223,14 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
                             {/* Action Buttons */}
                             <div className="flex items-center space-x-2">
-                              {!alert['acknowledged'] && (
+                              {!alert.acknowledged && (
                                 <>
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={() =>
                                       handleAlertAction(
-                                        alert['alertId'],
+                                        alert.alertId,
                                         'acknowledge',
                                       )
                                     }
@@ -3235,7 +3247,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                         'Add notes (optional):',
                                       )
                                       handleAlertAction(
-                                        alert['alertId'],
+                                        alert.alertId,
                                         'escalate',
                                         notes || undefined,
                                       )
@@ -3256,7 +3268,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                     setAlertNotes(
                                       (prev) =>
                                         new Map(
-                                          prev.set(alert['alertId'], notes),
+                                          prev.set(alert.alertId, notes),
                                         ),
                                     )
                                   }
@@ -3270,7 +3282,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 size="sm"
                                 variant="outline"
                                 onClick={() =>
-                                  handleAlertAction(alert['alertId'], 'dismiss')
+                                  handleAlertAction(alert.alertId, 'dismiss')
                                 }
                               >
                                 <X className="h-4 w-4 mr-1" />

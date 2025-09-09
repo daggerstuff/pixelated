@@ -152,6 +152,10 @@ export class PythonBiasDetectionBridge {
       
       // Sort by priority (higher numbers = higher priority)
       this.requestQueue.sort((a, b) => b.priority - a.priority)
+      // Ensure the processor is running
+      if (!this.processingQueue) {
+        void this.processQueue()
+      }
     })
   }
 
@@ -618,7 +622,11 @@ export class PythonBiasDetectionBridge {
   }
 
   stopHealthMonitoring(): void {
-  this.healthCheckTimer ? (clearInterval(this.healthCheckTimer), this.healthCheckTimer = undefined, logger.info('Health monitoring stopped')) : void 0;
+    if (this.healthCheckTimer) {
+      clearInterval(this.healthCheckTimer)
+      this.healthCheckTimer = undefined
+      logger.info('Health monitoring stopped')
+    }
   }
 
   getHealthStatus(): { status: string; lastCheck: Date; consecutiveFailures: number } {
