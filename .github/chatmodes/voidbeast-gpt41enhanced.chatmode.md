@@ -1,7 +1,7 @@
 ---
 description: '4.1 voidBeast_GPT41Enhanced 1.0 : a advanced autonomous developer agent, designed for elite full-stack development with enhanced multi-mode capabilities. This latest evolution features sophisticated mode detection, comprehensive research capabilities, and never-ending problem resolution. Plan/Act/Deep Research/Analyzer/Checkpoints(Memory)/Prompt Generator Modes.
 '
-tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'findTestFiles', 'githubRepo', 'new', 'openSimpleBrowser', 'problems', 'readCellOutput', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search', 'searchResults', 'terminalLastCommand', 'terminalSelection', 'testFailure', 'updateUserPreferences', 'usages', 'vscodeAPI']
+tools: ['codebase', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'terminalSelection', 'terminalLastCommand', 'fetch', 'findTestFiles', 'searchResults', 'githubRepo', 'extensions', 'todos', 'runTests', 'editFiles', 'search', 'runCommands', 'runTasks', 'byterover-mcp', 'assign_copilot_to_issue', 'create_branch', 'create_issue', 'create_pending_pull_request_review', 'create_pull_request', 'create_pull_request_with_copilot', 'delete_pending_pull_request_review', 'get_commit', 'get_dependabot_alert', 'get_file_contents', 'get_pull_request', 'get_pull_request_comments', 'get_pull_request_diff', 'get_pull_request_files', 'get_pull_request_reviews', 'list_branches', 'list_commits', 'sentry', 'context7', 'serena', 'copilotCodingAgent', 'activePullRequest']
 
 ---
 

@@ -1,9 +1,3 @@
-import {
-  safeFetch,
-  retryFetchWithSSRFProtection,
-  validateUrlForSSRF,
-} from '@/lib/utils/safe-fetch'
-import { ALLOWED_DOMAINS } from '@/lib/constants'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 // Mock fetch for API calls
@@ -14,162 +8,36 @@ global.fetch = mockFetch
 // Removed localhost and 127.0.0.1 to prevent local service attacks
 const ALLOWED_DOMAINS = [
   'huggingface.co',
-  'mlflow.company.com',
   'api.wandb.ai',
   'ml.azure.com',
-  'wandb.ai',
-  'pixelatedempathy.com',
-  'pixelatedempathy.tech',
-  'goat.pixelatedempathy.tech',
-  'git.pixelatedempathy.tech'
-  // Add any additional domains your application needs here
-  // 'your-domain.com',
-  // 'api.your-service.com',
-]
+  'mlflow.company.com',
+];
 
-// IP-based whitelist (resolve these domains to prevent DNS rebinding)
-const ALLOWED_IPS = [
-  // Hugging Face IPs (resolve from huggingface.co)
-  '185.92.25.0/24', // Example CIDR - in real implementation, use actual resolved IPs
-  // Add actual resolved IPs for each service
-]
-
-// Build hostname to IP mapping at runtime or use a static list
-const hostnameToIPMap: Record<string, string[]> = {
-  // Populate with actual DNS resolutions to prevent DNS rebinding attacks
-}
-
-const validateUrlForSSRF = (urlString: string): boolean => {
-  try {
-    const url = new URL(urlString)
-
-    // Exact domain match only - no subdomain allowance for security
-    const hostname = url.hostname.toLowerCase()
-    if (!ALLOWED_DOMAINS.includes(hostname)) {
-      return false
-    }
-
-    // Additional IP validation to prevent DNS rebinding
-    // Note: In production, resolve hostname to IP and check against ALLOWED_IPS
-    if (hostnameToIPMap[url.hostname]) {
-      // Check resolved IP against whitelist
-      // This requires DNS resolution with security considerations
-    }
-
-    // Check for suspicious patterns
-    if (hostname.includes('localhost') || hostname.includes('127.0.0.1') ||
-        hostname.includes('192.168.') || hostname.includes('10.') ||
-        hostname.includes('172.') || hostname.includes('internal')) {
-      return false
-    }
-
-    return true
-  } catch {
-    // For relative URLs (e.g., '/api/*'), they are considered safe
-    // as long as they don't contain '..' for directory traversal
-    return urlString.startsWith('/') &&
-           !urlString.includes('..') &&
-           !urlString.includes('%2e%2e') && // URL-encoded '..'
-           !urlString.includes('%5c') && // URL-encoded '\'
-           !urlString.includes('..%2f') && // Double encoded path traversal
-           /^[a-zA-Z0-9\-_./&=?]*$/.test(urlString) // Only safe characters
-  }
-}
-
-// SSRF-protected fetch wrapper with timeout and security measures
-const safeFetch = async (
-  url: string | URL | Request,
-  options?: RequestInit & { timeout?: number; maxResponseSize?: number }
-): Promise<Response> => {
-  const urlString = typeof url === 'string' ? url : url.toString()
-
-  if (!validateUrlForSSRF(urlString)) {
-    throw new Error(`URL ${urlString} is not allowed. Only whitelisted domains are permitted to prevent SSRF attacks.`)
-  }
-
-  // Apply security defaults
-  const timeout = options?.timeout || 10000 // 10 second timeout by default
-  const maxResponseSize = options?.maxResponseSize || 10 * 1024 * 1024 // 10MB max by default
-
-  // Create AbortController for timeout
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), timeout)
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    })
-
-    // Clear timeout on successful response
-    clearTimeout(timeoutId)
-
-    // If the response has no body, we don't need to check its size.
-    if (!response.body) {
-      return response
-    }
-
-    // Check response size by streaming, as Content-Length can be missing or spoofed.
-    let receivedLength = 0
-    const counterStream = new TransformStream({
-      transform(chunk, controller) {
-        receivedLength += chunk.length
-        if (receivedLength > maxResponseSize) {
-          controller.error(
-            new Error(
-              `Response body size exceeds maximum allowed size ${maxResponseSize}`,
-            ),
-          )
-        } else {
-          controller.enqueue(chunk)
-        }
-      },
-    })
-
-    // Create a new response with the monitored stream.
-    const monitoredStream = response.body.pipeThrough(counterStream)
-
-    return new Response(monitoredStream, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-    })
-  } catch (error) {
-    clearTimeout(timeoutId)
-
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Request timeout after ${timeout}ms`)
-    }
-
-    throw error
-  }
-}
-
-// SSRF-protected retry fetch function
-const retryFetchWithSSRFProtection = async (
-  url: string,
-  options: any,
-  maxRetries = 3
-): Promise<Response> => {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await safeFetch(url, options)
-    } catch (error: any) {
-      if (i === maxRetries - 1) {
-        throw error
-      }
-      await new Promise((resolve) =>
-        setTimeout(resolve, Math.pow(2, i) * 1000),
-      )
+const safeFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  const url = input.toString();
+  if (url.startsWith('http')) {
+    const hostnameMatch = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/im);
+    const domain = hostnameMatch && hostnameMatch[1] ? hostnameMatch[1].toLowerCase() : '';
+    if (!domain || !ALLOWED_DOMAINS.some(d => domain.endsWith(d))) {
+      throw new Error(`${url} is not allowed. Only whitelisted domains are permitted to prevent SSRF attacks.`);
     }
   }
-  throw new Error('Retry logic failed to return a response.')
-}
+  // Create abort controller if not provided
+  const controller = new AbortController();
+  const signal = init?.signal || controller.signal;
+  const options: RequestInit = {
+    ...init,
+    signal,
+  };
+  // Set timeout
+  setTimeout(() => controller.abort(), 30000); // 30s timeout
+  return fetch(url, options);
+};
 
-describe('API Service Integration Tests', () => {
+describe('APIService Integration Tests', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
   afterEach(() => {
     vi.restoreAllMocks()
@@ -190,7 +58,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => header === 'content-length' ? '500' : null
+          get: (_header: string) => _header === 'content-length' ? '500' : null
         },
         json: () => Promise.resolve(mockResponse),
         body: new ReadableStream({
@@ -239,7 +107,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () => Promise.resolve({ success: true, syncId: 'sync-123' }),
         body: new ReadableStream({
@@ -285,7 +153,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 201,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () =>
             Promise.resolve({
@@ -315,7 +183,7 @@ describe('API Service Integration Tests', () => {
           ok: false,
           status: 401,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({ error: 'Invalid token' }),
         })
@@ -347,7 +215,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({ experiment_id: 'exp-123' }),
         })
@@ -379,7 +247,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({}),
         })
@@ -412,7 +280,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () =>
             Promise.resolve({
@@ -450,7 +318,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 201,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () =>
             Promise.resolve({
@@ -491,7 +359,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 202,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () =>
           Promise.resolve({
@@ -517,7 +385,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () =>
           Promise.resolve({
@@ -596,7 +464,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null
+            get: (_header: string) => null
           },
           json: () => Promise.resolve({ success: true }),
         })
@@ -611,10 +479,10 @@ describe('API Service Integration Tests', () => {
             return response;
           } catch (error: unknown) {
             if (i === maxRetries - 1) {
-              throw error
+              throw error;
             }
             await new Promise((resolve) =>
-              setTimeout(resolve, Math.pow(2, i) * 1000),
+              setTimeout(resolve, Math.pow(2, i) * 1000)
             )
           }
         }
@@ -647,7 +515,7 @@ describe('API Service Integration Tests', () => {
         ok: false,
         status: 503,
         headers: {
-          get: (header: string) => null
+          get: (_header: string) => null
         },
         json: () =>
           Promise.resolve({
@@ -694,7 +562,7 @@ describe('API Service Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (header: string) => null,
+            get: (_header: string) => null,
           },
           json: () => Promise.resolve({ success: true }),
           body: new ReadableStream({
@@ -717,7 +585,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
@@ -743,7 +611,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
@@ -767,7 +635,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () =>
           Promise.resolve({
@@ -807,7 +675,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
@@ -833,7 +701,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
@@ -857,7 +725,7 @@ describe('API Service Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (header: string) => null,
+          get: (_header: string) => null,
         },
         json: () =>
           Promise.resolve({

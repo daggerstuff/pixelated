@@ -290,7 +290,7 @@ export class EmailService {
   async queueEmail(email: {
     to: string
     templateAlias: string
-    templateModel: Record<string, any>
+    templateModel: Record<string, unknown>
   }): Promise<void> {
     // In a real implementation, this would queue the email for processing
     // For now, we'll simulate sending it immediately

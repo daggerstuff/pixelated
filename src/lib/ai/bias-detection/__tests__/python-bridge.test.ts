@@ -1,20 +1,4 @@
 describe('analysis methods', () => {
-    const mockSession: TherapeuticSession = {
-      sessionId: 'test-session-123',
-      timestamp: new Date(),
-      content: {
-        patientPresentation: 'Test session content for bias analysis',
-        therapeuticInterventions: [],
-        patientResponses: [],
-        sessionNotes: 'Test notes'
-      },
-      participantDemographics: {
-        age: '30',
-        gender: 'female',
-        ethnicity: 'caucasian',
-        primaryLanguage: 'english',
-      },
-    }
   let bridge: PythonBiasDetectionBridge
   const mockConfig = {
     pythonServiceUrl: 'http://localhost:5000',

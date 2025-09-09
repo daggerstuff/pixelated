@@ -36,6 +36,7 @@ interface EmotionValidationResult {
   biasScore?: number
   biasAnalysis?: BiasAnalysisResult
   emotionConsistency: number
+  authenticityScore?: number
   contextualAppropriate: boolean
   recommendations: string[]
 }
@@ -109,6 +110,10 @@ class EmotionValidationPipeline {
     },
   ]
 
+  // Hoisted mitigation regex to match whole words only
+  private static readonly MITIGATION_REGEX =
+    /\b(?:aggressive|angry|hostile|emotional|sensitive|caring|rational|logical|analytical|irrational|unstable)\b/gi
+
   /**
    * Check if pipeline is initialized
    */
@@ -131,9 +136,9 @@ class EmotionValidationPipeline {
       // Initialize bias detection engine
       this.biasDetectionEngine = new BiasDetectionEngine({
         thresholds: {
-          warningLevel: 0.3,
-          highLevel: 0.6,
-          criticalLevel: 0.8,
+          warning: 0.3,
+          high: 0.6,
+          critical: 0.8,
         },
         auditLogging: true,
         hipaaCompliant: true,
@@ -272,13 +277,15 @@ class EmotionValidationPipeline {
           const therapeuticSession =
             this.convertToTherapeuticSession(emotionData)
           biasAnalysis =
-            await this.biasDetectionEngine.analyzeSession(therapeuticSession)
-          biasScore = biasAnalysis.overallBiasScore
+            await this.biasDetectionEngine.analyzeSession(therapeuticSession) as BiasAnalysisResult
         } catch (error: unknown) {
           this.logger.warn('Bias detection failed for emotion validation', {
             sessionId: emotionData.sessionId,
             error,
           })
+        }
+        if (biasAnalysis) {
+          biasScore = biasAnalysis.overallBiasScore
         }
       }
 
@@ -287,21 +294,21 @@ class EmotionValidationPipeline {
 
       // Real algorithmic bias mitigation step (if bias is detected)
       let biasMitigated = false
-      if (patternBias.detected) {
-        // Example mitigation: redact or neutralize flagged bias patterns in response
-        if (emotionData.responseText) {
-          let mitigatedText = emotionData.responseText
-          for (const biasType of patternBias.patterns) {
-            // Real mitigation could use an external rewriter; here use simple replacement
-            mitigatedText = mitigatedText.replace(/aggressive|angry|hostile|emotional|sensitive|caring|rational|logical|analytical|irrational|unstable/gi, '[BIAS-MITIGATED]')
-          }
-          if (mitigatedText !== emotionData.responseText) {
-            // Mutate a copy of emotionData for further analysis
-            emotionData = { ...emotionData, responseText: mitigatedText }
-            biasMitigated = true
-            // Rerun bias pattern detection to confirm mitigation
-            patternBias = this.detectBiasPatterns(emotionData)
-          }
+      if (patternBias.detected && emotionData.responseText) {
+        let mitigatedText = emotionData.responseText
+        if (patternBias.patterns.length > 0) {
+          // Use class-level regex to avoid partial matches and recompilation
+          mitigatedText = mitigatedText.replace(
+            EmotionValidationPipeline.MITIGATION_REGEX,
+            '[BIAS-MITIGATED]',
+          )
+        }
+        if (mitigatedText !== emotionData.responseText) {
+          // Mutate a copy of emotionData for further analysis
+          emotionData = { ...emotionData, responseText: mitigatedText }
+          biasMitigated = true
+          // Rerun bias pattern detection to confirm mitigation
+          patternBias = this.detectBiasPatterns(emotionData)
         }
       }
 
@@ -365,7 +372,7 @@ class EmotionValidationPipeline {
         )
       }
       // Add additional trace for authenticity scoring
-      (result as any).authenticityScore = authenticityScore
+      result.authenticityScore = authenticityScore
 
       // Add biasAnalysis only if it exists
       if (biasAnalysis) {
@@ -738,7 +745,7 @@ class EmotionValidationPipeline {
   ): TherapeuticSession {
     return {
       sessionId: emotionData.sessionId,
-      timestamp: emotionData.timestamp || new Date(),
+      sessionDate: (emotionData.timestamp || new Date()).toISOString(),
       participantDemographics: emotionData.participantDemographics || {
         age: '',
         gender: '',
@@ -748,28 +755,24 @@ class EmotionValidationPipeline {
       scenario: {
         // Provide a default TrainingScenario structure
         scenarioId: 'emotion-validation',
-        description: emotionData.context,
-        type: 'other',
-        complexity: 'beginner',
-        tags: [],
-        learningObjectives: [],
+        type: 'general-wellness',
       },
       content: {
-        patientPresentation: emotionData.context,
-        therapeuticInterventions: [],
-        patientResponses: emotionData.responseText
+        transcript: emotionData.context,
+        aiResponses: [],
+        userInputs: emotionData.responseText
           ? [emotionData.responseText]
           : [],
-        sessionNotes: emotionData.responseText || emotionData.context || '',
       },
       aiResponses: [],
       expectedOutcomes: [],
       transcripts: [],
+      userInputs: emotionData.responseText
+          ? [emotionData.responseText]
+          : [],
       metadata: {
-        trainingInstitution: 'emotion-validation-system',
-        traineeId: 'system',
-        sessionDuration: 0,
-        completionStatus: 'completed',
+        sessionStartTime: emotionData.timestamp || new Date(),
+        sessionEndTime: new Date(),
       },
     }
   }

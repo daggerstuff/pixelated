@@ -109,7 +109,7 @@ export async function getAllDataDeletionRequests(filters?: {
   patientId?: string
   dataScope?: 'all' | 'specific'
 }): Promise<DataDeletionRequest[]> {
-  const query: any = {}
+  const query: Partial<DataDeletionRequest> = {}
 
   if (filters) {
     // Use bracket notation for index signature properties

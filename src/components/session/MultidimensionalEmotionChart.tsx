@@ -164,6 +164,7 @@ export default function MultidimensionalEmotionChart({
     // Capture ref values for cleanup closure
     const cleanupRenderer = rendererRef.current
     const cleanupContainer = containerRef.current
+    const cleanupObjectPool = objectPoolRef.current
 
     const initScene = async () => {
       // Dynamically load Three.js with proper types
@@ -603,7 +604,7 @@ export default function MultidimensionalEmotionChart({
 
       // Clear object pools using captured reference for reliability.
       // This prevents memory leaks by guaranteeing the intended object pool is cleared.
-      objectPoolRef.current.clear()
+      cleanupObjectPool.clear()
     }
   }, [dimensionalMaps, isLoading, viewMode, detailLevel, sortedMaps, measure])
 

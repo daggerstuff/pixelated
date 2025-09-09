@@ -8,6 +8,7 @@ import type {
   MentalHealthAnalysisResult,
   RoutingContext,
 } from './types/mentalLLaMATypes'
+import type { MentalLLaMAAdapter as ServerAdapter } from './index'
 
 const logger = createBuildSafeLogger('mental-llama-client')
 
@@ -99,7 +100,7 @@ function isClientSide(): boolean {
  * On server: dynamically imports and returns the real adapter
  */
 export async function createMentalLLaMAFromEnvSafe(): Promise<{
-  adapter: ClientMentalLLaMAAdapter | any
+  adapter: ClientMentalLLaMAAdapter | ServerAdapter
 }> {
   if (isClientSide()) {
     // Client side - use API adapter

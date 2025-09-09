@@ -278,7 +278,7 @@ export class RedisService extends EventEmitter {
     return entries.slice(start, stop + 1).map(([member]) => member);
   }
 
-  async zpopmin(key: string): Promise<any[]> {
+  async zpopmin(key: string): Promise<{ value: string; score: number }[]> {
     const zset = zsetStore.get(key)
     if (!zset) {
       return []

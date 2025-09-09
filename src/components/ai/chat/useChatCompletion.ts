@@ -163,7 +163,7 @@ export function useChatCompletion({
     totalDuration: 0,
     startTime: initialMessages.length > 0 ? new Date() : null,
   })
-  const [messageStats, setMessageStats] = useState<MessageStats>({
+  const [messageStats] = useState<MessageStats>({
     longestMessage: 0,
     shortestMessage: 0,
     averageLength: 0,

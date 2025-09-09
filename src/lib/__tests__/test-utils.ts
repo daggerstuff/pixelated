@@ -119,7 +119,7 @@ export function createMockTimer(): {
 } {
   let currentTime = 0
 
-  const mockSetInterval = vi.fn().mockImplementation((fn: Function, delay: number) => {
+  const mockSetInterval = vi.fn().mockImplementation((fn: (...args: any[]) => void, _delay: number) => {
     const intervalId = { id: Math.random(), active: true }
     const wrappedFn = () => fn()
     // Simulate immediate execution for testing
@@ -127,7 +127,7 @@ export function createMockTimer(): {
     return intervalId
   })
 
-  const mockSetTimeout = vi.fn().mockImplementation((fn: Function, delay: number) => {
+  const mockSetTimeout = vi.fn().mockImplementation((fn: (...args: any[]) => void, delay: number) => {
     const timeoutId = { id: Math.random(), active: true }
     setTimeout(() => {
       if (timeoutId.active) {

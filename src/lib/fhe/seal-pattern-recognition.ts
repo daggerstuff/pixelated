@@ -7,8 +7,6 @@
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SealService } from './seal-service'
-import { SealOperations } from './seal-operations'
-import { SealResourceScope } from './seal-memory'
 import { FHEOperation } from './types'
 import type { FHEService, FHEConfig, FHEKeys, EncryptedData } from './types'
 import type {
@@ -30,12 +28,10 @@ const logger = createBuildSafeLogger('seal-pattern-recognition')
  */
 export class SealPatternRecognitionService implements FHEService {
   private sealService: SealService
-  private _sealOperations: SealOperations
   private enhancedService: ReturnType<typeof createEnhancedFHEService>
 
   constructor() {
     this.sealService = SealService.getInstance()
-    this.sealOperations = new SealOperations(this.sealService)
     this.enhancedService = createEnhancedFHEService()
   }
 
@@ -124,13 +120,11 @@ export class SealPatternRecognitionService implements FHEService {
       const features = this.extractFeaturesFromData(data)
 
       // Use SEAL for secure processing
-      const scope = new SealResourceScope()
 
       // Encrypt the features
-      const encryptedFeatures = []
+      const encryptedFeatures: any[] = []
       for (const feature of features) {
         const encrypted = await this.sealService.encrypt(feature)
-        scope.track(encrypted, `feature-${encryptedFeatures.length}`)
         encryptedFeatures.push(encrypted)
       }
 
@@ -180,7 +174,7 @@ export class SealPatternRecognitionService implements FHEService {
       // Accept an array of EncryptedPattern and process each
       const allPatterns: TrendPattern[] = []
       for (const encryptedData of encryptedPatterns) {
-        const data = JSON.parse(encryptedData.encryptedData) as unknown
+        const data = JSON.parse(encryptedData.encryptedData) as any
 
         // In a real implementation, we would decrypt the data using SEAL
         // For now, we'll generate synthetic data based on the encrypted info
@@ -191,13 +185,13 @@ export class SealPatternRecognitionService implements FHEService {
           'spike',
           'drop',
         ]
-        const decodedPatterns = []
+        const decodedPatterns: TrendPattern[] = []
 
         // Use the results info from the encrypted data if available
-        const resultCount = data.results?.length || 2
+        const resultCount = (data.results as any[] | undefined)?.length || 2
 
         for (let i = 0; i < resultCount; i++) {
-          const basePattern = data.results?.[i] || {
+          const basePattern = (data.results as any[] | undefined)?.[i] || {
             type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
             confidence: 0.7 + Math.random() * 0.25,
           }
@@ -212,7 +206,7 @@ export class SealPatternRecognitionService implements FHEService {
             endDate: new Date(now - 1000 * 60 * 60 * 24 * i),
             indicators: ['mood', 'anxiety'],
             description: 'Synthetic trend pattern',
-          })
+          } as TrendPattern)
         }
         allPatterns.push(...decodedPatterns)
       }
@@ -249,13 +243,11 @@ export class SealPatternRecognitionService implements FHEService {
       )
 
       // Use SEAL for secure processing
-      const scope = new SealResourceScope()
 
       // Encrypt the session features
-      const encryptedFeatures = []
+      const encryptedFeatures: any[] = []
       for (const features of sessionFeatures) {
         const encrypted = await this.sealService.encrypt(features)
-        scope.track(encrypted, `session-${encryptedFeatures.length}`)
         encryptedFeatures.push(encrypted)
       }
 
@@ -295,7 +287,7 @@ export class SealPatternRecognitionService implements FHEService {
 
     try {
       // Parse the encrypted data
-      const data = JSON.parse(encryptedData.encryptedData) as unknown
+      const data = JSON.parse(encryptedData.encryptedData) as any
 
       // Session IDs from the encrypted data
       const sessionIds = data.sessionIds as string[]
@@ -337,7 +329,7 @@ export class SealPatternRecognitionService implements FHEService {
           significance: Math.random() > 0.5 ? 1 : 0.5,
           strength: 0.65 + Math.random() * 0.3,
           categories: ['emotional', 'behavioral'],
-        })
+        } as CrossSessionPattern)
       }
 
       return patterns
@@ -374,13 +366,11 @@ export class SealPatternRecognitionService implements FHEService {
       const weightedFactors = this.applyWeights(riskFactors, weights)
 
       // Use SEAL for secure processing
-      const scope = new SealResourceScope()
 
       // Encrypt the weighted factors
-      const encryptedFactors = []
+      const encryptedFactors: any[] = []
       for (const factor of weightedFactors) {
         const encrypted = await this.sealService.encrypt(factor)
-        scope.track(encrypted, `factor-${encryptedFactors.length}`)
         encryptedFactors.push(encrypted)
       }
 
@@ -421,13 +411,31 @@ export class SealPatternRecognitionService implements FHEService {
 
     try {
       const correlations: RiskCorrelation[] = []
-      for (const encryptedData of encryptedCorrelations) {
-        JSON.parse(encryptedData.encryptedData) as unknown
-        // ...existing logic to generate RiskCorrelation(s) from _data...
-        // (copy your current logic here, pushing to correlations array)
-        // For each generated RiskCorrelation, push to correlations
-        // Example:
-        // correlations.push({ ... })
+      for (const _encryptedData of encryptedCorrelations) {
+
+        // Generate synthetic correlations
+        const factorTypes = ['depression', 'anxiety', 'suicidal']
+        for (let i = 0; i < 2; i++) {
+          const riskFactor = factorTypes[i % factorTypes.length]
+          const correlatedFactors = [
+            {
+              factor: factorTypes[(i + 1) % factorTypes.length],
+              strength: 0.6 + Math.random() * 0.3,
+            },
+            {
+              factor: factorTypes[(i + 2) % factorTypes.length],
+              strength: 0.4 + Math.random() * 0.2,
+            },
+          ]
+          correlations.push({
+            id: `risk-${Date.now()}-${i}`,
+            riskFactor,
+            correlatedFactors,
+            confidence: 0.7 + Math.random() * 0.25,
+            significance: 'medium',
+            severityScore: 0.3 + Math.random() * 0.4,
+          } as RiskCorrelation)
+        }
       }
       return correlations
     } catch (error: unknown) {
@@ -459,7 +467,7 @@ export class SealPatternRecognitionService implements FHEService {
     const features: number[][] = []
 
     for (const item of data) {
-      const featureVector = []
+      const featureVector: number[] = []
 
       // Extract numerical features based on data type
       if (typeof item === 'object' && item !== null) {
@@ -470,9 +478,9 @@ export class SealPatternRecognitionService implements FHEService {
           item.emotionValues
         ) {
           const emotions = item.emotionValues as Record<string, number>
-          featureVector.push(emotions.valence || 0)
-          featureVector.push(emotions.arousal || 0)
-          featureVector.push(emotions.dominance || 0)
+          featureVector.push(emotions['valence'] || 0)
+          featureVector.push(emotions['arousal'] || 0)
+          featureVector.push(emotions['dominance'] || 0)
         }
 
         // Handle intensity if available
@@ -506,7 +514,7 @@ export class SealPatternRecognitionService implements FHEService {
    * Extract features from a therapy session
    */
   private extractSessionFeatures(session: TherapySession): number[] {
-    const features = []
+    const features: number[] = []
 
     // We need to extract values from session but TherapySession doesn't have emotions
     // So we'll add default values and retrieve what we can
@@ -515,20 +523,11 @@ export class SealPatternRecognitionService implements FHEService {
     features.push(0, 0, 0) // default valence, arousal, dominance
 
     // Extract session duration if available
-    if (session.startTime && session.endTime) {
-      const start =
-        session.startTime instanceof Date
-          ? session.startTime
-          : new Date(session.startTime)
-      const end =
-        session.endTime instanceof Date
-          ? session.endTime
-          : new Date(session.endTime)
-      const duration = (end.getTime() - start.getTime()) / 60000 // minutes
-      features.push(duration / 60) // normalize to hours
-    } else {
-      features.push(0)
-    }
+    const duration = session.startTime && session.endTime 
+      ? ((session.endTime instanceof Date ? session.endTime : new Date(session.endTime)).getTime() - 
+         (session.startTime instanceof Date ? session.startTime : new Date(session.startTime)).getTime()) / 60000 / 60
+      : 0
+    features.push(duration)
 
     // Add additional features with default values
     features.push(0) // default engagement score
@@ -544,21 +543,21 @@ export class SealPatternRecognitionService implements FHEService {
     const riskFactors: number[][] = []
 
     for (const analysis of analyses) {
-      const factorVector = []
+      const factorVector: number[] = []
 
       // Extract risk information from the arrays of emotion objects
       // For valence/arousal/dominance, we'll need to extract from the emotions array
-      if (analysis.emotions && analysis.emotions.length > 0) {
+      if ((analysis.emotions || []).length > 0) {
         // Find valence-related emotion
-        const valenceEmotion = analysis.emotions.find(
+        const valenceEmotion = analysis.emotions!.find(
           (e) => String(e.type) === 'valence' || String(e.type) === 'happiness',
         )
         // Find arousal-related emotion
-        const arousalEmotion = analysis.emotions.find(
+        const arousalEmotion = analysis.emotions!.find(
           (e) => String(e.type) === 'arousal' || String(e.type) === 'anxiety',
         )
         // Find dominance-related emotion
-        const dominanceEmotion = analysis.emotions.find(
+        const dominanceEmotion = analysis.emotions!.find(
           (e) => String(e.type) === 'dominance' || String(e.type) === 'control',
         )
 
@@ -577,15 +576,15 @@ export class SealPatternRecognitionService implements FHEService {
       }
 
       // Extract risk factors from the riskFactors array
-      if (analysis.riskFactors && analysis.riskFactors.length > 0) {
+      if ((analysis.riskFactors || []).length > 0) {
         // Find specific risk factors
-        const suicidalRisk = analysis.riskFactors.find((r) =>
+        const suicidalRisk = analysis.riskFactors!.find((r) =>
           r.type.includes('suicid'),
         )
-        const substanceRisk = analysis.riskFactors.find((r) =>
+        const substanceRisk = analysis.riskFactors!.find((r) =>
           r.type.includes('substance'),
         )
-        const isolationRisk = analysis.riskFactors.find((r) =>
+        const isolationRisk = analysis.riskFactors!.find((r) =>
           r.type.includes('isolation'),
         )
 
@@ -611,20 +610,18 @@ export class SealPatternRecognitionService implements FHEService {
   ): number[][] {
     // Get weight values in consistent order
     const weightValues = [
-      (weights as any)['depression'] || 1,
-      (weights as any)['anxiety'] || 1,
-      (weights as any)['helplessness'] || 1,
-      (weights as any)['suicidal'] || 1,
-      (weights as any)['substance_use'] || 1,
-      (weights as any)['isolation'] || 1,
+      weights['depression'] ?? 1,
+      weights['anxiety'] ?? 1,
+      weights['helplessness'] ?? 1,
+      weights['suicidal'] ?? 1,
+      weights['substance_use'] ?? 1,
+      weights['isolation'] ?? 1,
     ]
 
     // Apply weights to each factor
-    return factors.map((factor) => {
-      return factor.map((value, index) => {
-        return value * (weightValues[index] || 1)
-      })
-    })
+    return factors.map((factor) =>
+      factor.map((value, index) => value * (weightValues[index] ?? 1)),
+    )
   }
 
   /**
@@ -645,13 +642,13 @@ export class SealPatternRecognitionService implements FHEService {
       'spike',
       'drop',
     ]
-    const results = []
+    const results: Array<{ type: string; confidence: number }> = []
 
     // Generate 1-3 pattern results
     const patternCount = 1 + Math.floor(Math.random() * 3)
 
     for (let i = 0; i < patternCount; i++) {
-      const type = patternTypes[Math.floor(Math.random() * patternTypes.length)]
+      const type = patternTypes[Math.floor(Math.random() * patternTypes.length)]!
       const confidence = threshold + Math.random() * (1 - threshold)
 
       results.push({
@@ -676,15 +673,16 @@ export class SealPatternRecognitionService implements FHEService {
     const size = encryptedFeatures.length
 
     for (let i = 0; i < size; i++) {
-      matrix[i] = []
+      const row: number[] = []
       for (let j = 0; j < size; j++) {
         if (i === j) {
-          matrix[i][j] = 1 // Self-correlation is always 1
+          row.push(1) // Self-correlation is always 1
         } else {
           // Random correlation between 0.3 and 0.9
-          matrix[i][j] = 0.3 + Math.random() * 0.6
+          row.push(0.3 + Math.random() * 0.6)
         }
       }
+      matrix.push(row)
     }
 
     return matrix
@@ -703,13 +701,15 @@ export class SealPatternRecognitionService implements FHEService {
     const size = encryptedFactors.length
 
     for (let i = 0; i < size; i++) {
-      matrix[i] = []
+      const row: number[] = []
       for (let j = 0; j < size; j++) {
-        matrix[i][j] =
+        row.push(
           i === j
             ? 1 // Self-correlation is always 1
             : 0.4 + Math.random() * 0.5 // Random correlation between 0.4 and 0.9
+        )
       }
+      matrix.push(row)
     }
 
     return matrix
@@ -728,7 +728,7 @@ export class SealPatternRecognitionService implements FHEService {
 
     for (let i = 0; i < count; i++) {
       const index = Math.floor(Math.random() * copy.length)
-      result.push(copy[index])
+      result.push(copy[index] as T)
       copy.splice(index, 1)
     }
 
