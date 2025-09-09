@@ -5,7 +5,7 @@
  * No frills, just works
  */
 
-const { execSync } = require('child_process')
+const { spawnSync } = require('child_process')
 
 // ANSI colors
 const colors = {
@@ -29,28 +29,60 @@ function error(message) {
   console.log(`${colors.red}✗ ${message}${colors.reset}`)
 }
 
+// at top of file, ensure string-argv is installed (npm install string-argv)
+const toArgv = require('string-argv')
+
+function parseArgs(command) {
+  return toArgv(command ?? '')
+}
+
+function isSafeToken(token) {
+  if (typeof token !== 'string' || token.length === 0) {
+    return false
+  }
+  // Disallow only control/newline/null; shell is disabled.
+  return !/[\0\n\r]/.test(token)
+}
+
 function runBlogCommand(command) {
   try {
-    const result = execSync(`pnpm run blog-publisher -- ${command}`, {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
-    return { success: true, output: result }
-  } catch (err) {
-    return {
-      success: false,
-      error: err.message,
-      output: err.stdout || '',
+    const tokens = Array.isArray(command) ? command : parseArgs(command || '')
+    if (tokens.length === 0) {
+      return { success: false, error: 'Empty command' }
     }
+
+    const top = tokens[0]
+    if (!ALLOWED_TOP_LEVEL.has(top)) {
+      return { success: false, error: `Disallowed command: ${top}` }
+    }
+
+    for (const t of tokens) {
+      if (!isSafeToken(t)) {
+        return { success: false, error: 'Invalid characters in arguments' }
+      }
+    }
+
+    const args = ['run', 'blog-publisher', '--', ...tokens]
+    const proc = spawnSync('pnpm', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false })
+    if (proc.error) {
+      return { success: false, error: proc.error.message }
+    }
+
+    if (proc.status === 0) {
+      return { success: true, output: proc.stdout }
+    }
+
+    return { success: false, error: proc.stderr || 'Unknown error', output: proc.stdout || '' }
+  } catch (err) {
+    return { success: false, error: err.message }
   }
 }
 
 // Get command line arguments
 const args = process.argv.slice(2)
-const command = args.join(' ')
 
 // Show help if no command
-if (!command || command === 'help') {
+if (args.length === 0 || args[0] === 'help') {
   log('')
   log(`${colors.cyan}Blog Management Commands:${colors.reset}`)
   log('')
@@ -83,7 +115,7 @@ if (!command || command === 'help') {
 }
 
 // Run the command
-const result = runBlogCommand(command)
+const result = runBlogCommand(args)
 
 if (result.success) {
   log(result.output)

@@ -30,12 +30,24 @@ export default async function handler(req: Request): Promise<Response> {
    return new Response('Invalid JSON', { status: 400 })
  }
 
- if (!isBatchBody(body)) {
-   return new Response('Request body does not match BatchBody shape', { status: 400 })
- }
+  if (!body || typeof body !== 'object') {
+    return new Response('Invalid request body', { status: 400 })
+  }
 
- const { sessions, options } = body
-
+ const { sessions, options } = body as { 
+    sessions?: unknown[]; 
+    options?: {
+      concurrency?: number;
+      batchSize?: number;
+      onProgress?: (progress: { completed: number; total: number }) => void;
+      onError?: (error: Error, session: any) => void;
+      retries?: number;
+      timeoutMs?: number;
+      logProgress?: boolean;
+      logErrors?: boolean;
+      priority?: 'low' | 'medium' | 'high';
+    }
+  }
   if (!Array.isArray(sessions) || sessions.length === 0) {
     return new Response('Missing or invalid sessions array', { status: 400 })
   }

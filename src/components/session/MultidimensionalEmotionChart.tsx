@@ -1,15 +1,15 @@
 import { useRef, useEffect, useState, useMemo } from 'react'
 import { cn } from '../../lib/utils.js'
 import * as THREE from 'three'
-import type { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 // Dynamic Three.js imports to reduce bundle size
 async function loadThreeWithTypes() {
-  const [THREE, { OrbitControls }] = await Promise.all([
+  const [threeModule, orbitModule] = await Promise.all([
     import('three'),
-    import('three/addons/controls/OrbitControls.js'),
+    import('three/examples/jsm/controls/OrbitControls.js'),
   ])
-  return { THREE, OrbitControls }
+  return { THREE: (threeModule as typeof import('three')), OrbitControls: (orbitModule as typeof import('three/examples/jsm/controls/OrbitControls.js')).OrbitControls }
 }
 
 // Types for dimensional emotion data and patterns
@@ -400,7 +400,7 @@ export default function MultidimensionalEmotionChart({
       // Use shader customization for high detail only
       if (detailLevel === 'high') {
         // Custom vertex shader to use the size attribute
-        material.onBeforeCompile = (shader) => {
+        material.onBeforeCompile = (shader: { vertexShader: string }) => {
           shader.vertexShader = shader.vertexShader
             .replace(
               'uniform float size;',
@@ -512,17 +512,17 @@ export default function MultidimensionalEmotionChart({
               cameraRef.current.matrixWorldInverse,
             ),
           )
-          scene.traverse((object) => {
-            if (object.userData?.['isCullable']) {
-              const { boundingSphere: sphere } = object.userData
-              if (sphere) {
-                object.visible = frustum.intersectsSphere(
-                  sphere as THREE.Sphere,
-                )
-              } else {
-                object.visible = true
-              }
-            }
+          scene.traverse((object: THREE.Object3D) => {
+                if ((object as any).userData?.['isCullable']) {
+                  const { boundingSphere: sphere } = (object as any).userData
+                  if (sphere) {
+                    object.visible = frustum.intersectsSphere(
+                      sphere as THREE.Sphere,
+                    )
+                  } else {
+                    object.visible = true
+                  }
+                }
           })
         }
 
@@ -589,13 +589,14 @@ export default function MultidimensionalEmotionChart({
       }
 
       if (sceneRef.current) {
-        sceneRef.current.traverse((object) => {
+        sceneRef.current.traverse((object: THREE.Object3D) => {
           if (object instanceof THREE.Mesh) {
             object.geometry?.dispose()
-            if (Array.isArray(object.material)) {
-              object.material.forEach((material) => material.dispose())
+            const mat = object.material
+            if (Array.isArray(mat)) {
+              mat.forEach((m: THREE.Material) => m.dispose())
             } else {
-              object.material?.dispose()
+              mat?.dispose()
             }
           }
         })

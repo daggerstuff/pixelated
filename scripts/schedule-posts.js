@@ -12,7 +12,9 @@ import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { globby } from 'globby'
-import matter from 'gray-matter'
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const matter = require('gray-matter');
 import simpleGit from 'simple-git'
 
 // Directory paths

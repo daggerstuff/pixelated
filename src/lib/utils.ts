@@ -5,7 +5,7 @@ import { clsx, type ClassValue } from 'clsx'
  * @param size - Number of bytes to generate
  * @returns Uint8Array of random bytes
  */
-function getRandomBytes(size: number): Uint8Array {
+export function getRandomBytes(size: number): Uint8Array {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
     // Browser environment - use Web Crypto API
     const bytes = new Uint8Array(size)
@@ -18,12 +18,11 @@ function getRandomBytes(size: number): Uint8Array {
       const { randomBytes } = require('crypto')
       return new Uint8Array(randomBytes(size))
     } catch {
-      // Fallback to Math.random (not cryptographically secure)
-      const bytes = new Uint8Array(size)
-      for (let i = 0; i < size; i++) {
-        bytes[i] = Math.floor(Math.random() * 256)
-      }
-      return bytes
+      // No cryptographically secure random available
+      throw new Error(
+        'Cryptographically secure random number generation is not supported in this environment. ' +
+        'Math.random() fallback has been removed for security. Please run in a secure context (browser with crypto.getRandomValues or Node.js with crypto.randomBytes).'
+      )
     }
   }
 }
@@ -45,7 +44,7 @@ function bytesToUint32BE(bytes: Uint8Array): number {
  * Uniform even for non-power-of-two upper bounds (no modulo bias).
  * Throws if maxExclusive < 1 or not integer.
  */
-function secureRandomInt(maxExclusive: number): number {
+export function secureRandomInt(maxExclusive: number): number {
   if (!Number.isInteger(maxExclusive) || maxExclusive < 1) {
     throw new Error('maxExclusive must be positive integer');
   }

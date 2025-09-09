@@ -4,12 +4,20 @@ import {
   type MemoryEntry,
   type SearchOptions,
   type MemoryStats,
-} from '@/lib/memory/memory-client'
+} from '../lib/memory/memory-client'
 
 interface UseMemoryOptions {
   userId?: string
   autoLoad?: boolean
   category?: string
+}
+
+export interface MemoryHistoryItem {
+  id: string
+  operation?: string
+  memoryId?: string
+  timestamp: string
+  details?: Record<string, unknown>
 }
 
 export interface UseMemoryReturn {
@@ -42,12 +50,12 @@ export interface UseMemoryReturn {
 
   // Memory management
   clearMemories: () => void
-    getMemoryHistory: () => Promise<unknown[]>
-}
-
-export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
+  getMemoryHistory: () => Promise<MemoryHistoryItem[]>
+} {
   const { userId = 'default', autoLoad = true, category } = options
 
+export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
+  const { userId, category, autoLoad = false } = options
   const [memories, setMemories] = useState<MemoryEntry[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -176,7 +184,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   )
 
   const addUserPreference = useCallback(
-  async (preference: string, value: unknown): Promise<void> => {
+    async (preference: string, value: string | number | boolean | object): Promise<void> => {
       await memoryManager.addUserPreference(userId, preference, value)
       await refreshMemories()
     },
@@ -355,7 +363,7 @@ export function useUserPreferences(userId: string): UseUserPreferencesReturn {
       if (prefMemory) {
         try {
           const match = prefMemory.content.match(/= (.+)$/)
-          return match && match[1] ? JSON.parse(match[1]) as string | number | boolean | object | null : null
+          return match && match[1] ? JSON.parse(match[1]) as unknown : null
         } catch {
           return null
         }

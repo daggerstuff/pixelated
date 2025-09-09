@@ -206,7 +206,7 @@ export default defineConfig({
   },
   server: {
     port: 4321,
-    host: true,
+    host: '0.0.0.0',
     watch: {
       ignored: [
         '**/ai/**',
@@ -226,7 +226,7 @@ export default defineConfig({
   },
   preview: {
     port: 4322,
-    host: true,
+    host: '0.0.0.0',
   },
   image: {
     service: passthroughImageService(),
