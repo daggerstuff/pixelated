@@ -14,7 +14,7 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { AuditEventType, logAuditEvent } from '../../audit'
 import type { RecoveryTestConfig, RecoveryTestResult } from './types'
-import { RecoveryTestStatus } from './backup-types'
+import { RecoveryTestStatus, VerificationMethod, TestEnvironmentType, TestCase, VerificationStep } from './backup-types'
 
 // Environment detection
 const isBrowser =
@@ -63,56 +63,33 @@ function generateUUID(): string {
   }
   // Fallback for older browsers or if Node.js crypto is unavailable
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0
+    // Use secure random byte for fallback UUID generation
+    let r = 0
+    try {
+      if (!isBrowser) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const nodeCrypto = require('crypto')
+        r = nodeCrypto.randomBytes(1)[0] & 0xf
+      } else if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+        const arr = new Uint8Array(1)
+        window.crypto.getRandomValues(arr)
+        if (arr?.[0] !== undefined) {
+          r = arr[0] & 0xf
+        } else {
+          throw new Error('Failed to generate secure random bytes')
+        }
+      } else {
+        throw new Error('Secure random not available in browser environment')
+      }
+    } catch {
+      throw new Error('Failed to generate secure random for UUID')
+    }
     const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
   })
 }
 
 const logger = createBuildSafeLogger('recovery-testing')
-
-/**
- * Supported test environment types
- */
-export enum TestEnvironmentType {
-  DOCKER = 'docker',
-  KUBERNETES = 'kubernetes',
-  VM = 'vm',
-  SANDBOX = 'sandbox',
-}
-
-/**
- * Verification method types
- */
-export enum VerificationMethod {
-  HASH = 'hash',
-  QUERY = 'query',
-  CONTENT = 'content',
-  API = 'api',
-}
-
-/**
- * Test case interface
- */
-export interface TestCase {
-  id: string
-  name: string
-  description: string
-  backupType: string
-  verificationSteps: VerificationStep[]
-}
-
-/**
- * Verification step interface
- */
-export interface VerificationStep {
-  id: string
-  type: VerificationMethod
-  target: string
-  expected?: string | number | boolean
-  query?: string
-  threshold?: number
-}
 
 /**
  * Test case configuration interface
@@ -534,7 +511,7 @@ export class RecoveryTestingManager {
     }> = []
 
     // Run each test case
-    for (const testCase of this.testCases.values()) {
+    for (const testCase of Array.from(this.testCases.values())) {
       logger.info('Running test case', {
         backupId,
         testCaseName: testCase.name,
@@ -619,6 +596,7 @@ export class RecoveryTestingManager {
           if (!isBrowser && nodeCryptoCreateHash) {
             if (
               verificationResult.passed &&
+              verificationResult.actual !== undefined &&
               (typeof verificationResult.actual === 'string' ||
                 verificationResult.actual instanceof Uint8Array)
             ) {
@@ -627,7 +605,7 @@ export class RecoveryTestingManager {
                 .digest('hex')
               results.push({
                 step: step.id,
-                passed: hash === step.expected,
+                passed: step.expected !== undefined && hash === step.expected,
                 details: {
                   actualHash: hash,
                   expectedHash: step.expected,
@@ -715,7 +693,7 @@ interface TestEnvironment {
 class DockerTestEnvironment implements TestEnvironment {
   // private config: Record<string, unknown>
 
-  
+
 
   async initialize(): Promise<void> {
     logger.info('Initializing Docker test environment')
@@ -759,7 +737,7 @@ class DockerTestEnvironment implements TestEnvironment {
 class KubernetesTestEnvironment implements TestEnvironment {
   // private config: Record<string, unknown>
 
-  
+
 
   async initialize(): Promise<void> {
     logger.info('Initializing Kubernetes test environment')
@@ -803,7 +781,7 @@ class KubernetesTestEnvironment implements TestEnvironment {
 class VMTestEnvironment implements TestEnvironment {
   // private config: Record<string, unknown>
 
-  
+
 
   async initialize(): Promise<void> {
     logger.info('Initializing VM test environment')
@@ -848,7 +826,7 @@ class SandboxTestEnvironment implements TestEnvironment {
   // private config: Record<string, unknown>
   private restoredData: Map<string, Uint8Array> = new Map()
 
-  
+
 
   async initialize(): Promise<void> {
     logger.info('Initializing sandbox test environment')

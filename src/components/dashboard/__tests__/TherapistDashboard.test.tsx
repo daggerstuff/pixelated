@@ -37,18 +37,25 @@ vi.mock("@/hooks/useTherapistAnalytics", () => ({
   })),
 }));
 
-describe("TherapistDashboard", () => {
-  it("renders dashboard heading", () => {
-    const mockSessions: TherapistSession[] = [
-      {
-        id: 'session-1',
-        status: 'completed',
-        startTime: new Date('2025-01-01T10:00:00Z'),
-        endTime: new Date('2025-01-01T11:00:00Z'),
-      }
-    ];
+describe("TherapistDashboard", function () {
+  const mockSessions: TherapistSession[] = [
+    {
+      id: 'session-1',
+      clientId: 'client-1',
+      therapistId: 'therapist-1',
+      status: 'completed',
+      startTime: '2025-01-01T10:00:00Z',
+      endTime: '2025-01-01T11:00:00Z',
+      progress: 100,
+    }
+  ];
 
   const mockOnSessionControl = vi.fn();
+
+  it("renders dashboard heading", () => {
+    render(<TherapistDashboard sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
+    expect(screen.getByLabelText('Therapist Dashboard')).toBeInTheDocument();
+  });
 
   it("renders dashboard heading with proper ARIA labels", () => {
     render(<TherapistDashboard sessions={mockSessions} onSessionControl={mockOnSessionControl} />);

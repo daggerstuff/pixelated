@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { TherapyProgressCharts } from "../TherapyProgressCharts";
+import TherapyProgressCharts from "../TherapyProgressCharts";
 import type { TherapistAnalyticsChartData } from "@/types/analytics";
 import { describe, expect, it } from "vitest";
 

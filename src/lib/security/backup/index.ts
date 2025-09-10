@@ -27,16 +27,30 @@ import * as NodeCrypto from 'crypto'
 // Import crypto polyfill statically to avoid issues during build
 
 // Utility function for browser-safe buffer conversions without using Buffer
+/**
+ * Converts a hex string to a Uint8Array backed by a true ArrayBuffer.
+ * This ensures compatibility with Web Crypto API (BufferSource).
+ */
 function hexStringToUint8Array(hexString: string): Uint8Array {
   if (!/^[0-9A-Fa-f]+$/.test(hexString) || hexString.length % 2 !== 0) {
     throw new Error('Invalid hex string')
   }
 
-  const bytes = new Uint8Array(hexString.length / 2)
+  // Always allocate a new ArrayBuffer to guarantee compatibility
+  const buffer = new ArrayBuffer(hexString.length / 2)
+  const bytes = new Uint8Array(buffer)
   for (let i = 0; i < hexString.length; i += 2) {
     bytes[i / 2] = parseInt(hexString.substring(i, i + 2), 16)
   }
   return bytes
+}
+
+// Helper function to ensure Uint8Array is compatible with Web Crypto API
+function toCryptoBufferSource(data: Uint8Array): Uint8Array {
+  // Always create a new Uint8Array backed by a regular ArrayBuffer to ensure type compatibility
+  const newArray = new Uint8Array(data.byteLength)
+  newArray.set(data)
+  return newArray
 }
 
 // Import crypto browser/node implementation
@@ -51,7 +65,7 @@ const getCrypto = async () => {
         const { subtle } = window.crypto
         const importedKey = await subtle.importKey(
           'raw',
-          key,
+          toCryptoBufferSource(key),
           { name: 'AES-GCM' },
           false,
           ['encrypt'],
@@ -59,7 +73,7 @@ const getCrypto = async () => {
         const encrypted = await subtle.encrypt(
           { name: 'AES-GCM', iv },
           importedKey,
-          data,
+          toCryptoBufferSource(data),
         )
         // In Web Crypto API, the auth tag is appended to the ciphertext
         const encryptedArray = new Uint8Array(encrypted)
@@ -76,7 +90,7 @@ const getCrypto = async () => {
         const { subtle } = window.crypto
         const importedKey = await subtle.importKey(
           'raw',
-          key,
+          toCryptoBufferSource(key),
           { name: 'AES-GCM' },
           false,
           ['decrypt'],
@@ -85,10 +99,13 @@ const getCrypto = async () => {
         const combined = new Uint8Array(data.length + authTag.length)
         combined.set(data)
         combined.set(authTag, data.length)
+        // Create a new ArrayBuffer to ensure proper typing
+        const combinedBuffer = new ArrayBuffer(combined.byteLength)
+        new Uint8Array(combinedBuffer).set(combined)
         const decrypted = await subtle.decrypt(
           { name: 'AES-GCM', iv },
           importedKey,
-          combined,
+          combinedBuffer,
         )
         return new Uint8Array(decrypted)
       },
@@ -208,8 +225,8 @@ export class BackupSecurityManager {
   private config: BackupConfig
   private encryptionKey!: Uint8Array // MODIFIED: Definite assignment assertion
   private isInitialized = false
-  private recoveryTestingManager?: RecoveryTestingManager
   private storageProviders: Map<StorageLocation, StorageProvider> = new Map()
+  private recoveryTestingManager!: RecoveryTestingManager
 
   constructor(config?: Partial<BackupConfig>) {
     // Default configuration
@@ -320,20 +337,30 @@ export class BackupSecurityManager {
     }
 
     // Simple UUID v4 implementation that works everywhere
-    const hexDigits = '0123456789abcdef'
     let uuid = ''
 
-    for (let i = 0; i < 36; i++) {
-      if (i === 8 || i === 13 || i === 18 || i === 23) {
-        uuid += '-'
-      } else if (i === 14) {
-        uuid += '4'
-      } else if (i === 19) {
-        uuid += hexDigits.charAt(Math.random() * 4 + 8)
-      } else {
-        uuid += hexDigits.charAt(Math.random() * 16)
+      // Use crypto-secure random values for UUID v4 generation
+      const randBytes = isBrowser
+        ? window.crypto.getRandomValues(new Uint8Array(16))
+        : NodeCrypto.randomBytes(16)
+
+      // Per RFC4122 v4: set bits for version and `clock_seq_hi_and_reserved`
+      if (randBytes[6] !== undefined) {
+        randBytes[6] = (randBytes[6] & 0x0f) | 0x40
       }
-    }
+      if (randBytes[8] !== undefined) {
+        randBytes[8] = (randBytes[8] & 0x3f) | 0x80
+      }
+
+      for (let i = 0; i < 16; i++) {
+        const byte = randBytes[i]
+        const hex = (byte !== undefined ? byte : 0).toString(16).padStart(2, '0')
+        // Insert dashes at the appropriate positions
+        if (i === 4 || i === 6 || i === 8 || i === 10) {
+          uuid += '-'
+        }
+        uuid += hex
+      }
 
     return uuid
   }
@@ -571,7 +598,13 @@ export class BackupSecurityManager {
   private async calculateHash(data: Uint8Array): Promise<string> {
     if (isBrowser) {
       // Web Crypto API for browser
-      const hashBuffer = await window.crypto.subtle.digest('SHA-256', data)
+      // Create a new ArrayBuffer to ensure proper typing
+      const dataBuffer = new ArrayBuffer(data.byteLength)
+      new Uint8Array(dataBuffer).set(data)
+      const hashBuffer = await window.crypto.subtle.digest(
+        'SHA-256',
+        dataBuffer
+      )
       return Array.from(new Uint8Array(hashBuffer))
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')
@@ -588,12 +621,6 @@ export class BackupSecurityManager {
   /**
    * Calculate retention date based on backup type
    */
-  private calculateRetentionDate(type: BackupType): string {
-    const { retention } = this.config.backupTypes[type]
-    const date = new Date()
-    date.setDate(date.getDate() + retention)
-    return date.toISOString()
-  }
 
   /**
    * Store the encrypted backup in the specified location
@@ -779,7 +806,9 @@ export class BackupSecurityManager {
     // Try to find in all configured storage locations
     const storageEntries = Array.from(this.storageProviders.entries())
     for (let i = 0; i < storageEntries.length; i++) {
-      const [location, provider] = storageEntries[i]
+      const entry = storageEntries[i]
+      if (!entry) continue
+      const [location, provider] = entry
       try {
         // Look for metadata files matching the ID
         const files = await provider.listFiles(
@@ -788,6 +817,7 @@ export class BackupSecurityManager {
 
         if (files.length > 0) {
           // Read the metadata file
+          if (!files[0]) continue;
           const metadataBuffer = await provider.getFile(files[0])
           return JSON.parse(
             new TextDecoder().decode(metadataBuffer),

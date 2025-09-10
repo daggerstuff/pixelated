@@ -131,9 +131,11 @@ export interface RecoveryTestConfig {
     description: string
     backupType: string
     dataVerification: Array<{
-      type: 'hash' | 'query' | 'content'
+      type: VerificationMethod
       target: string
       expected?: string | number | boolean
+      query?: string
+      threshold?: number
     }>
   }>
   notifyOnFailure: boolean
