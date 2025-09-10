@@ -1,0 +1,2 @@
+// Simple test file
+export {};
