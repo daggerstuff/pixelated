@@ -37,27 +37,16 @@ vi.mock("@/hooks/useTherapistAnalytics", () => ({
   })),
 }));
 
-
 describe("TherapistDashboard", () => {
-  const mockSessions: TherapistSession[] = [
-    {
-      id: 'session-1',
-      clientId: 'client-1',
-      therapistId: 'therapist-1',
-      startTime: '2025-01-01T10:00:00Z',
-      endTime: '2025-01-01T11:00:00Z',
-      status: 'completed',
-      progress: 100,
-    },
-    {
-      id: 'session-2',
-      clientId: 'client-2',
-      therapistId: 'therapist-1',
-      startTime: '2025-01-02T10:00:00Z',
-      status: 'active',
-      progress: 75,
-    }
-  ];
+  it("renders dashboard heading", () => {
+    const mockSessions: TherapistSession[] = [
+      {
+        id: 'session-1',
+        status: 'completed',
+        startTime: new Date('2025-01-01T10:00:00Z'),
+        endTime: new Date('2025-01-01T11:00:00Z'),
+      }
+    ];
 
   const mockOnSessionControl = vi.fn();
 
