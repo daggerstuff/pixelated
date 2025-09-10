@@ -186,6 +186,8 @@ This AGENTS.md is designed for coding agents. Update as the project evolves. For
 
 [byterover-mcp]
 
+[byterover-mcp]
+
 # Byterover MCP Server Tools Reference
 
 There are two main workflows with Byterover tools and recommended tool call strategies that you **MUST** follow precisely. 
