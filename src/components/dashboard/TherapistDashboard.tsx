@@ -14,8 +14,22 @@ import { cn } from "@/lib/utils";
 // Responsive grid layout using Tailwind
 
 export function TherapistDashboard({ sessions, onSessionControl, children }: TherapistDashboardProps) {
-  // Find the most recent session for progress tracking
-  const latestSession = sessions.length > 0 ? sessions[0] : null;
+  // Find the session with the latest valid startTime for progress tracking
+  const latestSession = React.useMemo(() => {
+    if (!Array.isArray(sessions) || sessions.length === 0) {
+      return null;
+    }
+    let latest: typeof sessions[0] | null = null;
+    let latestTime = -Infinity;
+    for (const session of sessions) {
+      const t = session?.startTime ? new Date(session.startTime).getTime() : NaN;
+      if (!isNaN(t) && t > latestTime) {
+        latest = session;
+        latestTime = t;
+      }
+    }
+    return latest ?? null;
+  }, [sessions]);
   if (!onSessionControl) {
     throw new Error("TherapistDashboard requires onSessionControl prop");
   }
