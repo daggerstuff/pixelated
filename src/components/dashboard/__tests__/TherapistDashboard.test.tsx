@@ -37,6 +37,7 @@ vi.mock("@/hooks/useTherapistAnalytics", () => ({
   })),
 }));
 
+
 describe("TherapistDashboard", () => {
   const mockSessions: TherapistSession[] = [
     {
