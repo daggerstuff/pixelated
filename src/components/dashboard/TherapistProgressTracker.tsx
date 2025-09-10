@@ -37,6 +37,21 @@ export function TherapistProgressTracker({ session, className }: TherapistProgre
     }));
   };
 
+  // Expandable sections for better keyboard navigation
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    overview: true,
+    progress: true,
+    skills: true,
+    notes: true
+  });
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   return (
     <div
       className={cn("space-y-6", className)}
