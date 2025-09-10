@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom';
 import { TherapistDashboard } from "../TherapistDashboard";
-import { SessionControls } from "../SessionControls";
+import SessionControls from "../SessionControls";
 import { TherapistProgressTracker } from "../TherapistProgressTracker";
-import { TherapyProgressCharts } from "../TherapyProgressCharts";
+import TherapyProgressCharts from "../TherapyProgressCharts";
 import { ProgressBar } from "../ProgressBar";
 import { SessionMetrics } from "../SessionMetrics";
 import { describe, expect, it, vi } from "vitest";

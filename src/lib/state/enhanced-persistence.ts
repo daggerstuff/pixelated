@@ -119,6 +119,8 @@ class EnhancedStatePersistence {
   private storageChangeListeners: Set<
     (key: string, newValue: unknown) => void
   > = new Set()
+  private static fallbackCounter = 0
+
 
   constructor() {
     this.config = {
@@ -413,8 +415,36 @@ class EnhancedStatePersistence {
       offlineData.queuedActions = []
     }
 
+    // Generate a cryptographically secure id suffix synchronously when possible
+    let secureSuffix: string
+    try {
+      if (typeof window !== 'undefined' && window.crypto && typeof window.crypto.getRandomValues === 'function') {
+        const arr = new Uint8Array(8)
+        window.crypto.getRandomValues(arr)
+        secureSuffix = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')
+      } else {
+        // Try synchronous node crypto require
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const nodeCrypto = typeof require === 'function' ? require('crypto') : null
+        if (nodeCrypto && typeof nodeCrypto.randomBytes === 'function') {
+          secureSuffix = nodeCrypto.randomBytes(8).toString('hex')
+        } else {
+          // Fallback deterministic unique-ish suffix using timestamp + counter
+          secureSuffix = `${Date.now().toString(36)}_${EnhancedStatePersistence.fallbackCounter++}`
+        }
+      }
+    } catch (err: unknown) {
+      // In case anything unexpected happens while generating secure suffix,
+      // fall back to a non-cryptographic but unique-enough suffix.
+      // This ensures the function remains robust in constrained environments.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const e: any = err
+      logger.warn('Secure suffix generation failed, falling back to timestamp+counter:', e)
+      secureSuffix = `${Date.now().toString(36)}_${EnhancedStatePersistence.fallbackCounter++}`
+    }
+
     offlineData.queuedActions.push({
-      id: `${Date.now()}_${Math.random().toString(36).substring(2)}`,
+      id: `${Date.now()}_${secureSuffix}`,
       type,
       payload,
       timestamp: Date.now(),
