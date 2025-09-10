@@ -111,7 +111,7 @@ Pixelated Empathy is a full-stack AI-powered bias detection and mental health pl
 	```
 - **Azure Pipelines:**
 	- CI/CD pipeline defined in `azure-pipelines.yml`
-	- Node.js 24.x, pnpm 10.16.0
+	- Node.js 24.x, pnpm 10.15.0
 	- Stages: Build, DockerBuild, Deploy, PostDeployTests
 - **Deployment commands:**
 	```sh
@@ -183,12 +183,6 @@ Pixelated Empathy is a full-stack AI-powered bias detection and mental health pl
 ---
 
 This AGENTS.md is designed for coding agents. Update as the project evolves. For subprojects, add AGENTS.md in their directories as needed.
-
-[byterover-mcp]
-
-[byterover-mcp]
-
-[byterover-mcp]
 
 [byterover-mcp]
 
