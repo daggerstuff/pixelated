@@ -52,7 +52,6 @@ describe("TherapistDashboard", function () {
 
   const mockOnSessionControl = vi.fn();
 
-
 describe("TherapistDashboard", () => {
   it("renders dashboard heading", () => {
     render(<TherapistDashboard sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
