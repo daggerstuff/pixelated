@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import type { TherapistDashboardProps } from "@/types/dashboard";
 import { AnalyticsCharts } from "./AnalyticsCharts";
 import { ProgressBar } from "./ProgressBar";
 import { SessionMetrics } from "./SessionMetrics";
-import { SessionControls } from "./SessionControls";
+import SessionControls from "./SessionControls";
 import { TherapistProgressTracker } from "./TherapistProgressTracker";
 import { TherapyProgressCharts } from "./TherapyProgressCharts";
 import { useTherapistAnalytics } from "@/hooks/useTherapistAnalytics";
@@ -15,52 +15,52 @@ import { cn } from "@/lib/utils";
 
 export function TherapistDashboard({ sessions, onSessionControl, children }: TherapistDashboardProps) {
   // Find the session with the latest valid startTime for progress tracking
-  const latestSession = React.useMemo(() => {
+  const latestSession = useMemo(() => {
     if (!Array.isArray(sessions) || sessions.length === 0) {
-      return null;
+      return null
     }
-    let latest: typeof sessions[0] | null = null;
-    let latestTime = -Infinity;
+    let latest: typeof sessions[0] | null = null
+    let latestTime = -Infinity
     for (const session of sessions) {
-      const t = session?.startTime ? new Date(session.startTime).getTime() : NaN;
+      const t = session?.startTime ? new Date(session.startTime).getTime() : NaN
       if (!isNaN(t) && t > latestTime) {
-        latest = session;
-        latestTime = t;
+        latest = session
+        latestTime = t
       }
     }
-    return latest ?? null;
-  }, [sessions]);
+    return latest ?? null
+  }, [sessions])
   if (!onSessionControl) {
     throw new Error("TherapistDashboard requires onSessionControl prop");
   }
 
-  // Use therapist analytics hook
-  const defaultFilters: AnalyticsFilters = { timeRange: '30d' };
-  const { data: therapistData, isLoading, error } = useTherapistAnalytics(defaultFilters, sessions);
-
   // Skip link state for accessibility
-  const [showSkipLink, setShowSkipLink] = useState(false);
+  const [showSkipLink, setShowSkipLink] = useState(false)
 
   // Handle keyboard navigation for skip links
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
-        setShowSkipLink(true);
+        setShowSkipLink(true)
       }
-    };
+    }
 
     const handleMouseDown = () => {
-      setShowSkipLink(false);
-    };
+      setShowSkipLink(false)
+    }
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('mousedown', handleMouseDown)
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, []);
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('mousedown', handleMouseDown)
+    }
+  }, [])
+
+  // Use therapist analytics hook
+  const defaultFilters: AnalyticsFilters = { timeRange: '30d' }
+  const { data: therapistData, isLoading, error } = useTherapistAnalytics(defaultFilters, sessions)
 
   return (
     <div className="relative">
@@ -69,11 +69,11 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground focus:underline focus:ring-2 focus:ring-primary"
-          onClick={(e) => {
-            e.preventDefault();
-            const mainContent = document.getElementById('main-content');
+            onClick={(e) => {
+            e.preventDefault()
+            const mainContent = document.getElementById('main-content')
             if (mainContent) {
-              mainContent.focus();
+              mainContent.focus()
             }
           }}
         >
@@ -84,9 +84,9 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
       <section
         id="main-content"
         className={cn(
-          "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6",
-          "bg-background text-foreground rounded-lg shadow-lg w-full min-h-[60vh]",
-          "focus:outline-none"
+          'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6',
+          'bg-background text-foreground rounded-lg shadow-lg w-full min-h-[60vh]',
+          'focus:outline-none'
         )}
         aria-label="Therapist Dashboard"
         role="main"
@@ -121,9 +121,7 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
           tabIndex={0}
         >
           <h3 className="text-lg font-semibold">Session Progress</h3>
-          {latestSession && (
-            <TherapistProgressTracker session={latestSession} />
-          )}
+          {latestSession && <TherapistProgressTracker session={latestSession} />}
         </section>
 
         {/* Therapy Progress Charts - Full width on larger screens */}
@@ -142,7 +140,7 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
         {children}
       </section>
     </div>
-  );
+  )
 }
 
-export default TherapistDashboard;
+export default TherapistDashboard

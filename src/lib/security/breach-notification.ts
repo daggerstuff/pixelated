@@ -1,4 +1,3 @@
-import { Auth } from '@/lib/auth'
 import { sendEmail } from '@/lib/email'
 import { logger } from '@/lib/logger'
 import { redis } from '@/lib/redis'
@@ -22,27 +21,16 @@ export interface TrainingMaterials {
   }
 }
 
-// Create an interface to extend Auth with getUserById method
-interface ExtendedAuth extends Auth {
-  getUserById(userId: string): Promise<{
-    id: string
-    email: string
-    name: string | null
-  }>
-}
-
-// Create auth instance and cast to extended interface
-const auth = new Auth() as ExtendedAuth
-
-// We need to add a getUserById method to Auth class if it doesn't exist
-if (!auth.getUserById) {
-  auth.getUserById = async function (userId: string) {
-    // Mock implementation that returns definite string values
-    return {
-      id: userId,
-      email: `user-${userId}@example.com`, // Definitely a string
-      name: `User ${userId}`, // Definitely a string
-    }
+/**
+ * Local helper to get user by ID.
+ * Replace with real implementation as needed.
+ */
+async function getUserById(userId: string): Promise<{ id: string; email: string; name: string }> {
+  // Mock implementation that returns definite string values
+  return {
+    id: userId,
+    email: `user-${userId}@example.com`,
+    name: `User ${userId}`,
   }
 }
 
@@ -93,7 +81,12 @@ export async function reportBreach(
   details: Omit<BreachDetails, 'id' | 'timestamp' | 'notificationStatus'>,
 ): Promise<string> {
   try {
-    const id = `breach_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+    // Use crypto.randomUUID when available, otherwise use secure random bytes
+    const cryptoLib = await import('crypto')
+    const uuidPart = typeof cryptoLib.randomUUID === 'function'
+      ? cryptoLib.randomUUID()
+      : cryptoLib.randomBytes(8).toString('hex')
+    const id = `breach_${Date.now()}_${uuidPart}`
     const breach: BreachDetails = {
       ...details,
       id,
@@ -200,7 +193,7 @@ async function notifyAffectedUsers(
 ): Promise<void> {
   const notifications = breach.affectedUsers.map(async (userId) => {
     try {
-      const user = await auth.getUserById(userId)
+      const user = await getUserById(userId)
 
       if (!user || !user.email) {
         logger.warn(`User ${userId} has no email, skipping notification`)
@@ -319,7 +312,7 @@ export async function getBreachStatus(
 ): Promise<BreachDetails | null> {
   try {
     const breach = await redis.get(getBreachKey(id))
-    return breach ? JSON.parse(breach) as unknown : null
+    return breach ? JSON.parse(breach) as BreachDetails : null
   } catch (error: unknown) {
     logger.error('Failed to get breach status:', error)
     throw error
@@ -332,11 +325,13 @@ export async function listRecentBreaches(): Promise<BreachDetails[]> {
     const breaches = await Promise.all(
       keys.map(async (key: string) => {
         const breach = await redis.get(key)
-        return breach ? JSON.parse(breach) as unknown : null
+        return breach ? (JSON.parse(breach) as BreachDetails) : null
       }),
     )
 
-    return breaches.filter(Boolean).sort((a, b) => b.timestamp - a.timestamp)
+    return breaches
+      .filter((item): item is BreachDetails => Boolean(item))
+      .sort((a, b) => (b as BreachDetails).timestamp - (a as BreachDetails).timestamp)
   } catch (error: unknown) {
     logger.error('Failed to list recent breaches:', error)
     throw error
@@ -416,7 +411,7 @@ export async function updateMetrics(breach: BreachDetails): Promise<void> {
     await redis.hset(monthKey, {
       ...metrics,
       lastUpdated: Date.now(),
-    })
+    } as any)
 
     // Set retention period
     await redis.expire(monthKey, DOCUMENTATION_RETENTION)
@@ -457,6 +452,7 @@ export async function getTrainingMaterials(): Promise<TrainingMaterials> {
   try {
     const materials = {
       procedures: {
+        title: 'Breach Response Procedures',
         content: await getBreachProcedures(),
         lastUpdated: Date.now(),
       },
