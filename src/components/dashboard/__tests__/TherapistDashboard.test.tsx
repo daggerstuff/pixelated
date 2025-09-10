@@ -3,6 +3,7 @@ import { TherapistDashboard } from "../TherapistDashboard";
 import type { TherapistSession } from "@/types/dashboard";
 import { describe, expect, it } from "vitest";
 
+
 describe("TherapistDashboard", () => {
   it("renders dashboard heading", () => {
     const mockSessions: TherapistSession[] = [

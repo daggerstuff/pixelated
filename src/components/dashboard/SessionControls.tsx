@@ -53,6 +53,7 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2">
         <button
+          type="button"
           ref={(el) => { buttonRefs.current['pause'] = el; }}
           onClick={() => activeSession && handleControlClick('pause', activeSession.id)}
           disabled={!activeSession}
@@ -71,6 +72,7 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
         </button>
 
         <button
+          type="button"
           ref={(el) => { buttonRefs.current['resume'] = el; }}
           onClick={() => pausedSession && handleControlClick('resume', pausedSession.id)}
           disabled={!pausedSession}
@@ -89,6 +91,7 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
         </button>
 
         <button
+          type="button"
           ref={(el) => { buttonRefs.current['end'] = el; }}
           onClick={() => activeSession && handleControlClick('end', activeSession.id)}
           disabled={!activeSession}
@@ -115,45 +118,46 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
             No recent sessions available
           </div>
         ) : (
-          sessions.slice(0, 3).map((session) => (
-            <div
-              key={session.id}
-              className={cn(
-                "flex items-center justify-between p-3 bg-background rounded border transition-colors",
-                "hover:bg-muted/50 focus-within:ring-2 focus-within:ring-primary"
-              )}
-              tabIndex={0}
-              role="article"
-              aria-label={`Session ${session.id.slice(0, 8)}, status: ${session.status}`}
-            >
-              <div>
-                <div className="text-sm font-medium">Session {session.id.slice(0, 8)}</div>
-                <div className="text-xs text-muted-foreground">
-                  {new Date(session.startTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </div>
-                {session.endTime && (
+          <ul className="space-y-2" role="list">
+            {sessions.slice(0, 3).map((session) => (
+              <li
+                key={session.id}
+                className={cn(
+                  "flex items-center justify-between p-3 bg-background rounded border transition-colors",
+                  "hover:bg-muted/50"
+                )}
+                role="listitem"
+                aria-label={`Session ${session.id.slice(0, 8)}, status: ${session.status}`}
+              >
+                <div>
+                  <div className="text-sm font-medium">Session {session.id.slice(0, 8)}</div>
                   <div className="text-xs text-muted-foreground">
-                    Ended: {new Date(session.endTime).toLocaleTimeString([], {
+                    {new Date(session.startTime).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit'
                     })}
                   </div>
-                )}
-              </div>
-              <span className={cn(
-                "px-2 py-1 text-xs rounded-full whitespace-nowrap",
-                session.status === 'active' && "bg-green-100 text-green-800",
-                session.status === 'paused' && "bg-yellow-100 text-yellow-800",
-                session.status === 'completed' && "bg-blue-100 text-blue-800",
-                session.status === 'cancelled' && "bg-red-100 text-red-800"
-              )}>
-                {session.status}
-              </span>
-            </div>
-          ))
+                  {session.endTime && (
+                    <div className="text-xs text-muted-foreground">
+                      Ended: {new Date(session.endTime).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  )}
+                </div>
+                <span className={cn(
+                  "px-2 py-1 text-xs rounded-full whitespace-nowrap",
+                  session.status === 'active' && "bg-green-100 text-green-800",
+                  session.status === 'paused' && "bg-yellow-100 text-yellow-800",
+                  session.status === 'completed' && "bg-blue-100 text-blue-800",
+                  session.status === 'cancelled' && "bg-red-100 text-red-800"
+                )}>
+                  {session.status}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>
