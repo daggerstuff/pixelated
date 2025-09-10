@@ -5,7 +5,7 @@ import { ProgressBar } from "./ProgressBar";
 import { SessionMetrics } from "./SessionMetrics";
 import SessionControls from "./SessionControls";
 import { TherapistProgressTracker } from "./TherapistProgressTracker";
-import { TherapyProgressCharts } from "./TherapyProgressCharts";
+import TherapyProgressCharts from "./TherapyProgressCharts";
 import { useTherapistAnalytics } from "@/hooks/useTherapistAnalytics";
 import type { AnalyticsFilters } from "@/types/analytics";
 import { cn } from "@/lib/utils";
