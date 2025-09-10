@@ -15,6 +15,10 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
 
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
+  // Focus management for keyboard navigation
+  const [focusedButton, setFocusedButton] = useState<string | null>(null);
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
   const handleControlClick = (action: 'start' | 'pause' | 'resume' | 'end', sessionId?: string) => {
     if (!sessionId) {
       return
@@ -46,6 +50,22 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
       return ''
     }
   }
+
+  // Keyboard event handling for session controls
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // Blur all buttons when Escape is pressed
+        Object.values(buttonRefs.current).forEach(button => {
+          button?.blur();
+        });
+        setFocusedButton(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <section className="space-y-4" aria-label="Session Controls">
