@@ -35,7 +35,8 @@ import type { SessionProgressMetrics } from '@/types/dashboard';
  */
 interface ConversationMemory {
   history: Array<{ role: 'therapist' | 'client'; message: string }>;
-  context: Record<string, any>;
+  // Prefer unknown to any for safety; callers can cast if they know the shape.
+  context: Record<string, unknown>;
   sessionState: 'idle' | 'active' | 'paused' | 'ended';
 }
 
@@ -142,35 +143,37 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
       history: [...prev.history, { role, message }],
     }));
 
-    // Update progress metrics for message counts and (optionally) response time.
-    // Manually update progressMetrics since setProgressState does not accept a function updater.
-    // Only include response-time statistics when we have a valid previous timestamp.
-    const prevResponses = progressMetrics.responsesCount ?? 0;
-    const prevAvg = progressMetrics.responseTime ?? 0;
+    // Use the latest progressMetrics snapshot from the hook state rather than
+    // capturing a possibly-stale outer variable. This avoids race conditions
+    // when multiple callers update metrics in quick succession.
+    setProgressState((prevState: any) => {
+      const prevMetrics = prevState?.progressMetrics ?? (DEFAULT_MEMORY.progressMetrics as typeof prevState.progressMetrics);
+      const prevResponses = (prevMetrics.responsesCount ?? 0) as number;
+      const prevAvg = (prevMetrics.responseTime ?? 0) as number;
 
-    const updatedMetrics: typeof progressMetrics = {
-      ...progressMetrics,
-      totalMessages: (progressMetrics.totalMessages ?? 0) + 1,
-      therapistMessages: role === 'therapist'
-        ? (progressMetrics.therapistMessages ?? 0) + 1
-        : progressMetrics.therapistMessages ?? 0,
-      clientMessages: role === 'client'
-        ? (progressMetrics.clientMessages ?? 0) + 1
-        : progressMetrics.clientMessages ?? 0,
-    } as typeof progressMetrics;
+      const updatedMetrics = {
+        ...prevMetrics,
+        totalMessages: (prevMetrics.totalMessages ?? 0) + 1,
+        therapistMessages: role === 'therapist'
+          ? (prevMetrics.therapistMessages ?? 0) + 1
+          : prevMetrics.therapistMessages ?? 0,
+        clientMessages: role === 'client'
+          ? (prevMetrics.clientMessages ?? 0) + 1
+          : prevMetrics.clientMessages ?? 0,
+      } as typeof prevMetrics;
 
-    if (responseTime !== null) {
-      // Update running average response time and response count
-      const newResponses = prevResponses + 1;
-      const newAvg = ((prevAvg * prevResponses) + responseTime) / newResponses;
-      updatedMetrics.responseTime = newAvg;
-      updatedMetrics.responsesCount = newResponses;
-    }
+      if (responseTime !== null) {
+        const newResponses = prevResponses + 1;
+        const newAvg = ((prevAvg * prevResponses) + responseTime) / newResponses;
+        updatedMetrics.responseTime = newAvg;
+        updatedMetrics.responsesCount = newResponses;
+      }
 
-    setProgressState({ progressMetrics: updatedMetrics });
+      return { progressMetrics: updatedMetrics };
+    });
 
-  // Record the timestamp for subsequent messages
-  lastMessageTimeRef.current = currentTime;
+    // Record the timestamp for subsequent messages
+    lastMessageTimeRef.current = currentTime;
   };
 
   /**
