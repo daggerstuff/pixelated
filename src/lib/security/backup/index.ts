@@ -71,7 +71,7 @@ const getCrypto = async () => {
           ['encrypt'],
         )
         const encrypted = await subtle.encrypt(
-          { name: 'AES-GCM', iv: toCryptoBufferSource(iv) },
+          { name: 'AES-GCM', iv },
           importedKey,
           toCryptoBufferSource(data),
         )
@@ -103,7 +103,7 @@ const getCrypto = async () => {
         const combinedBuffer = new ArrayBuffer(combined.byteLength)
         new Uint8Array(combinedBuffer).set(combined)
         const decrypted = await subtle.decrypt(
-          { name: 'AES-GCM', iv: toCryptoBufferSource(iv) },
+          { name: 'AES-GCM', iv },
           importedKey,
           combinedBuffer,
         )
@@ -226,7 +226,6 @@ export class BackupSecurityManager {
   private encryptionKey!: Uint8Array // MODIFIED: Definite assignment assertion
   private isInitialized = false
   private storageProviders: Map<StorageLocation, StorageProvider> = new Map()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private recoveryTestingManager!: RecoveryTestingManager
 
   constructor(config?: Partial<BackupConfig>) {
@@ -808,17 +807,17 @@ export class BackupSecurityManager {
     const storageEntries = Array.from(this.storageProviders.entries())
     for (let i = 0; i < storageEntries.length; i++) {
       const entry = storageEntries[i]
-      if (!entry || !Array.isArray(entry) || entry.length < 2) continue
+      if (!entry) continue
       const [location, provider] = entry
-      if (!provider) continue
       try {
         // Look for metadata files matching the ID
         const files = await provider.listFiles(
           `backups/*/*/*/*/${backupId}.meta.json`,
         )
 
-        if (files && files.length > 0 && files[0]) {
+        if (files.length > 0) {
           // Read the metadata file
+          if (!files[0]) continue;
           const metadataBuffer = await provider.getFile(files[0])
           return JSON.parse(
             new TextDecoder().decode(metadataBuffer),
