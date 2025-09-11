@@ -1,11 +1,23 @@
 import { Pool } from 'pg';
 import type { APIRoute } from 'astro';
+import { z } from 'zod';
 
 // Database connection pool
 const pool = new Pool({
   connectionString: process.env['DATABASE_URL'],
 });
 
+const GetQuerySchema = z.object({
+  sessionId: z.string().min(1),
+});
+
+const PostBodySchema = z.object({
+  sessionId: z.string().min(1),
+  feedback: z.string().min(1),
+  evaluatorId: z.string().optional(),
+  rating: z.number().int().min(1).max(5).optional(),
+  comments: z.string().optional(),
+});
 export const GET: APIRoute = async ({ request }) => {
   try {
     const url = new URL(request.url);
