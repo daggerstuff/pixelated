@@ -20,23 +20,6 @@ vi.mock("../TherapyProgressCharts", () => ({
   TherapyProgressCharts: () => <div data-testid="therapy-charts">Therapy Charts</div>
 }));
 
-// Mock the useTherapistAnalytics hook
-vi.mock("@/hooks/useTherapistAnalytics", () => ({
-  useTherapistAnalytics: vi.fn(() => ({
-    data: {
-      sessionMetrics: [],
-      skillProgress: [],
-      summaryStats: [],
-      progressSnapshots: [],
-      comparativeData: undefined,
-    },
-    isLoading: false,
-    error: null,
-    refetch: vi.fn(),
-    clearError: vi.fn(),
-  })),
-}));
-
 describe("TherapistDashboard", () => {
   it("renders dashboard heading", () => {
     const mockSessions: TherapistSession[] = [
