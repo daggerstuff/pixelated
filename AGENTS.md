@@ -1,3 +1,192 @@
+# AGENTS.md
+
+## Project Overview
+
+Pixelated Empathy is a full-stack AI-powered bias detection and mental health platform. It combines an Astro + React frontend, Node.js/TypeScript backend, Python AI/ML services, and a modular data pipeline. The project is containerized with Docker and deployed via Azure Pipelines. Key technologies: Astro, React, TypeScript, Python 3.11+, pnpm, Docker, Azure DevOps, Playwright, Vitest, PostgreSQL, Redis, MongoDB, Sentry, HIPAA compliance.
+
+## Setup Commands
+
+- **Install Node.js dependencies:**
+	```sh
+	pnpm install
+	```
+- **Install Python dependencies (recommended: uv):**
+	```sh
+	uv pip install -e .
+	```
+- **Environment setup:**
+	- Copy `.env.example` to `.env` and configure secrets.
+	- For Docker: environment variables are set in Dockerfile and Azure Pipelines.
+- **Database setup:**
+	- MongoDB: `pnpm mongodb:init && pnpm mongodb:seed`
+	- Redis: `pnpm redis:check`
+
+## Development Workflow
+
+- **Start Astro development server:**
+	```sh
+	pnpm dev
+	```
+- **Start all services (AI, analytics, worker):**
+	```sh
+	pnpm dev:all-services
+	```
+- **Hot reload/watch mode:**
+	- Astro and Vite support hot reload by default.
+- **Type checking:**
+	```sh
+	pnpm typecheck
+	```
+- **Linting:**
+	```sh
+	pnpm lint
+	pnpm lint:fix
+	```
+- **Formatting:**
+	```sh
+	pnpm format
+	pnpm format:check
+	```
+
+## Testing Instructions
+
+- **Run all tests:**
+	```sh
+	pnpm test:all
+	```
+- **Unit tests (Vitest):**
+	```sh
+	pnpm test:unit
+	```
+- **Integration tests:**
+	```sh
+	pnpm test:integration
+	```
+- **End-to-end tests (Playwright):**
+	```sh
+	pnpm e2e
+	pnpm e2e:smoke
+	pnpm e2e:ui
+	```
+- **Python tests:**
+	```sh
+	python -m pytest
+	python -m pytest --cov=src
+	```
+- **Test coverage:**
+	```sh
+	pnpm test:coverage
+	```
+- **Test file locations:**
+	- JS/TS: `src/**/*.{test,spec}.{js,ts,jsx,tsx}`
+	- Integration: `tests/integration/`
+	- E2E: `tests/e2e/`
+	- Python: `tests/`, `src/lib/ai/bias-detection/python-service/`
+
+## Code Style Guidelines
+
+- **Languages:** TypeScript, JavaScript, Python 3.11+
+- **Linting:** ESLint (JS/TS), Ruff/Flake8 (Python)
+- **Formatting:** Prettier (JS/TS/MD), Black (Python)
+- **File organization:**
+	- Components: `src/components/` (PascalCase)
+	- Utilities: `src/lib/` (camelCase)
+	- Tests: `src/test/`, `tests/`
+- **Naming conventions:**
+	- JS/TS: camelCase for variables, PascalCase for components
+	- Python: snake_case for variables/functions, PascalCase for classes
+- **Imports:** Use path aliases (`@/` for `src/`)
+
+## Build and Deployment
+
+- **Build for production:**
+	```sh
+	pnpm build
+	pnpm build:vercel
+	pnpm docker:build
+	```
+- **Docker run:**
+	```sh
+	pnpm docker:run
+	```
+- **Azure Pipelines:**
+	- CI/CD pipeline defined in `azure-pipelines.yml`
+	- Node.js 24.x, pnpm 10.15.0
+	- Stages: Build, DockerBuild, Deploy, PostDeployTests
+- **Deployment commands:**
+	```sh
+	pnpm deploy
+	pnpm deploy:prod
+	pnpm deploy:vercel
+	```
+
+## Security Considerations
+
+- **Security scanning:**
+	```sh
+	pnpm security:scan
+	pnpm security:check
+	pnpm security:fix
+	```
+- **Secrets management:**
+	- Use `.env` for local secrets; do not commit secrets.
+	- Azure DevOps manages secrets for CI/CD.
+- **Authentication:**
+	- Clerk, JWT, SSO supported.
+- **Permission models:**
+	- RBAC enforced in backend and Azure Environments.
+- **HIPAA compliance:**
+	- Run: `pnpm test:hipaa`
+
+## Monorepo Instructions
+
+- Main AGENTS.md at repo root.
+- Subprojects (e.g., tools/gdrive-dataset-manager) may have their own AGENTS.md.
+- Use `pnpm dlx turbo run where <project_name>` to jump to a package.
+
+## Pull Request Guidelines
+
+- **Title format:** `[component] Brief description`
+- **Required checks:**
+	- `pnpm lint`
+	- `pnpm test`
+- **Review process:**
+	- All PRs require review and passing CI.
+- **Commit message conventions:**
+	- Use conventional commits: `feat:`, `fix:`, `docs:`, etc.
+
+## Debugging and Troubleshooting
+
+- **Common issues:**
+	- File watcher limits: use `vitest run` for large suites
+	- Memory issues: use `pnpm build:vercel`
+	- Python: ensure Python 3.11+ and virtualenv
+	- Docker: check port 4321 and Docker daemon
+- **Debug commands:**
+	```sh
+	pnpm ai:test
+	pnpm redis:check
+	pnpm memory:test
+	pnpm performance:test
+	pnpm security:check
+	```
+- **Logging:**
+	- Node.js: Winston, console
+	- Python: logging module
+
+## Additional Notes
+
+- Performance: Optimize images (`pnpm optimize:images`), run benchmarks (`pnpm benchmark`)
+- Sentry: Error monitoring enabled (see `sentry.client.config.js`)
+- For more details, see README.md and docs/
+
+---
+
+This AGENTS.md is designed for coding agents. Update as the project evolves. For subprojects, add AGENTS.md in their directories as needed.
+[byterover-mcp]
+
+[byterover-mcp]
+
 [byterover-mcp]
 
 [byterover-mcp]
