@@ -37,8 +37,10 @@ export function useTherapistAnalytics(
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<AnalyticsErrorType | null>(null);
 
-  // Refs for cleanup and refresh loop
+  // Refs for cleanup and retry logic
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   /**
    * Transform session data for therapist analytics
@@ -373,10 +375,18 @@ export function useTherapistAnalytics(
    */
   useEffect(() => {
     return () => {
-      // Clear refresh interval
+      // Cancel any pending requests
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Clear timeouts
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current as unknown as number);
+      }
+
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current as unknown as number);
-        refreshIntervalRef.current = null
       }
     };
   }, []);
