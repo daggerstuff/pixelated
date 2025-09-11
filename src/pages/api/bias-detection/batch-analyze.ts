@@ -1,5 +1,6 @@
 import { BiasDetectionEngine } from '../../../lib/ai/bias-detection/BiasDetectionEngine'
 import type { TherapeuticSession as SessionData } from '../../../lib/ai/bias-detection/types'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 type BatchBody = { sessions?: SessionData[]; options?: Record<string, unknown> }
 
@@ -19,52 +20,54 @@ const isBatchBody = (val: unknown): val is BatchBody => {
 
 export const runtime = 'nodejs'
 
-export async function POST({ request }: { request: Request }) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<void> {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method Not Allowed' })
+    return
+  }
+
   let body: unknown
   try {
-    body = await request.json()
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    res.status(400).json({ error: 'Invalid JSON' })
+    return
   }
 
   if (!isBatchBody(body)) {
-    return new Response(JSON.stringify({ error: 'Request body does not match BatchBody shape' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    res
+      .status(400)
+      .json({ error: 'Request body does not match BatchBody shape' })
+    return
   }
+
+  // (Removed redundant destructure here—move below with type assertion)
 
   if (!body || typeof body !== 'object') {
-    return new Response(JSON.stringify({ error: 'Invalid request body' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    res.status(400).json({ error: 'Invalid request body' })
+    return
   }
 
-  const { sessions: batchSessions, options } = body as BatchBody
+  const { sessions, options } = body as BatchBody
   const MAX_BATCH = 100
   if (
-    !Array.isArray(batchSessions) ||
-    batchSessions.length === 0 ||
-    batchSessions.length > MAX_BATCH
+    !Array.isArray(sessions) ||
+    sessions.length === 0 ||
+    sessions.length > MAX_BATCH
   ) {
-    return new Response(JSON.stringify({ error: 'Missing or invalid sessions array' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    res.status(400).json({ error: 'Missing or invalid sessions array' })
+    return
   }
 
   // Prefer forNext utility if available, otherwise use for-of loop
   // forNext(sessions, (session) => { ... })
-  for (const session of batchSessions) {
+  for (const session of sessions) {
     if (!session || typeof session !== 'object' || !('sessionId' in session)) {
-      return new Response(JSON.stringify({ error: 'Invalid session object in array' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      res.status(400).json({ error: 'Invalid session object in array' })
+      return
     }
   }
 
@@ -73,23 +76,15 @@ export async function POST({ request }: { request: Request }) {
 
   try {
     const { results, errors } = await engine.batchAnalyzeSessions(
-      batchSessions as SessionData[],
+      sessions as SessionData[],
       options,
     )
-    return new Response(JSON.stringify({ results, errors }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store'
-      }
-    })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(200).json({ results, errors })
+    return
   } catch (error) {
-    return new Response(JSON.stringify({ error: (error as Error).message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store'
-      }
-    })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(500).json({ error: (error as Error).message })
+    return
   }
 }
