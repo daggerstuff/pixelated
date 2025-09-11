@@ -24,18 +24,9 @@ declare global {
       isMobile: boolean
     }
     // Define proper interfaces for speech recognition APIs
-    webkitSpeechRecognition: typeof SpeechRecognition
-    SpeechRecognition: {
-      new(): SpeechRecognition;
-      prototype: SpeechRecognition;
-    }
-    SpeechGrammarList: {
-      new(): SpeechGrammarList;
-      prototype: SpeechGrammarList;
-    }
+    // (Removed duplicate/conflicting SpeechRecognition and SpeechGrammarList declarations; see src/simulator/utils/speechRecognition.ts)
   }
 }
-
 declare module 'astro' {
   interface AstroGlobal {
     locals: Locals
@@ -106,8 +97,7 @@ declare module '*.md' {
     default: unknown;
   }
 
-  const Content: MarkdownContent
-  export { Content }
+  const MarkdownFile: MarkdownContent
 }
 
 // This is already defined in .astro-env.d.ts, so we don't need to redefine it here
@@ -130,3 +120,5 @@ type FeedbackType =
   | 'therapeutic_alliance'
   | 'communication_style'
   | 'question_formulation'
+
+// types module

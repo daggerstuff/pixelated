@@ -23,3 +23,7 @@ declare module 'ioredis' {
     keys(pattern: string): Promise<string[]>
   }
 }
+
+// types module
+
+// types module (standardized)
