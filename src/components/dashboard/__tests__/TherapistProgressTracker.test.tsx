@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { TherapistProgressTracker } from "../TherapistProgressTracker";
 import type { TherapistSession } from "@/types/dashboard";
 import { describe, expect, it } from "vitest";
@@ -50,7 +50,10 @@ describe("TherapistProgressTracker", () => {
     expect(screen.getByText("Duration")).toBeInTheDocument();
     expect(screen.getByText("1h 30m")).toBeInTheDocument();
     expect(screen.getByText("Progress")).toBeInTheDocument();
-    expect(screen.getByText("85%")).toBeInTheDocument();
+    // Scope the 85% lookup to the Progress container to avoid colliding with other 85% labels
+    const progressLabel = screen.getByText("Progress");
+    const progressContainer = progressLabel.parentElement ?? progressLabel.closest('div');
+    expect(within(progressContainer!).getByText("85%")).toBeInTheDocument();
   });
 
   it("renders progress bar with correct value", () => {
@@ -59,14 +62,19 @@ describe("TherapistProgressTracker", () => {
     const progressBar = screen.getByRole("progressbar");
     expect(progressBar).toHaveAttribute("aria-valuenow", "85");
     expect(progressBar).toHaveAttribute("aria-valuemax", "100");
-    expect(screen.getByText("85%")).toBeInTheDocument();
+    // Ensure the textual percentage associated with the progressbar is present in the same container
+    const progressBarContainer = progressBar.parentElement ?? progressBar.closest('div');
+    expect(within(progressBarContainer!).getByText("85%")).toBeInTheDocument();
   });
 
   it("displays skill development data", () => {
     render(<TherapistProgressTracker session={mockSession} />);
 
     expect(screen.getByText("Active Listening")).toBeInTheDocument();
-    expect(screen.getByText("85%")).toBeInTheDocument();
+    // Scope the Active Listening percentage to that metric's container
+    const activeListeningLabel = screen.getByText("Active Listening");
+    const activeListeningContainer = activeListeningLabel.parentElement ?? activeListeningLabel.closest('div');
+    expect(within(activeListeningContainer!).getByText("85%")).toBeInTheDocument();
     expect(screen.getByText("Empathy")).toBeInTheDocument();
     expect(screen.getByText("78%")).toBeInTheDocument();
     expect(screen.getByText("Questioning")).toBeInTheDocument();
@@ -116,7 +124,10 @@ describe("TherapistProgressTracker", () => {
 
     // Initially expanded
     expect(screen.getByText("Session ID")).toBeInTheDocument();
-    expect(screen.getByText("85%")).toBeInTheDocument();
+  // Scope the overall progress check to the Progress container
+  const progressLabel2 = screen.getByText("Progress");
+  const progressContainer2 = progressLabel2.parentElement ?? progressLabel2.closest('div');
+  expect(within(progressContainer2!).getByText("85%")).toBeInTheDocument();
 
     // Toggle overview section
     fireEvent.click(overviewToggle);
