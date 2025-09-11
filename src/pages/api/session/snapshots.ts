@@ -32,7 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
       // Update session with progress snapshots
       const query = `
         UPDATE sessions
-        SET progress_snapshots = $1, updated_at = NOW()
+        SET progress_snapshots = $1::jsonb, updated_at = NOW()
         WHERE id = $2
         RETURNING id
       `;
