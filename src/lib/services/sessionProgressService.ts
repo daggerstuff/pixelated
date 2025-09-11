@@ -15,20 +15,32 @@ import type {
  */
 
 // Save session progress metrics
+// Centralized fetch helper with timeout and credentials
+async function fetchWithTimeout(input: RequestInfo, init?: RequestInit, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const mergedInit: RequestInit = {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      ...init,
+      signal: controller.signal,
+    };
+
+    return await fetch(input, mergedInit);
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 export async function saveSessionProgress(
   sessionId: string,
   progressMetrics: SessionProgressMetrics
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/session/progress', {
+    const response = await fetchWithTimeout('/api/session/progress', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId,
-        progressMetrics,
-      }),
+      body: JSON.stringify({ sessionId, progressMetrics }),
     });
 
     if (!response.ok) {
@@ -48,15 +60,9 @@ export async function saveProgressSnapshots(
   snapshots: Array<{ timestamp: string; value: number }>
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/session/snapshots', {
+    const response = await fetchWithTimeout('/api/session/snapshots', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId,
-        snapshots,
-      }),
+      body: JSON.stringify({ sessionId, snapshots }),
     });
 
     if (!response.ok) {
@@ -77,16 +83,9 @@ export async function saveSkillScores(
   skillScores: Record<string, number>
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/session/skills', {
+    const response = await fetchWithTimeout('/api/session/skills', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId,
-        therapistId,
-        skillScores,
-      }),
+      body: JSON.stringify({ sessionId, therapistId, skillScores }),
     });
 
     if (!response.ok) {
@@ -109,15 +108,9 @@ export async function saveSessionAnalytics(
   }
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/session/analytics', {
+    const response = await fetchWithTimeout('/api/session/analytics', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId,
-        analyticsData,
-      }),
+      body: JSON.stringify({ sessionId, analyticsData }),
     });
 
     if (!response.ok) {
@@ -137,15 +130,9 @@ export async function saveSessionMilestones(
   milestones: string[]
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/session/milestones', {
+    const response = await fetchWithTimeout('/api/session/milestones', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId,
-        milestones,
-      }),
+      body: JSON.stringify({ sessionId, milestones }),
     });
 
     if (!response.ok) {
@@ -165,7 +152,8 @@ export async function getTherapistSessionData(
   timeRange: '7d' | '30d' | '90d' | '1y' = '30d'
 ): Promise<TherapistSessionData[]> {
   try {
-    const response = await fetch(`/api/therapist/${therapistId}/sessions?timeRange=${timeRange}`);
+    // Use session-scoped API to avoid relying on /api/therapist endpoints which may not exist
+    const response = await fetchWithTimeout(`/api/session/therapist/${therapistId}/sessions?timeRange=${timeRange}`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch therapist session data: ${response.statusText}`);
@@ -185,7 +173,8 @@ export async function getTherapistSkillProgress(
   timeRange: '7d' | '30d' | '90d' | '1y' = '30d'
 ): Promise<TherapistSkillProgressData[]> {
   try {
-    const response = await fetch(`/api/therapist/${therapistId}/skills?timeRange=${timeRange}`);
+    // Use session-scoped API to avoid relying on /api/therapist endpoints which may not exist
+    const response = await fetchWithTimeout(`/api/session/therapist/${therapistId}/skills?timeRange=${timeRange}`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch therapist skill data: ${response.statusText}`);
@@ -210,15 +199,9 @@ export async function saveSessionComparison(
   }
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/session/comparison', {
+    const response = await fetchWithTimeout('/api/session/comparison', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        therapistId,
-        ...comparisonData,
-      }),
+      body: JSON.stringify({ therapistId, ...comparisonData }),
     });
 
     if (!response.ok) {

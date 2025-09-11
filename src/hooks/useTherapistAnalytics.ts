@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger';
 import type {
   TherapistAnalyticsChartData,
-  AnalyticsError,
   AnalyticsFilters,
   TherapistSessionData,
  TherapistSkillProgressData,
   TherapistMetricSummary,
 } from '@/types/analytics';
+import { AnalyticsError } from '@/types/analytics';
 import type { TherapistSession } from '@/types/dashboard';
 
 const logger = createBuildSafeLogger('use-therapist-analytics');
@@ -26,30 +26,22 @@ interface UseTherapistAnalyticsResult {
   clearError: () => void;
 }
 
-const DEFAULT_OPTIONS: Required<UseTherapistAnalyticsOptions> = {
-  refreshInterval: 300000, // 5 minutes
-  retryAttempts: 3,
-  enableAutoRefresh: true,
-};
 
 /**
  * Custom hook for managing therapist-specific analytics data
  */
 export function useTherapistAnalytics(
-  filters: AnalyticsFilters,
-  sessions: TherapistSession[],
-  options: UseTherapistAnalyticsOptions = {}
+  _filters: AnalyticsFilters,
+  sessions: TherapistSession[]
 ): UseTherapistAnalyticsResult {
-  const config = { ...DEFAULT_OPTIONS, ...options };
-
   // State management
   const [data, setData] = useState<TherapistAnalyticsChartData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<AnalyticsError | null>(null);
 
   // Refs for cleanup and retry logic
-  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   /**
@@ -92,7 +84,7 @@ export function useTherapistAnalytics(
       skill,
       skillId: skill.toLowerCase().replace(/\s+/g, '-'),
       score: Math.round(data.total / data.count),
-      trend: data.count > 1 ? 'up' : 'stable', // Simplified trend calculation
+      trend: data.count > 1 ? (sessions[sessions.length-1]?.progressMetrics?.skillScores[skill] ?? 0) > (sessions[sessions.length-2]?.progressMetrics?.skillScores[skill] ?? 0) ? 'up' : 'down' : 'stable',
       category: 'therapeutic',
       sessionsPracticed: data.sessions,
       averageImprovement: data.count > 1 ? Math.round((data.total / data.count)) : 0,
@@ -152,7 +144,9 @@ export function useTherapistAnalytics(
    * Generate comparative data for session comparison
    */
   const generateComparativeData = useCallback((sessions: TherapistSession[]) => {
-    if (sessions.length < 2) return undefined;
+    if (sessions.length < 2) {
+      return undefined;
+    }
 
     const sortedSessions = [...sessions].sort((a, b) =>
       new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
@@ -161,15 +155,26 @@ export function useTherapistAnalytics(
     const currentSession = sortedSessions[0];
     const previousSession = sortedSessions[1];
 
-    const currentProgress = currentSession.progress;
-    const previousProgress = previousSession.progress;
+    if (!currentSession || !previousSession) {
+      return undefined;
+    }
+
+    const currentProgress = currentSession.progress ?? 0;
+    const previousProgress = previousSession.progress ?? 0;
     const trend: 'improving' | 'declining' | 'stable' =
       currentProgress > previousProgress ? 'improving' :
       currentProgress < previousProgress ? 'declining' : 'stable';
 
+    const currentSessionData = transformSessionData([currentSession])[0];
+    const previousSessionData = transformSessionData([previousSession])[0];
+
+    if (!currentSessionData) {
+      return undefined;
+    }
+
     return {
-      currentSession: transformSessionData([currentSession])[0],
-      previousSession: transformSessionData([previousSession])[0],
+      currentSession: currentSessionData,
+      previousSession: previousSessionData,
       trend,
     };
   }, [transformSessionData]);
@@ -214,11 +219,11 @@ export function useTherapistAnalytics(
       logger.info('Therapist analytics data generated successfully');
 
     } catch (loadError) {
-      const analyticsError: AnalyticsError = {
-        code: 'GENERATION_ERROR',
-        message: loadError instanceof Error ? loadError.message : 'Unknown error occurred',
-        details: loadError,
-      };
+      const message =
+        loadError instanceof Error && loadError.message
+          ? loadError.message
+          : 'Unknown error occurred';
+      const analyticsError = new AnalyticsError('GENERATION_ERROR', message, loadError);
 
       setError(analyticsError);
       logger.error('Failed to generate therapist analytics data', { error: analyticsError });
@@ -263,11 +268,11 @@ export function useTherapistAnalytics(
 
       // Clear timeouts
       if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
+        clearTimeout(retryTimeoutRef.current as unknown as number);
       }
 
       if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current);
+        clearInterval(refreshIntervalRef.current as unknown as number);
       }
     };
   }, []);

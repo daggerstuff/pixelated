@@ -31,7 +31,7 @@ ON session_analytics (metric_name, recorded_at);
 CREATE TABLE IF NOT EXISTS skill_development (
   id SERIAL PRIMARY KEY,
   therapist_id UUID NOT NULL,
-  skill_name VARCHAR(10) NOT NULL,
+  skill_name TEXT NOT NULL,
   skill_category VARCHAR(50),
   current_score NUMERIC,
   target_score NUMERIC,
@@ -41,8 +41,42 @@ CREATE TABLE IF NOT EXISTS skill_development (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create index for skill development queries
-CREATE INDEX IF NOT EXISTS idx_skill_development_therapist
+-- Ensure existing installations where skill_name may have been created with a smaller length
+DO $$
+BEGIN
+  -- If the column exists and its character maximum length is less than 100, alter it to varchar(100)
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'skill_development'
+      AND column_name = 'skill_name'
+      -- If the column is not already TEXT, alter it to TEXT
+      AND data_type != 'text'
+  ) THEN
+    ALTER TABLE skill_development
+    ALTER COLUMN skill_name TYPE TEXT;
+  END IF;
+EXCEPTION WHEN undefined_table THEN
+  -- table doesn't exist yet; nothing to do
+  NULL;
+END$$;
+
+-- Deduplicate skill_development on (therapist_id, skill_name) before adding unique constraint
+WITH duplicates AS (
+  SELECT
+    ctid,
+    ROW_NUMBER() OVER (
+      PARTITION BY therapist_id, skill_name
+      ORDER BY updated_at DESC, created_at DESC, ctid
+    ) AS rn
+  FROM skill_development
+)
+DELETE FROM skill_development
+WHERE ctid IN (
+  SELECT ctid FROM duplicates WHERE rn > 1
+);
+
+-- Create unique index for skill development upserts
+CREATE UNIQUE INDEX IF NOT EXISTS idx_skill_development_therapist
 ON skill_development (therapist_id, skill_name);
 
 -- Create table for session milestones
