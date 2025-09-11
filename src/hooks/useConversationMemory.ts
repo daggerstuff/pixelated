@@ -232,7 +232,6 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
   // Clear lastMessageTime so the next message is treated as the first.
   // This ensures first-sample behavior is preserved after reset.
   lastMessageTimeRef.current = null;
-
     setMemory((prev) => ({
       ...prev,
       history: [],
