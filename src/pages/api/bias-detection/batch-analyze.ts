@@ -11,11 +11,10 @@ const isBatchBody = (val: unknown): val is BatchBody => {
     val !== null &&
     !Array.isArray(val) &&
     (!('sessions' in val) || Array.isArray((val as BatchBody).sessions)) &&
-    (!('options' in val) || (
-      typeof (val as Record<string, unknown>)['options'] === 'object' &&
-      (val as Record<string, unknown>)['options'] !== null &&
-      !Array.isArray((val as Record<string, unknown>)['options'])
-    ))
+    (!('options' in val) ||
+      (typeof (val as Record<string, unknown>)['options'] === 'object' &&
+        (val as Record<string, unknown>)['options'] !== null &&
+        !Array.isArray((val as Record<string, unknown>)['options'])))
   )
 }
 
@@ -23,7 +22,7 @@ export const runtime = 'nodejs'
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ): Promise<void> {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' })
@@ -38,11 +37,14 @@ export default async function handler(
     return
   }
 
- if (!isBatchBody(body)) {
-   return new Response('Request body does not match BatchBody shape', { status: 400 })
- }
+  if (!isBatchBody(body)) {
+    res
+      .status(400)
+      .json({ error: 'Request body does not match BatchBody shape' })
+    return
+  }
 
- const { sessions, options } = body
+  // (Removed redundant destructure here—move below with type assertion)
 
   if (!body || typeof body !== 'object') {
     res.status(400).json({ error: 'Invalid request body' })
@@ -51,7 +53,11 @@ export default async function handler(
 
   const { sessions, options } = body as BatchBody
   const MAX_BATCH = 100
-  if (!Array.isArray(sessions) || sessions.length === 0 || sessions.length > MAX_BATCH) {
+  if (
+    !Array.isArray(sessions) ||
+    sessions.length === 0 ||
+    sessions.length > MAX_BATCH
+  ) {
     res.status(400).json({ error: 'Missing or invalid sessions array' })
     return
   }
@@ -60,8 +66,8 @@ export default async function handler(
   // forNext(sessions, (session) => { ... })
   for (const session of sessions) {
     if (!session || typeof session !== 'object' || !('sessionId' in session)) {
-  res.status(400).json({ error: 'Invalid session object in array' })
-  return
+      res.status(400).json({ error: 'Invalid session object in array' })
+      return
     }
   }
 
@@ -71,14 +77,14 @@ export default async function handler(
   try {
     const { results, errors } = await engine.batchAnalyzeSessions(
       sessions as SessionData[],
-      options
+      options,
     )
-  res.setHeader('Cache-Control', 'no-store')
-  res.status(200).json({ results, errors })
-  return
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(200).json({ results, errors })
+    return
   } catch (error) {
-  res.setHeader('Cache-Control', 'no-store')
-  res.status(500).json({ error: (error as Error).message })
-  return
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(500).json({ error: (error as Error).message })
+    return
   }
 }

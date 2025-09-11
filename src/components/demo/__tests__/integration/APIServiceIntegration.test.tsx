@@ -11,33 +11,41 @@ const ALLOWED_DOMAINS = [
   'api.wandb.ai',
   'ml.azure.com',
   'mlflow.company.com',
-];
+]
 
-const safeFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-  const url = input.toString();
+const safeFetch = async (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> => {
+  const url = input.toString()
   if (url.startsWith('http')) {
-    const hostnameMatch = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/im);
-    const domain = hostnameMatch && hostnameMatch[1] ? hostnameMatch[1].toLowerCase() : '';
-    if (!domain || !ALLOWED_DOMAINS.some(d => domain.endsWith(d))) {
-      throw new Error(`${url} is not allowed. Only whitelisted domains are permitted to prevent SSRF attacks.`);
+    const hostnameMatch = url.match(
+      /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/im,
+    )
+    const domain =
+      hostnameMatch && hostnameMatch[1] ? hostnameMatch[1].toLowerCase() : ''
+    if (!domain || !ALLOWED_DOMAINS.some((d) => domain.endsWith(d))) {
+      throw new Error(
+        `${url} is not allowed. Only whitelisted domains are permitted to prevent SSRF attacks.`,
+      )
     }
   }
   // Create abort controller if not provided
-  const controller = new AbortController();
-  const signal = init?.signal || controller.signal;
+  const controller = new AbortController()
+  const signal = init?.signal || controller.signal
   const options: RequestInit = {
     ...init,
     signal,
-  };
+  }
   // Set timeout
-  setTimeout(() => controller.abort(), 30000); // 30s timeout
-  return fetch(url, options);
-};
+  setTimeout(() => controller.abort(), 30000) // 30s timeout
+  return fetch(url, options)
+}
 
 describe('APIService Integration Tests', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-  });
+    vi.clearAllMocks()
+  })
 
   afterEach(() => {
     vi.restoreAllMocks()
@@ -58,12 +66,15 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (_header: string) => _header === 'content-length' ? '500' : null
+          get: (_header: string) =>
+            _header === 'content-length' ? '500' : null,
         },
         json: () => Promise.resolve(mockResponse),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify(mockResponse)))
+            controller.enqueue(
+              new TextEncoder().encode(JSON.stringify(mockResponse)),
+            )
             controller.close()
           },
         }),
@@ -107,12 +118,16 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (_header: string) => null
+          get: (_header: string) => null,
         },
         json: () => Promise.resolve({ success: true, syncId: 'sync-123' }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({ success: true, syncId: 'sync-123' })))
+            controller.enqueue(
+              new TextEncoder().encode(
+                JSON.stringify({ success: true, syncId: 'sync-123' }),
+              ),
+            )
             controller.close()
           },
         }),
@@ -153,7 +168,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 201,
           headers: {
-            get: (_header: string) => null
+            get: (_header: string) => null,
           },
           json: () =>
             Promise.resolve({
@@ -162,14 +177,17 @@ describe('APIService Integration Tests', () => {
             }),
         })
 
-        const response = await safeFetch('https://huggingface.co/api/datasets', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer hf_token',
-            'Content-Type': 'application/json',
+        const response = await safeFetch(
+          'https://huggingface.co/api/datasets',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer hf_token',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(datasetData),
           },
-          body: JSON.stringify(datasetData),
-        })
+        )
 
         const result = await response.json()
 
@@ -183,19 +201,22 @@ describe('APIService Integration Tests', () => {
           ok: false,
           status: 401,
           headers: {
-            get: (_header: string) => null
+            get: (_header: string) => null,
           },
           json: () => Promise.resolve({ error: 'Invalid token' }),
         })
 
-        const response = await safeFetch('https://huggingface.co/api/datasets', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer invalid_token',
-            'Content-Type': 'application/json',
+        const response = await safeFetch(
+          'https://huggingface.co/api/datasets',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer invalid_token',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
           },
-          body: JSON.stringify({}),
-        })
+        )
 
         expect(response.status).toBe(401)
         const error = await response.json()
@@ -215,7 +236,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (_header: string) => null
+            get: (_header: string) => null,
           },
           json: () => Promise.resolve({ experiment_id: 'exp-123' }),
         })
@@ -247,7 +268,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (_header: string) => null
+            get: (_header: string) => null,
           },
           json: () => Promise.resolve({}),
         })
@@ -280,7 +301,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (_header: string) => null
+            get: (_header: string) => null,
           },
           json: () =>
             Promise.resolve({
@@ -318,7 +339,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 201,
           headers: {
-            get: (_header: string) => null
+            get: (_header: string) => null,
           },
           json: () =>
             Promise.resolve({
@@ -359,7 +380,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 202,
         headers: {
-          get: (_header: string) => null
+          get: (_header: string) => null,
         },
         json: () =>
           Promise.resolve({
@@ -385,7 +406,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: {
-          get: (_header: string) => null
+          get: (_header: string) => null,
         },
         json: () =>
           Promise.resolve({
@@ -464,29 +485,33 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: {
-            get: (_header: string) => null
+            get: (_header: string) => null,
           },
           json: () => Promise.resolve({ success: true }),
         })
 
-      const retryFetch = async (url: string, options: any, maxRetries = 3): Promise<Response> => {
+      const retryFetch = async (
+        url: string,
+        options: any,
+        maxRetries = 3,
+      ): Promise<Response> => {
         for (let i = 0; i < maxRetries; i++) {
           try {
-            const response = await fetch(url, options);
+            const response = await fetch(url, options)
             if (!response.ok && i < maxRetries - 1) {
-              throw new Error(`Attempt ${i + 1} failed`);
+              throw new Error(`Attempt ${i + 1} failed`)
             }
-            return response;
+            return response
           } catch (error: unknown) {
             if (i === maxRetries - 1) {
-              throw error;
+              throw error
             }
             await new Promise((resolve) =>
-              setTimeout(resolve, Math.pow(2, i) * 1000)
+              setTimeout(resolve, Math.pow(2, i) * 1000),
             )
           }
         }
-        throw new Error('All retries failed');
+        throw new Error('All retries failed')
       }
 
       const response = await retryFetch('/api/knowledge-balancer/status', {})
@@ -515,7 +540,7 @@ describe('APIService Integration Tests', () => {
         ok: false,
         status: 503,
         headers: {
-          get: (_header: string) => null
+          get: (_header: string) => null,
         },
         json: () =>
           Promise.resolve({
@@ -567,7 +592,9 @@ describe('APIService Integration Tests', () => {
           json: () => Promise.resolve({ success: true }),
           body: new ReadableStream({
             start(controller) {
-              controller.enqueue(new TextEncoder().encode(JSON.stringify({ success: true })))
+              controller.enqueue(
+                new TextEncoder().encode(JSON.stringify({ success: true })),
+              )
               controller.close()
             },
           }),
@@ -590,7 +617,11 @@ describe('APIService Integration Tests', () => {
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({ authorized: true, user: 'test-user' })))
+            controller.enqueue(
+              new TextEncoder().encode(
+                JSON.stringify({ authorized: true, user: 'test-user' }),
+              ),
+            )
             controller.close()
           },
         }),
@@ -616,7 +647,9 @@ describe('APIService Integration Tests', () => {
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({ success: true })))
+            controller.enqueue(
+              new TextEncoder().encode(JSON.stringify({ success: true })),
+            )
             controller.close()
           },
         }),
@@ -645,11 +678,15 @@ describe('APIService Integration Tests', () => {
           }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({
-              access_token: 'new-access-token',
-              refresh_token: 'new-refresh-token',
-              expires_in: 3600,
-            })))
+            controller.enqueue(
+              new TextEncoder().encode(
+                JSON.stringify({
+                  access_token: 'new-access-token',
+                  refresh_token: 'new-refresh-token',
+                  expires_in: 3600,
+                }),
+              ),
+            )
             controller.close()
           },
         }),
@@ -680,7 +717,11 @@ describe('APIService Integration Tests', () => {
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({ authorized: true, user: 'test-user' })))
+            controller.enqueue(
+              new TextEncoder().encode(
+                JSON.stringify({ authorized: true, user: 'test-user' }),
+              ),
+            )
             controller.close()
           },
         }),
@@ -706,7 +747,9 @@ describe('APIService Integration Tests', () => {
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({ success: true })))
+            controller.enqueue(
+              new TextEncoder().encode(JSON.stringify({ success: true })),
+            )
             controller.close()
           },
         }),
@@ -735,11 +778,15 @@ describe('APIService Integration Tests', () => {
           }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({
-              access_token: 'new-access-token',
-              refresh_token: 'new-refresh-token',
-              expires_in: 3600,
-            })))
+            controller.enqueue(
+              new TextEncoder().encode(
+                JSON.stringify({
+                  access_token: 'new-access-token',
+                  refresh_token: 'new-refresh-token',
+                  expires_in: 3600,
+                }),
+              ),
+            )
             controller.close()
           },
         }),

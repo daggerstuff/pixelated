@@ -1,37 +1,16 @@
-import { extend } from '@react-three/fiber'
-import {
-  Sprite,
-  SpriteMaterial,
-  CanvasTexture,
-  Line,
-  BufferGeometry,
-  BufferAttribute,
-  LineBasicMaterial,
-  Mesh,
-  SphereGeometry,
-  MeshBasicMaterial,
-  Group,
-  GridHelper,
-  InstancedMesh,
-  Color,
-} from 'three'
+// Declarations for common three.js elements so TSX/JSX can accept them as intrinsic elements.
+// Avoid executing runtime code (like extend()) inside a declaration file.
 
-// Extend the fiber catalog
-extend({
-  Sprite,
-  SpriteMaterial,
-  CanvasTexture,
-  Line,
-  BufferGeometry,
-  BufferAttribute,
-  LineBasicMaterial,
-  Mesh,
-  SphereGeometry,
-  MeshBasicMaterial,
-  Group,
-  GridHelper,
-  InstancedMesh,
-  Color,
-})
-
-// This will automatically add the types to JSX.IntrinsicElements
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      group: any
+      mesh: any
+      meshBasicMaterial: any
+      perspectiveCamera: any
+      ambientLight: any
+      directionalLight: any
+    }
+  }
+}
+export {}

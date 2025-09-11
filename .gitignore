@@ -173,3 +173,14 @@ backups/
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md
+# Sentry Config File
+.env.sentry-build-plugin
+
+serena.project.json
+.junie
+.crush
+.copilot-tracking
+.amazonq/rules
+.notes
+.qwen
+.serena

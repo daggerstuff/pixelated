@@ -60,7 +60,7 @@ export default defineConfig({
         // - fa-solid: Not used anywhere in the codebase
       },
       customizations: {
-        customize(defaultCustomizations: any, name: any): any {
+        customize(defaultCustomizations: unknown, name: unknown): unknown {
           // Hardened: type guard and block empty, dash, double-dash, multiple dashes, or invalid values
           if (
             typeof name !== 'string' ||

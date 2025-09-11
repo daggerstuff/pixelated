@@ -13,7 +13,6 @@
 
 </div>
 
----
 
 > **We don't just process conversations. We understand them.**  
 > Most platforms see *what* you say. We see *why* you said it, *how* you felt when you said it, and *what* you really needed when you said it.
@@ -22,7 +21,6 @@ In a world where digital interactions generate more noise than connection, **Pix
 
 This isn't just another AI tool. This is **empathy, engineered**.
 
----
 
 ## The Empathy Gym™: Where Difficult Conversations Become Safe Practice
 
@@ -40,7 +38,6 @@ Our platform doesn't just simulate conversations; it *embodies* them. Through ou
 *   **Instant Feedback:** Get real-time analysis of your approach, tone, and effectiveness
 *   **Performance Analytics:** Track your growth across dozens of therapeutic competencies
 
----
 
 ## The Technology That Sees What Others Miss
 
@@ -55,7 +52,6 @@ Understanding that communication is more than words, our system analyzes the *fl
 ### 🧩 **Persona Intelligence**  
 People aren't static, and neither are our insights. Our Dual-Persona framework recognizes when someone is shifting roles—mentor, peer, or help-seeker—and adapts our analysis accordingly.
 
----
 
 ## Built for Those Who Build Communities
 
@@ -64,13 +60,7 @@ This technology is exclusively designed for organizations that understand: **you
 We partner with forward-thinking platforms that refuse to accept "engagement" as a substitute for genuine connection.
 
 ### Our Partners Build:
-- **Mental Health Platforms** that actually heal
-- **Enterprise Communities** that foster belonging  
-- **Educational Environments** that support every student
-- **Marketplaces** where trust isn't just promised—it's proven
-- **Clinical Training Programs** that prepare professionals for reality
 
----
 
 ## Enterprise-Grade. Enterprise-Focused.
 
@@ -90,7 +80,6 @@ Built with the same technologies that power the world's most demanding applicati
 
 </div>
 
----
 
 ## The Future of Human Connection is Here
 
@@ -100,7 +89,6 @@ If you're building a platform where connection matters more than clicks, where e
 
 Because while others are building better algorithms, we're building better humans.
 
----
 
 <div align="center">
   

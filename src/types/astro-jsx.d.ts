@@ -15,19 +15,18 @@ declare global {
       class?: string
     }
 
-    // Add Element type for components that return JSX.Element
-    type Element = React.ReactElement
-
-    // Add ElementClass for class components
-    interface ElementClass extends React.Component<unknown> {
-      render(): React.ReactNode
-    }
-
-    // Add ElementAttributesProperty for props type inference
-    interface ElementAttributesProperty {
-      props: Record<string, unknown>
-    }
+    // Keep declaration-only and avoid redeclaring DOM Element/ElementClass.
   }
 }
 
+// Minimal Astro JSX shims used only for build-time JSX parsing.
+export {}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'astro-fragment': any
+    }
+  }
+}
 export {}

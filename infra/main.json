@@ -17,6 +17,10 @@
       "type": "string",
       "defaultValue": "production"
     },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "production"
+    },
     "containerRegistryName": {
       "type": "string",
       "defaultValue": "pixelatedbox"
