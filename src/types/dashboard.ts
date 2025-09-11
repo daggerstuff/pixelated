@@ -46,3 +46,25 @@ export interface TherapistDashboardProps {
   ) => void
   children?: React.ReactNode
 }
+
+export interface TherapistSession {
+  id: string
+  clientId: string
+  therapistId: string
+  startTime: string
+  endTime?: string
+  status: 'active' | 'paused' | 'completed' | 'cancelled'
+  progress: number // 0-100
+  progressSnapshots?: Array<{ timestamp: string; value: number }>
+  analyticsData?: AnalyticsChartData
+  sessionMetrics?: SessionData[]
+  progressMetrics?: SessionProgressMetrics
+}
+
+export interface TherapistDashboardProps {
+  sessions: TherapistSession[]
+  onSessionControl?: (
+    sessionId: string,
+    action: 'start' | 'pause' | 'resume' | 'end',
+  ) => void
+  children?: React.ReactNode}
