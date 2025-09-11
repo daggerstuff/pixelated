@@ -114,12 +114,16 @@ export const GET: APIRoute = async ({ request }) => {
           metadata
         FROM session_analytics
         WHERE session_id = $1
-          AND recorded_at >= NOW() - INTERVAL '${timeRange}'
+          AND recorded_at >= NOW() - $2::interval
         ORDER BY recorded_at ASC
       `;
 
-      const result = await client.query(query, [sessionId]);
-
+      const interval =
+        timeRange === '7d' ? '7 days' :
+        timeRange === '30d' ? '30 days' :
+        timeRange === '90d' ? '90 days' :
+        timeRange === '1y' ? '1 year' : '30 days';
+      const result = await client.query(query, [sessionId, interval]);
       // Transform data for client consumption
       const sessionMetrics: Array<any> = [];
       const skillProgress: Array<any> = [];
