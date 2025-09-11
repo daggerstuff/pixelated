@@ -12,3 +12,5 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// types module (ambient ImportMeta preserved)

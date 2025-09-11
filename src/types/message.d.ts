@@ -9,3 +9,7 @@ export interface Message {
   verified?: boolean
   isError?: boolean
 }
+
+// types module
+
+// types module (standardized)

@@ -42,3 +42,5 @@ declare module 'commander' {
 
   export const program: Command
 }
+
+// types module
