@@ -74,6 +74,26 @@ const processedData = await fetchData();
 ## API Routes & Data Fetching
 
 ### API Endpoint Pattern
+> **⚠️ Critical Warning – Do NOT import `APIRoute` or `APIContext` from `'astro'` in Astro 5.x+**
+>
+> As established by Byterover memory and OpenMemory analysis, importing `APIRoute` (or `APIContext`) from `'astro'` is prohibited in Astro 5.x+.
+>
+> **Reason:** These types are *not exported* by the Astro core library—any attempt to import them will result in runtime errors or TypeScript failures, and can break production builds or dev environments.
+>
+> **Fix:** Remove all direct imports and type annotations referencing `APIRoute` or `APIContext` in API route files. Export handlers without explicit type annotations—TypeScript will infer them correctly, or use a project-local type if you need stricter typing. Example:
+>
+> ```typescript
+> // BAD (do NOT do this):
+> import type { APIRoute } from 'astro';
+> export const GET: APIRoute = async ({ request, cookies }) => { ... }
+>
+> // GOOD (Astro 5.x+):
+> export const GET = async ({ request, cookies }) => { ... }
+> ```
+>
+> For details, see reasoning in Byterover and OpenMemory.
+
+  
 ```typescript
 // src/pages/api/data.ts
 import type { APIRoute } from 'astro';
