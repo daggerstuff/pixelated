@@ -249,8 +249,10 @@ import { AnalyticsError } from '@/lib/services/analytics/analytics-types';
    * Load data when sessions change
    */
   useEffect(() => {
-    loadData(true);
-  }, [sessions, loadData]);
+    if (sessions.length > 0) {
+      loadData(true);
+    }
+  }, [sessions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Cleanup on unmount
