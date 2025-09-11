@@ -12,6 +12,7 @@ import type {
   TherapistMetricSummary,
   AnalyticsError as AnalyticsErrorType,
 } from '@/types/analytics';
+import { AnalyticsError } from '@/types/analytics';
 import type { TherapistSession } from '@/types/dashboard';
 
 const logger = createBuildSafeLogger('use-therapist-analytics');
