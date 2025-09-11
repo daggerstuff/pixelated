@@ -216,7 +216,8 @@ Efficient rendering of large datasets:
 
 ### Caching Strategies
 Performance-enhancing caching mechanisms:
-- Browser localStorage for session data
+- Browser localStorage for non-sensitive UI preferences only (never PHI/PII)
+- Session data stored server-side with encryption and short-lived tokens
 - In-memory caching for frequently accessed data
 - HTTP caching for API responses
 - Memoization for expensive computations
@@ -277,14 +278,20 @@ Scalability and performance verification:
 ## Usage Examples
 
 ### Basic Dashboard Implementation
+Sessions are fetched separately from your store or API and passed to the analytics hook.
 ```tsx
+// Example: fetch sessions from API or state
+const [sessions, setSessions] = useState<TherapistSession[]>([]);
+// ...fetch sessions logic here...
+
 import { TherapistDashboard } from "@/components/dashboard/TherapistDashboard";
 import { useTherapistAnalytics } from "@/hooks/useTherapistAnalytics";
 
 function DashboardPage() {
-  const { data: sessions, isLoading } = useTherapistAnalytics(
+  // analytics are derived from your session data (fetched elsewhere)
+  const { data: analytics, isLoading } = useTherapistAnalytics(
     { timeRange: '30d' },
-    []
+    sessions
   );
 
   const handleSessionControl = (sessionId: string, action: string) => {
@@ -298,7 +305,7 @@ function DashboardPage() {
 
   return (
     <TherapistDashboard 
-      sessions={sessions || []} 
+      sessions={sessions} 
       onSessionControl={handleSessionControl}
     >
       <div>Additional dashboard content</div>
