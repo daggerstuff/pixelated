@@ -19,7 +19,7 @@ export function TherapistProgressTracker({ session, className }: TherapistProgre
   const durationHours = Math.floor(durationMinutes / 60);
   const remainingMinutes = durationMinutes % 60;
 
-  // Use real skill progress hook
+  // We call the hook with the session to derive or fetch skill progress data
   const { data: skillProgress, loading: skillsLoading, error: skillsError } = useSkillProgress(session);
 
   // Expandable sections for better keyboard navigation
@@ -117,6 +117,11 @@ export function TherapistProgressTracker({ session, className }: TherapistProgre
             {skillsLoading && (
               <div className="text-sm text-muted-foreground">Loading skills…</div>
             )}
+
+            {skillsError && (
+              <div className="text-sm text-red-600">Failed to load skills: {skillsError.message}</div>
+            )}
+
             {!skillsLoading && !skillsError && (!skillProgress || skillProgress.length === 0) && (
               <div className="text-sm text-muted-foreground">No skill progress available for this session.</div>
             )}
