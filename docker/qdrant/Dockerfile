@@ -11,6 +11,7 @@ RUN set -eux \
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+
 # Keep the container running entrypoint as root so it can fix volume permissions,
 # then the entrypoint will use gosu to drop privileges to UID 1000 when executing qdrant.
 USER root
@@ -20,3 +21,6 @@ CMD ["/qdrant/qdrant"]
 # Health check for Qdrant service
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:6333/health || exit 1
+
+# Ensure last USER is not root
+USER 1000

@@ -58,13 +58,11 @@
       "users": {
         "valid_user": {
           "email": "test@example.com",
-          // password is now loaded from environment variable TEST_USER_PASSWORD
           "password": "${TEST_USER_PASSWORD}",
           "name": "Test User"
         },
         "admin_user": {
           "email": "admin@example.com",
-          // password is now loaded from environment variable ADMIN_USER_PASSWORD
           "password": "${ADMIN_USER_PASSWORD}",
           "name": "Admin User",
           "role": "admin"
@@ -176,11 +174,7 @@
     "security_tests": {
       "sql_injection": {
         "enabled": true,
-        "payloads": [
-          "'; DROP TABLE users; --",
-          "' OR '1'='1",
-          "admin'--"
-        ]
+        "payloads": ["'; DROP TABLE users; --", "' OR '1'='1", "admin'--"]
       },
       "xss_prevention": {
         "enabled": true,
