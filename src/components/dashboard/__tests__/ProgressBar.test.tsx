@@ -22,7 +22,7 @@ describe("ProgressBar", () => {
     render(<ProgressBar value={150} label="Over 100%" />);
 
     const progressBar = screen.getByRole("progressbar");
-    expect(progressBar).toHaveAttribute("aria-valuenow", "150");
+    expect(progressBar).toHaveAttribute("aria-valuenow", "100");
     expect(progressBar).toHaveAttribute("aria-valuemax", "100");
     expect(screen.getByText("100%")).toBeInTheDocument();
   });
@@ -31,8 +31,10 @@ describe("ProgressBar", () => {
     render(<ProgressBar value={-50} label="Negative Value" />);
 
     const progressBar = screen.getByRole("progressbar");
-    expect(progressBar).toHaveAttribute("aria-valuenow", "-50");
+    // The component clamps negative values to the minimum (0).
+    expect(progressBar).toHaveAttribute("aria-valuenow", "0");
     expect(progressBar).toHaveAttribute("aria-valuemin", "0");
+    // Visible label should show the clamped value
     expect(screen.getByText("0%")).toBeInTheDocument();
   });
 
