@@ -49,22 +49,44 @@ export const POST: APIRoute = async ({ request }) => {
         );
       }
 
-      // Also insert into session_milestones table for detailed tracking
-      if (snapshots.length > 0) {
-        const milestoneQuery = `
-          INSERT INTO session_milestones (session_id, milestone_name, milestone_value, achieved_at)
-          VALUES ($1, $2, $3, $4)
-        `;
+const client = await pool.connect();
+try {
+  await client.query('BEGIN')
+  // Update session with progress snapshots
+  const query = `
+    UPDATE sessions
+    SET progress_snapshots = $1::jsonb, updated_at = NOW()
+    WHERE id = $2
+    RETURNING id
+  `;
+  await client.query(query, [JSON.stringify(snapshots), sessionId]);
 
-        for (const snapshot of snapshots) {
-          await client.query(milestoneQuery, [
-            sessionId,
-            `Progress_${snapshot.value}`,
-            snapshot.value,
-            snapshot.timestamp
-          ]);
-        }
-      }
+  // Also insert into session_milestones table for detailed tracking
+  if (snapshots.length > 0) {
+    const values: any[] = []
+    const placeholders = snapshots.map((s, i) => {
+      const base = i * 4
+      values.push(
+        sessionId,
+        `Progress_${s.value}`,
+        s.value,
+        new Date(s.timestamp).toISOString()
+      )
+      return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4})`
+    })
+    const milestoneQuery = `
+      INSERT INTO session_milestones (session_id, milestone_name, milestone_value, achieved_at)
+      VALUES ${placeholders.join(',')}
+    `
+    await client.query(milestoneQuery, values)
+  }
+  await client.query('COMMIT')
+} catch (e) {
+  await client.query('ROLLBACK')
+  throw e
+} finally {
+  client.release();
+}
 
       return new Response(
         JSON.stringify({ success: true, sessionId }),
