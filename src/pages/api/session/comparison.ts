@@ -129,13 +129,14 @@ export const GET: APIRoute = async ({ request }) => {
       const result = await client.query(query, queryParams);
 
       // Transform data for client consumption
+      const toObj = (v: any) => (typeof v === 'string' ? JSON.parse(v || '{}') : (v ?? {}))
       const comparisons = result.rows.map(row => ({
         id: row.id,
         therapistId: row.therapist_id,
         currentSessionId: row.current_session_id,
         previousSessionId: row.previous_session_id,
         improvementScore: row.improvement_score,
-        metrics: JSON.parse(row.comparison_metrics || '{}'),
+        metrics: toObj(row.comparison_metrics),
         analyzedAt: row.analyzed_at,
         currentSessionStartedAt: row.current_session_started_at,
         previousSessionStartedAt: row.previous_session_started_at,
