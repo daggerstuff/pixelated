@@ -116,9 +116,13 @@ export const GET: APIRoute = async ({ request }) => {
           LEFT JOIN sessions cs ON sc.current_session_id = cs.id
           LEFT JOIN sessions ps ON sc.previous_session_id = ps.id
           WHERE sc.therapist_id = $1
-            AND sc.analyzed_at >= NOW() - INTERVAL '${timeRange}'
+            AND sc.analyzed_at >= NOW() - $2::interval
           ORDER BY sc.analyzed_at DESC
         `;
+        // Allowlist simple forms like '7 days', '30 days', '24 hours', '30d'
+        const allowed = /^(?:\d+\s+(?:minutes?|hours?|days?|weeks?|months?|years?)|\d+d)$/i
+        const safeRange = allowed.test(timeRange) ? timeRange.replace(/(\d+)d/i, '$1 days') : '30 days'
+        queryParams = [therapistId, safeRange];
         queryParams = [therapistId];
       }
 
