@@ -7,6 +7,7 @@ export interface ProgressSnapshot {
   metricName: string // Name of the metric (e.g., "gad7_score", "phq9_score", "session_engagement_rating")
   metricValue: number // Numerical value of the metric
   sessionId?: string // Optional session ID if the metric is tied to a specific session
+  progressSnapshots?: Array<{ timestamp: string; value: number }> // Session milestone snapshots
 }
 
 /**
@@ -59,6 +60,9 @@ export interface SessionData {
   newUsers?: number
   returningUsers?: number
   averageDuration?: number
+  therapistSessions?: number // Number of therapist training sessions
+  averageSessionProgress?: number // Average progress completion
+  skillImprovementRate?: number // Overall skill improvement rate
 }
 
 export interface SkillProgressData {
@@ -67,6 +71,8 @@ export interface SkillProgressData {
   previousScore?: number
   trend: 'up' | 'down' | 'stable'
   category: 'therapeutic' | 'technical' | 'interpersonal'
+  sessionsPracticed?: number // Number of sessions this skill was practiced
+  averageImprovement?: number // Average improvement per session
 }
 
 export interface MetricSummary {
@@ -80,10 +86,51 @@ export interface MetricSummary {
   color?: 'blue' | 'green' | 'purple' | 'orange' | 'red'
 }
 
+// Therapist-specific analytics data
+export interface TherapistSessionData extends SessionData {
+  sessionId: string
+  therapistId: string
+  clientComplexity?: number // 1-10 scale of client difficulty
+  sessionQualityScore?: number // 1-100 quality assessment
+  milestonesAchieved?: number // Number of milestones reached
+  averageResponseTime?: number // Average therapist response time (seconds)
+}
+
+export interface TherapistSkillProgressData extends SkillProgressData {
+  skillId: string
+  practiceHours?: number // Total hours practicing this skill
+  certificationLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+  competencyAssessment?: number // 1-100 competency score
+  lastAssessed?: string // ISO date of last assessment
+}
+
+export interface TherapistMetricSummary extends MetricSummary {
+  therapistId: string
+  benchmarkComparison?: {
+    userScore: number
+    benchmarkAverage: number
+    percentileRank: number
+    improvementNeeded: number
+  }
+}
+
+export interface TherapistAnalyticsChartData {
+  sessionMetrics: TherapistSessionData[]
+  skillProgress: TherapistSkillProgressData[]
+  summaryStats: TherapistMetricSummary[]
+  progressSnapshots?: Array<{ timestamp: string; value: number }> // Session milestone snapshots
+  comparativeData?: {
+    currentSession: TherapistSessionData
+    previousSession?: TherapistSessionData
+    trend: 'improving' | 'declining' | 'stable'
+  }
+}
+
 export interface AnalyticsChartData {
   sessionMetrics: SessionData[]
   skillProgress: SkillProgressData[]
   summaryStats: MetricSummary[]
+  therapistData?: TherapistAnalyticsChartData // Optional therapist-specific data
 }
 
 export interface AnalyticsError {

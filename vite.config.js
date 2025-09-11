@@ -14,19 +14,24 @@ const cdnAssetMap = (() => {
   try {
     return JSON.parse(fs.readFileSync('./src/cdn-asset-map.json', 'utf-8'))
   } catch (error) {
-    console.warn('CDN asset map not found or invalid, using empty map:', error.message)
+    console.warn(
+      'CDN asset map not found or invalid, using empty map:',
+      error.message,
+    )
     return {}
   }
 })()
 
-console.log('Sentry ENV Check:');
-console.log('SENTRY_AUTH_TOKEN:', process.env.SENTRY_AUTH_TOKEN);
-console.log('SENTRY_DSN:', process.env.SENTRY_DSN);
-console.log('SENTRY_ORG:', process.env.SENTRY_ORG);
-console.log('SENTRY_PROJECT:', process.env.SENTRY_PROJECT);
+console.log('Sentry ENV Check:')
+console.log('SENTRY_AUTH_TOKEN:', process.env.SENTRY_AUTH_TOKEN)
+console.log('SENTRY_DSN:', process.env.SENTRY_DSN)
+console.log('SENTRY_ORG:', process.env.SENTRY_ORG)
+console.log('SENTRY_PROJECT:', process.env.SENTRY_PROJECT)
 
 export default defineConfig({
-  cacheDir: process.env.CI ? '$(Agent.WorkFolder)/.vite-cache' : 'node_modules/.vite',
+  cacheDir: process.env.CI
+    ? '$(Agent.WorkFolder)/.vite-cache'
+    : 'node_modules/.vite',
   server: {
     watch: {
       ignored: [
@@ -42,13 +47,14 @@ export default defineConfig({
         '**/*.pyc',
         '**/__pycache__/**',
         '**/venv/**',
+        '**/.venv/**',
         '**/env/**',
         '**/.env*',
         '**/logs/**',
         '**/tmp/**',
-        '**/temp/**'
-      ]
-    }
+        '**/temp/**',
+      ],
+    },
   },
   plugins: [
     rewriteLoggerImportPlugin(),
@@ -64,10 +70,10 @@ export default defineConfig({
             id.endsWith('.js')
           ) {
             Object.entries(cdnAssetMap).forEach(([localPath, cdnUrl]) => {
-              const quotedLocalPath1 = `"${localPath}"`;
-              const quotedLocalPath2 = `'${localPath}'`;
-              code = code.replaceAll(quotedLocalPath1, `"${cdnUrl}"`);
-              code = code.replaceAll(quotedLocalPath2, `'${cdnUrl}'`);
+              const quotedLocalPath1 = `"${localPath}"`
+              const quotedLocalPath2 = `'${localPath}'`
+              code = code.replaceAll(quotedLocalPath1, `"${cdnUrl}"`)
+              code = code.replaceAll(quotedLocalPath2, `'${cdnUrl}'`)
             })
           }
           return code
@@ -104,6 +110,10 @@ export default defineConfig({
           }),
         ]
       : []),
+    sentryVitePlugin({
+      org: 'pixelated-empathy-dq',
+      project: 'pixel-astro',
+    }),
   ],
   base:
     process.env.NODE_ENV === 'production'
@@ -167,15 +177,19 @@ export default defineConfig({
         if (warning.code === 'SOURCEMAP_ERROR') {
           return
         }
-        if (warning.message && warning.message.includes('Failed to load source map')) {
+        if (
+          warning.message &&
+          warning.message.includes('Failed to load source map')
+        ) {
           return
         }
         // Suppress Vite 'externalized for browser compatibility' and Unocss icon '-' warnings
-        if (warning.message && (
-          warning.message.includes('externalized for browser compatibility') ||
-          warning.message.includes('icon "-"') ||
-          warning.message.includes('failed to load icon \'-\'')
-        )) {
+        if (
+          warning.message &&
+          (warning.message.includes('externalized for browser compatibility') ||
+            warning.message.includes('icon "-"') ||
+            warning.message.includes("failed to load icon '-'"))
+        ) {
           return
         }
         warn(warning)
@@ -262,7 +276,13 @@ export default defineConfig({
           mongodb: [/mongodb/],
           recharts: [/recharts/],
           chartjs: [/chart\.js/],
-          charts: [/Line\.js$/, /generateCategoricalChart/, /CartesianChart/, /AreaChart/, /BarChart/],
+          charts: [
+            /Line\.js$/,
+            /generateCategoricalChart/,
+            /CartesianChart/,
+            /AreaChart/,
+            /BarChart/,
+          ],
           fhe: [/fhe/],
           emotionViz: [
             /MultidimensionalEmotionChart/,
@@ -357,7 +377,7 @@ export default defineConfig({
       'process',
       '@fastify/otel',
       'path-to-regexp',
-      'mongodb'
+      'mongodb',
     ],
   },
 })

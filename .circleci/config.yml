@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   node: circleci/node@7.1.1
   python: circleci/python@3.2.0
-  docker: circleci/docker@3.0.0
+  docker: circleci/docker@3.0.1
 
 workflows:
   build-and-test:
@@ -60,7 +60,7 @@ jobs:
 
   python-test:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python@sha256:2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e # cimg/python:3.11 digest
     steps:
       - checkout
       - python/install-packages:

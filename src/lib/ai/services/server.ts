@@ -81,10 +81,7 @@ class AIServer {
     }
   }
 
-  private async handleChatCompletion(
-    res: any,
-    body: any,
-  ): Promise<void> {
+  private async handleChatCompletion(res: any, body: any): Promise<void> {
     try {
       const { messages, provider, options = {} } = body
 
@@ -122,7 +119,8 @@ class AIServer {
         if (!service) {
           this.sendJsonResponse(res, 503, {
             success: false,
-            error: 'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
+            error:
+              'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
           })
           return
         }
@@ -151,7 +149,8 @@ class AIServer {
       appLogger.error('Chat completion failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Chat completion failed',
+        error:
+          error instanceof Error ? error.message : 'Chat completion failed',
       })
     }
   }
@@ -197,7 +196,8 @@ class AIServer {
         if (!service) {
           this.sendJsonResponse(res, 503, {
             success: false,
-            error: 'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
+            error:
+              'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
           })
           return
         }
@@ -255,7 +255,8 @@ Respond in JSON format with the following structure:
       appLogger.error('Emotion analysis failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Emotion analysis failed',
+        error:
+          error instanceof Error ? error.message : 'Emotion analysis failed',
       })
     }
   }
@@ -301,7 +302,8 @@ Respond in JSON format with the following structure:
         if (!service) {
           this.sendJsonResponse(res, 503, {
             success: false,
-            error: 'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
+            error:
+              'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
           })
           return
         }
@@ -341,7 +343,9 @@ Respond in JSON format with the following structure:
           error: error instanceof Error ? error.message : 'Streaming failed',
         })
       } else {
-        res.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Streaming failed' })}\n\n`)
+        res.write(
+          `data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Streaming failed' })}\n\n`,
+        )
         res.end()
       }
     }
@@ -386,20 +390,23 @@ Respond in JSON format with the following structure:
           await this.handleHealthCheck(res)
           break
 
-        case 'POST /chat':
+        case 'POST /chat': {
           const chatBody = await this.parseRequestBody(req)
           await this.handleChatCompletion(res, chatBody)
           break
+        }
 
-        case 'POST /analyze-emotion':
+        case 'POST /analyze-emotion': {
           const emotionBody = await this.parseRequestBody(req)
           await this.handleEmotionAnalysis(req, res, emotionBody)
           break
+        }
 
-        case 'POST /chat/stream':
+        case 'POST /chat/stream': {
           const streamBody = await this.parseRequestBody(req)
           await this.handleStreamingChat(req, res, streamBody)
           break
+        }
 
         default:
           this.sendJsonResponse(res, 404, {

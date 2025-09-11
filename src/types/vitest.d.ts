@@ -1,14 +1,9 @@
 /// <reference types="vitest/globals" />
 
-declare global {
-  const describe: typeof import('vitest').describe
-  const it: typeof import('vitest').it
-  const expect: typeof import('vitest').expect
-  const beforeEach: typeof import('vitest').beforeEach
-  const afterEach: typeof import('vitest').afterEach
-  const beforeAll: typeof import('vitest').beforeAll
-  const afterAll: typeof import('vitest').afterAll
-  const vi: typeof import('vitest').vi
-}
+// Rely on the official vitest globals type definitions; keep this file as an external module
+// so it doesn't accidentally introduce duplicate global declarations.
+// Use the official vitest globals types but keep this file module-scoped
+// to avoid redeclaring globals in other type roots.
+/// <reference types="vitest/globals" />
 
 export {}

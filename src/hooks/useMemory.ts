@@ -50,13 +50,8 @@ export interface UseMemoryReturn {
 
   // Memory management
   clearMemories: () => void
-    getMemoryHistory: () => Promise<unknown[]>
-    getMemoryHistory: () => Promise<unknown[]>
+  getMemoryHistory: () => Promise<unknown[]>
 }
-
-export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
-  const { userId = 'default', autoLoad = true, category } = options
-
 export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   const { userId, category, autoLoad = false } = options
   const [memories, setMemories] = useState<MemoryEntry[]>([])
@@ -66,7 +61,9 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
 
   const handleError = useCallback((err: Error | unknown) => {
     const errorMessage =
-      err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
+      err instanceof Error
+        ? (err as Error)?.message || String(err)
+        : 'An unknown error occurred'
     setError(errorMessage)
     console.error('Memory operation error:', err)
   }, [])
@@ -142,12 +139,12 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
 
       try {
         return await memoryManager.searchMemories({
-                  query,
-                  userId,
-                  category,
-                  limit: 10,
-                  ...searchOptions,
-                });
+          query,
+          userId,
+          category,
+          limit: 10,
+          ...searchOptions,
+        })
       } catch (err: unknown) {
         handleError(err)
         return []
@@ -187,7 +184,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   )
 
   const addUserPreference = useCallback(
-  async (preference: string, value: unknown): Promise<void> => {
+    async (preference: string, value: unknown): Promise<void> => {
       await memoryManager.addUserPreference(userId, preference, value)
       await refreshMemories()
     },
@@ -240,8 +237,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
     setError(null)
   }, [])
 
-    const getMemoryHistory = useCallback(async (): Promise<unknown[]> => {
-    const getMemoryHistory = useCallback(async (): Promise<unknown[]> => {
+  const getMemoryHistory = useCallback(async (): Promise<unknown[]> => {
     try {
       return await memoryManager.getMemoryHistory(userId)
     } catch (err: unknown) {
@@ -286,12 +282,15 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
 }
 
 interface UseConversationMemoryReturn extends UseMemoryReturn {
-  addMessage: (message: string, role?: 'user' | 'assistant') => Promise<void>;
-  getConversationHistory: () => Promise<MemoryEntry[]>;
+  addMessage: (message: string, role?: 'user' | 'assistant') => Promise<void>
+  getConversationHistory: () => Promise<MemoryEntry[]>
 }
 
 // Hook for conversation memory management
-export function useConversationMemory(userId: string, sessionId?: string): UseConversationMemoryReturn {
+export function useConversationMemory(
+  userId: string,
+  sessionId?: string,
+): UseConversationMemoryReturn {
   const memory = useMemory({
     userId,
     category: 'conversation',
@@ -327,9 +326,9 @@ export function useConversationMemory(userId: string, sessionId?: string): UseCo
 }
 
 interface UseUserPreferencesReturn extends UseMemoryReturn {
-  setPreference: (key: string, value: unknown) => Promise<void>;
-  getPreference: (key: string) => string | number | boolean | object | null;
-  removePreference: (key: string) => Promise<void>;
+  setPreference: (key: string, value: unknown) => Promise<void>
+  getPreference: (key: string) => string | number | boolean | object | null
+  removePreference: (key: string) => Promise<void>
 }
 
 // Hook for user preferences memory
@@ -367,7 +366,14 @@ export function useUserPreferences(userId: string): UseUserPreferencesReturn {
       if (prefMemory) {
         try {
           const match = prefMemory.content.match(/= (.+)$/)
-          return match && match[1] ? JSON.parse(match[1]) as string | number | boolean | object | null : null
+          return match && match[1]
+            ? (JSON.parse(match[1]) as
+                | string
+                | number
+                | boolean
+                | object
+                | null)
+            : null
         } catch {
           return null
         }

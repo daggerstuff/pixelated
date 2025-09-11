@@ -1,30 +1,15 @@
-// Use conditional import to prevent MongoDB from being bundled on client side
-let _ObjectId: any
+// Use server-only helper for MongoDB types
+import { getServerMongoExports } from '@/lib/server-only/mongodb-types'
 
-if (typeof window === 'undefined') {
-  // Server side - import real MongoDB ObjectId
-  try {
-    const mongodb = require('mongodb')
-    _ObjectId = mongodb.ObjectId
-  } catch {
-    // Fallback if MongoDB is not available
-    _ObjectId = class MockObjectId {
-      constructor(id?: string) {
-        this.id = id || 'mock-object-id'
-      }
-      toString() { return this.id }
-      toHexString() { return this.id }
-    }
+let _ObjectId: unknown
+
+async function ensureObjectId() {
+  if (!_ObjectId) {
+    const mongo = await getServerMongoExports()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _ObjectId = (mongo as any).ObjectId
   }
-} else {
-  // Client side - use mock ObjectId
-  _ObjectId = class MockObjectId {
-    constructor(id?: string) {
-      this.id = id || 'mock-object-id'
-    }
-    toString() { return this.id }
-    toHexString() { return this.id }
-  }
+  return _ObjectId
 }
 // MongoDB-based user settings types
 

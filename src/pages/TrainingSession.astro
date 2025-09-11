@@ -1,0 +1,72 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import TrainingSessionComponent from '../components/TrainingSession.tsx'
+---
+
+<BaseLayout
+  title="Therapist Training Session | Pixelated Empathy"
+  description="Interactive therapist training powered by Pixelated Empathy AI."
+  bgType="plum"
+>
+  <section
+    class="relative min-h-screen flex flex-col items-center justify-center py-12"
+    aria-labelledby="training-session-title-heading"
+  >
+    <h1
+      id="training-session-title-heading"
+      class="text-3xl font-bold mb-6 text-primary"
+    >
+      Therapist Training Session
+    </h1>
+    <p class="mb-4 text-lg text-muted-foreground max-w-2xl text-center">
+      Welcome to the interactive therapist training session. This demo simulates
+      a real client conversation, provides bias analysis, and lets you practice
+      therapeutic responses in a safe environment.
+    </p>
+    <ul
+      class="mb-8 list-disc list-inside text-sm text-muted-foreground max-w-xl"
+    >
+      <li>Type your response as the therapist and send it to the AI client.</li>
+      <li>Review bias analysis feedback after each message.</li>
+      <li>
+        Session controls let you start, pause, resume, or end the training.
+      </li>
+      <li>All interactions are private and HIPAA-compliant.</li>
+    </ul>
+    <div class="w-full max-w-xl">
+      <TrainingSessionComponent client:load />
+      <noscript>
+        <div
+          class="bg-destructive text-destructive-foreground p-4 rounded-md mt-6"
+          role="alert"
+        >
+          <strong>JavaScript Required:</strong> This interactive training session
+          requires JavaScript and a modern browser. Please enable JavaScript to continue.
+        </div>
+      </noscript>
+    </div>
+    <div class="mt-10 w-full max-w-xl bg-muted p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-2">Demo Transcript</h2>
+      <div class="text-sm text-muted-foreground">
+        <strong>Client:</strong> Hello, I am your client. How can you help me today?<br
+        />
+        <strong>Therapist:</strong> I’m here to listen and support you. What’s on
+        your mind?<br />
+        <strong>Client:</strong> I’ve been feeling anxious about work.<br />
+        <strong>Therapist:</strong> Can you tell me more about what’s causing your
+        anxiety?<br />
+        <strong>Client:</strong> I’m worried I’ll lose my job.<br />
+      </div>
+    </div>
+    <div class="mt-10 w-full max-w-xl">
+      <h2 class="text-lg font-semibold mb-2">Accessibility & Support</h2>
+      <p class="text-sm text-muted-foreground">
+        This page uses ARIA landmarks, skip links, and high-contrast colors for
+        accessibility. If you need help, contact <a
+          href="/contact"
+          class="underline text-primary">support</a
+        >.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

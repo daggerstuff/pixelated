@@ -25,7 +25,9 @@ export interface AIServiceResponse {
   created?: number
 }
 
-export interface AIStreamOptions extends AIServiceOptions {}
+// Avoid using an empty interface extension which triggers the no-empty-object-type rule.
+// Use a type alias to explicitly represent the same shape as AIServiceOptions.
+export type AIStreamOptions = AIServiceOptions
 import {
   ObjectiveDefinition,
   AlignmentContext,
@@ -345,11 +347,12 @@ export class MetaAlignerAPI {
       ]
 
       // Generate enhanced response
-      const aiResponse: AICompletion = await this.aiService.createChatCompletion(messages, {
-        model: this.config.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-        temperature: this.config.temperature || 0.7,
-        maxTokens: Math.max(originalResponse.length * 1.5, 1024),
-      })
+      const aiResponse: AICompletion =
+        await this.aiService.createChatCompletion(messages, {
+          model: this.config.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+          temperature: this.config.temperature || 0.7,
+          maxTokens: Math.max(originalResponse.length * 1.5, 1024),
+        })
 
       if (!aiResponse.choices?.[0]?.message?.content) {
         throw new Error('Failed to generate enhanced response')
@@ -667,7 +670,7 @@ Please enhance the response to better meet these objectives while maintaining it
       (enhanced.overallScore - original.overallScore) * 100
 
     // Convert improvement areas to lowercase to match test expectations
-    const lowercaseAreas = improvementAreas.map(area => area.toLowerCase())
+    const lowercaseAreas = improvementAreas.map((area) => area.toLowerCase())
     let explanation = `Enhancement focused on: ${lowercaseAreas.join(', ')}. `
     explanation += `Overall score improvement: ${overallImprovement > 0 ? '+' : ''}${overallImprovement.toFixed(1)}%. `
 
@@ -709,10 +712,8 @@ export class IntegratedAIService {
     options?: AIStreamOptions,
   ): Promise<IntegratedResponse> {
     // Get the base response
-    const baseResponse: AICompletion = await this.baseService.createChatCompletion(
-      messages,
-      options,
-    )
+    const baseResponse: AICompletion =
+      await this.baseService.createChatCompletion(messages, options)
 
     if (!baseResponse.choices?.[0]?.message?.content) {
       return {
