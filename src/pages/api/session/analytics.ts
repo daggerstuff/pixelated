@@ -129,12 +129,15 @@ export const GET: APIRoute = async ({ request }) => {
       const skillProgress: Array<any> = [];
 
       result.rows.forEach(row => {
+        const meta = typeof row.metadata === 'string'
+          ? JSON.parse(row.metadata || '{}')
+          : (row.metadata ?? {})
         if (row.metric_category === 'skill') {
           skillProgress.push({
             skill: row.metric_name.replace('skill_', ''),
             score: row.metric_value,
             category: row.metric_category,
-            ...JSON.parse(row.metadata || '{}'),
+            ...meta,
             timestamp: row.recorded_at,
           });
         } else {
@@ -143,7 +146,7 @@ export const GET: APIRoute = async ({ request }) => {
             metricValue: row.metric_value,
             category: row.metric_category,
             recordedAt: row.recorded_at,
-            ...JSON.parse(row.metadata || '{}'),
+            ...meta,
           });
         }
       });
