@@ -183,13 +183,6 @@ Pixelated Empathy is a full-stack AI-powered bias detection and mental health pl
 ---
 
 This AGENTS.md is designed for coding agents. Update as the project evolves. For subprojects, add AGENTS.md in their directories as needed.
-[byterover-mcp]
-
-[byterover-mcp]
-
-[byterover-mcp]
-
-[byterover-mcp]
 
 [byterover-mcp]
 
