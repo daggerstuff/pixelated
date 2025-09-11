@@ -43,7 +43,7 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: 10.15.0
+        version: 10.16.0
         run_install: false
 
     - name: Get pnpm store directory
@@ -180,7 +180,7 @@ jobs:
           echo "PASS_RATE=${PASS_RATE}" >> $GITHUB_ENV
           echo "RUN_ID=${RUN_ID}" >> $GITHUB_ENV
           echo "RUN_SUCCESS=${RUN_SUCCESS}" >> $GITHUB_ENV
-          
+
           # Check if pass rate is below threshold for alerting
           if (( $(echo "${PASS_RATE} < 85" | bc -l) )); then
             echo "needs_alert=true" >> "$GITHUB_OUTPUT"
