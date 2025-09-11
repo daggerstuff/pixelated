@@ -77,25 +77,36 @@ export function useConversationMemory(initialState?: Partial<ConversationMemory>
   };
 
   const setSessionState = (state: ConversationMemory['sessionState']) => {
-    setMemory((prev) => {
-      // Update active time when pausing
-      if (state === 'paused' && prev.sessionState === 'active') {
-        return {
+    setMemory(prev => {
+      const now = Date.now()
+      // active -> paused or ended: flush last active span
+      if ((state === 'paused' || state === 'ended') && prev.sessionState === 'active') {
+        const delta = Math.floor((now - lastActiveTimeRef.current) / 1000)
+        const next = {
           ...prev,
           sessionState: state,
           progressMetrics: {
             ...prev.progressMetrics,
-            activeTime: prev.progressMetrics.activeTime + Math.floor((Date.now() - lastActiveTimeRef.current) / 1000)
+            activeTime: prev.progressMetrics.activeTime + delta,
+            // snapshot final duration on end
+            sessionDuration:
+              state === 'ended'
+                ? Math.floor((now - sessionStartTimeRef.current) / 1000)
+                : prev.progressMetrics.sessionDuration
           }
-        };
-      } else {
-        if (state === 'active' && prev.sessionState !== 'active') {
-          lastActiveTimeRef.current = Date.now();
         }
-        return { ...prev, sessionState: state };
+        return next
       }
-    });
-  };
+      // idle/paused/ended -> active: start/restart tracking
+      if (state === 'active' && prev.sessionState !== 'active') {
+        if (prev.sessionState === 'idle') {
+          sessionStartTimeRef.current = now
+        }
+        lastActiveTimeRef.current = now
+      }
+      return { ...prev, sessionState: state }
+    })
+  }
 
   const setProgress = (value: number) => {
     setMemory((prev) => ({ ...prev, progress: Math.max(0, Math.min(100, value)) }));
