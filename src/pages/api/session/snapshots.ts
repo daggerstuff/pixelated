@@ -13,11 +13,16 @@ const pool =
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { sessionId, snapshots } = await request.json();
+    const { sessionId, snapshots } = await request.json()
 
-    if (!sessionId || !snapshots) {
+    const isValidSnapshot = (s: any) =>
+      (typeof s?.value === 'number') &&
+      (typeof s?.timestamp === 'string' || typeof s?.timestamp === 'number' || s?.timestamp instanceof Date)
+    const isSnapshotArray = Array.isArray(snapshots) && snapshots.every(isValidSnapshot)
+
+    if (!sessionId || !isSnapshotArray) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: sessionId, snapshots' }),
+        JSON.stringify({ error: 'Invalid payload: require sessionId and snapshots[] of {timestamp,value:number}' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
