@@ -13,7 +13,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const { therapistId, currentSessionId, previousSessionId, improvementScore, metrics } = await request.json();
 
-    if (!therapistId || !currentSessionId || !improvementScore || !metrics) {
+    if (!therapistId || !currentSessionId || improvementScore === undefined || improvementScore === null || !metrics) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: therapistId, currentSessionId, improvementScore, metrics' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
