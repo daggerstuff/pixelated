@@ -10,6 +10,20 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const { sessionId, analyticsData } = await request.json();
 
+    const isValid =
+      typeof sessionId === 'string' &&
+      analyticsData &&
+      Array.isArray(analyticsData.sessionMetrics ?? []) &&
+      Array.isArray(analyticsData.skillProgress ?? []) &&
+      (analyticsData.sessionMetrics?.length ?? 0) <= 1000 &&
+      (analyticsData.skillProgress?.length ?? 0) <= 1000;
+    if (!isValid) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid payload' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (!sessionId || !analyticsData) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: sessionId, analyticsData' }),
