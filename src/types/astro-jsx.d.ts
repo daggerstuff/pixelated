@@ -20,6 +20,8 @@ declare global {
 }
 
 // Minimal Astro JSX shims used only for build-time JSX parsing.
+export {}
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {
