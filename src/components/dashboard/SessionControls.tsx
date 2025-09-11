@@ -17,7 +17,6 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
 
   // Focus management for keyboard navigation
   const [focusedButton, setFocusedButton] = useState<string | null>(null);
-  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const handleControlClick = (action: 'start' | 'pause' | 'resume' | 'end', sessionId?: string) => {
     if (!sessionId) {
@@ -74,7 +73,7 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
       <div className="flex gap-2">
         <button
           type="button"
-          ref={(el) => { buttonRefs.current['pause'] = el }}
+          ref={(el) => { buttonRefs.current['pause'] = el; }}
           onClick={() => activeSession && handleControlClick('pause', activeSession.id)}
           disabled={!activeSession}
           className={cn(activeSession ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
@@ -84,7 +83,7 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
 
         <button
           type="button"
-          ref={(el) => { buttonRefs.current['resume'] = el }}
+          ref={(el) => { buttonRefs.current['resume'] = el; }}
           onClick={() => pausedSession && handleControlClick('resume', pausedSession.id)}
           disabled={!pausedSession}
           className={cn(pausedSession ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
@@ -94,7 +93,7 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
 
         <button
           type="button"
-          ref={(el) => { buttonRefs.current['end'] = el }}
+          ref={(el) => { buttonRefs.current['end'] = el; }}
           onClick={() => activeSession && handleControlClick('end', activeSession.id)}
           disabled={!activeSession}
           className={cn(activeSession ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
@@ -108,15 +107,42 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
         {sessions.length === 0 ? (
           <div className="text-sm italic">No recent sessions</div>
         ) : (
-          <ul>
-            {sessions.slice(0, 3).map((s) => (
-              <li key={s.id} className="flex justify-between items-center p-2 rounded border">
+          <ul className="space-y-2" role="list">
+            {sessions.slice(0, 3).map((session) => (
+              <li
+                key={session.id}
+                className={cn(
+                  "flex items-center justify-between p-3 bg-background rounded border transition-colors",
+                  "hover:bg-muted/50"
+                )}
+                role="listitem"
+                aria-label={`Session ${session.id.slice(0, 8)}, status: ${session.status}`}
+              >
                 <div>
-                  <div className="text-sm font-medium">Session {s.id.slice(0, 8)}</div>
-                  <div className="text-xs text-muted-foreground">{fmt(s.startTime)}</div>
+                  <div className="text-sm font-medium">Session {session.id.slice(0, 8)}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(session.startTime).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                  {session.endTime && (
+                    <div className="text-xs text-muted-foreground">
+                      Ended: {new Date(session.endTime).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  )}
                 </div>
-                <span className={cn('px-2 py-1 text-xs rounded', s.status === 'active' ? 'bg-green-100' : 'bg-gray-100')}>
-                  {s.status}
+                <span className={cn(
+                  "px-2 py-1 text-xs rounded-full whitespace-nowrap",
+                  session.status === 'active' && "bg-green-100 text-green-800",
+                  session.status === 'paused' && "bg-yellow-100 text-yellow-800",
+                  session.status === 'completed' && "bg-blue-100 text-blue-800",
+                  session.status === 'cancelled' && "bg-red-100 text-red-800"
+                )}>
+                  {session.status}
                 </span>
               </li>
             ))}

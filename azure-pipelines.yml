@@ -101,7 +101,7 @@ stages:
         versionSpec: $(nodeVersion)
 
     - script: |
-        npm install -g pnpm@10.15.0
+        npm install -g pnpm@10.16.0
         pnpm config set store-dir $(Agent.WorkFolder)/.pnpm-store
         mkdir -p $(Agent.WorkFolder)/.pnpm-store
       displayName: Install and configure pnpm
