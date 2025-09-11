@@ -20,6 +20,23 @@ vi.mock("../TherapyProgressCharts", () => ({
   TherapyProgressCharts: () => <div data-testid="therapy-charts">Therapy Charts</div>
 }));
 
+// Mock the useTherapistAnalytics hook
+vi.mock("@/hooks/useTherapistAnalytics", () => ({
+  useTherapistAnalytics: vi.fn(() => ({
+    data: {
+      sessionMetrics: [],
+      skillProgress: [],
+      summaryStats: [],
+      progressSnapshots: [],
+      comparativeData: undefined,
+    },
+    isLoading: false,
+    error: null,
+    refetch: vi.fn(),
+    clearError: vi.fn(),
+  })),
+}));
+
 describe("TherapistDashboard", () => {
   const mockSessions: TherapistSession[] = [
     {
@@ -68,9 +85,9 @@ describe("TherapistDashboard", () => {
     expect(screen.getByTestId('progress-tracker')).toBeInTheDocument();
   });
 
-  it("displays therapy progress charts when data is available", () => {
+  it("displays therapy progress charts when data is available", async () => {
     render(<TherapistDashboard sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
-    expect(screen.getByTestId('therapy-charts')).toBeInTheDocument();
+    expect(await screen.findByTestId('therapy-charts')).toBeInTheDocument();
   });
 
   it("renders children components when provided", () => {
@@ -85,7 +102,6 @@ describe("TherapistDashboard", () => {
 
   it("throws error when onSessionControl prop is missing", () => {
     const renderWithoutProp = () => {
-      // @ts-expect-error - Testing missing required prop
       render(<TherapistDashboard sessions={mockSessions} />);
     };
     expect(renderWithoutProp).toThrow('TherapistDashboard requires onSessionControl prop');

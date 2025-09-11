@@ -8,7 +8,7 @@ import { ProgressBar } from "../ProgressBar";
 import { SessionMetrics } from "../SessionMetrics";
 import type { TherapistSession } from "@/types/dashboard";
 import type { TherapistAnalyticsChartData } from "@/types/analytics";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 describe("Dashboard Performance Tests", () => {
   // Create large dataset for performance testing
@@ -43,7 +43,7 @@ describe("Dashboard Performance Tests", () => {
   const createLargeAnalyticsDataset = (count: number): TherapistAnalyticsChartData => {
     return {
       sessionMetrics: Array.from({ length: count }, (_, i) => ({
-        date: new Date(Date.now() - (count - i) * 86400000).toISOString().split('T')[0],
+        date: new Date(Date.now() - (count - i) * 86400000).toISOString().slice(0, 10),
         sessions: Math.floor(Math.random() * 10) + 1,
         therapistSessions: Math.floor(Math.random() * 5) + 1,
         averageSessionProgress: Math.floor(Math.random() * 100),
@@ -126,7 +126,7 @@ describe("Dashboard Performance Tests", () => {
       name: 'test-measure',
       startTime: 0,
       detail: null
-    })) as any;
+    } as PerformanceMeasure));
     performance.getEntriesByName = vi.fn(() => []);
     performance.clearMarks = vi.fn();
     performance.clearMeasures = vi.fn();
@@ -172,7 +172,7 @@ describe("Dashboard Performance Tests", () => {
   it("renders progress tracker efficiently", () => {
     const startTime = performance.now();
 
-    render(React.createElement(TherapistProgressTracker, { session: mockSessions[0] }));
+  render(React.createElement(TherapistProgressTracker, { session: mockSessions[0]! }));
 
     const endTime = performance.now();
     const renderTime = endTime - startTime;
@@ -240,7 +240,14 @@ describe("Dashboard Performance Tests", () => {
 
     // Interaction should be fast
     expect(interactionTime).toBeLessThan(10);
-    expect(mockOnSessionControl).toHaveBeenCalledWith('session-1', 'pause');
+
+    // Find the first active session from the dataset instead of hardcoding
+    const firstActiveSession = mockSessions.find(session => session.status === 'active');
+    expect(firstActiveSession).toBeDefined();
+
+    // Extract the ID safely after confirming it exists
+    // @ts-expect-error - firstActiveSession is guaranteed to be defined after the assertion above
+    expect(mockOnSessionControl).toHaveBeenCalledWith(firstActiveSession.id, 'pause');
   });
 
   it("maintains performance with frequent re-renders", () => {
@@ -341,7 +348,7 @@ describe("Dashboard Performance Tests", () => {
     }));
 
     promises.push(new Promise(resolve => {
-      render(React.createElement(TherapistProgressTracker, { session: mockSessions[0] }));
+  render(React.createElement(TherapistProgressTracker, { session: mockSessions[0]! }));
       resolve(true);
     }));
 
@@ -474,7 +481,7 @@ describe("Dashboard Performance Tests", () => {
 describe("Dashboard Performance (non-JSX)", () => {
   it("renders therapist dashboard using createElement", () => {
     const mockOnSessionControl = vi.fn();
-    render(React.createElement(TherapistDashboard as any, { sessions: [], onSessionControl: mockOnSessionControl }));
+    render(React.createElement(TherapistDashboard, { sessions: [], onSessionControl: mockOnSessionControl }));
     expect(screen.getByLabelText("Therapist Dashboard")).toBeInTheDocument();
   });
 });

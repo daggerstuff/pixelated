@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { SessionControls } from "../SessionControls";
 import type { TherapistSession } from "@/types/dashboard";
 import { describe, expect, it, vi, beforeEach } from "vitest";
@@ -59,11 +60,12 @@ describe("SessionControls", () => {
     expect(resumeButton).toBeEnabled();
   });
 
-  it("calls onSessionControl with correct parameters when buttons are clicked", () => {
+  it("calls onSessionControl with correct parameters when buttons are clicked", async () => {
+    const user = userEvent.setup();
     render(<SessionControls sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
 
     const pauseButton = screen.getByText('Pause Session');
-    fireEvent.click(pauseButton);
+    await user.click(pauseButton);
 
     expect(mockOnSessionControl).toHaveBeenCalledWith('session-1', 'pause');
   });
@@ -101,13 +103,14 @@ describe("SessionControls", () => {
     expect(pauseButton).toHaveFocus();
   });
 
-  it("handles escape key to blur buttons", () => {
+  it("handles escape key to blur buttons", async () => {
+    const user = userEvent.setup();
     render(<SessionControls sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
 
     const pauseButton = screen.getByText('Pause Session');
     pauseButton.focus();
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+    await user.keyboard('{Escape}');
 
     // In JSDOM, we can't easily test blur state, but we can ensure no errors occur
     expect(screen.getByText('Pause Session')).toBeInTheDocument();

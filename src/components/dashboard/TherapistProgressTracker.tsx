@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import useSkillProgress, { SkillProgress } from "@/hooks/useSkillProgress";
 import type { TherapistSession } from "@/types/dashboard";
 import { ProgressBar } from "./ProgressBar";
 import { SessionMetrics } from "./SessionMetrics";
@@ -18,13 +19,8 @@ export function TherapistProgressTracker({ session, className }: TherapistProgre
   const durationHours = Math.floor(durationMinutes / 60);
   const remainingMinutes = durationMinutes % 60;
 
-  // Mock skill progress data (in a real app, this would come from the session data)
-  const skillProgress = [
-    { skill: "Active Listening", score: 85, trend: "up" as const },
-    { skill: "Empathy", score: 78, trend: "stable" as const },
-    { skill: "Questioning", score: 92, trend: "up" as const },
-    { skill: "Reflection", score: 71, trend: "down" as const },
-  ];
+  // We call the hook with the session to derive or fetch skill progress data
+  const { data: skillProgress, loading: skillsLoading, error: skillsError } = useSkillProgress(session);
 
   // Expandable sections for better keyboard navigation
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -118,28 +114,44 @@ export function TherapistProgressTracker({ session, className }: TherapistProgre
         </div>
         {expandedSections['skills'] && (
           <div className="space-y-3">
-            {skillProgress.map((skill, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-2 rounded hover:bg-background focus-within:bg-background focus-within:ring-1 focus-within:ring-primary"
-                tabIndex={0}
-                role="listitem"
-                aria-label={`${skill.skill}: ${skill.score}% (${skill.trend})`}
-              >
-                <span className="text-sm font-medium">{skill.skill}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">{skill.score}%</span>
-                  <span className={cn(
-                    "text-xs",
-                    skill.trend === 'up' && "text-green-600",
-                    skill.trend === 'down' && "text-red-600",
-                    skill.trend === 'stable' && "text-gray-600"
-                  )} aria-label={`Trend: ${skill.trend === 'up' ? 'improving' : skill.trend === 'down' ? 'declining' : 'stable'}`}>
-                    {skill.trend === 'up' ? '↗' : skill.trend === 'down' ? '↘' : '→'}
-                  </span>
-                </div>
+            {skillsLoading && (
+              <div className="text-sm text-muted-foreground">Loading skills…</div>
+            )}
+
+            {skillsError && (
+              <div className="text-sm text-red-600">Failed to load skills: {skillsError.message}</div>
+            )}
+
+            {!skillsLoading && !skillsError && (!skillProgress || skillProgress.length === 0) && (
+              <div className="text-sm text-muted-foreground">No skill progress available for this session.</div>
+            )}
+
+            {!skillsLoading && !skillsError && skillProgress && skillProgress.length > 0 && (
+              <div className="space-y-2" role="list">
+                {skillProgress.map((skill: SkillProgress, index: number) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 rounded hover:bg-background focus-within:bg-background focus-within:ring-1 focus-within:ring-primary"
+                    tabIndex={0}
+                    role="listitem"
+                    aria-label={`${skill.skill}: ${skill.score}% (${skill.trend})`}
+                  >
+                    <span className="text-sm font-medium">{skill.skill}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">{skill.score}%</span>
+                      <span className={cn(
+                        "text-xs",
+                        skill.trend === 'up' && "text-green-600",
+                        skill.trend === 'down' && "text-red-600",
+                        skill.trend === 'stable' && "text-gray-600"
+                      )} aria-label={`Trend: ${skill.trend === 'up' ? 'improving' : skill.trend === 'down' ? 'declining' : 'stable'}`}>
+                        {skill.trend === 'up' ? '↗' : skill.trend === 'down' ? '↘' : '→'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
       </section>
@@ -162,8 +174,12 @@ export function TherapistProgressTracker({ session, className }: TherapistProgre
           </button>
         </div>
         {expandedSections['notes'] && (
-          <div className="text-sm text-muted-foreground italic">
-            Session notes and observations will appear here...
+          <div className="text-sm">
+            {session.notes ? (
+              <p>{session.notes}</p>
+            ) : (
+              <p className="text-muted-foreground italic">No notes available for this session.</p>
+            )}
           </div>
         )}
       </section>

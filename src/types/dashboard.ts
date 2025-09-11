@@ -5,6 +5,7 @@ export interface SessionProgressMetrics {
   totalMessages: number
   therapistMessages: number
   clientMessages: number
+  responsesCount: number // count of responses for averaging
 
   // Time-based metrics
   sessionDuration: number // in seconds
@@ -34,6 +35,7 @@ export interface TherapistSession {
   analyticsData?: AnalyticsChartData
   sessionMetrics?: SessionData[]
   progressMetrics?: SessionProgressMetrics
+  notes?: string
 }
 
 export interface TherapistDashboardProps {
