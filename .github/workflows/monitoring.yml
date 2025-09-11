@@ -12,7 +12,7 @@ permissions: read-all
 
 env:
   NODE_VERSION: 24.7.0
-  PNPM_VERSION: 10.15.0
+  PNPM_VERSION: 10.16.0
   NODE_ENV: production
 
 jobs:
@@ -82,19 +82,19 @@ jobs:
           local max_retries=3
           local timeout=30
           local retry_delay=10
-          
+
           for attempt in $(seq 1 $max_retries); do
             echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
-            
+
             # Use curl with explicit timeout and connection timeout
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               --connect-timeout 15 \
               --max-time $timeout \
               --retry 0 \
               "$url" 2>/dev/null || echo "000")
-            
+
             echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
-            
+
             if [[ "$HTTP_STATUS" == "200" ]]; then
               echo "✅ $endpoint_name check successful"
               return 0
@@ -103,13 +103,13 @@ jobs:
             else
               echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
             fi
-            
+
             if [[ $attempt -lt $max_retries ]]; then
               echo "⏳ Waiting ${retry_delay}s before retry..."
               sleep $retry_delay
             fi
           done
-          
+
           return 1
         }
 
@@ -295,19 +295,19 @@ jobs:
           local max_retries=2  # Fewer retries for staging
           local timeout=20     # Shorter timeout for staging
           local retry_delay=5  # Shorter delay for staging
-          
+
           for attempt in $(seq 1 $max_retries); do
             echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
-            
+
             # Use curl with explicit timeout and connection timeout
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               --connect-timeout 10 \
               --max-time $timeout \
               --retry 0 \
               "$url" 2>/dev/null || echo "000")
-            
+
             echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
-            
+
             if [[ "$HTTP_STATUS" == "200" ]]; then
               echo "✅ $endpoint_name check successful"
               return 0
@@ -316,13 +316,13 @@ jobs:
             else
               echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
             fi
-            
+
             if [[ $attempt -lt $max_retries ]]; then
               echo "⏳ Waiting ${retry_delay}s before retry..."
               sleep $retry_delay
             fi
           done
-          
+
           return 1
         }
 
@@ -465,19 +465,19 @@ jobs:
           local max_retries=1  # Single retry for preview
           local timeout=15     # Short timeout for preview
           local retry_delay=3  # Very short delay for preview
-          
+
           for attempt in $(seq 1 $max_retries); do
             echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
-            
+
             # Use curl with explicit timeout and connection timeout
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               --connect-timeout 8 \
               --max-time $timeout \
               --retry 0 \
               "$url" 2>/dev/null || echo "000")
-            
+
             echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
-            
+
             if [[ "$HTTP_STATUS" == "200" ]]; then
               echo "✅ $endpoint_name check successful"
               return 0
@@ -486,13 +486,13 @@ jobs:
             else
               echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
             fi
-            
+
             if [[ $attempt -lt $max_retries ]]; then
               echo "⏳ Waiting ${retry_delay}s before retry..."
               sleep $retry_delay
             fi
           done
-          
+
           return 1
         }
 
