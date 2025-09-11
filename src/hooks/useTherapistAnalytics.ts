@@ -214,15 +214,16 @@ export function useTherapistAnalytics(
       logger.info('Therapist analytics data generated successfully');
 
     } catch (loadError) {
-      const analyticsError: AnalyticsError = {
-        code: 'GENERATION_ERROR',
-        message: loadError instanceof Error ? loadError.message : 'Unknown error occurred',
-        details: loadError,
-      };
+import { AnalyticsError } from '@/lib/services/analytics/analytics-types';
+
+      const analyticsError = new AnalyticsError(
+        loadError instanceof Error ? loadError.message : 'Unknown error occurred',
+        'GENERATION_ERROR',
+        loadError
+      );
 
       setError(analyticsError);
       logger.error('Failed to generate therapist analytics data', { error: analyticsError });
-
     } finally {
       if (showLoading) {
         setIsLoading(false);
