@@ -1,0 +1,167 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import { TherapistProgressTracker } from "../TherapistProgressTracker";
+import type { TherapistSession } from "@/types/dashboard";
+import { describe, expect, it } from "vitest";
+
+describe("TherapistProgressTracker", () => {
+  const mockSession: TherapistSession = {
+    id: 'session-1',
+    clientId: 'client-1',
+    therapistId: 'therapist-1',
+    startTime: '2025-01-01T10:00:00Z',
+    endTime: '2025-01-01T11:30:00Z',
+    status: 'completed',
+    progress: 85,
+    progressMetrics: {
+      totalMessages: 42,
+      therapistMessages: 21,
+      clientMessages: 21,
+      sessionDuration: 5400,
+      activeTime: 3600,
+      skillScores: {
+        'Active Listening': 85,
+        'Empathy': 78,
+        'Questioning': 92,
+        'Reflection': 71
+      },
+      responseTime: 2.5,
+      conversationFlow: 88,
+      milestonesReached: ['introduction', 'exploration', 'closure']
+    }
+  };
+
+  it("renders progress tracker with session data", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    expect(screen.getByLabelText("Therapist Progress Tracker")).toBeInTheDocument();
+    expect(screen.getByText("Session Overview")).toBeInTheDocument();
+    expect(screen.getByText("Overall Progress")).toBeInTheDocument();
+    expect(screen.getByText("Skill Development")).toBeInTheDocument();
+    expect(screen.getByText("Session Notes")).toBeInTheDocument();
+  });
+
+  it("displays correct session overview metrics", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    expect(screen.getByText("Session ID")).toBeInTheDocument();
+    expect(screen.getByText("session-1")).toBeInTheDocument();
+    expect(screen.getByText("Status")).toBeInTheDocument();
+    expect(screen.getByText("completed")).toBeInTheDocument();
+    expect(screen.getByText("Duration")).toBeInTheDocument();
+    expect(screen.getByText("1h 30m")).toBeInTheDocument();
+    expect(screen.getByText("Progress")).toBeInTheDocument();
+    expect(screen.getByText("85%")).toBeInTheDocument();
+  });
+
+  it("renders progress bar with correct value", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    const progressBar = screen.getByRole("progressbar");
+    expect(progressBar).toHaveAttribute("aria-valuenow", "85");
+    expect(progressBar).toHaveAttribute("aria-valuemax", "100");
+    expect(screen.getByText("85%")).toBeInTheDocument();
+  });
+
+  it("displays skill development data", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    expect(screen.getByText("Active Listening")).toBeInTheDocument();
+    expect(screen.getByText("85%")).toBeInTheDocument();
+    expect(screen.getByText("Empathy")).toBeInTheDocument();
+    expect(screen.getByText("78%")).toBeInTheDocument();
+    expect(screen.getByText("Questioning")).toBeInTheDocument();
+    expect(screen.getByText("92%")).toBeInTheDocument();
+    expect(screen.getByText("Reflection")).toBeInTheDocument();
+    expect(screen.getByText("71%")).toBeInTheDocument();
+  });
+
+  it("shows skill trends with correct indicators", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    // Check trend indicators
+    const trendIndicators = screen.getAllByText(/↗|↘|→/);
+    expect(trendIndicators.length).toBeGreaterThan(0);
+  });
+
+  it("handles session without end time (in progress)", () => {
+    const inProgressSession: TherapistSession = {
+      ...mockSession,
+      endTime: undefined,
+      status: 'active'
+    };
+
+    render(<TherapistProgressTracker session={inProgressSession} />);
+
+    expect(screen.getByText("In Progress")).toBeInTheDocument();
+  });
+
+  it("handles session without progress metrics", () => {
+    const sessionWithoutMetrics: TherapistSession = {
+      ...mockSession,
+      progressMetrics: undefined
+    };
+
+    render(<TherapistProgressTracker session={sessionWithoutMetrics} />);
+
+    // Should still render basic session info
+    expect(screen.getByText("Session Overview")).toBeInTheDocument();
+    expect(screen.getByText("Overall Progress")).toBeInTheDocument();
+ });
+
+  it("toggles section expansion", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    const overviewToggle = screen.getByLabelText("Collapse session overview");
+    const progressToggle = screen.getByLabelText("Collapse overall progress");
+
+    // Initially expanded
+    expect(screen.getByText("Session ID")).toBeInTheDocument();
+    expect(screen.getByText("85%")).toBeInTheDocument();
+
+    // Toggle overview section
+    fireEvent.click(overviewToggle);
+    expect(screen.queryByText("Session ID")).not.toBeInTheDocument();
+
+    // Toggle back
+    fireEvent.click(overviewToggle);
+    expect(screen.getByText("Session ID")).toBeInTheDocument();
+  });
+
+  it("applies correct styling classes", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    const container = screen.getByLabelText("Therapist Progress Tracker");
+    expect(container).toHaveClass("space-y-6");
+
+    const sections = screen.getAllByRole("region");
+    sections.forEach(section => {
+      expect(section).toHaveClass("bg-muted", "rounded-md", "p-4");
+    });
+  });
+
+  it("renders with custom className", () => {
+    render(<TherapistProgressTracker session={mockSession} className="custom-class" />);
+
+    const container = screen.getByLabelText("Therapist Progress Tracker");
+    expect(container).toHaveClass("custom-class");
+ });
+
+  it("handles keyboard navigation for toggle buttons", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    const toggleButton = screen.getByLabelText("Collapse session overview");
+    toggleButton.focus();
+
+    expect(toggleButton).toHaveFocus();
+  });
+
+  it("renders session notes section", () => {
+    render(<TherapistProgressTracker session={mockSession} />);
+
+    const notesToggle = screen.getByLabelText("Collapse session notes");
+    expect(notesToggle).toBeInTheDocument();
+
+    // Notes section should be expanded by default
+    expect(screen.getByText("Session notes and observations will appear here...")).toBeInTheDocument();
+  });
+});
