@@ -33,7 +33,7 @@ import type { SessionProgressMetrics } from '@/types/dashboard';
  * - `context`: Arbitrary session context (e.g., topic, metadata).
  * - `sessionState`: Current session state ('idle', 'active', 'paused', 'ended').
  */
-export interface ConversationMemory {
+interface ConversationMemory {
   history: Array<{ role: 'therapist' | 'client'; message: string }>;
   context: Record<string, any>;
   sessionState: 'idle' | 'active' | 'paused' | 'ended';
@@ -83,7 +83,9 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
   // Extracted session timing and metrics logic
   const sessionStartTimeRef = useRef<number>(Date.now());
   const lastActiveTimeRef = useRef<number>(Date.now());
-  const lastMessageTimeRef = useRef<number>(Date.now());
+  // Lazily track the timestamp of the last message. Start as null so the initial
+  // mount -> first-message interval isn't treated as a response time.
+  const lastMessageTimeRef = useRef<number | null>(null);
 
   useSessionTimingMetrics(memory.sessionState, setMemory, sessionStartTimeRef, lastActiveTimeRef);
 
@@ -113,32 +115,46 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
    */
   const addMessage = (role: 'therapist' | 'client', message: string) => {
     const currentTime = Date.now();
-    const responseTime = (currentTime - lastMessageTimeRef.current) / 1000; // in seconds
+    // If there's no previous message recorded, skip response-time calculation so
+    // the first message doesn't produce a skewed response time.
+    const responseTime = lastMessageTimeRef.current === null
+      ? null
+      : (currentTime - lastMessageTimeRef.current) / 1000; // in seconds
 
     setMemory((prev) => ({
       ...prev,
       history: [...prev.history, { role, message }],
     }));
 
-    // Update progress metrics for message counts and response time
-    // Manually update progressMetrics since setProgressState does not accept a function updater
-    setProgressState({
-      progressMetrics: {
-        ...progressMetrics,
-        totalMessages: (progressMetrics.totalMessages ?? 0) + 1,
-        therapistMessages: role === 'therapist'
-          ? (progressMetrics.therapistMessages ?? 0) + 1
-          : progressMetrics.therapistMessages ?? 0,
-        clientMessages: role === 'client'
-          ? (progressMetrics.clientMessages ?? 0) + 1
-          : progressMetrics.clientMessages ?? 0,
-        responseTime: ((progressMetrics.responseTime ?? 0) * (progressMetrics.responsesCount ?? 0) + responseTime) /
-          ((progressMetrics.responsesCount ?? 0) + 1),
-        responsesCount: (progressMetrics.responsesCount ?? 0) + 1,
-      },
-    });
+    // Update progress metrics for message counts and (optionally) response time.
+    // Manually update progressMetrics since setProgressState does not accept a function updater.
+    // Only include response-time statistics when we have a valid previous timestamp.
+    const prevResponses = progressMetrics.responsesCount ?? 0;
+    const prevAvg = progressMetrics.responseTime ?? 0;
 
-    lastMessageTimeRef.current = currentTime;
+    const updatedMetrics: typeof progressMetrics = {
+      ...progressMetrics,
+      totalMessages: (progressMetrics.totalMessages ?? 0) + 1,
+      therapistMessages: role === 'therapist'
+        ? (progressMetrics.therapistMessages ?? 0) + 1
+        : progressMetrics.therapistMessages ?? 0,
+      clientMessages: role === 'client'
+        ? (progressMetrics.clientMessages ?? 0) + 1
+        : progressMetrics.clientMessages ?? 0,
+    } as typeof progressMetrics;
+
+    if (responseTime !== null) {
+      // Update running average response time and response count
+      const newResponses = prevResponses + 1;
+      const newAvg = ((prevAvg * prevResponses) + responseTime) / newResponses;
+      updatedMetrics.responseTime = newAvg;
+      updatedMetrics.responsesCount = newResponses;
+    }
+
+    setProgressState({ progressMetrics: updatedMetrics });
+
+  // Record the timestamp for subsequent messages
+  lastMessageTimeRef.current = currentTime;
   };
 
   /**
@@ -192,9 +208,11 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
   };
 
   const resetSession = () => {
-    sessionStartTimeRef.current = Date.now();
-    lastActiveTimeRef.current = Date.now();
-    lastMessageTimeRef.current = Date.now();
+  sessionStartTimeRef.current = Date.now();
+  lastActiveTimeRef.current = Date.now();
+  // Clear lastMessageTime so the next message is treated as the first.
+  // This ensures first-sample behavior is preserved after reset.
+  lastMessageTimeRef.current = null;
 
     setMemory((prev) => ({
       ...prev,
