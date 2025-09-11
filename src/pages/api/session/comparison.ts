@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
       const query = `
         INSERT INTO session_comparisons (
           therapist_id, current_session_id, previous_session_id, improvement_score, comparison_metrics
-        ) VALUES ($1, $2, $3, $4, $5)
+        ) VALUES ($1, $2, $3, $4, $5::jsonb)
         RETURNING id
       `;
 
