@@ -30,7 +30,8 @@ describe("useTherapistAnalytics", () => {
         },
         responseTime: 2.5,
         conversationFlow: 88,
-        milestonesReached: ['introduction', 'exploration']
+        milestonesReached: ['introduction', 'exploration'],
+        responsesCount: 0
       }
     },
     {
@@ -52,7 +53,8 @@ describe("useTherapistAnalytics", () => {
         },
         responseTime: 2.1,
         conversationFlow: 92,
-        milestonesReached: ['introduction']
+        milestonesReached: ['introduction'],
+        responsesCount: 0
       }
     }
   ];
@@ -160,9 +162,11 @@ describe("useTherapistAnalytics", () => {
 
     const comparativeData = result.current.data?.comparativeData;
     expect(comparativeData).toBeDefined();
-    expect(comparativeData?.trend).toBe('declining'); // session-1 (85) vs session-2 (60) - declining
-    expect(comparativeData?.currentSession.sessionId).toBe('session-1');
-    expect(comparativeData?.previousSession?.sessionId).toBe('session-2');
+  expect(comparativeData?.trend).toBe('declining'); // session-1 (85) vs session-2 (60) - declining
+  // sessions are sorted by startTime descending, so the most recent session (session-2)
+  // should be considered the current session and the older one (session-1) the previous
+  expect(comparativeData?.currentSession.sessionId).toBe('session-2');
+  expect(comparativeData?.previousSession?.sessionId).toBe('session-1');
   });
 
   it("handles empty sessions array", async () => {
@@ -248,7 +252,8 @@ describe("useTherapistAnalytics", () => {
         },
         responseTime: 1.8,
         conversationFlow: 95,
-        milestonesReached: ['introduction', 'exploration', 'closure']
+        milestonesReached: ['introduction', 'exploration', 'closure'],
+        responsesCount: 0
       }
     };
     updatedSessions.push(newSession);
@@ -299,9 +304,10 @@ describe("useTherapistAnalytics", () => {
     expect(comparativeData).toBeUndefined();
   });
 
-  it("applies default options", async () => {
+  it("handles filters correctly", async () => {
+    const filters = { timeRange: '7d' as const };
     const { result } = renderHook(() =>
-      useTherapistAnalytics(mockFilters, mockSessions, {})
+      useTherapistAnalytics(filters, mockSessions)
     );
 
     // Wait for data to load

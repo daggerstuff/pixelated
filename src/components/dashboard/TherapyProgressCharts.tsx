@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 interface TherapyProgressChartsProps {
   data: TherapistAnalyticsChartData;
   className?: string;
+  /** Optional locale string (e.g. 'en-US'). If omitted, will use the user's default locale. */
+  locale?: string;
 }
 
 // Session Progress Timeline Chart
@@ -12,7 +14,7 @@ interface SessionProgressTimelineProps {
   sessions: TherapistAnalyticsChartData['sessionMetrics'];
 }
 
-const SessionProgressTimeline: React.FC<SessionProgressTimelineProps> = ({ sessions }) => {
+const SessionProgressTimeline: React.FC<SessionProgressTimelineProps & { locale?: string }> = ({ sessions, locale }) => {
   if (sessions.length === 0) {
     return (
       <div className="bg-muted rounded-md p-4 text-center text-muted-foreground">
@@ -30,6 +32,8 @@ const SessionProgressTimeline: React.FC<SessionProgressTimelineProps> = ({ sessi
   const progressValues = sortedSessions.map(session => session.averageSessionProgress ?? 0);
   const maxProgress = Math.max(...progressValues, 1);
 
+  const dateFormatter = new Intl.DateTimeFormat(locale ?? (typeof navigator !== 'undefined' ? navigator.language : undefined), { month: 'short', day: 'numeric' });
+
   return (
     <div className="bg-white p-4 rounded-lg shadow">
       <h3 className="text-lg font-semibold mb-4">Session Progress Timeline</h3>
@@ -37,17 +41,21 @@ const SessionProgressTimeline: React.FC<SessionProgressTimelineProps> = ({ sessi
         {sortedSessions.map((session, index) => (
           <div key={session.sessionId} className="flex-1 flex flex-col items-center">
             <div
-              className="bg-blue-500 w-full rounded-t transition-all duration-300 hover:bg-blue-600"
+              className="bg-blue-600 w-full rounded-t transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus:outline-none"
               style={{
-                height: `${(progressValues[index] / maxProgress) * 100}%`,
+                // guard against undefined just in case
+                height: `${((progressValues[index] ?? 0) / maxProgress) * 100}%`,
                 minHeight: '4px'
               }}
-              title={`Session ${session.sessionId.slice(0, 8)}: ${progressValues[index]}% progress`}
+              title={`Session ${session.sessionId.slice(0, 8)}: ${progressValues[index] ?? 0}% progress`}
+              tabIndex={0}
+              role="presentation"
+              aria-label={`Session ${session.sessionId.slice(0, 8)}: ${progressValues[index] ?? 0}% progress`}
             />
             <span className="text-xs mt-2 text-gray-600">
-              {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              {dateFormatter.format(new Date(session.date))}
             </span>
-            <span className="text-xs text-gray-500">{progressValues[index]}%</span>
+            <span className="text-xs text-gray-500">{progressValues[index] ?? 0}%</span>
           </div>
         ))}
       </div>
@@ -217,7 +225,7 @@ const SessionComparison: React.FC<SessionComparisonProps> = ({ comparativeData }
                 <span className="text-sm font-medium">{item.current}{item.unit}</span>
                 <span className={cn(
                   "text-xs px-2 py-1 rounded",
-                  isImprovement ? "bg-green-10 text-green-800" : "bg-red-100 text-red-800"
+                  isImprovement ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                 )}>
                   {isImprovement ? '+' : ''}{difference.toFixed(1)}{item.unit}
                 </span>
@@ -293,10 +301,10 @@ const SkillImprovementTimeline: React.FC<SkillImprovementTimelineProps> = ({ ski
   );
 };
 
-export function TherapyProgressCharts({ data, className }: TherapyProgressChartsProps) {
+export function TherapyProgressCharts({ data, className, locale }: TherapyProgressChartsProps) {
   return (
     <div className={cn("space-y-6", className)} aria-label="Therapy Progress Charts">
-      <SessionProgressTimeline sessions={data.sessionMetrics} />
+      <SessionProgressTimeline sessions={data.sessionMetrics} locale={locale} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SkillDevelopmentRadar skills={data.skillProgress} />
         <SessionComparison comparativeData={data.comparativeData} />
