@@ -322,8 +322,6 @@ Never save working files, text/mds and tests to the root folder.
 
 [byterover-mcp]
 
-[byterover-mcp]
-
 # Byterover MCP Server Tools Reference
 
 There are two main workflows with Byterover tools and recommended tool call strategies that you **MUST** follow precisely. 
