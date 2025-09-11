@@ -3,20 +3,33 @@ import type { TherapistAnalyticsChartData } from '@/types/analytics'
 import { cn } from '@/lib/utils'
 
 interface TherapyProgressChartsProps {
-  data: TherapistAnalyticsChartData
-  className?: string
-  locale?: string
+  data: TherapistAnalyticsChartData;
+  className?: string;
+  /** Optional locale string (e.g. 'en-US'). If omitted, will use the user's default locale. */
+  locale?: string;
 }
 
-const SessionProgressTimeline: React.FC<{ sessions?: TherapistAnalyticsChartData['sessionMetrics']; locale?: string }> = ({ sessions = [], locale }) => {
-  if (!sessions || sessions.length === 0) {
-    return <div className="bg-muted rounded-md p-4 text-center text-muted-foreground">No session data available</div>
+// Session Progress Timeline Chart
+interface SessionProgressTimelineProps {
+  sessions: TherapistAnalyticsChartData['sessionMetrics'];
+}
+
+const SessionProgressTimeline: React.FC<SessionProgressTimelineProps & { locale?: string }> = ({ sessions, locale }) => {
+  if (sessions.length === 0) {
+    return (
+      <div className="bg-muted rounded-md p-4 text-center text-muted-foreground">
+        No session data available
+      </div>
+    );
+  }
   }
 
   const sorted = [...sessions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   const values = sorted.map((s) => s.averageSessionProgress ?? 0)
   const max = Math.max(...values, 1)
   const df = new Intl.DateTimeFormat(locale ?? (typeof navigator !== 'undefined' ? navigator.language : 'en-US'), { month: 'short', day: 'numeric' })
+
+  const dateFormatter = new Intl.DateTimeFormat(locale ?? (typeof navigator !== 'undefined' ? navigator.language : undefined), { month: 'short', day: 'numeric' });
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">
@@ -25,11 +38,20 @@ const SessionProgressTimeline: React.FC<{ sessions?: TherapistAnalyticsChartData
         {sorted.map((s, i) => (
           <div key={String(s.sessionId)} className="flex-1 flex flex-col items-center">
             <div
-              className="bg-blue-600 w-full rounded-t transition-all duration-300 hover:bg-blue-700"
-              style={{ height: `${((values[i] ?? 0) / max) * 100}%`, minHeight: 4 }}
-              title={`${values[i] ?? 0}%`}
+              className="bg-blue-600 w-full rounded-t transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus:outline-none"
+              style={{
+                // guard against undefined just in case
+                height: `${((values[i] ?? 0) / max) * 100}%`,
+                minHeight: '4px'
+              }}
+              title={`Session ${s.sessionId.slice(0, 8)}: ${values[i] ?? 0}% progress`}
+              tabIndex={0}
+              role="presentation"
+              aria-label={`Session ${s.sessionId.slice(0, 8)}: ${values[i] ?? 0}% progress`}
             />
-            <span className="text-xs mt-2 text-gray-600">{df.format(new Date(s.date))}</span>
+            <span className="text-xs mt-2 text-gray-600">
+              {df.format(new Date(s.date))}
+            </span>
             <span className="text-xs text-gray-500">{values[i] ?? 0}%</span>
           </div>
         ))}
@@ -149,9 +171,9 @@ const SkillImprovementTimeline: React.FC<{ skills?: TherapistAnalyticsChartData[
   )
 }
 
-export default function TherapyProgressCharts({ data, className, locale }: TherapyProgressChartsProps) {
+export function TherapyProgressCharts({ data, className, locale }: TherapyProgressChartsProps) {
   return (
-    <div className={cn('space-y-6', className)} aria-label="Therapy Progress Charts">
+    <div className={cn("space-y-6", className)} aria-label="Therapy Progress Charts">
       <SessionProgressTimeline sessions={data.sessionMetrics} locale={locale} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SkillDevelopmentRadar skills={data.skillProgress} />

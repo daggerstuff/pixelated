@@ -111,7 +111,7 @@ Pixelated Empathy is a full-stack AI-powered bias detection and mental health pl
 	```
 - **Azure Pipelines:**
 	- CI/CD pipeline defined in `azure-pipelines.yml`
-	- Node.js 24.x, pnpm 10.15.0
+	- Node.js 24.x, pnpm 10.16.0
 	- Stages: Build, DockerBuild, Deploy, PostDeployTests
 - **Deployment commands:**
 	```sh
