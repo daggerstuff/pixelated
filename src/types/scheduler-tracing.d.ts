@@ -6,3 +6,5 @@ declare module 'scheduler/tracing' {
     readonly tags?: Set<string>;
   }
 }
+
+// types module

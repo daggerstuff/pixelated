@@ -36,3 +36,7 @@ declare module '@/lib/memory/memory-client' {
 
   export {}
 }
+
+// types module
+
+// types module (standardized)

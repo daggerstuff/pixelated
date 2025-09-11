@@ -17,3 +17,7 @@ declare module 'astro' {
     }
   }
 }
+
+export {}
+
+// types module

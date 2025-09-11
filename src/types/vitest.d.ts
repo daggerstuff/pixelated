@@ -7,3 +7,5 @@
 /// <reference types="vitest/globals" />
 
 export {}
+
+// types module

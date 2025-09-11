@@ -27,3 +27,5 @@ declare module 'scheduler/tracing' {
   ): unknown
   export function unstable_wrap(callback: CallbackFn): CallbackFn
 }
+
+// types module

@@ -1,16 +1,5 @@
-// Use server-only helper for MongoDB types
-import { getServerMongoExports } from '@/lib/server-only/mongodb-types'
+import type { ObjectId } from 'mongodb'
 
-let _ObjectId: unknown
-
-async function ensureObjectId() {
-  if (!_ObjectId) {
-    const mongo = await getServerMongoExports()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    _ObjectId = (mongo as any).ObjectId
-  }
-  return _ObjectId
-}
 // MongoDB-based user settings types
 
 export interface UserSettings {
