@@ -18,8 +18,8 @@
  * - Optimized chart rendering for different screen sizes
  */
 
-import type React from 'react';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import type React from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 // Lazy load the charts component to reduce initial bundle size
 // const BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
@@ -28,12 +28,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert } from '@/components/ui/alert'
 // Use lazy-loaded chart components to reduce bundle size
 import {
   XAxis,
@@ -55,7 +55,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from '@/components/ui/LazyChart';
+} from '@/components/ui/LazyChart'
 import {
   AlertTriangle,
   Users,
@@ -77,11 +77,15 @@ import {
   AlertCircle,
   Info,
   CheckCircle,
-} from 'lucide-react';
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger';
-import type { BiasDashboardData, BiasAnalysisResult, DashboardRecommendation } from '@/lib/ai/bias-detection';
+} from 'lucide-react'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type {
+  BiasDashboardData,
+  BiasAnalysisResult,
+  DashboardRecommendation,
+} from '@/lib/ai/bias-detection'
 
-const logger = createBuildSafeLogger('bias-dashboard');
+const logger = createBuildSafeLogger('bias-dashboard')
 
 interface BiasDashboardProps {
   className?: string
@@ -142,7 +146,7 @@ type WebSocketMessage =
   | { type: 'trends_update'; trends: TrendItem[] }
   | { type: 'connection_status'; status: string; error?: string }
   | { type: 'heartbeat' }
-  | { type: 'heartbeat_response' };
+  | { type: 'heartbeat_response' }
 
 interface TrendItem extends BaseFilterableItem {
   biasScore: number
@@ -277,7 +281,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   const [reducedMotion, setReducedMotion] = useState(false)
   const [announcements, setAnnouncements] = useState<string[]>([])
   // State for new high/critical bias alert notification
-  const [newHighBiasAlert, setNewHighBiasAlert] = useState<AlertItem | null>(null)
+  const [newHighBiasAlert, setNewHighBiasAlert] = useState<AlertItem | null>(
+    null,
+  )
 
   // Focus management refs
   const skipLinkRef = useRef<HTMLButtonElement>(null)
@@ -551,12 +557,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     ...alert,
                     acknowledged: true,
                     status: action,
-                    timestamp: alert.timestamp instanceof Date ? alert.timestamp : new Date(alert.timestamp!),
+                    timestamp:
+                      alert.timestamp instanceof Date
+                        ? alert.timestamp
+                        : new Date(alert.timestamp!),
                   } as typeof alert
                 }
                 return {
                   ...alert,
-                  timestamp: alert.timestamp instanceof Date ? alert.timestamp : new Date(alert.timestamp!),
+                  timestamp:
+                    alert.timestamp instanceof Date
+                      ? alert.timestamp
+                      : new Date(alert.timestamp!),
                 } as typeof alert
               }),
             }
@@ -732,7 +744,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         alertsCount: data.alerts.length,
       })
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? (err as Error)?.message || String(err) : 'Unknown error'
+      const errorMessage =
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'Unknown error'
       setError(errorMessage)
       logger.error('Failed to fetch dashboard data', { error: errorMessage })
     } finally {
@@ -835,115 +850,151 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         ws.onmessage = (event) => {
           try {
             const data: unknown = JSON.parse(event.data)
-            const hasType = (v: unknown): v is { type: string } =>
-              !!v && typeof v === 'object' && v !== null && 'type' in v && typeof (v as any).type === 'string'
-            if (!hasType(data)) {
+
+            const isObject = (v: unknown): v is Record<string, unknown> =>
+              typeof v === 'object' && v !== null
+
+            const hasStringProp = (
+              v: Record<string, unknown>,
+              prop: string,
+            ): boolean => prop in v && typeof v[prop] === 'string'
+
+            if (!isObject(data) || !hasStringProp(data, 'type')) {
               logger.warn('WS message missing type', { data })
               return
             }
-            const message = data
-            // Handle different types of real-time updates
-            switch (message.type) {
-              case 'bias_alert':
-                // Add new alert to the list
-                if ('alert' in message && typeof (message as any).alert === 'object' && (message as any).alert !== null) {
-                  const newAlert = (message as any).alert
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    // Show notification if high/critical
-                    if (newAlert.level === 'high' || newAlert.level === 'critical') {
-                      setNewHighBiasAlert(newAlert)
-                    }
-                    announceToScreenReader(
-                      `New ${newAlert.level} bias alert: ${newAlert.message}`,
-                    )
-                    return {
-                      ...prev,
-                      alerts: [newAlert, ...(prev.alerts || [])],
-                      summary: {
-                        ...prev.summary,
-                        alertsLast24h: prev.summary.alertsLast24h + 1,
-                      },
-                    }
-                  })
-                }
-                break
-              case 'session_update':
-                // Update session data
-                if ('session' in message && typeof (message as any).session === 'object' && (message as any).session !== null) {
-                  const updatedSession = (message as any).session
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    return {
-                      ...prev,
-                      recentAnalyses: prev.recentAnalyses.map((session: BiasAnalysisResult) =>
+
+            const message = data as Record<string, unknown>
+
+            // Helper to safely read nested object fields
+            const getObject = (
+              obj: Record<string, unknown>,
+              key: string,
+            ): Record<string, unknown> | undefined => {
+              const v = obj[key]
+              return isObject(v) ? v : undefined
+            }
+
+            // Handler for bias_alert
+            if (message.type === 'bias_alert') {
+              const alertObj = getObject(message, 'alert')
+              if (alertObj) {
+                const newAlert = alertObj as unknown as BiasAlert // rely on structural typing
+                setDashboardData((prev: BiasDashboardData | null) => {
+                  if (!prev) {
+                    return prev
+                  }
+                  if (
+                    newAlert.level === 'high' ||
+                    newAlert.level === 'critical'
+                  ) {
+                    setNewHighBiasAlert(newAlert)
+                  }
+                  announceToScreenReader(
+                    `New ${newAlert.level} bias alert: ${newAlert.message}`,
+                  )
+                  return {
+                    ...prev,
+                    alerts: [newAlert, ...(prev.alerts || [])],
+                    summary: {
+                      ...prev.summary,
+                      alertsLast24h: prev.summary.alertsLast24h + 1,
+                    },
+                  }
+                })
+              }
+              setLastUpdated(new Date())
+              return
+            }
+
+            // Handler for session_update
+            if (message.type === 'session_update') {
+              const sessionObj = getObject(message, 'session')
+              if (sessionObj) {
+                const updatedSession =
+                  sessionObj as unknown as BiasAnalysisResult
+                setDashboardData((prev: BiasDashboardData | null) => {
+                  if (!prev) {
+                    return prev
+                  }
+                  return {
+                    ...prev,
+                    recentAnalyses: prev.recentAnalyses.map(
+                      (session: BiasAnalysisResult) =>
                         session.sessionId === updatedSession.sessionId
                           ? updatedSession
                           : session,
-                      ),
-                    }
-                  })
-                  announceToScreenReader(
-                    `Session updated: ${updatedSession.sessionId}`,
-                  )
-                }
-                break
-
-              case 'metrics_update':
-                // Update summary metrics
-                if ('metrics' in message && typeof (message as any).metrics === 'object' && (message as any).metrics !== null) {
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    return {
-                      ...prev,
-                      summary: {
-                        ...prev.summary,
-                        ...(message as any).metrics,
-                      },
-                    }
-                  })
-                  announceToScreenReader('Dashboard metrics updated')
-                }
-                break
-
-              case 'trends_update':
-                // Update trend data
-                if ('trends' in message && ((message as any).trends !== undefined)) {
-                  setDashboardData((prev: BiasDashboardData | null) => {
-                    if (!prev) {
-                      return prev
-                    }
-                    return {
-                      ...prev,
-                      trends: (message as any).trends || prev.trends,
-                    }
-                  })
-                  announceToScreenReader('Trend data updated')
-                }
-                break
-
-              case 'connection_status':
-                // Handle connection status updates
-                if ('status' in message && typeof (message as any).status === 'string') {
-                  if ((message as any).status === 'authenticated') {
-                    logger.info('WebSocket authenticated successfully')
-                  } else if ((message as any).status === 'error') {
-                    logger.error('WebSocket authentication failed', {
-                      error: 'error' in message ? (message as any).error : undefined,
-                    })
+                    ),
                   }
-                }
-                setLastUpdated(new Date())
-              } catch (error: unknown) {
-                logger.error('Failed to process WebSocket message', { error, rawData: event.data })
+                })
+                announceToScreenReader(
+                  `Session updated: ${updatedSession.sessionId}`,
+                )
               }
+              setLastUpdated(new Date())
+              return
             }
+
+            // Handler for metrics_update
+            if (message.type === 'metrics_update') {
+              const metricsObj = getObject(message, 'metrics')
+              if (metricsObj) {
+                setDashboardData((prev: BiasDashboardData | null) => {
+                  if (!prev) {
+                    return prev
+                  }
+                  return {
+                    ...prev,
+                    summary: {
+                      ...prev.summary,
+                      ...(metricsObj as unknown as Partial<BiasDashboardSummary>),
+                    },
+                  }
+                })
+                announceToScreenReader('Dashboard metrics updated')
+              }
+              setLastUpdated(new Date())
+              return
+            }
+
+            // Handler for trends_update
+            if (message.type === 'trends_update') {
+              const trends = message['trends']
+              if (trends !== undefined) {
+                setDashboardData((prev: BiasDashboardData | null) => {
+                  if (!prev) {
+                    return prev
+                  }
+                  return {
+                    ...prev,
+                    trends: (trends as unknown as TrendItem[]) || prev.trends,
+                  }
+                })
+                announceToScreenReader('Trend data updated')
+              }
+              setLastUpdated(new Date())
+              return
+            }
+
+            // Handler for connection_status
+            if (message.type === 'connection_status') {
+              const status =
+                typeof message['status'] === 'string'
+                  ? (message['status'] as string)
+                  : undefined
+              if (status === 'authenticated') {
+                logger.info('WebSocket authenticated successfully')
+              } else if (status === 'error') {
+                const err = message['error']
+                logger.error('WebSocket authentication failed', {
+                  error: isObject(err) ? err : undefined,
+                })
+              }
+              setLastUpdated(new Date())
+              return
+            }
+
+            // Update last updated timestamp for any other message types
             setLastUpdated(new Date())
           } catch (error: unknown) {
             logger.error('Failed to process WebSocket message', {
@@ -1222,7 +1273,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         filename,
       })
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? (err as Error)?.message || String(err) : 'Export failed'
+      const errorMessage =
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'Export failed'
       setExportProgress({
         isExporting: false,
         progress: 0,
@@ -1443,7 +1497,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           data-testid="new-high-bias-alert"
         >
           <div>
-            <span className="font-bold text-orange-700 mr-2">New high bias alert</span>
+            <span className="font-bold text-orange-700 mr-2">
+              New high bias alert
+            </span>
             <span className="text-sm text-orange-800">
               {newHighBiasAlert.message}
             </span>
@@ -2490,7 +2546,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           variant="error"
           title="High Priority Bias Alerts"
           description={`${filteredAlerts.filter((alert) => alert.level === 'critical' || alert.level === 'high').length} critical or high-priority bias issues require immediate attention.`}
-                   icon={<AlertTriangle className="h-4 w-4" />}
+          icon={<AlertTriangle className="h-4 w-4" />}
         />
       )}
 
@@ -2878,7 +2934,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }: { name: string; percent?: number }) => {
+                        label={({
+                          name,
+                          percent,
+                        }: {
+                          name: string
+                          percent?: number
+                        }) => {
                           return `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
                         }}
                         animationDuration={1000}
@@ -2897,7 +2959,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         )}
                       </Pie>
                       <Tooltip
-                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number; percent?: number }> }) => {
+                        content={({
+                          active,
+                          payload,
+                        }: {
+                          active?: boolean
+                          payload?: Array<{
+                            name?: string
+                            value?: number
+                            percent?: number
+                          }>
+                        }) => {
                           if (active && payload && payload.length) {
                             return (
                               <div className="bg-white p-2 border rounded shadow">
@@ -2907,13 +2979,15 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 <p>Count: {payload[0]?.value}</p>
                                 <p>
                                   Percentage:{' '}
-                                  {payload[0]?.percent ? (payload[0].percent * 100).toFixed(1) : 0}
+                                  {payload[0]?.percent
+                                    ? (payload[0].percent * 100).toFixed(1)
+                                    : 0}
                                   %
                                 </p>
                               </div>
-                            );
+                            )
                           }
-                          return null;
+                          return null
                         }}
                       />
                       <Legend />
@@ -2942,7 +3016,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         outerRadius={80}
                         fill="#82ca9d"
                         dataKey="value"
-                        label={({ name, percent }: { name: string; percent?: number }) => {
+                        label={({
+                          name,
+                          percent,
+                        }: {
+                          name: string
+                          percent?: number
+                        }) => {
                           return `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
                         }}
                         animationDuration={1000}
@@ -2961,7 +3041,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         )}
                       </Pie>
                       <Tooltip
-                        content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number; percent?: number }> }) => {
+                        content={({
+                          active,
+                          payload,
+                        }: {
+                          active?: boolean
+                          payload?: Array<{
+                            name?: string
+                            value?: number
+                            percent?: number
+                          }>
+                        }) => {
                           if (active && payload && payload.length) {
                             return (
                               <div className="bg-white p-2 border rounded shadow">
@@ -2971,13 +3061,15 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                 <p>Count: {payload[0]?.value}</p>
                                 <p>
                                   Percentage:{' '}
-                                  {payload[0]?.percent ? (payload[0].percent * 100).toFixed(1) : 0}
+                                  {payload[0]?.percent
+                                    ? (payload[0].percent * 100).toFixed(1)
+                                    : 0}
                                   %
                                 </p>
                               </div>
-                            );
+                            )
                           }
-                          return null;
+                          return null
                         }}
                       />
                       <Legend />
@@ -3201,7 +3293,6 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                       )}
                                       {lastAction.type.charAt(0).toUpperCase() +
                                         lastAction.type.slice(1)}
-                                      d
                                     </Badge>
                                     <span className="text-xs text-muted-foreground">
                                       {new Date(
@@ -3267,9 +3358,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                   if (notes) {
                                     setAlertNotes(
                                       (prev) =>
-                                        new Map(
-                                          prev.set(alert.alertId, notes),
-                                        ),
+                                        new Map(prev.set(alert.alertId, notes)),
                                     )
                                   }
                                 }}

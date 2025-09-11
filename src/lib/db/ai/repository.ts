@@ -7,36 +7,48 @@ import type {
 } from './types'
 import type { TherapySession } from '../../ai/models/ai-types'
 import type { EmotionAnalysis } from '../../ai/emotions/types'
-// Use conditional imports to prevent MongoDB from being bundled on client side
-let mongodb: any
-let ObjectId: any
+let mongodb: unknown
+let ObjectId: unknown
 
 if (typeof window === 'undefined') {
   // Server side - import real MongoDB dependencies
-  try {
-    mongodb = require('../../../config/mongodb.config').default
-    const mongodbLib = require('mongodb')
-    ObjectId = mongodbLib.ObjectId
-  } catch {
-    // Fallback if MongoDB is not available
-    mongodb = null
-    ObjectId = class MockObjectId {
-      constructor(id?: string) {
-        this.id = id || 'mock-object-id'
+  ;(async () => {
+    try {
+      const configModule = await import('../../../config/mongodb.config')
+      mongodb = configModule.default
+      const mongodbLib = await import('mongodb')
+      ObjectId = mongodbLib.ObjectId
+    } catch {
+      // Fallback if MongoDB is not available
+      mongodb = null
+      ObjectId = class MockObjectId {
+        id: string
+        constructor(id?: string) {
+          this.id = id || 'mock-object-id'
+        }
+        toString() {
+          return this.id
+        }
+        toHexString() {
+          return this.id
+        }
       }
-      toString() { return this.id }
-      toHexString() { return this.id }
     }
-  }
+  })()
 } else {
   // Client side - use mocks
   mongodb = null
   ObjectId = class MockObjectId {
+    id: string
     constructor(id?: string) {
       this.id = id || 'mock-object-id'
     }
-    toString() { return this.id }
-    toHexString() { return this.id }
+    toString() {
+      return this.id
+    }
+    toHexString() {
+      return this.id
+    }
   }
 }
 // TODO: Create these service interfaces when services are implemented
@@ -51,7 +63,6 @@ interface EfficacyFeedback {
   therapistId: string
   context: Record<string, unknown>
 }
-
 
 interface Technique {
   id: string
@@ -77,11 +88,6 @@ interface PastTechnique {
   efficacy: number
   usageCount: number
 }
-
-
-
-
-
 
 interface BiasAnalysisResult {
   id: string
@@ -146,7 +152,6 @@ interface AlertAction {
   description: string
   metadata?: Record<string, unknown>
 }
-
 
 interface BiasAlertDistribution {
   low: number
@@ -221,7 +226,7 @@ export class AIRepository {
     if (!mongodb) {
       throw new Error('MongoDB not available on client side')
     }
-    
+
     try {
       return mongodb.getDb()
     } catch {
@@ -340,7 +345,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as SentimentAnalysisResult[]
@@ -363,7 +368,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as CrisisDetectionResult[]
@@ -386,7 +391,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as ResponseGenerationResult[]
@@ -409,7 +414,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as InterventionAnalysisResult[]
@@ -431,7 +436,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as AIUsageStats[]
@@ -452,7 +457,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as AIUsageStats[]
@@ -477,7 +482,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as CrisisDetectionResult[]
@@ -521,7 +526,7 @@ export class AIRepository {
       .sort({ startTime: -1 })
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as TherapySession[]
@@ -539,21 +544,23 @@ export class AIRepository {
     }
 
     const db = await this.getDatabase()
-    const objectIds = sessionIds.map(id => {
-      try {
-        return new ObjectId(id)
-      } catch {
-        // If not a valid ObjectId, search by string ID
-        return null
-      }
-    }).filter(Boolean) as ObjectId[]
+    const objectIds = sessionIds
+      .map((id) => {
+        try {
+          return new ObjectId(id)
+        } catch {
+          // If not a valid ObjectId, search by string ID
+          return null
+        }
+      })
+      .filter(Boolean) as ObjectId[]
 
     const results = await db
       .collection('therapy_sessions')
       .find({ _id: { $in: objectIds } })
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as TherapySession[]
@@ -573,7 +580,7 @@ export class AIRepository {
       .sort({ timestamp: 1 })
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as EmotionAnalysis[]
@@ -646,7 +653,7 @@ export class AIRepository {
       .find({ techniqueId })
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as EfficacyFeedback[]
@@ -664,7 +671,7 @@ export class AIRepository {
       .find({ clientId })
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as EfficacyFeedback[]
@@ -680,7 +687,7 @@ export class AIRepository {
       .find({ indications: indication })
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id?.toHexString(),
     })) as unknown as Technique[]
@@ -692,9 +699,7 @@ export class AIRepository {
    */
   async getClientProfile(clientId: string): Promise<ClientProfile | null> {
     const db = await this.getDatabase()
-    const profile = await db
-      .collection('client_profiles')
-      .findOne({ clientId })
+    const profile = await db.collection('client_profiles').findOne({ clientId })
 
     if (!profile) {
       return null
@@ -709,7 +714,7 @@ export class AIRepository {
     return {
       ...profile,
       history: {
-        pastTechniques: techniqueHistory.map(doc => ({
+        pastTechniques: techniqueHistory.map((doc) => ({
           ...doc,
           id: doc._id?.toHexString(),
         })),
@@ -802,7 +807,7 @@ export class AIRepository {
       .limit(options?.limit || 10)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as BiasAnalysisResult[]
@@ -878,7 +883,7 @@ export class AIRepository {
       .limit(options?.limit || 10)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as BiasMetric[]
@@ -959,7 +964,7 @@ export class AIRepository {
       .limit(options?.limit || 10)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as BiasAlert[]
@@ -1055,9 +1060,7 @@ export class AIRepository {
    */
   async getBiasReport(reportId: string): Promise<BiasReport | null> {
     const db = await this.getDatabase()
-    const result = await db
-      .collection('ai_bias_reports')
-      .findOne({ reportId })
+    const result = await db.collection('ai_bias_reports').findOne({ reportId })
 
     if (!result) {
       return null
@@ -1086,7 +1089,7 @@ export class AIRepository {
       .limit(limit)
       .toArray()
 
-    return results.map(doc => ({
+    return results.map((doc) => ({
       ...doc,
       id: doc._id.toHexString(),
     })) as unknown as BiasReport[]

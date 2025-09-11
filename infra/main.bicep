@@ -1,5 +1,6 @@
 param azureLocation string = resourceGroup().location
 param environment string = 'production'
+param environmentName string = 'production'
 param containerRegistryName string = 'pixelatedbox'
 param appServiceName string = 'pixelated'
 param keyVaultName string = '${appServiceName}-kv'

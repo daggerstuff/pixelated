@@ -36,7 +36,11 @@ export const mongodb = {
       return this.id
     }
     static isValid(id: string) {
-      return typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]{24}$/.test(id)
+      return (
+        typeof id === 'string' &&
+        id.length === 24 &&
+        /^[a-fA-F0-9]{24}$/.test(id)
+      )
     }
   },
   MongoClient: class MockMongoClient {
@@ -49,15 +53,11 @@ export const mongodb = {
       throw new Error('MongoDB is not supported in browser environment')
     }
   },
-  Collection: class MockCollection {
-    constructor() {
-      console.warn('MongoDB Collection is not supported in browser environment')
-    }
+  Collection: function MockCollection() {
+    console.warn('MongoDB Collection is not supported in browser environment')
   },
-  Db: class MockDb {
-    constructor() {
-      console.warn('MongoDB Db is not supported in browser environment')
-    }
+  Db: function MockDb() {
+    console.warn('MongoDB Db is not supported in browser environment')
   },
 }
 

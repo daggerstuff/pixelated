@@ -1,17 +1,3 @@
-declare namespace JSX {
-  // Define a common type for JSX element properties
-  type JSXElementProps = {
-    id?: string;
-    class?: string;
-    children?: React.ReactNode;
-    [key: string]: unknown;
-  }
-
-  interface IntrinsicElements {
-    button: JSXElementProps
-    div: JSXElementProps
-    p: JSXElementProps
-    header: JSXElementProps
-    // Add more elements as needed
-  }
-}
+// Intentionally minimal to avoid colliding with lib.dom's JSX definitions.
+// If you need custom JSX shims, add only what's strictly necessary and scope with `export {}`.
+export {}

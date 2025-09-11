@@ -178,105 +178,101 @@ const criticalAlertData = {
   ],
 }
 
-// Visual test utilities
-class DashboardVisualTestUtils {
-  static async setupMockData(page: Page, data: any) {
-    // Mock the dashboard API endpoint with consistent data
-    await page.route('/api/bias-detection/dashboard*', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(data),
-      })
+// Visual test utilities - use standalone functions instead of a static-only class
+async function setupMockData(page: Page, data: unknown) {
+  // Mock the dashboard API endpoint with consistent data
+  await page.route('/api/bias-detection/dashboard*', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(data),
     })
+  })
+}
+
+async function waitForDashboardLoad(page: Page) {
+  // Wait for dashboard container to be visible
+  await page.waitForSelector('[data-testid="bias-dashboard"]', {
+    timeout: 10000,
+  })
+
+  // Wait for React component to mount and render
+  await page.waitForLoadState('networkidle')
+
+  // Wait for charts to be present (if any)
+  try {
+    await page.waitForSelector('svg', { timeout: 5000 })
+  } catch {
+    // Charts might not be present in all states, that's ok
   }
 
-  static async waitForDashboardLoad(page: Page) {
-    // Wait for dashboard container to be visible
-    await page.waitForSelector('[data-testid="bias-dashboard"]', {
-      timeout: 10000,
-    })
+  // Small delay for animations to settle
+  await page.waitForTimeout(1000)
+}
 
-    // Wait for React component to mount and render
-    await page.waitForLoadState('networkidle')
-
-    // Wait for charts to be present (if any)
-    try {
-      await page.waitForSelector('svg', { timeout: 5000 })
-    } catch {
-      // Charts might not be present in all states, that's ok
-    }
-
-    // Small delay for animations to settle
-    await page.waitForTimeout(1000)
-  }
-
-  static async hideElementsWithRandomContent(page: Page) {
-    // Hide elements that contain timestamps or dynamic content
-    await page.addStyleTag({
-      content: `
-        [data-testid="last-updated-time"],
-        .timestamp,
-        .real-time-clock,
-        .loading-spinner {
-          visibility: hidden !important;
-        }
-        /* Disable animations for consistent screenshots */
-        *, *::before, *::after {
-          animation-duration: 0s !important;
-          animation-delay: 0s !important;
-          transition-duration: 0s !important;
-          transition-delay: 0s !important;
-        }
-      `,
-    })
-  }
-
-  static getViewportSizes() {
-    return {
-      mobile: { width: 375, height: 667 },
-      tablet: { width: 768, height: 1024 },
-      desktop: { width: 1920, height: 1080 },
-    }
-  }
-
-  static async mockAuthenticatedSession(page: Page) {
-    // Mock admin authentication for protected route
-    await page.addInitScript(() => {
-      // Mock localStorage for session
-      localStorage.setItem('auth-token', 'mock-admin-token')
-      // Mock any auth checks
-      window.mockAuth = {
-        isAuthenticated: true,
-        isAdmin: true,
-        user: { id: 'admin-user', role: 'admin' },
+async function hideElementsWithRandomContent(page: Page) {
+  // Hide elements that contain timestamps or dynamic content
+  await page.addStyleTag({
+    content: `
+      [data-testid="last-updated-time"],
+      .timestamp,
+      .real-time-clock,
+      .loading-spinner {
+        visibility: hidden !important;
       }
-    })
+      /* Disable animations for consistent screenshots */
+      *, *::before, *::after {
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        transition-duration: 0s !important;
+        transition-delay: 0s !important;
+      }
+    `,
+  })
+}
+
+function getViewportSizes() {
+  return {
+    mobile: { width: 375, height: 667 },
+    tablet: { width: 768, height: 1024 },
+    desktop: { width: 1920, height: 1080 },
   }
+}
+
+async function mockAuthenticatedSession(page: Page) {
+  // Mock admin authentication for protected route
+  await page.addInitScript(() => {
+    // Mock localStorage for session
+    localStorage.setItem('auth-token', 'mock-admin-token')
+    // Mock any auth checks
+    ;(window as any).mockAuth = {
+      isAuthenticated: true,
+      isAdmin: true,
+      user: { id: 'admin-user', role: 'admin' },
+    }
+  })
 }
 
 test.describe('Bias Dashboard - Visual Regression Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Set up authentication mock
-    await DashboardVisualTestUtils.mockAuthenticatedSession(page)
+    await mockAuthenticatedSession(page)
 
     // Hide dynamic content for consistent screenshots
-    await DashboardVisualTestUtils.hideElementsWithRandomContent(page)
+    await hideElementsWithRandomContent(page)
   })
 
   test.describe('Desktop Layout Visual Tests', () => {
     test.beforeEach(async ({ page }) => {
-      await page.setViewportSize(
-        DashboardVisualTestUtils.getViewportSizes().desktop,
-      )
+      await page.setViewportSize(getViewportSizes().desktop)
     })
 
     test('should match baseline dashboard in normal state', async ({
       page,
     }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Capture full dashboard
       await expect(
@@ -287,9 +283,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match dashboard with critical alerts', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, criticalAlertData)
+      await setupMockData(page, criticalAlertData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Capture dashboard with critical alert state
       await expect(
@@ -300,9 +296,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match trends tab content', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Click trends tab (should be active by default)
       const trendsTab = page.locator('[data-testid="trends-tab"]')
@@ -322,9 +318,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match demographics tab content', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Click demographics tab
       const demographicsTab = page.locator('[data-testid="demographics-tab"]')
@@ -346,9 +342,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match alerts tab content', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Click alerts tab
       const alertsTab = page.locator('[data-testid="alerts-tab"]')
@@ -370,15 +366,13 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
 
   test.describe('Mobile Layout Visual Tests', () => {
     test.beforeEach(async ({ page }) => {
-      await page.setViewportSize(
-        DashboardVisualTestUtils.getViewportSizes().mobile,
-      )
+      await page.setViewportSize(getViewportSizes().mobile)
     })
 
     test('should match baseline dashboard on mobile', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Capture mobile dashboard
       await expect(
@@ -389,9 +383,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match mobile responsive chart layout', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Focus on chart area for mobile
       const chartsSection = page.locator('[data-testid="charts-section"]')
@@ -406,15 +400,13 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
 
   test.describe('Tablet Layout Visual Tests', () => {
     test.beforeEach(async ({ page }) => {
-      await page.setViewportSize(
-        DashboardVisualTestUtils.getViewportSizes().tablet,
-      )
+      await page.setViewportSize(getViewportSizes().tablet)
     })
 
     test('should match baseline dashboard on tablet', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Capture tablet dashboard
       await expect(
@@ -427,9 +419,7 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
 
   test.describe('Component State Visual Tests', () => {
     test.beforeEach(async ({ page }) => {
-      await page.setViewportSize(
-        DashboardVisualTestUtils.getViewportSizes().desktop,
-      )
+      await page.setViewportSize(getViewportSizes().desktop)
     })
 
     test('should match dashboard loading state', async ({ page }) => {
@@ -479,9 +469,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match filter panel visual state', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Capture filter panel (it should be visible by default)
       const filterPanel = page.locator('[data-testid="filter-panel"]')
@@ -494,9 +484,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match export dialog visual appearance', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Click export button to open dialog
       const exportButton = page.locator('[data-testid="export-button"]')
@@ -518,15 +508,13 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
 
   test.describe('Chart Visual Consistency Tests', () => {
     test.beforeEach(async ({ page }) => {
-      await page.setViewportSize(
-        DashboardVisualTestUtils.getViewportSizes().desktop,
-      )
+      await page.setViewportSize(getViewportSizes().desktop)
     })
 
     test('should match bias trend chart visualization', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Focus on specific chart
       const biasChart = page.locator('[data-testid="bias-trend-chart"]')
@@ -538,9 +526,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match demographic distribution charts', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Navigate to demographics tab
       const demographicsTab = page.locator('[data-testid="demographics-tab"]')
@@ -564,9 +552,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     test('should match alert visualization with different severity levels', async ({
       page,
     }) => {
-      await DashboardVisualTestUtils.setupMockData(page, criticalAlertData)
+      await setupMockData(page, criticalAlertData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Navigate to alerts tab
       const alertsTab = page.locator('[data-testid="alerts-tab"]')
@@ -588,9 +576,7 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
 
   test.describe('Dark Mode Visual Tests', () => {
     test.beforeEach(async ({ page }) => {
-      await page.setViewportSize(
-        DashboardVisualTestUtils.getViewportSizes().desktop,
-      )
+      await page.setViewportSize(getViewportSizes().desktop)
       // Enable dark mode
       await page.addInitScript(() => {
         document.documentElement.classList.add('dark')
@@ -598,9 +584,9 @@ test.describe('Bias Dashboard - Visual Regression Tests', () => {
     })
 
     test('should match dashboard in dark mode', async ({ page }) => {
-      await DashboardVisualTestUtils.setupMockData(page, mockDashboardData)
+      await setupMockData(page, mockDashboardData)
       await page.goto('/admin/bias-detection')
-      await DashboardVisualTestUtils.waitForDashboardLoad(page)
+      await waitForDashboardLoad(page)
 
       // Capture dark mode dashboard
       await expect(

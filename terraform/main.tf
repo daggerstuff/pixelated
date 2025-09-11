@@ -279,6 +279,29 @@ resource "aws_s3_bucket" "assets" {
     enabled = true
   }
 
+  # Cross-region replication configuration
+  replication_configuration {
+    role = var.s3_replication_role_arn
+    rules {
+      id     = "replication"
+      status = "Enabled"
+      priority = 1
+      destination {
+        bucket        = var.s3_replication_dest_arn
+        storage_class = "STANDARD"
+        encryption_configuration {
+          replica_kms_key_id = var.s3_replication_kms_key_id
+        }
+      }
+      delete_marker_replication {
+        status = "Enabled"
+      }
+      filter {
+        prefix = ""
+      }
+    }
+  }
+
   tags = var.common_tags
 }
 
