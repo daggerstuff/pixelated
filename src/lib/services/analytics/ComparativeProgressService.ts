@@ -102,7 +102,7 @@ export class ComparativeProgressService {
     )
 
     // For demo, generate one data point per week
-    const snapshots: ProgressSnapshot[] = []
+    const progressSnapshots: ProgressSnapshot[] = []
     const dataPointCount = Math.min(Math.ceil(daysBetween / 7), 12) // Cap at 12 points
 
     // Generate a realistic trend (improving, declining, or fluctuating)
@@ -119,7 +119,7 @@ export class ComparativeProgressService {
       const randomVariance = (Math.random() - 0.5) * 2
       const value = Math.max(0, baseValue + i * changePerPoint + randomVariance)
 
-      snapshots.push({
+      progressSnapshots.push({
         anonymizedUserId,
         date: pointDate.toISOString().split('T')[0]!,
         metricName,
@@ -128,7 +128,7 @@ export class ComparativeProgressService {
       })
     }
 
-    return snapshots
+    return progressSnapshots
   }
 
   /**
@@ -190,21 +190,21 @@ export class ComparativeProgressService {
 
   /**
    * Analyzes user progress against benchmarks to generate insights.
-   * @param snapshots User progress snapshots
+   * @param progressSnapshots User progress snapshots
    * @param benchmark Benchmark data for comparison
    * @returns Comparison insights
    */
   private generateInsights(
-    snapshots: ProgressSnapshot[],
+    progressSnapshots: ProgressSnapshot[],
     benchmark: Benchmark | null,
   ): ComparativeProgressResult['comparisonInsights'] {
     // If we don't have enough data points or no benchmark, return insufficient data
-    if (snapshots.length < 2 || !benchmark) {
+    if (progressSnapshots.length < 2 || !benchmark) {
       return { trend: 'insufficient_data' }
     }
 
-    // Sort snapshots by date
-    const sortedSnapshots = [...snapshots].sort(
+    // Sort progressSnapshots by date
+    const sortedSnapshots = [...progressSnapshots].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     )
 

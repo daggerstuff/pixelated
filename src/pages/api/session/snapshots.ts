@@ -8,31 +8,45 @@ const pool = new Pool({
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { sessionId, snapshots } = await request.json();
+    const { sessionId, progressSnapshots } = await request.json();
 
-    if (!sessionId || !snapshots) {
+    if (!sessionId || !progressSnapshots) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: sessionId, snapshots' }),
+        JSON.stringify({ error: 'Missing required fields: sessionId, progressSnapshots' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate progressSnapshots array and timestamp parseability
+    if (
+      !Array.isArray(progressSnapshots) ||
+      !progressSnapshots.every(isValidSnapshot)
+    ) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid sessionId or progressSnapshots; timestamps must be parseable' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     const client = await pool.connect();
     try {
+      await client.query('BEGIN');
+
       // Update session with progress snapshots
       const query = `
         UPDATE sessions
-        SET progress_snapshots = $1, updated_at = NOW()
+        SET progress_snapshots = $1::jsonb, updated_at = NOW()
         WHERE id = $2
         RETURNING id
       `;
 
       const result = await client.query(query, [
-        JSON.stringify(snapshots),
+        JSON.stringify(progressSnapshots),
         sessionId
       ]);
 
       if (result.rowCount === 0) {
+        await client.query('ROLLBACK');
         return new Response(
           JSON.stringify({ error: 'Session not found' }),
           { status: 404, headers: { 'Content-Type': 'application/json' } }
@@ -40,26 +54,42 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       // Also insert into session_milestones table for detailed tracking
-      if (snapshots.length > 0) {
+      if (progressSnapshots.length > 0) {
         const milestoneQuery = `
           INSERT INTO session_milestones (session_id, milestone_name, milestone_value, achieved_at)
           VALUES ($1, $2, $3, $4)
         `;
 
-        for (const snapshot of snapshots) {
+        for (const snapshot of progressSnapshots) {
+          // Prefer descriptive milestone names when provided by the client.
+          // Supported fields (checked in order): milestoneName, name, label.
+          // If none are present, fall back to the original Progress_<value> pattern.
+          const milestoneName =
+            (snapshot as any).milestoneName ||
+            (snapshot as any).name ||
+            (snapshot as any).label ||
+            `Progress_${snapshot.value}`;
+
           await client.query(milestoneQuery, [
             sessionId,
-            `Progress_${snapshot.value}`,
+            milestoneName,
             snapshot.value,
-            snapshot.timestamp
+            snapshot.timestamp,
           ]);
         }
       }
+
+      await client.query('COMMIT');
 
       return new Response(
         JSON.stringify({ success: true, sessionId }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
+    } catch (e) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {}
+      throw e;
     } finally {
       client.release();
     }
@@ -115,7 +145,7 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           sessionId,
-          snapshots: sessionResult.rows[0].progress_snapshots,
+          progressSnapshots: sessionResult.rows[0].progress_snapshots,
           milestones: milestoneResult.rows,
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -131,3 +161,43 @@ export const GET: APIRoute = async ({ request }) => {
     );
   }
 };
+
+/**
+ * Type guard for snapshot validation.
+ * Ensures value is a number and timestamp is a string/number/Date
+ * and is parseable as a valid date.
+ */
+function isValidSnapshot(s: unknown): s is Snapshot {
+  if (
+    typeof s !== 'object' ||
+    s === null ||
+    !('value' in s) ||
+    !('timestamp' in s) ||
+    typeof (s as any).value !== 'number'
+  ) {
+    return false;
+  }
+  const ts = (s as any).timestamp;
+  if (typeof ts === 'string') {
+    const parsed = Date.parse(ts);
+    return !isNaN(parsed);
+  }
+  if (typeof ts === 'number') {
+    // Accepts both ms and seconds since epoch, but new Date(ts) will handle both
+    return !isNaN(new Date(ts).getTime());
+  }
+  if (ts instanceof Date) {
+    return !isNaN(ts.getTime());
+  }
+  return false;
+}
+
+/**
+ * Snapshot interface for session progress snapshots.
+ * - value: Numeric value representing the progress or metric.
+ * - timestamp: The time the snapshot was taken (string, number, or Date; must be parseable).
+ */
+export interface Snapshot {
+  value: number;
+  timestamp: string | number | Date;
+}
