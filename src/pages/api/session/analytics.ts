@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import type { APIRoute } from 'astro';
+import { getSession } from '../../../lib/auth/session';
 
 // Database connection pool
 const pool = new Pool({
@@ -8,6 +9,15 @@ const pool = new Pool({
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    // Verify authentication
+    const session = await getSession(request);
+    if (!session) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { sessionId, analyticsData } = await request.json();
 
     if (!sessionId || !analyticsData) {
@@ -18,6 +28,34 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const client = await pool.connect();
+
+    // Verify session ownership and permissions
+    const sessionQuery = `
+      SELECT therapist_id FROM sessions WHERE id = $1
+    `;
+    const sessionResult = await client.query(sessionQuery, [sessionId]);
+
+    if (sessionResult.rows.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Session not found' }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const sessionOwnerId = sessionResult.rows[0].therapist_id;
+    const userId = session.user._id.toString();
+    const userRole = session.user.role;
+
+    // Check if user owns the session or has therapist/admin role
+    const isOwner = sessionOwnerId === userId;
+    const hasPermission = userRole === 'therapist' || userRole === 'admin';
+
+    if (!isOwner && !hasPermission) {
+      return new Response(
+        JSON.stringify({ error: 'Access denied' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
     try {
       // Insert session analytics data into session_analytics table
       const query = `
@@ -77,6 +115,15 @@ export const POST: APIRoute = async ({ request }) => {
 
 export const GET: APIRoute = async ({ request }) => {
   try {
+    // Verify authentication
+    const session = await getSession(request);
+    if (!session) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const url = new URL(request.url);
     const sessionId = url.searchParams.get('sessionId');
     const timeRange = url.searchParams.get('timeRange') || '30d';
@@ -89,6 +136,34 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const client = await pool.connect();
+
+    // Verify session ownership and permissions
+    const sessionQuery = `
+      SELECT therapist_id FROM sessions WHERE id = $1
+    `;
+    const sessionResult = await client.query(sessionQuery, [sessionId]);
+
+    if (sessionResult.rows.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Session not found' }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const sessionOwnerId = sessionResult.rows[0].therapist_id;
+    const userId = session.user._id.toString();
+    const userRole = session.user.role;
+
+    // Check if user owns the session or has therapist/admin role
+    const isOwner = sessionOwnerId === userId;
+    const hasPermission = userRole === 'therapist' || userRole === 'admin';
+
+    if (!isOwner && !hasPermission) {
+      return new Response(
+        JSON.stringify({ error: 'Access denied' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
     try {
       // Get session analytics data
       const query = `

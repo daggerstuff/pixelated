@@ -113,3 +113,20 @@ COMMENT ON TABLE session_analytics IS 'Detailed analytics data for therapist tra
 COMMENT ON TABLE skill_development IS 'Skill development tracking for therapists';
 COMMENT ON TABLE session_milestones IS 'Milestone tracking for individual sessions';
 COMMENT ON TABLE session_comparisons IS 'Comparative analysis between sessions';
+
+-- Add unique constraint for upserts (if not already present)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE table_name = 'skill_development'
+      AND constraint_type = 'UNIQUE'
+      AND constraint_name = 'ux_skill_development_therapist_skill'
+  ) THEN
+    ALTER TABLE skill_development
+      ADD CONSTRAINT ux_skill_development_therapist_skill UNIQUE (therapist_id, skill_name);
+  END IF;
+EXCEPTION WHEN duplicate_object THEN
+  -- Constraint already exists, do nothing
+  NULL;
+END$$;
