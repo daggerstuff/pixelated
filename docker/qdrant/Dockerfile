@@ -22,5 +22,6 @@ CMD ["/qdrant/qdrant"]
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:6333/health || exit 1
 
-# Ensure last USER is not root
-USER 1000
+# Create qdrant user if it doesn't exist and ensure last USER is not root
+RUN id -u qdrant &>/dev/null || useradd -r -s /bin/false qdrant
+USER qdrant
