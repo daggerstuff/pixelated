@@ -1,1 +1,12 @@
-{}
+{
+  "version": "1.0.0",
+  "description": "CDN asset mapping for Pixelated Empathy",
+  "assets": {
+    "images": {},
+    "stylesheets": {},
+    "javascripts": {},
+    "fonts": {}
+  },
+  "cdn_base_url": "https://cdn.pixelatedempathy.com",
+  "fallback_urls": []
+}

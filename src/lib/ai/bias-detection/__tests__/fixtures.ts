@@ -1,11 +1,12 @@
 import type { TherapeuticSession } from '../types'
+import { vi } from 'vitest'
 /**
  * Test fixtures for bias detection scenarios
  */
 
 export const baselineAnxietyScenario: TherapeuticSession = {
   sessionId: 'baseline-anxiety-001',
-  timestamp: new Date(),
+  sessionDate: new Date().toISOString(),
   participantDemographics: {
     age: '25-35',
     gender: 'female',
@@ -14,51 +15,41 @@ export const baselineAnxietyScenario: TherapeuticSession = {
     education: 'bachelors',
   },
   scenario: {
-    scenarioId: 'anxiety-baseline-001',
-    type: 'anxiety',
-    complexity: 'intermediate',
-    tags: ['anxiety', 'baseline'],
-    description: 'Standard anxiety management scenario',
-    learningObjectives: ['assess anxiety', 'provide coping strategies'],
-  },
+  scenarioId: 'anxiety-baseline-001',
+  type: 'anxiety',
+   },
   content: {
-    patientPresentation: 'Patient presents with moderate anxiety symptoms',
-    therapeuticInterventions: ['Active listening', 'Cognitive restructuring'],
-    patientResponses: ['I feel anxious about work', 'That makes sense'],
-    sessionNotes: 'Patient responsive to interventions',
+    transcript: `Patient presents with moderate anxiety symptoms. Therapeutic interventions: Active listening, Cognitive restructuring. Patient responses: I feel anxious about work, That makes sense. Session notes: Patient responsive to interventions.`,
+    aiResponses: [],
+    userInputs: [],
   },
   aiResponses: [
     {
       responseId: 'resp-001',
-      type: 'intervention',
-      content: 'I understand your concerns about work stress',
+      text: 'I understand your concerns about work stress',
+      metadata: { confidence: 0.85, modelUsed: 'gpt-4' },
       timestamp: new Date(),
-      confidence: 0.85,
-      modelUsed: 'gpt-4',
     },
   ],
   expectedOutcomes: [
     {
       outcomeId: 'outcome-001',
-      type: 'therapeutic-alliance',
-      expectedValue: 0.8,
-      actualValue: 0.82,
+      description: 'therapeutic-alliance',
+      achieved: true,
     },
   ],
   transcripts: [
     {
-      speakerId: 'patient',
-      content: 'I feel anxious about work deadlines',
+      speaker: 'user',
+      text: 'I feel anxious about work deadlines',
       timestamp: new Date(),
-      emotionalTone: 'anxious',
     },
   ],
+  userInputs: [],
   metadata: {
-    trainingInstitution: 'Test University',
-    traineeId: 'trainee-001',
-    sessionDuration: 30,
-    completionStatus: 'completed',
-    technicalIssues: [],
+    sessionStartTime: new Date(),
+    sessionEndTime: new Date(Date.now() + 30 * 60000),
+    tags: [],
   },
 }
 
@@ -71,7 +62,7 @@ export const ageBiasYoungPatient: TherapeuticSession = {
   },
   content: {
     ...baselineAnxietyScenario.content,
-    patientPresentation: 'Young patient with anxiety about college',
+    transcript: `Young patient with anxiety about college. Therapeutic interventions: Active listening, Cognitive restructuring. Patient responses: I feel anxious about work, That makes sense. Session notes: Patient responsive to interventions.`,
   },
 }
 
@@ -85,7 +76,7 @@ export const ageBiasElderlyPatient: TherapeuticSession = {
   },
   content: {
     ...baselineAnxietyScenario.content,
-    patientPresentation: 'Elderly patient with anxiety about health',
+    transcript: `Elderly patient with anxiety about health. Therapeutic interventions: Active listening, Cognitive restructuring. Patient responses: I feel anxious about work, That makes sense. Session notes: Patient responsive to interventions.`,
   },
 }
 
@@ -121,13 +112,13 @@ export function getComparativeBiasScenarios(): [
 // =======================
 
 export const mockPythonBridge = {
-  initialize: jest.fn(),
-  checkHealth: jest.fn(),
-  runPreprocessingAnalysis: jest.fn(),
-  runModelLevelAnalysis: jest.fn(),
-  runInteractiveAnalysis: jest.fn(),
-  runEvaluationAnalysis: jest.fn(),
-  analyze_session: jest.fn(),
+  initialize: vi.fn(),
+  checkHealth: vi.fn(),
+  runPreprocessingAnalysis: vi.fn(),
+  runModelLevelAnalysis: vi.fn(),
+  runInteractiveAnalysis: vi.fn(),
+  runEvaluationAnalysis: vi.fn(),
+  analyze_session: vi.fn(),
 }
 
 export function createDefaultAnalysisResult() {

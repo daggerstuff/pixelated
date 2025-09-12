@@ -1,4 +1,6 @@
 {
+  "version": "1.0.0",
+  "description": "API testing configuration for Pixelated Empathy",
   "api_testing": {
     "enabled": true,
     "base_url": "http://localhost:3000",

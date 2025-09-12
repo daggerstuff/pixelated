@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger';
+// design tokens mapping is handled externally for chart color literals
 // Runtime import (class/value) for AnalyticsError - used for instantiation and instanceof checks
 import { AnalyticsError as AnalyticsErrorClass } from '@/types/analytics';
 // Type-only imports
@@ -36,24 +37,25 @@ export function useTherapistAnalytics(
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<AnalyticsErrorType | null>(null);
 
-  // Refs for cleanup and retry logic
-  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Refs for cleanup and refresh loop
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   /**
    * Transform session data for therapist analytics
    */
   const transformSessionData = useCallback((sessions: TherapistSession[]): TherapistSessionData[] => {
-    return sessions.map(session => ({
+    // Apply incoming filters (lightweight - detailed filtering delegated to helper)
+    const filtered = applyAnalyticsFilters(sessions, _filters)
+
+    return filtered.map(session => ({
       date: session.startTime,
       sessions: 1,
       therapistSessions: 1,
       averageSessionProgress: session.progress,
       sessionId: session.id,
       therapistId: session.therapistId,
-      milestonesAchieved: session.progressMetrics?.milestonesReached?.length || 0,
-      averageResponseTime: session.progressMetrics?.responseTime || 0,
+      milestonesAchieved: session.progressMetrics?.milestonesReached?.length ?? 0,
+      averageResponseTime: session.progressMetrics?.responseTime ?? 0,
     }));
   }, []);
 
@@ -61,32 +63,93 @@ export function useTherapistAnalytics(
    * Transform skill progress data for therapist analytics
    */
   const transformSkillProgressData = useCallback((sessions: TherapistSession[]): TherapistSkillProgressData[] => {
-    // Aggregate skill scores from all sessions
-    const skillScores: Record<string, { total: number; count: number; sessions: number }> = {};
-
-    sessions.forEach(session => {
-      if (session.progressMetrics?.skillScores) {
-        Object.entries(session.progressMetrics.skillScores).forEach(([skill, score]) => {
-          if (!skillScores[skill]) {
-            skillScores[skill] = { total: 0, count: 0, sessions: 0 };
-          }
-          skillScores[skill].total += score;
-          skillScores[skill].count += 1;
-          skillScores[skill].sessions += 1;
-        });
+    // Sort sessions by date ascending
+    const sorted = [...sessions].sort(
+      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    );
+    // Build per-skill score history
+    const perSkill: Record<string, { scores: number[]; sessions: number }> = {};
+    sorted.forEach(session => {
+      const scores = session.progressMetrics?.skillScores;
+      if (!scores) {
+        return;
       }
+      Object.entries(scores).forEach(([skill, score]) => {
+        if (!perSkill[skill]) {
+          perSkill[skill] = { scores: [], sessions: 0 };
+        }
+        perSkill[skill].scores.push(score);
+        perSkill[skill].sessions += 1;
+      });
     });
+    return Object.entries(perSkill).map(([skill, agg]) => {
+      const count = agg.scores.length;
+      const avg = Math.round(agg.scores.reduce((a, b) => a + b, 0) / (count || 1));
+      const last = count > 0 ? agg.scores[count - 1] : undefined;
+      const prev = count > 1 ? agg.scores[count - 2] : undefined;
+      const first = count > 0 ? agg.scores[0] : undefined;
 
-    return Object.entries(skillScores).map(([skill, data]) => ({
-      skill,
-      skillId: skill.toLowerCase().replace(/\s+/g, '-'),
-      score: Math.round(data.total / data.count),
-      trend: data.count > 1 ? (sessions[sessions.length-1]?.progressMetrics?.skillScores[skill] ?? 0) > (sessions[sessions.length-2]?.progressMetrics?.skillScores[skill] ?? 0) ? 'up' : 'down' : 'stable',
-      category: 'therapeutic',
-      sessionsPracticed: data.sessions,
-      averageImprovement: data.count > 1 ? Math.round((data.total / data.count)) : 0,
-    }));
+      let trend: 'up' | 'down' | 'stable' = 'stable';
+      if (typeof last === 'number' && typeof prev === 'number') {
+        if (last > prev) {
+          trend = 'up';
+        } else if (last < prev) {
+          trend = 'down';
+        } else {
+          trend = 'stable';
+        }
+      }
+
+      const averageImprovement =
+        typeof last === 'number' && typeof first === 'number' && count > 1
+          ? last - first
+          : 0;
+
+      return {
+        skill,
+        skillId: skill.toLowerCase().replace(/\s+/g, '-'),
+        score: avg,
+        trend,
+        category: 'therapeutic',
+        sessionsPracticed: agg.sessions,
+        averageImprovement,
+      };
+    });
   }, []);
+
+  /**
+   * Lightweight filter applier - keeps hook decoupled from filter shape.
+   * Currently supports timeRange and skillCategory from AnalyticsFilters.
+   */
+  const applyAnalyticsFilters = (allSessions: TherapistSession[], filters: AnalyticsFilters) => {
+    // Clone input
+    let out = [...allSessions]
+
+    // Time range filter - quick heuristic
+    if (filters?.timeRange) {
+      const now = Date.now()
+      const cutoff = ((): number => {
+        switch (filters.timeRange) {
+          case '7d': return now - 7 * 24 * 60 * 60 * 1000
+          case '30d': return now - 30 * 24 * 60 * 60 * 1000
+          case '90d': return now - 90 * 24 * 60 * 60 * 1000
+          case '1y': return now - 365 * 24 * 60 * 60 * 1000
+          default: return 0
+        }
+      })()
+      out = out.filter(s => new Date(s.startTime).getTime() >= cutoff)
+    }
+
+    // skillCategory placeholder - if provided, filter sessions practicing skills in that category.
+    if (filters?.skillCategory && filters.skillCategory !== 'all') {
+      out = out.filter(s => {
+        const scores = s.progressMetrics?.skillScores ?? {}
+        return Object.keys(scores).some(sk => sk.toLowerCase().includes(filters.skillCategory!))
+      })
+    }
+
+    return out
+  }
 
   /**
    * Transform summary stats for therapist analytics
@@ -110,29 +173,31 @@ export function useTherapistAnalytics(
       {
         value: totalSessions,
         label: 'Total Sessions',
-        therapistId: sessions[0]?.therapistId || 'unknown',
+        therapistId: sessions[0]?.therapistId ?? 'unknown',
         trend: totalSessions > 0 ? { value: totalSessions, direction: 'up', period: 'all time' } : undefined,
-        color: 'blue',
+  // Use semantic chart color token mapping; legacy hook consumers expect
+  // one of the defined literal names. Map to semantic literal.
+  color: 'blue',
       },
       {
         value: avgProgress,
         label: 'Avg Progress',
-        therapistId: sessions[0]?.therapistId || 'unknown',
+        therapistId: sessions[0]?.therapistId ?? 'unknown',
         trend: avgProgress > 50 ? { value: avgProgress - 50, direction: 'up', period: 'recent' } : undefined,
-        color: 'green',
+  color: 'green',
       },
       {
         value: completedSessions,
         label: 'Completed',
-        therapistId: sessions[0]?.therapistId || 'unknown',
+        therapistId: sessions[0]?.therapistId ?? 'unknown',
         trend: completedSessions > 0 ? { value: completedSessions, direction: 'up', period: 'recent' } : undefined,
-        color: 'purple',
+  color: 'purple',
       },
       {
         value: avgDuration,
         label: 'Avg Duration (s)',
-        therapistId: sessions[0]?.therapistId || 'unknown',
-        color: 'orange',
+        therapistId: sessions[0]?.therapistId ?? 'unknown',
+  color: 'orange',
       },
     ];
   }, []);
@@ -262,23 +327,36 @@ export function useTherapistAnalytics(
     }
   }, [sessions, loadData]);
 
+  // Auto-refresh (silent) based on options passed in via filters.config (if present)
+  useEffect(() => {
+    // If consumer passed options in _filters (some callers do), honor them.
+  const config: { enableAutoRefresh?: boolean; refreshInterval?: number } = ((_filters as any).config) ?? {}
+    if (!config.enableAutoRefresh || !config.refreshInterval) {
+      return;
+    }
+
+    refreshIntervalRef.current = setInterval(() => {
+      // silent refresh: do not toggle isLoading
+      loadData(false)
+    }, config.refreshInterval)
+
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current)
+        refreshIntervalRef.current = null
+      }
+    }
+  }, [(_filters as any).config, loadData])
+
   /**
    * Cleanup on unmount
    */
   useEffect(() => {
     return () => {
-      // Cancel any pending requests
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      // Clear timeouts
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current as unknown as number);
-      }
-
+      // Clear refresh interval
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current as unknown as number);
+        refreshIntervalRef.current = null
       }
     };
   }, []);

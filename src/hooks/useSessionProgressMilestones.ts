@@ -49,9 +49,10 @@ export function useSessionProgressMilestones(
   };
 
   const addProgressSnapshot = (value: number) => {
+    const clamped = Math.max(0, Math.min(100, value))
     setProgressSnapshots((prev) => [
       ...prev,
-      { timestamp: new Date().toISOString(), value },
+      { timestamp: new Date().toISOString(), value: clamped },
     ]);
   };
 
@@ -90,9 +91,15 @@ export function useSessionProgressMilestones(
   };
 
   const setProgressState = (state: Partial<ProgressMilestoneState>) => {
-    if (state.progress !== undefined) setProgressValue(state.progress);
-    if (state.progressSnapshots !== undefined) setProgressSnapshots(state.progressSnapshots);
-    if (state.progressMetrics !== undefined) setProgressMetrics(state.progressMetrics);
+    if (state.progress !== undefined) {
+      setProgressValue(state.progress);
+    }
+    if (state.progressSnapshots !== undefined && state.progressMetrics !== undefined) {
+          setProgressMetrics(state.progressMetrics);
+    }
+    if (state.progressMetrics !== undefined) {
+      setProgressMetrics(state.progressMetrics);
+    }
   };
 
   return {

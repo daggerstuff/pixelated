@@ -6,9 +6,6 @@ on:
       - master
       - staging
 
-permissions:
-  contents: write
-  workflows: write
 
 env:
   NODE_VERSION: 24.7.0
@@ -22,7 +19,6 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     permissions:
       contents: write
-      workflows: write
       deployments: write
       actions: read
       id-token: write
@@ -103,7 +99,6 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: write
-      workflows: write
       deployments: write
       actions: read
       id-token: write
