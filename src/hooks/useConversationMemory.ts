@@ -22,7 +22,7 @@
 
 // Session timing/metrics logic (active/idle/paused/ended spans, durations, etc.)
 // Progress and milestone tracking (progress %, skill scores, milestones, etc.)
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSessionTimingMetrics } from './useSessionTimingMetrics';
 import { useSessionProgressMilestones } from './useSessionProgressMilestones';
 import type { SessionProgressMetrics } from '@/types/dashboard';
@@ -69,16 +69,32 @@ interface MemoryState extends ConversationMemory {
  *     updateSkillScore, updateConversationFlow, addMilestone, resetSession, setMemory
  *   } = useConversationMemory();
  */
+const DEFAULT_MEMORY = {
+  history: [],
+  context: {},
+  sessionState: 'idle' as const,
+  progress: 0,
+  progressSnapshots: [] as Array<{ timestamp: string; value: number }>,
+  progressMetrics: {
+    totalMessages: 0,
+    therapistMessages: 0,
+    clientMessages: 0,
+    responsesCount: 0,
+    sessionDuration: 0,
+    activeTime: 0,
+    skillScores: {},
+    responseTime: 0,
+    conversationFlow: 0,
+    milestonesReached: [],
+    lastMilestoneTime: undefined,
+  } as SessionProgressMetrics,
+} as const
+
 export function useConversationMemory(initialState?: Partial<MemoryState>) {
   const [memory, setMemory] = useState<MemoryState>({
-    history: [],
-    context: {},
-    sessionState: 'idle',
-    progress: initialState?.progress ?? 0,
-    progressSnapshots: initialState?.progressSnapshots ?? [],
-    progressMetrics: initialState?.progressMetrics ?? ({} as SessionProgressMetrics),
+    ...DEFAULT_MEMORY,
     ...initialState,
-  });
+  } as MemoryState);
 
   // Extracted session timing and metrics logic
   const sessionStartTimeRef = useRef<number>(Date.now());
@@ -223,6 +239,27 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
 
     resetProgress();
   };
+
+  // Update session duration / active time every second only while active
+  useEffect(() => {
+    if (memory.sessionState !== 'active') {
+      return
+    }
+
+    const interval = setInterval(() => {
+      setMemory(prev => ({
+        ...prev,
+        progressMetrics: {
+          ...prev.progressMetrics,
+          sessionDuration: Math.floor((Date.now() - sessionStartTimeRef.current) / 1000),
+          activeTime: (prev.progressMetrics.activeTime ?? 0) + Math.floor((Date.now() - lastActiveTimeRef.current) / 1000),
+        }
+      }))
+      lastActiveTimeRef.current = Date.now()
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [memory.sessionState])
 
   return {
     memory,

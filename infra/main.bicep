@@ -1,6 +1,5 @@
 param azureLocation string = resourceGroup().location
 param environment string = 'production'
-param environmentName string = 'production'
 param containerRegistryName string = 'pixelatedbox'
 param appServiceName string = 'pixelated'
 param keyVaultName string = '${appServiceName}-kv'
@@ -112,6 +111,7 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
       healthCheckPath: '/api/health'
       ftpsState: 'Disabled'
       acrUseManagedIdentityCreds: true
+      numberOfWorkers: 2
       minimumElasticInstanceCount: 2  // Minimum instances for failover
     }
   }

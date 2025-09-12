@@ -146,7 +146,7 @@ resource "aws_elasticache_replication_group" "main" {
   parameter_group_name = "default.redis7"
 
   num_cache_clusters = var.redis_num_cache_nodes
-  
+
   subnet_group_name  = aws_elasticache_subnet_group.main.name
   security_group_ids = [aws_security_group.redis.id]
 
@@ -277,29 +277,6 @@ resource "aws_s3_bucket" "assets" {
   # Enable versioning for replication
   versioning {
     enabled = true
-  }
-
-  # Cross-region replication configuration
-  replication_configuration {
-    role = var.s3_replication_role_arn
-    rules {
-      id     = "replication"
-      status = "Enabled"
-      priority = 1
-      destination {
-        bucket        = var.s3_replication_dest_arn
-        storage_class = "STANDARD"
-        encryption_configuration {
-          replica_kms_key_id = var.s3_replication_kms_key_id
-        }
-      }
-      delete_marker_replication {
-        status = "Enabled"
-      }
-      filter {
-        prefix = ""
-      }
-    }
   }
 
   tags = var.common_tags

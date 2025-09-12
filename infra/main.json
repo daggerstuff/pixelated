@@ -116,6 +116,7 @@
         "siteConfig": {
           "minTlsVersion": "1.2",
           "http20Enabled": true,
+          "numberOfWorkers": 2,
           "appSettings": [
             {
               "name": "NODE_ENV",
