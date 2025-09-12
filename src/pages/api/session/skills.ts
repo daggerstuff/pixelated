@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import type { APIRoute } from 'astro';
+import { getSkillCategory } from '../../../lib/skillCategories';
 
 // Database connection pool
 const pool = new Pool({
@@ -40,34 +41,66 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       // Update or insert into skill_development table for long-term tracking
-      const skillQuery = `
-        INSERT INTO skill_development (
-          therapist_id, skill_name, skill_category, current_score, practice_sessions, last_practiced
-        ) VALUES ($1, $2, $3, $4, $5, NOW())
-        ON CONFLICT (therapist_id, skill_name)
-        DO UPDATE SET
-          current_score = EXCLUDED.current_score,
-          practice_sessions = skill_development.practice_sessions + 1,
-          last_practiced = NOW(),
-          updated_at = NOW()
-      `;
+      // Build batched INSERT query to avoid N+1 queries
+      const skillInserts: Array<{
+        therapistId: string;
+        skillName: string;
+        category: string;
+        score: number;
+      }> = [];
 
-      for (const [skillName, score] of Object.entries(skillScores)) {
-        // Determine skill category based on skill name
-        let category = 'therapeutic';
-        if (skillName.toLowerCase().includes('technical')) {
-          category = 'technical';
-        } else if (skillName.toLowerCase().includes('interpersonal')) {
-          category = 'interpersonal';
+      // skillScores may be either { name: number } or { name: { score: number, category?: string }}
+      for (const [skillName, scoreOrObj] of Object.entries(skillScores)) {
+        let score: number;
+        let explicitCategory: string | undefined;
+
+        if (typeof scoreOrObj === 'object' && scoreOrObj !== null && ('score' in scoreOrObj)) {
+          // @ts-ignore incoming payload from runtime
+          score = Number((scoreOrObj as any).score);
+          // @ts-ignore
+          explicitCategory = (scoreOrObj as any).category;
+        } else {
+          score = Number(scoreOrObj as any);
         }
 
-        await client.query(skillQuery, [
+  // Determine category using helper mapping (allows expansion without changing this file)
+  const category = getSkillCategory(skillName, explicitCategory);
+
+        skillInserts.push({
           therapistId,
           skillName,
           category,
-          score,
-          1 // practice session increment
-        ]);
+          score: score as number,
+        });
+      }
+
+      if (skillInserts.length > 0) {
+        // Build VALUES clause for batched insert
+        // We insert: therapist_id, skill_name, skill_category, current_score, practice_sessions, last_practiced
+        // For each row we need 5 parameters (last_practiced is NOW()). Build VALUES clause accordingly.
+        const valuesClause = skillInserts
+          .map((_, index) => `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${index * 5 + 4}, $${index * 5 + 5}, NOW())`)
+          .join(', ');
+
+        // Build parameter array
+        const params: any[] = [];
+        skillInserts.forEach(insert => {
+          params.push(insert.therapistId, insert.skillName, insert.category, insert.score, 1);
+        });
+
+        const batchedSkillQuery = `
+          INSERT INTO skill_development (
+            therapist_id, skill_name, skill_category, current_score, practice_sessions, last_practiced
+          ) VALUES ${valuesClause}
+          ON CONFLICT (therapist_id, skill_name)
+          DO UPDATE SET
+            current_score = EXCLUDED.current_score,
+            practice_sessions = skill_development.practice_sessions + 1,
+            last_practiced = NOW(),
+            updated_at = NOW()
+        `;
+
+        await client.query(batchedSkillQuery, params);
       }
 
       return new Response(

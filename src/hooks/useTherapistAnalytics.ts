@@ -1,27 +1,24 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger';
+// Runtime import (class/value) for AnalyticsError - used for instantiation and instanceof checks
+import { AnalyticsError as AnalyticsErrorClass } from '@/types/analytics';
+// Type-only imports
 import type {
   TherapistAnalyticsChartData,
   AnalyticsFilters,
   TherapistSessionData,
- TherapistSkillProgressData,
+  TherapistSkillProgressData,
   TherapistMetricSummary,
+  AnalyticsError as AnalyticsErrorType,
 } from '@/types/analytics';
-import { AnalyticsError } from '@/types/analytics';
 import type { TherapistSession } from '@/types/dashboard';
 
 const logger = createBuildSafeLogger('use-therapist-analytics');
 
-interface UseTherapistAnalyticsOptions {
-  refreshInterval?: number;
-  retryAttempts?: number;
-  enableAutoRefresh?: boolean;
-}
-
 interface UseTherapistAnalyticsResult {
   data: TherapistAnalyticsChartData | null;
   isLoading: boolean;
-  error: AnalyticsError | null;
+  error: AnalyticsErrorType | null;
   refetch: () => Promise<void>;
   clearError: () => void;
 }
@@ -37,7 +34,7 @@ export function useTherapistAnalytics(
   // State management
   const [data, setData] = useState<TherapistAnalyticsChartData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<AnalyticsError | null>(null);
+  const [error, setError] = useState<AnalyticsErrorType | null>(null);
 
   // Refs for cleanup and retry logic
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -223,10 +220,10 @@ export function useTherapistAnalytics(
         loadError instanceof Error && loadError.message
           ? loadError.message
           : 'Unknown error occurred';
-      const analyticsError = new AnalyticsError('GENERATION_ERROR', message, loadError);
+  const analyticsError = new AnalyticsErrorClass('GENERATION_ERROR', message, loadError);
 
-      setError(analyticsError);
-      logger.error('Failed to generate therapist analytics data', { error: analyticsError });
+  setError(analyticsError as unknown as AnalyticsErrorType);
+  logger.error('Failed to generate therapist analytics data', { error: analyticsError });
 
     } finally {
       if (showLoading) {
@@ -253,7 +250,16 @@ export function useTherapistAnalytics(
    * Load data when sessions change
    */
   useEffect(() => {
-    loadData(true);
+    // If sessions is empty, ensure loading state is cleared and no analytics are generated.
+    // This prevents indefinite loading for empty datasets.
+    if (sessions.length === 0) {
+      setIsLoading(false);
+      setData(null);
+      setError(null);
+      logger.info('No sessions available, analytics data cleared');
+    } else {
+      loadData(true);
+    }
   }, [sessions, loadData]);
 
   /**
