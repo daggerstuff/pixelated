@@ -57,12 +57,12 @@ export async function saveSessionProgress(
 // Save progress snapshots
 export async function saveProgressSnapshots(
   sessionId: string,
-  snapshots: Array<{ timestamp: string; value: number }>
+  progressSnapshots: Array<{ timestamp: string; value: number }>
 ): Promise<boolean> {
   try {
     const response = await fetchWithTimeout('/api/session/snapshots', {
       method: 'POST',
-      body: JSON.stringify({ sessionId, snapshots }),
+      body: JSON.stringify({ sessionId, progressSnapshots }),
     });
 
     if (!response.ok) {
