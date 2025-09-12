@@ -149,7 +149,7 @@ export class PythonBiasDetectionBridge {
         reject,
         priority,
       })
-      
+
       // Sort by priority (higher numbers = higher priority)
       this.requestQueue.sort((a, b) => b.priority - a.priority)
       // Ensure the processor is running
@@ -217,10 +217,17 @@ export class PythonBiasDetectionBridge {
       headers['Authorization'] = `Bearer ${this.authToken}`
     }
 
+    // Build a fetch signal compatible with Node, jsdom, and test envs.
+    // We'll create a per-request AbortController if AbortSignal.timeout is not available.
+    let localController: AbortController | null = null
+    const signalFromTimeout = typeof (AbortSignal as any)?.timeout === 'function'
+      ? (AbortSignal as any).timeout(this.timeout) as AbortSignal
+      : null
+
     const fetchOptions: RequestInit = {
       method,
       headers,
-      signal: AbortSignal.timeout(this.timeout),
+      // signal is assigned later after possibly obtaining a pooled connection controller
     }
 
     if (data && method === 'POST') {
@@ -233,13 +240,34 @@ export class PythonBiasDetectionBridge {
     // Retry logic
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
-        // Acquire a pooled connection for this request
-        pooledConnection = await this.connectionPool.acquireConnection()
+        // Acquire a pooled connection for this request if the pool supports it
+        if (this.connectionPool && typeof (this.connectionPool as any).acquireConnection === 'function') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - runtime check above ensures this exists
+          pooledConnection = await (this.connectionPool as any).acquireConnection()
+        }
+        // Decide which AbortSignal to use: prefer pooled controller if available, then AbortSignal.timeout, then a local controller
+        let signalToUse: AbortSignal | undefined
+        if (pooledConnection && pooledConnection.controller && pooledConnection.controller.signal) {
+          signalToUse = pooledConnection.controller.signal
+        } else if (signalFromTimeout) {
+          signalToUse = signalFromTimeout
+        } else {
+          // Create local controller and schedule timeout
+          localController = new AbortController()
+          signalToUse = localController.signal
+          setTimeout(() => {
+            try { localController?.abort() } catch (e) { /* ignore */ }
+          }, this.timeout)
+        }
+
+        // Attach the chosen signal to fetch options for this attempt
+        ;(fetchOptions as any).signal = signalToUse
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
         )
 
-        const response = await fetch(url, fetchOptions)
+  const response = await fetch(url, fetchOptions)
 
         if (!response.ok) {
           const errorText = await response.text()
@@ -268,10 +296,16 @@ export class PythonBiasDetectionBridge {
           )
         }
       } finally {
-        // Always release the connection if it was acquired
-        if (pooledConnection) {
-          this.connectionPool.releaseConnection(pooledConnection)
+        // Always release the connection if it was acquired and the pool supports releaseConnection
+        if (pooledConnection && this.connectionPool && typeof (this.connectionPool as any).releaseConnection === 'function') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - runtime check above ensures this exists
+          ;(this.connectionPool as any).releaseConnection(pooledConnection)
           pooledConnection = null
+        }
+        // Clear any local controller timeout by abandoning reference
+        if (localController) {
+          localController = null
         }
       }
     }

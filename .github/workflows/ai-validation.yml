@@ -7,13 +7,13 @@ permissions:
 on:
   # Schedule daily validation runs
   schedule:
-  - cron: 0 0 * * * # Every day at midnight UTC
+    - cron: 0 0 * * * # Every day at midnight UTC
 
   # Run on completed deployments
   workflow_run:
     workflows: [ Deploy to Staging, Deploy to Production ]
     types:
-    - completed
+      - completed
 
   # Allow manual runs for debugging
   workflow_dispatch:
