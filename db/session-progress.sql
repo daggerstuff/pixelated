@@ -72,10 +72,6 @@ WHERE ctid IN (
   SELECT ctid FROM duplicates WHERE rn > 1
 );
 
--- Create unique index for skill development upserts (ensures uniqueness)
-CREATE UNIQUE INDEX IF NOT EXISTS idx_skill_development_therapist
-ON skill_development (therapist_id, skill_name);
-
 -- Create table for session milestones
 CREATE TABLE IF NOT EXISTS session_milestones (
   id SERIAL PRIMARY KEY,
@@ -123,6 +119,10 @@ BEGIN
     ALTER TABLE skill_development
       ADD CONSTRAINT ux_skill_development_therapist_skill UNIQUE (therapist_id, skill_name);
   END IF;
+EXCEPTION WHEN duplicate_object THEN
+  -- Constraint already exists, do nothing
+  NULL;
+END$$;
 EXCEPTION WHEN duplicate_object THEN
   -- Constraint already exists, do nothing
   NULL;
