@@ -2,15 +2,18 @@ import { Pool } from 'pg';
 import type { APIRoute } from 'astro';
 
 // Database connection pool
-const pool = new Pool({
-  connectionString: process.env['DATABASE_URL'],
-});
+const { DATABASE_URL } = process.env
+if (!DATABASE_URL) throw new Error('DATABASE_URL is not set')
+const pool =
+  (globalThis as any).__pgPool ??
+  new Pool({ connectionString: DATABASE_URL })
+;(globalThis as any).__pgPool = pool
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { therapistId, currentSessionId, previousSessionId, improvementScore, metrics } = await request.json();
 
-    if (!therapistId || !currentSessionId || !improvementScore || !metrics) {
+    if (!therapistId || !currentSessionId || improvementScore === undefined || improvementScore === null || !metrics) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: therapistId, currentSessionId, improvementScore, metrics' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -23,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
       const query = `
         INSERT INTO session_comparisons (
           therapist_id, current_session_id, previous_session_id, improvement_score, comparison_metrics
-        ) VALUES ($1, $2, $3, $4, $5)
+        ) VALUES ($1, $2, $3, $4, $5::jsonb)
         RETURNING id
       `;
 
@@ -113,22 +116,27 @@ export const GET: APIRoute = async ({ request }) => {
           LEFT JOIN sessions cs ON sc.current_session_id = cs.id
           LEFT JOIN sessions ps ON sc.previous_session_id = ps.id
           WHERE sc.therapist_id = $1
-            AND sc.analyzed_at >= NOW() - INTERVAL '${timeRange}'
+            AND sc.analyzed_at >= NOW() - $2::interval
           ORDER BY sc.analyzed_at DESC
         `;
+        // Allowlist simple forms like '7 days', '30 days', '24 hours', '30d'
+        const allowed = /^(?:\d+\s+(?:minutes?|hours?|days?|weeks?|months?|years?)|\d+d)$/i
+        const safeRange = allowed.test(timeRange) ? timeRange.replace(/(\d+)d/i, '$1 days') : '30 days'
+        queryParams = [therapistId, safeRange];
         queryParams = [therapistId];
       }
 
       const result = await client.query(query, queryParams);
 
       // Transform data for client consumption
+      const toObj = (v: any) => (typeof v === 'string' ? JSON.parse(v || '{}') : (v ?? {}))
       const comparisons = result.rows.map(row => ({
         id: row.id,
         therapistId: row.therapist_id,
         currentSessionId: row.current_session_id,
         previousSessionId: row.previous_session_id,
         improvementScore: row.improvement_score,
-        metrics: JSON.parse(row.comparison_metrics || '{}'),
+        metrics: toObj(row.comparison_metrics),
         analyzedAt: row.analyzed_at,
         currentSessionStartedAt: row.current_session_started_at,
         previousSessionStartedAt: row.previous_session_started_at,
