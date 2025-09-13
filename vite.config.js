@@ -18,7 +18,7 @@ const cdnAssetMap = (() => {
       'CDN asset map not found or invalid, using empty map:',
       error.message,
     )
-    return {}
+    return {};
   }
 })()
 
