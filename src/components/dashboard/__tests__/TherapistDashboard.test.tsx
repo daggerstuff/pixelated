@@ -39,14 +39,9 @@ vi.mock("@/hooks/useTherapistAnalytics", () => ({
 
 describe("TherapistDashboard", () => {
   it("renders dashboard heading", () => {
-    const mockSessions: TherapistSession[] = [
-      {
-        id: 'session-1',
-        status: 'completed',
-        startTime: new Date('2025-01-01T10:00:00Z'),
-        endTime: new Date('2025-01-01T11:00:00Z'),
-      }
-    ];
+    render(<TherapistDashboard sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
+    expect(screen.getByLabelText('Therapist Dashboard')).toBeInTheDocument();
+  });
 
   const mockOnSessionControl = vi.fn();
 

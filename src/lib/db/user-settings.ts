@@ -1,4 +1,7 @@
-import type { ObjectId } from 'mongodb'
+// Use server-only helper for MongoDB types
+import type { ObjectId } from '@/lib/server-only/mongodb-types'
+
+let ObjectId: unknown
 
 // MongoDB-based user settings types
 

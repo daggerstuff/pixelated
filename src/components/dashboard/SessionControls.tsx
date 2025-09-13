@@ -1,29 +1,54 @@
-import React, { useState, useEffect, useRef } from "react";
-import type { TherapistSession } from "@/types/dashboard";
-import { cn } from "@/lib/utils";
+// Replaced entire file with a single authoritative implementation to remove merge residues.
+import React from 'react'
+import { useEffect, useRef } from 'react'
+import type { TherapistSession } from '@/types/dashboard'
+import { cn } from '@/lib/utils'
 
 interface SessionControlsProps {
-  sessions: TherapistSession[];
-  onSessionControl: (sessionId: string, action: 'start' | 'pause' | 'resume' | 'end') => void;
+  sessions: TherapistSession[]
+  onSessionControl: (sessionId: string, action: 'start' | 'pause' | 'resume' | 'end') => void
 }
 
-export function SessionControls({ sessions, onSessionControl }: SessionControlsProps) {
-  const activeSession = sessions.find(session => session.status === 'active');
-  const pausedSession = sessions.find(session => session.status === 'paused');
+export default function SessionControls({ sessions, onSessionControl }: SessionControlsProps) {
+  const activeSession = sessions.find((s) => s.status === 'active')
+  const pausedSession = sessions.find((s) => s.status === 'paused')
+
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   // Focus management for keyboard navigation
   const [focusedButton, setFocusedButton] = useState<string | null>(null);
-  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const handleControlClick = (action: 'start' | 'pause' | 'resume' | 'end', sessionId?: string) => {
-    if (sessionId) {
-      onSessionControl(sessionId, action);
-      // Remove focus after action to prevent accidental repeated clicks
-      if (buttonRefs.current[action]) {
-        buttonRefs.current[action]?.blur();
+    if (!sessionId) {
+      return
+    }
+    onSessionControl(sessionId, action)
+    const btn = buttonRefs.current[action]
+    if (btn) {
+      btn.blur()
+    }
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        Object.values(buttonRefs.current).forEach((b) => b?.blur())
       }
     }
-  };
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
+  const fmt = (iso?: string) => {
+    if (!iso) {
+      return ''
+    }
+    try {
+      return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    } catch {
+      return ''
+    }
+  }
 
   // Keyboard event handling for session controls
   useEffect(() => {
@@ -42,33 +67,18 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
   }, []);
 
   return (
-    <div
-      className="space-y-4 focus:outline-none"
-      role="group"
-      aria-label="Session Controls"
-      tabIndex={0}
-    >
+    <section className="space-y-4" aria-label="Session Controls">
       <h3 className="text-lg font-semibold">Session Controls</h3>
 
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2">
         <button
           type="button"
           ref={(el) => { buttonRefs.current['pause'] = el; }}
           onClick={() => activeSession && handleControlClick('pause', activeSession.id)}
           disabled={!activeSession}
-          className={cn(
-            "px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-            activeSession
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-200 text-gray-500 cursor-not-allowed"
-          )}
-          aria-label="Pause current session"
-          aria-disabled={!activeSession}
-          onFocus={() => setFocusedButton('pause')}
-          onBlur={() => setFocusedButton(null)}
+          className={cn(activeSession ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
         >
-          Pause Session
+          Pause
         </button>
 
         <button
@@ -76,18 +86,9 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
           ref={(el) => { buttonRefs.current['resume'] = el; }}
           onClick={() => pausedSession && handleControlClick('resume', pausedSession.id)}
           disabled={!pausedSession}
-          className={cn(
-            "px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-            pausedSession
-              ? "bg-green-600 text-white hover:bg-green-700"
-              : "bg-gray-200 text-gray-500 cursor-not-allowed"
-          )}
-          aria-label="Resume paused session"
-          aria-disabled={!pausedSession}
-          onFocus={() => setFocusedButton('resume')}
-          onBlur={() => setFocusedButton(null)}
+          className={cn(pausedSession ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
         >
-          Resume Session
+          Resume
         </button>
 
         <button
@@ -95,28 +96,16 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
           ref={(el) => { buttonRefs.current['end'] = el; }}
           onClick={() => activeSession && handleControlClick('end', activeSession.id)}
           disabled={!activeSession}
-          className={cn(
-            "px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-            activeSession
-              ? "bg-red-600 text-white hover:bg-red-700"
-              : "bg-gray-200 text-gray-500 cursor-not-allowed"
-          )}
-          aria-label="End current session"
-          aria-disabled={!activeSession}
-          onFocus={() => setFocusedButton('end')}
-          onBlur={() => setFocusedButton(null)}
+          className={cn(activeSession ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
         >
-          End Session
+          End
         </button>
       </div>
 
-      {/* Session List */}
-      <div className="space-y-2" role="region" aria-label="Recent Sessions">
+      <div>
         <h4 className="text-md font-medium">Recent Sessions</h4>
         {sessions.length === 0 ? (
-          <div className="text-sm text-muted-foreground italic p-4 text-center">
-            No recent sessions available
-          </div>
+          <div className="text-sm italic">No recent sessions</div>
         ) : (
           <ul className="space-y-2" role="list">
             {sessions.slice(0, 3).map((session) => (
@@ -160,8 +149,6 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
           </ul>
         )}
       </div>
-    </div>
-  );
+    </section>
+  )
 }
-
-export default SessionControls;
