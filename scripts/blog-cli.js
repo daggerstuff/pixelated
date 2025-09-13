@@ -315,3 +315,5 @@ rl.on('close', () => {
 
 // Start the CLI
 start()
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="10334f97-4b6c-538b-8a25-0e6bf4dcd9d4")}catch(e){}}();
+//# debugId=10334f97-4b6c-538b-8a25-0e6bf4dcd9d4

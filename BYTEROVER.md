@@ -103,3 +103,46 @@ To simplify imports, the project uses path aliases configured in `tsconfig.json`
     - Write unit tests for new logic and run with `pnpm test:unit`.
     - Write E2E tests for new features and run with `pnpm e2e`.
 6.  **Committing**: Follow conventional commit standards.
+## Manual Byterover/Cipher Onboarding
+
+If MCP tools are unavailable or automated onboarding is blocked, follow these steps to manually onboard and configure Byterover/Cipher for the Pixelated Empathy project:
+
+### 1. Create a `.cipherrc` Configuration File
+
+Add a `.cipherrc` file to the project root with the following minimal template:
+
+```json
+{
+  "projectName": "Pixelated Empathy",
+  "handbook": "BYTEROVER.md",
+  "modules": [
+    "src/lib/ai/",
+    "src/lib/db/",
+    "src/components/"
+  ],
+  "mcp": false
+}
+```
+
+- `projectName`: The name of your project.
+- `handbook`: Path to the Byterover handbook file.
+- `modules`: List of core module directories for Byterover/Cipher to track.
+- `mcp`: Set to `false` to indicate MCP tool usage is disabled.
+
+### 2. Handbook Presence
+
+- Ensure `BYTEROVER.md` exists and is up to date.
+- If onboarding or module sync is required, update this file manually to reflect new modules or architecture changes.
+
+### 3. Reference Official Workflow
+
+- For the official onboarding and planning workflow, see [`AGENTS.md`](AGENTS.md:1) (search for "Byterover MCP Server Tools Reference").
+- If MCP tools become available, follow the automated steps as documented.
+
+### 4. Troubleshooting
+
+- If you encounter issues with Byterover/Cipher integration, verify `.cipherrc` is present and correctly formatted.
+- Document any manual changes in this section for future maintainers.
+
+---
+  

@@ -19,6 +19,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@campfirein/cipher': path.resolve(__dirname, './src/lib/cipher/__mocks__/@campfirein/cipher.ts'),
       'react-dom/test-utils': path.resolve(
         __dirname,
         '__mocks__/react-dom/test-utils.js',
