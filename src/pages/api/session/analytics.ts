@@ -20,6 +20,20 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { sessionId, analyticsData } = await request.json();
 
+    const isValid =
+      typeof sessionId === 'string' &&
+      analyticsData &&
+      Array.isArray(analyticsData.sessionMetrics ?? []) &&
+      Array.isArray(analyticsData.skillProgress ?? []) &&
+      (analyticsData.sessionMetrics?.length ?? 0) <= 1000 &&
+      (analyticsData.skillProgress?.length ?? 0) <= 1000;
+    if (!isValid) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid payload' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (!sessionId || !analyticsData) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: sessionId, analyticsData' }),
@@ -175,23 +189,30 @@ export const GET: APIRoute = async ({ request }) => {
           metadata
         FROM session_analytics
         WHERE session_id = $1
-          AND recorded_at >= NOW() - INTERVAL '${timeRange}'
+          AND recorded_at >= NOW() - $2::interval
         ORDER BY recorded_at ASC
       `;
 
-      const result = await client.query(query, [sessionId]);
-
+      const interval =
+        timeRange === '7d' ? '7 days' :
+        timeRange === '30d' ? '30 days' :
+        timeRange === '90d' ? '90 days' :
+        timeRange === '1y' ? '1 year' : '30 days';
+      const result = await client.query(query, [sessionId, interval]);
       // Transform data for client consumption
       const sessionMetrics: Array<any> = [];
       const skillProgress: Array<any> = [];
 
       result.rows.forEach(row => {
+        const meta = typeof row.metadata === 'string'
+          ? JSON.parse(row.metadata || '{}')
+          : (row.metadata ?? {})
         if (row.metric_category === 'skill') {
           skillProgress.push({
             skill: row.metric_name.replace('skill_', ''),
             score: row.metric_value,
             category: row.metric_category,
-            ...JSON.parse(row.metadata || '{}'),
+            ...meta,
             timestamp: row.recorded_at,
           });
         } else {
@@ -200,7 +221,7 @@ export const GET: APIRoute = async ({ request }) => {
             metricValue: row.metric_value,
             category: row.metric_category,
             recordedAt: row.recorded_at,
-            ...JSON.parse(row.metadata || '{}'),
+            ...meta,
           });
         }
       });

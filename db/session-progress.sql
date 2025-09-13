@@ -40,16 +40,13 @@ CREATE TABLE IF NOT EXISTS skill_development (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
-
--- Ensure existing installations where skill_name may have been created with a smaller length
+-- Ensure existing installations where skill_name may have been created with a smaller/limited length
 DO $$
 BEGIN
-  -- If the column exists and its character maximum length is less than 100, alter it to varchar(100)
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'skill_development'
       AND column_name = 'skill_name'
-      -- If the column is not already TEXT, alter it to TEXT
       AND data_type != 'text'
   ) THEN
     ALTER TABLE skill_development
@@ -60,7 +57,7 @@ EXCEPTION WHEN undefined_table THEN
   NULL;
 END$$;
 
--- Deduplicate skill_development on (therapist_id, skill_name) before adding unique constraint
+-- Deduplicate skill_development on (therapist_id, skill_name) keeping the most recent record
 WITH duplicates AS (
   SELECT
     ctid,
@@ -75,7 +72,7 @@ WHERE ctid IN (
   SELECT ctid FROM duplicates WHERE rn > 1
 );
 
--- Create unique index for skill development upserts
+-- Create unique index for skill development upserts (ensures uniqueness)
 CREATE UNIQUE INDEX IF NOT EXISTS idx_skill_development_therapist
 ON skill_development (therapist_id, skill_name);
 

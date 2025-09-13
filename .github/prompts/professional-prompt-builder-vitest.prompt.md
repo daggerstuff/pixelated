@@ -1,3 +1,9 @@
+---
+title: "Professional Prompt Builder - Vitest"
+key: professional-prompt-builder-vitest
+---
+
+```markdown
 # Professional Prompt Builder for Copilot (Vitest Edition)
 
 ## Purpose
@@ -39,3 +45,5 @@ describe('myFunction', () => {
 });
 ```
 ```
+
+````

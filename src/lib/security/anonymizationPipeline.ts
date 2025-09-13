@@ -8,8 +8,9 @@
  */
 
 import { piiDetectionService } from './pii'
-import { Anonymizer as PHIAnonymizer } from './phiDetection'
+import { phiDetector, detectAndRedactPHIAsync } from './phiDetection'
 import { createPrivacyHash } from '../../simulator/utils/privacy'
+import * as crypto from 'crypto'
 
 // Types
 export interface AnonymizationResult<T = Record<string, unknown> | string> {
@@ -45,7 +46,9 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
   options: AnonymizationOptions = {},
 ): Promise<AnonymizationResult<T>> {
   const timestamp = Date.now()
-  const auditId = createPrivacyHash(`${timestamp}_${Math.random()}`)
+  // Use cryptographically secure random bytes instead of Math.random for audit id
+  const secureSuffix = crypto.randomBytes(8).toString('hex')
+  const auditId = createPrivacyHash(`${timestamp}_${secureSuffix}`)
   let summary: AnonymizationResult['summary'] = {
     redactedFields: [],
     auditId,
@@ -56,19 +59,29 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
   try {
     if (typeof input === 'string') {
       // TEXT anonymization (PHI)
-      const phiAnonymizer = new PHIAnonymizer()
-      // PHI entities would be detected here; fallback to redacting all detected entities
-      // TODO: Replace with real PHI detection integration
-      const redacted = await phiAnonymizer.anonymize({ text: input })
-      if ('entities' in redacted) {
-        summary.redactedTextEntities = redacted.entities as Array<{
-          type: string
-          start: number
-          end: number
-        }>
+      // Use the phiDetector utility exported from ./phiDetection.ts which provides
+      // async detection/redaction helpers and a singleton detector instance.
+      // Prefer the async helper which returns redacted text. If we need entities,
+      // call the detector directly.
+      const redactedText = await detectAndRedactPHIAsync(input)
+
+      // Attempt to get entities from the detector (best-effort, may be empty)
+      try {
+        const detection = await phiDetector.detectPHI(input)
+        if (detection && Array.isArray(detection.entities)) {
+          summary.redactedTextEntities = detection.entities.map((e) => ({
+            type: String(e.type),
+            start: e.start,
+            end: e.end,
+          }))
+        }
+      } catch (detErr) {
+        // Non-fatal: record detection error in summary but still return redacted text
+        summary.errors = [detErr instanceof Error ? detErr.message : String(detErr)]
       }
+
       return {
-        anonymized: redacted.text,
+        anonymized: redactedText as unknown as T,
         summary,
       }
     } else if (typeof input === 'object' && input !== null) {
@@ -118,7 +131,7 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
       })
     }
     return {
-      anonymized: typeof input === 'string' ? '' : ({} as T),
+      anonymized: (typeof input === 'string' ? '' : {}) as T,
       summary,
     }
   }

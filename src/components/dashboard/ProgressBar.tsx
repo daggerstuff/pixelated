@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number;
@@ -49,7 +49,7 @@ export function ProgressBar({
           style={{ width: `${percent}%` }}
         />
       </div>
-  <span className="text-xs text-muted-foreground ml-2">{ariaValueText}</span>
+      <span className="text-xs text-muted-foreground ml-2">{ariaValueText}</span>
     </div>
   );
 }

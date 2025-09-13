@@ -17,7 +17,7 @@ on:
 
 env:
   NODE_VERSION: 24.7.0
-  PNPM_VERSION: 10.15.0
+  PNPM_VERSION: 10.16.0
   AZURE_RESOURCE_GROUP: pixelated-rg
   AZURE_LOCATION: eastus
   AZURE_APP_NAME: pixelatedempathy
@@ -190,7 +190,7 @@ jobs:
         run: |
           OUTPUTS='${{ steps.bicep.outputs.deploymentOutputs }}'
           echo "Raw deployment outputs: $OUTPUTS"
-          
+
           # Validate outputs are present and valid JSON
           if [[ -z "$OUTPUTS" || "$OUTPUTS" == "null" ]]; then
             echo "ERROR: Deployment outputs are empty (deployment may have failed validation or encountered an error)"
@@ -201,7 +201,7 @@ jobs:
               exit 1
             fi
           fi
-          
+
           # Try to parse JSON, if it fails, try alternative format
           if echo "$OUTPUTS" | jq . >/dev/null 2>&1; then
             echo "Parsing JSON format outputs..."
@@ -218,12 +218,12 @@ jobs:
             REGISTRY_LOGIN_SERVER="${{ env.AZURE_APP_NAME }}box.azurecr.io"
             APP_SERVICE_NAME="${{ env.AZURE_APP_NAME }}"
           fi
-          
+
           echo "key-vault-name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
           echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
           echo "registry-login-server=$REGISTRY_LOGIN_SERVER" >> $GITHUB_OUTPUT
           echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
-          
+
           echo "Extracted outputs:"
           echo "  Key Vault: $KEY_VAULT_NAME"
           echo "  Registry: $REGISTRY_NAME"
@@ -244,14 +244,14 @@ jobs:
               --name "azure-openai-api-key" \
               --value "$AZURE_OPENAI_API_KEY"
           fi
-          
+
           if [[ -n "$AZURE_OPENAI_ENDPOINT" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
               --name "azure-openai-endpoint" \
               --value "$AZURE_OPENAI_ENDPOINT"
           fi
-          
+
           # Store MongoDB Atlas secrets
           if [[ -n "$MONGODB_URI" ]]; then
             az keyvault secret set \
@@ -259,7 +259,7 @@ jobs:
               --name "mongodb-uri" \
               --value "$MONGODB_URI"
           fi
-          
+
           if [[ -n "$MONGODB_DB_NAME" ]]; then
             az keyvault secret set \
               --vault-name ${{ steps.deployment.outputs.key-vault-name }} \
@@ -294,18 +294,18 @@ jobs:
           # Get ACR details from infrastructure deployment outputs
           REGISTRY_NAME="${{ needs.deploy-infrastructure.outputs.registry-name }}"
           LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
-          
+
           # Validate that we got the required values from the infrastructure deployment
           if [[ -z "$REGISTRY_NAME" || "$REGISTRY_NAME" == "null" ]]; then
             echo "Failed to get Azure Container Registry name from infrastructure deployment"
             exit 1
           fi
-          
+
           if [[ -z "$LOGIN_SERVER" || "$LOGIN_SERVER" == "null" ]]; then
             echo "Failed to get Azure Container Registry login server from infrastructure deployment"
             exit 1
           fi
-          
+
           echo "registry-name=$REGISTRY_NAME" >> $GITHUB_OUTPUT
           echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
 
@@ -316,11 +316,11 @@ jobs:
       - name: Build and push Docker image
         run: |
           IMAGE_TAG="${{ needs.build.outputs.environment }}-${{ github.sha }}"
-          
+
           docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG .
           docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }} .
           docker build -f Dockerfile.azure -t ${{ steps.acr.outputs.login-server }}/pixelated:latest .
-          
+
           docker push ${{ steps.acr.outputs.login-server }}/pixelated:$IMAGE_TAG
           docker push ${{ steps.acr.outputs.login-server }}/pixelated:${{ needs.build.outputs.environment }}
           docker push ${{ steps.acr.outputs.login-server }}/pixelated:latest
@@ -344,18 +344,18 @@ jobs:
           # Get app service name from infrastructure outputs
           APP_SERVICE_NAME="${{ needs.deploy-infrastructure.outputs.app-service-name }}"
           LOGIN_SERVER="${{ needs.deploy-infrastructure.outputs.registry-login-server }}"
-          
+
           # Validate that we got the required values
           if [[ -z "$APP_SERVICE_NAME" || "$APP_SERVICE_NAME" == "null" ]]; then
             echo "Failed to get App Service name from infrastructure deployment"
             exit 1
           fi
-          
+
           if [[ -z "$LOGIN_SERVER" || "$LOGIN_SERVER" == "null" ]]; then
             echo "Failed to get Container Registry login server from infrastructure deployment"
             exit 1
           fi
-          
+
           echo "app-service-name=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
           echo "login-server=$LOGIN_SERVER" >> $GITHUB_OUTPUT
 
@@ -378,7 +378,7 @@ jobs:
               NODE_ENV=${{ needs.build.outputs.environment }} \
               WEBSITES_PORT=3000 \
               WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
-          
+
           # MongoDB settings (apply only if provided)
           if [[ -n "$MONGODB_URI" ]]; then
             az webapp config appsettings set \
@@ -388,7 +388,7 @@ jobs:
                 MONGODB_URI="$MONGODB_URI" \
                 MONGO_URI="$MONGODB_URI"
           fi
-          
+
           if [[ -n "$MONGODB_DB_NAME" ]]; then
             az webapp config appsettings set \
               --name ${{ steps.details.outputs.app-service-name }} \
@@ -421,10 +421,10 @@ jobs:
       - name: Health check
         run: |
           echo "Testing application health at: ${{ steps.app-url.outputs.app-url }}"
-          
+
           # Wait for application to be ready
           sleep 60
-          
+
           # Health check
           response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }}/api/health)
           if [ $response -eq 200 ]; then
@@ -433,7 +433,7 @@ jobs:
             echo "❌ Health check failed with status: $response"
             exit 1
           fi
-          
+
           # Basic functionality test
           response=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.app-url.outputs.app-url }})
           if [ $response -eq 200 ]; then

@@ -16,7 +16,7 @@ REMOTE_PROJECT_DIR="/root/pixelated"
 
 # Target versions (Requirements 1.1, 1.2)
 TARGET_NODE_VERSION="24.7.0"
-TARGET_PNPM_VERSION="10.15.0"
+TARGET_PNPM_VERSION="10.16.0"
 
 # Colors for output
 RED='\033[0;31m'
@@ -50,7 +50,7 @@ initialize_deployment_context() {
     DEPLOYMENT_TIMESTAMP=$(date '+%Y-%m-%d-%H%M%S')
     COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
     DEPLOYMENT_CONTEXT="deployment-${DEPLOYMENT_TIMESTAMP}-${COMMIT_HASH}"
-    
+
     print_status "Deployment context initialized: $DEPLOYMENT_CONTEXT"
     print_status "Target Node.js version: $TARGET_NODE_VERSION"
     print_status "Target pnpm version: $TARGET_PNPM_VERSION"
@@ -65,9 +65,9 @@ initialize_deployment_context() {
 setup_nodejs_environment() {
     local ssh_cmd="$1"
     local vps_connection="$2"
-    
+
     print_header "Setting up Node.js environment (v${TARGET_NODE_VERSION})"
-    
+
     $ssh_cmd "$vps_connection" bash << EOF
 set -e
 
@@ -86,7 +86,7 @@ install_nvm() {
     if [[ ! -s "\$HOME/.nvm/nvm.sh" ]]; then
         print_status "Installing nvm (Node Version Manager)..."
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        
+
         # Add nvm to bashrc for persistent sessions (Requirement 1.3)
         if ! grep -q "NVM_DIR" ~/.bashrc; then
             print_status "Adding nvm to ~/.bashrc for persistent sessions..."
@@ -97,7 +97,7 @@ install_nvm() {
     else
         print_status "nvm already installed"
     fi
-    
+
     # Load nvm for current session
     export NVM_DIR="\$HOME/.nvm"
     [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
@@ -107,25 +107,25 @@ install_nvm() {
 # Function to install and configure Node.js 24.7.0
 install_nodejs() {
     print_status "Installing Node.js ${TARGET_NODE_VERSION}..."
-    
+
     # Install specific Node.js version
     nvm install ${TARGET_NODE_VERSION}
     nvm use ${TARGET_NODE_VERSION}
     nvm alias default ${TARGET_NODE_VERSION}
-    
+
     print_status "Node.js ${TARGET_NODE_VERSION} installation completed"
 }
 
 # Function to configure PATH for persistent sessions (Requirement 1.3)
 configure_nodejs_path() {
     print_status "Configuring PATH for persistent Node.js sessions..."
-    
+
     # Ensure Node.js binaries are in PATH
     local node_path="\$NVM_DIR/versions/node/v${TARGET_NODE_VERSION}/bin"
-    
+
     # Update current session PATH
     export PATH="\$node_path:\$PATH"
-    
+
     # Verify PATH configuration
     print_status "Current PATH includes Node.js: \$(echo \$PATH | grep -o "\$node_path" || echo "NOT FOUND")"
 }
@@ -153,9 +153,9 @@ EOF
 verify_nodejs_installation() {
     local ssh_cmd="$1"
     local vps_connection="$2"
-    
+
     print_header "Verifying Node.js installation"
-    
+
     local verification_result=$($ssh_cmd "$vps_connection" bash << 'EOF'
 set -e
 
@@ -211,9 +211,9 @@ EOF
 setup_pnpm_environment() {
     local ssh_cmd="$1"
     local vps_connection="$2"
-    
+
     print_header "Setting up pnpm environment (v${TARGET_PNPM_VERSION})"
-    
+
     $ssh_cmd "$vps_connection" bash << EOF
 set -e
 
@@ -238,10 +238,10 @@ nvm use ${TARGET_NODE_VERSION}
 # Function to install pnpm with specific version
 install_pnpm() {
     print_status "Installing pnpm ${TARGET_PNPM_VERSION}..."
-    
+
     # Install pnpm globally with specific version
     npm install -g pnpm@${TARGET_PNPM_VERSION}
-    
+
     print_status "pnpm ${TARGET_PNPM_VERSION} installation completed"
 }
 
@@ -249,10 +249,10 @@ install_pnpm() {
 verify_pnpm_basic() {
     local pnpm_version=\$(pnpm --version 2>/dev/null || echo "NONE")
     local pnpm_path=\$(which pnpm 2>/dev/null || echo "NOT_FOUND")
-    
+
     print_status "pnpm version: \$pnpm_version"
     print_status "pnpm path: \$pnpm_path"
-    
+
     return 0
 }
 
@@ -278,9 +278,9 @@ EOF
 verify_pnpm_installation() {
     local ssh_cmd="$1"
     local vps_connection="$2"
-    
+
     print_header "Verifying pnpm installation with detailed error reporting"
-    
+
     local verification_result=$($ssh_cmd "$vps_connection" bash << 'EOF'
 set -e
 
@@ -315,9 +315,9 @@ print_status "pnpm path: $PNPM_PATH"
 print_status "pnpm using Node.js version: $PNPM_NODE_VERSION"
 
 # Detailed error reporting for version mismatch
-if [[ "$PNPM_VERSION" == "10.15.0" ]]; then
+if [[ "$PNPM_VERSION" == "10.16.0" ]]; then
     print_status "✅ pnpm version verification passed"
-    
+
     # Verify pnpm is using correct Node.js version
     if [[ "$PNPM_NODE_VERSION" == "v24.7.0" ]]; then
         print_status "✅ pnpm Node.js version verification passed"
@@ -329,7 +329,7 @@ if [[ "$PNPM_VERSION" == "10.15.0" ]]; then
     fi
 else
     print_error "❌ pnpm version mismatch"
-    print_error "Expected: 10.15.0, Got: $PNPM_VERSION"
+    print_error "Expected: 10.16.0, Got: $PNPM_VERSION"
     print_error "pnpm path: $PNPM_PATH"
     echo "FAILED"
 fi
@@ -350,9 +350,9 @@ EOF
 validate_complete_environment() {
     local ssh_cmd="$1"
     local vps_connection="$2"
-    
+
     print_header "Performing comprehensive environment validation"
-    
+
     local validation_result=$($ssh_cmd "$vps_connection" bash << 'EOF'
 set -e
 
@@ -403,7 +403,7 @@ else
 fi
 
 # Check pnpm version
-if [[ "$PNPM_VERSION" != "10.15.0" ]]; then
+if [[ "$PNPM_VERSION" != "10.16.0" ]]; then
     print_error "❌ pnpm version check failed"
     VALIDATION_PASSED=false
 else
@@ -462,13 +462,13 @@ show_usage() {
 main() {
     # Initialize deployment context
     initialize_deployment_context
-    
+
     print_header "🚀 Starting Improved Deployment Pipeline"
     print_status "Target: $VPS_USER@$VPS_HOST:$VPS_PORT"
     print_status "Domain: ${DOMAIN:-"IP-based access"}"
     print_status "Local dir: $LOCAL_PROJECT_DIR"
     print_status "Remote dir: $REMOTE_PROJECT_DIR"
-    
+
     # Build SSH command
     SSH_CMD="ssh -t"
     if [[ -n "$SSH_KEY" ]]; then
@@ -476,7 +476,7 @@ main() {
     fi
     SSH_CMD="$SSH_CMD -p $VPS_PORT"
     VPS_CONNECTION="$VPS_USER@$VPS_HOST"
-    
+
     # Test SSH connection
     print_header "Testing SSH connection..."
     if $SSH_CMD "$VPS_CONNECTION" "echo 'SSH connection successful'" 2>/dev/null; then
@@ -485,42 +485,42 @@ main() {
         print_error "❌ SSH connection failed"
         exit 1
     fi
-    
+
     # Phase 1: Environment Setup
     print_header "Phase 1: Environment Setup"
-    
+
     # Setup Node.js environment
     if ! setup_nodejs_environment "$SSH_CMD" "$VPS_CONNECTION"; then
         print_error "❌ Node.js environment setup failed"
         exit 1
     fi
-    
+
     # Verify Node.js installation
     if ! verify_nodejs_installation "$SSH_CMD" "$VPS_CONNECTION"; then
         print_error "❌ Node.js verification failed"
         exit 1
     fi
-    
+
     # Setup pnpm environment
     if ! setup_pnpm_environment "$SSH_CMD" "$VPS_CONNECTION"; then
         print_error "❌ pnpm environment setup failed"
         exit 1
     fi
-    
+
     # Verify pnpm installation
     if ! verify_pnpm_installation "$SSH_CMD" "$VPS_CONNECTION"; then
         print_error "❌ pnpm verification failed"
         exit 1
     fi
-    
+
     # Comprehensive environment validation
     if ! validate_complete_environment "$SSH_CMD" "$VPS_CONNECTION"; then
         print_error "❌ Environment validation failed"
         exit 1
     fi
-    
+
     print_status "✅ Phase 1: Environment Setup completed successfully"
-    
+
     # TODO: Additional phases will be implemented in subsequent tasks
     print_status "🎉 Environment Manager implementation completed!"
     print_status "Next phases (Backup Manager, Container Manager, etc.) will be implemented in subsequent tasks."

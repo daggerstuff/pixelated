@@ -329,16 +329,36 @@ export function useTherapistAnalytics(
 
   // Auto-refresh (silent) based on options passed in via filters.config (if present)
   useEffect(() => {
-    // If consumer passed options in _filters (some callers do), honor them.
-  const config: { enableAutoRefresh?: boolean; refreshInterval?: number } = ((_filters as any).config) ?? {}
+    // Securely extract config from _filters, avoiding unsafe dynamic access
+    let config: { enableAutoRefresh?: boolean; refreshInterval?: number } = {};
+    if (
+      typeof _filters === 'object' &&
+      _filters !== null &&
+      'config' in _filters &&
+      typeof (_filters as any).config === 'object' &&
+      (_filters as any).config !== null
+    ) {
+      const rawConfig = (_filters as any).config;
+      config.enableAutoRefresh = Boolean(rawConfig.enableAutoRefresh);
+      // Only allow safe, finite numbers for refreshInterval
+      if (
+        typeof rawConfig.refreshInterval === 'number' &&
+        Number.isFinite(rawConfig.refreshInterval) &&
+        rawConfig.refreshInterval > 0 &&
+        rawConfig.refreshInterval < 3600000 // max 1 hour
+      ) {
+        config.refreshInterval = rawConfig.refreshInterval;
+      }
+    }
+
     if (!config.enableAutoRefresh || !config.refreshInterval) {
       return;
     }
 
     refreshIntervalRef.current = setInterval(() => {
       // silent refresh: do not toggle isLoading
-      loadData(false)
-    }, config.refreshInterval)
+      loadData(false);
+    }, config.refreshInterval);
 
     return () => {
       if (refreshIntervalRef.current) {
