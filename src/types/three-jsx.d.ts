@@ -14,6 +14,5 @@ declare global {
   }
 }
 export {}
-  // types module
 
 // types module (standardized)

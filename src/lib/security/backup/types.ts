@@ -3,7 +3,7 @@
  */
 
 // Import types from backup-types.ts to avoid duplication
-import type { BackupStatus, RecoveryTestStatus } from './backup-types'
+import type { BackupStatus, RecoveryTestStatus, VerificationMethod } from './backup-types'
 import { BackupType } from './backup-types'
 
 // Only export types needed by this file, not re-export from backup-types.ts
@@ -135,9 +135,11 @@ export interface RecoveryTestConfig {
     description: string
     backupType: string
     dataVerification: Array<{
-      type: 'hash' | 'query' | 'content'
+      type: VerificationMethod
       target: string
       expected?: string | number | boolean
+      query?: string
+      threshold?: number
     }>
   }>
   notifyOnFailure: boolean
