@@ -2,6 +2,4 @@
 // If you need custom JSX shims, add only what's strictly necessary and scope with `export {}`.
 export {}
 
-// types module
-
 // types module (standardized)
