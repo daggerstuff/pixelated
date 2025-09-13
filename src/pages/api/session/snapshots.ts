@@ -95,12 +95,9 @@ try {
     } finally {
       client.release();
     }
-  } catch (error) {
-    console.error('Error saving progress snapshots:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+  } catch (err) {
+    console.error('Error handling POST /api/session/snapshots', err);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
 
@@ -108,40 +105,19 @@ export const GET: APIRoute = async ({ request }) => {
   try {
     const url = new URL(request.url);
     const sessionId = url.searchParams.get('sessionId');
-
     if (!sessionId) {
-      return new Response(
-        JSON.stringify({ error: 'Missing sessionId parameter' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Missing sessionId parameter' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     const client = await pool.connect();
     try {
-      // Get snapshots from sessions table
-      const sessionQuery = `
-        SELECT progress_snapshots
-        FROM sessions
-        WHERE id = $1
-      `;
-
+      const sessionQuery = 'SELECT progress_snapshots FROM sessions WHERE id = $1';
       const sessionResult = await client.query(sessionQuery, [sessionId]);
-
       if (sessionResult.rowCount === 0) {
-        return new Response(
-          JSON.stringify({ error: 'Session not found' }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: 'Session not found' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
       }
 
-      // Get detailed milestone data
-      const milestoneQuery = `
-        SELECT milestone_name, milestone_value, achieved_at
-        FROM session_milestones
-        WHERE session_id = $1
-        ORDER BY achieved_at ASC
-      `;
-
+      const milestoneQuery = 'SELECT milestone_name, milestone_value, achieved_at FROM session_milestones WHERE session_id = $1 ORDER BY achieved_at ASC';
       const milestoneResult = await client.query(milestoneQuery, [sessionId]);
 
       return new Response(
@@ -155,11 +131,8 @@ export const GET: APIRoute = async ({ request }) => {
     } finally {
       client.release();
     }
-  } catch (error) {
-    console.error('Error fetching progress snapshots:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+  } catch (err) {
+    console.error('Error handling GET /api/session/snapshots', err);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
