@@ -65,7 +65,7 @@ jobs:
         id: get-tag
         run: |
           # Use the tag manager to validate and get rollback tag
-          if node scripts/tag-manager.js validate staging; then
+          if node scripts/tag-manager.cjs validate staging; then
             TAGS=$(git tag -l "staging-*" --sort=-committerdate)
             TAG=$(echo "$TAGS" | sed -n '2p')
             echo "tag=$TAG" >> $GITHUB_OUTPUT
@@ -74,7 +74,7 @@ jobs:
           else
             echo "::warning::Cannot rollback - insufficient staging tags"
             echo "::notice::Creating initial staging tags for future rollbacks"
-            node scripts/tag-manager.js create staging --message="Initial staging tag for rollback capability" --push
+            node scripts/tag-manager.cjs create staging --message="Initial staging tag for rollback capability" --push
             echo "::error::Rollback not possible - this appears to be the first deployment"
             exit 1
           fi
@@ -84,7 +84,7 @@ jobs:
 
       - name: Create rollback tag
         run: |
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          TIMESTAMP=$(date +%Y%m)
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git tag rollback-staging-$TIMESTAMP
@@ -142,7 +142,7 @@ jobs:
         id: get-tag
         run: |
           # Use the tag manager to validate and get rollback tag
-          if node scripts/tag-manager.js validate production; then
+          if node scripts/tag-manager.cjs validate production; then
             TAGS=$(git tag -l "production-*" --sort=-committerdate)
             TAG=$(echo "$TAGS" | sed -n '2p')
             echo "tag=$TAG" >> $GITHUB_OUTPUT
@@ -151,7 +151,7 @@ jobs:
           else
             echo "::warning::Cannot rollback - insufficient production tags"
             echo "::notice::Creating initial production tags for future rollbacks"
-            node scripts/tag-manager.js create production --message="Initial production tag for rollback capability" --push
+            node scripts/tag-manager.cjs create production --message="Initial production tag for rollback capability" --push
             echo "::error::Rollback not possible - this appears to be the first deployment"
             exit 1
           fi
@@ -161,8 +161,9 @@ jobs:
 
       - name: Create rollback tag
         run: |
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          TIMESTAMP=$(date +%Y%m%d)
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          git tag rollback-production-$TIMESTAMP
-          git push origin rollback-production-$TIMESTAMP
+          TAG_NAME=prod-rollback-$TIMESTAMP
+          git tag $TAG_NAME
+          git push origin $TAG_NAME

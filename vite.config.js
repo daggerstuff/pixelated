@@ -18,7 +18,7 @@ const cdnAssetMap = (() => {
       'CDN asset map not found or invalid, using empty map:',
       error.message,
     )
-    return {};
+    return {}
   }
 })()
 
@@ -110,6 +110,10 @@ export default defineConfig({
           }),
         ]
       : []),
+    sentryVitePlugin({
+      org: 'pixelated-empathy-dq',
+      project: 'pixel-astro',
+    }),
     sentryVitePlugin({
       org: 'pixelated-empathy-dq',
       project: 'pixel-astro',

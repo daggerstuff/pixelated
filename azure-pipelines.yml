@@ -124,18 +124,14 @@ stages:
       displayName: Install dependencies
 
     - script: |
-        # Install Node.js 24.x in container using nvm (no sudo)
-        set -e
+        # Activate Node.js 24.x with nvm (no redundant install)
         export NVM_DIR="$HOME/.nvm"
-        mkdir -p $NVM_DIR
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        . $NVM_DIR/nvm.sh
-        nvm install 24
+        . "$NVM_DIR/nvm.sh"
         nvm use 24
         node --version
         which node
-        echo "Node.js installation complete."
-      displayName: "Install Node.js 24.x in container (pre-build)"
+        echo "Node.js environment ready."
+      displayName: "Activate Node.js 24.x with nvm"
 
     - script: |
         set -eu
