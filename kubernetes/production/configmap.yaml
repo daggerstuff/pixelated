@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pixelated-config
+  namespace: pixelated-prod
+  labels:
+    app: pixelated
+    environment: production
+data:
+  # Redis Configuration
+  redis-host: "pixelated-redis-service.pixelated-prod.svc.cluster.local"
+  redis-port: "6379"
+
+  # AI Service Configuration
+  ai-service-url: "http://pixelated-ai-service.pixelated-prod.svc.cluster.local:5000"
+  ai-service-timeout: "30000"
+
+  # Application Configuration
+  app-name: "Pixelated"
+  app-version: "2.0.0"
+  environment: "production"
+
+  # Feature Flags
+  analytics-enabled: "true"
+  caching-enabled: "true"
+  monitoring-enabled: "true"
+  security-headers-enabled: "true"
+
+  # Performance Configuration
+  max-request-size: "10mb"
+  request-timeout: "30000"
+  connection-pool-size: "20"
+
+  # Logging Configuration
+  log-level: "info"
+  log-format: "json"
+  log-retention-days: "30"
+
+  # Cache Configuration
+  cache-ttl-analytics: "900"  # 15 minutes
+  cache-ttl-dashboard: "300"  # 5 minutes
+  cache-ttl-session: "3600"   # 1 hour
+
+  # Database Configuration
+  db-connection-pool-size: "10"
+  db-connection-timeout: "10000"
+  db-query-timeout: "30000"
+
+  # Security Configuration
+  cors-allowed-origins: "https://pixelated.com,https://app.pixelated.com"
+  rate-limit-window: "900000"  # 15 minutes
+  rate-limit-max-requests: "1000"
+
+  # Monitoring Configuration
+  metrics-collection-interval: "60000"  # 1 minute
+  health-check-interval: "30000"        # 30 seconds
+  alert-threshold-cpu: "80"
+  alert-threshold-memory: "85"
+  alert-threshold-disk: "90"
+
+  # Backup Configuration
+  backup-schedule: "0 2 * * *"  # Daily at 2 AM
+  backup-retention-days: "30"
+  backup-compression-enabled: "true"
+
+  # CDN Configuration
+  cdn-enabled: "true"
+  cdn-provider: "cloudflare"
+  cdn-zone-id: "your-zone-id"
+
+  # Email Configuration
+  smtp-host: "smtp.pixelated.com"
+  smtp-port: "587"
+  smtp-secure: "true"
+  email-from: "noreply@pixelated.com"
+
+  # Analytics Configuration
+  analytics-retention-days: "365"
+  analytics-sampling-rate: "1.0"
+  analytics-export-formats: "json,csv,pdf"
+
+  # Compliance Configuration
+  hipaa-enabled: "true"
+  gdpr-enabled: "true"
+  audit-log-retention-days: "2555"  # 7 years for HIPAA
+
+  # Integration Configuration
+  webhook-timeout: "10000"
+  webhook-retry-attempts: "3"
+  webhook-retry-delay: "1000"
+
+  # Maintenance Configuration
+  maintenance-mode-enabled: "false"
+  maintenance-message: "System is undergoing maintenance. Please try again later."
+
+  # Feature Rollout Configuration
+  feature-rollout-percentage: "100"
+  canary-deployment-enabled: "false"
+  canary-deployment-percentage: "10"

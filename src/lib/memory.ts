@@ -134,8 +134,12 @@ export class MemoryService {
         const aVal = a[options.sortBy!];
         const bVal = b[options.sortBy!];
         
-        if (aVal < bVal) return options.sortOrder === 'desc' ? 1 : -1;
-        if (aVal > bVal) return options.sortOrder === 'desc' ? -1 : 1;
+        if (aVal < bVal) {
+          return options.sortOrder === 'desc' ? 1 : -1;
+        }
+        if (aVal > bVal) {
+          return options.sortOrder === 'desc' ? -1 : 1;
+        }
         return 0;
       });
     }

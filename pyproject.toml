@@ -73,6 +73,7 @@ dependencies = [
   "morphcloud>=0.1.91",
   "unsloth>=2025.8.10",
   "sentry-sdk>=2.37.0",
+  "openai>=1.107.2",
 ]
 
 [project.optional-dependencies]

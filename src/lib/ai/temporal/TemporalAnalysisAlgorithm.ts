@@ -161,7 +161,9 @@ function detectShifts(maps: DimensionalMap[]): MultidimensionalPattern[] {
     const curr = maps[i]?.dimensions
     const next = maps[i + 1]?.dimensions
 
-    if (!prev || !curr || !next) continue
+    if (!prev || !curr || !next) {
+      continue
+    }
 
     // Calculate magnitude of change
     const changeMagnitude = calculateDimensionalDistance(prev, curr)
@@ -203,7 +205,9 @@ function detectStability(maps: DimensionalMap[]): MultidimensionalPattern[] {
   for (let i = 1; i < maps.length; i++) {
     const prevMap = maps[i - 1]
     const currMap = maps[i]
-    if (!prevMap?.dimensions || !currMap?.dimensions) continue
+    if (!prevMap?.dimensions || !currMap?.dimensions) {
+      continue
+    }
 
     const change = calculateDimensionalDistance(
       prevMap.dimensions,

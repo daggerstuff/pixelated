@@ -262,11 +262,8 @@ test.describe('Accessibility Audit and Compliance', () => {
           const currentLevel = headingLevels[i]?.level
           const previousLevel = headingLevels[i - 1]?.level
 
-          if (currentLevel !== undefined && previousLevel !== undefined) {
-            // Should not skip more than one level
-            if (currentLevel > previousLevel) {
-              expect(currentLevel - previousLevel).toBeLessThanOrEqual(1)
-            }
+          if (currentLevel !== undefined && previousLevel !== undefined && currentLevel > previousLevel) {
+                expect(currentLevel - previousLevel).toBeLessThanOrEqual(1)
           }
         }
       }

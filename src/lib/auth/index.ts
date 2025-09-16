@@ -12,11 +12,15 @@ import type { User } from './index'
 export async function getCurrentUser(cookies: AstroCookies): Promise<User | null> {
   // Try to get the session token from cookies
   const token = cookies.get('auth-token')?.value
-  if (!token) return null
+  if (!token) {
+    return null
+  }
 
   // getSession expects a session token
   const sessionData = await getSession(token)
-  if (!sessionData || !sessionData.user) return null
+  if (!sessionData || !sessionData.user) {
+    return null
+  }
 
   return sessionData.user
 }
@@ -26,7 +30,9 @@ export async function getCurrentUser(cookies: AstroCookies): Promise<User | null
  */
 export async function hasRole(cookies: AstroCookies, role: string): Promise<boolean> {
   const user = await getCurrentUser(cookies)
-  if (!user) return false
+  if (!user) {
+    return false
+  }
   return user.role === role
 }
 

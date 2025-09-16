@@ -332,7 +332,9 @@ export class EducationalContextRecognizer {
     userProfile?: UserProfile,
   ): EducationalContextResult {
     // Respect configuration toggle
-    if (!userProfile || !this.adaptToUserLevel) return result
+    if (!userProfile || !this.adaptToUserLevel) {
+      return result
+    }
 
     const adapted = { ...result }
 
@@ -426,7 +428,9 @@ export class EducationalContextRecognizer {
        [EducationalType.DEVELOPMENTAL]: 1,
      }
      bestMatch = matchedTypes.reduce((a, b) => {
-       if (a.confidence !== b.confidence) return a.confidence > b.confidence ? a : b
+       if (a.confidence !== b.confidence) {
+         return a.confidence > b.confidence ? a : b
+       }
        const ap = priority[a.type] ?? 0
        const bp = priority[b.type] ?? 0
        return ap >= bp ? a : b
@@ -542,8 +546,7 @@ Adapt complexity and resource recommendations accordingly.`
       throw new Error('Empty AI response')
     }
     // Return raw parsed result; caller will handle adaptation to avoid double-adjusting
-    const result = this.parseAIResponse(content as string)
-    return result
+    return this.parseAIResponse(content as string);
   }
 
   /**
@@ -569,7 +572,9 @@ Adapt complexity and resource recommendations accordingly.`
         }
       }
       // Ultimate fallback: try the original content
-      if (!jsonStr) jsonStr = content
+      if (!jsonStr) {
+        jsonStr = content
+      }
       logger.info('Extracted JSON string from AI response', { jsonStr })
       const parsed = JSON.parse(jsonStr) as unknown
       logger.info('Parsed AI response JSON', { parsed })
@@ -822,14 +827,10 @@ Adapt complexity and resource recommendations accordingly.`
       return complexity
     }
     // Upgrade for mid-level users to at least intermediate
-    if (
-      knowledge === 'intermediate' ||
-      education === 'undergraduate'
-    ) {
-      if (complexity === 'basic') {
-        logger.info('Upgrading basic to intermediate for mid-level user')
-        return 'intermediate'
-      }
+    if ((knowledge === 'intermediate' ||
+          education === 'undergraduate') && complexity === 'basic') {
+          logger.info('Upgrading basic to intermediate for mid-level user')
+          return 'intermediate'
     }
 
     // Aggressively upgrade for advanced/professional users
@@ -862,16 +863,12 @@ Adapt complexity and resource recommendations accordingly.`
 
     let adapted = [...resources]
     const ensureSciArticlesForHigherLevel = () => {
-      if (
-        userProfile.educationLevel === 'graduate' ||
-        userProfile.educationLevel === 'professional' ||
-        userProfile.priorMentalHealthKnowledge === 'advanced' ||
-        userProfile.priorMentalHealthKnowledge === 'intermediate'
-      ) {
-        if (!adapted.includes(ResourceType.SCIENTIFIC_ARTICLES)) {
-          logger.info('Adding scientific articles for higher-level user')
-          adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
-        }
+      if ((userProfile.educationLevel === 'graduate' ||
+              userProfile.educationLevel === 'professional' ||
+              userProfile.priorMentalHealthKnowledge === 'advanced' ||
+              userProfile.priorMentalHealthKnowledge === 'intermediate') && !adapted.includes(ResourceType.SCIENTIFIC_ARTICLES)) {
+            logger.info('Adding scientific articles for higher-level user')
+            adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
       }
     }
 

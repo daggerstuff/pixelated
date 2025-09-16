@@ -27,14 +27,13 @@ export class QueryPreprocessor implements IQueryPreprocessor {
     const normalizedQuery = this.normalize(sanitizedQuery);
     const enhancedQuery = this.enhanceQuery(normalizedQuery);
     const context = this.extractContext(request.context);
-    const newRequest = {
-      ...request,
-      context: {
-        ...context,
-        userQuery: enhancedQuery,
-      },
-    };
-    return newRequest;
+    return {
+          ...request,
+          context: {
+            ...context,
+            userQuery: enhancedQuery,
+          },
+        };
   }
 
   private validateAndSanitize(query: string): string {

@@ -3,9 +3,9 @@
  * Optimizes performance by reusing connections and managing concurrent requests
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { getBiasDetectionLogger } from '../../logging/standardized-logger'
 
-const logger = createBuildSafeLogger('ConnectionPool')
+const logger = getBiasDetectionLogger('connection-pool')
 
 export interface ConnectionPoolConfig {
   maxConnections: number
@@ -74,7 +74,7 @@ export class ConnectionPool {
     // Wait for available connection
     return new Promise((resolve, reject) => {
       this.queue.push({ resolve, reject })
-      
+
       // Timeout if waiting too long
       setTimeout(() => {
         const index = this.queue.findIndex(item => item.resolve === resolve)
@@ -127,7 +127,7 @@ export class ConnectionPool {
     const toRemove: string[] = []
 
     for (const [id, connection] of this.connections) {
-      if (!connection.inUse && 
+      if (!connection.inUse &&
           now.getTime() - connection.lastUsed.getTime() > this.config.idleTimeout) {
         connection.controller.abort()
         toRemove.push(id)

@@ -208,34 +208,35 @@ class PerformanceMonitor:
         """Generate comprehensive monitoring report"""
         if not self.metrics_history:
             return {'error': 'No metrics collected'}
-        
+
         # Calculate summary statistics
         cpu_values = [m['system']['cpu']['usage_percent'] for m in self.metrics_history]
         memory_values = [m['system']['memory']['percent'] for m in self.metrics_history]
-        
-        report = {
+
+        return {
             'monitoring_report': {
                 'timestamp': datetime.utcnow().isoformat(),
-                'monitoring_duration_minutes': len(self.metrics_history) * 0.5,  # Assuming 30s intervals
+                'monitoring_duration_minutes': len(self.metrics_history)
+                * 0.5,  # Assuming 30s intervals
                 'total_measurements': len(self.metrics_history),
                 'summary_statistics': {
                     'cpu_usage': {
                         'avg': sum(cpu_values) / len(cpu_values),
                         'max': max(cpu_values),
-                        'min': min(cpu_values)
+                        'min': min(cpu_values),
                     },
                     'memory_usage': {
                         'avg': sum(memory_values) / len(memory_values),
                         'max': max(memory_values),
-                        'min': min(memory_values)
-                    }
+                        'min': min(memory_values),
+                    },
                 },
                 'performance_trends': self.analyze_performance_trends(),
-                'recommendations': self.generate_recommendations(self.metrics_history)
+                'recommendations': self.generate_recommendations(
+                    self.metrics_history
+                ),
             }
         }
-        
-        return report
 
 if __name__ == "__main__":
     monitor = PerformanceMonitor()

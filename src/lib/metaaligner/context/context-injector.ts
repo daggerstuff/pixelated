@@ -38,14 +38,13 @@ export class ContextInjector implements IContextInjector {
       throw new Error('Invalid context');
     }
     const transformedContext = this.transformContext(request.context);
-    const newRequest = {
-      ...request,
-      context: {
-        ...transformedContext,
-        detectedContext,
-      },
-    };
-    return newRequest;
+    return {
+          ...request,
+          context: {
+            ...transformedContext,
+            detectedContext,
+          },
+        };
   }
 
   private validateContext(context: ContextType): boolean {

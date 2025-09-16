@@ -1,5 +1,6 @@
 import { EmailService } from '@/lib/services/email/EmailService'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { securePathJoin } from '../../utils/index'
 import { z } from 'zod'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
@@ -79,7 +80,17 @@ export class ContactService {
 
   private async loadTemplate(name: string): Promise<void> {
     try {
-      const htmlPath = join(process.cwd(), 'templates', 'email', `${name}.html`)
+      // Validate the template name to prevent path traversal
+      const validatedName = name.replace(/[^a-zA-Z0-9_-]/g, '') // Only allow safe characters
+      if (!validatedName || validatedName !== name) {
+        throw new Error(`Invalid template name: ${name}`)
+      }
+
+      const htmlPath = securePathJoin(
+        join(process.cwd(), 'templates', 'email'),
+        `${validatedName}.html`,
+        { allowedExtensions: ['.html'] },
+      )
       const html = await readFile(htmlPath, 'utf-8')
 
       // Generate text version from HTML (basic conversion)

@@ -184,3 +184,5 @@ serena.project.json
 .notes
 .qwen
 .serena
+llm_telegram_bot
+cipher

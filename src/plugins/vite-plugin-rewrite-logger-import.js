@@ -6,7 +6,9 @@ export default function rewriteLoggerImportPlugin() {
     enforce: 'pre',
     resolveId(source, _importer) {
       try {
-        if (!source) return null;
+        if (!source) {
+          return null;
+        }
         const relPattern = /^(?:\.\.\/)+lib\/logging\/build-safe-logger$/;
         if (relPattern.test(source)) {
           return path.resolve(process.cwd(), 'src/lib/logging/build-safe-logger.ts');
@@ -18,8 +20,12 @@ export default function rewriteLoggerImportPlugin() {
     },
     transform(code, id) {
       try {
-        if (!id || /node_modules/.test(id)) return null;
-        if (!/(\.ts|\.tsx|\.js|\.jsx|\.mjs)$/.test(id)) return null;
+        if (!id || /node_modules/.test(id)) {
+          return null;
+        }
+        if (!/(\.ts|\.tsx|\.js|\.jsx|\.mjs)$/.test(id)) {
+          return null;
+        }
 
         const patternFrom = /from\s+['"](?:\.\.\/)+lib\/logging\/build-safe-logger['"]/g;
         const patternDyn = /import\(\s*['"](?:\.\.\/)+lib\/logging\/build-safe-logger['"]\s*\)/g;
@@ -28,7 +34,9 @@ export default function rewriteLoggerImportPlugin() {
         transformed = transformed.replace(patternFrom, "from '@/lib/logging/build-safe-logger'");
         transformed = transformed.replace(patternDyn, "import('@/lib/logging/build-safe-logger')");
 
-        if (transformed === code) return null;
+        if (transformed === code) {
+          return null;
+        }
         return { code: transformed, map: null };
       } catch {
        // Fail open: do not block the build on plugin transform errors

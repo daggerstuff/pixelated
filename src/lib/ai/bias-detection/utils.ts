@@ -123,7 +123,9 @@ export function validateTherapeuticSession(session: any): TherapeuticSession {
 
 // Validate Bias Detection configuration used in tests
 export function validateBiasDetectionConfig(config: any): void {
-  if (!config || typeof config !== 'object') throw new Error('Invalid bias detection configuration')
+  if (!config || typeof config !== 'object') {
+    throw new Error('Invalid bias detection configuration')
+  }
   const t = config.thresholds || {}
   if (!(t.warningLevel ?? t.warning) || !(t.highLevel ?? t.high) || !(t.criticalLevel ?? t.critical)) {
     throw new Error('Invalid bias detection configuration')
@@ -146,7 +148,9 @@ export function validateBiasDetectionConfig(config: any): void {
 
 // Data sanitization
 export function sanitizeTextContent(content: string, maskingEnabled = true): string {
-  if (!maskingEnabled) return content
+  if (!maskingEnabled) {
+    return content
+  }
   let result = content
   // Specific pattern: "Patient First Last" -> preserve prefix
   result = result.replace(/\bPatient\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b/g, 'Patient [NAME]')
@@ -164,23 +168,41 @@ export function sanitizeTextContent(content: string, maskingEnabled = true): str
 // Demographic helpers
 export function extractDemographicGroups(d: ParticipantDemographics): Array<{ type: string; value: string }> {
   const groups: Array<{ type: string; value: string }> = []
-  if (d.age) groups.push({ type: 'age', value: d.age })
-  if (d.gender) groups.push({ type: 'gender', value: d.gender })
-  if (d.ethnicity) groups.push({ type: 'ethnicity', value: d.ethnicity })
-  if (d.primaryLanguage) groups.push({ type: 'language', value: d.primaryLanguage })
-  if (d.socioeconomicStatus) groups.push({ type: 'socioeconomic', value: d.socioeconomicStatus })
-  if (d.education) groups.push({ type: 'education', value: d.education })
-  if (d.region) groups.push({ type: 'region', value: d.region })
+  if (d.age) {
+    groups.push({ type: 'age', value: d.age })
+  }
+  if (d.gender) {
+    groups.push({ type: 'gender', value: d.gender })
+  }
+  if (d.ethnicity) {
+    groups.push({ type: 'ethnicity', value: d.ethnicity })
+  }
+  if (d.primaryLanguage) {
+    groups.push({ type: 'language', value: d.primaryLanguage })
+  }
+  if (d.socioeconomicStatus) {
+    groups.push({ type: 'socioeconomic', value: d.socioeconomicStatus })
+  }
+  if (d.education) {
+    groups.push({ type: 'education', value: d.education })
+  }
+  if (d.region) {
+    groups.push({ type: 'region', value: d.region })
+  }
   return groups
 }
 
 export function calculateDemographicRepresentation(
   sessions: Array<Pick<TherapeuticSession, 'participantDemographics'>>,
 ) {
-  if (!Array.isArray(sessions) || sessions.length === 0) return {}
+  if (!Array.isArray(sessions) || sessions.length === 0) {
+    return {}
+  }
   const counts: Record<string, Record<string, number>> = {}
   const add = (key: string, val?: string) => {
-    if (!val) return
+    if (!val) {
+      return
+    }
     counts[key] ||= {}
     counts[key]![val] = (counts[key]![val] || 0) + 1
   }
@@ -190,9 +212,15 @@ export function calculateDemographicRepresentation(
     add('gender', d.gender)
     add('ethnicity', d.ethnicity)
     add('language', d.primaryLanguage)
-    if (d.socioeconomicStatus) add('socioeconomic', d.socioeconomicStatus)
-    if (d.education) add('education', d.education)
-    if (d.region) add('region', d.region)
+    if (d.socioeconomicStatus) {
+      add('socioeconomic', d.socioeconomicStatus)
+    }
+    if (d.education) {
+      add('education', d.education)
+    }
+    if (d.region) {
+      add('region', d.region)
+    }
   }
   // Convert to proportions
   const representation: Record<string, Record<string, number>> = {}
@@ -230,22 +258,29 @@ export function calculateConfidenceScore(
   } else if (scores && typeof scores === 'object') {
     values = Object.values(scores).map((v) => v?.biasScore ?? 0)
   }
-  if (!Array.isArray(values) || values.length === 0) return 0
+  if (!Array.isArray(values) || values.length === 0) {
+    return 0
+  }
   const mean = values.reduce((a, b) => a + b, 0) / values.length
   const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length
   const std = Math.sqrt(variance)
   // Normalize std by max possible (0.5 for values in [0,1]) so high variance -> low confidence
-  const confidence = Math.max(0, Math.min(1, 1 - 2 * std))
-  return confidence
+  return Math.max(0, Math.min(1, 1 - 2 * std));
 }
 
 export function determineAlertLevel(
   score: number,
   thresholds: { warningLevel: number; highLevel: number; criticalLevel: number },
 ): AlertLevel {
-  if (score < thresholds.warningLevel) return 'low'
-  if (score < thresholds.highLevel) return 'medium'
-  if (score < thresholds.criticalLevel) return 'high'
+  if (score < thresholds.warningLevel) {
+    return 'low'
+  }
+  if (score < thresholds.highLevel) {
+    return 'medium'
+  }
+  if (score < thresholds.criticalLevel) {
+    return 'high'
+  }
   return 'critical'
 }
 
@@ -408,9 +443,15 @@ export function requiresAdditionalAuth(
   role: string,
   sensitivity: 'low' | 'medium' | 'high' | 'critical',
 ) {
-  if (sensitivity === 'high' || sensitivity === 'critical') return true
-  if (dataType === 'demographics') return role !== 'admin'
-  if (dataType === 'session-data') return role === 'viewer'
+  if (sensitivity === 'high' || sensitivity === 'critical') {
+    return true
+  }
+  if (dataType === 'demographics') {
+    return role !== 'admin'
+  }
+  if (dataType === 'session-data') {
+    return role === 'viewer'
+  }
   return false
 }
 

@@ -26,7 +26,7 @@ async function initializeDependencies() {
     if (typeof window === 'undefined') {
         serverDepsPromise = (async () => {
             try {
-                const mod = await import('@/config/mongodb.config');
+                const mod = await import('../config/mongodb.config');
                 mongodb = mod.default as unknown as MongoRuntime;
                 const mongodbLib = await import('mongodb');
                 ObjectId = mongodbLib.ObjectId;
@@ -49,7 +49,7 @@ import type {
   CrisisSessionFlag,
   Todo,
   TreatmentPlan,
-} from '@/types/mongodb.types'
+} from '../types/mongodb.types'
 
 export class TodoDAO {
   private async getCollection(): Promise<MongoCollection<Todo>> {
@@ -191,7 +191,7 @@ export class AIMetricsDAO {
       totalTokens: number
       averageResponseTime: number
     } | undefined
-    
+
     return (
       stats || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
     )

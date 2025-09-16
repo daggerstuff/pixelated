@@ -6,6 +6,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { securePathJoin } from '../../utils/index'
 import * as path from 'path'
 import * as fs from 'fs/promises'
 import * as crypto from 'crypto'
@@ -199,7 +200,9 @@ export class FileSystemStorageProvider implements StorageProvider {
   }
 
   private getFullPath(key: string): string {
-    return path.join(this.config.basePath, key)
+    return securePathJoin(this.config.basePath, key, {
+      allowedExtensions: ['.enc', '.meta', '.json', '.txt'], // Allow common backup file extensions
+    })
   }
 }
 
@@ -398,12 +401,9 @@ export class MockCloudStorageProvider implements StorageProvider {
   }
 
   private getFullPath(key: string): string {
-    return path.join(
-      this.config.basePath,
-      this.config.provider,
-      this.config.bucket,
-      key,
-    )
+    return securePathJoin(this.config.basePath, key, {
+      allowedExtensions: ['.enc', '.meta', '.json', '.txt'], // Allow common backup file extensions
+    })
   }
 }
 

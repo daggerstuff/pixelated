@@ -1,65 +1,82 @@
 /**
- * Standardized logger implementation.
- * Provides factory functions for contextual loggers used throughout the application.
+ * Standardized logger adapter.
+ *
+ * This module provides the historical standardized-logger API while delegating
+ * to the canonical getLogger implementation in utils/logger at runtime. This
+ * allows tests to mock getLogger (e.g., vi.spyOn or mockReturnValue) and have
+ * modules that import `standardizedLogger` or factory helpers receive the
+ * mocked logger implementation.
  */
 
-export type Logger = {
-  info: (...args: unknown[]) => void;
-  warn: (...args: unknown[]) => void;
-  error: (...args: unknown[]) => void;
-  debug: (...args: unknown[]) => void;
-};
+import { getLogger } from '../utils/logger'
 
-function createBuildSafeLogger(prefix: string): Logger {
-  const tag = `[standardized-logger][${prefix}]`;
-  return {
-    info: (...args: unknown[]) => { console.info(tag, ...args); },
-    warn: (...args: unknown[]) => { console.warn(tag, ...args); },
-    error: (...args: unknown[]) => { console.error(tag, ...args); },
-    debug: (...args: unknown[]) => { console.debug(tag, ...args); }
-  };
+export type Logger = {
+  info: (message: string, ...args: unknown[]) => void
+  warn: (message: string, ...args: unknown[]) => void
+  error: (message: string | Error, ...args: unknown[]) => void
+  debug: (message: string, ...args: unknown[]) => void
 }
 
-// Factory functions for named loggers
-
+// Factory functions for named loggers - delegate to canonical getLogger so tests can mock
 export function getBiasDetectionLogger(scope: string): Logger {
-  return createBuildSafeLogger(`bias-detection:${scope}`);
+  return getLogger(`bias-detection:${scope}`) as unknown as Logger
 }
 
 export function getClinicalAnalysisLogger(scope: string): Logger {
-  return createBuildSafeLogger(`clinical-analysis:${scope}`);
+  return getLogger(`clinical-analysis:${scope}`) as unknown as Logger
 }
 
 export function getAiServiceLogger(scope: string): Logger {
-  return createBuildSafeLogger(`ai-service:${scope}`);
+  return getLogger(`ai-service:${scope}`) as unknown as Logger
 }
 
 export function getApiEndpointLogger(scope: string): Logger {
-  return createBuildSafeLogger(`api-endpoint:${scope}`);
+  return getLogger(`api-endpoint:${scope}`) as unknown as Logger
 }
 
 export function getComponentLogger(scope: string): Logger {
-  return createBuildSafeLogger(`component:${scope}`);
+  return getLogger(`component:${scope}`) as unknown as Logger
 }
 
 export function getServiceLogger(scope: string): Logger {
-  return createBuildSafeLogger(`service:${scope}`);
+  return getLogger(`service:${scope}`) as unknown as Logger
 }
 
 export function getSecurityLogger(scope: string): Logger {
-  return createBuildSafeLogger(`security:${scope}`);
+  return getLogger(`security:${scope}`) as unknown as Logger
 }
 
 export function getAdvancedPHILogger(config: { enableLogCollection?: boolean } = {}): Logger {
-  // Optionally could vary behavior based on config in real implementation.
-  return createBuildSafeLogger(`advanced-phi${config.enableLogCollection ? ':collect' : ''}`);
+  return getLogger(`advanced-phi${config.enableLogCollection ? ':collect' : ''}`) as unknown as Logger
 }
 
 export function getHipaaCompliantLogger(scope: string): Logger {
-  return createBuildSafeLogger(`hipaa:${scope}`);
+  return getLogger(`hipaa:${scope}`) as unknown as Logger
 }
 
-// Default/general loggers
+// Default/general loggers - provide thin runtime proxies to getLogger
+const makeProxy = (name: string) : Logger => ({
+  info: (message: string, ...args: unknown[]) => {
+    const target: any = getLogger(name) as any;
+    const fn = target && typeof target.info === 'function' ? target.info.bind(target) : console.info.bind(console);
+    fn(message, ...args);
+  },
+  warn: (message: string, ...args: unknown[]) => {
+    const target: any = getLogger(name) as any;
+    const fn = target && typeof target.warn === 'function' ? target.warn.bind(target) : console.warn.bind(console);
+    fn(message, ...args);
+  },
+  error: (message: string | Error, ...args: unknown[]) => {
+    const target: any = getLogger(name) as any;
+    const fn = target && typeof target.error === 'function' ? target.error.bind(target) : console.error.bind(console);
+    fn(message, ...args);
+  },
+  debug: (message: string, ...args: unknown[]) => {
+    const target: any = getLogger(name) as any;
+    const fn = target && typeof target.debug === 'function' ? target.debug.bind(target) : console.debug.bind(console);
+    fn(message, ...args);
+  },
+})
 
-export const standardizedLogger: Logger = createBuildSafeLogger('general');
-export const appLogger: Logger = createBuildSafeLogger('app');
+export const standardizedLogger: Logger = makeProxy('general')
+export const appLogger: Logger = makeProxy('app')

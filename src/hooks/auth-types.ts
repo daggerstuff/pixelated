@@ -164,8 +164,12 @@ export function createAuthError(
 ): AuthError {
   const error = new Error(message) as AuthError
   error.name = 'AuthError'
-  if (code) error.code = code
-  if (details) error.details = details
+  if (code) {
+    error.code = code
+  }
+  if (details) {
+    error.details = details
+  }
   return error
 }
 

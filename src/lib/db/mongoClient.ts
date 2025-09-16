@@ -21,9 +21,13 @@ const processEnv = (typeof process !== 'undefined' ? process.env : {}) as Proces
 function getEnvVar(keys: string[], fallback?: string): string {
   for (const key of keys) {
     const value = processEnv[key]
-    if (value) return value
+    if (value) {
+      return value
+    }
   }
-  if (fallback) return fallback
+  if (fallback) {
+    return fallback
+  }
   throw new Error(`Missing required environment variable(s): ${keys.join(', ')}`)
 }
 

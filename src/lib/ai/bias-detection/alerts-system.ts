@@ -5,7 +5,7 @@
  * Extracted from BiasDetectionEngine.ts for better separation of concerns.
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { getBiasDetectionLogger } from '../../logging/standardized-logger'
 import { PythonBiasDetectionBridge } from './python-bridge'
 import { performanceMonitor } from './performance-monitor'
 import type { BiasAnalysisResult } from './types'
@@ -22,7 +22,7 @@ import type {
   TimeRange as _TimeRange,
 } from './bias-detection-interfaces'
 
-const logger = createBuildSafeLogger('bias-alerts')
+const logger = getBiasDetectionLogger('alerts-system')
 
 // Define proper types for the alert system
 interface AlertSystemConfig {
@@ -49,7 +49,14 @@ interface NotificationChannelConfig {
   config: Record<string, unknown>
 }
 
-import type { AlertLevel, ProblematicScenario, FeatureImportanceResult, InterventionEffectiveness } from './types'
+import type { AlertLevel } from './types'
+
+// Local minimal types to bridge current type gaps. These should be replaced
+// with canonical definitions from ./types once the overall type reconciliation
+// is performed.
+type ProblematicScenario = any
+type FeatureImportanceResult = any
+type InterventionEffectiveness = any
 
 interface AlertInstance {
   id: string
@@ -364,7 +371,7 @@ export class BiasAlertSystem {
     result: BiasAnalysisResult,
   ): boolean[] {
     const indicators: boolean[] = []
-  
+
     try {
       // Check preprocessing layer for demographic representation issues
       if (result.layerResults.preprocessing?.representationAnalysis) {
@@ -376,7 +383,7 @@ export class BiasAlertSystem {
         const hasLowDiversity = repr.diversityIndex < 0.3
         indicators.push(hasUnderrepresentedGroups, hasLowDiversity)
       }
-  
+
       // Check model level for fairness metric disparities
       if (result.layerResults.modelLevel?.fairnessMetrics) {
         const fairness = result.layerResults.modelLevel.fairnessMetrics
@@ -386,7 +393,7 @@ export class BiasAlertSystem {
         const hasEqualizedOddsIssue = fairness.equalizedOdds < 0.6
         indicators.push(hasDemographicParityIssue, hasEqualizedOddsIssue)
       }
-  
+
       // Check interactive layer for engagement pattern disparities
       if (
         result.layerResults.interactive?.counterfactualAnalysis
@@ -411,7 +418,7 @@ export class BiasAlertSystem {
     } catch (error: unknown) {
       logger.warn('Error analyzing demographic layer disparities', { error })
     }
-  
+
     return indicators
   }
 
@@ -470,12 +477,12 @@ export class BiasAlertSystem {
     result: BiasAnalysisResult,
   ): boolean[] {
     const indicators: boolean[] = []
-  
+
     try {
       // Check interactive layer feature importance for demographic sensitivity
       if (result.layerResults.interactive?.featureImportance) {
         const features = result.layerResults.interactive.featureImportance
-  
+
         features.forEach((feature: FeatureImportanceResult) => {
           // Check if demographic features have high bias contribution
           if (
@@ -484,23 +491,24 @@ export class BiasAlertSystem {
           ) {
             indicators.push(true)
           }
-  
+
           // Check demographic sensitivity across different groups
           if (feature.demographicSensitivity) {
             const sensitivityValues = Object.values(
               feature.demographicSensitivity,
             )
-            const maxSensitivity = Math.max(...sensitivityValues)
-            const minSensitivity = Math.min(...sensitivityValues)
+            const numericSensitivities = sensitivityValues.map(v => typeof v === 'number' ? v : Number(v)).filter(n => !Number.isNaN(n))
+            const maxSensitivity = numericSensitivities.length > 0 ? Math.max(...numericSensitivities) : 0
+            const minSensitivity = numericSensitivities.length > 0 ? Math.min(...numericSensitivities) : 0
             const sensitivityDisparity = maxSensitivity - minSensitivity
-  
+
             if (sensitivityDisparity > 0.3) {
               indicators.push(true)
             }
           }
         })
       }
-  
+
       // Check temporal analysis for intervention effectiveness disparities
       if (
         result.layerResults.evaluation?.temporalAnalysis
@@ -509,13 +517,13 @@ export class BiasAlertSystem {
         const interventions =
           result.layerResults.evaluation.temporalAnalysis
             .interventionEffectiveness
-  
+
         interventions.forEach((intervention: InterventionEffectiveness) => {
           // Check if bias mitigation effectiveness is low
           if (intervention.improvement < 0.1) {
             indicators.push(true)
           }
-  
+
           // Check sustainability of interventions
           if (intervention.sustainabilityScore < 0.7) {
             indicators.push(true)
@@ -525,7 +533,7 @@ export class BiasAlertSystem {
     } catch (error: unknown) {
       logger.warn('Error analyzing counterfactual disparities', { error })
     }
-  
+
     return indicators
   }
 
@@ -789,7 +797,7 @@ export class BiasAlertSystem {
     const callbackData = {
       alerts,
       sessionId: result.sessionId,
-      timestamp: result.timestamp,
+  timestamp: (result as any)?.timestamp ?? new Date().toISOString(),
       overallBiasScore: result.overallBiasScore,
       alertLevel: result.alertLevel,
       recommendations: result.recommendations,
@@ -906,18 +914,18 @@ export class BiasAlertSystem {
     }
   }
 
-  
+
   async getActiveAlerts(): Promise<AlertInstance[]> {
     try {
       // Get alerts from Python service
       const serverAlerts = await this.pythonBridge.getActiveAlerts();
-  
+
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
       const serverInstances: AlertInstance[] = (serverAlerts || []).map(alertDataToInstance);
-  
+
       // Combine with local queue
       const localActive = this.alertQueue.filter((alert) => !alert.acknowledged);
-  
+
       return [...serverInstances, ...localActive];
     } catch (error: unknown) {
       logger.error('Failed to fetch active alerts', { error });
@@ -979,14 +987,14 @@ export class BiasAlertSystem {
         start: new Date(Date.now() - timeRangeMs).toISOString(),
         end: new Date().toISOString(),
       });
-  
+
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
       const recentInstances: AlertInstance[] = (response || []).map(alertDataToInstance);
-  
+
       return recentInstances;
     } catch (error: unknown) {
       logger.error('Failed to fetch recent alerts', { error });
-  
+
       // Fallback to local alerts
       const cutoffTime = new Date(Date.now() - timeRangeMs);
       return this.alertQueue.filter((alert) => alert.timestamp >= cutoffTime);
@@ -1073,15 +1081,15 @@ export class BiasAlertSystem {
         escalated: false,
         biasScore: alertData.biasScore,
       }
-  
+
       this.alertQueue.push(alert)
-  
+
       // Send notifications if needed
       await this.sendNotifications(alert)
-  
+
       // Trigger monitoring callbacks
       this.triggerMonitoringCallbacks([alert], alertData.analysisResult)
-  
+
       logger.info('Alert processed successfully', {
         alertId: alert.id,
         sessionId: alertData.sessionId,

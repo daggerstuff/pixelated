@@ -41,7 +41,7 @@ export async function getCurrentUser(
     }
 
     // Assuming the decoded token contains the user ID
-    const userId = decoded.userId
+    const {userId} = decoded
 
     // Fetch user from the database
     const user = await mongoAuthService.getUserById(userId)

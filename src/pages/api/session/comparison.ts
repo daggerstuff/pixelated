@@ -3,7 +3,9 @@ import type { APIRoute } from 'astro';
 
 // Database connection pool
 const { DATABASE_URL } = process.env
-if (!DATABASE_URL) throw new Error('DATABASE_URL is not set')
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set')
+}
 const pool =
   (globalThis as any).__pgPool ??
   new Pool({ connectionString: DATABASE_URL })

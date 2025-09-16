@@ -1,12 +1,11 @@
 // Cipher context sharing utility for Pixelated Empathy platform
 // Follows MCP integration, security, and error handling best practices
 
-import Cipher from '@campfirein/cipher';
-import type { CipherOptions, ContextPayload } from '@campfirein/cipher';
+import Cipher from '@byterover/cipher';
+import type { CipherOptions, ContextPayload } from '@byterover/cipher';
 
 // Environment variable names (do NOT hardcode secrets)
-const CIPHER_API_KEY = process.env.CIPHER_API_KEY;
-const CIPHER_PROJECT_ID = process.env.CIPHER_PROJECT_ID;
+const {CIPHER_API_KEY, CIPHER_PROJECT_ID} = process.env;
 
 // Validate required environment variables
 if (!CIPHER_API_KEY || !CIPHER_PROJECT_ID) {

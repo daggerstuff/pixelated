@@ -7,12 +7,11 @@ import type { BatchAnalysisResult } from '../../../lib/ai/bias-detection/types'
 const engine = new BiasDetectionEngine()
 const batchJobQueue = new JobQueue<TherapeuticSession[], BatchAnalysisResult>(async (sessions, update) => {
   // Use batchAnalyzeSessions with progress callback
-  const { results, errors, metrics } = await engine.batchAnalyzeSessions(sessions, {
-    onProgress: ({ completed, total }) => update(completed / total),
-    logProgress: false,
-    logErrors: false,
-  })
-  return { results, errors, metrics }
+  return await engine.batchAnalyzeSessions(sessions, {
+      onProgress: ({ completed, total }) => update(completed / total),
+      logProgress: false,
+      logErrors: false,
+    });
 })
 
 export const runtime = 'nodejs'

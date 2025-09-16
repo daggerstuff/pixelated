@@ -737,9 +737,7 @@ class BiasDetectionService:
             return "critical"
         if bias_score >= self.config.high_threshold:
             return "high"
-        if bias_score >= self.config.warning_threshold:
-            return "medium"
-        return "low"
+        return "medium" if bias_score >= self.config.warning_threshold else "low"
 
     async def _log_audit_event(self, session_id: str, result: dict[str, Any]) -> None:
         """Log audit event for compliance"""

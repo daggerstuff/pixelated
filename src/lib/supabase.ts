@@ -28,10 +28,14 @@ const processEnv = (
 function getEnvVar(keys: string[], fallback?: string): string {
   for (const key of keys) {
     const value = processEnv[key]
-    if (value) return value
+    if (value) {
+      return value
+    }
   }
 
-  if (fallback) return fallback
+  if (fallback) {
+    return fallback
+  }
 
   const keyList = keys.join(', ')
   throw new Error(`Missing required environment variable(s): ${keyList}`)

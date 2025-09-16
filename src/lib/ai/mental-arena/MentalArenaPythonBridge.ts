@@ -903,7 +903,7 @@ export class MentalArenaPythonBridge {
 
       for (const line of lines) {
         // Parse package name and version specifier
-        const match = line.match(/^([a-zA-Z0-9_-]+)([>=<!=~^]*[\d.]+.*)?/)
+        const match = line.match(/^([a-zA-Z0-9_-]+)([>=<!~^]*[\d.]+.*)?/)
         if (!match) {
           violations.push(`Invalid package format: ${line}`)
           continue

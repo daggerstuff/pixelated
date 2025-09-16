@@ -14,7 +14,50 @@ import type {
 } from '@/types/analytics';
 import type { TherapistSession } from '@/types/dashboard';
 
-const logger = createBuildSafeLogger('use-therapist-analytics');
+// Normalize logger shape because tests sometimes mock createBuildSafeLogger to return
+// a bare function (vi.fn()) or a partial object. Ensure we always have an object
+// with callable info/warn/error/debug methods to avoid runtime TypeErrors.
+const _rawLogger = createBuildSafeLogger('use-therapist-analytics');
+const normalizeLogger = (raw: unknown) => {
+  const safeFn = (fn: unknown, fallback: (...args: any[]) => void) =>
+    typeof fn === 'function' ? (fn as (...args: any[]) => any) : fallback;
+
+  // If the module mock returned a bare function (e.g. vi.fn()), call it for all
+  // log levels but still provide the standard method names.
+  if (typeof raw === 'function') {
+    const fn = raw as (...args: any[]) => any;
+    return {
+      info: (...args: any[]) => { try { fn(...args); } catch (_) { /* swallow */ } },
+      warn: (...args: any[]) => { try { fn(...args); } catch (_) { /* swallow */ } },
+      error: (...args: any[]) => { try { fn(...args); } catch (_) { /* swallow */ } },
+      debug: (...args: any[]) => { try { fn(...args); } catch (_) { /* swallow */ } },
+      child: (/* name: string */) => normalizeLogger(raw),
+    };
+  }
+
+  // If it's an object, pick methods or fall back to console
+  if (typeof raw === 'object' && raw !== null) {
+    const obj = raw as Record<string, any>;
+    return {
+      info: safeFn(obj['info'], console.info.bind(console)),
+      warn: safeFn(obj['warn'], console.warn.bind(console)),
+      error: safeFn(obj['error'], console.error.bind(console)),
+      debug: safeFn(obj['debug'], console.debug ? console.debug.bind(console) : console.log.bind(console)),
+      child: (name?: string) => normalizeLogger(obj['child'] ? obj['child'](name) : obj),
+    };
+  }
+
+  // Fallback to console
+  return {
+    info: console.info.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+    debug: console.debug ? console.debug.bind(console) : console.log.bind(console),
+    child: () => normalizeLogger(console),
+  };
+};
+
+const logger = normalizeLogger(_rawLogger);
 
 interface UseTherapistAnalyticsResult {
   data: TherapistAnalyticsChartData | null;

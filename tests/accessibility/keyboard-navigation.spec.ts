@@ -59,7 +59,9 @@ test.describe('Keyboard Navigation Tests', () => {
       await pageContext.keyboard.press('Tab')
       const firstFocusedElement = await pageContext.evaluate(() => {
         const { activeElement } = document;
-        if (!activeElement) return { tagName: '', text: '' };
+        if (!activeElement) {
+          return { tagName: '', text: '' };
+        }
         
         return {
           tagName: activeElement.tagName.toLowerCase(),

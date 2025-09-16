@@ -46,27 +46,26 @@ class DatasetLister:
             # Query for files in the specified folder
             query = f"'{self.folder_id}' in parents and trashed=false"
             fields = "nextPageToken, files(id, name, size, modifiedTime, mimeType, description)"
-            
+
             results = self.service.files().list(
                 q=query,
                 fields=fields,
                 pageSize=1000  # Adjust as needed
             ).execute()
-            
+
             files = results.get('files', [])
             datasets = []
-            
+
             for file in files:
-                dataset_info = self._process_file_info(file, show_details)
-                if dataset_info:
+                if dataset_info := self._process_file_info(file, show_details):
                     datasets.append(dataset_info)
-            
+
             # Sort by modification time (newest first)
             datasets.sort(key=lambda x: x.get('modified_time', ''), reverse=True)
-            
+
             logger.info(f"Found {len(datasets)} datasets")
             return datasets
-            
+
         except HttpError as e:
             logger.error(f"HTTP error listing datasets: {e}")
             return []
@@ -95,23 +94,23 @@ class DatasetLister:
                 'mime_type': file.get('mimeType', ''),
                 'is_folder': file.get('mimeType') == 'application/vnd.google-apps.folder'
             }
-            
+
             # Format modification time
             if dataset_info['modified_time']:
                 try:
                     dt = datetime.fromisoformat(dataset_info['modified_time'].replace('Z', '+00:00'))
                     dataset_info['modified_time_formatted'] = dt.strftime('%Y-%m-%d %H:%M:%S')
-                except:
+                except Exception:
                     dataset_info['modified_time_formatted'] = dataset_info['modified_time']
             else:
                 dataset_info['modified_time_formatted'] = 'Unknown'
-            
+
             if include_details:
                 dataset_info['description'] = file.get('description', '')
                 dataset_info['type'] = self._determine_dataset_type(file['name'])
-            
+
             return dataset_info
-            
+
         except Exception as e:
             logger.warning(f"Error processing file {file.get('name', 'unknown')}: {e}")
             return None
@@ -227,24 +226,23 @@ class DatasetLister:
             # Build search query
             search_query = f"'{self.folder_id}' in parents and trashed=false and name contains '{query}'"
             fields = "nextPageToken, files(id, name, size, modifiedTime, mimeType, description)"
-            
+
             results = self.service.files().list(
                 q=search_query,
                 fields=fields,
                 pageSize=1000
             ).execute()
-            
+
             files = results.get('files', [])
             datasets = []
-            
+
             for file in files:
-                dataset_info = self._process_file_info(file, True)
-                if dataset_info:
+                if dataset_info := self._process_file_info(file, True):
                     datasets.append(dataset_info)
-            
+
             logger.info(f"Found {len(datasets)} datasets matching '{query}'")
             return datasets
-            
+
         except HttpError as e:
             logger.error(f"HTTP error searching datasets: {e}")
             return []

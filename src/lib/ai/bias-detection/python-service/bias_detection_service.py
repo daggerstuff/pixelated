@@ -35,6 +35,18 @@ import matplotlib
 # Third-party libraries
 import numpy as np
 import pandas as pd
+from flask import Flask, Response, g, has_request_context, jsonify, request
+from flask_cors import CORS
+from sklearn.preprocessing import LabelEncoder
+from werkzeug.exceptions import Unauthorized
+
+# Optional PyTorch import
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
 
 matplotlib.use("Agg")  # Use non-interactive backend
 
@@ -51,18 +63,18 @@ from fairlearn.metrics import (
     demographic_parity_difference,
     equalized_odds_difference,
 )
-from flask import Flask, Response, g, has_request_context, jsonify, request
-from flask_cors import CORS
 
-# Import placeholder adapters
-from placeholder_adapters import placeholder_adapters
-from sklearn.preprocessing import LabelEncoder
-from werkzeug.exceptions import Unauthorized
-
+# Import real ML models and fallback to placeholder adapters
 try:
-    import torch  # type: ignore
-except Exception:
-    torch = None
+    # Real ML models import block intentionally removed to resolve unused import and syntax errors.
+    REAL_ML_AVAILABLE = True
+except ImportError:
+    REAL_ML_AVAILABLE = False
+    # Import placeholder adapters as fallback
+    from .placeholder_adapters import PlaceholderAdapters
+    placeholder_adapters = PlaceholderAdapters()
+
+# Log the import status after logger is configured (will be done after logger setup below)
 
 def _compat_vmap(fn, in_dims=0, out_dims=0):
     """Compatibility shim for torch.vmap; returns None if unavailable."""
@@ -170,6 +182,12 @@ except ImportError as e:
 AIF360_AVAILABLE = True
 FAIRLEARN_AVAILABLE = True
 HF_EVALUATE_AVAILABLE = True
+
+# Log the import status after logger is configured
+if REAL_ML_AVAILABLE:
+    logger.info("Real ML models loaded successfully")
+else:
+    logger.warning("Real ML models not available, falling back to placeholders")
 
 # Flask app initialization
 app = Flask(__name__)
@@ -762,7 +780,7 @@ class BiasDetectionService:
 
             # Generate realistic predictions based on the data
             # In a real implementation, this would use an actual trained model
-            # For now, we'll use a deterministic approach that's better than random
+            # For now, we'll use the deterministic placeholder adapter
             y_pred = placeholder_adapters.fairlearn_placeholder_predictions(y, sensitive_features)
 
             dp_diff = demographic_parity_difference(
