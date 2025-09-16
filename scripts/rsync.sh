@@ -150,8 +150,8 @@ build_and_deploy() {
         
         # Clean up any existing containers and images
         echo "Cleaning up existing containers..."
-        docker stop pixelated-app-new 2>/dev/null || true
-        docker rm pixelated-app-new 2>/dev/null || true
+        docker stop pixelated-app 2>/dev/null || true
+        docker rm pixelated-app 2>/dev/null || true
         docker rmi pixelated-box:latest 2>/dev/null || true
         
         # Verify Dockerfile exists
@@ -175,7 +175,7 @@ build_and_deploy() {
             # Start new container
             echo "Starting container..."
             docker run -d \
-                --name pixelated-app-new \
+                --name pixelated-app \
                 --restart unless-stopped \
                 -p 4321:4321 \
                 "pixelated-box:latest"
@@ -187,16 +187,46 @@ build_and_deploy() {
                 echo "Waiting for application to start..."
                 sleep 15
                 
-                # Test if application is responding
-                if curl -f http://localhost:4321/ >/dev/null 2>&1; then
-                    echo "✅ Application is responding"
-                    exit 0
-                else
-                    echo "⚠️  Application may still be starting up"
-                    echo "Container logs:"
-                    docker logs --tail 20 pixelated-app-new
-                    exit 0
+                # Comprehensive health checks
+                echo "Running health checks..."
+                
+                # 1. Basic connectivity
+                if ! curl -f http://localhost:4321/ >/dev/null 2>&1; then
+                    echo "❌ Basic connectivity failed"
+                    docker logs --tail 20 pixelated-app
+                    exit 1
                 fi
+                echo "✅ Basic connectivity OK"
+                
+                # 2. Check main page content
+                CONTENT=$(curl -s http://localhost:4321/ | head -c 1000)
+                if [[ "$CONTENT" == *"Pixelated Empathy"* ]]; then
+                    echo "✅ Main page content verified"
+                else
+                    echo "⚠️ Main page content check failed"
+                    echo "Response: $CONTENT"
+                fi
+                
+                # 3. Check API endpoints
+                if curl -f http://localhost:4321/api/health >/dev/null 2>&1; then
+                    echo "✅ Health API responding"
+                else
+                    echo "⚠️ Health API not responding"
+                fi
+                
+                # 4. Check bias detection demo
+                if curl -f http://localhost:4321/demo/bias-detection >/dev/null 2>&1; then
+                    echo "✅ Bias detection demo accessible"
+                else
+                    echo "⚠️ Bias detection demo not accessible"
+                fi
+                
+                # 5. Container resource check
+                CONTAINER_STATS=$(docker stats pixelated-app --no-stream --format "table {{.CPUPerc}}\t{{.MemUsage}}")
+                echo "📊 Container stats: $CONTAINER_STATS"
+                
+                echo "✅ All health checks completed"
+                exit 0
             else
                 echo "❌ Failed to start container"
                 exit 1
