@@ -808,9 +808,13 @@ export class BackupSecurityManager {
     const storageEntries = Array.from(this.storageProviders.entries())
     for (let i = 0; i < storageEntries.length; i++) {
       const entry = storageEntries[i]
-      if (!entry || !Array.isArray(entry) || entry.length < 2) continue
+      if (!entry || !Array.isArray(entry) || entry.length < 2) {
+        continue
+      }
       const [location, provider] = entry
-      if (!provider) continue
+      if (!provider) {
+        continue
+      }
       try {
         // Look for metadata files matching the ID
         const files = await provider.listFiles(

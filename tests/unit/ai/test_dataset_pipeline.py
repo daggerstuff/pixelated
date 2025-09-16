@@ -60,24 +60,16 @@ class TestDatasetPipeline:
         # Simulate large dataset
         large_dataset = [{"input": f"text_{i}", "output": f"response_{i}", "label": "test"} 
                         for i in range(1000)]
-        
-        # Test processing
-        processed_count = 0
-        for item in large_dataset:
-            if item["input"] and item["output"]:
-                processed_count += 1
-        
+
+        processed_count = sum(bool(item["input"] and item["output"])
+                          for item in large_dataset)
         assert processed_count == 1000
     
     def test_error_handling(self):
         """Test error handling in dataset processing"""
         # Test with invalid data
         invalid_data = [{"input": None, "output": "test"}]
-        
-        errors = []
-        for item in invalid_data:
-            if not item["input"]:
-                errors.append("Missing input")
-        
+
+        errors = ["Missing input" for item in invalid_data if not item["input"]]
         assert len(errors) == 1
         assert "Missing input" in errors[0]

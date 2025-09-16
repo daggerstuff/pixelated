@@ -246,23 +246,97 @@ export class PythonBiasDetectionBridge {
           // @ts-ignore - runtime check above ensures this exists
           pooledConnection = await (this.connectionPool as any).acquireConnection()
         }
-        // Decide which AbortSignal to use: prefer pooled controller if available, then AbortSignal.timeout, then a local controller
-        let signalToUse: AbortSignal | undefined
+        // Decide which AbortSignals to use: prefer pooled controller, include timeout signal if available,
+        // and always ensure fetch receives a native AbortSignal instance. Tests may inject non-native
+        // or polyfilled signals; to be tolerant we compose/signals and forward aborts into a native controller.
+        const signalCandidates: Array<AbortSignal> = []
         if (pooledConnection && pooledConnection.controller && pooledConnection.controller.signal) {
-          signalToUse = pooledConnection.controller.signal
-        } else if (signalFromTimeout) {
-          signalToUse = signalFromTimeout
-        } else {
-          // Create local controller and schedule timeout
+          signalCandidates.push(pooledConnection.controller.signal)
+        }
+        if (signalFromTimeout) {
+          signalCandidates.push(signalFromTimeout)
+        }
+
+        // If there are no candidates yet, create a local controller to enforce the timeout
+        if (signalCandidates.length === 0) {
           localController = new AbortController()
-          signalToUse = localController.signal
+          signalCandidates.push(localController.signal)
           setTimeout(() => {
             try { localController?.abort() } catch (e) { /* ignore */ }
           }, this.timeout)
+        } else {
+          // Ensure we still enforce a per-request timeout if none of the candidates provide one
+          const hasTimeout = signalCandidates.some(s => (s as any).__isTimeoutSignal === true)
+          if (!hasTimeout) {
+            // create a local timeout controller and include it
+            localController = new AbortController()
+            signalCandidates.push(localController.signal)
+            setTimeout(() => {
+              try { localController?.abort() } catch (e) { /* ignore */ }
+            }, this.timeout)
+          }
         }
 
-        // Attach the chosen signal to fetch options for this attempt
-        ;(fetchOptions as any).signal = signalToUse
+        // Compose the candidate signals into a single native AbortSignal for fetch.
+        // If any candidate aborts, the composite will abort. This avoids "expected signal to be an instance of AbortSignal"
+        // errors coming from fetch implementations that rely on identity checks.
+        const createCompositeSignal = (signals: Array<AbortSignal>): AbortSignal => {
+          // If there's a single native-like signal, prefer returning it to avoid extra indirection
+          try {
+            if (signals.length === 1 && signals[0] instanceof AbortSignal) {
+              return signals[0]
+            }
+          } catch (_) {
+            // ignore instanceof failures in cross-realm/polyfilled environments
+          }
+
+          const controller = new AbortController()
+          const listeners: Array<() => void> = []
+
+          for (const s of signals) {
+            try {
+              if ((s as any).aborted) {
+                // If already aborted, abort composite immediately
+                try { controller.abort() } catch (e) { /* ignore */ }
+                break
+              }
+
+              const onAbort = () => {
+                try { controller.abort() } catch (e) { /* ignore */ }
+              }
+
+              if (typeof (s as any).addEventListener === 'function') {
+                (s as any).addEventListener('abort', onAbort)
+                listeners.push(() => { try { (s as any).removeEventListener('abort', onAbort) } catch (e) {} })
+              } else if (typeof (s as any).once === 'function') {
+                try { (s as any).once('abort', onAbort) } catch (_) {}
+                // best-effort; not all signals support once
+              } else if ('onabort' in (s as any)) {
+                // Try to patch onabort (best-effort, may overwrite existing handler)
+                const prev = (s as any).onabort
+                  (s as any).onabort = (ev: unknown) => {
+                    try { onAbort() } catch (e) {}
+                    try {
+                      if (typeof prev === 'function') {
+                        prev.call(s, ev)
+                      }
+                    } catch (e) {}
+                  }
+                listeners.push(() => { try { (s as any).onabort = prev } catch (e) {} })
+              }
+            } catch (e) {
+              // Ignore any errors attaching listeners to non-standard signals
+            }
+          }
+
+          // We don't attempt to remove listeners in normal flow; GC will clean up in most test runs.
+          return controller.signal
+        }
+
+        const compositeSignal = createCompositeSignal(signalCandidates)
+
+        // Attach the composite signal to fetch options for this attempt
+        ;(fetchOptions as any).signal = compositeSignal
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
         )
@@ -673,5 +747,100 @@ export class PythonBiasDetectionBridge {
 
   getMetrics() {
     return { ...this.metrics }
+  }
+
+  // --- Convenience shims for higher-level callers (thin wrappers over makeRequest)
+  // These exist to bridge the gap between the bridge's low-level request primitives
+  // and the higher-level methods other modules expect. They are intentionally
+  // permissive in types (unknown/any) and should be tightened as we reconcile
+  // TypeScript interfaces with the Python responses.
+
+  async sendMetricsBatch(payload: unknown): Promise<any> {
+    return this.makeRequest('/metrics/batch', 'POST', payload)
+  }
+
+  async sendAnalysisMetric(payload: unknown): Promise<any> {
+    return this.makeRequest('/metrics/analysis', 'POST', payload)
+  }
+
+  async getDashboardMetrics(query?: Record<string, unknown>): Promise<any> {
+    // For simplicity keep using POST for complex queries; GET can be added if needed
+    return this.makeRequest('/metrics/dashboard', 'POST', query ?? {})
+  }
+
+  async recordReportMetric(payload: unknown): Promise<any> {
+    return this.makeRequest('/metrics/report', 'POST', payload)
+  }
+
+  async getPerformanceMetrics(params?: Record<string, unknown>): Promise<any> {
+    return this.makeRequest('/metrics/performance', 'POST', params ?? {})
+  }
+
+  async getSessionData(sessionId: string): Promise<any> {
+    return this.makeRequest(`/session/${encodeURIComponent(sessionId)}`, 'GET')
+  }
+
+  async storeMetrics(payload: unknown): Promise<any> {
+    return this.makeRequest('/metrics/store', 'POST', payload)
+  }
+
+  // Alert system shims
+  async registerAlertSystem(config: unknown): Promise<any> {
+    return this.makeRequest('/alerts/register', 'POST', config)
+  }
+
+  async checkAlerts(payload: unknown): Promise<any> {
+    return this.makeRequest('/alerts/check', 'POST', payload)
+  }
+
+  async storeAlerts(payload: unknown): Promise<any> {
+    return this.makeRequest('/alerts/store', 'POST', payload)
+  }
+
+  async escalateAlert(payload: unknown): Promise<any> {
+    return this.makeRequest('/alerts/escalate', 'POST', payload)
+  }
+
+  async sendNotification(payload: unknown): Promise<any> {
+    return this.makeRequest('/alerts/notify', 'POST', payload)
+  }
+
+  async getActiveAlerts(): Promise<any> {
+    return this.makeRequest('/alerts/active', 'GET')
+  }
+
+  async acknowledgeAlert(payload: unknown): Promise<any> {
+    return this.makeRequest('/alerts/ack', 'POST', payload)
+  }
+
+  async sendSystemNotification(payload: unknown): Promise<any> {
+    return this.makeRequest('/alerts/system-notify', 'POST', payload)
+  }
+
+  async getRecentAlerts(params?: Record<string, unknown>): Promise<any> {
+    return this.makeRequest('/alerts/recent', 'POST', params ?? {})
+  }
+
+  async getAlertStatistics(params?: Record<string, unknown>): Promise<any> {
+    return this.makeRequest('/alerts/stats', 'POST', params ?? {})
+  }
+
+  async unregisterAlertSystem(payload: unknown): Promise<any> {
+    return this.makeRequest('/alerts/unregister', 'POST', payload)
+  }
+
+  async dispose(): Promise<void> {
+    // Stop internal timers and dispose of connection pool
+    try {
+      this.stopHealthMonitoring()
+      if (this.connectionPool && typeof (this.connectionPool as any).dispose === 'function') {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - runtime check above ensures this exists
+        await (this.connectionPool as any).dispose()
+      }
+      logger.info('PythonBiasDetectionBridge disposed')
+    } catch (e) {
+      logger.warn('Error disposing PythonBiasDetectionBridge', { error: e })
+    }
   }
 }

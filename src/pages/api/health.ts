@@ -1,117 +1,147 @@
-export const prerender = false
+import { initializeDatabase, healthCheck } from '@/lib/db'
+import type { APIRoute } from 'astro'
 
-interface HealthStatus {
-  status: 'healthy' | 'unhealthy' | 'degraded'
-  timestamp: string
-  services: Record<string, HealthStatusDetail>
-  responseTime: number
-}
-
-interface HealthStatusDetail {
-  status: 'healthy' | 'unhealthy' | 'degraded'
-  message: string
-  responseTime?: number
-  details?: Record<string, unknown>
-}
-
-export const GET = async (): Promise<Response> => {
-  const startTime = Date.now()
-
-  const healthStatus: HealthStatus = {
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    services: {},
-    responseTime: 0,
-  }
-
+export const GET: APIRoute = async () => {
   try {
-    // Basic application health
-    healthStatus.services['application'] = {
-      status: 'healthy',
-      message: 'Application is running',
-      responseTime: Date.now() - startTime,
+    // Initialize database connection if not already done
+    initializeDatabase()
+
+    // Perform health checks
+    const dbHealth = await healthCheck()
+
+    // Get system information
+    const systemInfo = {
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      version: process.version,
+      platform: process.platform,
+      environment: process.env['NODE_ENV'] || 'development'
     }
 
-    // Check MongoDB if available
+    // Check if bias detection service is accessible
+    let biasServiceHealth: { status: string; error?: string } = { status: 'unknown', error: 'Service check not implemented' }
+
     try {
-      healthStatus.services['mongodb'] = await checkMongoDBConnection()
-    } catch (error: unknown) {
-      healthStatus.services['mongodb'] = {
-        status: 'degraded',
-        message: 'MongoDB connection unavailable',
-        details: {
-          error: error instanceof Error ? error.message : String(error),
+      // Simple check - in production this would ping the actual service
+      const biasResponse = await fetch('http://localhost:5000/health', {
+        timeout: 5000,
+        headers: { 'Content-Type': 'application/json' }
+      } as RequestInit)
+
+      if (biasResponse.ok) {
+        biasServiceHealth = { status: 'healthy' }
+      } else {
+        biasServiceHealth = { status: 'unhealthy', error: `HTTP ${biasResponse.status}` }
+      }
+    } catch (error: any) {
+      biasServiceHealth = { status: 'unhealthy', error: error.message }
+    }
+
+    const overallStatus = dbHealth.status === 'healthy' ? 'healthy' : 'unhealthy'
+
+    const healthResponse = {
+      status: overallStatus,
+      timestamp: new Date().toISOString(),
+      services: {
+        database: dbHealth,
+        biasDetection: biasServiceHealth,
+        system: systemInfo
+      },
+      version: '2.0.0',
+      environment: process.env['NODE_ENV'] || 'development'
+    }
+
+    const statusCode = overallStatus === 'healthy' ? 200 : 503
+
+    return new Response(JSON.stringify(healthResponse, null, 2), {
+      status: statusCode,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      }
+    })
+
+  } catch (error: any) {
+    console.error('Health check failed:', error)
+
+    return new Response(JSON.stringify({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: error.message,
+      services: {
+        database: { status: 'unhealthy', error: error.message },
+        biasDetection: { status: 'unknown' },
+        system: {
+          timestamp: new Date().toISOString(),
+          uptime: process.uptime(),
+          version: process.version
+        }
+      }
+    }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
+}
+
+// POST endpoint for detailed diagnostics
+export const POST: APIRoute = async ({ request }) => {
+  try {
+    const body = await request.json()
+    const includeDetails = body?.includeDetails || false
+
+    // Initialize database connection if not already done
+    initializeDatabase()
+
+    // Perform comprehensive health checks
+    const dbHealth = await healthCheck()
+
+    // Additional diagnostics if requested
+    let diagnostics = {}
+    if (includeDetails) {
+      diagnostics = {
+        environment: {
+          nodeVersion: process.version,
+          platform: process.platform,
+          architecture: process.arch,
+          uptime: process.uptime(),
+          memoryUsage: process.memoryUsage(),
+          cpuUsage: process.cpuUsage(),
+          environmentVariables: Object.keys(process.env).filter(key =>
+            !key.includes('SECRET') && !key.includes('PASSWORD') && !key.includes('KEY')
+          )
         },
+        database: {
+          ...dbHealth,
+          connectionString: process.env['DB_HOST'] ? `${process.env['DB_HOST']}:${process.env['DB_PORT'] || 5432}` : 'not configured'
+        }
       }
     }
 
-    // Determine overall status
-    const serviceStatuses = Object.values(healthStatus.services).map(
-      (s) => s.status,
-    )
+    const overallStatus = dbHealth.status === 'healthy' ? 'healthy' : 'unhealthy'
 
-    if (serviceStatuses.includes('unhealthy')) {
-      healthStatus.status = 'unhealthy'
-    } else if (serviceStatuses.includes('degraded')) {
-      healthStatus.status = 'degraded'
-    }
-
-    healthStatus.responseTime = Date.now() - startTime
-
-    // Always return 200 for health checks to avoid false alarms
-    return new Response(JSON.stringify(healthStatus, null, 2), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-      },
+    return new Response(JSON.stringify({
+      status: overallStatus,
+      timestamp: new Date().toISOString(),
+      diagnostics,
+      services: {
+        database: dbHealth,
+        webServer: { status: 'healthy', uptime: process.uptime() }
+      }
+    }), {
+      status: overallStatus === 'healthy' ? 200 : 503,
+      headers: { 'Content-Type': 'application/json' }
     })
-  } catch (error: unknown) {
-    console.error('Health check error:', error)
 
-    return new Response(
-      JSON.stringify({
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
-        message: 'Health check failed',
-        error: error instanceof Error ? error.message : String(error),
-        responseTime: Date.now() - startTime,
-        services: {},
-      }),
-      {
-        status: 200, // Still return 200 to avoid pipeline failures
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-      },
-    )
-  }
-}
-
-async function checkMongoDBConnection(): Promise<HealthStatusDetail> {
-  const startTime = Date.now()
-
-  try {
-    // Try to import MongoDB config
-    const { mongodb } = await import('~/config/mongodb.config.ts')
-
-    const db = await mongodb.connect()
-    await db.admin().ping()
-
-    return {
-      status: 'healthy',
-      message: 'MongoDB connection successful',
-      responseTime: Date.now() - startTime,
-    }
-  } catch (error: unknown) {
-    return {
-      status: 'degraded',
-      message: 'MongoDB connection failed',
-      responseTime: Date.now() - startTime,
-      details: {
-        error: error instanceof Error ? error.message : String(error),
-      },
-    }
+  } catch (error: any) {
+    return new Response(JSON.stringify({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 }

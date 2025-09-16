@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "OpenMemory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "openmemory"
+      ],
+      "env": {
+        "OPENMEMORY_API_KEY": "om-8u4kpiwqmus434epjpsdeuk86o7mnrgg",
+        "CLIENT_NAME": "cursor"
+      }
+    }
+  }
+}

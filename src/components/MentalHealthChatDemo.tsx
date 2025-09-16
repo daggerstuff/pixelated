@@ -84,7 +84,9 @@ interface ChatMessage {
 
 // Helper function to map mental health categories to severity levels
 const mapCategoryToSeverity = (category?: string): 'low' | 'medium' | 'high' | 'critical' => {
-  if (!category) return 'low'
+  if (!category) {
+    return 'low'
+  }
 
   const lowerCategory = category.toLowerCase()
 

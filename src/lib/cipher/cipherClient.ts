@@ -1,5 +1,5 @@
 // src/lib/cipher/cipherClient.ts
-import { Cipher } from '@campfirein/cipher';
+// Stub implementation to bypass @byterover/cipher dependency issues
 
 export interface AgentRegistrationOptions {
   agentId: string;
@@ -18,16 +18,9 @@ export interface ValidationOptions {
 }
 
 export class CipherClient {
-  private cipher: Cipher;
-
   constructor() {
-    // All config is loaded from environment variables for security
-    const apiKey = process.env.CIPHER_API_KEY;
-    const endpoint = process.env.CIPHER_ENDPOINT;
-    if (!apiKey || !endpoint) {
-      throw new Error('Cipher configuration missing in environment variables');
-    }
-    this.cipher = new Cipher({ apiKey, endpoint });
+    // Stub implementation - cipher functionality disabled for now
+    console.warn('CipherClient: Using stub implementation - cipher functionality disabled');
   }
 
   /**

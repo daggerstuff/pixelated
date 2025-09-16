@@ -219,18 +219,7 @@ def export_dataset_chunk(
         )
 
         # Process chunk based on export format
-        if export_format == "jsonl":
-            # JSONL export
-            exported_data = []
-            for item in chunk_data:
-                exported_data.append(item)
-        elif export_format == "parquet":
-            # Parquet export (placeholder)
-            exported_data = chunk_data
-        else:
-            # Default JSON export
-            exported_data = chunk_data
-
+        exported_data = list(chunk_data) if export_format == "jsonl" else chunk_data
         self.update_state(
             state="PROGRESS",
             meta={"progress": 80, "message": f"Formatting chunk {chunk_id} for {export_format}"},
@@ -368,11 +357,10 @@ def distribute_task(task_name: str, data: List[Any], chunk_size: int = 100, **kw
     # Split data into chunks
     chunks = chunk_data(data, chunk_size)
 
-    # Create task signatures
-    task_signatures = []
-    for i, chunk in enumerate(chunks):
-        task_signatures.append(app.signature(task_name, args=[chunk, i], kwargs=kwargs))
-
+    task_signatures = [
+        app.signature(task_name, args=[chunk, i], kwargs=kwargs)
+        for i, chunk in enumerate(chunks)
+    ]
     # Execute tasks as a group
     job = group(task_signatures)
     result = job.apply_async()

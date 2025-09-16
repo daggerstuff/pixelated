@@ -71,7 +71,9 @@ test.describe('Dashboard Journey', () => {
     // Skip the first two we already tested (dashboard and profile)
     for (let i = 2; i < Math.min(sidebarLinks.length, 4); i++) {
       const link = sidebarLinks[i]
-      if (!link) continue
+      if (!link) {
+        continue
+      }
       const href = await link.getAttribute('href')
 
       if (href && !href.includes('logout')) {

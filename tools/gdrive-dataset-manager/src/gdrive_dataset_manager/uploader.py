@@ -80,7 +80,7 @@ class DatasetUploader:
             elif (
                 local_path.is_file()
                 and should_compress
-                and not local_path.suffix.lower() in [".zip", ".tar", ".gz"]
+                and local_path.suffix.lower() not in {".zip", ".tar", ".gz"}
             ):
                 upload_path = self._compress_file(local_path, dataset_name)
                 if not upload_path:
@@ -276,7 +276,8 @@ class DatasetUploader:
                 console.print(f"[red]✗ {Path(local_path).name} upload failed[/red]")
 
         # Summary
-        successful = sum(1 for result in results.values() if result is not None)
+        successful = sum(bool(result is not None)
+                     for result in results.values())
         console.print(
             f"\n[cyan]Upload Summary: {successful}/{len(dataset_paths)} successful[/cyan]"
         )
@@ -387,11 +388,7 @@ class DatasetUploader:
 
             results = self.service.files().list(q=query, fields="files(id, name)").execute()
 
-            files = results.get("files", [])
-            if files:
-                return files[0]["id"]
-            return None
-
+            return files[0]["id"] if (files := results.get("files", [])) else None
         except Exception as e:
             logger.error(f"Error finding folder: {e}")
             return None

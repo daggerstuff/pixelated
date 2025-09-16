@@ -1,0 +1,40 @@
+mcpServers:
+  filesystem:
+    type: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    connectionMode: strict
+
+  web_browser:
+    type: stdio
+    command: uvx
+    args: ["@truffle-ai/puppeteer-server"]
+    timeout: 60000
+    connectionMode: lenient
+
+sessions:
+  maxSessions: 50
+  sessionTTL: 7200000  # 2 hours
+
+llm:
+  provider: ollama
+  model: hf.co/QuantFactory/Qwen3-4B-Thinking-2507-GGUF:Q4_K_M
+  maxIterations: 50
+  baseUrl: $OLLAMA_BASE_URL
+
+evalLlm:
+  provider: ollama
+  model: hf.co/unsloth/gpt-oss-20b-GGUF:Q4_K_M
+  maxIterations: 50
+  baseUrl: $OLLAMA_BASE_URL
+
+embedding:
+  type: ollama
+  model: mxbai-embed-large
+  baseUrl: $OLLAMA_BASE_URL
+
+
+systemPrompt:
+  enabled: true
+  content: |
+    You are a helpful assistant that helps people find information in a large collection of documents. You will be given a question and a list of relevant documents. Use the information in the documents to help answer the question. If you do not know the answer, just say that you do not know. Do not try to make up an answer.

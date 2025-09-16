@@ -1,9 +1,28 @@
 import type { User } from '@/types/mongodb.types'
-import type { AuthUser, Provider } from '../types/auth'
+import type { AuthUser, Provider, UserRole } from '../types/auth'
 import { createSecureToken, verifySecureToken } from '../lib/security'
-import { MongoAuthService } from './mongoAuth.service'
 
-const authService = new MongoAuthService()
+/**
+ * Helper function to make API requests
+ */
+async function apiRequest(endpoint: string, options: RequestInit = {}) {
+  const url = `/api/auth/${endpoint}`
+
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    ...options,
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+    throw new Error(errorData.error || `HTTP ${response.status}`)
+  }
+
+  return response.json()
+}
 
 /**
  * Sign in with email and password
@@ -13,11 +32,14 @@ const authService = new MongoAuthService()
  */
 export async function signInWithEmail(email: string, password: string) {
   try {
-    const { user, token } = await authService.signIn(email, password)
+    const response = await apiRequest('signin', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
 
     return {
-      user: mapToAuthUser(user),
-      session: { access_token: token, refresh_token: token },
+      user: mapToAuthUser(response.user),
+      session: { access_token: response.token, refresh_token: response.token },
     }
   } catch (error: unknown) {
     console.error('Error signing in:', error)
@@ -52,18 +74,24 @@ export async function signInWithOAuth(_provider: Provider, _redirectTo?: string)
 export async function signUp(
   email: string,
   password: string,
-  _metadata?: { fullName?: string },
+  metadata?: { fullName?: string },
 ) {
   try {
-    const _user = await authService.createUser(email, password)
-    const { user: signedInUser, token } = await authService.signIn(
-      email,
-      password,
-    )
+    // First create the user
+    await apiRequest('signup', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, role: 'user', ...metadata }),
+    })
+
+    // Then sign them in
+    const response = await apiRequest('signin', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
 
     return {
-      user: mapToAuthUser(signedInUser),
-      session: { access_token: token, refresh_token: token },
+      user: mapToAuthUser(response.user),
+      session: { access_token: response.token, refresh_token: response.token },
     }
   } catch (error: unknown) {
     console.error('Error signing up:', error)
@@ -76,7 +104,12 @@ export async function signUp(
  */
 export async function signOut(token: string): Promise<boolean> {
   try {
-    await authService.signOut(token)
+    await apiRequest('signout', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
     return true
   } catch (error: unknown) {
     console.error('Error signing out:', error)
@@ -90,14 +123,14 @@ export async function signOut(token: string): Promise<boolean> {
  */
 export async function getCurrentUser(authHeader: string): Promise<AuthUser | null> {
   try {
-    const authInfo = await authService.verifyAuthToken(authHeader)
-    const user = await authService.getUserById(authInfo['userId'])
+    const response = await apiRequest('profile', {
+      method: 'GET',
+      headers: {
+        'Authorization': authHeader,
+      },
+    })
 
-    if (!user) {
-      return null
-    }
-
-    return mapToAuthUser(user)
+    return mapToAuthUser(response.user)
   } catch (error: unknown) {
     console.error('Error getting current user:', error)
     return null
@@ -109,12 +142,12 @@ export async function getCurrentUser(authHeader: string): Promise<AuthUser | nul
  * @param email User email
  * @param redirectTo URL to redirect after reset
  */
-export async function resetPassword(_email: string, _redirectTo?: string): Promise<void> {
+export async function resetPassword(email: string, redirectTo?: string): Promise<void> {
   try {
-    // For MongoDB implementation, you'd need to implement email sending
-    throw new Error(
-      'Password reset not implemented yet. Please implement email sending logic.',
-    )
+    await apiRequest('reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, redirectTo }),
+    })
   } catch (error: unknown) {
     console.error('Error resetting password:', error)
     throw error
@@ -129,12 +162,15 @@ export async function resetPassword(_email: string, _redirectTo?: string): Promi
  */
 export async function updatePassword(
   userId: string,
-  _currentPassword: string,
+  currentPassword: string,
   newPassword: string,
 ) {
   try {
-    // Only newPassword is required for Mongo
-    await authService.changePassword(userId, newPassword)
+    // Note: This API might need to be updated to handle userId and currentPassword
+    await apiRequest('update-password', {
+      method: 'POST',
+      body: JSON.stringify({ userId, currentPassword, password: newPassword }),
+    })
     return true
   } catch (error: unknown) {
     console.error('Error updating password:', error)
@@ -204,7 +240,7 @@ export function mapToAuthUser(user: User): AuthUser | null {
  * @returns Result of the update operation
  */
 export async function updateProfile(
-  userId: string,
+  _userId: string,
   profile: {
     fullName?: string
     avatarUrl?: string
@@ -212,15 +248,13 @@ export async function updateProfile(
   },
 ) {
   try {
-    const updatedUser = await authService.updateUser(userId, {
-      fullName: profile.fullName,
-      avatarUrl: profile.avatarUrl,
-      ...(profile.metadata ? { metadata: profile.metadata } : {}),
+    await apiRequest('profile', {
+      method: 'PUT',
+      body: JSON.stringify(profile),
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`, // Assuming token is stored
+      },
     })
-
-    if (!updatedUser) {
-      throw new Error('Failed to update profile')
-    }
 
     return { success: true }
   } catch (error: unknown) {
@@ -252,4 +286,4 @@ export async function verifyOtp(_params: {
 }
 
 // Export the auth service class for direct use
-export { MongoAuthService as AuthService }
+// export { MongoAuthService as AuthService }

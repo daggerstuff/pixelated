@@ -16,10 +16,12 @@ Pixelated follows a microservices architecture with the following components:
 - **Message Queue**: RabbitMQ or Redis streams
 
 ### AI/ML Layer
-- **Bias Detection Engine**: Custom Python service with TensorFlow/PyTorch
-- **Model Serving**: MLflow or custom REST API
-- **Data Processing**: Python with pandas, numpy, scikit-learn
+- **Bias Detection Engine**: Custom Python service with TensorFlow/PyTorch, Fairlearn, SHAP/LIME
+- **Model Serving**: MLflow or custom REST API with real ML model integration
+- **Data Processing**: Python with pandas, numpy, scikit-learn, AIF360
 - **Feature Store**: Custom implementation or Feast
+- **Real ML Models**: Integrated Fairlearn, SHAP/LIME, Hugging Face evaluate
+- **Frontend Integration**: Complete production API integration with client-side data transformation
 
 ## Component Relationships
 

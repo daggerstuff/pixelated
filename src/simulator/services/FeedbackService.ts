@@ -24,13 +24,11 @@ const logger = createBuildSafeLogger('default')
 
 // Dynamic TensorFlow.js imports to reduce bundle size
 async function loadTensorFlow() {
-  const tf = await import('@tensorflow/tfjs')
-  return tf
+  return await import('@tensorflow/tfjs');
 }
 
 async function loadTensorFlowLayers() {
-  const { loadLayersModel } = await import('@tensorflow/tfjs-layers')
-  return { loadLayersModel }
+  return await import('@tensorflow/tfjs-layers');
 }
 
 /**

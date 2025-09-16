@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 import { v4 as uuidv4 } from 'uuid'
 import { getSession } from '../auth/session'
+import { getLogger } from '../utils/logger'
 
 /**
  * Request logging and tracking middleware

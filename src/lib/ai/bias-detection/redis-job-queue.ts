@@ -55,7 +55,9 @@ export class RedisJobQueue<T = any, R = any> {
   }
 
   private async processNext() {
-    if (this.processing) return
+    if (this.processing) {
+      return
+    }
     this.processing = true
     try {
       const id = await this.redis.lPop(this.queueKey)

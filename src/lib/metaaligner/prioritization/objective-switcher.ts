@@ -25,7 +25,9 @@ export class ObjectiveSwitcher {
     transition: ContextTransition,
     weightingParams?: Record<string, any>
   ) {
-    if (!transition.detected) return
+    if (!transition.detected) {
+      return
+    }
 
     const objectivesList = getContextObjectives(transition.to.contextType)
     this.currentObjectives = defaultWeightingStrategy(objectivesList, weightingParams || {})

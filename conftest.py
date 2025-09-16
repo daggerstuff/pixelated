@@ -108,16 +108,16 @@ def capture_logs(caplog):
 
 
 # Pytest configuration
-def pytest_configure(_config):
+def pytest_configure(config):
     """Configure pytest with custom markers"""
-    _config.addinivalue_line("markers", "unit: Unit tests")
-    _config.addinivalue_line("markers", "integration: Integration tests")
-    _config.addinivalue_line("markers", "slow: Slow running tests")
-    _config.addinivalue_line("markers", "security: Security tests")
-    _config.addinivalue_line("markers", "performance: Performance tests")
+    config.addinivalue_line("markers", "unit: Unit tests")
+    config.addinivalue_line("markers", "integration: Integration tests")
+    config.addinivalue_line("markers", "slow: Slow running tests")
+    config.addinivalue_line("markers", "security: Security tests")
+    config.addinivalue_line("markers", "performance: Performance tests")
 
 
-def pytest_collection_modifyitems(_config, items):
+def pytest_collection_modifyitems(config, items):
     """Modify test collection to add markers automatically"""
     for item in items:
         # Add unit marker to all tests in unit test directories

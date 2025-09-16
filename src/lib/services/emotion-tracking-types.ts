@@ -181,7 +181,9 @@ export function createEmotionDataPoint(
 }
 
 export function calculateStandardDeviation(values: number[]): number {
-  if (values.length === 0) return 0
+  if (values.length === 0) {
+    return 0
+  }
   const mean = values.reduce((a, b) => a + b) / values.length
   const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length
   return Math.sqrt(variance)

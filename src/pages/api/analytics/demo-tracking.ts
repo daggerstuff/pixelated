@@ -83,9 +83,15 @@ export const POST = async ({ request }) => {
 
     // Only call analytics integrations if credentials are present
     const analyticsPromises = [];
-    if (hasGA) analyticsPromises.push(sendToGoogleAnalytics(enrichedEvent));
-    if (hasMixpanel) analyticsPromises.push(sendToMixpanel(enrichedEvent));
-    if (hasCustom) analyticsPromises.push(sendToCustomAnalytics(enrichedEvent));
+    if (hasGA) {
+      analyticsPromises.push(sendToGoogleAnalytics(enrichedEvent));
+    }
+    if (hasMixpanel) {
+      analyticsPromises.push(sendToMixpanel(enrichedEvent));
+    }
+    if (hasCustom) {
+      analyticsPromises.push(sendToCustomAnalytics(enrichedEvent));
+    }
     await Promise.allSettled(analyticsPromises);
 
     const response: DemoAnalyticsSuccessResponse = {

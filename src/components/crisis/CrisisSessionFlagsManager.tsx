@@ -3,7 +3,7 @@ import type { FC } from 'react'
 import type {
   CrisisSessionFlag,
   UserSessionStatus,
-} from '../../lib/ai/crisis/CrisisSessionFlaggingService'
+} from '../../lib/ai/crisis/types'
 
 interface CrisisSessionFlagsManagerProps {
   userId?: string

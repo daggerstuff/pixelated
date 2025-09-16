@@ -31,14 +31,13 @@ export class ObjectiveInjector implements IObjectiveInjector {
     }
     const prioritizedObjectives = this.prioritizeObjectives(objectives);
     const resolvedObjectives = this.resolveConflicts(prioritizedObjectives);
-    const newRequest = {
-      ...request,
-      context: {
-        ...request.context,
-        objectives: resolvedObjectives,
-      },
-    };
-    return newRequest;
+    return {
+          ...request,
+          context: {
+            ...request.context,
+            objectives: resolvedObjectives,
+          },
+        };
   }
 
   private validateObjectives(objectives: ObjectiveDefinition[]): boolean {

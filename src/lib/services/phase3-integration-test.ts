@@ -385,7 +385,9 @@ export class Phase3IntegrationTester {
           tags: ['recovery-test'],
           metadata: { test: 'error-recovery' }
         })
-        if (!recovery?.['id']) recoverySuccess = false
+        if (!recovery?.['id']) {
+          recoverySuccess = false
+        }
       }
 
       // Test Redis connection recovery
@@ -393,7 +395,9 @@ export class Phase3IntegrationTester {
         await this.redisService.disconnect()
         await this.redisService.connect()
         const testValue = await this.redisService.set('recovery-test', 'success', 1000)
-        if (testValue === undefined || testValue === null) recoverySuccess = false
+        if (testValue === undefined || testValue === null) {
+          recoverySuccess = false
+        }
       } catch {
         recoverySuccess = false
       }

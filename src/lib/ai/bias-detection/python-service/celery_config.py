@@ -10,10 +10,7 @@ from celery.schedules import crontab
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 REDIS_DB = os.getenv("REDIS_DB", "0")
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
-
-# Construct Redis URL
-if REDIS_PASSWORD:
+if REDIS_PASSWORD := os.getenv("REDIS_PASSWORD", ""):
     broker_url = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 else:
     broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"

@@ -1,4 +1,3 @@
-// import type { APIRoute, APIContext } from 'astro'
 import { ObjectId } from 'mongodb'
 import { todoDAO } from '../../services/mongodb.dao'
 import { verifyAuthToken } from '../../utils/auth'
@@ -24,18 +23,18 @@ export const GET = async ({ request }) => {
     }
 
     const { userId } = await verifyAuthToken(authHeader)
-    const todos = await todoDAO.findAll(new ObjectId(userId))
+    const todos = await todoDAO.findAll(userId)
 
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       success: true,
-      todos 
+      todos
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: false,
         error: 'Failed to fetch todos',
         message: error instanceof Error ? String(error) : 'Unknown error'
@@ -63,11 +62,11 @@ export const POST = async ({ request }) => {
 
     const { userId } = await verifyAuthToken(authHeader)
     const body = await request.json()
-    const { title, description, priority = 'medium' } = body
+    const { name, description } = body
 
-    if (!title) {
+    if (!name) {
       return new Response(
-        JSON.stringify({ error: 'Title is required' }),
+        JSON.stringify({ error: 'Name is required' }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
@@ -77,24 +76,21 @@ export const POST = async ({ request }) => {
 
     const todo = await todoDAO.create({
       userId: new ObjectId(userId),
-      title,
+      name,
       description,
-      priority,
-      completed: false,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      completed: false
     })
 
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       success: true,
-      todo 
+      todo
     }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: false,
         error: 'Failed to create todo',
         message: error instanceof Error ? String(error) : 'Unknown error'

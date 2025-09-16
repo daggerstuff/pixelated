@@ -22,8 +22,10 @@ Pixelated is a comprehensive AI-powered platform focused on bias detection and c
 - Deployment automation and monitoring
 
 ## Technology Stack
-- Frontend: React/Angular with TypeScript
-- Backend: Node.js, Python (FastAPI, Flask)
-- AI/ML: TensorFlow, PyTorch, custom transformer models
-- Infrastructure: Docker, Kubernetes, Helm
-- Databases: PostgreSQL, MongoDB, ElasticSearch
+- Frontend: Astro with React components, TypeScript, Tailwind CSS
+- Backend: Node.js (Astro SSR), Python (FastAPI, Flask) for AI services
+- AI/ML: TensorFlow, PyTorch, custom transformer models, Fairlearn, SHAP/LIME, Hugging Face evaluate
+- Infrastructure: Docker, Kubernetes, Helm, PNPM package manager
+- Databases: PostgreSQL, MongoDB, ElasticSearch, Redis
+- ML Libraries: scikit-learn, pandas, numpy, AIF360, Fairlearn, SHAP, LIME
+- Package Manager: PNPM (primary), npm/yarn (compatibility)

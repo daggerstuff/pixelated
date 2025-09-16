@@ -68,3 +68,69 @@ export interface RiskAssessment {
   indicators: string[]
   recommendations: string[]
 }
+
+export interface FlagSessionRequest {
+  userId: string
+  sessionId: string
+  crisisId: string
+  timestamp: string
+  reason: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  detectedRisks: string[]
+  confidence: number
+  textSample?: string
+  routingDecision?: unknown
+  metadata?: Record<string, unknown>
+}
+
+export interface CrisisSessionFlag {
+  id: string
+  userId: string
+  sessionId: string
+  crisisId: string
+  reason: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  detectedRisks: string[]
+  textSample?: string
+  status:
+    | 'pending'
+    | 'under_review'
+    | 'reviewed'
+    | 'resolved'
+    | 'escalated'
+    | 'dismissed'
+  flaggedAt: string
+  reviewedAt?: string
+  resolvedAt?: string
+  assignedTo?: string
+  reviewerNotes?: string
+  resolutionNotes?: string
+  routingDecision?: unknown
+  metadata?: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UserSessionStatus {
+  id: string
+  userId: string
+  isFlaggedForReview: boolean
+  currentRiskLevel: 'low' | 'medium' | 'high' | 'critical'
+  lastCrisisEventAt?: string
+  totalCrisisFlags: number
+  activeCrisisFlags: number
+  resolvedCrisisFlags: number
+  metadata?: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UpdateFlagStatusRequest {
+  flagId: string
+  status: 'under_review' | 'reviewed' | 'resolved' | 'escalated' | 'dismissed'
+  assignedTo?: string
+  reviewerNotes?: string
+  resolutionNotes?: string
+  metadata?: Record<string, unknown>
+}

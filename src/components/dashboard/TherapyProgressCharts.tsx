@@ -22,7 +22,6 @@ const SessionProgressTimeline: React.FC<SessionProgressTimelineProps & { locale?
       </div>
     );
   }
-  }
 
   const sorted = [...sessions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   const values = sorted.map((s) => s.averageSessionProgress ?? 0)

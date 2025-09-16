@@ -304,7 +304,9 @@ export function useAuth(): UseAuthReturn {
 
       // Update local user state with new profile data
       setUser((prev) => {
-        if (!prev) return null
+        if (!prev) {
+          return null
+        }
 
         return {
           ...prev,

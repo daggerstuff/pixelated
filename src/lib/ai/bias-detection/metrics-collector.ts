@@ -5,7 +5,7 @@
  * Extracted from BiasDetectionEngine.ts for better separation of concerns.
  */
 
-import { standardizedLogger } from '../../logging/standardized-logger'
+import { getBiasDetectionLogger } from '../../logging/standardized-logger'
 import { PythonBiasDetectionBridge } from './python-bridge'
 import type {
   BiasDetectionConfig,
@@ -18,7 +18,7 @@ import type {
   DashboardMetrics,
 } from './bias-detection-interfaces'
 
-const logger = standardizedLogger
+const logger = getBiasDetectionLogger('metrics-collector')
 
 /**
  * Production metrics collector that connects to Python Flask service
@@ -429,7 +429,7 @@ export class BiasMetricsCollector {
     try {
       // Store locally in cache with processing time
       this.localCache.set(result.sessionId, {
-        timestamp: result.timestamp.toISOString(),
+  timestamp: (result as any)?.timestamp ? new Date((result as any).timestamp).toISOString() : new Date().toISOString(),
         session_id: result.sessionId,
         overall_bias_score: result.overallBiasScore,
         alert_level: result.alertLevel,
@@ -448,7 +448,7 @@ export class BiasMetricsCollector {
       try {
         await this.pythonBridge.storeMetrics([
           {
-            timestamp: result.timestamp.toISOString(),
+            timestamp: (result as any)?.timestamp ? new Date((result as any).timestamp).toISOString() : new Date().toISOString(),
             session_id: result.sessionId,
             overall_bias_score: result.overallBiasScore,
             alert_level: result.alertLevel,

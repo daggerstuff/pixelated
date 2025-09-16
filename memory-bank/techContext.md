@@ -60,6 +60,7 @@
 ### Package Manager
 - **Primary**: pnpm (for better performance and disk usage)
 - **Alternative**: npm/yarn for compatibility
+- **Current Usage**: PNPM confirmed as primary package manager for all operations
 
 ### Version Control
 - **Platform**: Git
@@ -101,7 +102,12 @@
   "tensorflow": "^2.13.0",
   "torch": "2.0.0",
   "transformers": "^4.30.0",
-  "scikit-learn": "^1.3.0"
+  "scikit-learn": "^1.3.0",
+  "fairlearn": "^0.9.0",
+  "shap": "^0.42.0",
+  "lime": "^0.2.0",
+  "aif360": "^0.5.0",
+  "evaluate": "^0.4.0"
 }
 ```
 

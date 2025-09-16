@@ -83,7 +83,7 @@ export function usePasswordStrength(password: string): PasswordStrengthInfo {
 
     // Sequential characters check
     if (
-      /(?:abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|012|123|234|345|456|567|678|789)/i.test(
+      /(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|012|123|234|345|456|567|678|789)/i.test(
         password,
       )
     ) {
@@ -132,8 +132,7 @@ export function usePasswordStrength(password: string): PasswordStrengthInfo {
 
     // Generate specific enhancement suggestions
     if (score < 3) {
-      const suggestions = []
-
+      const suggestions: string[] = []
       if (password.length < 12) {
         suggestions.push('longer password')
       }

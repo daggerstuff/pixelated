@@ -159,8 +159,12 @@ function calculateRisk(
       return sum + riskScores[factor]
     }, 0) / factors.length
 
-  if (avgScore > 1.5) return 'high'
-  if (avgScore > 0.5) return 'moderate'
+  if (avgScore > 1.5) {
+    return 'high'
+  }
+  if (avgScore > 0.5) {
+    return 'moderate'
+  }
   return 'low'
 }
 

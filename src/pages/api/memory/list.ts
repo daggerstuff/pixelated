@@ -17,7 +17,7 @@ export const GET = async ({ request, cookies }) => {
     }
 
     const session = JSON.parse(sessionCookie.value) as unknown
-    const userId = session.userId
+    const {userId} = session
 
     // Parse query parameters
     const url = new URL(request.url)

@@ -285,7 +285,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 
   const groupedStats = demographicStats.reduce(
     (acc, stat) => {
-      const category = stat.category
+      const {category} = stat
       if (!acc[category]) {
         acc[category] = []
       }

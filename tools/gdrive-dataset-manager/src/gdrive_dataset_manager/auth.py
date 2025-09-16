@@ -64,7 +64,7 @@ class DriveAuthenticator:
             Credentials object if successful, None otherwise
         """
         creds = None
-        
+
         # Load existing token if available
         if self.token_file.exists():
             try:
@@ -72,20 +72,19 @@ class DriveAuthenticator:
                 logger.debug(f"Loaded existing token from {self.token_file}")
             except Exception as e:
                 logger.warning(f"Failed to load existing token: {e}")
-        
+
         # Refresh or obtain new credentials
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                try:
-                    creds.refresh(Request())
-                    logger.debug("Refreshed existing credentials")
-                except Exception as e:
-                    logger.warning(f"Failed to refresh credentials: {e}")
-                    creds = None
-            
-            if not creds:
-                creds = self._obtain_new_credentials()
-        
+        if (not creds or not creds.valid) and (creds and creds.expired and creds.refresh_token):
+            try:
+                creds.refresh(Request())
+                logger.debug("Refreshed existing credentials")
+            except Exception as e:
+                logger.warning(f"Failed to refresh credentials: {e}")
+                creds = None
+
+        if not creds:
+            creds = self._obtain_new_credentials()
+
         # Save credentials for next run
         if creds and creds.valid:
             try:
@@ -94,7 +93,7 @@ class DriveAuthenticator:
                 logger.debug(f"Saved credentials to {self.token_file}")
             except Exception as e:
                 logger.warning(f"Failed to save credentials: {e}")
-        
+
         return creds
     
     def _obtain_new_credentials(self) -> Optional[Credentials]:

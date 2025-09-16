@@ -52,9 +52,7 @@ def test_retrieval_file_components():
         Path(__file__).parent.parent / "ai" / "pixel" / "data" / "realtime_knowledge_retrieval.py"
     )
 
-    with open(retrieval_file) as f:
-        content = f.read()
-
+    content = Path(retrieval_file).read_text()
     required_components = [
         "class RealtimeKnowledgeRetrieval",
         "class RetrievalRequest",
@@ -81,9 +79,7 @@ def test_advanced_features_present():
         Path(__file__).parent.parent / "ai" / "pixel" / "data" / "realtime_knowledge_retrieval.py"
     )
 
-    with open(retrieval_file) as f:
-        content = f.read()
-
+    content = Path(retrieval_file).read_text()
     advanced_features = [
         "cache_size",
         "batch_processing",

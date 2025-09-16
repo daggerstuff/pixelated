@@ -16,6 +16,49 @@ const DIALOGUES_DIR = path.join(
 const OUTPUT_REPORT = path.join(DIALOGUES_DIR, 'validation_report.md')
 const MIN_TURNS = 20 // Minimum number of "Therapist:" and "Client:" exchanges
 
+// Secure path validation to prevent directory traversal
+function securePathResolve(basePath, userPath) {
+  // Reject absolute paths
+  if (path.isAbsolute(userPath)) {
+    throw new Error('Absolute paths are not allowed')
+  }
+
+  // Reject paths with .. segments (directory traversal)
+  if (
+    userPath.includes('..') ||
+    userPath.includes('../') ||
+    userPath.includes('..\\')
+  ) {
+    throw new Error('Directory traversal sequences (..) are not allowed')
+  }
+
+  // Reject paths with unsafe characters
+  const unsafeChars = /[<>:"|?*\x00-\x1f]/ // Control characters and Windows forbidden chars
+  if (unsafeChars.test(userPath)) {
+    throw new Error('Path contains unsafe characters')
+  }
+
+  // Validate filename pattern (only allow safe characters for dialogue files)
+  const safeFilenamePattern = /^[a-zA-Z0-9._-]+\.txt$/
+  if (!safeFilenamePattern.test(userPath)) {
+    throw new Error('Filename does not match expected pattern for dialogue files')
+  }
+
+  // Resolve the path and ensure it stays within the base directory
+  const resolvedPath = path.resolve(basePath, userPath)
+  const resolvedBase = path.resolve(basePath)
+
+  // Verify the resolved path starts with the base path
+  if (
+    !resolvedPath.startsWith(resolvedBase + path.sep) &&
+    resolvedPath !== resolvedBase
+  ) {
+    throw new Error('Path traversal detected: resolved path escapes base directory')
+  }
+
+  return resolvedPath
+}
+
 // Read all dialogue files in the directory
 function readDialogueFiles() {
   if (!fs.existsSync(DIALOGUES_DIR)) {
@@ -300,7 +343,7 @@ function analyzeOutcome(content, scenarioType) {
 
 // Validate a single dialogue file
 function validateDialogue(filename) {
-  const filePath = path.join(DIALOGUES_DIR, filename)
+  const filePath = securePathResolve(DIALOGUES_DIR, filename)
   const { promptId, scenarioType } = parseFilename(filename)
 
   try {

@@ -193,7 +193,9 @@ export class EducationalContextRecognizer {
     type: EducationalType,
     topicArea: TopicArea,
   ): Promise<EducationalContextResult | null> {
-    if (!this.config.aiService) return null
+    if (!this.config.aiService) {
+      return null
+    }
 
     const messages = [
       {
@@ -211,7 +213,9 @@ export class EducationalContextRecognizer {
     })
 
     const content = response?.choices?.[0]?.message?.content
-    if (!content) return null
+    if (!content) {
+      return null
+    }
 
     try {
       const parsed = JSON.parse(content) as unknown
@@ -276,7 +280,9 @@ export class EducationalContextRecognizer {
   }
 
   private validateResources(resources: unknown): ResourceType[] {
-    if (!Array.isArray(resources)) return []
+    if (!Array.isArray(resources)) {
+      return []
+    }
     return resources
       .filter(r => Object.values(ResourceType).includes(r))
       .slice(0, 5) // Limit to 5 resources

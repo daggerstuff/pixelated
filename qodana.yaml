@@ -1,5 +1,5 @@
-version: '1.0'
+version: "1.0"
 profile:
   name: qodana.starter
-linter: qodana-js
-projectJDK: '25'
+linter: qodana-jvm
+projectJDK: "25"

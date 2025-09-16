@@ -8,10 +8,14 @@ function usage() {
   process.exit(1);
 }
 
-if (args.length < 2) usage();
+if (args.length < 2) {
+  usage();
+}
 const command = args[0];
 const env = args[1];
-if (!['staging', 'production'].includes(env)) usage();
+if (!['staging', 'production'].includes(env)) {
+  usage();
+}
 
 function getTags(pattern) {
   try {
@@ -39,7 +43,9 @@ if (command === 'create') {
     if (args[i].startsWith('--message=')) {
       message = args[i].replace('--message=', '');
     }
-    if (args[i] === '--push') push = true;
+    if (args[i] === '--push') {
+      push = true;
+    }
   }
   const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
   const tagName = `${env}-${timestamp}`;

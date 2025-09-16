@@ -16,6 +16,7 @@ describe("TherapistProgressTracker", () => {
       totalMessages: 42,
       therapistMessages: 21,
       clientMessages: 21,
+      responsesCount: 42,
       sessionDuration: 5400,
       activeTime: 3600,
       skillScores: {
@@ -87,7 +88,7 @@ describe("TherapistProgressTracker", () => {
     render(<TherapistProgressTracker session={mockSession} />);
 
     // Check trend indicators
-    const trendIndicators = screen.getAllByText(/↗|↘|→/);
+    const trendIndicators = screen.getAllByText(/[↗↘→]/);
     expect(trendIndicators.length).toBeGreaterThan(0);
   });
 

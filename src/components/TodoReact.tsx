@@ -39,12 +39,12 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     }
   }, [todos])
 
-  // Generate a unique ID for each todo
+  // Generate a unique string ID for a new todo item
   const generateId = () => {
     return Date.now().toString(36) + Math.random().toString(36).substring(2)
   }
 
-  // Add a new todo
+  // Add a new todo item to the list
   const addTodo = () => {
     const text = inputValue.trim()
     if (!text) {
@@ -70,7 +70,7 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     )
   }
 
-  // Delete a todo
+  // Remove a todo item from the list by its ID
   const deleteTodo = (id: string) => {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
   }
@@ -80,7 +80,7 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     setInputValue(e.target.value)
   }
 
-  // Handle key press (Enter to add todo)
+  // Handle Enter key press to trigger adding a new todo
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       addTodo()

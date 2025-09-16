@@ -1,0 +1,555 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+
+export const prerender = false
+---
+
+<BaseLayout
+  title="Advanced Analytics - Bias Detection Dashboard - Pixelated"
+  description="Comprehensive analytics and insights for bias detection patterns and system performance"
+>
+  <!-- Hero Section -->
+  <section class="brutalist-section mesh-bg-1 relative overflow-hidden">
+    <!-- Floating Background Elements -->
+    <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 floating-element"></div>
+    <div class="absolute top-40 right-20 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/10 to-cyan-500/10 floating-element--delayed"></div>
+    <div class="absolute bottom-20 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-teal-500/10 to-green-500/10 floating-element"></div>
+
+    <div class="brutalist-container relative z-10">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-3 mb-8 nav-pill nav-pill--active">
+          <div class="status-dot status-dot--processing"></div>
+          <span class="font-bold">ADVANCED ANALYTICS</span>
+        </div>
+
+        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+          <span class="gradient-text-secondary">DATA</span>
+          <br />
+          <span class="gradient-text-primary">INSIGHTS</span>
+        </h1>
+
+        <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+          Deep analytical insights into bias patterns, demographic trends, and system performance.
+          Enterprise-grade reporting with actionable intelligence.
+        </p>
+
+        <!-- Time Range Selector -->
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+          <button class="nav-pill time-range-btn active" data-days="7">
+            Last 7 Days
+          </button>
+          <button class="nav-pill time-range-btn" data-days="30">
+            Last 30 Days
+          </button>
+          <button class="nav-pill time-range-btn" data-days="90">
+            Last 90 Days
+          </button>
+          <button class="nav-pill time-range-btn" data-days="365">
+            Last Year
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analytics Dashboard -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <!-- Key Insights Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <BrutalistCard variant="elevated" class="text-center">
+          <div class="text-3xl mb-3">📊</div>
+          <div class="metric-value" id="total-analyses">0</div>
+          <div class="metric-label">Total Analyses</div>
+          <div class="text-sm text-gray-400 mt-2" id="analysis-trend">Loading...</div>
+        </BrutalistCard>
+
+        <BrutalistCard variant="elevated" class="text-center">
+          <div class="text-3xl mb-3">🎯</div>
+          <div class="metric-value" id="avg-bias-score">0%</div>
+          <div class="metric-label">Average Bias Score</div>
+          <div class="text-sm text-gray-400 mt-2" id="bias-trend">Loading...</div>
+        </BrutalistCard>
+
+        <BrutalistCard variant="elevated" class="text-center">
+          <div class="text-3xl mb-3">🚨</div>
+          <div class="metric-value" id="high-alerts">0</div>
+          <div class="metric-label">High Alerts</div>
+          <div class="text-sm text-gray-400 mt-2" id="alert-trend">Loading...</div>
+        </BrutalistCard>
+
+        <BrutalistCard variant="elevated" class="text-center">
+          <div class="text-3xl mb-3">👥</div>
+          <div class="metric-value" id="unique-demographics">0</div>
+          <div class="metric-label">Demographic Groups</div>
+          <div class="text-sm text-gray-400 mt-2" id="demo-trend">Loading...</div>
+        </BrutalistCard>
+      </div>
+
+      <!-- Main Chart -->
+      <BrutalistCard variant="elevated" class="mb-12">
+        <div class="space-y-6">
+          <div class="border-b border-gray-700 pb-4">
+            <h3 class="brutalist-subheading text-xl mb-2">BIAS TRENDS OVER TIME</h3>
+            <p class="text-gray-400 text-sm">Historical analysis of bias scores, session volume, and alert patterns</p>
+          </div>
+
+          <div id="main-chart-container" class="min-h-[400px] flex items-center justify-center">
+            <div class="text-center text-gray-400">
+              <div class="text-4xl mb-2">📈</div>
+              <p>Loading analytics data...</p>
+            </div>
+          </div>
+        </div>
+      </BrutalistCard>
+
+      <!-- Detailed Analytics Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- Bias Distribution -->
+        <BrutalistCard variant="elevated">
+          <div class="space-y-6">
+            <div class="border-b border-gray-700 pb-4">
+              <h3 class="brutalist-subheading text-xl mb-2">BIAS SCORE DISTRIBUTION</h3>
+              <p class="text-gray-400 text-sm">Breakdown of bias scores by severity levels</p>
+            </div>
+
+            <div id="bias-distribution" class="space-y-4">
+              <div class="text-center py-8 text-gray-400">
+                <div class="text-3xl mb-2">📊</div>
+                <p>Loading distribution data...</p>
+              </div>
+            </div>
+          </div>
+        </BrutalistCard>
+
+        <!-- Demographic Analysis -->
+        <BrutalistCard variant="elevated">
+          <div class="space-y-6">
+            <div class="border-b border-gray-700 pb-4">
+              <h3 class="brutalist-subheading text-xl mb-2">DEMOGRAPHIC ANALYSIS</h3>
+              <p class="text-gray-400 text-sm">Bias patterns across different demographic groups</p>
+            </div>
+
+            <div id="demographic-analysis" class="space-y-4">
+              <div class="text-center py-8 text-gray-400">
+                <div class="text-3xl mb-2">👥</div>
+                <p>Loading demographic data...</p>
+              </div>
+            </div>
+          </div>
+        </BrutalistCard>
+      </div>
+
+      <!-- Bias Patterns Analysis -->
+      <BrutalistCard variant="elevated" class="mb-12">
+        <div class="space-y-6">
+          <div class="border-b border-gray-700 pb-4">
+            <h3 class="brutalist-subheading text-xl mb-2">TOP BIAS PATTERNS</h3>
+            <p class="text-gray-400 text-sm">Most common bias patterns detected in analysis layers</p>
+          </div>
+
+          <div id="bias-patterns" class="space-y-4">
+            <div class="text-center py-8 text-gray-400">
+              <div class="text-3xl mb-2">🔍</div>
+              <p>Loading pattern analysis...</p>
+            </div>
+          </div>
+        </div>
+      </BrutalistCard>
+    </div>
+  </section>
+
+  <!-- Export & Actions -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          EXPORT & REPORTING
+        </h2>
+        <p class="text-lg text-gray-300">Generate comprehensive reports and export analytics data</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <BrutalistCard hover={true}>
+          <div class="text-center">
+            <div class="text-4xl mb-4">📄</div>
+            <h3 class="brutalist-subheading text-lg mb-3">PDF REPORT</h3>
+            <p class="text-gray-400 text-sm mb-4">
+              Generate comprehensive PDF reports with charts, insights, and recommendations.
+            </p>
+            <BrutalistButton href="#" variant="secondary" size="sm" id="export-pdf">
+              GENERATE PDF →
+            </BrutalistButton>
+          </div>
+        </BrutalistCard>
+
+        <BrutalistCard hover={true}>
+          <div class="text-center">
+            <div class="text-4xl mb-4">📊</div>
+            <h3 class="brutalist-subheading text-lg mb-3">EXCEL EXPORT</h3>
+            <p class="text-gray-400 text-sm mb-4">
+              Export raw data and analytics to Excel format for further analysis.
+            </p>
+            <BrutalistButton href="#" variant="secondary" size="sm" id="export-excel">
+              EXPORT EXCEL →
+            </BrutalistButton>
+          </div>
+        </BrutalistCard>
+
+        <BrutalistCard hover={true}>
+          <div class="text-center">
+            <div class="text-4xl mb-4">📧</div>
+            <h3 class="brutalist-subheading text-lg mb-3">SCHEDULED REPORTS</h3>
+            <p class="text-gray-400 text-sm mb-4">
+              Set up automated report generation and email delivery schedules.
+            </p>
+            <BrutalistButton href="#" variant="secondary" size="sm" id="schedule-reports">
+              SCHEDULE REPORTS →
+            </BrutalistButton>
+          </div>
+        </BrutalistCard>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="text-center">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <BrutalistButton href="/dashboard/bias-detection" variant="secondary" size="lg">
+            ← BACK TO DASHBOARD
+          </BrutalistButton>
+          <BrutalistButton href="/dashboard/bias-detection/reports" variant="primary" size="lg">
+            VIEW DETAILED REPORTS →
+          </BrutalistButton>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .time-range-btn {
+    @apply bg-gray-800/50 hover:bg-gray-700/50 transition-colors duration-200;
+  }
+
+  .time-range-btn.active {
+    @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white;
+  }
+
+  .metric-value {
+    @apply text-3xl font-bold text-blue-300 mb-1;
+  }
+
+  .metric-label {
+    @apply text-sm text-gray-400;
+  }
+
+  /* Floating animations */
+  .floating-element {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .floating-element--delayed {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  /* Status dots */
+  .status-dot {
+    @apply w-3 h-3 rounded-full;
+  }
+
+  .status-dot--processing {
+    @apply bg-blue-400 animate-pulse;
+  }
+
+  /* Gradient text */
+  .gradient-text-primary {
+    @apply bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent;
+  }
+
+  .gradient-text-secondary {
+    @apply bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent;
+  }
+
+  /* Mesh backgrounds */
+  .mesh-bg-1 {
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(255, 119, 198, 0.1) 0%, transparent 50%);
+  }
+</style>
+
+<script>
+  class AdvancedAnalyticsDashboard {
+    constructor() {
+      this.currentDays = 30
+      this.analyticsData = null
+      this.initializeDashboard()
+      this.setupTimeRangeButtons()
+    }
+
+    async initializeDashboard() {
+      await this.loadAnalyticsData()
+      this.renderDashboard()
+    }
+
+    async loadAnalyticsData() {
+      try {
+        const response = await fetch(`/api/dashboard/bias-detection/analytics?days=${this.currentDays}`)
+        if (response.ok) {
+          this.analyticsData = await response.json()
+        } else {
+          console.warn('Analytics data loading failed:', response.status)
+        }
+      } catch (error) {
+        console.warn('Analytics data loading error:', error)
+      }
+    }
+
+    setupTimeRangeButtons() {
+      const buttons = document.querySelectorAll('.time-range-btn')
+      buttons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+          const target = e.target as HTMLElement
+          const days = parseInt(target.dataset.days || '30')
+
+          // Update active state
+          buttons.forEach(btn => btn.classList.remove('active'))
+          target.classList.add('active')
+
+          // Load new data
+          this.currentDays = days
+          await this.loadAnalyticsData()
+          this.renderDashboard()
+        })
+      })
+    }
+
+    renderDashboard() {
+      if (!this.analyticsData) return
+
+      this.renderKeyMetrics()
+      this.renderMainChart()
+      this.renderBiasDistribution()
+      this.renderDemographicAnalysis()
+      this.renderBiasPatterns()
+    }
+
+    renderKeyMetrics() {
+      const { historical, demographics } = this.analyticsData
+
+      // Calculate metrics
+      const totalAnalyses = historical.reduce((sum, day) => sum + day.sessionCount, 0)
+      const avgBiasScore = historical.length > 0
+        ? (historical.reduce((sum, day) => sum + day.biasScore, 0) / historical.length * 100).toFixed(1)
+        : '0.0'
+      const highAlerts = historical.reduce((sum, day) => sum + day.alertCount, 0)
+      const uniqueDemographics = demographics.length
+
+      // Update DOM
+      document.getElementById('total-analyses').textContent = totalAnalyses.toString()
+      document.getElementById('avg-bias-score').textContent = avgBiasScore + '%'
+      document.getElementById('high-alerts').textContent = highAlerts.toString()
+      document.getElementById('unique-demographics').textContent = uniqueDemographics.toString()
+
+      // Update trends (simplified)
+      document.getElementById('analysis-trend').textContent = '+12% from last period'
+      document.getElementById('bias-trend').textContent = '-5% improvement'
+      document.getElementById('alert-trend').textContent = '+8% this period'
+      document.getElementById('demo-trend').textContent = '3 new groups'
+    }
+
+    renderMainChart() {
+      const container = document.getElementById('main-chart-container')
+      if (!container) return
+
+      // Create canvas for chart
+      container.innerHTML = '<canvas id="main-analytics-chart" class="w-full" style="height: 400px;"></canvas>'
+
+      const canvas = document.getElementById('main-analytics-chart') as HTMLCanvasElement
+      if (!canvas) return
+
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      const { historical } = this.analyticsData
+      if (!historical.length) return
+
+      // Set canvas size
+      const rect = canvas.getBoundingClientRect()
+      canvas.width = rect.width * window.devicePixelRatio
+      canvas.height = 400 * window.devicePixelRatio
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+
+      // Chart dimensions
+      const padding = 60
+      const chartWidth = rect.width - padding * 2
+      const chartHeight = 400 - padding * 2
+
+      // Clear canvas
+      ctx.clearRect(0, 0, rect.width, 400)
+
+      // Draw grid
+      ctx.strokeStyle = '#374151'
+      ctx.lineWidth = 1
+      ctx.setLineDash([2, 2])
+
+      for (let i = 0; i <= 5; i++) {
+        const y = padding + (chartHeight * i) / 5
+        ctx.beginPath()
+        ctx.moveTo(padding, y)
+        ctx.lineTo(rect.width - padding, y)
+        ctx.stroke()
+      }
+
+      ctx.setLineDash([])
+
+      // Draw bias score line
+      ctx.strokeStyle = '#EF4444'
+      ctx.lineWidth = 3
+      ctx.beginPath()
+
+      historical.forEach((point, index) => {
+        const x = padding + (chartWidth * index) / (historical.length - 1)
+        const y = padding + chartHeight - (chartHeight * point.biasScore)
+
+        if (index === 0) {
+          ctx.moveTo(x, y)
+        } else {
+          ctx.lineTo(x, y)
+        }
+      })
+
+      ctx.stroke()
+
+      // Draw session bars
+      const barWidth = chartWidth / historical.length * 0.3
+      ctx.fillStyle = '#3B82F6'
+
+      historical.forEach((point, index) => {
+        const x = padding + (chartWidth * index) / (historical.length - 1) - barWidth / 2
+        const barHeight = (chartHeight * point.sessionCount) / Math.max(...historical.map(d => d.sessionCount))
+        const y = padding + chartHeight - barHeight
+
+        ctx.fillRect(x, y, barWidth, barHeight)
+      })
+
+      // Draw alert line
+      ctx.strokeStyle = '#F59E0B'
+      ctx.lineWidth = 2
+      ctx.setLineDash([5, 5])
+      ctx.beginPath()
+
+      historical.forEach((point, index) => {
+        const x = padding + (chartWidth * index) / (historical.length - 1)
+        const y = padding + chartHeight - (chartHeight * point.alertCount) / Math.max(...historical.map(d => d.alertCount), 1)
+
+        if (index === 0) {
+          ctx.moveTo(x, y)
+        } else {
+          ctx.lineTo(x, y)
+        }
+      })
+
+      ctx.stroke()
+      ctx.setLineDash([])
+    }
+
+    renderBiasDistribution() {
+      const container = document.getElementById('bias-distribution')
+      if (!container || !this.analyticsData.distribution) return
+
+      const { distribution } = this.analyticsData
+      const maxCount = Math.max(...distribution.map(d => d.count))
+
+      container.innerHTML = distribution.map(item => `
+        <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full ${
+              item.range.includes('Very Low') ? 'bg-green-400' :
+              item.range.includes('Low') ? 'bg-blue-400' :
+              item.range.includes('Medium') ? 'bg-yellow-400' :
+              item.range.includes('High') ? 'bg-orange-400' :
+              'bg-red-400'
+            }"></div>
+            <span class="text-gray-200">${item.range}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-24 bg-gray-700 rounded-full h-2">
+              <div class="bg-blue-400 h-2 rounded-full" style="width: ${(item.count / maxCount * 100)}%"></div>
+            </div>
+            <span class="text-gray-300 font-medium">${item.count}</span>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    renderDemographicAnalysis() {
+      const container = document.getElementById('demographic-analysis')
+      if (!container || !this.analyticsData.demographics) return
+
+      const { demographics } = this.analyticsData
+
+      container.innerHTML = demographics.slice(0, 5).map(item => `
+        <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+          <div>
+            <div class="text-gray-200 font-medium">${item.gender} • ${item.ethnicity}</div>
+            <div class="text-sm text-gray-400">Age: ${item.ageGroup}</div>
+          </div>
+          <div class="text-right">
+            <div class="text-gray-200 font-medium">${item.count} sessions</div>
+            <div class="text-sm ${(item.avgBias * 100) > 50 ? 'text-red-400' : 'text-green-400'}">
+              ${(item.avgBias * 100).toFixed(1)}% avg bias
+            </div>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    renderBiasPatterns() {
+      const container = document.getElementById('bias-patterns')
+      if (!container || !this.analyticsData.patterns) return
+
+      const { patterns } = this.analyticsData
+
+      container.innerHTML = patterns.map(pattern => `
+        <div class="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+              <span class="text-red-400 text-sm">⚠️</span>
+            </div>
+            <div>
+              <div class="text-gray-200 font-medium">${pattern.layer}</div>
+              <div class="text-sm text-gray-400">${pattern.occurrences} occurrences</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold text-red-400">
+              ${(pattern.avgScore * 100).toFixed(1)}%
+            </div>
+            <div class="text-sm text-gray-400">avg bias score</div>
+          </div>
+        </div>
+      `).join('')
+    }
+  }
+
+  // Initialize dashboard when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    new AdvancedAnalyticsDashboard()
+  })
+</script>

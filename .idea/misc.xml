@@ -3,7 +3,7 @@
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
     <option name="enabledOnSave" value="true" />
-    <option name="sdkName" value="Python 3.11 virtualenv at ~/pixelated/.venv" />
+    <option name="sdkName" value="uv (pixelated)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="openjdk-ea-25" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="25" project-jdk-type="JavaSDK" />
 </project>
