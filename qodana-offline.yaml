@@ -13,8 +13,20 @@ include:
   - name: IncorrectFormatting
   - name: CodeStyle
 
-bootstrap: sh ./prepare-qodana.sh
+# Disable cloud features for offline mode
+disableSanity: true
+
+# Use local analysis only
+mode: local
 
 fixesStrategy: cleanup
 
-linter: jetbrains/qodana-js:2025.2.1
+image: jetbrains/qodana-js:2025.2
+
+# Network configuration for offline mode
+dotnet:
+  toolTimeoutMs: 300000
+
+env:
+  QODANA_OFFLINE_MODE: "true"
+  QODANA_DISABLE_CLOUD: "true"

@@ -1,0 +1,24 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: gitlab
+  namespace: flux-system
+spec:
+  url: https://charts.gitlab.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: pixelkube
+  namespace: flux-system
+spec:
+  releaseName: pixelkube
+  chart:
+    spec:
+      chart: pixelkube
+      sourceRef:
+        kind: HelmRepository
+        name: gitlab
+        namespace: flux-system
+      version: "*"
+  values: {}

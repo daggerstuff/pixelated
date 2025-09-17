@@ -1,3 +1,17 @@
+# Debug job to diagnose runner DNS issues
+debug-dns:
+  image: alpine:latest
+  stage: validate
+  script:
+    - echo "===== /etc/resolv.conf ====="
+    - cat /etc/resolv.conf
+    - echo "===== nslookup deb.debian.org ====="
+    - apk add --no-cache bind-tools
+    - nslookup deb.debian.org || true
+    - echo "===== ping deb.debian.org ====="
+    - ping -c 2 deb.debian.org || true
+  rules:
+    - when: manual
 qodana:
   stage: test
   only:
@@ -36,6 +50,8 @@ validate-runner:
   - name: docker:24.0.5-dind
     alias: docker
     command: [ "--tls=false" ]
+    # Uncomment the next line to force Docker-in-Docker to use public DNS (helps with CI DNS issues)
+    # dns: ["8.8.8.8", "1.1.1.1"]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2

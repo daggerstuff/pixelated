@@ -1,6 +1,5 @@
 {
   "projectName": "Pixelated Empathy",
-  "handbook": "BYTEROVER.md",
   "modules": [
     "src/lib/ai/",
     "src/lib/db/",

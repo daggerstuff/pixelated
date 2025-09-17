@@ -21,6 +21,7 @@ process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully')
   server.close(() => {
     console.log('Process terminated')
+    process.exit(0)
   })
 })
 
@@ -28,10 +29,23 @@ process.on('SIGINT', () => {
   console.log('SIGINT received, shutting down gracefully')
   server.close(() => {
     console.log('Process terminated')
+    process.exit(0)
   })
 })
 
 // Start server
 server.listen(port, host, () => {
   console.log(`Server running at http://${host}:${port}`)
+})
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+  process.exit(1)
+})
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err)
+  process.exit(1)
 })

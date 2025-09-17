@@ -3,6 +3,21 @@ FROM node:${NODE_VERSION}-slim AS base
 
 LABEL org.opencontainers.image.description="Astro"
 
+
+# Install build tools, curl, and ca-certificates first so pnpm fallback always works
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    node-gyp \
+    pkg-config \
+    python-is-python3 \
+    git \
+    curl \
+    tini \
+    ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Install pnpm with retries and fallbacks (no DNS modification needed)
 ARG PNPM_VERSION=10.16.0
 RUN npm config set registry https://registry.npmjs.org/ && \
@@ -13,19 +28,6 @@ RUN npm config set registry https://registry.npmjs.org/ && \
      npm install -g pnpm@$PNPM_VERSION --registry=https://registry.npmmirror.com || \
      (curl -fsSL https://get.pnpm.io/install.sh | sh - && \
       mv ~/.local/share/pnpm/pnpm /usr/local/bin/))
-
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    build-essential=12.* \
-    node-gyp=* \
-    pkg-config=* \
-    python-is-python3=* \
-    git=* \
-    curl=* \
-    tini=* \
-    ca-certificates=* && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 LABEL org.opencontainers.image.authors="Vivi <vivi@pixelatedempathy.com>"
 LABEL org.opencontainers.image.title="Pixelated Empathy Node"
@@ -89,8 +91,8 @@ RUN echo "Starting pnpm build..." && \
     ls -la public/ && \
     echo "Node version: $(node --version)" && \
     echo "pnpm version: $(pnpm --version)" && \
-    echo "Available memory:" && \
-    free -h && \
+    echo "Available memory (from /proc/meminfo):" && \
+    cat /proc/meminfo && \
     exit 1)
 
 # Prune dev dependencies and clean up

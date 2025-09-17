@@ -179,14 +179,10 @@ export default defineConfig({
     // markdoc(),
     ...(process.env.SENTRY_DSN ? [
       sentry({
-        sourceMapsUploadOptions: process.env.SENTRY_AUTH_TOKEN ? {
-          project: process.env.SENTRY_PROJECT || 'pixel-astro',
-          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+        // Other Sentry options
+        sourceMapsUploadOptions: {
+          project: "pixel-astro",
           authToken: process.env.SENTRY_AUTH_TOKEN,
-          telemetry: false,
-        } : {
-          enabled: false,
-          telemetry: false,
         },
       }),
       // Add Spotlight for development debugging when explicitly enabled

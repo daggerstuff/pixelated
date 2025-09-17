@@ -2,7 +2,3 @@
 	path = ai
 	url = git@git.pixelatedempathy.tech:pixeltech/ai.git
 	ignore = all
-
-[submodule "cipher"]
-	path = cipher
-	url =
