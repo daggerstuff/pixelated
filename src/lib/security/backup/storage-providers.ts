@@ -163,15 +163,21 @@ export class FileSystemStorageProvider implements StorageProvider {
         const entries = await fs.readdir(dirPath, { withFileTypes: true })
 
         for (const entry of entries) {
-          const fullPath = path.join(dirPath, entry.name)
-          const relPath = path.join(relativePath, entry.name)
+           // Validate entry name for security
+           if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+             logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
+             continue
+           }
 
-          if (entry.isDirectory()) {
-            await scanDir(fullPath, relPath)
-          } else if (!pattern || matchesPattern(relPath, pattern)) {
-            results.push(relPath)
-          }
-        }
+           const fullPath = path.join(dirPath, entry.name)
+           const relPath = path.join(relativePath, entry.name)
+
+           if (entry.isDirectory()) {
+             await scanDir(fullPath, relPath)
+           } else if (!pattern || matchesPattern(relPath, pattern)) {
+             results.push(relPath)
+           }
+         }
       }
 
       const matchesPattern = (filePath: string, pattern: string): boolean => {
@@ -341,6 +347,12 @@ export class MockCloudStorageProvider implements StorageProvider {
 
         for (const entry of entries) {
           if (entry.name.endsWith('.meta')) {
+            continue
+          }
+
+          // Validate entry name for security
+          if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+            logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
             continue
           }
 
