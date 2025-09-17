@@ -21,4 +21,7 @@ spec:
         name: gitlab
         namespace: flux-system
       version: "*"
-  values: {}
+  values:
+    image:
+      repository: ghcr.io/pixelatedempathy/pixelkube
+      tag: "{{ .Values.image.tag | default (index .ImagePolicy 'pixelkube-latest').tag }}"

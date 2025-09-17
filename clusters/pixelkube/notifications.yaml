@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: slack-webhook-url
+  namespace: flux-system
+type: Opaque
+stringData:
+  address: "${SLACK_WEBHOOK_URL}"
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Provider
+metadata:
+  name: slack
+  namespace: flux-system
+spec:
+  type: slack
+  channel: "#pixelkube-events"
+  secretRef:
+    name: slack-webhook-url
+    key: address
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: flux-events
+  namespace: flux-system
+spec:
+  providerRef:
+    name: slack
+  eventSeverity: info
+  eventSources:
+    - kind: Kustomization
+      name: "*"
+    - kind: HelmRelease
+      name: "*"
+    - kind: GitRepository
+      name: "*"
+    - kind: HelmRepository
+      name: "*"
+    - kind: ImageUpdateAutomation
+      name: "*"
+    - kind: ImagePolicy
+      name: "*"
+    - kind: ImageRepository
+      name: "*"
+  summary: "FluxCD event notification to Slack"
