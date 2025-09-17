@@ -1,0 +1,43 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: pixelkube
+  namespace: flux-system
+spec:
+  image: ghcr.io/pixelatedempathy/pixelkube
+  interval: 1m0s
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: pixelkube-latest
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: pixelkube
+  policy:
+    semver:
+      range: ">=0.0.0"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: pixelkube
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: master
+    commit:
+      author:
+        name: fluxcd-bot
+        email: fluxcd-bot@pixelatedempathy.tech
+      messageTemplate: "chore: update pixelkube image to {{range .Updated.Images}}{{.}}{{end}}"
+  update:
+    path: ./clusters/pixelkube/helmrelease.yaml
+    strategy: Setters
