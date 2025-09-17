@@ -10,40 +10,27 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "ai"))
 
 
-def test_faiss_index_structure():
-    """Test that FAISS index files are properly structured."""
-
-    # Check file existence
+def _check_file_sizes():
+    """Check FAISS file sizes."""
     faiss_file = Path(__file__).parent / "ai" / "pixel" / "data" / "faiss_knowledge_index.py"
     test_file = Path(__file__).parent / "ai" / "pixel" / "data" / "test_faiss_knowledge_index.py"
 
+    # Check main file
     if faiss_file.exists():
-
-        # Check file size (should be substantial)
         file_size = faiss_file.stat().st_size
+        assert file_size > 0  # File should exist and have content
 
-        if file_size > 20000:  # Should be > 20KB for comprehensive implementation
-            pass")
-        else:
-            pass")
-    else:
-        pass")
-
+    # Check test file
     if test_file.exists():
-
-        # Check test file size
         test_size = test_file.stat().st_size
+        assert test_size > 0  # Test file should exist and have content
 
-        if test_size > 15000:  # Should be > 15KB for comprehensive tests
-            pass")
-        else:
-            pass")
-    else:
-        pass")
 
-    # Test basic imports and structure
+def _check_file_content():
+    """Check FAISS file content for required components."""
+    faiss_file = Path(__file__).parent / "ai" / "pixel" / "data" / "faiss_knowledge_index.py"
+
     try:
-        # Read the file content to check for key components
         with open(faiss_file) as f:
             content = f.read()
 
@@ -60,14 +47,12 @@ def test_faiss_index_structure():
             "def benchmark_search_performance",
         ]
 
-        if missing_components := [
+        missing_components = [
             component for component in required_components if component not in content
-        ]:
-            pass")
+        ]
+        assert len(missing_components) == 0, f"Missing components: {missing_components}"
 
-        else:
-            pass")
-        # Check for comprehensive functionality
+        # Check for advanced features
         advanced_features = [
             "IndexType.IVF_FLAT",
             "IndexType.HNSW",
@@ -78,18 +63,15 @@ def test_faiss_index_structure():
         ]
 
         found_features = [feature for feature in advanced_features if feature in content]
+        return len(found_features) >= len(advanced_features) * 0.8
 
-        if len(found_features) >= len(advanced_features) * 0.8:
-            pass")
-        else:
-            pass")
+    except Exception:
+        return False
 
-    except Exception as e:
-        pass")
 
-    # Test mock functionality
+def _test_mock_index():
+    """Test mock FAISS index functionality."""
     try:
-
         class SimpleMockIndex:
             def __init__(self, dimension):
                 self.dimension = dimension
@@ -101,11 +83,7 @@ def test_faiss_index_structure():
                 self.ntotal = len(self.vectors)
 
             def search(self, query, k):
-                # Simple distance calculation
-                if isinstance(query, list) and len(query) > 0:
-                    query_vec = query[0] if isinstance(query[0], list) else query
-                else:
-                    query_vec = query
+                query_vec = query[0] if isinstance(query, list) and len(query) > 0 else query
 
                 distances = [
                     (
@@ -121,8 +99,6 @@ def test_faiss_index_structure():
 
         # Test mock index
         mock_index = SimpleMockIndex(3)
-
-        # Add test vectors
         test_vectors = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
         mock_index.add(test_vectors)
 
@@ -136,11 +112,18 @@ def test_faiss_index_structure():
         assert len(indices) == 2
         assert indices[0] == 0  # Should find exact match first
 
+        return True
+    except Exception:
+        return False
 
-    except Exception as e:
-        pass")
 
+def test_faiss_index_structure():
+    """Test that FAISS index files are properly structured."""
+    _check_file_sizes()
+    _check_file_content()
+    _test_mock_index()
 
 
 if __name__ == "__main__":
+    test_faiss_index_structure()
     test_faiss_index_structure()

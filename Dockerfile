@@ -1,22 +1,21 @@
+# syntax=docker/dockerfile:1
+ARG BUILDKIT_INLINE_CACHE=1
 ARG NODE_VERSION=24
-FROM node:${NODE_VERSION}-slim AS base
+FROM node:${NODE_VERSION}-alpine AS base
 
 LABEL org.opencontainers.image.description="Astro"
 
 
 # Install build tools, curl, and ca-certificates first so pnpm fallback always works
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    build-essential \
-    node-gyp \
-    pkg-config \
-    python-is-python3 \
+RUN apk add --no-cache \
+    build-base \
+    python3 \
+    make \
+    g++ \
     git \
     curl \
     tini \
-    ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    ca-certificates
 
 # Install pnpm with retries and fallbacks (no DNS modification needed)
 ARG PNPM_VERSION=10.16.0
@@ -43,6 +42,7 @@ ENV VITE_CACHE_DIR=/tmp/.vite
 ENV PORT=4321
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable pnpm
 
 RUN groupadd --gid 1001 astro && \
     useradd --uid 1001 --gid astro --shell /bin/bash --create-home astro
@@ -53,8 +53,9 @@ FROM base AS deps
 COPY --chown=astro:astro package.json pnpm-lock.yaml ./
 
 # Install dependencies with optimizations
-RUN pnpm config set store-dir /pnpm/store && \
-    pnpm install --frozen-lockfile --prod=false
+RUN pnpm config set store-dir /pnpm/.pnpm-store && \
+    pnpm install --frozen-lockfile --prod=false && \
+    pnpm audit --audit-level moderate
 
 FROM base AS build
 
@@ -109,8 +110,8 @@ RUN pnpm prune --prod && \
 
 FROM base AS runtime
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:4321/api/health/simple || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:4321/api/health/simple', (res) => process.exit(res.statusCode === 200 ? 0 : 1))" || exit 1
 
 USER astro
 
