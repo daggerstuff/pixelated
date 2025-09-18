@@ -45,9 +45,9 @@ variables:
    CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
 validate-runner:
   stage: validate
-  image: docker:24.0.5
+  image: docker:27.3.1
   services:
-  - name: docker:24.0.5-dind
+  - name: docker:27.3.1-dind
     alias: docker
     command: [ "--tls=false" ]
     # Uncomment the next line to force Docker-in-Docker to use public DNS (helps with CI DNS issues)
@@ -77,15 +77,17 @@ validate-runner:
 
 build-frontend:
   stage: build
-  image: docker:24.0.5
+  image: docker:27.3.1
   services:
-  - name: docker:24.0.5-dind
+  - name: docker:27.3.1-dind
     alias: docker
     command: [ "--tls=false", "--experimental" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
+    NODE_ENV: production
+    CI: "true"
   before_script:
   - "echo === Diagnostic: Network connectivity to registry ==="
   - ping -c 4 git.pixelatedempathy.tech || true
@@ -98,7 +100,14 @@ build-frontend:
   - ls -la
   - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
   - docker buildx create --use --name multiarch-builder || docker buildx use multiarch-builder
-  - docker buildx build --load --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+  - |
+    docker buildx build \
+      --load \
+      --build-arg NODE_ENV=production \
+      --build-arg CI=true \
+      --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
+      --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
+      -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
   - echo "📤 Pushing container to GitLab Container Registry..."
   - timeout 300 docker push $CONTAINER_IMAGE
   - timeout 300 docker push $CONTAINER_IMAGE_LATEST
@@ -113,9 +122,9 @@ build-frontend:
 
 test-container:
   stage: test
-  image: docker:24.0.5
+  image: docker:27.3.1
   services:
-  - name: docker:24.0.5-dind
+  - name: docker:27.3.1-dind
     alias: docker
     command: [ "--tls=false" ]
   variables:
@@ -357,9 +366,9 @@ deploy-vps:
 # Build AI backend (separate job for the large AI components)
 build-ai-backend:
   stage: build
-  image: docker:24.0.5
+  image: docker:27.3.1
   services:
-  - name: docker:24.0.5-dind
+  - name: docker:27.3.1-dind
     alias: docker
     command: [ "--tls=false" ]
   variables:
@@ -392,9 +401,9 @@ build-ai-backend:
 # Security scan
 security-scan:
   stage: test
-  image: docker:24.0.5
+  image: docker:27.3.1
   services:
-  - name: docker:24.0.5-dind
+  - name: docker:27.3.1-dind
     alias: docker
     command: [ "--tls=false" ]
   variables:
@@ -592,9 +601,9 @@ deploy-staging:
 # Image Tagging
 tag-image:
   stage: build
-  image: docker:24.0.5
+  image: docker:27.3.1
   services:
-  - name: docker:24.0.5-dind
+  - name: docker:27.3.1-dind
     alias: docker
     command: [ "--tls=false", "--experimental" ]
   variables:
@@ -647,9 +656,9 @@ cache:
 # Automated Cleanup (improved)
 cleanup:
   stage: deploy
-  image: docker:24.0.5
+  image: docker:27.3.1
   services:
-  - name: docker:24.0.5-dind
+  - name: docker:27.3.1-dind
     alias: docker
     command: [ "--tls=false" ]
   variables:
@@ -671,5 +680,43 @@ cleanup:
   - if: $CI_COMMIT_BRANCH == "master"
     when: manual
   allow_failure: true
+
+# Kubernetes Deployment
+deploy-k8s:
+  stage: deploy
+  image: google/cloud-sdk:alpine
+  before_script:
+  - apk add --no-cache kubectl curl
+  - mkdir -p ~/.kube
+  - echo $KUBE_CONFIG | base64 -d > ~/.kube/config
+  - kubectl config use-context gitlab_com-pixeldeck_pixelated-pixelkube
+  script:
+  - echo "Deploying to Kubernetes cluster..."
+  - kubectl set image deployment/pixelated pixelated=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  - kubectl set env deployment/pixelated NODE_ENV=production CI=true
+  - kubectl rollout status deployment/pixelated --timeout=300s
+  - kubectl get pods,services
+  - |
+    echo "Running health check..."
+    EXTERNAL_IP=$(kubectl get service pixelated-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    if [ -n "$EXTERNAL_IP" ]; then
+      for i in {1..10}; do
+        if curl -f http://$EXTERNAL_IP/ --connect-timeout 10; then
+          echo "✅ Health check passed"
+          break
+        fi
+        echo "Attempt $i failed, retrying..."
+        sleep 30
+      done
+    fi
+  - echo "✅ Deployed to Kubernetes successfully"
+  environment:
+    name: production
+    url: http://35.243.226.27
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
+  dependencies:
+  - build-frontend
 
 # Documentation (see docs/ci-cd/pipeline-variables.md for variable setup and troubleshooting)
