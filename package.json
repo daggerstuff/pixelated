@@ -144,6 +144,7 @@
     "@aws-sdk/client-s3": "^3.848.0",
     "@aws-sdk/lib-dynamodb": "^3.848.0",
     "@azure/storage-blob": "^12.28.0",
+    "@chroma-core/default-embed": "^0.1.8",
     "@clerk/astro": "^2.10.8",
     "@google-cloud/storage": "^7.17.0",
     "@iconify-json/lucide": "^1.2.57",
@@ -166,6 +167,7 @@
     "bcryptjs": "^3.0.2",
     "buffer": "^6.0.3",
     "chart.js": "^4.5.0",
+    "chromadb": "^3.0.15",
     "clsx": "^2.1.1",
     "commander": "^13.1.0",
     "crypto-js": "^4.2.0",
@@ -213,6 +215,7 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@astrojs/markdoc": "^0.15.6",
     "@astrojs/rss": "^4.0.12",
     "@byterover/cipher": "^0.3.0",
     "@fontsource/inter": "^5.2.6",

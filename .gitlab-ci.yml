@@ -1,17 +1,4 @@
-# Debug job to diagnose runner DNS issues
-debug-dns:
-  image: alpine:latest
-  stage: validate
-  script:
-    - echo "===== /etc/resolv.conf ====="
-    - cat /etc/resolv.conf
-    - echo "===== nslookup deb.debian.org ====="
-    - apk add --no-cache bind-tools
-    - nslookup deb.debian.org || true
-    - echo "===== ping deb.debian.org ====="
-    - ping -c 2 deb.debian.org || true
-  rules:
-    - when: manual
+
 qodana:
   stage: test
   only:
@@ -89,11 +76,6 @@ build-frontend:
     NODE_ENV: production
     CI: "true"
   before_script:
-  - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 git.pixelatedempathy.tech || true
-  - nslookup git.pixelatedempathy.tech || true
-  - apk add --no-cache curl || true
-  - curl -v https://git.pixelatedempathy.tech || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "🏗️ Building Pixelated Empathy frontend container..."
@@ -131,11 +113,6 @@ test-container:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-  - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 registry.gitlab.com || true
-  - nslookup registry.gitlab.com || true
-  - apk add --no-cache curl || true
-  - curl -v https://registry.gitlab.com || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Testing container health..."
@@ -375,11 +352,6 @@ build-ai-backend:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-  - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 registry.gitlab.com || true
-  - nslookup registry.gitlab.com || true
-  - apk add --no-cache curl || true
-  - curl -v https://registry.gitlab.com || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Building AI backend components..."
@@ -410,11 +382,6 @@ security-scan:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-  - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 git.pixelatedempathy.tech || true
-  - nslookup git.pixelatedempathy.tech || true
-  - apk add --no-cache curl || true
-  - curl -v https://git.pixelatedempathy.tech/v2/ || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Running security scan on container..."
@@ -600,7 +567,7 @@ deploy-staging:
 
 # Image Tagging
 tag-image:
-  stage: build
+  stage: test
   image: docker:27.3.1
   services:
   - name: docker:27.3.1-dind
@@ -611,18 +578,17 @@ tag-image:
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
   before_script:
-  - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 git.pixelatedempathy.tech || true
-  - nslookup git.pixelatedempathy.tech || true
-  - apk add --no-cache curl || true
-  - curl -v https://git.pixelatedempathy.tech/v2/ || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script: |
     echo "Tagging image with branch and build number..."
-    docker pull $CONTAINER_IMAGE
-    docker tag $CONTAINER_IMAGE $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
-    docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
-    echo "✅ Image tagged and pushed: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID"
+    if docker pull $CONTAINER_IMAGE; then
+      docker tag $CONTAINER_IMAGE $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
+      docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
+      echo "✅ Image tagged and pushed: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID"
+    else
+      echo "❌ Failed to pull image $CONTAINER_IMAGE"
+      exit 1
+    fi
   dependencies:
   - build-frontend
   rules:
@@ -665,11 +631,6 @@ cleanup:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-  - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 git.pixelatedempathy.tech || true
-  - nslookup git.pixelatedempathy.tech || true
-  - apk add --no-cache curl || true
-  - curl -v https://git.pixelatedempathy.tech/v2/ || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Cleaning up old container images..."

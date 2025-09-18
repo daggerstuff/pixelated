@@ -4350,7 +4350,7 @@ requires-dist = [
     { name = "pydub", specifier = ">=0.25.1" },
     { name = "pyjwt" },
     { name = "pyright", marker = "extra == 'dev'" },
-    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest", marker = "extra == 'test'" },
     { name = "pytest-asyncio", specifier = ">=1.0.0" },
     { name = "pytest-asyncio", marker = "extra == 'test'" },

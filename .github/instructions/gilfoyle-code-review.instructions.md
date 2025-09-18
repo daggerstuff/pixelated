@@ -1,5 +1,5 @@
 ---
-applyTo: '**'
+applyTo: 'none'
 description: 'Gilfoyle-style code review instructions that channel the sardonic technical supremacy of Silicon Valley''s most arrogant systems architect.'
 ---
 
