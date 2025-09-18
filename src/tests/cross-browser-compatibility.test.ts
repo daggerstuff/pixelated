@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
 import fs from 'node:fs/promises'
-import { join } from 'node:path'
 import { FEATURES } from '../lib/browser/feature-detection'
 
 // Define types for compatibility results
@@ -61,7 +60,7 @@ testGroup('Cross-Browser Compatibility', () => {
       const detectionCode = feature.detectionFn.toString()
       const result = await page.evaluate(`(${detectionCode})()`)
       compatibilityResults.browsers['chromium'] = {
-        ...compatibilityResults.browsers['chromium'],
+        pages: compatibilityResults.browsers['chromium']?.pages ?? {},
         features: {
           ...compatibilityResults.browsers['chromium']?.features,
           [featureKey]: Boolean(result),
@@ -69,15 +68,22 @@ testGroup('Cross-Browser Compatibility', () => {
       }
     }
 
-    // Save results
-    const resultsPath = join(
-      process.cwd(),
-      'browser-compatibility-results.json',
-    )
+    // Save results securely (prevent path traversal)
+    const path = require('node:path')
+    const crypto = require('node:crypto')
+    const resultsDir = path.resolve(__dirname, '../../test-artifacts');
+    await fs.mkdir(resultsDir, { recursive: true });
+    const uniqueId = crypto.randomUUID();
+    const fileName = `browser-compatibility-results-${uniqueId}.json`;
+    const resolvedPath = path.resolve(resultsDir, fileName);
+    const relative = path.relative(resultsDir, resolvedPath);
+    if (relative.startsWith('..') || path.isAbsolute(relative)) {
+      throw new Error('Invalid results path detected');
+    }
     await fs.writeFile(
-      resultsPath,
+      resolvedPath,
       JSON.stringify(compatibilityResults, null, 2),
-    )
+    );
 
     // Basic assertion to ensure test ran
     expect(Object.keys(compatibilityResults.browsers)).toHaveLength(1)
@@ -102,7 +108,7 @@ testGroup('Cross-Browser Compatibility', () => {
       .locator('nav[role="navigation"]')
       .count()
     const bannerLandmarks = await page.locator('[role="banner"]').count()
-    const headerElements = await page.locator('header').count()
+    const headerElements = await page.locator('header.fixed').count()
 
     // Verify single navigation landmark exists
     expect(navigationLandmark).toBe(1)
@@ -113,7 +119,7 @@ testGroup('Cross-Browser Compatibility', () => {
     console.log('  ✓ Banner landmark found')
 
     // Verify no duplicate header landmarks (should have banner role instead)
-    expect(headerElements).toBeLessThanOrEqual(1)
+    expect(headerElements).toBe(1)
     console.log('  ✓ No duplicate header landmarks')
 
     console.log('📱 Testing responsive navigation - Desktop mode...')

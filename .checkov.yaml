@@ -36,7 +36,7 @@ compact: true
 quiet: false
 
 # Baseline file for incremental scanning
-baseline: security-baseline.json
+# baseline: security-baseline.json
 
 # Enable soft fail for CI/CD environments
 soft-fail: false

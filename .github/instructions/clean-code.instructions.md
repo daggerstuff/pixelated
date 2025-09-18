@@ -1,5 +1,5 @@
 ---
-inclusion: always
+inclusion: never
 ---
 
 # Clean Code Guidelines

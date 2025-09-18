@@ -155,7 +155,6 @@ jobs:
           retries: 1,
         };
         EOF
-                browserName: 'chromium',
     - name: Run Playwright tests
       id: run-tests
       if: steps.health-check.outputs.status == 'passing'
@@ -355,7 +354,7 @@ jobs:
       if: steps.health-check.outputs.status == 'passing'
       run: |
         cat > temp-playwright.config.js << 'EOF'
-        export default {
+        module.exports = {
           testDir: './tests/monitoring',
           use: {
             baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
@@ -516,20 +515,6 @@ jobs:
           testDir: './tests/monitoring',
           use: {
             baseURL: process.env.BASE_URL,
-          },
-          projects: [
-            {
-              name: 'chromium',
-              use: {
-                browserName: 'chromium',
-              },
-            },
-          ],
-          reporter: ['html', 'list'],
-          timeout: 60000,
-          retries: 2, // More retries for preview builds
-        };
-        EOF
           },
           projects: [
             {

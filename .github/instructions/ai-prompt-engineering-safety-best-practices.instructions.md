@@ -1,5 +1,5 @@
 ---
-applyTo: ['*']
+applyTo: ['none']
 description: "Comprehensive best practices for AI prompt engineering, safety frameworks, bias mitigation, and responsible AI usage for Copilot and LLMs."
 ---
 

@@ -1,7 +1,5 @@
-import os
-import asyncio
 import json
-import pathlib
+import os
 
 import pytest
 
@@ -10,7 +8,7 @@ os.environ.setdefault("ENV", "test")
 os.environ.setdefault("PYTEST", "1")
 
 # Import after env setup
-from src.lib.ai.bias-detection.python-service.bias_detection_service import (
+from src.lib.ai.bias_detection.python_service.bias_detection_service import (
     BiasDetectionConfig,
     BiasDetectionService,
 )
@@ -24,7 +22,7 @@ async def test_import_without_env_and_basic_init():
 
 
 @pytest.mark.asyncio
-async def test_audit_logger_safe_without_request(tmp_path, monkeypatch):
+async def test_audit_logger_safe_without_request(tmp_path):
     cfg = BiasDetectionConfig()
     svc = BiasDetectionService(cfg)
 
@@ -46,20 +44,23 @@ async def test_audit_logger_safe_without_request(tmp_path, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_fairlearn_analysis_noop_drop_fix(monkeypatch):
+async def test_fairlearn_analysis_noop_drop_fix():
     cfg = BiasDetectionConfig()
     svc = BiasDetectionService(cfg)
 
     # Minimal session data with ai_responses to trigger synthetic dataset creation
-    session = type("Session", (), {})
-    session.ai_responses = [{"content": "hi"} for _ in range(5)]
-    session.participant_demographics = {}
-    session.training_scenario = {}
-    session.content = {}
-    session.expected_outcomes = []
-    session.transcripts = []
-    session.metadata = {}
-    session.session_id = "s1"
+    class Session:
+        def __init__(self):
+            self.ai_responses = [{"content": "hi"} for _ in range(5)]
+            self.participant_demographics = {}
+            self.training_scenario = {}
+            self.content = {}
+            self.expected_outcomes = []
+            self.transcripts = []
+            self.metadata = {}
+            self.session_id = "s1"
+
+    session = Session()
 
     res = await svc._run_fairlearn_analysis(session)
     assert isinstance(res, dict)
@@ -68,17 +69,17 @@ async def test_fairlearn_analysis_noop_drop_fix(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_sentiment_fallback_schema(monkeypatch):
+async def test_sentiment_fallback_schema():
     cfg = BiasDetectionConfig()
     svc = BiasDetectionService(cfg)
     svc.sentiment_analyzer = None  # Force fallback
     out = svc._analyze_sentiment("This is fine")
-    assert set(["compound", "positive", "negative", "neutral"]).issubset(out.keys())
+    assert {"compound", "positive", "negative", "neutral"}.issubset(out.keys())
     assert out.get("source") in ("textblob", "vader")
 
 
 @pytest.mark.asyncio
-async def test_spacy_missing_model_handling(monkeypatch):
+async def test_spacy_missing_model_handling():
     cfg = BiasDetectionConfig()
     svc = BiasDetectionService(cfg)
     # If spacy model is missing, _detect_linguistic_bias should not raise
