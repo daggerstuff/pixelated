@@ -16,6 +16,11 @@ spec:
     spec:
       imagePullSecrets:
       - name: dockerhub-secret
+      securityContext:
+        runAsUser: 10001
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: pixelated
         image: registry.gitlab.com/pixeldeck/pixelated:latest
@@ -26,6 +31,10 @@ spec:
           value: "production"
         - name: PORT
           value: "4321"
+        - name: PUBLIC_CLERK_PUBLISHABLE_KEY
+          value: "pk_test_ZXhwZXJ0LWNvdWdhci0yNi5jbGVyay5hY2NvdW50cy5kZXYk"
+        - name: CLERK_SECRET_KEY
+          value: "sk_test_your_secret_key_here"
         resources:
           requests:
             memory: "512Mi"
@@ -33,6 +42,12 @@ spec:
           limits:
             memory: "1Gi"
             cpu: "500m"
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         livenessProbe:
           httpGet:
             path: /

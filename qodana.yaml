@@ -13,8 +13,6 @@ include:
   - name: IncorrectFormatting
   - name: CodeStyle
 
-bootstrap: sh ./prepare-qodana.sh
-
 fixesStrategy: cleanup
 
-linter: jetbrains/qodana-js:2025.2.1
+linter: jetbrains/qodana-js:latest
