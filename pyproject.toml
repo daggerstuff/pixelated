@@ -100,7 +100,7 @@ show_error_codes = true
 
 [tool.pyright]
 include = ["src", "tests", "ai", "api"]
-exclude = ["node_modules", "stubs", "venv", "env", "build", "dist"]
+exclude = ["node_modules", "stubs", "venv", "env", "build", "dist", ".coveragerc"]
 extraPaths = ["stubs"]
 typeCheckingMode = "basic"
 reportMissingTypeStubs = false
@@ -112,7 +112,7 @@ pythonVersion = "3.11"
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-exclude = ["node_modules", "stubs", "venv", "env", "build", "dist"]
+exclude = ["node_modules", "stubs", "venv", "env", "build", "dist", ".coveragerc"]
 
 [tool.ruff.lint]
 select = [
@@ -183,4 +183,5 @@ url = "https://download.pytorch.org/whl/cpu"
 [dependency-groups]
 dev = [
     "pip-audit>=2.9.0",
+    "pytest>=8.4.2",
 ]

@@ -34,15 +34,15 @@ stages:
 - deploy
 
 variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
-  CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
-  CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
-  # Use correct GitLab Container Registry endpoint
-  CI_REGISTRY: https://registry.gitlab.com/
-  # Use correct image path for registry.gitlab.com
-  CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
+   DOCKER_DRIVER: overlay2
+   DOCKER_TLS_CERTDIR: "/certs"
+   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
+   CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
+   # Use correct GitLab Container Registry endpoint
+   CI_REGISTRY: https://registry.gitlab.com/
+   # Use correct image path for registry.gitlab.com
+   CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
 validate-runner:
   stage: validate
   image: docker:24.0.5
@@ -90,6 +90,7 @@ build-frontend:
   - "echo === Diagnostic: Network connectivity to registry ==="
   - ping -c 4 git.pixelatedempathy.tech || true
   - nslookup git.pixelatedempathy.tech || true
+  - apk add --no-cache curl || true
   - curl -v https://git.pixelatedempathy.tech || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
@@ -122,9 +123,10 @@ test-container:
     DOCKER_TLS_CERTDIR: ""
   before_script:
   - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 git.pixelatedempathy.tech || true
-  - nslookup git.pixelatedempathy.tech || true
-  - curl -v https://git.pixelatedempathy.tech || true
+  - ping -c 4 registry.gitlab.com || true
+  - nslookup registry.gitlab.com || true
+  - apk add --no-cache curl || true
+  - curl -v https://registry.gitlab.com || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Testing container health..."
@@ -365,9 +367,10 @@ build-ai-backend:
     DOCKER_TLS_CERTDIR: ""
   before_script:
   - "echo === Diagnostic: Network connectivity to registry ==="
-  - ping -c 4 git.pixelatedempathy.tech || true
-  - nslookup git.pixelatedempathy.tech || true
-  - curl -v https://git.pixelatedempathy.tech/v2/ || true
+  - ping -c 4 registry.gitlab.com || true
+  - nslookup registry.gitlab.com || true
+  - apk add --no-cache curl || true
+  - curl -v https://registry.gitlab.com || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Building AI backend components..."
@@ -401,6 +404,7 @@ security-scan:
   - "echo === Diagnostic: Network connectivity to registry ==="
   - ping -c 4 git.pixelatedempathy.tech || true
   - nslookup git.pixelatedempathy.tech || true
+  - apk add --no-cache curl || true
   - curl -v https://git.pixelatedempathy.tech/v2/ || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
@@ -601,6 +605,7 @@ tag-image:
   - "echo === Diagnostic: Network connectivity to registry ==="
   - ping -c 4 git.pixelatedempathy.tech || true
   - nslookup git.pixelatedempathy.tech || true
+  - apk add --no-cache curl || true
   - curl -v https://git.pixelatedempathy.tech/v2/ || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script: |
@@ -654,6 +659,7 @@ cleanup:
   - "echo === Diagnostic: Network connectivity to registry ==="
   - ping -c 4 git.pixelatedempathy.tech || true
   - nslookup git.pixelatedempathy.tech || true
+  - apk add --no-cache curl || true
   - curl -v https://git.pixelatedempathy.tech/v2/ || true
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:

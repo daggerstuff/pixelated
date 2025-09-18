@@ -147,12 +147,10 @@ coordination/orchestration/*
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
-claude-flow
-claude-flow.bat
-claude-flow.ps1
-hive-mind-prompt-*.txt
-
-/ai/
+claude-flow/
+hive-mind/
+swarm/
+**/mcp.json
 QWEN.md
 roo-code-settings.json
 kilo-code-settings.json
@@ -165,14 +163,7 @@ kilo-code-settings.json
 .qoder/
 .augment/
 backups/
-.clinerules/byterover-rules.md
-.kilocode/rules/byterover-rules.md
-.roo/rules/byterover-rules.md
-.windsurf/rules/byterover-rules.md
-.cursor/rules/byterover-rules.mdc
-.kiro/steering/byterover-rules.md
-.qoder/rules/byterover-rules.md
-.augment/rules/byterover-rules.md
+**/byterover-rules.md
 # Sentry Config File
 .env.sentry-build-plugin
 
@@ -184,6 +175,5 @@ serena.project.json
 .notes
 .qwen
 .serena
-llm_telegram_bot
-cipher
-.roo/mcp.json
+memory-bank/
+memAgent/

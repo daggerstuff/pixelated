@@ -1,6 +1,6 @@
 [run]
 source = ai, src
-omit = 
+omit =
     */tests/*
     */test_*
     */.venv/*
