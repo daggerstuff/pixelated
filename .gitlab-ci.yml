@@ -1,14 +1,15 @@
+---
 stages:
 - validate
 - build
 - test
 - deploy
-
 qodana:
   stage: test
   image:
     name: jetbrains/qodana-js
-    entrypoint: [ "" ]
+    entrypoint:
+    - ''
   variables:
     QODANA_TOKEN: $QODANA_TOKEN
     GIT_STRATEGY: fetch
@@ -16,9 +17,8 @@ qodana:
   - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana
   allow_failure: true
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-    - if: "$CI_MERGE_REQUEST_ID"
-
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: "$CI_MERGE_REQUEST_ID"
 variables:
    DOCKER_DRIVER: overlay2
    DOCKER_TLS_CERTDIR: "/certs"
@@ -40,13 +40,12 @@ validate-runner:
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false" ]
-    # Uncomment the next line to force Docker-in-Docker to use public DNS (helps with CI DNS issues)
-    # dns: ["8.8.8.8", "1.1.1.1"]
+    command:
+    - "--tls=false"
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
   script:
   - set -e
   - echo "Validating GitLab runner capabilities..."
@@ -62,29 +61,32 @@ validate-runner:
   - echo "Runner:" $CI_RUNNER_DESCRIPTION
   - echo "Executor:" $CI_RUNNER_EXECUTOR
   rules:
-  - if: '$CI_COMMIT_BRANCH == "master"'
-  - if: '$CI_COMMIT_BRANCH == "main"'
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
   - if: "$CI_MERGE_REQUEST_ID"
-
 build-frontend:
   stage: build
   image: docker:27.3.1
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental" ]
+    command:
+    - "--tls=false"
+    - "--experimental"
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_BUILDKIT: 1
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
     NODE_ENV: production
-    CI: "true"
+    CI: 'true'
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
+    $CI_REGISTRY
   script:
-  - echo "🏗️ Building Pixelated Empathy frontend container..."
+  - "echo \"\U0001F3D7️ Building Pixelated Empathy frontend container...\""
   - ls -la
-  - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
+  - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit
+    1)
   - docker buildx create --use --name multiarch-builder || docker buildx use multiarch-builder
   - |
     docker buildx build \
@@ -94,30 +96,30 @@ build-frontend:
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
       -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
-  - echo "📤 Pushing container to GitLab Container Registry..."
+  - "echo \"\U0001F4E4 Pushing container to GitLab Container Registry...\""
   - timeout 300 docker push $CONTAINER_IMAGE
   - timeout 300 docker push $CONTAINER_IMAGE_LATEST
   - echo "✅ Frontend container pushed to GitLab Container Registry"
-  - |
-    echo "📦 Image SHA: $CONTAINER_IMAGE"
-    echo "🏷️  Latest: $CONTAINER_IMAGE_LATEST"
+  - "echo \"\U0001F4E6 Image SHA: $CONTAINER_IMAGE\"\necho \"\U0001F3F7️  Latest:
+    $CONTAINER_IMAGE_LATEST\"\n"
   rules:
-  - if: '$CI_COMMIT_BRANCH == "master"'
-  - if: '$CI_COMMIT_BRANCH == "main"'
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
   - if: "$CI_MERGE_REQUEST_ID"
-
 test-container:
   stage: test
   image: docker:27.3.1
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false" ]
+    command:
+    - "--tls=false"
   variables:
     DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
+    $CI_REGISTRY
   script:
   - echo "Testing container health..."
   - docker pull $CONTAINER_IMAGE
@@ -143,7 +145,6 @@ test-container:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
-
 deploy-vps:
   stage: deploy
   image: alpine:latest
@@ -344,25 +345,26 @@ deploy-vps:
     when: manual
   environment:
     name: production
-
-# Build AI backend (separate job for the large AI components)
 build-ai-backend:
   stage: build
   image: docker:27.3.1
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false" ]
+    command:
+    - "--tls=false"
   variables:
     DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
+    $CI_REGISTRY
   script:
   - echo "Building AI backend components..."
   - cd ai
   - docker buildx create --use --name ai-builder || docker buildx use ai-builder
-  - docker buildx build --load -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
+  - docker buildx build --load -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest
+    .
   - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
   - docker push $CI_REGISTRY_IMAGE/ai:latest
   - echo "✅ AI backend container pushed to GitLab Container Registry"
@@ -373,21 +375,21 @@ build-ai-backend:
   - if: $CI_COMMIT_BRANCH == "main"
     changes:
     - ai/**/*
-  allow_failure: true # Allow failure since AI backend is large
-
-# Security scan
+  allow_failure: true
 security-scan:
   stage: test
   image: docker:27.3.1
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false" ]
+    command:
+    - "--tls=false"
   variables:
     DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
+    $CI_REGISTRY
   script:
   - echo "Running security scan on container..."
   - docker pull $CONTAINER_IMAGE
@@ -410,8 +412,6 @@ security-scan:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
-
-# Automated Rollback (if deploy fails)
 rollback:
   stage: deploy
   image: alpine:latest
@@ -469,8 +469,6 @@ rollback:
   rules:
   - when: manual
   allow_failure: true
-
-# Health Check & Notification
 health-check:
   stage: deploy
   image: alpine:latest
@@ -490,8 +488,6 @@ health-check:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
-
-# Artifact/Log Retention
 retain-logs:
   stage: test
   image: alpine:latest
@@ -506,8 +502,6 @@ retain-logs:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
-
-# Staging Environment
 deploy-staging:
   stage: deploy
   image: alpine:latest
@@ -553,31 +547,27 @@ deploy-staging:
   - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
   script:
   - echo "Deploying to staging VPS..."
-  # Add staging deployment logic here
   environment:
     name: staging
   rules:
   - if: $CI_COMMIT_BRANCH == "staging"
     when: manual
-
-# Secret Management (comment)
-# Use GitLab CI/CD protected variables for all secrets and tokens.
-# Example: VPS_SSH_PRIVATE_KEY_B64, API_KEY, DB_PASSWORD
-
-# Image Tagging
 tag-image:
   stage: test
   image: docker:27.3.1
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental" ]
+    command:
+    - "--tls=false"
+    - "--experimental"
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_BUILDKIT: 1
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
+    $CI_REGISTRY
   script: |
     echo "Tagging image with branch and build number..."
     if docker pull $CONTAINER_IMAGE; then
@@ -593,8 +583,6 @@ tag-image:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
-
-# Advanced Security Scanning
 trivy-scan:
   stage: test
   image: aquasec/trivy:latest
@@ -617,12 +605,14 @@ cleanup:
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false" ]
+    command:
+    - "--tls=false"
   variables:
     DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
+    $CI_REGISTRY
   script:
   - echo "Cleaning up old container images..."
   - docker image prune -af --filter "until=24h"
@@ -632,8 +622,6 @@ cleanup:
   - if: $CI_COMMIT_BRANCH == "master"
     when: manual
   allow_failure: true
-
-# GKE Deployment
 deploy-gke:
   stage: deploy
   image: google/cloud-sdk:alpine
@@ -678,5 +666,5 @@ deploy-gke:
   - if: $CI_COMMIT_BRANCH == "main"
   dependencies:
   - build-frontend
-
-# Documentation (see docs/ci-cd/pipeline-variables.md for variable setup and troubleshooting)
+include:
+- remote: https://gitlab.com/gitlab-org/incubation-engineering/five-minute-production/library/-/raw/main/gcp/cloud-run.gitlab-ci.yml
