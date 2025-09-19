@@ -102,12 +102,24 @@ export async function signUp(
 /**
  * Sign out the current user
  */
-export async function signOut(token: string): Promise<boolean> {
+export async function signOut(token?: string): Promise<boolean> {
   try {
+    // If auth is disabled, just return success
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost' && 
+        (import.meta.env.DISABLE_AUTH === 'true' || import.meta.env.PUBLIC_DISABLE_AUTH === 'true')) {
+      return true
+    }
+
+    const authToken = token || (typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null)
+    
+    if (!authToken) {
+      return true // Already signed out
+    }
+
     await apiRequest('signout', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': authToken.startsWith('Bearer ') ? authToken : `Bearer ${authToken}`,
       },
     })
     return true
@@ -121,12 +133,38 @@ export async function signOut(token: string): Promise<boolean> {
  * Get the current user by token
  * @returns Current authenticated user or null
  */
-export async function getCurrentUser(authHeader: string): Promise<AuthUser | null> {
+export async function getCurrentUser(authHeader?: string): Promise<AuthUser | null> {
   try {
+    // If auth is disabled, return mock user
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost' && 
+        (import.meta.env.DISABLE_AUTH === 'true' || import.meta.env.PUBLIC_DISABLE_AUTH === 'true')) {
+      return {
+        id: 'test-user-id',
+        email: 'test@example.com',
+        name: 'Test User',
+        image: '',
+        role: 'user' as UserRole,
+        fullName: 'Test User',
+        roles: ['user' as UserRole],
+        emailVerified: true,
+        createdAt: new Date().toISOString(),
+        lastSignIn: new Date().toISOString(),
+        avatarUrl: '',
+        metadata: {},
+      }
+    }
+
+    // Get auth header from localStorage if not provided
+    const token = authHeader || (typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null)
+    
+    if (!token) {
+      return null
+    }
+
     const response = await apiRequest('profile', {
       method: 'GET',
       headers: {
-        'Authorization': authHeader,
+        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
       },
     })
 

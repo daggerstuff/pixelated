@@ -96,7 +96,8 @@ const SkillDevelopmentRadar: React.FC<{ skills?: TherapistAnalyticsChartData['sk
 const SessionComparison: React.FC<{ comparativeData?: TherapistAnalyticsChartData['comparativeData'] }> = ({ comparativeData }) => {
   if (!comparativeData) return <div className="bg-muted rounded-md p-4 text-center text-muted-foreground">Not enough session data for comparison</div>
   const { currentSession, previousSession, trend } = comparativeData
-  if (!previousSession || !currentSession) return <div className="bg-muted rounded-md p-4 text-center text-muted-foreground">Previous or current session data missing</div>
+  if (!previousSession) return <div className="bg-muted rounded-md p-4 text-center text-muted-foreground">Previous session data not available</div>
+  if (!currentSession) return <div className="bg-muted rounded-md p-4 text-center text-muted-foreground">Current session data not available</div>
 
   const items = [
     { label: 'Progress', current: currentSession.averageSessionProgress ?? 0, previous: previousSession.averageSessionProgress ?? 0, unit: '%' },
@@ -182,3 +183,5 @@ export function TherapyProgressCharts({ data, className, locale }: TherapyProgre
     </div>
   )
 }
+
+export default TherapyProgressCharts

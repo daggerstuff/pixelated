@@ -1,4 +1,5 @@
 export const prerender = false
+import type { APIContext } from 'astro'
 import { mongoAuthService } from '@/services/mongoAuth.service'
 import { verifyAuthToken } from '@/utils/auth'
 
@@ -21,6 +22,28 @@ export const GET = async ({ request }: APIContext) => {
     }
 
   const { userId } = await verifyAuthToken(authHeader)
+    
+    // If auth is disabled, return mock user data
+    if (process.env.DISABLE_AUTH === 'true') {
+      return new Response(
+        JSON.stringify({
+          user: {
+            id: 'test-user-id',
+            email: 'test@example.com',
+            role: 'user',
+            preferences: {},
+            emailVerified: true,
+            lastLogin: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+          },
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+    
     const user = await mongoAuthService.getUserById(userId)
 
     if (!user) {
@@ -76,6 +99,27 @@ export const PUT = async ({ request }: APIContext) => {
 
   const { userId } = await verifyAuthToken(authHeader)
     const updates = await request.json()
+
+    // If auth is disabled, return mock success response
+    if (process.env.DISABLE_AUTH === 'true') {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          user: {
+            id: 'test-user-id',
+            email: 'test@example.com',
+            role: 'user',
+            preferences: updates.preferences || {},
+            emailVerified: true,
+            updatedAt: new Date().toISOString(),
+          },
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
 
     // Only allow updating profile fields
   const allowedFields = ['preferences']

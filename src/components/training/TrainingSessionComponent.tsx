@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useConversationMemory } from '../hooks/useMemory'
+import { useConversationMemory } from '../../hooks/useMemory'
 
 // Basic UI scaffold for therapist training session
 const initialClientMessage =
   'Hello, I am your client. How can you help me today?'
 
-export default function TrainingSession() {
+export function TrainingSessionComponent() {
   // For demo, use static user/session
   const userId = 'demo-therapist'
   const sessionId = 'session-1'
-  // Removed unused clientMessage state
   const [therapistResponse, setTherapistResponse] = useState('')
   const [conversation, setConversation] = useState([
     { role: 'client', message: initialClientMessage },
@@ -29,9 +28,7 @@ export default function TrainingSession() {
         )
       }
     })
-  }, [])
-
-  // ...existing code...
+  }, [memory])
 
   const handleResponse = async () => {
     setConversation([
@@ -126,28 +123,50 @@ export default function TrainingSession() {
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 32 }}>
-      <h2>Therapist Training Session</h2>
-      <div style={{ marginBottom: 24 }}>
+    <div className="max-w-2xl mx-auto p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
+      <h2 className="text-2xl font-bold text-white mb-6">Therapist Training Session</h2>
+      
+      <div className="mb-6 space-y-4 max-h-96 overflow-y-auto">
         {conversation.map((entry, idx) => (
-          <div key={idx} style={{ marginBottom: 8 }}>
-            <strong>{entry.role === 'client' ? 'Client' : 'Therapist'}:</strong>{' '}
-            {entry.message}
+          <div 
+            key={idx} 
+            className={`p-4 rounded-lg ${
+              entry.role === 'client' 
+                ? 'bg-blue-500/20 border-l-4 border-blue-500' 
+                : 'bg-green-500/20 border-l-4 border-green-500'
+            }`}
+          >
+            <div className="font-semibold text-sm text-gray-300 mb-1">
+              {entry.role === 'client' ? 'Client' : 'Therapist'}
+            </div>
+            <div className="text-white">{entry.message}</div>
           </div>
         ))}
       </div>
-      <textarea
-        value={therapistResponse}
-        onChange={(e) => setTherapistResponse(e.target.value)}
-        rows={3}
-        style={{ width: '100%', marginBottom: 12 }}
-        placeholder="Type your response..."
-      />
-      <button onClick={handleResponse} disabled={!therapistResponse.trim()}>
-        Send Response
-      </button>
+
+      <div className="space-y-4">
+        <textarea
+          value={therapistResponse}
+          onChange={(e) => setTherapistResponse(e.target.value)}
+          rows={3}
+          className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Type your therapeutic response..."
+        />
+        
+        <button 
+          onClick={handleResponse} 
+          disabled={!therapistResponse.trim()}
+          className="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+        >
+          Send Response
+        </button>
+      </div>
+
       {evaluation && (
-        <div style={{ marginTop: 16, fontWeight: 'bold' }}>{evaluation}</div>
+        <div className="mt-6 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+          <div className="font-semibold text-yellow-300 mb-2">AI Feedback</div>
+          <div className="text-white whitespace-pre-line">{evaluation}</div>
+        </div>
       )}
     </div>
   )

@@ -24,6 +24,14 @@ const navItems = [
 const hasPermission = (_item: string) => true // In a real app, this would check actual permissions
 ---
 
+<head>
+  <title>{title}</title>
+  <meta name="description" content={title + ' page for Pixelated Empathy admin.'} />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
   <!-- Sidebar -->
   <aside

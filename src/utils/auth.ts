@@ -129,6 +129,15 @@ export interface AuthInfo {
 export async function verifyAuthToken(
   authHeader: string | null,
 ): Promise<AuthInfo> {
+  // Check if auth is disabled for testing
+  if (process.env.DISABLE_AUTH === 'true') {
+    return {
+      userId: 'test-user-id',
+      role: 'user' as const,
+      session: 'test-session',
+    }
+  }
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new Error('Invalid or missing authorization token')
   }

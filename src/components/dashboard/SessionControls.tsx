@@ -1,6 +1,5 @@
 // Replaced entire file with a single authoritative implementation to remove merge residues.
-import React from 'react'
-import { useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import type { TherapistSession } from '@/types/dashboard'
 import { cn } from '@/lib/utils'
 
@@ -9,7 +8,7 @@ interface SessionControlsProps {
   onSessionControl: (sessionId: string, action: 'start' | 'pause' | 'resume' | 'end') => void
 }
 
-export default function SessionControls({ sessions, onSessionControl }: SessionControlsProps) {
+export function SessionControls({ sessions, onSessionControl }: SessionControlsProps) {
   const activeSession = sessions.find((s) => s.status === 'active')
   const pausedSession = sessions.find((s) => s.status === 'paused')
 
@@ -70,7 +69,7 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
     <section className="space-y-4" aria-label="Session Controls">
       <h3 className="text-lg font-semibold">Session Controls</h3>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="group">
         <button
           type="button"
           ref={(el) => { buttonRefs.current['pause'] = el; }}
@@ -78,7 +77,7 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
           disabled={!activeSession}
           className={cn(activeSession ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
         >
-          Pause
+          Pause Session
         </button>
 
         <button
@@ -88,7 +87,7 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
           disabled={!pausedSession}
           className={cn(pausedSession ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
         >
-          Resume
+          Resume Session
         </button>
 
         <button
@@ -98,14 +97,14 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
           disabled={!activeSession}
           className={cn(activeSession ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500', 'px-3 py-2 rounded')}
         >
-          End
+          End Session
         </button>
       </div>
 
       <div>
         <h4 className="text-md font-medium">Recent Sessions</h4>
         {sessions.length === 0 ? (
-          <div className="text-sm italic">No recent sessions</div>
+          <div className="text-sm italic">No recent sessions available</div>
         ) : (
           <ul className="space-y-2" role="list">
             {sessions.slice(0, 3).map((session) => (
@@ -152,3 +151,5 @@ export default function SessionControls({ sessions, onSessionControl }: SessionC
     </section>
   )
 }
+
+export default SessionControls
