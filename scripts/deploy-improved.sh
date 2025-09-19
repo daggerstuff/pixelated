@@ -15,7 +15,7 @@ LOCAL_PROJECT_DIR="/home/vivi/pixelated"
 REMOTE_PROJECT_DIR="/root/pixelated"
 
 # Target versions (Requirements 1.1, 1.2)
-TARGET_NODE_VERSION="24.7.0"
+TARGET_NODE_VERSION="24.8.0"
 TARGET_PNPM_VERSION="10.16.0"
 
 # Colors for output
@@ -104,7 +104,7 @@ install_nvm() {
     [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 }
 
-# Function to install and configure Node.js 24.7.0
+# Function to install and configure Node.js 24.8.0
 install_nodejs() {
     print_status "Installing Node.js ${TARGET_NODE_VERSION}..."
 
@@ -174,8 +174,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Switch to target Node.js version
-nvm use 24.7.0 2>/dev/null || {
-    print_error "Failed to switch to Node.js 24.7.0"
+nvm use 24.8.0 2>/dev/null || {
+    print_error "Failed to switch to Node.js 24.8.0"
     exit 1
 }
 
@@ -299,8 +299,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Switch to target Node.js version
-nvm use 24.7.0 2>/dev/null || {
-    print_error "Failed to switch to Node.js 24.7.0 for pnpm verification"
+nvm use 24.8.0 2>/dev/null || {
+    print_error "Failed to switch to Node.js 24.8.0 for pnpm verification"
     echo "FAILED"
     exit 1
 }
@@ -373,7 +373,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Switch to target versions
-nvm use 24.7.0
+nvm use 24.8.0
 
 print_header "Environment Validation Report"
 print_status "================================"

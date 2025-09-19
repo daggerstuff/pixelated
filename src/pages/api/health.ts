@@ -1,26 +1,28 @@
-import type { APIRoute } from 'astro'
+import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async () => {
-  const healthResponse = {
+const startTime = Date.now();
+
+export const GET: APIRoute = () => {
+  const now = new Date();
+  const uptime = Date.now() - startTime;
+
+  const healthData = {
     status: 'healthy',
-    timestamp: new Date().toISOString(),
-    services: {
-      webServer: {
-        status: 'healthy',
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        version: process.version
-      }
-    },
-    version: '2.0.0',
-    environment: process.env['NODE_ENV'] || 'development'
-  }
+    timestamp: now.toISOString(),
+    uptime: Math.floor(uptime / 1000),
+    version: process.env['npm_package_version'] || '1.0.0',
+    environment: process.env['NODE_ENV'] || 'development',
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
+    }
+  };
 
-  return new Response(JSON.stringify(healthResponse, null, 2), {
+  return new Response(JSON.stringify(healthData), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache, no-store, must-revalidate'
+      'Cache-Control': 'no-cache'
     }
-  })
-}
+  });
+};
