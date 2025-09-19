@@ -1,0 +1,3 @@
+[submodule "ai"]
+	path = ai
+	url = git@git.pixelatedempathy.tech:pixeltech/ai.git
