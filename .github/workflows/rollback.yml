@@ -3,11 +3,11 @@ name: Deployment Rollback
 on:
   push:
     branches:
-      - master
-      - staging
+    - master
+    - staging
 
 env:
-  NODE_VERSION: 24.7.0
+  NODE_VERSION: 24.8.0
   PNPM_VERSION: 10.16.0
   NODE_ENV: production
 
@@ -25,71 +25,71 @@ jobs:
       group: staging_environment
       cancel-in-progress: true
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          fetch-tags: true
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
-      - name: Fetch all tags
-        run: git fetch --tags --force
+    - name: Fetch all tags
+      run: git fetch --tags --force
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
 
-      - name: Get pnpm store directory
-        id: pnpm-store
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-store
+      shell: bash
+      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
 
-      - name: Determine rollback tag
-        id: get-tag
-        run: |
-          # Use the tag manager to validate and get rollback tag
-          if node scripts/tag-manager.cjs validate staging; then
-            TAGS=$(git tag -l "staging-*" --sort=-committerdate)
-            TAG=$(echo "$TAGS" | sed -n '2p')
-            echo "tag=$TAG" >> $GITHUB_OUTPUT
-            echo "Rolling back to: $TAG"
-            git checkout $TAG
-          else
-            echo "::warning::Cannot rollback - insufficient staging tags"
-            echo "::notice::Creating initial staging tags for future rollbacks"
-            node scripts/tag-manager.cjs create staging --message="Initial staging tag for rollback capability" --push
-            echo "::error::Rollback not possible - this appears to be the first deployment"
-            exit 1
-          fi
+    - name: Determine rollback tag
+      id: get-tag
+      run: |
+        # Use the tag manager to validate and get rollback tag
+        if node scripts/tag-manager.cjs validate staging; then
+          TAGS=$(git tag -l "staging-*" --sort=-committerdate)
+          TAG=$(echo "$TAGS" | sed -n '2p')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Rolling back to: $TAG"
+          git checkout $TAG
+        else
+          echo "::warning::Cannot rollback - insufficient staging tags"
+          echo "::notice::Creating initial staging tags for future rollbacks"
+          node scripts/tag-manager.cjs create staging --message="Initial staging tag for rollback capability" --push
+          echo "::error::Rollback not possible - this appears to be the first deployment"
+          exit 1
+        fi
 
-      - name: Build application
-        run: pnpm build
+    - name: Build application
+      run: pnpm build
 
-      - name: Create rollback tag
-        env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
-        run: |
-          TIMESTAMP=$(date +%Y%m)
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git tag rollback-staging-$TIMESTAMP
-          git push https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git rollback-staging-$TIMESTAMP
+    - name: Create rollback tag
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
+      run: |
+        TIMESTAMP=$(date +%Y%m)
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git tag rollback-staging-$TIMESTAMP
+        git push https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git rollback-staging-$TIMESTAMP
 
   rollback-production:
     name: Rollback Production
@@ -104,70 +104,70 @@ jobs:
       actions: read
       id-token: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          fetch-tags: true
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
-      - name: Fetch all tags
-        run: git fetch --tags --force
+    - name: Fetch all tags
+      run: git fetch --tags --force
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
 
-      - name: Get pnpm store directory
-        id: pnpm-store
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    - name: Get pnpm store directory
+      id: pnpm-store
+      shell: bash
+      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
-        with:
-          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+    - name: Setup pnpm cache
+      uses: actions/cache@v4.2.3
+      with:
+        path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install
+    - name: Install dependencies
+      run: pnpm install
 
-      - name: Determine rollback tag
-        id: get-tag
-        run: |
-          # Use the tag manager to validate and get rollback tag
-          if node scripts/tag-manager.cjs validate production; then
-            TAGS=$(git tag -l "production-*" --sort=-committerdate)
-            TAG=$(echo "$TAGS" | sed -n '2p')
-            echo "tag=$TAG" >> $GITHUB_OUTPUT
-            echo "Rolling back to: $TAG"
-            git checkout $TAG
-          else
-            echo "::warning::Cannot rollback - insufficient production tags"
-            echo "::notice::Creating initial production tags for future rollbacks"
-            node scripts/tag-manager.cjs create production --message="Initial production tag for rollback capability" --push
-            echo "::error::Rollback not possible - this appears to be the first deployment"
-            exit 1
-          fi
+    - name: Determine rollback tag
+      id: get-tag
+      run: |
+        # Use the tag manager to validate and get rollback tag
+        if node scripts/tag-manager.cjs validate production; then
+          TAGS=$(git tag -l "production-*" --sort=-committerdate)
+          TAG=$(echo "$TAGS" | sed -n '2p')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Rolling back to: $TAG"
+          git checkout $TAG
+        else
+          echo "::warning::Cannot rollback - insufficient production tags"
+          echo "::notice::Creating initial production tags for future rollbacks"
+          node scripts/tag-manager.cjs create production --message="Initial production tag for rollback capability" --push
+          echo "::error::Rollback not possible - this appears to be the first deployment"
+          exit 1
+        fi
 
-      - name: Build application
-        run: pnpm build
+    - name: Build application
+      run: pnpm build
 
-      - name: Create rollback tag
-        env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
-        run: |
-          TIMESTAMP=$(date +%Y%m%d)
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          TAG_NAME=prod-rollback-$TIMESTAMP
-          git tag $TAG_NAME
-          git remote set-url origin https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git
-          git push origin $TAG_NAME
+    - name: Create rollback tag
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
+      run: |
+        TIMESTAMP=$(date +%Y%m%d)
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        TAG_NAME=prod-rollback-$TIMESTAMP
+        git tag $TAG_NAME
+        git remote set-url origin https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git
+        git push origin $TAG_NAME

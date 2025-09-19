@@ -13,7 +13,7 @@ set -euo pipefail
 declare -A DEPLOYMENT_CONTEXT=(
     ["timestamp"]=""
     ["commit_hash"]=""
-    ["node_version"]="24.7.0"
+    ["node_version"]="24.8.0"
     ["pnpm_version"]="10.16.0"
     ["container_tag"]=""
     ["backup_path"]=""

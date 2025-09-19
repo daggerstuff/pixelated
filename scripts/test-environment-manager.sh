@@ -61,8 +61,8 @@ fi
 
 # Test 2: Check target versions are correctly set
 print_status "Checking target versions..."
-if [[ "$TARGET_NODE_VERSION" == "24.7.0" ]]; then
-    print_status "✅ Target Node.js version correctly set to 24.7.0"
+if [[ "$TARGET_NODE_VERSION" == "24.8.0" ]]; then
+    print_status "✅ Target Node.js version correctly set to 24.8.0"
 else
     print_error "❌ Target Node.js version incorrect: $TARGET_NODE_VERSION"
     exit 1
@@ -90,14 +90,14 @@ print_header "✅ All Environment Manager component tests passed!"
 print_status "The Environment Manager component is ready for deployment."
 print_status ""
 print_status "Functions implemented:"
-print_status "  - setup_nodejs_environment() - Installs Node.js 24.7.0 via nvm"
+print_status "  - setup_nodejs_environment() - Installs Node.js 24.8.0 via nvm"
 print_status "  - verify_nodejs_installation() - Verifies Node.js version and path"
 print_status "  - setup_pnpm_environment() - Installs pnpm 10.16.0"
 print_status "  - verify_pnpm_installation() - Verifies pnpm version with detailed error reporting"
 print_status "  - validate_complete_environment() - Comprehensive environment validation"
 print_status ""
 print_status "Requirements satisfied:"
-print_status "  - 1.1: Node.js 24.7.0 installation ✅"
+print_status "  - 1.1: Node.js 24.8.0 installation ✅"
 print_status "  - 1.2: pnpm 10.16.0 installation ✅"
 print_status "  - 1.3: PATH configuration for persistent sessions ✅"
 print_status "  - 1.4: Version verification with detailed error reporting ✅"
