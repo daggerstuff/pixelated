@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { TrainingSessionComponent } from '../components/training/TrainingSessionComponent.tsx'
+
+export const prerender = false
+---
+
+<BaseLayout
+  title="Therapist Training Session | Pixelated Empathy"
+  description="Interactive training session for mental health professionals to practice therapeutic conversations with AI-powered feedback."
+  bgType="default"
+>
+  <div class="container mx-auto px-4 py-8">
+    <TrainingSessionComponent client:load />
+  </div>
+</BaseLayout>

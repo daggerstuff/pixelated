@@ -1,20 +1,25 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pixelated
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pixelated-empathy
+  name: pixelated
   namespace: pixelated
   labels:
-    app: pixelated-empathy
+    app: pixelated-app
     version: v1.0.0
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
-      app: pixelated-empathy
+      app: pixelated-app
   template:
     metadata:
       labels:
-        app: pixelated-empathy
+        app: pixelated-app
         version: v1.0.0
     spec:
       securityContext:
@@ -24,15 +29,18 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-      - name: pixelated-empathy
-        image: pixelated-empathy:v1.0.0@$(IMAGE_DIGEST)
+      - name: pixelated
+        image: registry.gitlab.com/pixeldeck/pixelated@sha256:1691c565a3f08071ff8a0ad27af889ec4964d23fc035b2f30d2ae8ce9ec8b0e6
         ports:
-        - containerPort: 3000
+        - containerPort: 4321
           name: http
         env:
         - name: NODE_ENV
           value: "production"
-        # Remove all secretKeyRef env and instead mount pixelated-secrets as a volume at /app/secrets
+        - name: HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "4321"
         resources:
           requests:
             memory: "256Mi"
@@ -43,17 +51,15 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 3000
+            port: 4321
           initialDelaySeconds: 30
           periodSeconds: 10
-          description: "Checks app health endpoint"
         readinessProbe:
           httpGet:
             path: /health
-            port: 3000
+            port: 4321
           initialDelaySeconds: 5
           periodSeconds: 5
-          description: "Checks app readiness endpoint"
         volumeMounts:
         - name: config-volume
           mountPath: /app/config
@@ -83,55 +89,53 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pixelated-empathy-service
+  name: pixelated-service
   namespace: pixelated
   labels:
-    app: pixelated-empathy
+    app: pixelated-app
 spec:
   selector:
-    app: pixelated-empathy
+    app: pixelated-app
   ports:
   - name: http
     port: 80
-    targetPort: 3000
+    targetPort: 4321
     protocol: TCP
   type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pixelated-empathy-ingress
+  name: pixelated-ingress
   namespace: pixelated
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
+  ingressClassName: "caddy"
   tls:
   - hosts:
-    - pixelated-empathy.com
-    - www.pixelated-empathy.com
-    secretName: pixelated-empathy-tls
+    - pixelatedempathy.com
+    - www.pixelatedempathy.com
+    secretName: pixelated-tls
   rules:
-  - host: pixelated-empathy.com
+  - host: pixelatedempathy.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: pixelated-empathy-service
+            name: pixelated-service
             port:
               number: 80
-  - host: www.pixelated-empathy.com
+  - host: www.pixelatedempathy.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: pixelated-empathy-service
+            name: pixelated-service
             port:
               number: 80
 ---
@@ -143,7 +147,7 @@ metadata:
 data:
   app.json: |
     {
-      "name": "pixelated-empathy",
+      "name": "pixelated",
       "version": "1.0.0",
       "environment": "production",
       "features": {
@@ -156,15 +160,15 @@ data:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: pixelated-empathy-hpa
+  name: pixelated-hpa-advanced
   namespace: pixelated
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: pixelated-empathy
+    name: pixelated
   minReplicas: 3
-  maxReplicas: 10
+  maxReplicas: 20
   metrics:
   - type: Resource
     resource:
@@ -177,17 +181,76 @@ spec:
       name: memory
       target:
         type: Utilization
-        averageUtilization: 80
+        averageUtilization: 75
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "1000"
+  - type: Object
+    object:
+      metric:
+        name: requests-per-second
+      describedObject:
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        name: pixelated-ingress
+      target:
+        type: Value
+        value: "10k"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 4
+        periodSeconds: 60
+      selectPolicy: Max
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pixelated-pdb
+  namespace: pixelated
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: pixelated-app
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: pixelated-empathy-deny-all
+  name: pixelated-allow-http
   namespace: pixelated
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app: pixelated-app
   policyTypes:
   - Ingress
   - Egress
-  ingress: []
-  egress: []
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - protocol: TCP
+      port: 4321
+  egress:
+  - {}

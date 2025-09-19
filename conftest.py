@@ -117,7 +117,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "performance: Performance tests")
 
 
-def pytest_collection_modifyitems(config, items):
+def pytest_collection_modifyitems(_, items):
     """Modify test collection to add markers automatically"""
     for item in items:
         # Add unit marker to all tests in unit test directories

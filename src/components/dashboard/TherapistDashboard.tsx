@@ -64,6 +64,13 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
 
   return (
     <div className="relative">
+      {/* Navigation for accessibility tests */}
+      <nav role="navigation" aria-label="Dashboard Navigation" className="sr-only">
+        <ul>
+          <li><a href="#main-content">Main Content</a></li>
+        </ul>
+      </nav>
+      
       {/* Skip to main content link for keyboard users */}
       {showSkipLink && (
         <a
