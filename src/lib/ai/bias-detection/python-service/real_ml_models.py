@@ -22,6 +22,7 @@ try:
         equalized_odds_difference,
     )
     from fairlearn.reductions import DemographicParity, ExponentiatedGradient
+
     FAIRLEARN_AVAILABLE = True
 except ImportError:
     FAIRLEARN_AVAILABLE = False
@@ -29,6 +30,7 @@ except ImportError:
 
 try:
     import shap
+
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
@@ -37,6 +39,7 @@ except ImportError:
 try:
     import lime
     from lime.lime_tabular import LimeTabularExplainer
+
     LIME_AVAILABLE = True
 except ImportError:
     LIME_AVAILABLE = False
@@ -44,6 +47,7 @@ except ImportError:
 
 try:
     import evaluate
+
     HF_EVALUATE_AVAILABLE = True
 except ImportError:
     HF_EVALUATE_AVAILABLE = False
@@ -61,7 +65,9 @@ class RealFairlearnAnalyzer:
         self.label_encoders = {}
         self.is_trained = False
 
-    def _prepare_features(self, session_data: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarray, List[str]]:
+    def _prepare_features(
+        self, session_data: Dict[str, Any]
+    ) -> Tuple[np.ndarray, np.ndarray, List[str]]:
         """Prepare features from session data for ML analysis"""
         # Extract relevant features from session data
         features = []
@@ -69,57 +75,57 @@ class RealFairlearnAnalyzer:
         feature_names = []
 
         # Demographic features
-        demographics = session_data.get('demographics', {})
+        demographics = session_data.get("demographics", {})
 
         # Age (numerical)
-        age = self._parse_age_range(demographics.get('age', '26-35'))
+        age = self._parse_age_range(demographics.get("age", "26-35"))
         features.append(age)
-        feature_names.append('age')
+        feature_names.append("age")
 
         # Gender (categorical)
-        gender = demographics.get('gender', 'female')
-        gender_encoded = self._encode_categorical('gender', gender)
+        gender = demographics.get("gender", "female")
+        gender_encoded = self._encode_categorical("gender", gender)
         features.append(gender_encoded)
         sensitive_features.append(gender_encoded)
-        feature_names.append('gender')
+        feature_names.append("gender")
 
         # Ethnicity (categorical)
-        ethnicity = demographics.get('ethnicity', 'white')
-        ethnicity_encoded = self._encode_categorical('ethnicity', ethnicity)
+        ethnicity = demographics.get("ethnicity", "white")
+        ethnicity_encoded = self._encode_categorical("ethnicity", ethnicity)
         features.append(ethnicity_encoded)
         sensitive_features.append(ethnicity_encoded)
-        feature_names.append('ethnicity')
+        feature_names.append("ethnicity")
 
         # Language (categorical)
-        language = demographics.get('primaryLanguage', 'en')
-        language_encoded = self._encode_categorical('language', language)
+        language = demographics.get("primaryLanguage", "en")
+        language_encoded = self._encode_categorical("language", language)
         features.append(language_encoded)
         sensitive_features.append(language_encoded)
-        feature_names.append('language')
+        feature_names.append("language")
 
         # Content-based features
-        content = session_data.get('content', '')
+        content = session_data.get("content", "")
         content_features = self._extract_content_features(content)
         features.extend(content_features)
-        feature_names.extend(['content_length', 'word_count', 'sentiment_score'])
+        feature_names.extend(["content_length", "word_count", "sentiment_score"])
 
         # Session metadata features
-        session_type = session_data.get('scenario', 'individual')
-        session_encoded = self._encode_categorical('session_type', session_type)
+        session_type = session_data.get("scenario", "individual")
+        session_encoded = self._encode_categorical("session_type", session_type)
         features.append(session_encoded)
-        feature_names.append('session_type')
+        feature_names.append("session_type")
 
         return (
             np.array(features).reshape(1, -1),
             np.array(sensitive_features).reshape(1, -1),
-            feature_names
+            feature_names,
         )
 
     def _parse_age_range(self, age_range: str) -> float:
         """Parse age range string to numerical value"""
-        if '-' in age_range:
-            start, end = age_range.split('-')
-            if end == '+':
+        if "-" in age_range:
+            start, end = age_range.split("-")
+            if end == "+":
                 return float(start) + 10  # Add 10 years for open-ended ranges
             return (float(start) + float(end)) / 2
         try:
@@ -133,13 +139,13 @@ class RealFairlearnAnalyzer:
             self.label_encoders[feature_name] = LabelEncoder()
 
         # Fit encoder if not already fitted
-        if not hasattr(self.label_encoders[feature_name], 'classes_'):
+        if not hasattr(self.label_encoders[feature_name], "classes_"):
             # Use common values for initial fitting
             common_values = {
-                'gender': ['male', 'female', 'non-binary', 'other'],
-                'ethnicity': ['white', 'black', 'hispanic', 'asian', 'native', 'mixed'],
-                'language': ['en', 'es', 'fr', 'zh', 'other'],
-                'session_type': ['individual', 'group', 'family', 'crisis-intervention']
+                "gender": ["male", "female", "non-binary", "other"],
+                "ethnicity": ["white", "black", "hispanic", "asian", "native", "mixed"],
+                "language": ["en", "es", "fr", "zh", "other"],
+                "session_type": ["individual", "group", "family", "crisis-intervention"],
             }
             if feature_name in common_values:
                 self.label_encoders[feature_name].fit(common_values[feature_name])
@@ -166,8 +172,8 @@ class RealFairlearnAnalyzer:
 
     def _calculate_simple_sentiment(self, text: str) -> float:
         """Simple sentiment calculation based on word lists"""
-        positive_words = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'happy', 'joy']
-        negative_words = ['bad', 'terrible', 'awful', 'horrible', 'sad', 'angry', 'frustrated']
+        positive_words = ["good", "great", "excellent", "amazing", "wonderful", "happy", "joy"]
+        negative_words = ["bad", "terrible", "awful", "horrible", "sad", "angry", "frustrated"]
 
         words = text.lower().split()
         positive_count = sum(1 for word in words if word in positive_words)
@@ -187,20 +193,14 @@ class RealFairlearnAnalyzer:
             return
 
         # Split data for training
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         # Scale features
         X_train_scaled = self.scaler.fit_transform(X_train)
         X_test_scaled = self.scaler.transform(X_test)
 
         # Train model (use Random Forest for better interpretability)
-        self.model = RandomForestClassifier(
-            n_estimators=100,
-            random_state=42,
-            max_depth=10
-        )
+        self.model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10)
         self.model.fit(X_train_scaled, y_train)
 
         # Calculate training accuracy
@@ -211,9 +211,7 @@ class RealFairlearnAnalyzer:
         self.is_trained = True
 
     async def analyze_fairness(
-        self,
-        session_data: Dict[str, Any],
-        sensitive_features: Optional[np.ndarray] = None
+        self, session_data: Dict[str, Any], sensitive_features: Optional[np.ndarray] = None
     ) -> Dict[str, Any]:
         """Perform real fairness analysis using Fairlearn"""
         try:
@@ -243,14 +241,14 @@ class RealFairlearnAnalyzer:
                     dp_diff = demographic_parity_difference(
                         y_true=np.array([0, 1]),  # Dummy for single prediction
                         y_pred=predictions,
-                        sensitive_features=sensitive_features.flatten()[:len(predictions)]
+                        sensitive_features=sensitive_features.flatten()[: len(predictions)],
                     )
 
                     # Equalized odds difference
                     eo_diff = equalized_odds_difference(
                         y_true=np.array([0, 1]),  # Dummy for single prediction
                         y_pred=predictions,
-                        sensitive_features=sensitive_features.flatten()[:len(predictions)]
+                        sensitive_features=sensitive_features.flatten()[: len(predictions)],
                     )
 
                     bias_score = float(max(abs(dp_diff), abs(eo_diff)))
@@ -267,22 +265,18 @@ class RealFairlearnAnalyzer:
 
             return {
                 "bias_score": min(bias_score, 1.0),
-                "demographic_parity_difference": dp_diff if 'dp_diff' in locals() else 0.0,
-                "equalized_odds_difference": eo_diff if 'eo_diff' in locals() else 0.0,
+                "demographic_parity_difference": dp_diff if "dp_diff" in locals() else 0.0,
+                "equalized_odds_difference": eo_diff if "eo_diff" in locals() else 0.0,
                 "dataset_size": len(X),
                 "predictions_generated": True,
                 "model_type": "RandomForest" if self.is_trained else "rule_based",
                 "feature_count": len(feature_names),
-                "confidence": min(probabilities.max(), 0.95)
+                "confidence": min(probabilities.max(), 0.95),
             }
 
         except Exception as e:
             logger.error(f"Real fairness analysis failed: {e}")
-            return {
-                "bias_score": 0.0,
-                "error": str(e),
-                "predictions_generated": False
-            }
+            return {"bias_score": 0.0, "error": str(e), "predictions_generated": False}
 
 
 class RealInterpretabilityAnalyzer:
@@ -297,7 +291,7 @@ class RealInterpretabilityAnalyzer:
         """Initialize SHAP explainer"""
         if SHAP_AVAILABLE:
             try:
-                if hasattr(model, 'predict_proba'):
+                if hasattr(model, "predict_proba"):
                     self.shap_explainer = shap.TreeExplainer(model, background_data)
                 else:
                     self.shap_explainer = shap.Explainer(model, background_data)
@@ -312,18 +306,15 @@ class RealInterpretabilityAnalyzer:
                 self.lime_explainer = LimeTabularExplainer(
                     training_data,
                     feature_names=feature_names,
-                    class_names=['low_bias', 'high_bias'],
-                    mode='classification'
+                    class_names=["low_bias", "high_bias"],
+                    mode="classification",
                 )
                 logger.info("LIME explainer initialized")
             except Exception as e:
                 logger.warning(f"LIME initialization failed: {e}")
 
     async def analyze_interpretability(
-        self,
-        model,
-        input_data: np.ndarray,
-        feature_names: List[str]
+        self, model, input_data: np.ndarray, feature_names: List[str]
     ) -> Dict[str, Any]:
         """Perform real interpretability analysis"""
         try:
@@ -332,7 +323,7 @@ class RealInterpretabilityAnalyzer:
                 "feature_importance": {},
                 "explanation_quality": 0.0,
                 "confidence": 0.0,
-                "methods_used": []
+                "methods_used": [],
             }
 
             # SHAP analysis
@@ -342,7 +333,7 @@ class RealInterpretabilityAnalyzer:
                     feature_importance = {}
 
                     # Calculate mean absolute SHAP values for feature importance
-                    if hasattr(shap_values, 'values'):
+                    if hasattr(shap_values, "values"):
                         if len(shap_values.values.shape) > 1:
                             mean_shap = np.mean(np.abs(shap_values.values), axis=0)
                         else:
@@ -365,8 +356,8 @@ class RealInterpretabilityAnalyzer:
                 try:
                     lime_exp = self.lime_explainer.explain_instance(
                         input_data[0],
-                        model.predict_proba if hasattr(model, 'predict_proba') else model.predict,
-                        num_features=min(5, len(feature_names))
+                        model.predict_proba if hasattr(model, "predict_proba") else model.predict,
+                        num_features=min(5, len(feature_names)),
                     )
 
                     # Extract feature importance from LIME
@@ -396,7 +387,7 @@ class RealInterpretabilityAnalyzer:
                 "feature_importance": {},
                 "explanation_quality": 0.0,
                 "confidence": 0.0,
-                "methods_used": []
+                "methods_used": [],
             }
 
 
@@ -408,11 +399,7 @@ class RealHuggingFaceAnalyzer:
         if HF_EVALUATE_AVAILABLE:
             try:
                 # Initialize common bias detection metrics
-                self.metrics = [
-                    'toxicity',
-                    'regard',
-                    'honest'
-                ]
+                self.metrics = ["toxicity", "regard", "honest"]
                 logger.info("Hugging Face evaluator initialized")
             except Exception as e:
                 logger.warning(f"Hugging Face evaluator initialization failed: {e}")
@@ -421,34 +408,40 @@ class RealHuggingFaceAnalyzer:
         """Analyze text for bias using Hugging Face models"""
         try:
             if not HF_EVALUATE_AVAILABLE:
-                return {
-                    "bias_score": 0.0,
-                    "error": "Hugging Face evaluate not available"
-                }
+                return {"bias_score": 0.0, "error": "Hugging Face evaluate not available"}
 
             results = {
                 "bias_score": 0.0,
                 "toxicity_score": 0.0,
                 "fairness_metrics": {},
-                "confidence": 0.0
+                "confidence": 0.0,
             }
 
             # Use evaluate library for bias detection
             for metric_name in self.metrics:
                 try:
-                    if metric_name == 'toxicity':
+                    if metric_name == "toxicity":
                         # Use a simple heuristic for toxicity (placeholder for real model)
-                        toxic_words = ['hate', 'stupid', 'idiot', 'awful', 'terrible', 'worst']
-                        toxicity_score = sum(1 for word in toxic_words if word in text.lower()) / len(text.split()) if text.split() else 0
+                        toxic_words = ["hate", "stupid", "idiot", "awful", "terrible", "worst"]
+                        toxicity_score = (
+                            sum(1 for word in toxic_words if word in text.lower())
+                            / len(text.split())
+                            if text.split()
+                            else 0
+                        )
                         results["toxicity_score"] = min(toxicity_score * 5, 1.0)
 
-                    elif metric_name == 'regard':
+                    elif metric_name == "regard":
                         # Simple regard analysis (placeholder)
-                        positive_indicators = ['good', 'great', 'excellent', 'amazing']
-                        negative_indicators = ['bad', 'terrible', 'awful', 'horrible']
+                        positive_indicators = ["good", "great", "excellent", "amazing"]
+                        negative_indicators = ["bad", "terrible", "awful", "horrible"]
 
-                        positive_count = sum(1 for word in positive_indicators if word in text.lower())
-                        negative_count = sum(1 for word in negative_indicators if word in text.lower())
+                        positive_count = sum(
+                            1 for word in positive_indicators if word in text.lower()
+                        )
+                        negative_count = sum(
+                            1 for word in negative_indicators if word in text.lower()
+                        )
 
                         regard_score = 0.5  # Neutral
                         if positive_count > negative_count:
@@ -458,7 +451,7 @@ class RealHuggingFaceAnalyzer:
 
                         results["fairness_metrics"]["regard"] = regard_score
 
-                    elif metric_name == 'honest':
+                    elif metric_name == "honest":
                         # Simple honesty assessment (placeholder)
                         honest_score = 0.8  # Assume mostly honest
                         results["fairness_metrics"]["honest"] = honest_score
@@ -470,7 +463,7 @@ class RealHuggingFaceAnalyzer:
             bias_indicators = [
                 results["toxicity_score"],
                 1.0 - (results["fairness_metrics"].get("regard", 0.5) * 2),  # Convert to bias score
-                1.0 - results["fairness_metrics"].get("honest", 0.8)  # Convert to bias score
+                1.0 - results["fairness_metrics"].get("honest", 0.8),  # Convert to bias score
             ]
 
             results["bias_score"] = float(np.mean(bias_indicators))
@@ -485,7 +478,7 @@ class RealHuggingFaceAnalyzer:
                 "error": str(e),
                 "toxicity_score": 0.0,
                 "fairness_metrics": {},
-                "confidence": 0.0
+                "confidence": 0.0,
             }
 
 
@@ -519,8 +512,8 @@ async def get_real_interaction_patterns_analysis(session_data: Dict[str, Any]) -
     """Real analysis of interaction patterns"""
     try:
         # Analyze response patterns, timing, and engagement
-        ai_responses = session_data.get('ai_responses', [])
-        response_times = [r.get('response_time', 0) for r in ai_responses]
+        ai_responses = session_data.get("ai_responses", [])
+        response_times = [r.get("response_time", 0) for r in ai_responses]
 
         if response_times:
             avg_response_time = np.mean(response_times)
@@ -533,9 +526,10 @@ async def get_real_interaction_patterns_analysis(session_data: Dict[str, Any]) -
 
         return {
             "bias_score": bias_score,
-            "interaction_frequency": len(ai_responses) / max(len(session_data.get('content', '').split()), 1),
+            "interaction_frequency": len(ai_responses)
+            / max(len(session_data.get("content", "").split()), 1),
             "pattern_consistency": 1.0 - bias_score,
-            "confidence": 0.75
+            "confidence": 0.75,
         }
     except Exception as e:
         logger.error(f"Real interaction patterns analysis failed: {e}")
@@ -545,17 +539,19 @@ async def get_real_interaction_patterns_analysis(session_data: Dict[str, Any]) -
 async def get_real_engagement_levels_analysis(session_data: Dict[str, Any]) -> Dict[str, Any]:
     """Real analysis of engagement levels"""
     try:
-        content = session_data.get('content', '')
-        ai_responses = session_data.get('ai_responses', [])
+        content = session_data.get("content", "")
+        ai_responses = session_data.get("ai_responses", [])
 
         # Analyze content depth and response quality
         content_length = len(content)
-        avg_response_length = np.mean([len(r.get('content', '')) for r in ai_responses]) if ai_responses else 0
+        avg_response_length = (
+            np.mean([len(r.get("content", "")) for r in ai_responses]) if ai_responses else 0
+        )
 
         # Calculate engagement variance
         engagement_scores = []
         for response in ai_responses:
-            score = len(response.get('content', '')) * 0.1  # Simple length-based score
+            score = len(response.get("content", "")) * 0.1  # Simple length-based score
             engagement_scores.append(min(score, 1.0))
 
         engagement_variance = np.var(engagement_scores) if engagement_scores else 0
@@ -564,7 +560,7 @@ async def get_real_engagement_levels_analysis(session_data: Dict[str, Any]) -> D
             "bias_score": float(min(engagement_variance * 2, 1.0)),
             "engagement_variance": float(engagement_variance),
             "demographic_differences": 0.1,  # Placeholder for demographic analysis
-            "confidence": 0.7
+            "confidence": 0.7,
         }
     except Exception as e:
         logger.error(f"Real engagement levels analysis failed: {e}")
@@ -574,13 +570,13 @@ async def get_real_engagement_levels_analysis(session_data: Dict[str, Any]) -> D
 async def get_real_outcome_fairness_analysis(session_data: Dict[str, Any]) -> Dict[str, Any]:
     """Real analysis of outcome fairness"""
     try:
-        expected_outcomes = session_data.get('expected_outcomes', [])
+        expected_outcomes = session_data.get("expected_outcomes", [])
 
         if not expected_outcomes:
             return {"bias_score": 0.0, "outcome_variance": 0.0, "fairness_metrics": {}}
 
         # Analyze outcome distribution
-        outcomes = [o.get('outcome', 0) for o in expected_outcomes]
+        outcomes = [o.get("outcome", 0) for o in expected_outcomes]
         outcome_variance = np.var(outcomes) if outcomes else 0
 
         return {
@@ -588,9 +584,9 @@ async def get_real_outcome_fairness_analysis(session_data: Dict[str, Any]) -> Di
             "outcome_variance": float(outcome_variance),
             "fairness_metrics": {
                 "demographic_parity": 0.9,  # Placeholder
-                "equalized_odds": 0.85     # Placeholder
+                "equalized_odds": 0.85,  # Placeholder
             },
-            "confidence": 0.8
+            "confidence": 0.8,
         }
     except Exception as e:
         logger.error(f"Real outcome fairness analysis failed: {e}")
@@ -600,7 +596,7 @@ async def get_real_outcome_fairness_analysis(session_data: Dict[str, Any]) -> Di
 async def get_real_performance_disparities_analysis(session_data: Dict[str, Any]) -> Dict[str, Any]:
     """Real analysis of performance disparities"""
     try:
-        ai_responses = session_data.get('ai_responses', [])
+        ai_responses = session_data.get("ai_responses", [])
 
         if not ai_responses:
             return {"bias_score": 0.0, "group_performance_variance": 0.0}
@@ -609,7 +605,7 @@ async def get_real_performance_disparities_analysis(session_data: Dict[str, Any]
         response_qualities = []
         for response in ai_responses:
             # Simple quality metric based on response length and coherence
-            content = response.get('content', '')
+            content = response.get("content", "")
             quality = min(len(content) / 100, 1.0)  # Normalize to 0-1
             response_qualities.append(quality)
 
@@ -619,7 +615,7 @@ async def get_real_performance_disparities_analysis(session_data: Dict[str, Any]
             "bias_score": float(min(performance_variance * 3, 1.0)),
             "group_performance_variance": float(performance_variance),
             "statistical_significance": 0.9,  # Placeholder
-            "confidence": 0.75
+            "confidence": 0.75,
         }
     except Exception as e:
         logger.error(f"Real performance disparities analysis failed: {e}")

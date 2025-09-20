@@ -358,8 +358,7 @@ def distribute_task(task_name: str, data: List[Any], chunk_size: int = 100, **kw
     chunks = chunk_data(data, chunk_size)
 
     task_signatures = [
-        app.signature(task_name, args=[chunk, i], kwargs=kwargs)
-        for i, chunk in enumerate(chunks)
+        app.signature(task_name, args=[chunk, i], kwargs=kwargs) for i, chunk in enumerate(chunks)
     ]
     # Execute tasks as a group
     job = group(task_signatures)
