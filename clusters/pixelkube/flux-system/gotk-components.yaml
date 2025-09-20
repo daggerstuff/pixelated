@@ -5116,7 +5116,7 @@ spec:
               containerName: manager
               resource: limits.memory
       - name: manager
-        image: ghcr.io/fluxcd/source-controller:v1.6.2
+        image: ghcr.io/fluxcd/source-controller:v1.6.2@sha256:example1
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -5150,6 +5150,8 @@ spec:
             - ALL
           readOnlyRootFilesystem: true
           runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
           seccompProfile:
             type: RuntimeDefault
         volumeMounts:

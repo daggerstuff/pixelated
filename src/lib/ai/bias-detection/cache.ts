@@ -7,16 +7,8 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { getCacheService, type CacheClient } from '../../services/cacheService'
-import type {
-  CacheEntry,
-  CacheStats,
-  BiasAnalysisResult,
-  TherapeuticSession,
-  BiasDashboardData,
-  BiasReport,
-  ParticipantDemographics,
-} from './types'
+import { getCacheService } from '../../services/cacheService'
+import { CacheEntry, CacheStats, BiasReport, BiasAnalysisResult, TherapeuticSession, ParticipantDemographics } from './types'
 
 import * as zlib from 'zlib'
 import { promisify } from 'util'
@@ -149,14 +141,8 @@ export class BiasDetectionCache {
   private async initializeRedis(): Promise<void> {
     try {
       const service = getCacheService()
-      // Check if the service returned actually has the keys method, which it should if it's Redis
-      if ('keys' in service) {
-        this.cacheService = service as CacheClient
-      } else {
-        throw new Error(
-          "CacheService does not implement CacheClient's 'keys' method.",
-        )
-      }
+      // CacheService now always implements CacheClient interface
+      this.cacheService = service
       this.redisAvailable = true
       logger.info('Redis cache service connected for bias detection')
     } catch (error: unknown) {
@@ -597,8 +583,6 @@ export class BiasDetectionCache {
     this.updateStats()
     return {
       ...this.stats,
-      redisAvailable: this.redisAvailable,
-      hybridMode: this.config.hybridMode,
     }
   }
 
@@ -979,7 +963,7 @@ export class DashboardCache {
   async cacheDashboardData(
     userId: string,
     timeRange: string,
-    data: BiasDashboardData,
+    data: DashboardData,
   ): Promise<void> {
     const key = `dashboard:${userId}:${timeRange}`
     const tags = ['dashboard', `user:${userId}`, `timerange:${timeRange}`]
@@ -993,9 +977,9 @@ export class DashboardCache {
   async getDashboardData(
     userId: string,
     timeRange: string,
-  ): Promise<BiasDashboardData | null> {
+  ): Promise<DashboardData | null> {
     const key = `dashboard:${userId}:${timeRange}`
-    return await this.cache.get<BiasDashboardData>(key)
+    return await this.cache.get<DashboardData>(key)
   }
 
   /**
@@ -1206,7 +1190,7 @@ export async function getCachedAnalysisResult(
 export async function cacheDashboardData(
   userId: string,
   timeRange: string,
-  data: BiasDashboardData,
+  data: DashboardData,
 ): Promise<void> {
   const cacheManager = getCacheManager()
   await cacheManager.dashboardCache.cacheDashboardData(userId, timeRange, data)
@@ -1218,7 +1202,7 @@ export async function cacheDashboardData(
 export async function getCachedDashboardData(
   userId: string,
   timeRange: string,
-): Promise<BiasDashboardData | null> {
+): Promise<DashboardData | null> {
   const cacheManager = getCacheManager()
   return await cacheManager.dashboardCache.getDashboardData(userId, timeRange)
 }

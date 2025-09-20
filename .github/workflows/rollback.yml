@@ -81,6 +81,22 @@ jobs:
     - name: Build application
       run: pnpm build
 
+    - name: Debug Token Permissions
+      run: |
+        echo "Checking token permissions..."
+        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+
+    - name: Dry Run Git Push
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
+      run: |
+        TIMESTAMP=$(date +%Y%m)
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git tag rollback-staging-$TIMESTAMP
+        echo "Dry run for git push..."
+        git push --dry-run https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git rollback-staging-$TIMESTAMP
+
     - name: Create rollback tag
       env:
         G_TOKEN: ${{ secrets.G_TOKEN }}
@@ -159,6 +175,22 @@ jobs:
 
     - name: Build application
       run: pnpm build
+
+    - name: Debug Token Permissions
+      run: |
+        echo "Checking token permissions..."
+        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+
+    - name: Dry Run Git Push
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
+      run: |
+        TIMESTAMP=$(date +%Y%m%d)
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git tag prod-rollback-$TIMESTAMP
+        echo "Dry run for git push..."
+        git push --dry-run https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git prod-rollback-$TIMESTAMP
 
     - name: Create rollback tag
       env:
