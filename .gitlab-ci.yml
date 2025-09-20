@@ -7,33 +7,40 @@ stages:
 qodana:
   stage: test
   image:
-    name: jetbrains/qodana-js
-    entrypoint:
-    - ''
+    name: jetbrains/qodana-js:2025.2
+    entrypoint: [ "" ]
   variables:
     QODANA_TOKEN: $QODANA_TOKEN
     GIT_STRATEGY: fetch
+    QODANA_OFFLINE_MODE: "true"
+    QODANA_DISABLE_CLOUD: "true"
+    # Memory optimization
+    JAVA_OPTS: "-Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=200" # Increased memory allocation to 4GB
   script:
-  - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana
+  - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana --cache-dir=/tmp/qodana-cache
   allow_failure: true
+  timeout: 10m
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: "$CI_MERGE_REQUEST_ID"
 variables:
-   DOCKER_DRIVER: overlay2
-   DOCKER_TLS_CERTDIR: "/certs"
-   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
-   CONTAINER_IMAGE_LATEST_PREV: $CI_REGISTRY_IMAGE:previous
-   CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
-   # Use correct GitLab Container Registry endpoint
-   CI_REGISTRY: https://registry.gitlab.com/
-   # Use correct image path for registry.gitlab.com
-   CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
-   # GKE configuration
-   GKE_CLUSTER_NAME: ${GKE_CLUSTER_NAME:-pixelcluster}
-   GKE_ZONE: ${GKE_ZONE:-us-east1}
-   GKE_ENVIRONMENT_URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
+  CONTAINER_IMAGE_LATEST_PREV: $CI_REGISTRY_IMAGE:previous
+  CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
+  # Use correct GitLab Container Registry endpoint
+  CI_REGISTRY: https://registry.gitlab.com/
+  # Use correct image path for registry.gitlab.com
+  CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
+  # GKE configuration
+  GKE_CLUSTER_NAME: ${GKE_CLUSTER_NAME:-pixelcluster}
+  GKE_ZONE: ${GKE_ZONE:-us-east1}
+  GKE_ENVIRONMENT_URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}
+  # Global memory settings for resource-intensive jobs
+  KUBERNETES_MEMORY_REQUEST: 2Gi
+  KUBERNETES_MEMORY_LIMIT: 4Gi
 validate-runner:
   stage: validate
   image: docker:27.3.1
@@ -80,13 +87,11 @@ build-frontend:
     NODE_ENV: production
     CI: 'true'
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
-    $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-  - "echo \"\U0001F3D7️ Building Pixelated Empathy frontend container...\""
+  - "echo \"🏗️ Building Pixelated Empathy frontend container...\""
   - ls -la
-  - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit
-    1)
+  - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
   - docker buildx create --use --name multiarch-builder || docker buildx use multiarch-builder
   - |
     docker buildx build \
@@ -96,12 +101,13 @@ build-frontend:
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
       -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
-  - "echo \"\U0001F4E4 Pushing container to GitLab Container Registry...\""
+  - "echo \"📤 Pushing container to GitLab Container Registry...\""
   - timeout 300 docker push $CONTAINER_IMAGE
   - timeout 300 docker push $CONTAINER_IMAGE_LATEST
   - echo "✅ Frontend container pushed to GitLab Container Registry"
-  - "echo \"\U0001F4E6 Image SHA: $CONTAINER_IMAGE\"\necho \"\U0001F3F7️  Latest:
-    $CONTAINER_IMAGE_LATEST\"\n"
+  - "echo \"📦 Image SHA: $CONTAINER_IMAGE\"
+
+    echo \"🏷️  Latest: $CONTAINER_IMAGE_LATEST\"\n"
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
@@ -118,8 +124,7 @@ test-container:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
-    $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Testing container health..."
   - docker pull $CONTAINER_IMAGE
@@ -357,14 +362,12 @@ build-ai-backend:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
-    $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Building AI backend components..."
   - cd ai
   - docker buildx create --use --name ai-builder || docker buildx use ai-builder
-  - docker buildx build --load -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest
-    .
+  - docker buildx build --load -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
   - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
   - docker push $CI_REGISTRY_IMAGE/ai:latest
   - echo "✅ AI backend container pushed to GitLab Container Registry"
@@ -388,8 +391,7 @@ security-scan:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
-    $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Running security scan on container..."
   - docker pull $CONTAINER_IMAGE
@@ -566,8 +568,7 @@ tag-image:
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
-    $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script: |
     echo "Tagging image with branch and build number..."
     if docker pull $CONTAINER_IMAGE; then
@@ -587,6 +588,7 @@ trivy-scan:
   stage: test
   image: aquasec/trivy:latest
   script:
+  - echo "Scanning container image for vulnerabilities..."
   - trivy image $CONTAINER_IMAGE
   dependencies:
   - build-frontend
@@ -611,8 +613,7 @@ cleanup:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
-    $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
   - echo "Cleaning up old container images..."
   - docker image prune -af --filter "until=24h"
@@ -627,7 +628,16 @@ deploy-gke:
   image: google/cloud-sdk:alpine
   before_script:
   - apk add --no-cache kubectl curl
-  - echo $GCP_SERVICE_ACCOUNT_KEY | base64 -d > /tmp/gcp-key.json
+  - |
+    echo "Fetching service account key dynamically..."
+    gcloud auth activate-service-account $GCP_SERVICE_ACCOUNT_EMAIL --key-file=/tmp/gcp-key.json || {
+      echo "❌ Failed to authenticate with gcloud. Ensure the service account email is correct."
+      exit 1
+    }
+    gcloud iam service-accounts keys create /tmp/gcp-key.json --iam-account=$GCP_SERVICE_ACCOUNT_EMAIL || {
+      echo "❌ Failed to fetch service account key dynamically."
+      exit 1
+    }
   - gcloud auth activate-service-account --key-file /tmp/gcp-key.json
   - gcloud config set project $GCP_PROJECT_ID
   - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
