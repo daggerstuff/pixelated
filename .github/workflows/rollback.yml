@@ -95,7 +95,7 @@ jobs:
         git config --global user.name "GitHub Action"
         git tag rollback-staging-$TIMESTAMP
         echo "Dry run for git push..."
-        git push --dry-run https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git rollback-staging-$TIMESTAMP
+        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git rollback-staging-$TIMESTAMP
 
     - name: Create rollback tag
       env:
@@ -105,7 +105,7 @@ jobs:
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         git tag rollback-staging-$TIMESTAMP
-        git push https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git rollback-staging-$TIMESTAMP
+        git push https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git rollback-staging-$TIMESTAMP
 
   rollback-production:
     name: Rollback Production
@@ -190,7 +190,7 @@ jobs:
         git config --global user.name "GitHub Action"
         git tag prod-rollback-$TIMESTAMP
         echo "Dry run for git push..."
-        git push --dry-run https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git prod-rollback-$TIMESTAMP
+        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git prod-rollback-$TIMESTAMP
 
     - name: Create rollback tag
       env:
@@ -201,5 +201,5 @@ jobs:
         git config --global user.name "GitHub Action"
         TAG_NAME=prod-rollback-$TIMESTAMP
         git tag $TAG_NAME
-        git remote set-url origin https://x-access-token:${G_TOKEN}@github.com/pixelatedempathy/pixelated.git
+        git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
         git push origin $TAG_NAME

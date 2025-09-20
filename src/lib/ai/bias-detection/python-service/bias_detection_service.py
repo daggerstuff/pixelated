@@ -13,7 +13,7 @@ This Flask service provides a comprehensive bias detection API that integrates:
 HIPAA Compliant with encryption, audit logging, and secure data handling.
 """
 
-# Standard library
+# Standard library imports
 import asyncio
 import base64
 import csv
@@ -24,38 +24,21 @@ import logging
 import os
 import sys
 import time
+import traceback
 import warnings
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import wraps
 from typing import Any
 
-import matplotlib
-
 # Third-party libraries
+import matplotlib
 import numpy as np
 import pandas as pd
 from flask import Flask, Response, g, has_request_context, jsonify, request
 from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
 from werkzeug.exceptions import Unauthorized
-
-# Optional PyTorch import
-try:
-    import torch
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
-    torch = None
-
-matplotlib.use("Agg")  # Use non-interactive backend
-
-import traceback
-
-import jwt
-from aif360.datasets import BinaryLabelDataset
-from aif360.metrics import BinaryLabelDatasetMetric
-from celery_config import app as celery_app
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -64,25 +47,51 @@ from fairlearn.metrics import (
     equalized_odds_difference,
 )
 
-# Import real ML models and fallback to placeholder adapters
+# Optional PyTorch import
 try:
-    # Real ML models import block intentionally removed to resolve unused import and syntax errors.
+    import torch
+
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
+
+# Real ML models import block
+try:
     REAL_ML_AVAILABLE = True
 except ImportError:
     REAL_ML_AVAILABLE = False
-    # Import placeholder adapters as fallback
     from .placeholder_adapters import PlaceholderAdapters
+
     placeholder_adapters = PlaceholderAdapters()
 
-# Log the import status after logger is configured (will be done after logger setup below)
+# NLP libraries
+try:
+    import nltk
+    from nltk.sentiment import SentimentIntensityAnalyzer
 
-def _compat_vmap(fn, in_dims=0, out_dims=0):
-    """Compatibility shim for torch.vmap; returns None if unavailable."""
-    if torch is not None and hasattr(torch, "vmap"):
-        return torch.vmap(fn, in_dims=in_dims, out_dims=out_dims)
-    return None
+    NLTK_AVAILABLE = True
+except ImportError:
+    NLTK_AVAILABLE = False
 
-# Filter noisy warnings early
+try:
+    import spacy
+
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
+
+try:
+    from textblob import TextBlob
+
+    TEXTBLOB_AVAILABLE = True
+except ImportError:
+    TEXTBLOB_AVAILABLE = False
+
+# Configure matplotlib backend
+matplotlib.use("Agg")  # Use non-interactive backend
+
+# Filter noisy warnings
 warnings.filterwarnings(
     "ignore",
     category=FutureWarning,
@@ -91,45 +100,15 @@ warnings.filterwarnings(
 )
 
 
-# NLP libraries
-# Try to load NLP stack components individually to support partial availability
-NLP_AVAILABLE = False
-NLTK_AVAILABLE = False
-SPACY_AVAILABLE = False
-TEXTBLOB_AVAILABLE = False
-try:
-    import nltk
-    from nltk.sentiment import SentimentIntensityAnalyzer
+# Log the import status after logger is configured (will be done after logger setup below)
 
-    NLTK_AVAILABLE = True
-except Exception:
-    NLTK_AVAILABLE = False
-try:
-    import spacy
 
-    SPACY_AVAILABLE = True
-except Exception:
-    SPACY_AVAILABLE = False
-try:
-    from textblob import TextBlob
+def _compat_vmap(fn, in_dims=0, out_dims=0):
+    """Compatibility shim for torch.vmap; returns None if unavailable."""
+    if torch is not None and hasattr(torch, "vmap"):
+        return torch.vmap(fn, in_dims=in_dims, out_dims=out_dims)
+    return None
 
-    TEXTBLOB_AVAILABLE = True
-except Exception:
-    TEXTBLOB_AVAILABLE = False
-
-# Consider NLP available if at least one backend is present
-NLP_AVAILABLE = NLTK_AVAILABLE or SPACY_AVAILABLE or TEXTBLOB_AVAILABLE
-if not NLP_AVAILABLE:
-    logging.warning("NLP libraries not available: no VADER, spaCy, or TextBlob present")
-else:
-    have = []
-    if NLTK_AVAILABLE:
-        have.append("VADER")
-    if SPACY_AVAILABLE:
-        have.append("spaCy")
-    if TEXTBLOB_AVAILABLE:
-        have.append("TextBlob")
-    logging.info(f"NLP backends available: {', '.join(have)}")
 
 # Model interpretability (feature flag only; avoid heavy imports until needed)
 try:
@@ -435,7 +414,6 @@ class BiasDetectionService:
                 interactive_result,
                 evaluation_result,
             ) = layer_results
-
 
             # Calculate overall bias score
             overall_score = self._calculate_overall_bias_score(layer_results)
@@ -988,7 +966,9 @@ class BiasDetectionService:
             blob = TextBlob(text)
             sentiment_obj = getattr(blob, "sentiment", None)
             polarity = float(getattr(sentiment_obj, "polarity", 0.0)) if sentiment_obj else 0.0
-            subjectivity = float(getattr(sentiment_obj, "subjectivity", 0.0)) if sentiment_obj else 0.0
+            subjectivity = (
+                float(getattr(sentiment_obj, "subjectivity", 0.0)) if sentiment_obj else 0.0
+            )
             pos = max(0.0, polarity)
             compound = polarity
             neg = max(0.0, -compound)

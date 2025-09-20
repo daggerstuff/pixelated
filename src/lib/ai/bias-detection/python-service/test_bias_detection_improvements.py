@@ -42,20 +42,21 @@ class TestPlaceholderAdapters(unittest.TestCase):
         """Test Fairlearn placeholder predictions"""
         # Create test data
         y_true = np.array([0, 1, 0, 1, 1, 0])
-        sensitive_features = pd.DataFrame({
-            "gender": [0, 1, 0, 1, 0, 1],
-            "age": [1, 0, 1, 0, 1, 0]
-        })
+        sensitive_features = pd.DataFrame({"gender": [0, 1, 0, 1, 0, 1], "age": [1, 0, 1, 0, 1, 0]})
 
         # Test deterministic predictions
-        predictions = placeholder_adapters.fairlearn_placeholder_predictions(y_true, sensitive_features)
+        predictions = placeholder_adapters.fairlearn_placeholder_predictions(
+            y_true, sensitive_features
+        )
 
         # Should return predictions of same length as y_true
         assert len(predictions) == len(y_true)
         # Should be binary predictions
         assert all(pred in [0, 1] for pred in predictions)
         # Should be deterministic (same input should produce same output)
-        predictions2 = placeholder_adapters.fairlearn_placeholder_predictions(y_true, sensitive_features)
+        predictions2 = placeholder_adapters.fairlearn_placeholder_predictions(
+            y_true, sensitive_features
+        )
         assert np.array_equal(predictions, predictions2)
 
     def test_interpretability_placeholder_analysis(self):
@@ -166,9 +167,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         # Mock the audit logger to avoid file operations
         with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
             # Test that Fairlearn analysis uses real implementation
-            result = asyncio.run(
-                self.service._run_fairlearn_analysis(session_data)
-            )
+            result = asyncio.run(self.service._run_fairlearn_analysis(session_data))
 
             # Should return structured result
             assert "bias_score" in result
@@ -185,9 +184,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         # Mock the audit logger to avoid file operations
         with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
             # Test that interpretability analysis uses real implementation
-            result = asyncio.run(
-                self.service._run_interpretability_analysis(session_data)
-            )
+            result = asyncio.run(self.service._run_interpretability_analysis(session_data))
 
             # Should return structured result
             assert "bias_score" in result
@@ -267,7 +264,9 @@ class TestDashboardAndExportEndpoints(unittest.TestCase):
     def test_dashboard_endpoint_real_data(self):
         """Test dashboard endpoint with real placeholder data"""
         # Mock the placeholder adapter
-        with patch("bias_detection_service.placeholder_adapters.dashboard_data_placeholder") as mock_dashboard:
+        with patch(
+            "bias_detection_service.placeholder_adapters.dashboard_data_placeholder"
+        ) as mock_dashboard:
             mock_dashboard.return_value = {
                 "summary": {
                     "total_sessions_analyzed": 1500,
@@ -303,7 +302,9 @@ class TestDashboardAndExportEndpoints(unittest.TestCase):
     def test_export_endpoint_real_data(self):
         """Test export endpoint with real placeholder data"""
         # Mock the placeholder adapter
-        with patch("bias_detection_service.placeholder_adapters.export_data_placeholder") as mock_export:
+        with patch(
+            "bias_detection_service.placeholder_adapters.export_data_placeholder"
+        ) as mock_export:
             mock_export.return_value = [
                 {
                     "session_id": "test_session_001",
@@ -321,7 +322,7 @@ class TestDashboardAndExportEndpoints(unittest.TestCase):
 
             export_data = {
                 "format": "json",
-                "date_range": {"start": "2024-01-01", "end": "2024-01-31"}
+                "date_range": {"start": "2024-01-01", "end": "2024-01-31"},
             }
 
             response = self.client.post("/export", json=export_data)
@@ -363,11 +364,7 @@ class TestErrorHandlingAndLogging(unittest.TestCase):
         # Normal logging
         asyncio.run(
             audit_logger.log_event(
-                "test_event",
-                "test_session",
-                "test_user",
-                {"test": "data"},
-                sensitive_data=False
+                "test_event", "test_session", "test_user", {"test": "data"}, sensitive_data=False
             )
         )
 
@@ -378,7 +375,7 @@ class TestErrorHandlingAndLogging(unittest.TestCase):
                 "test_session",
                 "test_user",
                 {"sensitive": "data"},
-                sensitive_data=True
+                sensitive_data=True,
             )
         )
 
@@ -390,9 +387,7 @@ class TestErrorHandlingAndLogging(unittest.TestCase):
         # Mock the audit logger to avoid file operations
         with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
             # Should handle empty session data gracefully
-            result = asyncio.run(
-                self.service.analyze_session(session_data, "test_user")
-            )
+            result = asyncio.run(self.service.analyze_session(session_data, "test_user"))
 
             # Should return structured result even with minimal data
             assert "session_id" in result
