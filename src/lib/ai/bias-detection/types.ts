@@ -432,3 +432,38 @@ export interface SessionData {
   participantDemographics?: ParticipantDemographics
   content?: SessionContent
 }
+
+// Define CacheEntry type
+export interface CacheEntry<T = any> {
+  key: string;
+  value: T;
+  timestamp: Date;
+  expiresAt: Date;
+  accessCount: number;
+  lastAccessed: Date;
+  tags: string[];
+}
+
+// Define CacheStats type
+export interface CacheStats {
+  totalEntries: number;
+  hitRate: number;
+  missRate: number;
+  evictionCount: number;
+  memoryUsage: number;
+  oldestEntry: Date;
+  newestEntry: Date;
+  redisHits: number;
+  redisMisses: number;
+  memoryHits: number;
+  memoryMisses: number;
+}
+
+// Define BiasReport type
+export interface BiasReport {
+  reportId: string;
+  title: string;
+  description: string;
+  createdAt: Date;
+  data: Record<string, any>;
+}

@@ -59,6 +59,54 @@ export interface CacheClient extends CacheService {
 }
 
 /**
+ * Enhanced Cache Service that includes keys method
+ * This is a compatibility layer to provide CacheClient functionality
+ */
+export class EnhancedCacheService implements CacheClient {
+  private baseService: CacheService
+
+  constructor(service: CacheService) {
+    this.baseService = service
+  }
+
+  async get<T = string>(key: string): Promise<T | null> {
+    return this.baseService.get<T>(key)
+  }
+
+  async set(key: string, value: string, ttl?: number): Promise<void> {
+    return this.baseService.set(key, value, ttl)
+  }
+
+  async delete(key: string): Promise<void> {
+    return this.baseService.delete(key)
+  }
+
+  async clearByPrefix(prefix: string): Promise<void> {
+    return this.baseService.clearByPrefix(prefix)
+  }
+
+  async mget<T = string>(keys: string[]): Promise<Record<string, T | null>> {
+    return this.baseService.mget<T>(keys)
+  }
+
+  async keys(pattern: string): Promise<string[]> {
+    // For memory cache, we need to implement keys functionality
+    if (this.baseService instanceof MemoryCacheService) {
+      const memoryService = this.baseService as any
+      const allKeys = Array.from(memoryService.cache.keys()) as string[]
+      return allKeys
+        .map(key => key.startsWith(memoryService.prefix) ? key.substring(memoryService.prefix.length) : key)
+        .filter(key => key.includes(pattern.replace('*', '')))
+    }
+
+    // For Vercel KV, we can't easily implement keys without Redis SCAN
+    // Return empty array as fallback
+    logger.warn('keys method not fully supported for Vercel KV cache service')
+    return []
+  }
+}
+
+/**
  * Vercel KV Cache Service Implementation
  * Uses Vercel KV for distributed caching across instances
  */
@@ -322,9 +370,9 @@ let memoryCacheService: MemoryCacheService | null = null
  * Get the appropriate cache service.
  * Tries to use Vercel KV first, falls back to in-memory cache
  *
- * @returns CacheService implementation
+ * @returns CacheClient implementation with keys method support
  */
-export function getCacheService(): CacheService {
+export function getCacheService(): CacheClient {
   // Initialize Vercel KV cache service if not already initialized
   if (!vercelKVCacheService) {
     vercelKVCacheService = new VercelKVCacheService()
@@ -337,9 +385,9 @@ export function getCacheService(): CacheService {
 
   // Use Vercel KV if connected, otherwise fall back to memory cache
   if (vercelKVCacheService.connected) {
-    return vercelKVCacheService
+    return new EnhancedCacheService(vercelKVCacheService)
   } else {
-    return memoryCacheService
+    return new EnhancedCacheService(memoryCacheService)
   }
 }
 

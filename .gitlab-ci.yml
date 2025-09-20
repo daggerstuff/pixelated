@@ -19,7 +19,7 @@ qodana:
   script:
   - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana --cache-dir=/tmp/qodana-cache
   allow_failure: true
-  timeout: 10m
+  timeout: 20m
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: "$CI_MERGE_REQUEST_ID"
@@ -30,15 +30,11 @@ variables:
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   CONTAINER_IMAGE_LATEST_PREV: $CI_REGISTRY_IMAGE:previous
   CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
-  # Use correct GitLab Container Registry endpoint
   CI_REGISTRY: https://registry.gitlab.com/
-  # Use correct image path for registry.gitlab.com
   CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
-  # GKE configuration
   GKE_CLUSTER_NAME: ${GKE_CLUSTER_NAME:-pixelcluster}
   GKE_ZONE: ${GKE_ZONE:-us-east1}
   GKE_ENVIRONMENT_URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}
-  # Global memory settings for resource-intensive jobs
   KUBERNETES_MEMORY_REQUEST: 2Gi
   KUBERNETES_MEMORY_LIMIT: 4Gi
 validate-runner:

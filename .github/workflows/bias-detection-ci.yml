@@ -387,6 +387,9 @@ jobs:
       env:
         POSTGRES_USER: postgres
 
+    - name: Ensure Playwright report directory exists
+      run: mkdir -p playwright-report-browser-compat
+
     - name: Install Playwright browsers
       run: pnpm exec playwright install --with-deps
 
@@ -420,7 +423,7 @@ jobs:
       env:
         NODE_ENV: test
 
-    - name: Run E2E tests
+    - name: Run Playwright tests
       run: pnpm test:e2e --project=chromium
       env:
         NODE_ENV: test
