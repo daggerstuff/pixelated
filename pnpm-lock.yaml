@@ -92,6 +92,9 @@ importers:
       '@sentry/profiling-node':
         specifier: ^10.10.0
         version: 10.10.0
+      '@sentry/toolbar':
+        specifier: 1.0.0-beta.11
+        version: 1.0.0-beta.11(react@19.1.1)
       '@sentry/vite-plugin':
         specifier: ^4.3.0
         version: 4.3.0
@@ -3309,6 +3312,12 @@ packages:
     resolution: {integrity: sha512-VAsXdIKEGpfYoXPxQVCH8277t/C7I27ZK+oLxar336dCTpBa85B000zVTQl073u/zW6r/eCKg4s6cO0Db2ytQA==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@sentry/toolbar@1.0.0-beta.11':
+    resolution: {integrity: sha512-7xImSt+R2v/rkWQfvjQEi7EBC/UfogmAVnGfb2iTs9IjvGlF1iQn/aRQZhU64Ve09aswRiFfUUJIbLIG05yG7A==}
+    engines: {node: '>=18', npm: USE PNPM, pnpm: '>=9', yarn: USE PNPM}
+    peerDependencies:
+      react: '>=18'
 
   '@sentry/vite-plugin@4.3.0':
     resolution: {integrity: sha512-MeTAHMmTOgBPMAjeW7/ONyXwgScZdaFFtNiALKcAODnVqC7eoHdSRIWeH5mkLr2Dvs7nqtBaDpKxRjUBgfm9LQ==}
@@ -13956,6 +13965,10 @@ snapshots:
       '@sentry/node': 10.10.0
     transitivePeerDependencies:
       - supports-color
+
+  '@sentry/toolbar@1.0.0-beta.11(react@19.1.1)':
+    dependencies:
+      react: 19.1.1
 
   '@sentry/vite-plugin@4.3.0':
     dependencies:
