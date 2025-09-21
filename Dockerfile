@@ -34,8 +34,16 @@ LABEL org.opencontainers.image.description="Secure Node.js app using a minimal b
 
 # Application Healthcheck: verifies service health (only one HEALTHCHECK allowed per stage)
   WORKDIR /app
+ARG SENTRY_DSN=""
+ARG SENTRY_AUTH_TOKEN=""
+ARG SENTRY_RELEASE=""
+ARG PUBLIC_SENTRY_DSN=""
 
 ENV NODE_ENV="production"
+ENV SENTRY_DSN=${SENTRY_DSN}
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
+ENV PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}
 ENV ASTRO_TELEMETRY_DISABLED=1
 ENV ASTRO_CACHE_DIR=/tmp/.astro
 ENV VITE_CACHE_DIR=/tmp/.vite
@@ -59,6 +67,13 @@ RUN pnpm config set store-dir /pnpm/.pnpm-store && \
     pnpm audit --audit-level moderate || true
 
 FROM base AS build
+
+# Forward build-time Sentry args into the build stage environment so plugins
+# (like source map upload) can run during `pnpm build` when args are provided.
+ENV SENTRY_DSN=${SENTRY_DSN}
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
+ENV PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}
 
 # Copy dependencies from deps stage
 COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules

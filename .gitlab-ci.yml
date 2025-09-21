@@ -84,26 +84,32 @@ build-frontend:
     CI: 'true'
   before_script:
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  script:
-  - "echo \"🏗️ Building Pixelated Empathy frontend container...\""
-  - ls -la
-  - test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
-  - docker buildx create --use --name multiarch-builder || docker buildx use multiarch-builder
-  - |
+  script: |
+    echo "🏗️ Building Pixelated Empathy frontend container..."
+    ls -la
+    test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
+    docker buildx create --use --name multiarch-builder || docker buildx use multiarch-builder
+
+    # Prefer tag for release when available; avoid inline parameter expansion that breaks YAML
+    export BUILD_SENTRY_RELEASE="${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
     docker buildx build \
       --load \
       --build-arg NODE_ENV=production \
       --build-arg CI=true \
+      --build-arg SENTRY_DSN="$SENTRY_DSN" \
+      --build-arg SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
+      --build-arg SENTRY_RELEASE="$BUILD_SENTRY_RELEASE" \
+      --build-arg PUBLIC_SENTRY_DSN="$PUBLIC_SENTRY_DSN" \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
       -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
-  - "echo \"📤 Pushing container to GitLab Container Registry...\""
-  - timeout 300 docker push $CONTAINER_IMAGE
-  - timeout 300 docker push $CONTAINER_IMAGE_LATEST
-  - echo "✅ Frontend container pushed to GitLab Container Registry"
-  - "echo \"📦 Image SHA: $CONTAINER_IMAGE\"
 
-    echo \"🏷️  Latest: $CONTAINER_IMAGE_LATEST\"\n"
+    echo "📤 Pushing container to GitLab Container Registry..."
+    timeout 300 docker push $CONTAINER_IMAGE
+    timeout 300 docker push $CONTAINER_IMAGE_LATEST
+    echo "✅ Frontend container pushed to GitLab Container Registry"
+    echo "📦 Image SHA: $CONTAINER_IMAGE"
+    echo "🏷️ Latest: $CONTAINER_IMAGE_LATEST"
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
@@ -146,6 +152,57 @@ test-container:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
+
+sentry-token-check:
+  stage: test
+  image: alpine:latest
+  script:
+    - |
+      if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+        echo "⚠️  SENTRY_AUTH_TOKEN is not set. Source map upload will be skipped. This check is non-blocking.";
+        exit 0;
+      else
+        echo "✅ SENTRY_AUTH_TOKEN is present.";
+      fi
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# Create Sentry release and upload source maps if token is present
+sentry-release:
+  stage: test
+  image: node:24-bullseye
+  before_script:
+    - apt-get update && apt-get install -y curl git ca-certificates
+  script:
+    - |
+      if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+        # Prefer Git tag for release name when available, else fall back to short SHA
+        if [ -n "$CI_COMMIT_TAG" ]; then
+          RELEASE="$CI_COMMIT_TAG"
+        else
+          RELEASE="$CI_COMMIT_SHORT_SHA"
+        fi
+        echo "Creating Sentry release: $RELEASE";
+        curl -sL https://sentry.io/get-cli/ | bash;
+        sentry-cli --version;
+        sentry-cli releases new "$RELEASE" || true;
+        sentry-cli releases files "$RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true;
+        sentry-cli releases finalize "$RELEASE" || true;
+      else
+        echo "SENTRY_AUTH_TOKEN not set; skipping sentry-cli release/upload";
+      fi
+  dependencies:
+    - build-frontend
+  rules:
+    # Run this job only when a Git tag is pushed (preferred release flow)
+    - if: $CI_COMMIT_TAG
+      when: on_success
+    # Keep the job non-blocking for master branch (manual run if needed)
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+  allow_failure: true
 deploy-vps:
   stage: deploy
   image: alpine:latest
