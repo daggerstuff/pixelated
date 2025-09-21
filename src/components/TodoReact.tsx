@@ -238,3 +238,6 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     </div>
   )
 }
+
+// TODO: Add prop validation for better type safety.
+// TODO: Implement a feature to reorder todos.
