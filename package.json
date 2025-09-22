@@ -276,7 +276,6 @@
     "medium-zoom": "^1.1.0",
     "micromatch": "^4.0.8",
     "msw": "^2.10.4",
-    "openmemory": "^0.0.1",
     "oxc-parser": "^0.77.3",
     "oxlint": "^1.8.0",
     "papaparse": "^5.5.3",
