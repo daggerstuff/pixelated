@@ -7,8 +7,8 @@
 5. Validate security (`pnpm security:scan`, `pnpm security:check`)
 6. Update documentation
 7. Ensure compliance (HIPAA, privacy)
-8. Push changes to develop/main branch
-9. Monitor CI/CD pipeline (Azure Pipelines, Vercel)
+8. Push changes to develop/master branch
+9. Monitor CI/CD pipeline (Gitlab, Github Actions)
 
 ## References
-- See `README.md`, `package.json`, `pyproject.toml`, `azure-pipelines.yml` for more details.
+- See `README.md`, `package.json`, `pyproject.toml`, `.gitlab-ci.yml` for more details.

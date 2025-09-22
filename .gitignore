@@ -177,3 +177,5 @@ serena.project.json
 .serena
 memory-bank/
 memAgent/
+
+tools/gdrive-dataset-manager

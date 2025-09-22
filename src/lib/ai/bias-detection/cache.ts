@@ -508,13 +508,17 @@ export class BiasDetectionCache {
    * Invalidate cache entries by tags (memory and Redis)
    */
   async invalidateByTags(tags: string[]): Promise<number> {
-    let invalidated = 0
+    // Track unique logical keys invalidated to avoid double-counting when an
+    // entry exists in both memory and Redis (hybrid mode). Tests expect the
+    // number of logical entries invalidated, not the number of storage
+    // operations performed.
+    const invalidatedKeys = new Set<string>()
 
     // Invalidate in-memory cache
     for (const [key, entry] of Array.from(this.memoryCache.entries())) {
       if (entry.tags.some((tag) => tags.includes(tag))) {
         this.memoryCache.delete(key)
-        invalidated++
+        invalidatedKeys.add(key)
         console.log('[DEBUG] invalidateByTags: deleted from memory', {
           key,
           tags: entry.tags,
@@ -546,25 +550,33 @@ export class BiasDetectionCache {
             cacheData.tags &&
             cacheData.tags.some((tag: string) => tags.includes(tag))
           ) {
-            if (this.cacheService) {
-              await this.cacheService.delete(redisKey)
+            // Compute logical key (without prefix) so we can deduplicate
+            const logicalKey = redisKey.startsWith(this.config.redisKeyPrefix)
+              ? redisKey.slice(this.config.redisKeyPrefix.length)
+              : redisKey
+
+            if (!invalidatedKeys.has(logicalKey)) {
+              if (this.cacheService) {
+                await this.cacheService.delete(redisKey)
+              }
+              invalidatedKeys.add(logicalKey)
+              console.log('[DEBUG] invalidateByTags: deleted from Redis', {
+                redisKey,
+                tags: cacheData.tags,
+              })
             }
-            invalidated++
-            console.log('[DEBUG] invalidateByTags: deleted from Redis', {
-              redisKey,
-              tags: cacheData.tags,
-            })
           }
         }
         logger.info('Redis cache entries invalidated by tags', {
           tags,
-          count: invalidated,
+          count: invalidatedKeys.size,
         })
       } catch (error: unknown) {
         logger.warn('Failed to invalidate Redis cache by tags', { tags, error })
       }
     }
 
+    const invalidated = invalidatedKeys.size
     if (invalidated > 0) {
       this.updateStats()
       logger.info('Cache entries invalidated by tags', {
