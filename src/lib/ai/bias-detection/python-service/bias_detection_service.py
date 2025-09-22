@@ -755,14 +755,22 @@ class BiasDetectionService:
                     "error": "Insufficient data for AIF360 analysis",
                 }
 
-            # Create AIF360 dataset
+            if BinaryLabelDataset is None:
+                return {
+                    "bias_score": 0.0,
+                    "error": "AIF360 BinaryLabelDataset not available",
+                }
             dataset = BinaryLabelDataset(
                 df=data["df"],
                 label_names=data["label_names"],
                 protected_attribute_names=data["protected_attributes"],
             )
 
-            # Calculate bias metrics
+            if BinaryLabelDatasetMetric is None:
+                return {
+                    "bias_score": 0.0,
+                    "error": "AIF360 BinaryLabelDatasetMetric not available",
+                }
             metric = BinaryLabelDatasetMetric(
                 dataset,
                 unprivileged_groups=data["unprivileged_groups"],

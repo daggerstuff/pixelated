@@ -4,12 +4,12 @@
 import asyncio
 import logging
 import time
-from typing import Any
+from typing import Any, List, Dict
 
 from celery.exceptions import SoftTimeLimitExceeded
 
-from celery_config import app
 from bias_detection_service import BiasDetectionConfig, BiasDetectionService, SessionData
+from celery_config import app
 
 logger = logging.getLogger(__name__)
 

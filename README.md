@@ -1,6 +1,6 @@
 <div align="center">
   
-  <img src="public/android-chrome-192x192.png" alt="Pixelated Empathy Logo" width="140">
+  <img src="public/android-chrome-512x512.png" alt="Pixelated Empathy Logo" width="250">
 
   <br/>
   <h1>Pixelated Empathy</h1>

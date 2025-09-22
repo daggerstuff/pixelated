@@ -14,8 +14,7 @@ qodana:
     GIT_STRATEGY: fetch
     QODANA_OFFLINE_MODE: "true"
     QODANA_DISABLE_CLOUD: "true"
-    # Memory optimization
-    JAVA_OPTS: "-Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=200" # Increased memory allocation to 4GB
+    JAVA_OPTS: "-Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
   script:
   - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana --cache-dir=/tmp/qodana-cache
   allow_failure: true
@@ -26,6 +25,11 @@ qodana:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
+  # Clerk publishable key and secret are provided as CI/CD variables in GitLab.
+  # Map them at the top-level so Docker-in-Docker builds and all jobs inherit them.
+  PUBLIC_CLERK_PUBLISHABLE_KEY: $PUBLIC_CLERK_PUBLISHABLE_KEY
+  CLERK_PUBLISHABLE_KEY: $PUBLIC_CLERK_PUBLISHABLE_KEY
+  CLERK_SECRET_KEY: $CLERK_SECRET_KEY
   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   CONTAINER_IMAGE_LATEST_PREV: $CI_REGISTRY_IMAGE:previous
@@ -90,7 +94,6 @@ build-frontend:
     test -f Dockerfile || (echo "❌ Dockerfile not found in repository root"; exit 1)
     docker buildx create --use --name multiarch-builder || docker buildx use multiarch-builder
 
-    # Prefer tag for release when available; avoid inline parameter expansion that breaks YAML
     export BUILD_SENTRY_RELEASE="${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
     docker buildx build \
       --load \
@@ -100,6 +103,8 @@ build-frontend:
       --build-arg SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
       --build-arg SENTRY_RELEASE="$BUILD_SENTRY_RELEASE" \
       --build-arg PUBLIC_SENTRY_DSN="$PUBLIC_SENTRY_DSN" \
+      --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+      --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
       -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
@@ -134,6 +139,7 @@ test-container:
     docker run -d --name test-container \
       -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
       -e PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+      -e CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
       $CONTAINER_IMAGE
   - sleep 30
   - docker logs test-container
@@ -320,6 +326,9 @@ deploy-vps:
         -e ASTRO_TELEMETRY_DISABLED=1 \
         -e PUBLIC_URL="$PUBLIC_URL" \
         -e CORS_ORIGINS="$CORS_ORIGINS" \
+        -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
+        -e PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+        -e CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
         $CONTAINER_IMAGE_LATEST
 
       # Wait for container to start
@@ -420,7 +429,10 @@ build-ai-backend:
   - echo "Building AI backend components..."
   - cd ai
   - docker buildx create --use --name ai-builder || docker buildx use ai-builder
-  - docker buildx build --load -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
+  - docker buildx build --load \
+      --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+      --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+      -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
   - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
   - docker push $CI_REGISTRY_IMAGE/ai:latest
   - echo "✅ AI backend container pushed to GitLab Container Registry"
