@@ -80,3 +80,21 @@ const makeProxy = (name: string) : Logger => ({
 
 export const standardizedLogger: Logger = makeProxy('general')
 export const appLogger: Logger = makeProxy('app')
+
+// Provide a default export object to help interoperability between
+// ESM named imports and CommonJS consumers or test mocks that replace
+// the module with a default object. Some test runners / bundlers
+// may resolve this module in a way that expects a default export.
+export default {
+  getBiasDetectionLogger,
+  getClinicalAnalysisLogger,
+  getAiServiceLogger,
+  getApiEndpointLogger,
+  getComponentLogger,
+  getServiceLogger,
+  getSecurityLogger,
+  getAdvancedPHILogger,
+  getHipaaCompliantLogger,
+  standardizedLogger,
+  appLogger,
+}

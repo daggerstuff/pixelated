@@ -73,6 +73,7 @@ dependencies = [
   "openai>=1.107.2",
   "pytest>=8.4.2",
   "ffmpeg>=1.4",
+  "s3cmd>=2.4.0",
 ]
 
 [project.optional-dependencies]

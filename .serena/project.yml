@@ -7,12 +7,24 @@ language: typescript
 
 # whether to use the project's gitignore file to ignore files
 # Added on 2025-04-07
-ignore_all_files_in_gitignore: true
+ignore_all_files_in_gitignore: false
 # list of additional paths to ignore
 # same syntax as gitignore, so you can use * and **
 # Was previously called `ignored_dirs`, please update your config if you are using that.
 # Added (renamed) on 2025-04-07
-ignored_paths: []
+ignored_paths: [
+  "**/node_modules/",
+  "**/dist/",
+  "**/build/",
+  "**/.venv/",
+  "**/.git/",
+  "**/.vscode/",
+  "**/*.log",
+  "**/coverage/",
+  "**/out/",
+  "**/.next/",
+  "**/volumes/"
+]
 
 # whether the project is in read-only mode
 # If set to true, all editing tools will be disabled and attempts to use them will result in an error
@@ -22,7 +34,7 @@ read_only: false
 
 # list of tool names to exclude. We recommend not excluding any tools, see the readme for more details.
 # Below is the complete list of tools for convenience.
-# To make sure you have the latest list of tools, and to view their descriptions, 
+# To make sure you have the latest list of tools, and to view their descriptions,
 # execute `uv run scripts/print_tool_overview.py`.
 #
 #  * `activate_project`: Activates a project by name.

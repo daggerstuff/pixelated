@@ -58,8 +58,8 @@ function getSecurityLogger(scope) {
 }
 
 function getAdvancedPHILogger(config) {
-  config = config || {}
-  return getLogger(`advanced-phi${config.enableLogCollection ? ':collect' : ''}`)
+  const loggerConfig = config || {}
+  return getLogger(`advanced-phi${loggerConfig.enableLogCollection ? ':collect' : ''}`)
 }
 
 function getHipaaCompliantLogger(scope) {
@@ -82,3 +82,6 @@ module.exports = {
   standardizedLogger,
   appLogger,
 }
+
+// Provide a default property for interoperability with ESM-style default imports
+module.exports.default = module.exports
