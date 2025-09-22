@@ -39,6 +39,16 @@ jobs:
       with:
         python-version: '3.9'
 
+    - name: Ensure `uv` shim is available
+      run: |
+        if ! command -v uv >/dev/null 2>&1; then
+          echo "uv not found - installing via pip"
+          python -m pip install --upgrade pip
+          python -m pip install uv
+        else
+          echo "uv already installed"
+        fi
+
     - name: Install pnpm
       run: npm install -g pnpm
 
@@ -48,7 +58,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         cd src/lib/ai/bias-detection/python-service
-        pip install -r requirements.txt
+        uv pip install -r requirements.txt
 
     - name: Setup test database
       run: |
@@ -75,7 +85,7 @@ jobs:
     - name: Run Python tests
       run: |
         cd src/lib/ai/bias-detection/python-service
-        python -m pytest test_*.py -v
+        uv python -m pytest test_*.py -v
 
     - name: Build application
       run: pnpm run build

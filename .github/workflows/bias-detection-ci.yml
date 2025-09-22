@@ -263,6 +263,16 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
+    - name: Ensure `uv` shim is available
+      run: |
+        if ! command -v uv >/dev/null 2>&1; then
+          echo "uv not found - installing via pip"
+          python -m pip install --upgrade pip
+          python -m pip install uv
+        else
+          echo "uv already installed"
+        fi
+
     - name: Cache pip dependencies
       uses: actions/cache@v4.2.3
       with:
@@ -288,18 +298,18 @@ jobs:
     - name: Run Python linting
       run: |
         cd src/lib/ai/bias-detection/python-service
-        pip install flake8 black isort
-        # Check formatting with black
-        python -m black --check --diff .
+        uv pip install flake8 black isort
+        # Check formatting with black (use uv black directly)
+        uv black --check --diff .
         # Check import sorting
-        python -m isort --check-only --diff .
+        uv isort --check-only --diff .
         # Run flake8 for code quality
-        python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        uv flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
     - name: Run Python tests
       run: |
         cd src/lib/ai/bias-detection/python-service
-        python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
+        uv python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
       env:
         ENV: ci
         FLASK_SECRET_KEY: test-flask-secret
@@ -368,13 +378,23 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
+    - name: Ensure `uv` shim is available
+      run: |
+        if ! command -v uv >/dev/null 2>&1; then
+          echo "uv not found - installing via pip"
+          python -m pip install --upgrade pip
+          python -m pip install uv
+        else
+          echo "uv already installed"
+        fi
+
     - name: Install Python ML dependencies
       run: |
         cd src/lib/ai/bias-detection/python-service
-        python -m pip install --upgrade pip setuptools wheel
+        uv pip install --upgrade pip setuptools wheel
         # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
-        pip install --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
-        pip install -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
+        uv pip install --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
+        uv pip install -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
 
     - name: Setup test database
       run: |
@@ -396,7 +416,7 @@ jobs:
     - name: Start Python ML service
       run: |
         cd src/lib/ai/bias-detection/python-service
-        python bias_detection_service.py &
+        uv python bias_detection_service.py &
         PYTHON_PID=$!
         echo "Started Python service with PID: $PYTHON_PID"
         sleep 10

@@ -1,7 +1,84 @@
-// Minimal placeholder for standardized-logger
-export function standardizedLog(message) {
-  // TODO: Implement standardized logging
-  return message;
+// Compatibility JS entry for standardized-logger
+// Mirror the TypeScript implementation API so modules that import
+// `standardized-logger` (TS or JS) get the expected factory functions.
+
+const { getLogger } = require('../utils/logger')
+
+function makeProxy(name) {
+  return {
+    info: (message, ...args) => {
+      const target = getLogger(name)
+      const fn = target && typeof target.info === 'function' ? target.info.bind(target) : console.info.bind(console)
+      fn(message, ...args)
+    },
+    warn: (message, ...args) => {
+      const target = getLogger(name)
+      const fn = target && typeof target.warn === 'function' ? target.warn.bind(target) : console.warn.bind(console)
+      fn(message, ...args)
+    },
+    error: (message, ...args) => {
+      const target = getLogger(name)
+      const fn = target && typeof target.error === 'function' ? target.error.bind(target) : console.error.bind(console)
+      fn(message, ...args)
+    },
+    debug: (message, ...args) => {
+      const target = getLogger(name)
+      const fn = target && typeof target.debug === 'function' ? target.debug.bind(target) : console.debug.bind(console)
+      fn(message, ...args)
+    },
+  }
 }
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ea36b66b-142c-53e5-8ae4-085246502620")}catch(e){}}();
-//# debugId=ea36b66b-142c-53e5-8ae4-085246502620
+
+function getBiasDetectionLogger(scope) {
+  return getLogger(`bias-detection:${scope}`)
+}
+
+function getClinicalAnalysisLogger(scope) {
+  return getLogger(`clinical-analysis:${scope}`)
+}
+
+function getAiServiceLogger(scope) {
+  return getLogger(`ai-service:${scope}`)
+}
+
+function getApiEndpointLogger(scope) {
+  return getLogger(`api-endpoint:${scope}`)
+}
+
+function getComponentLogger(scope) {
+  return getLogger(`component:${scope}`)
+}
+
+function getServiceLogger(scope) {
+  return getLogger(`service:${scope}`)
+}
+
+function getSecurityLogger(scope) {
+  return getLogger(`security:${scope}`)
+}
+
+function getAdvancedPHILogger(config) {
+  config = config || {}
+  return getLogger(`advanced-phi${config.enableLogCollection ? ':collect' : ''}`)
+}
+
+function getHipaaCompliantLogger(scope) {
+  return getLogger(`hipaa:${scope}`)
+}
+
+const standardizedLogger = makeProxy('general')
+const appLogger = makeProxy('app')
+
+module.exports = {
+  getBiasDetectionLogger,
+  getClinicalAnalysisLogger,
+  getAiServiceLogger,
+  getApiEndpointLogger,
+  getComponentLogger,
+  getServiceLogger,
+  getSecurityLogger,
+  getAdvancedPHILogger,
+  getHipaaCompliantLogger,
+  standardizedLogger,
+  appLogger,
+}
