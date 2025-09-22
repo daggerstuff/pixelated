@@ -179,3 +179,6 @@ memory-bank/
 memAgent/
 
 tools/gdrive-dataset-manager
+.idea
+.qodo
+.vscode
