@@ -9,7 +9,6 @@ async function main() {
     const shouldThrowTestException = process.env.FORCE_TEST_SENTRY === '1' || process.env.NODE_ENV !== 'production'
     if (shouldThrowTestException) {
       // Only print non-sensitive info when testing is intended
-      console.log('SENTRY_DSN configured:', Boolean(process.env.SENTRY_DSN))
       console.log('SENTRY_DEBUG:', process.env.SENTRY_DEBUG)
       throw new Error('Test Sentry exception from scripts/test-sentry.mjs')
     } else {
