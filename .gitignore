@@ -181,3 +181,12 @@ tools/gdrive-dataset-manager/
 .idea/
 .qodo/
 .vscode/
+.aiignore
+.qwen-config.json
+AGENTS.md
+mcp_agent.config.yaml
+mcp_agent.secrets.yaml
+tsconfig.json.backup
+TYPESCRIPT_CRASH_FIX.md
+WARP.md
+.claude/
