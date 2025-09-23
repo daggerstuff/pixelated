@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-import '../instrument.mjs'
-
 import { captureError, closeSentry } from '../instrument.mjs'
 
 async function main() {
