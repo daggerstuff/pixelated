@@ -168,17 +168,16 @@ backups/
 .env.sentry-build-plugin
 
 serena.project.json
-.junie
-.crush
-.copilot-tracking
-.amazonq/rules
-.notes
-.qwen
-.serena
+.junie/
+.crush/
+.copilot-tracking/
+.amazonq/
+.qwen/
+.serena/
 memory-bank/
 memAgent/
 
-tools/gdrive-dataset-manager
-.idea
-.qodo
-.vscode
+tools/gdrive-dataset-manager/
+.idea/
+.qodo/
+.vscode/
