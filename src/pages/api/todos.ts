@@ -33,6 +33,7 @@ export const GET = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
+    logError('GET /api/todos', error)
     return new Response(
       JSON.stringify({
         success: false,
@@ -89,6 +90,7 @@ export const POST = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
+    logError('POST /api/todos', error)
     return new Response(
       JSON.stringify({
         success: false,
@@ -103,5 +105,16 @@ export const POST = async ({ request }) => {
   }
 }
 
-// TODO: Add detailed error logging for better debugging.
-// TODO: Implement rate limiting to prevent abuse of the API.
+// Provide minimal structured error logging to aid debugging in CI and local
+// development. For production-grade logging, route these through the
+// project's centralized logging (e.g., Sentry) and include request IDs.
+function logError(context: string, err: unknown) {
+  // Avoid exposing sensitive details in responses; these logs are for server-side
+  // investigation only. Replace with Sentry.captureException or similar as needed.
+  console.error(`[todos.api] ${context} -`, err instanceof Error ? err.stack || err.message : String(err))
+}
+
+// Rate limiting should be implemented at the edge or via middleware (API gateway,
+// reverse proxy, or serverless platform) to keep this handler simple. Example
+// approaches: Redis token bucket, Cloudflare Workers KV, or GitHub Actions
+// protections for CI-triggered endpoints.
