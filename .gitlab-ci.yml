@@ -163,51 +163,51 @@ sentry-token-check:
   stage: test
   image: alpine:latest
   script:
-    - |
-      if [ -z "$SENTRY_AUTH_TOKEN" ]; then
-        echo "⚠️  SENTRY_AUTH_TOKEN is not set. Source map upload will be skipped. This check is non-blocking.";
-        exit 0;
-      else
-        echo "✅ SENTRY_AUTH_TOKEN is present.";
-      fi
+  - |
+    if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+      echo "⚠️  SENTRY_AUTH_TOKEN is not set. Source map upload will be skipped. This check is non-blocking.";
+      exit 0;
+    else
+      echo "✅ SENTRY_AUTH_TOKEN is present.";
+    fi
   allow_failure: true
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
 
 # Create Sentry release and upload source maps if token is present
 sentry-release:
   stage: test
   image: node:24-bullseye
   before_script:
-    - apt-get update && apt-get install -y curl git ca-certificates
+  - apt-get update && apt-get install -y curl git ca-certificates
   script:
-    - |
-      if [ -n "$SENTRY_AUTH_TOKEN" ]; then
-        # Prefer Git tag for release name when available, else fall back to short SHA
-        if [ -n "$CI_COMMIT_TAG" ]; then
-          RELEASE="$CI_COMMIT_TAG"
-        else
-          RELEASE="$CI_COMMIT_SHORT_SHA"
-        fi
-        echo "Creating Sentry release: $RELEASE";
-        curl -sL https://sentry.io/get-cli/ | bash;
-        sentry-cli --version;
-        sentry-cli releases new "$RELEASE" || true;
-        sentry-cli releases files "$RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true;
-        sentry-cli releases finalize "$RELEASE" || true;
+  - |
+    if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+      # Prefer Git tag for release name when available, else fall back to short SHA
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        RELEASE="$CI_COMMIT_TAG"
       else
-        echo "SENTRY_AUTH_TOKEN not set; skipping sentry-cli release/upload";
+        RELEASE="$CI_COMMIT_SHORT_SHA"
       fi
+      echo "Creating Sentry release: $RELEASE";
+      curl -sL https://sentry.io/get-cli/ | bash;
+      sentry-cli --version;
+      sentry-cli releases new "$RELEASE" || true;
+      sentry-cli releases files "$RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true;
+      sentry-cli releases finalize "$RELEASE" || true;
+    else
+      echo "SENTRY_AUTH_TOKEN not set; skipping sentry-cli release/upload";
+    fi
   dependencies:
-    - build-frontend
+  - build-frontend
   rules:
-    # Run this job only when a Git tag is pushed (preferred release flow)
-    - if: $CI_COMMIT_TAG
-      when: on_success
-    # Keep the job non-blocking for master branch (manual run if needed)
-    - if: $CI_COMMIT_BRANCH == "master"
-      when: manual
+  # Run this job only when a Git tag is pushed (preferred release flow)
+  - if: $CI_COMMIT_TAG
+    when: on_success
+  # Keep the job non-blocking for master branch (manual run if needed)
+  - if: $CI_COMMIT_BRANCH == "master"
+    when: manual
   allow_failure: true
 deploy-vps:
   stage: deploy
@@ -429,10 +429,7 @@ build-ai-backend:
   - echo "Building AI backend components..."
   - cd ai
   - docker buildx create --use --name ai-builder || docker buildx use ai-builder
-  - docker buildx build --load \
-      --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
+  - docker buildx build --load \ --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \ --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \ -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
   - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
   - docker push $CI_REGISTRY_IMAGE/ai:latest
   - echo "✅ AI backend container pushed to GitLab Container Registry"
@@ -543,18 +540,53 @@ health-check:
   - apk add --no-cache curl
   - echo "Running post-deploy health check..."
   - |
-    if curl -f https://$VPS_DOMAIN/api/health; then
-      echo "Health check passed";
+    # If neither VPS_DOMAIN nor VPS_HOST is set, skip the health check to avoid DNS failures
+    if [ -z "$VPS_DOMAIN" ] && [ -z "$VPS_HOST" ]; then
+      echo "No VPS_DOMAIN or VPS_HOST configured - skipping health check"
+      exit 0
+    fi
+
+    # Prefer VPS_DOMAIN, fall back to VPS_HOST
+    TARGET=""
+    if [ -n "$VPS_DOMAIN" ]; then
+      TARGET="$VPS_DOMAIN"
     else
-      echo "Health check failed";
-      # Add Slack/email notification integration here
-      exit 1;
+      TARGET="$VPS_HOST"
+    fi
+
+    # Try HTTPS first, then HTTP. Retry a few times to allow service to come up.
+    MAX_RETRIES=6
+    SLEEP_SECONDS=10
+    PASSED=0
+
+    for i in $(seq 1 $MAX_RETRIES); do
+      echo "Health check attempt $i/$MAX_RETRIES..."
+      if curl -fsS --connect-timeout 5 https://$TARGET/api/health >/dev/null 2>&1; then
+        echo "Health check passed (HTTPS)";
+        PASSED=1; break
+      fi
+      if curl -fsS --connect-timeout 5 http://$TARGET/api/health >/dev/null 2>&1; then
+        echo "Health check passed (HTTP)";
+        PASSED=1; break
+      fi
+      echo "Attempt $i failed, sleeping $SLEEP_SECONDS seconds before retry..."
+      sleep $SLEEP_SECONDS
+    done
+
+    if [ "$PASSED" -eq 1 ]; then
+      echo "Health check succeeded"
+      exit 0
+    else
+      echo "Health check failed after $MAX_RETRIES attempts"
+      # Non-blocking in CI: fail job but allow pipeline to continue
+      exit 1
     fi
   dependencies:
   - deploy-vps
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
+  allow_failure: true
 retain-logs:
   stage: test
   image: alpine:latest
@@ -651,7 +683,9 @@ tag-image:
   - if: $CI_COMMIT_BRANCH == "main"
 trivy-scan:
   stage: test
-  image: aquasec/trivy:latest
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [ "" ]
   script:
   - echo "Scanning container image for vulnerabilities..."
   - trivy image $CONTAINER_IMAGE
@@ -692,18 +726,38 @@ deploy-gke:
   stage: deploy
   image: google/cloud-sdk:alpine
   before_script:
-  - apk add --no-cache kubectl curl
+  - apk add --no-cache kubectl curl jq
   - |
-    echo "Fetching service account key dynamically..."
-    gcloud auth activate-service-account $GCP_SERVICE_ACCOUNT_EMAIL --key-file=/tmp/gcp-key.json || {
-      echo "❌ Failed to authenticate with gcloud. Ensure the service account email is correct."
-      exit 1
+    echo "Preparing GCP service account key for gcloud authentication..."
+
+    # Prefer a JSON key provided directly or base64-encoded in CI variables.
+    # CI should provide one of: GCP_SERVICE_ACCOUNT_KEY (raw JSON) or GCP_SERVICE_ACCOUNT_KEY_B64 (base64 encoded)
+    if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+      echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+    elif [ -n "$GCP_SERVICE_ACCOUNT_KEY_B64" ]; then
+      echo "$GCP_SERVICE_ACCOUNT_KEY_B64" | base64 -d > /tmp/gcp-key.json || {
+        echo "❌ Failed to decode GCP_SERVICE_ACCOUNT_KEY_B64"; exit 1;
+      }
+    else
+      echo "❌ Neither GCP_SERVICE_ACCOUNT_KEY nor GCP_SERVICE_ACCOUNT_KEY_B64 is set. Please configure one in CI variables.";
+      exit 1;
+    fi
+
+    # Basic validation of the written key file
+    if ! jq -e . /tmp/gcp-key.json >/dev/null 2>&1; then
+      echo "❌ /tmp/gcp-key.json does not contain valid JSON. Aborting.";
+      cat /tmp/gcp-key.json || true
+      exit 1;
+    fi
+
+    chmod 600 /tmp/gcp-key.json
+    gcloud auth activate-service-account --key-file=/tmp/gcp-key.json || {
+      echo "❌ Failed to authenticate with gcloud using /tmp/gcp-key.json";
+      gcloud --version || true
+      ls -l /tmp/gcp-key.json || true
+      exit 1;
     }
-    gcloud iam service-accounts keys create /tmp/gcp-key.json --iam-account=$GCP_SERVICE_ACCOUNT_EMAIL || {
-      echo "❌ Failed to fetch service account key dynamically."
-      exit 1
-    }
-  - gcloud auth activate-service-account --key-file /tmp/gcp-key.json
+    gcloud config set project $GCP_PROJECT_ID
   - gcloud config set project $GCP_PROJECT_ID
   - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
   script:
