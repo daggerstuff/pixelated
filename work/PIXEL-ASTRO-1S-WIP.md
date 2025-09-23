@@ -17,6 +17,8 @@ A test script `scripts/test-sentry.mjs` throws a deliberate Error for Sentry tes
 2. If test code is being executed in production, prevent it by gating with environment checks (e.g., `if (process.env.NODE_ENV !== 'production')`) or remove/ignore during production runs.
 3. Add a test or CI check to prevent accidental execution of test scripts in production environments.
 
+> Note: The current PR implements an environment-variable guard in the script itself. The CI check that fails builds or blocks deployments when test-only scripts are present is not included in this change and should be added in a follow-up PR (recommended). If you prefer it included here, I can add a minimal GitHub Actions workflow that scans for calls to test scripts or enforces an environment variable guard in CI.
+
 ## Local steps completed
 - Created branch `work/PIXEL-ASTRO-1S-wip` and this WIP file.
 

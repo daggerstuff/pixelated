@@ -2,10 +2,7 @@
 
 import '../instrument.mjs'
 
-import { captureError } from '../instrument.mjs'
-
-console.log('SENTRY_DSN:', process.env.SENTRY_DSN)
-console.log('SENTRY_DEBUG:', process.env.SENTRY_DEBUG)
+import { captureError, closeSentry } from '../instrument.mjs'
 
 async function main() {
   try {
@@ -13,8 +10,12 @@ async function main() {
     // Prevents accidental execution in production environments.
     const allowTest = process.env.FORCE_TEST_SENTRY === '1' || process.env.NODE_ENV !== 'production'
     if (allowTest) {
+      // Only print non-sensitive info when testing is allowed
+      console.log('SENTRY_DSN configured:', Boolean(process.env.SENTRY_DSN))
+      console.log('SENTRY_DEBUG:', process.env.SENTRY_DEBUG)
       throw new Error('Test Sentry exception from scripts/test-sentry.mjs')
     } else {
+      // Do not print DSN or debug info in production skip mode
       console.log('Skipping test Sentry throw because NODE_ENV=production and FORCE_TEST_SENTRY is not set.')
     }
   } catch (err) {
@@ -23,9 +24,9 @@ async function main() {
     // Give Sentry a moment to flush and then close gracefully
     await new Promise((r) => setTimeout(r, 2000))
     try {
-      await (await import('../instrument.mjs')).closeSentry()
-    } catch (_e) {
-      // ignore
+      await closeSentry()
+    } catch (closeErr) {
+      console.error('Error closing Sentry:', closeErr)
     }
     console.log('Done. Check Sentry dashboard for a new event if DSN is configured.')
   }
