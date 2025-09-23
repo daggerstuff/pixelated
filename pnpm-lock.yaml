@@ -131,9 +131,6 @@ importers:
       chart.js:
         specifier: ^4.5.0
         version: 4.5.0
-      chromadb:
-        specifier: ^3.0.15
-        version: 3.0.15
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -4580,41 +4577,6 @@ packages:
   chownr@3.0.0:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
-
-  chromadb-js-bindings-darwin-arm64@1.0.6:
-    resolution: {integrity: sha512-QO2r3RUknivwGih5kN5BQrtV25Fu23pL1EVrERwXDvGLPSmUJxZChWGg8nCWYhm1hVhwVGofCemuEvOZz+j10A==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [darwin]
-
-  chromadb-js-bindings-darwin-x64@1.0.6:
-    resolution: {integrity: sha512-UFcIwjx53HvHetiCNbQj47UM6UPi1mK57DXi732x52rIawUbgxUeG2u4lg4pzDOEDN5fEOxAZCIATyUNOazIEA==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [darwin]
-
-  chromadb-js-bindings-linux-arm64-gnu@1.0.6:
-    resolution: {integrity: sha512-uG9SYh51NxO22zmZYxz8ffT5s4L8p1e7LTFYBNd0QfO1XWTexQqd4hLmbjdzoz0BOLwKObr/FKiV7iKuX3kwww==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [linux]
-
-  chromadb-js-bindings-linux-x64-gnu@1.0.6:
-    resolution: {integrity: sha512-ZV9wD38SvrLKgm+igqWCkiuycewCRTuxsg+01Zku56NjJeccg//Puj/IFnnJUQVkTP8JwkrkPNZPwHTlOlQuVQ==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [linux]
-
-  chromadb-js-bindings-win32-x64-msvc@1.0.6:
-    resolution: {integrity: sha512-ymm/iYpnqBsAkc0DxO1rWB/uDykQH4vub2HZ0yMYVKwWCsDHDNvfF7XTs+uDLUQY/BC4pUiqfXFL6ZQ7lpO2Iw==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [win32]
-
-  chromadb@3.0.15:
-    resolution: {integrity: sha512-HSR6SX//1ZEHz/DdnK+RDMdQv/4ADanwM+rr++sv0qbNjX3MWg46VI/4GGkFMiyP0nmqtqHzG4dwvkHfIxqrCg==}
-    engines: {node: '>=20'}
-    hasBin: true
 
   ci-info@4.3.0:
     resolution: {integrity: sha512-l+2bNRMiQgcfILUi33labAZYIWlH1kWDp+ecNo5iisRKrbm0xcRyCww71/YU0Fkw0mAFpz9bJayXPjey6vkmaQ==}
@@ -14929,31 +14891,6 @@ snapshots:
   chownr@2.0.0: {}
 
   chownr@3.0.0: {}
-
-  chromadb-js-bindings-darwin-arm64@1.0.6:
-    optional: true
-
-  chromadb-js-bindings-darwin-x64@1.0.6:
-    optional: true
-
-  chromadb-js-bindings-linux-arm64-gnu@1.0.6:
-    optional: true
-
-  chromadb-js-bindings-linux-x64-gnu@1.0.6:
-    optional: true
-
-  chromadb-js-bindings-win32-x64-msvc@1.0.6:
-    optional: true
-
-  chromadb@3.0.15:
-    dependencies:
-      semver: 7.7.2
-    optionalDependencies:
-      chromadb-js-bindings-darwin-arm64: 1.0.6
-      chromadb-js-bindings-darwin-x64: 1.0.6
-      chromadb-js-bindings-linux-arm64-gnu: 1.0.6
-      chromadb-js-bindings-linux-x64-gnu: 1.0.6
-      chromadb-js-bindings-win32-x64-msvc: 1.0.6
 
   ci-info@4.3.0: {}
 
