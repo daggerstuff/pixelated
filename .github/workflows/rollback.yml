@@ -86,32 +86,8 @@ jobs:
         echo "Checking token permissions..."
         curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
 
-    - name: Compute unique rollback tag
-      id: compute-tag
-      shell: bash
-      run: |
-        # Compute a tag with a two-digit counter suffix to avoid collisions
-        TIMESTAMP=$(date +%Y%m%d)
-        BASE="prod-rollback-$TIMESTAMP"
-        # List existing tags that start with the base (only look for suffix -NN)
-        EXISTING=$(git tag -l "${BASE}-[0-9][0-9]")
-        if [ -z "${EXISTING}" ]; then
-          COUNTER=1
-        else
-          MAX=$(echo "${EXISTING}" | sed -n "s/^${BASE}-\([0-9]\{2\}\)$/\1/p" | sort -n | tail -n1)
-          if [ -z "${MAX}" ]; then
-            COUNTER=1
-          else
-            COUNTER=$((10#$MAX + 1))
-          fi
-        fi
-        COUNTER_PAD=$(printf "%02d" ${COUNTER})
-        TAG_NAME="${BASE}-${COUNTER_PAD}"
-        echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
-        echo "Computed tag: ${TAG_NAME}"
-
-    - name: Compute unique rollback tag
-      id: compute-tag
+    - name: Compute unique rollback tag for staging
+      id: compute-tag-staging
       shell: bash
       run: |
         # Compute a tag with a two-digit counter suffix to avoid collisions
@@ -141,7 +117,7 @@ jobs:
         # Use the computed tag from the previous step
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        TAG_NAME=${{ steps.compute-tag.outputs.tag }}
+        TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
         git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
@@ -153,7 +129,7 @@ jobs:
         # Push the previously computed tag
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        TAG_NAME=${{ steps.compute-tag.outputs.tag }}
+        TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
         git tag "$TAG_NAME"
         git push https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
@@ -230,6 +206,29 @@ jobs:
       run: |
         echo "Checking token permissions..."
         curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+    - name: Compute unique rollback tag for production
+      id: compute-tag-prod
+      shell: bash
+      run: |
+        # Compute a tag with a two-digit counter suffix to avoid collisions
+        TIMESTAMP=$(date +%Y%m%d)
+        BASE="prod-rollback-$TIMESTAMP"
+        # List existing tags that start with the base (only look for suffix -NN)
+        EXISTING=$(git tag -l "${BASE}-[0-9][0-9]")
+        if [ -z "${EXISTING}" ]; then
+          COUNTER=1
+        else
+          MAX=$(echo "${EXISTING}" | sed -n "s/^${BASE}-\([0-9]\{2\}\)$/\1/p" | sort -n | tail -n1)
+          if [ -z "${MAX}" ]; then
+            COUNTER=1
+          else
+            COUNTER=$((10#$MAX + 1))
+          fi
+        fi
+        COUNTER_PAD=$(printf "%02d" ${COUNTER})
+        TAG_NAME="${BASE}-${COUNTER_PAD}"
+        echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+        echo "Computed tag: ${TAG_NAME}"
 
     - name: Dry Run Git Push
       env:
@@ -237,7 +236,7 @@ jobs:
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        TAG_NAME=${{ steps.compute-tag.outputs.tag }}
+        TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
         git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
@@ -248,7 +247,7 @@ jobs:
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        TAG_NAME=${{ steps.compute-tag.outputs.tag }}
+        TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
         git tag "$TAG_NAME"
         git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
         git push origin "$TAG_NAME"
