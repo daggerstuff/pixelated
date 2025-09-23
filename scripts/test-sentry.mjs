@@ -6,11 +6,11 @@ import { captureError, closeSentry } from '../instrument.mjs'
 
 async function main() {
   try {
-    // Only throw the test exception when explicitly allowed.
+    // Only throw the test exception when explicitly intended.
     // Prevents accidental execution in production environments.
-    const allowTest = process.env.FORCE_TEST_SENTRY === '1' || process.env.NODE_ENV !== 'production'
-    if (allowTest) {
-      // Only print non-sensitive info when testing is allowed
+    const shouldThrowTestException = process.env.FORCE_TEST_SENTRY === '1' || process.env.NODE_ENV !== 'production'
+    if (shouldThrowTestException) {
+      // Only print non-sensitive info when testing is intended
       console.log('SENTRY_DSN configured:', Boolean(process.env.SENTRY_DSN))
       console.log('SENTRY_DEBUG:', process.env.SENTRY_DEBUG)
       throw new Error('Test Sentry exception from scripts/test-sentry.mjs')

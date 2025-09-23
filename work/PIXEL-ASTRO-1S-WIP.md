@@ -1,4 +1,19 @@
-# WIP: PIXEL-ASTRO-1S
+---
+post_title: "PIXEL-ASTRO-1S: Sentry test exception gating (WIP)"
+author1: "Vivi"
+post_slug: "pixel-astro-1s-wip"
+microsoft_alias: "TBD"
+featured_image: "/images/posts/pixel-astro-1s-wip.png"
+categories:
+  - Observability
+tags:
+  - sentry
+  - astro
+  - ci
+ai_note: "No AI assistance used"
+summary: "WIP note documenting a test Sentry exception and a plan to gate execution in production via env checks and CI."
+post_date: "2025-09-23"
+---
 
 Issue: Error: Test Sentry exception from scripts/test-sentry.mjs
 Sentry Issue: https://pixelated-empathy-dq.sentry.io/issues/PIXEL-ASTRO-1S
