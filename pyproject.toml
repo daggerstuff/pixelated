@@ -74,6 +74,7 @@ dependencies = [
   "pytest>=8.4.2",
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
+  "authlib>=1.6.4",
 ]
 
 [project.optional-dependencies]

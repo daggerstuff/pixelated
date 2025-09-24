@@ -1,0 +1,271 @@
+"""
+Docker Compose Configuration for Integrated WebSocket-Flask Pipeline System
+
+Provides complete containerized environment for the integrated MCP server
+with WebSocket real-time communication and Flask 6-stage pipeline orchestration.
+"""
+
+version: '3.8'
+
+services:
+  # MCP Server with integrated WebSocket and Flask pipeline
+  mcp-server-integrated:
+    build:
+      context: ..
+      dockerfile: Dockerfile.integration
+    container_name: mcp-server-integrated
+    ports:
+      - "8080:8080"  # Main MCP server port
+      - "8081:8081"  # WebSocket port
+    environment:
+      # Core Application
+      - APP_NAME=MCP Server Integrated
+      - API_VERSION=v1
+      - DEBUG=false
+      - ENVIRONMENT=development
+      
+      # Database Configuration
+      - MONGODB_URI=mongodb://mongodb:27017/pixelated_integrated
+      - DB_MAX_POOL_SIZE=100
+      - DB_MIN_POOL_SIZE=10
+      - DB_TIMEOUT=30
+      
+      # Redis Configuration
+      - REDIS_URL=redis://redis:6379/1
+      - REDIS_MAX_CONNECTIONS=100
+      - REDIS_SOCKET_TIMEOUT=30
+      - REDIS_CONNECT_TIMEOUT=10
+      
+      # Authentication
+      - JWT_SECRET=your-super-secret-jwt-key-for-integration-testing-min-32-chars
+      - JWT_ALGORITHM=HS256
+      - TOKEN_EXPIRATION=3600
+      - REFRESH_TOKEN_EXPIRATION=86400
+      
+      # External Services
+      - FLASK_API_URL=http://flask-pipeline-service:5000
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY:-}
+      - BIAS_DETECTION_URL=http://bias-detection-service:8082
+      
+      # WebSocket Configuration
+      - WEBSOCKET_ENABLED=true
+      - WEBSOCKET_CORS_ORIGINS=http://localhost:3000,http://localhost:4321
+      - WEBSOCKET_MAX_CONNECTIONS=1000
+      - WEBSOCKET_PING_INTERVAL=25
+      - WEBSOCKET_PING_TIMEOUT=20
+      
+      # Rate Limiting
+      - RATE_LIMIT_RPM=100
+      - RATE_LIMIT_BURST=10
+      - RATE_LIMIT_WINDOW=60
+      
+      # Logging
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+      - ENABLE_REQUEST_LOGGING=true
+      - ENABLE_RESPONSE_LOGGING=true
+      
+      # Audit
+      - AUDIT_ENABLED=true
+      - AUDIT_RETENTION_DAYS=2555
+      
+      # CORS
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:4321,http://localhost:8080
+    depends_on:
+      - mongodb
+      - redis
+      - flask-pipeline-service
+      - bias-detection-service
+    networks:
+      - mcp-integration-network
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Flask Pipeline Service (6-stage pipeline)
+  flask-pipeline-service:
+    build:
+      context: ../../ai/api/techdeck_integration
+      dockerfile: Dockerfile.pipeline
+    container_name: flask-pipeline-service
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+      - REDIS_URL=redis://redis:6379/2
+      - MONGODB_URI=mongodb://mongodb:27017/pixelated_pipeline
+      - JWT_SECRET=your-super-secret-jwt-key-for-pipeline-service
+      - BIAS_DETECTION_URL=http://bias-detection-service:8082
+      - MAX_WORKERS=4
+      - PIPELINE_TIMEOUT=300
+    depends_on:
+      - mongodb
+      - redis
+      - bias-detection-service
+    networks:
+      - mcp-integration-network
+    volumes:
+      - ../../ai/api/techdeck_integration:/app
+      - pipeline-data:/app/data
+      - pipeline-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Bias Detection Service
+  bias-detection-service:
+    build:
+      context: ../../ai/bias-detection
+      dockerfile: Dockerfile
+    container_name: bias-detection-service
+    ports:
+      - "8082:8082"
+    environment:
+      - PYTHONPATH=/app
+      - REDIS_URL=redis://redis:6379/3
+      - MODEL_CACHE_DIR=/app/models
+      - MAX_BATCH_SIZE=100
+      - BIAS_THRESHOLD=0.7
+    depends_on:
+      - redis
+    networks:
+      - mcp-integration-network
+    volumes:
+      - ../../ai/bias-detection:/app
+      - bias-detection-models:/app/models
+      - bias-detection-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb-integration
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin_password
+      - MONGO_INITDB_DATABASE=pixelated_integrated
+    networks:
+      - mcp-integration-network
+    volumes:
+      - mongodb-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Redis Cache and Message Broker
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis-integration
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    networks:
+      - mcp-integration-network
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Integration Test Runner
+  integration-test-runner:
+    build:
+      context: ..
+      dockerfile: Dockerfile.test
+    container_name: integration-test-runner
+    environment:
+      - MCP_SERVER_URL=http://mcp-server-integrated:8080
+      - FLASK_PIPELINE_URL=http://flask-pipeline-service:5000
+      - REDIS_URL=redis://redis:6379/0
+      - TEST_ENV=integration
+      - PYTEST_ARGS=-v --tb=short
+    depends_on:
+      - mcp-server-integrated
+      - flask-pipeline-service
+      - redis
+    networks:
+      - mcp-integration-network
+    volumes:
+      - ../tests:/app/tests
+      - ../reports:/app/reports
+    command: ["pytest", "tests/test_integration_websocket_flask.py", "-v", "--tb=short"]
+    profiles:
+      - testing
+
+  # Monitoring and Observability
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-integration
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - mcp-integration-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-integration
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - mcp-integration-network
+    depends_on:
+      - prometheus
+
+networks:
+  mcp-integration-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  mongodb-data:
+  redis-data:
+  pipeline-data:
+  pipeline-logs:
+  bias-detection-models:
+  bias-detection-logs:
+  prometheus-data:
+  grafana-data:
