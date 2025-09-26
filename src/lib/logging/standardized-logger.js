@@ -2,7 +2,7 @@
 // Mirror the TypeScript implementation API so modules that import
 // `standardized-logger` (TS or JS) get the expected factory functions.
 
-const { getLogger } = require('../utils/logger')
+const { getLogger } = require('../utils/logger.ts')
 
 function makeProxy(name) {
   return {
