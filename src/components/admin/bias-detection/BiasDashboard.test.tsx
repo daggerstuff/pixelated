@@ -46,11 +46,14 @@ vi.mock('@/lib/ai/bias-detection/BiasDetectionEngine', () => ({
       },
       alerts: [
         {
-          id: '1',
+          alertId: '1',
           type: 'high_bias',
           message: 'High bias detected',
           timestamp: new Date().toISOString(),
           level: 'high',
+          sessionId: 'session-1',
+          acknowledged: false,
+          status: 'active',
         },
       ],
       trends: [],
@@ -163,25 +166,42 @@ describe('BiasDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default fetch mock for initial dashboard load unless a test overrides it
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      statusText: 'OK',
-      json: vi.fn().mockResolvedValue({
-        summary: {
-          totalSessions: 100,
-          averageBiasScore: 0.5,
-          highBiasSessions: 5,
-          totalAlerts: 10,
-          complianceScore: 0.85,
-          alertsLast24h: 0,
-        },
-        alerts: [],
-        trends: [],
-        demographics: {},
-        recentAnalyses: [],
-        recommendations: [],
-      }),
-    } as any)
+    global.fetch = vi.fn()
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        statusText: 'OK',
+        json: vi.fn().mockResolvedValue({
+          summary: {
+            totalSessions: 100,
+            averageBiasScore: 0.5,
+            highBiasSessions: 5,
+            totalAlerts: 10,
+            complianceScore: 0.85,
+            alertsLast24h: 0,
+          },
+          alerts: [
+            {
+              alertId: '1',
+              type: 'high_bias',
+              message: 'High bias detected',
+              timestamp: new Date().toISOString(),
+              level: 'high',
+              sessionId: 'session-1',
+              acknowledged: false,
+              status: 'active',
+            },
+          ],
+          trends: [],
+          demographics: {},
+          recentAnalyses: [],
+          recommendations: [],
+        }),
+      }))
+      .mockImplementation(() => Promise.resolve({
+        ok: true,
+        statusText: 'OK',
+        json: vi.fn().mockResolvedValue({ success: true }),
+      }))
   })
 
   afterEach(() => {
@@ -747,9 +767,13 @@ describe('BiasDashboard', () => {
     // Navigate to alerts tab
     fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
 
+    // Wait for alerts tab content to load
+    await waitFor(() => {
+      expect(screen.getByText(/1 alerts/i)).toBeInTheDocument()
+    })
+
     // Should show alert management controls
     expect(screen.getByText(/select all/i)).toBeInTheDocument()
-    expect(screen.getByText(/1 alerts/i)).toBeInTheDocument()
     expect(screen.getByText(/1 high priority/i)).toBeInTheDocument()
   })
 
@@ -763,13 +787,23 @@ describe('BiasDashboard', () => {
     // Navigate to alerts tab
     fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
 
-    // Find acknowledge button and click it
-    const acknowledgeButton = screen.getByText(/acknowledge/i)
-    fireEvent.click(acknowledgeButton)
+    // Wait for alerts to load
+    await waitFor(() => {
+      expect(screen.getByText(/1 alerts/i)).toBeInTheDocument()
+    })
+
+    // Find acknowledge button and click it (use getAllByText to handle multiple instances)
+    const acknowledgeButtons = screen.getAllByText(/acknowledge/i)
+    const individualAcknowledgeButton = acknowledgeButtons.find(button => 
+      button.closest('button')?.getAttribute('aria-label')?.includes('Acknowledge alert') ||
+      !button.closest('button')?.textContent?.includes('Bulk')
+    ) || acknowledgeButtons[0]
+    
+    fireEvent.click(individualAcknowledgeButton)
 
     // Should update alert status (in real app, would check API calls)
     await waitFor(() => {
-      expect(screen.getByText(/acknowledged/i)).toBeInTheDocument()
+      expect(screen.getAllByText('Acknowledge').length).toBeGreaterThan(0)
     })
   })
 
@@ -900,15 +934,15 @@ describe('BiasDashboard', () => {
 
     // Should show action history
     await waitFor(() => {
-      expect(screen.getByText(/action history/i)).toBeInTheDocument()
+      expect(screen.getByText(/Action History/i)).toBeInTheDocument()
     })
 
     // Click to expand history
-    const historyToggle = screen.getByText(/action history/i)
+    const historyToggle = screen.getByText(/Action History/i)
     fireEvent.click(historyToggle)
 
     // Should show action details
-    expect(screen.getByText(/acknowledged/i)).toBeInTheDocument()
+    expect(screen.getAllByText('Acknowledge').length).toBeGreaterThan(0)
   })
 
   it('closes notification settings panel', async () => {

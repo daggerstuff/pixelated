@@ -295,10 +295,9 @@ describe('BiasDetectionConfigManager', () => {
         },
       }
 
-      configManager.updateConfig(invalidConfig as unknown)
-
-      // This should throw during update, so we test differently
-      expect(() => configManager.updateConfig(invalidConfig as unknown)).toThrow()
+      expect(() => {
+        configManager.updateConfig(invalidConfig as unknown)
+      }).toThrow('Configuration validation failed')
     })
   })
 

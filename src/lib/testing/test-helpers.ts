@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 
 // Type definitions for better TypeScript support
 interface TestResult {
@@ -187,10 +187,10 @@ export class TestUtils {
 
   static createMockResponse() {
     const res: any = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis(),
-      send: jest.fn().mockReturnThis(),
-      end: jest.fn().mockReturnThis()
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn().mockReturnThis(),
+      send: vi.fn().mockReturnThis(),
+      end: vi.fn().mockReturnThis()
     }
     return res
   }
