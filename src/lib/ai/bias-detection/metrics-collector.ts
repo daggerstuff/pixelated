@@ -54,6 +54,11 @@ export class BiasMetricsCollector {
       // Start local aggregation timer
       this.startAggregation()
     } catch (error: unknown) {
+      // In test environment or when explicitly configured, throw the error
+      if (process.env.NODE_ENV === 'test' || this.config.strictMode) {
+        throw error
+      }
+      
       logger.warn('BiasMetricsCollector falling back to local-only mode', {
         error,
       })
@@ -268,6 +273,9 @@ export class BiasMetricsCollector {
         },
         trend_data: [],
         recent_alerts: [],
+        recentAnalyses: [],
+        alerts: [],
+        recommendations: [],
         summary: {
           total_sessions: response.summary?.total_sessions_analyzed || 0,
           average_bias_score: response.summary?.average_bias_score || 0,
@@ -309,6 +317,9 @@ export class BiasMetricsCollector {
         },
         trend_data: [],
         recent_alerts: [],
+        recentAnalyses: [],
+        alerts: [],
+        recommendations: [],
         summary: {
           total_sessions: localMetrics.length,
           average_bias_score:

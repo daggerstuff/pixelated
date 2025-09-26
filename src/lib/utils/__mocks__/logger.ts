@@ -12,11 +12,12 @@ export const logger = {
 }
 
 export type Logger = typeof logger
+export const Logger = logger
 
 export const getLogger = vi.fn(() => logger)
 
 export default {
   logger,
   getLogger,
-  Logger, // Add Logger to the default export
+  Logger,
 }
