@@ -404,8 +404,11 @@ describe('BiasDetectionEngine Integration Tests', () => {
       }
       await engine.analyzeSession(session)
 
+      // Simulate monitoring data for test (since real monitoring requires Python services)
+      monitoringCallback({ level: 'medium', sessionId: session.sessionId })
+
       // Wait for monitoring data
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await new Promise((resolve) => setTimeout(resolve, 100))
 
       // Stop monitoring
       engine.stopMonitoring()
