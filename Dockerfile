@@ -36,13 +36,18 @@ LABEL org.opencontainers.image.description="Secure Node.js app using a minimal b
 # Set working directory
 WORKDIR /app
 ARG SENTRY_DSN=""
-ARG SENTRY_AUTH_TOKEN=""
+# NOTE: Do NOT pass sensitive secrets like SENTRY_AUTH_TOKEN via ARG or ENV.
+# Use BuildKit secrets at build-time (see example below) and runtime secrets
+# (Kubernetes secrets / Docker secrets / environment injection) instead.
+# Example build (BuildKit enabled):
+#   DOCKER_BUILDKIT=1 docker build \
+#     --secret id=sentry_auth_token,src=./sentry_auth_token.txt \
+#     -t myapp:latest .
 ARG SENTRY_RELEASE=""
 ARG PUBLIC_SENTRY_DSN=""
 
 ENV NODE_ENV="production"
 ENV SENTRY_DSN=${SENTRY_DSN}
-ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 ENV SENTRY_RELEASE=${SENTRY_RELEASE}
 ENV PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}
 ENV ASTRO_TELEMETRY_DISABLED=1
@@ -73,8 +78,10 @@ FROM base AS build
 
 # Forward build-time Sentry args into the build stage environment so plugins
 # (like source map upload) can run during `pnpm build` when args are provided.
+# NOTE: SENTRY_AUTH_TOKEN is intentionally NOT set via ENV here. If a build-time
+# Sentry auth token is required (for source map upload etc.), provide it using
+# a BuildKit secret and mount it during the specific RUN that needs it.
 ENV SENTRY_DSN=${SENTRY_DSN}
-ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 ENV SENTRY_RELEASE=${SENTRY_RELEASE}
 ENV PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}
 
@@ -106,15 +113,8 @@ RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
 
 # Set memory limits and build with verbose output
 ENV NODE_OPTIONS="--max-old-space-size=4096"
-RUN echo "Starting pnpm build..." && \
-    pnpm build --verbose || (echo "Build failed, checking for common issues..." && \
-    ls -la src/ && \
-    ls -la public/ && \
-    echo "Node version: $(node --version)" && \
-    echo "pnpm version: $(pnpm --version)" && \
-    echo "Available memory (from /proc/meminfo):" && \
-    cat /proc/meminfo && \
-    exit 1)
+RUN --mount=type=secret,id=sentry_auth_token \
+    sh -lc 'if [ -f /run/secrets/sentry_auth_token ]; then export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); fi; echo "Starting pnpm build..." && pnpm build --verbose || (echo "Build failed, checking for common issues..." && ls -la src/ && ls -la public/ && echo "Node version: $(node --version)" && echo "pnpm version: $(pnpm --version)" && echo "Available memory (from /proc/meminfo):" && cat /proc/meminfo && exit 1)'
 
 # Prune dev dependencies and clean up
 RUN pnpm prune --prod && \
