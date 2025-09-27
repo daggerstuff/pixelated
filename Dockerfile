@@ -59,9 +59,9 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable pnpm
 
 RUN set -eux; \
-    # Create group/user in a portable way (works on Debian/Alpine). Use fallbacks to avoid failing if already present.
-    (groupadd -g 1001 astro || true) && \
-    (useradd -u 1001 -g astro -s /bin/sh -M astro || true)
+    # Create group/user for Alpine Linux
+    addgroup -g 1001 -S astro && \
+    adduser -S astro -u 1001 -G astro
 
 FROM base AS deps
 
@@ -116,7 +116,7 @@ RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
 # Set memory limits and build with verbose output
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN --mount=type=secret,id=sentry_auth_token \
-    sh -lc 'if [ -f /run/secrets/sentry_auth_token ]; then export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); fi; echo "Starting pnpm build..." && pnpm build --verbose || (echo "Build failed, checking for common issues..." && ls -la src/ && ls -la public/ && echo "Node version: $(node --version)" && echo "pnpm version: $(pnpm --version)" && echo "Available memory (from /proc/meminfo):" && cat /proc/meminfo && exit 1)'
+    sh -c 'if [ -f /run/secrets/sentry_auth_token ]; then export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); fi; echo "Starting pnpm build..." && pnpm build --verbose || (echo "Build failed, checking for common issues..." && ls -la src/ && ls -la public/ && echo "Node version: $(node --version)" && echo "pnpm version: $(pnpm --version)" && echo "Available memory (from /proc/meminfo):" && cat /proc/meminfo && exit 1)'
 
 # Prune dev dependencies and clean up
 RUN pnpm prune --prod && \
