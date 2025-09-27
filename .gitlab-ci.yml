@@ -113,7 +113,8 @@ test-container:
   - echo "Testing container health..."
   - docker pull $CONTAINER_IMAGE
   - docker run -d --name test-container \
-  - BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \ $CONTAINER_IMAGE
+      -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+      $CONTAINER_IMAGE
   - sleep 30
   - docker logs test-container
   - |
