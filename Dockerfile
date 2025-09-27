@@ -103,8 +103,10 @@ COPY --chown=astro:astro instrument.mjs ./
 COPY --chown=astro:astro astro ./astro
 
 # Copy any additional config files that might be needed (optional)
-COPY --chown=astro:astro .env* ./ || true
-COPY --chown=astro:astro *.config.* ./ || true
+# NOTE: Dockerfile COPY is not a shell command; remove shell operators like '|| true'.
+# If files are optional, ensure they exist before building or provide them via build context.
+COPY --chown=astro:astro .env* ./
+COPY --chown=astro:astro *.config.* ./
 
 # Build the application
 RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
