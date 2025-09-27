@@ -3,10 +3,11 @@ ARG BUILDKIT_INLINE_CACHE=1
 ARG NODE_VERSION=24
 FROM node:${NODE_VERSION}-alpine AS base
 
+# Labels
 LABEL org.opencontainers.image.description="Astro"
 
-
 # Install build tools, curl, and ca-certificates first so pnpm fallback always works
+# Use Alpine package manager since base image is an Alpine variant
 RUN apk add --no-cache \
     build-base \
     python3 \
@@ -32,8 +33,8 @@ LABEL org.opencontainers.image.authors="Vivi <vivi@pixelatedempathy.com>"
 LABEL org.opencontainers.image.title="Pixelated Empathy Node"
 LABEL org.opencontainers.image.description="Secure Node.js app using a minimal base image for reduced vulnerabilities."
 
-# Application Healthcheck: verifies service health (only one HEALTHCHECK allowed per stage)
-  WORKDIR /app
+# Set working directory
+WORKDIR /app
 ARG SENTRY_DSN=""
 ARG SENTRY_AUTH_TOKEN=""
 ARG SENTRY_RELEASE=""
@@ -52,8 +53,10 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable pnpm
 
-RUN addgroup -g 1001 astro && \
-    adduser -u 1001 -G astro -s /bin/sh -D astro
+RUN set -eux; \
+    # Create group/user in a portable way (works on Debian/Alpine). Use fallbacks to avoid failing if already present.
+    (groupadd -g 1001 astro || true) && \
+    (useradd -u 1001 -g astro -s /bin/sh -M astro || true)
 
 FROM base AS deps
 
@@ -92,9 +95,9 @@ COPY --chown=astro:astro instrument.mjs ./
 # Copy the astro directory needed for tsconfig extends
 COPY --chown=astro:astro astro ./astro
 
-# Copy any additional config files that might be needed
-COPY --chown=astro:astro .env* ./
-COPY --chown=astro:astro *.config.* ./
+# Copy any additional config files that might be needed (optional)
+COPY --chown=astro:astro .env* ./ || true
+COPY --chown=astro:astro *.config.* ./ || true
 
 # Build the application
 RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
