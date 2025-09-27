@@ -3,6 +3,60 @@ import { BiasDetectionEngine } from '../BiasDetectionEngine'
 import type { TherapeuticSession } from '../types'
 import { baselineAnxietyScenario, ageBiasYoungPatient } from './fixtures'
 
+// Mock the Python bridge to avoid network calls
+vi.mock('../python-bridge', () => ({
+  PythonBiasDetectionBridge: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    analyzeSession: vi.fn().mockImplementation(async () => {
+      // Simulate realistic API response time (50-150ms)
+      const delay = 50 + Math.random() * 100
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return {
+        sessionId: 'test-session',
+        overallBiasScore: 0.3 + Math.random() * 0.4,
+        alertLevel: 'medium',
+        layerResults: {
+          preprocessing: { biasScore: 0.2 + Math.random() * 0.3 },
+          modelLevel: { biasScore: 0.3 + Math.random() * 0.3 },
+          interactive: { biasScore: 0.4 + Math.random() * 0.3 },
+          evaluation: { biasScore: 0.3 + Math.random() * 0.3 },
+        },
+      }
+    }),
+    checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
+// Mock the metrics collector
+vi.mock('../metrics-collector', () => ({
+  BiasMetricsCollector: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    getMetrics: vi.fn().mockResolvedValue({
+      overall_stats: { 
+        total_sessions: 100, 
+        average_bias_score: 0.3,
+        alert_distribution: {
+          low: 50,
+          medium: 30,
+          high: 15,
+          critical: 5,
+        },
+      },
+    }),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
+// Mock the alert system
+vi.mock('../alerts-system', () => ({
+  BiasAlertSystem: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    processAlert: vi.fn().mockResolvedValue(undefined),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
 /**
  * Load Testing Suite for Bias Detection Engine
  * Tests concurrent session analysis performance and system stability
