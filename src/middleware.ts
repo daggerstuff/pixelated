@@ -1,19 +1,6 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server'
 import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence } from 'astro/middleware'
 
-const isProtectedRoute = createRouteMatcher([
-  '/api/clerk-protected-example(.*)',
-])
-
-const clerkAuthMiddleware = clerkMiddleware((auth, context) => {
-  const { redirectToSignIn, userId } = auth()
-  if (!userId && isProtectedRoute(context.request)) {
-    return redirectToSignIn()
-  }
-  return undefined
-})
-
-// Single, clean middleware sequence
-export const onRequest = sequence(generateCspNonce, securityHeaders, clerkAuthMiddleware)
+// Single, clean middleware sequence (Clerk removed)
+export const onRequest = sequence(generateCspNonce, securityHeaders)
