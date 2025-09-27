@@ -142,7 +142,6 @@
     "@aws-sdk/lib-dynamodb": "^3.848.0",
     "@azure/storage-blob": "^12.28.0",
     "@chroma-core/default-embed": "^0.1.8",
-    "@clerk/astro": "^2.10.8",
     "@google-cloud/storage": "^7.17.0",
     "@iconify-json/lucide": "^1.2.57",
     "@radix-ui/react-tooltip": "^1.2.7",
@@ -372,7 +371,6 @@
     },
     "onlyBuiltDependencies": [
       "@aws-amplify/cli",
-      "@clerk/shared",
       "@contrast/fn-inspect",
       "@dwmkerr/terminal-ai",
       "@newrelic/native-metrics",
@@ -414,7 +412,6 @@
     "path-to-regexp": "8.3.0"
   },
   "trustedDependencies": [
-    "@clerk/shared",
     "aws-sdk",
     "core-js",
     "onnxruntime-node",
