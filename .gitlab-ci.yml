@@ -4,32 +4,10 @@ stages:
 - build
 - test
 - deploy
-qodana:
-  stage: test
-  image:
-    name: jetbrains/qodana-js:2025.2
-    entrypoint: [ "" ]
-  variables:
-    QODANA_TOKEN: $QODANA_TOKEN
-    GIT_STRATEGY: fetch
-    QODANA_OFFLINE_MODE: "true"
-    QODANA_DISABLE_CLOUD: "true"
-    JAVA_OPTS: "-Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
-  script:
-  - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana --cache-dir=/tmp/qodana-cache
-  allow_failure: true
-  timeout: 20m
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: "$CI_MERGE_REQUEST_ID"
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
-  # Clerk publishable key and secret are provided as CI/CD variables in GitLab.
-  # Map them at the top-level so Docker-in-Docker builds and all jobs inherit them.
-  PUBLIC_CLERK_PUBLISHABLE_KEY: $PUBLIC_CLERK_PUBLISHABLE_KEY
-  CLERK_PUBLISHABLE_KEY: $PUBLIC_CLERK_PUBLISHABLE_KEY
-  CLERK_SECRET_KEY: $CLERK_SECRET_KEY
+  BETTER_AUTH_SECRET: $BETTER_AUTH_SECRET
   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   CONTAINER_IMAGE_LATEST_PREV: $CI_REGISTRY_IMAGE:previous
@@ -103,8 +81,7 @@ build-frontend:
       --build-arg SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
       --build-arg SENTRY_RELEASE="$BUILD_SENTRY_RELEASE" \
       --build-arg PUBLIC_SENTRY_DSN="$PUBLIC_SENTRY_DSN" \
-      --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
       -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
@@ -135,12 +112,8 @@ test-container:
   script:
   - echo "Testing container health..."
   - docker pull $CONTAINER_IMAGE
-  - |
-    docker run -d --name test-container \
-      -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
-      -e PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      -e CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      $CONTAINER_IMAGE
+  - docker run -d --name test-container \
+  - BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \ $CONTAINER_IMAGE
   - sleep 30
   - docker logs test-container
   - |
@@ -326,9 +299,7 @@ deploy-vps:
         -e ASTRO_TELEMETRY_DISABLED=1 \
         -e PUBLIC_URL="$PUBLIC_URL" \
         -e CORS_ORIGINS="$CORS_ORIGINS" \
-        -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
-        -e PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-        -e CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+        -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET"
         $CONTAINER_IMAGE_LATEST
 
       # Wait for container to start
@@ -425,14 +396,19 @@ build-ai-backend:
     DOCKER_TLS_CERTDIR: ''
   before_script:
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  script:
-  - echo "Building AI backend components..."
-  - cd ai
-  - docker buildx create --use --name ai-builder || docker buildx use ai-builder
-  - docker buildx build --load \ --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \ --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \ -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
-  - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
-  - docker push $CI_REGISTRY_IMAGE/ai:latest
-  - echo "✅ AI backend container pushed to GitLab Container Registry"
+  script: |
+    echo "Building AI backend components..."
+    cd ai
+    docker buildx create --use --name ai-builder || docker buildx use ai-builder
+
+    docker buildx build \
+      --load \
+      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+      -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
+
+    docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
+    docker push $CI_REGISTRY_IMAGE/ai:latest
+    echo "✅ AI backend container pushed to GitLab Container Registry"
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
     changes:
@@ -696,10 +672,6 @@ trivy-scan:
   - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
 
-# Dependency Caching (using GitLab cache)
-# (Removed unused cache section to prevent warnings and YAML errors)
-
-# Automated Cleanup (improved)
 cleanup:
   stage: deploy
   image: docker:27.3.1
