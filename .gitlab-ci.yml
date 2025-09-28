@@ -762,15 +762,15 @@ deploy-gke:
   stage: deploy
   # Use prebuilt image from project's registry that includes kubectl and gke-gcloud-auth-plugin
   image: $CI_REGISTRY_IMAGE/cloud-sdk-gke:latest
-  before_script:
-  # Ensure PATH contains gcloud binaries so the credential plugin is discoverable
-  - export GCLOUD_SDK_ROOT=$(gcloud info --format='value(installation.sdk_root)' 2>/dev/null || echo "/google-cloud-sdk")
-  - export PATH="$GCLOUD_SDK_ROOT/bin:$PATH"
-  - echo "Using gcloud from: $(which gcloud || echo 'not found')"
-  - echo "Using gke-gcloud-auth-plugin from: $(which gke-gcloud-auth-plugin || echo 'not found')"
-  - apt-get update || true
-  - apt-get install -y --no-install-recommends jq curl || true
-  - |
+  before_script: |
+    # Ensure PATH contains gcloud binaries so the credential plugin is discoverable
+    export GCLOUD_SDK_ROOT=$(gcloud info --format='value(installation.sdk_root)' 2>/dev/null || echo "/google-cloud-sdk")
+    export PATH="$GCLOUD_SDK_ROOT/bin:$PATH"
+    echo "Using gcloud from: $(which gcloud || echo 'not found')"
+    echo "Using gke-gcloud-auth-plugin from: $(which gke-gcloud-auth-plugin || echo 'not found')"
+    apt-get update || true
+    apt-get install -y --no-install-recommends jq curl || true
+
     echo "Preparing GCP service account key for gcloud authentication..."
 
     # Prefer a JSON key provided directly or base64-encoded in CI variables.
@@ -820,8 +820,7 @@ deploy-gke:
       exit 1;
     }
     gcloud config set project $GCP_PROJECT_ID
-  - gcloud config set project $GCP_PROJECT_ID
-  - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
+    gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
   script:
   - echo "Deploying to GKE cluster..."
   - |
