@@ -11,10 +11,10 @@ LABEL org.opencontainers.image.license="MIT"
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release apt-transport-https && \
-    curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list && \
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg && \
+    echo 'deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' > /etc/apt/sources.list.d/kubernetes.list && \
     apt-get update && \
-    apt-get install -y --no-install-recommends kubectl && \
+    apt-get install -y kubectl && \
     # Avoid aggressive purging of packages gcloud may rely on; keep cleanup minimal to prevent
     # accidental removal of tools needed by gcloud components.
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
