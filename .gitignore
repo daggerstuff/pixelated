@@ -163,7 +163,6 @@ kilo-code-settings.json
 .qoder/
 .augment/
 backups/
-**/byterover-rules.md
 # Sentry Config File
 .env.sentry-build-plugin
 
