@@ -17,9 +17,8 @@ env:
   PNPM_VERSION: 10.17.1
   NODE_ENV: test
   DISABLE_AUTH: 'true'
-  CLERK_PUBLISHABLE_KEY: pk_test_dummy
-  PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
-  CLERK_SECRET_KEY: sk_test_dummy
+  BETTER_AUTH_URL: https://localhost:4321
+  BETTER_AUTH_SECRET: test_dummy_secret_for_ci
 
 jobs:
   browser-tests:
@@ -62,9 +61,8 @@ jobs:
         # Set test environment variables
         export NODE_ENV=test
         export DISABLE_AUTH=true
-        export CLERK_PUBLISHABLE_KEY=pk_test_dummy
-        export PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_dummy
-        export CLERK_SECRET_KEY=sk_test_dummy
+        export BETTER_AUTH_URL=https://localhost:4321
+        export BETTER_AUTH_SECRET=test_dummy_secret_for_ci
         export DISABLE_WEB_FONTS=true
         export SKIP_MSW=true
 

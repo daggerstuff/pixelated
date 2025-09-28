@@ -443,7 +443,7 @@ security-scan:
 
     echo "Checking container image properties..."
     docker inspect $CONTAINER_IMAGE --format='{{.Config.User}}' || echo "No user specified"
-    
+
     echo "Checking for common security issues..."
     # Check if container runs as root
     ROOT_USER=$(docker inspect $CONTAINER_IMAGE --format='{{.Config.User}}' 2>/dev/null || echo "")
@@ -804,6 +804,7 @@ deploy-gke:
   dependencies:
   - build-frontend
   allow_failure: true
+
 # Removed Cloud Run template to avoid conflicts with custom GKE deployment
 # include:
 # - remote: https://gitlab.com/gitlab-org/incubation-engineering/five-minute-production/library/-/raw/main/gcp/cloud-run.gitlab-ci.yml
