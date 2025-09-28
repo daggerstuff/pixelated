@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.16.0",
+  "packageManager": "pnpm@10.17.1",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -35,7 +35,7 @@
     "type-check": "pnpm run typecheck",
     "check": "astro check",
     "check:all": "pnpm run format:check && pnpm run lint && pnpm run typecheck",
-    "test": "vitest",
+    "test": "node ./scripts/local-test-runner.cjs",
     "test:unit": "vitest run --coverage",
     "test:integration": "vitest run tests/integration/",
     "test:coverage": "vitest run --coverage",

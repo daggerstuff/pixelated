@@ -8,7 +8,7 @@ on:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.16.0
+  PNPM_VERSION: 10.17.1
   NODE_ENV: production
 
 jobs:
@@ -84,7 +84,7 @@ jobs:
     - name: Debug Token Permissions
       run: |
         echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
 
     - name: Compute unique rollback tag for staging
       id: compute-tag-staging
@@ -112,7 +112,7 @@ jobs:
 
     - name: Dry Run Git Push
       env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         # Use the computed tag from the previous step
         git config --global user.email "action@github.com"
@@ -120,18 +120,34 @@ jobs:
         TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME" || true
+        # Remove the temporary local tag created for the dry-run to avoid collisions later
+        git tag -d "$TAG_NAME" || true
 
     - name: Create rollback tag
       env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         # Push the previously computed tag
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
-        git tag "$TAG_NAME"
-        git push https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        # Only create the tag if it doesn't already exist locally
+        if git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null; then
+          echo "Tag $TAG_NAME already exists locally - skipping tag creation"
+        else
+          git tag "$TAG_NAME"
+        fi
+        # Push the tag (will error if remote already has it, so use --force-with-lease to be safe only if needed)
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME" || {
+          echo "Push failed - checking if remote already has tag"
+          if git ls-remote --tags https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git | grep -q "refs/tags/$TAG_NAME"; then
+            echo "Remote already has tag $TAG_NAME - nothing to do"
+          else
+            echo "Remote does not have tag and push failed - failing"
+            exit 1
+          fi
+        }
 
   rollback-production:
     name: Rollback Production
@@ -205,7 +221,7 @@ jobs:
     - name: Debug Token Permissions
       run: |
         echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
     - name: Compute unique rollback tag for production
       id: compute-tag-prod
       shell: bash
@@ -232,22 +248,38 @@ jobs:
 
     - name: Dry Run Git Push
       env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME" || true
+        # Remove the temporary local tag created during dry-run to avoid collisions
+        git tag -d "$TAG_NAME" || true
 
     - name: Create rollback tag
       env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
-        git tag "$TAG_NAME"
-        git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
-        git push origin "$TAG_NAME"
+        # Only create the tag if it doesn't already exist locally
+        if git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null; then
+          echo "Tag $TAG_NAME already exists locally - skipping tag creation"
+        else
+          git tag "$TAG_NAME"
+        fi
+        # Ensure remote URL uses token and push; if push fails because remote already has tag, tolerate it
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+        git push origin "$TAG_NAME" || {
+          echo "Push failed - checking if remote already has tag"
+          if git ls-remote --tags https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git | grep -q "refs/tags/$TAG_NAME"; then
+            echo "Remote already has tag $TAG_NAME - nothing to do"
+          else
+            echo "Remote does not have tag and push failed - failing"
+            exit 1
+          fi
+        }

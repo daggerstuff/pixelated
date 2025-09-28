@@ -12,7 +12,7 @@ permissions:
 # Environment variables can be defined here
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.16.0
+  PNPM_VERSION: 10.17.1
   NODE_ENV: production
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: 10.16.0
+        version: 10.17.1
 
     - name: Get pnpm store directory
       id: pnpm-store
@@ -59,4 +59,4 @@ jobs:
     - name: Run post scheduler
       run: pnpm run schedule-posts
       env:
-        GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
