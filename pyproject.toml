@@ -60,6 +60,7 @@ dependencies = [
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
   "authlib>=1.6.4",
+  "aiohttp>=3.12.15",
 ]
 
 [project.optional-dependencies]

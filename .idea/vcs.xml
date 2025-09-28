@@ -3,5 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/ai" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ai/lightning" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ai/lightning/pixelated-training" vcs="Git" />
   </component>
 </project>
