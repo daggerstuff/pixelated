@@ -722,10 +722,14 @@ deploy-gke:
     # Prefer a JSON key provided directly or base64-encoded in CI variables.
     # CI should provide one of: GCP_SERVICE_ACCOUNT_KEY (raw JSON) or GCP_SERVICE_ACCOUNT_KEY_B64 (base64 encoded)
     if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+      echo "Using GCP_SERVICE_ACCOUNT_KEY (raw JSON format)"
       echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     elif [ -n "$GCP_SERVICE_ACCOUNT_KEY_B64" ]; then
+      echo "Using GCP_SERVICE_ACCOUNT_KEY_B64 (base64 encoded format)"
       echo "$GCP_SERVICE_ACCOUNT_KEY_B64" | base64 -d > /tmp/gcp-key.json || {
-        echo "❌ Failed to decode GCP_SERVICE_ACCOUNT_KEY_B64"; exit 1;
+        echo "❌ Failed to decode GCP_SERVICE_ACCOUNT_KEY_B64"
+        echo "First 100 chars of base64 data: $(echo "$GCP_SERVICE_ACCOUNT_KEY_B64" | head -c 100)"
+        exit 1;
       }
     else
       echo "❌ Neither GCP_SERVICE_ACCOUNT_KEY nor GCP_SERVICE_ACCOUNT_KEY_B64 is set. Please configure one in CI variables.";
@@ -733,10 +737,24 @@ deploy-gke:
       exit 0;
     fi
 
+    # Debug: Show file info
+    echo "Created key file info:"
+    ls -l /tmp/gcp-key.json
+    echo "File size: $(wc -c < /tmp/gcp-key.json) bytes"
+    echo "First line: $(head -n 1 /tmp/gcp-key.json)"
+    echo "Last line: $(tail -n 1 /tmp/gcp-key.json)"
+
     # Basic validation of the written key file
     if ! jq -e . /tmp/gcp-key.json >/dev/null 2>&1; then
-      echo "❌ /tmp/gcp-key.json does not contain valid JSON. Aborting.";
-      cat /tmp/gcp-key.json || true
+      echo "❌ /tmp/gcp-key.json does not contain valid JSON. Debugging info:"
+      echo "--- File content (first 500 chars) ---"
+      head -c 500 /tmp/gcp-key.json || true
+      echo ""
+      echo "--- File content (last 500 chars) ---"
+      tail -c 500 /tmp/gcp-key.json || true
+      echo ""
+      echo "--- JSON validation error ---"
+      jq . /tmp/gcp-key.json 2>&1 || true
       exit 1;
     fi
 
@@ -786,5 +804,6 @@ deploy-gke:
   dependencies:
   - build-frontend
   allow_failure: true
-include:
-- remote: https://gitlab.com/gitlab-org/incubation-engineering/five-minute-production/library/-/raw/main/gcp/cloud-run.gitlab-ci.yml
+# Removed Cloud Run template to avoid conflicts with custom GKE deployment
+# include:
+# - remote: https://gitlab.com/gitlab-org/incubation-engineering/five-minute-production/library/-/raw/main/gcp/cloud-run.gitlab-ci.yml
