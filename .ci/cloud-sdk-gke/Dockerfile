@@ -10,7 +10,7 @@ LABEL org.opencontainers.image.source="https://gitlab.com/pixeldeck/pixelated"
 LABEL org.opencontainers.image.license="MIT"
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release apt-transport-https && \
+    apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release apt-transport-https jq && \
     curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg && \
     echo 'deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' > /etc/apt/sources.list.d/kubernetes.list && \
     apt-get update && \
@@ -20,7 +20,8 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
 # Install gke-gcloud-auth-plugin (the base image disables component management)
-RUN apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin && \
+RUN apt-get update && \
+    apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
 # Ensure the cloudsdk user's home directory exists and has correct permissions
