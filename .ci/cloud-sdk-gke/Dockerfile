@@ -19,12 +19,12 @@ RUN apt-get update && \
     # accidental removal of tools needed by gcloud components.
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
-# Install gke-gcloud-auth-plugin (component installer will be idempotent)
-RUN gcloud components install gke-gcloud-auth-plugin --quiet || true
+# Install gke-gcloud-auth-plugin (the base image disables component management)
+RUN apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
-# Add a non-root user for security
-RUN useradd --no-log-init --system --home /home/cloudsdk --shell /bin/bash cloudsdk && \
-    mkdir -p /home/cloudsdk && chown cloudsdk:cloudsdk /home/cloudsdk
+# Ensure the cloudsdk user's home directory exists and has correct permissions
+RUN mkdir -p /home/cloudsdk && chown cloudsdk:cloudsdk /home/cloudsdk
 
 USER cloudsdk
 
