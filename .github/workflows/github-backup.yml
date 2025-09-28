@@ -17,7 +17,7 @@ jobs:
         uses: chyroc/github2dropbox@v0.4.0
         with:
           DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE_REPO: true
           ENABLE_STAR: true
           ENABLE_FOLLOWER: true

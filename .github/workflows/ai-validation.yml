@@ -8,7 +8,6 @@ on:
   # Schedule daily validation runs
   schedule:
   - cron: 0 0 * * * # Every day at midnight UTC
-
   # Run on completed deployments
   workflow_run:
     workflows: [ Deploy to Staging, Deploy to Production ]
@@ -43,7 +42,7 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: 10.16.0
+        version: 10.17.1
         run_install: false
 
     - name: Get pnpm store directory
@@ -222,7 +221,7 @@ jobs:
       if: ${{ steps.results.outputs.needs_alert == 'true' }}
       uses: actions/github-script@v7
       with:
-        github-token: ${{ secrets.G_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const { repo, owner } = context.repo;
           github.rest.issues.create({
