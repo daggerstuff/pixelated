@@ -768,8 +768,6 @@ deploy-gke:
     export PATH="$GCLOUD_SDK_ROOT/bin:$PATH"
     echo "Using gcloud from: $(which gcloud || echo 'not found')"
     echo "Using gke-gcloud-auth-plugin from: $(which gke-gcloud-auth-plugin || echo 'not found')"
-    apt-get update || true
-    apt-get install -y --no-install-recommends jq curl || true
 
     echo "Preparing GCP service account key for gcloud authentication..."
 
