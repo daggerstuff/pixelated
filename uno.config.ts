@@ -4,11 +4,11 @@ import {
   presetAttributify,
   presetTypography,
 } from 'unocss'
-import { presetWind3 } from '@unocss/preset-wind3'
+import { presetWind3 } from '@unocss/preset-wind'
 
 export default defineConfig({
-  // Workaround: filter out accidental i- or i-- icon classes that cause failed icon "-" lookups
   rules: [
+<<<<<<< Updated upstream
     // Match problematic icon patterns and ignore them
     [/^i-(-)?$/, () => ({})],           // Matches 'i-' and 'i--'
     [/^i--.*/, () => ({})],             // Matches anything starting with 'i--'
@@ -24,6 +24,10 @@ export default defineConfig({
     /^i-(-)*$/,     // Block 'i-', 'i--', 'i---', etc.
     /^i-\s*$/,      // Block 'i-' with whitespace
     /^icon-(-)*$/,  // Block similar 'icon-' patterns
+=======
+    [/^i-(-)?$/, () => ({})],
+    [/^i--.*/, () => ({})],
+>>>>>>> Stashed changes
   ],
   shortcuts: [
     [

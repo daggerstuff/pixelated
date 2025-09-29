@@ -29,7 +29,7 @@ export default defineConfig({
     build: {
       sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
       target: 'node22',
-      chunkSizeWarningLimit: 1500, // Increase limit for large bundles like FHE
+      chunkSizeWarningLimit: 1500,
       rollupOptions: {
         external: [
           '@google-cloud/storage',
@@ -43,7 +43,6 @@ export default defineConfig({
           'sqlite3',
           'better-sqlite3',
           'pdfkit',
-          // Performance optimization: externalize heavy libraries
           '@tensorflow/tfjs',
           '@tensorflow/tfjs-layers',
           'three',
@@ -58,9 +57,8 @@ export default defineConfig({
             warning.code === "SOURCEMAP_ERROR" ||
             (warning.message && warning.message.includes("didn't generate a sourcemap"))
           ) {
-            return // suppress sourcemap warnings (astro:transitions, etc.)
+            return
           }
-          // Suppress Vite 'externalized for browser compatibility' and Unocss icon '-' warnings
           if (warning.message && (
             warning.message.includes('externalized for browser compatibility') ||
             warning.message.includes('icon "-"') ||
@@ -89,7 +87,6 @@ export default defineConfig({
     },
     ssr: {
       external: [
-        // Packages from build.rollupOptions.external
         '@google-cloud/storage',
         '@aws-sdk/client-s3',
         '@aws-sdk/client-dynamodb',
@@ -101,13 +98,11 @@ export default defineConfig({
         'sqlite3',
         'better-sqlite3',
         'pdfkit',
-        // Additional SSR-specific packages
         'sharp',
         'canvas',
         'puppeteer',
         'playwright',
         '@sentry/profiling-node',
-        // Performance optimization: externalize heavy libraries
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
         'three',
@@ -130,7 +125,6 @@ export default defineConfig({
         'pdfkit',
         'recharts',
         'lucide-react',
-        // Performance optimization: exclude heavy libraries from optimization
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
         'three',
@@ -143,19 +137,11 @@ export default defineConfig({
     },
   },
   integrations: [
-    // expressiveCode({
-    //   themes: ['github-dark', 'github-light'],
-    //   styleOverrides: {
-    //     borderRadius: '0.5rem',
-    //   },
-    // }),
     react({
       include: ['**/react/*', '**/components/**/*'],
       experimentalReactChildren: true,
     }),
-    // mdx({
-    //   components: path.resolve('./mdx-components.js'),
-    // }),
+
     UnoCSS({
       injectReset: true,
     }),
@@ -176,16 +162,13 @@ export default defineConfig({
       },
       svgdir: './src/icons',
     }),
-    // markdoc(),
     ...(process.env.SENTRY_DSN ? [
       sentry({
-        // Other Sentry options
         sourceMapsUploadOptions: {
           project: "pixel-astro",
           authToken: process.env.SENTRY_AUTH_TOKEN,
         },
       }),
-      // Add Spotlight for development debugging when explicitly enabled
       ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1'
         ? [spotlightjs()]
         : [])
@@ -206,7 +189,7 @@ export default defineConfig({
     watch: {
       ignored: [
         '**/ai/**',
-        '**/dataset/**', 
+        '**/dataset/**',
         '**/MER2025/**',
         '**/VideoChat2/**',
         '**/*.py',

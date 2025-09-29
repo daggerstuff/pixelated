@@ -84,7 +84,18 @@ COPY --chown=astro:astro instrument.mjs ./
 
 COPY --chown=astro:astro astro ./astro
 
+<<<<<<< Updated upstream
 COPY --chown=astro:astro *.config.* ./
+=======
+# Copy any additional config files that might be needed (optional)
+# Docker's COPY does not accept shell operators like "|| true" — that becomes
+# part of the destination path and breaks builds under BuildKit. Instead
+# explicitly copy the known, safe files that exist in the repo. We include
+# .env.example (do NOT commit secrets) so local builds can still use an
+# example env. Any other optional configs are listed explicitly.
+COPY --chown=astro:astro .env.example ./
+COPY --chown=astro:astro postcss.config.cjs eslint.config.js sentry.client.config.js sentry.server.config.js ./
+>>>>>>> Stashed changes
 
 RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
     chmod -R 755 /tmp/.astro /app/node_modules/.astro && \
