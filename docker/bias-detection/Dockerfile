@@ -74,8 +74,8 @@ RUN pnpm tsc --project tsconfig.json --outDir dist
 
 FROM node-base AS production
 
-RUN addgroup --system --gid 1001 biasdetection && \
-    adduser --system --uid 1001 biasdetection
+RUN groupadd -g 1001 biasdetection || true && \
+    useradd -u 1001 -g 1001 -s /bin/sh -M -N -r biasdetection || true
 
 COPY --from=build --chown=biasdetection:biasdetection /app/dist ./dist
 COPY --from=build --chown=biasdetection:biasdetection /app/node_modules ./node_modules

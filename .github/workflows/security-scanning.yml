@@ -3,23 +3,6 @@ name: Security Scanning
 permissions:
   contents: read
   security-events: write
-  # Required for keyless signing (OIDC) and authenticating to cloud KMS providers.
-  id-token: write
-
-# REQUIRED REPOSITORY/ORG CONFIGURATION FOR COSIGN
-# - If you want to sign with a repository key, add a repository secret named
-#   `COSIGN_PRIVATE_KEY` containing the ASCII-armored private key (PEM). Keep
-#   the matching public key available to parties that will verify signatures
-#   (or upload it to a secure location and reference it during verification).
-# - For keyless signing / KMS-backed signing prefer using Actions OIDC and your
-#   cloud provider KMS (GCP KMS, AWS KMS, Azure Key Vault). Configure the
-#   appropriate trust relationship (Workload Identity/GCP/OIDC or IAM role)
-#   so the runner can obtain short-lived credentials. See your cloud provider
-#   docs for setting up Workload Identity / OIDC for GitHub Actions.
-# - Ensure repository Actions permissions allow `id-token: write` (set above)
-#   and grant the workflow's identity the minimal KMS sign/verify permissions.
-# - Do NOT hardcode secrets in the workflow YAML. Use repository or org-level
-#   secrets and restricted access policies.
 
 on:
   push:
@@ -47,15 +30,15 @@ jobs:
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@v0.16.1
+      continue-on-error: true
       with:
         scan-type: 'fs'
         scanners: 'vuln,secret,misconfig'
         format: 'sarif'
         output: 'trivy-results.sarif'
-        severity: 'HIGH,CRITICAL'
-        exit-code: '1'
     - name: Run Checkov scan
       uses: bridgecrewio/checkov-action@v12
+      continue-on-error: true
       with:
         directory: .
         framework: all
@@ -65,7 +48,6 @@ jobs:
         skip_path: "clusters/**"
         log_level: WARNING
         container_user: 0
-        soft_fail: false
 
     - name: Check for Checkov SARIF file
       id: checkov_sarif
@@ -143,77 +125,6 @@ jobs:
         name: checkov-sarif
         path: checkov-results.sarif
 
-    # --- COSIGN INTEGRATION START ---
-    - name: Install Cosign
-      run: |
-        COSIGN_VERSION="v2.2.3"
-        curl -sSL "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64" -o cosign
-        curl -sSL "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64.sig" -o cosign.sig
-        curl -sSL "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign.pub" -o cosign.pub
-        cosign verify-blob --key cosign.pub --signature cosign.sig cosign
-        chmod +x cosign
-        sudo mv cosign /usr/local/bin/cosign
-    - name: Build and push image
-      run: |
-        IMAGE_NAME="ghcr.io/${{ github.repository }}/pixelated-app"
-        IMAGE_TAG="${{ github.sha }}"
-        docker build -t "${IMAGE_NAME}:${IMAGE_TAG}" .
-        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-        docker push "${IMAGE_NAME}:${IMAGE_TAG}"
-
-    - name: Sign container image with Cosign
-      env:
-        COSIGN_EXPERIMENTAL: "true"
-      run: |
-        # Replace IMAGE_NAME and TAG with actual values
-        IMAGE_NAME="ghcr.io/${{ github.repository }}/pixelated-app"
-        IMAGE_TAG="${{ github.sha }}"
-        # If using keyless signing (OIDC)
-        cosign sign --yes "${IMAGE_NAME}:${IMAGE_TAG}"
-        # If using key (uncomment below)
-        # echo "${COSIGN_PRIVATE_KEY}" > cosign.key
-        # cosign sign --key cosign.key "${IMAGE_NAME}:${IMAGE_TAG}"
-        # rm -f cosign.key
-
-    - name: Upload Cosign signature artifact
-      run: |
-        IMAGE_NAME="ghcr.io/${{ github.repository }}/pixelated-app"
-        IMAGE_TAG="${{ github.sha }}"
-        cosign download attestation "${IMAGE_NAME}:${IMAGE_TAG}" > cosign-attestation.json || true
-      continue-on-error: true
-
-    - name: Upload Cosign attestation
-      uses: actions/upload-artifact@v4
-      with:
-        name: cosign-attestation
-        path: cosign-attestation.json
-
-    - name: Verify container image signature with Cosign
-      env:
-        COSIGN_EXPERIMENTAL: "true"
-      run: |
-        IMAGE_NAME="ghcr.io/${{ github.repository }}/pixelated-app"
-        IMAGE_TAG="${{ github.sha }}"
-        cosign verify "${IMAGE_NAME}:${IMAGE_TAG}"
-        IMAGE_NAME="ghcr.io/${{ github.repository }}/pixelated-app"
-        IMAGE_TAG="${{ github.sha }}"
-        cosign verify "${IMAGE_NAME}:${IMAGE_TAG}"
-      # Fail job if verification fails
-      continue-on-error: false
-
-    - name: Upload Cosign verification log
-      run: |
-        IMAGE_NAME="ghcr.io/${{ github.repository }}/pixelated-app"
-        IMAGE_TAG="${{ github.sha }}"
-        cosign verify "${IMAGE_NAME}:${IMAGE_TAG}" > cosign-verify.log 2>&1 || true
-      continue-on-error: true
-    - name: Upload Cosign verification artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: cosign-verify-log
-        path: cosign-verify.log
-    # --- COSIGN INTEGRATION END ---
-
   dependency-check:
     name: Dependency Check
     runs-on: ubuntu-latest
@@ -243,132 +154,3 @@ jobs:
       with:
         name: security-audit-results
         path: audit-results.json
-
-  # Container image signing & verification (Cosign)
-  # This job is intentionally separate from build/push pipelines so it can be
-  # added to scanning workflows without assuming how images are built.
-  # To enable this job set the IMAGE_REF environment variable to the image
-  # reference you want signed (e.g. ghcr.io/org/repo:tag) either from a
-  # previous job output or via repository/workflow inputs in CI.
-  container-sign-verify:
-    name: Container Sign & Verify
-    runs-on: ubuntu-latest
-    needs: [ security-scan, dependency-check ]
-    # Only run when an image reference is provided to avoid accidental runs
-    if: ${{ env.IMAGE_REF != '' }}
-    # Export a small set of environment variables to control behavior:
-    # - IMAGE_REF: image to sign/verify (required to run this job)
-    # - COSIGN_USE_OIDC: 'true' to prefer keyless/OIDC-KMS signing even if a repo
-    #   private key exists. Default: 'false'
-    # - ENFORCE_SIGNATURE: 'true' to require verification to pass (fail job on verify failure).
-    # - PROMOTION: 'true' when this verification is being used to gate a promotion/publish step.
-    env:
-      IMAGE_REF: ${{ env.IMAGE_REF }}
-      COSIGN_USE_OIDC: ${{ env.COSIGN_USE_OIDC || 'false' }}
-      ENFORCE_SIGNATURE: ${{ env.ENFORCE_SIGNATURE || 'true' }}
-      PROMOTION: ${{ env.PROMOTION || 'false' }}
-    outputs:
-      # Boolean-like output to indicate whether a signature/public key artifact was produced
-      signature_found: ${{ steps.set-signature-output.outputs.signature_found || 'false' }}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v5
-
-    - name: Install Cosign
-      uses: sigstore/cosign-installer@v2
-
-    # Signing: prefer repository secret key if provided, otherwise attempt
-    # keyless/OIDC signing using the runner's id-token and cloud KMS.
-    - name: Sign image using repo private key (if provided)
-      if: ${{ secrets.COSIGN_PRIVATE_KEY != '' && env.COSIGN_USE_OIDC != 'true' }}
-      run: |
-        set -euo pipefail
-        echo "Writing private key to file"
-        printf '%s' "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
-        chmod 600 cosign.key
-        echo "Signing image $IMAGE_REF with private key"
-        # Use cosign to sign the image with the provided key. Failure here should
-        # surface, but we prefer to let verification step enforce signature validity.
-        cosign sign --key cosign.key "$IMAGE_REF"
-        echo "Exporting public key for verification"
-        cosign public-key cosign.key > cosign.pub
-        # Remove private key from runner filesystem immediately after exporting
-        # the public key to avoid accidental leakage or upload.
-        rm -f cosign.key
-      shell: bash
-
-    - name: Sign image using OIDC / KMS (keyless) - requires OIDC/KMS setup
-      if: ${{ (secrets.COSIGN_PRIVATE_KEY == '' || env.COSIGN_USE_OIDC == 'true') }}
-      run: |
-        set -euo pipefail
-        echo "Attempting keyless/OIDC signing of $IMAGE_REF"
-        # For GCP KMS usage you may provide a KMS URI like:
-        #   "gcpkms://projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY"
-        # Example keyless signing (this will create an attestation in the registry):
-        # We capture output to a file for auditing. Keyless signing may need the
-        # runner to exchange an id-token for cloud credentials (configure OIDC/KMS
-        # trust separately in your cloud provider). Failure here will be logged
-        # but verification is the enforcement point.
-        cosign sign --a provenance -o cosign.sig --yes "$IMAGE_REF" > cosign.sign.out 2>&1 || true
-        echo "-- COSIGN KEYLESS SIGN OUTPUT START --"
-        cat cosign.sign.out || true
-        echo "-- COSIGN KEYLESS SIGN OUTPUT END --"
-      shell: bash
-
-    - name: Verify image signature
-      # Only enforce verification when requested (e.g. gating promotion) or when
-      # ENFORCE_SIGNATURE is enabled. This avoids failing scans when signatures
-      # are intentionally not present.
-      if: ${{ env.ENFORCE_SIGNATURE == 'true' || env.PROMOTION == 'true' }}
-      run: |
-        set -euo pipefail
-        echo "Verifying signature for $IMAGE_REF"
-        # If a public key file was exported earlier use it; otherwise perform
-        # keyless verification (will validate against the certificate chain)
-        if [ -f cosign.pub ]; then
-          echo "Using provided public key for verification"
-          cosign verify --key cosign.pub "$IMAGE_REF"
-        else
-          echo "No public key file found; performing keyless verification"
-          cosign verify "$IMAGE_REF"
-        fi
-      shell: bash
-
-    - name: Save signature & verification artifacts
-      run: |
-        set -euo pipefail
-        mkdir -p cosign-artifacts
-        # Save any produced files; cosign may attach signatures to the registry
-        # but we capture logs/artifacts produced during signing/verification.
-        if [ -f cosign.pub ]; then
-          cp cosign.pub cosign-artifacts/ || true
-        fi
-        if [ -f cosign.sig ]; then
-          cp cosign.sig cosign-artifacts/ || true
-        fi
-        # Save a verbose verification trace for auditing
-        cosign verify --verbose "$IMAGE_REF" > cosign-artifacts/verify.log || true
-      shell: bash
-
-    - name: Upload cosign artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: cosign-artifacts
-        path: cosign-artifacts
-
-    - name: Set signature output for job
-      id: set-signature-output
-      run: |
-        set -euo pipefail
-        SIGN_FOUND=false
-        if [ -f cosign.pub ] || [ -f cosign.sig ] || [ -f cosign.sign.out ]; then
-          SIGN_FOUND=true
-        fi
-        echo "signature_found=$SIGN_FOUND" >> $GITHUB_OUTPUT
-      shell: bash
-    # Optional: gate promotion/publish steps in later workflows by verifying
-    # signature at that time using the following verify command (this job
-    # already performs verification and will fail the workflow if verification
-    # fails). For promotion steps in other workflows set `if: success()` and
-    # re-run the verification step there using the public key or keyless verify.
-

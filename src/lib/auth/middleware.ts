@@ -30,6 +30,11 @@ export async function authenticateRequest(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+export async function authenticateRequest(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
   try {
     // Extract token from request
     const token = extractTokenFromRequest(req)
@@ -120,6 +125,7 @@ export function requireRole(requiredRole: UserRole) {
 
 /**
  * Permission-based authorization middleware
+ * Permission-based authorization middleware
  */
 export function requirePermission(permission: string) {
   return async function(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -199,6 +205,17 @@ export function requireAnyPermission(permissions: string[]) {
 }
 
 /**
+ * Admin-only middleware (convenience wrapper)
+ */
+export const requireAdmin = requireRole('admin')
+
+/**
+ * Therapist or higher middleware (convenience wrapper)
+ */
+export const requireTherapistOrHigher = requireRole('therapist')
+
+/**
+ * Authenticated user middleware (just checks if user is logged in)
  * Admin-only middleware (convenience wrapper)
  */
 export const requireAdmin = requireRole('admin')
@@ -379,6 +396,7 @@ export function createAuthRateLimit(options: {
           message: 'Too many requests, please try again later',
           retryAfter: Math.ceil((requestData.resetTime - now) / 1000),
         },
+      })
       })
     }
 

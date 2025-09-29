@@ -3,7 +3,6 @@ ARG BUILDKIT_INLINE_CACHE=1
 ARG NODE_VERSION=24
 FROM node:${NODE_VERSION}-slim AS base
 
-# Labels
 LABEL org.opencontainers.image.description="Astro"
 
 RUN apt-get update && \
@@ -50,10 +49,8 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable pnpm
 
-RUN set -eux; \
-    # Create group/user for Alpine Linux
-    addgroup -g 1001 -S astro && \
-    adduser -S astro -u 1001 -G astro
+RUN groupadd -g 1001 astro || true && \
+    useradd -u 1001 -g 1001 -s /bin/sh -M -N -r astro || true
 
 FROM base AS deps
 
@@ -84,18 +81,7 @@ COPY --chown=astro:astro instrument.mjs ./
 
 COPY --chown=astro:astro astro ./astro
 
-<<<<<<< Updated upstream
 COPY --chown=astro:astro *.config.* ./
-=======
-# Copy any additional config files that might be needed (optional)
-# Docker's COPY does not accept shell operators like "|| true" — that becomes
-# part of the destination path and breaks builds under BuildKit. Instead
-# explicitly copy the known, safe files that exist in the repo. We include
-# .env.example (do NOT commit secrets) so local builds can still use an
-# example env. Any other optional configs are listed explicitly.
-COPY --chown=astro:astro .env.example ./
-COPY --chown=astro:astro postcss.config.cjs eslint.config.js sentry.client.config.js sentry.server.config.js ./
->>>>>>> Stashed changes
 
 RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
     chmod -R 755 /tmp/.astro /app/node_modules/.astro && \
