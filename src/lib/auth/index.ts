@@ -1,3 +1,13 @@
+<<<<<<< Updated upstream
+=======
+export * from './middleware'
+// Re-export session functions
+export { createSession, endSession, getSession } from './session'
+
+import type { AstroCookies } from 'astro'
+import type { User } from './index'
+
+>>>>>>> Stashed changes
 /**
  * Authentication Module - Main export for Phase 7 JWT Authentication Service
  * Provides complete authentication system with Better-Auth integration
@@ -466,3 +476,7 @@ export const auth = {
   createUser,
 }
 export { requirePageAuth as requireAuth } from './serverAuth'
+<<<<<<< Updated upstream
+=======
+export { requirePageAuth as requireAuth } from './serverAuth'
+>>>>>>> Stashed changes

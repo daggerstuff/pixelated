@@ -825,7 +825,7 @@ deploy-gke:
       echo "--- JSON validation error ---"
       jq . /tmp/gcp-key.json 2>&1 || true
       exit 1;
-    fi
+    git 
 
     chmod 600 /tmp/gcp-key.json
     gcloud auth activate-service-account --key-file=/tmp/gcp-key.json || {
