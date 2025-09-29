@@ -82,7 +82,6 @@ build-frontend:
       --build-arg SENTRY_RELEASE="$BUILD_SENTRY_RELEASE" \
       --build-arg PUBLIC_SENTRY_DSN="$PUBLIC_SENTRY_DSN" \
       --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
       -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
@@ -113,9 +112,7 @@ test-container:
   script:
   - echo "Testing container health..."
   - docker pull $CONTAINER_IMAGE
-  - docker run -d --name test-container \
-  - BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-    $CONTAINER_IMAGE
+  - docker run -d --name test-container -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" $CONTAINER_IMAGE
   - sleep 30
   - docker logs test-container
   - |
@@ -302,7 +299,6 @@ deploy-vps:
         -e PUBLIC_URL="$PUBLIC_URL" \
         -e CORS_ORIGINS="$CORS_ORIGINS" \
         -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET"
-        -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET"
         $CONTAINER_IMAGE_LATEST
 
       # Wait for container to start
@@ -399,19 +395,6 @@ build-ai-backend:
     DOCKER_TLS_CERTDIR: ''
   before_script:
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  script: |
-    echo "Building AI backend components..."
-    cd ai
-    docker buildx create --use --name ai-builder || docker buildx use ai-builder
-
-    docker buildx build \
-      --load \
-      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-      -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
-
-    docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
-    docker push $CI_REGISTRY_IMAGE/ai:latest
-    echo "✅ AI backend container pushed to GitLab Container Registry"
   script: |
     echo "Building AI backend components..."
     cd ai
@@ -691,53 +674,6 @@ tag-image:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
-
-build-cloud-sdk-image:
-  stage: build
-  image: docker:27.3.1
-  services:
-  - name: docker:27.3.1-dind
-    alias: docker
-    command:
-    - "--tls=false"
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ''
-    DOCKER_BUILDKIT: 1
-  before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  script:
-  - |
-    echo "Building Cloud SDK image with kubectl and gke-gcloud-auth-plugin (buildx + registry cache)..."
-    IMAGE_NAME="$CI_REGISTRY_IMAGE/cloud-sdk-gke:$CI_COMMIT_SHA"
-    LATEST_NAME="$CI_REGISTRY_IMAGE/cloud-sdk-gke:latest"
-    CACHE_REF="$CI_REGISTRY_IMAGE/cloud-sdk-gke:cache"
-
-    # Ensure a buildx builder exists and is selected
-    docker buildx create --use --name cloud-builder || docker buildx use cloud-builder
-
-    # Build and push with registry cache to speed up apt/package installs between runs
-    docker buildx build \
-      --push \
-      --tag "$IMAGE_NAME" \
-      --cache-from type=registry,ref="$CACHE_REF" \
-      --cache-to type=registry,ref="$CACHE_REF",mode=max \
-      -f .ci/cloud-sdk-gke/Dockerfile .
-
-    # Tag latest and push
-    docker tag "$IMAGE_NAME" "$LATEST_NAME" || true
-    docker push "$LATEST_NAME" || true
-
-    # On master/main also push a stable tag for reuse
-    if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
-      docker tag "$IMAGE_NAME" "$CI_REGISTRY_IMAGE/cloud-sdk-gke:stable" || true
-      docker push "$CI_REGISTRY_IMAGE/cloud-sdk-gke:stable" || true
-    fi
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_COMMIT_BRANCH == "main"
-  dependencies:
-  - build-frontend
 trivy-scan:
   stage: test
   image:
@@ -777,15 +713,10 @@ cleanup:
   allow_failure: true
 deploy-gke:
   stage: deploy
-  # Use prebuilt image from project's registry that includes kubectl and gke-gcloud-auth-plugin
-  image: $CI_REGISTRY_IMAGE/cloud-sdk-gke:latest
-  before_script: |
-    # Ensure PATH contains gcloud binaries so the credential plugin is discoverable
-    export GCLOUD_SDK_ROOT=$(gcloud info --format='value(installation.sdk_root)' 2>/dev/null || echo "/google-cloud-sdk")
-    export PATH="$GCLOUD_SDK_ROOT/bin:$PATH"
-    echo "Using gcloud from: $(which gcloud || echo 'not found')"
-    echo "Using gke-gcloud-auth-plugin from: $(which gke-gcloud-auth-plugin || echo 'not found')"
-
+  image: google/cloud-sdk:alpine
+  before_script:
+  - apk add --no-cache kubectl curl jq
+  - |
     echo "Preparing GCP service account key for gcloud authentication..."
 
     # Prefer a JSON key provided directly or base64-encoded in CI variables.
@@ -825,7 +756,7 @@ deploy-gke:
       echo "--- JSON validation error ---"
       jq . /tmp/gcp-key.json 2>&1 || true
       exit 1;
-    git 
+    fi
 
     chmod 600 /tmp/gcp-key.json
     gcloud auth activate-service-account --key-file=/tmp/gcp-key.json || {
@@ -835,7 +766,8 @@ deploy-gke:
       exit 1;
     }
     gcloud config set project $GCP_PROJECT_ID
-    gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
+  - gcloud config set project $GCP_PROJECT_ID
+  - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
   script:
   - echo "Deploying to GKE cluster..."
   - |

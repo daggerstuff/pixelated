@@ -41,8 +41,8 @@ RUN pnpm tsc --project tsconfig.json --outDir dist
 
 FROM base AS production
 
-RUN addgroup --system --gid 1001 aiservice && \
-    adduser --system --uid 1001 aiservice
+RUN groupadd -g 1001 aiservice || true && \
+    useradd -u 1001 -g 1001 -s /bin/sh -M -N -r aiservice || true
 
 COPY --from=build --chown=aiservice:aiservice /app/dist ./dist
 COPY --from=build --chown=aiservice:aiservice /app/node_modules ./node_modules
