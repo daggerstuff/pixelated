@@ -10,23 +10,18 @@ import { logSecurityEvent } from '../../../lib/security'
 import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
-  try {
-    // Extract client information
-    const userAgent = request.headers.get('user-agent') || 'unknown'
-    const deviceId = request.headers.get('x-device-id') || 'unknown'
-    const clientInfo = {
-      ip: clientAddress || 'unknown',
-      userAgent,
-      deviceId,
-    }
+  // Extract client information early so it's available in the catch block
+  const userAgent = request.headers.get('user-agent') || 'unknown'
+  const deviceId = request.headers.get('x-device-id') || 'unknown'
+  const clientInfo = {
+    ip: clientAddress || 'unknown',
+    userAgent,
+    deviceId,
+  }
 
+  try {
     // Apply rate limiting
-    const rateLimitResult = await rateLimitMiddleware(
-      request,
-      'refresh',
-      20, // 20 refresh attempts per hour per IP
-      60
-    )
+    const rateLimitResult = await rateLimitMiddleware(request, 'refresh', 20, 60)
 
     if (!rateLimitResult.success) {
       return rateLimitResult.response!
@@ -34,19 +29,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Parse and validate request body
     const body = await request.json()
-    
-    // Validate required fields
-    if (!body.refreshToken) {
+
+    if (!body || !body.refreshToken) {
       return new Response(
-        JSON.stringify({
-          error: 'Missing refresh token',
-          details: ['refreshToken'],
-        }),
+        JSON.stringify({ error: 'Missing refresh token', details: ['refreshToken'] }),
         {
           status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         }
       )
     }
@@ -66,10 +55,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     await updatePhase6AuthenticationProgress(null, 'token_refreshed')
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        tokenPair,
-      }),
+      JSON.stringify({ success: true, tokenPair }),
       {
         status: 200,
         headers: {
@@ -78,8 +64,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         },
       }
     )
+  } catch (err: unknown) {
+    // Narrow the unknown error to access properties safely
+    const error =
+      typeof err === 'object' && err !== null
+        ? (err as { message?: string; name?: string; details?: unknown })
+        : { message: String(err), name: undefined }
 
-  } catch (error) {
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
       await logSecurityEvent('TOKEN_REFRESH_FAILED', null, {
@@ -89,38 +80,28 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       })
 
       return new Response(
-        JSON.stringify({
-          error: error.message,
-          details: error.details || {},
-        }),
+        JSON.stringify({ error: error.message, details: error.details || {} }),
         {
           status: 401,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         }
       )
     }
 
     // Handle unexpected errors
-    console.error('Token refresh error:', error)
-    
+    console.error('Token refresh error:', err)
+
     await logSecurityEvent('TOKEN_REFRESH_ERROR', null, {
-      error: error.message,
+      error: error.message || String(err),
       clientInfo,
       timestamp: Date.now(),
     })
 
     return new Response(
-      JSON.stringify({
-        error: 'Token refresh failed',
-        message: 'An unexpected error occurred. Please try again later.',
-      }),
+      JSON.stringify({ error: 'Token refresh failed', message: 'An unexpected error occurred. Please try again later.' }),
       {
         status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       }
     )
   }

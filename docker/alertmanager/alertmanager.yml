@@ -42,7 +42,7 @@ receivers:
       {{ end }}
 
   webhook_configs:
-  - url: 'http://localhost:8080/api/alerts'
+  - url: '${ALERTMANAGER_WEBHOOK_URL:-http://localhost:8080/api/alerts}'
     send_resolved: true
 
 - name: 'critical-alerts'

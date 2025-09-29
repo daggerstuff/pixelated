@@ -9,7 +9,6 @@ on:
 env:
   NODE_VERSION: 24.8.0
   PNPM_VERSION: 10.17.1
-  PNPM_VERSION: 10.17.1
   NODE_ENV: production
 
 jobs:
@@ -85,7 +84,7 @@ jobs:
     - name: Debug Token Permissions
       run: |
         echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
+        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
 
     - name: Compute unique rollback tag for staging
       id: compute-tag-staging
@@ -113,7 +112,7 @@ jobs:
 
     - name: Dry Run Git Push
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         # Use the computed tag from the previous step
         git config --global user.email "action@github.com"
@@ -121,13 +120,11 @@ jobs:
         TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME" || true
-        # Remove the temporary local tag created for the dry-run to avoid collisions later
-        git tag -d "$TAG_NAME" || true
+        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         # Push the previously computed tag, but ensure uniqueness by checking local and remote
         git config --global user.email "action@github.com"
@@ -225,7 +222,7 @@ jobs:
     - name: Debug Token Permissions
       run: |
         echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
+        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
     - name: Compute unique rollback tag for production
       id: compute-tag-prod
       shell: bash
@@ -252,20 +249,18 @@ jobs:
 
     - name: Dry Run Git Push
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME" || true
-        # Remove the temporary local tag created during dry-run to avoid collisions
-        git tag -d "$TAG_NAME" || true
+        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
