@@ -8,7 +8,7 @@ on:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.16.0
+  PNPM_VERSION: 10.17.1
   NODE_ENV: production
 
 jobs:
@@ -126,12 +126,29 @@ jobs:
       env:
         G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
-        # Push the previously computed tag
+        # Push the previously computed tag, but ensure uniqueness by checking local and remote
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
+        TAG_BASE=${{ steps.compute-tag-staging.outputs.tag }}
+        TAG_NAME="$TAG_BASE"
+        # Ensure the remote URL is set to use token auth for push checks
+        git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+        # Fetch remote tags for accurate checks
+        git fetch --tags --force
+        COUNT=0
+        # Try up to 50 suffix increments to find a unique tag
+        while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
+          COUNT=$((COUNT+1))
+          if [ "$COUNT" -gt 50 ]; then
+            echo "::error::Unable to compute unique tag after 50 attempts: $TAG_NAME"
+            exit 1
+          fi
+          printf -v PAD "%02d" "$COUNT"
+          TAG_NAME="${TAG_BASE}-$PAD"
+        done
+        echo "Creating and pushing tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push origin "$TAG_NAME"
 
   rollback-production:
     name: Rollback Production
@@ -247,7 +264,21 @@ jobs:
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
-        git tag "$TAG_NAME"
+        TAG_BASE=${{ steps.compute-tag-prod.outputs.tag }}
+        TAG_NAME="$TAG_BASE"
         git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+        git fetch --tags --force
+        COUNT=0
+        # Try up to 100 suffix increments to find a unique tag for production
+        while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
+          COUNT=$((COUNT+1))
+          if [ "$COUNT" -gt 100 ]; then
+            echo "::error::Unable to compute unique production tag after 100 attempts: $TAG_NAME"
+            exit 1
+          fi
+          printf -v PAD "%02d" "$COUNT"
+          TAG_NAME="${TAG_BASE}-$PAD"
+        done
+        echo "Creating and pushing production tag: $TAG_NAME"
+        git tag "$TAG_NAME"
         git push origin "$TAG_NAME"

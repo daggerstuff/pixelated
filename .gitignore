@@ -163,7 +163,6 @@ kilo-code-settings.json
 .qoder/
 .augment/
 backups/
-**/byterover-rules.md
 # Sentry Config File
 .env.sentry-build-plugin
 
@@ -171,10 +170,7 @@ serena.project.json
 .junie/
 .crush/
 .copilot-tracking/
-.amazonq/
 .qwen/
-.serena/
-memory-bank/
 memAgent/
 
 tools/gdrive-dataset-manager/
@@ -183,10 +179,12 @@ tools/gdrive-dataset-manager/
 .vscode/
 .aiignore
 .qwen-config.json
-AGENTS.md
 mcp_agent.config.yaml
 mcp_agent.secrets.yaml
 tsconfig.json.backup
 TYPESCRIPT_CRASH_FIX.md
 WARP.md
 .claude/
+
+checkov-results-fixed.sarif
+playwright-report-browser-compat

@@ -1,6 +1,55 @@
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
 import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 
+// Mock the Python bridge to avoid network calls
+vi.mock('../python-bridge', () => ({
+  PythonBiasDetectionBridge: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    analyzeSession: vi.fn().mockResolvedValue({
+      sessionId: 'test-session',
+      overallBiasScore: 0.3,
+      alertLevel: 'medium',
+      layerResults: {
+        preprocessing: { biasScore: 0.2 },
+        modelLevel: { biasScore: 0.3 },
+        interactive: { biasScore: 0.4 },
+        evaluation: { biasScore: 0.3 },
+      },
+    }),
+    checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
+// Mock the metrics collector
+vi.mock('../metrics-collector', () => ({
+  BiasMetricsCollector: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    getMetrics: vi.fn().mockResolvedValue({
+      overall_stats: { 
+        total_sessions: 100, 
+        average_bias_score: 0.3,
+        alert_distribution: {
+          low: 50,
+          medium: 30,
+          high: 15,
+          critical: 5,
+        },
+      },
+    }),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
+// Mock the alert system
+vi.mock('../alerts-system', () => ({
+  BiasAlertSystem: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    processAlert: vi.fn().mockResolvedValue(undefined),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
 // Allow CI to skip performance-heavy tests
 const SKIP_PERF = process.env['SKIP_PERFORMANCE_TESTS'] === 'true'
 const ddescribe = SKIP_PERF ? describe.skip : describe

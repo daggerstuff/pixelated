@@ -34,8 +34,8 @@ RUN pnpm tsc --project tsconfig.json --outDir dist
 # Production stage
 FROM base AS production
 
-RUN addgroup --system --gid 1001 jobs && \
-    adduser --system --uid 1001 jobs
+RUN groupadd -g 1001 jobs || true && \
+    useradd -u 1001 -g 1001 -s /bin/sh -M -N -r jobs || true
 
 # Copy built application
 COPY --from=build --chown=jobs:jobs /app/dist ./dist

@@ -54,5 +54,23 @@ Sentry.init({
     },
   },
 })
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="40958e06-4933-5d4d-8c5f-d969f7ba8976")}catch(e){}}();
-//# debugId=40958e06-4933-5d4d-8c5f-d969f7ba8976
+!function () {
+  try {
+    const e = "undefined" != typeof window ? window :
+      "undefined" != typeof global ? global :
+        "undefined" != typeof globalThis ? globalThis :
+          "undefined" != typeof self ? self : {};
+    const n = (new e.Error).stack;
+    if (n) {
+      e._sentryDebugIds = e._sentryDebugIds || {};
+      e._sentryDebugIds[n] = "40958e06-4933-5d4d-8c5f-d969f7ba8976";
+    }
+  } catch (err) {
+    // Handle error: log only in development to avoid leaking info in production
+    if (process?.env?.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Sentry debugId assignment failed:', err);
+    }
+  }
+}();
+

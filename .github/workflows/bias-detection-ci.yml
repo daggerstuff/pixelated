@@ -28,7 +28,7 @@ on:
 env:
   NODE_VERSION: 24.8.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.16.0
+  PNPM_VERSION: 10.17.1
 
 jobs:
   security-scan:
@@ -281,6 +281,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-
 
+    - name: Prepare uv venv
+      id: prepare-uv
+      uses: ./.github/actions/prepare-uv-venv
+      with:
+        service-dir: src/lib/ai/bias-detection/python-service
+
     - name: Install Python dependencies
       run: |
         if [ ! -d "src/lib/ai/bias-detection/python-service" ]; then
@@ -288,12 +294,19 @@ jobs:
           ls -la src/lib/ai/bias-detection/
           exit 1
         fi
+
+        # Prepare uv venv using the composite action, then use its output
+        # NOTE: composite actions run as steps, so this shell block only performs installs after the action has run.
         cd src/lib/ai/bias-detection/python-service
-        uv pip install --upgrade pip setuptools wheel
+
+        # Use the use-system output if set
+        USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
+
+        uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
         # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
-        uv pip install --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
-        uv pip install -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
-        uv pip install pytest pytest-cov pytest-asyncio httpx
+        uv pip install ${USE_SYSTEM} --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
+        uv pip install ${USE_SYSTEM} -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
+        uv pip install ${USE_SYSTEM} pytest pytest-cov pytest-asyncio httpx
 
     - name: Run Python linting
       run: |
@@ -391,10 +404,13 @@ jobs:
     - name: Install Python ML dependencies
       run: |
         cd src/lib/ai/bias-detection/python-service
-        uv pip install --upgrade pip setuptools wheel
+
+        USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
+
+        uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
         # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
-        uv pip install --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
-        uv pip install -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
+        uv pip install ${USE_SYSTEM} --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
+        uv pip install ${USE_SYSTEM} -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
 
     - name: Setup test database
       run: |

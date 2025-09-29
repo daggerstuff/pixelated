@@ -1,5 +1,5 @@
 export const prerender = false
-import { mongoAuthService } from '@/services/mongoAuth.service'
+import * as adapter from '@/adapters/betterAuthMongoAdapter'
 
 /**
  * Sign in endpoint
@@ -19,7 +19,7 @@ export const POST = async ({ request }) => {
       )
     }
 
-    const { user, token } = await mongoAuthService.signIn(email, password)
+    const { user, token } = await adapter.signIn(email, password) as unknown as { user: unknown; token: string }
 
     return new Response(
       JSON.stringify({

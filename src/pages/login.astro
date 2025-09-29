@@ -16,14 +16,13 @@ export const prerender = false
 <BaseLayout
   title="Login | Pixelated Empathy"
   description="Log in to your Pixelated Empathy account to access mental health resources and personal therapy chat."
-  bgType="default"
 >
   <ClientRouter />
   <div
     class="w-full max-w-md mx-auto p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl"
   >
     <link rel="preload" as="image" href="/apple-touch-icon.png" fetchpriority="high" />
-    <LoginForm client:idle redirectTo={redirectUrl} showSignup={false} />
+  <LoginForm client:load redirectTo={redirectUrl} showSignup={false} />
 
     {
       isFromDashboard && (
@@ -72,4 +71,5 @@ export const prerender = false
       font-size: 1.5rem;
     }
   }
+</style>
 </style>

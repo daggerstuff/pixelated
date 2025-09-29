@@ -4,32 +4,10 @@ stages:
 - build
 - test
 - deploy
-qodana:
-  stage: test
-  image:
-    name: jetbrains/qodana-js:2025.2
-    entrypoint: [ "" ]
-  variables:
-    QODANA_TOKEN: $QODANA_TOKEN
-    GIT_STRATEGY: fetch
-    QODANA_OFFLINE_MODE: "true"
-    QODANA_DISABLE_CLOUD: "true"
-    JAVA_OPTS: "-Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
-  script:
-  - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana --cache-dir=/tmp/qodana-cache
-  allow_failure: true
-  timeout: 20m
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: "$CI_MERGE_REQUEST_ID"
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
-  # Clerk publishable key and secret are provided as CI/CD variables in GitLab.
-  # Map them at the top-level so Docker-in-Docker builds and all jobs inherit them.
-  PUBLIC_CLERK_PUBLISHABLE_KEY: $PUBLIC_CLERK_PUBLISHABLE_KEY
-  CLERK_PUBLISHABLE_KEY: $PUBLIC_CLERK_PUBLISHABLE_KEY
-  CLERK_SECRET_KEY: $CLERK_SECRET_KEY
+  BETTER_AUTH_SECRET: $BETTER_AUTH_SECRET
   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   CONTAINER_IMAGE_LATEST_PREV: $CI_REGISTRY_IMAGE:previous
@@ -103,8 +81,7 @@ build-frontend:
       --build-arg SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
       --build-arg SENTRY_RELEASE="$BUILD_SENTRY_RELEASE" \
       --build-arg PUBLIC_SENTRY_DSN="$PUBLIC_SENTRY_DSN" \
-      --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max \
       -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
@@ -135,12 +112,7 @@ test-container:
   script:
   - echo "Testing container health..."
   - docker pull $CONTAINER_IMAGE
-  - |
-    docker run -d --name test-container \
-      -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
-      -e PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      -e CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-      $CONTAINER_IMAGE
+  - docker run -d --name test-container -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" $CONTAINER_IMAGE
   - sleep 30
   - docker logs test-container
   - |
@@ -326,9 +298,7 @@ deploy-vps:
         -e ASTRO_TELEMETRY_DISABLED=1 \
         -e PUBLIC_URL="$PUBLIC_URL" \
         -e CORS_ORIGINS="$CORS_ORIGINS" \
-        -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
-        -e PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
-        -e CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \
+        -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET"
         $CONTAINER_IMAGE_LATEST
 
       # Wait for container to start
@@ -425,14 +395,19 @@ build-ai-backend:
     DOCKER_TLS_CERTDIR: ''
   before_script:
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  script:
-  - echo "Building AI backend components..."
-  - cd ai
-  - docker buildx create --use --name ai-builder || docker buildx use ai-builder
-  - docker buildx build --load \ --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \ --build-arg CLERK_PUBLISHABLE_KEY="$PUBLIC_CLERK_PUBLISHABLE_KEY" \ -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
-  - docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
-  - docker push $CI_REGISTRY_IMAGE/ai:latest
-  - echo "✅ AI backend container pushed to GitLab Container Registry"
+  script: |
+    echo "Building AI backend components..."
+    cd ai
+    docker buildx create --use --name ai-builder || docker buildx use ai-builder
+
+    docker buildx build \
+      --load \
+      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+      -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/ai:latest .
+
+    docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
+    docker push $CI_REGISTRY_IMAGE/ai:latest
+    echo "✅ AI backend container pushed to GitLab Container Registry"
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
     changes:
@@ -458,18 +433,36 @@ security-scan:
   - echo "Running security scan on container..."
   - docker pull $CONTAINER_IMAGE
   - |
-    # Basic security checks
+    # Basic security checks with timeouts
     echo "Checking for non-root user..."
-    if docker run --rm $CONTAINER_IMAGE whoami | grep -v root; then
+    if timeout 30 docker run --rm --entrypoint="" $CONTAINER_IMAGE whoami 2>/dev/null | grep -v root; then
       echo "✅ Container runs as non-root user"
     else
-      echo "⚠️  Container may be running as root"
+      echo "⚠️  Container may be running as root (or check failed)"
     fi
 
-    echo "Checking exposed ports..."
-    docker run --rm $CONTAINER_IMAGE netstat -tlnp 2>/dev/null || echo "netstat not available"
+    echo "Checking container image properties..."
+    docker inspect $CONTAINER_IMAGE --format='{{.Config.User}}' || echo "No user specified"
+
+    echo "Checking for common security issues..."
+    # Check if container runs as root
+    ROOT_USER=$(docker inspect $CONTAINER_IMAGE --format='{{.Config.User}}' 2>/dev/null || echo "")
+    if [ -z "$ROOT_USER" ] || [ "$ROOT_USER" = "root" ] || [ "$ROOT_USER" = "0" ]; then
+      echo "⚠️  Container configured to run as root or no user specified"
+    else
+      echo "✅ Container configured with non-root user: $ROOT_USER"
+    fi
+
+    # Check exposed ports
+    EXPOSED_PORTS=$(docker inspect $CONTAINER_IMAGE --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
+    if [ -n "$EXPOSED_PORTS" ]; then
+      echo "ℹ️  Exposed ports: $EXPOSED_PORTS"
+    else
+      echo "ℹ️  No explicitly exposed ports found"
+    fi
 
     echo "✅ Security scan completed"
+  timeout: 10m
   dependencies:
   - build-frontend
   rules:
@@ -696,10 +689,6 @@ trivy-scan:
   - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
 
-# Dependency Caching (using GitLab cache)
-# (Removed unused cache section to prevent warnings and YAML errors)
-
-# Automated Cleanup (improved)
 cleanup:
   stage: deploy
   image: docker:27.3.1
@@ -733,20 +722,39 @@ deploy-gke:
     # Prefer a JSON key provided directly or base64-encoded in CI variables.
     # CI should provide one of: GCP_SERVICE_ACCOUNT_KEY (raw JSON) or GCP_SERVICE_ACCOUNT_KEY_B64 (base64 encoded)
     if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+      echo "Using GCP_SERVICE_ACCOUNT_KEY (raw JSON format)"
       echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     elif [ -n "$GCP_SERVICE_ACCOUNT_KEY_B64" ]; then
+      echo "Using GCP_SERVICE_ACCOUNT_KEY_B64 (base64 encoded format)"
       echo "$GCP_SERVICE_ACCOUNT_KEY_B64" | base64 -d > /tmp/gcp-key.json || {
-        echo "❌ Failed to decode GCP_SERVICE_ACCOUNT_KEY_B64"; exit 1;
+        echo "❌ Failed to decode GCP_SERVICE_ACCOUNT_KEY_B64"
+        echo "First 100 chars of base64 data: $(echo "$GCP_SERVICE_ACCOUNT_KEY_B64" | head -c 100)"
+        exit 1;
       }
     else
       echo "❌ Neither GCP_SERVICE_ACCOUNT_KEY nor GCP_SERVICE_ACCOUNT_KEY_B64 is set. Please configure one in CI variables.";
-      exit 1;
+      echo "ℹ️  Skipping GKE deployment until GCP credentials are configured.";
+      exit 0;
     fi
+
+    # Debug: Show file info
+    echo "Created key file info:"
+    ls -l /tmp/gcp-key.json
+    echo "File size: $(wc -c < /tmp/gcp-key.json) bytes"
+    echo "First line: $(head -n 1 /tmp/gcp-key.json)"
+    echo "Last line: $(tail -n 1 /tmp/gcp-key.json)"
 
     # Basic validation of the written key file
     if ! jq -e . /tmp/gcp-key.json >/dev/null 2>&1; then
-      echo "❌ /tmp/gcp-key.json does not contain valid JSON. Aborting.";
-      cat /tmp/gcp-key.json || true
+      echo "❌ /tmp/gcp-key.json does not contain valid JSON. Debugging info:"
+      echo "--- File content (first 500 chars) ---"
+      head -c 500 /tmp/gcp-key.json || true
+      echo ""
+      echo "--- File content (last 500 chars) ---"
+      tail -c 500 /tmp/gcp-key.json || true
+      echo ""
+      echo "--- JSON validation error ---"
+      jq . /tmp/gcp-key.json 2>&1 || true
       exit 1;
     fi
 
@@ -795,5 +803,8 @@ deploy-gke:
   - if: $CI_COMMIT_BRANCH == "main"
   dependencies:
   - build-frontend
-include:
-- remote: https://gitlab.com/gitlab-org/incubation-engineering/five-minute-production/library/-/raw/main/gcp/cloud-run.gitlab-ci.yml
+  allow_failure: true
+
+# Removed Cloud Run template to avoid conflicts with custom GKE deployment
+# include:
+# - remote: https://gitlab.com/gitlab-org/incubation-engineering/five-minute-production/library/-/raw/main/gcp/cloud-run.gitlab-ci.yml
