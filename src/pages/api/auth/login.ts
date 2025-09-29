@@ -1,149 +1,159 @@
-// import type { APIRoute, APIContext } from 'astro'
-import { fheService } from '../../../lib/fhe'
-import { EncryptionMode } from '../../../lib/fhe/types'
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { createVerificationToken } from '../../../lib/security'
+/**
+ * User Login API Endpoint
+ * Handles user authentication with Better-Auth integration
+ */
 
-// Initialize logger
-const logger = createBuildSafeLogger('default')
+import type { APIRoute } from 'astro'
+import { loginUser } from '../../../lib/auth/better-auth-integration'
+import { rateLimitMiddleware, csrfProtection } from '../../../lib/auth/middleware'
+import { sanitizeInput } from '../../../lib/auth/utils'
+import { logSecurityEvent } from '../../../lib/security'
+import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
 
-interface LoginRequest {
-  email: string
-  password: string
-  securityLevel?: string
-}
-
-interface User {
-  id: string
-  email: string
-}
-
-export const POST = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
-    const body = (await request.json()) as LoginRequest
-
-    // Authenticate user (replace with your actual auth logic)
-    const user: User = {
-      id: `user-${crypto.randomUUID()}`,
-      email: body.email,
+    // Extract client information
+    const userAgent = request.headers.get('user-agent') || 'unknown'
+    const deviceId = request.headers.get('x-device-id') || 'unknown'
+    const clientInfo = {
+      ip: clientAddress || 'unknown',
+      userAgent,
+      deviceId,
     }
 
-    // Create session data
-    const sessionData = {
-      sessionId: `session-${crypto.randomUUID()}`,
-      userId: user.id,
-      startTime: Date.now(),
-      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-      securityLevel: body.securityLevel || 'medium',
-      metadata: {
-        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown',
-      },
+    // Apply CSRF protection for POST requests
+    const csrfResult = await csrfProtection(request)
+    if (!csrfResult.success) {
+      return csrfResult.response!
     }
 
-    // Create a verification token for message integrity
-    const verificationToken = await createVerificationToken(
-      JSON.stringify(sessionData),
+    // Apply rate limiting
+    const rateLimitResult = await rateLimitMiddleware(
+      request,
+      'login',
+      10, // 10 login attempts per hour per IP
+      60
     )
 
-    // Encrypt sensitive session data if security level requires i
-    let encryptedSessionData = null
-    if (sessionData.securityLevel !== 'low') {
-      // Map security levels to FHE security levels
-      const mapSecurityLevel = (level: string): 'tc128' | 'tc192' | 'tc256' => {
-        switch (level) {
-          case 'high': return 'tc256'
-          case 'medium': return 'tc192'
-          default: return 'tc128'
-        }
-      }
+    if (!rateLimitResult.success) {
+      return rateLimitResult.response!
+    }
 
-      // Initialize FHE service if needed
-      await fheService.initialize({
-        mode:
-          sessionData.securityLevel === 'high'
-            ? EncryptionMode.FHE
-            : EncryptionMode.STANDARD,
-        keySize: 2048,
-        securityLevel: mapSecurityLevel(sessionData.securityLevel),
-      })
-
-      encryptedSessionData = await fheService.encrypt(
+    // Parse and validate request body
+    const body = await request.json()
+    
+    // Validate required fields
+    if (!body.email || !body.password) {
+      return new Response(
         JSON.stringify({
-          userId: sessionData.userId,
-          sessionId: sessionData.sessionId,
-          metadata: sessionData.metadata,
+          error: 'Missing required fields',
+          details: ['email', 'password'],
         }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       )
     }
 
-    // Create final session object with security metadata
-    const secureSession = {
-      ...sessionData,
-      verificationToken,
-      securityMetadata: {
-        encryptionEnabled: sessionData.securityLevel !== 'low',
-        encryptedData: encryptedSessionData,
-        encryptionMode:
-          sessionData.securityLevel === 'high'
-            ? EncryptionMode.FHE
-            : EncryptionMode.STANDARD,
-        timestamp: Date.now(),
-      },
-    }
+    // Sanitize input data
+    const email = sanitizeInput(body.email)
+    const password = body.password // Don't sanitize password
 
-    // Set secure session cookie
-    cookies.set('session', JSON.stringify({
-      sessionId: sessionData.sessionId,
-      userId: user.id,
-      expiresAt: sessionData.expiresAt
-    }), {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 // 24 hours
-    })
+    // Attempt login
+    const result = await loginUser(email, password, clientInfo)
 
     // Log successful login
-    logger.info('User authenticated successfully', {
-      userId: user.id,
-      securityLevel: sessionData.securityLevel,
+    await logSecurityEvent('USER_LOGIN_SUCCESS', result.user.id, {
+      email: result.user.email,
+      role: result.user.role,
+      clientInfo,
       timestamp: Date.now(),
     })
 
-    // Return the session with security data
+    // Update Phase 6 MCP server
+    await updatePhase6AuthenticationProgress(result.user.id, 'user_logged_in')
+
     return new Response(
       JSON.stringify({
         success: true,
-        session: secureSession,
-        // ... other response data ...
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          firstName: result.user.firstName,
+          lastName: result.user.lastName,
+          role: result.user.role,
+          lastLoginAt: result.user.lastLoginAt,
+        },
+        tokenPair: result.tokenPair,
       }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          // ... other headers ...
+          'Cache-Control': 'no-store, no-cache, must-revalidate, private',
         },
-      },
+      }
     )
-  } catch (error: unknown) {
-    // Handle the error properly
-    logger.error('Login error:', {
-      message: error instanceof Error ? error?.message : String(error),
+
+  } catch (error) {
+    // Handle specific authentication errors
+    if (error.name === 'AuthenticationError') {
+      await logSecurityEvent('USER_LOGIN_FAILED', null, {
+        error: error.message,
+        clientInfo,
+        timestamp: Date.now(),
+      })
+
+      return new Response(
+        JSON.stringify({
+          error: error.message,
+          details: error.details || {},
+        }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+
+    // Handle unexpected errors
+    console.error('Login error:', error)
+    
+    await logSecurityEvent('USER_LOGIN_ERROR', null, {
+      error: error.message,
+      clientInfo,
+      timestamp: Date.now(),
     })
 
     return new Response(
       JSON.stringify({
-        success: false,
-        message: 'Authentication failed',
-        error: error instanceof Error ? error?.message : 'Unknown error',
+        error: 'Login failed',
+        message: 'An unexpected error occurred. Please try again later.',
       }),
       {
-        status: 401,
+        status: 500,
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
   }
+}
+
+// Handle OPTIONS requests for CORS
+export const OPTIONS: APIRoute = async ({ request }) => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
+      'Access-Control-Max-Age': '86400',
+    },
+  })
 }

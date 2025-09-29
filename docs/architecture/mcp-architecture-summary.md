@@ -1,4 +1,17 @@
-# MCP Server Architecture Summary
+---
+title: MCP Server Architecture Summary
+description: Overview of the Management Control Panel (MCP) server architecture, security, and integration patterns for AI agent orchestration in the Pixelated platform.
+layout: doc
+tags:
+  - architecture
+  - mcp
+  - ai
+  - security
+  - compliance
+project: pixelated
+---
+
+## MCP Server Architecture Summary
 
 ## Executive Summary
 
@@ -343,8 +356,8 @@ The architecture successfully bridges the existing Flask service with modern age
 - **Documentation**: Available at `/docs` endpoint when running locally
 - **Health Monitoring**: Comprehensive health checks and monitoring
 - **Support**: api-support@pixelatedempathy.com
-- **Status Page**: https://status.pixelatedempathy.com
-- **Issue Tracking**: GitHub Issues with security classification
+- **Status Page**: [https://status.pixelatedempathy.com](https://status.pixelatedempathy.com)
+- **Issue Tracking**: [GitHub Issues](https://github.com/) with security classification
 
 ---
 

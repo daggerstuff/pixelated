@@ -1,7 +1,5 @@
-# AI Services - LLM, Mental Arena, Emotions
 FROM node:24-slim AS base
 
-# Install system dependencies
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     python3=3.11.2-1 \
@@ -12,43 +10,40 @@ RUN apt-get update -qq && \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install pnpm
 ARG PNPM_VERSION=
 RUN npm install -g pnpm@$PNPM_VERSION
 
+RUN python3 -m pip install --no-cache-dir uv || true
+
 WORKDIR /app
 
-# Create Python virtual environment for ML models
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python ML dependencies
 COPY /src/lib/ai/bias-detection/requirements.txt .
-RUN pip install --no-cache-dir --requirement requirements.txt
+RUN if command -v uv >/dev/null 2>&1; then \
+            uv pip install --python /opt/venv/bin/python --no-cache-dir --requirement requirements.txt; \
+        else \
+            pip install --no-cache-dir --requirement requirements.txt; \
+        fi
 
-# Build stage
 FROM base AS build
 
-# Copy package files
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --no-frozen-lockfile
 
-# Copy AI services source code
 COPY src/lib/ai ./src/lib/ai
 COPY src/types ./src/types
 COPY ai ./ai
 COPY tsconfig.json ./
 
-# Build TypeScript
 RUN pnpm tsc --project tsconfig.json --outDir dist
 
-# Production stage
 FROM base AS production
 
 RUN addgroup --system --gid 1001 aiservice && \
     adduser --system --uid 1001 aiservice
 
-# Copy built application
 COPY --from=build --chown=aiservice:aiservice /app/dist ./dist
 COPY --from=build --chown=aiservice:aiservice /app/node_modules ./node_modules
 COPY --from=build --chown=aiservice:aiservice /app/ai ./ai

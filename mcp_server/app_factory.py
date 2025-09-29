@@ -31,6 +31,8 @@ from .services.audit_logger import AuditLogger
 from .services.metrics_collector import MetricsCollector
 from .services.websocket_manager import WebSocketManager
 from .services.websocket_asgi import SocketIOEventHandlers, create_websocket_middleware
+from .services.token_manager import init_token_manager
+from .services.security_lockdown import init_security_lockdown_manager
 from .exceptions import (
     MCPException,
     AuthenticationError,
@@ -97,6 +99,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         auth_service = init_auth_service(app.state.database, app.state.redis_client)
         app.state.auth_service = auth_service
         logger.info("Auth service initialized")
+        
+        # Initialize token manager
+        token_manager = init_token_manager(app.state.redis_client)
+        app.state.token_manager = token_manager
+        logger.info("Token manager initialized")
+        
+        # Initialize security lockdown manager
+        security_lockdown_manager = init_security_lockdown_manager(app.state.redis_client, auth_service)
+        app.state.security_lockdown_manager = security_lockdown_manager
+        logger.info("Security lockdown manager initialized")
         
         # Initialize WebSocket manager if enabled
         if config.websocket_config.enabled:

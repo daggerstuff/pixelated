@@ -35,4 +35,6 @@ export const mongoClient =
     : (createMockClient() as unknown)
 
 // Export MongoDB auth service as main auth interface
+// Prefer adapter for new codepaths
+export { default as authAdapter } from '@/adapters/betterAuthMongoAdapter'
 export const authService = mongoAuthService

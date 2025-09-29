@@ -8,6 +8,7 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, Request
+from fastapi import Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import structlog
@@ -83,13 +84,13 @@ router = APIRouter()
 def get_websocket_manager(request: Request) -> WebSocketManager:
     """
     Get WebSocket manager from application state.
-    
+
     Args:
         request: FastAPI request object
-        
+
     Returns:
         WebSocketManager instance
-        
+
     Raises:
         HTTPException: If WebSocket manager is not available
     """
@@ -109,27 +110,27 @@ async def get_connections(
 ) -> List[WebSocketConnectionInfo]:
     """
     Get list of active WebSocket connections.
-    
+
     Returns:
         List of connection information
-        
+
     Raises:
         HTTPException: If user lacks required permissions
     """
     try:
         connections = websocket_manager.get_active_connections()
-        
+
         # Filter connections based on user permissions
         user_id = current_user.get('user_id')
         user_role = current_user.get('role', 'user')
-        
+
         if user_role != 'admin':
             # Regular users can only see their own connections
             connections = [
-                conn for conn in connections 
+                conn for conn in connections
                 if conn.user_id == user_id
             ]
-        
+
         return [
             WebSocketConnectionInfo(
                 sid=conn.sid,
@@ -143,7 +144,7 @@ async def get_connections(
             )
             for conn in connections
         ]
-        
+
     except Exception as e:
         logger.error("Error getting connections", error=str(e))
         raise HTTPException(status_code=500, detail="Failed to retrieve connections")
@@ -156,10 +157,10 @@ async def get_websocket_stats(
 ) -> WebSocketStats:
     """
     Get WebSocket server statistics.
-    
+
     Returns:
         WebSocket statistics
-        
+
     Raises:
         HTTPException: If user lacks required permissions
     """
@@ -168,10 +169,10 @@ async def get_websocket_stats(
         connections = websocket_manager.get_active_connections()
         authenticated_connections = len([c for c in connections if c.status.value == 'authenticated'])
         active_agents = len(set([c.agent_id for c in connections if c.agent_id]))
-        
+
         # Get server start time (placeholder - should be tracked properly)
         server_start_time = datetime.utcnow()  # This should be stored in app state
-        
+
         stats = WebSocketStats(
             total_connections=len(connections),
             authenticated_connections=authenticated_connections,
@@ -180,9 +181,9 @@ async def get_websocket_stats(
             messages_sent=0,  # TODO: Track message statistics
             messages_received=0  # TODO: Track message statistics
         )
-        
+
         return stats
-        
+
     except Exception as e:
         logger.error("Error getting WebSocket stats", error=str(e))
         raise HTTPException(status_code=500, detail="Failed to retrieve statistics")
@@ -191,22 +192,22 @@ async def get_websocket_stats(
 @router.post("/broadcast")
 async def broadcast_message(
     event: str = Query(..., description="Event name"),
-    data: Dict[str, Any] = Field(..., description="Event data"),
+    data: Dict[str, Any] = Body(..., description="Event data"),
     room: Optional[str] = Query(None, description="Target room"),
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
     current_user: Dict[str, Any] = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
     Broadcast a message to WebSocket clients.
-    
+
     Args:
         event: Event name
         data: Event data
         room: Target room (optional)
-        
+
     Returns:
         Success response
-        
+
     Raises:
         HTTPException: If broadcasting fails or user lacks permissions
     """
@@ -218,16 +219,16 @@ async def broadcast_message(
                 status_code=403,
                 detail="Insufficient permissions to broadcast messages"
             )
-        
+
         # Broadcast the message
         await websocket_manager.publish_event(event, data, room=room)
-        
+
         return {
             "status": "success",
             "message": f"Message broadcast to {room or 'all clients'}",
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -244,14 +245,14 @@ async def update_task_progress(
 ) -> Dict[str, Any]:
     """
     Update task progress via WebSocket.
-    
+
     Args:
         task_id: Task ID
         progress_update: Progress update data
-        
+
     Returns:
         Success response
-        
+
     Raises:
         HTTPException: If update fails or user lacks permissions
     """
@@ -266,21 +267,21 @@ async def update_task_progress(
             'updated_by': current_user.get('user_id'),
             'updated_at': datetime.utcnow().isoformat()
         }
-        
+
         # Broadcast progress update
         await websocket_manager.publish_event(
             'task:progress',
             progress_data,
             room=f"task:{task_id}"
         )
-        
+
         return {
             "status": "success",
             "message": "Task progress updated",
             "task_id": task_id,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except Exception as e:
         logger.error("Error updating task progress", task_id=task_id, error=str(e))
         raise HTTPException(status_code=500, detail="Failed to update task progress")
@@ -288,21 +289,21 @@ async def update_task_progress(
 
 @router.post("/agent/{agent_id}/status")
 async def update_agent_status(
-    agent_id: str = Path(..., description="Agent ID"),
     status_update: AgentStatusUpdate,
+    agent_id: str = Path(..., description="Agent ID"),
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
     current_user: Dict[str, Any] = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
     Update agent status via WebSocket.
-    
+
     Args:
         agent_id: Agent ID
         status_update: Status update data
-        
+
     Returns:
         Success response
-        
+
     Raises:
         HTTPException: If update fails or user lacks permissions
     """
@@ -310,12 +311,12 @@ async def update_agent_status(
         # Check permissions - users can only update their own agents unless admin
         user_role = current_user.get('role', 'user')
         user_id = current_user.get('user_id')
-        
+
         if user_role != 'admin' and status_update.agent_id != agent_id:
             # Check if this is the user's own agent
             # TODO: Implement proper agent ownership check
             pass
-        
+
         # Prepare status data
         status_data = {
             'agent_id': agent_id,
@@ -323,26 +324,31 @@ async def update_agent_status(
             'capabilities': status_update.capabilities,
             'metadata': status_update.metadata or {},
             'updated_by': user_id,
+
             'updated_at': datetime.utcnow().isoformat()
         }
-        
+
         # Broadcast status update
         await websocket_manager.publish_event(
             'agent:status_updated',
             status_data,
             room=f"agent:{agent_id}"
         )
-        
+
         return {
             "status": "success",
             "message": "Agent status updated",
             "agent_id": agent_id,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except Exception as e:
         logger.error("Error updating agent status", agent_id=agent_id, error=str(e))
         raise HTTPException(status_code=500, detail="Failed to update agent status")
+
+
+# Backwards-compatible alias expected by tests
+get_connection_stats = get_websocket_stats
 
 
 @router.post("/coordination/broadcast")
@@ -353,13 +359,13 @@ async def broadcast_coordination_message(
 ) -> Dict[str, Any]:
     """
     Broadcast a coordination message to a room.
-    
+
     Args:
         message: Coordination message data
-        
+
     Returns:
         Success response
-        
+
     Raises:
         HTTPException: If broadcasting fails or user lacks permissions
     """
@@ -371,7 +377,7 @@ async def broadcast_coordination_message(
                 status_code=403,
                 detail="Insufficient permissions for coordination messages"
             )
-        
+
         # Prepare coordination message
         coord_data = {
             'room': message.room,
@@ -381,21 +387,21 @@ async def broadcast_coordination_message(
             'sender_agent_id': current_user.get('agent_id'),
             'timestamp': datetime.utcnow().isoformat()
         }
-        
+
         # Broadcast to coordination room
         await websocket_manager.publish_event(
             'coordination:message',
             coord_data,
             room=f"coordination:{message.room}"
         )
-        
+
         return {
             "status": "success",
             "message": "Coordination message broadcast",
             "room": message.room,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -409,20 +415,20 @@ async def get_websocket_health(
 ) -> Dict[str, Any]:
     """
     Get WebSocket service health status.
-    
+
     Returns:
         Health status information
     """
     try:
         connection_count = websocket_manager.get_connection_count()
-        
+
         return {
             "status": "healthy",
             "service": "websocket",
             "connections": connection_count,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except Exception as e:
         logger.error("Error getting WebSocket health", error=str(e))
         return {
@@ -434,7 +440,6 @@ async def get_websocket_health(
 
 
 # Error handlers
-@router.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     """Handle HTTP exceptions."""
     return JSONResponse(
@@ -449,7 +454,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
-@router.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     """Handle unexpected exceptions."""
     logger.error(
@@ -458,7 +462,7 @@ async def general_exception_handler(request: Request, exc: Exception):
         error_type=type(exc).__name__,
         path=request.url.path
     )
-    
+
     return JSONResponse(
         status_code=500,
         content={
@@ -469,3 +473,15 @@ async def general_exception_handler(request: Request, exc: Exception):
             }
         }
     )
+
+# Register exception handlers on the router when supported. Some FastAPI
+# versions don't expose add_exception_handler on APIRouter; guard the call
+# to avoid raising during import (tests import this module during collection).
+if hasattr(router, 'add_exception_handler'):
+    router.add_exception_handler(HTTPException, http_exception_handler)
+    router.add_exception_handler(Exception, general_exception_handler)
+else:
+    # Fallback: attach handler functions to the router object so tests or
+    # application setup code can register them on the FastAPI app if needed.
+    setattr(router, 'http_exception_handler', http_exception_handler)
+    setattr(router, 'general_exception_handler', general_exception_handler)

@@ -1,14 +1,13 @@
- // API route implementation for user profile endpoints
+// API route implementation for user profile endpoints
 import { protectRoute } from '@/lib/auth/serverAuth'
 import type { AuthUser } from '@/lib/auth/types'
-import { MongoAuthService } from '@/services/mongoAuth.service'
+import * as adapter from '@/adapters/betterAuthMongoAdapter'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // Removed AuthAPIContext import - using direct type annotation instead
 
 export const prerender = false
 
 // Initialize services
-const authService = new MongoAuthService()
 const logger = createBuildSafeLogger('profile-api')
 
 // GET endpoint for profile data
@@ -20,7 +19,7 @@ export const GET = protectRoute({
     const { user } = locals
 
     // Get user profile from MongoDB
-    const userProfile = await authService.getUserById(user.id)
+    const userProfile = await adapter.getUserById(user.id) as unknown as { _id: { toString(): string }; fullName?: string; avatarUrl?: string | null; email: string; role: string; lastLogin?: Date; updatedAt?: Date; createdAt?: Date; preferences?: unknown } | null
 
     if (!userProfile) {
       logger.error(`Profile not found for user ${user.id}`)
@@ -94,7 +93,7 @@ export const PUT = protectRoute({
     }
 
     // Update profile in MongoDB
-    const updatedUser = await authService.updateUser(user.id, updates)
+    const updatedUser = await adapter.updateUser(user.id, updates) as unknown as { _id: { toString(): string }; fullName?: string; avatarUrl?: string | null; email: string; role: string; lastLogin?: Date; updatedAt?: Date; createdAt?: Date; preferences?: unknown } | null
 
     if (!updatedUser) {
       logger.error(`Error updating profile for user ${user.id}`)

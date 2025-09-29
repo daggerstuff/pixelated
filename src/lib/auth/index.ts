@@ -1,106 +1,103 @@
-export * from './middleware'
-export { createSession, endSession, getSession } from './session'
-
-import type { AstroCookies } from 'astro'
-import type { User } from './index'
-
 /**
- * Get the current user from AstroCookies
+ * Authentication Module - Main export for Phase 7 JWT Authentication Service
+ * Provides complete authentication system with Better-Auth integration
  */
-export async function getCurrentUser(cookies: AstroCookies): Promise<User | null> {
-  // Try to get the session token from cookies
-  const token = cookies.get('auth-token')?.value
-  if (!token) {
-    return null
-  }
 
-  // getSession expects a session token
-  const sessionData = await getSession(token)
-  if (!sessionData || !sessionData.user) {
-    return null
-  }
-
-  return sessionData.user
-}
-
-/**
- * Check if the current user has the specified role
- */
-export async function hasRole(cookies: AstroCookies, role: string): Promise<boolean> {
-  const user = await getCurrentUser(cookies)
-  if (!user) {
-    return false
-  }
-  return user.role === role
-}
-
-/**
- * Check if the current user is authenticated
- */
-export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
-  const user = await getCurrentUser(cookies)
-  return !!user
-}
-export type { SessionData } from './session'
-// Export authentication types and middleware
-export * from './types'
-
-// Export server-side auth functionality
+// JWT Service exports
 export {
-  verifyServerAuth,
-  protectRoute,
-  requirePageAuth,
-  trackSuspiciousActivity,
-} from './serverAuth'
+  generateTokenPair,
+  validateToken,
+  refreshAccessToken,
+  revokeToken,
+  cleanupExpiredTokens,
+  measureTokenOperation,
+  AuthenticationError,
+} from './jwt-service'
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+export type {
+  TokenPair,
+  TokenValidationResult,
+  ClientInfo,
+  UserRole,
+  TokenType,
+} from './jwt-service'
 
-const logger = createBuildSafeLogger('auth')
+// Better-Auth Integration exports
+export {
+  registerWithBetterAuth,
+  authenticateWithBetterAuth,
+  logoutFromBetterAuth,
+  getUserAuthentication,
+  getUserAuthenticationByBetterAuthId,
+  updateUserAuthentication,
+  validateJWTAndGetUser,
+  hasRequiredRole,
+  hasPermission,
+  getBetterAuthInstance,
+} from './better-auth-integration'
 
-export interface User {
-  id: string
-  email: string
-  name?: string
-  role: 'user' | 'admin' | 'therapist' | 'patient'
-  verified: boolean
-  createdAt: Date
-  lastLoginAt?: Date
-}
+export type {
+  UserAuthentication,
+  AuthenticationResult,
+  LoginCredentials,
+  RegisterCredentials,
+} from './better-auth-integration'
 
-export interface AuthSession {
-  userId: string
-  sessionId: string
-  expiresAt: Date
-  isActive: boolean
-  deviceInfo?: {
-    userAgent: string
-    ip: string
-    location?: string
+export { AuthenticationStatus } from './better-auth-integration'
+
+// Middleware exports
+export {
+  authenticateRequest,
+  requireRole,
+  requirePermission,
+  requireAnyRole,
+  requireAnyPermission,
+  requireAdmin,
+  requireTherapistOrHigher,
+  requireAuthenticated,
+  optionalAuthentication,
+  extractTokenFromRequest,
+  getClientIp,
+  getClientInfo,
+  createAuthRateLimit,
+  csrfProtection,
+  securityHeaders,
+  createAuthMiddlewareStack,
+} from './middleware'
+
+export type { AuthenticatedRequest, ClientInfo as MiddlewareClientInfo } from './middleware'
+
+// Utility functions
+export * from './utils'
+
+// Configuration
+export { getAuthConfig } from './config'
+
+// Integration with Phase 6 MCP Server
+export { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
+
+/**
+ * Initialize authentication system
+ */
+export async function initializeAuthSystem(): Promise<void> {
+  try {
+    // Initialize Better-Auth database connection
+    const { initializeBetterAuthDatabase } = await import('./better-auth-integration')
+    await initializeBetterAuthDatabase()
+
+    // Start token cleanup scheduler
+    const { startTokenCleanupScheduler } = await import('./jwt-service')
+    startTokenCleanupScheduler()
+
+    console.log('✅ Authentication system initialized successfully')
+  } catch (error) {
+    console.error('❌ Failed to initialize authentication system:', error)
+    throw error
   }
 }
 
-export interface AuthCredentials {
-  email: string
-  password: string
-}
-
-export interface AuthResult {
-  success: boolean
-  user?: User
-  session?: AuthSession
-  error?: string
-  requiresVerification?: boolean
-}
-
-export interface PasswordResetRequest {
-  email: string
-  token: string
-  expiresAt: Date
-  used: boolean
-}
-
 /**
- * Authentication Service
+ * Create authentication API routes
  */
 export class AuthService {
   private sessions = new Map<string, AuthSession>()

@@ -60,7 +60,13 @@ dependencies = [
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
   "authlib>=1.6.4",
-  "aiohttp>=3.12.15",
+  "motor>=3.7.1",
+  "structlog>=25.4.0",
+  "redis>=6.4.0",
+  "bcrypt>=4.3.0",
+  "email-validator>=2.3.0",
+  "python-socketio>=5.13.0",
+  "httpx>=0.28.1",
 ]
 
 [project.optional-dependencies]

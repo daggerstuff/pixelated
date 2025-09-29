@@ -1,4 +1,12 @@
-# MCP Server API Specification
+---
+title: MCP Server API Specification
+description: Comprehensive API specification for the Management Control Panel (MCP) server, including REST endpoints, WebSocket events, and integration patterns.
+version: v1
+sidebar_position: 1
+sidebar_label: MCP API
+---
+
+## MCP Server API Specification
 
 ## Overview
 
@@ -16,7 +24,7 @@ This document provides comprehensive API specifications for the Management Contr
 
 All API endpoints require JWT authentication using the `Authorization` header:
 
-```
+```http
 Authorization: Bearer <jwt_token>
 ```
 
@@ -786,6 +794,6 @@ Returns detailed health information including:
 ## Support
 
 For API support, please contact:
-- Email: api-support@pixelatedempathy.com
-- Documentation: https://docs.pixelatedempathy.com/mcp-api
-- Status Page: https://status.pixelatedempathy.com
+- [Email](mailto:api-support@pixelatedempathy.com)
+- [Documentation](https://docs.pixelatedempathy.com/mcp-api)
+- [Status Page](https://status.pixelatedempathy.com)

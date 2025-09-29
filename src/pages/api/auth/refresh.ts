@@ -1,91 +1,140 @@
-// import type { APIRoute } from 'astro'
-import { mongoAuthService } from '@/services/mongoAuth.service'
-import { AuditEventType, createAuditLog } from '@/lib/audit'
+/**
+ * Token Refresh API Endpoint
+ * Handles JWT token refresh with Better-Auth integration
+ */
 
-export const POST = async ({
-  request,
-}: {
-  request: Request
-}): Promise<Response> => {
+import type { APIRoute } from 'astro'
+import { refreshAccessToken } from '../../../lib/auth/jwt-service'
+import { rateLimitMiddleware } from '../../../lib/auth/middleware'
+import { logSecurityEvent } from '../../../lib/security'
+import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
+
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
-    // Get the authorization header
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: 'No access token provided',
-        }),
-        {
-          status: 401,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
+    // Extract client information
+    const userAgent = request.headers.get('user-agent') || 'unknown'
+    const deviceId = request.headers.get('x-device-id') || 'unknown'
+    const clientInfo = {
+      ip: clientAddress || 'unknown',
+      userAgent,
+      deviceId,
     }
 
-    const accessToken = authHeader.split(' ')[1]
-    if (!accessToken) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: 'Invalid access token format',
-        }),
-        {
-          status: 401,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-    }
-
-    const {
-      user,
-      session,
-      accessToken: newAccessToken,
-    } = await mongoAuthService.refreshSession(accessToken)
-
-    // Log the session refresh for HIPAA compliance
-    await createAuditLog(
-      AuditEventType.LOGIN,
-      'auth.session.refresh',
-      user._id.toString(),
-      'auth',
-      {
-        userId: user._id.toString(),
-        email: user.email,
-        timestamp: new Date().toISOString(),
-      },
+    // Apply rate limiting
+    const rateLimitResult = await rateLimitMiddleware(
+      request,
+      'refresh',
+      20, // 20 refresh attempts per hour per IP
+      60
     )
+
+    if (!rateLimitResult.success) {
+      return rateLimitResult.response!
+    }
+
+    // Parse and validate request body
+    const body = await request.json()
+    
+    // Validate required fields
+    if (!body.refreshToken) {
+      return new Response(
+        JSON.stringify({
+          error: 'Missing refresh token',
+          details: ['refreshToken'],
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+
+    const refreshToken = body.refreshToken
+
+    // Attempt token refresh
+    const tokenPair = await refreshAccessToken(refreshToken, clientInfo)
+
+    // Log successful token refresh
+    await logSecurityEvent('TOKEN_REFRESHED', null, {
+      clientInfo,
+      timestamp: Date.now(),
+    })
+
+    // Update Phase 6 MCP server
+    await updatePhase6AuthenticationProgress(null, 'token_refreshed')
 
     return new Response(
       JSON.stringify({
         success: true,
-        user,
-        session,
-        accessToken: newAccessToken,
+        tokenPair,
       }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, private',
         },
-      },
+      }
     )
-  } catch (error: unknown) {
+
+  } catch (error) {
+    // Handle specific authentication errors
+    if (error.name === 'AuthenticationError') {
+      await logSecurityEvent('TOKEN_REFRESH_FAILED', null, {
+        error: error.message,
+        clientInfo,
+        timestamp: Date.now(),
+      })
+
+      return new Response(
+        JSON.stringify({
+          error: error.message,
+          details: error.details || {},
+        }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+
+    // Handle unexpected errors
+    console.error('Token refresh error:', error)
+    
+    await logSecurityEvent('TOKEN_REFRESH_ERROR', null, {
+      error: error.message,
+      clientInfo,
+      timestamp: Date.now(),
+    })
+
     return new Response(
       JSON.stringify({
-        success: false,
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: 'Token refresh failed',
+        message: 'An unexpected error occurred. Please try again later.',
       }),
       {
-        status: 401,
+        status: 500,
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
   }
+}
+
+// Handle OPTIONS requests for CORS
+export const OPTIONS: APIRoute = async ({ request }) => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
+      'Access-Control-Max-Age': '86400',
+    },
+  })
 }
