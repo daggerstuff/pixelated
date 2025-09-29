@@ -7,10 +7,10 @@
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
 import { MongoClient, Db, Collection } from 'mongodb';
-import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
+
+
 import { logger } from '../../logger';
-import { rateLimiter } from '../../rate-limiting';
+
 import { encrypt, decrypt } from '../encryption';
 import { auditLog } from '../audit-logging';
 

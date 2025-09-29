@@ -4,19 +4,16 @@
  */
 
 import { EventEmitter } from 'events';
-import { MongoClient, Db, Collection, ObjectId } from 'mongodb';
+import { MongoClient, Db, } from 'mongodb';
 import { Redis } from 'ioredis';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 
 import {
   DatabaseConfig,
   GlobalThreatIntelligence,
-  ThreatIndicator,
   STIXConfig,
   TAXIIConfig,
   CorrelationData,
-  ValidationStatus,
-  TimeWindow,
   PaginationParams,
   ApiResponse
 } from '../global/types';

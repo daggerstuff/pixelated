@@ -5,7 +5,7 @@
 
 import { nanoid } from 'nanoid'
 import bcrypt from 'bcryptjs'
-import { JWT_CONFIG, BETTER_AUTH_CONFIG } from './config'
+import { BETTER_AUTH_CONFIG } from './config'
 
 /**
  * Generate secure random token

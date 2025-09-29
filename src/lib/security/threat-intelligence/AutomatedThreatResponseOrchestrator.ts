@@ -9,7 +9,7 @@ import { Redis } from 'ioredis';
 import { MongoClient, Db, Collection } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../../logger';
-import { rateLimiter } from '../../rate-limiting';
+
 import { auditLog } from '../audit-logging';
 
 // Types

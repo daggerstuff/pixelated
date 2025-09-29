@@ -356,11 +356,7 @@ describe("Dashboard Performance Tests", () => {
 
   it("maintains memory efficiency with large datasets", () => {
     // Mock memory usage tracking
-    const mockMemory = {
-      usedJSHeapSize: 50000000, // 50MB
-      totalJSHeapSize: 100000000, // 100MB
-      jsHeapSizeLimit: 2000000000 // 2GB
-    };
+    
 
     // In a real environment, we would check actual memory usage
     // For testing, we just verify the component renders without errors

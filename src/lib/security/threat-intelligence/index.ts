@@ -5,8 +5,8 @@
 
 import { EventEmitter } from 'events';
 import { logger } from '../../logger';
-import { rateLimiter } from '../../rate-limiting';
-import { auditLog } from '../audit-logging';
+
+
 
 // Import all threat intelligence components
 import GlobalThreatIntelligenceNetwork, { GlobalThreatIntelligenceNetworkConfig } from './GlobalThreatIntelligenceNetwork';
@@ -19,7 +19,7 @@ import ExternalThreatFeedIntegration, { ExternalThreatFeedIntegrationConfig } fr
 import ThreatValidationSystem, { ThreatValidationSystemConfig } from './ThreatValidationSystem';
 
 // Import configuration
-import { threatIntelligenceConfig, getCurrentConfig } from './config';
+import { getCurrentConfig } from './config';
 
 // Types
 export interface ThreatIntelligenceNetworkConfig {
@@ -262,14 +262,14 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Setting up component integration');
 
       // Get components
-      const globalNetwork = this.components.get('global');
-      const edgeDetection = this.components.get('edge');
-      const correlationEngine = this.components.get('correlation');
-      const responseOrchestrator = this.components.get('response');
-      const huntingSystem = this.components.get('hunting');
-      const feedIntegration = this.components.get('feeds');
-      const validationSystem = this.components.get('validation');
-      const database = this.components.get('database');
+      
+      
+      
+      
+      
+      
+      
+      
 
       // Set up event listeners for cross-component communication
       this.setupEventListeners();
@@ -290,7 +290,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   private setupEventListeners(): void {
     const globalNetwork = this.components.get('global');
     const edgeDetection = this.components.get('edge');
-    const correlationEngine = this.components.get('correlation');
+    
     const responseOrchestrator = this.components.get('response');
     const huntingSystem = this.components.get('hunting');
     const feedIntegration = this.components.get('feeds');

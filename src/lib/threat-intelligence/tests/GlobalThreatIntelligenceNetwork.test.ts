@@ -333,11 +333,7 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
 
     it('should handle database connection errors gracefully', async () => {
       // Simulate database error
-      const mockDb = {
-        collection: vi.fn().mockReturnValue({
-          insertOne: vi.fn().mockRejectedValue(new Error('Database connection lost'))
-        })
-      };
+      
       
       // This would need to be properly mocked in the actual implementation
       // For now, we test the error handling structure
@@ -422,22 +418,7 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
 
     it('should implement proper caching for repeated queries', async () => {
       const threatId = 'cache-test-threat';
-      const threatData = {
-        threatId,
-        threatType: 'malware',
-        severity: 'high',
-        confidence: 0.8,
-        indicators: [{
-          indicatorType: 'ip',
-          value: '192.168.1.50',
-          confidence: 0.9,
-          firstSeen: new Date(),
-          lastSeen: new Date()
-        }],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1']
-      };
+      
 
       // First query - should hit database
       const result1 = await network.getThreatById(threatId);
@@ -529,9 +510,7 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
 
     it('should handle shutdown errors gracefully', async () => {
       // Mock a shutdown error
-      const mockRedis = {
-        quit: vi.fn().mockRejectedValue(new Error('Redis shutdown error'))
-      };
+      
       
       // This would need proper mocking in the actual implementation
       // For now, we test the error handling structure

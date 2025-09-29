@@ -11,12 +11,11 @@ import {
   rateLimitMiddleware, 
   csrfProtection, 
   securityHeaders,
-  AuthenticationError,
   type AuthenticatedRequest,
   type UserRole
 } from '../middleware'
 import { validateToken } from '../jwt-service'
-import { getUserById, validateUserRole } from '../better-auth-integration'
+import { getUserById, } from '../better-auth-integration'
 import { logSecurityEvent } from '../../security'
 import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 
@@ -47,7 +46,7 @@ vi.mock('../../mcp/phase6-integration', () => ({
 
 describe('Authentication Middleware', () => {
   let mockRequest: NextRequest
-  let mockResponse: NextResponse
+  let _mockResponse: NextResponse
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -64,7 +63,7 @@ describe('Authentication Middleware', () => {
     })
 
     // Create mock response
-    mockResponse = NextResponse.json({ success: true })
+    _mockResponse = NextResponse.json({ success: true })
   })
 
   afterEach(() => {

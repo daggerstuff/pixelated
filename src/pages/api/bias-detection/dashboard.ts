@@ -8,8 +8,8 @@ export const GET = async ({ request }: { request: Request }): Promise<Response> 
   try {
     // Parse URL parameters
     const url = new URL(request.url)
-    const timeRange = url.searchParams.get('timeRange') || '24h'
-    const demographicFilter = url.searchParams.get('demographicFilter') || 'all'
+    
+    
 
     // Return mock dashboard data matching test expectations
     const mockDashboardData = {

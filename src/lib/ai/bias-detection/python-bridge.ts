@@ -220,9 +220,7 @@ export class PythonBiasDetectionBridge {
     // Build a fetch signal compatible with Node, jsdom, and test envs.
     // We'll create a per-request AbortController if AbortSignal.timeout is not available.
     let timeoutId: NodeJS.Timeout | null = null
-    const signalFromTimeout = typeof (AbortSignal as any)?.timeout === 'function'
-      ? (AbortSignal as any).timeout(this.timeout) as AbortSignal
-      : null
+    
 
     const fetchOptions: RequestInit = {
       method,

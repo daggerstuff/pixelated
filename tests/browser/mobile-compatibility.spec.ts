@@ -6,7 +6,7 @@
  */
 
 import { test, expect } from '@playwright/test'
-import fs from 'node:fs'
+
 import { TEST_PAGES, navigateToPage, verifyPageElements, checkHorizontalOverflow, waitForPageStable, ensureTestResultsDir } from '../helpers/test-utils'
 
 // Test devices to check

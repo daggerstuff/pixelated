@@ -8,18 +8,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { EnhancedMonitoringService } from '../enhanced-monitoring-service'
 import { 
-  createAlert, 
-  updateAlert, 
-  escalateAlert, 
-  resolveAlert,
   calculateAlertSeverity,
   shouldEscalateAlert,
   getAlertStatistics,
   generateAlertReport
 } from '../alert-utils'
 import { 
-  trackMetric, 
-  getMetrics, 
   calculateMetricsSummary,
   detectMetricAnomalies,
   getPerformanceMetrics

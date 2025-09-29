@@ -8,9 +8,9 @@
 
 import { EventEmitter } from 'events';
 import { logger } from '../../logging';
-import { getConfig } from '../../config';
+
 import { RegionConfig } from './MultiRegionDeploymentManager';
-import { EdgeLocation } from './EdgeComputingManager';
+
 
 export interface RoutingConfig {
   strategy: 'latency-based' | 'health-based' | 'compliance-based' | 'weighted-round-robin';
