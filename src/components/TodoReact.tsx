@@ -3,14 +3,6 @@ import { useState, useEffect } from 'react'
 interface TodoItem {
   id: string
   text: string
-  // The component uses TypeScript props and interfaces for type safety. For
-  // additional runtime prop validation consider integrating `prop-types` if
-  // needed for non-TypeScript consumers.
-  //
-  // Reordering todos is an enhancement: use a drag-and-drop library such as
-  // `@hello-pangea/dnd` or `react-beautiful-dnd` and update `todos` order in
-  // state. This is intentionally left as an opt-in feature to keep the
-  // component minimal.
   completed: boolean
 }
 
@@ -23,7 +15,6 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [inputValue, setInputValue] = useState('')
 
-  // Load todos from localStorage on component mount
   useEffect(() => {
     const loadTodos = (): TodoItem[] => {
       try {
@@ -38,7 +29,6 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     setTodos(loadTodos())
   }, [initialTodos])
 
-  // Save todos to localStorage whenever they change
   useEffect(() => {
     try {
       localStorage.setItem('todos', JSON.stringify(todos))
@@ -47,10 +37,6 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     }
   }, [todos])
 
-  // Generate a unique string ID for a new todo item
-  // Use shared generator for ids (exported below as `generateTodoId`)
-
-  // Add a new todo item to the list
   const addTodo = () => {
     const text = inputValue.trim()
     if (!text) {
@@ -67,7 +53,6 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     setInputValue('')
   }
 
-  // Toggle todo completion status
   const toggleTodoComplete = (id: string) => {
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
@@ -76,17 +61,14 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     )
   }
 
-  // Remove a todo item from the list by its ID
   const deleteTodo = (id: string) => {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
   }
 
-  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
 
-  // Handle Enter key press to trigger adding a new todo
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       addTodo()
@@ -245,17 +227,6 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
   )
 }
 
-// Notes / Next steps:
-// - Prop validation: TypeScript provides compile-time checks. If this
-//   component must be consumed by non-TypeScript consumers, consider
-//   adding `prop-types` for runtime validation.
-// - Reordering todos: To support drag-and-drop reordering, integrate a
-//   lightweight library such as `@hello-pangea/dnd` and update `todos`
-//   order in state. We intentionally keep the core component minimal.
-
-// Utility exported for testing or external reuse: generates a compact,
-// reasonably-unique id for todo items. It is deterministic enough for
-// client-side usage and avoids exposing implementation details elsewhere.
 export const generateTodoId = () => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2)
 }

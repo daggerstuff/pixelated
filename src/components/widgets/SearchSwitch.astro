@@ -51,7 +51,6 @@ import { getUrl } from '~/utils/common'
 </div>
 
 <script>
-  /// <reference types="../../lib/search" />
   import { toggleFadeEffect } from '~/utils/animation'
 
   /* Handle click on search switch to open or close */
@@ -81,8 +80,6 @@ import { getUrl } from '~/utils/common'
     const isWidthUnder1128 = window.innerWidth < 1128
     const target = event.target as HTMLElement | null
 
-    // check if the click event occurred outside the search panel
-    // in a non-ignored area ('search-switch')
     const isClickedOutsideOnDesktop =
       !isWidthUnder1128 &&
       target instanceof Node &&
@@ -94,7 +91,6 @@ import { getUrl } from '~/utils/common'
       return
     }
 
-    // check if a link within 'search-results' was clicked
     const isClickedOnLinkInSearchResults =
       target instanceof HTMLElement &&
       target.closest('#search-results') &&
@@ -112,7 +108,6 @@ import { getUrl } from '~/utils/common'
 </script>
 
 <script>
-  /// <reference types="../../lib/search" />
 
   const fakeResults = [
     {
@@ -137,27 +132,53 @@ import { getUrl } from '~/utils/common'
     if (import.meta.env.PROD) {
       const query = (event.target as HTMLInputElement).value
 
-      // Use FlexSearch which is available through searchClient
       if (window.searchClient && query.trim()) {
         const results = window.searchClient.search(query)
+        const searchResults = document.getElementById('search-results')
 
-        for (const result of results) {
-          document.getElementById('search-results')!.innerHTML += `
-          <a href="${result.url}" class="search-results-item">
-            <div class="search-results-title">${result.title}</div>
-            <div class="search-results-excerpt">${result.content.substring(0, 150)}...</div>
-          </a>`
+        if (searchResults) {
+          searchResults.innerHTML = ''
+
+          for (const result of results) {
+            const a = document.createElement('a')
+            a.href = result.url || '#'
+            a.className = 'search-results-item'
+
+            const titleDiv = document.createElement('div')
+            titleDiv.className = 'search-results-title'
+            titleDiv.textContent = result.title || ''
+
+            const excerptDiv = document.createElement('div')
+            excerptDiv.className = 'search-results-excerpt'
+            const excerptText = (result.content || '').substring(0, 150) + '...'
+            excerptDiv.textContent = excerptText
+
+            a.appendChild(titleDiv)
+            a.appendChild(excerptDiv)
+            searchResults.appendChild(a)
+          }
         }
       }
     } else {
-      // Show mock results in development
-      for (const data of fakeResults) {
-        const searchResults = document.getElementById('search-results')!
-        searchResults.innerHTML += `
-          <a href=${searchResults.dataset['base']} class="search-results-item">
-            <div class="search-results-title">${data.meta.title}</div>
-            <div class="search-results-excerpt">${data.excerpt}</div>
-          </a>`
+      const searchResults = document.getElementById('search-results')
+      if (searchResults) {
+        for (const data of fakeResults) {
+          const a = document.createElement('a')
+          a.href = searchResults.dataset['base'] || '#'
+          a.className = 'search-results-item'
+
+          const titleDiv = document.createElement('div')
+          titleDiv.className = 'search-results-title'
+          titleDiv.textContent = data.meta.title || ''
+
+          const excerptDiv = document.createElement('div')
+          excerptDiv.className = 'search-results-excerpt'
+          excerptDiv.textContent = data.excerpt || ''
+
+          a.appendChild(titleDiv)
+          a.appendChild(excerptDiv)
+          searchResults.appendChild(a)
+        }
       }
     }
   }
@@ -165,15 +186,12 @@ import { getUrl } from '~/utils/common'
   const searchInput = document.getElementById('search-input')
   searchInput?.addEventListener('input', (event: Event) => handleInput(event))
 
-  // Initialize search when ready
   window.addEventListener('search:ready', (event: Event) => {
     console.log('Search is ready with', (event as CustomEvent).detail.size, 'documents')
   })
 </script>
 
 <script is:inline>
-  // The search index is loaded via the flexsearch integration
-  // and will be available as window.searchIndex
   document.addEventListener('DOMContentLoaded', (_event) => {
     if (window.searchClient && window.searchIndex) {
       console.log('Search initialized with', window.searchIndex.length, 'documents')

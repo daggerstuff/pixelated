@@ -10,7 +10,7 @@ from typing import Optional, Dict, Any
 
 class MCPException(Exception):
     """Base exception for MCP server."""
-    
+
     def __init__(
         self,
         message: str,
@@ -21,7 +21,7 @@ class MCPException(Exception):
     ) -> None:
         """
         Initialize MCP exception.
-        
+
         Args:
             message: Human-readable error message
             error_code: Machine-readable error code
@@ -39,7 +39,7 @@ class MCPException(Exception):
 
 class AuthenticationError(MCPException):
     """Authentication-related exceptions."""
-    
+
     def __init__(self, message: str = "Authentication failed", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -51,7 +51,7 @@ class AuthenticationError(MCPException):
 
 class AuthorizationError(MCPException):
     """Authorization-related exceptions."""
-    
+
     def __init__(self, message: str = "Access denied", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -63,7 +63,7 @@ class AuthorizationError(MCPException):
 
 class ValidationError(MCPException):
     """Validation-related exceptions."""
-    
+
     def __init__(self, message: str = "Validation failed", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -73,9 +73,21 @@ class ValidationError(MCPException):
         )
 
 
+class IntegrationError(MCPException):
+    """Errors raised by external integrations and pipeline orchestration."""
+
+    def __init__(self, message: str = "Integration error", **kwargs: Any) -> None:
+        super().__init__(
+            message=message,
+            error_code="INTEGRATION_ERROR",
+            status_code=502,
+            **kwargs
+        )
+
+
 class NotFoundError(MCPException):
     """Resource not found exceptions."""
-    
+
     def __init__(self, message: str = "Resource not found", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -84,10 +96,13 @@ class NotFoundError(MCPException):
             **kwargs
         )
 
+# Backwards-compatible alias used across the codebase
+ResourceNotFoundError = NotFoundError
+
 
 class ConflictError(MCPException):
     """Resource conflict exceptions."""
-    
+
     def __init__(self, message: str = "Resource conflict", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -99,7 +114,7 @@ class ConflictError(MCPException):
 
 class RateLimitExceededError(MCPException):
     """Rate limit exceeded exceptions."""
-    
+
     def __init__(
         self,
         message: str = "Rate limit exceeded",
@@ -117,7 +132,7 @@ class RateLimitExceededError(MCPException):
 
 class ServiceUnavailableError(MCPException):
     """Service unavailable exceptions."""
-    
+
     def __init__(self, message: str = "Service unavailable", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -129,7 +144,7 @@ class ServiceUnavailableError(MCPException):
 
 class DatabaseError(MCPException):
     """Database-related exceptions."""
-    
+
     def __init__(self, message: str = "Database error", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -141,7 +156,7 @@ class DatabaseError(MCPException):
 
 class RedisError(MCPException):
     """Redis-related exceptions."""
-    
+
     def __init__(self, message: str = "Cache error", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -153,7 +168,7 @@ class RedisError(MCPException):
 
 class AgentNotFoundError(NotFoundError):
     """Agent not found exceptions."""
-    
+
     def __init__(self, agent_id: str, **kwargs: Any) -> None:
         super().__init__(
             message=f"Agent with ID '{agent_id}' not found",
@@ -164,7 +179,7 @@ class AgentNotFoundError(NotFoundError):
 
 class DuplicateAgentError(ConflictError):
     """Duplicate agent exceptions."""
-    
+
     def __init__(self, agent_id: str, **kwargs: Any) -> None:
         super().__init__(
             message=f"Agent with ID '{agent_id}' already exists",
@@ -175,7 +190,7 @@ class DuplicateAgentError(ConflictError):
 
 class TaskNotFoundError(NotFoundError):
     """Task not found exceptions."""
-    
+
     def __init__(self, task_id: str, **kwargs: Any) -> None:
         super().__init__(
             message=f"Task with ID '{task_id}' not found",
@@ -186,7 +201,7 @@ class TaskNotFoundError(NotFoundError):
 
 class PipelineNotFoundError(NotFoundError):
     """Pipeline not found exceptions."""
-    
+
     def __init__(self, pipeline_id: str, **kwargs: Any) -> None:
         super().__init__(
             message=f"Pipeline with ID '{pipeline_id}' not found",
@@ -197,7 +212,7 @@ class PipelineNotFoundError(NotFoundError):
 
 class TaskAssignmentError(MCPException):
     """Task assignment exceptions."""
-    
+
     def __init__(self, message: str = "Task assignment failed", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -209,7 +224,7 @@ class TaskAssignmentError(MCPException):
 
 class NoSuitableAgentError(TaskAssignmentError):
     """No suitable agent available exceptions."""
-    
+
     def __init__(self, message: str = "No suitable agents available", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -220,7 +235,7 @@ class NoSuitableAgentError(TaskAssignmentError):
 
 class TaskCompletionError(MCPException):
     """Task completion exceptions."""
-    
+
     def __init__(self, message: str = "Task completion failed", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -232,7 +247,7 @@ class TaskCompletionError(MCPException):
 
 class InvalidStatusTransitionError(MCPException):
     """Invalid status transition exceptions."""
-    
+
     def __init__(self, message: str = "Invalid status transition", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -244,7 +259,7 @@ class InvalidStatusTransitionError(MCPException):
 
 class UnauthorizedStatusUpdateError(AuthorizationError):
     """Unauthorized status update exceptions."""
-    
+
     def __init__(self, message: str = "Unauthorized status update", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -255,7 +270,7 @@ class UnauthorizedStatusUpdateError(AuthorizationError):
 
 class ConfigurationError(MCPException):
     """Configuration-related exceptions."""
-    
+
     def __init__(self, message: str = "Configuration error", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -267,7 +282,7 @@ class ConfigurationError(MCPException):
 
 class ExternalServiceError(MCPException):
     """External service exceptions."""
-    
+
     def __init__(self, message: str = "External service error", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -279,7 +294,7 @@ class ExternalServiceError(MCPException):
 
 class QueueOperationError(MCPException):
     """Queue operation exceptions."""
-    
+
     def __init__(self, message: str = "Queue operation failed", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -291,7 +306,7 @@ class QueueOperationError(MCPException):
 
 class EndpointValidationError(ValidationError):
     """Endpoint validation exceptions."""
-    
+
     def __init__(self, message: str = "Endpoint validation failed", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -302,7 +317,7 @@ class EndpointValidationError(ValidationError):
 
 class TokenExpiredError(AuthenticationError):
     """Token expired exceptions."""
-    
+
     def __init__(self, message: str = "Token has expired", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -313,7 +328,7 @@ class TokenExpiredError(AuthenticationError):
 
 class InvalidTokenError(AuthenticationError):
     """Invalid token exceptions."""
-    
+
     def __init__(self, message: str = "Invalid token", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -324,7 +339,7 @@ class InvalidTokenError(AuthenticationError):
 
 class DuplicateTaskError(ConflictError):
     """Duplicate task exceptions."""
-    
+
     def __init__(self, task_id: str, **kwargs: Any) -> None:
         super().__init__(
             message=f"Task with ID '{task_id}' already exists",
@@ -335,7 +350,7 @@ class DuplicateTaskError(ConflictError):
 
 class InsufficientPermissionsError(AuthorizationError):
     """Insufficient permissions exceptions."""
-    
+
     def __init__(self, message: str = "Insufficient permissions", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -346,7 +361,7 @@ class InsufficientPermissionsError(AuthorizationError):
 
 class AgentCapabilityError(MCPException):
     """Agent capability exceptions."""
-    
+
     def __init__(self, message: str = "Agent capability error", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -358,7 +373,7 @@ class AgentCapabilityError(MCPException):
 
 class TaskTimeoutError(MCPException):
     """Task timeout exceptions."""
-    
+
     def __init__(self, message: str = "Task execution timeout", **kwargs: Any) -> None:
         super().__init__(
             message=message,
@@ -370,7 +385,7 @@ class TaskTimeoutError(MCPException):
 
 class CircuitBreakerOpenError(ServiceUnavailableError):
     """Circuit breaker open exceptions."""
-    
+
     def __init__(self, message: str = "Circuit breaker is open", **kwargs: Any) -> None:
         super().__init__(
             message=message,

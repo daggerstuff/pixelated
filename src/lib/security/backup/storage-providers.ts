@@ -163,21 +163,21 @@ export class FileSystemStorageProvider implements StorageProvider {
         const entries = await fs.readdir(dirPath, { withFileTypes: true })
 
         for (const entry of entries) {
-           // Validate entry name for security
-           if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
-             logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
-             continue
-           }
+          // Validate entry name for security
+          if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+            logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
+            continue
+          }
 
-           const fullPath = path.join(dirPath, entry.name)
-           const relPath = path.join(relativePath, entry.name)
+          const fullPath = path.join(dirPath, entry.name)
+          const relPath = path.join(relativePath, entry.name)
 
-           if (entry.isDirectory()) {
-             await scanDir(fullPath, relPath)
-           } else if (!pattern || matchesPattern(relPath, pattern)) {
-             results.push(relPath)
-           }
-         }
+          if (entry.isDirectory()) {
+            await scanDir(fullPath, relPath)
+          } else if (!pattern || matchesPattern(relPath, pattern)) {
+            results.push(relPath)
+          }
+        }
       }
 
       const matchesPattern = (filePath: string, pattern: string): boolean => {
@@ -323,7 +323,9 @@ export class MockCloudStorageProvider implements StorageProvider {
       logger.error(
         `Error reading file ${key}: ${error instanceof Error ? String(error) : String(error)}`,
       )
-      throw new Error(`File not found in cloud storage: ${key}`)
+      throw new Error(`File not found in cloud storage: ${key}`, {
+        cause: error,
+      })
     }
   }
 
@@ -443,9 +445,9 @@ export class AWSS3StorageProvider implements StorageProvider {
     const endpoint = config['endpoint'] as string | undefined
     const credentials = config['credentials'] as
       | {
-          accessKeyId: string
-          secretAccessKey: string
-        }
+        accessKeyId: string
+        secretAccessKey: string
+      }
       | undefined
 
     this.config = {
@@ -478,6 +480,7 @@ export class AWSS3StorageProvider implements StorageProvider {
         )
         throw new Error(
           'The @aws-sdk/client-s3 package is not installed. Please install it with: pnpm add @aws-sdk/client-s3',
+          { cause: importError },
         )
       }
 
@@ -504,6 +507,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to initialize AWS S3 provider: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -521,7 +525,9 @@ export class AWSS3StorageProvider implements StorageProvider {
         logger.error(
           `Failed to import PutObjectCommand: ${importError instanceof Error ? importError.message : String(importError)}`,
         )
-        throw new Error('The @aws-sdk/client-s3 package is not installed.')
+        throw new Error('The @aws-sdk/client-s3 package is not installed.', {
+          cause: importError,
+        })
       }
 
       await (this.s3Client as S3Client).send(
@@ -542,6 +548,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to store file in S3: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -559,7 +566,9 @@ export class AWSS3StorageProvider implements StorageProvider {
         logger.error(
           `Failed to import GetObjectCommand: ${importError instanceof Error ? importError.message : String(importError)}`,
         )
-        throw new Error('The @aws-sdk/client-s3 package is not installed.')
+        throw new Error('The @aws-sdk/client-s3 package is not installed.', {
+          cause: importError,
+        })
       }
 
       const response = await (this.s3Client as S3Client).send(
@@ -583,7 +592,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       logger.error(
         `Error getting file ${key} from S3: ${error instanceof Error ? String(error) : String(error)}`,
       )
-      throw new Error(`File not found in S3: ${key}`)
+      throw new Error(`File not found in S3: ${key}`, { cause: error })
     }
   }
 
@@ -598,7 +607,9 @@ export class AWSS3StorageProvider implements StorageProvider {
         logger.error(
           `Failed to import ListObjectsV2Command: ${importError instanceof Error ? importError.message : String(importError)}`,
         )
-        throw new Error('The @aws-sdk/client-s3 package is not installed.')
+        throw new Error('The @aws-sdk/client-s3 package is not installed.', {
+          cause: importError,
+        })
       }
 
       const { prefix } = this.config
@@ -662,7 +673,9 @@ export class AWSS3StorageProvider implements StorageProvider {
         logger.error(
           `Failed to import DeleteObjectCommand: ${importError instanceof Error ? importError.message : String(importError)}`,
         )
-        throw new Error('The @aws-sdk/client-s3 package is not installed.')
+        throw new Error('The @aws-sdk/client-s3 package is not installed.', {
+          cause: importError,
+        })
       }
 
       await (this.s3Client as S3Client).send(
@@ -681,6 +694,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to delete file from S3: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -729,17 +743,23 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       // Dynamically import the GCS library
       // Note: This requires installing @google-cloud/storage as a dependency
       // if you intend to use this provider in production
-      let Storage: any = undefined
+      // Define a narrow constructor type for the Storage client to avoid `any`
+      type GCSConstructor = new (options?: Record<string, unknown>) => {
+        bucket(name: string): GCSBucket
+      }
+
+      let Storage: GCSConstructor | undefined = undefined
       try {
         // Using dynamic import with type assertion to avoid TypeScript errors
         const gcsModule = await import('@google-cloud/storage' as string)
-        Storage = gcsModule.Storage
+        Storage = (gcsModule as { Storage?: GCSConstructor }).Storage
       } catch (importError) {
         logger.error(
           `Failed to import @google-cloud/storage: ${importError instanceof Error ? importError.message : String(importError)}`,
         )
         throw new Error(
           'The @google-cloud/storage package is not installed. Please install it with: pnpm add @google-cloud/storage',
+          { cause: importError },
         )
       }
 
@@ -751,6 +771,10 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 
       if (this.config.credentials) {
         options['credentials'] = this.config.credentials
+      }
+
+      if (!Storage) {
+        throw new Error('Failed to load GCS Storage constructor', { cause: new Error('Missing Storage export') })
       }
 
       this.storage = new Storage(options) as unknown as GCSStorage
@@ -765,6 +789,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to initialize GCS provider: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -788,6 +813,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to store file in GCS: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -803,7 +829,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       logger.error(
         `Error getting file ${key} from GCS: ${error instanceof Error ? String(error) : String(error)}`,
       )
-      throw new Error(`File not found in GCS: ${key}`)
+      throw new Error(`File not found in GCS: ${key}`, { cause: error })
     }
   }
 
@@ -857,6 +883,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to delete file from GCS: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -929,6 +956,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
         )
         throw new Error(
           'The @azure/storage-blob package is not installed. Please install it with: pnpm add @azure/storage-blob',
+          { cause: importError },
         )
       }
 
@@ -965,6 +993,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to initialize Azure Blob Storage provider: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -991,6 +1020,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to store file in Azure: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -1024,7 +1054,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
       logger.error(
         `Error getting file ${key} from Azure: ${error instanceof Error ? String(error) : String(error)}`,
       )
-      throw new Error(`File not found in Azure: ${key}`)
+      throw new Error(`File not found in Azure: ${key}`, { cause: error })
     }
   }
 
@@ -1078,6 +1108,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to delete file from Azure: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }

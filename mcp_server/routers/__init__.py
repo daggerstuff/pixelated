@@ -1,20 +1,10 @@
+"""mcp_server.routers package.
+
+This package intentionally avoids importing submodules at package import
+time to keep test collection and lightweight imports safe. Import the
+individual router modules directly (for example ``from
+mcp_server.routers.websocket import router``).
 """
-MCP Server Routers Package
 
-This package contains all API routers for the MCP server following
-the Pixelated platform's established patterns.
-"""
-
-from .agents import router as agents_router
-from .tasks import router as tasks_router
-from .pipelines import router as pipelines_router
-from .health import router as health_router
-from .discovery import router as discovery_router
-
-__all__ = [
-    "agents_router",
-    "tasks_router", 
-    "pipelines_router",
-    "health_router",
-    "discovery_router"
-]
+# No eager imports here; submodules are imported on demand by consumers.
+__all__ = []

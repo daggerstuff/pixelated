@@ -1,30 +1,33 @@
-#!/usr/bin/env python3
-"""
-Simple script to check if our integration components can be imported
-without the complex MCP server dependencies.
-"""
-
 import sys
 import os
-sys.path.insert(0, '/root/pixelated/mcp_server')
+import traceback
 
-# Test basic imports
-try:
-    from services.integration_manager import IntegrationManager, IntegrationEventType
-    print("✅ IntegrationManager imported successfully")
-except ImportError as e:
-    print(f"❌ IntegrationManager import failed: {e}")
+# Ensure we run from the repository root so that package imports resolve
+# correctly. Put the repo root first on sys.path to avoid the script's
+# directory shadowing package resolution.
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+os.chdir(repo_root)
+sys.path[0] = repo_root
 
-try:
-    from services.flask_integration import FlaskIntegrationService, PipelineStatus
-    print("✅ FlaskIntegrationService imported successfully")
-except ImportError as e:
-    print(f"❌ FlaskIntegrationService import failed: {e}")
+print('CWD:', os.getcwd())
+print('PYTHONPATH env:', os.environ.get('PYTHONPATH'))
+print('\nsys.path entries:')
+for i, p in enumerate(sys.path[:20]):
+    print(i, p)
 
-try:
-    from services.websocket_manager import WebSocketManager
-    print("✅ WebSocketManager imported successfully")
-except ImportError as e:
-    print(f"❌ WebSocketManager import failed: {e}")
 
-print("\nIntegration components created successfully!")
+def try_import(name):
+    try:
+        mod = __import__(name, fromlist=['*'])
+        print(f"Imported {name} ->", getattr(mod, '__file__', None))
+    except Exception:
+        print(f"Failed to import {name}:")
+        traceback.print_exc()
+
+
+try_import('services')
+try_import('services.integration_manager')
+try_import('mcp_server.services')
+try_import('mcp_server.services.integration_manager')
+
+print('\nDone')

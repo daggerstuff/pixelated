@@ -1,8 +1,6 @@
-import { MongoAuthService } from '../../services/mongoAuth.service'
+import * as adapter from '../../adapters/betterAuthMongoAdapter'
 import type { Session, User } from '../../types/mongodb.types'
 import { AuditEventStatus, AuditEventType, createAuditLog } from '../../lib/audit'
-
-const authService = new MongoAuthService()
 
 export interface SessionData {
   user: User
@@ -31,11 +29,11 @@ export async function getSession(
       return null
     }
 
-    // Verify the JWT token
-    const tokenPayload = await authService.verifyAuthToken(token)
+    // Verify the JWT token via adapter
+    const tokenPayload = await adapter.verifyToken(token)
 
-    // Get the user from the database
-    const user = await authService.getUserById(tokenPayload.userId)
+    // Get the user from the database via adapter
+    const user = await adapter.getUserById((tokenPayload as unknown as { userId: string }).userId) as unknown as User | null
     if (!user) {
       console.log('User not found for token')
       return null

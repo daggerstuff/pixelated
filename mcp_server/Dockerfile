@@ -1,14 +1,15 @@
 # MCP Server Dockerfile
-# Multi-stage build for optimized production image
+# Multi-stage build for optimized production image with security fixes
 
 # Build stage
-FROM python:3.11-slim as builder
+FROM python:3.12-slim-bookworm AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y \
+# Install build dependencies with specific versions to avoid vulnerabilities
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && \
+    apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     git \
@@ -22,7 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Production stage
-FROM python:3.11-slim
+FROM python:3.12-slim-bookworm
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -31,18 +32,19 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Create non-root user
-RUN groupadd -r mcpuser && useradd -r -g mcpuser mcpuser
+RUN groupadd -r -g 1001 mcpuser && useradd -r -u 1001 -g mcpuser mcpuser
 
 # Set working directory
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
+# Install minimal runtime dependencies with specific versions
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && \
+    apt-get install -y --no-install-recommends \
+    curl=7.88.1-10+deb12u5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python packages from builder stage
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
@@ -58,9 +60,9 @@ USER mcpuser
 # Expose port
 EXPOSE 8080
 
-# Health check
+# Health check using a more secure approach
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health').getcode() == 200" || exit 1
 
 # Run the application
 CMD ["python", "-m", "mcp_server.main"]

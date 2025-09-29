@@ -91,9 +91,7 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
       newErrors.demographics = demographicsErrors
     }
 
-    // Input sanitization
     const sanitizedText = InputValidator.sanitizeString(formData.text)
-    const sanitizedContext = InputValidator.sanitizeString(formData.context)
 
     if (sanitizedText !== formData.text) {
       newErrors.text = 'Text contains potentially harmful content that has been sanitized'
@@ -107,7 +105,6 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
     setFormData(prev => ({ ...prev, text: value }))
     setCharacterCount(value.length)
 
-    // Clear text error when user starts typing
     if (errors.text) {
       setErrors(prev => ({ ...prev, text: undefined }))
     }
@@ -399,4 +396,5 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
   )
 }
 
+export default BiasDetectionForm
 export default BiasDetectionForm

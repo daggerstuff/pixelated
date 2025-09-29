@@ -1,5 +1,4 @@
 import { AuditEventType, createAuditLog } from '@/lib/audit'
-import { MongoAuthService } from '@/services/mongoAuth.service'
 import mongodb from '@/config/mongodb.config'
 
 export const GET = async ({
@@ -24,11 +23,9 @@ export const GET = async ({
   }
 
   try {
-    const authService = new MongoAuthService()
-
     // For OAuth callback, we would need to exchange the code with the OAuth provider
-    // This is a simplified implementation - you may need to adapt based on your OAuth setup
-    const { user, token } = await authService.verifyOAuthCode(authCode)
+    // Delegate to adapter which proxies to the runtime mongoAuthService
+    const { user, token } = await (await import('@/adapters/betterAuthMongoAdapter')).verifyOAuthCode(authCode) as unknown as { user: unknown; token: string }
 
     // Set cookies for session management
     cookies.set('auth-token', token, {

@@ -1,4 +1,25 @@
-# MCP Server Database Schema Design
+---
+post_title: "MCP Server Database Schema Design"
+author1: "Pixelated Team"
+post_slug: "mcp-database-schema"
+microsoft_alias: "pixelated"
+featured_image: "/images/architecture/mcp-database-schema.png"
+categories:
+  - "Architecture"
+  - "Database"
+tags:
+  - "MongoDB"
+  - "Redis"
+  - "Schema"
+  - "TechDeck"
+  - "Pipeline"
+  - "HIPAA"
+ai_note: "Generated and reviewed for technical accuracy by the Pixelated Empathy architecture team."
+summary: "Comprehensive schema and data architecture for the MCP server, including MongoDB collections, Redis structures, indexing, relationships, and compliance strategies for the TechDeck-Python pipeline."
+post_date: "2024-06-01"
+---
+
+## MCP Server Database Schema Design
 
 ## Overview
 

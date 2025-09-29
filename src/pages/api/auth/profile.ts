@@ -1,7 +1,7 @@
 export const prerender = false
 import type { APIContext } from 'astro'
-import { mongoAuthService } from '@/services/mongoAuth.service'
-import { verifyAuthToken } from '@/utils/auth'
+import * as adapter from '@/adapters/betterAuthMongoAdapter'
+import { verifyAuthToken, getSessionFromRequest } from '@/utils/auth'
 
 /**
  * User profile endpoint
@@ -10,19 +10,26 @@ import { verifyAuthToken } from '@/utils/auth'
  */
 export const GET = async ({ request }: APIContext) => {
   try {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Authorization header required' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+    // Try to get session first (cookie or header)
+    const session = await getSessionFromRequest(request)
+    let userId: string | null = null
+    if (session && session.user) {
+      userId = session.user._id?.toString() || session.user.id || null
+    } else {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'Authorization header required' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        )
+      }
+      const v = await verifyAuthToken(authHeader)
+      userId = v.userId
     }
 
-  const { userId } = await verifyAuthToken(authHeader)
-    
     // If auth is disabled, return mock user data
     if (process.env.DISABLE_AUTH === 'true') {
       return new Response(
@@ -43,8 +50,8 @@ export const GET = async ({ request }: APIContext) => {
         },
       )
     }
-    
-    const user = await mongoAuthService.getUserById(userId)
+
+    const user = await adapter.getUserById(userId) as unknown as { _id?: { toString(): string }; email: string; role: string; preferences?: unknown; emailVerified?: boolean; lastLogin?: Date; createdAt?: Date } | null
 
     if (!user) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
@@ -86,18 +93,25 @@ export const GET = async ({ request }: APIContext) => {
 
 export const PUT = async ({ request }: APIContext) => {
   try {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Authorization header required' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+    // determine userId for update route
+    let updateUserId: string | null = null
+    const sessionForPut = await getSessionFromRequest(request)
+    if (sessionForPut && sessionForPut.user) {
+      updateUserId = sessionForPut.user._id?.toString() || sessionForPut.user.id || null
+    } else {
+      const authHeaderForPut = request.headers.get('Authorization')
+      if (!authHeaderForPut) {
+        return new Response(
+          JSON.stringify({ error: 'Authorization header required' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        )
+      }
+      const v = await verifyAuthToken(authHeaderForPut)
+      updateUserId = v.userId
     }
-
-  const { userId } = await verifyAuthToken(authHeader)
     const updates = await request.json()
 
     // If auth is disabled, return mock success response
@@ -122,7 +136,7 @@ export const PUT = async ({ request }: APIContext) => {
     }
 
     // Only allow updating profile fields
-  const allowedFields = ['preferences']
+    const allowedFields = ['preferences']
     const safeUpdates = Object.keys(updates)
       .filter((key) => allowedFields.includes(key))
       .reduce<Record<string, unknown>>((obj, key) => {
@@ -140,7 +154,17 @@ export const PUT = async ({ request }: APIContext) => {
       )
     }
 
-    const updatedUser = await mongoAuthService.updateUser(userId, safeUpdates)
+    if (!updateUserId) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    const updatedUser = await adapter.updateUser(updateUserId, safeUpdates) as unknown as { _id?: { toString(): string }; email: string; role: string; preferences?: unknown; emailVerified?: boolean; updatedAt?: Date } | null
 
     if (!updatedUser) {
       return new Response(JSON.stringify({ error: 'User not found' }), {

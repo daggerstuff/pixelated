@@ -1,6 +1,6 @@
-<div align="center">
-  
-  <img src="public/android-chrome-512x512.png" alt="Pixelated Empathy Logo" width="250">
+<div style="text-align: center">
+
+  <img src="public/android-chrome-512x512.png" alt="Pixelated Empathy Logo" width="512">
 
   <br/>
   <h1>Pixelated Empathy</h1>
@@ -10,8 +10,6 @@
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg?style=flat-square)](LICENSE)
 [![Enterprise](https://img.shields.io/badge/enterprise-ready-blue.svg?style=flat-square)](https://pixelatedempathy.com)
 [![AI](https://img.shields.io/badge/AI-Powered-9cf.svg?style=flat-square)](https://pixelatedempathy.com)
-
-</div>
 
 
 > **We don't just process conversations. We understand them.**  
@@ -66,7 +64,6 @@ We partner with forward-thinking platforms that refuse to accept "engagement" as
 
 Built with the same technologies that power the world's most demanding applications.
 
-<div align="center">
 
 ![Astro](https://img.shields.io/badge/Astro-5.x-FF5D01?style=for-the-badge&logo=astro)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
@@ -78,7 +75,6 @@ Built with the same technologies that power the world's most demanding applicati
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright)
 
-</div>
 
 
 ## The Future of Human Connection is Here
@@ -90,8 +86,6 @@ If you're building a platform where connection matters more than clicks, where e
 Because while others are building better algorithms, we're building better humans.
 
 
-<div align="center">
-  
 **[Request Enterprise Access](https://pixelatedempathy.com/contact)** • **[View Case Studies](https://pixelatedempathy.com/case-studies)** • **[Meet Our Team](https://pixelatedempathy.com/team)**
 
 <br/>

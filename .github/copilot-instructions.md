@@ -61,12 +61,10 @@ Pixelated Empathy is a complex full-stack application combining:
 - **pyproject.toml**: Python dependencies and tool configurations
 - **astro.config.mjs**: Astro framework configuration
 - **Dockerfile**: Multi-stage container build with security best practices
-- **azure-pipelines.yml**: CI/CD pipeline with Qodana code quality checks
 
 ### Docker Configuration
 
-The project uses a multi-stage Docker build:
-- **Base**: Node.js 22 slim with pnpm and system dependencies
+- **Base**: Node.js 24 slim with pnpm and system dependencies
 - **Build Stage**: Installs dependencies and builds the application
 - **Runtime**: Optimized production image with non-root user
 - **Health Check**: Built-in endpoint monitoring on port 4321
@@ -274,7 +272,6 @@ pixelated/
 - **Vercel**: `pnpm deploy:vercel`
 
 #### CI/CD Pipeline
-- Qodana code quality checks
 - Automated testing and deployment
 - Container registry integration
 
@@ -299,6 +296,7 @@ pnpm performance:test
 # Security checks
 pnpm security:check
 ```
+
 
 [byterover-mcp]
 

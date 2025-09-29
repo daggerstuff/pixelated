@@ -12,9 +12,9 @@ from datetime import datetime
 from unittest.mock import Mock, AsyncMock, patch
 from typing import Dict, Any, List
 
-from mcp_server.services.integration_manager import IntegrationManager, IntegrationEventType
-from mcp_server.services.flask_integration import FlaskIntegrationService, PipelineStatus
-from mcp_server.services.websocket_manager import WebSocketManager
+from services.integration_manager import IntegrationManager, IntegrationEventType
+from services.flask_integration import FlaskIntegrationService, PipelineStatus
+from services.websocket_manager import WebSocketManager
 from config import MCPConfig
 from exceptions import ValidationError, IntegrationError
 
