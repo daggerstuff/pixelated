@@ -19,7 +19,7 @@ function isValidToken(auth: string | null): boolean {
   return auth === 'Bearer valid-token'
 }
 
-function mockAnalysisResult(sessionId: string): void {
+function mockAnalysisResult(sessionId: string): any {
   return {
     sessionId,
     overallScore: 0.75,
@@ -34,7 +34,7 @@ function mockAnalysisResult(sessionId: string): void {
 }
 
 // POST handler
-export async function POST({ request }: { request: any }): void {
+export async function POST({ request }: { request: any }): Promise<Response> {
   try {
     const auth = request.headers?.get?.('authorization') ?? null
     if (!isValidToken(auth)) {
@@ -85,7 +85,7 @@ export async function POST({ request }: { request: any }): void {
 }
 
 // GET handler
-export async function GET({ request, url }: { request: any; url: URL }): void {
+export async function GET({ request, url }: { request: any; url: URL }): Promise<Response> {
   const auth = request.headers?.get?.('authorization') ?? null
   if (!isValidToken(auth)) {
     return new Response(

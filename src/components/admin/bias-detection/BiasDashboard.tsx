@@ -994,6 +994,15 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               return
             }
 
+            // Handle heartbeat messages
+            if (message.type === 'heartbeat') {
+              // Respond to server heartbeat with heartbeat_response
+              if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'heartbeat_response' }))
+              }
+              return
+            }
+
             // Update last updated timestamp for any other message types
             setLastUpdated(new Date())
           } catch (error: unknown) {

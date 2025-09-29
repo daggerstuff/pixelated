@@ -1,15 +1,17 @@
 export const prerender = false
-import { mongoAuthService } from '@/services/mongoAuth.service'
+import * as adapter from '@/adapters/betterAuthMongoAdapter'
 
 /**
  * Sign out endpoint
  * POST /api/auth/signout
  */
+import { getSessionFromRequest } from '@/utils/auth'
+
 export const POST = async ({ request }) => {
   try {
-    const authHeader = request.headers.get('Authorization')
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const session = await getSessionFromRequest(request)
+    const token = session?.session?.token || null
+    if (!token) {
       return new Response(
         JSON.stringify({ error: 'No valid token provided' }),
         {
@@ -19,8 +21,7 @@ export const POST = async ({ request }) => {
       )
     }
 
-    const token = authHeader.split(' ')[1]
-    await mongoAuthService.signOut(token)
+    await adapter.revokeToken(token)
 
     return new Response(
       JSON.stringify({

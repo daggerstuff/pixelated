@@ -139,7 +139,7 @@ build_and_deploy() {
 
         if ! command -v pnpm >/dev/null 2>&1; then
             echo "Installing pnpm..."
-            npm install -g pnpm@10.16.0
+            npm install -g pnpm@10.17.1
         else
             echo "pnpm already installed: $(pnpm --version)"
         fi
@@ -192,7 +192,7 @@ build_and_deploy() {
                 echo "Waiting for application to start..."
                 # Give the app time to initialize
                 sleep 30
-                
+
                 # Check container logs for startup progress
                 echo "Checking startup logs..."
                 docker logs --tail 10 pixelated-app
@@ -229,7 +229,7 @@ build_and_deploy() {
                 # 3. CRITICAL: Test the actual live domain
                 echo "Testing live domain (pixelatedempathy.com)..."
                 sleep 5  # Give proxy time to detect new backend
-                
+
                 # Test HTTP (should redirect to HTTPS)
                 HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 15 http://pixelatedempathy.com/ || echo "000")
                 if [ "$HTTP_STATUS" = "308" ] || [ "$HTTP_STATUS" = "301" ]; then
@@ -237,12 +237,12 @@ build_and_deploy() {
                 else
                     echo "❌ HTTP redirect failed (status: $HTTP_STATUS)"
                 fi
-                
+
                 # Test HTTPS (the real test)
                 HTTPS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 15 https://pixelatedempathy.com/ || echo "000")
                 if [ "$HTTPS_STATUS" = "200" ]; then
                     echo "✅ HTTPS site responding (status: $HTTPS_STATUS)"
-                    
+
                     # Verify content
                     CONTENT=$(curl -s --max-time 10 https://pixelatedempathy.com/ | head -c 500)
                     if [[ "$CONTENT" == *"Pixelated Empathy"* ]]; then

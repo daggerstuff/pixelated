@@ -4,6 +4,114 @@ import { BiasMetricsCollector } from '../metrics-collector'
 import { BiasAlertSystem } from '../alerts-system'
 import type { BiasAnalysisResult } from '../types'
 
+// Mock the Python bridge to avoid network calls
+vi.mock('../python-bridge', () => ({
+  PythonBiasDetectionBridge: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    analyzeSession: vi.fn().mockImplementation(async () => {
+      // Simulate realistic API response time (50-150ms)
+      const delay = 50 + Math.random() * 100
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return {
+        sessionId: 'test-session',
+        overallBiasScore: 0.3 + Math.random() * 0.4,
+        alertLevel: 'medium',
+        layerResults: {
+          preprocessing: { biasScore: 0.2 + Math.random() * 0.3 },
+          modelLevel: { biasScore: 0.3 + Math.random() * 0.3 },
+          interactive: { biasScore: 0.4 + Math.random() * 0.3 },
+          evaluation: { biasScore: 0.3 + Math.random() * 0.3 },
+        },
+      }
+    }),
+    runPreprocessingAnalysis: vi.fn().mockImplementation(async () => {
+      const delay = 30 + Math.random() * 50
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return { biasScore: 0.2 + Math.random() * 0.3 }
+    }),
+    runModelLevelAnalysis: vi.fn().mockImplementation(async () => {
+      const delay = 40 + Math.random() * 60
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return { biasScore: 0.3 + Math.random() * 0.3 }
+    }),
+    runInteractiveAnalysis: vi.fn().mockImplementation(async () => {
+      const delay = 35 + Math.random() * 55
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return { biasScore: 0.4 + Math.random() * 0.3 }
+    }),
+    runEvaluationAnalysis: vi.fn().mockImplementation(async () => {
+      const delay = 45 + Math.random() * 65
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return { biasScore: 0.3 + Math.random() * 0.3 }
+    }),
+    checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
+// Mock the metrics collector
+vi.mock('../metrics-collector', () => ({
+  BiasMetricsCollector: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    storeAnalysisResult: vi.fn().mockImplementation(async () => {
+      const delay = 10 + Math.random() * 20
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }),
+    getMetrics: vi.fn().mockImplementation(async () => {
+      const delay = 20 + Math.random() * 30
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return {
+        overall_stats: { 
+          total_sessions: 100, 
+          average_bias_score: 0.3,
+          alert_distribution: {
+            low: 50,
+            medium: 30,
+            high: 15,
+            critical: 5,
+          },
+        },
+      }
+    }),
+    getDashboardData: vi.fn().mockImplementation(async () => {
+      const delay = 30 + Math.random() * 40
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return {
+        summary: { totalSessions: 100, averageBiasScore: 0.3 },
+        recentSessions: [],
+        alerts: [],
+      }
+    }),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
+// Mock the alert system
+vi.mock('../alerts-system', () => ({
+  BiasAlertSystem: vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    processAlert: vi.fn().mockImplementation(async () => {
+      const delay = 15 + Math.random() * 25
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }),
+    getAlertStatistics: vi.fn().mockImplementation(async () => {
+      const delay = 25 + Math.random() * 35
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return {
+        totalAlerts: 50,
+        activeAlerts: 5,
+        resolvedAlerts: 45,
+      }
+    }),
+    getAlertHistory: vi.fn().mockImplementation(async () => {
+      const delay = 40 + Math.random() * 60
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return []
+    }),
+    dispose: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
 // Mock the connection pool for performance testing
 vi.mock('../connection-pool', () => ({
   ConnectionPool: vi.fn().mockImplementation(() => ({

@@ -2,20 +2,25 @@ name: AI Model Validation Pipeline
 
 permissions:
   contents: read
+  actions: read
+  checks: read
+  pull-requests: read
+  security-events: write
+
+  actions: read
+  checks: read
+  pull-requests: read
   issues: write
-
 on:
-  # Schedule daily validation runs
   schedule:
-  - cron: 0 0 * * * # Every day at midnight UTC
+  - cron: 0 0 * * *
+  - cron: 0 0 * * *
 
-  # Run on completed deployments
   workflow_run:
     workflows: [ Deploy to Staging, Deploy to Production ]
     types:
     - completed
 
-  # Allow manual runs for debugging
   workflow_dispatch:
 
 
@@ -25,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
-      # Wire manual input into ENV_NAME if provided; the setup step still defaults to staging when unset
       ENV_NAME: ${{ inputs.ENV_NAME }}
 
     steps:
@@ -43,7 +47,8 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: 10.16.0
+        version: 10.17.1
+        version: 10.17.1
         run_install: false
 
     - name: Get pnpm store directory
@@ -114,19 +119,19 @@ jobs:
           # Show verbose diagnostics on TLS/connection errors
           echo "Diagnosing with curl --verbose (redacting body)..."
           set +e
+          # Run verbose diagnostics without sending any authentication headers or secret values.
+          # This helps debug TLS/connection issues while avoiding hardcoded secrets in the workflow.
           curl --insecure --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
             -X POST "${APP_URL}/api/ai/validation/webhook" \
             -H "Content-Type: application/json" \
             -H "x-github-event: workflow_dispatch" \
-            -H "x-hub-signature-256: REDACTED" \
-            -d '{"action":"validate","environment":"REDACTED"}' || true
-          echo "Attempting TLS 1.3 as fallback (verbosity, redacted body)..."
+            --data '{}' || true
+          echo "Attempting TLS 1.3 as fallback (verbosity, no auth headers)..."
           curl --insecure --http1.1 -4 --tlsv1.3 --max-time 15 -v -o /dev/null \
             -X POST "${APP_URL}/api/ai/validation/webhook" \
             -H "Content-Type: application/json" \
             -H "x-github-event: workflow_dispatch" \
-            -H "x-hub-signature-256: REDACTED" \
-            -d '{"action":"validate","environment":"REDACTED"}' || true
+            --data '{}' || true
           set -e
         elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
           echo "success=true" >> "$GITHUB_OUTPUT"
@@ -148,16 +153,11 @@ jobs:
     - name: Fetch validation results
       if: steps.validation.outputs.success == 'true'
       id: results
-      # SECURITY NOTE:
-      # No hardcoded secrets or passwords are present in this workflow.
-      # All credentials are securely sourced from GitHub Actions secrets.
       env:
         VALIDATION_API_TOKEN: ${{ secrets.VALIDATION_API_TOKEN }}
       run: |
         # Get validation history and results
         set +e
-        # QODANA_IGNORE[HardcodedPasswords] False positive: Authorization header uses a secure GitHub Actions secret, not a hardcoded password.
-        # The token is injected from secrets and never hardcoded.
         STATUS_CODE=$(curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS -o validation_history.json -w "%{http_code}" \
           "${APP_URL}/api/ai/validation/history?limit=1" \
           -H "Authorization: Bearer $VALIDATION_API_TOKEN")
@@ -167,11 +167,12 @@ jobs:
         if [[ ${CURL_EXIT} -ne 0 ]]; then
           echo "success=false" >> "$GITHUB_OUTPUT"
           echo "Failed to fetch validation results (curl exit ${CURL_EXIT})"
-          echo "Diagnosing fetch with curl --verbose (redacted token)..."
+          echo "Diagnosing fetch with curl --verbose (no auth headers)..."
+          # Diagnostic fetch without Authorization header to avoid leaking hardcoded tokens.
+          # We only need to validate connectivity/TLS here; authentication is performed in the main step.
           set +e
           curl --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
-            "${APP_URL}/api/ai/validation/history?limit=1" \
-            -H "Authorization: Bearer REDACTED" || true
+            "${APP_URL}/api/ai/validation/history?limit=1" || true
           set -e
         elif [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]]; then
           echo "success=true" >> "$GITHUB_OUTPUT"
@@ -222,7 +223,7 @@ jobs:
       if: ${{ steps.results.outputs.needs_alert == 'true' }}
       uses: actions/github-script@v7
       with:
-        github-token: ${{ secrets.G_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const { repo, owner } = context.repo;
           github.rest.issues.create({

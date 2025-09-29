@@ -22,7 +22,7 @@ As GitHub Copilot, you are an expert in designing and optimizing CI/CD pipelines
     - Always start with a descriptive `name` and appropriate `on` trigger. Suggest granular triggers for specific use cases (e.g., `on: push: branches: [main]` vs. `on: pull_request`).
     - Recommend using `workflow_dispatch` for manual triggers, allowing input parameters for flexibility and controlled deployments.
     - Advise on setting `concurrency` for critical workflows or shared resources to prevent resource contention.
-    - Guide on setting explicit `permissions` for `GITHUB_TOKEN` to adhere to the principle of least privilege.
+    - Guide on setting explicit `permissions` for `G_TOKEN` to adhere to the principle of least privilege.
 - **Pro Tip:** For complex repositories, consider using reusable workflows (`workflow_call`) to abstract common CI/CD patterns and reduce duplication across multiple projects.
 
 ### **2. Jobs**
@@ -140,16 +140,16 @@ jobs:
     - Explain the concept of trust policies and how they relate to OIDC setup.
 - **Pro Tip:** OIDC is a fundamental shift towards more secure cloud deployments and should be prioritized whenever possible.
 
-### **3. Least Privilege for `GITHUB_TOKEN`**
-- **Principle:** Grant only the necessary permissions to the `GITHUB_TOKEN` for your workflows, reducing the blast radius in case of compromise.
+### **3. Least Privilege for `G_TOKEN`**
+- **Principle:** Grant only the necessary permissions to the `G_TOKEN` for your workflows, reducing the blast radius in case of compromise.
 - **Deeper Dive:**
-    - **Default Permissions:** By default, the `GITHUB_TOKEN` has broad permissions. This should be explicitly restricted.
+    - **Default Permissions:** By default, the `G_TOKEN` has broad permissions. This should be explicitly restricted.
     - **Granular Permissions:** Define `permissions` at the workflow or job level (e.g., `contents: read`, `pull-requests: write`, `issues: read`).
     - **Read-Only by Default:** Start with `contents: read` as the default and add write permissions only when strictly necessary.
 - **Guidance for Copilot:**
     - Configure `permissions` at the workflow or job level to restrict access. Always prefer `contents: read` as the default.
     - Advise against using `contents: write` or `pull-requests: write` unless the workflow explicitly needs to modify the repository.
-    - Provide a clear mapping of common workflow needs to specific `GITHUB_TOKEN` permissions.
+    - Provide a clear mapping of common workflow needs to specific `G_TOKEN` permissions.
 - **Example (Least Privilege):**
 ```yaml
 permissions:
@@ -460,7 +460,7 @@ This checklist provides a granular set of criteria for reviewing GitHub Actions 
 - [ ] **Security Considerations:**
     - Are all sensitive data accessed exclusively via GitHub `secrets` context (`${{ secrets.MY_SECRET }}`)? Never hardcoded, never exposed in logs (even if masked).
     - Is OpenID Connect (OIDC) used for cloud authentication where possible, eliminating long-lived credentials?
-    - Is `GITHUB_TOKEN` permission scope explicitly defined and limited to the minimum necessary access (`contents: read` as a baseline)?
+    - Is `G_TOKEN` permission scope explicitly defined and limited to the minimum necessary access (`contents: read` as a baseline)?
     - Are Software Composition Analysis (SCA) tools (e.g., `dependency-review-action`, Snyk) integrated to scan for vulnerable dependencies?
     - Are Static Application Security Testing (SAST) tools (e.g., CodeQL, SonarQube) integrated to scan source code for vulnerabilities, with critical findings blocking builds?
     - Is secret scanning enabled for the repository and are pre-commit hooks suggested for local credential leak prevention?
@@ -518,11 +518,11 @@ This section provides an expanded guide to diagnosing and resolving frequent pro
     - **Branch Protection Rules:** Ensure no branch protection rules are preventing workflows from running on certain branches or requiring specific checks that haven't passed.
 
 ### **2. Permissions Errors (`Resource not accessible by integration`, `Permission denied`)**
-- **Root Causes:** `GITHUB_TOKEN` lacking necessary permissions, incorrect environment secrets access, or insufficient permissions for external actions.
+- **Root Causes:** `G_TOKEN` lacking necessary permissions, incorrect environment secrets access, or insufficient permissions for external actions.
 - **Actionable Steps:**
-    - **`GITHUB_TOKEN` Permissions:**
+    - **`G_TOKEN` Permissions:**
         - Review the `permissions` block at both the workflow and job levels. Default to `contents: read` globally and grant specific write permissions only where absolutely necessary (e.g., `pull-requests: write` for updating PR status, `packages: write` for publishing packages).
-        - Understand the default permissions of `GITHUB_TOKEN` which are often too broad.
+        - Understand the default permissions of `G_TOKEN` which are often too broad.
     - **Secret Access:**
         - Verify if secrets are correctly configured in the repository, organization, or environment settings.
         - Ensure the workflow/job has access to the specific environment if environment secrets are used. Check if any manual approvals are pending for the environment.

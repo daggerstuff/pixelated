@@ -7,7 +7,8 @@ export const prerender = false
 /**
  * Todos API endpoint
  * GET /api/todos - Get all todos for authenticated user
- * POST /api/todos - Create a new todo
+ * POST /api/todos - Create
+ * TODO: Add rate-limiting and pagination for production readiness. See project runbooks for rate-limit thresholds.
  */
 export const GET = async ({ request }) => {
   try {

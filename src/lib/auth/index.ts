@@ -1,29 +1,14 @@
-import { secureTimestampId, secureToken } from '../security/random'
-export * from './middleware'
-// Re-export session functions
-export { createSession, endSession, getSession } from './session'
-
-import type { AstroCookies } from 'astro'
-import type { User } from './index'
-
 /**
- * Get the current user from AstroCookies
+ * Authentication Module - Main export for Phase 7 JWT Authentication Service
+ * Provides complete authentication system with Better-Auth integration
  */
-export async function getCurrentUser(cookies: AstroCookies): Promise<User | null> {
-  // Try to get the session token from cookies
-  const token = cookies.get('auth-token')?.value
-  if (!token) {
-    return null
-  }
 
-  // getSession expects a session token
   const sessionData = await getSession(token)
   if (!sessionData || !sessionData.user) {
     return null
   }
 
   return sessionData.user
-}
 
 /**
  * Check if the current user has the specified role
@@ -49,380 +34,205 @@ export * from './types'
 
 // Export server-side auth functionality
 export {
-  verifyServerAuth,
-  protectRoute,
-  requirePageAuth,
-  trackSuspiciousActivity,
-} from './serverAuth'
+  generateTokenPair,
+  validateToken,
+  refreshAccessToken,
+  revokeToken,
+  cleanupExpiredTokens,
+  measureTokenOperation,
+  AuthenticationError,
+} from './jwt-service'
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+export type {
+  TokenPair,
+  TokenValidationResult,
+  ClientInfo,
+  UserRole,
+  TokenType,
+} from './jwt-service'
 
-const logger = createBuildSafeLogger('auth')
+// Better-Auth Integration exports
+export {
+  registerWithBetterAuth,
+  authenticateWithBetterAuth,
+  logoutFromBetterAuth,
+  getUserAuthentication,
+  getUserAuthenticationByBetterAuthId,
+  updateUserAuthentication,
+  validateJWTAndGetUser,
+  hasRequiredRole,
+  hasPermission,
+  getBetterAuthInstance,
+} from './better-auth-integration'
 
-export interface User {
-  id: string
-  email: string
-  name?: string
-  role: 'user' | 'admin' | 'therapist' | 'patient'
-  verified: boolean
-  createdAt: Date
-  lastLoginAt?: Date
-}
+export type {
+  UserAuthentication,
+  AuthenticationResult,
+  LoginCredentials,
+  RegisterCredentials,
+} from './better-auth-integration'
 
-export interface AuthSession {
-  userId: string
-  sessionId: string
-  expiresAt: Date
-  isActive: boolean
-  deviceInfo?: {
-    userAgent: string
-    ip: string
-    location?: string
-  }
-}
+export { AuthenticationStatus } from './better-auth-integration'
 
-export interface AuthCredentials {
-  email: string
-  password: string
-}
+// Middleware exports
+export {
+  authenticateRequest,
+  requireRole,
+  requirePermission,
+  requireAnyRole,
+  requireAnyPermission,
+  requireAdmin,
+  requireTherapistOrHigher,
+  requireAuthenticated,
+  optionalAuthentication,
+  extractTokenFromRequest,
+  getClientIp,
+  getClientInfo,
+  createAuthRateLimit,
+  csrfProtection,
+  securityHeaders,
+  createAuthMiddlewareStack,
+} from './middleware'
 
-export interface AuthResult {
-  success: boolean
-  user?: User
-  session?: AuthSession
-  error?: string
-  requiresVerification?: boolean
-}
+export type { AuthenticatedRequest, ClientInfo as MiddlewareClientInfo } from './middleware'
 
-export interface PasswordResetRequest {
-  email: string
-  token: string
-  expiresAt: Date
-  used: boolean
-}
+// Utility functions
+export * from './utils'
+
+// Configuration
+export { getAuthConfig } from './config'
+
+// Integration with Phase 6 MCP Server
+export { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
 /**
- * Authentication Service
+ * Initialize authentication system
  */
-export class AuthService {
-  private sessions = new Map<string, AuthSession>()
-  private users = new Map<string, User>()
-  private resetTokens = new Map<string, PasswordResetRequest>()
+export async function initializeAuthSystem(): Promise<void> {
+  try {
+    // Initialize Better-Auth database connection
+    const { initializeBetterAuthDatabase } = await import('./better-auth-integration')
+    await initializeBetterAuthDatabase()
 
-  constructor() {
-    logger.info('AuthService initialized')
-    this.initializeMockUsers()
-  }
+    // Start token cleanup scheduler
+    const { startTokenCleanupScheduler } = await import('./jwt-service')
+    startTokenCleanupScheduler()
 
-  /**
-   * Authenticate user with email and password
-   */
-  async authenticate(credentials: AuthCredentials): Promise<AuthResult> {
-    try {
-      logger.debug('Authenticating user', { email: credentials.email })
-
-      // Find user by email
-      const user = Array.from(this.users.values()).find(
-        (u) => u.email === credentials.email,
-      )
-
-      if (!user) {
-        return {
-          success: false,
-          error: 'Invalid email or password',
-        }
-      }
-
-      // In production, verify password hash
-      // For now, accept any password for demo users
-      if (!this.verifyPassword(credentials.password, user)) {
-        return {
-          success: false,
-          error: 'Invalid email or password',
-        }
-      }
-
-      if (!user.verified) {
-        return {
-          success: false,
-          error: 'Email verification required',
-          requiresVerification: true,
-        }
-      }
-
-      // Create session
-      const session = this.createSession(user.id)
-
-      // Update last login
-      user.lastLoginAt = new Date()
-
-      logger.info('User authenticated successfully', {
-        userId: user.id,
-        email: user.email,
-      })
-
-      return {
-        success: true,
-        user,
-        session,
-      }
-    } catch (error: unknown) {
-      logger.error('Authentication failed', { error, email: credentials.email })
-      return {
-        success: false,
-        error: 'Authentication failed',
-      }
-    }
-  }
-
-  /**
-   * Create a new user account
-   */
-  async createUser(userData: {
-    email: string
-    password: string
-    name?: string
-    role?: User['role']
-  }): Promise<AuthResult> {
-    try {
-      logger.debug('Creating new user', { email: userData.email })
-
-      // Check if user already exists
-      const existingUser = Array.from(this.users.values()).find(
-        (u) => u.email === userData.email,
-      )
-      if (existingUser) {
-        return {
-          success: false,
-          error: 'User with this email already exists',
-        }
-      }
-
-      // Create new user
-      const user: User = {
-        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        email: userData.email,
-        name: userData.name ?? '', // Ensure name is always a string
-        role: userData.role || 'user',
-        verified: false, // Requires email verification
-        createdAt: new Date(),
-      }
-
-      this.users.set(user.id, user)
-
-      logger.info('User created successfully', {
-        userId: user.id,
-        email: user.email,
-      })
-
-      return {
-        success: true,
-        user,
-        requiresVerification: true,
-      }
-    } catch (error: unknown) {
-      logger.error('User creation failed', { error, email: userData.email })
-      return {
-        success: false,
-        error: 'Failed to create user account',
-      }
-    }
-  }
-
-  /**
-   * Verify user session
-   */
-  async verifySession(sessionId: string): Promise<AuthResult> {
-    try {
-      const session = this.sessions.get(sessionId)
-
-      if (!session || !session.isActive || session.expiresAt < new Date()) {
-        return {
-          success: false,
-          error: 'Invalid or expired session',
-        }
-      }
-
-      const user = this.users.get(session.userId)
-      if (!user) {
-        return {
-          success: false,
-          error: 'User not found',
-        }
-      }
-
-      return {
-        success: true,
-        user,
-        session,
-      }
-    } catch (error: unknown) {
-      logger.error('Session verification failed', { error, sessionId })
-      return {
-        success: false,
-        error: 'Session verification failed',
-      }
-    }
-  }
-
-  /**
-   * Logout user and invalidate session
-   */
-  async logout(sessionId: string): Promise<boolean> {
-    try {
-      const session = this.sessions.get(sessionId)
-      if (session) {
-        session.isActive = false
-        logger.info('User logged out', { userId: session.userId, sessionId })
-      }
-      return true
-    } catch (error: unknown) {
-      logger.error('Logout failed', { error, sessionId })
-      return false
-    }
-  }
-
-  /**
-   * Request password reset
-   */
-  async requestPasswordReset(email: string): Promise<boolean> {
-    try {
-      const user = Array.from(this.users.values()).find(
-        (u) => u.email === email,
-      )
-      if (!user) {
-        // Don't reveal if email exists
-        return true
-      }
-
-      const token = this.generateResetToken()
-      const resetRequest: PasswordResetRequest = {
-        email,
-        token,
-        expiresAt: new Date(Date.now() + 3600000), // 1 hour
-        used: false,
-      }
-
-      this.resetTokens.set(token, resetRequest)
-
-      logger.info('Password reset requested', { email, token })
-      return true
-    } catch (error: unknown) {
-      logger.error('Password reset request failed', { error, email })
-      return false
-    }
-  }
-
-  /**
-   * Reset password with token
-   */
-  async resetPassword(token: string, newPassword: string): Promise<boolean> {
-    try {
-      const resetRequest = this.resetTokens.get(token)
-
-      if (
-        !resetRequest ||
-        resetRequest.used ||
-        resetRequest.expiresAt < new Date()
-      ) {
-        return false
-      }
-
-      const user = Array.from(this.users.values()).find(
-        (u) => u.email === resetRequest.email,
-      )
-      if (!user) {
-        return false
-      }
-
-      // In production, hash the new password
-      // user.password = await hashPassword(newPassword)
-      resetRequest.used = true
-
-      logger.info('Password reset successfully', {
-        userId: user.id,
-        passwordLength: newPassword.length,
-      })
-      return true
-    } catch (error: unknown) {
-      logger.error('Password reset failed', { error, token })
-      return false
-    }
-  }
-
-  /**
-   * Get user by ID
-   */
-  async getUserById(userId: string): Promise<User | null> {
-    return this.users.get(userId) || null
-  }
-
-  private createSession(userId: string): AuthSession {
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    const session: AuthSession = {
-      userId,
-      sessionId,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-      isActive: true,
-    }
-
-    this.sessions.set(sessionId, session)
-    return session
-  }
-
-  private verifyPassword(password: string, _user: User): boolean {
-    // In production, use proper password hashing (bcrypt, argon2, etc.)
-    // For demo purposes, accept any non-empty password
-    // Would normally check: bcrypt.compare(password, user.hashedPassword)
-    return password.length >= 6
-  }
-
-  private generateResetToken(): string {
-    return `reset_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`
-  }
-
-  private initializeMockUsers() {
-    // Create some demo users for testing
-    const demoUsers: User[] = [
-      {
-        id: 'user_demo_admin',
-        email: 'admin@pixelated.health',
-        name: 'System Administrator',
-        role: 'admin',
-        verified: true,
-        createdAt: new Date('2024-01-01'),
-      },
-      {
-        id: 'user_demo_therapist',
-        email: 'therapist@pixelated.health',
-        name: 'Dr. Sarah Johnson',
-        role: 'therapist',
-        verified: true,
-        createdAt: new Date('2024-01-15'),
-      },
-      {
-        id: 'user_demo_patient',
-        email: 'patient@pixelated.health',
-        name: 'John Doe',
-        role: 'patient',
-        verified: true,
-        createdAt: new Date('2024-02-01'),
-      },
-    ]
-
-    demoUsers.forEach((user) => {
-      this.users.set(user.id, user)
-    })
-
-    logger.info('Demo users initialized', { count: demoUsers.length })
+    console.log('✅ Authentication system initialized successfully')
+  } catch (_error) {
+    console.error('❌ Failed to initialize authentication system:', _error)
+    throw _error
   }
 }
 
-// Default auth service instance
-let authServiceInstance: AuthService | null = null
+/**
+ * Create authentication API routes
+ */
+export async function createAuthRoutes() {
+  const { Router } = await import('express')
+  const router = Router()
+
+  // Import route handlers
+  const {
+    handleRegister,
+    handleLogin,
+    handleLogout,
+    handleRefreshToken,
+    handleForgotPassword,
+    handleResetPassword,
+    handleVerifyEmail,
+  } = await import('./routes')
+
+  // Public routes
+  router.post('/register', handleRegister)
+  router.post('/login', handleLogin)
+  router.post('/forgot-password', handleForgotPassword)
+  router.post('/reset-password', handleResetPassword)
+  router.post('/verify-email', handleVerifyEmail)
+
+  // Protected routes
+  router.post('/logout', requireAuthenticated, handleLogout)
+  router.post('/refresh-token', handleRefreshToken)
+
+  // User profile routes
+  router.get('/profile', requireAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+    const user = req.context?.user
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'User not found' })
+    }
+
+    const userAuth = getUserAuthentication(user.id)
+    if (!userAuth) {
+      return res.status(404).json({ success: false, error: 'User not found' })
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: userAuth.id,
+        email: userAuth.email,
+        role: userAuth.role,
+        createdAt: userAuth.createdAt,
+        lastLoginAt: userAuth.lastLoginAt,
+      },
+    })
+  })
+
+  return router
+}
 
 /**
- * Get the default auth service instance
+ * Health check for authentication system
+ */
+export async function getAuthHealth(): Promise<{
+  status: 'healthy' | 'degraded' | 'unhealthy'
+  details: {
+    jwtService: boolean
+    betterAuth: boolean
+    redis: boolean
+    database: boolean
+  }
+}> {
+  try {
+    const { checkRedisConnection } = await import('../redis')
+
+    const [redisHealth] = await Promise.allSettled([
+      checkRedisConnection(),
+    ])
+
+    const details = {
+      jwtService: true, // JWT service is stateless
+      betterAuth: true, // Better-Auth health would go here
+      redis: redisHealth.status === 'fulfilled' && redisHealth.value,
+      database: true, // Database health would be checked here
+    }
+
+    const allHealthy = Object.values(details).every(health => health)
+
+    return {
+      status: allHealthy ? 'healthy' : 'degraded',
+      details,
+    }
+  } catch (_error) {
+    return {
+      status: 'unhealthy',
+      details: {
+        jwtService: false,
+        betterAuth: false,
+        redis: false,
+        database: false,
+      },
+    }
+  }
+}
+
+/**
+ * Export security event types for external use
+ */
+export { SecurityEventType } from '../security'
+
+/**
+ * Default export for convenience
  */
 export function getAuthService(): AuthService {
   if (!authServiceInstance) {

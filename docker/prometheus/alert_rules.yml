@@ -1,0 +1,283 @@
+groups:
+- name: ai-service-alerts
+  rules:
+  - alert: HighAIRequestRate
+    expr: rate(pixelated_ai_requests_total[5m]) > 1000
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High AI request rate detected"
+      description: "AI service is receiving {{ $value }} requests per second, which is above the threshold of 1000"
+
+  - alert: AIModelLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_ai_request_duration_seconds_bucket[5m]))) > 2
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High AI model latency detected"
+      description: "95th percentile latency for AI requests is {{ $value }} seconds, above threshold of 2 seconds"
+
+  - alert: AIErrorRateHigh
+    expr: (rate(pixelated_ai_errors_total[5m]) / rate(pixelated_ai_requests_total[5m])) * 100 > 5
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High AI error rate detected"
+      description: "AI service error rate is {{ $value | printf \"%.2f\" }}%%, above threshold of 5%%"
+
+  - alert: AIModelMemoryUsageHigh
+    expr: (pixelated_ai_memory_usage_bytes / pixelated_ai_memory_limit_bytes) * 100 > 90
+    for: 5m
+    labels:
+      severity: critical
+      team: ai
+      component: model-serving
+    annotations:
+      summary: "High AI model memory usage detected"
+      description: "AI model memory usage is at {{ $value | printf \"%.2f\" }}%% (threshold: 90%%)"
+      runbook_url: "${AI_MODEL_MEMORY_RUNBOOK_URL:-https://runbooks.example.com/ai-model-memory}"
+      dashboard_url: "${AI_MODEL_DASHBOARD_URL:-https://grafana.example.com/d/ai-models}"
+
+- name: bias-detection-alerts
+  rules:
+  - alert: HighBiasDetectionRate
+    expr: rate(pixelated_bias_detection_scores_total[5m]) > 500
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High bias detection rate detected"
+      description: "Bias detection service is processing {{ $value }} scores per second, above threshold of 500"
+
+  - alert: BiasDetectionLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_bias_detection_duration_seconds_bucket[5m]))) > 3
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High bias detection latency detected"
+      description: "95th percentile latency for bias detection is {{ $value }} seconds, above threshold of 3 seconds"
+
+  - alert: HighBiasScoreThreshold
+    expr: rate(pixelated_bias_scores_above_threshold_total[5m]) > 10
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High bias score threshold exceeded"
+      description: "Bias detection service detected {{ $value }} scores above threshold in the last 5 minutes"
+
+- name: behavioral-analysis-alerts
+  rules:
+  - alert: HighBehavioralAnomalyRate
+    expr: rate(pixelated_behavioral_anomalies_total[5m]) > 50
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High behavioral anomaly rate detected"
+      description: "Behavioral analysis service detected {{ $value }} anomalies per second, above threshold of 50"
+
+  - alert: BehavioralAnalysisLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_behavioral_analysis_duration_seconds_bucket[5m]))) > 5
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High behavioral analysis latency detected"
+      description: "95th percentile latency for behavioral analysis is {{ $value }} seconds, above threshold of 5 seconds"
+
+  - alert: CriticalBehavioralAnomaly
+    expr: rate(pixelated_critical_behavioral_anomalies_total[5m]) > 1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Critical behavioral anomaly detected"
+      description: "Behavioral analysis service detected {{ $value }} critical anomalies in the last minute"
+
+- name: rate-limiting-alerts
+  rules:
+  - alert: HighRateLimitViolations
+    expr: rate(pixelated_rate_limit_violations_total[5m]) > 100
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High rate limit violations detected"
+      description: "Rate limiting service detected {{ $value }} violations per second, above threshold of 100"
+
+  - alert: RateLimitingLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_rate_limiting_duration_seconds_bucket[5m]))) > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High rate limiting latency detected"
+      description: "95th percentile latency for rate limiting is {{ $value }} seconds, above threshold of 1 second"
+
+  - alert: RateLimitingCapacityExceeded
+    expr: rate(pixelated_rate_limit_capacity_exceeded_total[5m]) > 5
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Rate limiting capacity exceeded"
+      description: "Rate limiting capacity exceeded {{ $value }} times in the last minute"
+
+- name: response-orchestration-alerts
+  rules:
+  - alert: HighResponseActionRate
+    expr: rate(pixelated_response_actions_triggered_total[5m]) > 20
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High response action rate detected"
+      description: "Response orchestration service triggered {{ $value }} actions per second, above threshold of 20"
+
+  - alert: ResponseOrchestrationLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_response_orchestration_duration_seconds_bucket[5m]))) > 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High response orchestration latency detected"
+      description: "95th percentile latency for response orchestration is {{ $value }} seconds, above threshold of 10 seconds"
+
+  - alert: CriticalResponseAction
+    expr: rate(pixelated_critical_response_actions_total[5m]) > 1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Critical response action triggered"
+      description: "Response orchestration service triggered {{ $value }} critical actions in the last minute"
+
+- name: predictive-threat-intelligence-alerts
+  rules:
+  - alert: HighThreatPredictionRate
+    expr: rate(pixelated_threat_predictions_total[5m]) > 100
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High threat prediction rate detected"
+      description: "Predictive threat intelligence service generated {{ $value }} predictions per second, above threshold of 100"
+
+  - alert: ThreatPredictionLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_threat_prediction_duration_seconds_bucket[5m]))) > 15
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High threat prediction latency detected"
+      description: "95th percentile latency for threat prediction is {{ $value }} seconds, above threshold of 15 seconds"
+
+  - alert: HighRiskThreatPrediction
+    expr: rate(pixelated_high_risk_threat_predictions_total[5m]) > 5
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High risk threat prediction detected"
+      description: "Predictive threat intelligence service detected {{ $value }} high-risk predictions in the last 5 minutes"
+
+- name: security-monitoring-alerts
+  rules:
+  - alert: HighSecurityIncidentRate
+    expr: rate(pixelated_security_incidents_total[5m]) > 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High security incident rate detected"
+      description: "Security monitoring service detected {{ $value }} incidents per second, above threshold of 10"
+
+  - alert: CriticalSecurityIncident
+    expr: rate(pixelated_critical_security_incidents_total[5m]) > 1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Critical security incident detected"
+      description: "Security monitoring service detected {{ $value }} critical incidents in the last minute"
+
+  - alert: SecurityAnalysisLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_security_analysis_duration_seconds_bucket[5m]))) > 20
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High security analysis latency detected"
+      description: "95th percentile latency for security analysis is {{ $value }} seconds, above threshold of 20 seconds"
+
+- name: system-health-alerts
+  rules:
+  - alert: HighCPUUsage
+    expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage detected"
+      description: "CPU usage is at {{ $value }}%, above threshold of 80%"
+
+  - alert: HighMemoryUsage
+    expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage detected"
+      description: "Memory usage is at {{ $value }}%, above threshold of 85%"
+
+  - alert: HighDiskUsage
+    expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 90
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High disk usage detected"
+      description: "Disk usage is at {{ $value }}%, above threshold of 90%"
+
+  - alert: ServiceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Service is down"
+      description: "Service {{ $labels.instance }} has been down for more than 1 minute"
+
+- name: user-activity-alerts
+  rules:
+  - alert: UnusualUserActivity
+    expr: rate(pixelated_unusual_user_activity_total[5m]) > 5
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Unusual user activity detected"
+      description: "User activity analysis detected {{ $value }} unusual activities per second, above threshold of 5"
+
+  - alert: SuspiciousUserBehavior
+    expr: rate(pixelated_suspicious_user_behavior_total[5m]) > 1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Suspicious user behavior detected"
+      description: "User behavior analysis detected {{ $value }} suspicious behaviors in the last minute"
+
+  - alert: UserActivityAnalysisLatencyHigh
+    expr: histogram_quantile(0.95, sum by (le) (rate(pixelated_user_activity_analysis_duration_seconds_bucket[5m]))) > 8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High user activity analysis latency detected"
+      description: "95th percentile latency for user activity analysis is {{ $value }} seconds, above threshold of 8 seconds"
