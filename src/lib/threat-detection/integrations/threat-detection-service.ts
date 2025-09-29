@@ -14,8 +14,6 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { 
   ThreatData, 
   ThreatResponse,
-  ResponseAction,
-  RateLimitRule,
   RateLimitResult,
   ThreatAnalysis 
 } from '../response-orchestration'

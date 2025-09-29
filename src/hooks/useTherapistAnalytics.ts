@@ -100,7 +100,7 @@ export function useTherapistAnalytics(
       milestonesAchieved: session.progressMetrics?.milestonesReached?.length ?? 0,
       averageResponseTime: session.progressMetrics?.responseTime ?? 0,
     }));
-  }, []);
+  }, [_filters]);
 
   /**
    * Transform skill progress data for therapist analytics
@@ -409,7 +409,11 @@ export function useTherapistAnalytics(
         refreshIntervalRef.current = null
       }
     }
-  }, [(_filters as any).config, loadData])
+  }, [
+	(_filters as any).config,
+	loadData,
+	_filters
+])
 
   /**
    * Cleanup on unmount

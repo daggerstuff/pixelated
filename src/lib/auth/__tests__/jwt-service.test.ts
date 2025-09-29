@@ -12,12 +12,11 @@ import {
   revokeToken, 
   cleanupExpiredTokens,
   AuthenticationError,
-  type TokenPair,
   type ClientInfo
 } from '../jwt-service'
-import { redis } from '../../redis'
-import { logSecurityEvent } from '../../security'
-import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
+
+
+
 
 // Mock dependencies
 vi.mock('../../redis', () => ({
@@ -492,7 +491,7 @@ describe('JWT Service', () => {
       vi.mocked(setInCache).mockImplementation(async (key, data) => {
         if (key.startsWith('token:')) {
           // Store metadata with different device ID
-          const metadata = typeof data === 'object' ? { ...data, clientInfo: { ...data.clientInfo, deviceId: 'different-device' } } : data
+          
           return true
         }
         return true

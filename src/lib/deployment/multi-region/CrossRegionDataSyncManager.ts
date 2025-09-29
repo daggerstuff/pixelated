@@ -2,8 +2,8 @@ import { Logger } from '../../utils/logger';
 import { ConfigurationManager } from './ConfigurationManager';
 import { HealthMonitor } from './HealthMonitor';
 import { EventEmitter } from 'events';
-import { createClient, QueryResult } from '@clickhouse/client';
-import { MongoClient, Db, Collection } from 'mongodb';
+import { createClient, } from '@clickhouse/client';
+import { MongoClient, } from 'mongodb';
 import { Redis } from 'ioredis';
 import * as cockroach from 'cockroach';
 import { v4 as uuidv4 } from 'uuid';
@@ -518,7 +518,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
 
         const db = client.db();
         const usersCollection = db.collection('users');
-        const syncLogCollection = db.collection('sync_log');
+        
 
         // Find users that need syncing
         const pendingUsers = await usersCollection.find({

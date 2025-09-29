@@ -6,18 +6,16 @@
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
 import { MongoClient, Db } from 'mongodb';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, } from 'axios';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 
 import {
   FeedConfig,
-  FeedSource,
   FeedItem,
   FeedSubscription,
   FeedProcessingResult,
   GlobalThreatIntelligence,
-  ThreatIndicator
-} from '../global/types';
+  } from '../global/types';
 
 const logger = createBuildSafeLogger('external-threat-feed-integration');
 

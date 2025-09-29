@@ -1,7 +1,7 @@
 // Mock module for @campfirein/cipher used in Vitest tests
 
 export class Cipher {
-  constructor() {}
+  
   registerAgent(agentContext: any) {
     // Return a stub context object for testing
     return {

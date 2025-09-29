@@ -3,8 +3,8 @@
  * Core type definitions for the global threat intelligence system
  */
 
-import { ThreatIntelligence } from '../threat-detection/integrations/external-threat-intelligence';
-import { ThreatResponse } from '../threat-detection/response-orchestration';
+
+
 
 export interface GlobalThreatIntelligenceNetworkConfig {
   regions: RegionConfig[];

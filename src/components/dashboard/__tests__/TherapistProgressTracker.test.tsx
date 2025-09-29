@@ -121,7 +121,7 @@ describe("TherapistProgressTracker", () => {
     render(<TherapistProgressTracker session={mockSession} />);
 
     const overviewToggle = screen.getByLabelText("Collapse session overview");
-    const progressToggle = screen.getByLabelText("Collapse overall progress");
+    
 
     // Initially expanded
     expect(screen.getByText("Session ID")).toBeInTheDocument();

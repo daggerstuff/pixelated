@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken'
 import { randomUUID, createHmac } from 'crypto'
 import type { RedisClientType } from 'redis'
 import { getRedisClient } from '../redis'
-import { logger } from '../logger'
+
 import { BetterAuthIntegrationService } from './better-auth-integration'
 import { Phase6IntegrationService } from './phase6-integration'
 import { SecurityEventLogger } from './security-event-logger'

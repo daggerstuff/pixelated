@@ -369,7 +369,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
 
   private async monitorModelPerformance(): Promise<void> {
     try {
-      for (const [modelId, model] of this.models) {
+      for (const [modelId, _model] of this.models) {
         const performance = this.modelPerformance.get(modelId);
         if (performance) {
           // Simulate performance monitoring

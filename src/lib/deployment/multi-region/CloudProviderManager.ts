@@ -5,10 +5,10 @@
  * supporting AWS, GCP, and Azure with unified API interface.
  */
 
-import { EC2Client, RunInstancesCommand, DescribeInstancesCommand, TerminateInstancesCommand } from '@aws-sdk/client-ec2';
-import { EKSClient, CreateClusterCommand, DescribeClusterCommand } from '@aws-sdk/client-eks';
-import { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand } from '@aws-sdk/client-rds';
-import { S3Client, CreateBucketCommand, PutBucketEncryptionCommand } from '@aws-sdk/client-s3';
+import { EC2Client, } from '@aws-sdk/client-ec2';
+import { EKSClient, } from '@aws-sdk/client-eks';
+import { RDSClient, } from '@aws-sdk/client-rds';
+import { S3Client, } from '@aws-sdk/client-s3';
 import { Compute, DNS, Storage } from '@google-cloud/compute';
 import { RegionConfig } from './MultiRegionDeploymentManager';
 import { logger } from '../../logging';
@@ -64,7 +64,7 @@ export class CloudProviderManager {
    * Load cloud provider configuration from environment
    */
   private loadConfiguration(): CloudProviderConfig {
-    const config = getConfig();
+    
     
     return {
       aws: {
@@ -177,7 +177,7 @@ export class CloudProviderManager {
 
     try {
       for (const region of gcpRegions) {
-        const regionName = this.getGCPRegionName(region.location);
+        
 
         // Initialize Compute client
         const computeClient = new Compute({

@@ -13,7 +13,6 @@ import {
   ResponseStrategy,
   ResponseAction,
   ResponseCondition,
-  EscalationRule,
   IntegrationEndpoint,
   GlobalThreatIntelligence,
   ThreatResponse
@@ -847,7 +846,7 @@ export class AutomatedThreatResponseOrchestratorCore extends EventEmitter implem
   private async executeAlertAction(action: ResponseAction, response: ThreatResponse): Promise<boolean> {
     try {
       // Implement alerting logic (e.g., email, Slack, webhook)
-      const { recipients, message, priority } = action.parameters;
+      const { recipients, priority } = action.parameters;
       
       logger.info('Executing alert action', { 
         responseId: response.responseId,
@@ -890,7 +889,7 @@ export class AutomatedThreatResponseOrchestratorCore extends EventEmitter implem
   private async executeMitigateAction(action: ResponseAction, response: ThreatResponse): Promise<boolean> {
     try {
       // Implement mitigation logic (e.g., patch deployment, configuration changes)
-      const { mitigationType, targetSystem, parameters } = action.parameters;
+      const { mitigationType, targetSystem, } = action.parameters;
       
       logger.info('Executing mitigate action', { 
         responseId: response.responseId,
@@ -1016,19 +1015,7 @@ export class AutomatedThreatResponseOrchestratorCore extends EventEmitter implem
 
   private async sendToIntegrationEndpoint(endpoint: IntegrationEndpoint, response: ThreatResponse): Promise<void> {
     try {
-      const payload = {
-        event: 'threat_response',
-        responseId: response.responseId,
-        threatId: response.threatId,
-        severity: response.severity,
-        responseType: response.responseType,
-        actions: response.actions.map(a => ({
-          actionId: a.actionId,
-          actionType: a.actionType,
-          target: a.target
-        })),
-        timestamp: new Date().toISOString()
-      };
+      
       
       logger.info('Sending to integration endpoint', { 
         endpoint: endpoint.endpointId,

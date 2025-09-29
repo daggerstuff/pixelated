@@ -9,7 +9,7 @@ import * as tf from '@tensorflow/tfjs';
 import { Redis } from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../../logger';
-import { rateLimiter } from '../../rate-limiting';
+
 import { auditLog } from '../audit-logging';
 import { BiasDetectionEngine } from '../../ai/bias-detection/BiasDetectionEngine';
 
