@@ -1,5 +1,17 @@
 # Pixelated Empathy - Development Guide
 
+## IMPORTANT FIRST NOTES
+- **All** python commands and calls are to use uv. Not anaconda or venv. Use uv for everything.
+    - `uv install` to install dependencies from pyproject.toml
+    - `uv run <command>` to run commands like `python script.py` or `pytest tests/`
+    - `uv shell` to spawn a shell with the virtual environment activated
+- **All** node commands and calls are to use pnpm. Not npm or yarn. Use pnpm for everything.
+- **Always** start every new chat or task by referring to your mcp tool, openmemory.
+    - It has the full context of the project, and will help you avoid mistakes.
+    - Always log a new memory at the end of your work, summarizing what you did. To help further grow the memory base.
+    - Always update your memory if you encounter issues that you can't solve on your own.
+- **All** research must be reviewed by the end of the day. Any deviation from the project's goals will result in a review.
+
 ## Build/Lint/Test Commands
 - **Development**: `pnpm dev` (or `pnpm dev:all-services` for full stack)
 - **Single Test**: `pnpm vitest run src/path/to/test.spec.ts`

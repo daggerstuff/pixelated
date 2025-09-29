@@ -22,7 +22,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Authenticate the request first
     const authResult = await authenticateRequest(request)
-    
     if (!authResult.success) {
       return authResult.response!
     }
@@ -31,7 +30,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const sessionId = request.headers.get('x-session-id') || 'unknown'
 
     // Get user ID from authenticated request
-    const userId = (authResult.request as any).user?.id
+    const maybeRequest = authResult.request as unknown
+    const userId =
+      typeof maybeRequest === 'object' &&
+      maybeRequest !== null &&
+      'user' in maybeRequest &&
+      typeof (maybeRequest as { user?: { id?: string } }).user === 'object'
+        ? (maybeRequest as { user?: { id?: string } }).user?.id
+        : undefined
 
     if (!userId) {
       return new Response(
@@ -77,7 +83,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   } catch (error) {
     // Handle unexpected errors
     console.error('Logout error:', error)
-    
     await logSecurityEvent('USER_LOGOUT_ERROR', null, {
       error: error.message,
       clientInfo,
