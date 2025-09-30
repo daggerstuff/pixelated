@@ -222,7 +222,8 @@ deploy-vps:
   script:
   - echo "Deploying to VPS..."
   - |
-    ssh $VPS_USER@$VPS_HOST << 'EOF'
+    ssh -T $VPS_USER@$VPS_HOST << 'EOF'
+      export DEBIAN_FRONTEND=noninteractive
       set -e
 
       # Colors for remote output
