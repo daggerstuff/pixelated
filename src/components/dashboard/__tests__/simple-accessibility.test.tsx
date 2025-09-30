@@ -192,7 +192,7 @@ describe("Simple Accessibility Tests", () => {
     render(<TherapistDashboard sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
 
     // Check for skip links or other navigation
-    const navElements = screen.queryAllByRole('link');
+    
     // Just ensure it renders without errors
     expect(screen.getByLabelText('Therapist Dashboard')).toBeInTheDocument();
   });
@@ -293,7 +293,7 @@ describe("Simple Accessibility Tests", () => {
     render(<TherapistDashboard sessions={mockSessions} onSessionControl={mockOnSessionControl} />);
 
     // Check for skip links or other navigation
-    const navElements = screen.queryAllByRole('link');
+    
     // Just ensure it renders without errors
     expect(screen.getByLabelText('Therapist Dashboard')).toBeInTheDocument();
   });

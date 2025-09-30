@@ -15,7 +15,7 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   // Focus management for keyboard navigation
-  const [focusedButton, setFocusedButton] = useState<string | null>(null);
+  const [,setFocusedButton] = useState<string | null>(null);
 
   const handleControlClick = (action: 'start' | 'pause' | 'resume' | 'end', sessionId?: string) => {
     if (!sessionId) {
@@ -38,16 +38,7 @@ export function SessionControls({ sessions, onSessionControl }: SessionControlsP
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
-  const fmt = (iso?: string) => {
-    if (!iso) {
-      return ''
-    }
-    try {
-      return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    } catch {
-      return ''
-    }
-  }
+  
 
   // Keyboard event handling for session controls
   useEffect(() => {

@@ -8,7 +8,7 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from './audit'
-import { mongoAuthService } from './supabase'
+// legacy supabase import removed; using adapter dynamically where needed
 // Note: This is an Astro project, Next.js types are not needed here
 // TODO: Replace with Astro-compatible types when implementing API auth
 
@@ -35,16 +35,16 @@ export async function getCurrentUser(
   }
 
   try {
-    const decoded = await mongoAuthService.verifyAuthToken(accessToken)
+    const decoded = await (await import('@/adapters/betterAuthMongoAdapter')).verifyToken(accessToken)
     if (!decoded) {
       return null
     }
 
     // Assuming the decoded token contains the user ID
-    const {userId} = decoded
+    const { userId } = decoded
 
     // Fetch user from the database
-    const user = await mongoAuthService.getUserById(userId)
+    const user = await (await import('@/adapters/betterAuthMongoAdapter')).getUserById(userId)
     if (!user) {
       return null
     }

@@ -22,13 +22,23 @@ class Analyzer {
 }
 
 class Anonymizer {
-  async anonymize(payload: any): Promise<{ text: string }>{
-    return Promise.resolve({ text: payload.text })
+  async anonymize(payload: unknown): Promise<{ text: string }> {
+    // Safely extract text if payload is the expected shape
+    if (typeof payload === 'object' && payload !== null && 'text' in payload) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const obj = payload as { text?: unknown }
+      if (typeof obj.text === 'string') {
+        return Promise.resolve({ text: obj.text })
+      }
+    }
+
+    // If payload doesn't match expected shape, return empty text to avoid throwing
+    return Promise.resolve({ text: '' })
   }
 }
 
 // Mock implementation of memoize since the original is not accessible
-function memoize<T extends (...args: any[]) => any>(fn: T): T {
+function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>()
 
   return ((...args: Parameters<T>): ReturnType<T> => {
@@ -38,9 +48,10 @@ function memoize<T extends (...args: any[]) => any>(fn: T): T {
       return cache.get(key) as ReturnType<T>
     }
 
-    const result = fn(...(args as any))
-    cache.set(key, result as ReturnType<T>)
-    return result as ReturnType<T>
+    // Call the function with unknown args and assert the return type
+    const result = fn(...(args as unknown[])) as ReturnType<T>
+    cache.set(key, result)
+    return result
   }) as T
 }
 
@@ -306,7 +317,7 @@ export class PresidioPHIDetector {
         'g',
       ),
       [PHIEntityType.US_SSN]: new RegExp(
-        '\\b\\d{3}[-]?\\d{2}[-]?\\d{4}\\b',
+        '\\b\\d{3}-?\\d{2}-?\\d{4}\\b',
         'g',
       ),
       [PHIEntityType.IP_ADDRESS]: new RegExp(
@@ -357,7 +368,7 @@ export class PresidioPHIDetector {
         'g',
       ),
       [PHIEntityType.US_ITIN]: new RegExp(
-        '\\b9\\d{2}[-]?\\d{2}[-]?\\d{4}\\b',
+        '\\b9\\d{2}-?\\d{2}-?\\d{4}\\b',
         'g',
       ),
       [PHIEntityType.MEDICAL_LICENSE]: new RegExp('\\b[A-Z]{2}\\d{6}\\b', 'g'),

@@ -1,6 +1,6 @@
 // import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
-import { mongoAuthService } from '@/services/mongoAuth.service'
+import * as adapter from '@/adapters/betterAuthMongoAdapter'
 
 /**
  * Sign up endpoint
@@ -42,7 +42,7 @@ export const POST = async ({ request }) => {
       )
     }
 
-    const user = await mongoAuthService.createUser(email, password, role)
+    const user = await adapter.createUser({ email, password, role }) as unknown as { _id?: { toString: () => string }; id?: string; email: string; role: string; emailVerified: boolean }
 
     return new Response(
       JSON.stringify({

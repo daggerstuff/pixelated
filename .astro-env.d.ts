@@ -1,21 +1,18 @@
 /// <reference types="astro/client" />
 
-// Import types from React for HTML attributes (if needed in the future)
 import "./src/env.d.ts"
 
-// Type declarations for astro-icon
 declare module 'astro-icon/components' {
   interface IconProps {
     name: string
     class?: string
-    [key: string]: any
+    [key: string]: unknown
   }
 
-  const Icon: (props: IconProps) => any
+  const Icon: (props: IconProps) => unknown
   export { Icon }
 }
 
-// Type declarations for Astro virtual modules
 declare module 'virtual:astro:assets/fonts/internal' {
   interface PreloadData {
     url: string
@@ -35,7 +32,6 @@ declare module 'virtual:astro:assets/fonts/internal' {
   export { fontsData }
 }
 
-// Ensure Astro recognizes HTML attributes
 declare namespace astroHTML.JSX {
   interface HTMLAttributes {
     'class'?: string | null | undefined
@@ -52,7 +48,6 @@ declare namespace astroHTML.JSX {
     'data-*'?: string | null | undefined
   }
 
-  // Button element interface
   interface ButtonHTMLAttributes extends HTMLAttributes {
     type?: 'button' | 'submit' | 'reset' | null | undefined
     disabled?: string | boolean | null | undefined
@@ -61,7 +56,6 @@ declare namespace astroHTML.JSX {
     form?: string | null | undefined
   }
 
-  // Input element interface
   interface InputHTMLAttributes extends HTMLAttributes {
     type?: string | null | undefined
     name?: string | null | undefined
@@ -70,13 +64,9 @@ declare namespace astroHTML.JSX {
     placeholder?: string | null | undefined
     required?: string | boolean | null | undefined
     checked?: string | boolean | null | undefined
-    // Add other input attributes as needed
   }
-
-  // Add more element interfaces as needed
 }
 
-// Declare module for .astro files
 declare module '*.astro' {
   type AstroComponent = unknown
   const Component: AstroComponent

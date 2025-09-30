@@ -293,6 +293,7 @@ export class MetaAlignerAPI {
       })
       throw new Error(
         `Response evaluation failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
+        { cause: error }
       )
     }
   }
@@ -307,7 +308,8 @@ export class MetaAlignerAPI {
       request
 
     if (!this.aiService) {
-      throw new Error('AI service not configured for response enhancement')
+      // Tests expect the error message to be 'AI service not configured'
+      throw new Error('AI service not configured')
     }
 
     logger.info('Enhancing response', {
@@ -627,7 +629,7 @@ export class MetaAlignerAPI {
       if (isTargeted || result.score < 0.7) {
         const objective = this.objectives.find((o) => o.id === objectiveId)
         if (objective) {
-          ;(isTargeted ? targetedAreas : areas).push(objective.name)
+          ; (isTargeted ? targetedAreas : areas).push(objective.name)
         }
       }
     }
@@ -705,7 +707,7 @@ export class IntegratedAIService {
   constructor(
     private baseService: AIService,
     private metaAligner: MetaAlignerAPI,
-  ) {}
+  ) { }
 
   async createChatCompletion(
     messages: AIMessage[],
@@ -721,9 +723,9 @@ export class IntegratedAIService {
         content: '',
         usage: baseResponse.usage
           ? {
-              ...baseResponse.usage,
-              processingTimeMs: 0,
-            }
+            ...baseResponse.usage,
+            processingTimeMs: 0,
+          }
           : undefined,
       } as IntegratedResponse
     }
@@ -769,7 +771,10 @@ export class IntegratedAIService {
     ) {
       const maxAttempts = this.metaAligner['config'].maxEnhancementAttempts || 2
 
+      // Attempt enhancement up to maxAttempts. Count attempts even when an enhancement succeeds
       while (enhancementAttempts < maxAttempts && evaluation.needsEnhancement) {
+        enhancementAttempts++
+
         const enhancement = await this.metaAligner.enhanceResponse({
           originalResponse: finalResponse,
           evaluationResult: evaluation.evaluation,
@@ -781,8 +786,6 @@ export class IntegratedAIService {
           enhanced = true
           break
         }
-
-        enhancementAttempts++
       }
     }
 
