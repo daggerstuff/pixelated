@@ -109,8 +109,9 @@ RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
 # Build with optimized settings
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN echo "🏗️ Starting optimized build process..." && \
-    pnpm build --verbose || (\
+    pnpm build --verbose > /tmp/build.log 2>&1 || (\
         echo "❌ Build failed, debugging..." && \
+        cat /tmp/build.log && \
         ls -la src/ public/ && \
         echo "Node: $(node --version), pnpm: $(pnpm --version)" && \
         echo "Memory info:" && cat /proc/meminfo | head -5 && \
