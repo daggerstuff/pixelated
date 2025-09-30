@@ -58,4 +58,3 @@ const projectAuthMiddleware = async (context: Record<string, unknown>, next: () 
 
 // Single, clean middleware sequence
 export const onRequest = sequence(generateCspNonce, securityHeaders, projectAuthMiddleware)
->>>>>>> Stashed changes
