@@ -33,9 +33,13 @@ variables:
   # Build optimization
   NODE_OPTIONS: "--max-old-space-size=6144"
   PNPM_CACHE_FOLDER: .pnpm-store
+  GIT_STRATEGY: clone
 
   # Security
   SENTRY_RELEASE: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
+
+  # Container scanning configuration
+  CS_IMAGE: $CONTAINER_IMAGE
 
   # Legacy variables for compatibility
   CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
