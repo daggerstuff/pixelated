@@ -71,16 +71,29 @@ cache: &global_cache
       exit 1
     fi
 
-    # Write SSH key to temporary file
+    # Write SSH key to temporary file, converting single-line format to proper multi-line
     SSH_KEY_FILE=$(mktemp)
     trap "rm -f $SSH_KEY_FILE" EXIT
-    echo "$SSH_PRIVATE_KEY" > "$SSH_KEY_FILE"
-    chmod 600 "$SSH_KEY_FILE"
-    ssh-add "$SSH_KEY_FILE"
 
-    echo "✅ SSH key loaded successfully"
+    # Convert single-line key (with \n) to proper multi-line format
+    echo "$SSH_PRIVATE_KEY" | sed 's/\\n/\n/g' > "$SSH_KEY_FILE"
+    chmod 600 "$SSH_KEY_FILE"
+
+    # Validate and add key
+    if ssh-keygen -l -f "$SSH_KEY_FILE" >/dev/null 2>&1; then
+      ssh-add "$SSH_KEY_FILE"
+      echo "✅ SSH key loaded successfully"
+    else
+      echo "❌ Invalid SSH key format. Ensure your SSH_PRIVATE_KEY variable contains \\n for line breaks"
+      exit 1
+    fi
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
-  - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+  - |
+    if [ -n "$VPS_HOST" ]; then
+      ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+    else
+      echo "⚠️ VPS_HOST not set, skipping host key scan"
+    fi
 
 # Docker service template
 .docker_service: &docker_service
