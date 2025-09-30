@@ -389,7 +389,6 @@
       "faiss-node",
       "libpg-query",
       "msw",
-      "onnxruntime-node",
       "postinstall-postinstall",
       "protobufjs",
       "sharp",
@@ -417,7 +416,6 @@
   "trustedDependencies": [
     "aws-sdk",
     "core-js",
-    "onnxruntime-node",
     "postinstall-postinstall",
     "protobufjs",
     "unrs-resolver"
