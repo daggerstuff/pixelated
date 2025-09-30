@@ -74,7 +74,7 @@ cache: &global_cache
     SSH_KEY_FILE=$(mktemp)
     trap "rm -f $SSH_KEY_FILE" EXIT
 
-    printf '%s' "${VPS_SSH_PRIVATE_KEY_B64}" > "$SSH_KEY_FILE"
+    echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE"
 
     if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
       echo "❌ Invalid SSH key format"
