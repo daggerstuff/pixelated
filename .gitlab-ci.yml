@@ -76,8 +76,11 @@ cache: &global_cache
 
     echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE"
 
-    if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
-      echo "❌ Invalid SSH key format"
+    # Validate SSH key format - compatible with BusyBox grep
+    FIRST_LINE=$(head -n 1 "$SSH_KEY_FILE")
+    if ! echo "$FIRST_LINE" | grep -q "BEGIN"; then
+      echo "❌ Invalid SSH key format - expected key to start with BEGIN marker"
+      echo "First line: $FIRST_LINE"
       exit 1
     fi
 
