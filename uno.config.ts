@@ -3,8 +3,8 @@ import {
   presetIcons,
   presetAttributify,
   presetTypography,
+  presetWind,
 } from 'unocss'
-import { presetWind3 } from '@unocss/preset-wind'
 
 export default defineConfig({
   rules: [
@@ -47,7 +47,7 @@ export default defineConfig({
     ],
   ],
   presets: [
-    presetWind3(),
+    presetWind(),
     presetAttributify(),
     presetIcons({
       scale: 1.2,
