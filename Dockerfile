@@ -107,7 +107,7 @@ RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
     chmod -R 755 /tmp/.astro /app/node_modules/.astro
 
 # Build with optimized settings
-ENV NODE_OPTIONS="--max-old-space-size=6144"
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN echo "🏗️ Starting optimized build process..." && \
     pnpm build --verbose || (\
         echo "❌ Build failed, debugging..." && \
