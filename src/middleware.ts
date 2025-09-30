@@ -3,10 +3,6 @@ import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence } from 'astro/middleware'
 import { getSession } from './lib/auth/session'
 
-<<<<<<< Updated upstream
-// Single, clean middleware sequence (Clerk removed)
-export const onRequest = sequence(generateCspNonce, securityHeaders)
-=======
 // Simple route matcher replacement for Clerk's createRouteMatcher
 const protectedRoutePatterns: RegExp[] = [
   /\/api\/clerk-protected-example(.*)/, // keep original example pattern for compatibility
