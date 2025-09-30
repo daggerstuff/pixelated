@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import type { TherapistDashboardProps } from "@/types/dashboard";
 import { AnalyticsCharts } from "./AnalyticsCharts";
-import { ProgressBar } from "./ProgressBar";
-import { SessionMetrics } from "./SessionMetrics";
+
+
 import SessionControls from "./SessionControls";
 import { TherapistProgressTracker } from "./TherapistProgressTracker";
 import TherapyProgressCharts from "./TherapyProgressCharts";
@@ -60,12 +60,12 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
 
   // Use therapist analytics hook
   const defaultFilters: AnalyticsFilters = { timeRange: '30d' }
-  const { data: therapistData, isLoading, error } = useTherapistAnalytics(defaultFilters, sessions)
+  const { data: therapistData, } = useTherapistAnalytics(defaultFilters, sessions)
 
   return (
     <div className="relative">
       {/* Navigation for accessibility tests */}
-      <nav role="navigation" aria-label="Dashboard Navigation" className="sr-only">
+      <nav  aria-label="Dashboard Navigation" className="sr-only">
         <ul>
           <li><a href="#main-content">Main Content</a></li>
         </ul>

@@ -4,14 +4,25 @@ import {
   presetAttributify,
   presetTypography,
 } from 'unocss'
-import { presetWind3 } from '@unocss/preset-wind3'
+import { presetWind3 } from '@unocss/preset-wind'
 
 export default defineConfig({
-  // Workaround: filter out accidental i- or i-- icon classes that cause failed icon "-" lookups
   rules: [
-    // Match 'i-', 'i--', or single dash icon classes and ignore them
-    [/^i-(-)?$/, () => ({})],
-    [/^i--.*/, () => ({})],
+    // Match problematic icon patterns and ignore them
+    [/^i-(-)?$/, () => ({})],           // Matches 'i-' and 'i--'
+    [/^i--.*/, () => ({})],             // Matches anything starting with 'i--'
+    [/^i-$/, () => ({})],               // Matches just 'i-'
+    [/^i-\s*$/, () => ({})],            // Matches 'i-' with whitespace
+  ],
+  safelist: [
+    // Prevent UnoCSS from trying to generate invalid icon classes
+    'i-', 'i--', 'i---'
+  ],
+  blocklist: [
+    // Block problematic icon patterns
+    /^i-(-)*$/,     // Block 'i-', 'i--', 'i---', etc.
+    /^i-\s*$/,      // Block 'i-' with whitespace
+    /^icon-(-)*$/,  // Block similar 'icon-' patterns
   ],
   shortcuts: [
     [

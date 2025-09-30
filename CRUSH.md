@@ -31,7 +31,7 @@
 - **Security**: Input validation, sanitize user data, proper CORS
 
 ### Special Notes
-- Node.js 22+ required with pnpm package manager
+- Node.js 24+ required with pnpm package manager
 - Python 3.11+ for AI services with uv package manager
 - Docker available for full stack development 
 - Multi-environment support with proper dotenv configuration

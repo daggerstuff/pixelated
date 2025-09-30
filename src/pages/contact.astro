@@ -443,7 +443,8 @@ import Badge from '../components/ui/Badge.astro'
 
       if (result.success) {
         // Show success message
-        document.getElementById('success-text')!.textContent = result.message
+        const successTextEl = document.getElementById('success-text')
+        if (successTextEl) successTextEl.textContent = result.message
         successMessage.classList.remove('hidden')
         form.classList.add('hidden')
         successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' })

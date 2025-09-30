@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { TherapistDashboard } from "../TherapistDashboard";
-import type { TherapistSession } from "@/types/dashboard";
+
 import { describe, expect, it, vi } from "vitest";
 
 // Mock child components

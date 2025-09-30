@@ -28,7 +28,7 @@ const SessionProgressTimeline: React.FC<SessionProgressTimelineProps & { locale?
   const max = Math.max(...values, 1)
   const df = new Intl.DateTimeFormat(locale ?? (typeof navigator !== 'undefined' ? navigator.language : 'en-US'), { month: 'short', day: 'numeric' })
 
-  const dateFormatter = new Intl.DateTimeFormat(locale ?? (typeof navigator !== 'undefined' ? navigator.language : undefined), { month: 'short', day: 'numeric' });
+  
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">

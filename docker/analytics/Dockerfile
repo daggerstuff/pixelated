@@ -35,8 +35,8 @@ RUN pnpm tsc --project tsconfig.json --outDir dist
 # Production stage
 FROM base AS production
 
-RUN addgroup --system --gid 1001 analytics && \
-    adduser --system --uid 1001 analytics
+RUN groupadd -g 1001 analytics || true && \
+    useradd -u 1001 -g 1001 -s /bin/sh -M -N -r analytics || true
 
 # Copy built application
 COPY --from=build --chown=analytics:analytics /app/dist ./dist

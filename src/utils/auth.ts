@@ -1,4 +1,22 @@
 import type { ObjectId as RealObjectId } from 'mongodb';
+import { betterAuth } from "better-auth";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { client } from "@/db";
+import * as adapter from '@/adapters/betterAuthMongoAdapter'
+
+export const auth = betterAuth({
+  adapter: mongodbAdapter(client),
+  secret: process.env.BETTER_AUTH_SECRET,
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    },
+  },
+});
 
 export interface User {
   _id?: RealObjectId
@@ -37,7 +55,7 @@ export interface Todo {
   name: string
   description?: string
   completed: boolean
-  userId?: RealObjectId // For user-specific todos
+  userId?: RealObjectId
   createdAt: Date
   updatedAt: Date
 }
@@ -110,8 +128,6 @@ export interface ConsentManagement {
   ipAddress?: string
 }
 
-// This is a placeholder for what the decoded token might look like.
-// You should adjust this based on your actual token verification logic.
 export interface AuthInfo {
   userId: string
   role: 'admin' | 'user' | 'therapist'
@@ -119,45 +135,103 @@ export interface AuthInfo {
 }
 
 /**
- * Verify and decode the auth token.
- * This is a placeholder function. You should implement your actual
- * token verification logic here, e.g., using a library like 'jsonwebtoken'.
- * @param authHeader The Authorization header from the request.
+ * @param authHeaderOrToken The Authorization header or raw token string.
  * @returns The decoded auth context.
- * @throws Error if token is invalid.
+ * @throws Error if token is invalid or missing.
  */
 export async function verifyAuthToken(
-  authHeader: string | null,
+  authHeaderOrToken: string | null,
 ): Promise<AuthInfo> {
-  // Check if auth is disabled for testing
-  if (process.env.DISABLE_AUTH === 'true') {
-    return {
-      userId: 'test-user-id',
-      role: 'user' as const,
-      session: 'test-session',
+  if (process.env.NODE_ENV !== 'production') {
+    if (process.env.ALLOW_AUTH_DISABLE === 'true') {
+      return {
+        userId: 'test-user-id',
+        role: 'user',
+        session: 'test-session',
+      }
+    }
+  } else {
+    if (process.env.DISABLE_AUTH === 'true' || process.env.ALLOW_AUTH_DISABLE === 'true') {
+      throw new Error('Auth disabling is not permitted in production. Remove DISABLE_AUTH/ALLOW_AUTH_DISABLE from production environment.')
     }
   }
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeaderOrToken || typeof authHeaderOrToken !== 'string') {
     throw new Error('Invalid or missing authorization token')
   }
 
-  const token = authHeader.split(' ')[1]
-
-  // Here you would typically verify the token against a secret,
-  // check its expiration, and decode it to get user information.
-  // For this example, we'll return a mock AuthInfo object.
-  // Replace this with your actual implementation.
-
-  // Example of what you might get from a decoded JWT
-  const decodedPayload = {
-    userId: 'mock-user-id',
-    role: 'user' as const,
+  let token = authHeaderOrToken.trim()
+  if (token.startsWith('Bearer ')) {
+    token = token.slice(7).trim()
+  }
+  if (!token) {
+    throw new Error('Authorization token is empty after parsing')
   }
 
+  const info = await adapter.verifyToken(token)
+  if (!info || !info.userId || !info.role) {
+    throw new Error('Token verification failed: missing userId or role')
+  }
+  if (!['admin', 'user', 'therapist'].includes(info.role)) {
+    throw new Error(`Token verification failed: invalid role '${info.role}'`)
+  }
   return {
-    userId: decodedPayload.userId,
-    role: decodedPayload.role,
-    session: token ?? '',
+    userId: info.userId,
+    role: info.role as AuthInfo['role'],
+    session: info.session ?? token,
   }
 }
+
+/**
+ * Extract bearer token from request (Authorization header or cookie named `auth-token`).
+ */
+function extractTokenFromRequest(request: Request): string | null {
+  const authHeader = request.headers.get('authorization')
+  if (authHeader && authHeader.startsWith('Bearer ')) return authHeader.split(' ')[1]
+
+  const cookieHeader = request.headers.get('cookie')
+  if (!cookieHeader) return null
+  const cookies = cookieHeader.split(';').map((c) => c.trim())
+  for (const c of cookies) {
+    const [name, val] = c.split('=')
+    if (name === 'auth-token' && val !== undefined) return decodeURIComponent(val)
+  }
+  return null
+}
+
+/**
+ * Get session and user from a server Request using Better-Auth token verification.
+ * Returns an object with `user` and `session` or null when not authenticated.
+ */
+export async function getSessionFromRequest(
+  request: Request,
+): Promise<{ user: User; session: Session } | null> {
+  try {
+    // First, allow disabling auth in testing
+    if (process.env.DISABLE_AUTH === 'true') {
+      return null
+    }
+
+    const token = extractTokenFromRequest(request)
+    if (!token) return null
+
+    // verify token via adapter (delegates to mongoAuthService)
+    const authInfo = await verifyAuthToken(token)
+
+    const user = await adapter.getUserById(authInfo.userId)
+    if (!user) return null
+
+    const session: Session = {
+      userId: user._id,
+      token,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(),
+    }
+
+    return { user, session }
+  } catch (_err) {
+    return null
+  }
+}
+
+export * from '@/adapters/betterAuthMongoAdapter'

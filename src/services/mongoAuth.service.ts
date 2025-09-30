@@ -3,19 +3,17 @@ let jwt: typeof import('jsonwebtoken') | undefined;
 let mongodbLib: typeof import('mongodb') | undefined;
 import type { Db, ObjectId as RealObjectId } from 'mongodb'
 
-// Runtime shape of our MongoDB wrapper
 type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: unknown }
 
 class MockObjectId {
-    public id: string
-    constructor(id?: string) {
-        this.id = id || 'mock-object-id'
-    }
-    toString() { return this.id }
-    toHexString() { return this.id }
+  public id: string
+  constructor(id?: string) {
+    this.id = id || 'mock-object-id'
+  }
+  toString() { return this.id }
+  toHexString() { return this.id }
 }
 
-// Use conditional imports to prevent MongoDB, bcrypt, and JWT from being bundled on client side
 let mongodb: MongoRuntime | null = null;
 let ObjectId: typeof RealObjectId | typeof MockObjectId | null = null;
 let serverDepsPromise: Promise<void> | null = null;
@@ -63,13 +61,10 @@ interface AuthResult {
   accessToken: string
 }
 
-
-// Server-only implementation
-let MongoAuthServiceImpl: any = undefined;
-let mongoAuthService: any = undefined;
+let MongoAuthServiceImpl: unknown = undefined;
+let mongoAuthService: unknown = undefined;
 
 if (typeof window === 'undefined') {
-  // Only define the class and instance on the server
   MongoAuthServiceImpl = class MongoAuthService {
     private readonly JWT_SECRET: string = process.env['JWT_SECRET'] || 'your-secret-key';
     private readonly SALT_ROUNDS = 12;
@@ -150,6 +145,15 @@ if (typeof window === 'undefined') {
       return await usersCollection.findOne({ _id: new ObjectId(userId) });
     }
 
+    async findUserByEmail(email: string): Promise<User | null> {
+      await initializeDependencies();
+      if (!mongodb) throw new Error('MongoDB not available');
+      const db = await mongodb.connect();
+      const usersCollection = db.collection<User>('users');
+      // Email is expected to be indexed and unique in the users collection.
+      return await usersCollection.findOne({ email });
+    }
+
     async updateUser(userId: string, updates: Partial<User>): Promise<User | null> {
       await initializeDependencies();
       if (!mongodb) throw new Error('MongoDB not initialized in updateUser; dependencies missing or not loaded.');
@@ -189,11 +193,10 @@ if (typeof window === 'undefined') {
   mongoAuthService = new MongoAuthServiceImpl();
 }
 
-// Fallback stub for client-side: throws on all methods
 if (typeof window !== 'undefined') {
-  MongoAuthServiceImpl = class MongoAuthServiceStub {
-    constructor() { throw new Error('MongoAuthService is not available on the client'); }
-  } as any;
+  MongoAuthServiceImpl = function() {
+    throw new Error('MongoAuthService is not available on the client');
+  };
   mongoAuthService = undefined;
 }
 

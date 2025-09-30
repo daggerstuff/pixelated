@@ -72,7 +72,9 @@ export async function getDatabaseHealth() {
 }
 
 export const mongoClient = mongodb
-export const authService = mongoAuthService
+// Prefer adapter-based auth exports for application code
+export { default as authAdapter } from '@/adapters/betterAuthMongoAdapter'
+export const authService = mongoAuthService // legacy export; prefer `authAdapter`
 export { mongodb as default, mongoAuthService }
 
 console.log('📦 MongoDB library initialized (src/lib/db/mongoClient.ts)')
