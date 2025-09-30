@@ -60,29 +60,25 @@ cache: &global_cache
   - node_modules/
   policy: pull-push
 
-# Security template for SSH key handling
+# Security template for SSH key handling using GitLab's SSH_PRIVATE_KEY
 .ssh_setup: &ssh_setup
   before_script:
   - apk add --no-cache openssh-client curl git
   - eval $(ssh-agent -s)
   - |
-    if [ -z "$VPS_SSH_PRIVATE_KEY_B64" ]; then
-      echo "❌ VPS_SSH_PRIVATE_KEY_B64 not set"
+    if [ -z "$SSH_PRIVATE_KEY" ]; then
+      echo "❌ SSH_PRIVATE_KEY not set - configure it in GitLab CI/CD variables"
       exit 1
     fi
 
+    # Write SSH key to temporary file
     SSH_KEY_FILE=$(mktemp)
     trap "rm -f $SSH_KEY_FILE" EXIT
-
-    echo "$VPS_SSH_PRIVATE_KEY_B64" | base64 -d > "$SSH_KEY_FILE"
-
-    if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
-      echo "❌ Invalid SSH key format"
-      exit 1
-    fi
-
+    echo "$SSH_PRIVATE_KEY" > "$SSH_KEY_FILE"
     chmod 600 "$SSH_KEY_FILE"
     ssh-add "$SSH_KEY_FILE"
+
+    echo "✅ SSH key loaded successfully"
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
   - ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
 
