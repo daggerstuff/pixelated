@@ -437,9 +437,7 @@ deploy-vps:
     url: https://$VPS_DOMAIN
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
-    when: manual
   - if: $CI_COMMIT_BRANCH == "main"
-    when: manual
   timeout: 15m
 
 # Rollback capability
@@ -538,11 +536,11 @@ cleanup:
     docker system prune -f --filter "until=24h"
     echo "✅ Cleanup completed"
   rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
   - if: $CI_COMMIT_BRANCH == "master"
     when: manual
   - if: $CI_COMMIT_BRANCH == "main"
     when: manual
-  - if: $CI_PIPELINE_SOURCE == "schedule"
   allow_failure: true
   timeout: 10m
 
@@ -580,7 +578,7 @@ build-ai-backend:
   allow_failure: true
   timeout: 15m
 
-# GKE deployment - optimized
+# GKE deployment - optimized (manual only for safety)
 deploy-gke:
   stage: deploy
   image: google/cloud-sdk:alpine
