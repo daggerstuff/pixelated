@@ -118,7 +118,7 @@ export class ThreatCorrelationEngineCore extends EventEmitter implements ThreatC
       logger.info('Redis connection established for correlation engine');
     } catch (error) {
       logger.error('Failed to connect to Redis:', { error });
-      throw new Error('Redis connection failed');
+      throw new Error('Redis connection failed', { cause: error });
     }
   }
 
@@ -130,7 +130,7 @@ export class ThreatCorrelationEngineCore extends EventEmitter implements ThreatC
       logger.info('MongoDB connection established for correlation engine');
     } catch (error) {
       logger.error('Failed to connect to MongoDB:', { error });
-      throw new Error('MongoDB connection failed');
+      throw new Error('MongoDB connection failed', { cause: error });
     }
   }
 
@@ -457,23 +457,34 @@ export class ThreatCorrelationEngineCore extends EventEmitter implements ThreatC
     return 0;
   }
 
-  private compareAttribution(attribution1: any, attribution2: any): number {
+  private compareAttribution(attribution1: unknown, attribution2: unknown): number {
     let score = 0;
     let factors = 0;
     
-    if (attribution1.actor && attribution2.actor) {
-      factors++;
-      score += attribution1.actor === attribution2.actor ? 1 : 0;
-    }
+    // Type guard to check if attribution has the expected structure
+    const isValidAttribution = (attribution: unknown): attribution is {
+      actor?: string;
+      campaign?: string;
+      family?: string
+    } => {
+      return typeof attribution === 'object' && attribution !== null;
+    };
     
-    if (attribution1.campaign && attribution2.campaign) {
-      factors++;
-      score += attribution1.campaign === attribution2.campaign ? 1 : 0;
-    }
-    
-    if (attribution1.family && attribution2.family) {
-      factors++;
-      score += attribution1.family === attribution2.family ? 1 : 0;
+    if (isValidAttribution(attribution1) && isValidAttribution(attribution2)) {
+      if (attribution1.actor && attribution2.actor) {
+        factors++;
+        score += attribution1.actor === attribution2.actor ? 1 : 0;
+      }
+      
+      if (attribution1.campaign && attribution2.campaign) {
+        factors++;
+        score += attribution1.campaign === attribution2.campaign ? 1 : 0;
+      }
+      
+      if (attribution1.family && attribution2.family) {
+        factors++;
+        score += attribution1.family === attribution2.family ? 1 : 0;
+      }
     }
     
     return factors > 0 ? score / factors : 0;
@@ -538,8 +549,21 @@ export class ThreatCorrelationEngineCore extends EventEmitter implements ThreatC
     return count;
   }
 
-  private hasSimilarAttribution(attribution1: any, attribution2: any): boolean {
+  private hasSimilarAttribution(attribution1: unknown, attribution2: unknown): boolean {
     if (!attribution1 || !attribution2) {
+      return false;
+    }
+    
+    // Type guard to check if attribution has the expected structure
+    const isValidAttribution = (attribution: unknown): attribution is {
+      actor?: string;
+      campaign?: string;
+      family?: string
+    } => {
+      return typeof attribution === 'object' && attribution !== null;
+    };
+    
+    if (!isValidAttribution(attribution1) || !isValidAttribution(attribution2)) {
       return false;
     }
     
@@ -782,7 +806,7 @@ export class ThreatCorrelationEngineCore extends EventEmitter implements ThreatC
           $or: [
             { regions: { $in: targetThreat.regions } },
             { severity: targetThreat.severity },
-            { 'indicators.indicatorType': { $in: targetThreat.indicators.map((i: any) => i.indicatorType) } }
+            { 'indicators.indicatorType': { $in: targetThreat.indicators.map((i: { indicatorType: string }) => i.indicatorType) } }
           ]
         })
         .limit(100)
