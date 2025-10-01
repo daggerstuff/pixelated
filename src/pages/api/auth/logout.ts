@@ -7,7 +7,6 @@ import type { APIRoute } from 'astro'
 import { logoutUser } from '../../../lib/auth/better-auth-integration'
 import { authenticateRequest } from '../../../lib/auth/middleware'
 import { logSecurityEvent } from '../../../lib/security'
-import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
@@ -62,9 +61,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       clientInfo,
       timestamp: Date.now(),
     })
-
-    // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(userId, 'user_logged_out')
 
     return new Response(
       JSON.stringify({
