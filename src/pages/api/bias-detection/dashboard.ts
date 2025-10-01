@@ -7,7 +7,7 @@ export const GET = async ({ request }: { request: Request }): Promise<Response> 
   
   try {
     // Parse URL parameters
-    const url = new URL(request.url)
+    
     
     
 
