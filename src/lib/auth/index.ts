@@ -226,10 +226,6 @@ export async function getAuthHealth(): Promise<{
   }
 }
 
-/**
- * Export security event types for external use
- */
-export { SecurityEventType } from '../security'
 
 /**
  * Default export for convenience
