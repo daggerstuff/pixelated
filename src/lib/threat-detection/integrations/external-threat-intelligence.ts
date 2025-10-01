@@ -1206,7 +1206,6 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   }
 }
 
-export { ExternalThreatIntelligenceService };
 export type {
   ThreatIntelligenceConfig,
   ThreatIntelligenceFeed,
