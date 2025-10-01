@@ -462,10 +462,3 @@ export function createComprehensiveRateLimitMiddleware(options: {
 
   return middleware
 }
-
-// Export individual middleware creators
-export {
-  createRateLimitMiddleware,
-  createBetterAuthRateLimitMiddleware,
-  createComprehensiveRateLimitMiddleware
-}

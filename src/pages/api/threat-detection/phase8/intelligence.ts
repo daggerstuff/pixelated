@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { createCompleteThreatDetectionSystem } from '../../../../lib/threat-detection/integrations'
-import { getMongoClient } from '../../../../lib/mongodb'
-import { getRedisClient } from '../../../../lib/redis'
+import { mongoClient } from '@lib/db/mongoClient'
+import { redis } from '@lib/redis'
 import { authenticateRequest } from '../../../../lib/auth'
 import { sanitizeInput } from '../../../../lib/security'
 
@@ -54,8 +54,8 @@ export const GET: APIRoute = async ({ request, url }) => {
 
     // Get database connections (currently unused in this endpoint but kept for future use)
     // Prefix with '_' to satisfy linter about unused variables.
-    const _mongoClient = await getMongoClient()
-    const _redisClient = await getRedisClient()
+    const _mongoClient = mongoClient
+    const _redisClient = redis
 
     // Create mock orchestrator and rate limiter
     const { EventEmitter } = await import('events')
@@ -156,8 +156,8 @@ export const POST: APIRoute = async ({ request }) => {
     })
 
     // Get database connections (unused here but kept for parity with GET)
-    const _mongoClient = await getMongoClient()
-    const _redisClient = await getRedisClient()
+    const _mongoClient = mongoClient
+    const _redisClient = redis
 
     // Create mock orchestrator and rate limiter
     const { EventEmitter } = await import('events')
@@ -259,8 +259,8 @@ export const PUT: APIRoute = async ({ request }) => {
     }
 
     // Get database connections (unused here but kept for parity with other methods)
-    const _mongoClient = await getMongoClient()
-    const _redisClient = await getRedisClient()
+    const _mongoClient = mongoClient
+    const _redisClient = redis
 
     // Create mock orchestrator and rate limiter
     const { EventEmitter } = await import('events')

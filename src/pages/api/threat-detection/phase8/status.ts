@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { createCompleteThreatDetectionSystem } from '../../../../lib/threat-detection/integrations'
-import { getMongoClient } from '../../../../lib/mongodb'
-import { getRedisClient } from '../../../../lib/redis'
+import { mongoClient } from '@lib/db/mongoClient'
+import { redis } from '@lib/redis'
 import { authenticateRequest } from '../../../../lib/auth'
 
 export const GET: APIRoute = async ({ request }) => {
@@ -16,8 +16,8 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Get database connections (unused here — prefix with '_' to satisfy linter)
-    const _mongoClient = await getMongoClient()
-    const _redisClient = await getRedisClient()
+    const _mongoClient = mongoClient
+    const _redisClient = redis
 
     // Create mock orchestrator and rate limiter for status check
     const { EventEmitter } = await import('events')

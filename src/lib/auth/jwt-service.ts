@@ -7,7 +7,7 @@
 import jwt from 'jsonwebtoken'
 import { nanoid } from 'nanoid'
 import { redis, getFromCache, setInCache, removeFromCache } from '../redis'
-import { logSecurityEvent, SecurityEventType } from '../security'
+import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
 // Configuration
