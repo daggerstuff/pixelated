@@ -1064,5 +1064,4 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   }
 }
 
-export { AIEnhancedMonitoringService };
 export type { MonitoringConfig, SecurityMetrics, AIInsight, Alert };
