@@ -261,6 +261,12 @@ export type SecurityEventType =
   | 'therapy_chat_request'
   | 'therapy_chat_response'
   | 'therapy_chat_error'
+  | 'token_created'
+  | 'token_validated'
+  | 'token_validation_failed'
+  | 'token_refreshed'
+  | 'token_revoked'
+  | 'token_cleaned_up'
 
 /**
  * Generate audit log entry for HIPAA compliance

@@ -12,7 +12,7 @@ import { S3Client, } from '@aws-sdk/client-s3';
 import { Compute, DNS, Storage } from '@google-cloud/compute';
 import { RegionConfig } from './MultiRegionDeploymentManager';
 import { logger } from '../../logging';
-import { getConfig } from '../../config';
+
 
 export interface CloudProviderConfig {
   aws?: {

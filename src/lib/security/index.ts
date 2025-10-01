@@ -270,9 +270,12 @@ async function simulateHomomorphicOperation(
 // Export security types and utilities
 export {
   SecurityEventSeverity,
-  SecurityEventType,
+  SecurityEventType as SecurityEventTypeEnum,
   SecurityMonitoringService,
 } from './monitoring'
+
+// Also export the string literal SecurityEventType from main security module
+export type { SecurityEventType } from '../security'
 
 // Export PII detection functionality
 export * from './pii'
