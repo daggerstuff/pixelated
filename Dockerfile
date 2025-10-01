@@ -106,8 +106,8 @@ COPY --chown=astro:astro *.config.* ./
 RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
     chmod -R 755 /tmp/.astro /app/node_modules/.astro
 
-# Build with optimized settings
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+# Build with optimized settings - disable experimental TypeScript stripping for Node 24 compatibility
+ENV NODE_OPTIONS="--max-old-space-size=4096 --no-experimental-strip-types"
 RUN echo "🏗️ Starting optimized build process..." && \
     pnpm build --verbose > /tmp/build.log 2>&1 || (\
         echo "❌ Build failed, debugging..." && \
