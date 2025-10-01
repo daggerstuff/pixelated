@@ -30,8 +30,8 @@ variables:
   KUBERNETES_MEMORY_REQUEST: "2Gi"
   KUBERNETES_MEMORY_LIMIT: "8Gi"
 
-  # Build optimization
-  NODE_OPTIONS: "--max-old-space-size=6144"
+  # Build optimization - disable experimental TypeScript stripping for Node 24 compatibility
+  NODE_OPTIONS: "--max-old-space-size=6144 --no-experimental-strip-types"
   PNPM_CACHE_FOLDER: .pnpm-store
   GIT_STRATEGY: clone
 
