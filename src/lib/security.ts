@@ -78,7 +78,7 @@ export async function initializeSecurity(): Promise<void> {
     }
     logger.error('Failed to initialize security system:', errorDetails)
     throw new Error(
-      `Security initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+      `Security initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
     )
   }
 }
@@ -251,19 +251,22 @@ export function generateSecureSessionKey(): string {
  * HIPAA Security Helper Functions
  */
 
+// Security event types for logging
+export type SecurityEventType =
+  | 'access'
+  | 'message'
+  | 'login'
+  | 'logout'
+  | 'error'
+  | 'therapy_chat_request'
+  | 'therapy_chat_response'
+  | 'therapy_chat_error'
+
 /**
  * Generate audit log entry for HIPAA compliance
  */
 export function logSecurityEvent(
-  eventType:
-    | 'access'
-    | 'message'
-    | 'login'
-    | 'logout'
-    | 'error'
-    | 'therapy_chat_request'
-    | 'therapy_chat_response'
-    | 'therapy_chat_error',
+  eventType: SecurityEventType,
   details: Record<string, string | number | boolean | null | undefined>,
 ): void {
   // Log to console in dev mode

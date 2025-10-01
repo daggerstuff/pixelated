@@ -1282,7 +1282,6 @@ export class ThreatHuntingService extends EventEmitter {
   }
 }
 
-export { ThreatHuntingService };
 export type {
   ThreatHuntingConfig,
   HuntingRule,
