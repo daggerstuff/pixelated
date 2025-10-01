@@ -642,6 +642,11 @@ deploy-gke:
   allow_failure: true
   timeout: 20m
 
+# Override container scanning to ensure it runs after build
+container_scanning:
+  needs:
+    - build-frontend
+
 # Include GitLab security templates
 include:
 - template: Security/SAST.gitlab-ci.yml
