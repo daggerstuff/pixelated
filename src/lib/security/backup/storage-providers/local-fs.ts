@@ -6,7 +6,7 @@
  */
 
 import type { StorageProviderConfig } from '../backup-types'
-import { securePathJoin } from '../../../utils'
+import { securePathJoin } from '../../utils/index'
 import type { Dirent } from 'fs'
 
 interface FileSystem {
