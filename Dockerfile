@@ -55,8 +55,13 @@ FROM base AS deps
 # Switch to non-root user for dependency installation
 USER astro
 
-# Copy package files with proper ownership
-COPY --chown=astro:astro package.json pnpm-lock.yaml ./
+# Copy package files with proper ownership. If pnpm-lock.yaml is not present in the
+# build context (e.g., some CI detached checkouts), fall back to copying only
+# package.json to avoid build failures. This keeps builds resilient while still
+# preferring a lockfile when available.
+RUN if [ -f pnpm-lock.yaml ]; then echo "✅ pnpm-lock.yaml found"; else echo "⚠️ pnpm-lock.yaml not found - continuing without lockfile"; fi
+COPY --chown=astro:astro package.json ./
+COPY --chown=astro:astro pnpm-lock.yaml ./ 2>/dev/null || true
 
 # Configure pnpm store and install dependencies with optimizations
 RUN pnpm config set store-dir /app/.pnpm-store && \
