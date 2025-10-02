@@ -1,58 +1,38 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSession, saveSession } from '@/lib/sessionStore'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method === 'GET') {
-    const sessionId = req.query['id'] as string
-    const session = await getSession(sessionId)
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found' })
-    }
-    return res.status(200).json(session)
+export async function GET(context: any) {
+  const { request } = context
+  const url = new URL(request.url)
+  const sessionId = url.searchParams.get('id')
+  
+  if (!sessionId) {
+    return new Response(JSON.stringify({ error: 'Session ID required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
-  if (req.method === 'POST') {
-    const sessionData = req.body
-    const saved = await saveSession(sessionData)
-    return res.status(201).json(saved)
-  }
-  res.status(405).end()
-}
-
-export async function GET(context: unknown) {
-  if (typeof context !== 'object' || context === null) {
-    throw new Error('Invalid context')
-  }
-  const { request } = context as { request: { query?: { id?: string } } }
-  const sessionId = request.query?.id
-  const session = await import('@/lib/sessionStore').then((m) =>
-    m.getSession(sessionId),
-  )
+  
+  const session = await getSession(sessionId)
   if (!session) {
-    return {
+    return new Response(JSON.stringify({ error: 'Session not found' }), {
       status: 404,
-      json: async () => ({ error: 'Session not found' }),
-    }
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
-  return {
+  
+  return new Response(JSON.stringify(session), {
     status: 200,
-    json: async () => session,
-  }
+    headers: { 'Content-Type': 'application/json' }
+  })
 }
 
-export async function POST(context: unknown) {
-  if (typeof context !== 'object' || context === null) {
-    throw new Error('Invalid context')
-  }
-  const { request } = context as { request: { body: Record<string, unknown> } }
-  const sessionData = request.body
-  const saved = await import('@/lib/sessionStore').then((m) =>
-    m.saveSession(sessionData),
-  )
-  return {
+export async function POST(context: any) {
+  const { request } = context
+  const sessionData = await request.json()
+  
+  const saved = await saveSession(sessionData)
+  return new Response(JSON.stringify(saved), {
     status: 201,
-    json: async () => saved,
-  }
+    headers: { 'Content-Type': 'application/json' }
+  })
 }

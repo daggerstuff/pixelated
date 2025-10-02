@@ -2,8 +2,8 @@ import type { APIRoute } from 'astro'
 import { createCompleteThreatDetectionSystem } from '../../../../lib/threat-detection/integrations'
 import { mongoClient } from '@lib/db/mongoClient'
 import { redis } from '@lib/redis'
-import { authenticateRequest } from '../../../../lib/auth'
-import { sanitizeInput } from '../../../../lib/security'
+import { authenticateRequest } from '../../../../lib/auth/index'
+import { sanitizeInput } from '../../../../lib/auth/utils'
 
 // Allowed IOC types
 type IOCType = 'ip' | 'domain' | 'hash' | 'url'

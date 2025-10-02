@@ -4,7 +4,7 @@
  */
 
 import type { APIRoute } from 'astro'
-import { logoutUser } from '../../../lib/auth/better-auth-integration'
+import { logoutFromBetterAuth } from '../../../lib/auth/better-auth-integration'
 import { authenticateRequest } from '../../../lib/auth/middleware'
 import { logSecurityEvent } from '../../../lib/security'
 import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     // Perform logout
-    await logoutUser(userId, sessionId, clientInfo)
+    await logoutFromBetterAuth(userId, clientInfo)
 
     // Log successful logout
     await logSecurityEvent('USER_LOGOUT', userId, {

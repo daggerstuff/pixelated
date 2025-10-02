@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { RateLimiter } from '../../utils/rate-limiter'
 
 // Create a rate limiter instance
@@ -8,51 +7,45 @@ const limiter = new RateLimiter({
 })
 
 /**
- * Rate limiting middleware for Next.js API routes
+ * Rate limiting middleware for Astro API routes
  *
- * @param req The Next.js API request
- * @param res The Next.js API response
- * @returns A Promise that resolves when the middleware is done
+ * @param request The request object
+ * @returns A Response if rate limited, undefined otherwise
  */
-export function rateLimiter(
-  req: NextApiRequest,
-  res: NextApiResponse,
-): Promise<void> {
-  // Get client IP from headers or direct connection
+export async function rateLimiter(request: Request): Promise<Response | undefined> {
+  // Get client IP from headers
   const ip =
-    req.headers['x-forwarded-for'] ||
-    req.headers['x-real-ip'] ||
-    req.socket.remoteAddress ||
+    request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
     'unknown'
 
   // Use the first IP if x-forwarded-for returns a comma-separated list
-  const clientIp =
-    typeof ip === 'string'
-      ? ip.split(',')[0].trim()
-      : Array.isArray(ip)
-        ? ip[0]
-        : 'unknown'
+  const clientIp = ip.split(',')[0].trim()
 
   // Check rate limit for this IP
-  return limiter.check(clientIp).then((result) => {
-    // Set rate limit headers
-    res.setHeader('X-RateLimit-Limit', result.limit.toString())
-    res.setHeader('X-RateLimit-Remaining', result.remaining.toString())
-    res.setHeader('X-RateLimit-Reset', result.reset.toString())
+  const result = await limiter.check(clientIp)
 
-    // If rate limit is exceeded, return 429 Too Many Requests
-    if (!result.success) {
-      res.status(429).json({
+  // If rate limit is exceeded, return 429 Too Many Requests
+  if (!result.success) {
+    return new Response(
+      JSON.stringify({
         error: 'Too Many Requests',
         message: 'Rate limit exceeded. Please try again later.',
         retryAfter: Math.ceil((result.reset - Date.now()) / 1000),
-      })
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RateLimit-Limit': result.limit.toString(),
+          'X-RateLimit-Remaining': result.remaining.toString(),
+          'X-RateLimit-Reset': result.reset.toString(),
+          'Retry-After': Math.ceil((result.reset - Date.now()) / 1000).toString(),
+        },
+      }
+    )
+  }
 
-      // This is a rejected promise to stop handling the request
-      return Promise.reject('Rate limit exceeded')
-    }
-
-    // Continue processing the request
-    return Promise.resolve()
-  })
+  // Continue processing the request
+  return undefined
 }
