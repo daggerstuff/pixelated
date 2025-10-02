@@ -113,63 +113,63 @@ cache: &global_cache
     # Disable TLS for internal communication
     DOCKER_TLS: "false"
   before_script:
-    - echo "🔍 Waiting for Docker service to be ready..."
-    - |
-      # Enhanced Docker connectivity check with better error handling
-      echo "🔍 Checking network connectivity..."
-      
-      # Test DNS resolution first
-      if nslookup docker >/dev/null 2>&1; then
-        echo "✅ Docker hostname resolves successfully"
-      else
-        echo "❌ Docker hostname resolution failed"
-        echo "🔍 Checking /etc/hosts and DNS configuration..."
-        cat /etc/hosts || true
-        cat /etc/resolv.conf || true
-        echo "🔍 Testing alternative DNS resolution..."
-        nslookup docker 8.8.8.8 || true
+  - echo "🔍 Waiting for Docker service to be ready..."
+  - |
+    # Enhanced Docker connectivity check with better error handling
+    echo "🔍 Checking network connectivity..."
+
+    # Test DNS resolution first
+    if nslookup docker >/dev/null 2>&1; then
+      echo "✅ Docker hostname resolves successfully"
+    else
+      echo "❌ Docker hostname resolution failed"
+      echo "🔍 Checking /etc/hosts and DNS configuration..."
+      cat /etc/hosts || true
+      cat /etc/resolv.conf || true
+      echo "🔍 Testing alternative DNS resolution..."
+      nslookup docker 8.8.8.8 || true
+    fi
+
+    # Test port connectivity
+    if nc -z docker 2375 >/dev/null 2>&1; then
+      echo "✅ Docker port 2375 is reachable"
+    else
+      echo "❌ Docker port 2375 is not reachable"
+      echo "🔍 Testing network connectivity..."
+      ping -c 1 docker || echo "❌ Cannot ping docker service"
+    fi
+
+    # Wait for Docker daemon to be ready with extended timeout
+    echo "⏳ Waiting for Docker daemon to be ready..."
+    for i in {1..60}; do
+      if docker info >/dev/null 2>&1; then
+        echo "✅ Docker daemon is ready after $i attempts"
+        break
       fi
-      
-      # Test port connectivity
-      if nc -z docker 2375 >/dev/null 2>&1; then
-        echo "✅ Docker port 2375 is reachable"
-      else
-        echo "❌ Docker port 2375 is not reachable"
-        echo "🔍 Testing network connectivity..."
-        ping -c 1 docker || echo "❌ Cannot ping docker service"
-      fi
-      
-      # Wait for Docker daemon to be ready with extended timeout
-      echo "⏳ Waiting for Docker daemon to be ready..."
-      for i in {1..60}; do
-        if docker info >/dev/null 2>&1; then
-          echo "✅ Docker daemon is ready after $i attempts"
-          break
-        fi
-        echo "⏳ Waiting for Docker daemon... ($i/60)"
-        sleep 2
-      done
-      
-      # Final comprehensive check
-      if ! docker info >/dev/null 2>&1; then
-        echo "❌ Docker daemon failed to start after 120 seconds"
-        echo "🔍 Debugging Docker service status..."
-        
-        # Try to get more information about the failure
-        echo "🔍 Attempting direct API call..."
-        curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
-        
-        echo "🔍 Checking service status..."
-        ps aux | grep docker || true
-        
-        echo "🔍 Network debugging..."
-        netstat -tlnp || true
-        ss -tlnp || true
-        
-        exit 1
-      fi
-      
-      echo "✅ Docker service validation complete"
+      echo "⏳ Waiting for Docker daemon... ($i/60)"
+      sleep 2
+    done
+
+    # Final comprehensive check
+    if ! docker info >/dev/null 2>&1; then
+      echo "❌ Docker daemon failed to start after 120 seconds"
+      echo "🔍 Debugging Docker service status..."
+
+      # Try to get more information about the failure
+      echo "🔍 Attempting direct API call..."
+      curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
+
+      echo "🔍 Checking service status..."
+      ps aux | grep docker || true
+
+      echo "🔍 Network debugging..."
+      netstat -tlnp || true
+      ss -tlnp || true
+
+      exit 1
+    fi
+
+    echo "✅ Docker service validation complete"
 
 # Registry login template
 .registry_login: &registry_login
@@ -196,64 +196,64 @@ validate-runner:
     # Disable TLS for internal communication
     DOCKER_TLS: "false"
   before_script:
-    - echo "🔍 Waiting for Docker service to be ready..."
-    - |
-      # Enhanced Docker connectivity check with better error handling
-      echo "🔍 Checking network connectivity..."
-      
-      # Test DNS resolution first
-      if nslookup docker >/dev/null 2>&1; then
-        echo "✅ Docker hostname resolves successfully"
-      else
-        echo "❌ Docker hostname resolution failed"
-        echo "🔍 Checking /etc/hosts and DNS configuration..."
-        cat /etc/hosts || true
-        cat /etc/resolv.conf || true
-        echo "🔍 Testing alternative DNS resolution..."
-        nslookup docker 8.8.8.8 || true
+  - echo "🔍 Waiting for Docker service to be ready..."
+  - |
+    # Enhanced Docker connectivity check with better error handling
+    echo "🔍 Checking network connectivity..."
+
+    # Test DNS resolution first
+    if nslookup docker >/dev/null 2>&1; then
+      echo "✅ Docker hostname resolves successfully"
+    else
+      echo "❌ Docker hostname resolution failed"
+      echo "🔍 Checking /etc/hosts and DNS configuration..."
+      cat /etc/hosts || true
+      cat /etc/resolv.conf || true
+      echo "🔍 Testing alternative DNS resolution..."
+      nslookup docker 8.8.8.8 || true
+    fi
+
+    # Test port connectivity
+    if nc -z docker 2375 >/dev/null 2>&1; then
+      echo "✅ Docker port 2375 is reachable"
+    else
+      echo "❌ Docker port 2375 is not reachable"
+      echo "🔍 Testing network connectivity..."
+      ping -c 1 docker || echo "❌ Cannot ping docker service"
+    fi
+
+    # Wait for Docker daemon to be ready with extended timeout
+    echo "⏳ Waiting for Docker daemon to be ready..."
+    for i in {1..60}; do
+      if docker info >/dev/null 2>&1; then
+        echo "✅ Docker daemon is ready after $i attempts"
+        break
       fi
-      
-      # Test port connectivity
-      if nc -z docker 2375 >/dev/null 2>&1; then
-        echo "✅ Docker port 2375 is reachable"
-      else
-        echo "❌ Docker port 2375 is not reachable"
-        echo "🔍 Testing network connectivity..."
-        ping -c 1 docker || echo "❌ Cannot ping docker service"
-      fi
-      
-      # Wait for Docker daemon to be ready with extended timeout
-      echo "⏳ Waiting for Docker daemon to be ready..."
-      for i in {1..60}; do
-        if docker info >/dev/null 2>&1; then
-          echo "✅ Docker daemon is ready after $i attempts"
-          break
-        fi
-        echo "⏳ Waiting for Docker daemon... ($i/60)"
-        sleep 2
-      done
-      
-      # Final comprehensive check
-      if ! docker info >/dev/null 2>&1; then
-        echo "❌ Docker daemon failed to start after 120 seconds"
-        echo "🔍 Debugging Docker service status..."
-        
-        # Try to get more information about the failure
-        echo "🔍 Attempting direct API call..."
-        curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
-        
-        echo "🔍 Checking service status..."
-        ps aux | grep docker || true
-        
-        echo "🔍 Network debugging..."
-        netstat -tlnp || true
-        ss -tlnp || true
-        
-        exit 1
-      fi
+      echo "⏳ Waiting for Docker daemon... ($i/60)"
+      sleep 2
+    done
+
+    # Final comprehensive check
+    if ! docker info >/dev/null 2>&1; then
+      echo "❌ Docker daemon failed to start after 120 seconds"
+      echo "🔍 Debugging Docker service status..."
+
+      # Try to get more information about the failure
+      echo "🔍 Attempting direct API call..."
+      curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
+
+      echo "🔍 Checking service status..."
+      ps aux | grep docker || true
+
+      echo "🔍 Network debugging..."
+      netstat -tlnp || true
+      ss -tlnp || true
+
+      exit 1
+    fi
   script: |
     echo "🔍 Validating GitLab runner capabilities..."
-    
+
     # Detect OS and install packages accordingly
     if command -v apk >/dev/null 2>&1; then
       # Alpine Linux
@@ -267,13 +267,13 @@ validate-runner:
     else
       echo "⚠️ Unknown package manager, skipping package installation"
     fi
-    
+
     # Enhanced Docker validation with better error handling
     echo "🔍 Testing Docker connectivity..."
     if docker version >/dev/null 2>&1; then
       echo "✅ Docker client version:"
       docker version --format 'Client: {{.Client.Version}}'
-      
+
       echo "✅ Docker server info:"
       docker info --format 'Server Version: {{.ServerVersion}}'
       echo "Storage Driver: $(docker info --format '{{.Driver}}')"
@@ -283,7 +283,7 @@ validate-runner:
     else
       echo "❌ Docker connectivity test failed"
       echo "🔍 Attempting to diagnose the issue..."
-      
+
       # Test network connectivity to Docker service
       if ping -c 1 docker >/dev/null 2>&1; then
         echo "✅ Docker hostname resolves"
@@ -292,17 +292,17 @@ validate-runner:
         echo "Available services:"
         cat /etc/hosts || true
       fi
-      
+
       # Test port connectivity
       if nc -z docker 2375 >/dev/null 2>&1; then
         echo "✅ Docker port 2375 is reachable"
       else
         echo "❌ Docker port 2375 is not reachable"
       fi
-      
+
       exit 1
     fi
-    
+
     echo "✅ Runner validation complete"
     echo "Runner: $CI_RUNNER_DESCRIPTION"
     echo "Executor: $CI_RUNNER_EXECUTOR"
@@ -341,6 +341,11 @@ build-frontend:
   script:
   - echo "🏗️ Building optimized frontend container..."
   - |
+    # Note: we intentionally avoid trying to generate pnpm-lock.yaml from inside
+    # this docker client container because mounts into the docker-in-docker daemon
+    # are not host-accessible in this runner setup. The Dockerfile has been
+    # adjusted to not require a lockfile in the build context when it's not
+    # committed to the repository.
     # Create buildx builder with caching
     docker buildx create --use --name multiarch-builder --driver docker-container || docker buildx use multiarch-builder
 
@@ -822,7 +827,7 @@ deploy-gke:
 # Override container scanning to ensure it runs after build
 container_scanning:
   needs:
-    - build-frontend
+  - build-frontend
 
 # Include GitLab security templates
 include:
