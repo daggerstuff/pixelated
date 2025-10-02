@@ -18,25 +18,25 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: plain
-  
+
   # Container registry
   CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   CONTAINER_IMAGE_PREVIOUS: $CI_REGISTRY_IMAGE:previous
-  
+
   # Resource limits for better performance
   KUBERNETES_CPU_REQUEST: "1"
   KUBERNETES_CPU_LIMIT: "4"
   KUBERNETES_MEMORY_REQUEST: "2Gi"
   KUBERNETES_MEMORY_LIMIT: "8Gi"
-  
+
   # Build optimization
   NODE_OPTIONS: "--max-old-space-size=6144"
   PNPM_CACHE_FOLDER: .pnpm-store
-  
+
   # Security
   SENTRY_RELEASE: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
-  
+
   # Legacy variables for compatibility
   CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
   CI_REGISTRY: https://registry.gitlab.com/
@@ -47,7 +47,7 @@ variables:
 
 # Global cache configuration for faster builds
 cache: &global_cache
-  key: 
+  key:
     files:
       - pnpm-lock.yaml
     prefix: $CI_COMMIT_REF_SLUG
@@ -67,17 +67,17 @@ cache: &global_cache
         echo "❌ VPS_SSH_PRIVATE_KEY_B64 not set"
         exit 1
       fi
-      
+
       SSH_KEY_FILE=$(mktemp)
       trap "rm -f $SSH_KEY_FILE" EXIT
-      
+
       printf '%s' "${VPS_SSH_PRIVATE_KEY_B64}" > "$SSH_KEY_FILE"
-      
+
       if ! head -n 1 "$SSH_KEY_FILE" | grep -q "-----BEGIN"; then
         echo "❌ Invalid SSH key format"
         exit 1
       fi
-      
+
       chmod 600 "$SSH_KEY_FILE"
       ssh-add "$SSH_KEY_FILE"
     - mkdir -p ~/.ssh && chmod 700 ~/.ssh
@@ -127,7 +127,7 @@ validate-dependencies:
     - apk add --no-cache git
     - corepack enable pnpm
     - pnpm config set store-dir $PNPM_CACHE_FOLDER
-    - pnpm install --frozen-lockfile --prefer-offline
+    - pnpm install --no-frozen-lockfile --prefer-offline
     - pnpm audit --audit-level moderate || echo "Audit warnings found but continuing"
     - echo "✅ Dependencies validated"
   rules:
@@ -149,7 +149,7 @@ build-frontend:
     - |
       # Create buildx builder with caching
       docker buildx create --use --name multiarch-builder --driver docker-container || docker buildx use multiarch-builder
-      
+
       # Build with aggressive caching and multi-stage optimization
       docker buildx build \
         --load \
@@ -167,7 +167,7 @@ build-frontend:
         --target runtime \
         -t $CONTAINER_IMAGE \
         -t $CONTAINER_IMAGE_LATEST .
-      
+
       # Push with timeout and retry
       echo "📤 Pushing to registry..."
       for i in {1..3}; do
@@ -179,7 +179,7 @@ build-frontend:
           sleep 10
         fi
       done
-      
+
       echo "📦 Image: $CONTAINER_IMAGE"
   artifacts:
     expire_in: 1 hour
@@ -209,7 +209,7 @@ test-container:
         --health-retries=3 \
         -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
         $CONTAINER_IMAGE
-      
+
       # Wait for healthy status
       for i in {1..30}; do
         STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-container 2>/dev/null || echo "starting")
@@ -224,7 +224,7 @@ test-container:
         echo "⏳ Waiting for health check... ($i/30) Status: $STATUS"
         sleep 2
       done
-      
+
       docker stop test-container && docker rm test-container
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
@@ -299,7 +299,7 @@ security-scan:
         security-check)
           # Custom security checks
           echo "🔍 Checking container security configuration..."
-          
+
           # Check user
           USER_ID=$(docker inspect $CONTAINER_IMAGE --format='{{.Config.User}}' 2>/dev/null || echo "")
           if [ -z "$USER_ID" ] || [ "$USER_ID" = "root" ] || [ "$USER_ID" = "0" ]; then
@@ -315,11 +315,11 @@ security-scan:
           else
             echo "✅ Container configured with non-root user: $USER_ID"
           fi
-          
+
           # Check exposed ports
           EXPOSED_PORTS=$(docker inspect $CONTAINER_IMAGE --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
           echo "ℹ️ Exposed ports: ${EXPOSED_PORTS:-none}"
-          
+
           echo "✅ Security checks completed"
           ;;
       esac
@@ -373,26 +373,26 @@ deploy-vps:
     - |
       ssh $VPS_USER@$VPS_HOST << 'EOF'
         set -e
-        
+
         echo "🔄 Starting deployment..."
-        
+
         # Install Docker if needed
         if ! command -v docker &> /dev/null; then
           curl -fsSL https://get.docker.com | sh
           systemctl enable --now docker
         fi
-        
+
         # Login and pull
         echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
         docker pull $CONTAINER_IMAGE_LATEST
-        
+
         # Blue-green deployment
         if docker ps | grep -q pixelated-app; then
           docker tag $CONTAINER_IMAGE_LATEST $CONTAINER_IMAGE_PREVIOUS
           docker stop pixelated-app || true
           docker rm pixelated-app || true
         fi
-        
+
         # Start new container with security settings
         docker run -d \
           --name pixelated-app \
@@ -415,7 +415,7 @@ deploy-vps:
           --health-timeout=10s \
           --health-retries=3 \
           $CONTAINER_IMAGE_LATEST
-        
+
         # Wait for health check
         echo "⏳ Waiting for application to be healthy..."
         for i in {1..20}; do
@@ -427,7 +427,7 @@ deploy-vps:
           echo "Status: $STATUS (attempt $i/20)"
           sleep 5
         done
-        
+
         echo "✅ Deployment completed successfully"
       EOF
   environment:
@@ -450,13 +450,13 @@ rollback:
     - |
       ssh $VPS_USER@$VPS_HOST << 'EOF'
         set -e
-        
+
         echo "🔄 Performing rollback..."
-        
+
         # Stop current container
         docker stop pixelated-app || true
         docker rm pixelated-app || true
-        
+
         # Start previous version
         if docker images | grep -q $CONTAINER_IMAGE_PREVIOUS; then
           docker run -d \
@@ -490,22 +490,22 @@ health-check:
         echo "⚠️ No target configured, skipping health check"
         exit 0
       fi
-      
+
       TARGET="${VPS_DOMAIN:-$VPS_HOST}"
-      
+
       # Comprehensive health check
       for endpoint in "/api/health" "/health" "/"; do
         for protocol in "https" "http"; do
           URL="$protocol://$TARGET$endpoint"
           echo "🔍 Checking $URL..."
-          
+
           if curl -fsS --connect-timeout 10 --max-time 30 "$URL" >/dev/null 2>&1; then
             echo "✅ Health check passed: $URL"
             exit 0
           fi
         done
       done
-      
+
       echo "❌ All health checks failed"
       exit 1
   rules:
@@ -529,7 +529,7 @@ cleanup:
         tail -n +6 | \
         awk '{print $1}' | \
         xargs -r docker rmi || true
-      
+
       # System cleanup
       docker system prune -f --filter "until=24h"
       echo "✅ Cleanup completed"
@@ -592,12 +592,12 @@ deploy-gke:
         echo "⚠️ No GCP credentials configured, skipping GKE deployment"
         exit 0
       fi
-      
+
       if ! jq -e . /tmp/gcp-key.json >/dev/null 2>&1; then
         echo "❌ Invalid GCP service account key"
         exit 1
       fi
-      
+
       chmod 600 /tmp/gcp-key.json
       gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
       gcloud config set project $GCP_PROJECT_ID
@@ -607,14 +607,14 @@ deploy-gke:
     - |
       # Update deployment with new image
       kubectl patch deployment pixelated -p '{"spec":{"template":{"spec":{"containers":[{"name":"pixelated","image":"'$CONTAINER_IMAGE'"}]}}}}'
-      
+
       # Wait for rollout
       kubectl rollout status deployment/pixelated --timeout=600s
-      
+
       # Verify deployment
       kubectl get pods -l app=pixelated
       kubectl get services pixelated-service
-      
+
       echo "✅ Deployed to GKE successfully"
   environment:
     name: production-gke

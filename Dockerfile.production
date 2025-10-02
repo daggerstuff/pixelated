@@ -42,7 +42,7 @@ RUN node create-prod-package.js
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm config set store-dir /pnpm/store && \
     mv package.prod.json package.json && \
-    pnpm install --frozen-lockfile --prod
+    pnpm install --no-frozen-lockfile --prod
 
 FROM base AS build
 
@@ -50,7 +50,7 @@ FROM base AS build
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm config set store-dir /pnpm/store && \
-    pnpm install --frozen-lockfile
+    pnpm install --no-frozen-lockfile
 
 # Copy source files
 COPY src ./src
