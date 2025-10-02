@@ -100,7 +100,7 @@ cache: &global_cache
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4" ]
+    command: [ "--tls=false", "--experimental=false", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
@@ -108,6 +108,9 @@ cache: &global_cache
   before_script:
     - echo "🔍 Waiting for Docker service to be ready..."
     - |
+      # Install required tools for debugging
+      apk add --no-cache curl netcat-openbsd bind-tools
+      
       # Enhanced Docker connectivity check with better error handling
       echo "🔍 Checking network connectivity..."
 
@@ -135,7 +138,7 @@ cache: &global_cache
       # Wait for Docker daemon to be ready with extended timeout
       echo "⏳ Waiting for Docker daemon to be ready..."
       for i in {1..60}; do
-        if docker info >/dev/null 2>&1; then
+        if docker version >/dev/null 2>&1; then
           echo "✅ Docker daemon is ready after $i attempts"
           break
         fi
@@ -144,25 +147,27 @@ cache: &global_cache
       done
 
       # Final comprehensive check
-      if ! docker info >/dev/null 2>&1; then
+      if ! docker version >/dev/null 2>&1; then
         echo "❌ Docker daemon failed to start after 120 seconds"
         echo "🔍 Debugging Docker service status..."
 
         # Try to get more information about the failure
         echo "🔍 Attempting direct API call..."
-        curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
+        curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
 
         echo "🔍 Checking service status..."
         ps aux | grep docker || true
 
         echo "🔍 Network debugging..."
-        netstat -tlnp || true
-        ss -tlnp || true
+        netstat -tlnp 2>/dev/null || true
+        ss -tlnp 2>/dev/null || true
 
         exit 1
       fi
 
       echo "✅ Docker service validation complete"
+      echo "Docker version info:"
+      docker version
 
 # Registry login template
 .registry_login: &registry_login
@@ -176,15 +181,17 @@ validate-runner:
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4" ]
+    command: [ "--tls=false", "--experimental=false", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock" ]
   variables:
-    # Use direct IP from /etc/hosts to avoid DNS resolution issues
-    DOCKER_HOST: tcp://172.17.0.2:2375
+    DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
     DOCKER_DRIVER: overlay2
   before_script:
     - echo "🔍 Waiting for Docker service to be ready..."
     - |
+      # Install required tools for debugging
+      apk add --no-cache curl netcat-openbsd bind-tools
+      
       # Enhanced Docker connectivity check with better error handling
       echo "🔍 Checking network connectivity..."
 
@@ -212,7 +219,7 @@ validate-runner:
       # Wait for Docker daemon to be ready with extended timeout
       echo "⏳ Waiting for Docker daemon to be ready..."
       for i in {1..60}; do
-        if docker info >/dev/null 2>&1; then
+        if docker version >/dev/null 2>&1; then
           echo "✅ Docker daemon is ready after $i attempts"
           break
         fi
@@ -221,20 +228,20 @@ validate-runner:
       done
 
       # Final comprehensive check
-      if ! docker info >/dev/null 2>&1; then
+      if ! docker version >/dev/null 2>&1; then
         echo "❌ Docker daemon failed to start after 120 seconds"
         echo "🔍 Debugging Docker service status..."
 
         # Try to get more information about the failure
         echo "🔍 Attempting direct API call..."
-        curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
+        curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
 
         echo "🔍 Checking service status..."
         ps aux | grep docker || true
 
         echo "🔍 Network debugging..."
-        netstat -tlnp || true
-        ss -tlnp || true
+        netstat -tlnp 2>/dev/null || true
+        ss -tlnp 2>/dev/null || true
 
         exit 1
       fi
@@ -244,13 +251,13 @@ validate-runner:
     # Detect OS and install packages accordingly
     if command -v apk >/dev/null 2>&1; then
       # Alpine Linux
-      apk add --no-cache openssh-client git curl
+      apk add --no-cache openssh-client git curl netcat-openbsd bind-tools
     elif command -v apt-get >/dev/null 2>&1; then
       # Debian/Ubuntu
-      apt-get update -qq && apt-get install -y -qq openssh-client git curl
+      apt-get update -qq && apt-get install -y -qq openssh-client git curl netcat-openbsd dnsutils
     elif command -v yum >/dev/null 2>&1; then
       # RHEL/CentOS
-      yum install -y -q openssh-clients git curl
+      yum install -y -q openssh-clients git curl nmap-ncat bind-utils
     else
       echo "⚠️ Unknown package manager, skipping package installation"
     fi
@@ -262,11 +269,15 @@ validate-runner:
       docker version --format 'Client: {{.Client.Version}}'
 
       echo "✅ Docker server info:"
-      docker info --format 'Server Version: {{.ServerVersion}}'
-      echo "Storage Driver: $(docker info --format '{{.Driver}}')"
-      echo "Architecture: $(docker info --format '{{.Architecture}}')"
-      echo "CPUs: $(docker info --format '{{.NCPU}}')"
-      echo "Memory: $(docker info --format '{{.MemTotal}}')"
+      docker version --format 'Server: {{.Server.Version}}'
+      
+      # Try to get additional info if available
+      if docker info >/dev/null 2>&1; then
+        echo "Storage Driver: $(docker info --format '{{.Driver}}')"
+        echo "Architecture: $(docker info --format '{{.Architecture}}')"
+        echo "CPUs: $(docker info --format '{{.NCPU}}')"
+        echo "Memory: $(docker info --format '{{.MemTotal}}')"
+      fi
     else
       echo "❌ Docker connectivity test failed"
       echo "🔍 Attempting to diagnose the issue..."
@@ -286,6 +297,13 @@ validate-runner:
       else
         echo "❌ Docker port 2375 is not reachable"
       fi
+
+      # Additional debugging
+      echo "🔍 Checking Docker service status..."
+      ps aux | grep docker || true
+      
+      echo "🔍 Network configuration:"
+      netstat -tlnp 2>/dev/null || ss -tlnp 2>/dev/null || true
 
       exit 1
     fi
