@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import type { APIContext } from 'astro'
 import { POST as registerHandler } from '../../../pages/api/auth/register'
 import { POST as loginHandler } from '../../../pages/api/auth/login'
 import { POST as logoutHandler } from '../../../pages/api/auth/logout'
@@ -12,7 +13,6 @@ import {
   authenticateRequest,
   requireRole,
 } from '../middleware'
-import { NextRequest } from 'next/server'
 
 // Mock dependencies
 vi.mock('../../redis', () => ({
@@ -83,7 +83,7 @@ describe('Authentication System Integration', () => {
       })
 
       // Step 1: Register new user
-      const registerRequest = new NextRequest('https://example.com/api/auth/register', {
+      const registerRequest = new Request('https://example.com/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ describe('Authentication System Integration', () => {
     const { user } = registerData
 
       // Step 2: Login with registered user
-      const loginRequest = new NextRequest('https://example.com/api/auth/login', {
+      const loginRequest = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ describe('Authentication System Integration', () => {
         expect(loginData.tokenPair).toBeDefined()
 
       // Step 3: Refresh token
-      const refreshRequest = new NextRequest('https://example.com/api/auth/refresh', {
+      const refreshRequest = new Request('https://example.com/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -185,7 +185,7 @@ describe('Authentication System Integration', () => {
       expect(refreshData.tokenPair.accessToken).not.toBe(loginData.tokenPair.accessToken)
 
       // Step 4: Logout
-      const logoutRequest = new NextRequest('https://example.com/api/auth/logout', {
+      const logoutRequest = new Request('https://example.com/api/auth/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ describe('Authentication System Integration', () => {
         return null
       })
 
-      const loginRequest = new NextRequest('https://example.com/api/auth/login', {
+      const loginRequest = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ describe('Authentication System Integration', () => {
       })
 
       // Test with invalid CSRF token
-      const loginRequest = new NextRequest('https://example.com/api/auth/login', {
+      const loginRequest = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -299,7 +299,7 @@ describe('Authentication System Integration', () => {
         isActive: true,
       })
 
-      const request = new NextRequest('https://example.com/api/protected', {
+      const request = new Request('https://example.com/api/protected', {
         headers: {
           'Authorization': 'Bearer valid-token',
         },
@@ -321,7 +321,7 @@ describe('Authentication System Integration', () => {
       }
 
       const authenticatedRequest = {
-        ...new NextRequest('https://example.com/api/admin'),
+        ...new Request('https://example.com/api/admin'),
         user: mockUser,
         tokenId: 'token123',
       } as any
@@ -355,7 +355,7 @@ describe('Authentication System Integration', () => {
         return null
       })
 
-      const registerRequest = new NextRequest('https://example.com/api/auth/register', {
+      const registerRequest = new Request('https://example.com/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -398,7 +398,7 @@ describe('Authentication System Integration', () => {
       ]
 
       for (const weakPassword of weakPasswords) {
-        const registerRequest = new NextRequest('https://example.com/api/auth/register', {
+        const registerRequest = new Request('https://example.com/api/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -437,7 +437,7 @@ describe('Authentication System Integration', () => {
       })
 
       const start1 = performance.now()
-      const request1 = new NextRequest('https://example.com/api/auth/login', {
+      const request1 = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -477,7 +477,7 @@ describe('Authentication System Integration', () => {
       vi.mocked(bcrypt.compare).mockResolvedValue(false)
 
       const start2 = performance.now()
-      const request2 = new NextRequest('https://example.com/api/auth/login', {
+      const request2 = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -517,7 +517,7 @@ describe('Authentication System Integration', () => {
         return null
       })
 
-      const registerRequest = new NextRequest('https://example.com/api/auth/register', {
+      const registerRequest = new Request('https://example.com/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -565,7 +565,7 @@ describe('Authentication System Integration', () => {
 
       vi.mocked(bcrypt.compare).mockResolvedValue(true as any)
 
-      const loginRequest = new NextRequest('https://example.com/api/auth/login', {
+      const loginRequest = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -621,7 +621,7 @@ describe('Authentication System Integration', () => {
       const bcrypt = await import('bcryptjs')
       vi.mocked(bcrypt.compare).mockResolvedValue(true as any)
 
-      const loginRequest = new NextRequest('https://example.com/api/auth/login', {
+      const loginRequest = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -669,7 +669,7 @@ describe('Authentication System Integration', () => {
       const bcrypt = await import('bcryptjs')
       vi.mocked(bcrypt.compare).mockResolvedValue(true as any)
 
-      const loginRequest = new NextRequest('https://example.com/api/auth/login', {
+      const loginRequest = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -709,7 +709,7 @@ describe('Authentication System Integration', () => {
         return true
       })
 
-      const registerRequest = new NextRequest('https://example.com/api/auth/register', {
+      const registerRequest = new Request('https://example.com/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -748,7 +748,7 @@ describe('Authentication System Integration', () => {
         return null
       })
 
-      const registerRequest = new NextRequest('https://example.com/api/auth/register', {
+      const registerRequest = new Request('https://example.com/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -798,7 +798,7 @@ describe('Authentication System Integration', () => {
 
       vi.mocked(bcrypt.compare).mockResolvedValue(true as any)
 
-      const loginRequest = new NextRequest('https://example.com/api/auth/login', {
+      const loginRequest = new Request('https://example.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -826,7 +826,7 @@ describe('Authentication System Integration', () => {
     it('should track token refresh events', async () => {
       const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
 
-      const refreshRequest = new NextRequest('https://example.com/api/auth/refresh', {
+      const refreshRequest = new Request('https://example.com/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { NextRequest, NextResponse } from 'next/server'
+import type { APIContext } from 'astro'
 import { 
   authenticateRequest, 
   requireRole, 
@@ -45,14 +45,14 @@ vi.mock('../../mcp/phase6-integration', () => ({
 }))
 
 describe('Authentication Middleware', () => {
-  let mockRequest: NextRequest
-  let _mockResponse: NextResponse
+  let mockRequest: Request
+  let _mockResponse: Response
 
   beforeEach(() => {
     vi.clearAllMocks()
     
     // Create mock request
-    mockRequest = new NextRequest('https://example.com/api/test', {
+    mockRequest = new Request('https://example.com/api/test', {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer valid-token',
@@ -63,7 +63,9 @@ describe('Authentication Middleware', () => {
     })
 
     // Create mock response
-    _mockResponse = NextResponse.json({ success: true })
+    _mockResponse = new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
   })
 
   afterEach(() => {
@@ -99,7 +101,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should reject request without authorization header', async () => {
-      const requestWithoutAuth = new NextRequest('https://example.com/api/test')
+      const requestWithoutAuth = new Request('https://example.com/api/test')
 
       const result = await authenticateRequest(requestWithoutAuth)
 
@@ -109,7 +111,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should reject request with invalid token format', async () => {
-      const requestWithInvalidToken = new NextRequest('https://example.com/api/test', {
+      const requestWithInvalidToken = new Request('https://example.com/api/test', {
         headers: {
           'Authorization': 'InvalidFormat token',
         },
@@ -473,7 +475,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should handle requests without IP headers', async () => {
-      const requestWithoutIP = new NextRequest('https://example.com/api/test', {
+      const requestWithoutIP = new Request('https://example.com/api/test', {
         headers: {
           'User-Agent': 'Mozilla/5.0',
         },
@@ -493,7 +495,7 @@ describe('Authentication Middleware', () => {
 
   describe('csrfProtection', () => {
     it('should allow GET requests without CSRF token', async () => {
-      const getRequest = new NextRequest('https://example.com/api/test', {
+      const getRequest = new Request('https://example.com/api/test', {
         method: 'GET',
       })
 
@@ -504,7 +506,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should allow POST requests with valid CSRF token', async () => {
-      const postRequest = new NextRequest('https://example.com/api/test', {
+      const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
           'X-CSRF-Token': 'valid-csrf-token',
@@ -527,7 +529,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should reject POST requests without CSRF token', async () => {
-      const postRequest = new NextRequest('https://example.com/api/test', {
+      const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
       })
 
@@ -539,7 +541,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should reject POST requests with invalid CSRF token', async () => {
-      const postRequest = new NextRequest('https://example.com/api/test', {
+      const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
           'X-CSRF-Token': 'invalid-token',
@@ -563,7 +565,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should reject expired CSRF tokens', async () => {
-      const postRequest = new NextRequest('https://example.com/api/test', {
+      const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
           'X-CSRF-Token': 'expired-token',
@@ -587,7 +589,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should log CSRF violations', async () => {
-      const postRequest = new NextRequest('https://example.com/api/test', {
+      const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
           'X-CSRF-Token': 'invalid-token',
@@ -621,7 +623,7 @@ describe('Authentication Middleware', () => {
       for (const method of methods) {
         vi.clearAllMocks()
         
-        const request = new NextRequest('https://example.com/api/test', {
+        const request = new Request('https://example.com/api/test', {
           method,
           headers: {
             'X-CSRF-Token': 'valid-token',
@@ -646,7 +648,9 @@ describe('Authentication Middleware', () => {
 
   describe('securityHeaders', () => {
     it('should add security headers to response', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -658,7 +662,9 @@ describe('Authentication Middleware', () => {
     })
 
     it('should add Content-Security-Policy header', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -670,7 +676,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should add HIPAA-compliant headers for healthcare data', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -680,7 +686,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should remove sensitive headers', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
       response.headers.set('X-Powered-By', 'Express')
       response.headers.set('Server', 'Apache')
 
@@ -691,7 +697,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should handle requests without existing response headers', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -700,13 +706,13 @@ describe('Authentication Middleware', () => {
     })
 
     it('should add CORS headers for API requests', async () => {
-      const apiRequest = new NextRequest('https://example.com/api/test', {
+      const apiRequest = new Request('https://example.com/api/test', {
         headers: {
           'Origin': 'https://app.example.com',
         },
       })
 
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
 
       const result = await securityHeaders(apiRequest, response)
 
@@ -717,7 +723,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should handle preflight OPTIONS requests', async () => {
-      const optionsRequest = new NextRequest('https://example.com/api/test', {
+      const optionsRequest = new Request('https://example.com/api/test', {
         method: 'OPTIONS',
         headers: {
           'Origin': 'https://app.example.com',
@@ -725,7 +731,7 @@ describe('Authentication Middleware', () => {
         },
       })
 
-      const response = new NextResponse(null, { status: 204 })
+      const response = new Response(null, { status: 204 })
 
       const result = await securityHeaders(optionsRequest, response)
 
@@ -835,7 +841,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should enforce strict CSP policies', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -848,7 +854,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should prevent clickjacking attacks', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -857,7 +863,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should prevent MIME type sniffing', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -865,7 +871,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should enforce HTTPS', async () => {
-      const response = new NextResponse({ success: true })
+      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -904,7 +910,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should enforce strict cache control for health data', async () => {
-      const response = new NextResponse({ 
+      const response = new Response({ 
         patient: { name: 'John Doe', condition: 'Anxiety' } 
       })
 
@@ -1036,7 +1042,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should track CSRF violations', async () => {
-      const postRequest = new NextRequest('https://example.com/api/test', {
+      const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
           'X-CSRF-Token': 'invalid-token',

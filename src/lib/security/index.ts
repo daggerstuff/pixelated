@@ -1,11 +1,11 @@
 import type { SecurityEventType } from './monitoring'
 import { Buffer } from 'node:buffer'
 import { initializeSecurityDatabase } from '../../db/security/initialize'
-import { securityLogger } from '../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SecurityEventSeverity, SecurityMonitoringService } from './monitoring'
 import crypto from 'crypto'
 
-const logger = securityLogger
+const logger = createBuildSafeLogger('security')
 
 /**
  * Global security monitoring service instance
@@ -270,12 +270,9 @@ async function simulateHomomorphicOperation(
 // Export security types and utilities
 export {
   SecurityEventSeverity,
-  SecurityEventType as SecurityEventTypeEnum,
+  SecurityEventType,
   SecurityMonitoringService,
 } from './monitoring'
-
-// Also export the string literal SecurityEventType from main security module
-export type { SecurityEventType } from '../security'
 
 // Export PII detection functionality
 export * from './pii'

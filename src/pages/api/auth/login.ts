@@ -4,7 +4,7 @@
  */
 
 import type { APIRoute } from 'astro'
-import { loginUser } from '../../../lib/auth/better-auth-integration'
+import { authenticateWithBetterAuth } from '../../../lib/auth/better-auth-integration'
 import { rateLimitMiddleware, csrfProtection } from '../../../lib/auth/middleware'
 import { sanitizeInput } from '../../../lib/auth/utils'
 import { logSecurityEvent } from '../../../lib/security'
@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const password = body.password // Don't sanitize password
 
     // Attempt login
-    const result = await loginUser(email, password, clientInfo)
+    const result = await authenticateWithBetterAuth({ email, password }, clientInfo)
 
     // Log successful login
     await logSecurityEvent('USER_LOGIN_SUCCESS', result.user.id, {
