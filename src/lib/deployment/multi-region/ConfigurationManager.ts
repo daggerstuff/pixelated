@@ -7,7 +7,7 @@
 
 import { EventEmitter } from 'events';
 import { logger } from '../../logging';
-import { getConfig } from '../../config';
+
 import { DeploymentConfig, RegionConfig } from './MultiRegionDeploymentManager';
 import { EdgeDeploymentConfig } from './EdgeComputingManager';
 import { RoutingConfig } from './GlobalTrafficRoutingManager';
@@ -288,7 +288,7 @@ export class ConfigurationManager extends EventEmitter {
   private async loadEnvironmentOverrides(environment: string): Promise<Partial<MultiRegionConfig> | null> {
     try {
       // In a real implementation, this would load from a configuration service or file
-      const configPath = `config/environments/${environment}.json`;
+      
       
       // Simulate loading configuration
       const envOverrides: Record<string, Partial<MultiRegionConfig>> = {

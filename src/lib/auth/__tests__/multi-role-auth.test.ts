@@ -9,7 +9,6 @@ import {
   ROLE_DEFINITIONS,
   hasPermission,
   hasRequiredRole,
-  getRolePermissions,
   canAssignRole,
   validateRoleTransition,
 } from '../roles'
@@ -17,29 +16,18 @@ import {
   setupTwoFactorAuth,
   completeTwoFactorSetup,
   verifyTwoFactorToken,
-  getTwoFactorStatus,
-  disableTwoFactorAuth,
-  generateNewBackupCodes,
   isTwoFactorRequired,
 } from '../two-factor-auth'
 import {
   createSession,
   validateSession,
-  destroySession,
-  getUserSessions,
-  destroyAllUserSessions,
-  cleanupExpiredSessions,
-} from '../session-management'
+  } from '../session-management'
 import {
   requestRoleTransition,
   processRoleTransitionApproval,
-  cancelRoleTransitionRequest,
-  getUserRoleTransitionRequests,
-  getPendingRoleTransitionRequests,
-  validateRoleAssignment,
   getRoleTransitionAuditTrail,
 } from '../role-transitions'
-import { generateTokenPair, validateToken, refreshAccessToken } from '../jwt-service'
+import { generateTokenPair, validateToken, } from '../jwt-service'
 import type { SessionData, DeviceInfo } from '../session-management'
 import type { TwoFactorVerification } from '../two-factor-auth'
 
@@ -689,7 +677,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       const { getFromCache } = await import('../../redis')
       
       // Mock patient data access attempt
-      const therapistSession = { ...mockSessionData, role: 'therapist' }
+      
       
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('user_auth:')) {

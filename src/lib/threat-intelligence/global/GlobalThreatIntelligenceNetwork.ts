@@ -6,23 +6,19 @@
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
 import { MongoClient, Db } from 'mongodb';
-import * as tf from '@tensorflow/tfjs-node';
+
 import crypto from 'crypto';
 
 import {
   GlobalThreatIntelligenceNetworkConfig,
   GlobalThreatIntelligence,
   RealTimeThreatData,
-  ThreatStream,
-  GlobalThreatIndicator,
   ThreatAttribution,
   GlobalImpactAssessment,
   CorrelationData,
   ValidationStatus,
   HealthStatus,
-  RegionConfig,
-  EdgeNodeStatus
-} from './types';
+  } from './types';
 
 import { EdgeThreatDetectionSystem } from '../edge/EdgeThreatDetectionSystem';
 import { ThreatCorrelationEngine } from '../correlation/ThreatCorrelationEngine';

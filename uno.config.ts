@@ -3,12 +3,11 @@ import {
   presetIcons,
   presetAttributify,
   presetTypography,
+  presetWind,
 } from 'unocss'
-import { presetWind3 } from '@unocss/preset-wind'
 
 export default defineConfig({
   rules: [
-<<<<<<< Updated upstream
     // Match problematic icon patterns and ignore them
     [/^i-(-)?$/, () => ({})],           // Matches 'i-' and 'i--'
     [/^i--.*/, () => ({})],             // Matches anything starting with 'i--'
@@ -24,10 +23,6 @@ export default defineConfig({
     /^i-(-)*$/,     // Block 'i-', 'i--', 'i---', etc.
     /^i-\s*$/,      // Block 'i-' with whitespace
     /^icon-(-)*$/,  // Block similar 'icon-' patterns
-=======
-    [/^i-(-)?$/, () => ({})],
-    [/^i--.*/, () => ({})],
->>>>>>> Stashed changes
   ],
   shortcuts: [
     [
@@ -52,7 +47,7 @@ export default defineConfig({
     ],
   ],
   presets: [
-    presetWind3(),
+    presetWind(),
     presetAttributify(),
     presetIcons({
       scale: 1.2,

@@ -55,9 +55,9 @@ export const POST: APIRoute = async ({ request }) => {
         let explicitCategory: string | undefined;
 
         if (typeof scoreOrObj === 'object' && scoreOrObj !== null && ('score' in scoreOrObj)) {
-          // @ts-ignore incoming payload from runtime
+          // @ts-expect-error incoming payload from runtime
           score = Number((scoreOrObj as any).score);
-          // @ts-ignore
+          // @ts-expect-error
           explicitCategory = (scoreOrObj as any).category;
         } else {
           score = Number(scoreOrObj as any);

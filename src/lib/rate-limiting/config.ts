@@ -337,16 +337,3 @@ export const getMergedConfig = (): RateLimitConfig => {
     }
   }
 }
-
-// Export all configurations
-export {
-  defaultRateLimitConfig,
-  defaultRuleSets,
-  defaultBypassRules,
-  defaultDDoSConfig,
-  defaultBetterAuthConfig,
-  defaultWebSocketConfig,
-  getEnvironmentConfig,
-  getConfigFromEnv,
-  getMergedConfig
-}

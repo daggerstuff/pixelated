@@ -1537,7 +1537,7 @@ export class ThreatHuntingSystemCore extends EventEmitter implements ThreatHunti
       // Group by source IP and analyze patterns
       const groupedBySource = this.groupBy(results, 'data.sourceIp');
       
-      for (const [sourceIp, sourceResults] of Object.entries(groupedBySource)) {
+      for (const [_sourceIp, sourceResults] of Object.entries(groupedBySource)) {
         if (sourceResults.length >= 5) {
           // Mark as suspicious if many results from same source
           sourceResults.forEach(result => {
@@ -2138,7 +2138,7 @@ export class ThreatHuntingSystemCore extends EventEmitter implements ThreatHunti
       // Find active hunt execution
       let executionToCancel: HuntExecution | null = null;
       
-      for (const [executionId, execution] of this.activeHunts) {
+      for (const [_executionId, execution] of this.activeHunts) {
         if (execution.huntId === huntId && execution.status === 'executing') {
           executionToCancel = execution;
           break;
@@ -2241,7 +2241,7 @@ export class ThreatHuntingSystemCore extends EventEmitter implements ThreatHunti
   async getHuntMetrics(): Promise<HuntMetrics> {
     try {
       const executionsCollection = this.db.collection('hunt_executions');
-      const resultsCollection = this.db.collection('hunt_results');
+      
       const threatsCollection = this.db.collection('discovered_threats');
       
       const [
