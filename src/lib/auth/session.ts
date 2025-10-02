@@ -115,7 +115,7 @@ export async function endSession(
 ): Promise<void> {
   try {
     // Sign out using MongoDB auth service
-    await authService.signOut(sessionId)
+    await adapter.revokeToken(sessionId)
 
     // Log the session end
     await createAuditLog(

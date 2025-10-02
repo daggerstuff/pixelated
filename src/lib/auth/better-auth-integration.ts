@@ -7,7 +7,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import Database from 'better-sqlite3'
 import { generateTokenPair, validateToken, AuthenticationError } from './jwt-service'
-import { logSecurityEvent, SecurityEventType } from '../security'
+import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import type { UserRole, ClientInfo, TokenPair } from './jwt-service'
 

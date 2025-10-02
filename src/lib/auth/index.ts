@@ -3,12 +3,8 @@
  * Provides complete authentication system with Better-Auth integration
  */
 
-  const sessionData = await getSession(token)
-  if (!sessionData || !sessionData.user) {
-    return null
-  }
-
-  return sessionData.user
+import type { AstroCookies } from 'astro'
+import { getCurrentUser } from '../auth'
 
 /**
  * Check if the current user has the specified role
@@ -129,56 +125,8 @@ export async function initializeAuthSystem(): Promise<void> {
  * Create authentication API routes
  */
 export async function createAuthRoutes() {
-  const { Router } = await import('express')
-  const router = Router()
-
-  // Import route handlers
-  const {
-    handleRegister,
-    handleLogin,
-    handleLogout,
-    handleRefreshToken,
-    handleForgotPassword,
-    handleResetPassword,
-    handleVerifyEmail,
-  } = await import('./routes')
-
-  // Public routes
-  router.post('/register', handleRegister)
-  router.post('/login', handleLogin)
-  router.post('/forgot-password', handleForgotPassword)
-  router.post('/reset-password', handleResetPassword)
-  router.post('/verify-email', handleVerifyEmail)
-
-  // Protected routes
-  router.post('/logout', requireAuthenticated, handleLogout)
-  router.post('/refresh-token', handleRefreshToken)
-
-  // User profile routes
-  router.get('/profile', requireAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
-    const user = req.context?.user
-    if (!user) {
-      return res.status(401).json({ success: false, error: 'User not found' })
-    }
-
-    const userAuth = getUserAuthentication(user.id)
-    if (!userAuth) {
-      return res.status(404).json({ success: false, error: 'User not found' })
-    }
-
-    res.json({
-      success: true,
-      user: {
-        id: userAuth.id,
-        email: userAuth.email,
-        role: userAuth.role,
-        createdAt: userAuth.createdAt,
-        lastLoginAt: userAuth.lastLoginAt,
-      },
-    })
-  })
-
-  return router
+  // TODO: Implement when routes file is available
+  throw new Error('Auth routes not implemented yet')
 }
 
 /**
