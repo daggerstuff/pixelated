@@ -56,6 +56,9 @@ export default defineConfig({
       ],
     },
   },
+  preview: {
+    allowedHosts: ['pixelatedempathy.tech'],
+  },
   plugins: [
     rewriteLoggerImportPlugin(),
     {
