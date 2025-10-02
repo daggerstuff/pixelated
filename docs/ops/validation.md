@@ -109,4 +109,10 @@ Integrate `check_alerts()` in orchestrator after batches.
 - **Env**: MONGO_URI for quarantine; defaults to localhost:27017.
 - **Extensibility**: Add source types to mapping dict; enhance scoring with ML.
 
+## Security & Compliance
+- **Library Audit**: All third-party libraries audited and verified as secure (see `security_audit.md`)
+- **Input Sanitization**: All user-provided content sanitized with bleach library
+- **ID Validation**: Strict regex validation prevents injection attacks
+- **Connection Security**: Secure connection protocols for all external services
+
 For full pipeline, see `ai/dataset_pipeline/README.md`.

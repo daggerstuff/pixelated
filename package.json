@@ -141,18 +141,11 @@
     "@aws-sdk/client-s3": "^3.896.0",
     "@aws-sdk/lib-dynamodb": "^3.896.0",
     "@azure/storage-blob": "^12.28.0",
-<<<<<<< Updated upstream
     "@chroma-core/default-embed": "^0.1.8",
     "@google-cloud/storage": "^7.17.0",
     "@iconify-json/lucide": "^1.2.57",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-three/drei": "^10.6.2",
-=======
-    "@google-cloud/storage": "^7.17.1",
-    "@iconify-json/lucide": "^1.2.68",
-    "@radix-ui/react-tooltip": "^1.2.8",
-    "@react-three/drei": "^10.7.6",
->>>>>>> Stashed changes
     "@react-three/fiber": "^9.3.0",
     "@sentry/astro": "^10.15.0",
     "@sentry/browser": "^10.15.0",
