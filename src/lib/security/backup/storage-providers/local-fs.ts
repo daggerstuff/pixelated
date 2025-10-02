@@ -6,6 +6,7 @@
  */
 
 import type { StorageProviderConfig } from '../backup-types'
+import { securePathJoin } from '@/lib/utils'
 import type { Dirent } from 'fs'
 
 interface FileSystem {
@@ -21,6 +22,7 @@ interface PathModule {
   join: (...paths: string[]) => string;
   dirname: (path: string) => string;
   relative: (from: string, to: string) => string;
+  resolve: (...paths: string[]) => string;
 }
 
 export interface StorageProvider {
@@ -60,9 +62,20 @@ export class LocalFileSystemProvider implements StorageProvider {
         join: pathModule.join,
         dirname: pathModule.dirname,
         relative: pathModule.relative,
+        resolve: pathModule.resolve,
       };
 
       // Create base directory if it doesn't exist
+      // Normalize and validate basePath: resolve it and ensure it remains under CWD
+      const resolvedBase = this.path.resolve(this.basePath)
+      const cwd = this.path.resolve(process.cwd())
+      if (!resolvedBase.startsWith(cwd + this.path.join('')) && resolvedBase !== cwd) {
+        throw new Error('Configured base path escapes the project directory')
+      }
+
+      // Use resolved absolute base path going forward
+      this.basePath = resolvedBase
+
       await this.fs.mkdir(this.basePath, { recursive: true });
 
       this.initialized = true;
@@ -75,7 +88,7 @@ export class LocalFileSystemProvider implements StorageProvider {
         error,
       );
       throw new Error(
-        `Local filesystem initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+        `Local filesystem initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
       );
     }
   }
@@ -85,7 +98,7 @@ export class LocalFileSystemProvider implements StorageProvider {
 
     try {
       // List all files recursively
-      const allFiles = await this.listFilesRecursively(this.basePath)
+  const allFiles = await this.listFilesRecursively(this.basePath)
 
       // Convert absolute paths to relative paths
       const relativeFiles = allFiles.map((file) =>
@@ -107,7 +120,7 @@ export class LocalFileSystemProvider implements StorageProvider {
     } catch (error: unknown) {
       console.error('Failed to list files from local filesystem:', error)
       throw new Error(
-        `Failed to list files: ${error instanceof Error ? String(error) : String(error)}`,
+        `Failed to list files: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
       )
     }
   }
@@ -116,8 +129,10 @@ export class LocalFileSystemProvider implements StorageProvider {
     this.checkInitialized()
 
     try {
-      // Create full path
-      const fullPath = this.path.join(this.basePath, key)
+      // Resolve and validate full path to prevent path traversal
+      const fullPath = securePathJoin(this.basePath, key, {
+        allowedExtensions: [],
+      })
 
       // Create directory structure if needed
       const dir = this.path.dirname(fullPath)
@@ -128,7 +143,7 @@ export class LocalFileSystemProvider implements StorageProvider {
     } catch (error: unknown) {
       console.error(`Failed to store file ${key} to local filesystem:`, error)
       throw new Error(
-        `Failed to store file: ${error instanceof Error ? String(error) : String(error)}`,
+        `Failed to store file: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
       )
     }
   }
@@ -137,8 +152,8 @@ export class LocalFileSystemProvider implements StorageProvider {
     this.checkInitialized()
 
     try {
-      // Create full path
-      const fullPath = this.path.join(this.basePath, key)
+      // Resolve and validate full path to prevent path traversal
+      const fullPath = securePathJoin(this.basePath, key)
 
       // Check if file exists
       await this.fs.access(fullPath)
@@ -150,7 +165,7 @@ export class LocalFileSystemProvider implements StorageProvider {
     } catch (error: unknown) {
       console.error(`Failed to get file ${key} from local filesystem:`, error)
       throw new Error(
-        `Failed to get file: ${error instanceof Error ? String(error) : String(error)}`,
+        `Failed to get file: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
       )
     }
   }
@@ -159,8 +174,8 @@ export class LocalFileSystemProvider implements StorageProvider {
     this.checkInitialized()
 
     try {
-      // Create full path
-      const fullPath = this.path.join(this.basePath, key)
+      // Resolve and validate full path to prevent path traversal
+      const fullPath = securePathJoin(this.basePath, key)
 
       // Check if file exists
       try {
@@ -178,7 +193,7 @@ export class LocalFileSystemProvider implements StorageProvider {
         error,
       )
       throw new Error(
-        `Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`,
+        `Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
       )
     }
   }
@@ -195,13 +210,29 @@ export class LocalFileSystemProvider implements StorageProvider {
 
     const files = await Promise.all(
       entries.map(async (entry: Dirent) => {
-        const fullPath = this.path!.join(dir, entry.name);
-        return entry.isDirectory()
-          ? await this.listFilesRecursively(fullPath)
-          : fullPath;
-      }),
-    );
+        // Validate entry name to avoid traversal from filesystem metadata
+        if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+          // skip suspicious entries
+          return [] as string[]
+        }
 
-    return files.flat();
+        // Compose candidate path and ensure it resolves within the basePath
+        const candidate = this.path!.join(dir, entry.name)
+        const resolvedCandidate = this.path!.resolve(candidate)
+        const resolvedBase = this.path!.resolve(this.basePath)
+
+        if (!resolvedCandidate.startsWith(resolvedBase + this.path!.join('')) && resolvedCandidate !== resolvedBase) {
+          // Skip paths that escape the base
+          console.warn(`Skipping file outside base path: ${resolvedCandidate}`)
+          return [] as string[]
+        }
+
+        return entry.isDirectory()
+          ? await this.listFilesRecursively(resolvedCandidate)
+          : resolvedCandidate
+      }),
+    )
+
+    return files.flat()
   }
 }
