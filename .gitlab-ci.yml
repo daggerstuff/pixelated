@@ -100,10 +100,32 @@ cache: &global_cache
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental" ]
+    command: [ "--tls=false", "--experimental", "--insecure-registry=0.0.0.0/0" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
+    DOCKER_DRIVER: overlay2
+    # Add DNS configuration to fix resolution issues
+    DOCKER_DNS: "8.8.8.8,8.8.4.4"
+    DOCKER_OPTS: "--dns 8.8.8.8 --dns 8.8.4.4"
+  before_script:
+    - echo "🔍 Waiting for Docker service to be ready..."
+    - |
+      # Wait for Docker daemon to be ready with timeout
+      for i in {1..30}; do
+        if docker info >/dev/null 2>&1; then
+          echo "✅ Docker daemon is ready"
+          break
+        fi
+        echo "⏳ Waiting for Docker daemon... ($i/30)"
+        sleep 2
+      done
+      
+      # Final check
+      if ! docker info >/dev/null 2>&1; then
+        echo "❌ Docker daemon failed to start after 60 seconds"
+        exit 1
+      fi
 
 # Registry login template
 .registry_login: &registry_login
@@ -117,10 +139,35 @@ validate-runner:
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental" ]
+    command: [ "--tls=false", "--experimental", "--insecure-registry=0.0.0.0/0" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
+    DOCKER_DRIVER: overlay2
+    # Add DNS configuration to fix resolution issues
+    DOCKER_DNS: "8.8.8.8,8.8.4.4"
+    DOCKER_OPTS: "--dns 8.8.8.8 --dns 8.8.4.4"
+  before_script:
+    - echo "🔍 Waiting for Docker service to be ready..."
+    - |
+      # Wait for Docker daemon to be ready with timeout
+      for i in {1..30}; do
+        if docker info >/dev/null 2>&1; then
+          echo "✅ Docker daemon is ready"
+          break
+        fi
+        echo "⏳ Waiting for Docker daemon... ($i/30)"
+        sleep 2
+      done
+      
+      # Final check
+      if ! docker info >/dev/null 2>&1; then
+        echo "❌ Docker daemon failed to start after 60 seconds"
+        echo "🔍 Debugging Docker service status..."
+        # Try to get more information about the failure
+        curl -v http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
+        exit 1
+      fi
   script: |
     echo "🔍 Validating GitLab runner capabilities..."
     
@@ -138,11 +185,39 @@ validate-runner:
       echo "⚠️ Unknown package manager, skipping package installation"
     fi
     
-    # Validate Docker if available
-    if command -v docker >/dev/null 2>&1; then
-      docker --version && docker info
+    # Enhanced Docker validation with better error handling
+    echo "🔍 Testing Docker connectivity..."
+    if docker version >/dev/null 2>&1; then
+      echo "✅ Docker client version:"
+      docker version --format 'Client: {{.Client.Version}}'
+      
+      echo "✅ Docker server info:"
+      docker info --format 'Server Version: {{.ServerVersion}}'
+      echo "Storage Driver: $(docker info --format '{{.Driver}}')"
+      echo "Architecture: $(docker info --format '{{.Architecture}}')"
+      echo "CPUs: $(docker info --format '{{.NCPU}}')"
+      echo "Memory: $(docker info --format '{{.MemTotal}}')"
     else
-      echo "⚠️ Docker not available on this runner"
+      echo "❌ Docker connectivity test failed"
+      echo "🔍 Attempting to diagnose the issue..."
+      
+      # Test network connectivity to Docker service
+      if ping -c 1 docker >/dev/null 2>&1; then
+        echo "✅ Docker hostname resolves"
+      else
+        echo "❌ Docker hostname resolution failed"
+        echo "Available services:"
+        cat /etc/hosts || true
+      fi
+      
+      # Test port connectivity
+      if nc -z docker 2375 >/dev/null 2>&1; then
+        echo "✅ Docker port 2375 is reachable"
+      else
+        echo "❌ Docker port 2375 is not reachable"
+      fi
+      
+      exit 1
     fi
     
     echo "✅ Runner validation complete"
