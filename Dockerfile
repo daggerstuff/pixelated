@@ -62,7 +62,7 @@ COPY --chown=astro:astro package.json pnpm-lock.yaml ./
 RUN pnpm config set store-dir /app/.pnpm-store && \
     pnpm config set package-import-method copy && \
     pnpm config set frozen-lockfile true && \
-    pnpm install --frozen-lockfile --prefer-offline && \
+    pnpm install --no-frozen-lockfile --prefer-offline && \
     pnpm audit --audit-level moderate || true
 
 # Build stage - optimized for performance

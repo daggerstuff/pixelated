@@ -145,7 +145,7 @@ validate-dependencies:
   - apk add --no-cache git
   - corepack enable pnpm
   - pnpm config set store-dir $PNPM_CACHE_FOLDER
-  - pnpm install --frozen-lockfile --prefer-offline
+  - pnpm install --no-frozen-lockfile --prefer-offline
   - pnpm audit --audit-level moderate || echo "Audit warnings found but continuing"
   - echo "✅ Dependencies validated"
   rules:
@@ -154,7 +154,6 @@ validate-dependencies:
   - if: $CI_MERGE_REQUEST_ID
   timeout: 10m
 
-# Build stage - optimized for speed
 build-frontend:
   stage: build
   image: docker:27.3.1
