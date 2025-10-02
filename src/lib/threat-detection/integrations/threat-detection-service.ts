@@ -76,12 +76,12 @@ export class ThreatDetectionService {
   private config: ThreatDetectionConfig
 
   constructor(
-    orchestrator: AdvancedResponseOrchestrator,
-    rateLimiter: DistributedRateLimiter,
+    orchestrator: unknown,
+    rateLimiter: unknown,
     config: ThreatDetectionConfig
   ) {
-    this.orchestrator = orchestrator
-    this.rateLimiter = rateLimiter
+    this.orchestrator = orchestrator as any
+    this.rateLimiter = rateLimiter as any
     this.config = config
 
     // Initialize rate limiting bridge
@@ -516,8 +516,8 @@ export class ThreatDetectionService {
  * Create threat detection service with default configuration
  */
 export function createThreatDetectionService(
-  orchestrator: AdvancedResponseOrchestrator,
-  rateLimiter: DistributedRateLimiter,
+  orchestrator: unknown,
+  rateLimiter: unknown,
   customConfig?: Partial<ThreatDetectionConfig>
 ): ThreatDetectionService {
   const defaultConfig: ThreatDetectionConfig = {
@@ -588,5 +588,5 @@ export function createThreatDetectionService(
   }
 
   const config = { ...defaultConfig, ...customConfig }
-  return new ThreatDetectionService(orchestrator, rateLimiter, config)
+  return new ThreatDetectionService(orchestrator as any, rateLimiter as any, config)
 }

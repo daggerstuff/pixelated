@@ -6,7 +6,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import type { ThreatData, ThreatResponse, ResponseAction } from '../response-orchestration'
 
 const logger = createBuildSafeLogger('threat-detection-utils')

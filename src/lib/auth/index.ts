@@ -3,6 +3,9 @@
  * Provides complete authentication system with Better-Auth integration
  */
 
+import type { AstroCookies } from 'astro'
+import { getCurrentUser } from '../auth'
+
 /**
  * Check if the current user has the specified role
  */
