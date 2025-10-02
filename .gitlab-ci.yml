@@ -105,71 +105,64 @@ cache: &global_cache
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
     DOCKER_DRIVER: overlay2
-    # Enhanced DNS configuration to fix resolution issues
-    DOCKER_DNS: "8.8.8.8,8.8.4.4"
-    DOCKER_OPTS: "--dns 8.8.8.8 --dns 8.8.4.4"
-    # Add network configuration for better connectivity
-    DOCKER_NETWORK_MTU: 1450
-    # Disable TLS for internal communication
-    DOCKER_TLS: "false"
   before_script:
-  - echo "🔍 Waiting for Docker service to be ready..."
-  - |
-    # Enhanced Docker connectivity check with better error handling
-    echo "🔍 Checking network connectivity..."
+    - echo "🔍 Waiting for Docker service to be ready..."
+    - |
+      # Enhanced Docker connectivity check with better error handling
+      echo "🔍 Checking network connectivity..."
 
-    # Test DNS resolution first
-    if nslookup docker >/dev/null 2>&1; then
-      echo "✅ Docker hostname resolves successfully"
-    else
-      echo "❌ Docker hostname resolution failed"
-      echo "🔍 Checking /etc/hosts and DNS configuration..."
-      cat /etc/hosts || true
-      cat /etc/resolv.conf || true
-      echo "🔍 Testing alternative DNS resolution..."
-      nslookup docker 8.8.8.8 || true
-    fi
-
-    # Test port connectivity
-    if nc -z docker 2375 >/dev/null 2>&1; then
-      echo "✅ Docker port 2375 is reachable"
-    else
-      echo "❌ Docker port 2375 is not reachable"
-      echo "🔍 Testing network connectivity..."
-      ping -c 1 docker || echo "❌ Cannot ping docker service"
-    fi
-
-    # Wait for Docker daemon to be ready with extended timeout
-    echo "⏳ Waiting for Docker daemon to be ready..."
-    for i in {1..60}; do
-      if docker info >/dev/null 2>&1; then
-        echo "✅ Docker daemon is ready after $i attempts"
-        break
+      # Test DNS resolution first
+      if nslookup docker >/dev/null 2>&1; then
+        echo "✅ Docker hostname resolves successfully"
+      else
+        echo "❌ Docker hostname resolution failed"
+        echo "🔍 Checking /etc/hosts and DNS configuration..."
+        cat /etc/hosts || true
+        cat /etc/resolv.conf || true
+        echo "🔍 Testing alternative DNS resolution..."
+        nslookup docker 8.8.8.8 || true
       fi
-      echo "⏳ Waiting for Docker daemon... ($i/60)"
-      sleep 2
-    done
 
-    # Final comprehensive check
-    if ! docker info >/dev/null 2>&1; then
-      echo "❌ Docker daemon failed to start after 120 seconds"
-      echo "🔍 Debugging Docker service status..."
+      # Test port connectivity
+      if nc -z docker 2375 >/dev/null 2>&1; then
+        echo "✅ Docker port 2375 is reachable"
+      else
+        echo "❌ Docker port 2375 is not reachable"
+        echo "🔍 Testing network connectivity..."
+        ping -c 1 docker || echo "❌ Cannot ping docker service"
+      fi
 
-      # Try to get more information about the failure
-      echo "🔍 Attempting direct API call..."
-      curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
+      # Wait for Docker daemon to be ready with extended timeout
+      echo "⏳ Waiting for Docker daemon to be ready..."
+      for i in {1..60}; do
+        if docker info >/dev/null 2>&1; then
+          echo "✅ Docker daemon is ready after $i attempts"
+          break
+        fi
+        echo "⏳ Waiting for Docker daemon... ($i/60)"
+        sleep 2
+      done
 
-      echo "🔍 Checking service status..."
-      ps aux | grep docker || true
+      # Final comprehensive check
+      if ! docker info >/dev/null 2>&1; then
+        echo "❌ Docker daemon failed to start after 120 seconds"
+        echo "🔍 Debugging Docker service status..."
 
-      echo "🔍 Network debugging..."
-      netstat -tlnp || true
-      ss -tlnp || true
+        # Try to get more information about the failure
+        echo "🔍 Attempting direct API call..."
+        curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
 
-      exit 1
-    fi
+        echo "🔍 Checking service status..."
+        ps aux | grep docker || true
 
-    echo "✅ Docker service validation complete"
+        echo "🔍 Network debugging..."
+        netstat -tlnp || true
+        ss -tlnp || true
+
+        exit 1
+      fi
+
+      echo "✅ Docker service validation complete"
 
 # Registry login template
 .registry_login: &registry_login
@@ -185,72 +178,66 @@ validate-runner:
     alias: docker
     command: [ "--tls=false", "--experimental", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4" ]
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    # Use direct IP from /etc/hosts to avoid DNS resolution issues
+    DOCKER_HOST: tcp://172.17.0.2:2375
     DOCKER_TLS_CERTDIR: ''
     DOCKER_DRIVER: overlay2
-    # Enhanced DNS configuration to fix resolution issues
-    DOCKER_DNS: "8.8.8.8,8.8.4.4"
-    DOCKER_OPTS: "--dns 8.8.8.8 --dns 8.8.4.4"
-    # Add network configuration for better connectivity
-    DOCKER_NETWORK_MTU: 1450
-    # Disable TLS for internal communication
-    DOCKER_TLS: "false"
   before_script:
-  - echo "🔍 Waiting for Docker service to be ready..."
-  - |
-    # Enhanced Docker connectivity check with better error handling
-    echo "🔍 Checking network connectivity..."
+    - echo "🔍 Waiting for Docker service to be ready..."
+    - |
+      # Enhanced Docker connectivity check with better error handling
+      echo "🔍 Checking network connectivity..."
 
-    # Test DNS resolution first
-    if nslookup docker >/dev/null 2>&1; then
-      echo "✅ Docker hostname resolves successfully"
-    else
-      echo "❌ Docker hostname resolution failed"
-      echo "🔍 Checking /etc/hosts and DNS configuration..."
-      cat /etc/hosts || true
-      cat /etc/resolv.conf || true
-      echo "🔍 Testing alternative DNS resolution..."
-      nslookup docker 8.8.8.8 || true
-    fi
-
-    # Test port connectivity
-    if nc -z docker 2375 >/dev/null 2>&1; then
-      echo "✅ Docker port 2375 is reachable"
-    else
-      echo "❌ Docker port 2375 is not reachable"
-      echo "🔍 Testing network connectivity..."
-      ping -c 1 docker || echo "❌ Cannot ping docker service"
-    fi
-
-    # Wait for Docker daemon to be ready with extended timeout
-    echo "⏳ Waiting for Docker daemon to be ready..."
-    for i in {1..60}; do
-      if docker info >/dev/null 2>&1; then
-        echo "✅ Docker daemon is ready after $i attempts"
-        break
+      # Test DNS resolution first
+      if nslookup docker >/dev/null 2>&1; then
+        echo "✅ Docker hostname resolves successfully"
+      else
+        echo "❌ Docker hostname resolution failed"
+        echo "🔍 Checking /etc/hosts and DNS configuration..."
+        cat /etc/hosts || true
+        cat /etc/resolv.conf || true
+        echo "🔍 Testing alternative DNS resolution..."
+        nslookup docker 8.8.8.8 || true
       fi
-      echo "⏳ Waiting for Docker daemon... ($i/60)"
-      sleep 2
-    done
 
-    # Final comprehensive check
-    if ! docker info >/dev/null 2>&1; then
-      echo "❌ Docker daemon failed to start after 120 seconds"
-      echo "🔍 Debugging Docker service status..."
+      # Test port connectivity
+      if nc -z docker 2375 >/dev/null 2>&1; then
+        echo "✅ Docker port 2375 is reachable"
+      else
+        echo "❌ Docker port 2375 is not reachable"
+        echo "🔍 Testing network connectivity..."
+        ping -c 1 docker || echo "❌ Cannot ping docker service"
+      fi
 
-      # Try to get more information about the failure
-      echo "🔍 Attempting direct API call..."
-      curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
+      # Wait for Docker daemon to be ready with extended timeout
+      echo "⏳ Waiting for Docker daemon to be ready..."
+      for i in {1..60}; do
+        if docker info >/dev/null 2>&1; then
+          echo "✅ Docker daemon is ready after $i attempts"
+          break
+        fi
+        echo "⏳ Waiting for Docker daemon... ($i/60)"
+        sleep 2
+      done
 
-      echo "🔍 Checking service status..."
-      ps aux | grep docker || true
+      # Final comprehensive check
+      if ! docker info >/dev/null 2>&1; then
+        echo "❌ Docker daemon failed to start after 120 seconds"
+        echo "🔍 Debugging Docker service status..."
 
-      echo "🔍 Network debugging..."
-      netstat -tlnp || true
-      ss -tlnp || true
+        # Try to get more information about the failure
+        echo "🔍 Attempting direct API call..."
+        curl -v --max-time 10 http://docker:2375/v1.24/info || echo "❌ Cannot connect to Docker API"
 
-      exit 1
-    fi
+        echo "🔍 Checking service status..."
+        ps aux | grep docker || true
+
+        echo "🔍 Network debugging..."
+        netstat -tlnp || true
+        ss -tlnp || true
+
+        exit 1
+      fi
   script: |
     echo "🔍 Validating GitLab runner capabilities..."
 
