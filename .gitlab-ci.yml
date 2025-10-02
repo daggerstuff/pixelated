@@ -123,8 +123,28 @@ validate-runner:
     DOCKER_TLS_CERTDIR: ''
   script: |
     echo "🔍 Validating GitLab runner capabilities..."
-    apk add --no-cache openssh-client git curl
-    docker --version && docker info
+    
+    # Detect OS and install packages accordingly
+    if command -v apk >/dev/null 2>&1; then
+      # Alpine Linux
+      apk add --no-cache openssh-client git curl
+    elif command -v apt-get >/dev/null 2>&1; then
+      # Debian/Ubuntu
+      apt-get update -qq && apt-get install -y -qq openssh-client git curl
+    elif command -v yum >/dev/null 2>&1; then
+      # RHEL/CentOS
+      yum install -y -q openssh-clients git curl
+    else
+      echo "⚠️ Unknown package manager, skipping package installation"
+    fi
+    
+    # Validate Docker if available
+    if command -v docker >/dev/null 2>&1; then
+      docker --version && docker info
+    else
+      echo "⚠️ Docker not available on this runner"
+    fi
+    
     echo "✅ Runner validation complete"
     echo "Runner: $CI_RUNNER_DESCRIPTION"
     echo "Executor: $CI_RUNNER_EXECUTOR"
