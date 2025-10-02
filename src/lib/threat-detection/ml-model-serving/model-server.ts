@@ -3,7 +3,7 @@
  * Provides scalable TensorFlow.js model serving with ensemble learning capabilities
  */
 
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 import crypto from 'crypto';
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';

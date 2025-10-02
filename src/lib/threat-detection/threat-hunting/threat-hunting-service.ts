@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 
 const logger = createBuildSafeLogger('threat-hunting-service');
