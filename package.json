@@ -183,6 +183,7 @@
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "node-seal": "^5.1.6",
+    "openmemory": "^0.0.1",
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
     "prop-types": "^15.8.1",
