@@ -61,7 +61,9 @@ USER astro
 # preferring a lockfile when available.
 RUN if [ -f pnpm-lock.yaml ]; then echo "✅ pnpm-lock.yaml found"; else echo "⚠️ pnpm-lock.yaml not found - continuing without lockfile"; fi
 COPY --chown=astro:astro package.json ./
-COPY --chown=astro:astro pnpm-lock.yaml ./ 2>/dev/null || true
+# Use a conditional approach to handle missing pnpm-lock.yaml gracefully
+RUN if [ -f pnpm-lock.yaml ]; then cp pnpm-lock.yaml /tmp/pnpm-lock.yaml; fi
+RUN if [ -f /tmp/pnpm-lock.yaml ]; then cp /tmp/pnpm-lock.yaml ./; fi
 
 # Configure pnpm store and install dependencies with optimizations
 RUN pnpm config set store-dir /app/.pnpm-store && \
@@ -93,7 +95,10 @@ USER astro
 # Copy dependencies from deps stage
 COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules
 COPY --from=deps --chown=astro:astro /app/.pnpm-store ./.pnpm-store
-COPY --chown=astro:astro package.json pnpm-lock.yaml ./
+COPY --chown=astro:astro package.json ./
+# Handle pnpm-lock.yaml conditionally in build stage
+RUN if [ -f pnpm-lock.yaml ]; then cp pnpm-lock.yaml /tmp/pnpm-lock.yaml; fi
+RUN if [ -f /tmp/pnpm-lock.yaml ]; then cp /tmp/pnpm-lock.yaml ./; fi
 
 # Copy source files in order of change frequency (least to most)
 COPY --chown=astro:astro astro.config.mjs tsconfig.json uno.config.ts ./
