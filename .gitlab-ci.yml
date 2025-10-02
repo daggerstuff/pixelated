@@ -413,7 +413,6 @@ build-frontend:
       --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:latest \
-      --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max,compression=zstd \
       --target runtime \
       -t $CONTAINER_IMAGE \
       -t $CONTAINER_IMAGE_LATEST \
@@ -830,7 +829,6 @@ build-ai-backend:
         --load \
         --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
         --cache-from type=registry,ref=$CI_REGISTRY_IMAGE/ai:cache \
-        --cache-to type=registry,ref=$CI_REGISTRY_IMAGE/ai:cache,mode=min \
         -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA \
         -t $CI_REGISTRY_IMAGE/ai:latest .
       docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
