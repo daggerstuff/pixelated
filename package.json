@@ -156,7 +156,6 @@
     "@spotlightjs/astro": "^3.2.5",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-layers": "^4.22.0",
-    "@tensorflow/tfjs-node": "^4.22.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/three": "^0.180.0",
     "@types/ws": "^8.18.1",
