@@ -1,0 +1,17 @@
+{
+  "total_conversations": 92731,
+  "train_size": 74184,
+  "val_size": 9273,
+  "test_size": 9274,
+  "sources": {
+    "merged_dataset": 64536,
+    "priority_folders": 27,
+    "cot_datasets": 28168
+  },
+  "output_files": {
+    "combined": "/root/pixelated/processed/mini_pipeline/combined_dataset.jsonl",
+    "train": "/root/pixelated/processed/mini_pipeline/splits/train.jsonl",
+    "val": "/root/pixelated/processed/mini_pipeline/splits/val.jsonl",
+    "test": "/root/pixelated/processed/mini_pipeline/splits/test.jsonl"
+  }
+}
