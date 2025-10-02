@@ -6,7 +6,7 @@
  */
 
 import type { StorageProviderConfig } from '../backup-types'
-import { securePathJoin } from '@/lib/utils/index'
+import { securePathJoin } from '../../../utils/index'
 import type { Dirent } from 'fs'
 
 interface FileSystem {
@@ -50,7 +50,7 @@ export class LocalFileSystemProvider implements StorageProvider {
       const pathModule = await import('path');
 
       this.fs = {
-        mkdir: fsModule.mkdir,
+        mkdir: fsModule.mkdir as (path: string, options?: { recursive?: boolean }) => Promise<void>,
         readdir: fsModule.readdir,
         writeFile: fsModule.writeFile,
         readFile: fsModule.readFile,
@@ -88,7 +88,7 @@ export class LocalFileSystemProvider implements StorageProvider {
         error,
       );
       throw new Error(
-        `Local filesystem initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
+        `Local filesystem initialization failed: ${error instanceof Error ? String(error) : String(error)}`
       );
     }
   }
@@ -119,9 +119,11 @@ export class LocalFileSystemProvider implements StorageProvider {
       return relativeFiles
     } catch (error: unknown) {
       console.error('Failed to list files from local filesystem:', error)
-      throw new Error(
-        `Failed to list files: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
-      )
+      const err = new Error(`Failed to list files: ${error instanceof Error ? String(error) : String(error)}`)
+      // Attach original error for debugging
+      // @ts-ignore
+      err.cause = error
+      throw err
     }
   }
 
@@ -142,9 +144,11 @@ export class LocalFileSystemProvider implements StorageProvider {
       await this.fs.writeFile(fullPath, data)
     } catch (error: unknown) {
       console.error(`Failed to store file ${key} to local filesystem:`, error)
-      throw new Error(
-        `Failed to store file: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
-      )
+      const err = new Error(`Failed to store file: ${error instanceof Error ? String(error) : String(error)}`)
+      // Attach original error for debugging
+      // @ts-ignore
+      err.cause = error
+      throw err
     }
   }
 
@@ -164,9 +168,11 @@ export class LocalFileSystemProvider implements StorageProvider {
       return new Uint8Array(data)
     } catch (error: unknown) {
       console.error(`Failed to get file ${key} from local filesystem:`, error)
-      throw new Error(
-        `Failed to get file: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
-      )
+      const err = new Error(`Failed to get file: ${error instanceof Error ? String(error) : String(error)}`)
+      // Attach original error for debugging
+      // @ts-ignore
+      err.cause = error
+      throw err
     }
   }
 
@@ -192,9 +198,11 @@ export class LocalFileSystemProvider implements StorageProvider {
         `Failed to delete file ${key} from local filesystem:`,
         error,
       )
-      throw new Error(
-        `Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
-      )
+      const err = new Error(`Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`)
+      // Attach original error for debugging
+      // @ts-ignore
+      err.cause = error
+      throw err
     }
   }
 
