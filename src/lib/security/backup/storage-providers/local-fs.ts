@@ -6,7 +6,7 @@
  */
 
 import type { StorageProviderConfig } from '../backup-types'
-import { securePathJoin } from '../../../utils/index'
+import { securePathJoin } from '../../../utils'
 import type { Dirent } from 'fs'
 
 interface FileSystem {
@@ -88,7 +88,7 @@ export class LocalFileSystemProvider implements StorageProvider {
         error,
       );
       throw new Error(
-        `Local filesystem initialization failed: ${error instanceof Error ? String(error) : String(error)}`
+        `Local filesystem initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error }
       );
     }
   }
@@ -120,8 +120,6 @@ export class LocalFileSystemProvider implements StorageProvider {
     } catch (error: unknown) {
       console.error('Failed to list files from local filesystem:', error)
       const err = new Error(`Failed to list files: ${error instanceof Error ? String(error) : String(error)}`)
-      // Attach original error for debugging
-      // @ts-ignore
       err.cause = error
       throw err
     }
@@ -146,7 +144,7 @@ export class LocalFileSystemProvider implements StorageProvider {
       console.error(`Failed to store file ${key} to local filesystem:`, error)
       const err = new Error(`Failed to store file: ${error instanceof Error ? String(error) : String(error)}`)
       // Attach original error for debugging
-      // @ts-ignore
+  // @ts-expect-error: Attach original error as 'cause' property for debugging (not standard in all TS versions)
       err.cause = error
       throw err
     }
@@ -170,7 +168,7 @@ export class LocalFileSystemProvider implements StorageProvider {
       console.error(`Failed to get file ${key} from local filesystem:`, error)
       const err = new Error(`Failed to get file: ${error instanceof Error ? String(error) : String(error)}`)
       // Attach original error for debugging
-      // @ts-ignore
+  // @ts-expect-error: Attach original error as 'cause' property for debugging (not standard in all TS versions)
       err.cause = error
       throw err
     }
@@ -200,7 +198,7 @@ export class LocalFileSystemProvider implements StorageProvider {
       )
       const err = new Error(`Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`)
       // Attach original error for debugging
-      // @ts-ignore
+  // @ts-expect-error: Attach original error as 'cause' property for debugging (not standard in all TS versions)
       err.cause = error
       throw err
     }

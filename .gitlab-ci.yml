@@ -54,11 +54,14 @@ cache: &global_cache
   key:
     files:
     - pnpm-lock.yaml
+    - package.json
     prefix: $CI_COMMIT_REF_SLUG
   paths:
   - .pnpm-store/
   - node_modules/
+  - ~/.cache/pnpm/
   policy: pull-push
+  unprotect: true
 
 # Security template for SSH key handling using GitLab's SSH_PRIVATE_KEY
 .ssh_setup: &ssh_setup
@@ -106,68 +109,68 @@ cache: &global_cache
     DOCKER_TLS_CERTDIR: ''
     DOCKER_DRIVER: overlay2
   before_script:
-    - echo "🔍 Waiting for Docker service to be ready..."
-    - |
-      # Install required tools for debugging
-      apk add --no-cache curl netcat-openbsd bind-tools
-      
-      # Enhanced Docker connectivity check with better error handling
-      echo "🔍 Checking network connectivity..."
+  - echo "🔍 Waiting for Docker service to be ready..."
+  - |
+    # Install required tools for debugging
+    apk add --no-cache curl netcat-openbsd bind-tools
 
-      # Test DNS resolution first
-      if nslookup docker >/dev/null 2>&1; then
-        echo "✅ Docker hostname resolves successfully"
-      else
-        echo "❌ Docker hostname resolution failed"
-        echo "🔍 Checking /etc/hosts and DNS configuration..."
-        cat /etc/hosts || true
-        cat /etc/resolv.conf || true
-        echo "🔍 Testing alternative DNS resolution..."
-        nslookup docker 8.8.8.8 || true
+    # Enhanced Docker connectivity check with better error handling
+    echo "🔍 Checking network connectivity..."
+
+    # Test DNS resolution first
+    if nslookup docker >/dev/null 2>&1; then
+      echo "✅ Docker hostname resolves successfully"
+    else
+      echo "❌ Docker hostname resolution failed"
+      echo "🔍 Checking /etc/hosts and DNS configuration..."
+      cat /etc/hosts || true
+      cat /etc/resolv.conf || true
+      echo "🔍 Testing alternative DNS resolution..."
+      nslookup docker 8.8.8.8 || true
+    fi
+
+    # Test port connectivity
+    if nc -z docker 2375 >/dev/null 2>&1; then
+      echo "✅ Docker port 2375 is reachable"
+    else
+      echo "❌ Docker port 2375 is not reachable"
+      echo "🔍 Testing network connectivity..."
+      ping -c 1 docker || echo "❌ Cannot ping docker service"
+    fi
+
+    # Wait for Docker daemon to be ready with extended timeout
+    echo "⏳ Waiting for Docker daemon to be ready..."
+    for i in {1..60}; do
+      if docker version >/dev/null 2>&1; then
+        echo "✅ Docker daemon is ready after $i attempts"
+        break
       fi
+      echo "⏳ Waiting for Docker daemon... ($i/60)"
+      sleep 2
+    done
 
-      # Test port connectivity
-      if nc -z docker 2375 >/dev/null 2>&1; then
-        echo "✅ Docker port 2375 is reachable"
-      else
-        echo "❌ Docker port 2375 is not reachable"
-        echo "🔍 Testing network connectivity..."
-        ping -c 1 docker || echo "❌ Cannot ping docker service"
-      fi
+    # Final comprehensive check
+    if ! docker version >/dev/null 2>&1; then
+      echo "❌ Docker daemon failed to start after 120 seconds"
+      echo "🔍 Debugging Docker service status..."
 
-      # Wait for Docker daemon to be ready with extended timeout
-      echo "⏳ Waiting for Docker daemon to be ready..."
-      for i in {1..60}; do
-        if docker version >/dev/null 2>&1; then
-          echo "✅ Docker daemon is ready after $i attempts"
-          break
-        fi
-        echo "⏳ Waiting for Docker daemon... ($i/60)"
-        sleep 2
-      done
+      # Try to get more information about the failure
+      echo "🔍 Attempting direct API call..."
+      curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
 
-      # Final comprehensive check
-      if ! docker version >/dev/null 2>&1; then
-        echo "❌ Docker daemon failed to start after 120 seconds"
-        echo "🔍 Debugging Docker service status..."
+      echo "🔍 Checking service status..."
+      ps aux | grep docker || true
 
-        # Try to get more information about the failure
-        echo "🔍 Attempting direct API call..."
-        curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
+      echo "🔍 Network debugging..."
+      netstat -tlnp 2>/dev/null || true
+      ss -tlnp 2>/dev/null || true
 
-        echo "🔍 Checking service status..."
-        ps aux | grep docker || true
+      exit 1
+    fi
 
-        echo "🔍 Network debugging..."
-        netstat -tlnp 2>/dev/null || true
-        ss -tlnp 2>/dev/null || true
-
-        exit 1
-      fi
-
-      echo "✅ Docker service validation complete"
-      echo "Docker version info:"
-      docker version
+    echo "✅ Docker service validation complete"
+    echo "Docker version info:"
+    docker version
 
 # Registry login template
 .registry_login: &registry_login
@@ -187,64 +190,64 @@ validate-runner:
     DOCKER_TLS_CERTDIR: ''
     DOCKER_DRIVER: overlay2
   before_script:
-    - echo "🔍 Waiting for Docker service to be ready..."
-    - |
-      # Install required tools for debugging
-      apk add --no-cache curl netcat-openbsd bind-tools
-      
-      # Enhanced Docker connectivity check with better error handling
-      echo "🔍 Checking network connectivity..."
+  - echo "🔍 Waiting for Docker service to be ready..."
+  - |
+    # Install required tools for debugging
+    apk add --no-cache curl netcat-openbsd bind-tools
 
-      # Test DNS resolution first
-      if nslookup docker >/dev/null 2>&1; then
-        echo "✅ Docker hostname resolves successfully"
-      else
-        echo "❌ Docker hostname resolution failed"
-        echo "🔍 Checking /etc/hosts and DNS configuration..."
-        cat /etc/hosts || true
-        cat /etc/resolv.conf || true
-        echo "🔍 Testing alternative DNS resolution..."
-        nslookup docker 8.8.8.8 || true
+    # Enhanced Docker connectivity check with better error handling
+    echo "🔍 Checking network connectivity..."
+
+    # Test DNS resolution first
+    if nslookup docker >/dev/null 2>&1; then
+      echo "✅ Docker hostname resolves successfully"
+    else
+      echo "❌ Docker hostname resolution failed"
+      echo "🔍 Checking /etc/hosts and DNS configuration..."
+      cat /etc/hosts || true
+      cat /etc/resolv.conf || true
+      echo "🔍 Testing alternative DNS resolution..."
+      nslookup docker 8.8.8.8 || true
+    fi
+
+    # Test port connectivity
+    if nc -z docker 2375 >/dev/null 2>&1; then
+      echo "✅ Docker port 2375 is reachable"
+    else
+      echo "❌ Docker port 2375 is not reachable"
+      echo "🔍 Testing network connectivity..."
+      ping -c 1 docker || echo "❌ Cannot ping docker service"
+    fi
+
+    # Wait for Docker daemon to be ready with extended timeout
+    echo "⏳ Waiting for Docker daemon to be ready..."
+    for i in {1..60}; do
+      if docker version >/dev/null 2>&1; then
+        echo "✅ Docker daemon is ready after $i attempts"
+        break
       fi
+      echo "⏳ Waiting for Docker daemon... ($i/60)"
+      sleep 2
+    done
 
-      # Test port connectivity
-      if nc -z docker 2375 >/dev/null 2>&1; then
-        echo "✅ Docker port 2375 is reachable"
-      else
-        echo "❌ Docker port 2375 is not reachable"
-        echo "🔍 Testing network connectivity..."
-        ping -c 1 docker || echo "❌ Cannot ping docker service"
-      fi
+    # Final comprehensive check
+    if ! docker version >/dev/null 2>&1; then
+      echo "❌ Docker daemon failed to start after 120 seconds"
+      echo "🔍 Debugging Docker service status..."
 
-      # Wait for Docker daemon to be ready with extended timeout
-      echo "⏳ Waiting for Docker daemon to be ready..."
-      for i in {1..60}; do
-        if docker version >/dev/null 2>&1; then
-          echo "✅ Docker daemon is ready after $i attempts"
-          break
-        fi
-        echo "⏳ Waiting for Docker daemon... ($i/60)"
-        sleep 2
-      done
+      # Try to get more information about the failure
+      echo "🔍 Attempting direct API call..."
+      curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
 
-      # Final comprehensive check
-      if ! docker version >/dev/null 2>&1; then
-        echo "❌ Docker daemon failed to start after 120 seconds"
-        echo "🔍 Debugging Docker service status..."
+      echo "🔍 Checking service status..."
+      ps aux | grep docker || true
 
-        # Try to get more information about the failure
-        echo "🔍 Attempting direct API call..."
-        curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
+      echo "🔍 Network debugging..."
+      netstat -tlnp 2>/dev/null || true
+      ss -tlnp 2>/dev/null || true
 
-        echo "🔍 Checking service status..."
-        ps aux | grep docker || true
-
-        echo "🔍 Network debugging..."
-        netstat -tlnp 2>/dev/null || true
-        ss -tlnp 2>/dev/null || true
-
-        exit 1
-      fi
+      exit 1
+    fi
   script: |
     echo "🔍 Validating GitLab runner capabilities..."
 
@@ -270,7 +273,7 @@ validate-runner:
 
       echo "✅ Docker server info:"
       docker version --format 'Server: {{.Server.Version}}'
-      
+
       # Try to get additional info if available
       if docker info >/dev/null 2>&1; then
         echo "Storage Driver: $(docker info --format '{{.Driver}}')"
@@ -301,7 +304,7 @@ validate-runner:
       # Additional debugging
       echo "🔍 Checking Docker service status..."
       ps aux | grep docker || true
-      
+
       echo "🔍 Network configuration:"
       netstat -tlnp 2>/dev/null || ss -tlnp 2>/dev/null || true
 
@@ -323,19 +326,50 @@ validate-dependencies:
   cache:
     <<: *global_cache
     policy: pull
+  variables:
+    # Optimize pnpm performance
+    PNPM_HOME: /root/.local/share/pnpm
+    PNPM_STORE_DIR: .pnpm-store
+    HUSKY: 0 # Disable husky hooks in CI
   script:
   - echo "🔍 Validating dependencies..."
-  - apk add --no-cache git
+  - apk add --no-cache git curl
   - corepack enable pnpm
   - pnpm config set store-dir $PNPM_CACHE_FOLDER
-  - pnpm install --no-frozen-lockfile --prefer-offline
-  - pnpm audit --audit-level moderate || echo "Audit warnings found but continuing"
+  - pnpm config set registry https://registry.npmjs.org/
+  - |
+    # Install dependencies with optimized settings
+    echo "📦 Installing dependencies..."
+    pnpm install \
+      --no-frozen-lockfile \
+      --prefer-offline \
+      --reporter=silent \
+      --ignore-scripts \
+      --shamefully-hoist=false
+
+    # Verify installation
+    echo "✅ Dependencies installed successfully"
+    pnpm list --depth=0
+
+    # Security audit with faster execution
+    echo "🔒 Running security audit..."
+    pnpm audit --audit-level moderate --json > audit-report.json || echo "Audit completed with findings"
+
+    # Check for critical vulnerabilities
+    if [ -f audit-report.json ]; then
+      CRITICAL_VULNS=$(jq '.metadata.vulnerabilities.critical // 0' audit-report.json 2>/dev/null || echo "0")
+      if [ "$CRITICAL_VULNS" -gt 0 ]; then
+        echo "⚠️ $CRITICAL_VULNS critical vulnerabilities found"
+      else
+        echo "✅ No critical vulnerabilities found"
+      fi
+    fi
   - echo "✅ Dependencies validated"
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   - if: $CI_MERGE_REQUEST_ID
-  timeout: 10m
+  timeout: 8m
 
 build-frontend:
   stage: build
@@ -343,20 +377,31 @@ build-frontend:
   <<: [ *docker_service, *registry_login ]
   cache:
     <<: *global_cache
+  variables:
+    # Optimize Docker build performance
+    DOCKER_BUILDKIT: 1
+    BUILDKIT_PROGRESS: plain
+    DOCKER_CLI_EXPERIMENTAL: enabled
   script:
   - echo "🏗️ Building optimized frontend container..."
   - |
-    # Note: we intentionally avoid trying to generate pnpm-lock.yaml from inside
-    # this docker client container because mounts into the docker-in-docker daemon
-    # are not host-accessible in this runner setup. The Dockerfile has been
-    # adjusted to not require a lockfile in the build context when it's not
-    # committed to the repository.
-    # Create buildx builder with caching
-    docker buildx create --use --name multiarch-builder --driver docker-container || docker buildx use multiarch-builder
+    # Create buildx builder with enhanced caching
+    docker buildx create --use --name multiarch-builder \
+      --driver docker-container \
+      --driver-opt image=moby/buildkit:latest \
+      --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=1048576 \
+      --driver-opt env.BUILDKIT_STEP_LOG_MAX_SPEED=10485760 || docker buildx use multiarch-builder
+
+    # Pre-pull base images for faster builds
+    echo "📥 Pre-pulling base images..."
+    docker pull node:24-alpine || true
+    docker pull alpine:latest || true
 
     # Build with optimized caching and multi-stage optimization
+    echo "🔨 Starting optimized build..."
     docker buildx build \
       --load \
+      --platform linux/amd64 \
       --build-arg NODE_ENV=production \
       --build-arg CI=true \
       --build-arg BUILDKIT_INLINE_CACHE=1 \
@@ -367,20 +412,22 @@ build-frontend:
       --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
       --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:latest \
-      --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=min \
+      --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=max,compression=zstd \
       --target runtime \
       -t $CONTAINER_IMAGE \
-      -t $CONTAINER_IMAGE_LATEST .
+      -t $CONTAINER_IMAGE_LATEST \
+      --progress=plain \
+      .
 
     # Push with timeout and retry
     echo "📤 Pushing to registry..."
     for i in {1..3}; do
-      if timeout 300 docker push $CONTAINER_IMAGE && timeout 300 docker push $CONTAINER_IMAGE_LATEST; then
+      if timeout 600 docker push $CONTAINER_IMAGE && timeout 600 docker push $CONTAINER_IMAGE_LATEST; then
         echo "✅ Images pushed successfully"
         break
       else
         echo "⚠️ Push attempt $i failed, retrying..."
-        sleep 10
+        sleep 15
       fi
     done
 
@@ -391,7 +438,7 @@ build-frontend:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   - if: $CI_MERGE_REQUEST_ID
-  timeout: 20m
+  timeout: 40m
 
 # Parallel testing stage
 test-container:
@@ -445,21 +492,38 @@ test-unit:
   parallel:
     matrix:
     - TEST_SUITE: [ unit, security, lint ]
+  variables:
+    # Optimize test performance
+    HUSKY: 0
+    NODE_OPTIONS: "--max-old-space-size=4096"
+    CI: true
   script:
   - echo "🧪 Running $TEST_SUITE tests..."
   - apk add --no-cache git
   - corepack enable pnpm
   - pnpm config set store-dir $PNPM_CACHE_FOLDER
   - |
+    # Install dependencies with optimized settings for testing
+    echo "📦 Installing dependencies for testing..."
+    pnpm install \
+      --no-frozen-lockfile \
+      --prefer-offline \
+      --reporter=silent \
+      --ignore-scripts \
+      --shamefully-hoist=false
+
     case $TEST_SUITE in
       unit)
-        pnpm test:unit || echo "Unit tests completed with warnings"
+        echo "🔬 Running unit tests..."
+        pnpm test:unit --reporter=verbose --run || echo "Unit tests completed with warnings"
         ;;
       security)
-        pnpm security:check || echo "Security check completed with warnings"
+        echo "🔒 Running security checks..."
+        pnpm security:check --format=json > security-report.json || echo "Security check completed with warnings"
         ;;
       lint)
-        pnpm lint:ci || echo "Linting completed with warnings"
+        echo "🔍 Running linting..."
+        pnpm lint:ci --format=json > lint-report.json || echo "Linting completed with warnings"
         ;;
     esac
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
@@ -468,14 +532,20 @@ test-unit:
       coverage_report:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
+      junit: test-results.xml
     expire_in: 1 week
     when: always
+    paths:
+    - coverage/
+    - test-results.xml
+    - security-report.json
+    - lint-report.json
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   - if: $CI_MERGE_REQUEST_ID
   allow_failure: true
-  timeout: 15m
+  timeout: 12m
 
 # Security stage - comprehensive scanning
 security-scan:
@@ -569,7 +639,7 @@ deploy-vps:
   stage: deploy
   image: alpine:latest
   <<: *ssh_setup
-  needs: [ "test-container" ]
+  needs: [ "test-container", "test-unit", "security-scan" ]
   script:
   - echo "🚀 Deploying to VPS environment..."
   - |

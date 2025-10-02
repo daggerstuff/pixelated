@@ -69,7 +69,11 @@ RUN if [ -f /tmp/pnpm-lock.yaml ]; then cp /tmp/pnpm-lock.yaml ./; fi
 RUN pnpm config set store-dir /app/.pnpm-store && \
     pnpm config set package-import-method copy && \
     pnpm config set frozen-lockfile true && \
-    pnpm install --no-frozen-lockfile --prefer-offline && \
+    pnpm config set registry https://registry.npmjs.org/ && \
+    pnpm config set fetch-timeout 300000 && \
+    pnpm config set fetch-retry-mintimeout 20000 && \
+    pnpm config set fetch-retry-maxtimeout 120000 && \
+    pnpm install --frozen-lockfile --prefer-offline --reporter=silent --ignore-scripts && \
     pnpm audit --audit-level moderate || true
 
 # Build stage - optimized for performance
