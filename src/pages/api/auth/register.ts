@@ -4,7 +4,7 @@
  */
 
 import type { APIRoute } from 'astro'
-import { registerUser } from '../../../lib/auth/better-auth-integration'
+import { registerWithBetterAuth } from '../../../lib/auth/better-auth-integration'
 import { rateLimitMiddleware } from '../../../lib/auth/middleware'
 import { sanitizeInput } from '../../../lib/auth/utils'
 import { logSecurityEvent } from '../../../lib/security'
@@ -64,7 +64,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     // Register user
-    const result = await registerUser(sanitizedData, clientInfo)
+    const result = await registerWithBetterAuth(sanitizedData, clientInfo)
 
     // Log successful registration
     await logSecurityEvent('USER_REGISTERED', result.user.id, {

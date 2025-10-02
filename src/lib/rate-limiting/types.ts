@@ -243,23 +243,3 @@ export interface RateLimitMonitor {
   /** Alert handlers */
   handlers: Array<(alert: RateLimitAlert) => void | Promise<void>>
 }
-
-// Export all types
-export type {
-  RateLimitConfig,
-  RateLimitRule,
-  RateLimitResult,
-  AttackPattern,
-  RateLimitContext,
-  RateLimitRuleSet,
-  RateLimitAnalytics,
-  SecurityEvent,
-  RateLimitBypassRule,
-  DDoSProtectionConfig,
-  RateLimitMiddlewareConfig,
-  RateLimitHeaders,
-  BetterAuthRateLimitConfig,
-  WebSocketRateLimitConfig,
-  RateLimitAlert,
-  RateLimitMonitor
-}

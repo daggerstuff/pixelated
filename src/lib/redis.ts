@@ -27,25 +27,121 @@ function createMockRedisClient() {
 
   console.warn(message)
 
-  // Return a mock client with basic Redis operations
+  const mockStore = new Map<string, string>()
+
+  // Return a mock client with all Redis operations needed by the threat detection system
   return {
-    get: async () => null,
-    set: async () => 'OK',
-    del: async () => 1,
-    exists: async () => 0,
-    expire: async () => 1,
+    // Basic operations
+    get: async (key: string) => mockStore.get(key) || null,
+    set: async (key: string, value: string) => { mockStore.set(key, value); return 'OK' },
+    del: async (key: string) => { const existed = mockStore.has(key); mockStore.delete(key); return existed ? 1 : 0 },
+    exists: async (key: string) => mockStore.has(key) ? 1 : 0,
+    expire: async (key: string, seconds: number) => mockStore.has(key) ? 1 : 0,
+    
+    // Advanced operations needed by rate limiter
+    setex: async (key: string, seconds: number, value: string) => { mockStore.set(key, value); return 'OK' },
+    hincrby: async (key: string, field: string, increment: number) => {
+      const hashKey = `${key}:${field}`
+      const current = parseInt(mockStore.get(hashKey) || '0')
+      const newValue = current + increment
+      mockStore.set(hashKey, newValue.toString())
+      return newValue
+    },
+    hgetall: async (key: string) => {
+      const result: Record<string, string> = {}
+      for (const [k, v] of mockStore.entries()) {
+        if (k.startsWith(`${key}:`)) {
+          const field = k.substring(key.length + 1)
+          result[field] = v
+        }
+      }
+      return result
+    },
+    hset: async (key: string, field: string, value: string) => {
+      mockStore.set(`${key}:${field}`, value)
+      return 1
+    },
+    
+    // Pipeline operations
+    pipeline: () => ({
+      setex: (key: string, seconds: number, value: string) => ({ setex: [key, seconds, value] }),
+      hincrby: (key: string, field: string, increment: number) => ({ hincrby: [key, field, increment] }),
+      exec: async () => [['OK'], [1]] // Mock successful pipeline execution
+    }),
+    
+    // Connection operations
     ping: async () => 'PONG',
     quit: async () => 'OK',
     disconnect: () => {},
     status: 'ready',
-    zrangebyscore: async () => [],
-    lpush: async () => 1,
-    lRange: async () => [],
-    lrem: async () => 1,
-    zadd: async () => 1,
-    hset: async () => 1,
-    zremrangebyscore: async () => 1,
-    keys: async () => [],
+    
+    // List operations
+    lpush: async (key: string, ...values: string[]) => {
+      const listKey = `list:${key}`
+      const existing = mockStore.get(listKey) || '[]'
+      const list = JSON.parse(existing)
+      list.unshift(...values)
+      mockStore.set(listKey, JSON.stringify(list))
+      return list.length
+    },
+    lRange: async (key: string, start: number, stop: number) => {
+      const listKey = `list:${key}`
+      const existing = mockStore.get(listKey) || '[]'
+      const list = JSON.parse(existing)
+      return list.slice(start, stop + 1)
+    },
+    lrem: async (key: string, count: number, value: string) => {
+      const listKey = `list:${key}`
+      const existing = mockStore.get(listKey) || '[]'
+      const list = JSON.parse(existing)
+      const filtered = list.filter((item: string) => item !== value)
+      mockStore.set(listKey, JSON.stringify(filtered))
+      return list.length - filtered.length
+    },
+    
+    // Sorted set operations
+    zadd: async (key: string, score: number, member: string) => {
+      const zsetKey = `zset:${key}`
+      const existing = mockStore.get(zsetKey) || '{}'
+      const zset = JSON.parse(existing)
+      zset[member] = score
+      mockStore.set(zsetKey, JSON.stringify(zset))
+      return 1
+    },
+    zrangebyscore: async (key: string, min: number, max: number) => {
+      const zsetKey = `zset:${key}`
+      const existing = mockStore.get(zsetKey) || '{}'
+      const zset = JSON.parse(existing)
+      return Object.entries(zset)
+        .filter(([_, score]) => (score as number) >= min && (score as number) <= max)
+        .map(([member]) => member)
+    },
+    zremrangebyscore: async (key: string, min: number, max: number) => {
+      const zsetKey = `zset:${key}`
+      const existing = mockStore.get(zsetKey) || '{}'
+      const zset = JSON.parse(existing)
+      let removed = 0
+      for (const [member, score] of Object.entries(zset)) {
+        if ((score as number) >= min && (score as number) <= max) {
+          delete zset[member]
+          removed++
+        }
+      }
+      mockStore.set(zsetKey, JSON.stringify(zset))
+      return removed
+    },
+    
+    // Additional operations
+    keys: async (pattern: string) => Array.from(mockStore.keys()).filter(k => 
+      pattern === '*' || k.includes(pattern.replace('*', ''))
+    ),
+    flushall: async () => { mockStore.clear(); return 'OK' },
+    ttl: async (key: string) => mockStore.has(key) ? -1 : -2,
+    
+    // Event emitter methods (for compatibility)
+    on: () => {},
+    off: () => {},
+    emit: () => false,
   }
 }
 

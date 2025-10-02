@@ -1,36 +1,22 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-
 function generateMockResponse(input: string): string {
   return `Mock client says: ${input}`
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method === 'POST') {
-    const { message } = req.body
-    if (!message) {
-      return res.status(400).json({ error: 'Message required' })
-    }
-    const response = generateMockResponse(message)
-    return res.status(200).json({ response })
-  }
-  res.status(405).end()
-}
-
 export async function POST(context: any) {
   const { request } = context
-  const { message } = request.body
+  const body = await request.json()
+  const { message } = body
+  
   if (!message) {
-    return {
+    return new Response(JSON.stringify({ error: 'Message required' }), {
       status: 400,
-      json: async () => ({ error: 'Message required' }),
-    }
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
-  const reply = `Mock client says: ${message}`
-  return {
+  
+  const reply = generateMockResponse(message)
+  return new Response(JSON.stringify({ reply }), {
     status: 200,
-    json: async () => ({ reply }),
-  }
+    headers: { 'Content-Type': 'application/json' }
+  })
 }

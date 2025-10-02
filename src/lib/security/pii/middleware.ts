@@ -12,9 +12,7 @@
 import type { APIContext } from 'astro'
 import { defineMiddleware } from 'astro/middleware'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type { NextRequest } from 'next/server'
 import type { PIIType } from '.'
-import { NextResponse } from 'next/server'
 
 const logger = createBuildSafeLogger('PIIMiddleware')
 
@@ -49,7 +47,6 @@ const DEFAULT_CONFIG: PIIMiddlewareConfig = {
     /\/api\/medical\/.*/,
   ],
   excludePathPatterns: [
-    /\/_next\/.*/,
     /\/static\/.*/,
     /\/images\/.*/,
     /\/favicon\.ico/,
@@ -77,10 +74,10 @@ const DEFAULT_CONFIG: PIIMiddlewareConfig = {
  * Main PII middleware implementation
  */
 async function piiMiddleware(
-  request: NextRequest,
-  next: () => Promise<NextResponse>,
+  request: Request,
+  next: () => Promise<Response>,
   config: Partial<PIIMiddlewareConfig> = {},
-): Promise<NextResponse> {
+): Promise<Response> {
   // Merge with default config
   const finalConfig: PIIMiddlewareConfig = {
     ...DEFAULT_CONFIG,
@@ -119,7 +116,7 @@ async function piiMiddleware(
     return next()
   } catch (error: unknown) {
     logger.error('Error in PII middleware', { error })
-    return new NextResponse('Internal Server Error', { status: 500 })
+    return new Response('Internal Server Error', { status: 500 })
   }
 }
 
@@ -140,7 +137,7 @@ export const onRequest = defineMiddleware(async (context: APIContext, next) => {
  * Middleware factory function for easier configuration
  */
 export function createPIIMiddleware(config: Partial<PIIMiddlewareConfig> = {}) {
-  return (request: NextRequest, next: () => Promise<NextResponse>) =>
+  return (request: Request, next: () => Promise<Response>) =>
     piiMiddleware(request, next, config)
 }
 

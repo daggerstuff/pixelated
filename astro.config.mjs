@@ -42,8 +42,16 @@ export default defineConfig({
           'mysql2',
           'sqlite3',
           'better-sqlite3',
+          'better-auth',
+          'better-auth/adapters/mongodb',
+          'better-auth/adapters/drizzle',
+          'better-auth/react',
+          'axios',
+          'bcryptjs',
+          'jsonwebtoken',
           'pdfkit',
           '@tensorflow/tfjs',
+          '@tensorflow/tfjs-node',
           '@tensorflow/tfjs-layers',
           'three',
           '@react-three/fiber',
@@ -62,7 +70,8 @@ export default defineConfig({
           if (warning.message && (
             warning.message.includes('externalized for browser compatibility') ||
             warning.message.includes('icon "-"') ||
-            warning.message.includes('failed to load icon \'-\'')
+            warning.message.includes('failed to load icon \'-\'') ||
+            warning.message.includes('Rollup failed to resolve import')
           )) {
             return
           }
@@ -97,6 +106,13 @@ export default defineConfig({
         'mysql2',
         'sqlite3',
         'better-sqlite3',
+        'better-auth',
+        'better-auth/adapters/mongodb',
+        'better-auth/adapters/drizzle',
+        'better-auth/react',
+        'axios',
+        'bcryptjs',
+        'jsonwebtoken',
         'pdfkit',
         'sharp',
         'canvas',
@@ -104,6 +120,7 @@ export default defineConfig({
         'playwright',
         '@sentry/profiling-node',
         '@tensorflow/tfjs',
+        '@tensorflow/tfjs-node',
         '@tensorflow/tfjs-layers',
         'three',
         '@react-three/fiber',
@@ -123,9 +140,17 @@ export default defineConfig({
         'playwright',
         '@sentry/profiling-node',
         'pdfkit',
+        'better-auth',
+        'better-auth/adapters/mongodb',
+        'better-auth/adapters/drizzle',
+        'better-auth/react',
+        'axios',
+        'bcryptjs',
+        'jsonwebtoken',
         'recharts',
         'lucide-react',
         '@tensorflow/tfjs',
+        '@tensorflow/tfjs-node',
         '@tensorflow/tfjs-layers',
         'three',
         '@react-three/fiber',
