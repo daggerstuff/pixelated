@@ -8,8 +8,8 @@
 
 import { EventEmitter } from 'events';
 import { logger } from '../../logging';
-import { getConfig } from '../../config';
-import { RegionConfig } from './MultiRegionDeploymentManager';
+
+
 
 export interface EdgeLocation {
   id: string;

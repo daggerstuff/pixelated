@@ -9,8 +9,8 @@ interface TrainingSessionProps {
 }
 
 function AIErrorBoundary({ children }: { children: React.ReactNode }) {
-  const [hasError, setHasError] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
+  const [hasError] = useState(false)
+  const [error] = useState<Error | null>(null)
 
   if (hasError) {
     return (

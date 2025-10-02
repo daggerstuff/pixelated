@@ -507,6 +507,3 @@ export class RateLimitAnalytics {
  * Create a singleton instance of the analytics service
  */
 export const rateLimitAnalytics = new RateLimitAnalytics()
-
-// Export the class for testing and custom implementations
-export { RateLimitAnalytics }

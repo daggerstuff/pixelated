@@ -4,7 +4,7 @@
  */
 
 import { nanoid } from 'nanoid'
-import { redis, setInCache, getFromCache, removeFromCache } from '../redis'
+import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { AuthenticationError } from './jwt-service'
@@ -13,9 +13,7 @@ import {
   ROLE_DEFINITIONS, 
   validateRoleTransition, 
   canAssignRole,
-  requiresMFA,
-  requiresAudit
-} from './roles'
+  } from './roles'
 import { isTwoFactorRequired, verifyTwoFactorToken } from './two-factor-auth'
 import type { SessionData } from './session-management'
 

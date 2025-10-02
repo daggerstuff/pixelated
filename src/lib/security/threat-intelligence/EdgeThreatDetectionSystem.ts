@@ -9,7 +9,7 @@ import * as tf from '@tensorflow/tfjs';
 import { Redis } from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../../logger';
-import { rateLimiter } from '../../rate-limiting';
+
 import { auditLog } from '../audit-logging';
 import { BiasDetectionEngine } from '../../ai/bias-detection/BiasDetectionEngine';
 
@@ -65,13 +65,13 @@ export interface ThreatDetection {
   bias_analysis: BiasAnalysis;
   final_result: DetectionResult;
   processing_time: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface DetectionInput {
   type: 'network' | 'behavioral' | 'content' | 'system';
-  data: Record<string, any>;
-  context: Record<string, any>;
+  data: Record<string, unknown>;
+  context: Record<string, unknown>;
   source: string;
 }
 
@@ -166,7 +166,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         location: this.config.location, 
         region: this.config.region 
       });
-      throw new Error(`Failed to initialize edge threat detection: ${error.message}`);
+      throw new Error(`Failed to initialize edge threat detection: ${error.message}`, { cause: error });
     }
   }
 
@@ -442,7 +442,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Extract network-related features
    */
-  private extractNetworkFeatures(data: Record<string, any>): number[] {
+  private extractNetworkFeatures(data: Record<string, unknown>): number[] {
     const features = [
       data.packet_count || 0,
       data.bytes_transferred || 0,
@@ -460,7 +460,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Extract behavioral features
    */
-  private extractBehavioralFeatures(data: Record<string, any>): number[] {
+  private extractBehavioralFeatures(data: Record<string, unknown>): number[] {
     const features = [
       data.login_attempts || 0,
       data.failed_logins || 0,
@@ -478,7 +478,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Extract content features
    */
-  private extractContentFeatures(data: Record<string, any>): number[] {
+  private extractContentFeatures(data: Record<string, unknown>): number[] {
     const features = [
       data.content_length || 0,
       data.keyword_density || 0,
@@ -496,7 +496,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Extract system features
    */
-  private extractSystemFeatures(data: Record<string, any>): number[] {
+  private extractSystemFeatures(data: Record<string, unknown>): number[] {
     const features = [
       data.cpu_usage || 0,
       data.memory_usage || 0,
@@ -531,7 +531,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
     clustering: ModelResult;
     prediction: ModelResult;
   }> {
-    const results: any = {};
+    const results: Record<string, ModelResult> = {};
 
     for (const [modelName, model] of this.models) {
       try {
@@ -602,10 +602,10 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Analyze bias in detection results
    */
-  private async analyzeBias(input: DetectionInput, modelResults: any): Promise<BiasAnalysis> {
+  private async analyzeBias(input: DetectionInput, modelResults: Record<string, ModelResult>): Promise<BiasAnalysis> {
     try {
       // Combine all model predictions for bias analysis
-      const allPredictions = Object.values(modelResults).flatMap((result: any) => result.predictions || []);
+      const allPredictions = Object.values(modelResults).flatMap((result: ModelResult) => result.predictions || []);
       
       const biasResult = await this.biasDetector.analyze({
         input: input.data,
@@ -642,7 +642,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private async generateFinalResult(
     input: DetectionInput,
-    modelResults: any,
+    modelResults: Record<string, ModelResult>,
     biasAnalysis: BiasAnalysis
   ): Promise<DetectionResult> {
     try {
@@ -692,7 +692,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Ensemble predictions from multiple models
    */
-  private ensemblePredictions(modelResults: any): { confidence: number; anomaly_score: number } {
+  private ensemblePredictions(modelResults: Record<string, ModelResult>): { confidence: number; anomaly_score: number } {
     const weights = {
       anomaly_detection: 0.3,
       classification: 0.25,
@@ -706,8 +706,8 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
 
     for (const [modelName, result] of Object.entries(modelResults)) {
       const weight = weights[modelName as keyof typeof weights] || 0;
-      const confidence = (result as any).confidence || 0;
-      const anomalyScore = (result as any).predictions?.[0] || 0;
+      const confidence = result.confidence || 0;
+      const anomalyScore = result.predictions?.[0] || 0;
 
       weightedConfidence += confidence * weight;
       weightedAnomalyScore += anomalyScore * weight;
@@ -723,7 +723,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Determine threat type based on model results
    */
-  private determineThreatType(modelResults: any, inputType: string): string {
+  private determineThreatType(modelResults: Record<string, ModelResult>, inputType: string): string {
     const classificationResult = modelResults.classification;
     if (classificationResult && classificationResult.predictions.length > 0) {
       const maxIndex = classificationResult.predictions.indexOf(
@@ -759,7 +759,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Extract threat indicators
    */
-  private extractThreatIndicators(input: DetectionInput, modelResults: any, isThreat: boolean): ThreatIndicator[] {
+  private extractThreatIndicators(input: DetectionInput, modelResults: Record<string, ModelResult>, isThreat: boolean): ThreatIndicator[] {
     const indicators: ThreatIndicator[] = [];
 
     if (isThreat) {
@@ -816,7 +816,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private generateExplanation(
     input: DetectionInput,
-    modelResults: any,
+    modelResults: Record<string, ModelResult>,
     biasAnalysis: BiasAnalysis,
     isThreat: boolean
   ): string {
@@ -993,7 +993,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   /**
    * Handle model updates
    */
-  private async handleModelUpdate(update: any): Promise<void> {
+  private async handleModelUpdate(update: { model_name: string; version: string }): Promise<void> {
     try {
       logger.info('Processing model update', { 
         model: update.model_name, 

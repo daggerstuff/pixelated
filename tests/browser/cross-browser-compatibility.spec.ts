@@ -7,15 +7,11 @@
 
 import { test, expect } from '@playwright/test'
 import type { Page, ConsoleMessage } from '@playwright/test'
-import { mkdir } from 'fs/promises'
+
 import { TEST_PAGES, navigateToPage, verifyPageElements, waitForPageStable, ensureTestResultsDir } from '../helpers/test-utils'
 
 // Use TEST_PAGES from test-utils
-const TEST_URLS = TEST_PAGES.reduce((acc, page) => {
-  const key = page.name.toLowerCase().replace(/\s+/g, '')
-  acc[key] = page.url
-  return acc
-}, {} as Record<string, string>)
+
 
 // Define a reusable function to test core functionality
 async function testCoreFunctionality(

@@ -1,8 +1,7 @@
 import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
 import {
   ResponseGenerationService,
-  type ResponseGenerationConfig,
-} from '@/lib/ai/services/response-generation'
+  } from '@/lib/ai/services/response-generation'
 
 // Mock AI service
 const mockAIService: AIService = {

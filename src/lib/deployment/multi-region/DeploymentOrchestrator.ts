@@ -7,7 +7,7 @@
 
 import { EventEmitter } from 'events';
 import { logger } from '../../logging';
-import { RegionConfig, DeploymentConfig, DeploymentStatus } from './MultiRegionDeploymentManager';
+import { RegionConfig, } from './MultiRegionDeploymentManager';
 import { CloudProviderManager, DeploymentResult } from './CloudProviderManager';
 
 export interface DeploymentOrchestratorConfig {

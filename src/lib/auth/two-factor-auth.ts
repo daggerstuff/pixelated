@@ -4,9 +4,9 @@
  */
 
 import { authenticator } from 'otplib'
-import { nanoid } from 'nanoid'
+
 import QRCode from 'qrcode'
-import { redis, setInCache, getFromCache, removeFromCache } from '../redis'
+import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { AuthenticationError } from './jwt-service'

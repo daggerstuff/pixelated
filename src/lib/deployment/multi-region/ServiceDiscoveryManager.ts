@@ -857,7 +857,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
     try {
       const backends = await this.getHealthyBackends();
       
-      for (const [serviceName, instances] of this.serviceRegistry) {
+      for (const [_serviceName, instances] of this.serviceRegistry) {
         for (const instance of instances) {
           if (instance.status === 'healthy') {
             instance.lastHeartbeat = new Date();
@@ -1169,7 +1169,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       }
 
       // Close backend connections
-      for (const [region, consul] of this.consulClients) {
+      for (const [region, _consul] of this.consulClients) {
         // Consul doesn't have a close method
         this.logger.info(`Consul connection closed for region: ${region}`);
       }

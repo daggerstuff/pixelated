@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, } from 'react'
 import { useChatWithMemory, UseChatWithMemoryReturn } from '@/hooks/useChatWithMemory'
 import { useAuth } from '@/hooks/useAuth'
 import { ChatContainer } from './ChatContainer'
