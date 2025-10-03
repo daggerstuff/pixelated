@@ -23,12 +23,23 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '24'
-        cache: 'pnpm'
 
     - name: Setup pnpm
       run: |
         corepack enable
+        # Ensure pnpm is available via corepack before using it
+        corepack prepare pnpm@latest --activate
         pnpm -v
+
+    - name: Cache pnpm store
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.pnpm-store
+          ~/.local/share/pnpm
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-
 
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile

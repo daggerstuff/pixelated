@@ -1,5 +1,5 @@
 /**
- * Better-Auth Integration Service - Complete replacement for Clerk authentication
+ * Better-Auth Integration Service - Complete authentication solution
  * Implements Better-Auth authentication with JWT token management and user management
  */
 
@@ -108,15 +108,26 @@ const userAuthStore = new Map<string, UserAuthentication>()
 /**
  * Map Better-Auth user to local user authentication
  */
-function mapBetterAuthUserToLocal(betterAuthUser: any): UserAuthentication {
+function mapBetterAuthUserToLocal(betterAuthUser: unknown): UserAuthentication {
+  // Type assertion for expected Better-Auth user shape
+  if (
+    typeof betterAuthUser !== 'object' ||
+    betterAuthUser === null ||
+    !('id' in betterAuthUser) ||
+    !('email' in betterAuthUser)
+  ) {
+    throw new AuthenticationError('Invalid Better-Auth user object')
+  }
+  const userObj = betterAuthUser as { id: string; email: string; role?: UserRole }
+
   const existingUser = Array.from(userAuthStore.values()).find(
-    user => user.betterAuthUserId === betterAuthUser.id
+    user => user.betterAuthUserId === userObj.id
   )
 
   if (existingUser) {
     return {
       ...existingUser,
-      email: betterAuthUser.email,
+      email: userObj.email,
       updatedAt: Date.now(),
     }
   }
@@ -124,9 +135,9 @@ function mapBetterAuthUserToLocal(betterAuthUser: any): UserAuthentication {
   // Create new user authentication record
   const newUserAuth: UserAuthentication = {
     id: generateUserId(),
-    betterAuthUserId: betterAuthUser.id,
-    email: betterAuthUser.email,
-    role: (betterAuthUser.role as UserRole) || 'guest',
+    betterAuthUserId: userObj.id,
+    email: userObj.email,
+    role: userObj.role || 'guest',
     authenticationStatus: AuthenticationStatus.UNAUTHENTICATED,
     loginAttempts: 0,
     createdAt: Date.now(),

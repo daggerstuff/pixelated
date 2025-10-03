@@ -33,6 +33,7 @@ export default defineConfig({
     ? '$(Agent.WorkFolder)/.vite-cache'
     : 'node_modules/.vite',
   server: {
+    allowedHosts: ['pixelatedempathy.tech'],
     watch: {
       ignored: [
         '**/node_modules/**',

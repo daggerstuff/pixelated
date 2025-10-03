@@ -208,7 +208,7 @@ export interface ResponseCondition {
   conditionType: 'threshold' | 'pattern' | 'time' | 'location';
   condition: string;
   operator: 'greater_than' | 'less_than' | 'equals' | 'contains' | 'matches';
-  value: any;
+  value: string | number | boolean | string[] | number[];
 }
 
 export interface IntegrationEndpoint {
@@ -266,7 +266,7 @@ export interface HuntPattern {
 export interface HuntCondition {
   field: string;
   operator: string;
-  value: any;
+  value: string | number | boolean | string[] | number[];
   weight: number;
 }
 
@@ -339,11 +339,11 @@ export interface ValidationCondition {
   type: 'field_exists' | 'field_value' | 'regex_match' | 'range_check' | 'whitelist' | 'blacklist';
   field: string;
   operator?: string;
-  value?: any;
+  value?: string | number | boolean | string[] | number[];
   pattern?: string;
   min?: number;
   max?: number;
-  values?: any[];
+  values?: string[] | number[];
   required: boolean;
 }
 
@@ -945,7 +945,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     },
     authentication: {
       method: 'jwt',
-      providers: ['clerk'],
+      providers: ['better-auth'],
       tokenExpiration: 3600000, // 1 hour
       refreshTokenEnabled: true,
       sessionManagement: true
@@ -1101,7 +1101,7 @@ export class ThreatIntelligenceConfigManager {
       logger.info('Redis connection established for configuration manager');
     } catch (error) {
       logger.error('Failed to connect to Redis:', { error });
-      throw new Error('Redis connection failed');
+      throw new Error('Redis connection failed', { cause: error });
     }
   }
 
@@ -1113,7 +1113,7 @@ export class ThreatIntelligenceConfigManager {
       logger.info('MongoDB connection established for configuration manager');
     } catch (error) {
       logger.error('Failed to connect to MongoDB:', { error });
-      throw new Error('MongoDB connection failed');
+      throw new Error('MongoDB connection failed', { cause: error });
     }
   }
 
@@ -1268,15 +1268,21 @@ export class ThreatIntelligenceConfigManager {
     }
   }
 
-  private deepMerge(target: any, source: any): any {
-    const result = { ...target };
+  private deepMerge<T extends Record<string, unknown>, U extends Record<string, unknown>>(target: T, source: U): T & U {
+    const result = { ...target } as T & U;
     
     for (const key in source) {
       if (Object.prototype.hasOwnProperty.call(source, key)) {
-        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-          result[key] = this.deepMerge(result[key] || {}, source[key]);
+        const sourceValue = source[key];
+        const targetValue = (result as Record<string, unknown>)[key];
+        
+        if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
+          (result as Record<string, unknown>)[key] = this.deepMerge(
+            (targetValue as Record<string, unknown>) || {},
+            sourceValue as Record<string, unknown>
+          );
         } else {
-          result[key] = source[key];
+          (result as Record<string, unknown>)[key] = sourceValue;
         }
       }
     }
