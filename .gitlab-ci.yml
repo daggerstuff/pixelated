@@ -421,17 +421,46 @@ build-frontend:
 
     # Push with timeout and retry
     echo "📤 Pushing to registry..."
+    PUSH_SUCCESS=false
     for i in {1..3}; do
+      echo "📤 Push attempt $i/3..."
       if timeout 600 docker push $CONTAINER_IMAGE && timeout 600 docker push $CONTAINER_IMAGE_LATEST; then
-        echo "✅ Images pushed successfully"
+        echo "✅ Images pushed successfully on attempt $i"
+        PUSH_SUCCESS=true
         break
       else
-        echo "⚠️ Push attempt $i failed, retrying..."
-        sleep 15
+        PUSH_EXIT_CODE=$?
+        echo "❌ Push attempt $i failed with exit code $PUSH_EXIT_CODE"
+        if [ $i -lt 3 ]; then
+          echo "⏳ Waiting 15 seconds before retry..."
+          sleep 15
+        fi
       fi
     done
 
+    # Verify push succeeded
+    if [ "$PUSH_SUCCESS" = "false" ]; then
+      echo "❌ Failed to push images after 3 attempts"
+      echo "🔍 Troubleshooting information:"
+      echo "  - Registry: $CI_REGISTRY"
+      echo "  - Image: $CONTAINER_IMAGE"
+      echo "  - Check registry permissions and authentication"
+      echo "  - Verify CI_JOB_TOKEN has write access to registry"
+      exit 1
+    fi
+
+    # Verify images exist in registry
+    echo "🔍 Verifying images in registry..."
+    if docker manifest inspect $CONTAINER_IMAGE >/dev/null 2>&1; then
+      echo "✅ Image verified in registry: $CONTAINER_IMAGE"
+    else
+      echo "❌ Image not found in registry after push: $CONTAINER_IMAGE"
+      echo "This indicates a registry synchronization issue"
+      exit 1
+    fi
+
     echo "📦 Image: $CONTAINER_IMAGE"
+    echo "📦 Latest: $CONTAINER_IMAGE_LATEST"
   artifacts:
     expire_in: 1 hour
   rules:
