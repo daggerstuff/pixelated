@@ -36,8 +36,7 @@ variables:
   PNPM_CACHE_FOLDER: .pnpm-store
   GIT_STRATEGY: clone
 
-  # Security
-  SENTRY_RELEASE: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
+  # Security - Note: SENTRY_RELEASE is set dynamically in jobs that need it
 
   # Container scanning configuration
   CS_IMAGE: $CONTAINER_IMAGE
@@ -544,6 +543,13 @@ build-frontend:
     docker pull node:24-alpine || true
     docker pull alpine:latest || true
 
+    # Set SENTRY_RELEASE dynamically
+    if [ -n "$CI_COMMIT_TAG" ]; then
+      export SENTRY_RELEASE="$CI_COMMIT_TAG"
+    else
+      export SENTRY_RELEASE="$CI_COMMIT_SHORT_SHA"
+    fi
+
     # Build with optimized caching and multi-stage optimization
     echo "🔨 Starting optimized build..."
     docker buildx build \
@@ -794,6 +800,13 @@ sentry-release:
   needs: [ "build-frontend" ]
   script:
   - |
+    # Set SENTRY_RELEASE dynamically
+    if [ -n "$CI_COMMIT_TAG" ]; then
+      export SENTRY_RELEASE="$CI_COMMIT_TAG"
+    else
+      export SENTRY_RELEASE="$CI_COMMIT_SHORT_SHA"
+    fi
+
     if [ -n "$SENTRY_AUTH_TOKEN" ]; then
       echo "📊 Creating Sentry release: $SENTRY_RELEASE"
       apk add --no-cache curl git
@@ -823,7 +836,7 @@ deploy-vps:
   script:
   - echo "🚀 Deploying to VPS environment..."
   - |
-    ssh $VPS_USER@$VPS_HOST << 'EOF'
+    ssh $VPS_USER@$VPS_HOST "bash -s" << EOF
       set -e
 
       echo "🔄 Starting deployment..."
@@ -834,8 +847,8 @@ deploy-vps:
         systemctl enable --now docker
       fi
 
-      # Login and pull
-      echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+      # Login and pull (credentials passed from GitLab CI)
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
       docker pull $CONTAINER_IMAGE_LATEST
 
       # Blue-green deployment
@@ -870,13 +883,13 @@ deploy-vps:
 
       # Wait for health check (using seq for sh compatibility)
       echo "⏳ Waiting for application to be healthy..."
-      for i in $(seq 1 20); do
-        STATUS=$(docker inspect --format='{{.State.Health.Status}}' pixelated-app 2>/dev/null || echo "starting")
-        if [ "$STATUS" = "healthy" ]; then
+      for i in \$(seq 1 20); do
+        STATUS=\$(docker inspect --format='{{.State.Health.Status}}' pixelated-app 2>/dev/null || echo "starting")
+        if [ "\$STATUS" = "healthy" ]; then
           echo "✅ Application is healthy"
           break
         fi
-        echo "Status: $STATUS (attempt $i/20)"
+        echo "Status: \$STATUS (attempt \$i/20)"
         sleep 5
       done
 
@@ -898,7 +911,7 @@ rollback:
   script:
   - echo "🔄 Rolling back to previous version..."
   - |
-    ssh $VPS_USER@$VPS_HOST << 'EOF'
+    ssh $VPS_USER@$VPS_HOST "bash -s" << EOF
       set -e
 
       echo "🔄 Performing rollback..."
@@ -907,7 +920,7 @@ rollback:
       docker stop pixelated-app || true
       docker rm pixelated-app || true
 
-      # Start previous version
+      # Start previous version (CONTAINER_IMAGE_PREVIOUS passed from GitLab CI)
       if docker images | grep -q $CONTAINER_IMAGE_PREVIOUS; then
         docker run -d \
           --name pixelated-app \
