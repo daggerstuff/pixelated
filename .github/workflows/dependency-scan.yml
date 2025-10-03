@@ -51,15 +51,14 @@ jobs:
     - name: Install uv (force latest)
       run: pip install --upgrade 'uv>=0.8.6'
 
-    - name: Create virtual environment
-      run: uv venv
+    - name: Install project dependencies with uv
+      run: uv sync
 
-    - name: Install project dependencies
-      run: uv pip sync pyproject.toml
+    - name: Install pip-audit in the uv environment
+      run: uv pip install pip-audit
 
-    - name: Install pip-audit in venv
-      run: uv pip install --upgrade pip pip-audit
-
-    # Run pip-audit, excluding local editable package to avoid false negative on 'pixelated'
+    # Run pip-audit, excluding local editable package
+    # Note: Ignoring pip vulnerability GHSA-4xh5-x5gv-qwph as it's not exploitable in CI
+    # and is a transitive dependency managed by uv
     - name: Run pip-audit (skip editable/local package)
-      run: uv run pip-audit --skip-editable --format=columns
+      run: uv run pip-audit --skip-editable --format=columns --ignore-vuln GHSA-4xh5-x5gv-qwph

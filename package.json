@@ -351,7 +351,8 @@
       "tar-fs@>=2.0.0 <2.1.3": ">=2.1.3",
       "@grpc/grpc-js": ">=1.8.22",
       "axios": ">=1.12.0",
-      "mem0ai>axios": ">=1.12.0"
+      "mem0ai>axios": ">=1.12.0",
+      "esbuild": "^0.25.9"
     },
     "allowedDeprecatedVersions": {
       "abab": "2.0.6",
@@ -374,7 +375,11 @@
       ],
       "allowedVersions": {
         "@vercel/kv": ">=1.0.1",
-        "@unocss/reset": ">=0.63.2"
+        "@unocss/reset": ">=0.63.2",
+        "zod": "4",
+        "pg": "8",
+        "@types/pg": "8",
+        "redis": "5"
       }
     },
     "onlyBuiltDependencies": [
@@ -425,8 +430,5 @@
     "postinstall-postinstall",
     "protobufjs",
     "unrs-resolver"
-  ],
-  "overrides": {
-    "esbuild": "^0.25.9"
-  }
+  ]
 }
