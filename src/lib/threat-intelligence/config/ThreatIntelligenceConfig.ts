@@ -4,7 +4,7 @@
  */
 
 import { Redis } from 'ioredis';
-import { MongoClient } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 
 const logger = createBuildSafeLogger('threat-intelligence-config');
@@ -1101,7 +1101,8 @@ export class ThreatIntelligenceConfigManager {
       logger.info('Redis connection established for configuration manager');
     } catch (error) {
       logger.error('Failed to connect to Redis:', { error });
-      throw new Error('Redis connection failed', { cause: error });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Redis connection failed: ${errorMessage}`);
     }
   }
 
@@ -1113,7 +1114,8 @@ export class ThreatIntelligenceConfigManager {
       logger.info('MongoDB connection established for configuration manager');
     } catch (error) {
       logger.error('Failed to connect to MongoDB:', { error });
-      throw new Error('MongoDB connection failed', { cause: error });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`MongoDB connection failed: ${errorMessage}`);
     }
   }
 
@@ -1268,21 +1270,21 @@ export class ThreatIntelligenceConfigManager {
     }
   }
 
-  private deepMerge<T extends Record<string, unknown>, U extends Record<string, unknown>>(target: T, source: U): T & U {
-    const result = { ...target } as T & U;
+  private deepMerge(target: ThreatIntelligenceConfig, source: Partial<ThreatIntelligenceConfig>): ThreatIntelligenceConfig {
+    const result = { ...target };
     
     for (const key in source) {
       if (Object.prototype.hasOwnProperty.call(source, key)) {
-        const sourceValue = source[key];
-        const targetValue = (result as Record<string, unknown>)[key];
+        const sourceValue = source[key as keyof ThreatIntelligenceConfig];
+        const targetValue = result[key as keyof ThreatIntelligenceConfig];
         
         if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
-          (result as Record<string, unknown>)[key] = this.deepMerge(
-            (targetValue as Record<string, unknown>) || {},
-            sourceValue as Record<string, unknown>
+          (result as any)[key] = this.deepMerge(
+            (targetValue as any) || {},
+            sourceValue as any
           );
         } else {
-          (result as Record<string, unknown>)[key] = sourceValue;
+          (result as any)[key] = sourceValue;
         }
       }
     }
@@ -1458,5 +1460,3 @@ export class ThreatIntelligenceConfigManager {
     }
   }
 }
-
-export { ThreatIntelligenceConfigManager };
