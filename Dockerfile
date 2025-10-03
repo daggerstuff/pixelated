@@ -99,9 +99,7 @@ USER astro
 COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules
 COPY --from=deps --chown=astro:astro /app/.pnpm-store ./.pnpm-store
 COPY --chown=astro:astro package.json ./
-# Handle pnpm-lock.yaml conditionally in build stage
-RUN if [ -f pnpm-lock.yaml ]; then cp pnpm-lock.yaml /tmp/pnpm-lock.yaml; fi
-RUN if [ -f /tmp/pnpm-lock.yaml ]; then cp /tmp/pnpm-lock.yaml ./; fi
+COPY --chown=astro:astro pnpm-lock.yaml* ./
 
 # Copy source files in order of change frequency (least to most)
 COPY --chown=astro:astro astro.config.mjs tsconfig.json uno.config.ts ./

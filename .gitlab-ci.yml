@@ -717,9 +717,9 @@ deploy-vps:
         --health-retries=3 \
         $CONTAINER_IMAGE_LATEST
 
-      # Wait for health check
+      # Wait for health check (using seq for sh compatibility)
       echo "⏳ Waiting for application to be healthy..."
-      for i in {1..20}; do
+      for i in $(seq 1 20); do
         STATUS=$(docker inspect --format='{{.State.Health.Status}}' pixelated-app 2>/dev/null || echo "starting")
         if [ "$STATUS" = "healthy" ]; then
           echo "✅ Application is healthy"

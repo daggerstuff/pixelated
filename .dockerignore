@@ -33,6 +33,12 @@
 **/.python
 **/.azure-artifacts/
 **/*.node
+**/.pnpm-store/
+**/.gitlab-ci.yml
+**/README.md
+**/docs/
+**/*.md
+!pnpm-lock.yaml
 
 **/.mcp.json
 .swarm/
