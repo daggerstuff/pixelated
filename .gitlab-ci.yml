@@ -759,40 +759,25 @@ sentry-release:
   image: node:24-alpine
   needs: [ "deploy-gke" ]
   script:
-  - "# Set SENTRY_RELEASE dynamically
-
-    if [ -n \"$CI_COMMIT_TAG\" ]; then
-
-    \  export SENTRY_RELEASE=\"$CI_COMMIT_TAG\"
-
+  - |
+    # Set SENTRY_RELEASE dynamically
+    if [ -n "$CI_COMMIT_TAG" ]; then
+      export SENTRY_RELEASE="$CI_COMMIT_TAG"
     else
-
-    \  export SENTRY_RELEASE=\"$CI_COMMIT_SHORT_SHA\"
-
+      export SENTRY_RELEASE="$CI_COMMIT_SHORT_SHA"
     fi
 
-
-    if [ -n \"$SENTRY_AUTH_TOKEN\" ]; then
-
-    \  echo \"\udcca Creating Sentry release: $SENTRY_RELEASE\"
-
-    \  apk add --no-cache curl git
-
-    \  curl -sL https://sentry.io/get-cli/ | sh
-
-    \  sentry-cli releases new \"$SENTRY_RELEASE\" || true
-
-    \  sentry-cli releases files \"$SENTRY_RELEASE\" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
-
-    \  sentry-cli releases finalize \"$SENTRY_RELEASE\" || true
-
-    \  echo \"✅ Sentry release created\"
-
+    if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+      echo "Creating Sentry release: $SENTRY_RELEASE"
+      apk add --no-cache curl git
+      curl -sL https://sentry.io/get-cli/ | sh
+      sentry-cli releases new "$SENTRY_RELEASE" || true
+      sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
+      sentry-cli releases finalize "$SENTRY_RELEASE" || true
+      echo "Sentry release created"
     else
-
-    \  echo \"⚠️ SENTRY_AUTH_TOKEN not set, skipping\"
-
-    fi\n"
+      echo "SENTRY_AUTH_TOKEN not set, skipping"
+    fi
   rules:
   - if: $CI_COMMIT_TAG
   - if: $CI_COMMIT_BRANCH == "master"
