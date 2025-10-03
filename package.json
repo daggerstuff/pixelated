@@ -351,7 +351,7 @@
       "tar-fs@>=2.0.0 <2.1.3": ">=2.1.3",
       "@grpc/grpc-js": ">=1.8.22",
       "axios": ">=1.12.0",
-      "openmemory>mem0ai>axios": ">=1.12.0"
+      "mem0ai>axios": ">=1.12.0"
     },
     "allowedDeprecatedVersions": {
       "abab": "2.0.6",
