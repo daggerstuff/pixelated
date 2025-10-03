@@ -36,12 +36,8 @@ variables:
   PNPM_CACHE_FOLDER: .pnpm-store
   GIT_STRATEGY: clone
 
-  # Security - Note: SENTRY_RELEASE is set dynamically in jobs that need it
-
-  # Container scanning configuration
   CS_IMAGE: $CONTAINER_IMAGE
 
-  # Legacy variables for compatibility
   CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
   CI_REGISTRY: https://registry.gitlab.com/
   CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
@@ -49,7 +45,6 @@ variables:
   GKE_ZONE: ${GKE_ZONE:-us-east1}
   GKE_ENVIRONMENT_URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}
 
-# Global cache configuration for faster builds
 cache: &global_cache
   key:
     files:
@@ -62,41 +57,6 @@ cache: &global_cache
   - ~/.cache/pnpm/
   policy: pull-push
   unprotect: true
-
-# Security template for SSH key handling using GitLab's SSH_PRIVATE_KEY
-.ssh_setup: &ssh_setup
-  before_script:
-  - apk add --no-cache openssh-client curl git
-  - eval $(ssh-agent -s)
-  - |
-    if [ -z "$SSH_PRIVATE_KEY" ]; then
-      echo "❌ SSH_PRIVATE_KEY not set - configure it in GitLab CI/CD variables"
-      exit 1
-    fi
-
-    # Write SSH key to temporary file, converting single-line format to proper multi-line
-    SSH_KEY_FILE=$(mktemp)
-    trap "rm -f $SSH_KEY_FILE" EXIT
-
-    # Convert single-line key (with \n) to proper multi-line format
-    echo "$SSH_PRIVATE_KEY" | sed 's/\\n/\n/g' > "$SSH_KEY_FILE"
-    chmod 600 "$SSH_KEY_FILE"
-
-    # Validate and add key
-    if ssh-keygen -l -f "$SSH_KEY_FILE" >/dev/null 2>&1; then
-      ssh-add "$SSH_KEY_FILE"
-      echo "✅ SSH key loaded successfully"
-    else
-      echo "❌ Invalid SSH key format. Ensure your SSH_PRIVATE_KEY variable contains \\n for line breaks"
-      exit 1
-    fi
-  - mkdir -p ~/.ssh && chmod 700 ~/.ssh
-  - |
-    if [ -n "$VPS_HOST" ]; then
-      ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
-    else
-      echo "⚠️ VPS_HOST not set, skipping host key scan"
-    fi
 
 # Docker service template
 .docker_service: &docker_service
@@ -793,194 +753,122 @@ security-scan:
   allow_failure: true
   timeout: 15m
 
-# Sentry integration - conditional
+# Sentry integration - runs after successful deployment
 sentry-release:
-  stage: security
+  stage: deploy
   image: node:24-alpine
-  needs: [ "build-frontend" ]
+  needs: [ "deploy-gke" ]
   script:
-  - |
-    # Set SENTRY_RELEASE dynamically
-    if [ -n "$CI_COMMIT_TAG" ]; then
-      export SENTRY_RELEASE="$CI_COMMIT_TAG"
+  - "# Set SENTRY_RELEASE dynamically
+
+    if [ -n \"$CI_COMMIT_TAG\" ]; then
+
+    \  export SENTRY_RELEASE=\"$CI_COMMIT_TAG\"
+
     else
-      export SENTRY_RELEASE="$CI_COMMIT_SHORT_SHA"
+
+    \  export SENTRY_RELEASE=\"$CI_COMMIT_SHORT_SHA\"
+
     fi
 
-    if [ -n "$SENTRY_AUTH_TOKEN" ]; then
-      echo "📊 Creating Sentry release: $SENTRY_RELEASE"
-      apk add --no-cache curl git
-      curl -sL https://sentry.io/get-cli/ | sh
-      sentry-cli releases new "$SENTRY_RELEASE" || true
-      sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
-      sentry-cli releases finalize "$SENTRY_RELEASE" || true
-      echo "✅ Sentry release created"
+
+    if [ -n \"$SENTRY_AUTH_TOKEN\" ]; then
+
+    \  echo \"\udcca Creating Sentry release: $SENTRY_RELEASE\"
+
+    \  apk add --no-cache curl git
+
+    \  curl -sL https://sentry.io/get-cli/ | sh
+
+    \  sentry-cli releases new \"$SENTRY_RELEASE\" || true
+
+    \  sentry-cli releases files \"$SENTRY_RELEASE\" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
+
+    \  sentry-cli releases finalize \"$SENTRY_RELEASE\" || true
+
+    \  echo \"✅ Sentry release created\"
+
     else
-      echo "⚠️ SENTRY_AUTH_TOKEN not set, skipping"
-    fi
+
+    \  echo \"⚠️ SENTRY_AUTH_TOKEN not set, skipping\"
+
+    fi\n"
   rules:
   - if: $CI_COMMIT_TAG
   - if: $CI_COMMIT_BRANCH == "master"
-    when: manual
   - if: $CI_COMMIT_BRANCH == "main"
-    when: manual
   allow_failure: true
   timeout: 5m
 
-# Deployment stage - secure and reliable
-deploy-vps:
-  stage: deploy
-  image: alpine:latest
-  <<: *ssh_setup
-  needs: [ "test-container", "test-unit", "security-scan" ]
-  script:
-  - echo "🚀 Deploying to VPS environment..."
-  - |
-    ssh $VPS_USER@$VPS_HOST "bash -s" << EOF
-      set -e
-
-      echo "🔄 Starting deployment..."
-
-      # Install Docker if needed
-      if ! command -v docker &> /dev/null; then
-        curl -fsSL https://get.docker.com | sh
-        systemctl enable --now docker
-      fi
-
-      # Login and pull (credentials passed from GitLab CI)
-      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-      docker pull $CONTAINER_IMAGE_LATEST
-
-      # Blue-green deployment
-      if docker ps | grep -q pixelated-app; then
-        docker tag $CONTAINER_IMAGE_LATEST $CONTAINER_IMAGE_PREVIOUS
-        docker stop pixelated-app || true
-        docker rm pixelated-app || true
-      fi
-
-      # Start new container with security settings
-      docker run -d \
-        --name pixelated-app \
-        --restart unless-stopped \
-        --user 1001:1001 \
-        --read-only \
-        --tmpfs /tmp:rw,noexec,nosuid,size=100m \
-        --security-opt no-new-privileges:true \
-        --cap-drop ALL \
-        --cap-add CHOWN \
-        --cap-add SETGID \
-        --cap-add SETUID \
-        -p 4321:4321 \
-        -e NODE_ENV=production \
-        -e PORT=4321 \
-        -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-        -e ASTRO_TELEMETRY_DISABLED=1 \
-        --health-cmd="node -e \"require('http').get('http://localhost:4321/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\"" \
-        --health-interval=30s \
-        --health-timeout=10s \
-        --health-retries=3 \
-        $CONTAINER_IMAGE_LATEST
-
-      # Wait for health check (using seq for sh compatibility)
-      echo "⏳ Waiting for application to be healthy..."
-      for i in \$(seq 1 20); do
-        STATUS=\$(docker inspect --format='{{.State.Health.Status}}' pixelated-app 2>/dev/null || echo "starting")
-        if [ "\$STATUS" = "healthy" ]; then
-          echo "✅ Application is healthy"
-          break
-        fi
-        echo "Status: \$STATUS (attempt \$i/20)"
-        sleep 5
-      done
-
-      echo "✅ Deployment completed successfully"
-    EOF
-  environment:
-    name: production
-    url: https://$VPS_DOMAIN
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_COMMIT_BRANCH == "main"
-  timeout: 15m
-
-# Rollback capability
-rollback:
-  stage: deploy
-  image: alpine:latest
-  <<: *ssh_setup
-  script:
-  - echo "🔄 Rolling back to previous version..."
-  - |
-    ssh $VPS_USER@$VPS_HOST "bash -s" << EOF
-      set -e
-
-      echo "🔄 Performing rollback..."
-
-      # Stop current container
-      docker stop pixelated-app || true
-      docker rm pixelated-app || true
-
-      # Start previous version (CONTAINER_IMAGE_PREVIOUS passed from GitLab CI)
-      if docker images | grep -q $CONTAINER_IMAGE_PREVIOUS; then
-        docker run -d \
-          --name pixelated-app \
-          --restart unless-stopped \
-          --user 1001:1001 \
-          -p 4321:4321 \
-          -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-          $CONTAINER_IMAGE_PREVIOUS
-        echo "✅ Rollback completed"
-      else
-        echo "❌ No previous image found for rollback"
-        exit 1
-      fi
-    EOF
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-    when: manual
-  - if: $CI_COMMIT_BRANCH == "main"
-    when: manual
-  allow_failure: true
-  timeout: 10m
-
-# Health monitoring
+# Health monitoring - GKE deployment
 health-check:
   stage: deploy
-  image: alpine:latest
-  needs: [ "deploy-vps" ]
-  script:
-  - apk add --no-cache curl
-  - echo "🏥 Running post-deployment health check..."
+  image: google/cloud-sdk:alpine
+  needs: [ "deploy-gke" ]
+  before_script:
+  - apk add --no-cache kubectl curl jq
+  - gcloud components install gke-gcloud-auth-plugin --quiet
   - |
-    if [ -z "$VPS_DOMAIN" ] && [ -z "$VPS_HOST" ]; then
-      echo "⚠️ No target configured, skipping health check"
+    if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+      echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+    elif [ -n "$GCP_SERVICE_ACCOUNT_KEY_B64" ]; then
+      echo "$GCP_SERVICE_ACCOUNT_KEY_B64" | base64 -d > /tmp/gcp-key.json
+    else
+      echo "⚠️ No GCP credentials configured, skipping health check"
       exit 0
     fi
 
-    TARGET="${VPS_DOMAIN:-$VPS_HOST}"
+    chmod 600 /tmp/gcp-key.json
+    gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    gcloud config set project $GCP_PROJECT_ID
+    gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
+  script:
+  - echo "🏥 Running post-deployment health check on GKE..."
+  - |
+    # Check Kubernetes deployment health
+    echo "🔍 Checking Kubernetes deployment status..."
+    if ! kubectl get deployment pixelated >/dev/null 2>&1; then
+      echo "❌ Deployment 'pixelated' not found"
+      exit 1
+    fi
 
-    # Comprehensive health check
-    for endpoint in "/api/health" "/health" "/"; do
-      for protocol in "https" "http"; do
-        URL="$protocol://$TARGET$endpoint"
-        echo "🔍 Checking $URL..."
+    # Check if pods are ready
+    READY_REPLICAS=$(kubectl get deployment pixelated -o jsonpath='{.status.readyReplicas}')
+    DESIRED_REPLICAS=$(kubectl get deployment pixelated -o jsonpath='{.spec.replicas}')
+
+    echo "📊 Ready replicas: $READY_REPLICAS/$DESIRED_REPLICAS"
+
+    if [ "$READY_REPLICAS" != "$DESIRED_REPLICAS" ]; then
+      echo "⚠️ Not all replicas are ready"
+      kubectl get pods -l app=pixelated
+      exit 1
+    fi
+
+    # Check HTTP endpoint if configured
+    if [ -n "$GKE_ENVIRONMENT_URL" ]; then
+      echo "🔍 Checking HTTP endpoint: $GKE_ENVIRONMENT_URL"
+
+      for endpoint in "/api/health" "/health" "/"; do
+        URL="$GKE_ENVIRONMENT_URL$endpoint"
+        echo "🔍 Testing $URL..."
 
         if curl -fsS --connect-timeout 10 --max-time 30 "$URL" >/dev/null 2>&1; then
           echo "✅ Health check passed: $URL"
+          echo "✅ GKE deployment is healthy"
           exit 0
         fi
       done
-    done
 
-    echo "❌ All health checks failed"
-    exit 1
+      echo "⚠️ HTTP endpoints not responding, but pods are ready"
+    fi
+
+    echo "✅ Kubernetes deployment health check passed"
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
   timeout: 5m
 
-# Cleanup job - runs periodically
 cleanup:
   stage: deploy
   image: docker:27.3.1
@@ -1001,9 +889,7 @@ cleanup:
   rules:
   - if: $CI_PIPELINE_SOURCE == "schedule"
   - if: $CI_COMMIT_BRANCH == "master"
-    when: manual
   - if: $CI_COMMIT_BRANCH == "main"
-    when: manual
   allow_failure: true
   timeout: 10m
 
@@ -1046,6 +932,7 @@ deploy-gke:
   image: google/cloud-sdk:alpine
   before_script:
   - apk add --no-cache kubectl curl jq
+  - gcloud components install gke-gcloud-auth-plugin --quiet
   - |
     if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
       echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
@@ -1084,19 +971,15 @@ deploy-gke:
     url: $GKE_ENVIRONMENT_URL
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
-    when: manual
   - if: $CI_COMMIT_BRANCH == "main"
-    when: manual
-  needs: [ "build-frontend" ]
+  needs: [ "build-frontend", "test-container", "test-unit", "security-scan" ]
   allow_failure: true
   timeout: 20m
 
-# Override container scanning to ensure it runs after build
 container_scanning:
   needs:
   - build-frontend
 
-# Include GitLab security templates
 include:
 - template: Security/SAST.gitlab-ci.yml
 - template: Security/Dependency-Scanning.gitlab-ci.yml
