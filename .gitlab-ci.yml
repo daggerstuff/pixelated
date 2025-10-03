@@ -176,7 +176,7 @@ cache: &global_cache
 # Registry login template
 .registry_login: &registry_login
   before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
 # Validation stage - runs in parallel
 validate-runner:
