@@ -141,7 +141,7 @@ cache: &global_cache
 
     # Wait for Docker daemon to be ready with extended timeout
     echo "⏳ Waiting for Docker daemon to be ready..."
-    for i in {1..60}; do
+    for i in $(seq 1 60); do
       if docker version >/dev/null 2>&1; then
         echo "✅ Docker daemon is ready after $i attempts"
         break
@@ -173,9 +173,72 @@ cache: &global_cache
     echo "Docker version info:"
     docker version
 
-# Registry login template
+# Registry login template - merged with docker service setup
 .registry_login: &registry_login
   before_script:
+  - echo "🔍 Waiting for Docker service to be ready..."
+  - |
+    # Install required tools for debugging
+    apk add --no-cache curl netcat-openbsd bind-tools
+
+    # Enhanced Docker connectivity check with better error handling
+    echo "🔍 Checking network connectivity..."
+
+    # Test DNS resolution first
+    if nslookup docker >/dev/null 2>&1; then
+      echo "✅ Docker hostname resolves successfully"
+    else
+      echo "❌ Docker hostname resolution failed"
+      echo "🔍 Checking /etc/hosts and DNS configuration..."
+      cat /etc/hosts || true
+      cat /etc/resolv.conf || true
+      echo "🔍 Testing alternative DNS resolution..."
+      nslookup docker 8.8.8.8 || true
+    fi
+
+    # Test port connectivity
+    if nc -z docker 2375 >/dev/null 2>&1; then
+      echo "✅ Docker port 2375 is reachable"
+    else
+      echo "❌ Docker port 2375 is not reachable"
+      echo "🔍 Testing network connectivity..."
+      ping -c 1 docker || echo "❌ Cannot ping docker service"
+    fi
+
+    # Wait for Docker daemon to be ready with extended timeout
+    echo "⏳ Waiting for Docker daemon to be ready..."
+    for i in $(seq 1 60); do
+      if docker version >/dev/null 2>&1; then
+        echo "✅ Docker daemon is ready after $i attempts"
+        break
+      fi
+      echo "⏳ Waiting for Docker daemon... ($i/60)"
+      sleep 2
+    done
+
+    # Final comprehensive check
+    if ! docker version >/dev/null 2>&1; then
+      echo "❌ Docker daemon failed to start after 120 seconds"
+      echo "🔍 Debugging Docker service status..."
+
+      # Try to get more information about the failure
+      echo "🔍 Attempting direct API call..."
+      curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
+
+      echo "🔍 Checking service status..."
+      ps aux | grep docker || true
+
+      echo "🔍 Network debugging..."
+      netstat -tlnp 2>/dev/null || true
+      ss -tlnp 2>/dev/null || true
+
+      exit 1
+    fi
+
+    echo "✅ Docker service validation complete"
+    echo "Docker version info:"
+    docker version
+  - echo "🔐 Logging into GitLab Container Registry..."
   - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
 # Validation stage - runs in parallel
@@ -222,7 +285,7 @@ validate-runner:
 
     # Wait for Docker daemon to be ready with extended timeout
     echo "⏳ Waiting for Docker daemon to be ready..."
-    for i in {1..60}; do
+    for i in $(seq 1 60); do
       if docker version >/dev/null 2>&1; then
         echo "✅ Docker daemon is ready after $i attempts"
         break
@@ -450,10 +513,18 @@ validate-dependencies:
 build-frontend:
   stage: build
   image: docker:27.3.1
-  <<: [ *docker_service, *registry_login ]
+  services:
+  - name: docker:27.3.1-dind
+    alias: docker
+    command: [ "--tls=false", "--experimental=false", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock" ]
+  <<: *registry_login
   cache:
     <<: *global_cache
   variables:
+    # Docker configuration
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ''
+    DOCKER_DRIVER: overlay2
     # Optimize Docker build performance
     DOCKER_BUILDKIT: 1
     BUILDKIT_PROGRESS: plain
@@ -565,7 +636,7 @@ test-container:
       $CONTAINER_IMAGE
 
     # Wait for healthy status
-    for i in {1..30}; do
+    for i in $(seq 1 30); do
       STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-container 2>/dev/null || echo "starting")
       if [ "$STATUS" = "healthy" ]; then
         echo "✅ Container health check passed"
