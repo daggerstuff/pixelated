@@ -328,33 +328,108 @@ validate-dependencies:
     <<: *global_cache
     policy: pull
   variables:
-    # Optimize pnpm performance
     PNPM_HOME: /root/.local/share/pnpm
     PNPM_STORE_DIR: .pnpm-store
-    HUSKY: 0 # Disable husky hooks in CI
+    HUSKY: 0
+    # Increase Node memory for dependency resolution
+    NODE_OPTIONS: "--max-old-space-size=4096"
   script:
   - echo "🔍 Validating dependencies..."
-  - apk add --no-cache git curl
+  - apk add --no-cache git curl jq
   - corepack enable pnpm
   - pnpm config set store-dir $PNPM_CACHE_FOLDER
   - pnpm config set registry https://registry.npmjs.org/
+  - pnpm config set network-timeout 60000
   - |
-    # Install dependencies with optimized settings
-    echo "📦 Installing dependencies..."
-    pnpm install \
+    # Diagnostic information
+    echo "📊 Environment Information:"
+    echo "Node version: $(node --version)"
+    echo "pnpm version: $(pnpm --version)"
+    echo "Available memory: $(free -h | grep Mem || echo 'N/A')"
+    echo "Store directory: $PNPM_CACHE_FOLDER"
+
+    # Check if lockfile exists and is valid
+    if [ -f "pnpm-lock.yaml" ]; then
+      echo "✅ pnpm-lock.yaml found"
+    else
+      echo "⚠️ No pnpm-lock.yaml found - will create new lockfile"
+    fi
+
+    # Install dependencies with progressive fallback strategy
+    echo "📦 Installing dependencies (attempt 1: optimized with cache)..."
+    if pnpm install \
       --no-frozen-lockfile \
       --prefer-offline \
-      --reporter=silent \
-      --ignore-scripts \
-      --shamefully-hoist=false
+      --reporter=default \
+      --ignore-scripts 2>&1 | tee pnpm-install.log; then
+      echo "✅ Install successful with optimized settings"
+    else
+      EXIT_CODE=$?
+      echo "❌ Install attempt 1 failed with exit code $EXIT_CODE"
+      echo "📋 Last 50 lines of install log:"
+      tail -n 50 pnpm-install.log || true
+
+      echo ""
+      echo "📦 Installing dependencies (attempt 2: without offline preference)..."
+      if pnpm install \
+        --no-frozen-lockfile \
+        --reporter=default \
+        --ignore-scripts 2>&1 | tee pnpm-install-2.log; then
+        echo "✅ Install successful without offline preference"
+      else
+        EXIT_CODE=$?
+        echo "❌ Install attempt 2 failed with exit code $EXIT_CODE"
+        echo "📋 Last 50 lines of install log:"
+        tail -n 50 pnpm-install-2.log || true
+
+        echo ""
+        echo "📦 Installing dependencies (attempt 3: minimal flags)..."
+        if pnpm install --ignore-scripts 2>&1 | tee pnpm-install-3.log; then
+          echo "✅ Install successful with minimal flags"
+        else
+          EXIT_CODE=$?
+          echo "❌ Install attempt 3 failed with exit code $EXIT_CODE"
+          echo "📋 Last 50 lines of install log:"
+          tail -n 50 pnpm-install-3.log || true
+
+          echo ""
+          echo "📦 Installing dependencies (attempt 4: last resort - allow scripts)..."
+          if pnpm install 2>&1 | tee pnpm-install-4.log; then
+            echo "✅ Install successful with all features enabled"
+          else
+            EXIT_CODE=$?
+            echo "❌ All install attempts failed"
+            echo "📋 Full diagnostic information:"
+            echo ""
+            echo "=== Final install log (last 100 lines) ==="
+            tail -n 100 pnpm-install-4.log || true
+            echo ""
+            echo "=== Network connectivity test ==="
+            curl -I https://registry.npmjs.org/ || echo "Registry unreachable"
+            echo ""
+            echo "=== Disk space ==="
+            df -h || true
+            echo ""
+            exit $EXIT_CODE
+          fi
+        fi
+      fi
+    fi
 
     # Verify installation
+    echo ""
     echo "✅ Dependencies installed successfully"
-    pnpm list --depth=0
+    echo "📋 Installed packages:"
+    pnpm list --depth=0 || echo "⚠️ Could not list packages"
 
-    # Security audit with faster execution
+    # Security audit with faster execution (non-blocking)
+    echo ""
     echo "🔒 Running security audit..."
-    pnpm audit --audit-level moderate --json > audit-report.json || echo "Audit completed with findings"
+    if pnpm audit --audit-level moderate --json > audit-report.json 2>&1; then
+      echo "✅ Security audit completed successfully"
+    else
+      echo "⚠️ Security audit completed with findings (non-blocking)"
+    fi
 
     # Check for critical vulnerabilities
     if [ -f audit-report.json ]; then
@@ -508,9 +583,14 @@ test-unit:
     pnpm install \
       --no-frozen-lockfile \
       --prefer-offline \
-      --reporter=silent \
+      --reporter=default \
       --ignore-scripts \
-      --shamefully-hoist=false
+      --shamefully-hoist=false || {
+        echo "❌ pnpm install failed, trying with fallback options..."
+        pnpm install --no-frozen-lockfile --ignore-scripts || \
+        pnpm install --ignore-scripts || \
+        pnpm install
+      }
 
     case $TEST_SUITE in
       unit)
