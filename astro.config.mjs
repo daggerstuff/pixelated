@@ -23,11 +23,11 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
-    sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
+    sourcemap: true, // Always generate sourcemaps for Sentry
   },
   vite: {
     build: {
-      sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
+      sourcemap: 'hidden', // Generate but don't expose to users
       target: 'node22',
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
@@ -190,8 +190,15 @@ export default defineConfig({
     ...(process.env.SENTRY_DSN ? [
       sentry({
         sourceMapsUploadOptions: {
-          project: "pixel-astro",
+          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+          project: process.env.SENTRY_PROJECT || 'pixel-astro',
           authToken: process.env.SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs'],
+            ignore: ['**/node_modules/**'],
+            filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
+          },
         },
       }),
       ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1'

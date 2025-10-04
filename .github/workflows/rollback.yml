@@ -57,7 +57,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Install dependencies
+    - name: Install dependencies (for tag manager)
       run: pnpm install --no-frozen-lockfile
 
     - name: Determine rollback tag
@@ -77,6 +77,12 @@ jobs:
           echo "::error::Rollback not possible - this appears to be the first deployment"
           exit 1
         fi
+
+    - name: Reinstall dependencies for rollback tag
+      run: |
+        echo "Cleaning node_modules and reinstalling for rollback tag..."
+        rm -rf node_modules
+        pnpm install --no-frozen-lockfile
 
     - name: Build application
       run: pnpm build
@@ -195,7 +201,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Install dependencies
+    - name: Install dependencies (for tag manager)
       run: pnpm install --no-frozen-lockfile
 
     - name: Determine rollback tag
@@ -215,6 +221,12 @@ jobs:
           echo "::error::Rollback not possible - this appears to be the first deployment"
           exit 1
         fi
+
+    - name: Reinstall dependencies for rollback tag
+      run: |
+        echo "Cleaning node_modules and reinstalling for rollback tag..."
+        rm -rf node_modules
+        pnpm install --no-frozen-lockfile
 
     - name: Build application
       run: pnpm build

@@ -100,6 +100,12 @@ test('responsive navigation should work on mobile devices', async ({
   // Navigate to homepage
   await navigateToPage(page, '/')
 
+  // Wait for page to be fully loaded and hydrated
+  await page.waitForLoadState('networkidle')
+
+  // Wait a bit longer for Astro page-load event to fire
+  await page.waitForTimeout(1000)
+
   // Look for mobile navigation elements - hamburger menu or similar
   const mobileNavTrigger = page
     .locator('button[aria-label*="menu" i], button[aria-label*="navigation" i]')
@@ -107,10 +113,17 @@ test('responsive navigation should work on mobile devices', async ({
 
   // If we have a mobile trigger, test it
   if ((await mobileNavTrigger.count()) > 0) {
+    // Ensure the button is visible and ready before clicking
+    await expect(mobileNavTrigger).toBeVisible({ timeout: 5000 })
+
     // Click the mobile nav trigger
     await mobileNavTrigger.click()
 
-    // Wait for any animations
+    // Wait for the mobile menu container to become visible (not just exist)
+    const mobileMenu = page.locator('#mobile-menu')
+    await expect(mobileMenu).not.toHaveClass(/hidden/, { timeout: 5000 })
+
+    // Wait for CSS transitions to complete
     await page.waitForTimeout(500)
 
     // Take screenshot with menu open
@@ -118,13 +131,24 @@ test('responsive navigation should work on mobile devices', async ({
       path: `./test-results/mobile/mobile-nav-open.png`,
     })
 
-    // Verify menu items are visible
-    const menuItems = page.locator('nav a')
-    // Check if first menu item exists and is attached to DOM
+    // Verify the menu container is visible first
+    await expect(mobileMenu).toBeVisible({ timeout: 3000 })
+
+    // Now verify menu items are visible
+    const menuItems = mobileMenu.locator('nav a')
     const firstMenuItem = menuItems.first()
+
+    // Check if first menu item exists
     if ((await firstMenuItem.count()) > 0) {
-      // Wait for it to be visible with a longer timeout
-      await expect(firstMenuItem).toBeVisible({ timeout: 15000 })
+      // Wait for it to be visible with explicit checks
+      await expect(firstMenuItem).toBeVisible({ timeout: 5000 })
+
+      // Verify it's actually interactable
+      await expect(firstMenuItem).toBeEnabled({ timeout: 2000 })
+
+      console.log(`✅ Mobile navigation test passed - menu opens and links are visible`)
+    } else {
+      throw new Error('No navigation links found in mobile menu')
     }
   }
 
