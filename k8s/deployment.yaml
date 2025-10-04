@@ -64,9 +64,6 @@ spec:
         - name: config-volume
           mountPath: /app/config
           readOnly: true
-        - name: secrets-volume
-          mountPath: /app/secrets
-          readOnly: true
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -79,9 +76,6 @@ spec:
       - name: config-volume
         configMap:
           name: pixelated-config
-      - name: secrets-volume
-        secret:
-          secretName: pixelated-secrets
       imagePullSecrets:
       - name: regcred
       automountServiceAccountToken: false
