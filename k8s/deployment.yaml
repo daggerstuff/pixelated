@@ -48,18 +48,30 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+        startupProbe:
+          httpGet:
+            path: /api/health
+            port: 4321
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 12
         livenessProbe:
           httpGet:
-            path: /health
+            path: /api/health
             port: 4321
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /health
+            path: /api/health
             port: 4321
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
         volumeMounts:
         - name: config-volume
           mountPath: /app/config
