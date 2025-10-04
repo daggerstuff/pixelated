@@ -988,7 +988,7 @@ deploy-gke:
 
     # Apply all Kubernetes manifests
 
-    echo \"\udce6 Applying Kubernetes manifests...\"
+    echo \"🚀 Applying Kubernetes manifests...\"
 
 
     if [ -f \"k8s/deployment.yaml\" ]; then
@@ -1010,7 +1010,7 @@ deploy-gke:
 
     if [ -f \"k8s/service.yaml\" ]; then
 
-    \  echo \"\udcdd Applying k8s/service.yaml\"
+    \  echo \"📋 Applying k8s/service.yaml\"
 
     \  kubectl apply -f k8s/service.yaml -n $NAMESPACE
 
@@ -1023,7 +1023,7 @@ deploy-gke:
 
     if [ -f \"k8s/ingress.yaml\" ]; then
 
-    \  echo \"\udcdd Applying k8s/ingress.yaml\"
+    \  echo \"📋 Applying k8s/ingress.yaml\"
 
     \  kubectl apply -f k8s/ingress.yaml -n $NAMESPACE
 
