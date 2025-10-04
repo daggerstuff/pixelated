@@ -121,7 +121,8 @@ test('responsive navigation should work on mobile devices', async ({
 
     // Wait for the mobile menu container to become visible (not just exist)
     const mobileMenu = page.locator('#mobile-menu')
-    await expect(mobileMenu).not.toHaveClass(/hidden/, { timeout: 5000 })
+    // Check actual visibility instead of class names - md:hidden is expected for responsive behavior
+    await expect(mobileMenu).toBeVisible({ timeout: 5000 })
 
     // Wait for CSS transitions to complete
     await page.waitForTimeout(500)

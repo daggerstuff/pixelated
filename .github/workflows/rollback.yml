@@ -21,7 +21,6 @@ jobs:
       deployments: write
       actions: read
       id-token: write
-      workflows: write
     concurrency:
       group: staging_environment
       cancel-in-progress: true
@@ -169,7 +168,6 @@ jobs:
       deployments: write
       actions: read
       id-token: write
-      workflows: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
