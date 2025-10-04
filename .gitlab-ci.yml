@@ -763,9 +763,11 @@ test-playwright:
   script:
   - echo "🎭 Running Playwright browser tests..."
   - |
-    # Install pnpm
-    corepack enable pnpm
+    # Install pnpm directly using npm (bypasses corepack signature verification issues)
+    echo "📦 Installing pnpm@10.17.1..."
+    npm install -g pnpm@10.17.1
     pnpm config set store-dir $PNPM_CACHE_FOLDER
+    echo "✅ pnpm version: $(pnpm --version)"
 
     # Install dependencies
     echo "📦 Installing dependencies..."
