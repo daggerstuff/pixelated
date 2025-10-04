@@ -959,208 +959,114 @@ deploy-gke:
     gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
   script:
   - echo "🚀 Deploying to GKE cluster..."
-  - "# Check current deployments and namespaces
-
-    echo \"🔍 Checking existing deployments...\"
-
-    kubectl get deployments --all-namespaces | grep pixelated || echo \"No pixelated deployments found yet\"
-
+  - |
+    # Check current deployments and namespaces
+    echo "🔍 Checking existing deployments..."
+    kubectl get deployments --all-namespaces | grep pixelated || echo "No pixelated deployments found yet"
 
     # Determine namespace (default to pixelated)
-
-    NAMESPACE=\"pixelated\"
-
+    NAMESPACE="pixelated"
 
     # Check if namespace exists, create if needed
-
     if ! kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
-
-    \  echo \"📦 Creating namespace $NAMESPACE...\"
-
-    \  kubectl create namespace $NAMESPACE
-
+      echo "📦 Creating namespace $NAMESPACE..."
+      kubectl create namespace $NAMESPACE
     else
-
-    \  echo \"✅ Namespace $NAMESPACE exists\"
-
+      echo "✅ Namespace $NAMESPACE exists"
     fi
-
 
     # Apply all Kubernetes manifests
+    echo "🚀 Applying Kubernetes manifests..."
 
-    echo \"🚀 Applying Kubernetes manifests...\"
-
-
-    if [ -f \"k8s/deployment.yaml\" ]; then
-
-    \  echo \"📝 Applying k8s/deployment.yaml\"
-
-    \  # Update the image in the manifest before applying
-
-    \  sed \"s|image: .*pixelated.*|image: $CONTAINER_IMAGE|g\" k8s/deployment.yaml > /tmp/deployment.yaml
-
-    \  kubectl apply -f /tmp/deployment.yaml -n $NAMESPACE
-
+    if [ -f "k8s/deployment.yaml" ]; then
+      echo "📝 Applying k8s/deployment.yaml"
+      # Update the image in the manifest before applying
+      sed "s|image: .*pixelated.*|image: $CONTAINER_IMAGE|g" k8s/deployment.yaml > /tmp/deployment.yaml
+      kubectl apply -f /tmp/deployment.yaml -n $NAMESPACE
     else
-
-    \  echo \"⚠️ k8s/deployment.yaml not found\"
-
+      echo "⚠️ k8s/deployment.yaml not found"
     fi
 
-
-    if [ -f \"k8s/service.yaml\" ]; then
-
-    \  echo \"📋 Applying k8s/service.yaml\"
-
-    \  kubectl apply -f k8s/service.yaml -n $NAMESPACE
-
+    if [ -f "k8s/service.yaml" ]; then
+      echo "📋 Applying k8s/service.yaml"
+      kubectl apply -f k8s/service.yaml -n $NAMESPACE
     else
-
-    \  echo \"⚠️ k8s/service.yaml not found\"
-
+      echo "⚠️ k8s/service.yaml not found"
     fi
 
-
-    if [ -f \"k8s/ingress.yaml\" ]; then
-
-    \  echo \"📋 Applying k8s/ingress.yaml\"
-
-    \  kubectl apply -f k8s/ingress.yaml -n $NAMESPACE
-
+    if [ -f "k8s/ingress.yaml" ]; then
+      echo "📋 Applying k8s/ingress.yaml"
+      kubectl apply -f k8s/ingress.yaml -n $NAMESPACE
     else
-
-    \  echo \"⚠️ k8s/ingress.yaml not found (optional)\"
-
+      echo "⚠️ k8s/ingress.yaml not found (optional)"
     fi
-
 
     # Verify deployment was created
-
-    DEPLOYMENT_NAME=\"pixelated\"
-
+    DEPLOYMENT_NAME="pixelated"
     if ! kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE >/dev/null 2>&1; then
-
-    \  echo \"❌ Deployment $DEPLOYMENT_NAME was not created!\"
-
-    \  echo \"Available deployments in namespace $NAMESPACE:\"
-
-    \  kubectl get deployments -n $NAMESPACE
-
-    \  exit 1
-
+      echo "❌ Deployment $DEPLOYMENT_NAME was not created!"
+      echo "Available deployments in namespace $NAMESPACE:"
+      kubectl get deployments -n $NAMESPACE
+      exit 1
     fi
-
 
     # Force update the image to ensure we're using the latest
-
-    echo \"📝 Updating deployment image to: $CONTAINER_IMAGE\"
-
+    echo "📝 Updating deployment image to: $CONTAINER_IMAGE"
     kubectl set image deployment/$DEPLOYMENT_NAME pixelated=$CONTAINER_IMAGE -n $NAMESPACE
 
-
     # Wait for rollout with extended timeout and better error handling
-
-    echo \"⏳ Waiting for rollout to complete...\"
-
+    echo "⏳ Waiting for rollout to complete..."
     if ! kubectl rollout status deployment/$DEPLOYMENT_NAME -n $NAMESPACE --timeout=900s; then
-
-    \  echo \"❌ Rollout failed or timed out after 15 minutes\"
-
-    \  echo \"\"
-
-    \  echo \"🔍 Diagnosing rollout failure...\"
-
-    \  echo \"\"
-
-    \  echo \"=== Pod Status ===\"
-
-    \  kubectl get pods -n $NAMESPACE -l app=pixelated-app -o wide
-
-    \  echo \"\"
-
-    \  echo \"=== ReplicaSet Status ===\"
-
-    \  kubectl get rs -n $NAMESPACE -l app=pixelated-app
-
-    \  echo \"\"
-
-    \  echo \"=== Recent Events ===\"
-
-    \  kubectl get events -n $NAMESPACE --sort-by='.lastTimestamp' | tail -30
-
-    \  echo \"\"
-
-    \  echo \"=== Describe Deployment ===\"
-
-    \  kubectl describe deployment $DEPLOYMENT_NAME -n $NAMESPACE | tail -50
-
-    \  echo \"\"
-
-    \  echo \"=== Describe Failed Pods ===\"
-
-    \  kubectl describe pods -n $NAMESPACE -l app=pixelated-app | grep -A 20 \"Events:\"
-
-    \  echo \"\"
-
-    \  echo \"=== Logs from New Pods ===\"
-
-    \  for pod in \$(kubectl get pods -n $NAMESPACE -l app=pixelated-app --field-selector=status.phase!=Running -o name 2>/dev/null); do
-
-    \    echo \"--- Logs from \$pod ---\"
-
-    \    kubectl logs -n $NAMESPACE \$pod --tail=50 2>&1 || echo \"Could not retrieve logs\"
-
-    \    echo \"\"
-
-    \  done
-
-    \  echo \"\"
-
-    \  echo \"💡 Common causes:\"
-
-    \  echo \"  1. Health check endpoint not responding (/health)\"
-
-    \  echo \"  2. Container startup failures (missing env vars, secrets)\"
-
-    \  echo \"  3. Image pull failures\"
-
-    \  echo \"  4. Resource constraints (insufficient CPU/memory)\"
-
-    \  echo \"  5. PodDisruptionBudget blocking pod termination\"
-
-    \  echo \"\"
-
-    \  exit 1
-
+      echo "❌ Rollout failed or timed out after 15 minutes"
+      echo ""
+      echo "🔍 Diagnosing rollout failure..."
+      echo ""
+      echo "=== Pod Status ==="
+      kubectl get pods -n $NAMESPACE -l app=pixelated-app -o wide
+      echo ""
+      echo "=== ReplicaSet Status ==="
+      kubectl get rs -n $NAMESPACE -l app=pixelated-app
+      echo ""
+      echo "=== Recent Events ==="
+      kubectl get events -n $NAMESPACE --sort-by='.lastTimestamp' | tail -30
+      echo ""
+      echo "=== Describe Deployment ==="
+      kubectl describe deployment $DEPLOYMENT_NAME -n $NAMESPACE | tail -50
+      echo ""
+      echo "=== Describe Failed Pods ==="
+      kubectl describe pods -n $NAMESPACE -l app=pixelated-app | grep -A 20 "Events:"
+      echo ""
+      echo "=== Logs from New Pods ==="
+      for pod in $(kubectl get pods -n $NAMESPACE -l app=pixelated-app --field-selector=status.phase!=Running -o name 2>/dev/null); do
+        echo "--- Logs from $pod ---"
+        kubectl logs -n $NAMESPACE $pod --tail=50 2>&1 || echo "Could not retrieve logs"
+        echo ""
+      done
+      echo ""
+      echo "💡 Common causes:"
+      echo "  1. Health check endpoint not responding (/health)"
+      echo "  2. Container startup failures (missing env vars, secrets)"
+      echo "  3. Image pull failures"
+      echo "  4. Resource constraints (insufficient CPU/memory)"
+      echo "  5. PodDisruptionBudget blocking pod termination"
+      echo ""
+      exit 1
     fi
 
-
     # Verify deployment
-
-    echo \"✅ Verifying deployment...\"
-
+    echo "✅ Verifying deployment..."
     kubectl get pods -n $NAMESPACE -l app=pixelated-app
-
     kubectl get services -n $NAMESPACE
 
-
-    echo \"\"
-
-    echo \"✅ Deployed to GKE successfully\"
-
-    echo \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"
-
-    echo \"Namespace: $NAMESPACE\"
-
-    echo \"Deployment: $DEPLOYMENT_NAME\"
-
-    echo \"Image: $CONTAINER_IMAGE\"
-
-    echo \"Pods:\"
-
+    echo ""
+    echo "✅ Deployed to GKE successfully"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Namespace: $NAMESPACE"
+    echo "Deployment: $DEPLOYMENT_NAME"
+    echo "Image: $CONTAINER_IMAGE"
+    echo "Pods:"
     kubectl get pods -n $NAMESPACE -l app=pixelated-app -o wide
-
-    echo \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   environment:
     name: production-gke
     url: $GKE_ENVIRONMENT_URL
