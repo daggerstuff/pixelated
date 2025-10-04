@@ -594,7 +594,7 @@ test-container:
     # Run container with health check
     docker run -d \
       --name test-container \
-      --health-cmd="node -e \"require('http').get('http://localhost:4321/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\"" \
+      --health-cmd="wget --no-verbose --tries=1 --spider http://localhost:4321/api/health || exit 1" \
       --health-interval=10s \
       --health-timeout=5s \
       --health-retries=3 \
@@ -973,6 +973,26 @@ deploy-gke:
       kubectl create namespace $NAMESPACE
     else
       echo "✅ Namespace $NAMESPACE exists"
+    fi
+
+    # Clean up stuck deployments and replica sets
+    echo "🧹 Cleaning up old failed replica sets..."
+
+    # Check for stuck pods referencing missing secrets
+    STUCK_PODS=$(kubectl get pods -n $NAMESPACE -l app=pixelated-app --field-selector=status.phase=Pending -o name 2>/dev/null | wc -l)
+    if [ "$STUCK_PODS" -gt 0 ]; then
+      echo "⚠️ Found $STUCK_PODS stuck pods in Pending state"
+      echo "🔧 Scaling deployment to 0 to clear stuck state..."
+      kubectl scale deployment pixelated -n $NAMESPACE --replicas=0 || true
+      kubectl wait --for=delete pod -l app=pixelated-app -n $NAMESPACE --timeout=60s || true
+
+      # Delete old replica sets that might reference missing secrets
+      echo "🗑️ Deleting old replica sets..."
+      kubectl delete rs -n $NAMESPACE -l app=pixelated-app --cascade=orphan || true
+
+      sleep 5
+    else
+      echo "✅ No stuck pods found"
     fi
 
     # Apply all Kubernetes manifests
