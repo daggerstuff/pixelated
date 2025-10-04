@@ -1058,11 +1058,81 @@ deploy-gke:
     kubectl set image deployment/$DEPLOYMENT_NAME pixelated=$CONTAINER_IMAGE -n $NAMESPACE
 
 
-    # Wait for rollout
+    # Wait for rollout with extended timeout and better error handling
 
     echo \"⏳ Waiting for rollout to complete...\"
 
-    kubectl rollout status deployment/$DEPLOYMENT_NAME -n $NAMESPACE --timeout=600s
+    if ! kubectl rollout status deployment/$DEPLOYMENT_NAME -n $NAMESPACE --timeout=900s; then
+
+    \  echo \"❌ Rollout failed or timed out after 15 minutes\"
+
+    \  echo \"\"
+
+    \  echo \"🔍 Diagnosing rollout failure...\"
+
+    \  echo \"\"
+
+    \  echo \"=== Pod Status ===\"
+
+    \  kubectl get pods -n $NAMESPACE -l app=pixelated-app -o wide
+
+    \  echo \"\"
+
+    \  echo \"=== ReplicaSet Status ===\"
+
+    \  kubectl get rs -n $NAMESPACE -l app=pixelated-app
+
+    \  echo \"\"
+
+    \  echo \"=== Recent Events ===\"
+
+    \  kubectl get events -n $NAMESPACE --sort-by='.lastTimestamp' | tail -30
+
+    \  echo \"\"
+
+    \  echo \"=== Describe Deployment ===\"
+
+    \  kubectl describe deployment $DEPLOYMENT_NAME -n $NAMESPACE | tail -50
+
+    \  echo \"\"
+
+    \  echo \"=== Describe Failed Pods ===\"
+
+    \  kubectl describe pods -n $NAMESPACE -l app=pixelated-app | grep -A 20 \"Events:\"
+
+    \  echo \"\"
+
+    \  echo \"=== Logs from New Pods ===\"
+
+    \  for pod in \$(kubectl get pods -n $NAMESPACE -l app=pixelated-app --field-selector=status.phase!=Running -o name 2>/dev/null); do
+
+    \    echo \"--- Logs from \$pod ---\"
+
+    \    kubectl logs -n $NAMESPACE \$pod --tail=50 2>&1 || echo \"Could not retrieve logs\"
+
+    \    echo \"\"
+
+    \  done
+
+    \  echo \"\"
+
+    \  echo \"💡 Common causes:\"
+
+    \  echo \"  1. Health check endpoint not responding (/health)\"
+
+    \  echo \"  2. Container startup failures (missing env vars, secrets)\"
+
+    \  echo \"  3. Image pull failures\"
+
+    \  echo \"  4. Resource constraints (insufficient CPU/memory)\"
+
+    \  echo \"  5. PodDisruptionBudget blocking pod termination\"
+
+    \  echo \"\"
+
+    \  exit 1
+
+    fi
 
 
     # Verify deployment
