@@ -591,30 +591,47 @@ test-container:
   - echo "🧪 Testing container health..."
   - docker pull $CONTAINER_IMAGE
   - |
-    # Run container with health check
+    # Run container with health check using curl (installed in Alpine base)
     docker run -d \
       --name test-container \
-      --health-cmd="wget --no-verbose --tries=1 --spider http://localhost:4321/api/health || exit 1" \
+      --health-cmd="curl -f http://localhost:4321/api/health || exit 1" \
       --health-interval=10s \
-      --health-timeout=5s \
-      --health-retries=3 \
+      --health-timeout=10s \
+      --health-retries=5 \
+      --health-start-period=30s \
       -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
       $CONTAINER_IMAGE
 
-    # Wait for healthy status
+    # Wait for healthy status with extended timeout
+    echo "⏳ Waiting for container to start (30s grace period)..."
+    sleep 30
+
     for i in $(seq 1 30); do
       STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-container 2>/dev/null || echo "starting")
       if [ "$STATUS" = "healthy" ]; then
         echo "✅ Container health check passed"
+        docker logs test-container
         break
       elif [ "$STATUS" = "unhealthy" ]; then
         echo "❌ Container health check failed"
+        echo "📋 Container logs:"
         docker logs test-container
+        echo ""
+        echo "🔍 Health check details:"
+        docker inspect test-container --format='{{json .State.Health}}' | jq '.' || true
         exit 1
       fi
       echo "⏳ Waiting for health check... ($i/30) Status: $STATUS"
       sleep 2
     done
+
+    # Final status check
+    FINAL_STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-container 2>/dev/null || echo "unknown")
+    if [ "$FINAL_STATUS" != "healthy" ]; then
+      echo "❌ Container never became healthy (final status: $FINAL_STATUS)"
+      docker logs test-container
+      exit 1
+    fi
 
     docker stop test-container && docker rm test-container
   rules:
