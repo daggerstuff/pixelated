@@ -12,7 +12,7 @@ metadata:
     app: pixelated-app
     version: v1.0.0
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: pixelated-app
