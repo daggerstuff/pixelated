@@ -364,17 +364,26 @@ const isActive = (href: string) => {
       transform 0.3s ease,
       opacity 0.3s ease;
     transform-origin: top;
+    overflow: hidden;
   }
 
   #mobile-menu.hidden {
     opacity: 0;
     transform: scaleY(0);
-    display: none;
+    max-height: 0;
+    visibility: hidden;
   }
 
   #mobile-menu:not(.hidden) {
     opacity: 1;
     transform: scaleY(1);
-    display: block;
+    max-height: 100vh;
+    visibility: visible;
+  }
+
+  /* Ensure nav links are visible when menu is open */
+  #mobile-menu:not(.hidden) nav a {
+    visibility: visible;
+    opacity: 1;
   }
 </style>

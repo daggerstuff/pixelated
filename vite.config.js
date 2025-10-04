@@ -111,13 +111,15 @@ export default defineConfig({
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
             project: process.env.SENTRY_PROJECT || 'pixel-astro',
             authToken: process.env.SENTRY_AUTH_TOKEN,
+            telemetry: false,
+            sourcemaps: {
+              assets: './dist/**',
+              ignore: ['**/node_modules/**'],
+              filesToDeleteAfterUpload: ['**/*.map'],
+            },
           }),
         ]
       : []),
-    sentryVitePlugin({
-      org: 'pixelated-empathy-dq',
-      project: 'pixel-astro',
-    }),
   ],
   base:
     process.env.NODE_ENV === 'production'
