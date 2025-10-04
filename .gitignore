@@ -8,6 +8,7 @@ node_modules/
 
 # AI submodule - managed separately
 /ai/
+/ai.bak/
 
 /npm-debug.log*
 /yarn-debug.log*
@@ -191,7 +192,7 @@ WARP.md
 
 checkov-results-fixed.sarif
 playwright-report-browser-compat
-ai/
-yt-downloader
+yt-downloader/
+yt-down/
 
 processed/
