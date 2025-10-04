@@ -810,24 +810,44 @@ health-check:
   script:
   - echo "🏥 Running post-deployment health check on GKE..."
   - |
+    # Use the pixelated namespace
+    NAMESPACE="pixelated"
+    DEPLOYMENT_NAME="pixelated"
+    APP_LABEL="pixelated-app"
+
     # Check Kubernetes deployment health
-    echo "🔍 Checking Kubernetes deployment status..."
-    if ! kubectl get deployment pixelated >/dev/null 2>&1; then
-      echo "❌ Deployment 'pixelated' not found"
+    echo "🔍 Checking Kubernetes deployment status in namespace: $NAMESPACE"
+
+    # Verify deployment exists
+    if ! kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE >/dev/null 2>&1; then
+      echo "❌ Deployment $DEPLOYMENT_NAME not found in namespace $NAMESPACE"
+      echo "Available deployments:"
+      kubectl get deployments -n $NAMESPACE
       exit 1
     fi
 
-    # Check if pods are ready
-    READY_REPLICAS=$(kubectl get deployment pixelated -o jsonpath='{.status.readyReplicas}')
-    DESIRED_REPLICAS=$(kubectl get deployment pixelated -o jsonpath='{.spec.replicas}')
+    echo "✅ Found deployment: $DEPLOYMENT_NAME"
+
+    # Check if pods are ready (using correct label selector)
+    READY_REPLICAS=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath='{.status.readyReplicas}' || echo "0")
+    DESIRED_REPLICAS=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath='{.spec.replicas}')
 
     echo "📊 Ready replicas: $READY_REPLICAS/$DESIRED_REPLICAS"
 
-    if [ "$READY_REPLICAS" != "$DESIRED_REPLICAS" ]; then
+    if [ "$READY_REPLICAS" != "$DESIRED_REPLICAS" ] || [ -z "$READY_REPLICAS" ]; then
       echo "⚠️ Not all replicas are ready"
-      kubectl get pods -l app=pixelated
+      echo "Deployment status:"
+      kubectl describe deployment $DEPLOYMENT_NAME -n $NAMESPACE | tail -20
+      echo ""
+      echo "Pod status:"
+      kubectl get pods -n $NAMESPACE -l app=$APP_LABEL
+      kubectl describe pods -n $NAMESPACE -l app=$APP_LABEL | tail -50
       exit 1
     fi
+
+    # Show pod status
+    echo "📋 Pod status:"
+    kubectl get pods -n $NAMESPACE -l app=$APP_LABEL
 
     # Check HTTP endpoint if configured
     if [ -n "$GKE_ENVIRONMENT_URL" ]; then
@@ -911,7 +931,7 @@ build-ai-backend:
   allow_failure: true
   timeout: 15m
 
-# GKE deployment - optimized (manual only for safety)
+# GKE deployment - optimized with proper manifest application
 deploy-gke:
   stage: deploy
   image: google/cloud-sdk:alpine
@@ -939,18 +959,138 @@ deploy-gke:
     gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
   script:
   - echo "🚀 Deploying to GKE cluster..."
-  - |
-    # Update deployment with new image
-    kubectl patch deployment pixelated -p '{"spec":{"template":{"spec":{"containers":[{"name":"pixelated","image":"'$CONTAINER_IMAGE'"}]}}}}'
+  - "# Check current deployments and namespaces
+
+    echo \"🔍 Checking existing deployments...\"
+
+    kubectl get deployments --all-namespaces | grep pixelated || echo \"No pixelated deployments found yet\"
+
+
+    # Determine namespace (default to pixelated)
+
+    NAMESPACE=\"pixelated\"
+
+
+    # Check if namespace exists, create if needed
+
+    if ! kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
+
+    \  echo \"📦 Creating namespace $NAMESPACE...\"
+
+    \  kubectl create namespace $NAMESPACE
+
+    else
+
+    \  echo \"✅ Namespace $NAMESPACE exists\"
+
+    fi
+
+
+    # Apply all Kubernetes manifests
+
+    echo \"\udce6 Applying Kubernetes manifests...\"
+
+
+    if [ -f \"k8s/deployment.yaml\" ]; then
+
+    \  echo \"📝 Applying k8s/deployment.yaml\"
+
+    \  # Update the image in the manifest before applying
+
+    \  sed \"s|image: .*pixelated.*|image: $CONTAINER_IMAGE|g\" k8s/deployment.yaml > /tmp/deployment.yaml
+
+    \  kubectl apply -f /tmp/deployment.yaml -n $NAMESPACE
+
+    else
+
+    \  echo \"⚠️ k8s/deployment.yaml not found\"
+
+    fi
+
+
+    if [ -f \"k8s/service.yaml\" ]; then
+
+    \  echo \"\udcdd Applying k8s/service.yaml\"
+
+    \  kubectl apply -f k8s/service.yaml -n $NAMESPACE
+
+    else
+
+    \  echo \"⚠️ k8s/service.yaml not found\"
+
+    fi
+
+
+    if [ -f \"k8s/ingress.yaml\" ]; then
+
+    \  echo \"\udcdd Applying k8s/ingress.yaml\"
+
+    \  kubectl apply -f k8s/ingress.yaml -n $NAMESPACE
+
+    else
+
+    \  echo \"⚠️ k8s/ingress.yaml not found (optional)\"
+
+    fi
+
+
+    # Verify deployment was created
+
+    DEPLOYMENT_NAME=\"pixelated\"
+
+    if ! kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE >/dev/null 2>&1; then
+
+    \  echo \"❌ Deployment $DEPLOYMENT_NAME was not created!\"
+
+    \  echo \"Available deployments in namespace $NAMESPACE:\"
+
+    \  kubectl get deployments -n $NAMESPACE
+
+    \  exit 1
+
+    fi
+
+
+    # Force update the image to ensure we're using the latest
+
+    echo \"📝 Updating deployment image to: $CONTAINER_IMAGE\"
+
+    kubectl set image deployment/$DEPLOYMENT_NAME pixelated=$CONTAINER_IMAGE -n $NAMESPACE
+
 
     # Wait for rollout
-    kubectl rollout status deployment/pixelated --timeout=600s
+
+    echo \"⏳ Waiting for rollout to complete...\"
+
+    kubectl rollout status deployment/$DEPLOYMENT_NAME -n $NAMESPACE --timeout=600s
+
 
     # Verify deployment
-    kubectl get pods -l app=pixelated
-    kubectl get services pixelated-service
 
-    echo "✅ Deployed to GKE successfully"
+    echo \"✅ Verifying deployment...\"
+
+    kubectl get pods -n $NAMESPACE -l app=pixelated-app
+
+    kubectl get services -n $NAMESPACE
+
+
+    echo \"\"
+
+    echo \"✅ Deployed to GKE successfully\"
+
+    echo \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"
+
+    echo \"Namespace: $NAMESPACE\"
+
+    echo \"Deployment: $DEPLOYMENT_NAME\"
+
+    echo \"Image: $CONTAINER_IMAGE\"
+
+    echo \"Pods:\"
+
+    kubectl get pods -n $NAMESPACE -l app=pixelated-app -o wide
+
+    echo \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"\n"
   environment:
     name: production-gke
     url: $GKE_ENVIRONMENT_URL
