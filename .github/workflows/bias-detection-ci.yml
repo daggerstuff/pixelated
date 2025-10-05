@@ -49,13 +49,10 @@ jobs:
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3.29.1
       if: always()
+      continue-on-error: true
       with:
         sarif_file: trivy-results.sarif
-
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3.29.1
-      with:
-        languages: javascript,typescript
+        category: trivy-scan
 
     - name: Setup Node.js for CodeQL
       uses: actions/setup-node@v4.4.0
@@ -68,7 +65,6 @@ jobs:
     - name: Setup pnpm for CodeQL
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: ${{ env.PNPM_VERSION }}
         run_install: false
 
     - name: Get pnpm store directory for CodeQL
@@ -76,6 +72,11 @@ jobs:
       shell: bash
       run: |
         echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3.29.1
+      with:
+        languages: javascript,typescript
 
     - name: Setup pnpm cache for CodeQL
       uses: actions/cache@v4.2.3
@@ -113,7 +114,6 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: ${{ env.PNPM_VERSION }}
         run_install: false
 
     - name: Get pnpm store directory
@@ -200,7 +200,6 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: ${{ env.PNPM_VERSION }}
         run_install: false
 
     - name: Get pnpm store directory
@@ -366,7 +365,6 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: ${{ env.PNPM_VERSION }}
         run_install: false
 
     - name: Get pnpm store directory
@@ -493,7 +491,6 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: ${{ env.PNPM_VERSION }}
         run_install: false
 
     - name: Get pnpm store directory
@@ -553,7 +550,6 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: ${{ env.PNPM_VERSION }}
         run_install: false
 
     - name: Get pnpm store directory

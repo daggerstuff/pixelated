@@ -31,7 +31,7 @@ terraform {
 provider "aws" {
   alias  = "us_east"
   region = "us-east-1"
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -45,7 +45,7 @@ provider "aws" {
 provider "aws" {
   alias  = "us_west"
   region = "us-west-2"
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -59,7 +59,7 @@ provider "aws" {
 provider "aws" {
   alias  = "eu_central"
   region = "eu-central-1"
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -73,7 +73,7 @@ provider "aws" {
 provider "aws" {
   alias  = "ap_southeast"
   region = "ap-southeast-1"
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -121,18 +121,18 @@ module "vpc_us_east" {
   providers = {
     aws = aws.us_east
   }
-  
+
   project_name        = var.project_name
   environment         = var.environment
   region             = "us-east-1"
   vpc_cidr           = "10.1.0.0/16"
   availability_zones = slice(data.aws_availability_zones.available.names, 0, 3)
-  
+
   enable_nat_gateway   = true
   enable_vpn_gateway   = false
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = var.common_tags
 }
 
@@ -141,18 +141,18 @@ module "vpc_us_west" {
   providers = {
     aws = aws.us_west
   }
-  
+
   project_name        = var.project_name
   environment         = var.environment
   region             = "us-west-2"
   vpc_cidr           = "10.2.0.0/16"
   availability_zones = slice(data.aws_availability_zones.available.names, 0, 3)
-  
+
   enable_nat_gateway   = true
   enable_vpn_gateway   = false
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = var.common_tags
 }
 
@@ -161,18 +161,18 @@ module "vpc_eu_central" {
   providers = {
     aws = aws.eu_central
   }
-  
+
   project_name        = var.project_name
   environment         = var.environment
   region             = "eu-central-1"
   vpc_cidr           = "10.3.0.0/16"
   availability_zones = slice(data.aws_availability_zones.available.names, 0, 3)
-  
+
   enable_nat_gateway   = true
   enable_vpn_gateway   = false
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = var.common_tags
 }
 
@@ -181,18 +181,18 @@ module "vpc_ap_southeast" {
   providers = {
     aws = aws.ap_southeast
   }
-  
+
   project_name        = var.project_name
   environment         = var.environment
   region             = "ap-southeast-1"
   vpc_cidr           = "10.4.0.0/16"
   availability_zones = slice(data.aws_availability_zones.available.names, 0, 3)
-  
+
   enable_nat_gateway   = true
   enable_vpn_gateway   = false
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = var.common_tags
 }
 
@@ -202,19 +202,26 @@ resource "google_compute_network" "gcp_europe" {
   name                    = "${var.project_name}-vpc-europe"
   auto_create_subnetworks = false
   routing_mode           = "REGIONAL"
-  
+
   depends_on = [
     google_project_service.compute_api
   ]
 }
 
 resource "google_compute_subnetwork" "gcp_europe_subnets" {
-  provider      = google.gcp_europe
-  for_each      = toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"])
-  name          = "${var.project_name}-subnet-${each.key}"
-  ip_cidr_range = "10.5.${index(toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"]), each.key)}.0/24"
-  region        = "europe-west3"
-  network       = google_compute_network.gcp_europe.id
+  provider                 = google.gcp_europe
+  for_each                 = toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"])
+  name                     = "${var.project_name}-subnet-${each.key}"
+  ip_cidr_range            = "10.5.${index(toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"]), each.key)}.0/24"
+  region                   = "europe-west3"
+  network                  = google_compute_network.gcp_europe.id
+  private_ip_google_access = true
+
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 resource "google_compute_network" "gcp_asia" {
@@ -222,19 +229,26 @@ resource "google_compute_network" "gcp_asia" {
   name                    = "${var.project_name}-vpc-asia"
   auto_create_subnetworks = false
   routing_mode           = "REGIONAL"
-  
+
   depends_on = [
     google_project_service.compute_api
   ]
 }
 
 resource "google_compute_subnetwork" "gcp_asia_subnets" {
-  provider      = google.gcp_asia
-  for_each      = toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"])
-  name          = "${var.project_name}-subnet-${each.key}"
-  ip_cidr_range = "10.6.${index(toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"]), each.key)}.0/24"
-  region        = "asia-southeast1"
-  network       = google_compute_network.gcp_asia.id
+  provider                 = google.gcp_asia
+  for_each                 = toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"])
+  name                     = "${var.project_name}-subnet-${each.key}"
+  ip_cidr_range            = "10.6.${index(toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"]), each.key)}.0/24"
+  region                   = "asia-southeast1"
+  network                  = google_compute_network.gcp_asia.id
+  private_ip_google_access = true
+
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 # Enable required Google APIs
@@ -246,7 +260,7 @@ resource "google_project_service" "compute_api" {
     "redis.googleapis.com"
   ])
   service = each.key
-  
+
   disable_on_destroy = false
 }
 
@@ -256,21 +270,21 @@ module "eks_us_east" {
   providers = {
     aws = aws.us_east
   }
-  
+
   cluster_name    = "${var.project_name}-eks-us-east"
   cluster_version = var.kubernetes_version
   vpc_id         = module.vpc_us_east.vpc_id
   subnet_ids     = module.vpc_us_east.private_subnets
-  
+
   node_groups = {
     main = {
       desired_size = var.node_group_desired_size
       max_size     = var.node_group_max_size
       min_size     = var.node_group_min_size
-      
+
       instance_types = var.node_instance_types
       capacity_type  = "ON_DEMAND"
-      
+
       k8s_labels = {
         Environment = var.environment
         Region      = "us-east-1"
@@ -278,7 +292,7 @@ module "eks_us_east" {
       }
     }
   }
-  
+
   tags = var.common_tags
 }
 
@@ -287,21 +301,21 @@ module "eks_us_west" {
   providers = {
     aws = aws.us_west
   }
-  
+
   cluster_name    = "${var.project_name}-eks-us-west"
   cluster_version = var.kubernetes_version
   vpc_id         = module.vpc_us_west.vpc_id
   subnet_ids     = module.vpc_us_west.private_subnets
-  
+
   node_groups = {
     main = {
       desired_size = var.node_group_desired_size
       max_size     = var.node_group_max_size
       min_size     = var.node_group_min_size
-      
+
       instance_types = var.node_instance_types
       capacity_type  = "ON_DEMAND"
-      
+
       k8s_labels = {
         Environment = var.environment
         Region      = "us-west-2"
@@ -309,7 +323,7 @@ module "eks_us_west" {
       }
     }
   }
-  
+
   tags = var.common_tags
 }
 
@@ -318,21 +332,21 @@ module "eks_eu_central" {
   providers = {
     aws = aws.eu_central
   }
-  
+
   cluster_name    = "${var.project_name}-eks-eu-central"
   cluster_version = var.kubernetes_version
   vpc_id         = module.vpc_eu_central.vpc_id
   subnet_ids     = module.vpc_eu_central.private_subnets
-  
+
   node_groups = {
     main = {
       desired_size = var.node_group_desired_size
       max_size     = var.node_group_max_size
       min_size     = var.node_group_min_size
-      
+
       instance_types = var.node_instance_types
       capacity_type  = "ON_DEMAND"
-      
+
       k8s_labels = {
         Environment = var.environment
         Region      = "eu-central-1"
@@ -340,7 +354,7 @@ module "eks_eu_central" {
       }
     }
   }
-  
+
   tags = var.common_tags
 }
 
@@ -349,21 +363,21 @@ module "eks_ap_southeast" {
   providers = {
     aws = aws.ap_southeast
   }
-  
+
   cluster_name    = "${var.project_name}-eks-ap-southeast"
   cluster_version = var.kubernetes_version
   vpc_id         = module.vpc_ap_southeast.vpc_id
   subnet_ids     = module.vpc_ap_southeast.private_subnets
-  
+
   node_groups = {
     main = {
       desired_size = var.node_group_desired_size
       max_size     = var.node_group_max_size
       min_size     = var.node_group_min_size
-      
+
       instance_types = var.node_instance_types
       capacity_type  = "ON_DEMAND"
-      
+
       k8s_labels = {
         Environment = var.environment
         Region      = "ap-southeast-1"
@@ -371,7 +385,7 @@ module "eks_ap_southeast" {
       }
     }
   }
-  
+
   tags = var.common_tags
 }
 
@@ -381,26 +395,26 @@ module "gke_europe" {
   providers = {
     google = google.gcp_europe
   }
-  
+
   project_id      = var.gcp_project_id
   cluster_name    = "${var.project_name}-gke-europe"
   region         = "europe-west3"
   network        = google_compute_network.gcp_europe.id
   subnetworks    = [for s in google_compute_subnetwork.gcp_europe_subnets : s.id]
-  
+
   node_pools = [
     {
       name       = "main-pool"
       node_count = var.node_group_desired_size
       node_type  = "n2-standard-4"
-      
+
       labels = {
         environment = var.environment
         region      = "europe-west3"
       }
     }
   ]
-  
+
   tags = var.common_tags
 }
 
@@ -409,33 +423,33 @@ module "gke_asia" {
   providers = {
     google = google.gcp_asia
   }
-  
+
   project_id      = var.gcp_project_id
   cluster_name    = "${var.project_name}-gke-asia"
   region         = "asia-southeast1"
   network        = google_compute_network.gcp_asia.id
   subnetworks    = [for s in google_compute_subnetwork.gcp_asia_subnets : s.id]
-  
+
   node_pools = [
     {
       name       = "main-pool"
       node_count = var.node_group_desired_size
       node_type  = "n2-standard-4"
-      
+
       labels = {
         environment = var.environment
         region      = "asia-southeast1"
       }
     }
   ]
-  
+
   tags = var.common_tags
 }
 
 # Multi-region databases
 module "rds_multi_region" {
   source = "./modules/rds-multi-region"
-  
+
   for_each = {
     us_east = {
       provider = aws.us_east
@@ -462,7 +476,7 @@ module "rds_multi_region" {
       region   = "ap-southeast-1"
     }
   }
-  
+
   project_name     = var.project_name
   environment      = var.environment
   engine          = "postgres"
@@ -470,26 +484,26 @@ module "rds_multi_region" {
   instance_class  = var.db_instance_class
   allocated_storage = var.db_allocated_storage
   max_allocated_storage = var.db_max_allocated_storage
-  
+
   providers = {
     aws = each.value.provider
   }
-  
+
   vpc_id     = each.value.vpc_id
   subnet_ids = each.value.subnets
   region     = each.value.region
-  
+
   backup_retention_period = var.db_backup_retention_period
   backup_window          = var.db_backup_window
   maintenance_window     = var.db_maintenance_window
-  
+
   tags = var.common_tags
 }
 
 # CockroachDB multi-region cluster
 module "cockroachdb_cluster" {
   source = "./modules/cockroachdb"
-  
+
   cluster_name = "${var.project_name}-cockroachdb"
   regions = [
     {
@@ -509,17 +523,17 @@ module "cockroachdb_cluster" {
       zones = ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]
     }
   ]
-  
+
   node_count = 3
   node_type  = "n2-standard-8"
-  
+
   tags = var.common_tags
 }
 
 # Redis multi-region clusters
 module "redis_multi_region" {
   source = "./modules/redis-multi-region"
-  
+
   for_each = {
     us_east = {
       provider = aws.us_east
@@ -542,32 +556,32 @@ module "redis_multi_region" {
       region   = "ap-southeast-1"
     }
   }
-  
+
   project_name     = var.project_name
   environment      = var.environment
   node_type       = var.redis_node_type
   num_cache_nodes = var.redis_num_cache_nodes
-  
+
   providers = {
     aws = each.value.provider
   }
-  
+
   subnet_ids = each.value.subnets
   region     = each.value.region
-  
+
   at_rest_encryption_enabled = true
   transit_encryption_enabled = true
-  
+
   tags = var.common_tags
 }
 
 # Global load balancers and CDN
 module "global_load_balancer" {
   source = "./modules/global-load-balancer"
-  
+
   project_name = var.project_name
   environment  = var.environment
-  
+
   regions = {
     us_east = {
       provider   = aws.us_east
@@ -594,27 +608,27 @@ module "global_load_balancer" {
       region     = "ap-southeast-1"
     }
   }
-  
+
   health_check_path     = "/health"
   health_check_interval = 30
   health_check_timeout  = 5
-  
+
   tags = var.common_tags
 }
 
 # Multi-region S3 buckets with replication
 module "s3_multi_region" {
   source = "./modules/s3-multi-region"
-  
+
   project_name = var.project_name
   environment  = var.environment
-  
+
   regions = ["us-east-1", "us-west-2", "eu-central-1", "ap-southeast-1"]
-  
+
   versioning_enabled = true
   encryption_enabled = true
   replication_enabled = true
-  
+
   lifecycle_rules = [
     {
       id      = "expire-old-versions"
@@ -627,7 +641,7 @@ module "s3_multi_region" {
       }
     }
   ]
-  
+
   tags = var.common_tags
 }
 
@@ -723,25 +737,25 @@ resource "cloudflare_load_balancer_pool" "ap_southeast" {
 # Monitoring and alerting setup
 module "monitoring_stack" {
   source = "./modules/monitoring"
-  
+
   project_name = var.project_name
   environment  = var.environment
-  
+
   prometheus_config = {
     retention = "30d"
     storage   = "100Gi"
   }
-  
+
   grafana_config = {
     admin_password = var.grafana_admin_password
     persistence    = true
   }
-  
+
   alertmanager_config = {
     slack_webhook_url = var.slack_webhook_url
     pagerduty_key     = var.pagerduty_key
   }
-  
+
   tags = var.common_tags
 }
 
@@ -753,39 +767,68 @@ resource "aws_security_group" "multi_region" {
     eu_central = aws.eu_central
     ap_southeast = aws.ap_southeast
   }
-  
+
   provider = each.value
-  
+
   name_prefix = "${var.project_name}-multi-region-"
   description = "Multi-region security group for ${each.key}"
-  
+
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTPS from anywhere"
+    cidr_blocks = ["10.0.0.0/8"]  # Restrict to private network ranges
+    description = "HTTPS from internal network"
   }
-  
-  ingress {
+
+  # Removed unrestricted HTTP port 80 ingress for security compliance
+
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS outbound"
+  }
+
+  egress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTP from anywhere"
+    description = "HTTP outbound"
   }
-  
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound traffic"
-  }
-  
+
   tags = merge(var.common_tags, {
     Region = each.key
   })
+}
+
+# KMS keys for backup encryption
+resource "aws_kms_key" "backup_replication" {
+  for_each = {
+    us_east      = aws.us_east
+    us_west      = aws.us_west
+    eu_central   = aws.eu_central
+    ap_southeast = aws.ap_southeast
+  }
+
+  provider = each.value
+
+  description             = "KMS key for RDS backup replication in ${each.key}"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  tags = merge(var.common_tags, {
+    Name = "${var.project_name}-backup-kms-${each.key}"
+  })
+}
+
+resource "aws_kms_alias" "backup_replication" {
+  for_each = aws_kms_key.backup_replication
+
+  name          = "alias/${var.project_name}-backup-${each.key}"
+  target_key_id = each.value.key_id
 }
 
 # IAM roles and policies for cross-region access
@@ -796,11 +839,11 @@ resource "aws_iam_role" "multi_region_role" {
     eu_central = aws.eu_central
     ap_southeast = aws.ap_southeast
   }
-  
+
   provider = each.value
-  
+
   name = "${var.project_name}-multi-region-role-${each.key}"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -813,7 +856,7 @@ resource "aws_iam_role" "multi_region_role" {
       }
     ]
   })
-  
+
   tags = var.common_tags
 }
 
@@ -825,12 +868,13 @@ resource "aws_db_instance_automated_backups_replication" "multi_region_backup" {
     eu_central = aws.eu_central
     ap_southeast = aws.ap_southeast
   }
-  
+
   provider = each.value
-  
+
   source_db_instance_arn = module.rds_multi_region[each.key].db_instance_arn
   retention_period       = var.db_backup_retention_period
-  
+  kms_key_id            = aws_kms_key.backup_replication[each.key].arn
+
   tags = var.common_tags
 }
 
