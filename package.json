@@ -148,7 +148,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
-    "@sentry/astro": "^10.15.0",
+    "@sentry/astro": "^10.17.0",
     "@sentry/browser": "^10.15.0",
     "@sentry/node": "^10.15.0",
     "@sentry/profiling-node": "^10.15.0",
