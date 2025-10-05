@@ -53,17 +53,23 @@ RUN mkdir -p /tmp/.cache && corepack enable pnpm
 # Dependencies stage - optimized for caching
 FROM base AS deps
 
+# Copy package files first (as root to ensure proper setup)
+COPY --chown=astro:astro package.json pnpm-lock.yaml* ./
+
+# Create cache directories with proper permissions for astro user
+# Must be done as root before switching users
+RUN mkdir -p /tmp/.cache/node/corepack/v1 /app/.pnpm-store && \
+    chown -R astro:astro /tmp/.cache /app/.pnpm-store && \
+    chmod -R 777 /tmp/.cache && \
+    chmod -R 755 /app/.pnpm-store
+
 # Switch to non-root user for dependency installation
 USER astro
-
-# Copy package files with proper ownership
-COPY --chown=astro:astro package.json pnpm-lock.yaml* ./
 
 # Configure pnpm to use a smaller cache directory and install dependencies
 # Use /tmp for corepack cache to avoid ENOSPC errors in user home
 ENV XDG_CACHE_HOME=/tmp/.cache
-RUN mkdir -p /tmp/.cache && \
-    pnpm config set store-dir /app/.pnpm-store && \
+RUN pnpm config set store-dir /app/.pnpm-store && \
     pnpm config set package-import-method copy && \
     pnpm config set registry https://registry.npmjs.org/ && \
     pnpm config set fetch-timeout 300000 && \
