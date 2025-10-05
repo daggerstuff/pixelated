@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.30.0
+      uses: aquasecurity/trivy-action@0.33.1
       with:
         scan-type: fs
         scan-ref: .
@@ -55,7 +55,7 @@ jobs:
         category: trivy-scan
 
     - name: Setup Node.js for CodeQL
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -104,7 +104,7 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -190,7 +190,7 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -258,7 +258,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
@@ -355,7 +355,7 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -385,7 +385,7 @@ jobs:
       run: pnpm install --no-frozen-lockfile
 
     - name: Setup Python for ML service
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
@@ -481,7 +481,7 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -540,7 +540,7 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ env.NODE_VERSION }}
 
