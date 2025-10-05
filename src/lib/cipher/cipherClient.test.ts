@@ -1,14 +1,8 @@
 /**
  * Unit tests for CipherClient: agent registration, context sync, validation
- * Mocks @campfirein/cipher to allow test execution without dependency.
+ * Tests the stub implementation without external dependencies.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// Mock the missing @campfirein/cipher dependency with a minimal stub
-vi.mock("@campfirein/cipher", () => ({
-  Cipher: ,
-}));
-
 import { CipherClient } from "./cipherClient";
 
 // Mock dependencies (no secrets, no real crypto)

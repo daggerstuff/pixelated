@@ -76,19 +76,25 @@ export default defineConfig({
     },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'pnpm build && pnpm start',
-    url: 'http://localhost:4321',
-    reuseExistingServer: !process.env['CI'],
-    timeout: 180 * 1000,
-    env: {
-      NODE_ENV: 'test',
-      DISABLE_AUTH: 'true',
-      DISABLE_WEB_FONTS: 'true',
-      SKIP_MSW: 'true'
-    }
-  },
+  /* Run your local dev server before starting the tests.
+   * For faster local debugging (or when you don't want Playwright to run
+   * the build/start command which can be resource-heavy), set
+   * PLAYWRIGHT_SKIP_WEBSERVER=true in the environment. This will disable
+   * Playwright's webServer handling and assume a server is already running
+   * on the configured `baseURL` (or tests may be pointed at a different URL).
+   */
+    webServer: process.env['PLAYWRIGHT_SKIP_WEBSERVER'] === 'true' ? undefined : {
+      command: 'pnpm build && pnpm start',
+      url: 'http://localhost:4321',
+      reuseExistingServer: !process.env['CI'],
+      timeout: 180 * 1000,
+      env: {
+        NODE_ENV: 'test',
+        DISABLE_AUTH: 'true',
+        DISABLE_WEB_FONTS: 'true',
+        SKIP_MSW: 'true'
+      }
+    },
 
   /* Test output directories */
  outputDir: 'test-results/',

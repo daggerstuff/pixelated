@@ -29251,13 +29251,7 @@
         "type": "decl"
       }
     ],
-    "Cipher": [
-      {
-        "file": "src/lib/cipher/__mocks__/@campfirein/cipher.ts",
-        "line": 3,
-        "type": "decl"
-      }
-    ],
+    "Cipher": [],
     "userPreferencesAtom": [
       {
         "file": "src/lib/state/enhanced-persistence.ts",
