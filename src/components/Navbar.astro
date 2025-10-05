@@ -149,6 +149,7 @@ const isActive = (href: string) => {
         aria-controls="mobile-menu"
         aria-expanded="false"
         aria-label="Open main menu"
+        onclick="(function(btn){const menu=document.getElementById('mobile-menu'); if(!menu) return; const isExpanded=btn.getAttribute('aria-expanded')==='true'; btn.setAttribute('aria-expanded', (!isExpanded).toString()); if(menu.classList.contains('hidden')){ menu.classList.remove('hidden'); } else { menu.classList.add('hidden'); } menu.setAttribute('data-menu-open', (!isExpanded).toString()); const svgs=btn.querySelectorAll('svg'); if(svgs[0]) svgs[0].classList.toggle('hidden'); if(svgs[1]) svgs[1].classList.toggle('hidden'); if(!isExpanded){ const first=menu.querySelector('a'); first && first.focus(); } })(this)"
       >
         <span class="sr-only">Open main menu</span>
         <!-- Icon when menu is closed -->
@@ -256,13 +257,23 @@ const isActive = (href: string) => {
 </header>
 
 <script>
-  // Handle mobile menu toggle
-  document.addEventListener('astro:page-load', (_event: Event) => {
+  // Handle mobile menu toggle. Initialize on multiple events so it works in
+  // test environments where 'astro:page-load' may not fire.
+  function initMobileMenu() {
     const button = document.getElementById('mobile-menu-button')
     const menu = document.getElementById('mobile-menu')
     const menuIcons = button?.querySelectorAll('svg')
 
     if (!button || !menu || !menuIcons) return
+
+    // Avoid attaching multiple listeners if init runs more than once
+    if ((button as any).__mobileMenuInitialized) return
+    ;(button as any).__mobileMenuInitialized = true
+
+    // Initialize data-menu-open attribute for test reliability
+    if (!menu.hasAttribute('data-menu-open')) {
+      menu.setAttribute('data-menu-open', 'false')
+    }
 
     const toggleMenu = () => {
       const isExpanded = button.getAttribute('aria-expanded') === 'true'
@@ -329,7 +340,20 @@ const isActive = (href: string) => {
         }
       }
     })
-  })
+  }
+
+  // Try to initialize immediately if possible
+  try {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initMobileMenu()
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // Also initialize on events (Astro and standard DOM events)
+  document.addEventListener('astro:page-load', initMobileMenu)
+  document.addEventListener('DOMContentLoaded', initMobileMenu)
 </script>
 
 <style>
