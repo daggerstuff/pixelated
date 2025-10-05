@@ -108,14 +108,32 @@ export async function checkHorizontalOverflow(page: Page, deviceName: string, pa
 /**
  * Wait for page to be fully loaded and stable
  */
-export async function waitForPageStable(page: Page, options: { timeout?: number } = {}) {
-  const { timeout = 30000 } = options
+export async function waitForPageStable(
+  page: Page,
+  options: { timeout?: number; browser?: string } = {},
+) {
+  const { timeout = 30000, browser } = options
 
-  // Wait for network to be idle
-  await page.waitForLoadState('networkidle', { timeout })
-
-  // Wait a bit more for any animations or dynamic content
-  await page.waitForTimeout(1000)
+  try {
+    // Firefox has issues with networkidle, use domcontentloaded instead
+    if (browser === 'firefox') {
+      await page.waitForLoadState('domcontentloaded', { timeout: 15000 })
+      // Extra buffer for Firefox to finish loading resources
+      await page.waitForTimeout(2000)
+    } else {
+      // For other browsers, use networkidle
+      await page.waitForLoadState('networkidle', { timeout })
+      // Wait a bit more for any animations or dynamic content
+      await page.waitForTimeout(1000)
+    }
+  } catch (error) {
+    // Fallback: if networkidle times out, just wait for load state
+    console.warn(
+      `waitForPageStable timeout (${browser || 'unknown'}), falling back to 'load' state`,
+    )
+    await page.waitForLoadState('load', { timeout: 10000 })
+    await page.waitForTimeout(1500)
+  }
 }
 
 /**

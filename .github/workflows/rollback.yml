@@ -21,6 +21,7 @@ jobs:
       deployments: write
       actions: read
       id-token: write
+      workflows: write
     concurrency:
       group: staging_environment
       cancel-in-progress: true
@@ -90,7 +91,7 @@ jobs:
     - name: Debug Token Permissions
       run: |
         echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
 
     - name: Compute unique rollback tag for staging
       id: compute-tag-staging
@@ -117,8 +118,6 @@ jobs:
         echo "Computed tag: ${TAG_NAME}"
 
     - name: Dry Run Git Push
-      env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         # Use the computed tag from the previous step
         git config --global user.email "action@github.com"
@@ -126,11 +125,9 @@ jobs:
         TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
-      env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         # Push the previously computed tag, but ensure uniqueness by checking local and remote
         git config --global user.email "action@github.com"
@@ -138,7 +135,7 @@ jobs:
         TAG_BASE=${{ steps.compute-tag-staging.outputs.tag }}
         TAG_NAME="$TAG_BASE"
         # Ensure the remote URL is set to use token auth for push checks
-        git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git
         # Fetch remote tags for accurate checks
         git fetch --tags --force
         COUNT=0
@@ -168,6 +165,7 @@ jobs:
       deployments: write
       actions: read
       id-token: write
+      workflows: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -234,7 +232,7 @@ jobs:
     - name: Debug Token Permissions
       run: |
         echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
     - name: Compute unique rollback tag for production
       id: compute-tag-prod
       shell: bash
@@ -260,25 +258,21 @@ jobs:
         echo "Computed tag: ${TAG_NAME}"
 
     - name: Dry Run Git Push
-      env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
-      env:
-        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_BASE=${{ steps.compute-tag-prod.outputs.tag }}
         TAG_NAME="$TAG_BASE"
-        git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git
         git fetch --tags --force
         COUNT=0
         # Try up to 100 suffix increments to find a unique tag for production

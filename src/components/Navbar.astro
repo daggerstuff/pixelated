@@ -268,6 +268,8 @@ const isActive = (href: string) => {
       const isExpanded = button.getAttribute('aria-expanded') === 'true'
       button.setAttribute('aria-expanded', (!isExpanded).toString())
       menu.classList.toggle('hidden')
+      // Add data attribute for test reliability
+      menu.setAttribute('data-menu-open', (!isExpanded).toString())
       menuIcons[0]?.classList.toggle('hidden')
       menuIcons[1]?.classList.toggle('hidden')
 
