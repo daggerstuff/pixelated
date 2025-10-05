@@ -50,7 +50,7 @@ for (const device of TEST_DEVICES) {
       await navigateToPage(pageObj, page.url)
 
       // Wait for page to fully load
-      await waitForPageStable(pageObj)
+      await waitForPageStable(pageObj, { browser: browserName })
 
       // Take screenshot for visual verification
       await pageObj.screenshot({
@@ -103,7 +103,19 @@ test('responsive navigation should work on mobile devices', async ({
   // Wait for page to be fully loaded and hydrated
   await page.waitForLoadState('networkidle')
 
-  // Wait a bit longer for Astro page-load event to fire
+  // Wait for Astro's client-side hydration and script execution
+  await page.evaluate(() => {
+    return new Promise<void>((resolve) => {
+      if (document.readyState === 'complete') {
+        // Extra wait for Astro scripts to initialize
+        setTimeout(resolve, 500)
+      } else {
+        window.addEventListener('load', () => setTimeout(resolve, 500))
+      }
+    })
+  })
+
+  // Additional wait for astro:page-load event handlers to attach
   await page.waitForTimeout(1000)
 
   // Look for mobile navigation elements - hamburger menu or similar
@@ -116,12 +128,14 @@ test('responsive navigation should work on mobile devices', async ({
     // Ensure the button is visible and ready before clicking
     await expect(mobileNavTrigger).toBeVisible({ timeout: 5000 })
 
+    // Wait for JavaScript event listeners to be attached
+    await page.waitForTimeout(500)
+
     // Click the mobile nav trigger
     await mobileNavTrigger.click()
 
-    // Wait for the mobile menu container to become visible (not just exist)
-    const mobileMenu = page.locator('#mobile-menu')
-    // Check actual visibility instead of class names - md:hidden is expected for responsive behavior
+    // Wait for the mobile menu to open (using data attribute for reliability)
+    const mobileMenu = page.locator('#mobile-menu[data-menu-open="true"]')
     await expect(mobileMenu).toBeVisible({ timeout: 5000 })
 
     // Wait for CSS transitions to complete
@@ -135,22 +149,28 @@ test('responsive navigation should work on mobile devices', async ({
     // Verify the menu container is visible first
     await expect(mobileMenu).toBeVisible({ timeout: 3000 })
 
-    // Now verify menu items are visible
-    const menuItems = mobileMenu.locator('nav a')
-    const firstMenuItem = menuItems.first()
+    // Now verify menu items are visible with more specific selector
+    const menuItems = page.locator('#mobile-menu[data-menu-open="true"] nav ul a')
+    const menuItemCount = await menuItems.count()
 
-    // Check if first menu item exists
-    if ((await firstMenuItem.count()) > 0) {
-      // Wait for it to be visible with explicit checks
-      await expect(firstMenuItem).toBeVisible({ timeout: 5000 })
+    console.log(`Found ${menuItemCount} navigation links in mobile menu`)
 
-      // Verify it's actually interactable
-      await expect(firstMenuItem).toBeEnabled({ timeout: 2000 })
-
-      console.log(`✅ Mobile navigation test passed - menu opens and links are visible`)
-    } else {
+    // Ensure we have navigation links
+    if (menuItemCount === 0) {
       throw new Error('No navigation links found in mobile menu')
     }
+
+    const firstMenuItem = menuItems.first()
+
+    // Wait for first menu item to be visible with explicit checks
+    await expect(firstMenuItem).toBeVisible({ timeout: 5000 })
+
+    // Verify it's actually interactable
+    await expect(firstMenuItem).toBeEnabled({ timeout: 2000 })
+
+    console.log(
+      `✅ Mobile navigation test passed - menu opens and ${menuItemCount} links are visible`,
+    )
   }
 
   // Close context when done
