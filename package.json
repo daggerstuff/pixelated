@@ -179,7 +179,7 @@
     "jotai": "^2.15.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.544.0",
-    "mongodb": "^6.18.0",
+    "mongodb": "^6.20.0",
     "nanoid": "^5.1.6",
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
