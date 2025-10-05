@@ -12,15 +12,45 @@ updates:
   ignore:
   # This action is not publicly accessible and causes Dependabot to fail
   - dependency-name: "github/copilot-review-action"
+  groups:
+    github-actions:
+      patterns:
+      - "*"
 
 - package-ecosystem: "npm"
   directory: "/"
   schedule:
     interval: "weekly"
   open-pull-requests-limit: 10
+  groups:
+    production-dependencies:
+      dependency-type: "production"
+      update-types:
+      - "minor"
+      - "patch"
+    development-dependencies:
+      dependency-type: "development"
+      update-types:
+      - "minor"
+      - "patch"
+    major-updates:
+      update-types:
+      - "major"
 
 - package-ecosystem: "pip"
   directory: "/"
   schedule:
     interval: "weekly"
   open-pull-requests-limit: 10
+  groups:
+    python-dependencies:
+      patterns:
+      - "*"
+      update-types:
+      - "minor"
+      - "patch"
+    python-major-updates:
+      patterns:
+      - "*"
+      update-types:
+      - "major"
