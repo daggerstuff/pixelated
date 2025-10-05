@@ -47,7 +47,8 @@ ENV VITE_CACHE_DIR=/tmp/.vite
 ENV PORT=4321
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable pnpm
+ENV XDG_CACHE_HOME=/tmp/.cache
+RUN mkdir -p /tmp/.cache && corepack enable pnpm
 
 # Dependencies stage - optimized for caching
 FROM base AS deps
@@ -55,18 +56,14 @@ FROM base AS deps
 # Switch to non-root user for dependency installation
 USER astro
 
-# Copy package files with proper ownership. If pnpm-lock.yaml is not present in the
-# build context (e.g., some CI detached checkouts), fall back to copying only
-# package.json to avoid build failures. This keeps builds resilient while still
-# preferring a lockfile when available.
-RUN if [ -f pnpm-lock.yaml ]; then echo "✅ pnpm-lock.yaml found"; else echo "⚠️ pnpm-lock.yaml not found - continuing without lockfile"; fi
-COPY --chown=astro:astro package.json ./
-# Use a conditional approach to handle missing pnpm-lock.yaml gracefully
-RUN if [ -f pnpm-lock.yaml ]; then cp pnpm-lock.yaml /tmp/pnpm-lock.yaml; fi
-RUN if [ -f /tmp/pnpm-lock.yaml ]; then cp /tmp/pnpm-lock.yaml ./; fi
+# Copy package files with proper ownership
+COPY --chown=astro:astro package.json pnpm-lock.yaml* ./
 
-# Configure pnpm store and install dependencies with optimizations
-RUN pnpm config set store-dir /app/.pnpm-store && \
+# Configure pnpm to use a smaller cache directory and install dependencies
+# Use /tmp for corepack cache to avoid ENOSPC errors in user home
+ENV XDG_CACHE_HOME=/tmp/.cache
+RUN mkdir -p /tmp/.cache && \
+    pnpm config set store-dir /app/.pnpm-store && \
     pnpm config set package-import-method copy && \
     pnpm config set registry https://registry.npmjs.org/ && \
     pnpm config set fetch-timeout 300000 && \
