@@ -33,9 +33,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Enable Corepack
-      run: corepack enable
-
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
