@@ -98,9 +98,10 @@ ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 # Switch to non-root user
 USER astro
 
-# Copy dependencies from deps stage
+# Copy dependencies and cache directories from deps stage (with proper permissions)
 COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules
 COPY --from=deps --chown=astro:astro /app/.pnpm-store ./.pnpm-store
+COPY --from=deps --chown=astro:astro /tmp/.cache /tmp/.cache
 COPY --chown=astro:astro package.json ./
 COPY --chown=astro:astro pnpm-lock.yaml* ./
 
@@ -116,8 +117,9 @@ COPY --chown=astro:astro src ./src
 COPY --chown=astro:astro .env* ./
 COPY --chown=astro:astro *.config.* ./
 
-# Create cache directories with proper permissions
-RUN mkdir -p /tmp/.astro /app/node_modules/.astro && \
+# Create cache directories with proper permissions (including corepack cache)
+# Note: /tmp/.cache is already copied with correct permissions from deps stage
+RUN mkdir -p /tmp/.astro /app/node_modules/.astro /tmp/.cache/node/corepack/v1 && \
     chmod -R 755 /tmp/.astro /app/node_modules/.astro
 
 # Build with optimized settings - disable experimental TypeScript stripping for Node 24 compatibility
