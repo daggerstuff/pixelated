@@ -201,7 +201,7 @@ jobs:
 
     - name: Notify failure
       if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
-      uses: slackapi/slack-github-action@v1.25.0
+      uses: slackapi/slack-github-action@v2.1.1
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       with:
@@ -697,7 +697,7 @@ jobs:
 
     - name: Notify performance issues
       if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
-      uses: slackapi/slack-github-action@v1.25.0
+      uses: slackapi/slack-github-action@v2.1.1
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       with:
