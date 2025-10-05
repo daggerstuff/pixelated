@@ -1,56 +1,24 @@
-name: "Copilot Code Review"
-
+name: Copilot Setup
 on:
-  pull_request:
-    types: [ opened, synchronize, reopened ]
   workflow_dispatch:
 
-
 jobs:
-  copilot-code-review:
+  copilot-setup-steps:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      pull-requests: write
-
-    environment: copilot
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: "24"
-        cache: "pnpm"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 10.18.0
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-    - name: Install dependencies
-      run: pnpm install --no-frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install
 
-    - name: Lint (ESLint)
-      run: pnpm exec eslint . --ext .js,.ts,.tsx,.astro
-
-    - name: Format check (Prettier)
-      run: pnpm exec prettier --check .
-
-    - name: Run tests
-      run: |
-        if pnpm exec vitest --version 2>/dev/null; then
-          pnpm exec vitest run --reporter=dot
-        elif pnpm exec jest --version 2>/dev/null; then
-          pnpm exec jest --ci
-        else
-          echo "No supported test runner found (vitest/jest)."
-        fi
-
-    - name: GitHub Copilot Code Review
-      uses: github/copilot-review-action@v1
-      with:
-        github-token: ${{ secrets.G_TOKEN }}
+      - name: Run linter
+        run: uvx ruff@latest check --fix .
