@@ -9,6 +9,9 @@ updates:
   directory: "/"
   schedule:
     interval: "weekly"
+  ignore:
+  # This action is not publicly accessible and causes Dependabot to fail
+  - dependency-name: "github/copilot-review-action"
 
 - package-ecosystem: "npm"
   directory: "/"
