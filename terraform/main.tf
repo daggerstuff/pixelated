@@ -274,11 +274,6 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_s3_bucket" "assets" {
   bucket = "${var.project_name}-assets-${random_string.bucket_suffix.result}"
 
-  # Enable versioning for replication
-  versioning {
-    enabled = true
-  }
-
   tags = var.common_tags
 }
 

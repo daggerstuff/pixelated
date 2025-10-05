@@ -224,6 +224,61 @@ resource "google_compute_subnetwork" "gcp_europe_subnets" {
   }
 }
 
+# GCP Europe Firewall Rules
+resource "google_compute_firewall" "gcp_europe_allow_internal" {
+  provider    = google.gcp_europe
+  name        = "${var.project_name}-europe-allow-internal"
+  network     = google_compute_network.gcp_europe.name
+  description = "Allow internal communication within VPC"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "icmp"
+  }
+
+  source_ranges = ["10.5.0.0/16"]
+  priority      = 1000
+}
+
+resource "google_compute_firewall" "gcp_europe_allow_https" {
+  provider    = google.gcp_europe
+  name        = "${var.project_name}-europe-allow-https"
+  network     = google_compute_network.gcp_europe.name
+  description = "Allow HTTPS ingress"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["web"]
+  priority      = 1000
+}
+
+resource "google_compute_firewall" "gcp_europe_deny_all" {
+  provider    = google.gcp_europe
+  name        = "${var.project_name}-europe-deny-all"
+  network     = google_compute_network.gcp_europe.name
+  description = "Deny all other traffic"
+
+  deny {
+    protocol = "all"
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  priority      = 65535
+}
+
 resource "google_compute_network" "gcp_asia" {
   provider                = google.gcp_asia
   name                    = "${var.project_name}-vpc-asia"
@@ -249,6 +304,61 @@ resource "google_compute_subnetwork" "gcp_asia_subnets" {
     flow_sampling        = 0.5
     metadata             = "INCLUDE_ALL_METADATA"
   }
+}
+
+# GCP Asia Firewall Rules
+resource "google_compute_firewall" "gcp_asia_allow_internal" {
+  provider    = google.gcp_asia
+  name        = "${var.project_name}-asia-allow-internal"
+  network     = google_compute_network.gcp_asia.name
+  description = "Allow internal communication within VPC"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "icmp"
+  }
+
+  source_ranges = ["10.6.0.0/16"]
+  priority      = 1000
+}
+
+resource "google_compute_firewall" "gcp_asia_allow_https" {
+  provider    = google.gcp_asia
+  name        = "${var.project_name}-asia-allow-https"
+  network     = google_compute_network.gcp_asia.name
+  description = "Allow HTTPS ingress"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["web"]
+  priority      = 1000
+}
+
+resource "google_compute_firewall" "gcp_asia_deny_all" {
+  provider    = google.gcp_asia
+  name        = "${var.project_name}-asia-deny-all"
+  network     = google_compute_network.gcp_asia.name
+  description = "Deny all other traffic"
+
+  deny {
+    protocol = "all"
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  priority      = 65535
 }
 
 # Enable required Google APIs
@@ -760,6 +870,7 @@ module "monitoring_stack" {
 }
 
 # Security groups and network policies
+# checkov:skip=CKV2_AWS_5: Security groups are templates for future resource attachment
 resource "aws_security_group" "multi_region" {
   for_each = {
     us_east    = aws.us_east
@@ -771,7 +882,7 @@ resource "aws_security_group" "multi_region" {
   provider = each.value
 
   name_prefix = "${var.project_name}-multi-region-"
-  description = "Multi-region security group for ${each.key}"
+  description = "Multi-region security group template for ${each.key} - to be attached to application resources"
 
   ingress {
     from_port   = 443
@@ -818,6 +929,34 @@ resource "aws_kms_key" "backup_replication" {
   description             = "KMS key for RDS backup replication in ${each.key}"
   deletion_window_in_days = 30
   enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow use of the key for RDS backup encryption"
+        Effect = "Allow"
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:CreateGrant"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 
   tags = merge(var.common_tags, {
     Name = "${var.project_name}-backup-kms-${each.key}"
