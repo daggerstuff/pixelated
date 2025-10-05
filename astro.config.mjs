@@ -28,7 +28,7 @@ export default defineConfig({
   vite: {
     build: {
       sourcemap: 'hidden', // Generate but don't expose to users
-      target: 'node22',
+      target: 'node24',
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
         external: [

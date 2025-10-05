@@ -397,4 +397,3 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
 }
 
 export default BiasDetectionForm
-export default BiasDetectionForm
