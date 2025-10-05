@@ -98,9 +98,10 @@ ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 # Switch to non-root user
 USER astro
 
-# Copy dependencies from deps stage
+# Copy dependencies and cache directories from deps stage (with proper permissions)
 COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules
 COPY --from=deps --chown=astro:astro /app/.pnpm-store ./.pnpm-store
+COPY --from=deps --chown=astro:astro /tmp/.cache /tmp/.cache
 COPY --chown=astro:astro package.json ./
 COPY --chown=astro:astro pnpm-lock.yaml* ./
 
