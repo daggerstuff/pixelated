@@ -491,18 +491,6 @@ build-frontend:
   script:
   - echo "🏗️ Building optimized frontend container..."
   - |
-    # Create buildx builder with enhanced caching
-    docker buildx create --use --name multiarch-builder \
-      --driver docker-container \
-      --driver-opt image=moby/buildkit:latest \
-      --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=1048576 \
-      --driver-opt env.BUILDKIT_STEP_LOG_MAX_SPEED=10485760 || docker buildx use multiarch-builder
-
-    # Pre-pull base images for faster builds
-    echo "📥 Pre-pulling base images..."
-    docker pull node:24-alpine || true
-    docker pull alpine:latest || true
-
     # Set SENTRY_RELEASE dynamically
     if [ -n "$CI_COMMIT_TAG" ]; then
       export SENTRY_RELEASE="$CI_COMMIT_TAG"
@@ -510,26 +498,35 @@ build-frontend:
       export SENTRY_RELEASE="$CI_COMMIT_SHORT_SHA"
     fi
 
-    # Build with optimized caching and multi-stage optimization
-    echo "🔨 Starting optimized build..."
-    docker buildx build \
-      --load \
-      --platform linux/amd64 \
+    # Use standard docker build instead of buildx to avoid session timeout issues
+    # Build directly to registry with push to avoid local export timeout
+    echo "🔨 Starting optimized build with direct registry push..."
+
+    # Prepare secrets for Docker BuildKit secret mounts (more secure than build args)
+    echo "🔐 Preparing secrets for secure build..."
+    echo -n "$SENTRY_DSN" > /tmp/.sentry_dsn
+    echo -n "$SENTRY_AUTH_TOKEN" > /tmp/.sentry_auth_token
+    echo -n "$BETTER_AUTH_SECRET" > /tmp/.better_auth_secret
+
+    # Build with BuildKit secret mounts (secrets not stored in image layers)
+    DOCKER_BUILDKIT=1 docker build \
       --build-arg NODE_ENV=production \
       --build-arg CI=true \
       --build-arg BUILDKIT_INLINE_CACHE=1 \
-      --build-arg SENTRY_DSN="$SENTRY_DSN" \
-      --build-arg SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
       --build-arg SENTRY_RELEASE="$SENTRY_RELEASE" \
       --build-arg PUBLIC_SENTRY_DSN="$PUBLIC_SENTRY_DSN" \
-      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-      --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
-      --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:latest \
+      --secret id=sentry_dsn,src=/tmp/.sentry_dsn \
+      --secret id=sentry_auth_token,src=/tmp/.sentry_auth_token \
+      --secret id=better_auth_secret,src=/tmp/.better_auth_secret \
+      --cache-from $CI_REGISTRY_IMAGE:latest \
       --target runtime \
       -t $CONTAINER_IMAGE \
       -t $CONTAINER_IMAGE_LATEST \
       --progress=plain \
       .
+
+    # Clean up secret files
+    rm -f /tmp/.sentry_dsn /tmp/.sentry_auth_token /tmp/.better_auth_secret
 
     # Push with timeout and retry
     echo "📤 Pushing to registry..."
@@ -1033,13 +1030,21 @@ build-ai-backend:
   - |
     if [ -d "ai" ]; then
       cd ai
-      docker buildx create --use --name ai-builder || docker buildx use ai-builder
-      docker buildx build \
-        --load \
-        --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-        --cache-from type=registry,ref=$CI_REGISTRY_IMAGE/ai:cache \
+
+      # Prepare secrets for secure build
+      echo "🔐 Preparing secrets..."
+      echo -n "$BETTER_AUTH_SECRET" > /tmp/.better_auth_secret
+
+      # Use standard docker build to avoid buildx session timeout
+      DOCKER_BUILDKIT=1 docker build \
+        --secret id=better_auth_secret,src=/tmp/.better_auth_secret \
+        --cache-from $CI_REGISTRY_IMAGE/ai:latest \
         -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA \
         -t $CI_REGISTRY_IMAGE/ai:latest .
+
+      # Clean up secrets
+      rm -f /tmp/.better_auth_secret
+
       docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
       docker push $CI_REGISTRY_IMAGE/ai:latest
       echo "✅ AI backend container pushed"
