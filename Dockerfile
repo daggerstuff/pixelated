@@ -81,19 +81,13 @@ RUN pnpm config set store-dir /app/.pnpm-store && \
 # Build stage - optimized for performance
 FROM base AS build
 
-# Build-time arguments for Sentry
-ARG SENTRY_DSN=""
-ARG SENTRY_AUTH_TOKEN=""
+# Non-sensitive build arguments
 ARG SENTRY_RELEASE=""
 ARG PUBLIC_SENTRY_DSN=""
-ARG BETTER_AUTH_SECRET=""
 
-# Set build environment variables
-ENV SENTRY_DSN=${SENTRY_DSN}
-ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+# Set non-sensitive environment variables
 ENV SENTRY_RELEASE=${SENTRY_RELEASE}
 ENV PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}
-ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 
 # Switch to non-root user
 USER astro
@@ -123,8 +117,15 @@ RUN mkdir -p /tmp/.astro /app/node_modules/.astro /tmp/.cache/node/corepack/v1 &
     chmod -R 755 /tmp/.astro /app/node_modules/.astro
 
 # Build with optimized settings - disable experimental TypeScript stripping for Node 24 compatibility
+# Secrets are mounted at build time and read from files (not exposed in image layers)
 ENV NODE_OPTIONS="--max-old-space-size=4096 --no-experimental-strip-types"
-RUN echo "🏗️ Starting optimized build process..." && \
+RUN --mount=type=secret,id=sentry_dsn \
+    --mount=type=secret,id=sentry_auth_token \
+    --mount=type=secret,id=better_auth_secret \
+    echo "🏗️ Starting optimized build process..." && \
+    export SENTRY_DSN=$(cat /run/secrets/sentry_dsn 2>/dev/null || echo "") && \
+    export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token 2>/dev/null || echo "") && \
+    export BETTER_AUTH_SECRET=$(cat /run/secrets/better_auth_secret 2>/dev/null || echo "") && \
     pnpm build --verbose > /tmp/build.log 2>&1 || (\
         echo "❌ Build failed, debugging..." && \
         cat /tmp/build.log && \
