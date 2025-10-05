@@ -28,7 +28,7 @@ on:
 env:
   NODE_VERSION: 24.8.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.17.1
+  PNPM_VERSION: 10.18.0
 
 jobs:
   security-scan:

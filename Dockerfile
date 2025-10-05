@@ -23,7 +23,7 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 # Install pnpm with optimized configuration
-ARG PNPM_VERSION=10.17.1
+ARG PNPM_VERSION=10.18.0
 RUN npm config set registry https://registry.npmjs.org/ && \
     npm config set fetch-timeout 300000 && \
     npm config set fetch-retry-mintimeout 20000 && \

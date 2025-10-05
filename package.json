@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.17.1",
+  "packageManager": "pnpm@10.18.0",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -52,7 +52,7 @@
     "e2e:browser-compat": "playwright test tests/browser-compatibility.spec.ts --config=playwright-browser-compat.config.ts",
     "e2e:browser-compat-timeout": "bash scripts/browser-compatibility-test.sh",
     "e2e:ui": "playwright test --ui-mode",
-  "e2e:no-webserver": "cross-env PLAYWRIGHT_SKIP_WEBSERVER=true pnpm exec playwright test",
+    "e2e:no-webserver": "cross-env PLAYWRIGHT_SKIP_WEBSERVER=true pnpm exec playwright test",
     "test:e2e": "playwright test",
     "test:e2e-ui": "playwright test --ui",
     "test:smoke": "playwright test tests/e2e/smoke/",
