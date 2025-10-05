@@ -190,7 +190,7 @@ importers:
         version: 5.1.7
       openmemory:
         specifier: ^0.0.1
-        version: 0.0.1(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(jiti@2.5.1)(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(postcss@8.5.6)(redis@5.8.2)(sqlite3@5.1.7)(tsx@4.20.6)(typescript@5.9.2)(ws@8.18.3)(yaml@2.8.1)
+        version: 0.0.1(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(jiti@2.5.1)(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(postcss@8.5.6)(redis@5.8.3)(sqlite3@5.1.7)(tsx@4.20.6)(typescript@5.9.2)(ws@8.18.3)(yaml@2.8.1)
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -216,8 +216,8 @@ importers:
         specifier: ^3.2.1
         version: 3.2.1(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react-is@18.3.1)(react@19.1.1)(redux@5.0.1)
       redis:
-        specifier: ^5.8.2
-        version: 5.8.2
+        specifier: ^5.8.3
+        version: 5.8.3
       rehype-sanitize:
         specifier: ^6.0.0
         version: 6.0.0
@@ -3000,33 +3000,33 @@ packages:
       react-native:
         optional: true
 
-  '@redis/bloom@5.8.2':
-    resolution: {integrity: sha512-855DR0ChetZLarblio5eM0yLwxA9Dqq50t8StXKp5bAtLT0G+rZ+eRzzqxl37sPqQKjUudSYypz55o6nNhbz0A==}
+  '@redis/bloom@5.8.3':
+    resolution: {integrity: sha512-1eldTzHvdW3Oi0TReb8m1yiFt8ZwyF6rv1NpZyG5R4TpCwuAdKQetBKoCw7D96tNFgsVVd6eL+NaGZZCqhRg4g==}
     engines: {node: '>= 18'}
     peerDependencies:
-      '@redis/client': ^5.8.2
+      '@redis/client': ^5.8.3
 
-  '@redis/client@5.8.2':
-    resolution: {integrity: sha512-WtMScno3+eBpTac1Uav2zugXEoXqaU23YznwvFgkPwBQVwEHTDgOG7uEAObtZ/Nyn8SmAMbqkEubJaMOvnqdsQ==}
+  '@redis/client@5.8.3':
+    resolution: {integrity: sha512-MZVUE+l7LmMIYlIjubPosruJ9ltSLGFmJqsXApTqPLyHLjsJUSAbAJb/A3N34fEqean4ddiDkdWzNu4ZKPvRUg==}
     engines: {node: '>= 18'}
 
-  '@redis/json@5.8.2':
-    resolution: {integrity: sha512-uxpVfas3I0LccBX9rIfDgJ0dBrUa3+0Gc8sEwmQQH0vHi7C1Rx1Qn8Nv1QWz5bohoeIXMICFZRcyDONvum2l/w==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@redis/client': ^5.8.2
-
-  '@redis/search@5.8.2':
-    resolution: {integrity: sha512-cNv7HlgayavCBXqPXgaS97DRPVWFznuzsAmmuemi2TMCx5scwLiP50TeZvUS06h/MG96YNPe6A0Zt57yayfxwA==}
+  '@redis/json@5.8.3':
+    resolution: {integrity: sha512-DRR09fy/u8gynHGJ4gzXYeM7D8nlS6EMv5o+h20ndTJiAc7RGR01fdk2FNjnn1Nz5PjgGGownF+s72bYG4nZKQ==}
     engines: {node: '>= 18'}
     peerDependencies:
-      '@redis/client': ^5.8.2
+      '@redis/client': ^5.8.3
 
-  '@redis/time-series@5.8.2':
-    resolution: {integrity: sha512-g2NlHM07fK8H4k+613NBsk3y70R2JIM2dPMSkhIjl2Z17SYvaYKdusz85d7VYOrZBWtDrHV/WD2E3vGu+zni8A==}
+  '@redis/search@5.8.3':
+    resolution: {integrity: sha512-EMIvEeGRR2I0BJEz4PV88DyCuPmMT1rDtznlsHY3cKSDcc9vj0Q411jUnX0iU2vVowUgWn/cpySKjpXdZ8m+5g==}
     engines: {node: '>= 18'}
     peerDependencies:
-      '@redis/client': ^5.8.2
+      '@redis/client': ^5.8.3
+
+  '@redis/time-series@5.8.3':
+    resolution: {integrity: sha512-5Jwy3ilsUYQjzpE7WZ1lEeG1RkqQ5kHtwV1p8yxXHSEmyUbC/T/AVgyjMcm52Olj/Ov/mhDKjx6ndYUi14bXsw==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.8.3
 
   '@reduxjs/toolkit@2.9.0':
     resolution: {integrity: sha512-fSfQlSRu9Z5yBkvsNhYF2rPS8cGXn/TZVrlwN1948QyZ8xMZ0JvP50S2acZNaf+o63u6aEeMjipFyksjIcWrog==}
@@ -8707,8 +8707,8 @@ packages:
     resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
     engines: {node: '>=4'}
 
-  redis@5.8.2:
-    resolution: {integrity: sha512-31vunZj07++Y1vcFGcnNWEf5jPoTkGARgfWI4+Tk55vdwHxhAvug8VEtW7Cx+/h47NuJTEg/JL77zAwC6E0OeA==}
+  redis@5.8.3:
+    resolution: {integrity: sha512-MfSrfV6+tEfTw8c4W0yFp6XWX8Il4laGU7Bx4kvW4uiYM1AuZ3KGqEGt1LdQHeD1nEyLpIWetZ/SpY3kkbgrYw==}
     engines: {node: '>= 18'}
 
   redux-thunk@3.1.0:
@@ -13972,25 +13972,25 @@ snapshots:
       - '@types/react'
       - immer
 
-  '@redis/bloom@5.8.2(@redis/client@5.8.2)':
+  '@redis/bloom@5.8.3(@redis/client@5.8.3)':
     dependencies:
-      '@redis/client': 5.8.2
+      '@redis/client': 5.8.3
 
-  '@redis/client@5.8.2':
+  '@redis/client@5.8.3':
     dependencies:
       cluster-key-slot: 1.1.2
 
-  '@redis/json@5.8.2(@redis/client@5.8.2)':
+  '@redis/json@5.8.3(@redis/client@5.8.3)':
     dependencies:
-      '@redis/client': 5.8.2
+      '@redis/client': 5.8.3
 
-  '@redis/search@5.8.2(@redis/client@5.8.2)':
+  '@redis/search@5.8.3(@redis/client@5.8.3)':
     dependencies:
-      '@redis/client': 5.8.2
+      '@redis/client': 5.8.3
 
-  '@redis/time-series@5.8.2(@redis/client@5.8.2)':
+  '@redis/time-series@5.8.3(@redis/client@5.8.3)':
     dependencies:
-      '@redis/client': 5.8.2
+      '@redis/client': 5.8.3
 
   '@reduxjs/toolkit@2.9.0(react-redux@9.2.0(@types/react@19.1.12)(react@19.1.1)(redux@5.0.1))(react@19.1.1)':
     dependencies:
@@ -19804,7 +19804,7 @@ snapshots:
 
   medium-zoom@1.1.0: {}
 
-  mem0ai@2.1.38(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(redis@5.8.2)(sqlite3@5.1.7)(ws@8.18.3):
+  mem0ai@2.1.38(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(redis@5.8.3)(sqlite3@5.1.7)(ws@8.18.3):
     dependencies:
       '@anthropic-ai/sdk': 0.40.1(encoding@0.1.13)
       '@cloudflare/workers-types': 4.20251001.0
@@ -19823,7 +19823,7 @@ snapshots:
       ollama: 0.5.18
       openai: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
       pg: 8.16.3
-      redis: 5.8.2
+      redis: 5.8.3
       sqlite3: 5.1.7
       uuid: 9.0.1
       zod: 3.25.76
@@ -20561,11 +20561,11 @@ snapshots:
       - encoding
     optional: true
 
-  openmemory@0.0.1(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(jiti@2.5.1)(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(postcss@8.5.6)(redis@5.8.2)(sqlite3@5.1.7)(tsx@4.20.6)(typescript@5.9.2)(ws@8.18.3)(yaml@2.8.1):
+  openmemory@0.0.1(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(jiti@2.5.1)(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(postcss@8.5.6)(redis@5.8.3)(sqlite3@5.1.7)(tsx@4.20.6)(typescript@5.9.2)(ws@8.18.3)(yaml@2.8.1):
     dependencies:
       '@modelcontextprotocol/sdk': 1.17.5
       dotenv: 16.6.1
-      mem0ai: 2.1.38(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(redis@5.8.2)(sqlite3@5.1.7)(ws@8.18.3)
+      mem0ai: 2.1.38(@anthropic-ai/sdk@0.40.1(encoding@0.1.13))(@cloudflare/workers-types@4.20251001.0)(@google/genai@1.21.0(@modelcontextprotocol/sdk@1.17.5)(encoding@0.1.13))(@langchain/core@0.3.78(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.11)))(@mistralai/mistralai@1.10.0)(@qdrant/js-client-rest@1.13.0(typescript@5.9.2))(@supabase/supabase-js@2.58.0)(@types/jest@29.5.14)(@types/pg@8.15.5)(@types/sqlite3@3.1.11)(cloudflare@4.5.0(encoding@0.1.13))(encoding@0.1.13)(groq-sdk@0.3.0(encoding@0.1.13))(neo4j-driver@5.28.2)(ollama@0.5.18)(pg@8.16.3)(redis@5.8.3)(sqlite3@5.1.7)(ws@8.18.3)
       tsup: 8.5.0(jiti@2.5.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.9.2)(yaml@2.8.1)
       zod: 3.25.76
     transitivePeerDependencies:
@@ -21248,13 +21248,13 @@ snapshots:
     dependencies:
       redis-errors: 1.2.0
 
-  redis@5.8.2:
+  redis@5.8.3:
     dependencies:
-      '@redis/bloom': 5.8.2(@redis/client@5.8.2)
-      '@redis/client': 5.8.2
-      '@redis/json': 5.8.2(@redis/client@5.8.2)
-      '@redis/search': 5.8.2(@redis/client@5.8.2)
-      '@redis/time-series': 5.8.2(@redis/client@5.8.2)
+      '@redis/bloom': 5.8.3(@redis/client@5.8.3)
+      '@redis/client': 5.8.3
+      '@redis/json': 5.8.3(@redis/client@5.8.3)
+      '@redis/search': 5.8.3(@redis/client@5.8.3)
+      '@redis/time-series': 5.8.3(@redis/client@5.8.3)
 
   redux-thunk@3.1.0(redux@5.0.1):
     dependencies:
