@@ -21,11 +21,11 @@ def test_relevance_scorer_structure():
         file_size = scorer_file.stat().st_size
 
         if file_size > 25000:  # Should be > 25KB for comprehensive implementation
-            pass")
+            pass
         else:
-            pass")
+            pass
     else:
-        pass")
+        pass
 
     if test_file.exists():
 
@@ -33,11 +33,11 @@ def test_relevance_scorer_structure():
         test_size = test_file.stat().st_size
 
         if test_size > 20000:  # Should be > 20KB for comprehensive tests
-            pass")
+            pass
         else:
-            pass")
+            pass
     else:
-        pass")
+        pass
 
     # Test basic structure and components
     try:
@@ -66,9 +66,9 @@ def test_relevance_scorer_structure():
                 missing_components.append(component)
 
         if not missing_components:
-            pass")
+            pass
         else:
-            pass")
+            pass
 
         # Check for advanced features
         advanced_features = [
@@ -87,12 +87,12 @@ def test_relevance_scorer_structure():
         found_features = [feature for feature in advanced_features if feature in content]
 
         if len(found_features) >= len(advanced_features) * 0.8:
-            pass")
+            pass
         else:
-            pass")
+            pass
 
     except Exception as e:
-        pass")
+        pass
 
     # Test core scoring concepts
     try:
@@ -224,7 +224,7 @@ def test_relevance_scorer_structure():
         assert 0 <= combined_score <= 1
 
     except Exception as e:
-        pass")
+        pass
 
     # Test advanced scoring features
     try:
@@ -308,7 +308,7 @@ def test_relevance_scorer_structure():
         assert dsm5_count <= 2  # Should limit DSM-5 results
 
     except Exception as e:
-        pass")
+        pass
 
 
 

@@ -8,7 +8,6 @@ on:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.18.0
   NODE_ENV: production
 
 jobs:
@@ -36,8 +35,6 @@ jobs:
 
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
-      with:
-        version: ${{ env.PNPM_VERSION }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -81,8 +78,6 @@ jobs:
 
     - name: Re-setup pnpm after checkout
       uses: pnpm/action-setup@v4.1.0
-      with:
-        version: ${{ env.PNPM_VERSION }}
 
     - name: Reinstall dependencies for rollback tag
       run: |
@@ -182,8 +177,6 @@ jobs:
 
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
-      with:
-        version: ${{ env.PNPM_VERSION }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -227,8 +220,6 @@ jobs:
 
     - name: Re-setup pnpm after checkout
       uses: pnpm/action-setup@v4.1.0
-      with:
-        version: ${{ env.PNPM_VERSION }}
 
     - name: Reinstall dependencies for rollback tag
       run: |
