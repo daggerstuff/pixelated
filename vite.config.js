@@ -33,11 +33,10 @@ export default defineConfig({
     ? '$(Agent.WorkFolder)/.vite-cache'
     : 'node_modules/.vite',
   server: {
-    allowedHosts: ['pixelatedempathy.tech'],
+    allowedHosts: ['pixelatedempathy.com'],
     watch: {
       ignored: [
         '**/node_modules/**',
-        '**/ai/**',
         '**/dataset/**',
         '**/MER2025/**',
         '**/VideoChat2/**',
@@ -58,7 +57,7 @@ export default defineConfig({
     },
   },
   preview: {
-    allowedHosts: ['pixelatedempathy.tech'],
+    allowedHosts: ['pixelatedempathy.com'],
   },
   plugins: [
     rewriteLoggerImportPlugin(),
@@ -159,7 +158,6 @@ export default defineConfig({
       'zlib': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'net': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'tls': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
-      // Alias MongoDB to a client-safe polyfill
       'mongodb': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       '@lib': path.resolve(__dirname, 'src/lib'),
       '@/hooks/useMentalHealthAnalysis': path.resolve(
@@ -179,7 +177,6 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       onwarn(warning, warn) {
-        // Suppress SORUCEMAP warnings
         if (warning.code === 'SOURCEMAP_ERROR') {
           return
         }
@@ -189,7 +186,6 @@ export default defineConfig({
         ) {
           return
         }
-        // Suppress Vite 'externalized for browser compatibility' and Unocss icon '-' warnings
         if (
           warning.message &&
           (warning.message.includes('externalized for browser compatibility') ||
@@ -207,7 +203,6 @@ export default defineConfig({
         ) {
           return true
         }
-        // Exclude MongoDB from client-side bundles
         if (id === 'mongodb' || id.includes('mongodb')) {
           return true
         }

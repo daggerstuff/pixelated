@@ -5,18 +5,39 @@
 
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import Database from 'better-sqlite3'
+
+// Make better-sqlite3 optional for testing environments
+// Use `unknown` for the imported module and narrow it when used to avoid `any`.
+let Database: unknown = null
+try {
+  // Use dynamic import to avoid build-time errors and explicitly pick default export if available
+  Database = await import('better-sqlite3')
+    .then((m: unknown) => {
+      if (m && typeof m === 'object' && 'default' in m) {
+        return (m as { default: unknown }).default
+      }
+      return m
+    })
+    .catch(() => null)
+} catch (_error) {
+  // Prefix unused catch parameter with underscore to satisfy lint rules
+  console.warn('better-sqlite3 not available, using mock database for testing')
+}
 import { generateTokenPair, validateToken, AuthenticationError } from './jwt-service'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import type { UserRole, ClientInfo, TokenPair } from './jwt-service'
 
 // Database setup for Better-Auth
-const db = new Database(':memory:') // In production, use proper SQLite/MongoDB connection
+// Only construct Database if it is a constructor (safer than assuming a shape)
+const db =
+  Database && typeof Database === 'function'
+    ? new (Database as { new (...args: unknown[]): unknown })(':memory:')
+    : null // In production, use proper SQLite/MongoDB connection
 
 // Better-Auth configuration
 const auth = betterAuth({
-  database: drizzleAdapter(db),
+  database: db ? drizzleAdapter(db) : undefined,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Enable in production
@@ -143,7 +164,7 @@ function mapBetterAuthUserToLocal(betterAuthUser: unknown): UserAuthentication {
     createdAt: Date.now(),
     updatedAt: Date.now(),
   }
-  
+
   userAuthStore.set(newUserAuth.id, newUserAuth)
   return newUserAuth
 }
@@ -183,7 +204,7 @@ export async function registerWithBetterAuth(
 
     // Map to local user authentication
     const userAuth = mapBetterAuthUserToLocal(result.user)
-    
+
     // Update role if specified
     if (credentials.role) {
       userAuth.role = credentials.role
@@ -278,7 +299,7 @@ export async function authenticateWithBetterAuth(
       accountLockedUntil: null,
       updatedAt: Date.now(),
     }
-    
+
     userAuthStore.set(userAuth.id, updatedUser)
 
     // Generate JWT tokens
@@ -315,16 +336,16 @@ export async function authenticateWithBetterAuth(
     const userAuth = Array.from(userAuthStore.values()).find(
       user => user.email === credentials.email
     )
-    
+
     if (userAuth) {
       userAuth.loginAttempts += 1
-      
+
       // Lock account after 5 failed attempts
       if (userAuth.loginAttempts >= 5) {
         userAuth.authenticationStatus = AuthenticationStatus.ACCOUNT_LOCKED
         userAuth.accountLockedUntil = Date.now() + (15 * 60 * 1000) // 15 minutes
       }
-      
+
       userAuthStore.set(userAuth.id, userAuth)
     }
 
@@ -348,7 +369,7 @@ export async function logoutFromBetterAuth(
 ): Promise<void> {
   try {
     const userAuth = userAuthStore.get(userId)
-    
+
     if (!userAuth) {
       throw new AuthenticationError('User not found')
     }
@@ -398,7 +419,7 @@ export function updateUserAuthentication(
   updates: Partial<UserAuthentication>
 ): UserAuthentication {
   const user = userAuthStore.get(userId)
-  
+
   if (!user) {
     throw new AuthenticationError('User not found')
   }
@@ -408,7 +429,7 @@ export function updateUserAuthentication(
     ...updates,
     updatedAt: Date.now(),
   }
-  
+
   userAuthStore.set(userId, updatedUser)
   return updatedUser
 }
@@ -422,7 +443,7 @@ export async function validateJWTAndGetUser(
 ): Promise<UserAuthentication | null> {
   try {
     const validation = await validateToken(token, tokenType)
-    
+
     if (!validation.valid || !validation.userId) {
       return null
     }

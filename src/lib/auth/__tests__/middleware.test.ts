@@ -4,12 +4,11 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import type { APIContext } from 'astro'
-import { 
-  authenticateRequest, 
-  requireRole, 
-  rateLimitMiddleware, 
-  csrfProtection, 
+import {
+  authenticateRequest,
+  requireRole,
+  rateLimitMiddleware,
+  csrfProtection,
   securityHeaders,
   type AuthenticatedRequest,
   type UserRole
@@ -44,13 +43,22 @@ vi.mock('../../mcp/phase6-integration', () => ({
   updatePhase6AuthenticationProgress: vi.fn(),
 }))
 
+vi.mock('../../redis', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../redis')>()
+  return {
+    ...actual,
+    getFromCache: vi.fn(),
+    setInCache: vi.fn(),
+  }
+})
+
 describe('Authentication Middleware', () => {
   let mockRequest: Request
   let _mockResponse: Response
 
   beforeEach(() => {
     vi.clearAllMocks()
-    
+
     // Create mock request
     mockRequest = new Request('https://example.com/api/test', {
       method: 'GET',
@@ -360,10 +368,10 @@ describe('Authentication Middleware', () => {
   describe('rateLimitMiddleware', () => {
     it('should allow requests within rate limit', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       // Mock no previous requests
       vi.mocked(getFromCache).mockResolvedValue(null)
-      vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data, _ttl) => {
         return true
       })
 
@@ -375,7 +383,7 @@ describe('Authentication Middleware', () => {
 
     it('should block requests exceeding rate limit', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       // Mock 5 previous requests (at limit)
       vi.mocked(getFromCache).mockResolvedValue({
         count: 5,
@@ -391,14 +399,14 @@ describe('Authentication Middleware', () => {
 
     it('should reset counter after time window', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       // Mock expired rate limit data
       vi.mocked(getFromCache).mockResolvedValue({
         count: 5,
         resetTime: Date.now() - 1000, // Expired
       })
 
-      vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data, _ttl) => {
         return true
       })
 
@@ -416,15 +424,15 @@ describe('Authentication Middleware', () => {
 
     it('should use different rate limits for different endpoints', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue(null)
-      vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data, _ttl) => {
         return true
       })
 
       // Login endpoint - 5 requests per hour
       await rateLimitMiddleware(mockRequest, 'login', 5, 60)
-      
+
       // API endpoint - 100 requests per hour
       await rateLimitMiddleware(mockRequest, 'api', 100, 60)
 
@@ -443,7 +451,7 @@ describe('Authentication Middleware', () => {
 
     it('should log rate limit violations', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue({
         count: 10,
         resetTime: Date.now() + 60000,
@@ -464,7 +472,7 @@ describe('Authentication Middleware', () => {
 
     it('should identify clients by IP address', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         // Verify IP is used in rate limit key
         expect(key).toContain('127.0.0.1')
@@ -482,7 +490,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         // Should use some identifier even without IP
         expect(key).toBeDefined()
@@ -514,7 +522,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'valid-csrf-token', expiresAt: Date.now() + 3600000 }
@@ -549,7 +557,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'different-token', expiresAt: Date.now() + 3600000 }
@@ -573,7 +581,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'expired-token', expiresAt: Date.now() - 1000 } // Expired
@@ -597,7 +605,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'different-token', expiresAt: Date.now() + 3600000 }
@@ -619,10 +627,10 @@ describe('Authentication Middleware', () => {
 
     it('should handle other HTTP methods that require CSRF protection', async () => {
       const methods = ['PUT', 'PATCH', 'DELETE']
-      
+
       for (const method of methods) {
         vi.clearAllMocks()
-        
+
         const request = new Request('https://example.com/api/test', {
           method,
           headers: {
@@ -631,7 +639,7 @@ describe('Authentication Middleware', () => {
         })
 
         const { getFromCache } = await import('../../redis')
-        
+
         vi.mocked(getFromCache).mockImplementation(async (key) => {
           if (key.startsWith('csrf:')) {
             return { token: 'valid-token', expiresAt: Date.now() + 3600000 }
@@ -760,22 +768,22 @@ describe('Authentication Middleware', () => {
       vi.mocked(getUserById).mockResolvedValue(mockUser)
 
       const start = performance.now()
-      
+
       await authenticateRequest(mockRequest)
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(10)
     })
 
     it('should meet sub-5ms rate limiting target', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue(null)
 
       const start = performance.now()
-      
+
       await rateLimitMiddleware(mockRequest, 'api', 100, 60)
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(5)
     })
@@ -783,8 +791,6 @@ describe('Authentication Middleware', () => {
 
   describe('Security Requirements', () => {
     it('should prevent timing attacks in authentication', async () => {
-      const { getFromCache } = await import('../../redis')
-      
       // Test with valid token but no user
       vi.mocked(validateToken).mockResolvedValue({
         valid: true,
@@ -793,7 +799,7 @@ describe('Authentication Middleware', () => {
         tokenId: 'token123',
         expiresAt: Date.now() + 3600000,
       })
-      
+
       vi.mocked(getUserById).mockResolvedValue(null)
 
       const start1 = performance.now()
@@ -834,7 +840,7 @@ describe('Authentication Middleware', () => {
       await authenticateRequest(mockRequest)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // Should not log full user agent or IP
       expect(JSON.stringify(loggedData)).not.toContain('Mozilla/5.0')
       expect(JSON.stringify(loggedData)).not.toContain('127.0.0.1')
@@ -846,7 +852,7 @@ describe('Authentication Middleware', () => {
       const result = await securityHeaders(mockRequest, response)
 
       const csp = result.headers.get('Content-Security-Policy')
-      
+
       expect(csp).toContain("default-src 'self'")
       expect(csp).toContain("object-src 'none'")
       expect(csp).toContain("base-uri 'self'")
@@ -903,15 +909,15 @@ describe('Authentication Middleware', () => {
       await authenticateRequest(mockRequest)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // Should not log medical record numbers or health data
       expect(JSON.stringify(loggedData)).not.toContain('MRN123456')
       expect(JSON.stringify(loggedData)).not.toContain('medical')
     })
 
     it('should enforce strict cache control for health data', async () => {
-      const response = new Response({ 
-        patient: { name: 'John Doe', condition: 'Anxiety' } 
+      const response = new Response({
+        patient: { name: 'John Doe', condition: 'Anxiety' }
       })
 
       const result = await securityHeaders(mockRequest, response)
@@ -940,7 +946,7 @@ describe('Authentication Middleware', () => {
       await authenticateRequest(mockRequest)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // IP should be masked or not included
       if (loggedData.clientInfo) {
         expect(loggedData.clientInfo.ip).toBeUndefined()
@@ -1027,7 +1033,7 @@ describe('Authentication Middleware', () => {
 
     it('should track rate limiting events', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue({
         count: 10,
         resetTime: Date.now() + 60000,
@@ -1050,7 +1056,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'different-token', expiresAt: Date.now() + 3600000 }

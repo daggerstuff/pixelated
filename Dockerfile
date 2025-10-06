@@ -48,7 +48,12 @@ ENV PORT=4321
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV XDG_CACHE_HOME=/tmp/.cache
-RUN mkdir -p /tmp/.cache && corepack enable pnpm
+RUN mkdir -p /tmp/.cache && \
+    # ensure corepack and node cache dirs are writable by the non-root user we create
+    mkdir -p /tmp/.cache/node/corepack/v1 && \
+    chown -R 1001:1001 /tmp/.cache || true && \
+    chmod -R 0777 /tmp/.cache || true && \
+    corepack enable pnpm
 
 # Dependencies stage - optimized for caching
 FROM base AS deps
@@ -59,9 +64,10 @@ COPY --chown=astro:astro package.json pnpm-lock.yaml* ./
 # Create cache directories with proper permissions for astro user
 # Must be done as root before switching users
 RUN mkdir -p /tmp/.cache/node/corepack/v1 /app/.pnpm-store && \
-    chown -R astro:astro /tmp/.cache /app/.pnpm-store && \
-    chmod -R 777 /tmp/.cache && \
-    chmod -R 755 /app/.pnpm-store
+    # prefer numeric uid/gid to avoid name resolution issues in some builders
+    chown -R 1001:1001 /tmp/.cache /app/.pnpm-store || true && \
+    chmod -R 0777 /tmp/.cache || true && \
+    chmod -R 0755 /app/.pnpm-store || true
 
 # Switch to non-root user for dependency installation
 USER astro

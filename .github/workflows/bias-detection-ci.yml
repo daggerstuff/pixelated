@@ -307,18 +307,19 @@ jobs:
     - name: Run Python linting
       run: |
         cd src/lib/ai/bias-detection/python-service
-        uv pip install flake8 black isort
-        # Check formatting with black (use uv black directly)
-        uv black --check --diff .
+        USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
+        uv pip install ${USE_SYSTEM} flake8 black isort
+        # Check formatting with black
+        uv run black --check --diff .
         # Check import sorting
-        uv isort --check-only --diff .
+        uv run isort --check-only --diff .
         # Run flake8 for code quality
-        uv flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
     - name: Run Python tests
       run: |
         cd src/lib/ai/bias-detection/python-service
-        uv python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
+        uv run pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
       env:
         ENV: ci
         FLASK_SECRET_KEY: test-flask-secret
@@ -425,7 +426,7 @@ jobs:
     - name: Start Python ML service
       run: |
         cd src/lib/ai/bias-detection/python-service
-        uv python bias_detection_service.py &
+        uv run python bias_detection_service.py &
         PYTHON_PID=$!
         echo "Started Python service with PID: $PYTHON_PID"
         sleep 10
