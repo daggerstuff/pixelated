@@ -21,7 +21,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
@@ -235,7 +235,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
@@ -402,7 +402,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
@@ -580,7 +580,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Resolve APP_URL (Performance)
       id: resolve-perf
