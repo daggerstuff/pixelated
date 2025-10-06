@@ -129,17 +129,13 @@ RUN --mount=type=secret,id=sentry_dsn \
     --mount=type=secret,id=sentry_auth_token \
     --mount=type=secret,id=better_auth_secret \
     echo "🏗️ Starting optimized build process..." && \
+    echo "Node: $(node --version), pnpm: $(pnpm --version)" && \
+    echo "Memory available: $(cat /proc/meminfo | grep MemAvailable)" && \
     export SENTRY_DSN=$(cat /run/secrets/sentry_dsn 2>/dev/null || echo "") && \
     export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token 2>/dev/null || echo "") && \
     export BETTER_AUTH_SECRET=$(cat /run/secrets/better_auth_secret 2>/dev/null || echo "") && \
-    pnpm build --verbose > /tmp/build.log 2>&1 || (\
-        echo "❌ Build failed, debugging..." && \
-        cat /tmp/build.log && \
-        ls -la src/ public/ && \
-        echo "Node: $(node --version), pnpm: $(pnpm --version)" && \
-        echo "Memory info:" && cat /proc/meminfo | head -5 && \
-        exit 1\
-    )
+    pnpm build --verbose 2>&1 | tee /tmp/build.log && \
+    echo "✅ Build completed successfully"
 
 # Production cleanup - remove dev dependencies and unnecessary files
 RUN echo "🧹 Cleaning up build artifacts..." && \
