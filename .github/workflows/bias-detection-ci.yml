@@ -49,52 +49,54 @@ jobs:
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3.29.1
       if: always()
-      continue-on-error: true
       with:
         sarif_file: trivy-results.sarif
         category: trivy-scan
+    # Note: Manual CodeQL analysis is disabled because CodeQL default setup is enabled
+    # in the repository settings. If you need custom CodeQL configuration, disable
+    # default setup in Settings > Code security and analysis > CodeQL analysis
+    # and uncomment the steps below.
 
-    - name: Setup pnpm for CodeQL
-      uses: pnpm/action-setup@v4.1.0
-      with:
-        version: ${{ env.PNPM_VERSION }}
-        run_install: false
+    # - name: Setup pnpm for CodeQL
+    #   uses: pnpm/action-setup@v4.1.0
+    #   with:
+    #     version: ${{ env.PNPM_VERSION }}
+    #
+    # - name: Setup Node.js for CodeQL
+    #   uses: actions/setup-node@v5
+    #   with:
+    #     node-version: ${{ env.NODE_VERSION }}
+    #     cache: 'pnpm'
+    #
+    # - name: Get pnpm store directory for CodeQL
+    #   id: pnpm-cache-codeql
+    #   shell: bash
+    #   run: |
+    #     echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+    #
+    # - name: Initialize CodeQL
+    #   uses: github/codeql-action/init@v3.29.1
+    #   with:
+    #     languages: javascript,typescript
+    #
+    # - name: Setup pnpm cache for CodeQL
+    #   uses: actions/cache@v4.2.3
+    #   with:
+    #     path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
+    #     key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-pnpm-store-
+    #
+    # - name: Install dependencies for CodeQL
+    #   run: pnpm install --no-frozen-lockfile
+    #
+    # - name: Build for CodeQL
+    #   run: pnpm build
+    #
+    # - name: Perform CodeQL Analysis
+    #   uses: github/codeql-action/analyze@v3.29.1
 
-    - name: Setup Node.js for CodeQL
-      uses: actions/setup-node@v5
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
-
-    - name: Get pnpm store directory for CodeQL
-      id: pnpm-cache-codeql
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3.29.1
-      with:
-        languages: javascript,typescript
-
-    - name: Setup pnpm cache for CodeQL
-      uses: actions/cache@v4.2.3
-      with:
-        path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
-
-    - name: Install dependencies for CodeQL
-      run: pnpm install --no-frozen-lockfile
-
-    - name: Build for CodeQL
-      run: pnpm build
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3.29.1
-
-  # Code quality and linting
+    # Code quality and linting
   code-quality:
     name: Code Quality
     runs-on: ubuntu-latest
@@ -112,7 +114,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'pnpm'
-        run_install: false
 
     - name: Get pnpm store directory
       id: pnpm-cache
@@ -197,7 +198,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'pnpm'
-        run_install: false
 
     - name: Get pnpm store directory
       id: pnpm-cache
@@ -361,7 +361,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'pnpm'
-        run_install: false
 
     - name: Get pnpm store directory
       id: pnpm-cache
@@ -486,7 +485,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'pnpm'
-        run_install: false
 
     - name: Get pnpm store directory
       id: pnpm-cache
@@ -544,7 +542,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'pnpm'
-        run_install: false
 
     - name: Get pnpm store directory
       id: pnpm-cache
