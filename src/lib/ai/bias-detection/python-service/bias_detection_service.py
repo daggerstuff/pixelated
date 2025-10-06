@@ -52,6 +52,7 @@ from werkzeug.exceptions import Unauthorized
 try:
     from aif360.datasets import BinaryLabelDataset
     from aif360.metrics import BinaryLabelDatasetMetric
+
     AIF360_AVAILABLE = True
 except ImportError:
     AIF360_AVAILABLE = False
@@ -74,6 +75,7 @@ except ImportError:
     REAL_ML_AVAILABLE = False
     try:
         from .placeholder_adapters import PlaceholderAdapters
+
         placeholder_adapters = PlaceholderAdapters()
     except ImportError:
         # Create a mock placeholder adapter if import fails
@@ -198,7 +200,7 @@ try:
     from celery import Celery
 
     # Initialize celery_app
-    celery_app = Celery('bias_detection')
+    celery_app = Celery("bias_detection")
 
     CELERY_AVAILABLE = True
     logger.info("Celery distributed processing initialized successfully")
