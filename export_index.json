@@ -29216,42 +29216,6 @@
         "type": "decl"
       }
     ],
-    "AgentRegistrationOptions": [
-      {
-        "file": "src/lib/cipher/cipherClient.ts",
-        "line": 4,
-        "type": "decl"
-      }
-    ],
-    "ContextSyncOptions": [
-      {
-        "file": "src/lib/cipher/cipherClient.ts",
-        "line": 10,
-        "type": "decl"
-      }
-    ],
-    "ValidationOptions": [
-      {
-        "file": "src/lib/cipher/cipherClient.ts",
-        "line": 15,
-        "type": "decl"
-      }
-    ],
-    "CipherClient": [
-      {
-        "file": "src/lib/cipher/cipherClient.ts",
-        "line": 20,
-        "type": "decl"
-      }
-    ],
-    "cipherClient": [
-      {
-        "file": "src/lib/cipher/cipherClient.ts",
-        "line": 58,
-        "type": "decl"
-      }
-    ],
-    "Cipher": [],
     "userPreferencesAtom": [
       {
         "file": "src/lib/state/enhanced-persistence.ts",

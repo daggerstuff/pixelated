@@ -195,7 +195,7 @@ export default defineConfig({
           authToken: process.env.SENTRY_AUTH_TOKEN,
           telemetry: false,
           sourcemaps: {
-            assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs'],
+            assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs', './dist/**/*.js', './dist/**/*.mjs'],
             ignore: ['**/node_modules/**'],
             filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
           },

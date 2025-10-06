@@ -162,7 +162,6 @@ Create a `.env.mcp` file based on `.env.mcp.example`:
 
 ```bash
 # Critical security tokens (replace with actual values)
-MCP_BYTEROVER_TOKEN=your_byterover_jwt_token_here
 GITHUB_PERSONAL_ACCESS_TOKEN=your_github_pat_here
 SENTRY_AUTH_TOKEN=your_sentry_auth_token_here
 ```
@@ -173,7 +172,6 @@ All other settings have sensible defaults but can be customized:
 
 ```bash
 # Performance tuning
-MCP_BYTEROVER_TIMEOUT=30000
 SERENA_CACHE_SIZE=1000
 GITHUB_MEMORY_LIMIT=512m
 
@@ -283,7 +281,7 @@ Check individual server health:
 
 ```bash
 # Test specific server
-pnpm mcp:health-check --server=byterover-mcp
+pnpm mcp:health-check
 
 # Check all servers
 pnpm mcp:health-check --all
