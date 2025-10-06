@@ -495,6 +495,13 @@ export function getBetterAuthInstance() {
 }
 
 /**
+ * Get user by ID (alias for getUserAuthentication for backward compatibility)
+ */
+export async function getUserById(userId: string): Promise<UserAuthentication | null> {
+  return getUserAuthentication(userId)
+}
+
+/**
  * Export Better-Auth types and utilities
  */
 export type { BetterAuthOptions, User } from 'better-auth'
