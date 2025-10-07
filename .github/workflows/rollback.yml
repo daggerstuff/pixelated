@@ -20,7 +20,6 @@ jobs:
       deployments: write
       actions: read
       id-token: write
-      workflows: write
     concurrency:
       group: staging_environment
       cancel-in-progress: true
@@ -30,6 +29,7 @@ jobs:
       with:
         fetch-depth: 0
         fetch-tags: true
+        token: ${{ secrets.WORKFLOW_PAT }}
 
     - name: Fetch all tags
       run: git fetch --tags --force
@@ -89,11 +89,6 @@ jobs:
     - name: Build application
       run: pnpm build
 
-    - name: Debug Token Permissions
-      run: |
-        echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
-
     - name: Compute unique rollback tag for staging
       id: compute-tag-staging
       shell: bash
@@ -126,7 +121,7 @@ jobs:
         TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
       run: |
@@ -136,7 +131,7 @@ jobs:
         TAG_BASE=${{ steps.compute-tag-staging.outputs.tag }}
         TAG_NAME="$TAG_BASE"
         # Ensure the remote URL is set to use token auth for push checks
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+        git remote set-url origin https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git
         # Fetch remote tags for accurate checks
         git fetch --tags --force
         COUNT=0
@@ -166,13 +161,13 @@ jobs:
       deployments: write
       actions: read
       id-token: write
-      workflows: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
       with:
         fetch-depth: 0
         fetch-tags: true
+        token: ${{ secrets.WORKFLOW_PAT }}
 
     - name: Fetch all tags
       run: git fetch --tags --force
@@ -232,10 +227,6 @@ jobs:
     - name: Build application
       run: pnpm build
 
-    - name: Debug Token Permissions
-      run: |
-        echo "Checking token permissions..."
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
     - name: Compute unique rollback tag for production
       id: compute-tag-prod
       shell: bash
@@ -267,7 +258,7 @@ jobs:
         TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
       run: |
@@ -275,7 +266,7 @@ jobs:
         git config --global user.name "GitHub Action"
         TAG_BASE=${{ steps.compute-tag-prod.outputs.tag }}
         TAG_NAME="$TAG_BASE"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+        git remote set-url origin https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git
         git fetch --tags --force
         COUNT=0
         # Try up to 100 suffix increments to find a unique tag for production
