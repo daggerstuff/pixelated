@@ -1227,11 +1227,6 @@ deploy-gke:
   allow_failure: true
   timeout: 20m
 
-container_scanning:
-  needs:
-  - build-frontend
-
 include:
 - template: Security/SAST.gitlab-ci.yml
 - template: Security/Dependency-Scanning.gitlab-ci.yml
-- template: Security/Container-Scanning.gitlab-ci.yml
