@@ -894,21 +894,27 @@ resource "aws_security_group" "multi_region" {
 
   # Removed unrestricted HTTP port 80 ingress for security compliance
 
+  # Egress restricted to VPC CIDR ranges only - add specific external IPs/ranges as needed
+  # For external API calls, update cidr_blocks with specific service IP ranges
   egress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTPS outbound"
+    cidr_blocks = ["10.0.0.0/8"]  # Restricted to private network ranges
+    description = "HTTPS outbound to internal services"
   }
 
   egress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTP outbound"
+    cidr_blocks = ["10.0.0.0/8"]  # Restricted to private network ranges
+    description = "HTTP outbound to internal services"
   }
+
+  # NOTE: If external internet access is required, create separate security group rules
+  # with specific destination CIDR blocks for known services (e.g., AWS API endpoints,
+  # specific CDNs, update servers). Use VPC endpoints where possible.
 
   tags = merge(var.common_tags, {
     Region = each.key

@@ -3,3 +3,11 @@ kind: Kustomization
 resources:
 - gotk-components.yaml
 - gotk-sync.yaml
+- flux-namespace-secret-role.yaml
+
+# Strategic merge patches to fix security vulnerabilities
+patches:
+- path: flux-clusterrole-secrets-patch.yaml
+  target:
+    kind: ClusterRole
+    name: crd-controller-flux-system
