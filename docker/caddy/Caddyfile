@@ -1,0 +1,44 @@
+# Pixelated Empathy Caddy Configuration
+{
+    # Global options
+    auto_https off
+    admin off
+}
+
+# Main application
+:80 {
+    # Health check endpoint
+    handle /health {
+        respond "OK" 200
+    }
+
+    # API routes
+    handle /api/bias-detection/* {
+        reverse_proxy bias-detection-service:5001
+    }
+
+    # Main application
+    handle {
+        reverse_proxy frontend:4321
+    }
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+
+    # Error handling
+    handle_errors {
+        respond "Service temporarily unavailable" 503
+    }
+}
+
+# HTTPS configuration (for production)
+# pixelatedempathy.com {
+#     reverse_proxy frontend:4321
+#     
+#     handle /api/bias-detection/* {
+#         reverse_proxy bias-detection-service:5001
+#     }
+# }

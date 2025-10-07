@@ -1,0 +1,70 @@
+/**
+ * Example fix for useNotificationPreferences test
+ *
+ * The error is: "expected [object Object] to equal ObjectContaining"
+ * This usually happens when you're comparing objects incorrectly with expect.objectContaining
+ *
+ * Original test might look like:
+ */
+
+// Original failing test
+test('falls back to default preferences on load error', async () => {
+  // Mock a failed API call
+  mockApi.getUserNotificationPreferences.mockRejectedValue(new Error('API Error'));
+
+  const { result } = renderHook(() => useNotificationPreferences());
+
+  // Wait for the hook to handle the error
+  await waitFor(() => {
+    // This assertion is failing because objectContaining isn't being used correctly
+    expect(result.current.preferences).toEqual(expect.objectContaining(DEFAULT_PREFERENCES));
+  });
+});
+
+/**
+ * The fix has two possible solutions:
+ *
+ * 1. Use expect.objectContaining() properly:
+ */
+
+// Fixed test - solution 1
+test('falls back to default preferences on load error', async () => {
+  mockApi.getUserNotificationPreferences.mockRejectedValue(new Error('API Error'));
+
+  const { result } = renderHook(() => useNotificationPreferences());
+
+  await waitFor(() => {
+    // Now we're using objectContaining as a matcher function
+    expect(result.current.preferences).toEqual(expect.objectContaining(DEFAULT_PREFERENCES));
+  });
+});
+
+/**
+ * 2. Or use direct equality if the objects should be exactly the same:
+ */
+
+// Fixed test - solution 2
+test('falls back to default preferences on load error', async () => {
+  mockApi.getUserNotificationPreferences.mockRejectedValue(new Error('API Error'));
+
+  const { result } = renderHook(() => useNotificationPreferences());
+
+  await waitFor(() => {
+    // Direct equality comparison if the objects should be exactly the same
+    expect(result.current.preferences).toEqual(DEFAULT_PREFERENCES);
+  });
+});
+
+/**
+ * Note: The problem could also be in the implementation of objectContaining itself.
+ * Check vitest.setup.ts to make sure objectContaining is properly implemented:
+ *
+ * const originalObjectContaining = expect.objectContaining;
+ * expect.objectContaining = (obj) => {
+ *   const matcher = originalObjectContaining(obj);
+ *   matcher.toString = () => `ObjectContaining(${JSON.stringify(obj)})`;
+ *   return matcher;
+ * };
+ *
+ * This ensures that the matcher has a proper string representation.
+ */

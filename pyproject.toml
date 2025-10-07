@@ -1,0 +1,180 @@
+[project]
+name = "pixelated"
+version = "0.1.0"
+description = "Pixelated Empathy - AI-powered bias detection and mental health platform"
+authors = [
+  { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
+]
+requires-python = ">=3.11"
+dependencies = [
+  "flask",
+  "flask-cors",
+  "pandas",
+  "numpy",
+  "scikit-learn",
+  "pyjwt",
+  "werkzeug",
+  "fairlearn",
+  "shap>=0.41.0",
+  "lime",
+  "spacy",
+  "nltk",
+  "evaluate",
+  "cryptography",
+  "requests",
+  "python-dotenv",
+  "click<9.0",
+  "numba>=0.56.0",
+  "faiss-cpu>=1.11.0",
+  "pytest-asyncio>=1.0.0",
+  "flake8>=7.3.0",
+  "matplotlib>=3.10.3",
+  "mypy>=1.16.1",
+  "psutil>=7.0.0",
+  "chardet>=5.2.0",
+  "pydub>=0.25.1",
+  "sourcery>=1.37.0",
+  "pyarrow>=21.0.0",
+  "hatch>=1.14.1",
+  "textstat>=0.7.8",
+  "isort>=6.0.1",
+  "black>=25.1.0",
+  "pytest-cov>=6.2.1",
+  "seaborn>=0.13.2",
+  "plotly>=6.2.0",
+  "wandb>=0.21.1",
+  # Training dependencies
+  "datasets>=2.19.0",
+  "sentencepiece>=0.2.0",
+  "einops>=0.8.0",
+  # HuggingFace Hub
+  "huggingface-hub>=0.24.0",
+  "gguf>=0.10.0",
+  "ruff>=0.12.5",
+  "yamllint>=1.37.1",
+  "textblob>=0.19.0",
+  "omnara>=1.5.7",
+  "sentry-sdk>=2.37.0",
+  "openai>=1.107.2",
+  "pytest>=8.4.2",
+  "ffmpeg>=1.4",
+  "s3cmd>=2.4.0",
+  "authlib>=1.6.4",
+  "motor>=3.7.1",
+  "structlog>=25.4.0",
+  "redis>=6.4.0",
+  "bcrypt>=4.3.0",
+  "email-validator>=2.3.0",
+  "python-socketio>=5.13.0",
+  "httpx>=0.28.1",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "coverage"]
+dev = ["black", "isort", "ruff", "mypy", "pyright"]
+
+[project.scripts]
+process-priority-5 = "ai.scripts.process_priority_5:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ai*"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+mypy_path = "stubs"
+files = ["src", "tests", "ai", "api"]
+show_error_codes = true
+
+[tool.pyright]
+include = ["src", "tests", "ai", "api"]
+exclude = ["node_modules", "stubs", "venv", "env", "build", "dist", ".coveragerc"]
+extraPaths = ["stubs"]
+typeCheckingMode = "basic"
+reportMissingTypeStubs = false
+reportMissingImports = false
+reportMissingModuleSource = false
+reportPrivateUsage = false
+pythonVersion = "3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+exclude = ["node_modules", "stubs", "venv", "env", "build", "dist", ".coveragerc"]
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "W",
+  "I",
+  "N",
+  "UP",
+  "B",
+  "A",
+  "C4",
+  "DTZ",
+  "PIE",
+  "PT",
+  "Q",
+  "RET",
+  "SIM",
+  "T20",
+  "TID",
+  "ARG",
+  "PL",
+  "RUF",
+]
+ignore = ["E501", "UP017", "PLR2004"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ai", "src", "api"]
+combine-as-imports = true
+force-single-line = false
+
+[tool.black]
+target-version = ["py311"]
+line-length = 100
+skip-string-normalization = false
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["ai", "src", "api"]
+combine_as_imports = true
+force_single_line = false
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["src", "ai", "api"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.uv.workspace]
+members = [
+    "./",
+    "tools/gdrive-dataset-manager",
+]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[tool.uv.sources.pytorch-cpu]
+url = "https://download.pytorch.org/whl/cpu"
+
+[dependency-groups]
+dev = [
+    "pip-audit>=2.9.0",
+    "pytest>=8.4.2",
+]

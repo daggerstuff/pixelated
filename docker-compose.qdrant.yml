@@ -1,0 +1,19 @@
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.9.0
+    container_name: pixelated-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage:rw
+    command: ["/bin/sh", "-c", "chown -R 1000:1000 /qdrant/storage || true; chmod -R u+rwX /qdrant/storage || true; exec /qdrant/qdrant"]
+    environment:
+      QDRANT__LOG_LEVEL: "INFO"
+      QDRANT__SERVICE__HOST: "0.0.0.0"
+      QDRANT__STORAGE__DIR: "/qdrant/storage"
+    restart: unless-stopped
+
+volumes:
+  qdrant_storage:
+    name: pixelated_qdrant_storage

@@ -1,0 +1,116 @@
+---
+export interface Props {
+  variant?: 'default' | 'fluid' | 'narrow' | 'wide'
+  className?: string
+  padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl'
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'none'
+  center?: boolean
+  tag?: keyof HTMLElementTagNameMap
+}
+
+const {
+  variant = 'default',
+  className = '',
+  padding = 'md',
+  maxWidth = 'xl',
+  center = true,
+  tag = 'div',
+  ...props
+} = Astro.props
+
+// Container variant styles
+const variantClasses = {
+  default: 'container-responsive',
+  fluid: 'w-full',
+  narrow: 'max-w-3xl mx-auto',
+  wide: 'max-w-7xl mx-auto',
+}
+
+// Padding classes
+const paddingClasses = {
+  none: '',
+  sm: 'padding-responsive-sm',
+  md: 'padding-responsive-md',
+  lg: 'padding-responsive-lg',
+  xl: 'padding-responsive-xl',
+}
+
+// Max width classes
+const maxWidthClasses = {
+  'xs': 'max-w-xs',
+  'sm': 'max-w-sm',
+  'md': 'max-w-md',
+  'lg': 'max-w-lg',
+  'xl': 'max-w-xl',
+  '2xl': 'max-w-2xl',
+  'none': 'max-w-none',
+}
+
+const containerClass = [
+  variantClasses[variant],
+  paddingClasses[padding],
+  maxWidth !== 'none' && variant === 'default' ? maxWidthClasses[maxWidth] : '',
+  center ? 'mx-auto' : '',
+  'w-full',
+  className,
+]
+  .filter(Boolean)
+  .join(' ')
+
+const Element = tag
+---
+
+<Element class={containerClass} {...props}>
+  <slot />
+</Element>
+
+<style>
+  /* Ensure responsive containers work well with CSS Grid and Flexbox */
+  .container-responsive {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Enhanced responsive padding that respects safe areas */
+  .container-responsive {
+    padding-left: max(var(--space-responsive-sm), env(safe-area-inset-left));
+    padding-right: max(var(--space-responsive-sm), env(safe-area-inset-right));
+  }
+
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: max(var(--space-responsive-md), env(safe-area-inset-left));
+      padding-right: max(
+        var(--space-responsive-md),
+        env(safe-area-inset-right)
+      );
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: max(var(--space-responsive-lg), env(safe-area-inset-left));
+      padding-right: max(
+        var(--space-responsive-lg),
+        env(safe-area-inset-right)
+      );
+    }
+  }
+
+  /* Fluid container variant for full-width layouts */
+  .fluid {
+    max-width: none;
+    width: 100%;
+  }
+
+  /* Narrow container for focused content */
+  .narrow {
+    max-width: 768px;
+  }
+
+  /* Wide container for data-heavy layouts */
+  .wide {
+    max-width: 1400px;
+  }
+</style>

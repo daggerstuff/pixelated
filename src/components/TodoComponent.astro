@@ -1,0 +1,29 @@
+---
+import { Todo } from './Todo'
+
+interface Props {
+  title?: string
+  initialTodos?: Array<{
+    id: string
+    text: string
+    completed: boolean
+  }>
+}
+
+const { title = 'Todo List', initialTodos = [] } = Astro.props
+---
+
+<div class="todo-container">
+  <Todo client:visible {title} {initialTodos} />
+</div>
+
+<style>
+  .todo-container {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+</style>

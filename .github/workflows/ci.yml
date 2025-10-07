@@ -1,0 +1,196 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pixelated_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'pnpm'
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Ensure `uv` shim is available
+      run: |
+        if ! command -v uv >/dev/null 2>&1; then
+          echo "uv not found - installing via pip"
+          python -m pip install --upgrade pip
+          python -m pip install uv
+        else
+          echo "uv already installed"
+        fi
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install Node.js dependencies
+      run: pnpm install
+
+    - name: Install Python dependencies
+      run: |
+        cd src/lib/ai/bias-detection/python-service
+        uv pip install -r requirements.txt
+
+    - name: Setup test database
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -d pixelated_test -f ../../../db/session.sql
+      env:
+        PGPASSWORD: postgres
+
+    - name: Run linting
+      run: pnpm run lint
+
+    - name: Run TypeScript type checking
+      run: pnpm run type-check || npx tsc --noEmit
+
+    - name: Run unit tests
+      run: pnpm run test:unit
+      env:
+        NODE_ENV: test
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: pixelated_test
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+
+    - name: Run Python tests
+      run: |
+        cd src/lib/ai/bias-detection/python-service
+        uv python -m pytest test_*.py -v
+
+    - name: Build application
+      run: pnpm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: dist/
+
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Run security audit
+      run: pnpm audit --audit-level moderate
+
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/init@v2
+      with:
+        languages: javascript, python
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+  deploy-staging:
+    needs: [test, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build for staging
+      run: pnpm run build
+      env:
+        NODE_ENV: staging
+
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        # Add your staging deployment commands here
+        # This could be Docker build/push, server deployment, etc.
+
+  deploy-production:
+    needs: [test, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build for production
+      run: pnpm run build
+      env:
+        NODE_ENV: production
+
+    - name: Run production tests
+      run: pnpm run test:e2e
+      env:
+        NODE_ENV: production
+
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production environment..."
+        # Add your production deployment commands here
+        # This should include proper rollback mechanisms and health checks

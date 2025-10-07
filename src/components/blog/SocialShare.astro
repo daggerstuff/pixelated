@@ -1,0 +1,67 @@
+---
+export interface Props {
+  platforms?: string[]
+  title?: string
+  description?: string
+  url?: string
+}
+
+const {
+  platforms = ['twitter', 'linkedin', 'facebook', 'email'],
+  title = 'Check this out!',
+  description = '',
+  url = '',
+} = Astro.props
+---
+
+<div class="flex flex-wrap gap-2 mt-2">
+  {
+    platforms.includes('twitter') && (
+      <a
+        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1 px-3 py-2 bg-[#1DA1F2] text-white rounded hover:bg-opacity-90"
+      >
+        <span class="font-medium">Twitter</span>
+      </a>
+    )
+  }
+
+  {
+    platforms.includes('linkedin') && (
+      <a
+        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1 px-3 py-2 bg-[#0A66C2] text-white rounded hover:bg-opacity-90"
+      >
+        <span class="font-medium">LinkedIn</span>
+      </a>
+    )
+  }
+
+  {
+    platforms.includes('facebook') && (
+      <a
+        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1 px-3 py-2 bg-[#1877F2] text-white rounded hover:bg-opacity-90"
+      >
+        <span class="font-medium">Facebook</span>
+      </a>
+    )
+  }
+
+  {
+    platforms.includes('email') && (
+      <a
+        href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(description + '\n\n' + url)}`}
+        class="inline-flex items-center gap-1 px-3 py-2 bg-gray-700 text-white rounded hover:bg-opacity-90"
+      >
+        <span class="font-medium">Email</span>
+      </a>
+    )
+  }
+</div>

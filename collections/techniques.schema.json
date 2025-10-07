@@ -1,0 +1,121 @@
+{
+  "$ref": "#/definitions/techniques",
+  "definitions": {
+    "techniques": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "**Required**. Unique identifier for the technique.",
+          "markdownDescription": "**Required**. Unique identifier for the technique."
+        },
+        "name": {
+          "type": "string",
+          "description": "**Required**. Name of the therapeutic technique.",
+          "markdownDescription": "**Required**. Name of the therapeutic technique."
+        },
+        "description": {
+          "type": "string",
+          "description": "**Required**. Detailed description of the technique.",
+          "markdownDescription": "**Required**. Detailed description of the technique."
+        },
+        "category": {
+          "type": "string",
+          "description": "**Required**. Category or type of the technique (e.g., CBT, Mindfulness, DBT, etc.)",
+          "markdownDescription": "**Required**. Category or type of the technique (e.g., CBT, Mindfulness, DBT, etc.)"
+        },
+        "evidenceLevel": {
+          "type": "string",
+          "enum": ["Strong", "Moderate", "Preliminary", "Anecdotal"],
+          "description": "**Required**. Level of scientific evidence supporting the technique.",
+          "markdownDescription": "**Required**. Level of scientific evidence supporting the technique."
+        },
+        "recommendedFor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of conditions or situations for which this technique is recommended.",
+          "markdownDescription": "List of conditions or situations for which this technique is recommended."
+        },
+        "contraindications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of contraindications or cases where this technique should not be used.",
+          "markdownDescription": "List of contraindications or cases where this technique should not be used."
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Step-by-step instructions for applying the technique.",
+          "markdownDescription": "Step-by-step instructions for applying the technique."
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of references, studies, or resources supporting the technique.",
+          "markdownDescription": "List of references, studies, or resources supporting the technique."
+        },
+        "created": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "integer",
+              "format": "unix-time"
+            }
+          ],
+          "description": "Date the technique was added.",
+          "markdownDescription": "Date the technique was added."
+        },
+        "updated": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "integer",
+              "format": "unix-time"
+            }
+          ],
+          "description": "Date the technique was last updated.",
+          "markdownDescription": "Date the technique was last updated."
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "category",
+        "evidenceLevel",
+        "created"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

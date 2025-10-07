@@ -1,0 +1,98 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import AIPerformanceDashboard from '@/components/monitoring/AIPerformanceDashboard.astro'
+
+// Inlined from AIPerformanceDashboard.astro for type safety
+type AIOperationType =
+  | 'emotion-detection'
+  | 'pattern-recognition'
+  | 'documentation-generation'
+  | 'summary-generation'
+  | 'recommendation-generation'
+  | 'time-series-analysis'
+  | 'trend-detection'
+  | 'risk-assessment'
+  | 'custom'
+
+// Get configuration and metrics
+const operationTypes: AIOperationType[] = [
+  'emotion-detection',
+  'pattern-recognition',
+  'documentation-generation',
+  'summary-generation',
+  'recommendation-generation',
+  'time-series-analysis',
+]
+
+// Page title and description
+const pageTitle = 'AI Performance Monitoring'
+const pageDescription =
+  'Monitor and analyze AI processing performance across all AI operations.'
+---
+
+<DashboardLayout title={`${pageTitle} | Admin`}>
+  <div class="container px-4 py-8 mx-auto">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {pageTitle}
+      </h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        {pageDescription}
+      </p>
+    </header>
+
+    <div class="mb-8">
+      <AIPerformanceDashboard
+        title="AI Performance Metrics"
+        description="Monitor AI processing time, token usage, and performance metrics"
+        refreshInterval={30000}
+      />
+    </div>
+
+    <!-- Documentation Link -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        Integration Documentation
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        Learn how to integrate AI performance monitoring into your AI services
+        and operations.
+      </p>
+      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          Usage Example
+        </h3>
+        <pre
+          class="bg-gray-800 text-white rounded-lg p-4 overflow-x-auto text-sm">
+{`// Import the performance monitoring decorator
+import { monitorPerformance } from '@/lib/ai/performance';
+
+class EmotionAnalysisService {
+  @monitorPerformance('emotion-detection', {
+    getInputTokens: (args) => estimateTokens(args[0]),
+    getOutputTokens: (result) => result.emotions.length * 10
+  })
+  async detectEmotions(text) {
+    // Your emotion detection logic here
+    return { emotions: [] };
+  }
+}`}
+        </pre>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a
+          href="/docs/api/ai/performance-monitoring"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          View Documentation
+        </a>
+        <a
+          href="/docs/examples/ai-performance-monitoring"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          View Examples
+        </a>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

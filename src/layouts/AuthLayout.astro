@@ -1,0 +1,30 @@
+---
+import BaseLayout from './BaseLayout.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  transitionMode?:
+    | 'default'
+    | 'fade'
+    | 'slide'
+    | 'slide-up'
+    | 'slide-down'
+    | 'zoom'
+}
+
+const {
+  title = 'Authentication',
+  description = 'Pixelated Empathy - Secure AI Therapy Platform',
+  transitionMode = 'fade',
+} = Astro.props
+---
+
+<BaseLayout
+  {title}
+  {description}
+  bgType="dot"
+  {transitionMode}
+>
+  <slot />
+</BaseLayout>

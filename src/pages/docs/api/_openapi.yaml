@@ -1,0 +1,183 @@
+openapi: 3.0.3
+info:
+  title: Pixelated Empathy API
+  description: |
+    The Pixelated Empathy API provides a comprehensive set of endpoints for integrating
+    with our platform.
+  version: '1.0.0'
+  contact:
+    name: Pixelated Empathy API Support
+    email: api-support@pixelated.dev
+    url: https://pixelated.dev/support
+servers:
+  - url: 'https://api.pixelated.dev/api/v1'
+    description: Production API server
+  - url: 'https://staging-api.pixelated.dev/api/v1'
+    description: Staging API server (for testing)
+security:
+  - ApiKeyAuth: []
+paths:
+  /search:
+    get:
+      summary: Search content
+      description: Search across blog posts and documentation
+      operationId: searchContent
+      tags:
+        - Search
+      parameters:
+        - name: q
+          in: query
+          description: Search query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful search
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    description: API version
+                    example: 'v1'
+                  results:
+                    type: array
+                    maxItems: 100
+                    items:
+                      $ref: '#/components/schemas/SearchResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users:
+    get:
+      summary: List users
+      description: Retrieve a list of users
+      operationId: listUsers
+      tags:
+        - Users
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of users to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: offset
+          in: query
+          description: Number of users to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    maxItems: 100
+                    items:
+                      $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: API key provided in the format `Bearer YOUR_API_KEY`
+  schemas:
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the search result
+        title:
+          type: string
+          description: Title of the content
+        excerpt:
+          type: string
+          description: Excerpt of the content with search terms highlighted
+        url:
+          type: string
+          description: URL to access the full content
+        type:
+          type: string
+          description: Type of content (blog, documentation, etc.)
+        score:
+          type: number
+          description: Relevance score for the search result
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the user
+        name:
+          type: string
+          description: Full name of the user
+        email:
+          type: string
+          format: email
+          description: Email address of the user
+        created_at:
+          type: string
+          format: date-time
+          description: Time when the user was created
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Error message
+            status:
+              type: integer
+              description: HTTP status code
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+tags:
+  - name: Search
+    description: Search operations
+  - name: Users
+    description: User management
+  - name: Sessions
+    description: Session management
+  - name: Analytics
+    description: Analytics and reporting

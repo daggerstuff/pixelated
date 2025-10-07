@@ -1,0 +1,30 @@
+/* Spinning Globe CSS */
+#globe-container {
+  position: relative;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+#globe-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+
+/* Animation styles */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+#globe-canvas {
+  animation: pulse 3s infinite ease-in-out;
+}

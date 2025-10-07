@@ -1,0 +1,134 @@
+---
+import { getCollection } from 'astro:content'
+import type { CollectionEntry } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const posts = await getCollection(
+    'blog',
+    ({ data }: { data: { draft?: boolean; tags: string[]; pubDate: Date } }) =>
+      !data.draft,
+  )
+  const tags = [
+    ...new Set(
+      posts.flatMap((post: CollectionEntry<'blog'>) => post.data.tags),
+    ),
+  ]
+
+  return tags.map((tag) => ({
+    params: { tag },
+    props: {
+      posts: posts
+        .filter((post: CollectionEntry<'blog'>) => post.data.tags.includes(tag))
+        .sort(
+          (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) =>
+            b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+        ),
+    },
+  }))
+}
+
+interface Props {
+  posts: CollectionEntry<'blog'>[]
+}
+
+const { tag } = Astro.params
+const { posts } = Astro.props as Props
+---
+
+<BaseLayout
+  title={`#${tag}`}
+  description={`All blog posts tagged with ${tag}`}
+>
+
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <header class="mb-12">
+      <div class="flex items-center gap-2 mb-4 text-sm text-slate-400">
+        <a href="/blog" class="hover:text-green-400 transition-colors">Blog</a>
+        <span>/</span>
+        <a href="/blog/tags" class="hover:text-green-400 transition-colors">Topics</a>
+        <span>/</span>
+        <span class="text-green-400">#{tag}</span>
+      </div>
+      <h1 class="text-3xl font-bold mb-4">#{tag}</h1>
+      <p class="text-slate-400">
+        {posts.length} post{posts.length !== 1 ? 's' : ''} about {tag}
+      </p>
+    </header>
+
+    <div class="space-y-8">
+      {posts.map((post: CollectionEntry<'blog'>) => (
+        <article class="group">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+              {post.data.pubDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+              <span class="hidden sm:block mt-1">
+                {Math.ceil(post.body.split(/\s+/).length / 200)} min read
+              </span>
+            </div>
+
+            <div class="flex-1">
+              <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
+                <a href={`/blog/${post.slug}`} class="block">
+                  {post.data.title}
+                </a>
+              </h3>
+
+              <p class="text-slate-300 mb-3 leading-relaxed">
+                {post.data.description}
+              </p>
+
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-3">
+                  {post.data.tags.map((postTag: string) => (
+                    <a
+                      href={`/blog/tags/${postTag}`}
+                      class={`text-xs transition-colors ${
+                        postTag === tag
+                          ? 'text-green-400'
+                          : 'text-slate-400 hover:text-green-300'
+                      }`}
+                    >
+                      #{postTag}
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <a
+                href={`/blog/${post.slug}`}
+                class="inline-flex items-center text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+              >
+                Read article
+                <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="border-t border-slate-700 pt-8 mt-12">
+      <div class="flex flex-col sm:flex-row gap-4 justify-between">
+        <a
+          href="/blog/tags"
+          class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+        >
+          ← All topics
+        </a>
+        <a
+          href="/blog"
+          class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+        >
+          All posts →
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

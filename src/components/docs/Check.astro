@@ -1,0 +1,72 @@
+---
+// Check component for displaying checkmark items or validation messages
+export interface Props {
+  class?: string
+  variant?: 'success' | 'info' | 'default'
+}
+
+const { class: className, variant = 'success' } = Astro.props
+
+const variantClasses = {
+  success:
+    'text-green-800 bg-green-50 border-green-200 dark:text-green-100 dark:bg-green-900/20 dark:border-green-800',
+  info: 'text-blue-800 bg-blue-50 border-blue-200 dark:text-blue-100 dark:bg-blue-900/20 dark:border-blue-800',
+  default:
+    'text-gray-800 bg-gray-50 border-gray-200 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700',
+}
+
+const iconColors = {
+  success: 'text-green-600 dark:text-green-400',
+  info: 'text-blue-600 dark:text-blue-400',
+  default: 'text-gray-600 dark:text-gray-400',
+}
+---
+
+<div class={`check-item ${variantClasses[variant]} ${className || ''}`}>
+  <div class={`check-icon ${iconColors[variant]}`}>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M13.5 4.5L6 12L2.5 8.5"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </div>
+  <div class="check-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .check-item {
+    @apply flex items-start gap-3 p-4 border rounded-lg mb-4;
+  }
+
+  .check-icon {
+    @apply flex-shrink-0 mt-0.5;
+  }
+
+  .check-content {
+    @apply flex-1 text-sm;
+  }
+
+  .check-content :global(p:first-child) {
+    @apply mt-0;
+  }
+
+  .check-content :global(p:last-child) {
+    @apply mb-0;
+  }
+
+  /* When used inline */
+  .check-item:only-child {
+    @apply mb-0;
+  }
+</style>

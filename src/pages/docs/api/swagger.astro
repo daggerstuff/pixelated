@@ -1,0 +1,109 @@
+---
+import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
+---
+
+<DocumentationLayout
+  title="API Reference - Swagger UI"
+  description="Interactive API documentation using Swagger UI"
+>
+  <h1>API Reference - Swagger UI</h1>
+
+  <p>
+    This interactive documentation allows you to explore and test the Pixelated
+    Empathy API directly from your browser. You can view request parameters,
+    response formats, and even make test API calls.
+  </p>
+
+  <div class="card mb-4">
+    <div class="card-title">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      Important Note
+    </div>
+    <p>
+      To make API calls from this page, you'll need a valid API key. You can
+      obtain one from the
+      <a href="/dashboard/developer">developer dashboard</a>. Add your API key
+      to the "Authorize" dialog to authenticate your requests.
+    </p>
+  </div>
+
+  <div id="swagger-ui" class="swagger-ui-container"></div>
+</DocumentationLayout>
+
+<!-- Load Swagger UI assets via CDN to avoid TypeScript issues -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css"
+/>
+
+<style>
+  .swagger-ui-container {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Override some Swagger UI styles to match our site theme */
+  :global(.swagger-ui .opblock-tag) {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+  }
+
+  :global(.swagger-ui .opblock .opblock-summary-operation-id) {
+    font-size: 0.875rem;
+  }
+
+  :global(.swagger-ui .btn.authorize) {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+  }
+
+  :global(.swagger-ui .btn.authorize svg) {
+    fill: white;
+  }
+</style>
+
+<script is:inline>
+  // Load the Swagger UI script
+  document.addEventListener('DOMContentLoaded', function () {
+    const script = document.createElement('script')
+    script.src = 'https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js'
+    script.onload = function () {
+      // Initialize Swagger UI
+      const ui = window.SwaggerUIBundle({
+        url: '/docs/api/_openapi.yaml',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          window.SwaggerUIBundle.presets.apis,
+          window.SwaggerUIBundle.SwaggerUIStandalonePreset,
+        ],
+        layout: 'BaseLayout',
+        persistAuthorization: true,
+        requestInterceptor: function (req) {
+          // Add CSRF protection if needed
+          return req
+        },
+      })
+
+      // Store UI instance for debugging
+      window.ui = ui
+    }
+    document.body.appendChild(script)
+  })
+</script>

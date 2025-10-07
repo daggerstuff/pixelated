@@ -1,0 +1,37 @@
+---
+export const prerender = false
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import GithubView from '@/components/views/GithubView.astro'
+import Link from '@/components/base/Link.astro'
+
+const frontmatter = {
+  title: 'AstroEco is Contributing..',
+  description:
+    'Example: Displaying GitHub pull requests using astro-loader-github-prs',
+  subtitle: '',
+  bgType: 'plum',
+  toc: false,
+  ogImage: '/og-image.png',
+}
+---
+
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  bgType={frontmatter.bgType}
+>
+  <section class="py-12">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <h1 class="text-4xl font-bold text-white mb-4">
+        AstroEco is <span class="animate-pulse">Contributing...</span>
+      </h1>
+      <p class="text-slate-400 italic mb-12">
+        Example: Displaying GitHub pull requests using <Link
+          href="https://github.com/lin-stephanie/astro-loaders/tree/main/packages/astro-loader-github-prs"
+          external={true}>astro-loader-github-prs</Link
+        >
+      </p>
+      <GithubView collectionType="prs" />
+    </div>
+  </section>
+</BaseLayout>

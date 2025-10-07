@@ -1,0 +1,79 @@
+---
+interface Props {
+  type?: 'info' | 'warning' | 'tip' | 'danger'
+  title?: string
+  className?: string
+}
+
+const { type = 'info', title, className } = Astro.props
+---
+
+<div class={`note note-${type} ${className || ''}`}>
+  {title && <div class="note-title">{title}</div>}
+  <div class="note-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .note {
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-left: 4px solid;
+  }
+
+  .note-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .note-content {
+    line-height: 1.6;
+  }
+
+  .note-info {
+    background-color: #f0f9ff;
+    border-left-color: #0ea5e9;
+    color: #0c4a6e;
+  }
+
+  .note-warning {
+    background-color: #fffbeb;
+    border-left-color: #f59e0b;
+    color: #92400e;
+  }
+
+  .note-tip {
+    background-color: #f0fdf4;
+    border-left-color: #10b981;
+    color: #065f46;
+  }
+
+  .note-danger {
+    background-color: #fef2f2;
+    border-left-color: #ef4444;
+    color: #991b1b;
+  }
+
+  /* Dark mode support */
+  :global(.dark) .note-info {
+    background-color: #0c4a6e;
+    color: #bae6fd;
+  }
+
+  :global(.dark) .note-warning {
+    background-color: #92400e;
+    color: #fed7aa;
+  }
+
+  :global(.dark) .note-tip {
+    background-color: #065f46;
+    color: #bbf7d0;
+  }
+
+  :global(.dark) .note-danger {
+    background-color: #991b1b;
+    color: #fecaca;
+  }
+</style>

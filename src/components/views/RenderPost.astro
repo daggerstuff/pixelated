@@ -1,0 +1,36 @@
+---
+import type { ContentCollectionKey } from 'astro:content'
+
+interface Props {
+  collectionType: ContentCollectionKey
+  slug: string
+  pageToc: boolean
+}
+
+const { collectionType, slug, pageToc } = Astro.props
+
+// Handle content rendering at the global scope to avoid TypeScript errors
+let contentResult
+let tocComponent
+
+try {
+  // Just do direct imports here to avoid fighting with TypeScript
+  if (collectionType === 'blog') {
+    const component = await import('@/content/blog/' + slug + '.md')
+    contentResult = component.Content
+
+    if (pageToc) {
+      const Toc = (await import('@/components/toc/Toc.astro')).default
+      tocComponent = Toc
+    }
+  }
+  // Add more collection types as needed
+} catch (error) {
+  console.error(`Failed to load ${slug} from ${collectionType}`, error)
+}
+---
+
+<div>
+  {pageToc && tocComponent && <tocComponent />}
+  {contentResult && <contentResult />}
+</div>

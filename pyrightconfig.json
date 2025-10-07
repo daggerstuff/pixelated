@@ -1,0 +1,11 @@
+{
+  "include": ["src", "tests", "ai"],
+  "exclude": ["**/node_modules/**", "**/stubs/**", "**/.venv/**", "**/.env", "**/build/**", "**/dist/**", "**/datasets/**", ".coveragerc"],
+  "extraPaths": ["stubs"],
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": false,
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "reportPrivateUsage": false,
+  "pythonVersion": "3.11"
+}

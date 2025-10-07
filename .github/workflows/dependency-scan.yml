@@ -1,0 +1,65 @@
+name: Dependency Vulnerability Scan
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+  - cron: '0 0 * * 0' # Run every Sunday at midnight
+
+jobs:
+  node_scan:
+    name: Scan Node.js Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.17.1
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Run pnpm audit
+      run: pnpm audit
+
+  python_scan:
+    name: Scan Python Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv (force latest)
+      run: pip install --upgrade 'uv>=0.8.6'
+
+    - name: Create virtual environment
+      run: uv venv
+
+    - name: Install project dependencies
+      run: uv pip sync pyproject.toml
+
+    - name: Install pip-audit in venv
+      run: uv pip install --upgrade pip pip-audit
+
+    # Run pip-audit, excluding local editable package to avoid false negative on 'pixelated'
+    - name: Run pip-audit (skip editable/local package)
+      run: uv run pip-audit --skip-editable --format=columns

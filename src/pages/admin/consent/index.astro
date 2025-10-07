@@ -1,0 +1,95 @@
+---
+export const prerender = false // Ensure server-rendering for this page
+import AdminLayout from '@/components/admin/AdminLayout.astro'
+import ConsentDashboard from '@/components/admin/consent/ConsentDashboard.astro'
+import { requirePageAuth } from '@/lib/auth/serverAuth'
+import { Icon } from 'astro-icon/components'
+
+// Ensure only admins can access this page
+await requirePageAuth(Astro, 'admin')
+---
+
+<AdminLayout
+  title="Consent Management"
+  description="Manage patient consent options, versions, and monitor consent status"
+>
+  <div class="bg-white p-6 shadow rounded-lg mb-6">
+    <div class="flex items-start mb-6">
+      <div class="mr-4 bg-green-100 p-2 rounded-lg">
+        <Icon name="tabler:clipboard-check" class="h-8 w-8 text-green-600" />
+      </div>
+      <div>
+        <h2 class="text-lg font-semibold">
+          HIPAA-Compliant Consent Management
+        </h2>
+        <p class="text-gray-600">
+          This dashboard provides tools to create and manage consent types,
+          consent document versions, and monitor user consent status in
+          compliance with HIPAA regulations.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+      <a
+        href="/admin/consent/types"
+        class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <div class="mr-3 bg-blue-100 p-2 rounded-full">
+          <Icon name="tabler:category" class="h-5 w-5 text-blue-600" />
+        </div>
+        <div>
+          <h3 class="font-medium">Consent Types</h3>
+          <p class="text-sm text-gray-500">Manage consent categories</p>
+        </div>
+      </a>
+
+      <a
+        href="/admin/consent/versions"
+        class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <div class="mr-3 bg-purple-100 p-2 rounded-full">
+          <Icon name="tabler:versions" class="h-5 w-5 text-purple-600" />
+        </div>
+        <div>
+          <h3 class="font-medium">Document Versions</h3>
+          <p class="text-sm text-gray-500">Manage consent documents</p>
+        </div>
+      </a>
+
+      <a
+        href="/admin/consent/options"
+        class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <div class="mr-3 bg-green-100 p-2 rounded-full">
+          <Icon name="tabler:list-details" class="h-5 w-5 text-green-600" />
+        </div>
+        <div>
+          <h3 class="font-medium">Consent Options</h3>
+          <p class="text-sm text-gray-500">Manage granular options</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <ConsentDashboard />
+
+  <div class="mt-8 bg-amber-50 border-l-4 border-amber-400 p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <Icon name="tabler:info-circle" class="h-5 w-5 text-amber-400" />
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-amber-800">Implementation Note</h3>
+        <div class="mt-2 text-sm text-amber-700">
+          <p>
+            This consent management system implements granular consent with
+            version tracking and withdrawal workflows according to HIPAA
+            requirements. It includes a complete audit trail of all
+            consent-related activities.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

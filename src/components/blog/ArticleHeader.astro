@@ -1,0 +1,47 @@
+---
+import { formatDate } from '@/utils/date'
+
+interface Props {
+  title: string
+  author: string
+  date: string
+  readingTime?: string
+  tags?: string[]
+}
+
+const { title, author, date, readingTime, tags = [] } = Astro.props
+const formattedDate = formatDate(date)
+---
+
+<div class="mb-12">
+  <h1 class="text-4xl font-bold mb-4">{title}</h1>
+
+  <div class="flex items-center text-gray-500 dark:text-gray-400 text-sm mb-6">
+    <span>{formattedDate}</span>
+    {
+      readingTime && (
+        <span>
+          <span class="mx-2">•</span>
+          <span>{readingTime}</span>
+        </span>
+      )
+    }
+    <span class="mx-2">•</span>
+    <span>{author}</span>
+  </div>
+
+  {
+    tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag: string) => (
+          <a
+            href={`/blog/tag/${tag}`}
+            class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            #{tag}
+          </a>
+        ))}
+      </div>
+    )
+  }
+</div>

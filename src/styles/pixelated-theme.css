@@ -1,0 +1,343 @@
+/* Pixelated Empathy Theme - Green/Emerald */
+
+/* Theme Color Variables */
+:root {
+  /* Primary Theme Colors */
+  --theme-primary: #10b981; /* green-500 */
+  --theme-primary-dark: #059669; /* green-600 */
+  --theme-primary-light: #34d399; /* green-400 */
+  --theme-secondary: #6366f1; /* blue-500 for accents */
+  --theme-secondary-dark: #4f46e5; /* blue-600 */
+  --theme-secondary-light: #818cf8; /* blue-400 */
+
+  /* Text Colors for Dark Theme */
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #d1fae5; /* green-100 */
+  --theme-text-muted: #86efac; /* green-300/80 */
+  --theme-text-accent: #10b981; /* green-500 */
+
+  /* Background Colors */
+  --theme-bg-primary: #050505;
+  --theme-bg-secondary: rgba(16, 185, 129, 0.1); /* green-500/10 */
+  --theme-bg-card: rgba(16, 185, 129, 0.05); /* green-500/5 */
+
+  /* Border Colors */
+  --theme-border-primary: rgba(16, 185, 129, 0.3); /* green-500/30 */
+  --theme-border-secondary: rgba(16, 185, 129, 0.4); /* green-500/40 */
+  --theme-border-hover: rgba(16, 185, 129, 0.6); /* green-500/60 */
+}
+
+/* Organic Particles Animation */
+.particles-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--theme-primary);
+  border-radius: 50%;
+  animation: float-organic 12s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.particle-1 {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+  animation-duration: 15s;
+}
+
+.particle-2 {
+  top: 40%;
+  right: 20%;
+  animation-delay: 3s;
+  animation-duration: 18s;
+}
+
+.particle-3 {
+  bottom: 30%;
+  left: 25%;
+  animation-delay: 6s;
+  animation-duration: 12s;
+}
+
+.particle-4 {
+  top: 60%;
+  right: 40%;
+  animation-delay: 9s;
+  animation-duration: 20s;
+}
+
+.particle-5 {
+  bottom: 10%;
+  right: 10%;
+  animation-delay: 12s;
+  animation-duration: 16s;
+}
+
+@keyframes float-organic {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-30px) translateX(20px) scale(1.2);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-15px) scale(0.9);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(20px) translateX(10px) scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+/* Golden Shimmer Text Effect */
+.golden-shimmer {
+  background: linear-gradient(
+    45deg,
+    var(--theme-primary),
+    var(--theme-primary-dark),
+    #047857
+  );
+  background-size: 200% 200%;
+  animation: shimmer 3s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Organic Card Effects */
+.organic-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--theme-border-primary);
+  transition: all 0.7s ease;
+}
+
+.organic-card:hover {
+  border-color: var(--theme-border-hover);
+}
+
+.organic-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: transparent;
+  animation: organic-pulse 4s ease-in-out infinite;
+  transform: scale(0);
+}
+
+.organic-card:hover::before {
+  transform: scale(1);
+}
+
+@keyframes organic-pulse {
+  0%,
+  100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+/* Stats Counter */
+.organic-counter {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  animation: organic-count 2s ease-out;
+  color: var(--theme-primary-light);
+}
+
+@keyframes organic-count {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.stat-card {
+  animation: organic-fade-in 1s ease-out;
+  animation-fill-mode: both;
+}
+
+.stat-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.stat-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.stat-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stat-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes organic-fade-in {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Breathing Animation */
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Theme-specific Text Colors */
+.theme-text-primary {
+  color: var(--theme-text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--theme-text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--theme-text-muted);
+}
+
+.theme-text-accent {
+  color: var(--theme-text-accent);
+}
+
+/* Theme-specific Background Colors */
+.theme-bg-primary {
+  background-color: var(--theme-bg-primary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--theme-bg-secondary);
+}
+
+.theme-bg-card {
+  background-color: var(--theme-bg-card);
+}
+
+/* Theme-specific Border Colors */
+.theme-border-primary {
+  border-color: var(--theme-border-primary);
+}
+
+.theme-border-secondary {
+  border-color: var(--theme-border-secondary);
+}
+
+/* Theme-specific Button Styles */
+.theme-btn-primary {
+  background: linear-gradient(to right, var(--theme-primary), #34d399);
+  color: #1f2937;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.theme-btn-primary:hover {
+  background: linear-gradient(to right, var(--theme-primary-light), #6ee7b7);
+  transform: scale(1.05);
+}
+
+.theme-btn-secondary {
+  background: transparent;
+  border: 2px solid var(--theme-primary-light);
+  color: var(--theme-text-muted);
+  transition: all 0.3s ease;
+}
+
+.theme-btn-secondary:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .particle {
+    width: 3px;
+    height: 3px;
+  }
+}
+
+/* Make text readable on theme background */
+.theme-page {
+  color: var(--theme-text-primary);
+}
+
+.theme-page h1,
+.theme-page h2,
+.theme-page h3,
+.theme-page h4,
+.theme-page h5,
+.theme-page h6 {
+  color: var(--theme-text-primary);
+}
+
+.theme-page p {
+  color: var(--theme-text-secondary);
+}
+
+.theme-page a {
+  color: var(--theme-text-accent);
+}
+
+.theme-page a:hover {
+  color: var(--theme-primary-light);
+}
+
+/* Card styling for consistent theme */
+.theme-card {
+  background-color: var(--theme-bg-card);
+  border: 1px solid var(--theme-border-primary);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.theme-card:hover {
+  border-color: var(--theme-border-hover);
+  background-color: rgba(16, 185, 129, 0.08);
+}

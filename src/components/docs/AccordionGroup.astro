@@ -1,0 +1,17 @@
+---
+interface Props {
+  class?: string
+}
+
+const { class: className = '' } = Astro.props
+---
+
+<div class={`accordion-group space-y-2 ${className}`}>
+  <slot />
+</div>
+
+<style>
+  .accordion-group {
+    /* Additional styling for the accordion group container */
+  }
+</style>

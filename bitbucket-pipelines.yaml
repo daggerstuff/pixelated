@@ -1,0 +1,42 @@
+image: node:24-bullseye-slim
+
+clone:
+  depth: full
+
+definitions:
+  caches:
+    sonar: ~/.sonar/cache
+    pnpm: ~/.pnpm-store
+  steps:
+  - step: &build-test-sonarcloud
+      name: Build, test and analyze on SonarCloud
+      caches:
+      - pnpm
+      - sonar
+      script:
+      - echo "Installing dependencies"
+      - corepack enable
+      - corepack prepare pnpm@latest --activate
+      - pnpm install --no-frozen-lockfile
+      - echo "Run tests and build"
+      - pnpm test --silent
+      - pnpm build --if-present
+      - pipe: sonarsource/sonarcloud-scan:4.0.0
+        variables:
+          SONAR_TOKEN: $SONAR_TOKEN
+  - step: &check-quality-gate-sonarcloud
+      name: Check the Quality Gate on SonarCloud
+      script:
+      - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+        variables:
+          SONAR_TOKEN: $SONAR_TOKEN
+
+pipelines:
+  branches:
+    master:
+    - step: *build-test-sonarcloud
+    - step: *check-quality-gate-sonarcloud
+  pull-requests:
+    '**':
+    - step: *build-test-sonarcloud
+    - step: *check-quality-gate-sonarcloud

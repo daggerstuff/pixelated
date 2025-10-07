@@ -1,0 +1,30 @@
+/* /releases & /prs */
+.github-item-prose h1,
+.github-item-prose h2,
+.github-item-prose h3,
+.github-item-prose h4,
+.github-item-prose h5 {
+  --uno: 'text-1em lt-sm:text-sm';
+}
+
+.github-item-prose > :first-child {
+  margin-top: 1.6em;
+}
+
+.github-item-prose > :last-child {
+  margin-bottom: 1.25em;
+}
+
+.github-item-prose h5 a {
+  font-size: 0.875em;
+}
+
+.github-item-prose li {
+  --uno: 'lt-sm:text-sm';
+}
+
+/* /highlights */
+.card-item-prose p {
+  margin-bottom: 1.1em;
+  margin-top: 1.1em;
+}

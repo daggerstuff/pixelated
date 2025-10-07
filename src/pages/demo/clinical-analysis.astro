@@ -1,0 +1,103 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import ClinicalAnalysisDemo from '@/components/demo/ClinicalAnalysisDemo'
+---
+
+<BaseLayout
+  title="Clinical Analysis Suite - Comprehensive Assessment"
+  description="Enterprise-grade clinical analysis system with risk assessment, mental health indicators, therapeutic recommendations, and progress tracking."
+>
+  <main class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div class="container mx-auto px-4 py-12">
+      <!-- Hero Section -->
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
+          <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+          <span class="text-blue-400 font-medium text-sm">CLINICAL ANALYSIS SUITE</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+          Clinical Analysis
+          <span class="bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent block">
+            & Assessment
+          </span>
+        </h1>
+        
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
+          Comprehensive clinical analysis system providing detailed risk assessment, mental health 
+          indicators analysis, evidence-based therapeutic recommendations, and progress tracking capabilities.
+        </p>
+        
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+          <div class="bg-blue-600/20 border border-blue-500/30 rounded-lg px-4 py-2 text-blue-300">
+            <span class="font-semibold">50+</span> Clinical Indicators
+          </div>
+          <div class="bg-teal-600/20 border border-teal-500/30 rounded-lg px-4 py-2 text-teal-300">
+            <span class="font-semibold">5</span> Therapeutic Frameworks
+          </div>
+          <div class="bg-purple-600/20 border border-purple-500/30 rounded-lg px-4 py-2 text-purple-300">
+            <span class="font-semibold">Evidence-Based</span> Recommendations
+          </div>
+          <div class="bg-green-600/20 border border-green-500/30 rounded-lg px-4 py-2 text-green-300">
+            <span class="font-semibold">Real-Time</span> Analysis
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo Component -->
+      <ClinicalAnalysisDemo client:load />
+      
+      <!-- Technical Details -->
+      <div class="mt-16 max-w-4xl mx-auto">
+        <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
+          <h2 class="text-2xl font-bold text-white mb-6 text-center">Clinical Features</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 class="text-lg font-semibold text-blue-400 mb-4">Risk Assessment</h3>
+              <ul class="space-y-2 text-gray-300">
+                <li>• Suicide risk evaluation</li>
+                <li>• Self-harm indicators</li>
+                <li>• Substance use patterns</li>
+                <li>• Behavioral markers</li>
+                <li>• Social functioning</li>
+                <li>• Crisis intervention needs</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-lg font-semibold text-teal-400 mb-4">Mental Health Analysis</h3>
+              <ul class="space-y-2 text-gray-300">
+                <li>• Mood disorder indicators</li>
+                <li>• Anxiety assessment</li>
+                <li>• Trauma responses</li>
+                <li>• Cognitive patterns</li>
+                <li>• Emotional regulation</li>
+                <li>• Stress factors</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-lg font-semibold text-purple-400 mb-4">Treatment Planning</h3>
+              <ul class="space-y-2 text-gray-300">
+                <li>• Therapeutic recommendations</li>
+                <li>• Intervention strategies</li>
+                <li>• Framework selection</li>
+                <li>• Goal setting</li>
+                <li>• Progress monitoring</li>
+                <li>• Outcome tracking</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="mt-8 p-6 bg-blue-950/30 border border-blue-500/20 rounded-lg">
+            <p class="text-blue-200 text-center">
+              <strong>Clinical Validation:</strong> All analysis algorithms are based on evidence-based clinical 
+              research and validated assessment tools. This system supports clinical decision-making but does not replace professional judgment.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

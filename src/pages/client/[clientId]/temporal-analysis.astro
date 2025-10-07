@@ -1,0 +1,433 @@
+---
+export const prerender = false
+import type { AstroGlobal } from 'astro'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import EmotionTemporalAnalysisChart from '../../../components/session/EmotionTemporalAnalysisChart'
+import ClientHeader from '../../../components/client/ClientHeader.astro'
+import SessionList from '../../../components/session/SessionList.astro'
+import { requirePageAuth } from '../../../lib/auth/serverAuth'
+import { createLogger } from '../../../utils/logger'
+
+// Create logger with context instead of prefix
+const logger = createLogger({ context: 'temporal-analysis-page' })
+
+// Properly type Astro global
+const astro = Astro as AstroGlobal
+
+// Get client ID from URL params
+const { clientId } = astro.params
+
+// Ensure clientId is not undefined for type safety
+const safeClientId = clientId || 'unknown'
+
+// Check authentication
+const authResult = await requirePageAuth(astro)
+if (authResult) {
+  return authResult
+}
+
+// Get user from locals
+const user = astro.locals?.user
+
+if (!user) {
+  return astro.redirect('/auth/login')
+}
+
+// Fetch client info
+// In a real implementation, this would call your API
+// For now, we'll simulate with placeholder data
+const client = {
+  id: safeClientId,
+  name: 'Jane Doe',
+  email: 'jane.doe@example.com',
+  avatar: '/img/avatars/woman1.png',
+  therapistId: user.id,
+}
+
+// Get 5 most recent sessions
+// In a real implementation, this would call your API
+// For now, we'll simulate with placeholder data
+const recentSessions = Array.from({ length: 5 }, (_, i) => ({
+  id: `session-${i + 1}`,
+  clientId: safeClientId,
+  therapistId: user.id,
+  startTime: new Date(Date.now() - i * 86400000).toISOString(), // 1 day back for each
+  status: 'completed',
+  title: `Session ${i + 1}`,
+}))
+
+// Empty client placeholders to use when fetching data from client
+const placeholderData = {
+  trendlines: {},
+  volatility: {},
+  transitions: [],
+  patterns: [],
+  criticalPoints: [],
+  progression: {
+    overallImprovement: 0,
+    stabilityChange: 0,
+    positiveEmotionChange: 0,
+    negativeEmotionChange: 0,
+  },
+  dimensionalRelationships: [],
+}
+
+// Log page access
+logger.info('Temporal analysis page accessed', {
+  userId: user.id,
+  clientId: safeClientId,
+})
+
+// Page title
+const title = `Temporal Analysis - ${client.name}`
+---
+
+<BaseLayout {title}>
+  <div class="container mx-auto px-4 py-8">
+    <ClientHeader
+      clientId={client.id}
+      name={client.name}
+      email={client.email}
+      avatar={client.avatar}
+    />
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+      <div class="lg:col-span-2">
+        <h2 class="text-2xl font-semibold mb-4">
+          Emotional Patterns Over Time
+        </h2>
+        <p class="text-gray-600 mb-6">
+          Temporal analysis tracks emotional patterns across multiple sessions,
+          helping identify trends, detect critical moments, and measure
+          progress.
+        </p>
+
+        <div class="bg-white rounded-lg shadow-sm mb-8">
+          <EmotionTemporalAnalysisChart
+            client:load
+            data={placeholderData}
+            clientId={safeClientId}
+            height={500}
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-3">
+              Intervention Effectiveness
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Analysis of which therapeutic approaches have been most effective
+              based on emotional response patterns.
+            </p>
+            <div class="flex flex-col space-y-2">
+              <div class="flex justify-between items-center">
+                <span>Cognitive Behavioral Therapy</span>
+                <div class="h-2 bg-gray-200 rounded-full w-2/3">
+                  <div class="h-2 bg-green-500 rounded-full" style="width: 85%">
+                  </div>
+                </div>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Mindfulness Techniques</span>
+                <div class="h-2 bg-gray-200 rounded-full w-2/3">
+                  <div class="h-2 bg-green-500 rounded-full" style="width: 70%">
+                  </div>
+                </div>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Exposure Therapy</span>
+                <div class="h-2 bg-gray-200 rounded-full w-2/3">
+                  <div class="h-2 bg-green-500 rounded-full" style="width: 65%">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-3">Key Insights</h3>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <span
+                  class="inline-flex items-center justify-center rounded-full bg-green-100 text-green-800 mr-3 p-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </span>
+                <span
+                  >Anxiety levels show a consistent decreasing trend over the
+                  last 5 sessions</span
+                >
+              </li>
+              <li class="flex items-start">
+                <span
+                  class="inline-flex items-center justify-center rounded-full bg-blue-100 text-blue-800 mr-3 p-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </span>
+                <span
+                  >Strong correlation between mindfulness practice and increased
+                  positive emotions</span
+                >
+              </li>
+              <li class="flex items-start">
+                <span
+                  class="inline-flex items-center justify-center rounded-full bg-yellow-100 text-yellow-800 mr-3 p-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </span>
+                <span
+                  >Weekly pattern of increased anxiety detected on Mondays</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Recommendations</h3>
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <p class="mb-4">Based on temporal analysis of emotional patterns:</p>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span
+                class="inline-flex items-center justify-center rounded-full bg-purple-100 text-purple-800 mr-3 p-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                  <path
+                    fill-rule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </span>
+              <span
+                >Continue mindfulness exercises with focus on daily practice
+                rather than weekly sessions</span
+              >
+            </li>
+            <li class="flex items-start">
+              <span
+                class="inline-flex items-center justify-center rounded-full bg-purple-100 text-purple-800 mr-3 p-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                  <path
+                    fill-rule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </span>
+              <span
+                >Consider additional Monday morning support or check-ins to
+                address weekly pattern</span
+              >
+            </li>
+            <li class="flex items-start">
+              <span
+                class="inline-flex items-center justify-center rounded-full bg-purple-100 text-purple-800 mr-3 p-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                  <path
+                    fill-rule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </span>
+              <span
+                >Explore and address root causes behind negative emotion spikes
+                in social situations</span
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lg:col-span-1">
+        <h3 class="text-xl font-semibold mb-4">Recent Sessions</h3>
+        <SessionList sessions={recentSessions} selectedSessionId="" />
+
+        <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-3">Analysis Settings</h3>
+          <form class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Time Window</label
+              >
+              <select
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              >
+                <option value="30">Last 30 days</option>
+                <option value="90" selected>Last 90 days</option>
+                <option value="180">Last 180 days</option>
+                <option value="365">Last year</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Emotion Types</label
+              >
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input
+                    id="emotion-all"
+                    type="checkbox"
+                    checked
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label for="emotion-all" class="ml-2 text-sm text-gray-700"
+                    >All Emotions</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input
+                    id="emotion-anxiety"
+                    type="checkbox"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label
+                    for="emotion-anxiety"
+                    class="ml-2 text-sm text-gray-700">Anxiety</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input
+                    id="emotion-sadness"
+                    type="checkbox"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label
+                    for="emotion-sadness"
+                    class="ml-2 text-sm text-gray-700">Sadness</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input
+                    id="emotion-joy"
+                    type="checkbox"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label for="emotion-joy" class="ml-2 text-sm text-gray-700"
+                    >Joy</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Analysis Features</label
+              >
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input
+                    id="patterns"
+                    type="checkbox"
+                    checked
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label for="patterns" class="ml-2 text-sm text-gray-700"
+                    >Include Pattern Detection</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input
+                    id="dimensions"
+                    type="checkbox"
+                    checked
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label for="dimensions" class="ml-2 text-sm text-gray-700"
+                    >Dimensional Analysis</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition"
+            >
+              Update Analysis
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 mt-6">
+          <h3 class="text-md font-semibold text-blue-800 mb-2">
+            About Temporal Analysis
+          </h3>
+          <p class="text-sm text-blue-700 mb-2">
+            Temporal analysis helps identify emotional patterns, trends, and
+            significant moments across multiple therapy sessions.
+          </p>
+          <p class="text-sm text-blue-700">
+            This analysis uses AI to detect patterns that might not be
+            immediately obvious during individual sessions, providing a more
+            comprehensive view of progress.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // This script will run on the client to initialize the actual data loading
+  // In a production environment, this would connect to your actual API
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+    // For demo purposes we'll populate with mock data
+    // In production, you'd fetch from the API using the useTemporalEmotionAnalysis hook
+    const clientId = document.location.pathname.split('/')[2]
+    console.log(`Would fetch temporal analysis data for client: ${clientId}`)
+
+    // The actual data fetching happens in the EmotionTemporalAnalysisChart component
+    // through the useTemporalEmotionAnalysis hook
+  })
+</script>

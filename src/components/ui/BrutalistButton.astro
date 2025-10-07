@@ -1,0 +1,53 @@
+---
+export interface Props {
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  class?: string;
+}
+
+const { 
+  variant = 'primary', 
+  size = 'md', 
+  href, 
+  type = 'button', 
+  disabled = false,
+  class: className = ''
+} = Astro.props;
+
+const baseClasses = 'brutalist-button';
+const variantClasses = {
+  primary: 'brutalist-button--primary',
+  secondary: 'brutalist-button--secondary', 
+  outline: 'brutalist-button--outline',
+  danger: 'bg-red-600 hover:bg-red-700 text-white border-2 border-red-600 hover:border-red-700'
+};
+
+const sizeClasses = {
+  sm: 'text-sm px-3 py-2',
+  md: 'text-base px-4 py-3', 
+  lg: 'text-lg px-6 py-4'
+};
+
+const classes = [
+  baseClasses,
+  variantClasses[variant],
+  sizeClasses[size],
+  disabled && 'opacity-50 cursor-not-allowed',
+  className
+].filter(Boolean).join(' ');
+
+const Element = href ? 'a' : 'button';
+---
+
+<Element
+  class={classes}
+  href={href}
+  type={!href ? type : undefined}
+  disabled={!href ? disabled : undefined}
+  {...Astro.props}
+>
+  <slot />
+</Element>

@@ -1,0 +1,498 @@
+groups:
+- name: system-health
+  interval: 30s
+  rules:
+  # High CPU Usage
+  - alert: HighCPUUsage
+    expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High CPU usage detected on {{ $labels.instance }}"
+      description: "CPU usage is above 80% for more than 5 minutes. Current usage: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/cpu-usage"
+      ai_insights: "This high CPU usage may indicate performance bottlenecks or inefficient resource allocation. Consider scaling resources or optimizing application code."
+
+  # High Memory Usage
+  - alert: HighMemoryUsage
+    expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High memory usage detected on {{ $labels.instance }}"
+      description: "Memory usage is above 85% for more than 10 minutes. Current usage: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/memory-usage"
+      ai_insights: "High memory usage can lead to system instability. Consider increasing memory allocation, optimizing memory usage patterns, or identifying memory leaks."
+
+  # High Disk Usage
+  - alert: HighDiskUsage
+    expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 85
+    for: 15m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High disk usage detected on {{ $labels.instance }}"
+      description: "Disk usage is above 85% for more than 15 minutes. Current usage: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/disk-usage"
+      ai_insights: "High disk usage can lead to system failures. Consider cleaning up disk space, implementing data retention policies, or increasing storage capacity."
+
+  # High Network I/O
+  - alert: HighNetworkIO
+    expr: sum by(instance) (rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m])) / 1024 / 1024 > 100
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High network I/O detected on {{ $labels.instance }}"
+      description: "Network I/O is above 100 MB/s for more than 5 minutes. Current rate: {{ $value }} MB/s"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/network-io"
+      ai_insights: "High network I/O may indicate unusual traffic patterns or network congestion. Monitor for potential DDoS attacks or bandwidth issues."
+
+  # High Disk I/O
+  - alert: HighDiskIO
+    expr: sum by(instance) (rate(node_disk_io_time_seconds_total[5m])) * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High disk I/O detected on {{ $labels.instance }}"
+      description: "Disk I/O utilization is above 80% for more than 5 minutes. Current utilization: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/disk-io"
+      ai_insights: "High disk I/O can indicate storage bottlenecks. Consider optimizing disk usage patterns or upgrading storage infrastructure."
+
+- name: application-health
+  interval: 30s
+  rules:
+  # High Error Rate
+  - alert: HighErrorRate
+    expr: (rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])) * 100 > 5
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate detected on {{ $labels.service }}"
+      description: "Error rate is above 5% for more than 5 minutes. Current rate: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/error-rate"
+      ai_insights: "High error rates indicate application issues. Check logs for specific error patterns and investigate root causes. This may require immediate intervention."
+
+  # High Latency
+  - alert: HighLatency
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High latency detected on {{ $labels.service }}"
+      description: "95th percentile latency is above 2 seconds for more than 5 minutes. Current latency: {{ $value }}s"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/latency"
+      ai_insights: "High latency affects user experience. Check database queries, network latency, and application performance. Consider implementing caching or optimization strategies."
+
+  # Low Throughput
+  - alert: LowThroughput
+    expr: rate(http_requests_total[5m]) < 10
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low throughput detected on {{ $labels.service }}"
+      description: "Request throughput is below 10 requests per minute for more than 10 minutes. Current rate: {{ $value }} req/min"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/throughput"
+      ai_insights: "Low throughput may indicate reduced user activity or service issues. Check if this is expected or investigate potential service problems."
+
+  # High Response Time
+  - alert: HighResponseTime
+    expr: rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m]) > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High response time detected on {{ $labels.service }}"
+      description: "Average response time is above 1 second for more than 5 minutes. Current average: {{ $value }}s"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/response-time"
+      ai_insights: "High response times impact user experience. Check database performance, network latency, and application bottlenecks."
+
+  - alert: DatabaseConnectionIssues
+    expr: (jdbc_connections_active / jdbc_connections_max) * 100 > 90
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Database connection issues detected on {{ $labels.service }}"
+      description: "Database connections are above 90% capacity for more than 5 minutes. Current usage: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/database-connections"
+      ai_insights: "High database connection usage can lead to connection pool exhaustion. Consider optimizing queries, increasing connection pool size, or implementing connection pooling strategies."
+
+- name: ai-service-health
+  interval: 30s
+  rules:
+  - alert: AIServiceDown
+    expr: up{job="ai-service"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "AI service is down"
+      description: "AI service is not responding. Check service health and restart if necessary."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-service"
+      ai_insights: "AI service downtime affects all AI-powered features. Immediate action required to restore service and investigate root cause."
+
+  - alert: AIRequestLatencyHigh
+    expr: histogram_quantile(0.95, rate(ai_request_duration_seconds_bucket[5m])) > 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High AI request latency detected"
+      description: "95th percentile AI request latency is above 10 seconds for more than 5 minutes. Current latency: {{ $value }}s"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-latency"
+      ai_insights: "High AI request latency affects user experience. Check model performance, resource allocation, and network connectivity to AI services."
+
+  - alert: AIModelPerformanceDegradation
+    expr: rate(ai_model_inference_time_seconds_sum[5m]) / rate(ai_model_inference_time_seconds_count[5m]) > 5
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "AI model performance degradation detected"
+      description: "Average AI model inference time is above 5 seconds for more than 10 minutes. Current average: {{ $value }}s"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-performance"
+      ai_insights: "Model performance degradation may indicate model issues or resource constraints. Consider model optimization or scaling resources."
+
+  - alert: AIErrorRateHigh
+    expr: (rate(ai_requests_total{status=~"5.."}[5m]) / rate(ai_requests_total[5m])) * 100 > 10
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High AI error rate detected"
+      description: "AI error rate is above 10% for more than 5 minutes. Current rate: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-errors"
+      ai_insights: "High AI error rates indicate serious issues with AI services. Check model health, API connectivity, and resource availability."
+
+  - alert: AIServiceResourceExhaustion
+    expr: rate(ai_service_cpu_usage[5m]) > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "AI service resource exhaustion detected"
+      description: "AI service CPU usage is above 80% for more than 5 minutes. Current usage: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-resources"
+      ai_insights: "AI service resource exhaustion can lead to service degradation. Consider scaling resources, optimizing models, or implementing load balancing."
+
+- name: security-alerts
+  interval: 30s
+  rules:
+  # High Failed Login Attempts
+  - alert: HighFailedLoginAttempts
+    expr: rate(auth_failed_attempts_total[5m]) > 10
+    for: 5m
+    labels:
+      severity: high
+    annotations:
+      summary: "High failed login attempts detected"
+      description: "Failed login attempts are above 10 per minute for more than 5 minutes. Current rate: {{ $value }} attempts/min"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/security-login"
+      ai_insights: "High failed login attempts may indicate brute force attacks. Implement rate limiting, CAPTCHA, or IP blocking to prevent unauthorized access."
+
+  # Suspicious API Activity
+  - alert: SuspiciousAPIActivity
+    expr: rate(api_requests_total{ip!~"192.168.*"}[5m]) > 100
+    for: 5m
+    labels:
+      severity: high
+    annotations:
+      summary: "Suspicious API activity detected"
+      description: "Unusual API activity detected from external IP. Current rate: {{ $value }} requests/min"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/security-api"
+      ai_insights: "Unusual API activity may indicate automated attacks or scraping attempts. Implement IP reputation checks and rate limiting."
+
+  # Data Exfiltration
+  - alert: DataExfiltration
+    expr: rate(data_outbound_bytes_total[5m]) > 1000000
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Potential data exfiltration detected"
+      description: "Unusual outbound data transfer detected. Current rate: {{ $value }} bytes/min"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/security-data"
+      ai_insights: "Unusual outbound data may indicate data exfiltration. Investigate immediately and implement data loss prevention measures."
+
+  # Anomalous User Behavior
+  - alert: AnomalousUserBehavior
+    expr: rate(user_activity_anomalies_total[5m]) > 5
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Anomalous user behavior detected"
+      description: "Unusual user behavior patterns detected. Current rate: {{ $value }} anomalies/min"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/security-user-behavior"
+      ai_insights: "Anomalous user behavior may indicate account compromise or unusual activity patterns. Implement additional authentication checks."
+
+  # Security Vulnerability Scan
+  - alert: SecurityVulnerabilityScan
+    expr: rate(vulnerability_scan_results_total{severity="critical"}[5m]) > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Critical security vulnerability detected"
+      description: "Critical security vulnerability found in system. Immediate action required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/security-vulnerabilities"
+      ai_insights: "Critical vulnerabilities require immediate patching. Prioritize security updates and implement additional monitoring."
+
+- name: ai-bias-monitoring
+  interval: 60s
+  rules:
+  # High Bias Detection Rate
+  - alert: HighBiasDetectionRate
+    expr: rate(bias_detection_events_total[5m]) > 10
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High bias detection rate detected"
+      description: "Bias detection events are above 10 per minute for more than 10 minutes. Current rate: {{ $value }} events/min"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-bias"
+      ai_insights: "High bias detection rates may indicate systemic bias in AI models. Review training data and model architecture for bias mitigation."
+
+  # Model Drift Detection
+  - alert: ModelDriftDetected
+    expr: model_drift_score > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Model drift detected"
+      description: "Model drift score is above 0.8 for more than 5 minutes. Current score: {{ $value }}"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-drift"
+      ai_insights: "Model drift indicates performance degradation. Consider retraining the model with fresh data or adjusting model parameters."
+
+  # Fairness Metric Degradation
+  - alert: FairnessMetricDegradation
+    expr: fairness_score < 0.7
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Fairness metric degradation detected"
+      description: "Fairness score is below 0.7 for more than 10 minutes. Current score: {{ $value }}"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-fairness"
+      ai_insights: "Fairness metric degradation may indicate bias in model predictions. Review model training data and implement fairness constraints."
+
+  # AI Ethics Violation
+  - alert: AIEthicsViolation
+    expr: rate(ethics_violation_events_total[5m]) > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "AI ethics violation detected"
+      description: "AI ethics violation event detected. Immediate review required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/ai-ethics"
+      ai_insights: "AI ethics violations require immediate attention. Review model behavior and implement ethical safeguards."
+
+  # Privacy Violation
+  - alert: PrivacyViolation
+    expr: rate(privacy_violation_events_total[5m]) > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Privacy violation detected"
+      description: "Privacy violation event detected. Immediate review required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/privacy"
+      ai_insights: "Privacy violations require immediate action. Review data handling practices and implement privacy protections."
+
+- name: business-metrics
+  interval: 300s
+  rules:
+  # User Activity Drop
+  - alert: UserActivityDrop
+    expr: rate(user_activity_events_total[1h]) < (rate(user_activity_events_total[24h]) * 0.5)
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "User activity drop detected"
+      description: "User activity has dropped by more than 50% compared to 24-hour average. Current rate: {{ $value }} events/hour"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/user-activity"
+      ai_insights: "Significant user activity drop may indicate service issues or reduced user engagement. Investigate potential causes and implement retention strategies."
+
+  # Conversion Rate Drop
+  - alert: ConversionRateDrop
+    expr: (rate(conversion_events_total[1h]) / rate(user_activity_events_total[1h])) * 100 < 1
+    for: 2h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Conversion rate drop detected"
+      description: "Conversion rate has dropped below 1% for more than 2 hours. Current rate: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/conversion-rate"
+      ai_insights: "Low conversion rates may indicate user experience issues or feature problems. Review user journey and optimize conversion funnel."
+
+  # Revenue Drop
+  - alert: RevenueDrop
+    expr: rate(revenue_events_total[1h]) < (rate(revenue_events_total[24h]) * 0.7)
+    for: 2h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Revenue drop detected"
+      description: "Revenue has dropped by more than 30% compared to 24-hour average. Current rate: ${{ $value }}/hour"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/revenue"
+      ai_insights: "Revenue drop requires immediate attention. Check payment systems, user engagement, and service performance to identify root causes."
+
+  # Customer Satisfaction Drop
+  - alert: CustomerSatisfactionDrop
+    expr: satisfaction_score < 3.5
+    for: 24h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Customer satisfaction drop detected"
+      description: "Customer satisfaction score is below 3.5 for more than 24 hours. Current score: {{ $value }}"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/satisfaction"
+      ai_insights: "Low customer satisfaction scores indicate user experience issues. Review user feedback and implement improvements."
+
+  # Support Ticket Spike
+  - alert: SupportTicketSpike
+    expr: rate(support_ticket_events_total[1h]) > 50
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Support ticket spike detected"
+      description: "Support tickets have exceeded 50 per hour for more than 1 hour. Current rate: {{ $value }} tickets/hour"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/support-tickets"
+      ai_insights: "High support ticket volumes may indicate service issues or user experience problems. Investigate common themes and address root causes."
+
+- name: compliance-monitoring
+  interval: 3600s
+  rules:
+  # HIPAA Compliance Violation
+  - alert: HIPAAComplianceViolation
+    expr: rate(hipaa_violation_events_total[1h]) > 0
+    for: 1h
+    labels:
+      severity: critical
+    annotations:
+      summary: "HIPAA compliance violation detected"
+      description: "HIPAA compliance violation detected. Immediate action required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/hipaa-compliance"
+      ai_insights: "HIPAA violations require immediate attention. Review data handling practices and implement compliance measures."
+
+  # GDPR Compliance Issue
+  - alert: GDPRComplianceIssue
+    expr: rate(gdpr_violation_events_total[1h]) > 0
+    for: 1h
+    labels:
+      severity: critical
+    annotations:
+      summary: "GDPR compliance issue detected"
+      description: "GDPR compliance issue detected. Immediate action required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/gdpr-compliance"
+      ai_insights: "GDPR issues require immediate attention. Review data processing practices and implement privacy protections."
+
+  # Data Retention Violation
+  - alert: DataRetentionViolation
+    expr: rate(data_retention_violation_events_total[1h]) > 0
+    for: 1h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Data retention violation detected"
+      description: "Data retention violation detected. Immediate action required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/data-retention"
+      ai_insights: "Data retention violations require immediate attention. Review data lifecycle management and implement retention policies."
+
+  # Audit Trail Issues
+  - alert: AuditTrailIssues
+    expr: rate(audit_trail_violation_events_total[1h]) > 0
+    for: 1h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Audit trail issues detected"
+      description: "Audit trail violation detected. Immediate action required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/audit-trail"
+      ai_insights: "Audit trail issues compromise compliance. Review logging practices and implement proper audit controls."
+
+  # Encryption Issues
+  - alert: EncryptionIssues
+    expr: rate(encryption_violation_events_total[1h]) > 0
+    for: 1h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Encryption issues detected"
+      description: "Encryption violation detected. Immediate action required."
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/encryption"
+      ai_insights: "Encryption issues compromise data security. Review encryption practices and implement proper key management."
+
+- name: predictive-alerts
+  interval: 300s
+  rules:
+  # Predictive Resource Exhaustion
+  - alert: PredictiveResourceExhaustion
+    expr: predict_linear(node_cpu_usage[1h], 3600) > 90
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Predictive resource exhaustion detected"
+      description: "CPU usage is predicted to exceed 90% in the next hour. Current prediction: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/predictive-resources"
+      ai_insights: "Predictive resource exhaustion allows proactive scaling. Consider increasing resources or implementing auto-scaling."
+
+  # Predictive User Growth
+  - alert: PredictiveUserGrowth
+    expr: predict_linear(user_activity_events_total[24h], 86400) > (rate(user_activity_events_total[24h]) * 2)
+    for: 24h
+    labels:
+      severity: info
+    annotations:
+      summary: "Predictive user growth detected"
+      description: "User activity is predicted to double in the next 24 hours. Current prediction: {{ $value }} events/day"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/predictive-growth"
+      ai_insights: "Predictive user growth indicates scaling opportunities. Prepare infrastructure for increased load and consider capacity planning."
+
+  # Predictive Error Rate Increase
+  - alert: PredictiveErrorRateIncrease
+    expr: predict_linear(error_rate[1h], 3600) > 10
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Predictive error rate increase detected"
+      description: "Error rate is predicted to exceed 10% in the next hour. Current prediction: {{ $value }}%"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/predictive-errors"
+      ai_insights: "Predictive error rate increases indicate potential system issues. Investigate root causes and implement preventive measures."
+
+  # Predictive Performance Degradation
+  - alert: PredictivePerformanceDegradation
+    expr: predict_linear(response_time[1h], 3600) > 5
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Predictive performance degradation detected"
+      description: "Response time is predicted to exceed 5 seconds in the next hour. Current prediction: {{ $value }}s"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/predictive-performance"
+      ai_insights: "Predictive performance degradation allows proactive optimization. Consider scaling resources or optimizing application code."
+
+  # Predictive Security Threat
+  - alert: PredictiveSecurityThreat
+    expr: predict_linear(suspicious_activity[1h], 3600) > 100
+    for: 1h
+    labels:
+      severity: high
+    annotations:
+      summary: "Predictive security threat detected"
+      description: "Suspicious activity is predicted to exceed 100 events in the next hour. Current prediction: {{ $value }} events"
+      runbook_url: "https://docs.pixelatedempathy.com/monitoring/predictive-security"
+      ai_insights: "Predictive security threats allow proactive defense measures. Implement enhanced monitoring and security controls."

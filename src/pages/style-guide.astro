@@ -1,0 +1,228 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+import FormStyleGuide from '../components/ui/FormStyleGuide'
+
+const title = 'Style Guide | Pixelated Empathy'
+const description =
+  'Comprehensive style guide for the Pixelated Empathy design system.'
+---
+
+<BaseLayout {title} {description}>
+  <main class="container mx-auto py-12 px-4">
+    <h1 class="text-4xl font-bold mb-8 text-center">
+      Pixelated Empathy Style Guide
+    </h1>
+    <p class="text-lg text-center mb-12 max-w-3xl mx-auto">
+      This style guide provides a comprehensive overview of the Pixelated
+      Empathy design system components, ensuring consistent styling and user
+      experience across the entire application.
+    </p>
+
+    <section class="mb-16">
+      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
+        <h2 class="text-3xl font-bold mb-6 text-center">Colors</h2>
+
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-xl font-semibold mb-4">Primary Colors</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="space-y-2">
+                <div class="h-20 bg-primary rounded-md"></div>
+                <p class="text-sm font-medium">Primary</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-primary-foreground rounded-md"></div>
+                <p class="text-sm font-medium">Primary Foreground</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-secondary rounded-md"></div>
+                <p class="text-sm font-medium">Secondary</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-secondary-foreground rounded-md"></div>
+                <p class="text-sm font-medium">Secondary Foreground</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-semibold mb-4">UI Colors</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="space-y-2">
+                <div class="h-20 bg-background rounded-md border"></div>
+                <p class="text-sm font-medium">Background</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-foreground rounded-md"></div>
+                <p class="text-sm font-medium">Foreground</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-card rounded-md border"></div>
+                <p class="text-sm font-medium">Card</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-card-foreground rounded-md"></div>
+                <p class="text-sm font-medium">Card Foreground</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-semibold mb-4">Feedback Colors</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="space-y-2">
+                <div class="h-20 bg-destructive rounded-md"></div>
+                <p class="text-sm font-medium">Destructive</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-destructive-foreground rounded-md"></div>
+                <p class="text-sm font-medium">Destructive Foreground</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-success rounded-md"></div>
+                <p class="text-sm font-medium">Success</p>
+              </div>
+              <div class="space-y-2">
+                <div class="h-20 bg-muted rounded-md"></div>
+                <p class="text-sm font-medium">Muted</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
+        <h2 class="text-3xl font-bold mb-6 text-center">Typography</h2>
+
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-xl font-semibold mb-4">Headings</h3>
+            <div class="space-y-4">
+              <div>
+                <h1 class="text-5xl font-bold">Heading 1</h1>
+                <p class="text-sm text-muted-foreground mt-1">
+                  text-5xl font-bold
+                </p>
+              </div>
+              <div>
+                <h2 class="text-4xl font-bold">Heading 2</h2>
+                <p class="text-sm text-muted-foreground mt-1">
+                  text-4xl font-bold
+                </p>
+              </div>
+              <div>
+                <h3 class="text-3xl font-bold">Heading 3</h3>
+                <p class="text-sm text-muted-foreground mt-1">
+                  text-3xl font-bold
+                </p>
+              </div>
+              <div>
+                <h4 class="text-2xl font-bold">Heading 4</h4>
+                <p class="text-sm text-muted-foreground mt-1">
+                  text-2xl font-bold
+                </p>
+              </div>
+              <div>
+                <h5 class="text-xl font-bold">Heading 5</h5>
+                <p class="text-sm text-muted-foreground mt-1">
+                  text-xl font-bold
+                </p>
+              </div>
+              <div>
+                <h6 class="text-lg font-bold">Heading 6</h6>
+                <p class="text-sm text-muted-foreground mt-1">
+                  text-lg font-bold
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-semibold mb-4">Body Text</h3>
+            <div class="space-y-4">
+              <div>
+                <p class="text-base">
+                  Base text (text-base): The quick brown fox jumps over the lazy
+                  dog.
+                </p>
+              </div>
+              <div>
+                <p class="text-sm">
+                  Small text (text-sm): The quick brown fox jumps over the lazy
+                  dog.
+                </p>
+              </div>
+              <div>
+                <p class="text-xs">
+                  Extra small text (text-xs): The quick brown fox jumps over the
+                  lazy dog.
+                </p>
+              </div>
+              <div>
+                <p class="text-lg">
+                  Large text (text-lg): The quick brown fox jumps over the lazy
+                  dog.
+                </p>
+              </div>
+              <div>
+                <p class="text-xl">
+                  Extra large text (text-xl): The quick brown fox jumps over the
+                  lazy dog.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-semibold mb-4">Text Styles</h3>
+            <div class="space-y-4">
+              <div>
+                <p class="font-bold">
+                  Bold text: The quick brown fox jumps over the lazy dog.
+                </p>
+              </div>
+              <div>
+                <p class="italic">
+                  Italic text: The quick brown fox jumps over the lazy dog.
+                </p>
+              </div>
+              <div>
+                <p class="underline">
+                  Underlined text: The quick brown fox jumps over the lazy dog.
+                </p>
+              </div>
+              <div>
+                <p class="line-through">
+                  Strikethrough text: The quick brown fox jumps over the lazy
+                  dog.
+                </p>
+              </div>
+              <div>
+                <p class="text-muted-foreground">
+                  Muted text: The quick brown fox jumps over the lazy dog.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
+        <h2 class="text-3xl font-bold mb-6 text-center">Buttons</h2>
+        
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
+        <h2 class="text-3xl font-bold mb-6 text-center">Form Elements</h2>
+        <FormStyleGuide client:load />
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -1,0 +1,105 @@
+/* Custom animations for UI components */
+
+/* Progress indeterminate animation */
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-progress-indeterminate {
+  animation: progress-indeterminate 2s ease-in-out infinite;
+}
+
+/* Skeleton wave animation */
+@keyframes skeleton-wave {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.animate-skeleton-wave {
+  animation: skeleton-wave 1.5s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-bg, #e2e8f0) 25%,
+    var(--skeleton-shine, #f1f5f9) 37%,
+    var(--skeleton-bg, #e2e8f0) 63%
+  );
+  background-size: 200px 100%;
+}
+
+/* Dark mode overrides */
+html.dark .animate-skeleton-wave {
+  --skeleton-bg: #222222;
+  --skeleton-shine: #333333;
+}
+
+/* Toast animations */
+@keyframes enter {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes leave {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-enter {
+  animation: enter 0.3s ease-out forwards;
+}
+
+.animate-leave {
+  animation: leave 0.3s ease-in forwards;
+}
+
+/* Dialog animations */
+@keyframes dialog-overlay-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-content-show {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dialog-overlay-show {
+  animation: dialog-overlay-show 0.2s ease-out;
+}
+
+.dialog-content-show {
+  animation: dialog-content-show 0.2s ease-out;
+}

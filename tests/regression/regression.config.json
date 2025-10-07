@@ -1,0 +1,45 @@
+{
+  "regression_tests": {
+    "enabled": true,
+    "test_categories": [
+      "authentication",
+      "chat_functionality", 
+      "ui_ux",
+      "performance",
+      "data_integrity",
+      "security"
+    ],
+    "test_environment": {
+      "base_url": "http://localhost:3000",
+      "timeout": 30000,
+      "retries": 2
+    },
+    "performance_thresholds": {
+      "page_load_time": 3000,
+      "memory_usage_mb": 100,
+      "network_timeout": 5000
+    },
+    "security_checks": {
+      "xss_prevention": true,
+      "file_upload_validation": true,
+      "input_sanitization": true
+    },
+    "bug_tracking": {
+      "fixed_bugs": [
+        "AUTH-001: Expired tokens accepted",
+        "AUTH-002: Race condition in concurrent logins",
+        "CHAT-001: Message history lost on refresh",
+        "CHAT-002: Special characters encoding issues",
+        "CHAT-003: Duplicate message sending",
+        "UI-001: Mobile layout breakage",
+        "UI-002: Tab navigation issues",
+        "PERF-001: Slow dashboard loading",
+        "PERF-002: Memory leaks with large histories",
+        "DATA-001: User preferences reset",
+        "DATA-002: Network error data loss",
+        "SEC-001: XSS vulnerability",
+        "SEC-002: Malicious file uploads"
+      ]
+    }
+  }
+}

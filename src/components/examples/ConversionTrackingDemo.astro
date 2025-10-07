@@ -1,0 +1,56 @@
+---
+import ConversionTrackingExample from './ConversionTrackingExample'
+---
+
+<div class="conversion-tracking-demo">
+  <div class="demo-card">
+    <h2>Conversion Tracking Example</h2>
+    <p>
+      This example demonstrates how to use the <code>useConversionTracking</code
+      > hook to track both direct conversions and multi-stage funnels.
+    </p>
+    <div class="demo-content">
+      <ConversionTrackingExample client:load />
+    </div>
+  </div>
+</div>
+
+<style>
+  .conversion-tracking-demo {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  .demo-card {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  h2 {
+    color: #333;
+    margin-top: 0;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  code {
+    background: #f4f4f4;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+
+  .demo-content {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+</style>

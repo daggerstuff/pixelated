@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    container_name: pixelated-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PUBLIC_SITE_URL=https://pixelatedempathy.tech
+    networks:
+      - web
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: pixelated-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

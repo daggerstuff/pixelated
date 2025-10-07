@@ -1,0 +1,31 @@
+{
+  "extends": "../../astro/tsconfigs/strict.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": "../..",
+    "paths": {
+      "~/*": ["src/*"],
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@utils/*": ["src/utils/*"],
+      "@lib/*": ["src/lib/*"],
+      "@types/*": ["src/types/*"]
+    }
+  },
+  "include": [
+    "./**/*.astro",
+    "./**/*.tsx", 
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "**/*.js",
+    "**/*.astro.ts",
+    "**/*.astro.js",
+    "**/*.bak"
+  ]
+}

@@ -1,0 +1,43 @@
+---
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts'
+
+export interface Props {
+  title?: string
+  description?: string
+  image?: string
+  url?: string
+}
+
+const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+
+<!-- Favicons for different themes and devices -->
+<link
+  rel="icon"
+  type="image/svg+xml"
+  href="/favicon.svg"
+  media="(prefers-color-scheme: light)"
+/>
+<link
+  rel="icon"
+  type="image/svg+xml"
+  href="/darkfavicon.svg"
+  media="(prefers-color-scheme: dark)"
+/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+
+<meta name="generator" content={Astro.generator} />
+<meta name="color-scheme" content="dark light" />
+
+<!-- Canonical URL -->
+
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />

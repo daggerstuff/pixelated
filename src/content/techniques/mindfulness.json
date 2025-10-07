@@ -1,0 +1,28 @@
+{
+  "id": "mbsr",
+  "name": "Mindfulness-Based Stress Reduction (MBSR)",
+  "description": "MBSR is an evidence-based program that uses mindfulness meditation to alleviate stress, anxiety, depression, and pain. It teaches participants to focus attention on the present moment in a non-judgmental way.",
+  "category": "Mindfulness",
+  "evidenceLevel": "Strong",
+  "recommendedFor": [
+    "Chronic Pain",
+    "Anxiety Disorders",
+    "Depression",
+    "Stress Management",
+    "Cancer-related distress"
+  ],
+  "contraindications": ["Active psychosis", "Severe dissociation"],
+  "steps": [
+    "Orientation and introduction to mindfulness",
+    "Body scan meditation",
+    "Sitting meditation",
+    "Mindful movement (yoga)",
+    "Group discussion and inquiry",
+    "Daily home practice assignments"
+  ],
+  "references": [
+    "Kabat-Zinn, J. (1990). Full Catastrophe Living: Using the Wisdom of Your Body and Mind to Face Stress, Pain, and Illness. Delta.",
+    "Grossman, P., Niemann, L., Schmidt, S., & Walach, H. (2004). Mindfulness-based stress reduction and health benefits: A meta-analysis. Journal of Psychosomatic Research, 57(1), 35-43."
+  ],
+  "created": "2025-01-17"
+}

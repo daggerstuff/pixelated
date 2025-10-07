@@ -1,0 +1,125 @@
+---
+// Brutalist Dark Header - Mental Health Platform
+const navLinks = [
+  { name: 'Demos', href: '/demo-hub' },
+  { name: 'Features', href: '/features' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
+];
+---
+
+<header class="fixed top-0 z-50 w-full bg-black/70 supports-[backdrop-filter]:backdrop-blur border-b border-gray-800">
+  <div class="brutalist-container">
+    <div class="flex items-center justify-between h-14">
+      <!-- Brutalist Branding -->
+      <div class="flex items-center">
+        <a class="flex items-center gap-3 hover:opacity-90 transition-opacity" href="/">
+          <img
+            src="/apple-touch-icon.png"
+            alt="Pixelated Empathy Logo"
+            class="w-8 h-8 rounded-lg"
+            width="64" height="64"
+            fetchpriority="high"
+            loading="eager"
+            decoding="async"
+          />
+          <span class="text-lg font-bold text-white tracking-tight">
+            PIXELATED EMPATHY
+          </span>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center">
+        <ul class="flex items-center space-x-1">
+          {navLinks.map(link => (
+            <li>
+              <a
+                href={link.href}
+                class="nav-link text-sm px-3 py-2 text-gray-400 hover:text-white transition-colors"
+              >
+                {link.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <!-- Primary CTA -->
+        <div class="ml-6">
+          <a
+            href="/contact"
+            class="brutalist-button brutalist-button--primary text-sm px-5 py-2 rounded-full"
+          >
+            GET STARTED
+          </a>
+        </div>
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden">
+        <button
+          id="mobile-menu-button"
+          class="p-2 text-white hover:text-green-400 transition-colors"
+          aria-label="Toggle mobile menu"
+          aria-expanded="false"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden fixed top-14 left-0 right-0 bg-black border-b-2 border-gray-800 z-40">
+    <div class="brutalist-container py-4 space-y-2">
+      {navLinks.map(link => (
+        <a
+          href={link.href}
+          class="block px-4 py-3 text-gray-200 hover:text-white hover:bg-gray-900 transition-colors"
+        >
+          {link.name}
+        </a>
+      ))}
+      <div class="pt-2 border-t border-gray-800">
+        <a
+          href="/contact"
+          class="block brutalist-button brutalist-button--primary text-center py-3"
+        >
+          GET STARTED
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script is:inline>
+  // Mobile menu functionality
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', (_event) => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
+
+      if (isOpen) {
+        mobileMenu.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+      } else {
+        mobileMenu.classList.remove('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+</script>
+
+

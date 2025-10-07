@@ -1,0 +1,83 @@
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@pixelatedempathy.com'
+  smtp_auth_username: 'alerts@pixelatedempathy.com'
+  smtp_auth_password_file: '/etc/alertmanager/secrets/smtp_password'
+
+route:
+  group_by: [ 'alertname', 'severity', 'service' ]
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook'
+  routes:
+  - match:
+      severity: 'critical'
+    receiver: 'critical-alerts'
+receivers:
+- name: 'web.hook'
+  email_configs:
+  - to: 'security-team@pixelatedempathy.com'
+    subject: '🚨 Pixelated Security Alert: {{ .GroupLabels.alertname }}'
+    text: |
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Severity: {{ .Labels.severity }}
+      Service: {{ .Labels.service }}
+      Time: {{ .StartsAt }}
+      {{ end }}
+
+  slack_configs:
+  - api_url_file: '/etc/alertmanager/secrets/slack_webhook_url'
+    channel: '#security-alerts'
+    title: '🚨 Pixelated Security Alert'
+    text: |
+      {{ range .Alerts }}
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Severity:* {{ .Labels.severity }}
+      *Service:* {{ .Labels.service }}
+      *Time:* {{ .StartsAt }}
+      {{ end }}
+
+  webhook_configs:
+  - url: '${ALERTMANAGER_WEBHOOK_URL:-http://localhost:8080/api/alerts}'
+    send_resolved: true
+
+- name: 'critical-alerts'
+  email_configs:
+  - to: 'emergency-response@pixelatedempathy.com'
+    subject: '🚨 CRITICAL - Pixelated Security Alert: {{ .GroupLabels.alertname }}'
+    text: |
+      CRITICAL ALERT - IMMEDIATE ATTENTION REQUIRED
+
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Severity: {{ .Labels.severity }}
+      Service: {{ .Labels.service }}
+      Time: {{ .StartsAt }}
+      {{ end }}
+
+  slack_configs:
+  - api_url_file: '/etc/alertmanager/secrets/slack_webhook_url'
+    channel: '#critical-alerts'
+    title: '🚨 CRITICAL - Pixelated Security Alert'
+    text: |
+      CRITICAL ALERT - IMMEDIATE ATTENTION REQUIRED
+
+      {{ range .Alerts }}
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Severity:* {{ .Labels.severity }}
+      *Service:* {{ .Labels.service }}
+      *Time:* {{ .StartsAt }}
+      {{ end }}
+
+inhibit_rules:
+- source_match:
+    severity: 'critical'
+  target_match:
+    severity: 'warning'
+  equal: [ 'alertname', 'service' ]

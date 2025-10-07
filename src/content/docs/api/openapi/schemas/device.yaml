@@ -1,0 +1,83 @@
+Device:
+  type: object
+  required:
+    - id
+    - name
+    - type
+    - status
+    - lastUsed
+    - createdAt
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the device
+      example: device_01H5NQJK8Y7X2W3V4U5T6R7S8Q
+    name:
+      type: string
+      description: User-provided name for the device
+      example: Windows Hello Face Recognition
+    type:
+      type: string
+      description: Type of device
+      enum:
+        - webauthn
+        - trusted
+      example: webauthn
+    status:
+      type: string
+      description: Current status of the device
+      enum:
+        - active
+        - disabled
+        - locked
+      example: active
+    lastUsed:
+      type: string
+      format: date-time
+      description: Timestamp of the last successful authentication
+      example: 2024-03-20T10:30:00Z
+    metadata:
+      type: object
+      description: Additional device-specific metadata
+      properties:
+        browser:
+          type: string
+          description: Browser name for WebAuthn devices
+          example: Chrome
+        platform:
+          type: string
+          description: Operating system or platform
+          example: Windows
+        version:
+          type: string
+          description: Browser or OS version
+          example: 120.0.0.0
+        model:
+          type: string
+          description: Device model for trusted devices
+          example: iPhone13,3
+        os:
+          type: string
+          description: Operating system for trusted devices
+          example: iOS
+      examples:
+        webauthn:
+          browser: Chrome
+          platform: Windows
+          version: 120.0.0.0
+        trusted:
+          model: iPhone13,3
+          os: iOS
+          version: 17.3.1
+    createdAt:
+      type: string
+      format: date-time
+      description: Timestamp when the device was registered
+      example: 2024-03-19T15:00:00Z
+    updatedAt:
+      type: string
+      format: date-time
+      description: Timestamp when the device was last updated
+      example: 2024-03-20T10:30:00Z
+  allOf:
+    - $ref: ./common.yaml#/Timestamp

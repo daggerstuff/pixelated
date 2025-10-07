@@ -1,0 +1,8 @@
+# Ignore problematic peer dependencies that cause build conflicts
+auto-install-peers=false
+strict-peer-dependencies=false
+
+# Exclude specific peer dependencies that conflict with Astro build
+peer-dependency-rules.ignoreMissing[]="@capacitor/preferences"
+peer-dependency-rules.ignoreMissing[]="@capacitor/core" 
+peer-dependency-rules.ignoreMissing[]="@netlify/blobs"

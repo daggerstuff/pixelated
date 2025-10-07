@@ -1,0 +1,8 @@
+/* Fallback system fonts */
+:root {
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-condensed: Arial Narrow, Arial, sans-serif;
+}

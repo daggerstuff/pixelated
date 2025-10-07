@@ -1,0 +1,184 @@
+---
+interface Props {
+  title?: string
+  initialTodos?: TodoItem[]
+}
+
+interface TodoItem {
+  id: string
+  text: string
+  completed: boolean
+}
+
+const { title = 'Todo List', initialTodos = [] } = Astro.props
+
+// Initial todos for Alpine.js
+const initialTodosJson = JSON.stringify(initialTodos || [])
+---
+
+<div
+  class="todo-container"
+  x-data=`{
+    todos: JSON.parse(localStorage.getItem('todos') || '${initialTodosJson}'),
+    newTodo: '',
+
+    init() {
+      this.$watch('todos', (val) => {
+        localStorage.setItem('todos', JSON.stringify(val));
+      });
+    },
+
+    addTodo() {
+      if (!this.newTodo.trim()) return;
+
+      this.todos.push({
+        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+        text: this.newTodo.trim(),
+        completed: false
+      });
+
+      this.newTodo = '';
+    },
+
+    toggleComplete(id) {
+      const todo = this.todos.find(t => t.id === id);
+      if (todo) todo.completed = !todo.completed;
+    },
+
+    deleteTodo(id) {
+      this.todos = this.todos.filter(t => t.id !== id);
+    }
+  }`
+>
+  <h2>{title}</h2>
+
+  <div class="todo-input-container">
+    <input
+      type="text"
+      placeholder="Add a new task..."
+      class="todo-input"
+      x-model="newTodo"
+      @keyup.enter="addTodo()"
+    />
+    <button class="todo-button add-button" @click="addTodo()">Add</button>
+  </div>
+
+  <ul class="todo-list">
+    <template x-for="todo in todos" :key="todo.id">
+      <li
+        class="todo-item"
+        :class="{ 'completed': todo.completed }"
+        :data-id="todo.id"
+      >
+        <span class="todo-text" x-text="todo.text"></span>
+        <div class="todo-actions">
+          <button
+            class="todo-button complete-button"
+            @click="toggleComplete(todo.id)"
+            x-text="todo.completed ? '↩️' : '✓'"></button>
+          <button class="todo-button delete-button" @click="deleteTodo(todo.id)"
+            >×</button
+          >
+        </div>
+      </li>
+    </template>
+  </ul>
+</div>
+
+<style>
+  .todo-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background-color: var(--color-bg-secondary, #f8f9fa);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary, #333);
+  }
+
+  .todo-input-container {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
+  .todo-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px 0 0 4px;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .todo-button {
+    background-color: var(--color-accent, #4a7dff);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .todo-button:hover {
+    background-color: var(--color-accent-dark, #3a6ae6);
+  }
+
+  .add-button {
+    border-radius: 0 4px 4px 0;
+  }
+
+  .todo-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+    transition: background-color 0.2s;
+  }
+
+  .todo-item:hover {
+    background-color: var(--color-bg-hover, #f1f3f5);
+  }
+
+  .todo-item.completed .todo-text {
+    text-decoration: line-through;
+    color: var(--color-text-muted, #888);
+  }
+
+  .todo-text {
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .todo-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .complete-button,
+  .delete-button {
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .complete-button {
+    background-color: var(--color-success, #28a745);
+  }
+
+  .delete-button {
+    background-color: var(--color-danger, #dc3545);
+  }
+</style>

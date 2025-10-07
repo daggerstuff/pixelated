@@ -1,0 +1,508 @@
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Log in with email and password
+      description: Authenticate a user using their email and password credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+            examples:
+              success:
+                summary: Successful login
+                value:
+                  email: user@example.com
+                  password: SecurePass123!
+              invalid_email:
+                summary: Invalid email format
+                value:
+                  email: invalid-email
+                  password: SecurePass123!
+              weak_password:
+                summary: Password too short
+                value:
+                  email: user@example.com
+                  password: weak
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: ../schemas/user.yaml#/User
+              examples:
+                success:
+                  summary: Successful login response
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    user:
+                      id: 123e4567-e89b-12d3-a456-426614174000
+                      email: user@example.com
+                      name: John Doe
+                      preferences:
+                        theme: dark
+                        notifications: true
+                      createdAt: 2024-03-20T10:30:00Z
+                      updatedAt: 2024-03-20T10:30:00Z
+        401:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_credentials:
+                  summary: Invalid email or password
+                  value:
+                    code: AUTH_INVALID_CREDENTIALS
+                    message: Invalid email or password
+        429:
+          description: Too many login attempts
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                rate_limited:
+                  summary: Rate limit exceeded
+                  value:
+                    code: AUTH_RATE_LIMIT
+                    message: Too many login attempts. Please try again in 15 minutes.
+                    details:
+                      retryAfter: 900
+                      maxAttempts: 5
+
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                name:
+                  type: string
+                  minLength: 2
+            examples:
+              success:
+                summary: Successful registration
+                value:
+                  email: newuser@example.com
+                  password: SecurePass123!
+                  name: Jane Smith
+              existing_email:
+                summary: Email already registered
+                value:
+                  email: existing@example.com
+                  password: SecurePass123!
+                  name: John Smith
+              invalid_input:
+                summary: Invalid registration data
+                value:
+                  email: invalid-email
+                  password: weak
+                  name: J
+      responses:
+        201:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: ../schemas/user.yaml#/User
+                  token:
+                    type: string
+              examples:
+                success:
+                  summary: Successful registration response
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    user:
+                      id: 123e4567-e89b-12d3-a456-426614174001
+                      email: newuser@example.com
+                      name: Jane Smith
+                      preferences:
+                        theme: system
+                        notifications: true
+                      createdAt: 2024-03-20T11:00:00Z
+                      updatedAt: 2024-03-20T11:00:00Z
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_email:
+                  summary: Invalid email format
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      email: Invalid email format
+                weak_password:
+                  summary: Password too weak
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      password: Password must be at least 8 characters long
+                invalid_name:
+                  summary: Name too short
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Invalid input data
+                    details:
+                      name: Name must be at least 2 characters long
+        409:
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                email_exists:
+                  summary: Email already in use
+                  value:
+                    code: AUTH_EMAIL_EXISTS
+                    message: Email address is already registered
+
+  /webauthn/register:
+    post:
+      tags:
+        - Authentication
+        - WebAuthn
+      summary: Register a WebAuthn device
+      description: |
+        Register a new WebAuthn authenticator for passwordless login.
+        Supports various authenticator types including platform (Windows Hello, Touch ID)
+        and cross-platform (security keys) authenticators.
+
+        Common error cases:
+        * Device compatibility issues
+        * Unsupported attestation format
+        * Timeout during registration
+        * Browser API not available
+        * User verification failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - attestation
+              properties:
+                attestation:
+                  type: object
+                  description: WebAuthn attestation object
+                deviceName:
+                  type: string
+                  description: User-provided name for the device
+            examples:
+              success:
+                summary: Successful WebAuthn registration
+                value:
+                  attestation:
+                    id: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo
+                    rawId: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=
+                    response:
+                      clientDataJSON: >
+                        eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiY2hhbGxlbmdlIiwib3JpZ2luIjoiaHR0
+                        cHM6Ly9leGFtcGxlLmNvbSJ9
+                      attestationObject: o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBZ5YE6p3rJQhcvPAb...
+                    type: public-key
+                  deviceName: Windows Hello Face Recognition
+              unsupported_attestation:
+                summary: Unsupported attestation format
+                value:
+                  attestation:
+                    id: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo
+                    rawId: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=
+                    response:
+                      clientDataJSON: >
+                        eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiY2hhbGxlbmdlIiwib3JpZ2luIjoiaHR0
+                        cHM6Ly9leGFtcGxlLmNvbSJ9
+                      attestationObject: invalidFormat...
+                    type: public-key
+                  deviceName: Unsupported Security Key
+              timeout:
+                summary: Registration timeout
+                value:
+                  attestation:
+                    error: NotAllowedError
+                    message: The operation either timed out or was not allowed
+      responses:
+        201:
+          description: WebAuthn device registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deviceId:
+                    type: string
+                  name:
+                    type: string
+              examples:
+                success:
+                  summary: Successful WebAuthn registration
+                  value:
+                    deviceId: device_01H5NQJK8Y7X2W3V4U5T6R7S8Q
+                    name: Windows Hello Face Recognition
+        400:
+          description: Invalid attestation or device error
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_attestation:
+                  summary: Invalid attestation object
+                  value:
+                    code: WEBAUTHN_INVALID_ATTESTATION
+                    message: Invalid attestation object
+                    details:
+                      error: Attestation verification failed
+                unsupported_algorithm:
+                  summary: Unsupported cryptographic algorithm
+                  value:
+                    code: WEBAUTHN_UNSUPPORTED_ALGORITHM
+                    message: The authenticator uses an unsupported algorithm
+                    details:
+                      algorithm: RS512
+                      supportedAlgorithms: [ES256, RS256]
+                device_incompatible:
+                  summary: Device compatibility error
+                  value:
+                    code: WEBAUTHN_DEVICE_INCOMPATIBLE
+                    message: The authenticator is not compatible with this implementation
+                    details:
+                      requiredFeatures: [UserVerification]
+                      missingFeatures: [UserVerification]
+                browser_not_supported:
+                  summary: Browser API not available
+                  value:
+                    code: WEBAUTHN_BROWSER_NOT_SUPPORTED
+                    message: WebAuthn is not supported in this browser
+                    details:
+                      browser: IE11
+                      minimumVersion: Edge 18
+                timeout:
+                  summary: Operation timeout
+                  value:
+                    code: WEBAUTHN_TIMEOUT
+                    message: The operation timed out
+                    details:
+                      timeoutSeconds: 60
+                user_verification_failed:
+                  summary: User verification failed
+                  value:
+                    code: WEBAUTHN_USER_VERIFICATION_FAILED
+                    message: User verification failed (e.g., wrong PIN, failed biometric)
+                    details:
+                      remainingAttempts: 2
+                      lockoutPeriod: 300
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                unauthorized:
+                  summary: User not authenticated
+                  value:
+                    code: AUTH_UNAUTHORIZED
+                    message: Authentication required
+
+  /webauthn/login:
+    post:
+      tags:
+        - Authentication
+        - WebAuthn
+      summary: Log in with WebAuthn
+      description: |
+        Authenticate using a registered WebAuthn device.
+        Supports various authenticator types including platform (Windows Hello, Touch ID)
+        and cross-platform (security keys) authenticators.
+
+        Common error cases:
+        * Device not found or removed
+        * Signature verification failed
+        * User verification failed
+        * Device locked or disabled
+        * Browser compatibility issues
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - assertion
+              properties:
+                assertion:
+                  type: object
+                  description: WebAuthn assertion object
+            examples:
+              success:
+                summary: Successful WebAuthn assertion
+                value:
+                  assertion:
+                    id: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo
+                    rawId: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=
+                    response:
+                      clientDataJSON: >
+                        eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiY2hhbGxlbmdlIiwib3JpZ2luIjoiaHR0
+                        cHM6Ly9leGFtcGxlLmNvbSJ9
+                      authenticatorData: >
+                        SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAABA==
+                      signature: MEUCIQDKn1Nl3ReSF6NMrRNIQbUbUVLFtMcBSVZhLtf/wCwYugIgfiI1K7TtKyI...
+                      userHandle: MIIBkzCCATigAwIBAgIJAKZgJdKdXvNKMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+                    type: public-key
+              invalid_signature:
+                summary: Invalid signature
+                value:
+                  assertion:
+                    id: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo
+                    rawId: QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=
+                    response:
+                      clientDataJSON: >
+                        eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiY2hhbGxlbmdlIiwib3JpZ2luIjoiaHR0
+                        cHM6Ly9leGFtcGxlLmNvbSJ9
+                      authenticatorData: >
+                        SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAABA==
+                      signature: invalidSignature...
+                      userHandle: MIIBkzCCATigAwIBAgIJAKZgJdKdXvNKMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+                    type: public-key
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: ../schemas/user.yaml#/User
+              examples:
+                success:
+                  summary: Successful WebAuthn login
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    user:
+                      id: 123e4567-e89b-12d3-a456-426614174000
+                      email: user@example.com
+                      name: John Doe
+                      preferences:
+                        theme: dark
+                        notifications: true
+                      createdAt: 2024-03-20T10:30:00Z
+                      updatedAt: 2024-03-20T10:30:00Z
+        400:
+          description: Invalid assertion or device error
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                invalid_assertion:
+                  summary: Invalid assertion object
+                  value:
+                    code: WEBAUTHN_INVALID_ASSERTION
+                    message: Invalid assertion object
+                    details:
+                      error: Signature verification failed
+                device_locked:
+                  summary: Device temporarily locked
+                  value:
+                    code: WEBAUTHN_DEVICE_LOCKED
+                    message: Device is temporarily locked due to too many failed attempts
+                    details:
+                      remainingLockTime: 300
+                      maxAttempts: 5
+                device_disabled:
+                  summary: Device permanently disabled
+                  value:
+                    code: WEBAUTHN_DEVICE_DISABLED
+                    message: Device has been permanently disabled due to security policy
+                    details:
+                      reason: Too many failed attempts
+                      contactSupport: true
+                user_verification_failed:
+                  summary: User verification failed
+                  value:
+                    code: WEBAUTHN_USER_VERIFICATION_FAILED
+                    message: User verification failed (e.g., wrong PIN, failed biometric)
+                    details:
+                      remainingAttempts: 2
+                      lockoutPeriod: 300
+                browser_not_supported:
+                  summary: Browser API not available
+                  value:
+                    code: WEBAUTHN_BROWSER_NOT_SUPPORTED
+                    message: WebAuthn is not supported in this browser
+                    details:
+                      browser: IE11
+                      minimumVersion: Edge 18
+        401:
+          description: Device not found or unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+              examples:
+                device_not_registered:
+                  summary: Device not registered
+                  value:
+                    code: WEBAUTHN_DEVICE_NOT_FOUND
+                    message: WebAuthn device not registered
+                device_removed:
+                  summary: Device has been removed
+                  value:
+                    code: WEBAUTHN_DEVICE_REMOVED
+                    message: This device has been removed from your account
+                    details:
+                      removedAt: 2024-03-20T10:30:00Z
+                      reason: User requested removal

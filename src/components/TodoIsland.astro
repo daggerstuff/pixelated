@@ -1,0 +1,29 @@
+---
+import { Todo } from './TodoReact'
+
+interface Props {
+  title?: string
+  initialTodos?: TodoItem[]
+}
+
+interface TodoItem {
+  id: string
+  text: string
+  completed: boolean
+}
+
+const { title = 'Todo List', initialTodos = [] } = Astro.props
+---
+
+<div class="todo-container">
+  <Todo client:load {title} {initialTodos} />
+</div>
+
+<style>
+  .todo-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    /* The styling will come from the React component */
+  }
+</style>

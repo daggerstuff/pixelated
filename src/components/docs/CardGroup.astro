@@ -1,0 +1,42 @@
+---
+interface Props {
+  cols?: number
+  className?: string
+}
+
+const { cols = 2, className } = Astro.props
+---
+
+<div class={`card-group card-group-${cols} ${className || ''}`}>
+  <slot />
+</div>
+
+<style>
+  .card-group {
+    display: grid;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .card-group-1 {
+    grid-template-columns: 1fr;
+  }
+
+  .card-group-2 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .card-group-3 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .card-group-4 {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    .card-group {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

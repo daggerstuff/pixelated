@@ -1,0 +1,15 @@
+name: 'Security Analysis'
+
+disable-default-queries: false
+
+paths:
+  - src
+
+paths-ignore:
+  - '**/node_modules'
+  - '**/dist'
+  - '**/build'
+  - '**/test'
+  - '**/tests'
+  - '**/spec'
+  - '**/mocks'

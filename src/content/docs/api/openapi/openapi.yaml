@@ -1,0 +1,91 @@
+openapi: 3.1.0
+info:
+  title: Pixelated API
+  version: 1.0.0
+  description: |
+    The Pixelated API provides a comprehensive set of endpoints for managing users,
+    sessions, and analytics in the Pixelated platform. This API follows REST
+    principles and uses standard HTTP methods and status codes.
+
+    ## Authentication
+    Most endpoints require authentication using either JWT Bearer tokens or API keys.
+    Some endpoints also support WebAuthn for passwordless authentication.
+
+    ## Rate Limiting
+    API requests are rate limited based on the authentication method and endpoint.
+    Rate limit information is included in response headers.
+
+    ## Pagination
+    List endpoints support pagination using `page` and `perPage` parameters.
+    Response includes pagination metadata.
+
+    ## Error Handling
+    Errors follow a consistent format with appropriate HTTP status codes
+    and detailed error messages.
+
+  contact:
+    name: Pixelated Support
+    email: support@gradiant.dev
+    url: https://gradiant.dev/support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.gradiant.dev/v1
+    description: Production server
+  - url: https://staging-api.gradiant.dev/v1
+    description: Staging server
+  - url: http://localhost:3000/api/v1
+    description: Local development
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+tags:
+  - name: auth
+    description: Authentication and authorization
+  - name: users
+    description: User management
+  - name: sessions
+    description: Session management
+  - name: analytics
+    description: Analytics and metrics
+
+paths:
+  /auth:
+    $ref: ./auth/auth.yaml#/paths/~1auth
+  /users:
+    $ref: ./users/users.yaml#/paths/~1users
+  /sessions:
+    $ref: ./sessions/sessions.yaml#/paths/~1sessions
+  /analytics:
+    $ref: ./analytics/analytics.yaml#/paths/~1analytics
+
+components:
+  schemas:
+    Error:
+      $ref: ./schemas/common.yaml#/Error
+    Pagination:
+      $ref: ./schemas/common.yaml#/Pagination
+    Timestamp:
+      $ref: ./schemas/common.yaml#/Timestamp
+    User:
+      $ref: ./schemas/user.yaml#/User
+    Session:
+      $ref: ./schemas/session.yaml#/Session
+    UserMetrics:
+      $ref: ./schemas/analytics.yaml#/UserMetrics
+    SystemMetrics:
+      $ref: ./schemas/analytics.yaml#/SystemMetrics
+
+  securitySchemes:
+    BearerAuth:
+      $ref: ./security/schemes.yaml#/BearerAuth
+    ApiKeyAuth:
+      $ref: ./security/schemes.yaml#/ApiKeyAuth
+    OAuth2:
+      $ref: ./security/schemes.yaml#/OAuth2
+    WebAuthn:
+      $ref: ./security/schemes.yaml#/WebAuthn

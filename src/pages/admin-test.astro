@@ -1,0 +1,90 @@
+---
+import SimpleAdminLayout from '../components/admin/SimpleAdminLayout.astro'
+
+// Mock user for testing
+const mockUser = {
+  id: '1',
+  name: 'Test Admin',
+  email: 'admin@example.com',
+  role: 'administrator',
+  permissions: [
+    'VIEW_USERS',
+    'CREATE_USER',
+    'VIEW_SESSIONS',
+    'VIEW_METRICS',
+    'VIEW_LOGS',
+    'ADMIN_SETTINGS',
+  ],
+}
+---
+
+<SimpleAdminLayout title="Admin Test Page">
+  <div class="admin-test-content">
+    <h2>Welcome to the Admin Test Page</h2>
+    <p>
+      This is a simple test page to check if the admin layout works correctly.
+    </p>
+
+    <div class="card">
+      <h3>System Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <span class="metric-label">Active Users</span>
+          <span class="metric-value">124</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Active Sessions</span>
+          <span class="metric-value">56</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Average Response Time</span>
+          <span class="metric-value">238ms</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">CPU Usage</span>
+          <span class="metric-value">42%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</SimpleAdminLayout>
+
+<style>
+  .admin-test-content {
+    padding: 1rem;
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .metric-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+  }
+
+  .metric-label {
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+  }
+</style>

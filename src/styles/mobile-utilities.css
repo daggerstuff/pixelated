@@ -1,0 +1,272 @@
+/**
+ * Mobile Utilities - Comprehensive mobile presentation fixes
+ */
+
+/* Mobile-first responsive utilities */
+.mobile-container {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.mobile-section {
+  padding: 1.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mobile-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+.mobile-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobile-center {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-full-width {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.mobile-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+.mobile-text-sm {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.mobile-text-base {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.mobile-text-lg {
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.mobile-spacing-sm {
+  margin-bottom: 0.5rem;
+}
+
+.mobile-spacing-md {
+  margin-bottom: 1rem;
+}
+
+.mobile-spacing-lg {
+  margin-bottom: 1.5rem;
+}
+
+/* Mobile-specific overrides */
+@media (max-width: 768px) {
+  /* Force mobile layouts */
+  .lg\\:grid-cols-2,
+  .lg\\:grid-cols-3,
+  .lg\\:grid-cols-4,
+  .md\\:grid-cols-2,
+  .md\\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .lg\\:flex-row,
+  .md\\:flex-row,
+  .sm\\:flex-row {
+    flex-direction: column !important;
+  }
+
+  /* Fix common spacing issues */
+  .gap-16,
+  .gap-12,
+  .gap-8 {
+    gap: 1rem !important;
+  }
+
+  .mb-20,
+  .mb-16,
+  .mb-12 {
+    margin-bottom: 2rem !important;
+  }
+
+  .py-16,
+  .py-12,
+  .py-8 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Fix text sizing */
+  .text-5xl,
+  .text-4xl {
+    font-size: 1.875rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .text-3xl {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .text-2xl {
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .text-xl {
+    font-size: 1.125rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .text-lg {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Fix padding and margins */
+  .px-10,
+  .px-8,
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .py-5,
+  .py-4 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  /* Fix container constraints */
+  .max-w-6xl,
+  .max-w-5xl,
+  .max-w-4xl,
+  .max-w-3xl,
+  .max-w-2xl {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Fix image sizing */
+  .w-60,
+  .w-72,
+  .w-48,
+  .w-56 {
+    width: 100% !important;
+    max-width: 12rem !important;
+    height: auto !important;
+  }
+
+  /* Fix rounded corners for mobile */
+  .rounded-3xl {
+    border-radius: 1rem !important;
+  }
+
+  .rounded-2xl {
+    border-radius: 0.75rem !important;
+  }
+
+  /* Fix button sizing */
+  .px-10 {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  /* Ensure touch targets are adequate */
+  button,
+  .button,
+  a[role='button'] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  /* Fix overflow issues */
+  * {
+    max-width: 100vw;
+  }
+
+  /* Hide decorative elements on mobile */
+  .particle,
+  .particles-container {
+    display: none !important;
+  }
+
+  /* Simplify animations on mobile */
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+  }
+
+  /* Fix prose content */
+  .prose {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3 {
+    margin-top: 1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .prose p {
+    margin-bottom: 1rem !important;
+  }
+
+  .prose ul,
+  .prose ol {
+    margin-bottom: 1rem !important;
+    padding-left: 1.5rem !important;
+  }
+}
+
+/* Extra small mobile adjustments */
+@media (max-width: 480px) {
+  .mobile-container {
+    padding: 0 0.75rem;
+  }
+
+  .mobile-section {
+    padding: 1rem 0.75rem;
+  }
+
+  .text-base {
+    font-size: 0.875rem !important;
+  }
+
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+
+  /* Even more aggressive spacing reduction */
+  .gap-4,
+  .gap-6 {
+    gap: 0.75rem !important;
+  }
+
+  .mb-8,
+  .mb-6 {
+    margin-bottom: 1rem !important;
+  }
+
+  .py-6,
+  .py-4 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+}

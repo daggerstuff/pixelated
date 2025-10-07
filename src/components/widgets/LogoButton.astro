@@ -1,0 +1,87 @@
+---
+import Link from '~/components/base/Link.astro'
+import { getUrl } from '~/utils/common'
+import { SITE } from '~/config'
+
+const title = `${SITE.author} @ ${new URL(SITE.website).hostname}`
+---
+
+<Link
+  class="link op-transition"
+  href={getUrl('/')}
+  {title}
+  aria-current={Astro.url.pathname === `${getUrl('/')}` ? 'page' : false}
+>
+  <div class="logo-container">
+    <span class="font-babies brand-title">Pixelated Empathy</span>
+  </div>
+</Link>
+
+<style>
+  .link {
+    /* opacity: 1; */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .logo-container {
+    width: 100%;
+    /* Remove flex and centering */
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    /* gap: 0.8rem; */
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 767.9px) {
+    .logo-container {
+      transform-origin: 0%;
+      transform: scale(0.95);
+    }
+  }
+
+  .font-babies {
+    font-family: 'Babies Playtime', sans-serif;
+    letter-spacing: 0.03em;
+    font-size: 2.2rem;
+    text-align: center;
+    display: block;
+    margin: 0 auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .logo-container svg {
+    height: 2rem;
+  }
+
+  @keyframes grow {
+    0% {
+      stroke-dashoffset: 1px;
+      stroke-dasharray: 350px 0;
+    }
+    20% {
+      stroke-dasharray: 0 350px;
+    }
+    80% {
+      stroke-dasharray: 0 350px;
+    }
+    to {
+      stroke-dasharray: 350px 0;
+    }
+  }
+
+  .draw {
+    stroke-dashoffset: 1px;
+    stroke-dasharray: 350px 0;
+    animation: grow 10s ease forwards infinite;
+  }
+
+  @media (prefers-reduced-motion), print {
+    .draw {
+      stroke-dasharray: unset !important;
+      animation: none !important;
+    }
+  }
+</style>

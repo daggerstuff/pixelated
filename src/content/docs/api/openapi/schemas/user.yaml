@@ -1,0 +1,116 @@
+User:
+  type: object
+  required:
+    - id
+    - email
+    - name
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier
+    email:
+      type: string
+      format: email
+      description: User's email address
+    name:
+      type: string
+      description: User's full name
+    profilePicture:
+      type: object
+      description: User's profile picture information
+      properties:
+        urls:
+          type: object
+          properties:
+            original:
+              type: string
+              format: uri
+              description: URL to the original image
+            display:
+              type: string
+              format: uri
+              description: URL to the display size image (500x500)
+            thumbnail:
+              type: string
+              format: uri
+              description: URL to the thumbnail image (150x150)
+        metadata:
+          type: object
+          properties:
+            width:
+              type: integer
+              description: Original image width
+            height:
+              type: integer
+              description: Original image height
+            format:
+              type: string
+              description: Image format (jpeg, png, webp)
+            size:
+              type: integer
+              description: File size in bytes
+            updatedAt:
+              type: string
+              format: date-time
+              description: Last update timestamp
+    role:
+      type: string
+      enum: [user, admin, therapist]
+      description: User's role in the system
+    preferences:
+      type: object
+      properties:
+        theme:
+          type: string
+          enum: [light, dark, system]
+          description: UI theme preference
+        language:
+          type: string
+          description: Preferred language code (ISO 639-1)
+        timezone:
+          type: string
+          description: Preferred timezone (IANA format)
+        notifications:
+          type: object
+          properties:
+            email:
+              type: boolean
+              description: Email notifications enabled
+            push:
+              type: boolean
+              description: Push notifications enabled
+            sms:
+              type: boolean
+              description: SMS notifications enabled
+    webauthn:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether WebAuthn is enabled
+        credentials:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: WebAuthn credential ID
+              name:
+                type: string
+                description: Device name
+              lastUsed:
+                type: string
+                format: date-time
+                description: Last time this device was used
+    status:
+      type: string
+      enum: [active, inactive, suspended]
+      description: Account status
+    metadata:
+      type: object
+      description: Additional user metadata
+      additionalProperties: true
+    allOf:
+      - $ref: ./common.yaml#/Timestamp

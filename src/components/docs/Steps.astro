@@ -1,0 +1,66 @@
+---
+interface Props {
+  className?: string
+}
+
+const { className } = Astro.props
+---
+
+<div class={`steps ${className || ''}`}>
+  <slot />
+</div>
+
+<style>
+  .steps {
+    counter-reset: step;
+    margin: 1.5rem 0;
+  }
+
+  .steps :global(> *) {
+    counter-increment: step;
+    position: relative;
+    padding-left: 3rem;
+    margin: 1.5rem 0;
+  }
+
+  .steps :global(> *::before) {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .steps :global(> *::after) {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 2rem;
+    width: 2px;
+    height: calc(100% + 0.5rem);
+    background: #e5e7eb;
+    z-index: -1;
+  }
+
+  .steps :global(> *:last-child::after) {
+    display: none;
+  }
+
+  /* Dark mode support */
+  :global(.dark) .steps :global(> *::before) {
+    background: #1d4ed8;
+  }
+
+  :global(.dark) .steps :global(> *::after) {
+    background: #374151;
+  }
+</style>

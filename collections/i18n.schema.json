@@ -1,0 +1,61 @@
+{
+  "$ref": "#/definitions/i18n",
+  "definitions": {
+    "i18n": {
+      "type": "object",
+      "properties": {
+        "toggleTheme.accessibleLabel": {
+          "type": "string",
+          "description": "Accessible label for the theme selection dropdown.",
+          "markdownDescription": "Accessible label for the theme selection dropdown."
+        },
+        "languageSelect.accessibleLabel": {
+          "type": "string",
+          "description": "Accessible label for the language selection dropdown.",
+          "markdownDescription": "Accessible label for the language selection dropdown."
+        },
+        "i18n.untranslatedContent": {
+          "type": "string",
+          "description": "Notice informing users they are on a page that is not yet translated to their language.",
+          "markdownDescription": "Notice informing users they are on a page that is not yet translated to their language."
+        },
+        "page.draft": {
+          "type": "string",
+          "description": "Development-only notice informing users they are on a page that is a draft which will not be included in production builds.",
+          "markdownDescription": "Development-only notice informing users they are on a page that is a draft which will not be included in production builds."
+        },
+        "404.text": {
+          "type": "string",
+          "description": "Text shown on Vitesse’s default 404 page",
+          "markdownDescription": "Text shown on Vitesse’s default 404 page"
+        },
+        "builtWithVitesse.label": {
+          "type": "string",
+          "description": "Label for the “Built with Vitesse” badge optionally displayed in the site footer.",
+          "markdownDescription": "Label for the “Built with Vitesse” badge optionally displayed in the site footer."
+        },
+        "comment.on": {
+          "type": "string",
+          "description": "Label for the comment section",
+          "markdownDescription": "Label for the comment section"
+        },
+        "posts.empty": {
+          "type": "string",
+          "description": "Text shown when there are no posts to display",
+          "markdownDescription": "Text shown when there are no posts to display"
+        },
+        "sponsor.thanks": {
+          "type": "string"
+        },
+        "sponsor.to-suport": {
+          "type": "string"
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -1,0 +1,134 @@
+{
+  "$ref": "#/definitions/pages",
+  "definitions": {
+    "pages": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "display": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "layoutFullWidth": {
+          "type": "boolean",
+          "default": false
+        },
+        "date": {
+          "type": "string"
+        },
+        "tocAlwaysOn": {
+          "type": "boolean",
+          "default": false
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "draft": {
+          "type": "boolean",
+          "default": false
+        },
+        "wrapperClass": {
+          "type": "string"
+        },
+        "class": {
+          "type": "string"
+        },
+        "place": {
+          "type": "string"
+        },
+        "placeLink": {
+          "type": "string",
+          "format": "uri"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "redirect": {
+          "type": "string",
+          "format": "uri"
+        },
+        "inperson": {
+          "type": "boolean",
+          "default": false
+        },
+        "recording": {
+          "type": "boolean",
+          "default": false
+        },
+        "platform": {
+          "type": "string"
+        },
+        "radio": {
+          "type": "boolean",
+          "default": false
+        },
+        "video": {
+          "type": "boolean",
+          "default": false
+        },
+        "path": {
+          "type": "string",
+          "format": "uri"
+        },
+        "head": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag": {
+                "type": "string",
+                "enum": [
+                  "title",
+                  "base",
+                  "link",
+                  "style",
+                  "meta",
+                  "script",
+                  "noscript",
+                  "template"
+                ]
+              },
+              "attrs": {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                },
+                "default": {}
+              },
+              "content": {
+                "type": "string",
+                "default": ""
+              }
+            },
+            "required": ["tag"],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": ["title"],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

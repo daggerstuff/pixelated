@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320" height="120" viewBox="0 0 320 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vitesseGrad" x1="0" y1="0" x2="320" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8" stop-opacity=".7"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity=".5"/>
+    </linearGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+  </defs>
+  <ellipse cx="160" cy="60" rx="120" ry="40" fill="url(#vitesseGrad)" filter="url(#blur)"/>
+</svg>

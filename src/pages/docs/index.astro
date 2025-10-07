@@ -1,0 +1,145 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+// Define types for use in the template
+type DocPage = {
+  data: {
+    draft: boolean
+    pubDate: Date
+    category?: string
+    tags?: string[]
+    featured?: boolean
+    image?: { url: string; alt: string }
+    title: string
+    description: string
+    slug: string
+    readingTime?: number
+    order?: number
+  }
+  id: string
+  slug: string
+}
+
+// Get all docs and sort by order, then by date
+const docs = await getCollection('docs', ({ data }: DocPage) => {
+  return import.meta.env.PROD ? !data.draft : true
+})
+
+const sortedDocs = docs.sort((a: DocPage, b: DocPage) => {
+  // Sort by order first (if available), then by date
+  if (a.data.order !== undefined && b.data.order !== undefined) {
+    return a.data.order - b.data.order
+  }
+  if (a.data.order !== undefined) return -1
+  if (b.data.order !== undefined) return 1
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+})
+
+// Group docs by category
+const docsByCategory = sortedDocs.reduce(
+  (acc: Record<string, DocPage[]>, doc: DocPage) => {
+    const category = doc.data.category || 'General'
+    if (!acc[category]) {
+      acc[category] = []
+    }
+    acc[category].push(doc)
+    return acc
+  },
+  {},
+)
+
+// Get categories in a logical order
+const categoryOrder = ['Getting Started', 'API', 'Guides', 'General']
+const categories = Object.keys(docsByCategory).sort((a, b) => {
+  const aIndex = categoryOrder.indexOf(a)
+  const bIndex = categoryOrder.indexOf(b)
+  if (aIndex === -1 && bIndex === -1) return a.localeCompare(b)
+  if (aIndex === -1) return 1
+  if (bIndex === -1) return -1
+  return aIndex - bIndex
+})
+
+// Format date like: Oct 4 · 4 min
+function formatDocDate(date: Date, readingTime?: number): string {
+  const monthDay = date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
+  return readingTime ? `${monthDay} · ${readingTime} min` : monthDay
+}
+
+const title = 'Documentation'
+const description = 'Comprehensive documentation for Pixelated Empathy platform'
+const bgType = 'dot'
+---
+
+<BaseLayout {title} {description} {bgType}>
+  <div class="max-w-prose mx-auto">
+    <h1 class="text-4xl font-bold mb-8">{title}</h1>
+
+    <div class="prose dark:prose-invert">
+      <!-- Docs by Category -->
+      {
+        categories.map((category) => (
+          <div class="mb-8">
+            <h2 class="text-2xl mb-4">{category}</h2>
+            <ul class="space-y-3 list-none pl-0">
+              {docsByCategory[category].map((doc: DocPage) => (
+                <li class="flex justify-between items-baseline mb-2 leading-relaxed">
+                  <a
+                    href={`/docs/${doc.slug}`}
+                    class="flex-1 text-primary hover:underline text-lg"
+                    transition:name={`doc-title-${doc.slug}`}
+                  >
+                    {doc.data.title}
+                  </a>
+                  <span class="text-sm text-gray-500 dark:text-gray-400 op-80 ml-4">
+                    {formatDocDate(doc.data.pubDate, doc.data.readingTime)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+
+      <!-- Navigation Section -->
+      <div class="mt-16">
+        <div class="flex justify-between items-center">
+          <div class="flex gap-2">
+            <a
+              href="/docs"
+              class="text-sm px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              all docs
+            </a>
+            <a
+              href="/api-docs"
+              class="text-sm px-3 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              API docs
+            </a>
+          </div>
+          <a
+            href="/docs/getting-started"
+            class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          >
+            Get Started
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Use UnoCSS compatible styling */
+  li {
+    transition: transform 0.2s ease;
+  }
+
+  li:hover {
+    transform: translateX(4px);
+  }
+</style>

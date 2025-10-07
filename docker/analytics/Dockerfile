@@ -1,0 +1,55 @@
+# Analytics and Monitoring Service
+FROM node:24-slim AS base
+
+# Install system dependencies
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    curl \
+    ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install pnpm
+ARG PNPM_VERSION=
+RUN npm install -g pnpm@$PNPM_VERSION
+
+WORKDIR /app
+
+# Build stage
+FROM base AS build
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --no-frozen-lockfile
+
+# Copy analytics source code
+COPY src/lib/ai/analytics.ts ./src/lib/ai/
+COPY src/lib/ai/performance ./src/lib/ai/performance
+COPY src/lib/analytics ./src/lib/analytics
+COPY src/types ./src/types
+COPY tsconfig.json ./
+
+# Build TypeScript
+RUN pnpm tsc --project tsconfig.json --outDir dist
+
+# Production stage
+FROM base AS production
+
+RUN groupadd -g 1001 analytics || true && \
+    useradd -u 1001 -g 1001 -s /bin/sh -M -N -r analytics || true
+
+# Copy built application
+COPY --from=build --chown=analytics:analytics /app/dist ./dist
+COPY --from=build --chown=analytics:analytics /app/node_modules ./node_modules
+
+# Create data directory
+RUN mkdir -p /app/data && chown analytics:analytics /app/data
+
+USER analytics
+
+EXPOSE 8003
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8003/health || exit 1
+
+CMD ["node", "dist/lib/analytics/server.js"]

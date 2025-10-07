@@ -1,0 +1,229 @@
+services:
+  # Celery Worker for bias analysis tasks
+  celery-worker-bias-analysis:
+    build:
+      context: ./src/lib/ai/bias-detection/python-service
+      dockerfile: Dockerfile
+    container_name: pixelated-celery-bias-worker
+    command: celery -A celery_config worker --loglevel=info --queues=bias_analysis --concurrency=4
+    environment:
+      - ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=pixelated
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+    volumes:
+      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./bias_detection.log:/app/bias_detection.log
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # Celery Worker for batch processing tasks
+  celery-worker-batch-processing:
+    build:
+      context: ./src/lib/ai/bias-detection/python-service
+      dockerfile: Dockerfile
+    container_name: pixelated-celery-batch-worker
+    command: celery -A celery_config worker --loglevel=info --queues=batch_processing --concurrency=8
+    environment:
+      - ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=pixelated
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+    volumes:
+      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./bias_detection.log:/app/bias_detection.log
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+  # Celery Worker for quality validation tasks
+  celery-worker-quality-validation:
+    build:
+      context: ./src/lib/ai/bias-detection/python-service
+      dockerfile: Dockerfile
+    container_name: pixelated-celery-quality-worker
+    command: celery -A celery_config worker --loglevel=info --queues=quality_validation --concurrency=2
+    environment:
+      - ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=pixelated
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+    volumes:
+      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./bias_detection.log:/app/bias_detection.log
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  # Celery Worker for export processing tasks
+  celery-worker-export-processing:
+    build:
+      context: ./src/lib/ai/bias-detection/python-service
+      dockerfile: Dockerfile
+    container_name: pixelated-celery-export-worker
+    command: celery -A celery_config worker --loglevel=info --queues=export_processing --concurrency=6
+    environment:
+      - ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=pixelated
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+    volumes:
+      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./bias_detection.log:/app/bias_detection.log
+      - ./ai/dataset_pipeline:/app/dataset_pipeline
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 3G
+        reservations:
+          cpus: '0.75'
+          memory: 1.5G
+
+  # Celery Beat scheduler for periodic tasks
+  celery-beat:
+    build:
+      context: ./src/lib/ai/bias-detection/python-service
+      dockerfile: Dockerfile
+    container_name: pixelated-celery-beat
+    command: celery -A celery_config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=pixelated
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+    volumes:
+      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./bias_detection.log:/app/bias_detection.log
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+  # Flower monitoring dashboard for Celery
+  celery-flower:
+    build:
+      context: ./src/lib/ai/bias-detection/python-service
+      dockerfile: Dockerfile
+    container_name: pixelated-celery-flower
+    command: celery -A celery_config flower --address=0.0.0.0 --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=pixelated
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+    volumes:
+      - ./src/lib/ai/bias-detection/python-service:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pixelated-network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+networks:
+  pixelated-network:
+    driver: bridge
+    external: true

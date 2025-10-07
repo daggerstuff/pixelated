@@ -1,0 +1,94 @@
+---
+interface Props {
+  type?: 'note' | 'tip' | 'warning' | 'danger' | 'info'
+  title?: string
+  className?: string
+}
+
+const { type = 'note', title, className } = Astro.props
+---
+
+<aside class={`aside aside-${type} ${className || ''}`} role="complementary">
+  {title && <div class="aside-title">{title}</div>}
+  <div class="aside-content">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .aside {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 4px solid;
+    position: relative;
+  }
+
+  .aside-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .aside-content {
+    line-height: 1.6;
+  }
+
+  .aside-note {
+    background-color: #f8fafc;
+    border-left-color: #64748b;
+    color: #334155;
+  }
+
+  .aside-info {
+    background-color: #eff6ff;
+    border-left-color: #3b82f6;
+    color: #1e40af;
+  }
+
+  .aside-tip {
+    background-color: #f0fdf4;
+    border-left-color: #22c55e;
+    color: #15803d;
+  }
+
+  .aside-warning {
+    background-color: #fffbeb;
+    border-left-color: #f59e0b;
+    color: #d97706;
+  }
+
+  .aside-danger {
+    background-color: #fef2f2;
+    border-left-color: #ef4444;
+    color: #dc2626;
+  }
+
+  /* Dark mode support */
+  :global(.dark) .aside-note {
+    background-color: #1e293b;
+    color: #cbd5e1;
+  }
+
+  :global(.dark) .aside-info {
+    background-color: #1e3a8a;
+    color: #bfdbfe;
+  }
+
+  :global(.dark) .aside-tip {
+    background-color: #14532d;
+    color: #bbf7d0;
+  }
+
+  :global(.dark) .aside-warning {
+    background-color: #92400e;
+    color: #fed7aa;
+  }
+
+  :global(.dark) .aside-danger {
+    background-color: #991b1b;
+    color: #fecaca;
+  }
+</style>

@@ -1,0 +1,96 @@
+@startuml Monitoring Flow
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v16.0/dist
+!include AWSPuml/AWSCommon.puml
+!include AWSPuml/ManagementGovernance/CloudWatch.puml
+!include AWSPuml/Analytics/OpenSearch.puml
+!include AWSPuml/Analytics/KinesisDataFirehose.puml
+!include AWSPuml/Compute/Lambda.puml
+!include AWSPuml/ApplicationIntegration/SNS.puml
+!include AWSPuml/Storage/S3.puml
+!include AWSPuml/ManagementGovernance/Grafana.puml
+
+title Monitoring Flow Architecture
+
+' Define components
+rectangle "Application" {
+    component "ECS Tasks" as app
+}
+
+rectangle "Log Collection" {
+    CloudWatch(cloudwatch, "CloudWatch", "")
+    KinesisDataFirehose(firehose, "Kinesis Firehose", "")
+    Lambda(processor, "Log Processor", "")
+}
+
+rectangle "Storage & Analysis" {
+    OpenSearch(opensearch, "OpenSearch", "")
+    S3(s3, "S3 Buckets", "")
+}
+
+rectangle "Visualization" {
+    Grafana(grafana, "Grafana", "")
+}
+
+rectangle "Alerting" {
+    SNS(sns, "SNS", "")
+}
+
+' Define relationships
+app --> cloudwatch: Send logs & metrics
+cloudwatch --> firehose: Stream logs
+firehose --> processor: Process logs
+processor --> opensearch: Index logs
+processor --> s3: Archive logs
+cloudwatch --> grafana: Metrics visualization
+opensearch --> grafana: Log visualization
+
+' Define alert flow
+cloudwatch --> sns: Trigger alerts
+opensearch --> sns: Trigger alerts
+sns --> "Email" : Send notifications
+sns --> "Slack" : Send notifications
+
+' Define monitoring paths
+collections "Metrics" as metrics {
+    component "Application Metrics" as appMetrics
+    component "Infrastructure Metrics" as infraMetrics
+    component "Business Metrics" as bizMetrics
+}
+
+collections "Logs" as logs {
+    component "Application Logs" as appLogs
+    component "Access Logs" as accessLogs
+    component "Audit Logs" as auditLogs
+}
+
+metrics --> cloudwatch
+logs --> cloudwatch
+
+' Define dashboards
+rectangle "Dashboards" {
+    component "Application Dashboard" as appDash
+    component "Infrastructure Dashboard" as infraDash
+    component "Business Dashboard" as bizDash
+}
+
+grafana --> appDash
+grafana --> infraDash
+grafana --> bizDash
+
+' Define alert rules
+rectangle "Alert Rules" {
+    component "High Error Rate" as errorRule
+    component "High Latency" as latencyRule
+    component "Resource Usage" as resourceRule
+}
+
+cloudwatch --> errorRule
+cloudwatch --> latencyRule
+cloudwatch --> resourceRule
+
+errorRule --> sns
+latencyRule --> sns
+resourceRule --> sns
+
+@enduml 

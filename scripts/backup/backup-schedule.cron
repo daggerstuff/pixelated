@@ -1,0 +1,17 @@
+# Pixelated Empathy Backup Schedule
+# ==================================
+
+# Daily database backup at 2 AM
+0 2 * * * /home/vivi/pixelated/scripts/backup/backup-system.sh database
+
+# Daily application data backup at 3 AM  
+0 3 * * * /home/vivi/pixelated/scripts/backup/backup-system.sh application
+
+# Weekly full system backup on Sunday at 1 AM
+0 1 * * 0 /home/vivi/pixelated/scripts/backup/backup-system.sh full
+
+# Monthly backup verification on 1st at 4 AM
+0 4 1 * * /home/vivi/pixelated/scripts/backup/verify-backups.sh
+
+# Backup cleanup - remove backups older than 30 days, daily at 5 AM
+0 5 * * * /home/vivi/pixelated/scripts/backup/cleanup-backups.sh

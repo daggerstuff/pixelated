@@ -1,0 +1,39 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import GroupView from '@/components/views/GroupView.astro'
+import Link from '@/components/base/Link.astro'
+import { getUrl } from '@/utils/common'
+
+const frontmatter = {
+  title: 'Projects',
+  subtitle: 'Tech Stack for the Astro AntfuStyle Theme & Credits',
+  description: 'Tech Stack for the Astro AntfuStyle Theme & Credits',
+  bgType: 'dot',
+  toc: true,
+  ogImage: '/og-image.png',
+}
+---
+
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  bgType={frontmatter.bgType}
+>
+  <section class="py-12">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <h1 class="text-4xl font-bold text-white mb-4">{frontmatter.title}</h1>
+      <p class="text-lg text-slate-400 mb-8">{frontmatter.subtitle}</p>
+      <div class="flex flex-wrap justify-center items-center gap-4 mb-12">
+        <Link class="btn-orange" href={getUrl('/releases/')}>
+          <span class="i-lucide-rocket"></span>
+          <span class="ml-1.5">Latest Releases</span>
+        </Link>
+        <Link class="btn-violet" href={getUrl('/prs/')}>
+          <span class="i-lucide-git-pull-request"></span>
+          <span class="ml-1.5">Recent Pull Requests</span>
+        </Link>
+      </div>
+      <GroupView pageToc={frontmatter.toc} />
+    </div>
+  </section>
+</BaseLayout>

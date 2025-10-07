@@ -1,0 +1,156 @@
+name: Security Scanning
+
+permissions:
+  contents: read
+  security-events: write
+
+on:
+  push:
+    branches: [ master, development ]
+  pull_request:
+    branches: [ master, development ]
+  schedule:
+  - cron: '0 0 * * *'
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Install UV (preferred Python installer)
+      run: |
+        # Ensure pip is available, then install uv; non-fatal if install fails
+        python3 -m pip install --upgrade pip || true
+        python3 -m pip install --no-cache-dir uv || true
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@v0.16.1
+      continue-on-error: true
+      with:
+        scan-type: 'fs'
+        scanners: 'vuln,secret,misconfig'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    - name: Run Checkov scan
+      uses: bridgecrewio/checkov-action@v12
+      continue-on-error: true
+      with:
+        directory: .
+        framework: all
+        output_format: sarif
+        output_file_path: checkov-results.sarif
+        skip_check: ""
+        skip_path: "clusters/**"
+        log_level: WARNING
+        container_user: 0
+
+    - name: Check for Checkov SARIF file
+      id: checkov_sarif
+      run: |
+        if [ -s checkov-results.sarif ]; then
+          echo "found=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "found=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Check for Trivy SARIF file
+      id: trivy_sarif
+      run: |
+        if [ -s trivy-results.sarif ]; then
+          echo "found=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "found=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Create diagnostic artifact when Trivy SARIF missing
+      if: ${{ steps.trivy_sarif.outputs.found == 'false' }}
+      run: |
+        echo "Trivy SARIF not produced (vulnerability DB download may have failed)." > trivy-missing.txt || true
+      continue-on-error: true
+
+    - name: Upload Trivy diagnostic artifact
+      if: ${{ steps.trivy_sarif.outputs.found == 'false' }}
+      uses: actions/upload-artifact@v4
+      continue-on-error: true
+      with:
+        name: trivy-diagnostic
+        path: trivy-missing.txt
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
+      continue-on-error: true
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Upload Trivy SARIF as artifact
+      uses: actions/upload-artifact@v4
+      if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
+      continue-on-error: true
+      with:
+        name: trivy-sarif
+        path: trivy-results.sarif
+
+    - name: Upload Checkov scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
+      continue-on-error: true
+      with:
+        sarif_file: 'checkov-results.sarif'
+
+    - name: Create diagnostic artifact when Checkov SARIF missing
+      if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
+      run: |
+        echo "Checkov SARIF not produced." > checkov-missing.txt || true
+      continue-on-error: true
+
+    - name: Upload Checkov diagnostic artifact
+      if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
+      uses: actions/upload-artifact@v4
+      continue-on-error: true
+      with:
+        name: checkov-diagnostic
+        path: checkov-missing.txt
+
+    - name: Upload Checkov SARIF as artifact
+      uses: actions/upload-artifact@v4
+      if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
+      continue-on-error: true
+      with:
+        name: checkov-sarif
+        path: checkov-results.sarif
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
+
+    - name: Run security audit
+      run: pnpm audit --audit-level moderate
+
+    - name: Check for known vulnerabilities
+      run: pnpm audit --json > audit-results.json || true
+
+    - name: Upload audit results
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-audit-results
+        path: audit-results.json

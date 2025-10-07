@@ -1,0 +1,187 @@
+paths:
+  /analytics/users/{userId}:
+    get:
+      summary: Get user metrics
+      description: Get metrics for a specific user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+          description: Time period for metrics
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Start date (YYYY-MM-DD)
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date (YYYY-MM-DD), defaults to today
+      responses:
+        200:
+          description: User metrics
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/analytics.yaml#/UserMetrics
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+  /analytics/system:
+    get:
+      summary: Get system metrics
+      description: Get system-wide metrics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [hourly, daily, weekly, monthly]
+          description: Time period for metrics
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Start date (ISO 8601)
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: End date (ISO 8601), defaults to now
+      responses:
+        200:
+          description: System metrics
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/analytics.yaml#/SystemMetrics
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+
+  /analytics/export:
+    post:
+      summary: Export analytics data
+      description: Export analytics data in various formats
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - format
+                - startDate
+              properties:
+                type:
+                  type: string
+                  enum: [user, system]
+                  description: Type of data to export
+                format:
+                  type: string
+                  enum: [csv, json, excel]
+                  description: Export format
+                userId:
+                  type: string
+                  format: uuid
+                  description: User ID (required for user type)
+                startDate:
+                  type: string
+                  format: date-time
+                  description: Start date (ISO 8601)
+                endDate:
+                  type: string
+                  format: date-time
+                  description: End date (ISO 8601), defaults to now
+                metrics:
+                  type: array
+                  items:
+                    type: string
+                  description: Specific metrics to include (optional)
+      responses:
+        202:
+          description: Export job created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    format: uuid
+                    description: Export job ID
+                  status:
+                    type: string
+                    enum: [pending, processing]
+                    description: Job status
+                  estimatedTime:
+                    type: integer
+                    description: Estimated processing time in seconds
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/common.yaml#/Error

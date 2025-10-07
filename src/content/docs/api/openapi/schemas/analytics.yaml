@@ -1,0 +1,125 @@
+UserMetrics:
+  type: object
+  required:
+    - userId
+    - period
+  properties:
+    userId:
+      type: string
+      format: uuid
+      description: User ID these metrics belong to
+    period:
+      type: string
+      enum: [daily, weekly, monthly]
+      description: Time period for these metrics
+    startDate:
+      type: string
+      format: date
+      description: Start date of the period
+    endDate:
+      type: string
+      format: date
+      description: End date of the period
+    sessionCount:
+      type: integer
+      description: Number of sessions in this period
+    totalDuration:
+      type: integer
+      description: Total session duration in minutes
+    averageDuration:
+      type: number
+      format: float
+      description: Average session duration in minutes
+    deviceBreakdown:
+      type: object
+      properties:
+        browser:
+          type: integer
+          description: Number of browser sessions
+        mobile:
+          type: integer
+          description: Number of mobile sessions
+        desktop:
+          type: integer
+          description: Number of desktop sessions
+    metadata:
+      type: object
+      description: Additional metrics metadata
+      additionalProperties: true
+    allOf:
+      - $ref: ./common.yaml#/Timestamp
+
+SystemMetrics:
+  type: object
+  required:
+    - period
+  properties:
+    period:
+      type: string
+      enum: [hourly, daily, weekly, monthly]
+      description: Time period for these metrics
+    startDate:
+      type: string
+      format: date-time
+      description: Start date of the period
+    endDate:
+      type: string
+      format: date-time
+      description: End date of the period
+    activeUsers:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of active users
+        new:
+          type: integer
+          description: Number of new users
+        returning:
+          type: integer
+          description: Number of returning users
+    sessions:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of sessions
+        average:
+          type: number
+          format: float
+          description: Average sessions per user
+        peak:
+          type: integer
+          description: Peak concurrent sessions
+    errors:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of errors
+        byType:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Error count by type
+    performance:
+      type: object
+      properties:
+        averageResponseTime:
+          type: number
+          format: float
+          description: Average API response time in ms
+        p95ResponseTime:
+          type: number
+          format: float
+          description: 95th percentile response time in ms
+        errorRate:
+          type: number
+          format: float
+          description: Error rate as percentage
+    metadata:
+      type: object
+      description: Additional metrics metadata
+      additionalProperties: true
+    allOf:
+      - $ref: ./common.yaml#/Timestamp

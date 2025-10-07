@@ -1,0 +1,57 @@
+{
+  "extends": "lighthouse:default",
+  "settings": {
+    "onlyAudits": [
+      "accessibility",
+      "best-practices",
+      "seo",
+      "performance"
+    ],
+    "skipAudits": [
+      "uses-http2"
+    ]
+  },
+  "categories": {
+    "accessibility": {
+      "title": "Accessibility",
+      "description": "These checks highlight opportunities to improve the accessibility of your web app.",
+      "auditRefs": [
+        {"id": "accesskeys", "weight": 3},
+        {"id": "aria-allowed-attr", "weight": 10},
+        {"id": "aria-hidden-body", "weight": 10},
+        {"id": "aria-hidden-focus", "weight": 3},
+        {"id": "aria-input-field-name", "weight": 3},
+        {"id": "aria-required-attr", "weight": 10},
+        {"id": "aria-roles", "weight": 10},
+        {"id": "aria-valid-attr-value", "weight": 10},
+        {"id": "aria-valid-attr", "weight": 10},
+        {"id": "button-name", "weight": 10},
+        {"id": "bypass", "weight": 3},
+        {"id": "color-contrast", "weight": 3},
+        {"id": "definition-list", "weight": 3},
+        {"id": "dlitem", "weight": 3},
+        {"id": "document-title", "weight": 3},
+        {"id": "duplicate-id-aria", "weight": 3},
+        {"id": "form-field-multiple-labels", "weight": 2},
+        {"id": "frame-title", "weight": 3},
+        {"id": "heading-order", "weight": 2},
+        {"id": "html-has-lang", "weight": 3},
+        {"id": "html-lang-valid", "weight": 3},
+        {"id": "image-alt", "weight": 10},
+        {"id": "input-image-alt", "weight": 10},
+        {"id": "label", "weight": 10},
+        {"id": "link-name", "weight": 3},
+        {"id": "list", "weight": 3},
+        {"id": "listitem", "weight": 3},
+        {"id": "meta-refresh", "weight": 10},
+        {"id": "meta-viewport", "weight": 10},
+        {"id": "object-alt", "weight": 3},
+        {"id": "tabindex", "weight": 3},
+        {"id": "td-headers-attr", "weight": 3},
+        {"id": "th-has-data-cells", "weight": 3},
+        {"id": "valid-lang", "weight": 3},
+        {"id": "video-caption", "weight": 10}
+      ]
+    }
+  }
+}

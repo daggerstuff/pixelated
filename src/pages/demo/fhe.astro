@@ -1,0 +1,76 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { FHEDemo } from '@/components/demo/FHEDemo'
+---
+
+<BaseLayout
+  title="FHE Demo | Pixelated Empathy"
+  description="Explore Fully Homomorphic Encryption capabilities in Pixelated Empathy"
+>
+  <div class="container mx-auto py-10">
+    <div class="flex flex-col gap-6">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold tracking-tight">
+          Fully Homomorphic Encryption Demo
+        </h1>
+        <p class="text-muted-foreground mt-2">
+          Experience the power of secure computing on encrypted data
+        </p>
+      </div>
+
+      <div class="max-w-4xl mx-auto w-full">
+        <FHEDemo
+          client:load
+          defaultMessage="Your data is protected with FHE technology"
+        />
+      </div>
+
+      <div class="max-w-3xl mx-auto mt-10 px-4">
+        <h2 class="text-2xl font-semibold mb-4">
+          About Fully Homomorphic Encryption
+        </h2>
+        <div class="prose prose-neutral dark:prose-invert">
+          <p>
+            Fully Homomorphic Encryption (FHE) is a revolutionary cryptographic
+            technique that allows computations to be performed directly on
+            encrypted data without requiring decryption first.
+          </p>
+          <h3>Key Benefits</h3>
+          <ul>
+            <li>
+              <strong>Complete Privacy:</strong> Data remains encrypted throughou
+              the entire processing lifecycle
+            </li>
+            <li>
+              <strong>Secure Computation:</strong> Perform operations on sensitive
+              data while maintaining confidentiality
+            </li>
+            <li>
+              <strong>HIPAA Compliance:</strong> Ideal for healthcare applications
+              requiring the highest levels of privacy
+            </li>
+            <li>
+              <strong>Zero Knowledge:</strong> Servers can process data without ever
+              seeing the actual content
+            </li>
+          </ul>
+          <h3>Use Cases in Pixelated Empathy</h3>
+          <p>In our therapy platform, FHE enables:</p>
+          <ul>
+            <li>Secure sentiment analysis on therapy messages</li>
+            <li>Privacy-preserving categorization of session content</li>
+            <li>Confidential summarization of therapy conversations</li>
+            <li>
+              Secure key rotation to maintain the highest level of protection
+            </li>
+          </ul>
+          <p>
+            The demo above demonstrates these capabilities in an interactive
+            way, allowing you to see FHE in action without revealing the
+            underlying sensitive data.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

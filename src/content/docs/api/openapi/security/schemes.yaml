@@ -1,0 +1,29 @@
+BearerAuth:
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  description: JWT token for authentication
+
+ApiKeyAuth:
+  type: apiKey
+  in: header
+  name: X-API-Key
+  description: API key for service-to-service authentication
+
+OAuth2:
+  type: oauth2
+  description: OAuth2 authentication
+  flows:
+    authorizationCode:
+      authorizationUrl: https://auth.gradiant.dev/oauth/authorize
+      tokenUrl: https://auth.gradiant.dev/oauth/token
+      scopes:
+        read: Read access to protected resources
+        write: Write access to protected resources
+        admin: Admin access to protected resources
+
+WebAuthn:
+  type: http
+  scheme: bearer
+  bearerFormat: WebAuthn
+  description: WebAuthn authentication for passwordless login

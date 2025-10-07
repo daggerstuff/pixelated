@@ -1,0 +1,128 @@
+Error:
+  type: object
+  required:
+    - error
+  properties:
+    error:
+      type: object
+      required:
+        - type
+        - code
+        - message
+      properties:
+        type:
+          type: string
+          description: Error type (e.g., validation_error, authorization_error)
+          example: validation_error
+        code:
+          type: string
+          description: Specific error code with namespace
+          example: api.invalid_input
+        message:
+          type: string
+          description: Human-readable error message
+          example: Validation error
+        details:
+          type: object
+          description: Additional error details specific to the error type
+          additionalProperties: true
+
+Pagination:
+  type: object
+  properties:
+    total:
+      type: integer
+      description: Total number of items
+    page:
+      type: integer
+      description: Current page number
+    perPage:
+      type: integer
+      description: Number of items per page
+    totalPages:
+      type: integer
+      description: Total number of pages
+
+Timestamp:
+  type: object
+  properties:
+    createdAt:
+      type: string
+      format: date-time
+      description: Creation timestamp
+    updatedAt:
+      type: string
+      format: date-time
+      description: Last update timestamp
+    deletedAt:
+      type: string
+      format: date-time
+      description: Deletion timestamp (if soft deleted)
+
+ValidationError:
+  allOf:
+    - $ref: '#/Error'
+    - type: object
+      properties:
+        error:
+          properties:
+            details:
+              type: object
+              properties:
+                invalidFields:
+                  type: object
+                  description: Map of field names to validation error messages
+                  additionalProperties:
+                    type: string
+
+NotFoundError:
+  allOf:
+    - $ref: '#/Error'
+    - type: object
+      properties:
+        error:
+          properties:
+            details:
+              type: object
+              properties:
+                resourceType:
+                  type: string
+                  description: Type of resource not found
+                identifier:
+                  type: string
+                  description: Identifier of the resource not found
+
+AuthenticationError:
+  allOf:
+    - $ref: '#/Error'
+    - type: object
+      properties:
+        error:
+          properties:
+            code:
+              example: api.invalid_credentials
+            type:
+              example: authentication_error
+            message:
+              example: Authentication required
+
+RateLimitError:
+  allOf:
+    - $ref: '#/Error'
+    - type: object
+      properties:
+        error:
+          properties:
+            code:
+              example: api.rate_limit_exceeded
+            type:
+              example: rate_limit_error
+            message:
+              example: Rate limit exceeded
+            details:
+              type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  description: Seconds to wait before retrying
+                  example: 60

@@ -1,0 +1,179 @@
+---
+import { verifyAdmin } from '../../lib/auth/middleware.js'
+import type { AuthContext, SessionData } from '../../lib/auth/types.js'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+
+// Verify admin access
+const context: AuthContext = {
+  session: (Astro.locals as { session?: SessionData }).session || null,
+  securityVerification: undefined,
+  hipaaCompliance: undefined,
+}
+
+const response = await verifyAdmin(Astro.request, context)
+if (response) return response
+
+// Get FHE stats from context
+const fheStats = context.securityVerification?.details
+---
+
+<BaseLayout title="FHE Dashboard">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">
+      Fully Homomorphic Encryption Dashboard
+    </h1>
+
+    {
+      fheStats ? (
+        <div class="bg-white shadow rounded-lg p-6">
+          <h2 class="text-xl font-semibold mb-4">Latest Verification</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-gray-600">Timestamp</p>
+              <p class="font-medium">
+                {new Date(fheStats.timestamp).toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <p class="text-gray-600">Verification Hash</p>
+              <p class="font-medium font-mono">{fheStats.verificationHash}</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div class="bg-white shadow rounded-lg p-6 text-center">
+          <p class="text-gray-500">No FHE verification data available</p>
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--color-heading);
+  }
+
+  .description {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  :global(.fhe-system-dashboard) {
+    background-color: var(--color-background-card);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(_0, 0, 0, 0.1);
+  }
+
+  :global(.dashboard-stats) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(_200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  :global(.stat-card) {
+    background-color: var(--color-background);
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(_0, 0, 0, 0.1);
+  }
+
+  :global(.stat-value) {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-primary);
+  }
+
+  :global(.stat-percentage) {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  :global(.recent-activity table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+  }
+
+  :global(.recent-activity th, .recent-activity td) {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  :global(.status-badge) {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  :global(.status-badge.valid) {
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
+  }
+
+  :global(.status-badge.invalid) {
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+  }
+
+  :global(.status-badge.pending) {
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning);
+  }
+
+  :global(.system-health) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(_250px, 1fr));
+    gap: 1rem;
+  }
+
+  :global(.health-card) {
+    background-color: var(--color-background);
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(_0, 0, 0, 0.1);
+  }
+
+  :global(.health-status) {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+  }
+
+  :global(.health-status.healthy) {
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
+  }
+
+  :global(.health-status.warning) {
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning);
+  }
+
+  :global(.health-status.critical) {
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+  }
+
+  :global(.health-message) {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+</style>

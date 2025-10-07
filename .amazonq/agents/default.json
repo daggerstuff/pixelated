@@ -1,0 +1,64 @@
+{
+  "name": "amazon_q_default",
+  "description": "Default agent configuration",
+  "mcpServers": {
+    "OpenMemory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "openmemory"
+      ],
+      "env": {
+        "OPENMEMORY_API_KEY": "om-8u4kpiwqmus434epjpsdeuk86o7mnrgg",
+        "CLIENT_NAME": "cursor"
+      }
+    }
+  },
+  "tools": [
+    "@OpenMemory",
+    "fsRead",
+    "fsWrite",
+    "fsReplace",
+    "listDirectory",
+    "fileSearch",
+    "executeBash",
+    "codeReview",
+    "displayFindings"
+  ],
+  "allowedTools": [
+    "fsRead",
+    "listDirectory",
+    "fileSearch",
+    "codeReview",
+    "displayFindings"
+  ],
+  "toolsSettings": {
+    "execute_bash": {
+      "alwaysAllow": [
+        {
+          "preset": "readOnly"
+        }
+      ]
+    },
+    "use_aws": {
+      "alwaysAllow": [
+        {
+          "preset": "readOnly"
+        }
+      ]
+    }
+  },
+  "resources": [
+    "file://AmazonQ.md",
+    "file://AGENTS.md",
+    "file://README.md",
+    "file://.amazonq/rules/**/*.md"
+  ],
+  "prompt": "",
+  "toolAliases": {},
+  "useLegacyMcpJson": false,
+  "hooks": {
+    "agentSpawn": [],
+    "userPromptSubmit": []
+  }
+}

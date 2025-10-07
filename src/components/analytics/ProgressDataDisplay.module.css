@@ -1,0 +1,61 @@
+/* ProgressDataDisplay styles */
+
+.chartContainer {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.chartTitle {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.chartDescription {
+  margin-bottom: 16px;
+  color: #555;
+}
+
+.dataRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.colorIndicator {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background-color: var(--indicator-color);
+}
+
+.benchmarkIndicator {
+  background-color: #666;
+}
+
+.dataText {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.userData {
+  color: var(--user-data-color);
+  font-weight: 500;
+}
+
+.dataLabel {
+  font-weight: bold;
+}
+
+.noDataMessage {
+  color: #888;
+  font-style: italic;
+  padding: 10px 0;
+}

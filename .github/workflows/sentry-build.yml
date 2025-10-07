@@ -1,0 +1,79 @@
+name: Build & Sentry Release
+
+permissions:
+  contents: read
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NODE_OPTIONS: '--max-old-space-size=4096'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'pnpm'
+
+    - name: Setup pnpm
+      run: |
+        corepack enable
+        pnpm -v
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Build (with Sentry envs if provided)
+      env:
+        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
+        SENTRY_RELEASE: ${{ github.sha }}
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      run: |
+        echo "Building with SENTRY_RELEASE=${SENTRY_RELEASE}"
+        pnpm build
+
+    - name: Create Sentry release and upload source maps (optional)
+      if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        SENTRY_RELEASE: ${{ github.sha }}
+      run: |
+        # Install sentry-cli if not available and then create a release and upload source maps
+        curl -sL https://sentry.io/get-cli/ | bash
+        sentry-cli --version
+        sentry-cli releases new ${SENTRY_RELEASE}
+        sentry-cli releases files ${SENTRY_RELEASE} upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix
+        sentry-cli releases finalize ${SENTRY_RELEASE}
+
+    - name: Build Docker image (optional)
+      env:
+        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_RELEASE: ${{ github.sha }}
+        PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
+      run: |
+        IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+        docker build \
+          --tag $IMAGE_TAG \
+          --build-arg SENTRY_DSN="${SENTRY_DSN}" \
+          --build-arg SENTRY_AUTH_TOKEN="${SENTRY_AUTH_TOKEN}" \
+          --build-arg SENTRY_RELEASE="${SENTRY_RELEASE}" \
+          --build-arg PUBLIC_SENTRY_DSN="${PUBLIC_SENTRY_DSN}" \
+          .
+
+    - name: Optionally push Docker image to GitHub Container Registry
+      if: ${{ env.GITHUB_TOKEN != '' && always() }}
+      run: |
+        echo "Skipping automatic push by default — configure PAT or change this step if you want to push images."

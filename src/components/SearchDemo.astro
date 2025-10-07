@@ -1,0 +1,46 @@
+---
+import SearchDemoReact from './SearchDemoReact'
+
+export interface Props {
+  title?: string
+  description?: string
+  className?: string
+}
+
+const {
+  title = 'Search Demo',
+  description = 'Try our advanced search capabilities with this interactive demo',
+  className = '',
+} = Astro.props
+---
+
+<div class={`w-full transition-colors duration-300 ${className}`}>
+  {
+    title && (
+      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+        {title}
+      </h2>
+    )
+  }
+  {
+    description && (
+      <p class="mb-6 text-gray-600 dark:text-gray-400">{description}</p>
+    )
+  }
+
+  <SearchDemoReact client:load />
+</div>
+
+<style>
+  /* Ensure smooth dark mode transitions */
+  :root {
+    --transition-duration: 300ms;
+  }
+
+  .transition-colors {
+    transition:
+      background-color var(--transition-duration) ease-in-out,
+      color var(--transition-duration) ease-in-out,
+      border-color var(--transition-duration) ease-in-out;
+  }
+</style>

@@ -1,0 +1,29 @@
+@keyframes flow {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+}
+
+.flow-animation {
+  animation: flow 1s linear infinite;
+  background-color: #76c7c0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  left: -15px; /* Start just to the left of the arrow */
+}
+
+@media (max-width: 768px) {
+  .pipeline-container {
+    flex-direction: column;
+  }
+  .pipeline-arrow {
+    transform: rotate(90deg);
+  }
+}

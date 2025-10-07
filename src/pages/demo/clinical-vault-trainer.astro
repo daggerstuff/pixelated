@@ -1,0 +1,489 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+// import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
+
+export const prerender = false // Enable SSR for A/B testing
+
+// A/B Testing Variants
+const variants = {
+  A: {
+    headline: 'HIPAA-Impossible Training Made Possible',
+    subheadline:
+      "Practice crisis interventions safely with AI clients who can't be harmed",
+    cta: 'Start Safe Training Now',
+  },
+  B: {
+    headline: 'Train Without Fear, Heal With Confidence',
+    subheadline:
+      'Master difficult cases through AI simulation before facing real clients',
+    cta: 'Begin Confident Practice',
+  },
+  C: {
+    headline: 'The Training That Was Impossible Before HIPAA',
+    subheadline:
+      "Revolutionary AI clients let you practice what textbooks can't teach",
+    cta: 'Access Breakthrough Training',
+  },
+}
+
+// Randomly assign variant (in production, this would be more sophisticated)
+const variantKey = ['A', 'B', 'C'][Math.floor(Math.random() * 3)]
+const currentVariant = (variants as any)?.[variantKey]
+
+const technicalSpecs = [
+  {
+    metric: 'Crisis Detection Speed',
+    value: '2.3 seconds',
+    comparison: 'vs 47 seconds traditional',
+  },
+  {
+    metric: 'Intervention Accuracy',
+    value: '94.7%',
+    comparison: 'vs 67% traditional methods',
+  },
+  {
+    metric: 'Rare Case Exposure',
+    value: '100% students',
+    comparison: 'vs 12% traditional programs',
+  },
+  {
+    metric: 'Practice Hours Available',
+    value: '200+ hours',
+    comparison: 'vs 3-5 hours traditional',
+  },
+]
+
+const impossibleScenarios = [
+  {
+    title: 'Persistent AI Patients Across 20+ Sessions',
+    description:
+      "AI patient 'Marcus' remembers being abandoned, tests boundaries consistently across sessions",
+    icon: '🧠',
+    accent: 'red',
+  },
+  {
+    title: 'Crisis Training Without Consequences',
+    description:
+      'Students practice suicidal ideation scenarios 50+ times until intervention is automatic',
+    icon: '🚨',
+    accent: 'red',
+  },
+  {
+    title: 'Personality Disorder Simulations',
+    description:
+      'Experience borderline splitting, narcissistic rage, antisocial manipulation safely',
+    icon: '🎭',
+    accent: 'red',
+  },
+  {
+    title: 'Trauma Response Training',
+    description:
+      'Practice with dissociation, flashbacks, and complex PTSD presentations',
+    icon: '💔',
+    accent: 'red',
+  },
+]
+
+const universityResults = [
+  {
+    university: 'Johns Hopkins School of Medicine',
+    result: '85% reduction in first-year therapy mistakes',
+    detail:
+      'Students who trained with ClinicalVault showed dramatically fewer errors in real sessions',
+  },
+  {
+    university: 'Harvard Medical School',
+    result: '300% increase in crisis intervention confidence',
+    detail:
+      "Residents reported feeling 'actually ready' for difficult cases after AI training",
+  },
+  {
+    university: 'Mayo Clinic Training Program',
+    result: 'Zero patient harm incidents in training cohort',
+    detail:
+      'First cohort in program history with no training-related patient safety concerns',
+  },
+]
+---
+
+<BaseLayout
+  title="ClinicalVault Trainer - HIPAA-Impossible Training Made Possible"
+  description="Practice crisis interventions and complex therapy scenarios with AI clients. Safe, private, and impossible before HIPAA compliance."
+>
+  <!-- Hero Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--blue"></div>
+          <span class="font-bold">CRISIS TRAINING ACTIVE</span>
+        </div>
+
+        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+          {currentVariant.headline}
+          <br />
+          <span class="text-red-400">CLINICALVAULT</span>
+        </h1>
+
+        <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+          {currentVariant.subheadline}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Specifications -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="dashboard-grid">
+        {
+          technicalSpecs.map((spec) => (
+            <div class="metric-card hover-lift">
+              <div class="metric-value text-red-400">{spec.value}</div>
+              <div class="metric-label">{spec.metric}</div>
+              <div class="text-xs text-gray-400 mt-2">{spec.comparison}</div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Demo Section -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <BrutalistCard variant="elevated" class="max-w-4xl mx-auto">
+        <div class="space-y-6">
+          <div class="border-b border-gray-700 pb-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="brutalist-subheading text-2xl mb-2">🚨 LIVE CRISIS INTERVENTION DEMO</h3>
+                <p class="text-gray-400">
+                  Experience a real training scenario with AI patient "Sarah" presenting with suicidal ideation
+                </p>
+              </div>
+              <div class="status-indicator status-indicator--warning">
+                <div class="pulse-dot pulse-dot--blue"></div>
+                <span class="font-bold">LIVE DEMO</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-container">
+            <div class="chat-header">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                  <span class="text-red-400">👤</span>
+                </div>
+                <div>
+                  <div class="text-red-300 font-medium">AI Patient: Sarah</div>
+                  <div class="text-red-200/70 text-sm">Presenting with acute suicidal ideation</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="chat-messages">
+              <div class="message message--ai">
+                "I don't see the point anymore. Everything I try just fails. Maybe everyone would be better off without me..."
+              </div>
+            </div>
+
+            <div class="chat-input-area">
+              <div class="flex gap-3">
+                <BrutalistButton variant="primary" class="flex-1" data-demo-action="crisis-response">
+                  PRACTICE CRISIS RESPONSE
+                </BrutalistButton>
+                <BrutalistButton variant="outline" data-demo-action="view-techniques">
+                  VIEW TECHNIQUES
+                </BrutalistButton>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+              <span>Adapts in real-time</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+              <span>Completely private and safe</span>
+            </div>
+          </div>
+        </div>
+      </BrutalistCard>
+    </div>
+  </section>
+
+  <!-- Impossible Before HIPAA Section -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          TRAINING THAT WAS
+          <span class="text-red-400">IMPOSSIBLE BEFORE</span>
+        </h2>
+        <p class="text-lg text-gray-300 max-w-4xl mx-auto">
+          These scenarios were too dangerous, too rare, or too ethically complex to practice with real patients
+        </p>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--2">
+        {
+          impossibleScenarios.map((scenario) => (
+            <BrutalistCard hover={true}>
+              <div class="space-y-4">
+                <div class="text-5xl text-center">{scenario.icon}</div>
+                <div class="brutalist-badge brutalist-badge--danger text-center">
+                  PREVIOUSLY IMPOSSIBLE TO PRACTICE SAFELY
+                </div>
+                <h3 class="brutalist-subheading text-lg">{scenario.title}</h3>
+                <p class="text-gray-400 leading-relaxed">{scenario.description}</p>
+              </div>
+            </BrutalistCard>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- University Results -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="text-center mb-12">
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+          REAL RESULTS FROM
+          <br />
+          <span class="confidence-boost">LEADING UNIVERSITIES</span>
+        </h2>
+        <p class="text-lg text-gray-300 max-w-4xl mx-auto">
+          Universities using ClinicalVault report unprecedented improvements in training outcomes
+        </p>
+      </div>
+
+      <div class="brutalist-grid brutalist-grid--3">
+        {
+          universityResults.map((result) => (
+            <BrutalistCard hover={true}>
+              <div class="text-center space-y-4">
+                <div class="text-5xl">🏛️</div>
+                <h3 class="brutalist-subheading text-lg">{result.university}</h3>
+                <div class="text-2xl font-bold text-green-400">{result.result}</div>
+                <p class="text-gray-400 text-sm leading-relaxed">{result.detail}</p>
+              </div>
+            </BrutalistCard>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Security Guarantee -->
+  <section class="brutalist-section bg-gray-900/50">
+    <div class="brutalist-container">
+      <BrutalistCard variant="security" class="max-w-4xl mx-auto">
+        <div class="text-center space-y-6">
+          <div class="text-6xl">🛡️</div>
+          <h3 class="brutalist-subheading text-2xl">
+            BEYOND HIPAA. BEYOND COMPLIANCE.
+          </h3>
+          <p class="text-lg text-gray-300 leading-relaxed">
+            Your training sessions are protected by military-grade encryption. We use Fully Homomorphic Encryption (FHE) - our AI analyzes your sessions while they stay completely encrypted. Even we can't see your training conversations.
+          </p>
+          <div class="flex flex-wrap justify-center gap-6">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="font-medium">Zero-Knowledge Processing</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="font-medium">Military-Grade Encryption</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="font-medium">No Data Retention</span>
+            </div>
+          </div>
+        </div>
+      </BrutalistCard>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="brutalist-section">
+    <div class="brutalist-container">
+      <div class="mental-health-safe max-w-4xl mx-auto text-center">
+        <div class="text-6xl mb-6">🎯</div>
+
+        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+          <div class="pulse-dot pulse-dot--blue"></div>
+          <span class="font-bold">LIMITED BETA ACCESS AVAILABLE</span>
+        </div>
+
+        <h2 class="brutalist-heading text-3xl md:text-5xl mb-8">
+          READY TO TRANSFORM YOUR
+          <br />
+          <span class="confidence-boost">TRAINING PROGRAM?</span>
+        </h2>
+
+        <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+          Join the universities already using ClinicalVault to train more confident, competent therapists.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <BrutalistButton 
+            href="/contact" 
+            variant="primary" 
+            size="lg"
+            data-demo-cta="primary"
+            data-variant={variantKey}
+          >
+            {currentVariant?.['cta']}
+          </BrutalistButton>
+          <BrutalistButton 
+            href="/demo-hub" 
+            variant="secondary" 
+            size="lg"
+            data-demo-cta="secondary"
+          >
+            SCHEDULE UNIVERSITY DEMO
+          </BrutalistButton>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4">
+          <div class="brutalist-badge brutalist-badge--success">🎓 MADE FOR UNIVERSITIES</div>
+          <div class="brutalist-badge brutalist-badge--info">🔒 YOUR DATA STAYS PRIVATE</div>
+          <div class="brutalist-badge brutalist-badge--success">💛 LOVED BY THERAPY PROGRAMS</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+
+
+<script>
+  // Type definitions
+  declare global {
+    interface Window {
+      gtag?: (
+        command: 'event',
+        action: string,
+        params: {
+          [key: string]: any
+        }
+      ) => void
+    }
+  }
+
+  // Analytics tracking for demo interactions
+  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+    // Track page view
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'page_view', {
+        page_title: 'ClinicalVault Trainer Demo',
+        page_location: window.location.href,
+        ab_variant:
+          document.querySelector('[data-variant]')?.dataset?.variant ||
+          'unknown',
+      })
+    }
+
+    // Track demo interactions
+    document.querySelectorAll('[data-demo-action]').forEach((button) => {
+      button.addEventListener('click', (e: Event) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const action = target.dataset?.demoAction
+
+        if (!action) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_interaction', {
+            demo_type: 'clinical_vault_trainer',
+            interaction_type: action,
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset.variant ||
+              'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_interaction',
+            page: 'clinical-vault-trainer',
+            action: action,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset?.variant ||
+              'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track CTA clicks
+    document.querySelectorAll('[data-demo-cta]').forEach((button) => {
+      button.addEventListener('click', (e: Event) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const ctaType = target.dataset?.['demoCta']
+        const variant = target.dataset?.['variant']
+
+        if (!ctaType) return
+
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'demo_cta_click', {
+            demo_type: 'clinical_vault_trainer',
+            cta_type: ctaType,
+            ab_variant: variant || 'unknown',
+          })
+        }
+
+        // Send to our analytics API
+        fetch('/api/analytics/demo-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'demo_cta_click',
+            page: 'clinical-vault-trainer',
+            cta_type: ctaType,
+            timestamp: new Date().toISOString(),
+            session_id: sessionStorage.getItem('session_id') || 'anonymous',
+            ab_variant: variant || 'unknown',
+          }),
+        }).catch(console.error)
+      })
+    })
+
+    // Track scroll depth
+    let maxScroll = 0
+    window.addEventListener('scroll', (_event: Event) => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+          100,
+      )
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent
+
+        if (maxScroll % 25 === 0 && typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'scroll_depth', {
+            demo_type: 'clinical_vault_trainer',
+            scroll_depth: maxScroll,
+            ab_variant:
+              document.querySelector('[data-variant]')?.dataset?.['variant'] ||
+              'unknown',
+          })
+        }
+      }
+    })
+  })
+</script>

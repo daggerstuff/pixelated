@@ -1,0 +1,20 @@
+---
+import type { HeaderProps } from './HeaderReact'
+import HeaderReact from './HeaderReact'
+
+/**
+ * Header component wrapper for the React implementation
+ * @prop {boolean} showThemeToggle - Whether to show the theme toggle button
+ * @prop {boolean} showUserMenu - Whether to show the user menu
+ * @prop {string} position - Position style for the header (fixed, sticky, or static)
+ */
+type Props = Pick<HeaderProps, 'showThemeToggle' | 'showUserMenu' | 'position'>
+
+const {
+  showThemeToggle = true,
+  showUserMenu = true,
+  position = 'fixed',
+} = Astro.props
+---
+
+<HeaderReact client:load {showThemeToggle} {showUserMenu} {position} />

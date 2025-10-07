@@ -1,0 +1,262 @@
+---
+import { getCollection } from 'astro:content'
+import Link from '@/components/base/Link.astro'
+import GithubItem from '@/components/views/GithubItem.astro'
+import { UI } from '@/config'
+import { getUrl } from '@/utils/common'
+import { extractPackageName, matchLogo, processVersion } from '@/utils/data'
+import { formatDate, isDiffMonth } from '@/utils/datetime'
+
+import type { CollectionEntry } from 'astro:content'
+import type { Icon, RepoWithOwner, Url } from '@/types'
+import type { PrSchema, ReleaseSchema } from '@/content/schema'
+
+interface Props {
+  collectionType: 'releases' | 'prs'
+}
+
+type ReleaseData = ReleaseSchema
+type PrData = PrSchema
+
+export type ExtendedReleaseData = ReleaseData & {
+  isInMonorepo: boolean
+  pkgName: string
+  mainLogo: Url | Icon
+  subLogo: Url | Icon | undefined
+  versionType: 'major' | 'minor' | 'patch' | 'pre'
+  versionParts: [string, string]
+  publishedAt: string
+  repoOwner: string
+  repoName: string
+  repoNameWithOwner: string
+  tagName: string
+  versionNum: string
+}
+
+export type ExtendedPrData = PrData & {
+  mainLogo: Url | Icon
+  subLogo: Url | Icon | undefined
+}
+
+const MAX_PER_PKG = 5
+const { collectionType } = Astro.props
+const { monorepos, mainLogoOverrides, subLogoMatches } = UI.githubView
+
+/* Releases */
+let releases: CollectionEntry<'releases'>[] = []
+let extendedReleases: ExtendedReleaseData[] = []
+
+if (collectionType === 'releases') {
+  try {
+    releases = await getCollection(collectionType)
+    const pkgCountMap: Record<string, number> = {}
+
+    // Get all releases from all items
+    const allReleases = releases.flatMap((item) => {
+      const releasesData = item.data.projects.releases || []
+      return releasesData
+    })
+
+    // Process each release
+    extendedReleases = allReleases
+      .map((release: ReleaseData): ExtendedReleaseData => {
+        // Extract repo details from the link or generate defaults
+        const repoInfo =
+          release.link?.match(/github\.com\/([^/]+)\/([^/]+)/) || []
+        const repoOwner = repoInfo[1] || 'unknown'
+        // Explicitly cast to the correct type with only the properties that exist
+        const typedRelease = release as {
+          link: string
+          desc: string
+          id: string
+          icon: string
+          publishedAt?: string
+        }
+        const repoName = repoInfo[2] || typedRelease.id || ''
+        const repoNameWithOwner = `${repoOwner}/${repoName}`
+
+        // Extract version from id instead of name
+        const versionMatch = (typedRelease.id || '').match(
+          /v?(\d+\.\d+\.\d+(?:-[\w.]+)?)/,
+        ) || ['', '0.0.0']
+        const versionNum = versionMatch[1]
+        const tagName = `${typedRelease.id || ''}@${versionNum}`
+
+        const isInMonorepo = monorepos.includes(
+          repoNameWithOwner as RepoWithOwner,
+        )
+        const pkgName = isInMonorepo ? extractPackageName(tagName) : repoName
+
+        const mainLogo =
+          matchLogo((pkgName || '') as string, mainLogoOverrides) ||
+          `https://github.com/${repoOwner}.png`
+        const subLogo = matchLogo((pkgName || '') as string, subLogoMatches)
+
+        const [versionType, ...versionParts] = processVersion(versionNum || '0.0.0')
+
+        // Use current date if publishedAt is not available
+        const currentDate = new Date().toISOString()
+        const publishedAt = typedRelease.publishedAt || currentDate
+
+        return {
+          ...typedRelease,
+          repoOwner,
+          repoName,
+          repoNameWithOwner,
+          versionNum,
+          tagName,
+          isInMonorepo,
+          pkgName,
+          mainLogo,
+          subLogo,
+          versionType,
+          versionParts: versionParts as [string, string],
+          publishedAt,
+        }
+      })
+      // filters releases to ensure each pkg has no more than a specified maximum number
+      .filter((item) => {
+        if ((pkgCountMap[item.pkgName] || 0) < MAX_PER_PKG) {
+          pkgCountMap[item.pkgName] = (pkgCountMap[item.pkgName] || 0) + 1
+          return true
+        }
+        return false
+      })
+      .sort((a, b) => {
+        return +new Date(b.publishedAt) - +new Date(a.publishedAt)
+      })
+  } catch (error) {
+    console.error('Error processing releases:', error)
+    extendedReleases = []
+  }
+}
+
+/* PRs */
+let prs: CollectionEntry<'prs'>[] = []
+let extendedPrs: ExtendedPrData[] = []
+
+if (collectionType === 'prs') {
+  try {
+    prs = await getCollection(collectionType)
+
+    // Get PRs from the nested structure
+    const allPrs = prs.flatMap((item) => item.data.projects.pull_requests || [])
+
+    extendedPrs = allPrs
+      .filter(
+        (item) =>
+          item.state !== 'CLOSED' &&
+          !item.isDraft &&
+          !/\b(?:chore|docs|i18n)\b/.test(item.title),
+      )
+      .map((item): ExtendedPrData => {
+        const mainLogo =
+          matchLogo((item.repository.name || '') as string, mainLogoOverrides) ||
+          `https://github.com/${item.repository.owner.login}.png`
+        const subLogo = matchLogo((item.repository.name || '') as string, subLogoMatches)
+
+        return {
+          ...item,
+          mainLogo,
+          subLogo,
+        }
+      })
+      .sort((a, b) => {
+        return +new Date(b.createdAt) - +new Date(a.createdAt)
+      })
+  } catch (error) {
+    console.error('Error processing PRs:', error)
+    extendedPrs = []
+  }
+}
+---
+
+<div
+  class="flex flex-col gap-8 lt-sm:gap-6 mt-16.8"
+  role="feed"
+  aria-label={`GitHub ${collectionType}`}
+>
+  {
+    collectionType === 'releases' && extendedReleases.length > 0 ? (
+      extendedReleases.map((item, idx) => (
+        <GithubItem
+          collectionType={collectionType}
+          idx={idx}
+          item={item}
+          isDiffMonth={isDiffMonth(
+            item.publishedAt,
+            extendedReleases[idx - 1]?.publishedAt,
+          )}
+        />
+      ))
+    ) : collectionType === 'releases' ? (
+      <p class="text-center op-50" role="status">
+        No releases found
+      </p>
+    ) : null
+  }
+  {
+    collectionType === 'prs' && extendedPrs.length > 0 ? (
+      extendedPrs.map((item, idx) => (
+        <GithubItem
+          collectionType={collectionType}
+          idx={idx}
+          item={item}
+          isDiffMonth={isDiffMonth(
+            item.createdAt,
+            extendedPrs[idx - 1]?.createdAt,
+          )}
+        />
+      ))
+    ) : collectionType === 'prs' ? (
+      <p class="text-center op-50" role="status">
+        No pull requests found
+      </p>
+    ) : null
+  }
+</div>
+
+<div
+  class="prose flex flex-col items-center mx-a op-50 text-center text-3.75! lt-sm:text-sm!"
+  role="contentinfo"
+>
+  <hr class="mt-3em!" />
+  <p class="flex lt-sm:flex-col items-center my-0! lt-sm:my-1.5!">
+    <span>
+      Last fetched:
+      <time
+        class="inline-block text-[var(--fg-deeper)]"
+        datetime={new Date().toISOString()}
+        title={new Date().toISOString()}
+      >
+        {formatDate(new Date(), false)}
+      </time>
+    </span>
+    <span class="lt-sm:hidden">&nbsp;|&nbsp;</span>
+    <span>
+      Scheduled refresh:
+      <span class="text-[var(--fg-deeper)]">Every Saturday</span>
+    </span>
+  </p>
+  <p class="my-0! lt-sm:my-1.5!">
+    See
+    <Link
+      class="op-100!"
+      href={getUrl('/blog/customizing-github-activity-pages/')}
+    >
+      Customizing GitHub Activity Pages
+    </Link>
+    to configure your own
+  </p>
+  <p class="my-0! lt-sm:my-1.5!">
+    Inspired by
+    <Link
+      class="op-100!"
+      href={collectionType === 'releases'
+        ? 'https://releases.antfu.me/'
+        : 'https://prs.atinux.com/'}
+    >
+      {collectionType === 'releases' ? 'releases.antfu.me' : 'prs.atinux.com'}
+    </Link>
+  </p>
+</div>

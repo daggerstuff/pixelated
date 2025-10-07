@@ -1,0 +1,86 @@
+---
+export const prerender = false
+
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { ClientRouter } from 'astro:transitions'
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import EmotionDimensionalAnalysis from '@/components/dashboard/EmotionDimensionalAnalysis'
+import { requirePageAuth } from '@/lib/auth/serverAuth'
+import type { AstroCookies } from 'astro'
+// Ensure user is authenticated
+const result = await requirePageAuth(
+  Astro as unknown as {
+    request: Request
+    cookies: AstroCookies
+    redirect: (path: string) => Response
+    locals: Record<string, unknown>
+  },
+)
+if (result instanceof Response) {
+  return result
+}
+
+// Assert the user type
+type AuthUser = { id: string; [key: string]: any }
+const user = (Astro as unknown as { locals: { user: AuthUser | undefined } })
+  .locals.user as AuthUser
+
+// Page metadata
+const pageTitle = 'Dimensional Emotion Analysis'
+const pageDescription =
+  'Analyze emotions in multi-dimensional space using valence, arousal, and dominance dimensions'
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <ClientRouter />
+
+  <DashboardLayout>
+    <div class="p-6">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+          {pageTitle}
+        </h1>
+        <p class="text-gray-600">
+          {pageDescription}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+          About Multi-dimensional Emotion Mapping
+        </h2>
+
+        <div class="prose max-w-none">
+          <p>
+            Multi-dimensional emotion mapping uses established psychological
+            models to represent emotions in a three-dimensional space:
+          </p>
+
+          <ul>
+            <li>
+              <strong>Valence</strong>: The pleasure-displeasure dimension
+              (positive vs. negative feelings)
+            </li>
+            <li>
+              <strong>Arousal</strong>: The activation-deactivation dimension
+              (energized vs. calm)
+            </li>
+            <li>
+              <strong>Dominance</strong>: The control dimension (feeling in
+              control vs. feeling controlled)
+            </li>
+          </ul>
+
+          <p>
+            This approach provides a richer understanding of emotional states
+            beyond basic emotion categories. It helps identify patterns,
+            transitions, and relationships between different emotional
+            dimensions.
+          </p>
+        </div>
+      </div>
+
+      <EmotionDimensionalAnalysis client:load userId={user.id} />
+    </div>
+  </DashboardLayout>
+</BaseLayout>

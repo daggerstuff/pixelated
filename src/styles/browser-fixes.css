@@ -1,0 +1,99 @@
+/* Safari-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Fix for iOS Safari viewport height issue */
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+
+  /* Fix for Safari sticky positioning */
+  .sticky {
+    position: -webkit-sticky;
+  }
+
+  /* Fix for Safari flexbox gap */
+  .flex {
+    gap: var(--flex-gap, 0);
+  }
+
+  /* Fix for Safari scrolling momentum */
+  .scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix for Safari input styling */
+  input[type='search'] {
+    -webkit-appearance: none;
+  }
+}
+
+/* Mobile browser fixes */
+@media (max-width: 768px) {
+  /* Fix for mobile browser address bar resizing */
+  html,
+  body {
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Fix for mobile browser tap highlight */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fix for mobile browser font sizing */
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Fix for mobile browser form elements */
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevents zoom on focus in iOS */
+  }
+
+  /* Fix for mobile browser button active state */
+  button:active {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+}
+
+/* iOS PWA fixes */
+@media all and (display-mode: standalone) {
+  /* Fix for PWA status bar */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Fix for iOS momentum scrolling */
+.overflow-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for iOS rubber band effect */
+html {
+  overscroll-behavior-y: none;
+}
+
+/* Fix for mobile browser hover states */
+@media (hover: hover) {
+  .hover\:opacity-80:hover {
+    opacity: 0.8;
+  }
+}
+
+/* Fix for mobile browser focus states */
+@media (hover: none) {
+  .focus\:opacity-80:focus {
+    opacity: 0.8;
+  }
+}
+
+/* Fix for mobile browser keyboard appearing */
+.fixed {
+  position: fixed !important;
+}

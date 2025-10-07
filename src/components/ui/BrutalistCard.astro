@@ -1,0 +1,34 @@
+---
+export interface Props {
+  variant?: 'default' | 'elevated' | 'therapy' | 'security';
+  class?: string;
+  hover?: boolean;
+}
+
+const { 
+  variant = 'default',
+  class: className = '',
+  hover = true
+} = Astro.props;
+
+const baseClasses = 'brutalist-card';
+const variantClasses = {
+  default: '',
+  elevated: 'bg-gray-800 border-gray-600',
+  therapy: 'therapy-session-card',
+  security: 'bg-blue-900/20 border-blue-700'
+};
+
+const hoverClasses = hover ? 'hover-lift' : '';
+
+const classes = [
+  baseClasses,
+  variantClasses[variant],
+  hoverClasses,
+  className
+].filter(Boolean).join(' ');
+---
+
+<div class={classes}>
+  <slot />
+</div>

@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-01-01T00:00:00Z",
+    "description": "Test psychology training data for demo pipeline",
+    "totalItems": 50
+  },
+  "categories": [
+    {
+      "id": "anxiety-disorders",
+      "name": "Anxiety Disorders",
+      "items": [
+        {
+          "id": "anxiety-001",
+          "content": "Client presents with persistent worry and physical symptoms of anxiety including rapid heartbeat and sweating.",
+          "intervention": "Cognitive behavioral therapy focusing on thought restructuring and relaxation techniques.",
+          "outcome": "Significant reduction in anxiety symptoms after 12 sessions.",
+          "tags": ["generalized-anxiety", "CBT", "somatic-symptoms"]
+        },
+        {
+          "id": "anxiety-002",
+          "content": "Patient experiences panic attacks with intense fear and physical discomfort lasting 10-15 minutes.",
+          "intervention": "Panic-focused CBT with exposure therapy and breathing exercises.",
+          "outcome": "Decreased frequency of panic attacks from daily to weekly occurrences.",
+          "tags": ["panic-disorder", "exposure-therapy", "breathing-techniques"]
+        }
+      ]
+    },
+    {
+      "id": "mood-disorders",
+      "name": "Mood Disorders",
+      "items": [
+        {
+          "id": "mood-001",
+          "content": "Client reports persistent sadness, loss of interest in activities, and sleep disturbances for 6 weeks.",
+          "intervention": "Combination of cognitive therapy and behavioral activation techniques.",
+          "outcome": "Gradual improvement in mood and activity level over 8 weeks of treatment.",
+          "tags": ["major-depression", "behavioral-activation", "sleep-hygiene"]
+        },
+        {
+          "id": "mood-002",
+          "content": "Patient exhibits alternating periods of elevated mood and depression with impaired functioning.",
+          "intervention": "Mood stabilization therapy with psychoeducation and lifestyle modifications.",
+          "outcome": "Stabilized mood episodes with improved medication compliance.",
+          "tags": ["bipolar-disorder", "psychoeducation", "mood-tracking"]
+        }
+      ]
+    },
+    {
+      "id": "trauma-ptsd",
+      "name": "Trauma & PTSD",
+      "items": [
+        {
+          "id": "trauma-001",
+          "content": "Veteran presents with intrusive memories, nightmares, and hypervigilance following combat exposure.",
+          "intervention": "Trauma-focused CBT with EMDR processing of traumatic memories.",
+          "outcome": "Reduced PTSD symptoms and improved sleep quality after 16 sessions.",
+          "tags": ["combat-trauma", "EMDR", "hypervigilance", "nightmares"]
+        },
+        {
+          "id": "trauma-002",
+          "content": "Survivor of childhood abuse exhibits dissociative symptoms and emotional dysregulation.",
+          "intervention": "Phase-oriented trauma treatment with grounding techniques and emotional regulation skills.",
+          "outcome": "Decreased dissociative episodes and improved emotional stability.",
+          "tags": [
+            "childhood-trauma",
+            "dissociation",
+            "emotional-regulation",
+            "grounding"
+          ]
+        }
+      ]
+    }
+  ],
+  "qualityMetrics": {
+    "validationScore": 92,
+    "clinicalAccuracy": 89,
+    "ethicalCompliance": 95,
+    "formatConsistency": 88
+  },
+  "processingStats": {
+    "totalProcessingTime": 45.2,
+    "averageItemTime": 0.904,
+    "successRate": 98.0,
+    "errorCount": 1
+  }
+}
