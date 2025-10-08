@@ -1,0 +1,18 @@
+[
+  {
+    "text": "When someone has narcissistic traits, they often use manipulation and gaslighting to control others. This creates significant trauma for their victims who may struggle with self-doubt and confusion.",
+    "style": "therapeutic",
+    "confidence": 0.85,
+    "quality": 0.75,
+    "source": "tim_fletcher",
+    "file": "narcissism_and_trauma.txt"
+  },
+  {
+    "text": "Interviewer: How can somebody begin to heal from childhood trauma. Tim Fletcher: Well, that's a huge question because unfortunately, most people don't realize the depth of their childhood wounds.",
+    "style": "therapeutic",
+    "confidence": 0.92,
+    "quality": 0.68,
+    "source": "tim_fletcher",
+    "file": "childhood_trauma_interview.txt"
+  }
+]

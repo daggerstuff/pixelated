@@ -1,0 +1,54 @@
+{
+  "model_config": {
+    "base_model": "microsoft/DialoGPT-medium",
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "v_proj",
+      "k_proj",
+      "o_proj"
+    ]
+  },
+  "training_config": {
+    "num_experts": 4,
+    "batch_size": 8,
+    "learning_rate": 0.0005,
+    "num_epochs": 3,
+    "max_length": 1024,
+    "gradient_accumulation_steps": 4,
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01,
+    "save_steps": 100,
+    "eval_steps": 100,
+    "logging_steps": 10
+  },
+  "data_config": {
+    "train_file": "train.json",
+    "validation_file": "validation.json",
+    "expert_files": {
+      "expert_therapeutic": "expert_therapeutic.json",
+      "expert_educational": "expert_educational.json",
+      "expert_empathetic": "expert_empathetic.json",
+      "expert_practical": "expert_practical.json"
+    }
+  },
+  "expert_mapping": {
+    "therapeutic": 0,
+    "educational": 1,
+    "empathetic": 2,
+    "practical": 3
+  },
+  "dataset_stats": {
+    "total_conversations": 2,
+    "train_conversations": 1,
+    "validation_conversations": 1,
+    "expert_distribution": {
+      "therapeutic": 2,
+      "educational": 0,
+      "empathetic": 0,
+      "practical": 0
+    }
+  }
+}

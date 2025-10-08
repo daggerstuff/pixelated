@@ -1,0 +1,74 @@
+[
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "I'm struggling with trauma and healing. Can you help me understand what's happening?"
+      },
+      {
+        "from": "gpt",
+        "value": "When someone has narcissistic traits, they often use manipulation and gaslighting to control others. This creates significant trauma for their victims who may struggle with self-doubt and confusion."
+      }
+    ],
+    "expert_id": 0,
+    "style": "therapeutic",
+    "quality": 0.75,
+    "source": "tim_fletcher",
+    "metadata": {
+      "confidence": 0.85,
+      "file": "narcissism_and_trauma.txt",
+      "expert_name": "therapeutic",
+      "analysis": {
+        "content_type": "monologue",
+        "content_confidence": 0.3,
+        "question_confidence": 0.0,
+        "semantic_coherence": 0.0,
+        "overall_confidence": 0.075,
+        "generation_method": "contextual",
+        "transition_markers": [],
+        "processing_notes": [
+          "Low confidence - may need manual review",
+          "No clear question found - may be monologue/speech format",
+          "Potential semantic mismatch between question and response"
+        ]
+      }
+    },
+    "computed_quality": 0.155
+  },
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "How can somebody begin to heal from childhood trauma?"
+      },
+      {
+        "from": "gpt",
+        "value": "Interviewer: How can somebody begin to heal from childhood trauma. Tim Fletcher: Well, that's a huge question because unfortunately, most people don't realize the depth of their childhood wounds."
+      }
+    ],
+    "expert_id": 0,
+    "style": "therapeutic",
+    "quality": 0.68,
+    "source": "tim_fletcher",
+    "metadata": {
+      "confidence": 0.92,
+      "file": "childhood_trauma_interview.txt",
+      "expert_name": "therapeutic",
+      "analysis": {
+        "content_type": "interview",
+        "content_confidence": 0.7,
+        "question_confidence": 0.7999999999999999,
+        "semantic_coherence": 0.6000000000000001,
+        "overall_confidence": 0.625,
+        "generation_method": "extracted",
+        "transition_markers": [
+          "that's a huge question",
+          "unfortunately",
+          "well"
+        ],
+        "processing_notes": []
+      }
+    },
+    "computed_quality": 0.634
+  }
+]
