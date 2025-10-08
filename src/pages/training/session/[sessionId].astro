@@ -1,0 +1,486 @@
+---
+// Pixelated Empathy Training Session - Individual Session Page
+// Integrates with existing Astro architecture for immersive training experience
+
+import Layout from '@/layouts/Layout.astro';
+import { getSession } from '@/lib/auth';
+
+const { sessionId } = Astro.params;
+const session = await getSession(Astro.request);
+
+if (!session) {
+  return Astro.redirect('/auth/login');
+}
+
+// Get session data from API
+const sessionData = await fetch(`${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`, {
+  headers: { Authorization: `Bearer ${session.accessToken}` }
+}).then(res => res.json()).catch(() => null);
+
+if (!sessionData) {
+  return Astro.redirect('/training?error=session-not-found');
+}
+
+const userRole = session.user.role;
+const isTrainee = userRole === 'trainee';
+const isSupervisor = userRole === 'supervisor';
+---
+
+<Layout 
+  title={`Training Session - ${sessionData.clientProfile.name}`}
+  description="Immersive therapeutic training session with AI client simulation"
+>
+  <!-- Load required scripts for real-time functionality -->
+  <script src="/js/socket.io.min.js"></script>
+  <script src="/js/training-session.js" type="module"></script>
+
+  <main class="h-screen flex flex-col bg-gray-50">
+    <!-- Session Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <button 
+            id="back-button"
+            class="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Back to Training
+          </button>
+          
+          <div class="h-6 border-l border-gray-300"></div>
+          
+          <div>
+            <h1 class="text-xl font-semibold text-gray-900">
+              Training Session: {sessionData.clientProfile.name}
+            </h1>
+            <p class="text-sm text-gray-600">
+              {sessionData.clientProfile.personalityType} • Level {sessionData.difficultyLevel}
+            </p>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- Session Timer -->
+          <div class="flex items-center space-x-2 text-sm text-gray-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span id="session-timer">00:00</span>
+          </div>
+          
+          <!-- Emergency Button -->
+          <button 
+            id="emergency-button"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          >
+            🚨 Emergency
+          </button>
+          
+          <!-- Session Controls -->
+          <div class="flex items-center space-x-2">
+            <button 
+              id="pause-session"
+              class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-md text-sm transition-colors"
+            >
+              ⏸️ Pause
+            </button>
+            <button 
+              id="end-session"
+              class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm transition-colors"
+            >
+              ⏹️ End
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Training Interface -->
+    <div class="flex-1 flex overflow-hidden">
+      
+      {/* Trainee Interface */}
+      {isTrainee && (
+        <div class="flex-1 flex">
+          <!-- Left Sidebar: Client Info & Avatar -->
+          <aside class="w-80 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Client Information Panel -->
+            <div class="p-6 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Client Information</h2>
+              
+              <div class="space-y-4">
+                <div>
+                  <label class="text-sm font-medium text-gray-600">Demographics</label>
+                  <p class="text-sm text-gray-900">
+                    {sessionData.clientProfile.age} year old {sessionData.clientProfile.gender}
+                  </p>
+                </div>
+                
+                <div>
+                  <label class="text-sm font-medium text-gray-600">Presenting Problem</label>
+                  <p class="text-sm text-gray-900">
+                    {sessionData.clientProfile.presentingProblem}
+                  </p>
+                </div>
+                
+                <div>
+                  <label class="text-sm font-medium text-gray-600">Key Triggers</label>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    {sessionData.clientProfile.triggers?.map((trigger: string) => (
+                      <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                        {trigger}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="text-sm font-medium text-gray-600">Strengths</label>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    {sessionData.clientProfile.strengths?.map((strength: string) => (
+                      <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                        {strength}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Emotional Avatar -->
+            <div class="p-6 border-b border-gray-200">
+              <h3 class="text-md font-semibold text-gray-900 mb-4">Client State</h3>
+              
+              <div class="text-center mb-4">
+                <div 
+                  id="client-avatar"
+                  class="w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-blue-300 transition-all duration-1000"
+                >
+                  <span class="text-4xl" id="avatar-emotion">😐</span>
+                </div>
+                
+                <div id="emotional-state" class="text-sm font-medium text-gray-600 mb-2">
+                  Neutral
+                </div>
+              </div>
+              
+              <!-- State Meters -->
+              <div class="space-y-3">
+                <div>
+                  <div class="flex justify-between text-xs text-gray-600 mb-1">
+                    <span>Trust Level</span>
+                    <span id="trust-percentage">0%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      id="trust-meter"
+                      class="bg-green-500 h-2 rounded-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between text-xs text-gray-600 mb-1">
+                    <span>Resistance Level</span>
+                    <span id="resistance-percentage">0%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      id="resistance-meter"
+                      class="bg-red-500 h-2 rounded-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between text-xs text-gray-600 mb-1">
+                    <span>Crisis Risk</span>
+                    <span id="crisis-percentage">0%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      id="crisis-meter"
+                      class="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Nonverbal Cues -->
+            <div class="p-6 flex-1">
+              <h3 class="text-md font-semibold text-gray-900 mb-4">Nonverbal Cues</h3>
+              
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="font-medium text-gray-600">Body Language:</span>
+                  <span id="body-language" class="ml-2 text-gray-900">Neutral posture</span>
+                </div>
+                <div>
+                  <span class="font-medium text-gray-600">Voice Tone:</span>
+                  <span id="voice-tone" class="ml-2 text-gray-900">Normal tone</span>
+                </div>
+                <div>
+                  <span class="font-medium text-gray-600">Eye Contact:</span>
+                  <span id="eye-contact" class="ml-2 text-gray-900">Appropriate</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+          
+          <!-- Center: Conversation Interface -->
+          <div class="flex-1 flex flex-col">
+            <!-- Conversation Area -->
+            <div class="flex-1 flex flex-col bg-white">
+              <!-- Messages Container -->
+              <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <!-- Messages will be populated by JavaScript -->
+                <div class="text-center text-gray-500 py-8">
+                  <p>Session starting... The client will begin speaking shortly.</p>
+                </div>
+              </div>
+              
+              <!-- Message Composer -->
+              <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="flex flex-col space-y-3">
+                  <!-- Intervention Type Selector -->
+                  <div class="flex items-center space-x-4">
+                    <label class="text-sm font-medium text-gray-700">Response Type:</label>
+                    <select 
+                      id="intervention-type"
+                      class="text-sm border border-gray-300 rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="reflection">Reflection</option>
+                      <option value="empathy">Empathy</option>
+                      <option value="inquiry">Open-ended Question</option>
+                      <option value="clarification">Clarification</option>
+                      <option value="interpretation">Interpretation</option>
+                      <option value="confrontation">Therapeutic Confrontation</option>
+                    </select>
+                    
+                    <button 
+                      id="suggestions-button"
+                      class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 transition-colors"
+                    >
+                      💡 Get Suggestions
+                    </button>
+                  </div>
+                  
+                  <!-- Message Input -->
+                  <div class="flex space-x-3">
+                    <div class="flex-1">
+                      <textarea
+                        id="message-input"
+                        placeholder="Type your therapeutic response..."
+                        class="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        rows="3"
+                      ></textarea>
+                      
+                      <!-- Input Assistance -->
+                      <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                        <span>
+                          Quality: <span id="response-quality" class="font-medium">Good</span>
+                        </span>
+                        <span id="character-count">0/1000</span>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      id="send-message"
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center"
+                      disabled
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Sidebar: Feedback Panel -->
+          <aside class="w-80 bg-white border-l border-gray-200 flex flex-col">
+            <!-- Real-time Feedback -->
+            <div class="p-6 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Real-time Guidance</h2>
+              
+              <!-- Skill Meters -->
+              <div class="space-y-4">
+                <div>
+                  <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Rapport Building</span>
+                    <span id="rapport-score">0/5</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      id="rapport-progress"
+                      class="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Active Listening</span>
+                    <span id="listening-score">0/5</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      id="listening-progress"
+                      class="bg-green-500 h-2 rounded-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Empathy</span>
+                    <span id="empathy-score">0/5</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      id="empathy-progress"
+                      class="bg-purple-500 h-2 rounded-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Live Feedback -->
+            <div class="p-6 border-b border-gray-200">
+              <h3 class="text-md font-semibold text-gray-900 mb-4">Live Feedback</h3>
+              <div id="feedback-messages" class="space-y-2 text-sm">
+                <p class="text-gray-500">Feedback will appear here as you interact with the client.</p>
+              </div>
+            </div>
+            
+            <!-- Crisis Alerts -->
+            <div id="crisis-alerts" class="hidden p-6 bg-red-50 border-b border-red-200">
+              <h3 class="text-md font-semibold text-red-900 mb-2">⚠️ Crisis Alert</h3>
+              <div id="crisis-message" class="text-sm text-red-800"></div>
+            </div>
+            
+            <!-- Session Notes -->
+            <div class="flex-1 p-6">
+              <h3 class="text-md font-semibold text-gray-900 mb-4">Session Notes</h3>
+              <textarea
+                id="session-notes"
+                placeholder="Add your reflections and observations..."
+                class="w-full h-32 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              ></textarea>
+            </div>
+          </aside>
+        </div>
+      )}
+      
+      {/* Supervisor Interface */}
+      {isSupervisor && (
+        <div class="flex-1">
+          <!-- Supervisor dashboard will be loaded here -->
+          <div id="supervisor-dashboard"></div>
+        </div>
+      )}
+    </div>
+  </main>
+
+  <!-- Hidden data for JavaScript -->
+  <script type="application/json" id="session-data">
+    {JSON.stringify(sessionData)}
+  </script>
+  
+  <script type="application/json" id="user-data">
+    {JSON.stringify({ role: userRole, id: session.user.id })}
+  </script>
+</Layout>
+
+<style>
+  /* Custom styles for training session */
+  .message-bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .message-therapist {
+    background: #3b82f6;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+  }
+  
+  .message-client {
+    background: #f3f4f6;
+    color: #1f2937;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+  }
+  
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    color: #6b7280;
+  }
+  
+  .typing-dots {
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .typing-dots span {
+    height: 8px;
+    width: 8px;
+    background: #9ca3af;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 2px;
+    animation: typing 1.4s infinite;
+  }
+  
+  .typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes typing {
+    0%, 60%, 100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  /* Responsive design */
+  @media (max-width: 1024px) {
+    aside {
+      width: 20rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .flex {
+      flex-direction: column;
+    }
+    
+    aside {
+      width: 100%;
+      height: auto;
+      max-height: 40vh;
+    }
+  }
+</style>

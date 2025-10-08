@@ -163,6 +163,8 @@ kilo-code-settings.json
 .qoder/
 .augment/
 backups/
+backup-drive.sh
+
 # Sentry Config File
 .env.sentry-build-plugin
 
