@@ -1,5 +1,5 @@
 {
-  "name": "amazon_q_default",
+  "name": "q_ide_default",
   "description": "Default agent configuration",
   "mcpServers": {
     "OpenMemory": {
@@ -56,7 +56,7 @@
   ],
   "prompt": "",
   "toolAliases": {},
-  "useLegacyMcpJson": false,
+  "useLegacyMcpJson": true,
   "hooks": {
     "agentSpawn": [],
     "userPromptSubmit": []
