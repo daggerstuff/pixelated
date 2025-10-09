@@ -642,13 +642,18 @@ deploy-gke:
   allow_failure: true
   timeout: 20m
 
-# Override container scanning to ensure it runs after build
-container_scanning:
-  needs:
-    - build-frontend
-
 # Include GitLab security templates
 include:
 - template: Security/SAST.gitlab-ci.yml
 - template: Security/Dependency-Scanning.gitlab-ci.yml
 - template: Security/Container-Scanning.gitlab-ci.yml
+
+# Override container_scanning from included templates to make build-frontend optional
+container_scanning:
+  needs:
+  - job: build-frontend
+    optional: true
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_MERGE_REQUEST_ID
