@@ -51,7 +51,10 @@
   "containerization": "Docker 24+",
   "orchestration": "Kubernetes 1.27+",
   "deployment": "Helm 3.12+",
-  "monitoring": "Prometheus + Grafana"
+  "monitoring": "Prometheus + Grafana",
+  "load_balancer": "Traefik 3.0+",
+  "service_mesh": "Istio (optional)",
+  "health_checks": "Custom health endpoints + Kubernetes probes"
 }
 ```
 
@@ -121,11 +124,20 @@ pixelated/
 │   │   └── ai/            # AI and ML services
 │   │       └── bias-detection/
 │   ├── pages/             # Route pages
+│   │   └── api/           # API routes
+│   │       ├── health/    # Health check endpoints
+│   │       └── bias-analysis/ # Bias analysis API
 │   └── utils/             # Utility functions
 ├── ai/                    # Python AI services
 ├── docker/                # Docker configurations
+│   ├── traefik/           # Traefik load balancer config
+│   ├── prometheus/        # Prometheus monitoring
+│   └── alertmanager/      # Alert management
+├── k8s/                   # Kubernetes manifests
+│   └── production/        # Production deployments
 ├── helm/                  # Kubernetes Helm charts
 ├── scripts/               # Build and utility scripts
+│   └── monitor-k8s-health.sh # Cluster health monitoring
 ├── memory-bank/           # Cline Memory Bank files
 └── config files...        # Various config files
 ```
@@ -176,12 +188,45 @@ docker run -p 3000:3000 pixelated
 - Database query performance
 - AI model inference times
 - User session analytics
+- Health check endpoint performance (`/api/health/simple`, `/api/health`)
 
 ### Infrastructure Monitoring
 - System resource usage (CPU, Memory, Disk)
 - Container health checks
 - Network performance
 - Security events
+- Kubernetes pod health and restart counts
+- Traefik load balancer metrics
+
+### Health Check Endpoints
+```typescript
+// Simple health check - basic status
+GET /api/health/simple
+// Returns: { status: 'ok', timestamp: '2025-10-10T13:00:00.000Z' }
+
+// Advanced health check - detailed diagnostics
+GET /api/health
+// Returns: {
+//   status: 'healthy',
+//   timestamp: '2025-10-10T13:00:00.000Z',
+//   uptime: 3600,
+//   services: {
+//     database: 'connected',
+//     redis: 'connected',
+//     bias_detection: 'operational'
+//   },
+//   metrics: {
+//     memory: { used: 125MB, total: 512MB },
+//     cpu: { usage: '15%' }
+//   }
+// }
+```
+
+### Kubernetes Health Probes
+- **Liveness Probes**: Container health monitoring
+- **Readiness Probes**: Service availability checks
+- **Startup Probes**: Initial container startup validation
+- **Custom Monitoring Scripts**: Cluster health assessment tools
 
 ### Logging Strategy
 - Structured JSON logging

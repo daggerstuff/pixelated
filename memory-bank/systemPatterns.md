@@ -10,10 +10,12 @@ Pixelated follows a microservices architecture with the following components:
 - **Style Approach**: Tailwind CSS or Angular Material
 
 ### Backend Services
-- **API Gateway**: Node.js/Express with TypeScript
+- **API Gateway**: Node.js/Express with TypeScript (Astro SSR)
 - **Microservices**: Python (FastAPI/Flask) for AI services
 - **Database Layer**: PostgreSQL primary, MongoDB for documents, Redis for caching
 - **Message Queue**: RabbitMQ or Redis streams
+- **Health Monitoring**: Custom health endpoints with detailed diagnostics
+- **Load Balancing**: Traefik reverse proxy with dynamic configuration
 
 ### AI/ML Layer
 - **Bias Detection Engine**: Custom Python service with TensorFlow/PyTorch, Fairlearn, SHAP/LIME
@@ -35,6 +37,11 @@ Pixelated follows a microservices architecture with the following components:
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   PostgreSQL   │    │     Redis      │    │     MongoDB    │
 │ (Relational)   │    │   (Cache)      │    │ (Document)     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         ▼                        ▼                         ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Traefik LB   │    │   Prometheus   │    │   Health Check │
+│ (Load Balancer)│    │  (Monitoring)  │    │   Endpoints    │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -84,10 +91,17 @@ class BiasDetectionService {
 ## Data Flow Patterns
 
 ### Request Flow
-1. User request → API Gateway
-2. Authenticate and validate request
-3. Route to appropriate microservice
-4. Process request and return response
+1. User request → Traefik Load Balancer
+2. Route to API Gateway (Astro SSR)
+3. Authenticate and validate request
+4. Route to appropriate microservice
+5. Process request and return response
+
+### Health Check Flow
+1. Kubernetes/Traefik → Health Check Endpoint
+2. Service status validation (database, cache, AI services)
+3. Response with health status and metrics
+4. Monitoring system processes results
 
 ### Event Flow
 1. State change triggers event
@@ -139,9 +153,16 @@ class AppError extends Error {
 - TypeScript interfaces for compile-time checking
 - SQL injection prevention with parameterized queries
 - XSS prevention with content sanitization
+- HIPAA compliance validation for healthcare data
 
 ### Authentication & Authorization
 - JWT tokens with refresh mechanism
 - Role-based access control (RBAC)
 - API key authentication for services
 - OAuth2 integration for third-party login
+
+### Health Check Security
+- Health endpoints exposed for monitoring
+- No sensitive data in health responses
+- Rate limiting on health endpoints
+- Network policies for health check access
