@@ -1,0 +1,27 @@
+{
+  "name": "pixelated-integration-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for Pixelated bias detection system",
+  "type": "module",
+  "scripts": {
+    "test": "node integration-test-runner.ts",
+    "test:watch": "node integration-test-runner.ts --watch",
+    "test:ci": "node integration-test-runner.ts --ci",
+    "test:performance": "node integration-test-runner.ts --performance",
+    "test:health": "node integration-test-runner.ts --health-only",
+    "test:suite": "vitest run",
+    "test:suite:watch": "vitest watch",
+    "test:api": "vitest run bias-detection-api.integration.test.ts",
+    "test:system": "vitest run complete-system.integration.test.ts",
+    "test:report": "node generate-test-report.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.0.0"
+  }
+}

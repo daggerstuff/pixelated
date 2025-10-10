@@ -1,6 +1,22 @@
 ---
 import AdminLayout from '../../../../layouts/AdminLayout.astro'
 
+type RecoveryPlanStatus =
+  | 'verified'
+  | 'needs-testing'
+  | 'needs-update'
+  | 'in-development'
+
+interface RecoveryPlan {
+  id: string
+  name: string
+  systems: string[]
+  rto: number
+  rpo: number
+  lastTested: Date
+  status: RecoveryPlanStatus
+}
+
 // Mock data for the disaster recovery dashboard
 const recoveryMetrics = {
   totalRecoveryPlans: 8,
@@ -11,7 +27,7 @@ const recoveryMetrics = {
   lastTestDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
 }
 
-const recoveryPlans = [
+const recoveryPlans: RecoveryPlan[] = [
   {
     id: 'DR-001',
     name: 'Database Failure Recovery',
@@ -93,7 +109,7 @@ function formatDate(date: Date): string {
 }
 
 // Helper function to get status badge class
-function getStatusBadgeClass(status: 'verified' | 'needs-testing' | 'needs-update' | 'in-development'): string {
+function getStatusBadgeClass(status: RecoveryPlanStatus): string {
   switch (status) {
     case 'verified':
       return 'bg-green-100 text-green-800'
@@ -109,7 +125,7 @@ function getStatusBadgeClass(status: 'verified' | 'needs-testing' | 'needs-updat
 }
 
 // Helper function to get status display text
-function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-update' | 'in-development'): string {
+function getStatusDisplayText(status: RecoveryPlanStatus): string {
   switch (status) {
     case 'verified':
       return 'Verified'
@@ -576,10 +592,10 @@ function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-upda
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Handle "Run Test" button
     const runTestBtn = document.getElementById('run-test-btn')
-    runTestBtn?.addEventListener('click', (_event: Event) => {
+    runTestBtn?.addEventListener('click', () => {
       // In a real implementation, this would open a modal to select a test to run
       alert(
         'In a production environment, this would open the test configuration dialog.',
@@ -588,34 +604,49 @@ function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-upda
 
     // Handle "Schedule Test" button
     const scheduleTestBtn = document.getElementById('schedule-test-btn')
-    scheduleTestBtn?.addEventListener('click', (_event: Event) => {
+    scheduleTestBtn?.addEventListener('click', () => {
       window.location.href = '/admin/security/disaster-recovery/tests/schedule'
     })
 
     // Handle "Test Plan" buttons
     const testPlanBtns = document.querySelectorAll('.test-plan')
     testPlanBtns.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
-        const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
-        window.location.href = `/admin/security/disaster-recovery/plans/${planId}/test`
+      button.addEventListener('click', (event) => {
+        const target = event.target
+        if (target instanceof HTMLElement) {
+          const planId = target.getAttribute('data-plan-id')
+          if (planId) {
+            window.location.href = `/admin/security/disaster-recovery/plans/${planId}/test`
+          }
+        }
       })
     })
 
     // Handle "Edit Plan" buttons
     const editPlanBtns = document.querySelectorAll('.edit-plan')
     editPlanBtns.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
-        const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
-        window.location.href = `/admin/security/disaster-recovery/plans/${planId}/edit`
+      button.addEventListener('click', (event) => {
+        const target = event.target
+        if (target instanceof HTMLElement) {
+          const planId = target.getAttribute('data-plan-id')
+          if (planId) {
+            window.location.href = `/admin/security/disaster-recovery/plans/${planId}/edit`
+          }
+        }
       })
     })
 
     // Handle test detail buttons
     const testDetailBtns = document.querySelectorAll('[data-test-id]')
     testDetailBtns.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
-        const testId = (e.target as HTMLElement).getAttribute('data-test-id')
-        window.location.href = `/admin/security/disaster-recovery/tests/${testId}`
+      button.addEventListener('click', (event) => {
+        const target = event.target
+        if (target instanceof HTMLElement) {
+          const testId = target.getAttribute('data-test-id')
+          if (testId) {
+            window.location.href = `/admin/security/disaster-recovery/tests/${testId}`
+          }
+        }
       })
     })
   })
