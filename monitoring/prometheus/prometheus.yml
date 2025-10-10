@@ -42,10 +42,10 @@ scrape_configs:
       - targets: ['redis-exporter:9121']
     scrape_interval: 15s
 
-  # Nginx metrics
-  - job_name: 'nginx-exporter'
+  # Traefik metrics
+  - job_name: 'traefik'
     static_configs:
-      - targets: ['nginx-exporter:9113']
+      - targets: ['traefik:8082']
     scrape_interval: 15s
 
   # Docker metrics

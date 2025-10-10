@@ -9,7 +9,7 @@
     "framework": "React 18 / Angular 18",
     "language": "TypeScript 5.x",
     "build": "Vite / Angular CLI",
-    "styling": "Tailwind CSS / Angular Material"
+    "styling": "UnoCSS / Angular Material"
   },
   "state": {
     "management": "Redux Toolkit / NgRx",
@@ -23,12 +23,12 @@
 ```json
 {
   "api": {
-    "runtime": "Node.js 18+",
+    "runtime": "Node.js 24+",
     "framework": "Express.js / Fastify",
     "documentation": "Swagger/OpenAPI"
   },
   "ai": {
-    "runtime": "Python 3.9+",
+    "runtime": "Python 3.11.13",
     "frameworks": ["FastAPI", "Flask", "TensorFlow", "PyTorch"],
     "ml": ["scikit-learn", "pandas", "numpy"]
   }
@@ -219,7 +219,7 @@ docker run -p 3000:3000 pixelated
 
 ### Horizontal Scaling
 - Container orchestration with Kubernetes
-- Load balancing with NGINX/Ingress
+- Load balancing with Traefik reverse proxy
 - Database read replicas
 - Redis cluster for caching
 

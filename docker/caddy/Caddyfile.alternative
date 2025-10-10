@@ -1,0 +1,137 @@
+# Alternative: Caddy Configuration
+# 
+# Caddy is simpler than Traefik but less feature-rich.
+# This file is provided as an alternative if Traefik proves too complex.
+# To use Caddy instead of Traefik:
+# 1. Replace traefik service in docker-compose with caddy
+# 2. Use this Caddyfile
+# 3. Mount as: ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+{
+    # Global options
+    email admin@pixelated-empathy.com
+    
+    # Metrics
+    servers {
+        metrics
+    }
+}
+
+# Main site with automatic HTTPS
+pixelated-empathy.com www.pixelated-empathy.com {
+    # Automatic HTTPS with Let's Encrypt
+    
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    }
+    
+    # Compression
+    encode gzip zstd
+    
+    # Rate limiting for auth endpoints
+    @auth {
+        path /api/auth/*
+    }
+    rate_limit @auth {
+        zone auth 5r/m
+    }
+    
+    # Rate limiting for API
+    @api {
+        path /api/*
+    }
+    rate_limit @api {
+        zone api 50r/m
+    }
+    
+    # WebSocket support
+    @websocket {
+        path /ws
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websocket {
+        to app1:3000 app2:3000 app3:3000
+        lb_policy least_conn
+        health_uri /health
+        health_interval 30s
+        health_timeout 5s
+    }
+    
+    # Static file caching
+    @static {
+        path *.jpg *.jpeg *.png *.gif *.ico *.css *.js *.woff *.woff2 *.svg
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+    
+    # Main reverse proxy with load balancing
+    reverse_proxy {
+        to app1:3000 app2:3000 app3:3000
+        
+        # Load balancing
+        lb_policy least_conn
+        lb_try_duration 5s
+        lb_try_interval 250ms
+        
+        # Health checks
+        health_uri /health
+        health_interval 30s
+        health_timeout 5s
+        health_status 2xx
+        
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 60s
+        }
+        
+        # Headers
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Metrics endpoint (localhost only)
+    handle /metrics {
+        @local {
+            remote_ip 127.0.0.1 ::1
+        }
+        metrics @local
+    }
+    
+    # Access logs
+    log {
+        output file /var/log/caddy/access.log
+        format json
+    }
+}
+
+# Caddy dashboard (optional)
+:2019 {
+    metrics
+}
+
+# Note: To use Caddy, update docker-compose.yml:
+#
+# caddy:
+#   image: caddy:2-alpine
+#   ports:
+#     - "80:80"
+#     - "443:443"
+#     - "2019:2019"  # Metrics
+#   volumes:
+#     - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+#     - caddy_data:/data
+#     - caddy_config:/config
+#   restart: unless-stopped
+#
+# volumes:
+#   caddy_data:
+#   caddy_config:
