@@ -19,7 +19,7 @@ services:
         delay: 5s
         max_attempts: 3
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4321/api/health/simple"]
+      test: [ "CMD", "curl", "-f", "http://localhost:4321/api/health/simple" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -43,7 +43,7 @@ services:
           memory: 1G
           cpus: '1'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pixelated_prod}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pixelated_prod}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -58,19 +58,24 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 3
 
-  nginx:
-    image: nginx:alpine
+  traefik:
+    build:
+      context: .
+      dockerfile: docker/traefik/Dockerfile
     ports:
       - "80:80"
       - "443:443"
+      - "8082:8082" # Metrics
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+      - ./docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./docker/traefik/dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro
     depends_on:
       - app
     deploy:
@@ -78,8 +83,16 @@ services:
         limits:
           memory: 256M
           cpus: '0.5'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.pixelated-empathy.com`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
 
 volumes:
+  traefik_letsencrypt:
+    driver: local
   postgres_prod_data:
     driver: local
   redis_prod_data:

@@ -1,0 +1,133 @@
+# Pixelated Empathy - Traefik Dynamic Configuration
+# ==================================================
+
+http:
+  middlewares:
+    # Security Headers
+    security-headers:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
+        contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+
+    # Rate Limiting
+    rate-limit:
+      rateLimit:
+        average: 100
+        period: 1m
+        burst: 50
+
+    # Strict Rate Limit for Auth
+    rate-limit-auth:
+      rateLimit:
+        average: 5
+        period: 1m
+        burst: 10
+
+    # Rate Limit for API
+    rate-limit-api:
+      rateLimit:
+        average: 50
+        period: 1m
+        burst: 100
+
+    # Compression
+    compression:
+      compress: {}
+
+    # Circuit Breaker
+    circuit-breaker:
+      circuitBreaker:
+        expression: "NetworkErrorRatio() > 0.3 || ResponseCodeRatio(500, 600, 0, 600) > 0.3"
+
+    # Retry
+    retry:
+      retry:
+        attempts: 3
+        initialInterval: 100ms
+
+  # Load Balancer Services
+  services:
+    pixelated-backend:
+      loadBalancer:
+        servers:
+          - url: "http://app1:3000"
+          - url: "http://app2:3000"
+          - url: "http://app3:3000"
+        healthCheck:
+          path: /health
+          interval: 30s
+          timeout: 5s
+        sticky:
+          cookie:
+            name: pixelated_session
+            secure: true
+            httpOnly: true
+            sameSite: strict
+
+  # Routers
+  routers:
+    # Main Application
+    app:
+      rule: "Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)"
+      entryPoints:
+        - websecure
+      service: pixelated-backend
+      middlewares:
+        - security-headers
+        - compression
+        - circuit-breaker
+        - retry
+      tls:
+        certResolver: letsencrypt
+
+    # API Routes
+    api:
+      rule: "(Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)) && PathPrefix(`/api/`)"
+      entryPoints:
+        - websecure
+      service: pixelated-backend
+      middlewares:
+        - security-headers
+        - rate-limit-api
+        - compression
+        - circuit-breaker
+      tls:
+        certResolver: letsencrypt
+
+    # Auth Routes (stricter rate limiting)
+    auth:
+      rule: "(Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)) && PathPrefix(`/api/auth/`)"
+      entryPoints:
+        - websecure
+      service: pixelated-backend
+      middlewares:
+        - security-headers
+        - rate-limit-auth
+        - compression
+      priority: 100
+      tls:
+        certResolver: letsencrypt
+
+    # WebSocket Routes
+    websocket:
+      rule: "(Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)) && PathPrefix(`/ws`)"
+      entryPoints:
+        - websecure
+      service: pixelated-backend
+      middlewares:
+        - security-headers
+      tls:
+        certResolver: letsencrypt
+
+# TCP Configuration (if needed for database proxying)
+tcp:
+  routers: {}
+  services: {}
