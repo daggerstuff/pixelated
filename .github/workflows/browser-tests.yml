@@ -38,7 +38,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'pnpm'
-        run_install: false
 
     - name: Get pnpm store directory
       id: pnpm-cache
