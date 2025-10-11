@@ -1,0 +1,1910 @@
+openapi: 3.0.3
+info:
+  title: Pixelated Empathy API
+  description: |
+    Comprehensive API for bias detection, mental health analysis, and therapy session management.
+
+    ## Core Features
+    - **Bias Detection**: Advanced ML-powered bias analysis for therapy sessions
+    - **Mental Health Analysis**: Real-time emotional and psychological assessment
+    - **Session Management**: Complete therapy session lifecycle management
+    - **Analytics**: Comprehensive reporting and insights
+    - **Authentication**: Secure JWT-based authentication with role management
+
+    ## Authentication
+    All API endpoints require authentication via JWT tokens in the Authorization header:
+    ```
+    Authorization: Bearer <jwt_token>
+    ```
+
+    ## Rate Limiting
+    - Anonymous: 10 requests/minute
+    - Authenticated: 100 requests/minute
+    - Admin: 1000 requests/minute
+
+    ## Response Format
+    All responses follow this structure:
+    ```json
+    {
+      "success": true,
+      "data": { ... },
+      "performance": {
+        "requestId": "uuid",
+        "totalTime": 150,
+        "serverTime": 145
+      }
+    }
+    ```
+  version: 1.0.0
+  contact:
+    name: Pixelated Empathy Team
+    url: https://pixelatedempathy.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.pixelatedempathy.com/v1
+    description: Production server
+  - url: https://staging-api.pixelatedempathy.com/v1
+    description: Staging server
+  - url: http://localhost:4321/api
+    description: Development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Validation failed"
+        message:
+          type: string
+          example: "Text is required and must be at least 50 characters"
+        requestId:
+          type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+    PerformanceMetrics:
+      type: object
+      properties:
+        requestId:
+          type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        totalTime:
+          type: number
+          example: 150
+        validationTime:
+          type: number
+          example: 5
+        analysisTime:
+          type: number
+          example: 120
+        serverTime:
+          type: number
+          example: 145
+
+    BiasAnalysisRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          minLength: 50
+          maxLength: 10000
+          example: "Patient expressed frustration about systemic inequalities in healthcare access..."
+          description: "Therapy session text for bias analysis"
+        context:
+          type: string
+          example: "Individual therapy session focused on cultural identity"
+          description: "Additional context about the therapy session"
+        demographics:
+          type: object
+          properties:
+            age:
+              type: number
+              minimum: 18
+              maximum: 120
+            gender:
+              type: string
+              enum: [male, female, non-binary, other]
+            ethnicity:
+              type: string
+            primaryLanguage:
+              type: string
+        sessionType:
+          type: string
+          enum: [individual, group, family, couples]
+          default: individual
+        therapistNotes:
+          type: string
+          maxLength: 1000
+
+    BiasAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        analysis:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            sessionId:
+              type: string
+              format: uuid
+            overallBiasScore:
+              type: number
+              minimum: 0
+              maximum: 1
+              example: 0.23
+            alertLevel:
+              type: string
+              enum: [low, medium, high, critical]
+            confidence:
+              type: number
+              minimum: 0
+              maximum: 1
+              example: 0.87
+            layerResults:
+              type: object
+              properties:
+                pattern_analysis:
+                  type: object
+                  properties:
+                    bias_score:
+                      type: number
+                    layer:
+                      type: string
+                    confidence:
+                      type: number
+                    patterns_found:
+                      type: array
+                      items:
+                        type: string
+                sentiment_analysis:
+                  type: object
+                  properties:
+                    bias_score:
+                      type: number
+                    layer:
+                      type: string
+                    confidence:
+                      type: number
+                contextual_analysis:
+                  type: object
+                  properties:
+                    bias_score:
+                      type: number
+                    layer:
+                      type: string
+                    confidence:
+                      type: number
+            recommendations:
+              type: array
+              items:
+                type: string
+              example: ["Monitor communication patterns", "Consider cultural sensitivity training"]
+            demographics:
+              type: object
+            sessionType:
+              type: string
+            processingTimeMs:
+              type: number
+              example: 245
+            createdAt:
+              type: string
+              format: date-time
+            cached:
+              type: boolean
+              example: false
+        performance:
+          $ref: '#/components/schemas/PerformanceMetrics'
+
+    HealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        status:
+          type: string
+          example: "healthy"
+        message:
+          type: string
+          example: "All systems operational"
+        timestamp:
+          type: string
+          format: date-time
+        services:
+          type: object
+          properties:
+            database:
+              type: object
+              properties:
+                status:
+                  type: string
+                latency:
+                  type: number
+            redis:
+              type: object
+              properties:
+                status:
+                  type: string
+                keys:
+                  type: number
+            ai_service:
+              type: object
+              properties:
+                status:
+                  type: string
+                models_loaded:
+                  type: number
+        performance:
+          $ref: '#/components/schemas/PerformanceMetrics'
+
+    SessionRequest:
+      type: object
+      properties:
+        therapistId:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        sessionType:
+          type: string
+          enum: [individual, group, family, couples]
+        context:
+          type: object
+
+    BatchAnalysisRequest:
+      type: object
+      required:
+        - texts
+      properties:
+        texts:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 100
+          example: ["Text sample 1...", "Text sample 2..."]
+        options:
+          type: object
+          properties:
+            demographics:
+              type: array
+              items:
+                type: object
+            context:
+              type: array
+              items:
+                type: string
+
+    BatchAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              biasScore:
+                type: number
+                minimum: 0
+                maximum: 1
+              alertLevel:
+                type: string
+                enum: [low, medium, high, critical]
+              confidence:
+                type: number
+                minimum: 0
+                maximum: 1
+              processingTimeMs:
+                type: number
+        performance:
+          type: object
+          properties:
+            requestId:
+              type: string
+            totalTime:
+              type: number
+            textCount:
+              type: number
+            avgTimePerText:
+              type: number
+
+  parameters:
+    TherapistId:
+      name: therapistId
+      in: query
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: "UUID of the therapist"
+
+    Days:
+      name: days
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 365
+        default: 30
+      description: "Number of days to look back"
+
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 50
+      description: "Maximum number of results to return"
+
+    Offset:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: "Number of results to skip for pagination"
+
+paths:
+  /health:
+    get:
+      summary: "Get system health status"
+      description: |
+        Comprehensive health check for all system components including database,
+        Redis cache, AI services, and external integrations.
+      tags:
+        - Health
+        - Monitoring
+      security: []
+      responses:
+        '200':
+          description: "System is healthy"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      status:
+                        type: string
+                        example: "healthy"
+                      message:
+                        type: string
+                        example: "All systems operational"
+                      timestamp:
+                        type: string
+                        format: date-time
+                      services:
+                        type: object
+                        properties:
+                          database:
+                            type: object
+                          redis:
+                            type: object
+                          ai_service:
+                            type: object
+                  - $ref: '#/components/schemas/PerformanceMetrics'
+        '503':
+          description: "System is unhealthy"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /health/simple:
+    get:
+      summary: "Get simple health status"
+      description: "Lightweight health check for load balancer probes"
+      tags:
+        - Health
+        - Monitoring
+      security: []
+      responses:
+        '200':
+          description: "System is healthy"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "OK"
+        '503':
+          description: "System is unhealthy"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "UNHEALTHY"
+
+  /bias-analysis/analyze:
+    post:
+      summary: "Analyze text for bias"
+      description: |
+        Performs comprehensive bias analysis on therapy session text using
+        multiple ML models and analysis layers.
+
+        ## Analysis Layers
+        - **Pattern Analysis**: Keyword and phrase pattern matching
+        - **Sentiment Analysis**: Emotional tone and bias indicators
+        - **Contextual Analysis**: Situational and cultural context evaluation
+
+        ## Performance
+        - Response time: < 2 seconds
+        - Cache hit rate: > 90%
+        - Accuracy: > 85% confidence
+      tags:
+        - Bias Analysis
+        - AI
+        - Therapy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BiasAnalysisRequest'
+            example:
+              text: "Patient expressed frustration about systemic inequalities in healthcare access for marginalized communities. They feel that institutional bias prevents fair treatment."
+              context: "Cultural identity therapy session"
+              demographics:
+                age: 35
+                gender: "non-binary"
+                ethnicity: "Latinx"
+                primaryLanguage: "Spanish"
+              sessionType: "individual"
+              therapistNotes: "Patient showing increased awareness of systemic issues"
+      responses:
+        '200':
+          description: "Analysis completed successfully"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      analysis:
+                        $ref: '#/components/schemas/BiasAnalysisResponse'
+                  - $ref: '#/components/schemas/PerformanceMetrics'
+        '400':
+          description: "Invalid request data"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: "Authentication required"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '408':
+          description: "Analysis timeout"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: "Rate limit exceeded"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      summary: "Get bias analysis statistics"
+      description: |
+        Retrieve bias analysis metrics and statistics for a therapist.
+        Useful for dashboard displays and performance monitoring.
+      tags:
+        - Bias Analysis
+        - Analytics
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TherapistId'
+        - $ref: '#/components/parameters/Days'
+      responses:
+        '200':
+          description: "Statistics retrieved successfully"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      summary:
+                        type: object
+                        properties:
+                          total_analyses:
+                            type: number
+                          avg_bias_score:
+                            type: number
+                          high_alerts:
+                            type: number
+                          low_alerts:
+                            type: number
+                          last_analysis:
+                            type: string
+                            format: date-time
+                          trend:
+                            type: string
+                            enum: [improving, stable, worsening]
+                  - $ref: '#/components/schemas/PerformanceMetrics'
+
+  /bias-analysis/analyze-optimized:
+    post:
+      summary: "Optimized bias analysis (High Performance)"
+      description: |
+        High-performance version of bias analysis with enhanced caching,
+        parallel processing, and optimized algorithms.
+
+        ## Performance Features
+        - Sub-1.5 second response times
+        - Intelligent content-based caching
+        - Batch processing support
+        - Advanced pattern matching algorithms
+      tags:
+        - Bias Analysis
+        - High Performance
+        - AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BiasAnalysisRequest'
+      responses:
+        '200':
+          description: "Optimized analysis completed"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      analysis:
+                        $ref: '#/components/schemas/BiasAnalysisResponse'
+                  - $ref: '#/components/schemas/PerformanceMetrics'
+
+    put:
+      summary: "Batch analyze multiple texts"
+      description: |
+        Process multiple texts for bias analysis in a single request.
+        Optimized for high-throughput scenarios.
+
+        ## Limits
+        - Maximum 100 texts per request
+        - 10MB total payload limit
+        - 60 second processing timeout
+      tags:
+        - Bias Analysis
+        - Batch Processing
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchAnalysisRequest'
+      responses:
+        '200':
+          description: "Batch analysis completed"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      results:
+                        $ref: '#/components/schemas/BatchAnalysisResponse'
+                  - $ref: '#/components/schemas/PerformanceMetrics'
+
+  /bias-analysis/analyze-legacy:
+    post:
+      summary: "Legacy bias analysis endpoint"
+      description: "Original bias analysis implementation for backward compatibility"
+      deprecated: true
+      tags:
+        - Bias Analysis
+        - Legacy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BiasAnalysisRequest'
+      responses:
+        '200':
+          description: "Analysis completed"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                      analysis:
+                        $ref: '#/components/schemas/BiasAnalysisResponse'
+                  - $ref: '#/components/schemas/PerformanceMetrics'
+
+  /auth/login:
+    post:
+      summary: "User authentication"
+      description: |
+        Authenticate user and receive JWT token for API access.
+
+        ## Token Usage
+        Include the returned token in Authorization header for all subsequent requests:
+        ```
+        Authorization: Bearer <token>
+        ```
+      tags:
+        - Authentication
+        - Users
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "therapist@clinic.com"
+                password:
+                  type: string
+                  format: password
+                  example: "secure_password_123!"
+                rememberMe:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: "Authentication successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      email:
+                        type: string
+                        format: email
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      role:
+                        type: string
+                        enum: [admin, therapist, researcher, patient, guest]
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  refreshToken:
+                    type: string
+        '401':
+          description: "Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: "Too many login attempts"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      summary: "Refresh JWT token"
+      description: "Get a new JWT token using refresh token before expiration"
+      tags:
+        - Authentication
+        - Users
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  example: "refresh_token_here"
+      responses:
+        '200':
+          description: "Token refreshed successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                  expiresAt:
+                    type: string
+                    format: date-time
+        '401':
+          description: "Invalid or expired refresh token"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/logout:
+    post:
+      summary: "User logout"
+      description: "Invalidate JWT token and clean up session"
+      tags:
+        - Authentication
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Logout successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+
+  /admin/users:
+    get:
+      summary: "List all users (Admin only)"
+      description: "Retrieve paginated list of all users in the system"
+      tags:
+        - Admin
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [admin, therapist, researcher, patient, guest]
+          description: "Filter by user role"
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+          description: "Filter by active status"
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: "Users retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        email:
+                          type: string
+                          format: email
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        role:
+                          type: string
+                        isActive:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+                        lastLogin:
+                          type: string
+                          format: date-time
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  pageSize:
+                    type: number
+
+    post:
+      summary: "Create new user (Admin only)"
+      description: "Create a new user account with specified role and permissions"
+      tags:
+        - Admin
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - firstName
+                - lastName
+                - role
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, therapist, researcher, patient, guest]
+                institution:
+                  type: string
+                licenseNumber:
+                  type: string
+      responses:
+        '201':
+          description: "User created successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      email:
+                        type: string
+                        format: email
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      role:
+                        type: string
+        '409':
+          description: "User already exists"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/sessions:
+    get:
+      summary: "Get all therapy sessions (Admin only)"
+      description: |
+        Retrieve all therapy sessions across the platform with filtering and pagination.
+        Includes session metadata, therapist information, and status.
+      tags:
+        - Admin
+        - Sessions
+        - Analytics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: therapistId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: "Filter by therapist"
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, in_progress, completed, cancelled]
+          description: "Filter by session state"
+        - name: sessionType
+          in: query
+          schema:
+            type: string
+            enum: [individual, group, family, couples]
+          description: "Filter by session type"
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+          description: "Start date for filtering"
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+          description: "End date for filtering"
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: "Sessions retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  sessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        therapistId:
+                          type: string
+                          format: uuid
+                        clientId:
+                          type: string
+                          format: uuid
+                        sessionType:
+                          type: string
+                        state:
+                          type: string
+                        startedAt:
+                          type: string
+                          format: date-time
+                        endedAt:
+                          type: string
+                          format: date-time
+                        duration:
+                          type: number
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  pageSize:
+                    type: number
+
+  /admin/metrics:
+    get:
+      summary: "Get platform metrics (Admin only)"
+      description: |
+        Comprehensive platform metrics including user activity,
+        bias analysis statistics, and system performance.
+      tags:
+        - Admin
+        - Analytics
+        - Monitoring
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Days'
+      responses:
+        '200':
+          description: "Metrics retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  metrics:
+                    type: object
+                    properties:
+                      users:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                          active:
+                            type: number
+                          new:
+                            type: number
+                      sessions:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                          completed:
+                            type: number
+                          avgDuration:
+                            type: number
+                      biasAnalyses:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                          avgScore:
+                            type: number
+                          highAlerts:
+                            type: number
+                      performance:
+                        type: object
+                        properties:
+                          avgResponseTime:
+                            type: number
+                          cacheHitRate:
+                            type: number
+                          errorRate:
+                            type: number
+
+  /analytics/dashboard:
+    get:
+      summary: "Get analytics dashboard data"
+      description: |
+        Retrieve comprehensive analytics data for dashboard display.
+        Includes bias trends, session statistics, and performance metrics.
+      tags:
+        - Analytics
+        - Dashboard
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TherapistId'
+        - $ref: '#/components/parameters/Days'
+      responses:
+        '200':
+          description: "Dashboard data retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  dashboard:
+                    type: object
+                    properties:
+                      biasTrends:
+                        type: array
+                        items:
+                          type: object
+                      sessionStats:
+                        type: object
+                      alerts:
+                        type: array
+                        items:
+                          type: object
+                      performance:
+                        type: object
+
+  /session:
+    post:
+      summary: "Create new therapy session"
+      description: |
+        Initialize a new therapy session with optional client assignment
+        and session type configuration.
+      tags:
+        - Sessions
+        - Therapy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionRequest'
+      responses:
+        '201':
+          description: "Session created successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  session:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      therapistId:
+                        type: string
+                        format: uuid
+                      clientId:
+                        type: string
+                        format: uuid
+                      sessionType:
+                        type: string
+                      state:
+                        type: string
+                        example: "scheduled"
+                      startedAt:
+                        type: string
+                        format: date-time
+
+  /session/{sessionId}:
+    get:
+      summary: "Get session details"
+      description: "Retrieve complete session information including bias analyses and progress"
+      tags:
+        - Sessions
+        - Therapy
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: "Session details retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  session:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      therapist:
+                        type: object
+                      client:
+                        type: object
+                      analyses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BiasAnalysisResponse'
+                      progress:
+                        type: object
+
+    patch:
+      summary: "Update session information"
+      description: "Update session metadata, notes, or state"
+      tags:
+        - Sessions
+        - Therapy
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                  type: string
+                  enum: [scheduled, in_progress, completed, cancelled]
+                notes:
+                  type: string
+                summary:
+                  type: string
+      responses:
+        '200':
+          description: "Session updated successfully"
+
+  /session/{sessionId}/bias-analysis:
+    get:
+      summary: "Get bias analyses for session"
+      description: "Retrieve all bias analyses performed during a specific therapy session"
+      tags:
+        - Sessions
+        - Bias Analysis
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: "Bias analyses retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  analyses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BiasAnalysisResponse'
+
+  /mental-health/analyze:
+    post:
+      summary: "Analyze mental health indicators"
+      description: |
+        Perform comprehensive mental health analysis including emotional state,
+        crisis indicators, and therapeutic insights.
+      tags:
+        - Mental Health
+        - AI
+        - Therapy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+                - sessionId
+              properties:
+                text:
+                  type: string
+                  minLength: 10
+                  example: "I'm feeling overwhelmed and anxious about recent events..."
+                sessionId:
+                  type: string
+                  format: uuid
+                context:
+                  type: object
+      responses:
+        '200':
+          description: "Mental health analysis completed"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  analysis:
+                    type: object
+                    properties:
+                      emotionalState:
+                        type: object
+                      crisisIndicators:
+                        type: array
+                        items:
+                          type: string
+                      therapeuticInsights:
+                        type: array
+                        items:
+                          type: string
+                      recommendations:
+                        type: array
+                        items:
+                          type: string
+
+  /mental-health/chat:
+    post:
+      summary: "Interactive mental health chat"
+      description: |
+        Real-time conversational AI for mental health support and analysis.
+        Maintains context across the conversation for personalized responses.
+      tags:
+        - Mental Health
+        - Chat
+        - AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+                - conversationId
+              properties:
+                message:
+                  type: string
+                  example: "I've been feeling really down lately and don't know why"
+                conversationId:
+                  type: string
+                  format: uuid
+                context:
+                  type: object
+      responses:
+        '200':
+          description: "Chat response generated"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  response:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      emotionalAnalysis:
+                        type: object
+                      suggestions:
+                        type: array
+                        items:
+                          type: string
+                      followUpQuestions:
+                        type: array
+                        items:
+                          type: string
+
+  /crisis/session-flags:
+    get:
+      summary: "Get crisis session flags"
+      description: |
+        Retrieve sessions flagged for crisis indicators requiring immediate attention.
+        Includes risk assessment and recommended interventions.
+      tags:
+        - Crisis Detection
+        - Safety
+        - Monitoring
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Crisis flags retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  flaggedSessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sessionId:
+                          type: string
+                          format: uuid
+                        riskLevel:
+                          type: string
+                          enum: [low, medium, high, critical]
+                        indicators:
+                          type: array
+                          items:
+                            type: string
+                        recommendedActions:
+                          type: array
+                          items:
+                            type: string
+                        flaggedAt:
+                          type: string
+                          format: date-time
+
+  /patient-rights/request-export:
+    post:
+      summary: "Request data export (GDPR/HIPAA)"
+      description: |
+        Initiate data export request for patient data under GDPR Article 15
+        and HIPAA individual right of access. All therapy session data,
+        bias analyses, and personal information will be included.
+      tags:
+        - Patient Rights
+        - GDPR
+        - HIPAA
+        - Privacy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - dataTypes
+                - format
+              properties:
+                dataTypes:
+                  type: array
+                  items:
+                    type: string
+                    enum: [sessions, analyses, profile, all]
+                  example: ["sessions", "analyses"]
+                format:
+                  type: string
+                  enum: [json, pdf, csv]
+                  default: json
+                dateFrom:
+                  type: string
+                  format: date
+                dateTo:
+                  type: string
+                  format: date
+      responses:
+        '202':
+          description: "Export request accepted"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  requestId:
+                    type: string
+                    format: uuid
+                  estimatedCompletion:
+                    type: string
+                    format: date-time
+                  message:
+                    type: string
+                    example: "Your data export has been queued for processing"
+
+  /patient-rights/export-status/{requestId}:
+    get:
+      summary: "Check export request status"
+      description: "Get the current status of a data export request"
+      tags:
+        - Patient Rights
+        - GDPR
+        - HIPAA
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: "Export status retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  status:
+                    type: object
+                    properties:
+                      requestId:
+                        type: string
+                        format: uuid
+                      state:
+                        type: string
+                        enum: [pending, processing, completed, failed]
+                      progress:
+                        type: number
+                        minimum: 0
+                        maximum: 100
+                      downloadUrl:
+                        type: string
+                        format: uri
+                      expiresAt:
+                        type: string
+                        format: date-time
+                      fileSize:
+                        type: number
+
+  /patient-rights/delete-request:
+    post:
+      summary: "Request account deletion (GDPR/HIPAA)"
+      description: |
+        Submit request for complete account and data deletion under
+        GDPR Article 17 (Right to Erasure) and HIPAA individual rights.
+        Includes 30-day verification period before deletion.
+      tags:
+        - Patient Rights
+        - GDPR
+        - HIPAA
+        - Privacy
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  enum: [consent_withdrawal, service_unused, data_concern, other]
+                confirmationText:
+                  type: string
+                  example: "I understand this action cannot be undone"
+      responses:
+        '202':
+          description: "Deletion request submitted"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  requestId:
+                    type: string
+                    format: uuid
+                  verificationPeriodDays:
+                    type: number
+                    example: 30
+                  scheduledDeletion:
+                    type: string
+                    format: date-time
+
+  /ai/recommendations/enhanced:
+    get:
+      summary: "Get AI-powered therapeutic recommendations"
+      description: |
+        Generate personalized therapeutic recommendations based on session
+        analysis, patient history, and evidence-based practices.
+      tags:
+        - AI
+        - Recommendations
+        - Therapy
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: "Specific session to analyze"
+        - name: patientId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: "Patient for personalized recommendations"
+        - name: focusArea
+          in: query
+          schema:
+            type: string
+            enum: [anxiety, depression, trauma, relationships, bias, cultural]
+          description: "Specific therapeutic focus area"
+      responses:
+        '200':
+          description: "Recommendations generated"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  recommendations:
+                    type: object
+                    properties:
+                      immediate:
+                        type: array
+                        items:
+                          type: string
+                      shortTerm:
+                        type: array
+                        items:
+                          type: string
+                      longTerm:
+                        type: array
+                        items:
+                          type: string
+                      evidenceBased:
+                        type: array
+                        items:
+                          type: object
+                      culturalConsiderations:
+                        type: array
+                        items:
+                          type: string
+
+  /dashboard/bias-detection/summary:
+    get:
+      summary: "Get bias detection dashboard summary"
+      description: |
+        Retrieve comprehensive bias detection metrics for dashboard display.
+        Includes trends, alerts, and performance indicators.
+      tags:
+        - Dashboard
+        - Bias Detection
+        - Analytics
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TherapistId'
+        - $ref: '#/components/parameters/Days'
+      responses:
+        '200':
+          description: "Dashboard summary retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  summary:
+                    type: object
+                    properties:
+                      totalAnalyses:
+                        type: number
+                      avgBiasScore:
+                        type: number
+                      trend:
+                        type: string
+                      alerts:
+                        type: array
+                        items:
+                          type: object
+                      recentActivity:
+                        type: array
+                        items:
+                          type: object
+
+  /analytics/comparative-progress:
+    get:
+      summary: "Get comparative progress analytics"
+      description: |
+        Compare progress across different time periods, therapists,
+        or patient demographics for insights and benchmarking.
+      tags:
+        - Analytics
+        - Progress
+        - Comparison
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: compareBy
+          in: query
+          schema:
+            type: string
+            enum: [therapist, time_period, demographics, session_type]
+          description: "Dimension to compare by"
+        - name: timeRange
+          in: query
+          schema:
+            type: string
+            enum: [week, month, quarter, year]
+          description: "Time range for comparison"
+        - $ref: '#/components/parameters/Days'
+      responses:
+        '200':
+          description: "Comparative analytics retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  comparison:
+                    type: object
+                    properties:
+                      datasets:
+                        type: array
+                        items:
+                          type: object
+                      insights:
+                        type: array
+                        items:
+                          type: string
+                      recommendations:
+                        type: array
+                        items:
+                          type: string
+
+  /websocket/bias-alerts:
+    get:
+      summary: "WebSocket connection for real-time bias alerts"
+      description: |
+        Establish WebSocket connection for real-time bias detection alerts
+        and notifications during active therapy sessions.
+      tags:
+        - WebSocket
+        - Real-time
+        - Alerts
+      security:
+        - bearerAuth: []
+      responses:
+        '101':
+          description: "WebSocket connection established"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  connectionId:
+                    type: string
+                  protocols:
+                    type: array
+                    items:
+                      type: string
+
+  /v1/health:
+    get:
+      summary: "Legacy health check endpoint"
+      description: "Original health check implementation for backward compatibility"
+      deprecated: true
+      tags:
+        - Health
+        - Legacy
+      security: []
+      responses:
+        '200':
+          description: "System is healthy"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /v1/production-readiness:
+    get:
+      summary: "Get production readiness status"
+      description: |
+        Retrieve current production readiness metrics and deployment status.
+        Useful for monitoring deployment progress and system maturity.
+      tags:
+        - Production
+        - Monitoring
+        - Deployment
+      security: []
+      responses:
+        '200':
+          description: "Production readiness status"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  readiness:
+                    type: object
+                    properties:
+                      percentage:
+                        type: number
+                        minimum: 0
+                        maximum: 100
+                        example: 95
+                      status:
+                        type: string
+                        enum: [planning, development, testing, staging, production_ready, deployed]
+                      completedTasks:
+                        type: number
+                      totalTasks:
+                        type: number
+                      lastUpdated:
+                        type: string
+                        format: date-time
+                      nextMilestone:
+                        type: string
