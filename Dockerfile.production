@@ -1,86 +1,82 @@
-# syntax = docker/dockerfile:1
+# Production Dockerfile for Pixelated Empathy Platform
+FROM node:24-alpine AS base
 
-ARG NODE_VERSION=24
-FROM node:${NODE_VERSION}-alpine AS base
-
-LABEL org.opencontainers.image.description="Pixelated Empathy - Production"
-
-# Install pnpm
-ARG PNPM_VERSION=10.18.0
-RUN npm install -g pnpm@$PNPM_VERSION
-
-# Install only essential system dependencies
+# Install dependencies for native modules
 RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    git \
+    postgresql-client \
+    redis \
     curl \
-    ca-certificates \
-    && rm -rf /var/cache/apk/*
+    dumb-init
 
+# Create app user for security
+RUN addgroup -g 1001 -S nodejs && adduser -S pixelated -u 1001
+
+# Set working directory
 WORKDIR /app
-
-ENV NODE_ENV="production"
-ENV ASTRO_TELEMETRY_DISABLED=1
-ENV ASTRO_CACHE_DIR=/tmp/.astro
-ENV VITE_CACHE_DIR=/tmp/.vite
-ENV PORT=4321
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-# Create non-root user
-RUN addgroup -g 1001 -S astro && \
-    adduser -S astro -u 1001 -G astro
-
-FROM base AS deps
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Create production package.json using a separate script to avoid parsing issues
-COPY scripts/create-prod-package.js ./
-RUN node create-prod-package.js
+# Install dependencies (including dev dependencies for build)
+RUN npm install -g pnpm@latest && pnpm install --frozen-lockfile
 
-# Install only production dependencies
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm config set store-dir /pnpm/store && \
-    mv package.prod.json package.json && \
-    pnpm install --no-frozen-lockfile --prod
+# Copy source code
+COPY . .
 
-FROM base AS build
+# Build application
+RUN pnpm build:production
 
-# Copy full dependencies for build
+# Production stage
+FROM node:24-alpine AS production
+
+# Install production dependencies
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    postgresql-client
+
+# Create app user
+RUN addgroup -g 1001 -S nodejs && adduser -S pixelated -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
 COPY package.json pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm config set store-dir /pnpm/store && \
-    pnpm install --no-frozen-lockfile
 
-# Copy source files
-COPY src ./src
-COPY public ./public
-COPY astro.config.mjs ./
-COPY tsconfig.json ./
-COPY uno.config.ts ./
+# Install production dependencies only
+RUN npm install -g pnpm@latest && pnpm install --frozen-lockfile --prod
 
-# Build the application
-RUN pnpm build
+# Copy built application from build stage
+COPY --from=base /app/dist ./dist
+COPY --from=base /app/src ./src
+COPY --from=base /app/astro.config.mjs ./
+COPY --from=base /app/astro.config.optimized.mjs ./
 
-FROM base AS runtime
+# Copy production configuration
+COPY docker/production-entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:4321/api/health/simple || exit 1
+# Create directories for secrets and logs
+RUN mkdir -p /app/config/secrets /app/logs && \
+    chown -R pixelated:nodejs /app
 
-USER astro
+# Switch to non-root user
+USER pixelated
 
-# Copy production dependencies
-COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules
-COPY --from=deps --chown=astro:astro /app/package.json ./
-
-# Copy built application
-COPY --from=build --chown=astro:astro /app/dist ./dist
-
-# Create minimal start script
-RUN echo '#!/bin/sh\nnode ./dist/server/entry.mjs' > start.sh && \
-    chmod +x start.sh
-
+# Expose port
 EXPOSE 4321
 
-CMD ["./start.sh"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:4321/api/health || exit 1
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+# Start application
+CMD ["/usr/local/bin/entrypoint.sh"]

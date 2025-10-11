@@ -1,0 +1,230 @@
+version: '3.8'
+
+services:
+  # Main Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    container_name: pixelated-app
+    restart: unless-stopped
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=production
+      - PORT=4321
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-pixelated}
+      - DB_USER=${DB_USER:-pixelated_user}
+      - DB_PASSWORD_FILE=/run/secrets/db_password
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD_FILE=/run/secrets/redis_password
+      - JWT_SECRET_FILE=/run/secrets/jwt_secret
+      - PUBLIC_SITE_URL=${PUBLIC_SITE_URL:-https://pixelatedempathy.com}
+      - CDN_BASE_URL=${CDN_BASE_URL:-https://cdn.pixelatedempathy.com}
+    secrets:
+      - db_password
+      - redis_password
+      - jwt_secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4321/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: pixelated-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_NAME:-pixelated}
+      - POSTGRES_USER=${DB_USER:-pixelated_user}
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+    secrets:
+      - db_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pixelated_user} -d ${DB_NAME:-pixelated}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: pixelated-redis
+    restart: unless-stopped
+    command: redis-server --requirepass "$(cat /run/secrets/redis_password)" --appendonly yes
+    secrets:
+      - redis_password
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # Reverse Proxy & Load Balancer
+  traefik:
+    image: traefik:v2.10
+    container_name: pixelated-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/traefik:/etc/traefik
+      - ssl_certs:/ssl-certs
+    environment:
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
+      - TRAEFIK_ENTRYPOINTS_web_ADDRESS=:80
+      - TRAEFIK_ENTRYPOINTS_websecure_ADDRESS=:443
+      - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_EMAIL=${SSL_EMAIL}
+      - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_STORAGE=/ssl-certs/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-pixelatedempathy.com}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+  # Monitoring & Observability
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pixelated-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pixelated-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./docker/grafana/grafana.ini:/etc/grafana/grafana.ini
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # Log Aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: pixelated-loki
+    restart: unless-stopped
+    volumes:
+      - loki_data:/loki
+      - ./docker/loki/config.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: pixelated-promtail
+    restart: unless-stopped
+    volumes:
+      - ./docker/promtail/config.yml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 128M
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local
+  ssl_certs:
+    driver: local
+
+secrets:
+  db_password:
+    file: ./config/secrets/db-password
+  redis_password:
+    file: ./config/secrets/redis-password
+  jwt_secret:
+    file: ./config/secrets/jwt-secret
+
+networks:
+  default:
+    name: pixelated-network
+    driver: bridge
