@@ -1,14 +1,5 @@
 
-// Use local types to avoid Astro 5.x APIContext bug
-type AstroAPIContext = {
-  request: Request
-  cookies: never
-  url: URL
-  params: Record<string, string | undefined>
-  site?: URL
-  generator: string
-}
-type APIRoute = (context: AstroAPIContext) => Response | Promise<Response>
+import type { APIRoute, APIContext } from 'astro'
 import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
 import { getAIServiceByProvider } from '@/lib/ai/providers'
 import { getSession } from '@/lib/auth/session'
@@ -33,7 +24,7 @@ const crisisProtocolInstance = CrisisProtocol.getInstance()
 /**
  * API route for crisis detection
  */
-export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
+export const POST: APIRoute = async ({ request }: APIContext) => {
   const startTime = Date.now()
   let crisisDetected = false
   let session: SessionData | null = null
@@ -131,7 +122,7 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
             await crisisProtocolInstance.handleCrisis(
               session.user.id,
               session.session?.sessionId?.substring(0, 8) ||
-                `batch-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
+              `batch-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
               detection.content, // Text sample from CrisisDetectionResult
               detection.confidence, // Detection score from CrisisDetectionResult
               detection.category ? [detection.category] : [], // Detected risks from CrisisDetectionResult
@@ -162,7 +153,7 @@ export const POST: APIRoute = async ({ request }: AstroAPIContext) => {
           await CrisisProtocol.getInstance().handleCrisis(
             session.user.id,
             session.session?.sessionId?.substring(0, 8) ||
-              `single-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
+            `single-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
             singleResult.content, // Text sample from CrisisDetectionResult
             singleResult.confidence, // Detection score from CrisisDetectionResult
             singleResult.category ? [singleResult.category] : [], // Detected risks from CrisisDetectionResult

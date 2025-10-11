@@ -1,5 +1,6 @@
 // import type { AIMessage } from '@/lib/ai/models/types'
 import type { SessionData } from '../../../lib/auth/session'
+import type { APIRoute, APIContext } from 'astro'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 import { handleApiError } from '../../../lib/ai/error-handling'
 import { createTogetherAIService } from '../../../lib/ai/services/together'
@@ -18,15 +19,7 @@ interface AIMessage {
 // Initialize logger
 const logger = createBuildSafeLogger('ai-completion')
 
-export interface AstroAPIContext {
-  request: Request
-  params: Record<string, string>
-  props: Record<string, unknown>
-}
-
-export type APIRoute = (
-  context: AstroAPIContext,
-) => Promise<Response> | Response
+// Use the shared Astro API types to avoid duplication and ensure consistency
 
 /**
  * API route for AI chat completions
@@ -34,7 +27,7 @@ export type APIRoute = (
  */
 
 // GET handler - returns information about the completion endpoint
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
     // Verify session for security
     const session = await getSession(request)
@@ -89,7 +82,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request }: APIContext) => {
   // Define session outside try block to make it accessible in catch block
   let session: SessionData | null = null
 
