@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: pixelated
-        image: registry.gitlab.com/pixeldeck/pixelated@sha256:1691c565a3f08071ff8a0ad27af889ec4964d23fc035b2f30d2ae8ce9ec8b0e6
+  image: registry.gitlab.com/pixeldeck/pixelated@sha256:1691c565a3f08071ff8a0ad27af889ec4964d23fc035b2f30d2ae8ce9ec8b0e6
         ports:
         - containerPort: 4321
           name: http
