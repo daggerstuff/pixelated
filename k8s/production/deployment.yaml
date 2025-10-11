@@ -54,7 +54,9 @@ spec:
 
       containers:
       - name: pixelated-web
-        image: pixelated/pixelated-web:latest
+        # Use the project's registry image path for the web component and tag it
+        # with the current commit SHA during CI deploys.
+        image: ${CI_REGISTRY_IMAGE}/pixelated-web:${CI_COMMIT_SHA}
         imagePullPolicy: Always
 
         # Resource Limits
@@ -183,7 +185,7 @@ spec:
       # Init Container for database migration
       initContainers:
       - name: db-migration
-        image: pixelated/pixelated-web:latest
+        image: ${CI_REGISTRY_IMAGE}/pixelated-web:${CI_COMMIT_SHA}
         command: ['npm', 'run', 'db:migrate']
         env:
         - name: NODE_ENV

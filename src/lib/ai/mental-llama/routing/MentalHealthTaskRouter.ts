@@ -3,6 +3,7 @@ import type {
   RoutingInput,
   RoutingDecision,
   LLMInvoker,
+  RoutingContext,
 } from '../types/mentalLLaMATypes'
 
 export interface RoutingContext {
@@ -50,7 +51,7 @@ const ANXIETY_KEYWORDS = [
 ]
 
 export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
-  constructor(private llmInvoker: LLMInvoker) {}
+  constructor(private llmInvoker: LLMInvoker) { }
 
   async route(input: RoutingInput): Promise<RoutingDecision> {
     const text = input.text.toLowerCase()
@@ -102,29 +103,15 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
       }
     }
 
-    // LLM fallback for ambiguous cases
+    // LLM-based classification for ambiguous cases: try a structured classification call
     try {
-      const llmResult = await this.llmInvoker([
-        {
-          role: 'system',
-          content:
-            'Classify this mental health text into: crisis, depression, anxiety, or general. Respond with just the category.',
-        },
-        { role: 'user', content: input.text },
-      ])
-
-      const category = llmResult.content.toLowerCase().trim()
-      if (['crisis', 'depression', 'anxiety'].includes(category)) {
-        return {
-          targetAnalyzer: category,
-          confidence: 0.6,
-          isCritical: category === 'crisis',
-          method: 'llm',
-          insights: { llmReasoning: llmResult.content },
-        }
+      const llmDecision = await this.performBroadClassificationLLM(text, input.context)
+      // If LLM returned a meaningful decision, use it
+      if (llmDecision && llmDecision.targetAnalyzer) {
+        return llmDecision
       }
     } catch {
-      // LLM failed, continue to default
+      // LLM failed - fall back to default below
     }
 
     return {
@@ -194,5 +181,97 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
 
   updateRoutingRules(_rules: Record<string, unknown>): void {
     // Implementation for updating routing rules
+  }
+
+  // Map commonly returned LLM categories to internal analyzer names
+  private mapLlmCategoryToAnalyzer(category: string): string {
+    const normalized = category.trim().toLowerCase()
+    const map: Record<string, string> = {
+      suicidal: 'crisis',
+      'self-harm': 'crisis',
+      suicide: 'crisis',
+      crisis: 'crisis',
+      depression: 'depression',
+      depressive: 'depression',
+      anxiety: 'anxiety',
+      panic: 'anxiety',
+      worry: 'anxiety',
+      general: 'general_mental_health',
+      'general_mental_health': 'general_mental_health',
+      unknown: 'unknown',
+      none: 'none',
+    }
+    return map[normalized] ?? 'general_mental_health'
+  }
+
+  // Try to extract JSON payload from LLM response (handles fenced code blocks too)
+  private extractJsonLike(content: string): string | null {
+    if (!content) return null
+    // Strip markdown code fences
+    const fencedMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/im)
+    if (fencedMatch && fencedMatch[1]) {
+      return fencedMatch[1].trim()
+    }
+    // Sometimes models respond with a JSON-like line or object
+    const jsonStart = content.indexOf('{')
+    const jsonEnd = content.lastIndexOf('}')
+    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+      return content.slice(jsonStart, jsonEnd + 1)
+    }
+    return null
+  }
+
+  // Perform a structured LLM classification call and return a RoutingDecision when possible
+  private async performBroadClassificationLLM(
+    text: string,
+    context?: RoutingContext,
+  ): Promise<RoutingDecision | null> {
+    const system = `You are a classification assistant. Classify the user's text into one of: crisis, depression, anxiety, general, none, unknown. Respond with a JSON object: { "category": "<one of the categories>", "confidence": 0.0, "is_critical": false, "reason": "explain briefly" }`.trim()
+    const user = `Text: ${text}\nContext: ${context ? JSON.stringify(context) : '{}'}\nRespond only with the JSON object described.`
+
+    const messages = [
+      { role: 'system', content: system },
+      { role: 'user', content: user },
+    ]
+
+    const resp = await this.llmInvoker(messages, { temperature: 0.0, max_tokens: 300 })
+    const raw = resp.content || ''
+    const jsonLike = this.extractJsonLike(raw)
+    if (!jsonLike) {
+      // Unable to find JSON in response; as a last resort, try to use the plain text
+      const plain = raw.trim().toLowerCase()
+      const mapped = this.mapLlmCategoryToAnalyzer(plain.split(/\s|\.|,|\n/)[0] || 'general')
+      return {
+        targetAnalyzer: mapped,
+        confidence: 0.5,
+        isCritical: mapped === 'crisis',
+        method: 'llm',
+        insights: { llmReasoning: raw },
+      }
+    }
+
+    try {
+      const parsed = JSON.parse(jsonLike) as { category?: string; confidence?: number; is_critical?: boolean; reason?: string }
+      const category = parsed.category ?? 'general'
+      const mapped = this.mapLlmCategoryToAnalyzer(String(category))
+      const confidence = Math.max(0, Math.min(1, Number(parsed.confidence) || 0.5))
+      const isCritical = parsed.is_critical === true || mapped === 'crisis'
+      return {
+        targetAnalyzer: mapped,
+        confidence,
+        isCritical,
+        method: 'llm',
+        insights: { llmReasoning: parsed.reason || raw, llmCategory: parsed.category },
+      }
+    } catch (err) {
+      // Parsing failed - return a conservative fallback decision
+      return {
+        targetAnalyzer: 'general_mental_health',
+        confidence: 0.4,
+        isCritical: false,
+        method: 'llm',
+        insights: { llmReasoning: raw, fallbackReason: 'parsing_failed' },
+      }
+    }
   }
 }
