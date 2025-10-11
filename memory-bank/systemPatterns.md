@@ -22,6 +22,8 @@ Pixelated follows a microservices architecture with the following components:
 - **Feature Store**: Custom implementation or Feast
 - **Real ML Models**: Integrated Fairlearn, SHAP/LIME, Hugging Face evaluate
 - **Frontend Integration**: Complete production API integration with client-side data transformation
+- **Therapeutic AI Training**: Lightning.ai H100 LoRA training with multi-expert MoE architecture
+- **Intelligent Agent**: Multi-pattern analysis with question extraction and semantic validation
 
 ## Component Relationships
 
@@ -47,6 +49,19 @@ interface IRepository<T> {
   save(entity: T): Promise<T>;
   delete(id: string): Promise<void>;
 }
+```
+
+### Intelligent Agent Pattern
+```python
+class IntelligentPromptAgent:
+    def __init__(self, pattern_analyzers: List[PatternAnalyzer]):
+        self.analyzers = pattern_analyzers
+    
+    def process_content(self, content: str) -> ProcessedContent:
+        # Multi-pattern analysis with semantic validation
+        patterns = self.extract_patterns(content)
+        questions = self.extract_questions(content, patterns)
+        return self.validate_semantic_coherence(questions, content)
 ```
 
 ### Service Layer Pattern
@@ -109,6 +124,8 @@ user:profile:{userId}
 bias:result:{contentHash}
 session:{sessionId}
 config:global
+therapeutic:segment:{segmentId}
+lightning:dataset:{datasetId}
 ```
 
 ## Error Handling
@@ -145,3 +162,5 @@ class AppError extends Error {
 - Role-based access control (RBAC)
 - API key authentication for services
 - OAuth2 integration for third-party login
+- Lightning.ai API integration for H100 training access
+- Multi-environment secrets management with encrypted variables

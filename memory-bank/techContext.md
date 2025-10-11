@@ -61,6 +61,7 @@
 - **Primary**: pnpm (for better performance and disk usage)
 - **Alternative**: npm/yarn for compatibility
 - **Current Usage**: PNPM confirmed as primary package manager for all operations
+- **Python**: uv package manager for all Python operations (uv install, uv run, uv shell)
 
 ### Version Control
 - **Platform**: Git
@@ -107,7 +108,9 @@
   "shap": "^0.42.0",
   "lime": "^0.2.0",
   "aif360": "^0.5.0",
-  "evaluate": "^0.4.0"
+  "evaluate": "^0.4.0",
+  "lightning": "^2.0.0",
+  "lightning-cloud": "^0.5.0"
 }
 ```
 
@@ -146,6 +149,11 @@ cp .env.example .env
 # Start development services
 docker-compose up -d
 pnpm run dev
+
+# Python AI services
+cd src/lib/ai/bias-detection/python-service
+uv install
+uv run python app.py
 ```
 
 ### Docker Development
