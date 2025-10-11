@@ -1,4 +1,4 @@
 [submodule "ai"]
 	path = ai
-	url = git@git.pixelatedempathy.tech:pixeltech/ai.git
+	url = git@gitlab-gemcity:gemcity/ai.git
 	ignore = all
