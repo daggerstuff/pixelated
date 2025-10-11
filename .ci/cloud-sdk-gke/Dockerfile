@@ -6,7 +6,7 @@ FROM ${BASE_IMAGE}
 # --build-arg BASE_IMAGE=google/cloud-sdk:436.0.0-slim
 
 # Metadata for image scanners / catalogues
-LABEL org.opencontainers.image.source="https://gitlab.com/pixeldeck/pixelated"
+LABEL org.opencontainers.image.source="https://gitlab.com/gemcity/pixelated"
 LABEL org.opencontainers.image.license="MIT"
 
 RUN apt-get update && \

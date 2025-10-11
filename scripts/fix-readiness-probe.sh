@@ -33,7 +33,17 @@ echo "✅ Kubernetes cluster accessible"
 
 # Apply the updated deployment
 echo "📦 Applying updated deployment configuration..."
-if kubectl apply -f k8s/production/deployment.yaml -n "$NAMESPACE"; then
+
+# If CONTAINER_IMAGE or CI_COMMIT_SHA are set, substitute them into the manifest before applying.
+if command -v envsubst >/dev/null 2>&1; then
+    echo "🔁 Substituting environment variables into k8s/production/deployment.yaml"
+    envsubst < k8s/production/deployment.yaml > /tmp/deployment.yaml
+    APPLY_FILE=/tmp/deployment.yaml
+else
+    APPLY_FILE=k8s/production/deployment.yaml
+fi
+
+if kubectl apply -f "$APPLY_FILE" -n "$NAMESPACE"; then
     echo "✅ Deployment configuration applied successfully"
 else
     echo "❌ Failed to apply deployment configuration"
