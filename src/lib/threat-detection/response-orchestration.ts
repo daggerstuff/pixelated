@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 import crypto from 'node:crypto';
 
 export interface ThreatResponse {
@@ -314,7 +314,7 @@ export class AdvancedResponseOrchestrator extends EventEmitter implements Respon
     // Calculate threat severity and impact
     const severity = this.calculateThreatSeverity(threatData, mlAnalysis);
     const impact = this.calculateThreatImpact(threatData, mlAnalysis);
-    const {confidence} = mlAnalysis;
+    const { confidence } = mlAnalysis;
 
     return {
       threatId: threatData.threatId,

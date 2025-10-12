@@ -47,7 +47,13 @@ jobs:
           ${{ runner.os }}-pnpm-store-
 
     - name: Install dependencies
-      run: pnpm install --no-frozen-lockfile
+      run: pnpm install --no-frozen-lockfile --ignore-scripts
+
+    - name: Rebuild critical native modules
+      run: |
+        # Rebuild only essential native modules that need post-install scripts
+        # Skip @tensorflow/tfjs-node as it's incompatible with Node.js 24
+        pnpm rebuild sharp esbuild @sentry/cli || echo "Some rebuilds failed, continuing..."
 
     - name: Install Playwright browsers
       run: pnpm exec playwright install --with-deps
