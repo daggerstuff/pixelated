@@ -141,7 +141,7 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "^4.3.6",
-    "@astrojs/node": "^9.4.4",
+    "@astrojs/node": "^9.4.5",
     "@astrojs/react": "^4.4.0",
     "@aws-sdk/client-dynamodb": "^3.902.0",
     "@aws-sdk/client-kms": "^3.901.0",
