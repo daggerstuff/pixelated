@@ -134,7 +134,7 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "^4.3.6",
-    "@astrojs/node": "^9.4.4",
+    "@astrojs/node": "^9.4.5",
     "@astrojs/react": "^4.4.0",
     "@aws-sdk/client-dynamodb": "^3.896.0",
     "@aws-sdk/client-kms": "^3.896.0",
@@ -240,7 +240,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "@vitest/coverage-v8": "^3.2.4",
     "archiver": "^7.0.1",
-    "astro": "^5.14.1",
+    "astro": "^5.14.3",
     "astro-eslint-parser": "^1.2.2",
     "astro-expressive-code": "^0.41.3",
     "astro-loader-github-prs": "^1.2.1",
