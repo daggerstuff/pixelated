@@ -1,4 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
+// Detect CI environment to avoid running dev server with file watchers in CI (which can fail under low inotify limits).
+const isCi = !!process.env['CI'];
 
 /**
  * Playwright configuration for Pixelated Empathy AI E2E tests
@@ -66,12 +68,21 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:4321',
-    reuseExistingServer: !process.env['CI'],
-    timeout: 180 * 1000,
-  },
+  webServer: isCi
+    ? {
+        // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
+        command: 'pnpm run build && pnpm run preview -- --port 4321',
+        url: 'http://localhost:4321',
+        reuseExistingServer: false,
+        timeout: 10 * 60 * 1000, // allow time for build + preview start
+      }
+    : {
+        // Local/dev flow should keep the fast dev server with HMR.
+        command: 'pnpm dev',
+        url: 'http://localhost:4321',
+        reuseExistingServer: true,
+        timeout: 180 * 1000,
+      },
   
   /* Global setup and teardown */
   // globalSetup: './tests/e2e/global-setup.ts',

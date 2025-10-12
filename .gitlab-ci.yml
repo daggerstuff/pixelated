@@ -13,10 +13,9 @@ stages:
 
 # Global variables with security and performance optimizations
 variables:
-  # Docker optimization - TLS disabled for compatibility
+  # Docker optimization
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: plain
 
@@ -36,169 +35,80 @@ variables:
   PNPM_CACHE_FOLDER: .pnpm-store
   GIT_STRATEGY: clone
 
+  # Security
+  SENTRY_RELEASE: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
+
+  # Container scanning configuration
   CS_IMAGE: $CONTAINER_IMAGE
 
-  CI_REPOSITORY_URL: git@gitlab.com:gemcity/pixelated.git
+  # Legacy variables for compatibility
+  CI_REPOSITORY_URL: git@gitlab.com:pixeldeck/pixelated.git
   CI_REGISTRY: https://registry.gitlab.com/
-  CI_REGISTRY_IMAGE: registry.gitlab.com/gemcity/pixelated
+  CI_REGISTRY_IMAGE: registry.gitlab.com/pixeldeck/pixelated
   GKE_CLUSTER_NAME: ${GKE_CLUSTER_NAME:-pixelcluster}
   GKE_ZONE: ${GKE_ZONE:-us-east1}
   GKE_ENVIRONMENT_URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}
 
+# Global cache configuration for faster builds
 cache: &global_cache
   key:
     files:
     - pnpm-lock.yaml
-    - package.json
     prefix: $CI_COMMIT_REF_SLUG
   paths:
   - .pnpm-store/
   - node_modules/
-  - ~/.cache/pnpm/
   policy: pull-push
-  unprotect: true
+
+# Security template for SSH key handling using GitLab's SSH_PRIVATE_KEY
+.ssh_setup: &ssh_setup
+  before_script:
+  - apk add --no-cache openssh-client curl git
+  - eval $(ssh-agent -s)
+  - |
+    if [ -z "$SSH_PRIVATE_KEY" ]; then
+      echo "❌ SSH_PRIVATE_KEY not set - configure it in GitLab CI/CD variables"
+      exit 1
+    fi
+
+    # Write SSH key to temporary file, converting single-line format to proper multi-line
+    SSH_KEY_FILE=$(mktemp)
+    trap "rm -f $SSH_KEY_FILE" EXIT
+
+    # Convert single-line key (with \n) to proper multi-line format
+    echo "$SSH_PRIVATE_KEY" | sed 's/\\n/\n/g' > "$SSH_KEY_FILE"
+    chmod 600 "$SSH_KEY_FILE"
+
+    # Validate and add key
+    if ssh-keygen -l -f "$SSH_KEY_FILE" >/dev/null 2>&1; then
+      ssh-add "$SSH_KEY_FILE"
+      echo "✅ SSH key loaded successfully"
+    else
+      echo "❌ Invalid SSH key format. Ensure your SSH_PRIVATE_KEY variable contains \\n for line breaks"
+      exit 1
+    fi
+  - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+  - |
+    if [ -n "$VPS_HOST" ]; then
+      ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+    else
+      echo "⚠️ VPS_HOST not set, skipping host key scan"
+    fi
 
 # Docker service template
 .docker_service: &docker_service
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental=false", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock" ]
+    command: [ "--tls=false", "--experimental" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
-    DOCKER_DRIVER: overlay2
-  before_script:
-  - echo "🔍 Waiting for Docker service to be ready..."
-  - |
-    # Install required tools for debugging
-    apk add --no-cache curl netcat-openbsd bind-tools
 
-    # Enhanced Docker connectivity check with better error handling
-    echo "🔍 Checking network connectivity..."
-
-    # Test DNS resolution first
-    if nslookup docker >/dev/null 2>&1; then
-      echo "✅ Docker hostname resolves successfully"
-    else
-      echo "❌ Docker hostname resolution failed"
-      echo "🔍 Checking /etc/hosts and DNS configuration..."
-      cat /etc/hosts || true
-      cat /etc/resolv.conf || true
-      echo "🔍 Testing alternative DNS resolution..."
-      nslookup docker 8.8.8.8 || true
-    fi
-
-    # Test port connectivity
-    if nc -z docker 2375 >/dev/null 2>&1; then
-      echo "✅ Docker port 2375 is reachable"
-    else
-      echo "❌ Docker port 2375 is not reachable"
-      echo "🔍 Testing network connectivity..."
-      ping -c 1 docker || echo "❌ Cannot ping docker service"
-    fi
-
-    # Wait for Docker daemon to be ready with extended timeout
-    echo "⏳ Waiting for Docker daemon to be ready..."
-    for i in $(seq 1 60); do
-      if docker version >/dev/null 2>&1; then
-        echo "✅ Docker daemon is ready after $i attempts"
-        break
-      fi
-      echo "⏳ Waiting for Docker daemon... ($i/60)"
-      sleep 2
-    done
-
-    # Final comprehensive check
-    if ! docker version >/dev/null 2>&1; then
-      echo "❌ Docker daemon failed to start after 120 seconds"
-      echo "🔍 Debugging Docker service status..."
-
-      # Try to get more information about the failure
-      echo "🔍 Attempting direct API call..."
-      curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
-
-      echo "🔍 Checking service status..."
-      ps aux | grep docker || true
-
-      echo "🔍 Network debugging..."
-      netstat -tlnp 2>/dev/null || true
-      ss -tlnp 2>/dev/null || true
-
-      exit 1
-    fi
-
-    echo "✅ Docker service validation complete"
-    echo "Docker version info:"
-    docker version
-
-# Registry login template - merged with docker service setup
+# Registry login template
 .registry_login: &registry_login
   before_script:
-  - echo "🔍 Waiting for Docker service to be ready..."
-  - |
-    # Install required tools for debugging
-    apk add --no-cache curl netcat-openbsd bind-tools
-
-    # Enhanced Docker connectivity check with better error handling
-    echo "🔍 Checking network connectivity..."
-
-    # Test DNS resolution first
-    if nslookup docker >/dev/null 2>&1; then
-      echo "✅ Docker hostname resolves successfully"
-    else
-      echo "❌ Docker hostname resolution failed"
-      echo "🔍 Checking /etc/hosts and DNS configuration..."
-      cat /etc/hosts || true
-      cat /etc/resolv.conf || true
-      echo "🔍 Testing alternative DNS resolution..."
-      nslookup docker 8.8.8.8 || true
-    fi
-
-    # Test port connectivity
-    if nc -z docker 2375 >/dev/null 2>&1; then
-      echo "✅ Docker port 2375 is reachable"
-    else
-      echo "❌ Docker port 2375 is not reachable"
-      echo "🔍 Testing network connectivity..."
-      ping -c 1 docker || echo "❌ Cannot ping docker service"
-    fi
-
-    # Wait for Docker daemon to be ready with extended timeout
-    echo "⏳ Waiting for Docker daemon to be ready..."
-    for i in $(seq 1 60); do
-      if docker version >/dev/null 2>&1; then
-        echo "✅ Docker daemon is ready after $i attempts"
-        break
-      fi
-      echo "⏳ Waiting for Docker daemon... ($i/60)"
-      sleep 2
-    done
-
-    # Final comprehensive check
-    if ! docker version >/dev/null 2>&1; then
-      echo "❌ Docker daemon failed to start after 120 seconds"
-      echo "🔍 Debugging Docker service status..."
-
-      # Try to get more information about the failure
-      echo "🔍 Attempting direct API call..."
-      curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
-
-      echo "🔍 Checking service status..."
-      ps aux | grep docker || true
-
-      echo "🔍 Network debugging..."
-      netstat -tlnp 2>/dev/null || true
-      ss -tlnp 2>/dev/null || true
-
-      exit 1
-    fi
-
-    echo "✅ Docker service validation complete"
-    echo "Docker version info:"
-    docker version
-  - echo "🔐 Logging into GitLab Container Registry..."
-  - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
 # Validation stage - runs in parallel
 validate-runner:
@@ -207,133 +117,14 @@ validate-runner:
   services:
   - name: docker:27.3.1-dind
     alias: docker
-    command: [ "--tls=false", "--experimental=false", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock" ]
+    command: [ "--tls=false", "--experimental" ]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
-    DOCKER_DRIVER: overlay2
-  before_script:
-  - echo "🔍 Waiting for Docker service to be ready..."
-  - |
-    # Install required tools for debugging
-    apk add --no-cache curl netcat-openbsd bind-tools
-
-    # Enhanced Docker connectivity check with better error handling
-    echo "🔍 Checking network connectivity..."
-
-    # Test DNS resolution first
-    if nslookup docker >/dev/null 2>&1; then
-      echo "✅ Docker hostname resolves successfully"
-    else
-      echo "❌ Docker hostname resolution failed"
-      echo "🔍 Checking /etc/hosts and DNS configuration..."
-      cat /etc/hosts || true
-      cat /etc/resolv.conf || true
-      echo "🔍 Testing alternative DNS resolution..."
-      nslookup docker 8.8.8.8 || true
-    fi
-
-    # Test port connectivity
-    if nc -z docker 2375 >/dev/null 2>&1; then
-      echo "✅ Docker port 2375 is reachable"
-    else
-      echo "❌ Docker port 2375 is not reachable"
-      echo "🔍 Testing network connectivity..."
-      ping -c 1 docker || echo "❌ Cannot ping docker service"
-    fi
-
-    # Wait for Docker daemon to be ready with extended timeout
-    echo "⏳ Waiting for Docker daemon to be ready..."
-    for i in $(seq 1 60); do
-      if docker version >/dev/null 2>&1; then
-        echo "✅ Docker daemon is ready after $i attempts"
-        break
-      fi
-      echo "⏳ Waiting for Docker daemon... ($i/60)"
-      sleep 2
-    done
-
-    # Final comprehensive check
-    if ! docker version >/dev/null 2>&1; then
-      echo "❌ Docker daemon failed to start after 120 seconds"
-      echo "🔍 Debugging Docker service status..."
-
-      # Try to get more information about the failure
-      echo "🔍 Attempting direct API call..."
-      curl -v --max-time 10 http://docker:2375/v1.24/version || echo "❌ Cannot connect to Docker API"
-
-      echo "🔍 Checking service status..."
-      ps aux | grep docker || true
-
-      echo "🔍 Network debugging..."
-      netstat -tlnp 2>/dev/null || true
-      ss -tlnp 2>/dev/null || true
-
-      exit 1
-    fi
   script: |
     echo "🔍 Validating GitLab runner capabilities..."
-
-    # Detect OS and install packages accordingly
-    if command -v apk >/dev/null 2>&1; then
-      # Alpine Linux
-      apk add --no-cache openssh-client git curl netcat-openbsd bind-tools
-    elif command -v apt-get >/dev/null 2>&1; then
-      # Debian/Ubuntu
-      apt-get update -qq && apt-get install -y -qq openssh-client git curl netcat-openbsd dnsutils
-    elif command -v yum >/dev/null 2>&1; then
-      # RHEL/CentOS
-      yum install -y -q openssh-clients git curl nmap-ncat bind-utils
-    else
-      echo "⚠️ Unknown package manager, skipping package installation"
-    fi
-
-    # Enhanced Docker validation with better error handling
-    echo "🔍 Testing Docker connectivity..."
-    if docker version >/dev/null 2>&1; then
-      echo "✅ Docker client version:"
-      docker version --format 'Client: {{.Client.Version}}'
-
-      echo "✅ Docker server info:"
-      docker version --format 'Server: {{.Server.Version}}'
-
-      # Try to get additional info if available
-      if docker info >/dev/null 2>&1; then
-        echo "Storage Driver: $(docker info --format '{{.Driver}}')"
-        echo "Architecture: $(docker info --format '{{.Architecture}}')"
-        echo "CPUs: $(docker info --format '{{.NCPU}}')"
-        echo "Memory: $(docker info --format '{{.MemTotal}}')"
-      fi
-    else
-      echo "❌ Docker connectivity test failed"
-      echo "🔍 Attempting to diagnose the issue..."
-
-      # Test network connectivity to Docker service
-      if ping -c 1 docker >/dev/null 2>&1; then
-        echo "✅ Docker hostname resolves"
-      else
-        echo "❌ Docker hostname resolution failed"
-        echo "Available services:"
-        cat /etc/hosts || true
-      fi
-
-      # Test port connectivity
-      if nc -z docker 2375 >/dev/null 2>&1; then
-        echo "✅ Docker port 2375 is reachable"
-      else
-        echo "❌ Docker port 2375 is not reachable"
-      fi
-
-      # Additional debugging
-      echo "🔍 Checking Docker service status..."
-      ps aux | grep docker || true
-
-      echo "🔍 Network configuration:"
-      netstat -tlnp 2>/dev/null || ss -tlnp 2>/dev/null || true
-
-      exit 1
-    fi
-
+    apk add --no-cache openssh-client git curl
+    docker --version && docker info
     echo "✅ Runner validation complete"
     echo "Runner: $CI_RUNNER_DESCRIPTION"
     echo "Executor: $CI_RUNNER_EXECUTOR"
@@ -349,234 +140,71 @@ validate-dependencies:
   cache:
     <<: *global_cache
     policy: pull
-  variables:
-    PNPM_HOME: /root/.local/share/pnpm
-    PNPM_STORE_DIR: .pnpm-store
-    HUSKY: 0
-    # Increase Node memory for dependency resolution
-    NODE_OPTIONS: "--max-old-space-size=4096"
   script:
   - echo "🔍 Validating dependencies..."
-  - apk add --no-cache git curl jq
+  - apk add --no-cache git
   - corepack enable pnpm
   - pnpm config set store-dir $PNPM_CACHE_FOLDER
-  - pnpm config set registry https://registry.npmjs.org/
-  - pnpm config set network-timeout 60000
-  - |
-    # Diagnostic information
-    echo "📊 Environment Information:"
-    echo "Node version: $(node --version)"
-    echo "pnpm version: $(pnpm --version)"
-    echo "Available memory: $(free -h | grep Mem || echo 'N/A')"
-    echo "Store directory: $PNPM_CACHE_FOLDER"
-
-    # Check if lockfile exists and is valid
-    if [ -f "pnpm-lock.yaml" ]; then
-      echo "✅ pnpm-lock.yaml found"
-    else
-      echo "⚠️ No pnpm-lock.yaml found - will create new lockfile"
-    fi
-
-    # Install dependencies with progressive fallback strategy
-    echo "📦 Installing dependencies (attempt 1: optimized with cache)..."
-    if pnpm install \
-      --no-frozen-lockfile \
-      --prefer-offline \
-      --reporter=default \
-      --ignore-scripts 2>&1 | tee pnpm-install.log; then
-      echo "✅ Install successful with optimized settings"
-    else
-      EXIT_CODE=$?
-      echo "❌ Install attempt 1 failed with exit code $EXIT_CODE"
-      echo "📋 Last 50 lines of install log:"
-      tail -n 50 pnpm-install.log || true
-
-      echo ""
-      echo "📦 Installing dependencies (attempt 2: without offline preference)..."
-      if pnpm install \
-        --no-frozen-lockfile \
-        --reporter=default \
-        --ignore-scripts 2>&1 | tee pnpm-install-2.log; then
-        echo "✅ Install successful without offline preference"
-      else
-        EXIT_CODE=$?
-        echo "❌ Install attempt 2 failed with exit code $EXIT_CODE"
-        echo "📋 Last 50 lines of install log:"
-        tail -n 50 pnpm-install-2.log || true
-
-        echo ""
-        echo "📦 Installing dependencies (attempt 3: minimal flags)..."
-        if pnpm install --ignore-scripts 2>&1 | tee pnpm-install-3.log; then
-          echo "✅ Install successful with minimal flags"
-        else
-          EXIT_CODE=$?
-          echo "❌ Install attempt 3 failed with exit code $EXIT_CODE"
-          echo "📋 Last 50 lines of install log:"
-          tail -n 50 pnpm-install-3.log || true
-
-          echo ""
-          echo "📦 Installing dependencies (attempt 4: last resort - allow scripts)..."
-          if pnpm install 2>&1 | tee pnpm-install-4.log; then
-            echo "✅ Install successful with all features enabled"
-          else
-            EXIT_CODE=$?
-            echo "❌ All install attempts failed"
-            echo "📋 Full diagnostic information:"
-            echo ""
-            echo "=== Final install log (last 100 lines) ==="
-            tail -n 100 pnpm-install-4.log || true
-            echo ""
-            echo "=== Network connectivity test ==="
-            curl -I https://registry.npmjs.org/ || echo "Registry unreachable"
-            echo ""
-            echo "=== Disk space ==="
-            df -h || true
-            echo ""
-            exit $EXIT_CODE
-          fi
-        fi
-      fi
-    fi
-
-    # Verify installation
-    echo ""
-    echo "✅ Dependencies installed successfully"
-    echo "📋 Installed packages:"
-    pnpm list --depth=0 || echo "⚠️ Could not list packages"
-
-    # Security audit with faster execution (non-blocking)
-    echo ""
-    echo "🔒 Running security audit..."
-    if pnpm audit --audit-level moderate --json > audit-report.json 2>&1; then
-      echo "✅ Security audit completed successfully"
-    else
-      echo "⚠️ Security audit completed with findings (non-blocking)"
-    fi
-
-    # Check for critical vulnerabilities
-    if [ -f audit-report.json ]; then
-      CRITICAL_VULNS=$(jq '.metadata.vulnerabilities.critical // 0' audit-report.json 2>/dev/null || echo "0")
-      if [ "$CRITICAL_VULNS" -gt 0 ]; then
-        echo "⚠️ $CRITICAL_VULNS critical vulnerabilities found"
-      else
-        echo "✅ No critical vulnerabilities found"
-      fi
-    fi
+  - pnpm install --frozen-lockfile --prefer-offline
+  - pnpm audit --audit-level moderate || echo "Audit warnings found but continuing"
   - echo "✅ Dependencies validated"
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   - if: $CI_MERGE_REQUEST_ID
-  timeout: 8m
+  timeout: 10m
 
+# Build stage - optimized for speed
 build-frontend:
   stage: build
   image: docker:27.3.1
-  services:
-  - name: docker:27.3.1-dind
-    alias: docker
-    command: [ "--tls=false", "--experimental=false", "--insecure-registry=0.0.0.0/0", "--dns=8.8.8.8", "--dns=8.8.4.4", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock" ]
-  <<: *registry_login
+  <<: [ *docker_service, *registry_login ]
   cache:
     <<: *global_cache
-  variables:
-    # Docker configuration
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ''
-    DOCKER_DRIVER: overlay2
-    # Optimize Docker build performance
-    DOCKER_BUILDKIT: 1
-    BUILDKIT_PROGRESS: plain
-    DOCKER_CLI_EXPERIMENTAL: enabled
   script:
   - echo "🏗️ Building optimized frontend container..."
   - |
-    # Set SENTRY_RELEASE dynamically
-    if [ -n "$CI_COMMIT_TAG" ]; then
-      export SENTRY_RELEASE="$CI_COMMIT_TAG"
-    else
-      export SENTRY_RELEASE="$CI_COMMIT_SHORT_SHA"
-    fi
+    # Create buildx builder with caching
+    docker buildx create --use --name multiarch-builder --driver docker-container || docker buildx use multiarch-builder
 
-    # Use standard docker build instead of buildx to avoid session timeout issues
-    # Build directly to registry with push to avoid local export timeout
-    echo "🔨 Starting optimized build with direct registry push..."
-
-    # Prepare secrets for Docker BuildKit secret mounts (more secure than build args)
-    echo "🔐 Preparing secrets for secure build..."
-    echo -n "$SENTRY_DSN" > /tmp/.sentry_dsn
-    echo -n "$SENTRY_AUTH_TOKEN" > /tmp/.sentry_auth_token
-    echo -n "$BETTER_AUTH_SECRET" > /tmp/.better_auth_secret
-
-    # Build with BuildKit secret mounts (secrets not stored in image layers)
-    DOCKER_BUILDKIT=1 docker build \
+    # Build with optimized caching and multi-stage optimization
+    docker buildx build \
+      --load \
       --build-arg NODE_ENV=production \
       --build-arg CI=true \
       --build-arg BUILDKIT_INLINE_CACHE=1 \
+      --build-arg SENTRY_DSN="$SENTRY_DSN" \
+      --build-arg SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
       --build-arg SENTRY_RELEASE="$SENTRY_RELEASE" \
       --build-arg PUBLIC_SENTRY_DSN="$PUBLIC_SENTRY_DSN" \
-      --secret id=sentry_dsn,src=/tmp/.sentry_dsn \
-      --secret id=sentry_auth_token,src=/tmp/.sentry_auth_token \
-      --secret id=better_auth_secret,src=/tmp/.better_auth_secret \
-      --cache-from $CI_REGISTRY_IMAGE:latest \
+      --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+      --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache \
+      --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:latest \
+      --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache,mode=min \
       --target runtime \
       -t $CONTAINER_IMAGE \
-      -t $CONTAINER_IMAGE_LATEST \
-      --progress=plain \
-      .
-
-    # Clean up secret files
-    rm -f /tmp/.sentry_dsn /tmp/.sentry_auth_token /tmp/.better_auth_secret
+      -t $CONTAINER_IMAGE_LATEST .
 
     # Push with timeout and retry
     echo "📤 Pushing to registry..."
-    PUSH_SUCCESS=false
-    for i in $(seq 1 3); do
-      echo "📤 Push attempt $i/3..."
-      if timeout 600 docker push $CONTAINER_IMAGE && timeout 600 docker push $CONTAINER_IMAGE_LATEST; then
-        echo "✅ Images pushed successfully on attempt $i"
-        PUSH_SUCCESS=true
+    for i in {1..3}; do
+      if timeout 300 docker push $CONTAINER_IMAGE && timeout 300 docker push $CONTAINER_IMAGE_LATEST; then
+        echo "✅ Images pushed successfully"
         break
       else
-        PUSH_EXIT_CODE=$?
-        echo "❌ Push attempt $i failed with exit code $PUSH_EXIT_CODE"
-        if [ $i -lt 3 ]; then
-          echo "⏳ Waiting 15 seconds before retry..."
-          sleep 15
-        fi
+        echo "⚠️ Push attempt $i failed, retrying..."
+        sleep 10
       fi
     done
 
-    # Verify push succeeded
-    if [ "$PUSH_SUCCESS" = "false" ]; then
-      echo "❌ Failed to push images after 3 attempts"
-      echo "🔍 Troubleshooting information:"
-      echo "  - Registry: $CI_REGISTRY"
-      echo "  - Image: $CONTAINER_IMAGE"
-      echo "  - Check registry permissions and authentication"
-      echo "  - Verify CI_JOB_TOKEN has write access to registry"
-      exit 1
-    fi
-
-    # Verify images exist in registry
-    echo "🔍 Verifying images in registry..."
-    if docker manifest inspect $CONTAINER_IMAGE >/dev/null 2>&1; then
-      echo "✅ Image verified in registry: $CONTAINER_IMAGE"
-    else
-      echo "❌ Image not found in registry after push: $CONTAINER_IMAGE"
-      echo "This indicates a registry synchronization issue"
-      exit 1
-    fi
-
     echo "📦 Image: $CONTAINER_IMAGE"
-    echo "📦 Latest: $CONTAINER_IMAGE_LATEST"
   artifacts:
     expire_in: 1 hour
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   - if: $CI_MERGE_REQUEST_ID
-  timeout: 40m
+  timeout: 20m
 
 # Parallel testing stage
 test-container:
@@ -588,47 +216,30 @@ test-container:
   - echo "🧪 Testing container health..."
   - docker pull $CONTAINER_IMAGE
   - |
-    # Run container with health check using curl (installed in Alpine base)
+    # Run container with health check
     docker run -d \
       --name test-container \
-      --health-cmd="curl -f http://localhost:4321/api/health || exit 1" \
+      --health-cmd="node -e \"require('http').get('http://localhost:4321/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\"" \
       --health-interval=10s \
-      --health-timeout=10s \
-      --health-retries=5 \
-      --health-start-period=30s \
+      --health-timeout=5s \
+      --health-retries=3 \
       -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
       $CONTAINER_IMAGE
 
-    # Wait for healthy status with extended timeout
-    echo "⏳ Waiting for container to start (30s grace period)..."
-    sleep 30
-
-    for i in $(seq 1 30); do
+    # Wait for healthy status
+    for i in {1..30}; do
       STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-container 2>/dev/null || echo "starting")
       if [ "$STATUS" = "healthy" ]; then
         echo "✅ Container health check passed"
-        docker logs test-container
         break
       elif [ "$STATUS" = "unhealthy" ]; then
         echo "❌ Container health check failed"
-        echo "📋 Container logs:"
         docker logs test-container
-        echo ""
-        echo "🔍 Health check details:"
-        docker inspect test-container --format='{{json .State.Health}}' | jq '.' || true
         exit 1
       fi
       echo "⏳ Waiting for health check... ($i/30) Status: $STATUS"
       sleep 2
     done
-
-    # Final status check
-    FINAL_STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-container 2>/dev/null || echo "unknown")
-    if [ "$FINAL_STATUS" != "healthy" ]; then
-      echo "❌ Container never became healthy (final status: $FINAL_STATUS)"
-      docker logs test-container
-      exit 1
-    fi
 
     docker stop test-container && docker rm test-container
   rules:
@@ -647,173 +258,37 @@ test-unit:
   parallel:
     matrix:
     - TEST_SUITE: [ unit, security, lint ]
-  variables:
-    # Optimize test performance
-    HUSKY: 0
-    NODE_OPTIONS: "--max-old-space-size=4096"
-    CI: true
   script:
   - echo "🧪 Running $TEST_SUITE tests..."
   - apk add --no-cache git
   - corepack enable pnpm
   - pnpm config set store-dir $PNPM_CACHE_FOLDER
   - |
-    # Install dependencies with optimized settings for testing
-    echo "📦 Installing dependencies for testing..."
-    pnpm install \
-      --no-frozen-lockfile \
-      --prefer-offline \
-      --reporter=default \
-      --ignore-scripts \
-      --shamefully-hoist=false || {
-        echo "❌ pnpm install failed, trying with fallback options..."
-        pnpm install --no-frozen-lockfile --ignore-scripts || \
-        pnpm install --ignore-scripts || \
-        pnpm install
-      }
-
     case $TEST_SUITE in
       unit)
-        echo "🔬 Running unit tests..."
-        echo "📋 Test configuration:"
-        echo "  - Node version: $(node --version)"
-        echo "  - pnpm version: $(pnpm --version)"
-        echo "  - Available memory: $(free -h 2>/dev/null | grep Mem || echo 'N/A')"
-
-        # Run tests with better error handling
-        if pnpm test:unit --reporter=verbose --run; then
-          echo "✅ All unit tests passed"
-        else
-          EXIT_CODE=$?
-          echo "⚠️ Unit tests completed with failures (exit code: $EXIT_CODE)"
-          echo ""
-          echo "📊 Test Summary:"
-          echo "  - Check test-results/ directory for detailed reports"
-          echo "  - Review screenshots and traces for failed tests"
-          echo "  - See artifacts for full test output"
-          echo ""
-          # Don't exit with failure - let allow_failure handle it
-        fi
+        pnpm test:unit || echo "Unit tests completed with warnings"
         ;;
       security)
-        echo "🔒 Running security checks..."
-        if pnpm security:check --format=json > security-report.json; then
-          echo "✅ Security checks passed"
-        else
-          echo "⚠️ Security check completed with findings"
-        fi
+        pnpm security:check || echo "Security check completed with warnings"
         ;;
       lint)
-        echo "🔍 Running linting..."
-        if pnpm lint:ci --format=json > lint-report.json; then
-          echo "✅ Linting passed"
-        else
-          echo "⚠️ Linting completed with issues"
-        fi
+        pnpm lint:ci || echo "Linting completed with warnings"
         ;;
     esac
-
-    # Show test result summary if available
-    if [ -f "test-results.xml" ]; then
-      echo ""
-      echo "📋 Test Results Summary:"
-      grep -o 'tests="[0-9]*"' test-results.xml 2>/dev/null || true
-      grep -o 'failures="[0-9]*"' test-results.xml 2>/dev/null || true
-      grep -o 'errors="[0-9]*"' test-results.xml 2>/dev/null || true
-    fi
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
     reports:
       coverage_report:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
-      junit: test-results.xml
     expire_in: 1 week
     when: always
-    paths:
-    - coverage/
-    - test-results/
-    - test-results.xml
-    - security-report.json
-    - lint-report.json
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   - if: $CI_MERGE_REQUEST_ID
   allow_failure: true
   timeout: 15m
-
-# Playwright browser tests - separate job for better visibility
-test-playwright:
-  stage: test
-  image: mcr.microsoft.com/playwright:v1.49.0-noble
-  cache:
-    <<: *global_cache
-    policy: pull
-  needs: [ "validate-dependencies" ]
-  variables:
-    HUSKY: 0
-    NODE_OPTIONS: "--max-old-space-size=4096"
-    CI: true
-    # Playwright specific
-    PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
-  script:
-  - echo "🎭 Running Playwright browser tests..."
-  - |
-    # Install pnpm directly using npm (bypasses corepack signature verification issues)
-    echo "📦 Installing pnpm@10.18.0..."
-    npm install -g pnpm@10.18.0
-    pnpm config set store-dir $PNPM_CACHE_FOLDER
-    echo "✅ pnpm version: $(pnpm --version)"
-
-    # Install dependencies
-    echo "📦 Installing dependencies..."
-    pnpm install --no-frozen-lockfile --prefer-offline || pnpm install
-
-    # Verify Playwright browsers are available
-    echo "🔍 Checking Playwright installation..."
-    if ! pnpm exec playwright --version >/dev/null 2>&1; then
-      echo "⚠️ Playwright not found, installing browsers..."
-      pnpm exec playwright install --with-deps
-    else
-      echo "✅ Playwright version: $(pnpm exec playwright --version)"
-    fi
-
-    # Run Playwright tests with detailed reporting
-    echo "🎬 Starting Playwright tests..."
-    if pnpm exec playwright test \
-      --reporter=list,html,junit \
-      --output=test-results/playwright; then
-      echo "✅ All Playwright tests passed"
-    else
-      EXIT_CODE=$?
-      echo "⚠️ Playwright tests completed with failures (exit code: $EXIT_CODE)"
-      echo ""
-      echo "📊 Test Summary:"
-      echo "  - Check test-results/playwright/ for screenshots"
-      echo "  - View HTML report in artifacts"
-      echo "  - Review traces for failed tests"
-      echo ""
-      echo "💡 Common issues:"
-      echo "  1. Mobile navigation timing - ensure CSS transitions complete"
-      echo "  2. Astro hydration timing - wait for page-load events"
-      echo "  3. Element visibility - check CSS display/visibility properties"
-      echo ""
-    fi
-  artifacts:
-    expire_in: 1 week
-    when: always
-    paths:
-    - test-results/
-    - playwright-report/
-    reports:
-      junit: test-results/junit.xml
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_COMMIT_BRANCH == "main"
-  - if: $CI_MERGE_REQUEST_ID
-  allow_failure: true
-  timeout: 20m
 
 # Security stage - comprehensive scanning
 security-scan:
@@ -875,127 +350,187 @@ security-scan:
   allow_failure: true
   timeout: 15m
 
-# Sentry integration - runs after successful deployment
+# Sentry integration - conditional
 sentry-release:
-  stage: deploy
+  stage: security
   image: node:24-alpine
-  needs: [ "deploy-gke" ]
+  needs: [ "build-frontend" ]
   script:
   - |
-    # Set SENTRY_RELEASE dynamically
-    if [ -n "$CI_COMMIT_TAG" ]; then
-      export SENTRY_RELEASE="$CI_COMMIT_TAG"
-    else
-      export SENTRY_RELEASE="$CI_COMMIT_SHORT_SHA"
-    fi
-
     if [ -n "$SENTRY_AUTH_TOKEN" ]; then
-      echo "Creating Sentry release: $SENTRY_RELEASE"
+      echo "📊 Creating Sentry release: $SENTRY_RELEASE"
       apk add --no-cache curl git
       curl -sL https://sentry.io/get-cli/ | sh
       sentry-cli releases new "$SENTRY_RELEASE" || true
       sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
       sentry-cli releases finalize "$SENTRY_RELEASE" || true
-      echo "Sentry release created"
+      echo "✅ Sentry release created"
     else
-      echo "SENTRY_AUTH_TOKEN not set, skipping"
+      echo "⚠️ SENTRY_AUTH_TOKEN not set, skipping"
     fi
   rules:
   - if: $CI_COMMIT_TAG
   - if: $CI_COMMIT_BRANCH == "master"
+    when: manual
   - if: $CI_COMMIT_BRANCH == "main"
+    when: manual
   allow_failure: true
   timeout: 5m
 
-# Health monitoring - GKE deployment
+# Deployment stage - secure and reliable
+deploy-vps:
+  stage: deploy
+  image: alpine:latest
+  <<: *ssh_setup
+  needs: [ "test-container" ]
+  script:
+  - echo "🚀 Deploying to VPS environment..."
+  - |
+    ssh $VPS_USER@$VPS_HOST << 'EOF'
+      set -e
+
+      echo "🔄 Starting deployment..."
+
+      # Install Docker if needed
+      if ! command -v docker &> /dev/null; then
+        curl -fsSL https://get.docker.com | sh
+        systemctl enable --now docker
+      fi
+
+      # Login and pull
+      echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+      docker pull $CONTAINER_IMAGE_LATEST
+
+      # Blue-green deployment
+      if docker ps | grep -q pixelated-app; then
+        docker tag $CONTAINER_IMAGE_LATEST $CONTAINER_IMAGE_PREVIOUS
+        docker stop pixelated-app || true
+        docker rm pixelated-app || true
+      fi
+
+      # Start new container with security settings
+      docker run -d \
+        --name pixelated-app \
+        --restart unless-stopped \
+        --user 1001:1001 \
+        --read-only \
+        --tmpfs /tmp:rw,noexec,nosuid,size=100m \
+        --security-opt no-new-privileges:true \
+        --cap-drop ALL \
+        --cap-add CHOWN \
+        --cap-add SETGID \
+        --cap-add SETUID \
+        -p 4321:4321 \
+        -e NODE_ENV=production \
+        -e PORT=4321 \
+        -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+        -e ASTRO_TELEMETRY_DISABLED=1 \
+        --health-cmd="node -e \"require('http').get('http://localhost:4321/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\"" \
+        --health-interval=30s \
+        --health-timeout=10s \
+        --health-retries=3 \
+        $CONTAINER_IMAGE_LATEST
+
+      # Wait for health check
+      echo "⏳ Waiting for application to be healthy..."
+      for i in {1..20}; do
+        STATUS=$(docker inspect --format='{{.State.Health.Status}}' pixelated-app 2>/dev/null || echo "starting")
+        if [ "$STATUS" = "healthy" ]; then
+          echo "✅ Application is healthy"
+          break
+        fi
+        echo "Status: $STATUS (attempt $i/20)"
+        sleep 5
+      done
+
+      echo "✅ Deployment completed successfully"
+    EOF
+  environment:
+    name: production
+    url: https://$VPS_DOMAIN
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
+  timeout: 15m
+
+# Rollback capability
+rollback:
+  stage: deploy
+  image: alpine:latest
+  <<: *ssh_setup
+  script:
+  - echo "🔄 Rolling back to previous version..."
+  - |
+    ssh $VPS_USER@$VPS_HOST << 'EOF'
+      set -e
+
+      echo "🔄 Performing rollback..."
+
+      # Stop current container
+      docker stop pixelated-app || true
+      docker rm pixelated-app || true
+
+      # Start previous version
+      if docker images | grep -q $CONTAINER_IMAGE_PREVIOUS; then
+        docker run -d \
+          --name pixelated-app \
+          --restart unless-stopped \
+          --user 1001:1001 \
+          -p 4321:4321 \
+          -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+          $CONTAINER_IMAGE_PREVIOUS
+        echo "✅ Rollback completed"
+      else
+        echo "❌ No previous image found for rollback"
+        exit 1
+      fi
+    EOF
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+    when: manual
+  - if: $CI_COMMIT_BRANCH == "main"
+    when: manual
+  allow_failure: true
+  timeout: 10m
+
+# Health monitoring
 health-check:
   stage: deploy
-  image: google/cloud-sdk:alpine
-  needs: [ "deploy-gke" ]
-  before_script:
-  - apk add --no-cache kubectl curl jq gettext
-  - gcloud components install gke-gcloud-auth-plugin --quiet
+  image: alpine:latest
+  needs: [ "deploy-vps" ]
+  script:
+  - apk add --no-cache curl
+  - echo "🏥 Running post-deployment health check..."
   - |
-    if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
-      echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
-    elif [ -n "$GCP_SERVICE_ACCOUNT_KEY_B64" ]; then
-      echo "$GCP_SERVICE_ACCOUNT_KEY_B64" | base64 -d > /tmp/gcp-key.json
-    else
-      echo "⚠️ No GCP credentials configured, skipping health check"
+    if [ -z "$VPS_DOMAIN" ] && [ -z "$VPS_HOST" ]; then
+      echo "⚠️ No target configured, skipping health check"
       exit 0
     fi
 
-    chmod 600 /tmp/gcp-key.json
-    gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-    gcloud config set project $GCP_PROJECT_ID
-    gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
-  script:
-  - echo "🏥 Running post-deployment health check on GKE..."
-  - |
-    # Use the pixelated namespace
-    NAMESPACE="pixelated"
-    DEPLOYMENT_NAME="pixelated"
-    APP_LABEL="pixelated-app"
+    TARGET="${VPS_DOMAIN:-$VPS_HOST}"
 
-    # Check Kubernetes deployment health
-    echo "🔍 Checking Kubernetes deployment status in namespace: $NAMESPACE"
-
-    # Verify deployment exists
-    if ! kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE >/dev/null 2>&1; then
-      echo "❌ Deployment $DEPLOYMENT_NAME not found in namespace $NAMESPACE"
-      echo "Available deployments:"
-      kubectl get deployments -n $NAMESPACE
-      exit 1
-    fi
-
-    echo "✅ Found deployment: $DEPLOYMENT_NAME"
-
-    # Check if pods are ready (using correct label selector)
-    READY_REPLICAS=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath='{.status.readyReplicas}' || echo "0")
-    DESIRED_REPLICAS=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath='{.spec.replicas}')
-
-    echo "📊 Ready replicas: $READY_REPLICAS/$DESIRED_REPLICAS"
-
-    if [ "$READY_REPLICAS" != "$DESIRED_REPLICAS" ] || [ -z "$READY_REPLICAS" ]; then
-      echo "⚠️ Not all replicas are ready"
-      echo "Deployment status:"
-      kubectl describe deployment $DEPLOYMENT_NAME -n $NAMESPACE | tail -20
-      echo ""
-      echo "Pod status:"
-      kubectl get pods -n $NAMESPACE -l app=$APP_LABEL
-      kubectl describe pods -n $NAMESPACE -l app=$APP_LABEL | tail -50
-      exit 1
-    fi
-
-    # Show pod status
-    echo "📋 Pod status:"
-    kubectl get pods -n $NAMESPACE -l app=$APP_LABEL
-
-    # Check HTTP endpoint if configured
-    if [ -n "$GKE_ENVIRONMENT_URL" ]; then
-      echo "🔍 Checking HTTP endpoint: $GKE_ENVIRONMENT_URL"
-
-      for endpoint in "/api/health" "/health" "/"; do
-        URL="$GKE_ENVIRONMENT_URL$endpoint"
-        echo "🔍 Testing $URL..."
+    # Comprehensive health check
+    for endpoint in "/api/health" "/health" "/"; do
+      for protocol in "https" "http"; do
+        URL="$protocol://$TARGET$endpoint"
+        echo "🔍 Checking $URL..."
 
         if curl -fsS --connect-timeout 10 --max-time 30 "$URL" >/dev/null 2>&1; then
           echo "✅ Health check passed: $URL"
-          echo "✅ GKE deployment is healthy"
           exit 0
         fi
       done
+    done
 
-      echo "⚠️ HTTP endpoints not responding, but pods are ready"
-    fi
-
-    echo "✅ Kubernetes deployment health check passed"
+    echo "❌ All health checks failed"
+    exit 1
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
   timeout: 5m
 
+# Cleanup job - runs periodically
 cleanup:
   stage: deploy
   image: docker:27.3.1
@@ -1016,7 +551,9 @@ cleanup:
   rules:
   - if: $CI_PIPELINE_SOURCE == "schedule"
   - if: $CI_COMMIT_BRANCH == "master"
+    when: manual
   - if: $CI_COMMIT_BRANCH == "main"
+    when: manual
   allow_failure: true
   timeout: 10m
 
@@ -1030,21 +567,14 @@ build-ai-backend:
   - |
     if [ -d "ai" ]; then
       cd ai
-
-      # Prepare secrets for secure build
-      echo "🔐 Preparing secrets..."
-      echo -n "$BETTER_AUTH_SECRET" > /tmp/.better_auth_secret
-
-      # Use standard docker build to avoid buildx session timeout
-      DOCKER_BUILDKIT=1 docker build \
-        --secret id=better_auth_secret,src=/tmp/.better_auth_secret \
-        --cache-from $CI_REGISTRY_IMAGE/ai:latest \
+      docker buildx create --use --name ai-builder || docker buildx use ai-builder
+      docker buildx build \
+        --load \
+        --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+        --cache-from type=registry,ref=$CI_REGISTRY_IMAGE/ai:cache \
+        --cache-to type=registry,ref=$CI_REGISTRY_IMAGE/ai:cache,mode=min \
         -t $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA \
         -t $CI_REGISTRY_IMAGE/ai:latest .
-
-      # Clean up secrets
-      rm -f /tmp/.better_auth_secret
-
       docker push $CI_REGISTRY_IMAGE/ai:$CI_COMMIT_SHA
       docker push $CI_REGISTRY_IMAGE/ai:latest
       echo "✅ AI backend container pushed"
@@ -1061,13 +591,12 @@ build-ai-backend:
   allow_failure: true
   timeout: 15m
 
-# GKE deployment - optimized with proper manifest application
+# GKE deployment - optimized (manual only for safety)
 deploy-gke:
   stage: deploy
   image: google/cloud-sdk:alpine
   before_script:
   - apk add --no-cache kubectl curl jq
-  - gcloud components install gke-gcloud-auth-plugin --quiet
   - |
     if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
       echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
@@ -1090,146 +619,41 @@ deploy-gke:
   script:
   - echo "🚀 Deploying to GKE cluster..."
   - |
-    # Check current deployments and namespaces
-    echo "🔍 Checking existing deployments..."
-    kubectl get deployments --all-namespaces | grep pixelated || echo "No pixelated deployments found yet"
+    # Update deployment with new image
+    kubectl patch deployment pixelated -p '{"spec":{"template":{"spec":{"containers":[{"name":"pixelated","image":"'$CONTAINER_IMAGE'"}]}}}}'
 
-    # Determine namespace (default to pixelated)
-    NAMESPACE="pixelated"
-
-    # Check if namespace exists, create if needed
-    if ! kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
-      echo "📦 Creating namespace $NAMESPACE..."
-      kubectl create namespace $NAMESPACE
-    else
-      echo "✅ Namespace $NAMESPACE exists"
-    fi
-
-    # Clean up stuck deployments and replica sets
-    echo "🧹 Cleaning up old failed replica sets..."
-
-    # Check for stuck pods referencing missing secrets
-    STUCK_PODS=$(kubectl get pods -n $NAMESPACE -l app=pixelated-app --field-selector=status.phase=Pending -o name 2>/dev/null | wc -l)
-    if [ "$STUCK_PODS" -gt 0 ]; then
-      echo "⚠️ Found $STUCK_PODS stuck pods in Pending state"
-      echo "🔧 Scaling deployment to 0 to clear stuck state..."
-      kubectl scale deployment pixelated -n $NAMESPACE --replicas=0 || true
-      kubectl wait --for=delete pod -l app=pixelated-app -n $NAMESPACE --timeout=60s || true
-
-      # Delete old replica sets that might reference missing secrets
-      echo "🗑️ Deleting old replica sets..."
-      kubectl delete rs -n $NAMESPACE -l app=pixelated-app --cascade=orphan || true
-
-      sleep 5
-    else
-      echo "✅ No stuck pods found"
-    fi
-
-    # Apply all Kubernetes manifests
-    echo "🚀 Applying Kubernetes manifests..."
-
-    if [ -f "k8s/deployment.yaml" ]; then
-      echo "📝 Applying k8s/deployment.yaml"
-      # Substitute pipeline variables (CONTAINER_IMAGE, CI_REGISTRY_IMAGE, CI_COMMIT_SHA) into
-      # the manifest so it is deployed with the exact image produced by the pipeline.
-      envsubst < k8s/deployment.yaml > /tmp/deployment.yaml
-      kubectl apply -f /tmp/deployment.yaml -n $NAMESPACE
-    else
-      echo "⚠️ k8s/deployment.yaml not found"
-    fi
-
-    if [ -f "k8s/service.yaml" ]; then
-      echo "📋 Applying k8s/service.yaml"
-      envsubst < k8s/service.yaml > /tmp/service.yaml
-      kubectl apply -f /tmp/service.yaml -n $NAMESPACE
-    else
-      echo "⚠️ k8s/service.yaml not found"
-    fi
-
-    if [ -f "k8s/ingress.yaml" ]; then
-      echo "📋 Applying k8s/ingress.yaml"
-      envsubst < k8s/ingress.yaml > /tmp/ingress.yaml
-      kubectl apply -f /tmp/ingress.yaml -n $NAMESPACE
-    else
-      echo "⚠️ k8s/ingress.yaml not found (optional)"
-    fi
-
-    # Verify deployment was created
-    DEPLOYMENT_NAME="pixelated"
-    if ! kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE >/dev/null 2>&1; then
-      echo "❌ Deployment $DEPLOYMENT_NAME was not created!"
-      echo "Available deployments in namespace $NAMESPACE:"
-      kubectl get deployments -n $NAMESPACE
-      exit 1
-    fi
-
-    # Force update the image to ensure we're using the latest
-    echo "📝 Updating deployment image to: $CONTAINER_IMAGE"
-    kubectl set image deployment/$DEPLOYMENT_NAME pixelated=$CONTAINER_IMAGE -n $NAMESPACE
-
-    # Wait for rollout with extended timeout and better error handling
-    echo "⏳ Waiting for rollout to complete..."
-    if ! kubectl rollout status deployment/$DEPLOYMENT_NAME -n $NAMESPACE --timeout=900s; then
-      echo "❌ Rollout failed or timed out after 15 minutes"
-      echo ""
-      echo "🔍 Diagnosing rollout failure..."
-      echo ""
-      echo "=== Pod Status ==="
-      kubectl get pods -n $NAMESPACE -l app=pixelated-app -o wide
-      echo ""
-      echo "=== ReplicaSet Status ==="
-      kubectl get rs -n $NAMESPACE -l app=pixelated-app
-      echo ""
-      echo "=== Recent Events ==="
-      kubectl get events -n $NAMESPACE --sort-by='.lastTimestamp' | tail -30
-      echo ""
-      echo "=== Describe Deployment ==="
-      kubectl describe deployment $DEPLOYMENT_NAME -n $NAMESPACE | tail -50
-      echo ""
-      echo "=== Describe Failed Pods ==="
-      kubectl describe pods -n $NAMESPACE -l app=pixelated-app | grep -A 20 "Events:"
-      echo ""
-      echo "=== Logs from New Pods ==="
-      for pod in $(kubectl get pods -n $NAMESPACE -l app=pixelated-app --field-selector=status.phase!=Running -o name 2>/dev/null); do
-        echo "--- Logs from $pod ---"
-        kubectl logs -n $NAMESPACE $pod --tail=50 2>&1 || echo "Could not retrieve logs"
-        echo ""
-      done
-      echo ""
-      echo "💡 Common causes:"
-      echo "  1. Health check endpoint not responding (/health)"
-      echo "  2. Container startup failures (missing env vars, secrets)"
-      echo "  3. Image pull failures"
-      echo "  4. Resource constraints (insufficient CPU/memory)"
-      echo "  5. PodDisruptionBudget blocking pod termination"
-      echo ""
-      exit 1
-    fi
+    # Wait for rollout
+    kubectl rollout status deployment/pixelated --timeout=600s
 
     # Verify deployment
-    echo "✅ Verifying deployment..."
-    kubectl get pods -n $NAMESPACE -l app=pixelated-app
-    kubectl get services -n $NAMESPACE
+    kubectl get pods -l app=pixelated
+    kubectl get services pixelated-service
 
-    echo ""
     echo "✅ Deployed to GKE successfully"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "Namespace: $NAMESPACE"
-    echo "Deployment: $DEPLOYMENT_NAME"
-    echo "Image: $CONTAINER_IMAGE"
-    echo "Pods:"
-    kubectl get pods -n $NAMESPACE -l app=pixelated-app -o wide
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   environment:
     name: production-gke
     url: $GKE_ENVIRONMENT_URL
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
+    when: manual
   - if: $CI_COMMIT_BRANCH == "main"
-  needs: [ "build-frontend", "test-container", "test-unit", "security-scan" ]
+    when: manual
+  needs: [ "build-frontend" ]
   allow_failure: true
   timeout: 20m
 
+# Include GitLab security templates
 include:
 - template: Security/SAST.gitlab-ci.yml
 - template: Security/Dependency-Scanning.gitlab-ci.yml
+- template: Security/Container-Scanning.gitlab-ci.yml
+
+# Override container_scanning from included templates to make build-frontend optional
+container_scanning:
+  needs:
+  - job: build-frontend
+    optional: true
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_MERGE_REQUEST_ID

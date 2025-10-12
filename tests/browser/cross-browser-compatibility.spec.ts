@@ -122,7 +122,7 @@ for (const pageInfo of TEST_PAGES) {
 
     // Navigate to page
     await navigateToPage(page, pageInfo.url)
-    await waitForPageStable(page, { browser: browserName })
+    await waitForPageStable(page)
 
     // Verify page elements
     await verifyPageElements(page, pageInfo)
@@ -147,7 +147,7 @@ test('responsive navigation works correctly in all browsers', async ({
 
   // Go to home page
   await navigateToPage(page, '/')
-  await waitForPageStable(page, { browser: browserName })
+  await waitForPageStable(page)
 
   // Test desktop navigation
   await page.setViewportSize({ width: 1280, height: 800 })

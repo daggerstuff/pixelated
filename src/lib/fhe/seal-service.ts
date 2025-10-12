@@ -304,7 +304,6 @@ export class SealService {
       logger.error('Failed to initialize SEAL service', { error })
       throw new Error(
         `SEAL service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
-        { cause: error },
       )
     }
   }
@@ -364,7 +363,6 @@ export class SealService {
       logger.error('Failed to generate SEAL keys', { error })
       throw new Error(
         `Key generation failed: ${error instanceof Error ? String(error) : String(error)}`,
-        { cause: error },
       )
     }
   }
@@ -575,7 +573,6 @@ export class SealService {
       logger.error('Encryption failed', { error })
       throw new Error(
         `Encryption failed: ${error instanceof Error ? String(error) : String(error)}`,
-        { cause: error },
       )
     }
   }
@@ -611,7 +608,6 @@ export class SealService {
       logger.error('Decryption failed', { error })
       throw new Error(
         `Decryption failed: ${error instanceof Error ? String(error) : String(error)}`,
-        { cause: error },
       )
     }
   }
@@ -714,7 +710,6 @@ export class SealService {
       logger.error('Failed to load SEAL keys', { error })
       throw new Error(
         `Key loading failed: ${error instanceof Error ? String(error) : String(error)}`,
-        { cause: error },
       )
     }
   }

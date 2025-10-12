@@ -33,10 +33,10 @@ export default defineConfig({
     ? '$(Agent.WorkFolder)/.vite-cache'
     : 'node_modules/.vite',
   server: {
-    allowedHosts: ['pixelatedempathy.com'],
     watch: {
       ignored: [
         '**/node_modules/**',
+        '**/ai/**',
         '**/dataset/**',
         '**/MER2025/**',
         '**/VideoChat2/**',
@@ -55,9 +55,6 @@ export default defineConfig({
         '**/temp/**',
       ],
     },
-  },
-  preview: {
-    allowedHosts: ['pixelatedempathy.com'],
   },
   plugins: [
     rewriteLoggerImportPlugin(),
@@ -110,15 +107,17 @@ export default defineConfig({
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
             project: process.env.SENTRY_PROJECT || 'pixel-astro',
             authToken: process.env.SENTRY_AUTH_TOKEN,
-            telemetry: false,
-            sourcemaps: {
-              assets: './dist/**',
-              ignore: ['**/node_modules/**'],
-              filesToDeleteAfterUpload: ['**/*.map'],
-            },
           }),
         ]
       : []),
+    sentryVitePlugin({
+      org: 'pixelated-empathy-dq',
+      project: 'pixel-astro',
+    }),
+    sentryVitePlugin({
+      org: 'pixelated-empathy-dq',
+      project: 'pixel-astro',
+    }),
   ],
   base:
     process.env.NODE_ENV === 'production'
@@ -158,6 +157,7 @@ export default defineConfig({
       'zlib': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'net': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       'tls': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
+      // Alias MongoDB to a client-safe polyfill
       'mongodb': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       '@lib': path.resolve(__dirname, 'src/lib'),
       '@/hooks/useMentalHealthAnalysis': path.resolve(
@@ -177,6 +177,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       onwarn(warning, warn) {
+        // Suppress SORUCEMAP warnings
         if (warning.code === 'SOURCEMAP_ERROR') {
           return
         }
@@ -186,6 +187,7 @@ export default defineConfig({
         ) {
           return
         }
+        // Suppress Vite 'externalized for browser compatibility' and Unocss icon '-' warnings
         if (
           warning.message &&
           (warning.message.includes('externalized for browser compatibility') ||
@@ -203,6 +205,7 @@ export default defineConfig({
         ) {
           return true
         }
+        // Exclude MongoDB from client-side bundles
         if (id === 'mongodb' || id.includes('mongodb')) {
           return true
         }

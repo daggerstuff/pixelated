@@ -1,4 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
+// Detect CI environment so CI uses build+preview (no HMR/watchers)
+const isCi = !!process.env['CI']
 
 /**
  * Playwright configuration for MCP-integrated E2E tests
@@ -53,13 +55,22 @@ export default defineConfig({
     },
   ],
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env['CI'],
-    stdout: 'pipe',
-    stderr: 'pipe',
-  },
+  webServer: isCi
+    ? {
+        command: 'pnpm run build && pnpm run preview -- --port 3000',
+        url: 'http://localhost:3000',
+        reuseExistingServer: false,
+        stdout: 'pipe',
+        stderr: 'pipe',
+        timeout: 10 * 60 * 1000,
+      }
+    : {
+        command: 'pnpm dev',
+        url: 'http://localhost:3000',
+        reuseExistingServer: true,
+        stdout: 'pipe',
+        stderr: 'pipe',
+      },
   /* Global setup for MCP integration */
   globalSetup: './tests/mcp-global-setup.ts',
 })

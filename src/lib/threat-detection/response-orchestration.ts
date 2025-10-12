@@ -6,9 +6,8 @@
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';
-import * as tf from '@tensorflow/tfjs';
-import crypto from 'crypto';
-
+import * as tf from '@tensorflow/tfjs-node';
+import crypto from 'node:crypto';
 
 export interface ThreatResponse {
   responseId: string;

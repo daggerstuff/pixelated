@@ -68,8 +68,8 @@ else
     exit 1
 fi
 
-if [[ "$TARGET_PNPM_VERSION" == "10.18.0" ]]; then
-    print_status "✅ Target pnpm version correctly set to 10.18.0"
+if [[ "$TARGET_PNPM_VERSION" == "10.17.1" ]]; then
+    print_status "✅ Target pnpm version correctly set to 10.17.1"
 else
     print_error "❌ Target pnpm version incorrect: $TARGET_PNPM_VERSION"
     exit 1
@@ -92,12 +92,12 @@ print_status ""
 print_status "Functions implemented:"
 print_status "  - setup_nodejs_environment() - Installs Node.js 24.8.0 via nvm"
 print_status "  - verify_nodejs_installation() - Verifies Node.js version and path"
-print_status "  - setup_pnpm_environment() - Installs pnpm 10.18.0"
+print_status "  - setup_pnpm_environment() - Installs pnpm 10.17.1"
 print_status "  - verify_pnpm_installation() - Verifies pnpm version with detailed error reporting"
 print_status "  - validate_complete_environment() - Comprehensive environment validation"
 print_status ""
 print_status "Requirements satisfied:"
 print_status "  - 1.1: Node.js 24.8.0 installation ✅"
-print_status "  - 1.2: pnpm 10.18.0 installation ✅"
+print_status "  - 1.2: pnpm 10.17.1 installation ✅"
 print_status "  - 1.3: PATH configuration for persistent sessions ✅"
 print_status "  - 1.4: Version verification with detailed error reporting ✅"

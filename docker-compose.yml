@@ -1,19 +1,32 @@
-version: '3.8'
-
 services:
-  pixelated-app-new:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: pixelated-app-new
-    ports:
-      - "3000:3000"
+  app:
+    build: .
+    container_name: pixelated-app
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-  
+      - PUBLIC_SITE_URL=https://pixelatedempathy.tech
+    networks:
+      - web
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: pixelated-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

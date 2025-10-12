@@ -9,7 +9,7 @@
     "framework": "React 18 / Angular 18",
     "language": "TypeScript 5.x",
     "build": "Vite / Angular CLI",
-    "styling": "UnoCSS / Angular Material"
+    "styling": "Tailwind CSS / Angular Material"
   },
   "state": {
     "management": "Redux Toolkit / NgRx",
@@ -23,12 +23,12 @@
 ```json
 {
   "api": {
-    "runtime": "Node.js 24+",
+    "runtime": "Node.js 18+",
     "framework": "Express.js / Fastify",
     "documentation": "Swagger/OpenAPI"
   },
   "ai": {
-    "runtime": "Python 3.11.13",
+    "runtime": "Python 3.9+",
     "frameworks": ["FastAPI", "Flask", "TensorFlow", "PyTorch"],
     "ml": ["scikit-learn", "pandas", "numpy"]
   }
@@ -51,10 +51,7 @@
   "containerization": "Docker 24+",
   "orchestration": "Kubernetes 1.27+",
   "deployment": "Helm 3.12+",
-  "monitoring": "Prometheus + Grafana",
-  "load_balancer": "Traefik 3.0+",
-  "service_mesh": "Istio (optional)",
-  "health_checks": "Custom health endpoints + Kubernetes probes"
+  "monitoring": "Prometheus + Grafana"
 }
 ```
 
@@ -64,6 +61,7 @@
 - **Primary**: pnpm (for better performance and disk usage)
 - **Alternative**: npm/yarn for compatibility
 - **Current Usage**: PNPM confirmed as primary package manager for all operations
+- **Python**: uv package manager for all Python operations (uv install, uv run, uv shell)
 
 ### Version Control
 - **Platform**: Git
@@ -110,7 +108,9 @@
   "shap": "^0.42.0",
   "lime": "^0.2.0",
   "aif360": "^0.5.0",
-  "evaluate": "^0.4.0"
+  "evaluate": "^0.4.0",
+  "lightning": "^2.0.0",
+  "lightning-cloud": "^0.5.0"
 }
 ```
 
@@ -124,20 +124,11 @@ pixelated/
 │   │   └── ai/            # AI and ML services
 │   │       └── bias-detection/
 │   ├── pages/             # Route pages
-│   │   └── api/           # API routes
-│   │       ├── health/    # Health check endpoints
-│   │       └── bias-analysis/ # Bias analysis API
 │   └── utils/             # Utility functions
 ├── ai/                    # Python AI services
 ├── docker/                # Docker configurations
-│   ├── traefik/           # Traefik load balancer config
-│   ├── prometheus/        # Prometheus monitoring
-│   └── alertmanager/      # Alert management
-├── k8s/                   # Kubernetes manifests
-│   └── production/        # Production deployments
 ├── helm/                  # Kubernetes Helm charts
 ├── scripts/               # Build and utility scripts
-│   └── monitor-k8s-health.sh # Cluster health monitoring
 ├── memory-bank/           # Cline Memory Bank files
 └── config files...        # Various config files
 ```
@@ -158,6 +149,11 @@ cp .env.example .env
 # Start development services
 docker-compose up -d
 pnpm run dev
+
+# Python AI services
+cd src/lib/ai/bias-detection/python-service
+uv install
+uv run python app.py
 ```
 
 ### Docker Development
@@ -188,45 +184,12 @@ docker run -p 3000:3000 pixelated
 - Database query performance
 - AI model inference times
 - User session analytics
-- Health check endpoint performance (`/api/health/simple`, `/api/health`)
 
 ### Infrastructure Monitoring
 - System resource usage (CPU, Memory, Disk)
 - Container health checks
 - Network performance
 - Security events
-- Kubernetes pod health and restart counts
-- Traefik load balancer metrics
-
-### Health Check Endpoints
-```typescript
-// Simple health check - basic status
-GET /api/health/simple
-// Returns: { status: 'ok', timestamp: '2025-10-10T13:00:00.000Z' }
-
-// Advanced health check - detailed diagnostics
-GET /api/health
-// Returns: {
-//   status: 'healthy',
-//   timestamp: '2025-10-10T13:00:00.000Z',
-//   uptime: 3600,
-//   services: {
-//     database: 'connected',
-//     redis: 'connected',
-//     bias_detection: 'operational'
-//   },
-//   metrics: {
-//     memory: { used: 125MB, total: 512MB },
-//     cpu: { usage: '15%' }
-//   }
-// }
-```
-
-### Kubernetes Health Probes
-- **Liveness Probes**: Container health monitoring
-- **Readiness Probes**: Service availability checks
-- **Startup Probes**: Initial container startup validation
-- **Custom Monitoring Scripts**: Cluster health assessment tools
 
 ### Logging Strategy
 - Structured JSON logging
@@ -264,7 +227,7 @@ GET /api/health
 
 ### Horizontal Scaling
 - Container orchestration with Kubernetes
-- Load balancing with Traefik reverse proxy
+- Load balancing with NGINX/Ingress
 - Database read replicas
 - Redis cluster for caching
 

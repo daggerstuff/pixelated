@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: 24.8.0
+  PNPM_VERSION: 10.17.1
   NODE_ENV: production
 
 jobs:
@@ -29,19 +30,19 @@ jobs:
       with:
         fetch-depth: 0
         fetch-tags: true
-        token: ${{ secrets.WORKFLOW_PAT }}
 
     - name: Fetch all tags
       run: git fetch --tags --force
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
-
     - name: Setup Node.js
-      uses: actions/setup-node@v5
+      uses: actions/setup-node@v4.4.0
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
 
     - name: Get pnpm store directory
       id: pnpm-store
@@ -56,7 +57,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Install dependencies (for tag manager)
+    - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
 
     - name: Determine rollback tag
@@ -77,17 +78,13 @@ jobs:
           exit 1
         fi
 
-    - name: Re-setup pnpm after checkout
-      uses: pnpm/action-setup@v4.1.0
-
-    - name: Reinstall dependencies for rollback tag
-      run: |
-        echo "Cleaning node_modules and reinstalling for rollback tag..."
-        rm -rf node_modules
-        pnpm install --no-frozen-lockfile
-
     - name: Build application
       run: pnpm build
+
+    - name: Debug Token Permissions
+      run: |
+        echo "Checking token permissions..."
+        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
 
     - name: Compute unique rollback tag for staging
       id: compute-tag-staging
@@ -114,6 +111,8 @@ jobs:
         echo "Computed tag: ${TAG_NAME}"
 
     - name: Dry Run Git Push
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         # Use the computed tag from the previous step
         git config --global user.email "action@github.com"
@@ -121,9 +120,11 @@ jobs:
         TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         # Push the previously computed tag, but ensure uniqueness by checking local and remote
         git config --global user.email "action@github.com"
@@ -131,7 +132,7 @@ jobs:
         TAG_BASE=${{ steps.compute-tag-staging.outputs.tag }}
         TAG_NAME="$TAG_BASE"
         # Ensure the remote URL is set to use token auth for push checks
-        git remote set-url origin https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git
+        git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
         # Fetch remote tags for accurate checks
         git fetch --tags --force
         COUNT=0
@@ -167,19 +168,19 @@ jobs:
       with:
         fetch-depth: 0
         fetch-tags: true
-        token: ${{ secrets.WORKFLOW_PAT }}
 
     - name: Fetch all tags
       run: git fetch --tags --force
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
-
     - name: Setup Node.js
-      uses: actions/setup-node@v5
+      uses: actions/setup-node@v4.4.0
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+      with:
+        version: ${{ env.PNPM_VERSION }}
 
     - name: Get pnpm store directory
       id: pnpm-store
@@ -194,8 +195,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Install dependencies (for tag manager)
-      run: pnpm install --no-frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install
 
     - name: Determine rollback tag
       id: get-tag
@@ -215,18 +216,13 @@ jobs:
           exit 1
         fi
 
-    - name: Re-setup pnpm after checkout
-      uses: pnpm/action-setup@v4.1.0
-
-    - name: Reinstall dependencies for rollback tag
-      run: |
-        echo "Cleaning node_modules and reinstalling for rollback tag..."
-        rm -rf node_modules
-        pnpm install --no-frozen-lockfile
-
     - name: Build application
       run: pnpm build
 
+    - name: Debug Token Permissions
+      run: |
+        echo "Checking token permissions..."
+        curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
     - name: Compute unique rollback tag for production
       id: compute-tag-prod
       shell: bash
@@ -252,21 +248,25 @@ jobs:
         echo "Computed tag: ${TAG_NAME}"
 
     - name: Dry Run Git Push
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
         echo "Dry run for git push using tag: $TAG_NAME"
         git tag "$TAG_NAME"
-        git push --dry-run https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+        git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
     - name: Create rollback tag
+      env:
+        G_TOKEN: ${{ secrets.G_TOKEN }}
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         TAG_BASE=${{ steps.compute-tag-prod.outputs.tag }}
         TAG_NAME="$TAG_BASE"
-        git remote set-url origin https://x-access-token:${{ secrets.WORKFLOW_PAT }}@github.com/pixelatedempathy/pixelated.git
+        git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
         git fetch --tags --force
         COUNT=0
         # Try up to 100 suffix increments to find a unique tag for production

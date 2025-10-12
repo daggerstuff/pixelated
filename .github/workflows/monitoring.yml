@@ -10,7 +10,7 @@ permissions: read-all
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.18.0
+  PNPM_VERSION: 10.17.1
   NODE_ENV: production
 
 jobs:
@@ -21,20 +21,19 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
         version: ${{ env.PNPM_VERSION }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
         run_install: false
 
     - name: Get pnpm store directory
@@ -202,11 +201,10 @@ jobs:
 
     - name: Notify failure
       if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
-      uses: slackapi/slack-github-action@v2.1.1
+      uses: slackapi/slack-github-action@v1.25.0
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       with:
-        webhook-type: incoming-webhook
         payload: |
           {
             "text": "🚨 *PRODUCTION MONITORING FAILED*",
@@ -235,20 +233,19 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
         version: ${{ env.PNPM_VERSION }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
         run_install: false
 
     - name: Get pnpm store directory
@@ -402,20 +399,19 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
         version: ${{ env.PNPM_VERSION }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
         run_install: false
 
     - name: Get pnpm store directory
@@ -580,7 +576,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
 
     - name: Resolve APP_URL (Performance)
       id: resolve-perf
@@ -701,11 +697,10 @@ jobs:
 
     - name: Notify performance issues
       if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
-      uses: slackapi/slack-github-action@v2.1.1
+      uses: slackapi/slack-github-action@v1.25.0
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       with:
-        webhook-type: incoming-webhook
         payload: |
           {
             "text": "⚠️ *Performance Issues Detected in PRODUCTION*",

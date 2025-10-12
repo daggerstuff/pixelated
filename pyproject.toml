@@ -67,10 +67,6 @@ dependencies = [
   "email-validator>=2.3.0",
   "python-socketio>=5.13.0",
   "httpx>=0.28.1",
-  "torch>=2.8.0",
-  "torchvision>=0.23.0",
-  "torchaudio>=2.8.0",
-  "openai-agents[redis]>=0.3.3",
 ]
 
 [project.optional-dependencies]
@@ -174,8 +170,7 @@ members = [
 [tool.uv]
 index-strategy = "unsafe-best-match"
 
-[[tool.uv.index]]
-name = "pytorch-cpu"
+[tool.uv.sources.pytorch-cpu]
 url = "https://download.pytorch.org/whl/cpu"
 
 [dependency-groups]

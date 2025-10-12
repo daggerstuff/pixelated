@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';
-import * as tf from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs-node';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 // Removed unused type imports to satisfy lint rules
 

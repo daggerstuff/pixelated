@@ -4,7 +4,7 @@
  */
 
 import { Redis } from 'ioredis';
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 
 const logger = createBuildSafeLogger('threat-intelligence-config');
@@ -208,7 +208,7 @@ export interface ResponseCondition {
   conditionType: 'threshold' | 'pattern' | 'time' | 'location';
   condition: string;
   operator: 'greater_than' | 'less_than' | 'equals' | 'contains' | 'matches';
-  value: string | number | boolean | string[] | number[];
+  value: any;
 }
 
 export interface IntegrationEndpoint {
@@ -266,7 +266,7 @@ export interface HuntPattern {
 export interface HuntCondition {
   field: string;
   operator: string;
-  value: string | number | boolean | string[] | number[];
+  value: any;
   weight: number;
 }
 
@@ -339,11 +339,11 @@ export interface ValidationCondition {
   type: 'field_exists' | 'field_value' | 'regex_match' | 'range_check' | 'whitelist' | 'blacklist';
   field: string;
   operator?: string;
-  value?: string | number | boolean | string[] | number[];
+  value?: any;
   pattern?: string;
   min?: number;
   max?: number;
-  values?: string[] | number[];
+  values?: any[];
   required: boolean;
 }
 
@@ -945,7 +945,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     },
     authentication: {
       method: 'jwt',
-      providers: ['better-auth'],
+      providers: ['clerk'],
       tokenExpiration: 3600000, // 1 hour
       refreshTokenEnabled: true,
       sessionManagement: true
@@ -1101,8 +1101,7 @@ export class ThreatIntelligenceConfigManager {
       logger.info('Redis connection established for configuration manager');
     } catch (error) {
       logger.error('Failed to connect to Redis:', { error });
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new Error(`Redis connection failed: ${errorMessage}`);
+      throw new Error('Redis connection failed');
     }
   }
 
@@ -1114,8 +1113,7 @@ export class ThreatIntelligenceConfigManager {
       logger.info('MongoDB connection established for configuration manager');
     } catch (error) {
       logger.error('Failed to connect to MongoDB:', { error });
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new Error(`MongoDB connection failed: ${errorMessage}`);
+      throw new Error('MongoDB connection failed');
     }
   }
 
@@ -1270,21 +1268,15 @@ export class ThreatIntelligenceConfigManager {
     }
   }
 
-  private deepMerge(target: ThreatIntelligenceConfig, source: Partial<ThreatIntelligenceConfig>): ThreatIntelligenceConfig {
+  private deepMerge(target: any, source: any): any {
     const result = { ...target };
     
     for (const key in source) {
       if (Object.prototype.hasOwnProperty.call(source, key)) {
-        const sourceValue = source[key as keyof ThreatIntelligenceConfig];
-        const targetValue = result[key as keyof ThreatIntelligenceConfig];
-        
-        if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
-          (result as any)[key] = this.deepMerge(
-            (targetValue as any) || {},
-            sourceValue as any
-          );
+        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+          result[key] = this.deepMerge(result[key] || {}, source[key]);
         } else {
-          (result as any)[key] = sourceValue;
+          result[key] = source[key];
         }
       }
     }
@@ -1460,3 +1452,5 @@ export class ThreatIntelligenceConfigManager {
     }
   }
 }
+
+export { ThreatIntelligenceConfigManager };
