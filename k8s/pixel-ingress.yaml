@@ -1,3 +1,4 @@
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,18 +8,18 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   tls:
-  - hosts:
-    - pixelatedempathy.com
-    secretName: pixel-tls
+    - hosts:
+        - pixelatedempathy.com
+      secretName: pixel-tls
 
   rules:
-  - host: pixelatedempathy.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pixelated-service
-            port:
-              number: 80
+    - host: pixelatedempathy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pixelated-service
+                port:
+                  number: 80

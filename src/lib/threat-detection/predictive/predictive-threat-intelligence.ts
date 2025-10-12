@@ -29,7 +29,7 @@ function _secureId(prefix = ''): string {
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';
 import { EventEmitter } from 'events';
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 
 export interface ThreatData {
   threatId: string;
