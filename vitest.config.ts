@@ -19,6 +19,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@byterover/cipher': path.resolve(__dirname, './src/lib/cipher/__mocks__/@byterover/cipher.ts'),
       'react-dom/test-utils': path.resolve(
         __dirname,
         '__mocks__/react-dom/test-utils.js',

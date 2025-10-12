@@ -25,61 +25,36 @@ test('login form shows validation errors', async ({ page }) => {
 
   // Try to submit the form without filling it
   await page.click('button[type="submit"]')
-  await page.waitForTimeout(3000) // Wait longer for validation to appear
+  await page.waitForTimeout(2000) // Wait for validation to appear
 
   // Check for validation errors (they might be in different formats)
   const emailError = page.locator('text=Email is required').or(
     page.locator('[id*="email-error"]')
   ).or(
     page.locator('.error-message').filter({ hasText: /email/i })
-  ).or(
-    page.locator('.text-red-500, .text-danger, [class*="error"]').filter({ hasText: /email/i })
-  ).or(
-    page.locator('span, div, p').filter({ hasText: /email.*required|required.*email/i })
   )
-
+  
   const passwordError = page.locator('text=Password is required').or(
     page.locator('[id*="password-error"]')
   ).or(
     page.locator('.error-message').filter({ hasText: /password/i })
-  ).or(
-    page.locator('.text-red-500, .text-danger, [class*="error"]').filter({ hasText: /password/i })
-  ).or(
-    page.locator('span, div, p').filter({ hasText: /password.*required|required.*password/i })
   )
 
-  // Check if validation errors exist - if not, skip the test
-  const emailErrorCount = await emailError.count()
-  const passwordErrorCount = await passwordError.count()
-
-  if (emailErrorCount === 0 && passwordErrorCount === 0) {
-    test.skip(true, 'Login form does not show client-side validation errors (may use browser native validation or server-side validation)')
-    return
-  }
-
   // Check that validation errors are shown
-  if (emailErrorCount > 0) {
-    await expect(emailError.first()).toBeVisible({ timeout: 10000 })
-  }
-  if (passwordErrorCount > 0) {
-    await expect(passwordError.first()).toBeVisible({ timeout: 10000 })
-  }
+  await expect(emailError).toBeVisible({ timeout: 10000 })
+  await expect(passwordError).toBeVisible({ timeout: 10000 })
 
-  // Fill email but not password (only if validation errors were found)
-  if (emailErrorCount > 0 || passwordErrorCount > 0) {
-    await page.fill('input[type="email"]', 'test@example.com')
-    await page.click('button[type="submit"]')
-    await page.waitForTimeout(2000)
+  // Fill email but not password
+  await page.fill('input[type="email"]', 'test@example.com')
+  await page.click('button[type="submit"]')
+  await page.waitForTimeout(2000)
 
-    // Check that only password error is shown (if password validation exists)
-    if (passwordErrorCount > 0) {
-      await expect(passwordError.first()).toBeVisible({ timeout: 10000 })
-    }
-    // Email error should be gone or not visible
-    const emailErrorVisible = await emailError.isVisible().catch(() => false)
-    if (emailErrorVisible) {
-      console.log('Email error still visible, this might be expected behavior')
-    }
+  // Check that only password error is shown
+  await expect(passwordError).toBeVisible({ timeout: 10000 })
+  // Email error should be gone or not visible
+  const emailErrorVisible = await emailError.isVisible().catch(() => false)
+  if (emailErrorVisible) {
+    console.log('Email error still visible, this might be expected behavior')
   }
 })
 
@@ -119,17 +94,17 @@ test('login page has proper transitions', async ({ page }) => {
   const passwordResetButton = page
     .locator('button, a')
     .filter({ hasText: /forgot.*password/i })
-
+  
   // Check if the forgot password element exists
   const resetButtonCount = await passwordResetButton.count()
-
+  
   if (resetButtonCount > 0) {
     await expect(passwordResetButton).toBeVisible({ timeout: 5000 })
-
+    
     // Click to switch to reset mode
     await passwordResetButton.click()
     await page.waitForTimeout(1000)
-
+    
     // Verify we're in reset mode (check for reset form elements)
     await expect(page.locator('text=Reset Password')).toBeVisible({ timeout: 10000 })
     await expect(page.locator('text=Send Reset Link')).toBeVisible({ timeout: 10000 })

@@ -1,4 +1,5 @@
 ---
+// Brutalist Dark Header - Mental Health Platform
 const navLinks = [
   { name: 'Demos', href: '/demo-hub' },
   { name: 'Features', href: '/features' },
@@ -71,32 +72,24 @@ const navLinks = [
   </div>
 
   <!-- Mobile Menu -->
-  <div id="mobile-menu" class="hidden md:hidden fixed top-14 left-0 right-0 bg-black border-b-2 border-gray-800 z-40" role="dialog" aria-modal="true" aria-label="Mobile navigation menu">
-    <div class="brutalist-container py-4">
-      <nav aria-label="Mobile navigation">
-        <ul class="space-y-2" role="menu">
-          {navLinks.map(link => (
-            <li role="none">
-              <a
-                href={link.href}
-                class="block px-4 py-3 text-gray-200 hover:text-white hover:bg-gray-900 transition-colors"
-                role="menuitem"
-              >
-                {link.name}
-              </a>
-            </li>
-          ))}
-          <li role="none" class="pt-2 border-t border-gray-800">
-            <a
-              href="/contact"
-              class="block brutalist-button brutalist-button--primary text-center py-3"
-              role="menuitem"
-            >
-              GET STARTED
-            </a>
-          </li>
-        </ul>
-      </nav>
+  <div id="mobile-menu" class="hidden md:hidden fixed top-14 left-0 right-0 bg-black border-b-2 border-gray-800 z-40">
+    <div class="brutalist-container py-4 space-y-2">
+      {navLinks.map(link => (
+        <a
+          href={link.href}
+          class="block px-4 py-3 text-gray-200 hover:text-white hover:bg-gray-900 transition-colors"
+        >
+          {link.name}
+        </a>
+      ))}
+      <div class="pt-2 border-t border-gray-800">
+        <a
+          href="/contact"
+          class="block brutalist-button brutalist-button--primary text-center py-3"
+        >
+          GET STARTED
+        </a>
+      </div>
     </div>
   </div>
 </header>
@@ -105,38 +98,25 @@ const navLinks = [
   // Mobile menu functionality
   const mobileMenuButton = document.getElementById('mobile-menu-button');
   const mobileMenu = document.getElementById('mobile-menu');
-  if (mobileMenuButton && mobileMenu) {
-    // Ensure an explicit data attribute exists for test runners that rely on it
-    try {
-      if (!mobileMenu.hasAttribute('data-menu-open')) {
-        mobileMenu.setAttribute('data-menu-open', 'false')
-      }
-    } catch (err) {
-      // ignore (defensive)
-    }
 
+  if (mobileMenuButton && mobileMenu) {
     mobileMenuButton.addEventListener('click', (_event) => {
       const isOpen = !mobileMenu.classList.contains('hidden');
 
       if (isOpen) {
         mobileMenu.classList.add('hidden');
         mobileMenuButton.setAttribute('aria-expanded', 'false');
-        mobileMenu.setAttribute('data-menu-open', 'false');
       } else {
         mobileMenu.classList.remove('hidden');
         mobileMenuButton.setAttribute('aria-expanded', 'true');
-        mobileMenu.setAttribute('data-menu-open', 'true');
       }
     });
 
     // Close mobile menu when clicking outside
     document.addEventListener('click', (e) => {
       if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
-        if (!mobileMenu.classList.contains('hidden')) {
-          mobileMenu.classList.add('hidden');
-          mobileMenuButton.setAttribute('aria-expanded', 'false');
-          mobileMenu.setAttribute('data-menu-open', 'false');
-        }
+        mobileMenu.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
       }
     });
   }

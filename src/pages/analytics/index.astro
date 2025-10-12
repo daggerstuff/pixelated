@@ -1,22 +1,14 @@
 ---
 export const prerender = false
-import { ConversionDashboard } from '@/components/analytics/ConversionDashboard'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { PrivacyDashboard } from '@/components/analytics/PrivacyDashboard'
 import AnalyticsDashboard from '@/components/chat/AnalyticsDashboardReact'
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import { ConversionDashboard } from '@/components/analytics/ConversionDashboard'
 import { requirePageAuth } from '@/lib/auth/serverAuth'
+import type { AstroGlobal } from 'astro'
 
 // Protect this route - only authenticated users can access analytics
-const requestIp =
-  Astro.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-  Astro.request.headers.get('x-real-ip') ||
-  'unknown'
-
-await requirePageAuth({
-  cookies: Astro.cookies,
-  request: Astro.request,
-  requestIp,
-})
+await requirePageAuth(Astro as AstroGlobal)
 
 // Default analytics configuration
 const defaultConfig = {

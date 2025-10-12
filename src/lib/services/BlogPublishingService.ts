@@ -3,7 +3,6 @@ import * as cron from 'node-cron'
 import fs from 'fs/promises'
 import path from 'path'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { securePathJoin } from '../utils/index'
 
 const logger = createBuildSafeLogger('blog-publishing')
 
@@ -51,17 +50,7 @@ export class BlogPublishingService {
   private posts: Map<string, PostInfo> = new Map()
 
   constructor(contentDir = 'src/content/blog') {
-    // Validate and normalize provided content directory to prevent path traversal
-    try {
-      // Resolve relative to project root (process.cwd()) and ensure it doesn't escape
-      this.contentDir = securePathJoin(process.cwd(), contentDir, {
-        allowAbsolute: false,
-      })
-    } catch (err) {
-      // If validation fails, fall back to the default safe directory inside the project
-      logger.warn('Invalid contentDir provided, falling back to default.', { contentDir, err })
-      this.contentDir = path.join(process.cwd(), 'src', 'content', 'blog')
-    }
+    this.contentDir = contentDir
   }
 
   /**

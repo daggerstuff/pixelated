@@ -6,10 +6,6 @@
 node_modules/
 *.node
 
-# AI submodule - managed separately
-/ai/
-/ai.bak/
-
 /npm-debug.log*
 /yarn-debug.log*
 /yarn-error.log*
@@ -167,6 +163,8 @@ kilo-code-settings.json
 .qoder/
 .augment/
 backups/
+backup-drive.sh
+
 # Sentry Config File
 .env.sentry-build-plugin
 
@@ -192,7 +190,5 @@ WARP.md
 
 checkov-results-fixed.sarif
 playwright-report-browser-compat
-yt-downloader/
-yt-down/
-
-processed/
+ai/
+yt-downloader

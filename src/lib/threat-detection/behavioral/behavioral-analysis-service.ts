@@ -5,7 +5,7 @@
 
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';
-import * as tf from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs-node';
 import crypto from 'crypto';
 import { EventEmitter } from 'events';
 

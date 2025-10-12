@@ -20,51 +20,21 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4
       with:
-        version: 10.18.0
+        version: 10.17.1
 
     - name: Setup Node.js
-      uses: actions/setup-node@v5
+      uses: actions/setup-node@v4
       with:
         node-version: '24'
         cache: 'pnpm'
 
-    - name: Get pnpm store directory
-      id: pnpm-store
-      shell: bash
-      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
-
     - name: Install dependencies
-      run: |
-        set -euo pipefail
-        echo "Attempting pnpm install --frozen-lockfile"
-        if pnpm install --frozen-lockfile; then
-          echo "pnpm install succeeded with --frozen-lockfile"
-        else
-          echo "Lockfile appears broken or out-of-date. Attempting pnpm install --no-frozen-lockfile as a fallback..." >&2
-          # Try a non-frozen install to repair lockfile in CI environment. This may change pnpm-lock.yaml.
-          if pnpm install --no-frozen-lockfile; then
-            echo "pnpm install --no-frozen-lockfile succeeded. Please run 'pnpm install --no-frozen-lockfile' locally and commit the updated pnpm-lock.yaml to fix the broken lockfile permanently." >&2
-            # Emit a GitHub Actions warning to draw attention to the broken lockfile that needs fixing.
-            echo "::warning file=.github/workflows/dependency-scan.yml::pnpm lockfile missing dependency (fallback used). Run 'pnpm install --no-frozen-lockfile' locally and commit the lockfile."
-          else
-            echo "Fallback pnpm install also failed. Exiting with error." >&2
-            exit 1
-          fi
-        fi
+      run: pnpm install
 
     - name: Run pnpm audit
-      run: pnpm audit --audit-level=moderate
-      continue-on-error: true
+      run: pnpm audit
 
   python_scan:
     name: Scan Python Dependencies
@@ -74,21 +44,22 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Setup Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
     - name: Install uv (force latest)
       run: pip install --upgrade 'uv>=0.8.6'
 
-    - name: Install project dependencies with uv
-      run: uv sync
+    - name: Create virtual environment
+      run: uv venv
 
-    - name: Install pip-audit in the uv environment
-      run: uv pip install pip-audit
+    - name: Install project dependencies
+      run: uv pip sync pyproject.toml
 
-    # Run pip-audit, excluding local editable package
-    # Note: Ignoring pip vulnerability GHSA-4xh5-x5gv-qwph as it's not exploitable in CI
-    # and is a transitive dependency managed by uv
+    - name: Install pip-audit in venv
+      run: uv pip install --upgrade pip pip-audit
+
+    # Run pip-audit, excluding local editable package to avoid false negative on 'pixelated'
     - name: Run pip-audit (skip editable/local package)
-      run: uv run pip-audit --skip-editable --format=columns --ignore-vuln GHSA-4xh5-x5gv-qwph
+      run: uv run pip-audit --skip-editable --format=columns

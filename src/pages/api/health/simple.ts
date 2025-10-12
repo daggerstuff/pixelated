@@ -1,23 +1,23 @@
 import type { APIRoute } from 'astro'
 
-// Pre-calculate static response parts to minimize execution time
-const baseResponse = {
-  status: 'healthy',
-  version: '2.0.0',
-  environment: process.env['NODE_ENV'] || 'development',
-  nodeVersion: process.version
-}
-
 export const GET: APIRoute = async () => {
   try {
-    // Minimal health response optimized for speed
     const healthResponse = {
-      ...baseResponse,
+      status: 'healthy',
       timestamp: new Date().toISOString(),
-      uptime: Math.floor(process.uptime())
+      services: {
+        webServer: {
+          status: 'healthy',
+          uptime: process.uptime(),
+          memory: process.memoryUsage(),
+          version: process.version
+        }
+      },
+      version: '2.0.0',
+      environment: process.env['NODE_ENV'] || 'development'
     }
 
-    return new Response(JSON.stringify(healthResponse), {
+    return new Response(JSON.stringify(healthResponse, null, 2), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ export const GET: APIRoute = async () => {
     return new Response(JSON.stringify({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
-      error: error?.message || 'Unknown error'
+      error: error.message
     }), {
       status: 503,
       headers: { 'Content-Type': 'application/json' }

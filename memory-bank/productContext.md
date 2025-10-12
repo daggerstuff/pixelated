@@ -32,6 +32,3 @@ Pixelated provides an end-to-end bias detection platform that:
 - 99.9% uptime availability
 - Support for 50+ languages
 - GDPR and HIPAA compliance
-- < 2 second response time for bias analysis
-- Real-time health monitoring with < 1 second health checks
-- Production-ready infrastructure with auto-scaling

@@ -907,6 +907,3 @@ export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
     return result
   }) as T
 }
-
-// Re-export secure path utilities from utils/index
-export { securePathJoin, validateFilename } from './utils/index'

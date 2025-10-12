@@ -1,43 +1,22 @@
 /**
- * Better-Auth Integration Service - Complete authentication solution
+ * Better-Auth Integration Service - Complete replacement for Clerk authentication
  * Implements Better-Auth authentication with JWT token management and user management
  */
 
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-
-// Make better-sqlite3 optional for testing environments
-// Use `unknown` for the imported module and narrow it when used to avoid `any`.
-let Database: unknown = null
-try {
-  // Use dynamic import to avoid build-time errors and explicitly pick default export if available
-  Database = await import('better-sqlite3')
-    .then((m: unknown) => {
-      if (m && typeof m === 'object' && 'default' in m) {
-        return (m as { default: unknown }).default
-      }
-      return m
-    })
-    .catch(() => null)
-} catch (_error) {
-  // Prefix unused catch parameter with underscore to satisfy lint rules
-  console.warn('better-sqlite3 not available, using mock database for testing')
-}
+import Database from 'better-sqlite3'
 import { generateTokenPair, validateToken, AuthenticationError } from './jwt-service'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import type { UserRole, ClientInfo, TokenPair } from './jwt-service'
 
 // Database setup for Better-Auth
-// Only construct Database if it is a constructor (safer than assuming a shape)
-const db =
-  Database && typeof Database === 'function'
-    ? new (Database as { new (...args: unknown[]): unknown })(':memory:')
-    : null // In production, use proper SQLite/MongoDB connection
+const db = new Database(':memory:') // In production, use proper SQLite/MongoDB connection
 
 // Better-Auth configuration
 const auth = betterAuth({
-  database: db ? drizzleAdapter(db) : undefined,
+  database: drizzleAdapter(db),
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Enable in production
@@ -129,26 +108,15 @@ const userAuthStore = new Map<string, UserAuthentication>()
 /**
  * Map Better-Auth user to local user authentication
  */
-function mapBetterAuthUserToLocal(betterAuthUser: unknown): UserAuthentication {
-  // Type assertion for expected Better-Auth user shape
-  if (
-    typeof betterAuthUser !== 'object' ||
-    betterAuthUser === null ||
-    !('id' in betterAuthUser) ||
-    !('email' in betterAuthUser)
-  ) {
-    throw new AuthenticationError('Invalid Better-Auth user object')
-  }
-  const userObj = betterAuthUser as { id: string; email: string; role?: UserRole }
-
+function mapBetterAuthUserToLocal(betterAuthUser: any): UserAuthentication {
   const existingUser = Array.from(userAuthStore.values()).find(
-    user => user.betterAuthUserId === userObj.id
+    user => user.betterAuthUserId === betterAuthUser.id
   )
 
   if (existingUser) {
     return {
       ...existingUser,
-      email: userObj.email,
+      email: betterAuthUser.email,
       updatedAt: Date.now(),
     }
   }
@@ -156,15 +124,15 @@ function mapBetterAuthUserToLocal(betterAuthUser: unknown): UserAuthentication {
   // Create new user authentication record
   const newUserAuth: UserAuthentication = {
     id: generateUserId(),
-    betterAuthUserId: userObj.id,
-    email: userObj.email,
-    role: userObj.role || 'guest',
+    betterAuthUserId: betterAuthUser.id,
+    email: betterAuthUser.email,
+    role: (betterAuthUser.role as UserRole) || 'guest',
     authenticationStatus: AuthenticationStatus.UNAUTHENTICATED,
     loginAttempts: 0,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   }
-
+  
   userAuthStore.set(newUserAuth.id, newUserAuth)
   return newUserAuth
 }
@@ -204,7 +172,7 @@ export async function registerWithBetterAuth(
 
     // Map to local user authentication
     const userAuth = mapBetterAuthUserToLocal(result.user)
-
+    
     // Update role if specified
     if (credentials.role) {
       userAuth.role = credentials.role
@@ -299,7 +267,7 @@ export async function authenticateWithBetterAuth(
       accountLockedUntil: null,
       updatedAt: Date.now(),
     }
-
+    
     userAuthStore.set(userAuth.id, updatedUser)
 
     // Generate JWT tokens
@@ -336,16 +304,16 @@ export async function authenticateWithBetterAuth(
     const userAuth = Array.from(userAuthStore.values()).find(
       user => user.email === credentials.email
     )
-
+    
     if (userAuth) {
       userAuth.loginAttempts += 1
-
+      
       // Lock account after 5 failed attempts
       if (userAuth.loginAttempts >= 5) {
         userAuth.authenticationStatus = AuthenticationStatus.ACCOUNT_LOCKED
         userAuth.accountLockedUntil = Date.now() + (15 * 60 * 1000) // 15 minutes
       }
-
+      
       userAuthStore.set(userAuth.id, userAuth)
     }
 
@@ -369,7 +337,7 @@ export async function logoutFromBetterAuth(
 ): Promise<void> {
   try {
     const userAuth = userAuthStore.get(userId)
-
+    
     if (!userAuth) {
       throw new AuthenticationError('User not found')
     }
@@ -419,7 +387,7 @@ export function updateUserAuthentication(
   updates: Partial<UserAuthentication>
 ): UserAuthentication {
   const user = userAuthStore.get(userId)
-
+  
   if (!user) {
     throw new AuthenticationError('User not found')
   }
@@ -429,7 +397,7 @@ export function updateUserAuthentication(
     ...updates,
     updatedAt: Date.now(),
   }
-
+  
   userAuthStore.set(userId, updatedUser)
   return updatedUser
 }
@@ -443,7 +411,7 @@ export async function validateJWTAndGetUser(
 ): Promise<UserAuthentication | null> {
   try {
     const validation = await validateToken(token, tokenType)
-
+    
     if (!validation.valid || !validation.userId) {
       return null
     }
@@ -492,13 +460,6 @@ export function hasPermission(userRole: UserRole, permission: string): boolean {
  */
 export function getBetterAuthInstance() {
   return auth
-}
-
-/**
- * Get user by ID (alias for getUserAuthentication for backward compatibility)
- */
-export async function getUserById(userId: string): Promise<UserAuthentication | null> {
-  return getUserAuthentication(userId)
 }
 
 /**

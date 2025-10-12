@@ -14,7 +14,7 @@ on:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.18.0
+  PNPM_VERSION: 10.17.1
   NODE_ENV: test
   DISABLE_AUTH: 'true'
   BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
@@ -28,27 +28,20 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
     - name: Setup pnpm
       uses: pnpm/action-setup@v4.1.0
       with:
-        version: ${{ env.PNPM_VERSION }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
-
-    - name: Get pnpm store directory
-      id: pnpm-cache
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+        version: 10.17.1
 
     - name: Setup pnpm cache
       uses: actions/cache@v4
       with:
-        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        path: ~/.pnpm-store
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-

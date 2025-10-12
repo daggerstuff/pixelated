@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 import { Redis } from 'ioredis';
-import * as tf from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs-node';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 
 import {
@@ -74,22 +74,22 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   async initialize(): Promise<void> {
     try {
       logger.info('Initializing Edge Threat Detection System');
-
+      
       // Initialize Redis connection
       await this.initializeRedis();
-
+      
       // Load AI models
       await this.loadAIModels();
-
+      
       // Initialize edge node tracking
       await this.initializeEdgeNodes();
-
+      
       // Start model monitoring
       await this.startModelMonitoring();
-
+      
       this.emit('system_initialized');
       logger.info('Edge Threat Detection System initialized successfully');
-
+      
     } catch (error) {
       logger.error('Failed to initialize Edge Threat Detection System:', { error });
       this.emit('initialization_error', { error });
@@ -104,7 +104,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
       logger.info('Redis connection established for edge detection');
     } catch (error) {
       logger.error('Failed to connect to Redis:', { error });
-      throw new Error('Redis connection failed', { cause: error });
+      throw new Error('Redis connection failed');
     }
   }
 
@@ -123,9 +123,9 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   private async loadModel(modelConfig: AIModelConfig): Promise<void> {
     try {
       logger.info(`Loading AI model: ${modelConfig.modelId}`);
-
+      
       let model: tf.GraphModel | tf.Sequential;
-
+      
       switch (modelConfig.framework) {
         case 'tensorflow':
           model = await this.loadTensorFlowModel(modelConfig);
@@ -133,9 +133,9 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         default:
           throw new Error(`Unsupported framework: ${modelConfig.framework}`);
       }
-
+      
       this.models.set(modelConfig.modelId, model);
-
+      
       // Initialize performance tracking
       this.modelPerformance.set(modelConfig.modelId, {
         modelId: modelConfig.modelId,
@@ -146,9 +146,9 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         inferenceTime: 0,
         memoryUsage: 0
       });
-
+      
       logger.info(`AI model loaded successfully: ${modelConfig.modelId}`);
-
+      
     } catch (error) {
       logger.error(`Failed to load AI model ${modelConfig.modelId}:`, { error });
       throw error;
@@ -159,9 +159,9 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
     try {
       // In a real implementation, this would load a pre-trained model
       // For now, create a dummy model based on the configuration
-
+      
       const model = tf.sequential();
-
+      
       // Add layers based on model type
       switch (modelConfig.modelType) {
         case 'anomaly':
@@ -179,141 +179,141 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         default:
           throw new Error(`Unsupported model type: ${modelConfig.modelType}`);
       }
-
+      
       // Compile the model
       model.compile({
         optimizer: tf.train.adam(0.001),
         loss: this.getLossFunction(modelConfig.modelType),
         metrics: ['accuracy']
       });
-
+      
       return model;
-
+      
     } catch (error) {
       logger.error(`Failed to build TensorFlow model ${modelConfig.modelId}:`, { error });
       throw error;
     }
   }
 
-  private buildAnomalyDetectionModel(model: tf.Sequential, _modelConfig: AIModelConfig): void {
+  private buildAnomalyDetectionModel(model: tf.Sequential, modelConfig: AIModelConfig): void {
     // Autoencoder architecture for anomaly detection
     model.add(tf.layers.dense({
       units: 64,
       activation: 'relu',
       inputShape: [10]
     }));
-
+    
     model.add(tf.layers.dense({
       units: 32,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 16,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 8,
       activation: 'relu'
     }));
-
+    
     // Decoder
     model.add(tf.layers.dense({
       units: 16,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 32,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 64,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 10,
       activation: 'sigmoid'
     }));
   }
 
-  private buildClassificationModel(model: tf.Sequential, _modelConfig: AIModelConfig): void {
+  private buildClassificationModel(model: tf.Sequential, modelConfig: AIModelConfig): void {
     // Classification model for threat categorization
     model.add(tf.layers.dense({
       units: 128,
       activation: 'relu',
       inputShape: [10]
     }));
-
+    
     model.add(tf.layers.dropout({ rate: 0.3 }));
-
+    
     model.add(tf.layers.dense({
       units: 64,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dropout({ rate: 0.2 }));
-
+    
     model.add(tf.layers.dense({
       units: 32,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 4, // 4 threat categories: low, medium, high, critical
       activation: 'softmax'
     }));
   }
 
-  private buildClusteringModel(model: tf.Sequential, _modelConfig: AIModelConfig): void {
+  private buildClusteringModel(model: tf.Sequential, modelConfig: AIModelConfig): void {
     // Clustering model for threat grouping
     model.add(tf.layers.dense({
       units: 64,
       activation: 'relu',
       inputShape: [10]
     }));
-
+    
     model.add(tf.layers.dense({
       units: 32,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 16,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 8,
       activation: 'relu'
     }));
   }
 
-  private buildPredictionModel(model: tf.Sequential, _modelConfig: AIModelConfig): void {
+  private buildPredictionModel(model: tf.Sequential, modelConfig: AIModelConfig): void {
     // Prediction model for threat forecasting
     model.add(tf.layers.dense({
       units: 100,
       activation: 'relu',
       inputShape: [10]
     }));
-
+    
     model.add(tf.layers.dropout({ rate: 0.2 }));
-
+    
     model.add(tf.layers.dense({
       units: 50,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dropout({ rate: 0.2 }));
-
+    
     model.add(tf.layers.dense({
       units: 25,
       activation: 'relu'
     }));
-
+    
     model.add(tf.layers.dense({
       units: 1,
       activation: 'sigmoid'
@@ -352,7 +352,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
           });
         }
       }
-
+      
       logger.info(`Initialized ${this.nodeStatus.size} edge nodes`);
     } catch (error) {
       logger.error('Failed to initialize edge nodes:', { error });
@@ -376,7 +376,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
           // In a real implementation, this would collect actual metrics
           performance.inferenceTime = Math.random() * 100 + 50; // 50-150ms
           performance.memoryUsage = Math.random() * 100 + 100; // 100-200MB
-
+          
           // Check for performance degradation
           if (performance.inferenceTime > 200 || performance.memoryUsage > 500) {
             this.emit('model_performance_degraded', { modelId, performance });
@@ -391,24 +391,24 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   async detectThreat(threatData: RealTimeThreatData): Promise<EdgeDetectionResult> {
     try {
       logger.info('Detecting threat at edge', { threatId: threatData.threatId, region: threatData.region });
-
+      
       const startTime = Date.now();
-
+      
       // Step 1: Preprocess threat data
       const processedData = await this.preprocessThreatData(threatData);
-
+      
       // Step 2: Extract features for ML models
       const features = await this.extractFeatures(processedData);
-
+      
       // Step 3: Run anomaly detection
       const anomalyScore = await this.detectAnomaly(features);
-
+      
       // Step 4: Run threat classification
       const classificationResult = await this.classifyThreat(features);
-
+      
       // Step 5: Run threat prediction
       const predictionScore = await this.predictThreat(features);
-
+      
       // Step 6: Combine results and make final decision
       const finalResult = await this.combineResults(
         anomalyScore,
@@ -416,7 +416,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         predictionScore,
         features
       );
-
+      
       // Step 7: Create detection result
       const detectionResult: EdgeDetectionResult = {
         detectionId: this.generateDetectionId(),
@@ -430,21 +430,21 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         processingTime: Date.now() - startTime,
         timestamp: new Date()
       };
-
+      
       // Step 8: Cache result for real-time access
       await this.cacheDetectionResult(detectionResult);
-
+      
       // Step 9: Update edge node status
       await this.updateEdgeNodeStatus(detectionResult.edgeNodeId, detectionResult.processingTime);
-
-      this.emit('threat_detected', {
-        detectionId: detectionResult.detectionId,
+      
+      this.emit('threat_detected', { 
+        detectionId: detectionResult.detectionId, 
         threatId: threatData.threatId,
-        severity: detectionResult.severity
+        severity: detectionResult.severity 
       });
-
+      
       return detectionResult;
-
+      
     } catch (error) {
       logger.error('Failed to detect threat at edge:', { error, threatId: threatData.threatId });
       this.emit('detection_error', { error, threatId: threatData.threatData });
@@ -474,38 +474,38 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
 
   private createFeatureVector(threatData: RealTimeThreatData): number[] {
     // Create numerical feature vector for ML models
-    const _features: number[] = [];
-
+    const features: number[] = [];
+    
     // Threat severity
     features.push(threatData.severity);
-
+    
     // Confidence level
     features.push(threatData.confidence);
-
+    
     // Number of indicators
     features.push(threatData.indicators.length / 10); // Normalize to 0-1
-
+    
     // Time-based features
     const hour = threatData.timestamp.getHours();
     features.push(hour / 24); // Hour of day (0-1)
     features.push((hour >= 9 && hour <= 17) ? 1 : 0); // Business hours
-
+    
     // Indicator type distribution
     const indicatorTypes = new Set(threatData.indicators.map(i => i.indicatorType));
     features.push(indicatorTypes.size / 5); // Normalize to 0-1
-
+    
     // Geographic features (if available)
     if (threatData.context?.geographicLocation) {
       features.push(1); // Has location
     } else {
       features.push(0); // No location
     }
-
+    
     // Pad or truncate to fixed size (10 features)
     while (features.length < 10) {
       features.push(0);
     }
-
+    
     return features.slice(0, 10);
   }
 
@@ -513,78 +513,78 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
     return processedData.featureVector;
   }
 
-  private async detectAnomaly(_features: number[]): Promise<number> {
+  private async detectAnomaly(features: number[]): Promise<number> {
     try {
       const anomalyModel = this.models.get('anomaly_detection');
       if (!anomalyModel) {
         logger.warn('Anomaly detection model not found, using fallback');
         return this.fallbackAnomalyDetection(features);
       }
-
+      
       const input = tf.tensor2d([features]);
       const prediction = await anomalyModel.predict(input) as tf.Tensor;
       const anomalyScore = await prediction.data();
-
+      
       input.dispose();
       prediction.dispose();
-
+      
       return anomalyScore[0];
-
+      
     } catch (error) {
       logger.error('Anomaly detection failed:', { error });
       return this.fallbackAnomalyDetection(features);
     }
   }
 
-  private fallbackAnomalyDetection(_features: number[]): number {
+  private fallbackAnomalyDetection(features: number[]): number {
     // Simple statistical anomaly detection
     const mean = features.reduce((sum, val) => sum + val, 0) / features.length;
     const variance = features.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / features.length;
     const stdDev = Math.sqrt(variance);
-
+    
     // Calculate z-score for the most anomalous feature
     const maxDeviation = Math.max(...features.map(f => Math.abs(f - mean)));
     const zScore = maxDeviation / (stdDev || 1);
-
+    
     // Normalize to 0-1 range
     return Math.min(zScore / 3, 1);
   }
 
-  private async classifyThreat(_features: number[]): Promise<ClassificationResult> {
+  private async classifyThreat(features: number[]): Promise<ClassificationResult> {
     try {
       const classificationModel = this.models.get('threat_classification');
       if (!classificationModel) {
         logger.warn('Classification model not found, using fallback');
         return this.fallbackClassification(features);
       }
-
+      
       const input = tf.tensor2d([features]);
       const prediction = await classificationModel.predict(input) as tf.Tensor;
       const probabilities = await prediction.data();
-
+      
       input.dispose();
       prediction.dispose();
-
+      
       // Map probabilities to threat types
       const threatTypes = ['low', 'medium', 'high', 'critical'];
       const maxIndex = probabilities.indexOf(Math.max(...Array.from(probabilities)));
-
+      
       return {
         threatType: threatTypes[maxIndex],
         confidence: probabilities[maxIndex],
         probabilities: Array.from(probabilities)
       };
-
+      
     } catch (error) {
       logger.error('Threat classification failed:', { error });
       return this.fallbackClassification(features);
     }
   }
 
-  private fallbackClassification(_features: number[]): ClassificationResult {
+  private fallbackClassification(features: number[]): ClassificationResult {
     // Simple rule-based classification
     const avgFeature = features.reduce((sum, val) => sum + val, 0) / features.length;
-
+    
     if (avgFeature > 0.7) {
       return { threatType: 'critical', confidence: 0.8, probabilities: [0.1, 0.2, 0.3, 0.4] };
     } else if (avgFeature > 0.5) {
@@ -596,30 +596,30 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
     }
   }
 
-  private async predictThreat(_features: number[]): Promise<number> {
+  private async predictThreat(features: number[]): Promise<number> {
     try {
       const predictionModel = this.models.get('threat_prediction');
       if (!predictionModel) {
         logger.warn('Prediction model not found, using fallback');
         return this.fallbackPrediction(features);
       }
-
+      
       const input = tf.tensor2d([features]);
       const prediction = await predictionModel.predict(input) as tf.Tensor;
       const threatProbability = await prediction.data();
-
+      
       input.dispose();
       prediction.dispose();
-
+      
       return threatProbability[0];
-
+      
     } catch (error) {
       logger.error('Threat prediction failed:', { error });
       return this.fallbackPrediction(features);
     }
   }
 
-  private fallbackPrediction(_features: number[]): number {
+  private fallbackPrediction(features: number[]): number {
     // Simple linear prediction based on feature average
     const avgFeature = features.reduce((sum, val) => sum + val, 0) / features.length;
     return Math.min(avgFeature * 1.2, 1); // Scale up slightly and cap at 1
@@ -629,7 +629,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
     anomalyScore: number,
     classificationResult: ClassificationResult,
     predictionScore: number,
-    _features: number[]
+    features: number[]
   ): Promise<CombinedResult> {
     try {
       // Weighted combination of results
@@ -638,27 +638,27 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         classification: 0.4,
         prediction: 0.3
       };
-
+      
       // Calculate weighted severity score
       const severityScore = (
         anomalyScore * weights.anomaly +
         this.mapThreatTypeToScore(classificationResult.threatType) * weights.classification +
         predictionScore * weights.prediction
       );
-
+      
       // Determine final threat type based on combined score
       const finalThreatType = this.determineFinalThreatType(severityScore, classificationResult);
-
+      
       // Calculate final confidence
       const finalConfidence = this.calculateFinalConfidence(
         classificationResult.confidence,
         anomalyScore,
         predictionScore
       );
-
+      
       // Select primary model based on highest confidence
       const primaryModel = this.selectPrimaryModel(anomalyScore, classificationResult, predictionScore);
-
+      
       return {
         threatType: finalThreatType,
         severity: this.mapScoreToSeverity(severityScore),
@@ -671,7 +671,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
           combined: severityScore
         }
       };
-
+      
     } catch (error) {
       logger.error('Failed to combine detection results:', { error });
       throw error;
@@ -688,7 +688,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
     return scores[threatType as keyof typeof scores] || 0.5;
   }
 
-  private determineFinalThreatType(severityScore: number, _classificationResult: ClassificationResult): string {
+  private determineFinalThreatType(severityScore: number, classificationResult: ClassificationResult): string {
     // Use classification result as primary, but adjust based on combined score
     if (severityScore > 0.8) return 'critical';
     if (severityScore > 0.6) return 'high';
@@ -707,17 +707,17 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
       'threat_classification': classificationResult.confidence,
       'threat_prediction': predictionScore
     };
-
+    
     let maxScore = 0;
     let primaryModel = 'threat_classification'; // Default
-
+    
     for (const [model, score] of Object.entries(scores)) {
       if (score > maxScore) {
         maxScore = score;
         primaryModel = model;
       }
     }
-
+    
     return primaryModel;
   }
 
@@ -731,7 +731,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   private extractIndicators(threatData: RealTimeThreatData, finalResult: CombinedResult): ThreatIndicator[] {
     // Extract and enhance indicators based on detection results
     const enhancedIndicators: ThreatIndicator[] = [];
-
+    
     for (const indicator of threatData.indicators) {
       enhancedIndicators.push({
         ...indicator,
@@ -743,18 +743,18 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         }
       });
     }
-
+    
     return enhancedIndicators;
   }
 
   private selectOptimalEdgeNode(region: string): string {
     // Select the edge node with the lowest load and highest availability
     const nodes = Array.from(this.nodeStatus.values()).filter(node => node.region === region);
-
+    
     if (nodes.length === 0) {
       return 'default_node';
     }
-
+    
     // Sort by load (ascending) and select the first one
     nodes.sort((a, b) => a.load - b.load);
     return nodes[0].nodeId;
@@ -770,7 +770,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
       region: result.region,
       timestamp: result.timestamp
     };
-
+    
     await this.redis.setex(cacheKey, 1800, JSON.stringify(cacheData)); // 30 minutes TTL
   }
 
@@ -795,18 +795,18 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   async deployAIModel(modelConfig: AIModelConfig, nodeIds: string[]): Promise<boolean> {
     try {
       logger.info('Deploying AI model to edge nodes', { modelId: modelConfig.modelId, nodeCount: nodeIds.length });
-
+      
       // Load the model first
       await this.loadModel(modelConfig);
-
+      
       // Deploy to specified nodes
       for (const nodeId of nodeIds) {
         await this.deployModelToNode(modelConfig.modelId, nodeId);
       }
-
+      
       this.emit('model_deployed', { modelId: modelConfig.modelId, nodeIds });
       return true;
-
+      
     } catch (error) {
       logger.error('Failed to deploy AI model:', { error, modelId: modelConfig.modelId });
       this.emit('model_deployment_error', { error, modelId: modelConfig.modelId });
@@ -820,17 +820,17 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
       if (!status) {
         throw new Error(`Edge node not found: ${nodeId}`);
       }
-
+      
       // Add model to node's active models
       if (!status.activeModels.includes(modelId)) {
         status.activeModels.push(modelId);
       }
-
+      
       // Update node status
       status.lastHeartbeat = new Date();
-
+      
       logger.info(`Model ${modelId} deployed to node ${nodeId}`);
-
+      
     } catch (error) {
       logger.error(`Failed to deploy model to node ${nodeId}:`, { error });
       throw error;
@@ -840,19 +840,19 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   async updateDetectionThresholds(thresholds: DetectionThresholds): Promise<boolean> {
     try {
       logger.info('Updating detection thresholds', { thresholds });
-
+      
       // Validate thresholds
       this.validateThresholds(thresholds);
-
+      
       // Update thresholds
       this.detectionThresholds = thresholds;
-
+      
       // Cache new thresholds
       await this.redis.setex('edge_detection_thresholds', 3600, JSON.stringify(thresholds));
-
+      
       this.emit('thresholds_updated', { thresholds });
       return true;
-
+      
     } catch (error) {
       logger.error('Failed to update detection thresholds:', { error });
       return false;
@@ -863,15 +863,15 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
     if (thresholds.anomaly < 0 || thresholds.anomaly > 1) {
       throw new Error('Anomaly threshold must be between 0 and 1');
     }
-
+    
     if (thresholds.threat < 0 || thresholds.threat > 1) {
       throw new Error('Threat threshold must be between 0 and 1');
     }
-
+    
     if (thresholds.confidence < 0 || thresholds.confidence > 1) {
       throw new Error('Confidence threshold must be between 0 and 1');
     }
-
+    
     // Validate severity thresholds
     const severityThresholds = thresholds.severity;
     if (severityThresholds.low < 0 || severityThresholds.low > 1 ||
@@ -885,7 +885,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   async getHealthStatus(): Promise<HealthStatus> {
     try {
       const startTime = Date.now();
-
+      
       // Check Redis connection
       const redisHealthy = await this.checkRedisHealth();
       if (!redisHealthy) {
@@ -894,7 +894,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
           message: 'Redis connection failed'
         };
       }
-
+      
       // Check model availability
       const modelCount = this.models.size;
       if (modelCount === 0) {
@@ -903,20 +903,20 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
           message: 'No AI models available'
         };
       }
-
+      
       // Check edge node availability
       const activeNodes = Array.from(this.nodeStatus.values()).filter(node => node.status === 'online').length;
       const totalNodes = this.nodeStatus.size;
-
+      
       if (activeNodes === 0) {
         return {
           healthy: false,
           message: 'No active edge nodes'
         };
       }
-
+      
       const responseTime = Date.now() - startTime;
-
+      
       return {
         healthy: true,
         message: 'Edge threat detection system is healthy',
@@ -924,7 +924,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         activeNodes,
         totalNodes
       };
-
+      
     } catch (error) {
       logger.error('Health check failed:', { error });
       return {
@@ -947,7 +947,7 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
   async shutdown(): Promise<void> {
     try {
       logger.info('Shutting down Edge Threat Detection System');
-
+      
       // Dispose of TensorFlow models
       for (const [modelId, model] of this.models) {
         if (model instanceof tf.Sequential) {
@@ -955,18 +955,18 @@ export class EdgeThreatDetectionSystemCore extends EventEmitter implements EdgeT
         }
         logger.info(`Disposed model: ${modelId}`);
       }
-
+      
       this.models.clear();
       this.modelPerformance.clear();
-
+      
       // Close Redis connection
       if (this.redis) {
         await this.redis.quit();
       }
-
+      
       this.emit('system_shutdown');
       logger.info('Edge Threat Detection System shutdown completed');
-
+      
     } catch (error) {
       logger.error('Error during shutdown:', { error });
       throw error;
@@ -986,7 +986,7 @@ interface ProcessedThreatData {
   severity: number;
   confidence: number;
   indicators: ThreatIndicator[];
-  context: unknown;
+  context: any;
   normalizedSeverity: number;
   featureVector: number[];
 }
@@ -1010,6 +1010,13 @@ interface CombinedResult {
   };
 }
 
-
+interface RegionStatus {
+  regionId: string;
+  status: 'healthy' | 'degraded' | 'unhealthy' | 'initializing';
+  lastUpdate: Date;
+  threatCount: number;
+  activeNodes: number;
+  healthScore: number;
+}
 
 export { EdgeThreatDetectionSystemCore };

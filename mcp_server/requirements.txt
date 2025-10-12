@@ -1,52 +1,53 @@
 # MCP Server Dependencies
 # FastAPI and ASGI server
-fastapi==0.118.0
-uvicorn[standard]==0.37.0
-gunicorn==23.0.0
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==22.0.0
 
 # Database and caching
-motor==3.7.1
-redis==6.4.0
-pymongo==4.15.2
+motor==3.3.2
+redis==5.0.1
+pymongo==4.6.3
 
 # Authentication and security
-python-jose[cryptography]==3.5.0
+python-jose[cryptography]==3.4.0
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.20
+python-multipart==0.0.7
 
 # Validation and serialization
-pydantic==2.11.10
-pydantic-settings==2.11.0
-email-validator==2.3.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator==2.1.0
 
 # HTTP client for external services
-httpx==0.28.1
-aiohttp==3.12.15
+httpx==0.25.2
+aiohttp==3.12.14
 
 # Logging and monitoring
-structlog==25.4.0
-prometheus-client==0.23.1
-sentry-sdk==2.39.0
+structlog==23.2.0
+prometheus-client==0.19.0
+sentry-sdk==1.45.1
 
 # Utilities
-python-dotenv==1.1.1
+python-dotenv==1.0.0
 ulid-py==1.1.0
-tenacity==9.1.2
+tenacity==8.2.3
 aioredis==2.0.1
 
 # WebSocket support
-python-socketio==5.14.1
-python-engineio==4.12.3
-websockets==15.0.1
+python-socketio==5.10.0
+python-engineio==4.7.1
+websockets==12.0
 
 # Development dependencies
-pytest==8.4.2
-pytest-asyncio==1.2.0
-pytest-cov==7.0.0
-factory-boy==3.3.3
-faker==37.8.0
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2
+factory-boy==3.3.0
+faker==20.1.0
 
 # Type checking
-mypy==1.18.2
-types-redis==4.6.0.20241004
-types-requests==2.32.4.20250913
+mypy==1.7.1
+types-redis==4.6.0.11
+types-requests==2.31.0.10

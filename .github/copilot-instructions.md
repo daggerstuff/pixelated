@@ -26,7 +26,9 @@ Security and secrets
 - Never print or commit secrets. Refer to them as placeholders and recommend reading from environment variables or secret stores.
 - If a fix requires secret configuration, explain what env var or secret is required and why.
 
-...existing code...
+Testing and verification
+- After making code changes, run relevant fast checks: linters, typecheck, and unit tests where practical.
+- When running Python code or tests, use `uv run` so the proper environment is used.
 
 Communication style
 - Be concise, specific, and actionable. Show diffs/edits by editing files directly in the repo.

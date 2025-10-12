@@ -291,9 +291,9 @@ EOF
     local rollback_commands=$(generate_registry_rollback_commands "git.pixelatedempathy.tech" "pixelated-empathy" "20240130" "test-app")
     
     if [[ -n "$rollback_commands" ]]; then
-    if echo "$rollback_commands" | grep -q "docker pull git.pixelatedempathy.tech/pixelated-empathy:20240130" && \
-        echo "$rollback_commands" | grep -q "docker stop test-app" && \
-        echo "$rollback_commands" | grep -q "docker run.*test-app-rollback"; then
+        if echo "$rollback_commands" | grep -q "docker pull git.pixelatedempathy.tech/pixelated-empathy:20240130" && \
+           echo "$rollback_commands" | grep -q "docker stop test-app" && \
+           echo "$rollback_commands" | grep -q "docker run.*test-app-rollback"; then
             print_test_pass "generate_registry_rollback_commands creates complete rollback instructions"
         else
             print_test_fail "generate_registry_rollback_commands missing required rollback steps"

@@ -10,12 +10,10 @@ Pixelated follows a microservices architecture with the following components:
 - **Style Approach**: Tailwind CSS or Angular Material
 
 ### Backend Services
-- **API Gateway**: Node.js/Express with TypeScript (Astro SSR)
+- **API Gateway**: Node.js/Express with TypeScript
 - **Microservices**: Python (FastAPI/Flask) for AI services
 - **Database Layer**: PostgreSQL primary, MongoDB for documents, Redis for caching
 - **Message Queue**: RabbitMQ or Redis streams
-- **Health Monitoring**: Custom health endpoints with detailed diagnostics
-- **Load Balancing**: Traefik reverse proxy with dynamic configuration
 
 ### AI/ML Layer
 - **Bias Detection Engine**: Custom Python service with TensorFlow/PyTorch, Fairlearn, SHAP/LIME
@@ -24,6 +22,8 @@ Pixelated follows a microservices architecture with the following components:
 - **Feature Store**: Custom implementation or Feast
 - **Real ML Models**: Integrated Fairlearn, SHAP/LIME, Hugging Face evaluate
 - **Frontend Integration**: Complete production API integration with client-side data transformation
+- **Therapeutic AI Training**: Lightning.ai H100 LoRA training with multi-expert MoE architecture
+- **Intelligent Agent**: Multi-pattern analysis with question extraction and semantic validation
 
 ## Component Relationships
 
@@ -38,11 +38,6 @@ Pixelated follows a microservices architecture with the following components:
 │   PostgreSQL   │    │     Redis      │    │     MongoDB    │
 │ (Relational)   │    │   (Cache)      │    │ (Document)     │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
-         ▼                        ▼                         ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Traefik LB   │    │   Prometheus   │    │   Health Check │
-│ (Load Balancer)│    │  (Monitoring)  │    │   Endpoints    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
 ## Design Patterns
@@ -54,6 +49,19 @@ interface IRepository<T> {
   save(entity: T): Promise<T>;
   delete(id: string): Promise<void>;
 }
+```
+
+### Intelligent Agent Pattern
+```python
+class IntelligentPromptAgent:
+    def __init__(self, pattern_analyzers: List[PatternAnalyzer]):
+        self.analyzers = pattern_analyzers
+    
+    def process_content(self, content: str) -> ProcessedContent:
+        # Multi-pattern analysis with semantic validation
+        patterns = self.extract_patterns(content)
+        questions = self.extract_questions(content, patterns)
+        return self.validate_semantic_coherence(questions, content)
 ```
 
 ### Service Layer Pattern
@@ -91,17 +99,10 @@ class BiasDetectionService {
 ## Data Flow Patterns
 
 ### Request Flow
-1. User request → Traefik Load Balancer
-2. Route to API Gateway (Astro SSR)
-3. Authenticate and validate request
-4. Route to appropriate microservice
-5. Process request and return response
-
-### Health Check Flow
-1. Kubernetes/Traefik → Health Check Endpoint
-2. Service status validation (database, cache, AI services)
-3. Response with health status and metrics
-4. Monitoring system processes results
+1. User request → API Gateway
+2. Authenticate and validate request
+3. Route to appropriate microservice
+4. Process request and return response
 
 ### Event Flow
 1. State change triggers event
@@ -123,6 +124,8 @@ user:profile:{userId}
 bias:result:{contentHash}
 session:{sessionId}
 config:global
+therapeutic:segment:{segmentId}
+lightning:dataset:{datasetId}
 ```
 
 ## Error Handling
@@ -153,16 +156,11 @@ class AppError extends Error {
 - TypeScript interfaces for compile-time checking
 - SQL injection prevention with parameterized queries
 - XSS prevention with content sanitization
-- HIPAA compliance validation for healthcare data
 
 ### Authentication & Authorization
 - JWT tokens with refresh mechanism
 - Role-based access control (RBAC)
 - API key authentication for services
 - OAuth2 integration for third-party login
-
-### Health Check Security
-- Health endpoints exposed for monitoring
-- No sensitive data in health responses
-- Rate limiting on health endpoints
-- Network policies for health check access
+- Lightning.ai API integration for H100 training access
+- Multi-environment secrets management with encrypted variables
