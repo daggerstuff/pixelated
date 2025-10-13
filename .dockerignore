@@ -59,7 +59,6 @@ node_modules/
 .pnpm-store/
 .npm/
 .yarn/
-pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
