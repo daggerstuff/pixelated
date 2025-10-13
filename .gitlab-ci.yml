@@ -194,128 +194,6 @@ validate:
         ;;
     esac
   - echo "✅ $VALIDATION_TYPE validation complete"
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_COMMIT_BRANCH == "main"
-  - if: $CI_MERGE_REQUEST_ID
-  timeout: 8m
-  allow_failure: true
-
-# Build stage - optimized for speed and security
-build:
-  stage: build
-  image: docker:27.3.1
-  services:
-  - name: docker:27.3.1-dind
-    alias: docker
-    command: [ "--tls=false", "--experimental" ]
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ''
-  cache:
-    <<: *global_cache
-  before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  script:
-  - echo "🏗️ Building optimized container..."
-  - docker buildx create --use --name multiarch-builder --driver docker-container || docker buildx use multiarch-builder
-  - |
-    docker buildx build \
-      --load \
-      --build-arg NODE_ENV=production \
-      --build-arg CI=true \
-      --build-arg BUILDKIT_INLINE_CACHE=1 \
-      --secret id=SENTRY_DSN,env=SENTRY_DSN \
-      --secret id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
-      --secret id=PUBLIC_SENTRY_DSN,env=PUBLIC_SENTRY_DSN \
-      --cache-from type=registry,ref=$CONTAINER_IMAGE_CACHE \
-      --cache-from type=registry,ref=$CONTAINER_IMAGE_LATEST \
-      --cache-to type=registry,ref=$CONTAINER_IMAGE_CACHE,mode=max \
-      --target runtime \
-      -f Dockerfile \
-      -t $CONTAINER_IMAGE \
-      -t $CONTAINER_IMAGE_LATEST .
-  - echo "📤 Pushing to registry..."
-  - timeout 300 docker push $CONTAINER_IMAGE || (sleep 10 && timeout 300 docker push $CONTAINER_IMAGE)
-  - timeout 300 docker push $CONTAINER_IMAGE_LATEST || (sleep 10 && timeout 300 docker push $CONTAINER_IMAGE_LATEST)
-  - echo "✅ Images pushed successfully"
-  - echo "📦 Image: $CONTAINER_IMAGE"
-  artifacts:
-    expire_in: 1 hour
-    reports:
-      dotenv: build.env
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_COMMIT_BRANCH == "main"
-  - if: $CI_MERGE_REQUEST_ID
-  timeout: 15m
-
-# Test stage - comprehensive parallel testing
-test:
-  stage: test
-  image: docker:27.3.1
-  services:
-  - name: docker:27.3.1-dind
-    alias: docker
-    command: [ "--tls=false", "--experimental" ]
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ''
-  parallel:
-    matrix:
-    - TEST_TYPE: [ container-health, unit, integration ]
-  before_script:
-  - |
-    if [ "$TEST_TYPE" = "container-health" ]; then
-      echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-    else
-      apk add --no-cache git
-      corepack enable pnpm
-      pnpm config set store-dir $PNPM_CACHE_FOLDER
-    fi
-  script:
-  - echo "🧪 Running $TEST_TYPE tests..."
-  - |
-    case $TEST_TYPE in
-      container-health)
-        # Container health testing
-        docker pull $CONTAINER_IMAGE
-        docker run -d \
-          --name test-container \
-          --health-cmd="node -e \"require('http').get('http://localhost:4321/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\"" \
-          --health-interval=10s \
-          --health-timeout=5s \
-          --health-retries=3 \
-          -e NODE_ENV=production \
-          $CONTAINER_IMAGE
-        
-        # Wait for healthy status
-        for i in {1..30}; do
-          STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-container 2>/dev/null || echo "starting")
-          if [ "$STATUS" = "healthy" ]; then
-            echo "✅ Container health check passed"
-            break
-          elif [ "$STATUS" = "unhealthy" ]; then
-            echo "❌ Container health check failed"
-            docker logs test-container
-            exit 1
-          fi
-          echo "⏳ Waiting for health check... ($i/30) Status: $STATUS"
-          sleep 2
-        done
-        docker stop test-container && docker rm test-container
-        ;;
-      unit)
-        # Unit testing
-        pnpm install --frozen-lockfile --prefer-offline
-        pnpm test:unit || echo "⚠️ Unit tests completed with warnings"
-        ;;
-      integration)
-        # Integration testing
-        pnpm install --frozen-lockfile --prefer-offline
-        pnpm test:integration || echo "⚠️ Integration tests completed with warnings"
-        ;;
-    esac
   needs: [ "build" ]
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
@@ -541,11 +419,12 @@ deploy-gke:
     MAX_UNAVAILABLE: ${GKE_MAX_UNAVAILABLE:-0}
   <<: *gcp_auth
   script:
-    - echo "🚀 Deploying to GKE cluster: $GKE_CLUSTER_NAME"
-    - echo "📦 Container image: $CONTAINER_IMAGE"
-    - |
-      # Pre-deployment validation
-      echo "🔍 Pre-deployment validation..."
+  - |
+    echo "🚀 Deploying to GKE cluster: $GKE_CLUSTER_NAME"
+    echo "📦 Container image: $CONTAINER_IMAGE"
+
+    # Pre-deployment validation
+    echo "🔍 Pre-deployment validation..."
 
     # Check if deployment exists
     if kubectl get deployment $GKE_DEPLOYMENT_NAME >/dev/null 2>&1; then
@@ -562,7 +441,7 @@ deploy-gke:
     echo "📋 Applying Kubernetes manifests..."
 
     # Create deployment manifest
-    cat > deployment.yaml << EOF
+    cat > deployment.yaml << 'EOF'
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -705,7 +584,7 @@ deploy-gke:
           targetPort: 4321
           protocol: TCP
         type: ClusterIP
-    EOF
+      EOF
       kubectl apply -f service.yaml
     fi
 
@@ -784,7 +663,8 @@ deploy-gke:
   timeout: 25m
   artifacts:
     reports:
-      dotenv: gke-deployment.env
+      dotenv:
+      - gke-deployment.env
     paths:
     - deployment.yaml
     - service.yaml
