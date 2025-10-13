@@ -648,8 +648,6 @@ deploy-gke:
       namespace: ${GKE_NAMESPACE:-pixelated}
   needs:
   - job: build
-  - job: test
-    artifacts: false
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
     when: manual
