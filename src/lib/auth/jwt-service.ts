@@ -1,7 +1,7 @@
 /**
  * JWT Token Service - Core authentication logic for Phase 7
  * Implements secure JWT token generation, validation, and management
- * with integration to existing Clerk infrastructure and Phase 6 MCP server tracking
+ * with integration to existing authentication infrastructure (Better-Auth) and Phase 6 MCP server tracking
  */
 
 import jwt from 'jsonwebtoken'
@@ -292,7 +292,7 @@ export async function validateToken(
     }
 
     // Additional security checks
-  validateTokenSecurity(payload, tokenMetadata)
+    validateTokenSecurity(payload, tokenMetadata)
 
     // Log successful validation
     await logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, payload.sub, {

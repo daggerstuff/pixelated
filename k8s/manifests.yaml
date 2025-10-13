@@ -25,7 +25,7 @@ metadata:
 type: kubernetes.io/dockerconfigjson
 data:
   # This will be populated by the CI/CD pipeline
-  .dockerconfigjson: e30K # Empty JSON object base64 encoded
+  .dockerconfigjson: e30K  # Empty JSON object base64 encoded
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -391,4 +391,4 @@ spec:
     - protocol: TCP
       port: 4321
   egress:
-  - {} # Allow all egress traffic (can be restricted based on requirements)
+    - {}  # Allow all egress traffic (can be restricted based on requirements)

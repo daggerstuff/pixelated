@@ -9,7 +9,7 @@ RUN apk add --no-cache bash git python3 make g++ && \
     corepack enable pnpm
 
 # Copy package manifests first for better layer caching
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml* ./
 
 # Install all dependencies (dev + prod) required for build
 RUN pnpm install --frozen-lockfile

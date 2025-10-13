@@ -47,7 +47,7 @@ check_prerequisites() {
     command -v kubectl >/dev/null 2>&1 || { log_error "kubectl is required but not installed."; exit 1; }
     
     # Check environment variables
-    required_vars=("MONGODB_URI" "REDIS_URL" "OPENAI_API_KEY" "CLERK_SECRET_KEY")
+    required_vars=("MONGODB_URI" "REDIS_URL" "OPENAI_API_KEY")
     for var in "${required_vars[@]}"; do
         if [[ -z "${!var:-}" ]]; then
             log_error "Required environment variable $var is not set"

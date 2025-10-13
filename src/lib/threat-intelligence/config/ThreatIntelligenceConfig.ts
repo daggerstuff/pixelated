@@ -12,37 +12,37 @@ const logger = createBuildSafeLogger('threat-intelligence-config');
 export interface ThreatIntelligenceConfig {
   // Global Network Configuration
   global: GlobalThreatIntelligenceConfig;
-  
+
   // Edge Detection Configuration
   edge: EdgeDetectionConfig;
-  
+
   // Correlation Engine Configuration
   correlation: CorrelationEngineConfig;
-  
+
   // Database Configuration
   database: DatabaseConfig;
-  
+
   // Response Orchestration Configuration
   orchestration: OrchestrationConfig;
-  
+
   // Threat Hunting Configuration
   hunting: HuntingConfig;
-  
+
   // External Feed Integration Configuration
   feeds: FeedIntegrationConfig;
-  
+
   // Validation Configuration
   validation: ValidationConfig;
-  
+
   // Multi-region Configuration
   regions: RegionConfig[];
-  
+
   // Security Configuration
   security: SecurityConfig;
-  
+
   // Performance Configuration
   performance: PerformanceConfig;
-  
+
   // Monitoring Configuration
   monitoring: MonitoringConfig;
 }
@@ -542,7 +542,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     encryptionEnabled: true,
     compressionEnabled: true
   },
-  
+
   edge: {
     enabled: true,
     modelUpdateInterval: 3600000, // 1 hour
@@ -585,7 +585,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       }
     ]
   },
-  
+
   correlation: {
     enabled: true,
     correlationWindow: 3600000, // 1 hour
@@ -617,7 +617,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     ],
     statisticalMethods: ['correlation', 'regression', 'time_series', 'clustering']
   },
-  
+
   database: {
     mongodb: {
       uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_intelligence',
@@ -678,7 +678,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       unit: 'years'
     }
   },
-  
+
   orchestration: {
     automationLevel: 'semi',
     responseStrategies: [
@@ -756,7 +756,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     notificationEnabled: true,
     approvalRequired: false
   },
-  
+
   hunting: {
     enabled: true,
     huntPatterns: [
@@ -795,7 +795,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     falsePositiveReduction: true,
     threatDiscoveryThreshold: 0.7
   },
-  
+
   feeds: {
     enabled: true,
     feedSources: [
@@ -841,7 +841,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       burstAllowance: 10
     }
   },
-  
+
   validation: {
     validationThreshold: 70,
     validationRules: [
@@ -883,7 +883,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     customRulesEnabled: true,
     aiAssistedValidation: false
   },
-  
+
   regions: [
     {
       regionId: 'us-east-1',
@@ -934,7 +934,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       }
     }
   ],
-  
+
   security: {
     encryption: {
       enabled: true,
@@ -945,7 +945,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     },
     authentication: {
       method: 'jwt',
-      providers: ['clerk'],
+      providers: ['better-auth'],
       tokenExpiration: 3600000, // 1 hour
       refreshTokenEnabled: true,
       sessionManagement: true
@@ -978,7 +978,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       allowedFileTypes: ['.json', '.csv', '.xml', '.stix', '.taxii']
     }
   },
-  
+
   performance: {
     caching: {
       enabled: true,
@@ -1026,7 +1026,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       parallelProcessing: true
     }
   },
-  
+
   monitoring: {
     metrics: {
       enabled: true,
@@ -1073,21 +1073,21 @@ export class ThreatIntelligenceConfigManager {
   async initialize(): Promise<void> {
     try {
       logger.info('Initializing Threat Intelligence Configuration Manager');
-      
+
       // Initialize Redis connection
       await this.initializeRedis();
-      
+
       // Initialize MongoDB connection
       await this.initializeMongoDB();
-      
+
       // Load configuration from database if available
       await this.loadConfiguration();
-      
+
       // Validate configuration
       this.validateConfiguration();
-      
+
       logger.info('Threat Intelligence Configuration Manager initialized successfully');
-      
+
     } catch (error) {
       logger.error('Failed to initialize Configuration Manager:', { error });
       throw error;
@@ -1121,7 +1121,7 @@ export class ThreatIntelligenceConfigManager {
     try {
       const configCollection = this.db.collection('configuration');
       const storedConfig = await configCollection.findOne({ configId: 'threat_intelligence' });
-      
+
       if (storedConfig) {
         this.config = { ...this.config, ...storedConfig.config };
         logger.info('Configuration loaded from database');
@@ -1130,7 +1130,7 @@ export class ThreatIntelligenceConfigManager {
         await this.storeConfiguration();
         logger.info('Default configuration stored in database');
       }
-      
+
     } catch (error) {
       logger.error('Failed to load configuration:', { error });
     }
@@ -1142,27 +1142,27 @@ export class ThreatIntelligenceConfigManager {
       if (!this.config.global.networkId) {
         throw new Error('Global network ID is required');
       }
-      
+
       if (!this.config.database.mongodb.uri) {
         throw new Error('MongoDB URI is required');
       }
-      
+
       if (!this.config.database.redis.url) {
         throw new Error('Redis URL is required');
       }
-      
+
       // Validate region configuration
       if (this.config.regions.length === 0) {
         throw new Error('At least one region must be configured');
       }
-      
+
       const primaryRegions = this.config.regions.filter(r => r.primary);
       if (primaryRegions.length !== 1) {
         throw new Error('Exactly one primary region must be configured');
       }
-      
+
       logger.info('Configuration validation passed');
-      
+
     } catch (error) {
       logger.error('Configuration validation failed:', { error });
       throw error;
@@ -1181,14 +1181,14 @@ export class ThreatIntelligenceConfigManager {
         },
         { upsert: true }
       );
-      
+
       // Cache in Redis
       await this.redis.setex(
         'threat_intel:config',
         3600, // 1 hour
         JSON.stringify(this.config)
       );
-      
+
     } catch (error) {
       logger.error('Failed to store configuration:', { error });
       throw error;
@@ -1250,18 +1250,18 @@ export class ThreatIntelligenceConfigManager {
   async updateConfig(updates: Partial<ThreatIntelligenceConfig>): Promise<void> {
     try {
       logger.info('Updating threat intelligence configuration');
-      
+
       // Deep merge updates
       this.config = this.deepMerge(this.config, updates);
-      
+
       // Validate updated configuration
       this.validateConfiguration();
-      
+
       // Store updated configuration
       await this.storeConfiguration();
-      
+
       logger.info('Configuration updated successfully');
-      
+
     } catch (error) {
       logger.error('Failed to update configuration:', { error });
       throw error;
@@ -1270,7 +1270,7 @@ export class ThreatIntelligenceConfigManager {
 
   private deepMerge(target: any, source: any): any {
     const result = { ...target };
-    
+
     for (const key in source) {
       if (Object.prototype.hasOwnProperty.call(source, key)) {
         if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
@@ -1280,7 +1280,7 @@ export class ThreatIntelligenceConfigManager {
         }
       }
     }
-    
+
     return result;
   }
 
@@ -1291,20 +1291,20 @@ export class ThreatIntelligenceConfigManager {
   async updateRegionConfig(regionId: string, updates: Partial<RegionConfig>): Promise<void> {
     try {
       const regionIndex = this.config.regions.findIndex(r => r.regionId === regionId);
-      
+
       if (regionIndex === -1) {
         throw new Error(`Region not found: ${regionId}`);
       }
-      
+
       this.config.regions[regionIndex] = {
         ...this.config.regions[regionIndex],
         ...updates
       };
-      
+
       await this.storeConfiguration();
-      
+
       logger.info('Region configuration updated', { regionId });
-      
+
     } catch (error) {
       logger.error('Failed to update region configuration:', { error, regionId });
       throw error;
@@ -1318,12 +1318,12 @@ export class ThreatIntelligenceConfigManager {
       if (existingRegion) {
         throw new Error(`Region already exists: ${regionConfig.regionId}`);
       }
-      
+
       this.config.regions.push(regionConfig);
       await this.storeConfiguration();
-      
+
       logger.info('Region configuration added', { regionId: regionConfig.regionId });
-      
+
     } catch (error) {
       logger.error('Failed to add region configuration:', { error, regionId: regionConfig.regionId });
       throw error;
@@ -1333,21 +1333,21 @@ export class ThreatIntelligenceConfigManager {
   async removeRegionConfig(regionId: string): Promise<void> {
     try {
       const regionIndex = this.config.regions.findIndex(r => r.regionId === regionId);
-      
+
       if (regionIndex === -1) {
         throw new Error(`Region not found: ${regionId}`);
       }
-      
+
       // Don't allow removal of primary region
       if (this.config.regions[regionIndex].primary) {
         throw new Error('Cannot remove primary region');
       }
-      
+
       this.config.regions.splice(regionIndex, 1);
       await this.storeConfiguration();
-      
+
       logger.info('Region configuration removed', { regionId });
-      
+
     } catch (error) {
       logger.error('Failed to remove region configuration:', { error, regionId });
       throw error;
@@ -1357,15 +1357,15 @@ export class ThreatIntelligenceConfigManager {
   async refreshConfig(): Promise<void> {
     try {
       logger.info('Refreshing configuration from database');
-      
+
       // Clear Redis cache
       await this.redis.del('threat_intel:config');
-      
+
       // Reload from database
       await this.loadConfiguration();
-      
+
       logger.info('Configuration refreshed successfully');
-      
+
     } catch (error) {
       logger.error('Failed to refresh configuration:', { error });
       throw error;
@@ -1380,52 +1380,51 @@ export class ThreatIntelligenceConfigManager {
 
   async validateEnvironment(): Promise<{ valid: boolean; issues: string[] }> {
     const issues: string[] = [];
-    
+
     try {
       // Check required environment variables
       const requiredEnvVars = [
         'MONGODB_URI',
         'REDIS_URL'
       ];
-      
+
       for (const envVar of requiredEnvVars) {
         if (!process.env[envVar]) {
           issues.push(`Missing required environment variable: ${envVar}`);
         }
       }
-      
+
       // Check optional but recommended variables
       const recommendedEnvVars = [
         'OPENAI_API_KEY',
         'GOOGLE_AI_API_KEY',
-        'CLERK_SECRET_KEY',
         'SENTRY_DSN'
       ];
-      
+
       for (const envVar of recommendedEnvVars) {
         if (!process.env[envVar]) {
           issues.push(`Recommended environment variable not set: ${envVar}`);
         }
       }
-      
+
       // Test database connections
       try {
         await this.redis.ping();
       } catch (error) {
         issues.push('Redis connection failed: ' + error.message);
       }
-      
+
       try {
         await this.mongoClient.db().admin().ping();
       } catch (error) {
         issues.push('MongoDB connection failed: ' + error.message);
       }
-      
+
       return {
         valid: issues.filter(i => i.startsWith('Missing required')).length === 0,
         issues
       };
-      
+
     } catch (error) {
       issues.push('Environment validation error: ' + error.message);
       return { valid: false, issues };
@@ -1435,17 +1434,17 @@ export class ThreatIntelligenceConfigManager {
   async shutdown(): Promise<void> {
     try {
       logger.info('Shutting down Threat Intelligence Configuration Manager');
-      
+
       if (this.redis) {
         await this.redis.quit();
       }
-      
+
       if (this.mongoClient) {
         await this.mongoClient.close();
       }
-      
+
       logger.info('Threat Intelligence Configuration Manager shutdown completed');
-      
+
     } catch (error) {
       logger.error('Error during shutdown:', { error });
       throw error;

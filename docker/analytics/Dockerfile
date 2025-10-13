@@ -19,7 +19,7 @@ WORKDIR /app
 FROM base AS build
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --no-frozen-lockfile
 
 # Copy analytics source code

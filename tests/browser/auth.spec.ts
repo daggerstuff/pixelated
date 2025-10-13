@@ -27,18 +27,9 @@ test('login form shows validation errors', async ({ page }) => {
   await page.click('button[type="submit"]')
   await page.waitForTimeout(2000) // Wait for validation to appear
 
-  // Check for validation errors (they might be in different formats)
-  const emailError = page.locator('text=Email is required').or(
-    page.locator('[id*="email-error"]')
-  ).or(
-    page.locator('.error-message').filter({ hasText: /email/i })
-  )
-  
-  const passwordError = page.locator('text=Password is required').or(
-    page.locator('[id*="password-error"]')
-  ).or(
-    page.locator('.error-message').filter({ hasText: /password/i })
-  )
+  // Check for validation errors - the actual form uses specific IDs
+  const emailError = page.locator('#email-error')
+  const passwordError = page.locator('#password-error')
 
   // Check that validation errors are shown
   await expect(emailError).toBeVisible({ timeout: 10000 })

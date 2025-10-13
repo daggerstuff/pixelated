@@ -60,7 +60,7 @@ RUN if command -v uv >/dev/null 2>&1; then \
 
 FROM node-base AS build
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml* ./
 
 RUN pnpm install --no-frozen-lockfile
 

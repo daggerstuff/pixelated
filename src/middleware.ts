@@ -3,9 +3,8 @@ import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence } from 'astro/middleware'
 import { getSession } from './lib/auth/session'
 
-// Simple route matcher replacement for Clerk's createRouteMatcher
+// Simple route matcher for protected API routes
 const protectedRoutePatterns: RegExp[] = [
-  /\/api\/clerk-protected-example(.*)/, // keep original example pattern for compatibility
   /\/api\/protected(.*)/,
 ]
 

@@ -22,14 +22,14 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY /src/lib/ai/bias-detection/requirements.txt .
 RUN if command -v uv >/dev/null 2>&1; then \
-            uv pip install --python /opt/venv/bin/python --no-cache-dir --requirement requirements.txt; \
-        else \
-            pip install --no-cache-dir --requirement requirements.txt; \
-        fi
+    uv pip install --python /opt/venv/bin/python --no-cache-dir --requirement requirements.txt; \
+    else \
+    pip install --no-cache-dir --requirement requirements.txt; \
+    fi
 
 FROM base AS build
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --no-frozen-lockfile
 
 COPY src/lib/ai ./src/lib/ai

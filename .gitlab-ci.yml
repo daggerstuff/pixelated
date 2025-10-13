@@ -302,7 +302,7 @@ security:
   allow_failure: true
   timeout: 10m
 
-# Sentry release - conditional and optimized
+# Sentry release - automated for all successful builds
 sentry-release:
   stage: security
   image: node:24-alpine
@@ -323,13 +323,11 @@ sentry-release:
   rules:
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == "master"
-      when: manual
     - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
   allow_failure: true
   timeout: 5m
 
-# GKE Deployment - Google Kubernetes Engine (Optimized)
+# GKE Deployment - Automated with Smart Strategies
 deploy-gke:
   stage: deploy
   image: google/cloud-sdk:alpine
@@ -340,18 +338,36 @@ deploy-gke:
     GKE_NAMESPACE: ${GKE_NAMESPACE:-pixelated}
     GKE_DEPLOYMENT_NAME: ${GKE_DEPLOYMENT_NAME:-pixelated}
     GKE_SERVICE_NAME: ${GKE_SERVICE_NAME:-pixelated-service}
-    # Deployment configuration
+    # Deployment configuration with progressive rollout
     REPLICAS: ${GKE_REPLICAS:-3}
     MAX_SURGE: ${GKE_MAX_SURGE:-1}
     MAX_UNAVAILABLE: ${GKE_MAX_UNAVAILABLE:-0}
+    # Blue-green deployment support
+    DEPLOYMENT_STRATEGY: ${DEPLOYMENT_STRATEGY:-rolling}
+    CANARY_PERCENTAGE: ${CANARY_PERCENTAGE:-25}
+    # Auto-rollback configuration
+    AUTO_ROLLBACK_ENABLED: ${AUTO_ROLLBACK:-true}
+    HEALTH_CHECK_TIMEOUT: ${HEALTH_CHECK_TIMEOUT:-300}
   <<: *gcp_auth
   script:
     - |
       echo "🚀 Deploying to GKE cluster: $GKE_CLUSTER_NAME"
       echo "📦 Container image: $CONTAINER_IMAGE"
+      echo "🎯 Deployment strategy: $DEPLOYMENT_STRATEGY"
 
       # Pre-deployment validation
       echo "🔍 Pre-deployment validation..."
+      
+      # Check deployment strategy and validate
+      case $DEPLOYMENT_STRATEGY in
+        rolling|blue-green|canary)
+          echo "✅ Deployment strategy: $DEPLOYMENT_STRATEGY"
+          ;;
+        *)
+          echo "❌ Invalid deployment strategy: $DEPLOYMENT_STRATEGY"
+          exit 1
+          ;;
+      esac
 
       # Check if deployment exists
       if kubectl get deployment $GKE_DEPLOYMENT_NAME >/dev/null 2>&1; then
@@ -359,217 +375,114 @@ deploy-gke:
         kubectl get deployment $GKE_DEPLOYMENT_NAME
         kubectl get pods -l app=pixelated
         DEPLOYMENT_EXISTS=true
+        # Store current revision for potential rollback
+        CURRENT_REVISION=$(kubectl rollout history deployment/$GKE_DEPLOYMENT_NAME | tail -2 | head -1 | awk '{print $1}')
+        echo "📋 Current revision: $CURRENT_REVISION"
       else
         echo "🆕 Creating new deployment"
         DEPLOYMENT_EXISTS=false
+        CURRENT_REVISION=0
       fi
 
-      # Apply Kubernetes manifests
-      echo "📋 Applying Kubernetes manifests..."
+      # Apply Kubernetes manifests based on strategy
+      echo "📋 Applying Kubernetes manifests using $DEPLOYMENT_STRATEGY strategy..."
 
-      # Create deployment manifest
-      cat > deployment.yaml << 'EOF'
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: $GKE_DEPLOYMENT_NAME
-        namespace: $GKE_NAMESPACE
-        labels:
-          app: pixelated
-          version: $CI_COMMIT_SHORT_SHA
-      spec:
-        replicas: $REPLICAS
-        strategy:
-          type: RollingUpdate
-          rollingUpdate:
-            maxSurge: $MAX_SURGE
-            maxUnavailable: $MAX_UNAVAILABLE
-        selector:
-          matchLabels:
-            app: pixelated
-        template:
-          metadata:
-            labels:
-              app: pixelated
-              version: $CI_COMMIT_SHORT_SHA
-            annotations:
-              prometheus.io/scrape: "true"
-              prometheus.io/port: "4321"
-              prometheus.io/path: "/metrics"
-          spec:
-            securityContext:
-              runAsNonRoot: true
-              runAsUser: 1001
-              runAsGroup: 1001
-              fsGroup: 1001
-            containers:
-            - name: pixelated
-              image: $CONTAINER_IMAGE
-              imagePullPolicy: Always
-              ports:
-              - containerPort: 4321
-                name: http
-                protocol: TCP
-              env:
-              - name: NODE_ENV
-                value: "production"
-              - name: PORT
-                value: "4321"
-              - name: ASTRO_TELEMETRY_DISABLED
-                value: "1"
-              - name: KUBERNETES_NAMESPACE
-                valueFrom:
-                  fieldRef:
-                    fieldPath: metadata.namespace
-              - name: KUBERNETES_POD_NAME
-                valueFrom:
-                  fieldRef:
-                    fieldPath: metadata.name
-              resources:
-                requests:
-                  memory: "1Gi"
-                  cpu: "500m"
-                limits:
-                  memory: "2Gi"
-                  cpu: "2"
-              livenessProbe:
-                httpGet:
-                  path: /api/health
-                  port: 4321
-                  scheme: HTTP
-                initialDelaySeconds: 30
-                periodSeconds: 30
-                timeoutSeconds: 10
-                failureThreshold: 3
-                successThreshold: 1
-              readinessProbe:
-                httpGet:
-                  path: /api/health
-                  port: 4321
-                  scheme: HTTP
-                initialDelaySeconds: 5
-                periodSeconds: 10
-                timeoutSeconds: 5
-                failureThreshold: 3
-                successThreshold: 1
-              startupProbe:
-                httpGet:
-                  path: /api/health
-                  port: 4321
-                  scheme: HTTP
-                initialDelaySeconds: 10
-                periodSeconds: 5
-                timeoutSeconds: 5
-                failureThreshold: 30
-                successThreshold: 1
-              securityContext:
-                allowPrivilegeEscalation: false
-                readOnlyRootFilesystem: true
-                capabilities:
-                  drop:
-                  - ALL
-                  add:
-                  - CHOWN
-                  - SETGID
-                  - SETUID
-              volumeMounts:
-              - name: tmp
-                mountPath: /tmp
-              - name: var-tmp
-                mountPath: /var/tmp
-            volumes:
-            - name: tmp
-              emptyDir:
-                sizeLimit: 100Mi
-            - name: var-tmp
-              emptyDir:
-                sizeLimit: 50Mi
-            imagePullSecrets:
-            - name: gitlab-registry
-      EOF
+      case $DEPLOYMENT_STRATEGY in
+        rolling)
+          # Standard rolling update
+          . ./scripts/deploy-rolling.sh
+          ;;
+        blue-green)
+          # Blue-green deployment
+          . ./scripts/deploy-blue-green.sh
+          ;;
+        canary)
+          # Canary deployment
+          . ./scripts/deploy-canary.sh
+          ;;
+      esac
 
-      # Apply deployment
-      kubectl apply -f deployment.yaml
-
-      # Create or update service if needed
-      if ! kubectl get service $GKE_SERVICE_NAME >/dev/null 2>&1; then
-        echo "🌐 Creating service..."
-        cat > service.yaml << EOF
-        apiVersion: v1
-        kind: Service
-        metadata:
-          name: $GKE_SERVICE_NAME
-          namespace: $GKE_NAMESPACE
-          labels:
-            app: pixelated
-        spec:
-          selector:
-            app: pixelated
-          ports:
-          - name: http
-            port: 80
-            targetPort: 4321
-            protocol: TCP
-          type: ClusterIP
-        EOF
-        kubectl apply -f service.yaml
-      fi
-
-      # Wait for rollout to complete
+      # Wait for rollout based on strategy
       echo "⏳ Waiting for deployment rollout..."
-      if ! kubectl rollout status deployment/$GKE_DEPLOYMENT_NAME --timeout=600s; then
-        echo "❌ Deployment rollout failed"
-        kubectl describe deployment $GKE_DEPLOYMENT_NAME
-        kubectl get events --sort-by=.metadata.creationTimestamp
+      case $DEPLOYMENT_STRATEGY in
+        rolling)
+          if ! kubectl rollout status deployment/$GKE_DEPLOYMENT_NAME --timeout=600s; then
+            echo "❌ Rolling deployment failed"
+            kubectl describe deployment $GKE_DEPLOYMENT_NAME
+            kubectl get events --sort-by=.metadata.creationTimestamp
+            # Auto-rollback if enabled
+            if [ "$AUTO_ROLLBACK_ENABLED" = "true" ] && [ "$DEPLOYMENT_EXISTS" = "true" ]; then
+              echo "🔄 Initiating automatic rollback..."
+              kubectl rollout undo deployment/$GKE_DEPLOYMENT_NAME
+              kubectl rollout status deployment/$GKE_DEPLOYMENT_NAME --timeout=300s
+            fi
+            exit 1
+          fi
+          ;;
+        blue-green|canary)
+          # For advanced strategies, wait for canary/blue validation
+          if ! . ./scripts/wait-for-deployment.sh; then
+            echo "❌ Deployment validation failed"
+            if [ "$AUTO_ROLLBACK_ENABLED" = "true" ]; then
+              echo "🔄 Initiating automatic rollback..."
+              . ./scripts/rollback-deployment.sh
+            fi
+            exit 1
+          fi
+          ;;
+      esac
+
+      # Post-deployment validation with health checks
+      echo "🔍 Post-deployment validation..."
+      
+      # Run comprehensive health checks
+      if ! . ./scripts/health-check-comprehensive.sh; then
+        echo "❌ Health checks failed"
+        if [ "$AUTO_ROLLBACK_ENABLED" = "true" ]; then
+          echo "🔄 Initiating automatic rollback due to health check failure..."
+          . ./scripts/rollback-deployment.sh
+        fi
         exit 1
       fi
 
-      # Post-deployment validation
-      echo "🔍 Post-deployment validation..."
-
-      # Check deployment status
-      kubectl get deployment $GKE_DEPLOYMENT_NAME -o wide
-      kubectl get pods -l app=pixelated -o wide
-      kubectl get services $GKE_SERVICE_NAME
-
-      # Verify pod health
-      READY_PODS=$(kubectl get pods -l app=pixelated -o json | jq '[.items[] | select(.status.phase == "Running" and (.status.containerStatuses[]?.ready // false))] | length')
-      DESIRED_PODS=$(kubectl get deployment $GKE_DEPLOYMENT_NAME -o json | jq '.spec.replicas')
-
-      echo "📊 Pod status: $READY_PODS/$DESIRED_PODS ready"
-
-      if [ "$READY_PODS" -lt "$DESIRED_PODS" ]; then
-        echo "⚠️ Not all pods are ready"
-        kubectl describe pods -l app=pixelated
-        
-        # Check for common issues
-        echo "🔍 Checking for common issues..."
-        kubectl get events --field-selector type=Warning --sort-by=.metadata.creationTimestamp
-        
-        # Still proceed if at least one pod is ready
-        if [ "$READY_PODS" -lt 1 ]; then
-          echo "❌ No healthy pods running"
+      # Performance validation for canary deployments
+      if [ "$DEPLOYMENT_STRATEGY" = "canary" ]; then
+        echo "📈 Validating canary performance..."
+        if ! . ./scripts/validate-canary-performance.sh; then
+          echo "❌ Canary performance validation failed"
+          if [ "$AUTO_ROLLBACK_ENABLED" = "true" ]; then
+            echo "🔄 Rolling back canary deployment..."
+            . ./scripts/rollback-deployment.sh
+          fi
           exit 1
-        else
-          echo "⚠️ Proceeding with $READY_PODS healthy pods"
         fi
       fi
 
-      # Test service connectivity
-      echo "🌐 Testing service connectivity..."
-      SERVICE_IP=$(kubectl get service $GKE_SERVICE_NAME -o json | jq -r '.spec.clusterIP')
-      echo "Service IP: $SERVICE_IP"
-
       echo "✅ GKE deployment completed successfully"
       echo "🌐 Application URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}"
+      echo "📊 Deployment strategy: $DEPLOYMENT_STRATEGY"
+      
+      # Store deployment metadata
+      cat > gke-deployment.env << EOF
+      DEPLOYMENT_STRATEGY=$DEPLOYMENT_STRATEGY
+      DEPLOYMENT_REVISION=$(kubectl rollout history deployment/$GKE_DEPLOYMENT_NAME | tail -2 | head -1 | awk '{print $1}')
+      DEPLOYMENT_STATUS=success
+      CONTAINER_IMAGE=$CONTAINER_IMAGE
+      DEPLOYMENT_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+      EOF
   after_script:
     - |
       # Cleanup temporary files
       rm -f /tmp/gcp-key.json deployment.yaml service.yaml
-
+      
       # Final status report
       echo "📊 Final deployment status:"
       kubectl get all -l app=pixelated || true
+      
+      # Send deployment notification
+      if [ -n "$SLACK_WEBHOOK_URL" ]; then
+        . ./scripts/notify-deployment.sh
+      fi
   environment:
     name: production-gke
     url: $GKE_ENVIRONMENT_URL
@@ -577,14 +490,13 @@ deploy-gke:
       namespace: ${GKE_NAMESPACE:-pixelated}
   needs:
     - job: build
+    - job: security
+    - job: sentry-release
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-      when: manual
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
     - if: $CI_COMMIT_TAG
-      when: manual
-  allow_failure: true
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main"
+  allow_failure: false
   timeout: 25m
   artifacts:
     reports:
@@ -593,6 +505,7 @@ deploy-gke:
     paths:
       - deployment.yaml
       - service.yaml
+      - deployment-*.yaml
     expire_in: 1 week
     when: always
 
@@ -702,7 +615,7 @@ health-check-gke:
   allow_failure: true
   timeout: 5m
 
-# Cleanup job - optimized and scheduled
+# Automated cleanup job - runs on schedule and after deployments
 cleanup:
   stage: deploy
   image: docker:27.3.1
@@ -713,36 +626,120 @@ cleanup:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+    # Cleanup configuration
+    KEEP_IMAGES: ${KEEP_IMAGES:-5}
+    CLEANUP_OLDER_THAN: ${CLEANUP_OLDER_THAN:-24h}
+    BUILDER_CLEANUP_OLDER_THAN: ${BUILDER_CLEANUP_OLDER_THAN:-48h}
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - echo "🧹 Cleaning up old images and containers..."
     - |
-      # Clean up old images (keep last 5 versions)
-      echo "🗑️ Removing old container images..."
-      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
-        grep $CI_REGISTRY_IMAGE | \
-        tail -n +6 | \
-        awk '{print $1}' | \
-        xargs -r docker rmi || true
-
-      # System cleanup with more aggressive settings
+      echo "🧹 Starting automated cleanup process..."
+      echo "📋 Configuration:"
+      echo "  - Keep last $KEEP_IMAGES images"
+      echo "  - Cleanup images older than $CLEANUP_OLDER_THAN"
+      echo "  - Builder cache cleanup older than $BUILDER_CLEANUP_OLDER_THAN"
+      
+      # Image cleanup with smart retention
+      echo "🗑️ Cleaning up old container images..."
+      if [ -n "$CI_REGISTRY_IMAGE" ]; then
+        # Get list of images sorted by creation date (newest first)
+        IMAGES=$(docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
+          grep $CI_REGISTRY_IMAGE | \
+          sort -k2 -r)
+        
+        IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
+        echo "📊 Found $IMAGE_COUNT images for $CI_REGISTRY_IMAGE"
+        
+        if [ $IMAGE_COUNT -gt $KEEP_IMAGES ]; then
+          # Remove images beyond the keep threshold
+          IMAGES_TO_REMOVE=$(echo "$IMAGES" | tail -n +$((KEEP_IMAGES + 1)) | awk '{print $1}')
+          echo "🗑️ Removing $(echo "$IMAGES_TO_REMOVE" | wc -l) old images..."
+          echo "$IMAGES_TO_REMOVE" | xargs -r docker rmi || echo "⚠️ Some images could not be removed"
+        else
+          echo "✅ Image count within retention policy"
+        fi
+      else
+        echo "⚠️ CI_REGISTRY_IMAGE not set, skipping image cleanup"
+      fi
+      
+      # System cleanup with safety checks
       echo "🧽 Running system cleanup..."
-      docker system prune -af --filter "until=24h"
+      echo "🧹 Cleaning up unused containers..."
+      docker container prune -f --filter "until=$CLEANUP_OLDER_THAN"
+      
+      echo "🧹 Cleaning up unused networks..."
+      docker network prune -f
+      
+      echo "🧹 Cleaning up unused volumes (excluding keep labels)..."
       docker volume prune -f --filter "label!=keep"
-
-      # Clean up build cache (keep recent)
-      docker builder prune -af --filter "until=48h"
-
-      echo "✅ Cleanup completed"
+      
+      echo "🧹 Cleaning up build cache..."
+      docker system prune -af --filter "until=$CLEANUP_OLDER_THAN"
+      
+      # Build cache cleanup
+      echo "🔧 Cleaning up build cache..."
+      if command -v docker builder >/dev/null 2>&1; then
+        docker builder prune -af --filter "until=$BUILDER_CLEANUP_OLDER_THAN"
+      else
+        echo "⚠️ Docker BuildKit not available, skipping builder cleanup"
+      fi
+      
+      # Registry cleanup (if supported)
+      echo "🔧 Cleaning up registry..."
+      if command -v docker manifest >/dev/null 2>&1 && [ -n "$CI_REGISTRY_IMAGE" ]; then
+        # Remove old manifests (implementation depends on registry type)
+        echo "ℹ️ Registry manifest cleanup skipped (requires registry-specific implementation)"
+      fi
+      
+      # Cleanup temporary files
+      echo "🧹 Cleaning up temporary files..."
+      find /tmp -name "docker-*" -type f -mtime +1 -delete 2>/dev/null || true
+      find /var/tmp -name "docker-*" -type f -mtime +1 -delete 2>/dev/null || true
+      
+      # Final status
+      echo "📊 Cleanup completed successfully"
+      echo "📈 Remaining images:"
+      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}" | head -10
+      
+      echo "💾 Disk usage after cleanup:"
+      docker system df
+      
+      # Create cleanup report
+      cat > cleanup-report.json << EOF
+      {
+        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "images_retained": $KEEP_IMAGES,
+        "cleanup_older_than": "$CLEANUP_OLDER_THAN",
+        "builder_cleanup_older_than": "$BUILDER_CLEANUP_OLDER_THAN",
+        "status": "completed",
+        "registry": "${CI_REGISTRY_IMAGE:-unknown}"
+      }
+      EOF
+      
+      echo "📄 Cleanup report saved to cleanup-report.json"
+  after_script:
+    - |
+      # Always attempt to logout from registry
+      docker logout $CI_REGISTRY || true
+      
+      # Cleanup any remaining temporary files
+      rm -f /tmp/gcp-key.json deployment.yaml service.yaml deployment-*.yaml service-*.yaml
+      
+      echo "✅ Cleanup process finalized"
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_COMMIT_BRANCH == "master"
-      when: manual
     - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
+    - if: $CI_COMMIT_TAG
   allow_failure: true
-  timeout: 10m
+  timeout: 15m
+  artifacts:
+    reports:
+      dotenv:
+        - cleanup-report.json
+    expire_in: 1 week
+    when: always
 
 # Include GitLab security templates - optimized
 include:

@@ -14,9 +14,7 @@ mkdir -p test-results/mobile test-results/cross-browser
 # Set environment variables for testing
 export NODE_ENV=test
 export DISABLE_AUTH=true
-export CLERK_PUBLISHABLE_KEY=pk_test_dummy
-export PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_dummy
-export CLERK_SECRET_KEY=sk_test_dummy
+# Clerk removed: no Clerk env vars should be set by test scripts
 export DISABLE_WEB_FONTS=true
 export SKIP_MSW=true
 

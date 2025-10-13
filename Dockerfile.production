@@ -32,7 +32,7 @@ RUN addgroup -g 1001 -S astro && \
 FROM base AS deps
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml* ./
 
 # Create production package.json using a separate script to avoid parsing issues
 COPY scripts/create-prod-package.js ./
@@ -47,7 +47,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 FROM base AS build
 
 # Copy full dependencies for build
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml* ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm config set store-dir /pnpm/store && \
     pnpm install --frozen-lockfile

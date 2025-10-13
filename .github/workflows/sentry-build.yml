@@ -70,23 +70,79 @@ jobs:
         sentry-cli releases files ${SENTRY_RELEASE} upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix
         sentry-cli releases finalize ${SENTRY_RELEASE}
 
-    - name: Build Docker image (optional)
+    - name: Build Docker image (automated)
       env:
         SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         SENTRY_RELEASE: ${{ github.sha }}
         PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
       run: |
-        IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+        # Build image with multiple tags for different environments
+        IMAGE_TAG_SHA=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+        IMAGE_TAG_BRANCH=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.ref_name }}
+        IMAGE_TAG_LATEST=ghcr.io/${{ github.repository_owner }}/pixelated:latest
+        
+        echo "🔧 Building Docker image with multiple tags..."
         docker build \
-          --tag $IMAGE_TAG \
+          --tag $IMAGE_TAG_SHA \
+          --tag $IMAGE_TAG_BRANCH \
+          --tag $IMAGE_TAG_LATEST \
           --build-arg SENTRY_DSN="${SENTRY_DSN}" \
           --build-arg SENTRY_AUTH_TOKEN="${SENTRY_AUTH_TOKEN}" \
           --build-arg SENTRY_RELEASE="${SENTRY_RELEASE}" \
           --build-arg PUBLIC_SENTRY_DSN="${PUBLIC_SENTRY_DSN}" \
           .
+        
+        # Store image tags for later steps
+        echo "IMAGE_TAG_SHA=$IMAGE_TAG_SHA" >> $GITHUB_ENV
+        echo "IMAGE_TAG_BRANCH=$IMAGE_TAG_BRANCH" >> $GITHUB_ENV
+        echo "IMAGE_TAG_LATEST=$IMAGE_TAG_LATEST" >> $GITHUB_ENV
 
-    - name: Optionally push Docker image to GitHub Container Registry
-      if: ${{ env.GITHUB_TOKEN != '' && always() }}
+    - name: Push Docker image to GitHub Container Registry (automated)
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "Skipping automatic push by default — configure PAT or change this step if you want to push images."
+        echo "🔧 Logging in to GitHub Container Registry..."
+        echo $GITHUB_TOKEN | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        
+        echo "📤 Pushing Docker images..."
+        docker push $IMAGE_TAG_SHA
+        docker push $IMAGE_TAG_BRANCH
+        docker push $IMAGE_TAG_LATEST
+        
+        echo "✅ Docker images pushed successfully"
+        
+        # Create deployment metadata
+        cat > deployment-metadata.json << EOF
+        {
+          "image_tags": [
+            "$IMAGE_TAG_SHA",
+            "$IMAGE_TAG_BRANCH",
+            "$IMAGE_TAG_LATEST"
+          ],
+          "commit_sha": "${{ github.sha }}",
+          "branch": "${{ github.ref_name }}",
+          "build_timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "sentry_release": "${{ github.sha }}"
+        }
+        EOF
+
+    - name: Create deployment notification
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: |
+        echo "🚀 Deployment ready for production"
+        echo "📦 Image: $IMAGE_TAG_SHA"
+        echo "🎯 Branch: ${{ github.ref_name }}"
+        echo "🔖 Commit: ${{ github.sha }}"
+        
+        # Output deployment information
+        cat deployment-metadata.json
+        
+        # Trigger deployment workflow if configured
+        if [ -n "${{ secrets.DEPLOYMENT_WEBHOOK_URL }}" ]; then
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d @deployment-metadata.json \
+            "${{ secrets.DEPLOYMENT_WEBHOOK_URL }}" || echo "⚠️ Deployment webhook failed"
+        fi
