@@ -49,8 +49,10 @@ jobs:
         else
           echo "No supported test runner found (vitest/jest)."
         fi
-
-    - name: GitHub Copilot Code Review
-      uses: github/copilot-review-action@v1
-      with:
-        github-token: ${{ secrets.G_TOKEN }}
+    # NOTE: github/copilot-review-action is not publicly accessible
+    # and causes Dependabot to fail. Commented out until a public
+    # alternative is available or access is granted.
+    # - name: GitHub Copilot Code Review
+    #   uses: github/copilot-review-action@v1
+    #   with:
+    #     github-token: ${{ secrets.G_TOKEN }}

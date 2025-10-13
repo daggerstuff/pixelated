@@ -88,7 +88,7 @@ export default defineConfig({
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
       },
-      extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
+      extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
       mainFields: ['module', 'main'],
       conditions: ['import', 'module', 'browser', 'default'],
