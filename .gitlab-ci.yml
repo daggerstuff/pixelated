@@ -166,7 +166,7 @@ build:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - apk add --no-cache docker-cli curl
+    - apk add --no-cache docker-cli curl git
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     # Install Docker Buildx for BuildKit support
     - |
@@ -187,31 +187,47 @@ build:
       pnpm install --frozen-lockfile --prefer-offline
       pnpm build
 
-      # Create a minimal Dockerfile for the application
+    - |
+      # Create a multi-stage Dockerfile that builds inside the image.
+      # This avoids relying on a pre-generated ./dist in the CI workspace and
+      # ensures pnpm and the build run with the same Node image used to run the app.
       cat > Dockerfile << 'EOF'
-      FROM node:24-alpine
+      # Builder: install deps and run the site build
+      FROM node:24-alpine AS builder
       WORKDIR /app
 
-      # Copy package files
+      # Install build-time tools and enable pnpm
+      RUN apk add --no-cache bash git python3 make g++ && \
+        corepack enable pnpm
+
+      # Copy package manifests first for better layer caching
       COPY package.json pnpm-lock.yaml ./
 
-      # Install pnpm and dependencies
-      RUN corepack enable pnpm && pnpm install --prod --frozen-lockfile
+      # Install all dependencies (including devDeps needed for build)
+      RUN pnpm install --frozen-lockfile
 
-      # Copy built application
-      COPY dist ./dist
-      COPY public ./public
+      # Copy the rest of the repo and run the build
+      COPY . .
+      RUN pnpm build
+
+      # Runtime: minimal image only containing built artifacts
+      FROM node:24-alpine AS runtime
+      WORKDIR /app
 
       # Create non-root user
-      RUN addgroup -g 1001 -S nodejs && \
-          adduser -S nextjs -u 1001 -G nodejs
+      RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 
-      # Set permissions
-      RUN chown -R nextjs:nodejs /app
+      # Copy built output and public assets from builder
+      COPY --from=builder /app/dist ./dist
+      COPY --from=builder /app/public ./public
+      COPY --from=builder /app/package.json ./package.json
+
+      # Set permissions and drop to non-root user
+      RUN chown -R nextjs:nodejs /app && \
+        chmod -R g+rX /app
       USER nextjs
 
       EXPOSE 4321
-
       CMD ["node", "dist/server/entry.mjs"]
       EOF
 
