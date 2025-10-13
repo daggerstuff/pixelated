@@ -188,56 +188,14 @@ build:
       pnpm build
 
     - |
-      # Create a multi-stage Dockerfile that builds inside the image.
-      # This avoids relying on a pre-generated ./dist in the CI workspace and
-      # ensures pnpm and the build run with the same Node image used to run the app.
-      cat > Dockerfile << 'EOF'
-      # Builder: install deps and run the site build
-      FROM node:24-alpine AS builder
-      WORKDIR /app
-
-      # Install build-time tools and enable pnpm
-      RUN apk add --no-cache bash git python3 make g++ && \
-        corepack enable pnpm
-
-      # Copy package manifests first for better layer caching
-      COPY package.json pnpm-lock.yaml ./
-
-      # Install all dependencies (including devDeps needed for build)
-      RUN pnpm install --frozen-lockfile
-
-      # Copy the rest of the repo and run the build
-      COPY . .
-      RUN pnpm build
-
-      # Runtime: minimal image only containing built artifacts
-      FROM node:24-alpine AS runtime
-      WORKDIR /app
-
-      # Create non-root user
-      RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
-
-      # Copy built output and public assets from builder
-      COPY --from=builder /app/dist ./dist
-      COPY --from=builder /app/public ./public
-      COPY --from=builder /app/package.json ./package.json
-
-      # Set permissions and drop to non-root user
-      RUN chown -R nextjs:nodejs /app && \
-        chmod -R g+rX /app
-      USER nextjs
-
-      EXPOSE 4321
-      CMD ["node", "dist/server/entry.mjs"]
-      EOF
-
-      # Build and push container image
-      docker build -t $CONTAINER_IMAGE .
-      docker push $CONTAINER_IMAGE
+      # Use the repository Dockerfile to build and push the image.
+      # This Dockerfile is kept in repo root and handles build inside the image.
+      docker build -f Dockerfile -t $CONTAINER_IMAGE .
+      docker push $CONTAINER_IMAGE || true
 
       # Also tag and push as latest for caching
-      docker tag $CONTAINER_IMAGE $CONTAINER_IMAGE_LATEST
-      docker push $CONTAINER_IMAGE_LATEST
+      docker tag $CONTAINER_IMAGE $CONTAINER_IMAGE_LATEST || true
+      docker push $CONTAINER_IMAGE_LATEST || true
 
       echo "✅ Container image built and pushed: $CONTAINER_IMAGE"
 

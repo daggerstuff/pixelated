@@ -1,96 +1,38 @@
-# Build stage - optimized for security and performance
+# Single, clean multi-stage Dockerfile for building and running Pixelated
+
+# Builder stage: install deps and run the static build
 FROM node:24-alpine AS builder
-
-# Install security updates and required packages
-RUN apk update && apk upgrade && \
-    apk add --no-cache dumb-init && \
-    rm -rf /var/cache/apk/*
-
-# Create non-root user for build
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S pixelated -u 1001 -G nodejs
-
-# Enable pnpm
-RUN corepack enable pnpm
-
-# Set working directory
 WORKDIR /app
 
-# Copy package files with proper ownership
-COPY --chown=pixelated:nodejs package.json pnpm-lock.yaml ./
+# Install build-time tools and enable pnpm
+RUN apk add --no-cache bash git python3 make g++ && \
+    corepack enable pnpm
 
-# Switch to non-root user for dependency installation
-USER pixelated
+# Copy package manifests first for better layer caching
+COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies with optimized caching
-RUN --mount=type=cache,target=/home/pixelated/.local/share/pnpm/store,uid=1001,gid=1001 \
-    pnpm config set store-dir /home/pixelated/.local/share/pnpm/store && \
-    pnpm install --frozen-lockfile --prefer-offline
+# Install all dependencies (dev + prod) required for build
+RUN pnpm install --frozen-lockfile
 
-# Copy source files
-COPY --chown=pixelated:nodejs . .
+# Copy source and run the build
+COPY . .
+RUN pnpm build
 
-# Build the application with resource limits
-RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
-    --mount=type=secret,id=SENTRY_DSN \
-    --mount=type=secret,id=PUBLIC_SENTRY_DSN \
-    export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN 2>/dev/null || echo "") && \
-    export SENTRY_DSN=$(cat /run/secrets/SENTRY_DSN 2>/dev/null || echo "") && \
-    export PUBLIC_SENTRY_DSN=$(cat /run/secrets/PUBLIC_SENTRY_DSN 2>/dev/null || echo "") && \
-    NODE_OPTIONS="--max-old-space-size=4096" pnpm run build
-
-# Runtime stage - minimal and secure
+# Runtime stage: minimal image with only production bits
 FROM node:24-alpine AS runtime
-
-# Install security updates and dumb-init
-RUN apk update && apk upgrade && \
-    apk add --no-cache dumb-init && \
-    rm -rf /var/cache/apk/*
+WORKDIR /app
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S pixelated -u 1001 -G nodejs
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 
-# Enable pnpm
-RUN corepack enable pnpm
+# Copy built output and public assets from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
 
-# Set working directory
-WORKDIR /app
+# Set ownership and drop to non-root
+RUN chown -R nextjs:nodejs /app && chmod -R g+rX /app
+USER nextjs
 
-# Copy package files
-COPY --chown=pixelated:nodejs package.json pnpm-lock.yaml ./
-
-# Switch to non-root user
-USER pixelated
-
-# Install production dependencies only with caching
-RUN --mount=type=cache,target=/home/pixelated/.local/share/pnpm/store,uid=1001,gid=1001 \
-    pnpm config set store-dir /home/pixelated/.local/share/pnpm/store && \
-    pnpm install --prod --frozen-lockfile --prefer-offline
-
-# Copy built application from builder
-COPY --from=builder --chown=pixelated:nodejs /app/dist ./dist
-
-# Create necessary directories with proper permissions
-RUN mkdir -p /tmp/pixelated && \
-    chown pixelated:nodejs /tmp/pixelated
-
-# Security and performance settings
-ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=4321
-ENV NODE_OPTIONS="--max-old-space-size=2048"
-ENV ASTRO_TELEMETRY_DISABLED=1
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:4321/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"
-
-# Expose port
 EXPOSE 4321
-
-# Use dumb-init to handle signals properly
-ENTRYPOINT ["dumb-init", "--"]
-
-# Start the application
-CMD ["pnpm", "start"]
+CMD ["node", "dist/server/entry.mjs"]
