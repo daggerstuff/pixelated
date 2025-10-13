@@ -541,11 +541,11 @@ deploy-gke:
     MAX_UNAVAILABLE: ${GKE_MAX_UNAVAILABLE:-0}
   <<: *gcp_auth
   script:
-  - echo "🚀 Deploying to GKE cluster: $GKE_CLUSTER_NAME"
-  - echo "📦 Container image: $CONTAINER_IMAGE"
-  - |
-    # Pre-deployment validation
-    echo "🔍 Pre-deployment validation..."
+    - echo "🚀 Deploying to GKE cluster: $GKE_CLUSTER_NAME"
+    - echo "📦 Container image: $CONTAINER_IMAGE"
+    - |
+      # Pre-deployment validation
+      echo "🔍 Pre-deployment validation..."
 
     # Check if deployment exists
     if kubectl get deployment $GKE_DEPLOYMENT_NAME >/dev/null 2>&1; then
@@ -766,7 +766,7 @@ deploy-gke:
     kubectl get all -l app=pixelated || true
   environment:
     name: production-gke
-    url: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}
+    url: $GKE_ENVIRONMENT_URL
     kubernetes:
       namespace: ${GKE_NAMESPACE:-pixelated}
   needs:
