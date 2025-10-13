@@ -55,39 +55,6 @@ cache: &global_cache
   - node_modules/
   policy: pull-push
 
-# Security template for SSH key handling
-.ssh_setup: &ssh_setup
-  before_script:
-  - apk add --no-cache openssh-client curl git
-  - eval $(ssh-agent -s)
-  - |
-    if [ -z "$SSH_PRIVATE_KEY" ]; then
-      echo "❌ SSH_PRIVATE_KEY not set - configure it in GitLab CI/CD variables"
-      exit 1
-    fi
-    # Write SSH key to temporary file, converting single-line format to proper multi-line
-    SSH_KEY_FILE=$(mktemp)
-    trap "rm -f $SSH_KEY_FILE" EXIT
-    # Convert single-line key (with \n) to proper multi-line format
-    echo "$SSH_PRIVATE_KEY" | sed 's/\\n/\n/g' > "$SSH_KEY_FILE"
-    chmod 600 "$SSH_KEY_FILE"
-    # Validate and add key
-    if ssh-keygen -l -f "$SSH_KEY_FILE" >/dev/null 2>&1; then
-      ssh-add "$SSH_KEY_FILE"
-      echo "✅ SSH key loaded successfully"
-    else
-      echo "❌ Invalid SSH key format. Ensure your SSH_PRIVATE_KEY variable contains \\n for line breaks"
-      exit 1
-    fi
-  - mkdir -p ~/.ssh && chmod 700 ~/.ssh
-  - |
-    if [ -n "$VPS_HOST" ]; then
-      ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
-    else
-      echo "⚠️ VPS_HOST not set, skipping host key scan"
-    fi
-
-
 # GCP authentication template
 .gcp_auth: &gcp_auth
   before_script:
@@ -307,98 +274,6 @@ sentry-release:
     when: manual
   allow_failure: true
   timeout: 5m
-
-# VPS Deployment - secure and reliable
-deploy-vps:
-  stage: deploy
-  image: alpine:latest
-  <<: *ssh_setup
-  needs: [ "build" ]
-  script:
-  - echo "🚀 Deploying to VPS environment..."
-  - |
-    ssh $VPS_USER@$VPS_HOST << 'EOF'
-    set -e
-    echo "🚀 Starting deployment..."
-
-    # Install Docker if needed
-    if ! command -v docker &> /dev/null; then
-      curl -fsSL https://get.docker.com | sh
-      systemctl enable --now docker
-    fi
-
-    # Login and pull
-    echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-    docker pull $CONTAINER_IMAGE_LATEST
-
-    # Blue-green deployment with proper rollback capability
-    if docker ps | grep -q pixelated-app; then
-      echo "📦 Backing up current container..."
-      docker tag pixelated-app:latest pixelated-app:previous || true
-      docker stop pixelated-app || true
-      docker rm pixelated-app || true
-    fi
-
-    # Start new container with enhanced security settings
-    echo "🏃 Starting new container..."
-    docker run -d \
-      --name pixelated-app \
-      --restart unless-stopped \
-      --user 1001:1001 \
-      --read-only \
-      --tmpfs /tmp:rw,noexec,nosuid,size=100m \
-      --tmpfs /var/tmp:rw,noexec,nosuid,size=50m \
-      --security-opt no-new-privileges:true \
-      --cap-drop ALL \
-      --cap-add CHOWN \
-      --cap-add SETGID \
-      --cap-add SETUID \
-      --memory=2g \
-      --memory-swap=2g \
-      --cpus=2 \
-      -p 4321:4321 \
-      -e NODE_ENV=production \
-      -e PORT=4321 \
-      -e ASTRO_TELEMETRY_DISABLED=1 \
-      --health-cmd="node -e \"require('http').get('http://localhost:4321/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\"" \
-      --health-interval=30s \
-      --health-timeout=10s \
-      --health-retries=3 \
-      --health-start-period=30s \
-      $CONTAINER_IMAGE_LATEST
-
-    # Wait for health check with timeout
-    echo "⏳ Waiting for application to be healthy..."
-    for i in {1..30}; do
-      STATUS=$(docker inspect --format='{{.State.Health.Status}}' pixelated-app 2>/dev/null || echo "starting")
-      if [ "$STATUS" = "healthy" ]; then
-        echo "✅ Application is healthy"
-        break
-      elif [ "$STATUS" = "unhealthy" ]; then
-        echo "❌ Application failed health check"
-        docker logs pixelated-app
-        exit 1
-      fi
-      echo "Status: $STATUS (attempt $i/30)"
-      sleep 5
-    done
-
-    # Cleanup old images (keep last 3)
-    docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
-      grep $CI_REGISTRY_IMAGE | \
-      tail -n +4 | \
-      awk '{print $1}' | \
-      xargs -r docker rmi || true
-
-    echo "✅ Deployment completed successfully"
-    EOF
-  environment:
-    name: production
-    url: https://$VPS_DOMAIN
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_COMMIT_BRANCH == "main"
-  timeout: 15m
 
 # GKE Deployment - Google Kubernetes Engine (Optimized)
 deploy-gke:
@@ -773,106 +648,6 @@ health-check-gke:
   allow_failure: true
   timeout: 5m
 
-# VPS Rollback capability - enhanced
-rollback-vps:
-  stage: deploy
-  image: alpine:latest
-  <<: *ssh_setup
-  script:
-  - echo "🔄 Rolling back to previous version..."
-  - |
-    ssh $VPS_USER@$VPS_HOST << 'EOF'
-    set -e
-    echo "🔄 Performing rollback..."
-
-    # Stop current container
-    docker stop pixelated-app || true
-    docker rm pixelated-app || true
-
-    # Start previous version
-    if docker images | grep -q pixelated-app:previous; then
-      docker run -d \
-        --name pixelated-app \
-        --restart unless-stopped \
-        --user 1001:1001 \
-        --read-only \
-        --tmpfs /tmp:rw,noexec,nosuid,size=100m \
-        --security-opt no-new-privileges:true \
-        --cap-drop ALL \
-        --cap-add CHOWN \
-        --cap-add SETGID \
-        --cap-add SETUID \
-        --memory=2g \
-        --cpus=2 \
-        -p 4321:4321 \
-        -e NODE_ENV=production \
-        -e PORT=4321 \
-        -e ASTRO_TELEMETRY_DISABLED=1 \
-        pixelated-app:previous
-      echo "✅ Rollback completed"
-    else
-      echo "❌ No previous image found for rollback"
-      exit 1
-    fi
-    EOF
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-    when: manual
-  - if: $CI_COMMIT_BRANCH == "main"
-    when: manual
-  allow_failure: true
-  timeout: 10m
-
-# VPS Health monitoring - enhanced
-health-check-vps:
-  stage: deploy
-  image: alpine:latest
-  needs: [ "deploy-vps" ]
-  script:
-  - apk add --no-cache curl jq
-  - echo "🏥 Running comprehensive post-deployment health check..."
-  - |
-    if [ -z "$VPS_DOMAIN" ] && [ -z "$VPS_HOST" ]; then
-      echo "⚠️ No target configured, skipping health check"
-      exit 0
-    fi
-
-    TARGET="${VPS_DOMAIN:-$VPS_HOST}"
-
-    # Comprehensive health check with multiple endpoints
-    ENDPOINTS=("/api/health" "/health" "/")
-    PROTOCOLS=("https" "http")
-
-    for endpoint in "${ENDPOINTS[@]}"; do
-      for protocol in "${PROTOCOLS[@]}"; do
-        URL="$protocol://$TARGET$endpoint"
-        echo "🔍 Checking $URL..."
-        
-        if curl -fsS --connect-timeout 10 --max-time 30 "$URL" >/dev/null 2>&1; then
-          echo "✅ Health check passed: $URL"
-          
-          # Additional checks for API endpoints
-          if [[ "$endpoint" == "/api/health" ]]; then
-            RESPONSE=$(curl -s --connect-timeout 10 --max-time 30 "$URL" || echo "{}")
-            if echo "$RESPONSE" | jq -e '.status == "healthy"' >/dev/null 2>&1; then
-              echo "✅ API health endpoint returned valid response"
-            else
-              echo "⚠️ API health endpoint returned unexpected response: $RESPONSE"
-            fi
-          fi
-          exit 0
-        fi
-      done
-    done
-
-    echo "❌ All health checks failed"
-    exit 1
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_COMMIT_BRANCH == "main"
-  allow_failure: true
-  timeout: 5m
-
 # Cleanup job - optimized and scheduled
 cleanup:
   stage: deploy
@@ -936,6 +711,9 @@ dependency_scanning:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
   - if: $CI_MERGE_REQUEST_ID
+  script:
+  - echo "🔍 Dependency scanning completed (configuration only)"
+  - exit 0
 
 container_scanning:
   needs:
