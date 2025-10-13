@@ -87,28 +87,6 @@ cache: &global_cache
       echo "⚠️ VPS_HOST not set, skipping host key scan"
     fi
 
-# Docker service template - optimized
-.docker_service: &docker_service
-  services:
-  - name: docker:27.3.1-dind
-    alias: docker
-    command: [ "--tls=false", "--experimental" ]
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ''
-
-# Registry login template
-.registry_login: &registry_login
-  before_script:
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-
-# Resource limits template
-.resource_limits: &resource_limits
-  variables:
-    KUBERNETES_CPU_REQUEST: "500m"
-    KUBERNETES_CPU_LIMIT: "2"
-    KUBERNETES_MEMORY_REQUEST: "1Gi"
-    KUBERNETES_MEMORY_LIMIT: "4Gi"
 
 # GCP authentication template
 .gcp_auth: &gcp_auth
@@ -335,7 +313,7 @@ deploy-vps:
   stage: deploy
   image: alpine:latest
   <<: *ssh_setup
-  needs: [ "test" ]
+  needs: [ "build" ]
   script:
   - echo "🚀 Deploying to VPS environment..."
   - |
