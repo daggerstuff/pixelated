@@ -1,3 +1,4 @@
+---
 # Kubernetes Manifests for Pixelated Empathy GKE Deployment
 
 apiVersion: v1
@@ -12,7 +13,6 @@ metadata:
     app.kubernetes.io/component: namespace
     app.kubernetes.io/part-of: pixelated-empathy
     app.kubernetes.io/managed-by: gitlab-ci
-
 ---
 apiVersion: v1
 kind: Secret
@@ -25,8 +25,7 @@ metadata:
 type: kubernetes.io/dockerconfigjson
 data:
   # This will be populated by the CI/CD pipeline
-  .dockerconfigjson: e30K  # Empty JSON object base64 encoded
-
+  .dockerconfigjson: e30K # Empty JSON object base64 encoded
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -216,7 +215,6 @@ spec:
                   values:
                   - pixelated
               topologyKey: kubernetes.io/hostname
-
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -227,7 +225,6 @@ metadata:
     app.kubernetes.io/name: pixelated
     app.kubernetes.io/component: service-account
 automountServiceAccountToken: false
-
 ---
 apiVersion: v1
 kind: Service
@@ -251,7 +248,6 @@ spec:
     protocol: TCP
   type: ClusterIP
   sessionAffinity: None
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -295,7 +291,6 @@ spec:
             name: pixelated-service
             port:
               number: 80
-
 ---
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
@@ -304,9 +299,8 @@ metadata:
   namespace: pixelated
 spec:
   domains:
-    - pixelatedempathy.com
-    - www.pixelatedempathy.com
-
+  - pixelatedempathy.com
+  - www.pixelatedempathy.com
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -353,7 +347,6 @@ spec:
         value: 2
         periodSeconds: 60
       selectPolicy: Max
-
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -369,7 +362,6 @@ spec:
     matchLabels:
       app: pixelated
       app.kubernetes.io/name: pixelated
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

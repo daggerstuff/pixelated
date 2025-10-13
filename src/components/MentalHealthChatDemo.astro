@@ -1,5 +1,5 @@
 ---
-import { MentalHealthChatDemo as MentalHealthChatDemoComponent } from './MentalHealthChatDemo'
+import { MentalHealthChatDemo as MentalHealthChatDemoComponent } from './MentalHealthChatDemo.tsx'
 
 export interface Props {
   conversationId?: string
@@ -36,9 +36,7 @@ const {
     )
   }
 
-  <MentalHealthChatDemoComponent
-    client:only="react"
-  />
+  <MentalHealthChatDemoComponent client:only="react" />
 </div>
 
 <style>

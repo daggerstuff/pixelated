@@ -12,18 +12,37 @@ if (!session) {
   return Astro.redirect('/auth/login');
 }
 
+// Extract token for API call
+const authHeader = Astro.request.headers.get('authorization');
+function getCookieValue(cookieName: string): string | null {
+  const cookieHeader = Astro.request.headers.get('cookie');
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(';').map(c => c.trim());
+  for (const cookie of cookies) {
+    const [name, value] = cookie.split('=');
+    if (name === cookieName && value !== undefined) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+const token = authHeader?.replace('Bearer ', '') || getCookieValue('auth-token');
+
 // Get session data from API
 const sessionData = await fetch(`${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`, {
-  headers: { Authorization: `Bearer ${session.accessToken}` }
+  headers: { Authorization: `Bearer ${token}` }
 }).then(res => res.json()).catch(() => null);
 
 if (!sessionData) {
   return Astro.redirect('/training?error=session-not-found');
 }
 
+// Map MongoDB roles to training context
+// In a real implementation, this would check specific training permissions
+// For now: therapists are trainees by default, admins can supervise
 const userRole = session.user.role;
-const isTrainee = userRole === 'trainee';
-const isSupervisor = userRole === 'supervisor';
+const isTrainee = userRole === 'therapist' || userRole === 'user';
+const isSupervisor = userRole === 'admin';
 ---
 
 <Layout 
@@ -31,8 +50,8 @@ const isSupervisor = userRole === 'supervisor';
   description="Immersive therapeutic training session with AI client simulation"
 >
   <!-- Load required scripts for real-time functionality -->
-  <script src="/js/socket.io.min.js"></script>
-  <script src="/js/training-session.js" type="module"></script>
+  <script is:inline src="/js/socket.io.min.js"></script>
+  <script is:inline src="/js/training-session.js" type="module"></script>
 
   <main class="h-screen flex flex-col bg-gray-50">
     <!-- Session Header -->

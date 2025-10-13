@@ -1,6 +1,9 @@
 // Minimal placeholder for requirePageAuth
 import { type Role } from './access-control'
 
+// Re-export session management functions
+export { getSession } from './auth/session'
+
 // Use a generic cookies interface to avoid type conflicts
 type CookiesLike = {
   get(key: string): { value: string } | undefined

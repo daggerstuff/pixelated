@@ -60,29 +60,39 @@ jobs:
     - name: Install pip-audit in venv
       run: uv pip install --upgrade pip pip-audit
 
-    # Run pip-audit, excluding local editable package to avoid false negative on 'pixelated'
-    # Note: GHSA-4xh5-x5gv-qwph is a known vulnerability in pip 25.2 with no patch available yet
-    # This is a tarfile extraction flaw that affects pip itself, not project dependencies
     - name: Run pip-audit (skip editable/local package)
       id: pip_audit
       continue-on-error: true
       run: |
-        uv run pip-audit --skip-editable --format=columns | tee pip-audit-output.txt
-        EXIT_CODE=${PIPESTATUS[0]}
-        echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
-        exit $EXIT_CODE
+        uv run pip-audit --skip-editable --format=columns 2>&1 | tee pip-audit-output.txt
+        exit ${PIPESTATUS[0]}
 
     - name: Check for non-pip vulnerabilities
-      if: steps.pip_audit.outcome == 'failure'
+      if: always()
       run: |
+        # Check if pip-audit found any vulnerabilities
+        if [ ! -f pip-audit-output.txt ]; then
+          echo "❌ pip-audit output file not found"
+          exit 1
+        fi
+
+        # Count total vulnerabilities found
+        VULN_COUNT=$(grep -c "^pip " pip-audit-output.txt || echo "0")
+
+        if [ "$VULN_COUNT" -eq 0 ]; then
+          echo "✅ No vulnerabilities found"
+          exit 0
+        fi
+
         # Check if the ONLY vulnerability is the known pip issue
-        if grep -q "GHSA-4xh5-x5gv-qwph" pip-audit-output.txt && [ $(grep -c "GHSA-" pip-audit-output.txt) -eq 1 ]; then
+        if grep -q "GHSA-4xh5-x5gv-qwph" pip-audit-output.txt && [ "$VULN_COUNT" -eq 1 ]; then
           echo "✅ Only known vulnerability is GHSA-4xh5-x5gv-qwph (pip 25.2 tarfile extraction)"
           echo "📌 This is a known issue in pip itself with no patch available yet"
           echo "🔒 This vulnerability has minimal impact as it only affects pip package installation"
           exit 0
         else
-          echo "❌ Found vulnerabilities beyond the known pip issue"
+          echo "❌ Found $VULN_COUNT vulnerabilities beyond the known pip issue"
+          echo "Full output:"
           cat pip-audit-output.txt
           exit 1
         fi
