@@ -219,8 +219,22 @@ build:
   script:
   - echo "🏗️ Building optimized container..."
   - docker buildx create --use --name multiarch-builder --driver docker-container || docker buildx use multiarch-builder
-  - >
-    docker buildx build --load --build-arg NODE_ENV=production --build-arg CI=true --build-arg BUILDKIT_INLINE_CACHE=1 --secret id=SENTRY_DSN,env=SENTRY_DSN --secret id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN --secret id=PUBLIC_SENTRY_DSN,env=PUBLIC_SENTRY_DSN --cache-from type=registry,ref=$CONTAINER_IMAGE_CACHE --cache-from type=registry,ref=$CONTAINER_IMAGE_LATEST --cache-to type=registry,ref=$CONTAINER_IMAGE_CACHE,mode=max --target runtime -f Dockerfile -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+  - |
+    docker buildx build \
+      --load \
+      --build-arg NODE_ENV=production \
+      --build-arg CI=true \
+      --build-arg BUILDKIT_INLINE_CACHE=1 \
+      --secret id=SENTRY_DSN,env=SENTRY_DSN \
+      --secret id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
+      --secret id=PUBLIC_SENTRY_DSN,env=PUBLIC_SENTRY_DSN \
+      --cache-from type=registry,ref=$CONTAINER_IMAGE_CACHE \
+      --cache-from type=registry,ref=$CONTAINER_IMAGE_LATEST \
+      --cache-to type=registry,ref=$CONTAINER_IMAGE_CACHE,mode=max \
+      --target runtime \
+      -f Dockerfile \
+      -t $CONTAINER_IMAGE \
+      -t $CONTAINER_IMAGE_LATEST .
   - echo "📤 Pushing to registry..."
   - timeout 300 docker push $CONTAINER_IMAGE || (sleep 10 && timeout 300 docker push $CONTAINER_IMAGE)
   - timeout 300 docker push $CONTAINER_IMAGE_LATEST || (sleep 10 && timeout 300 docker push $CONTAINER_IMAGE_LATEST)
