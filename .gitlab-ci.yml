@@ -194,7 +194,6 @@ validate:
         ;;
     esac
   - echo "✅ $VALIDATION_TYPE validation complete"
-  needs: [ "build" ]
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_COMMIT_BRANCH == "main"
