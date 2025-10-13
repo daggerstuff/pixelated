@@ -209,6 +209,27 @@ validate:
     expire_in: 1 week
     when: always
 
+# Build stage - minimal placeholder to satisfy needs for downstream jobs
+build:
+  stage: build
+  image: node:24-alpine
+  script:
+  - echo "🔧 Running placeholder build job"
+  - |
+    # Create a small dotenv artifact used by downstream jobs. If you have a real build
+    # step, replace this block with actual docker build/push commands.
+    echo "CONTAINER_IMAGE=$CONTAINER_IMAGE" > build.env
+  artifacts:
+    reports:
+      dotenv:
+      - build.env
+    expire_in: 1 hour
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_COMMIT_BRANCH == "main"
+  - if: $CI_MERGE_REQUEST_ID
+  timeout: 15m
+
 # Security stage - consolidated security scanning
 security:
   stage: security
