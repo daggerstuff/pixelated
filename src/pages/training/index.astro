@@ -5,20 +5,27 @@
 import Button from '@/components/ui/Button.astro'
 import Card from '@/components/ui/Card.astro'
 import Layout from '@/layouts/Layout.astro'
-import { getSession } from '@/lib/auth'
+import { getCurrentUser, isAuthenticated } from '@/lib/auth'
 
-const session = await getSession(Astro.request)
+// Check if user is authenticated using the available auth functions
+const isUserAuthenticated = await isAuthenticated(Astro.cookies)
+if (!isUserAuthenticated) {
+  return Astro.redirect('/auth/login')
+}
+
+const session = await getCurrentUser(Astro.cookies)
 if (!session) {
   return Astro.redirect('/auth/login')
 }
 
-const userRole = session.user.role // 'trainee', 'supervisor', 'admin'
+const userRole = session.role // 'trainee', 'supervisor', 'admin'
 
 // Get active training sessions for this user
+// Note: In a real implementation, you'd need to retrieve the actual access token from cookies
 const activeTrainingSessions = await fetch(
   `${import.meta.env.API_BASE_URL}/training/sessions/active`,
   {
-    headers: { Authorization: `Bearer ${session.accessToken}` },
+    headers: { 'X-User-Id': session.id },
   },
 )
   .then((res) => res.json())
@@ -28,7 +35,7 @@ const activeTrainingSessions = await fetch(
 const trainingPrograms = await fetch(
   `${import.meta.env.API_BASE_URL}/training/programs`,
   {
-    headers: { Authorization: `Bearer ${session.accessToken}` },
+    headers: { 'X-User-Id': session.id },
   },
 )
   .then((res) => res.json())

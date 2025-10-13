@@ -139,7 +139,7 @@ build_and_deploy() {
 
         if ! command -v pnpm >/dev/null 2>&1; then
             echo "Installing pnpm..."
-            npm install -g pnpm@10.17.1
+            npm install -g pnpm@10.18.2
         else
             echo "pnpm already installed: $(pnpm --version)"
         fi

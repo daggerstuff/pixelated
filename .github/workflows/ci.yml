@@ -6,23 +6,26 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+env:
+  POSTGRES_VERSION: "17"
+  REDIS_VERSION: "7.4"
+  NODE_VERSION: "24"
+  PYTHON_VERSION: "3.11"
+
 jobs:
   test:
     runs-on: ubuntu-latest
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: pixelated_test
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
-          - 5432:5432
+        - 5432:5432
 
     steps:
     - name: Checkout code
@@ -31,13 +34,13 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '24'
         cache: 'pnpm'
 
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
+        python-version: '3.11'
 
     - name: Ensure `uv` shim is available
       run: |
@@ -91,7 +94,7 @@ jobs:
       run: pnpm run build
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: dist/
@@ -106,7 +109,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '24'
         cache: 'pnpm'
 
     - name: Install pnpm
@@ -119,15 +122,15 @@ jobs:
       run: pnpm audit --audit-level moderate
 
     - name: Run CodeQL Analysis
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: javascript, python
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
 
   deploy-staging:
-    needs: [test, security-scan]
+    needs: [ test, security-scan ]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
 
@@ -138,7 +141,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '24'
         cache: 'pnpm'
 
     - name: Install pnpm
@@ -159,7 +162,7 @@ jobs:
         # This could be Docker build/push, server deployment, etc.
 
   deploy-production:
-    needs: [test, security-scan]
+    needs: [ test, security-scan ]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
@@ -170,7 +173,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '24'
         cache: 'pnpm'
 
     - name: Install pnpm

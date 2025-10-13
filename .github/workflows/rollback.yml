@@ -8,7 +8,7 @@ on:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.17.1
+  PNPM_VERSION: 10.18.2
   NODE_ENV: production
 
 jobs:
@@ -29,7 +29,6 @@ jobs:
       uses: actions/checkout@v5
       with:
         fetch-depth: 0
-        fetch-tags: true
 
     - name: Fetch all tags
       run: git fetch --tags --force
@@ -168,7 +167,6 @@ jobs:
       uses: actions/checkout@v5
       with:
         fetch-depth: 0
-        fetch-tags: true
 
     - name: Fetch all tags
       run: git fetch --tags --force

@@ -14,7 +14,7 @@ RUN apt-get update -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ARG PNPM_VERSION=10.17.1
+ARG PNPM_VERSION=10.18.2
 RUN npm install -g pnpm@$PNPM_VERSION
 
 WORKDIR /app
@@ -25,38 +25,38 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY src/lib/ai/bias-detection/requirements.txt ./requirements.txt
 RUN python3 -m pip install --no-cache-dir uv || true
 RUN if command -v uv >/dev/null 2>&1; then \
-            uv pip install --no-cache-dir -r requirements.txt; \
-        else \
-            pip install --no-cache-dir -r requirements.txt; \
-        fi
+    uv pip install --no-cache-dir -r requirements.txt; \
+    else \
+    pip install --no-cache-dir -r requirements.txt; \
+    fi
 
 RUN if command -v uv >/dev/null 2>&1; then \
-            uv pip install --no-cache-dir \
-                torch \
-                transformers \
-                scikit-learn \
-                pandas \
-                numpy \
-                matplotlib \
-                seaborn \
-                fairlearn \
-                aif360 \
-                lime \
-                shap; \
-        else \
-            pip install --no-cache-dir \
-                torch \
-                transformers \
-                scikit-learn \
-                pandas \
-                numpy \
-                matplotlib \
-                seaborn \
-                fairlearn \
-                aif360 \
-                lime \
-                shap; \
-        fi
+    uv pip install --no-cache-dir \
+    torch \
+    transformers \
+    scikit-learn \
+    pandas \
+    numpy \
+    matplotlib \
+    seaborn \
+    fairlearn \
+    aif360 \
+    lime \
+    shap; \
+    else \
+    pip install --no-cache-dir \
+    torch \
+    transformers \
+    scikit-learn \
+    pandas \
+    numpy \
+    matplotlib \
+    seaborn \
+    fairlearn \
+    aif360 \
+    lime \
+    shap; \
+    fi
 
 FROM node-base AS build
 

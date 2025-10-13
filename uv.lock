@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'linux'",
@@ -143,14 +143,14 @@ wheels = [
 
 [[package]]
 name = "authlib"
-version = "1.6.4"
+version = "1.6.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/bb/73a1f1c64ee527877f64122422dafe5b87a846ccf4ac933fe21bcbb8fee8/authlib-1.6.4.tar.gz", hash = "sha256:104b0442a43061dc8bc23b133d1d06a2b0a9c2e3e33f34c4338929e816287649", size = 164046, upload-time = "2025-09-17T09:59:23.897Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cd/3f/1d3bbd0bf23bdd99276d4def22f29c27a914067b4cf66f753ff9b8bbd0f3/authlib-1.6.5.tar.gz", hash = "sha256:6aaf9c79b7cc96c900f0b284061691c5d4e61221640a948fe690b556a6d6d10b", size = 164553, upload-time = "2025-10-02T13:36:09.489Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0e/aa/91355b5f539caf1b94f0e66ff1e4ee39373b757fce08204981f7829ede51/authlib-1.6.4-py2.py3-none-any.whl", hash = "sha256:39313d2a2caac3ecf6d8f95fbebdfd30ae6ea6ae6a6db794d976405fdd9aa796", size = 243076, upload-time = "2025-09-17T09:59:22.259Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/aa/5082412d1ee302e9e7d80b6949bc4d2a8fa1149aaab610c5fc24709605d6/authlib-1.6.5-py2.py3-none-any.whl", hash = "sha256:3e0e0507807f842b02175507bdee8957a1d5707fd4afb17c32fb43fee90b6e3a", size = 243608, upload-time = "2025-10-02T13:36:07.637Z" },
 ]
 
 [[package]]
@@ -2881,7 +2881,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "authlib", specifier = ">=1.6.4" },
+    { name = "authlib", specifier = ">=1.6.5" },
     { name = "bcrypt", specifier = ">=4.3.0" },
     { name = "black", specifier = ">=25.1.0" },
     { name = "black", marker = "extra == 'dev'" },
@@ -2930,7 +2930,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "pytest-mock", marker = "extra == 'test'" },
     { name = "python-dotenv" },
-    { name = "python-socketio", specifier = ">=5.13.0" },
+    { name = "python-socketio", specifier = ">=5.14.0" },
     { name = "redis", specifier = ">=6.4.0" },
     { name = "requests" },
     { name = "ruff", specifier = ">=0.12.5" },
@@ -3534,15 +3534,15 @@ wheels = [
 
 [[package]]
 name = "python-socketio"
-version = "5.13.0"
+version = "5.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bidict" },
     { name = "python-engineio" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/21/1a/396d50ccf06ee539fa758ce5623b59a9cb27637fc4b2dc07ed08bf495e77/python_socketio-5.13.0.tar.gz", hash = "sha256:ac4e19a0302ae812e23b712ec8b6427ca0521f7c582d6abb096e36e24a263029", size = 121125, upload-time = "2025-04-12T15:46:59.933Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/05/c2/a9ae3d0eb4488748a2d9c15defddb7277a852234e29e50c73136834dff1b/python_socketio-5.14.1.tar.gz", hash = "sha256:bf49657073b90ee09e4cbd6651044b46bb526694276621e807a1b8fcc0c1b25b", size = 123068, upload-time = "2025-10-02T18:44:54.467Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/32/b4fb8585d1be0f68bde7e110dffbcf354915f77ad8c778563f0ad9655c02/python_socketio-5.13.0-py3-none-any.whl", hash = "sha256:51f68d6499f2df8524668c24bcec13ba1414117cfb3a90115c559b601ab10caf", size = 77800, upload-time = "2025-04-12T15:46:58.412Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/5e/302c3499a134a52b68e4e6fb345cea52ab1c41460949bcdb09f8bd0e3594/python_socketio-5.14.1-py3-none-any.whl", hash = "sha256:3419f5917f0e3942317836a77146cb4caa23ad804c8fd1a7e3f44a6657a8406e", size = 78496, upload-time = "2025-10-02T18:44:52.649Z" },
 ]
 
 [[package]]
