@@ -11,18 +11,15 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import type { UserRole, ClientInfo, TokenPair } from './jwt-service'
 
-// Database setup for Better-Auth
-const db = new Database(':memory:') // In production, use proper SQLite/MongoDB connection
+const db = new Database(':memory:')
 
-// Better-Auth configuration
 const auth = betterAuth({
   database: drizzleAdapter(db),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // Enable in production
+    requireEmailVerification: false,
   },
   socialProviders: {
-    // Add social providers as needed
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',

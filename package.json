@@ -392,6 +392,7 @@
       "faiss-node",
       "libpg-query",
       "msw",
+      "onnxruntime-node",
       "postinstall-postinstall",
       "protobufjs",
       "sharp",
