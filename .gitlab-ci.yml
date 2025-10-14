@@ -91,6 +91,10 @@ cache: &global_cache
       gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
       gcloud config set project $GCP_PROJECT_ID
 
+      # Install gke-gcloud-auth-plugin for kubectl authentication
+      echo "🔧 Installing gke-gcloud-auth-plugin..."
+      gcloud components install gke-gcloud-auth-plugin --quiet
+
       # Verify cluster access
       if ! gcloud container clusters get-credentials ${GKE_CLUSTER_NAME:-pixelcluster} --zone ${GKE_ZONE:-us-east1}; then
         echo "❌ Failed to connect to GKE cluster"
@@ -357,7 +361,7 @@ deploy-gke:
 
       # Pre-deployment validation
       echo "🔍 Pre-deployment validation..."
-      
+
       # Check deployment strategy and validate
       case $DEPLOYMENT_STRATEGY in
         rolling|blue-green|canary)
@@ -434,7 +438,7 @@ deploy-gke:
 
       # Post-deployment validation with health checks
       echo "🔍 Post-deployment validation..."
-      
+
       # Run comprehensive health checks
       if ! . ./scripts/health-check-comprehensive.sh; then
         echo "❌ Health checks failed"
@@ -461,7 +465,7 @@ deploy-gke:
       echo "✅ GKE deployment completed successfully"
       echo "🌐 Application URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}"
       echo "📊 Deployment strategy: $DEPLOYMENT_STRATEGY"
-      
+
       # Store deployment metadata
       cat > gke-deployment.env << EOF
       DEPLOYMENT_STRATEGY=$DEPLOYMENT_STRATEGY
@@ -474,11 +478,11 @@ deploy-gke:
     - |
       # Cleanup temporary files
       rm -f /tmp/gcp-key.json deployment.yaml service.yaml
-      
+
       # Final status report
       echo "📊 Final deployment status:"
       kubectl get all -l app=pixelated || true
-      
+
       # Send deployment notification
       if [ -n "$SLACK_WEBHOOK_URL" ]; then
         . ./scripts/notify-deployment.sh
@@ -627,9 +631,10 @@ cleanup:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
     # Cleanup configuration
-    KEEP_IMAGES: ${KEEP_IMAGES:-5}
-    CLEANUP_OLDER_THAN: ${CLEANUP_OLDER_THAN:-24h}
-    BUILDER_CLEANUP_OLDER_THAN: ${BUILDER_CLEANUP_OLDER_THAN:-48h}
+    # Ensure sensible defaults so variables are never empty in CI
+    KEEP_IMAGES: "${KEEP_IMAGES:-5}"
+    CLEANUP_OLDER_THAN: "${CLEANUP_OLDER_THAN:-24h}"
+    BUILDER_CLEANUP_OLDER_THAN: "${BUILDER_CLEANUP_OLDER_THAN:-48h}"
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
@@ -639,7 +644,7 @@ cleanup:
       echo "  - Keep last $KEEP_IMAGES images"
       echo "  - Cleanup images older than $CLEANUP_OLDER_THAN"
       echo "  - Builder cache cleanup older than $BUILDER_CLEANUP_OLDER_THAN"
-      
+
       # Image cleanup with smart retention
       echo "🗑️ Cleaning up old container images..."
       if [ -n "$CI_REGISTRY_IMAGE" ]; then
@@ -662,21 +667,21 @@ cleanup:
       else
         echo "⚠️ CI_REGISTRY_IMAGE not set, skipping image cleanup"
       fi
-      
+
       # System cleanup with safety checks
       echo "🧽 Running system cleanup..."
       echo "🧹 Cleaning up unused containers..."
       docker container prune -f --filter "until=$CLEANUP_OLDER_THAN"
-      
+
       echo "🧹 Cleaning up unused networks..."
       docker network prune -f
-      
+
       echo "🧹 Cleaning up unused volumes (excluding keep labels)..."
       docker volume prune -f --filter "label!=keep"
-      
+
       echo "🧹 Cleaning up build cache..."
       docker system prune -af --filter "until=$CLEANUP_OLDER_THAN"
-      
+
       # Build cache cleanup
       echo "🔧 Cleaning up build cache..."
       if command -v docker builder >/dev/null 2>&1; then
@@ -684,48 +689,45 @@ cleanup:
       else
         echo "⚠️ Docker BuildKit not available, skipping builder cleanup"
       fi
-      
+
       # Registry cleanup (if supported)
       echo "🔧 Cleaning up registry..."
       if command -v docker manifest >/dev/null 2>&1 && [ -n "$CI_REGISTRY_IMAGE" ]; then
         # Remove old manifests (implementation depends on registry type)
         echo "ℹ️ Registry manifest cleanup skipped (requires registry-specific implementation)"
       fi
-      
+
       # Cleanup temporary files
       echo "🧹 Cleaning up temporary files..."
       find /tmp -name "docker-*" -type f -mtime +1 -delete 2>/dev/null || true
       find /var/tmp -name "docker-*" -type f -mtime +1 -delete 2>/dev/null || true
-      
+
       # Final status
       echo "📊 Cleanup completed successfully"
       echo "📈 Remaining images:"
       docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}" | head -10
-      
+
       echo "💾 Disk usage after cleanup:"
       docker system df
-      
-      # Create cleanup report
-      cat > cleanup-report.json << EOF
-      {
-        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-        "images_retained": $KEEP_IMAGES,
-        "cleanup_older_than": "$CLEANUP_OLDER_THAN",
-        "builder_cleanup_older_than": "$BUILDER_CLEANUP_OLDER_THAN",
-        "status": "completed",
-        "registry": "${CI_REGISTRY_IMAGE:-unknown}"
-      }
-      EOF
-      
+
+      # Create cleanup report (use printf to avoid here-doc indentation issues)
+      printf '%s\n' '{' \
+        '  "timestamp": "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'",' \
+        '  "images_retained": '"$KEEP_IMAGES"',' \
+        '  "cleanup_older_than": '""$CLEANUP_OLDER_THAN""',' \
+        '  "builder_cleanup_older_than": '""$BUILDER_CLEANUP_OLDER_THAN""',' \
+        '  "status": "completed",' \
+        '  "registry": "'"${CI_REGISTRY_IMAGE:-unknown}"'"' \
+        '}' > cleanup-report.json || echo '{}'>cleanup-report.json
       echo "📄 Cleanup report saved to cleanup-report.json"
   after_script:
     - |
       # Always attempt to logout from registry
       docker logout $CI_REGISTRY || true
-      
+
       # Cleanup any remaining temporary files
       rm -f /tmp/gcp-key.json deployment.yaml service.yaml deployment-*.yaml service-*.yaml
-      
+
       echo "✅ Cleanup process finalized"
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"

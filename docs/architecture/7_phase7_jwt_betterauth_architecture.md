@@ -16,7 +16,7 @@ summary: "Comprehensive architecture for JWT authentication with Better-Auth, HI
 
 ## 🎯 Executive Summary
 
-This architecture document defines the comprehensive JWT authentication system for Phase 7, replacing the current Clerk-based authentication with Better-Auth integration while maintaining seamless compatibility with existing systems and HIPAA compliance requirements.
+This architecture document defines the comprehensive JWT authentication system for Phase 7, replacing legacy external auth integrations with Better-Auth integration while maintaining seamless compatibility with existing systems and HIPAA compliance requirements.
 
 ## 🏗️ System Architecture Overview
 
@@ -221,13 +221,13 @@ interface Phase6IntegrationService {
 ### Existing System Compatibility
 ```typescript
 interface LegacySystemAdapter {
-  // Clerk compatibility layer
-  migrateFromClerk(clerkUserId: string): Promise<User>
-  syncClerkData(userId: string): Promise<void>
-  handleClerkWebhook(event: ClerkWebhookEvent): Promise<void>
+  // Legacy compatibility layer (e.g., migrate from previous third-party providers)
+  migrateFromLegacyProvider(legacyUserId: string): Promise<User>
+  syncLegacyProviderData(userId: string): Promise<void>
+  handleLegacyProviderWebhook(event: LegacyProviderWebhookEvent): Promise<void>
   
   // Session migration
-  migrateSessions(clerkSessionId: string): Promise<Session>
+  migrateSessions(legacySessionId: string): Promise<Session>
   validateLegacySession(sessionData: LegacySession): Promise<boolean>
 }
 ```

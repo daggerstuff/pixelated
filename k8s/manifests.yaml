@@ -94,127 +94,127 @@ spec:
       serviceAccountName: pixelated
       automountServiceAccountToken: false
       containers:
-      - name: pixelated
-        image: registry.gitlab.com/gemcity/pixelated:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 4321
-          name: http
-          protocol: TCP
-        envFrom:
-        - configMapRef:
-            name: pixelated-config
-        env:
-        - name: KUBERNETES_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: KUBERNETES_POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: KUBERNETES_POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
-        - name: KUBERNETES_NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        resources:
-          requests:
-            memory: "1Gi"
-            cpu: "500m"
-            ephemeral-storage: "1Gi"
-          limits:
-            memory: "2Gi"
-            cpu: "2"
-            ephemeral-storage: "2Gi"
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 4321
-            scheme: HTTP
-          initialDelaySeconds: 30
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 3
-          successThreshold: 1
-        readinessProbe:
-          httpGet:
-            path: /api/health
-            port: 4321
-            scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-          successThreshold: 1
-        startupProbe:
-          httpGet:
-            path: /api/health
-            port: 4321
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 5
-          failureThreshold: 30
-          successThreshold: 1
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1001
-          runAsGroup: 1001
-          capabilities:
-            drop:
-            - ALL
-            add:
-            - CHOWN
-            - SETGID
-            - SETUID
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - name: tmp
-          mountPath: /tmp
-        - name: var-tmp
-          mountPath: /var/tmp
-        - name: cache
-          mountPath: /app/.cache
+        - name: pixelated
+          image: registry.gitlab.com/gemcity/pixelated:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4321
+              name: http
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: pixelated-config
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KUBERNETES_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: KUBERNETES_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: KUBERNETES_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+              ephemeral-storage: "1Gi"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+              ephemeral-storage: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 4321
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 4321
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 4321
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 30
+            successThreshold: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - SETGID
+                - SETUID
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: var-tmp
+              mountPath: /var/tmp
+            - name: cache
+              mountPath: /app/.cache
       volumes:
-      - name: tmp
-        emptyDir:
-          sizeLimit: 100Mi
-          medium: Memory
-      - name: var-tmp
-        emptyDir:
-          sizeLimit: 50Mi
-          medium: Memory
-      - name: cache
-        emptyDir:
-          sizeLimit: 500Mi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 100Mi
+            medium: Memory
+        - name: var-tmp
+          emptyDir:
+            sizeLimit: 50Mi
+            medium: Memory
+        - name: cache
+          emptyDir:
+            sizeLimit: 500Mi
       imagePullSecrets:
-      - name: gitlab-registry
+        - name: gitlab-registry
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:
-      - key: "kubernetes.io/arch"
-        operator: "Equal"
-        value: "amd64"
-        effect: "NoSchedule"
+        - key: "kubernetes.io/arch"
+          operator: "Equal"
+          value: "amd64"
+          effect: "NoSchedule"
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - pixelated
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - pixelated
+                topologyKey: kubernetes.io/hostname
 ---
 apiVersion: v1
 kind: ServiceAccount

@@ -32,7 +32,8 @@ spec:
       containers:
         - name: pixelated
           # Image SHA256 pinned for security
-          image: registry.gitlab.com/pixeldeck/pixelated@sha256:1691c565a3f08071ff8a0ad27af889ec4964d23fc035b2f30d2ae8ce9ec8b0e6
+          image: registry.gitlab.com/pixeldeck/pixelated@sha256:\
+            1691c565a3f08071ff8a0ad27af889ec4964d23fc035b2f30d2ae8ce9ec8b0e6
           ports:
             - containerPort: 4321
               name: http
@@ -116,8 +117,8 @@ spec:
   ingressClassName: "caddy"
   tls:
     - hosts:
-      - pixelatedempathy.com
-      - www.pixelatedempathy.com
+        - pixelatedempathy.com
+        - www.pixelatedempathy.com
       secretName: pixelated-tls
   rules:
     - host: pixelatedempathy.com
@@ -206,22 +207,22 @@ spec:
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Percent
-        value: 10
-        periodSeconds: 60
-      - type: Pods
-        value: 2
-        periodSeconds: 60
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+        - type: Pods
+          value: 2
+          periodSeconds: 60
       selectPolicy: Min
     scaleUp:
       stabilizationWindowSeconds: 60
       policies:
-      - type: Percent
-        value: 50
-        periodSeconds: 60
-      - type: Pods
-        value: 4
-        periodSeconds: 60
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+        - type: Pods
+          value: 4
+          periodSeconds: 60
       selectPolicy: Max
 ---
 apiVersion: policy/v1

@@ -58,6 +58,7 @@ export default defineConfig({
           'mongodb',
           'recharts',
           'chart.js'
+
         ],
         onwarn(warning, warn) {
           if (
@@ -126,6 +127,7 @@ export default defineConfig({
         'mongodb',
         'recharts',
         'chart.js'
+
       ],
     },
     optimizeDeps: {
@@ -155,6 +157,7 @@ export default defineConfig({
         'mongodb',
         'recharts',
         'chart.js'
+
       ],
     },
   },

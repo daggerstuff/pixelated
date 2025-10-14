@@ -23,9 +23,13 @@ test('login form shows validation errors', async ({ page }) => {
   await page.waitForLoadState('networkidle')
   await page.waitForTimeout(2000) // Wait for React hydration
 
-  // Try to submit the form without filling it
-  await page.click('button[type="submit"]')
-  await page.waitForTimeout(2000) // Wait for validation to appear
+  // Focus email field and blur to trigger validation
+  await page.focus('input[type="email"]')
+  await page.keyboard.press('Tab') // Tab away to trigger blur
+  
+  // Focus password field and blur to trigger validation
+  await page.focus('input[type="password"]')
+  await page.keyboard.press('Tab') // Tab away to trigger blur
 
   // Check for validation errors - the actual form uses specific IDs
   const emailError = page.locator('#email-error')
@@ -37,16 +41,12 @@ test('login form shows validation errors', async ({ page }) => {
 
   // Fill email but not password
   await page.fill('input[type="email"]', 'test@example.com')
-  await page.click('button[type="submit"]')
-  await page.waitForTimeout(2000)
-
+  await page.keyboard.press('Tab') // Tab away to validate email
+  
   // Check that only password error is shown
   await expect(passwordError).toBeVisible({ timeout: 10000 })
-  // Email error should be gone or not visible
-  const emailErrorVisible = await emailError.isVisible().catch(() => false)
-  if (emailErrorVisible) {
-    console.log('Email error still visible, this might be expected behavior')
-  }
+  // Email error should be gone since we filled a valid email
+  await expect(emailError).not.toBeVisible()
 })
 
 // Test for mobile viewport issues on auth pages
