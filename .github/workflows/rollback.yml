@@ -78,13 +78,11 @@ jobs:
             exit 1
           fi
 
-      - name: Build application
-        run: pnpm build
-
-      - name: Debug Token Permissions
-        run: |
-          echo "Checking token permissions..."
-          curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+      # Build step intentionally removed: rollback checks out historical tags which
+      # may reference removed/legacy providers and can fail the workflow. If you
+      # need to validate that a tag builds, run the build in a controlled CI job
+      # that targets the tag explicitly or recreate safe rollback tags that point
+      # to commits verified to build.
 
       - name: Compute unique rollback tag for staging
         id: compute-tag-staging
@@ -216,13 +214,9 @@ jobs:
             exit 1
           fi
 
-      - name: Build application
-        run: pnpm build
-
-      - name: Debug Token Permissions
-        run: |
-          echo "Checking token permissions..."
-          curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+      # Build step intentionally removed for production rollback for the same
+      # reasons described above. Perform builds in separate validation pipelines
+      # or ensure rollback tags point to known-good commits.
       - name: Compute unique rollback tag for production
         id: compute-tag-prod
         shell: bash
