@@ -246,8 +246,8 @@ spec:
     matchLabels:
       app: pixelated-app
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
     - from:
         - ipBlock:

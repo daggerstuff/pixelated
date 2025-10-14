@@ -242,10 +242,10 @@ spec:
     app: pixelated
     app.kubernetes.io/name: pixelated
   ports:
-  - name: http
-    port: 80
-    targetPort: 4321
-    protocol: TCP
+    - name: http
+      port: 80
+      targetPort: 4321
+      protocol: TCP
   type: ClusterIP
   sessionAffinity: None
 ---
@@ -268,29 +268,31 @@ metadata:
       add_header X-Content-Type-Options "nosniff" always;
       add_header X-XSS-Protection "1; mode=block" always;
       add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; media-src 'self'; object-src 'none'; child-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self';" always;
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; \
+        style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; \
+        media-src 'self'; object-src 'none'; child-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self';" always;
 spec:
   rules:
   - host: pixelatedempathy.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pixelated-service
-            port:
-              number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: pixelated-service
+              port:
+                number: 80
   - host: www.pixelatedempathy.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pixelated-service
-            port:
-              number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: pixelated-service
+              port:
+                number: 80
 ---
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
@@ -299,8 +301,8 @@ metadata:
   namespace: pixelated
 spec:
   domains:
-  - pixelatedempathy.com
-  - www.pixelatedempathy.com
+    - pixelatedempathy.com
+    - www.pixelatedempathy.com
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -334,18 +336,18 @@ spec:
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Percent
-        value: 10
-        periodSeconds: 60
+        - type: Percent
+          value: 10
+          periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 60
       policies:
-      - type: Percent
-        value: 50
-        periodSeconds: 60
-      - type: Pods
-        value: 2
-        periodSeconds: 60
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+        - type: Pods
+          value: 2
+          periodSeconds: 60
       selectPolicy: Max
 ---
 apiVersion: policy/v1

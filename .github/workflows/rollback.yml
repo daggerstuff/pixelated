@@ -10,6 +10,10 @@ env:
   NODE_VERSION: 24.8.0
   PNPM_VERSION: 10.18.2
   NODE_ENV: production
+  # Prefer a PAT with 'workflow' scope for pushes that modify workflow files;
+  # fall back to the repository token when WORKFLOW_PAT isn't set. Use the
+  # PUSH_TOKEN environment variable in git commands below.
+  PUSH_TOKEN: ${{ secrets.WORKFLOW_PAT || github.token }}
 
 jobs:
   rollback-staging:
@@ -29,6 +33,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          token: ${{ env.PUSH_TOKEN }}
 
       - name: Fetch all tags
         run: git fetch --tags --force
@@ -37,6 +42,9 @@ jobs:
         uses: actions/setup-node@v4.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
@@ -63,7 +71,6 @@ jobs:
       - name: Determine rollback tag
         id: get-tag
         run: |
-          # Use the tag manager to validate and get rollback tag
           if node scripts/tag-manager.cjs validate staging; then
             TAGS=$(git tag -l "staging-*" --sort=-committerdate)
             TAG=$(echo "$TAGS" | sed -n '2p')
@@ -78,20 +85,12 @@ jobs:
             exit 1
           fi
 
-      # Build step intentionally removed: rollback checks out historical tags which
-      # may reference removed/legacy providers and can fail the workflow. If you
-      # need to validate that a tag builds, run the build in a controlled CI job
-      # that targets the tag explicitly or recreate safe rollback tags that point
-      # to commits verified to build.
-
       - name: Compute unique rollback tag for staging
         id: compute-tag-staging
         shell: bash
         run: |
-          # Compute a tag with a two-digit counter suffix to avoid collisions
           TIMESTAMP=$(date +%Y%m)
           BASE="rollback-staging-$TIMESTAMP"
-          # List existing tags that start with the base (only look for suffix -NN)
           EXISTING=$(git tag -l "${BASE}-[0-9][0-9]")
           if [ -z "${EXISTING}" ]; then
             COUNTER=1
@@ -110,31 +109,26 @@ jobs:
 
       - name: Dry Run Git Push
         env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
+          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
-          # Use the computed tag from the previous step
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
           git tag "$TAG_NAME"
-          git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+          git push --dry-run https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
       - name: Create rollback tag
         env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
+          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
-          # Push the previously computed tag, but ensure uniqueness by checking local and remote
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_BASE=${{ steps.compute-tag-staging.outputs.tag }}
           TAG_NAME="$TAG_BASE"
-          # Ensure the remote URL is set to use token auth for push checks
-          git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
-          # Fetch remote tags for accurate checks
+          git remote set-url origin https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git
           git fetch --tags --force
           COUNT=0
-          # Try up to 50 suffix increments to find a unique tag
           while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
             COUNT=$((COUNT+1))
             if [ "$COUNT" -gt 50 ]; then
@@ -165,6 +159,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          token: ${{ env.PUSH_TOKEN }}
 
       - name: Fetch all tags
         run: git fetch --tags --force
@@ -173,6 +168,9 @@ jobs:
         uses: actions/setup-node@v4.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
@@ -199,7 +197,6 @@ jobs:
       - name: Determine rollback tag
         id: get-tag
         run: |
-          # Use the tag manager to validate and get rollback tag
           if node scripts/tag-manager.cjs validate production; then
             TAGS=$(git tag -l "production-*" --sort=-committerdate)
             TAG=$(echo "$TAGS" | sed -n '2p')
@@ -214,17 +211,12 @@ jobs:
             exit 1
           fi
 
-      # Build step intentionally removed for production rollback for the same
-      # reasons described above. Perform builds in separate validation pipelines
-      # or ensure rollback tags point to known-good commits.
       - name: Compute unique rollback tag for production
         id: compute-tag-prod
         shell: bash
         run: |
-          # Compute a tag with a two-digit counter suffix to avoid collisions
           TIMESTAMP=$(date +%Y%m%d)
           BASE="prod-rollback-$TIMESTAMP"
-          # List existing tags that start with the base (only look for suffix -NN)
           EXISTING=$(git tag -l "${BASE}-[0-9][0-9]")
           if [ -z "${EXISTING}" ]; then
             COUNTER=1
@@ -243,27 +235,26 @@ jobs:
 
       - name: Dry Run Git Push
         env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
+          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
           git tag "$TAG_NAME"
-          git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+          git push --dry-run https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
       - name: Create rollback tag
         env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
+          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_BASE=${{ steps.compute-tag-prod.outputs.tag }}
           TAG_NAME="$TAG_BASE"
-          git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+          git remote set-url origin https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git
           git fetch --tags --force
           COUNT=0
-          # Try up to 100 suffix increments to find a unique tag for production
           while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
             COUNT=$((COUNT+1))
             if [ "$COUNT" -gt 100 ]; then
