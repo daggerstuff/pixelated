@@ -268,31 +268,40 @@ metadata:
       add_header X-Content-Type-Options "nosniff" always;
       add_header X-XSS-Protection "1; mode=block" always;
       add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; \
-        style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; \
-        media-src 'self'; object-src 'none'; child-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self';" always;
+      add_header Content-Security-Policy "default-src 'self'; \
+        script-src 'self' 'unsafe-inline' 'unsafe-eval'; \
+        style-src 'self' 'unsafe-inline'; \
+        img-src 'self' data: https:; \
+        font-src 'self' data:; \
+        connect-src 'self' https:; \
+        media-src 'self'; \
+        object-src 'none'; \
+        child-src 'self'; \
+        frame-ancestors 'self'; \
+        form-action 'self'; \
+        base-uri 'self';" always;
 spec:
   rules:
-  - host: pixelatedempathy.com
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: pixelated-service
-              port:
-                number: 80
-  - host: www.pixelatedempathy.com
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: pixelated-service
-              port:
-                number: 80
+    - host: pixelatedempathy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pixelated-service
+                port:
+                  number: 80
+    - host: www.pixelatedempathy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pixelated-service
+                port:
+                  number: 80
 ---
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
@@ -320,18 +329,18 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300
@@ -378,19 +387,19 @@ spec:
     matchLabels:
       app: pixelated
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    - namespaceSelector:
-        matchLabels:
-          name: istio-system
-    - podSelector: {}
-    ports:
-    - protocol: TCP
-      port: 4321
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      - namespaceSelector:
+          matchLabels:
+            name: istio-system
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 4321
   egress:
     - {}  # Allow all egress traffic (can be restricted based on requirements)
