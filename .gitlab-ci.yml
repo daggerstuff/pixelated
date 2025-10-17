@@ -135,6 +135,7 @@ validate:
     <<: *global_cache
     policy: pull
   before_script:
+    - apk add --no-cache git
     - |
       echo "🔧 Configuring git for Kubernetes environment..."
       # Git fetch retry logic for network issues
@@ -233,6 +234,7 @@ build:
     DOCKER_BUILDKIT_MAX_PARALLELISM: "2"
     BUILDKIT_STEP_LOG_MAX_SIZE: "1048576"
   before_script:
+    - apk add --no-cache docker-cli curl git
     - |
       echo "🔧 Configuring git for Kubernetes environment..."
       # Git fetch retry logic for network issues
@@ -253,7 +255,6 @@ build:
       # Disable LFS smudge to speed up clones
       git config --global lfs.skipSmudge 1
       echo "✅ Git configuration optimized for Kubernetes"
-    - apk add --no-cache docker-cli curl git
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     # Install Docker Buildx for BuildKit support
     - |
@@ -469,11 +470,13 @@ security:
 sentry-release:
   stage: security
   image: node:24-alpine
+  before_script:
+    - apk add --no-cache git
   script:
     - |
       if [ -n "$SENTRY_AUTH_TOKEN" ] && [ -n "$SENTRY_DSN" ]; then
         echo "📊 Creating Sentry release: $SENTRY_RELEASE"
-        apk add --no-cache curl git
+        apk add --no-cache curl
         curl -sL https://sentry.io/get-cli/ | sh
         sentry-cli releases new "$SENTRY_RELEASE" || true
         sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
