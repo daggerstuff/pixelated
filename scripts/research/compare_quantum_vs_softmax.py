@@ -1,7 +1,8 @@
 import time
+from collections import Counter
+
 import numpy as np
 import torch
-from collections import Counter
 
 from ai.pixel.research.quantum_emotional_states import QuantumEmotionState
 
@@ -16,16 +17,16 @@ def run_softmax_simulation():
     # Create a random logit tensor
     logits = torch.randn(len(EMOTIONS))
     probabilities = torch.softmax(logits, dim=0)
-    
+
     results = []
     for _ in range(NUM_SIMULATIONS):
         # Sample from the distribution
         sampled_index = torch.multinomial(probabilities, 1).item()
         results.append(EMOTIONS[sampled_index])
-    
+
     end_time = time.time()
     duration = end_time - start_time
-    
+
     print(f"Probabilities: {probabilities.numpy()}")
     print(f"Result Distribution: {Counter(results)}")
     print(f"Duration: {duration:.4f} seconds")

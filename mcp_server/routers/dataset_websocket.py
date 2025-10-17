@@ -6,20 +6,22 @@ integrating with the comprehensive dataset processing infrastructure and
 providing live progress updates with safety validation.
 """
 
-from typing import Dict, Any, Optional, List
 from datetime import datetime
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Request
+import structlog
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-import structlog
 
-from ..config import MCPConfig, get_config
-from ..services.dataset_integration import DatasetIntegrationService, get_dataset_integration_service
-from ..services.integration_manager import IntegrationManager, IntegrationEventType
+from ..exceptions import ValidationError
 from ..middleware.auth import get_current_user
-from ..exceptions import ValidationError, AuthenticationError, ServiceUnavailableError
-from ..models.dataset import DatasetProcessingRequest, DatasetStatusResponse, DatasetProgressUpdate
+from ..models.dataset import DatasetProcessingRequest, DatasetProgressUpdate, DatasetStatusResponse
+from ..services.dataset_integration import (
+    DatasetIntegrationService,
+    get_dataset_integration_service,
+)
+from ..services.integration_manager import IntegrationEventType, IntegrationManager
 
 logger = structlog.get_logger(__name__)
 
@@ -27,54 +29,54 @@ logger = structlog.get_logger(__name__)
 # Pydantic models for request/response
 class DatasetProcessingRequest(BaseModel):
     """Request model for dataset processing."""
-    dataset_config: Dict[str, Any] = Field(..., description="Dataset processing configuration")
+    dataset_config: dict[str, Any] = Field(..., description="Dataset processing configuration")
     processing_mode: str = Field(default="comprehensive", description="Processing mode")
     quality_threshold: float = Field(default=0.8, ge=0.0, le=1.0, description="Quality threshold")
     enable_bias_detection: bool = Field(default=True, description="Enable bias detection")
     enable_safety_validation: bool = Field(default=True, description="Enable safety validation")
-    storage_config: Optional[Dict[str, Any]] = Field(default=None, description="Storage configuration")
-    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
+    storage_config: dict[str, Any] | None = Field(default=None, description="Storage configuration")
+    metadata: dict[str, Any] | None = Field(default=None, description="Additional metadata")
 
 
 class DatasetStatusResponse(BaseModel):
     """Response model for dataset processing status."""
     execution_id: str
     status: str
-    current_stage: Optional[str]
+    current_stage: str | None
     overall_progress: float
-    quality_score: Optional[float]
-    bias_score: Optional[float]
-    stage_results: Dict[str, Any]
+    quality_score: float | None
+    bias_score: float | None
+    stage_results: dict[str, Any]
     start_time: str
-    end_time: Optional[str]
-    error_message: Optional[str]
-    estimated_completion: Optional[str]
-    source_locations: List[str]
-    output_locations: List[str]
+    end_time: str | None
+    error_message: str | None
+    estimated_completion: str | None
+    source_locations: list[str]
+    output_locations: list[str]
 
 
 class DatasetProgressUpdate(BaseModel):
     """Dataset processing progress update."""
     execution_id: str = Field(..., description="Dataset execution ID")
     overall_progress: float = Field(..., ge=0, le=100, description="Overall progress percentage")
-    current_stage: Optional[str] = Field(None, description="Current processing stage")
-    stage_progress: Optional[Dict[str, Any]] = Field(None, description="Stage-specific progress")
-    quality_score: Optional[float] = Field(None, description="Current quality score")
-    bias_score: Optional[float] = Field(None, description="Current bias score")
-    estimated_completion: Optional[str] = Field(None, description="Estimated completion time")
-    message: Optional[str] = Field(None, description="Progress message")
+    current_stage: str | None = Field(None, description="Current processing stage")
+    stage_progress: dict[str, Any] | None = Field(None, description="Stage-specific progress")
+    quality_score: float | None = Field(None, description="Current quality score")
+    bias_score: float | None = Field(None, description="Current bias score")
+    estimated_completion: str | None = Field(None, description="Estimated completion time")
+    message: str | None = Field(None, description="Progress message")
 
 
 class DatasetStatisticsRequest(BaseModel):
     """Request model for dataset statistics."""
     execution_id: str = Field(..., description="Dataset execution ID")
     include_detailed_metrics: bool = Field(default=True, description="Include detailed metrics")
-    metric_categories: Optional[List[str]] = Field(default=None, description="Specific metric categories")
+    metric_categories: list[str] | None = Field(default=None, description="Specific metric categories")
 
 
 class DatasetCancelRequest(BaseModel):
     """Request model for dataset processing cancellation."""
-    reason: Optional[str] = Field(None, description="Cancellation reason")
+    reason: str | None = Field(None, description="Cancellation reason")
 
 
 # Create router
@@ -94,7 +96,7 @@ def get_dataset_integration_service(request: Request) -> DatasetIntegrationServi
     Raises:
         HTTPException: If service is not available
     """
-    dataset_service = getattr(request.app.state, 'dataset_integration_service', None)
+    dataset_service = getattr(request.app.state, "dataset_integration_service", None)
     if not dataset_service:
         raise HTTPException(
             status_code=503,
@@ -116,7 +118,7 @@ def get_integration_manager(request: Request) -> IntegrationManager:
     Raises:
         HTTPException: If integration manager is not available
     """
-    integration_manager = getattr(request.app.state, 'integration_manager', None)
+    integration_manager = getattr(request.app.state, "integration_manager", None)
     if not integration_manager:
         raise HTTPException(
             status_code=503,
@@ -125,12 +127,12 @@ def get_integration_manager(request: Request) -> IntegrationManager:
     return integration_manager
 
 
-@router.post("/process", response_model=Dict[str, Any])
+@router.post("/process", response_model=dict[str, Any])
 async def process_dataset(
     request: DatasetProcessingRequest,
     dataset_service: DatasetIntegrationService = Depends(get_dataset_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Process dataset through comprehensive pipeline with real-time WebSocket updates.
     
@@ -146,17 +148,17 @@ async def process_dataset(
         HTTPException: If processing fails or user lacks permissions
     """
     try:
-        user_id = current_user.get('user_id')
-        
+        user_id = current_user.get("user_id")
+
         # Validate dataset configuration
         _validate_dataset_config(request.dataset_config)
-        
+
         # Process dataset
         execution_id = await dataset_service.process_dataset(
             request.dataset_config,
             user_id
         )
-        
+
         # Publish dataset processing start event via integration manager
         integration_manager = get_integration_manager(Request)
         await integration_manager.publish_integration_event(
@@ -164,24 +166,24 @@ async def process_dataset(
             pipeline_id=execution_id,
             user_id=user_id,
             data={
-                'stage_name': 'initialization',
-                'stage_number': 0,
-                'processing_mode': request.processing_mode,
-                'quality_threshold': request.quality_threshold,
-                'enable_bias_detection': request.enable_bias_detection,
-                'enable_safety_validation': request.enable_safety_validation,
-                'source_count': len(request.dataset_config.get('sources', []))
+                "stage_name": "initialization",
+                "stage_number": 0,
+                "processing_mode": request.processing_mode,
+                "quality_threshold": request.quality_threshold,
+                "enable_bias_detection": request.enable_bias_detection,
+                "enable_safety_validation": request.enable_safety_validation,
+                "source_count": len(request.dataset_config.get("sources", []))
             }
         )
-        
+
         logger.info(
             "Dataset processing initiated via WebSocket API",
             execution_id=execution_id,
             user_id=user_id,
             processing_mode=request.processing_mode,
-            source_count=len(request.dataset_config.get('sources', []))
+            source_count=len(request.dataset_config.get("sources", []))
         )
-        
+
         return {
             "status": "success",
             "execution_id": execution_id,
@@ -189,9 +191,9 @@ async def process_dataset(
             "timestamp": datetime.utcnow().isoformat(),
             "estimated_duration": "5-15 minutes depending on dataset size"
         }
-        
+
     except ValidationError as e:
-        logger.warning("Dataset validation failed", user_id=current_user.get('user_id'), error=str(e))
+        logger.warning("Dataset validation failed", user_id=current_user.get("user_id"), error=str(e))
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error("Error initiating dataset processing", error=str(e))
@@ -202,7 +204,7 @@ async def process_dataset(
 async def get_dataset_status(
     execution_id: str = Path(..., description="Dataset execution ID"),
     dataset_service: DatasetIntegrationService = Depends(get_dataset_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: dict[str, Any] = Depends(get_current_user)
 ) -> DatasetStatusResponse:
     """
     Get current dataset processing status with WebSocket integration.
@@ -219,11 +221,11 @@ async def get_dataset_status(
         HTTPException: If execution not found or access denied
     """
     try:
-        user_id = current_user.get('user_id')
-        
+        user_id = current_user.get("user_id")
+
         # Get execution status
         status_data = await dataset_service.get_execution_status(execution_id, user_id)
-        
+
         # Publish status query event
         integration_manager = get_integration_manager(Request)
         await integration_manager.publish_integration_event(
@@ -231,23 +233,23 @@ async def get_dataset_status(
             pipeline_id=execution_id,
             user_id=user_id,
             data={
-                'status_query': True,
-                'current_progress': status_data.get('overall_progress', 0),
-                'current_stage': status_data.get('current_stage'),
-                'quality_score': status_data.get('quality_score'),
-                'bias_score': status_data.get('bias_score')
+                "status_query": True,
+                "current_progress": status_data.get("overall_progress", 0),
+                "current_stage": status_data.get("current_stage"),
+                "quality_score": status_data.get("quality_score"),
+                "bias_score": status_data.get("bias_score")
             }
         )
-        
+
         logger.debug(
             "Dataset status retrieved",
             execution_id=execution_id,
             user_id=user_id,
-            status=status_data.get('status')
+            status=status_data.get("status")
         )
-        
+
         return DatasetStatusResponse(**status_data)
-        
+
     except ValidationError as e:
         logger.warning("Dataset status access denied", execution_id=execution_id, user_id=user_id, error=str(e))
         raise HTTPException(status_code=403, detail=str(e))
@@ -256,13 +258,13 @@ async def get_dataset_status(
         raise HTTPException(status_code=500, detail="Failed to retrieve dataset status")
 
 
-@router.post("/{execution_id}/cancel", response_model=Dict[str, Any])
+@router.post("/{execution_id}/cancel", response_model=dict[str, Any])
 async def cancel_dataset_processing(
     request: DatasetCancelRequest,
     execution_id: str = Path(..., description="Dataset execution ID"),
     dataset_service: DatasetIntegrationService = Depends(get_dataset_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Cancel dataset processing with WebSocket notification.
     
@@ -279,11 +281,11 @@ async def cancel_dataset_processing(
         HTTPException: If cancellation fails or access denied
     """
     try:
-        user_id = current_user.get('user_id')
-        
+        user_id = current_user.get("user_id")
+
         # Cancel execution
         success = await dataset_service.cancel_execution(execution_id, user_id)
-        
+
         if success:
             # Publish cancellation event
             integration_manager = get_integration_manager(Request)
@@ -292,28 +294,27 @@ async def cancel_dataset_processing(
                 pipeline_id=execution_id,
                 user_id=user_id,
                 data={
-                    'status': 'cancelled',
-                    'reason': request.reason or 'User requested cancellation',
-                    'cancelled_at': datetime.utcnow().isoformat()
+                    "status": "cancelled",
+                    "reason": request.reason or "User requested cancellation",
+                    "cancelled_at": datetime.utcnow().isoformat()
                 }
             )
-            
+
             logger.info(
                 "Dataset processing cancelled",
                 execution_id=execution_id,
                 user_id=user_id,
                 reason=request.reason
             )
-            
+
             return {
                 "status": "success",
                 "message": "Dataset processing cancelled successfully",
                 "execution_id": execution_id,
                 "timestamp": datetime.utcnow().isoformat()
             }
-        else:
-            raise HTTPException(status_code=400, detail="Failed to cancel dataset processing")
-            
+        raise HTTPException(status_code=400, detail="Failed to cancel dataset processing")
+
     except ValidationError as e:
         logger.warning("Dataset cancellation failed", execution_id=execution_id, error=str(e))
         raise HTTPException(status_code=403, detail=str(e))
@@ -322,13 +323,13 @@ async def cancel_dataset_processing(
         raise HTTPException(status_code=500, detail="Failed to cancel dataset processing")
 
 
-@router.post("/{execution_id}/progress", response_model=Dict[str, Any])
+@router.post("/{execution_id}/progress", response_model=dict[str, Any])
 async def update_dataset_progress(
     progress_update: DatasetProgressUpdate,
     execution_id: str = Path(..., description="Dataset execution ID"),
     integration_manager: IntegrationManager = Depends(get_integration_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Update dataset progress via WebSocket (for internal use by processing stages).
     
@@ -345,32 +346,32 @@ async def update_dataset_progress(
         HTTPException: If update fails or user lacks permissions
     """
     try:
-        user_id = current_user.get('user_id')
-        user_role = current_user.get('role', 'user')
-        
+        user_id = current_user.get("user_id")
+        user_role = current_user.get("role", "user")
+
         # Check permissions - only system/agents can update progress
-        if user_role not in ['system', 'agent', 'admin']:
+        if user_role not in ["system", "agent", "admin"]:
             raise HTTPException(
                 status_code=403,
                 detail="Insufficient permissions to update dataset progress"
             )
-        
+
         # Publish progress update
         await integration_manager.publish_integration_event(
             IntegrationEventType.PIPELINE_PROGRESS,
             pipeline_id=execution_id,
             user_id=user_id,
             data={
-                'overall_progress': progress_update.overall_progress,
-                'current_stage': progress_update.current_stage,
-                'stage_progress': progress_update.stage_progress,
-                'quality_score': progress_update.quality_score,
-                'bias_score': progress_update.bias_score,
-                'estimated_completion': progress_update.estimated_completion,
-                'message': progress_update.message
+                "overall_progress": progress_update.overall_progress,
+                "current_stage": progress_update.current_stage,
+                "stage_progress": progress_update.stage_progress,
+                "quality_score": progress_update.quality_score,
+                "bias_score": progress_update.bias_score,
+                "estimated_completion": progress_update.estimated_completion,
+                "message": progress_update.message
             }
         )
-        
+
         logger.debug(
             "Dataset progress updated via WebSocket API",
             execution_id=execution_id,
@@ -379,14 +380,14 @@ async def update_dataset_progress(
             quality_score=progress_update.quality_score,
             bias_score=progress_update.bias_score
         )
-        
+
         return {
             "status": "success",
             "message": "Dataset progress updated successfully",
             "execution_id": execution_id,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -394,11 +395,11 @@ async def update_dataset_progress(
         raise HTTPException(status_code=500, detail="Failed to update dataset progress")
 
 
-@router.get("/active", response_model=List[Dict[str, Any]])
+@router.get("/active", response_model=list[dict[str, Any]])
 async def get_active_dataset_executions(
     dataset_service: DatasetIntegrationService = Depends(get_dataset_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> List[Dict[str, Any]]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> list[dict[str, Any]]:
     """
     Get list of active dataset processing executions.
     
@@ -413,24 +414,24 @@ async def get_active_dataset_executions(
         HTTPException: If retrieval fails
     """
     try:
-        user_id = current_user.get('user_id')
-        user_role = current_user.get('role', 'user')
-        
+        user_id = current_user.get("user_id")
+        user_role = current_user.get("role", "user")
+
         # Get all executions for admin, user-specific for regular users
-        if user_role == 'admin':
+        if user_role == "admin":
             # Admin can see all executions
             executions = []
             for execution_id, execution in dataset_service.active_executions.items():
                 if execution.status == DatasetStatus.PROCESSING:
                     executions.append({
-                        'execution_id': execution_id,
-                        'user_id': execution.user_id,
-                        'status': execution.status.value,
-                        'current_stage': execution.current_stage.value if execution.current_stage else None,
-                        'overall_progress': execution.overall_progress,
-                        'quality_score': execution.quality_score,
-                        'bias_score': execution.bias_score,
-                        'start_time': execution.start_time.isoformat()
+                        "execution_id": execution_id,
+                        "user_id": execution.user_id,
+                        "status": execution.status.value,
+                        "current_stage": execution.current_stage.value if execution.current_stage else None,
+                        "overall_progress": execution.overall_progress,
+                        "quality_score": execution.quality_score,
+                        "bias_score": execution.bias_score,
+                        "start_time": execution.start_time.isoformat()
                     })
         else:
             # Regular users can only see their own executions
@@ -438,36 +439,36 @@ async def get_active_dataset_executions(
             for execution_id, execution in dataset_service.active_executions.items():
                 if execution.user_id == user_id and execution.status == DatasetStatus.PROCESSING:
                     executions.append({
-                        'execution_id': execution_id,
-                        'status': execution.status.value,
-                        'current_stage': execution.current_stage.value if execution.current_stage else None,
-                        'overall_progress': execution.overall_progress,
-                        'quality_score': execution.quality_score,
-                        'bias_score': execution.bias_score,
-                        'start_time': execution.start_time.isoformat()
+                        "execution_id": execution_id,
+                        "status": execution.status.value,
+                        "current_stage": execution.current_stage.value if execution.current_stage else None,
+                        "overall_progress": execution.overall_progress,
+                        "quality_score": execution.quality_score,
+                        "bias_score": execution.bias_score,
+                        "start_time": execution.start_time.isoformat()
                     })
-        
+
         logger.info(
             "Active dataset executions retrieved",
             user_id=user_id,
             role=user_role,
             count=len(executions)
         )
-        
+
         return executions
-        
+
     except Exception as e:
         logger.error("Error retrieving active dataset executions", error=str(e))
         raise HTTPException(status_code=500, detail="Failed to retrieve active dataset executions")
 
 
-@router.get("/statistics/{execution_id}", response_model=Dict[str, Any])
+@router.get("/statistics/{execution_id}", response_model=dict[str, Any])
 async def get_dataset_statistics(
     execution_id: str = Path(..., description="Dataset execution ID"),
     include_detailed: bool = Query(True, description="Include detailed metrics"),
     dataset_service: DatasetIntegrationService = Depends(get_dataset_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Get comprehensive dataset processing statistics.
     
@@ -484,36 +485,36 @@ async def get_dataset_statistics(
         HTTPException: If statistics retrieval fails or access denied
     """
     try:
-        user_id = current_user.get('user_id')
-        
+        user_id = current_user.get("user_id")
+
         # Get dataset statistics
         statistics = await dataset_service.get_dataset_statistics(execution_id, user_id)
-        
+
         # Add detailed metrics if requested
         if include_detailed:
-            statistics['detailed_metrics'] = {
-                'timestamp': datetime.utcnow().isoformat(),
-                'metric_categories': ['data_metrics', 'quality_metrics', 'bias_metrics', 'processing_metrics'],
-                'data_quality_indicators': {
-                    'completeness': statistics.get('quality_metrics', {}).get('final_validation_quality', 0.0),
-                    'consistency': statistics.get('quality_metrics', {}).get('standardization_quality', 0.0),
-                    'accuracy': statistics.get('quality_metrics', {}).get('validation_quality', 0.0)
+            statistics["detailed_metrics"] = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "metric_categories": ["data_metrics", "quality_metrics", "bias_metrics", "processing_metrics"],
+                "data_quality_indicators": {
+                    "completeness": statistics.get("quality_metrics", {}).get("final_validation_quality", 0.0),
+                    "consistency": statistics.get("quality_metrics", {}).get("standardization_quality", 0.0),
+                    "accuracy": statistics.get("quality_metrics", {}).get("validation_quality", 0.0)
                 },
-                'bias_indicators': {
-                    'overall_bias_score': statistics.get('bias_metrics', {}).get('bias_detection_bias', 0.0),
-                    'demographic_balance': statistics.get('bias_metrics', {}).get('distribution_balancing_bias', 0.0)
+                "bias_indicators": {
+                    "overall_bias_score": statistics.get("bias_metrics", {}).get("bias_detection_bias", 0.0),
+                    "demographic_balance": statistics.get("bias_metrics", {}).get("distribution_balancing_bias", 0.0)
                 }
             }
-        
+
         logger.info(
             "Dataset statistics retrieved",
             execution_id=execution_id,
             user_id=user_id,
             detailed=include_detailed
         )
-        
+
         return statistics
-        
+
     except ValidationError as e:
         logger.warning("Dataset statistics access denied", execution_id=execution_id, user_id=user_id, error=str(e))
         raise HTTPException(status_code=403, detail=str(e))
@@ -522,10 +523,10 @@ async def get_dataset_statistics(
         raise HTTPException(status_code=500, detail="Failed to retrieve dataset statistics")
 
 
-@router.get("/health", response_model=Dict[str, Any])
+@router.get("/health", response_model=dict[str, Any])
 async def get_dataset_service_health(
     dataset_service: DatasetIntegrationService = Depends(get_dataset_integration_service)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get dataset processing service health status.
     
@@ -537,11 +538,11 @@ async def get_dataset_service_health(
     """
     try:
         health_status = await dataset_service.get_service_health()
-        
-        logger.debug("Dataset service health retrieved", status=health_status.get('status'))
-        
+
+        logger.debug("Dataset service health retrieved", status=health_status.get("status"))
+
         return health_status
-        
+
     except Exception as e:
         logger.error("Error getting dataset service health", error=str(e))
         return {
@@ -556,7 +557,7 @@ async def get_dataset_service_health(
 async def websocket_dataset_updates(
     execution_id: str,
     websocket_manager=Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: dict[str, Any] = Depends(get_current_user)
 ):
     """
     WebSocket endpoint for real-time dataset updates.
@@ -574,35 +575,35 @@ async def websocket_dataset_updates(
     return {
         "message": "WebSocket endpoint for dataset updates",
         "execution_id": execution_id,
-        "user_id": current_user.get('user_id')
+        "user_id": current_user.get("user_id")
     }
 
 
 # Utility functions
-def _validate_dataset_config(config: Dict[str, Any]) -> None:
+def _validate_dataset_config(config: dict[str, Any]) -> None:
     """Validate dataset processing configuration."""
-    required_fields = ['sources', 'processing_config']
+    required_fields = ["sources", "processing_config"]
     missing_fields = [field for field in required_fields if field not in config]
-    
+
     if missing_fields:
         raise ValidationError(f"Missing required dataset configuration fields: {missing_fields}")
-    
+
     # Validate sources
-    sources = config.get('sources', [])
+    sources = config.get("sources", [])
     if not sources:
         raise ValidationError("At least one data source must be specified")
-    
+
     for i, source in enumerate(sources):
-        if 'type' not in source:
+        if "type" not in source:
             raise ValidationError(f"Source {i} missing required 'type' field")
-        
-        source_type = source['type']
-        supported_types = ['s3', 'google_drive', 'local', 'huggingface']
+
+        source_type = source["type"]
+        supported_types = ["s3", "google_drive", "local", "huggingface"]
         if source_type not in supported_types:
             raise ValidationError(f"Unsupported source type: {source_type}")
-    
+
     # Validate processing config
-    processing_config = config.get('processing_config', {})
+    processing_config = config.get("processing_config", {})
     if not isinstance(processing_config, dict):
         raise ValidationError("processing_config must be a dictionary")
 
@@ -632,7 +633,7 @@ async def general_exception_handler(request: Request, exc: Exception):
         error_type=type(exc).__name__,
         path=request.url.path
     )
-    
+
     return JSONResponse(
         status_code=500,
         content={

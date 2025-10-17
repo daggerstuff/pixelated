@@ -6,17 +6,15 @@ priority support, agent capacity management, and comprehensive statistics.
 """
 
 import json
-import time
-from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Any, Set
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Any
 
-from redis.asyncio import Redis
 import structlog
+from redis.asyncio import Redis
 
-from mcp_server.models.task import Task, TaskStatus, TaskPriority, TaskQueueItem
-from mcp_server.exceptions import ValidationError, ResourceNotFoundError, ConflictError
-
+from mcp_server.exceptions import ConflictError, ValidationError
+from mcp_server.models.task import Task, TaskPriority, TaskQueueItem, TaskStatus
 
 logger = structlog.get_logger(__name__)
 
@@ -26,10 +24,10 @@ class QueueStats:
     """Queue statistics."""
 
     total_queued: int
-    by_priority: Dict[str, int]
-    oldest_task_age_seconds: Optional[float]
-    average_queue_time_seconds: Optional[float]
-    queue_depth_by_priority: Dict[str, int]
+    by_priority: dict[str, int]
+    oldest_task_age_seconds: float | None
+    average_queue_time_seconds: float | None
+    queue_depth_by_priority: dict[str, int]
 
 
 class TaskQueueService:
@@ -50,7 +48,7 @@ class TaskQueueService:
         self.redis = redis
         logger.info("TaskQueueService initialized")
 
-    async def enqueue_task(self, task: Task, priority: Optional[TaskPriority] = None) -> None:
+    async def enqueue_task(self, task: Task, priority: TaskPriority | None = None) -> None:
         """
         Add task to queue with specified priority.
 
@@ -108,9 +106,9 @@ class TaskQueueService:
 
         except Exception as e:
             logger.error("Failed to enqueue task", task_id=task.id, error=str(e))
-            raise ValidationError(f"Failed to enqueue task: {str(e)}")
+            raise ValidationError(f"Failed to enqueue task: {e!s}")
 
-    async def dequeue_task(self, agent_id: str, max_priority: Optional[TaskPriority] = None) -> Optional[str]:
+    async def dequeue_task(self, agent_id: str, max_priority: TaskPriority | None = None) -> str | None:
         """
         Get next task from queue for assignment to agent.
 
@@ -137,7 +135,7 @@ class TaskQueueService:
             max_priority_value = max_priority.value if max_priority else TaskPriority.CRITICAL.value
 
             for task_id_bytes, score in task_ids:
-                task_id = task_id_bytes.decode('utf-8')
+                task_id = task_id_bytes.decode("utf-8")
 
                 # Get queue item
                 item_key = self._get_queue_item_key(task_id)
@@ -182,7 +180,7 @@ class TaskQueueService:
 
         except Exception as e:
             logger.error("Failed to dequeue task", agent_id=agent_id, error=str(e))
-            raise ValidationError(f"Failed to dequeue task: {str(e)}")
+            raise ValidationError(f"Failed to dequeue task: {e!s}")
 
     async def get_queue_stats(self) -> QueueStats:
         """
@@ -215,7 +213,7 @@ class TaskQueueService:
             total_age = 0
 
             for task_id_bytes, score in task_ids_with_scores:
-                task_id = task_id_bytes.decode('utf-8')
+                task_id = task_id_bytes.decode("utf-8")
 
                 # Get queue item for priority and age calculation
                 item_key = self._get_queue_item_key(task_id)
@@ -255,7 +253,7 @@ class TaskQueueService:
 
         except Exception as e:
             logger.error("Failed to get queue stats", error=str(e))
-            raise ValidationError(f"Failed to get queue stats: {str(e)}")
+            raise ValidationError(f"Failed to get queue stats: {e!s}")
 
     async def cancel_task(self, task_id: str) -> bool:
         """
@@ -292,9 +290,9 @@ class TaskQueueService:
 
         except Exception as e:
             logger.error("Failed to cancel task", task_id=task_id, error=str(e))
-            raise ValidationError(f"Failed to cancel task: {str(e)}")
+            raise ValidationError(f"Failed to cancel task: {e!s}")
 
-    async def requeue_task(self, task_id: str, priority: Optional[TaskPriority] = None) -> None:
+    async def requeue_task(self, task_id: str, priority: TaskPriority | None = None) -> None:
         """
         Requeue a failed or cancelled task.
 
@@ -317,9 +315,9 @@ class TaskQueueService:
 
         except Exception as e:
             logger.error("Failed to requeue task", task_id=task_id, error=str(e))
-            raise ValidationError(f"Failed to requeue task: {str(e)}")
+            raise ValidationError(f"Failed to requeue task: {e!s}")
 
-    async def get_queued_tasks(self, limit: int = 100, offset: int = 0) -> List[str]:
+    async def get_queued_tasks(self, limit: int = 100, offset: int = 0) -> list[str]:
         """
         Get list of queued task IDs.
 
@@ -333,13 +331,13 @@ class TaskQueueService:
         try:
             queue_key = self._get_queue_key()
             task_ids_bytes = await self.redis.zrange(queue_key, offset, offset + limit - 1)
-            return [task_id.decode('utf-8') for task_id in task_ids_bytes]
+            return [task_id.decode("utf-8") for task_id in task_ids_bytes]
 
         except Exception as e:
             logger.error("Failed to get queued tasks", error=str(e))
-            raise ValidationError(f"Failed to get queued tasks: {str(e)}")
+            raise ValidationError(f"Failed to get queued tasks: {e!s}")
 
-    async def get_task_queue_position(self, task_id: str) -> Optional[int]:
+    async def get_task_queue_position(self, task_id: str) -> int | None:
         """
         Get queue position for a specific task.
 
@@ -356,7 +354,7 @@ class TaskQueueService:
 
         except Exception as e:
             logger.error("Failed to get task queue position", task_id=task_id, error=str(e))
-            raise ValidationError(f"Failed to get task queue position: {str(e)}")
+            raise ValidationError(f"Failed to get task queue position: {e!s}")
 
     async def cleanup_expired_items(self) -> int:
         """
@@ -381,7 +379,7 @@ class TaskQueueService:
                     ttl = await self.redis.ttl(key)
                     if ttl == -2:  # Key doesn't exist
                         # Extract task ID from key
-                        task_id = key.decode('utf-8').split(":")[-1]
+                        task_id = key.decode("utf-8").split(":")[-1]
 
                         # Remove from queue if present
                         removed = await self.redis.zrem(queue_key, task_id)
@@ -435,7 +433,7 @@ RedisQueueService = TaskQueueService
 
 
 # Global queue service instance (initialized by app startup tests or fixtures)
-_queue_service: Optional[TaskQueueService] = None
+_queue_service: TaskQueueService | None = None
 
 
 def init_queue_service(redis: Redis) -> TaskQueueService:
@@ -493,9 +491,9 @@ class AgentCapacityManager:
 
         except Exception as e:
             logger.error("Failed to update agent capacity", agent_id=agent_id, error=str(e))
-            raise ValidationError(f"Failed to update agent capacity: {str(e)}")
+            raise ValidationError(f"Failed to update agent capacity: {e!s}")
 
-    async def get_agent_capacity(self, agent_id: str) -> Optional[Dict[str, Any]]:
+    async def get_agent_capacity(self, agent_id: str) -> dict[str, Any] | None:
         """
         Get agent's current capacity information.
 
@@ -541,7 +539,7 @@ class AgentCapacityManager:
             logger.error("Failed to check agent availability", agent_id=agent_id, error=str(e))
             return False
 
-    async def get_available_agents(self, required_slots: int = 1) -> List[str]:
+    async def get_available_agents(self, required_slots: int = 1) -> list[str]:
         """
         Get list of agents with available capacity.
 
@@ -560,7 +558,7 @@ class AgentCapacityManager:
                 cursor, keys = await self.redis.scan(cursor, match=pattern, count=100)
 
                 for key in keys:
-                    agent_id = key.decode('utf-8').split(":")[-1]
+                    agent_id = key.decode("utf-8").split(":")[-1]
                     capacity = await self.get_agent_capacity(agent_id)
 
                     if capacity and capacity.get("available_slots", 0) >= required_slots:

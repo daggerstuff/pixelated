@@ -5,19 +5,18 @@ Provides WebSocket endpoints for real-time 6-stage pipeline orchestration,
 integrating with Flask service and providing live progress updates.
 """
 
-from typing import Dict, Any, Optional, List
 from datetime import datetime
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Request
+import structlog
+from fastapi import APIRouter, Depends, HTTPException, Path, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-import structlog
 
-from ..config import MCPConfig, get_config
-from ..services.flask_integration import FlaskIntegrationService
-from ..services.integration_manager import IntegrationManager, IntegrationEventType
+from ..exceptions import ValidationError
 from ..middleware.auth import get_current_user
-from ..exceptions import ValidationError, AuthenticationError, ServiceUnavailableError
+from ..services.flask_integration import FlaskIntegrationService
+from ..services.integration_manager import IntegrationEventType, IntegrationManager
 
 logger = structlog.get_logger(__name__)
 
@@ -25,47 +24,47 @@ logger = structlog.get_logger(__name__)
 # Pydantic models for request/response
 class PipelineExecutionRequest(BaseModel):
     """Request model for pipeline execution."""
-    pipeline_config: Dict[str, Any] = Field(..., description="Pipeline configuration")
+    pipeline_config: dict[str, Any] = Field(..., description="Pipeline configuration")
     execution_mode: str = Field(default="standard", description="Execution mode")
     quality_threshold: float = Field(default=0.8, ge=0.0, le=1.0, description="Quality threshold")
     enable_bias_detection: bool = Field(default=True, description="Enable bias detection")
-    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
+    metadata: dict[str, Any] | None = Field(default=None, description="Additional metadata")
 
 
 class PipelineStatusResponse(BaseModel):
     """Response model for pipeline status."""
     execution_id: str
     status: str
-    current_stage: Optional[str]
+    current_stage: str | None
     overall_progress: float
-    quality_score: Optional[float]
-    stage_results: Dict[str, Any]
+    quality_score: float | None
+    stage_results: dict[str, Any]
     start_time: str
-    end_time: Optional[str]
-    error_message: Optional[str]
-    estimated_completion: Optional[str]
+    end_time: str | None
+    error_message: str | None
+    estimated_completion: str | None
 
 
 class PipelineProgressUpdate(BaseModel):
     """Pipeline progress update data."""
     execution_id: str = Field(..., description="Pipeline execution ID")
     overall_progress: float = Field(..., ge=0, le=100, description="Overall progress percentage")
-    current_stage: Optional[str] = Field(None, description="Current pipeline stage")
-    stage_progress: Optional[Dict[str, Any]] = Field(None, description="Stage-specific progress")
-    estimated_completion: Optional[str] = Field(None, description="Estimated completion time")
-    message: Optional[str] = Field(None, description="Progress message")
+    current_stage: str | None = Field(None, description="Current pipeline stage")
+    stage_progress: dict[str, Any] | None = Field(None, description="Stage-specific progress")
+    estimated_completion: str | None = Field(None, description="Estimated completion time")
+    message: str | None = Field(None, description="Progress message")
 
 
 class PipelineStageRequest(BaseModel):
     """Request model for individual pipeline stage execution."""
     stage_name: str = Field(..., description="Pipeline stage name")
-    input_data: Dict[str, Any] = Field(..., description="Input data for the stage")
-    execution_id: Optional[str] = Field(None, description="Parent execution ID")
+    input_data: dict[str, Any] = Field(..., description="Input data for the stage")
+    execution_id: str | None = Field(None, description="Parent execution ID")
 
 
 class PipelineCancelRequest(BaseModel):
     """Request model for pipeline cancellation."""
-    reason: Optional[str] = Field(None, description="Cancellation reason")
+    reason: str | None = Field(None, description="Cancellation reason")
 
 
 # Create router
@@ -85,7 +84,7 @@ def get_flask_integration_service(request: Request) -> FlaskIntegrationService:
     Raises:
         HTTPException: If service is not available
     """
-    flask_service = getattr(request.app.state, 'flask_integration_service', None)
+    flask_service = getattr(request.app.state, "flask_integration_service", None)
     if not flask_service:
         raise HTTPException(
             status_code=503,
@@ -107,7 +106,7 @@ def get_integration_manager(request: Request) -> IntegrationManager:
     Raises:
         HTTPException: If integration manager is not available
     """
-    integration_manager = getattr(request.app.state, 'integration_manager', None)
+    integration_manager = getattr(request.app.state, "integration_manager", None)
     if not integration_manager:
         raise HTTPException(
             status_code=503,
@@ -116,12 +115,12 @@ def get_integration_manager(request: Request) -> IntegrationManager:
     return integration_manager
 
 
-@router.post("/execute", response_model=Dict[str, Any])
+@router.post("/execute", response_model=dict[str, Any])
 async def execute_pipeline(
     request: PipelineExecutionRequest,
     flask_service: FlaskIntegrationService = Depends(get_flask_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Execute 6-stage pipeline with real-time WebSocket updates.
     
@@ -137,17 +136,17 @@ async def execute_pipeline(
         HTTPException: If execution fails or user lacks permissions
     """
     try:
-        user_id = current_user.get('user_id')
-        
+        user_id = current_user.get("user_id")
+
         # Validate pipeline configuration
         _validate_pipeline_config(request.pipeline_config)
-        
+
         # Execute pipeline
         execution_id = await flask_service.execute_pipeline(
             request.pipeline_config,
             user_id
         )
-        
+
         # Publish pipeline start event via integration manager
         integration_manager = get_integration_manager(Request)
         await integration_manager.publish_integration_event(
@@ -155,21 +154,21 @@ async def execute_pipeline(
             pipeline_id=execution_id,
             user_id=user_id,
             data={
-                'stage_name': 'initialization',
-                'stage_number': 0,
-                'execution_mode': request.execution_mode,
-                'quality_threshold': request.quality_threshold,
-                'enable_bias_detection': request.enable_bias_detection
+                "stage_name": "initialization",
+                "stage_number": 0,
+                "execution_mode": request.execution_mode,
+                "quality_threshold": request.quality_threshold,
+                "enable_bias_detection": request.enable_bias_detection
             }
         )
-        
+
         logger.info(
             "Pipeline execution initiated via WebSocket API",
             execution_id=execution_id,
             user_id=user_id,
             execution_mode=request.execution_mode
         )
-        
+
         return {
             "status": "success",
             "execution_id": execution_id,
@@ -177,9 +176,9 @@ async def execute_pipeline(
             "timestamp": datetime.utcnow().isoformat(),
             "estimated_duration": "30-60 seconds"
         }
-        
+
     except ValidationError as e:
-        logger.warning("Pipeline validation failed", user_id=current_user.get('user_id'), error=str(e))
+        logger.warning("Pipeline validation failed", user_id=current_user.get("user_id"), error=str(e))
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error("Error initiating pipeline execution", error=str(e))
@@ -190,7 +189,7 @@ async def execute_pipeline(
 async def get_pipeline_status(
     execution_id: str = Path(..., description="Pipeline execution ID"),
     flask_service: FlaskIntegrationService = Depends(get_flask_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: dict[str, Any] = Depends(get_current_user)
 ) -> PipelineStatusResponse:
     """
     Get current pipeline execution status with WebSocket integration.
@@ -207,11 +206,11 @@ async def get_pipeline_status(
         HTTPException: If execution not found or access denied
     """
     try:
-        user_id = current_user.get('user_id')
-        
+        user_id = current_user.get("user_id")
+
         # Get execution status
         status_data = await flask_service.get_execution_status(execution_id, user_id)
-        
+
         # Publish status query event
         integration_manager = get_integration_manager(Request)
         await integration_manager.publish_integration_event(
@@ -219,21 +218,21 @@ async def get_pipeline_status(
             pipeline_id=execution_id,
             user_id=user_id,
             data={
-                'status_query': True,
-                'current_progress': status_data.get('overall_progress', 0),
-                'current_stage': status_data.get('current_stage')
+                "status_query": True,
+                "current_progress": status_data.get("overall_progress", 0),
+                "current_stage": status_data.get("current_stage")
             }
         )
-        
+
         logger.debug(
             "Pipeline status retrieved",
             execution_id=execution_id,
             user_id=user_id,
-            status=status_data.get('status')
+            status=status_data.get("status")
         )
-        
+
         return PipelineStatusResponse(**status_data)
-        
+
     except ValidationError as e:
         logger.warning("Pipeline status access denied", execution_id=execution_id, user_id=user_id, error=str(e))
         raise HTTPException(status_code=403, detail=str(e))
@@ -242,13 +241,13 @@ async def get_pipeline_status(
         raise HTTPException(status_code=500, detail="Failed to retrieve pipeline status")
 
 
-@router.post("/{execution_id}/cancel", response_model=Dict[str, Any])
+@router.post("/{execution_id}/cancel", response_model=dict[str, Any])
 async def cancel_pipeline(
     request: PipelineCancelRequest,
     execution_id: str = Path(..., description="Pipeline execution ID"),
     flask_service: FlaskIntegrationService = Depends(get_flask_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Cancel pipeline execution with WebSocket notification.
     
@@ -265,11 +264,11 @@ async def cancel_pipeline(
         HTTPException: If cancellation fails or access denied
     """
     try:
-        user_id = current_user.get('user_id')
-        
+        user_id = current_user.get("user_id")
+
         # Cancel execution
         success = await flask_service.cancel_execution(execution_id, user_id)
-        
+
         if success:
             # Publish cancellation event
             integration_manager = get_integration_manager(Request)
@@ -278,28 +277,27 @@ async def cancel_pipeline(
                 pipeline_id=execution_id,
                 user_id=user_id,
                 data={
-                    'status': 'cancelled',
-                    'reason': request.reason or 'User requested cancellation',
-                    'cancelled_at': datetime.utcnow().isoformat()
+                    "status": "cancelled",
+                    "reason": request.reason or "User requested cancellation",
+                    "cancelled_at": datetime.utcnow().isoformat()
                 }
             )
-            
+
             logger.info(
                 "Pipeline execution cancelled",
                 execution_id=execution_id,
                 user_id=user_id,
                 reason=request.reason
             )
-            
+
             return {
                 "status": "success",
                 "message": "Pipeline execution cancelled successfully",
                 "execution_id": execution_id,
                 "timestamp": datetime.utcnow().isoformat()
             }
-        else:
-            raise HTTPException(status_code=400, detail="Failed to cancel pipeline execution")
-            
+        raise HTTPException(status_code=400, detail="Failed to cancel pipeline execution")
+
     except ValidationError as e:
         logger.warning("Pipeline cancellation failed", execution_id=execution_id, error=str(e))
         raise HTTPException(status_code=403, detail=str(e))
@@ -308,13 +306,13 @@ async def cancel_pipeline(
         raise HTTPException(status_code=500, detail="Failed to cancel pipeline execution")
 
 
-@router.post("/{execution_id}/progress", response_model=Dict[str, Any])
+@router.post("/{execution_id}/progress", response_model=dict[str, Any])
 async def update_pipeline_progress(
     progress_update: PipelineProgressUpdate,
     execution_id: str = Path(..., description="Pipeline execution ID"),
     integration_manager: IntegrationManager = Depends(get_integration_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Update pipeline progress via WebSocket (for internal use by pipeline stages).
     
@@ -331,44 +329,44 @@ async def update_pipeline_progress(
         HTTPException: If update fails or user lacks permissions
     """
     try:
-        user_id = current_user.get('user_id')
-        user_role = current_user.get('role', 'user')
-        
+        user_id = current_user.get("user_id")
+        user_role = current_user.get("role", "user")
+
         # Check permissions - only system/agents can update progress
-        if user_role not in ['system', 'agent', 'admin']:
+        if user_role not in ["system", "agent", "admin"]:
             raise HTTPException(
                 status_code=403,
                 detail="Insufficient permissions to update pipeline progress"
             )
-        
+
         # Publish progress update
         await integration_manager.publish_integration_event(
             IntegrationEventType.PIPELINE_PROGRESS,
             pipeline_id=execution_id,
             user_id=user_id,
             data={
-                'overall_progress': progress_update.overall_progress,
-                'current_stage': progress_update.current_stage,
-                'stage_progress': progress_update.stage_progress,
-                'estimated_completion': progress_update.estimated_completion,
-                'message': progress_update.message
+                "overall_progress": progress_update.overall_progress,
+                "current_stage": progress_update.current_stage,
+                "stage_progress": progress_update.stage_progress,
+                "estimated_completion": progress_update.estimated_completion,
+                "message": progress_update.message
             }
         )
-        
+
         logger.debug(
             "Pipeline progress updated via WebSocket API",
             execution_id=execution_id,
             progress=progress_update.overall_progress,
             current_stage=progress_update.current_stage
         )
-        
+
         return {
             "status": "success",
             "message": "Pipeline progress updated successfully",
             "execution_id": execution_id,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -376,11 +374,11 @@ async def update_pipeline_progress(
         raise HTTPException(status_code=500, detail="Failed to update pipeline progress")
 
 
-@router.get("/active", response_model=List[Dict[str, Any]])
+@router.get("/active", response_model=list[dict[str, Any]])
 async def get_active_executions(
     flask_service: FlaskIntegrationService = Depends(get_flask_integration_service),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> List[Dict[str, Any]]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> list[dict[str, Any]]:
     """
     Get list of active pipeline executions.
     
@@ -395,22 +393,22 @@ async def get_active_executions(
         HTTPException: If retrieval fails
     """
     try:
-        user_id = current_user.get('user_id')
-        user_role = current_user.get('role', 'user')
-        
+        user_id = current_user.get("user_id")
+        user_role = current_user.get("role", "user")
+
         # Get all executions for admin, user-specific for regular users
-        if user_role == 'admin':
+        if user_role == "admin":
             # Admin can see all executions
             executions = []
             for execution_id, execution in flask_service.active_executions.items():
                 if execution.status == PipelineStatus.RUNNING:
                     executions.append({
-                        'execution_id': execution_id,
-                        'user_id': execution.user_id,
-                        'status': execution.status.value,
-                        'current_stage': execution.current_stage.value if execution.current_stage else None,
-                        'overall_progress': execution.overall_progress,
-                        'start_time': execution.start_time.isoformat()
+                        "execution_id": execution_id,
+                        "user_id": execution.user_id,
+                        "status": execution.status.value,
+                        "current_stage": execution.current_stage.value if execution.current_stage else None,
+                        "overall_progress": execution.overall_progress,
+                        "start_time": execution.start_time.isoformat()
                     })
         else:
             # Regular users can only see their own executions
@@ -418,31 +416,31 @@ async def get_active_executions(
             for execution_id, execution in flask_service.active_executions.items():
                 if execution.user_id == user_id and execution.status == PipelineStatus.RUNNING:
                     executions.append({
-                        'execution_id': execution_id,
-                        'status': execution.status.value,
-                        'current_stage': execution.current_stage.value if execution.current_stage else None,
-                        'overall_progress': execution.overall_progress,
-                        'start_time': execution.start_time.isoformat()
+                        "execution_id": execution_id,
+                        "status": execution.status.value,
+                        "current_stage": execution.current_stage.value if execution.current_stage else None,
+                        "overall_progress": execution.overall_progress,
+                        "start_time": execution.start_time.isoformat()
                     })
-        
+
         logger.info(
             "Active pipeline executions retrieved",
             user_id=user_id,
             role=user_role,
             count=len(executions)
         )
-        
+
         return executions
-        
+
     except Exception as e:
         logger.error("Error retrieving active executions", error=str(e))
         raise HTTPException(status_code=500, detail="Failed to retrieve active executions")
 
 
-@router.get("/health", response_model=Dict[str, Any])
+@router.get("/health", response_model=dict[str, Any])
 async def get_pipeline_service_health(
     flask_service: FlaskIntegrationService = Depends(get_flask_integration_service)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get pipeline service health status.
     
@@ -454,11 +452,11 @@ async def get_pipeline_service_health(
     """
     try:
         health_status = await flask_service.get_service_health()
-        
-        logger.debug("Pipeline service health retrieved", status=health_status.get('status'))
-        
+
+        logger.debug("Pipeline service health retrieved", status=health_status.get("status"))
+
         return health_status
-        
+
     except Exception as e:
         logger.error("Error getting pipeline service health", error=str(e))
         return {
@@ -473,7 +471,7 @@ async def get_pipeline_service_health(
 async def websocket_pipeline_updates(
     execution_id: str,
     websocket_manager=Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: dict[str, Any] = Depends(get_current_user)
 ):
     """
     WebSocket endpoint for real-time pipeline updates.
@@ -491,24 +489,24 @@ async def websocket_pipeline_updates(
     return {
         "message": "WebSocket endpoint for pipeline updates",
         "execution_id": execution_id,
-        "user_id": current_user.get('user_id')
+        "user_id": current_user.get("user_id")
     }
 
 
 # Utility functions
-def _validate_pipeline_config(config: Dict[str, Any]) -> None:
+def _validate_pipeline_config(config: dict[str, Any]) -> None:
     """Validate pipeline configuration."""
-    required_fields = ['source_format', 'target_format', 'input_data']
+    required_fields = ["source_format", "target_format", "input_data"]
     missing_fields = [field for field in required_fields if field not in config]
-    
+
     if missing_fields:
         raise ValidationError(f"Missing required pipeline configuration fields: {missing_fields}")
-    
-    supported_formats = ['csv', 'json', 'jsonl', 'parquet', 'txt']
-    if config['source_format'] not in supported_formats:
+
+    supported_formats = ["csv", "json", "jsonl", "parquet", "txt"]
+    if config["source_format"] not in supported_formats:
         raise ValidationError(f"Unsupported source format: {config['source_format']}")
-    
-    if config['target_format'] not in supported_formats:
+
+    if config["target_format"] not in supported_formats:
         raise ValidationError(f"Unsupported target format: {config['target_format']}")
 
 
@@ -537,7 +535,7 @@ async def general_exception_handler(request: Request, exc: Exception):
         error_type=type(exc).__name__,
         path=request.url.path
     )
-    
+
     return JSONResponse(
         status_code=500,
         content={

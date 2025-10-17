@@ -5,15 +5,15 @@ This middleware handles JWT token validation and agent authentication
 following the Pixelated platform's security standards.
 """
 
-from typing import Optional, Dict, Any
-from fastapi import HTTPException, status, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Any
+
 import structlog
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from mcp_server.services.auth import AuthService, get_auth_service
+from mcp_server.exceptions import AuthenticationError
 from mcp_server.models.agent import Agent
-from mcp_server.exceptions import AuthenticationError, AuthorizationError
-
+from mcp_server.services.auth import AuthService, get_auth_service
 
 logger = structlog.get_logger(__name__)
 
@@ -94,9 +94,9 @@ async def get_current_agent(
 
 
 async def get_optional_current_agent(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
     auth_service: AuthService = Depends(get_auth_service)
-) -> Optional[Agent]:
+) -> Agent | None:
     """
     Get the currently authenticated agent from JWT token (optional).
 
@@ -158,7 +158,7 @@ async def require_admin_agent(current_agent: Agent = Depends(get_current_agent))
     # In a production system, you might have a more sophisticated role-based system
 
     # Check if agent has admin capabilities or special flag
-    if not (hasattr(current_agent, 'is_admin') and current_agent.is_admin):
+    if not (hasattr(current_agent, "is_admin") and current_agent.is_admin):
         logger.warning("Non-admin agent attempted admin operation", agent_id=current_agent.id)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -168,7 +168,7 @@ async def require_admin_agent(current_agent: Agent = Depends(get_current_agent))
     return current_agent
 
 
-async def get_current_user(current_agent: Optional[Agent] = Depends(get_optional_current_agent)) -> Dict[str, Any]:
+async def get_current_user(current_agent: Agent | None = Depends(get_optional_current_agent)) -> dict[str, Any]:
     """
     Backwards-compatible dependency used by routers that expect a simple
     user dictionary rather than the full Agent model.
@@ -204,7 +204,7 @@ class AuthMiddleware:
         """
         self.auth_service = auth_service
 
-    async def __call__(self, request) -> Optional[Agent]:
+    async def __call__(self, request) -> Agent | None:
         """
         Validate authentication for incoming request.
 
@@ -228,8 +228,7 @@ class AuthMiddleware:
                 # Get agent details
                 return await self.auth_service.get_agent_by_id(agent_id)
 
-            else:
-                return None
+            return None
 
         except AuthenticationError:
             return None
@@ -382,16 +381,16 @@ class RateLimitMiddleware:
 
 # Export commonly used dependencies
 __all__ = [
-    "get_current_agent",
-    "get_optional_current_agent",
-    "require_active_agent",
-    "require_admin_agent",
-    "require_auth",
-    "require_active_auth",
-    "require_admin_auth",
-    "require_active_admin_auth",
     "AuthMiddleware",
     "RateLimitMiddleware",
-    "validate_api_key",
-    "create_auth_dependency"
+    "create_auth_dependency",
+    "get_current_agent",
+    "get_optional_current_agent",
+    "require_active_admin_auth",
+    "require_active_agent",
+    "require_active_auth",
+    "require_admin_agent",
+    "require_admin_auth",
+    "require_auth",
+    "validate_api_key"
 ]

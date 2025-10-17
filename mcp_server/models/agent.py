@@ -6,9 +6,11 @@ following the Pixelated platform's security and data standards.
 """
 
 
+import builtins
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Optional, List, Dict, Any
+from typing import Any
+
 from pydantic import BaseModel, Field, validator
 
 
@@ -25,11 +27,11 @@ class AgentCapabilities(BaseModel):
     """Agent capabilities model."""
 
     max_concurrent_tasks: int = Field(default=1, ge=1, le=100, description="Maximum concurrent tasks")
-    supported_task_types: List[str] = Field(default_factory=list, description="Supported task types")
+    supported_task_types: list[str] = Field(default_factory=list, description="Supported task types")
     requires_gpu: bool = Field(default=False, description="Requires GPU resources")
-    memory_limit_mb: Optional[int] = Field(default=None, ge=128, description="Memory limit in MB")
-    cpu_limit_cores: Optional[float] = Field(default=None, gt=0, description="CPU limit in cores")
-    custom_capabilities: Dict[str, Any] = Field(default_factory=dict, description="Custom capability flags")
+    memory_limit_mb: int | None = Field(default=None, ge=128, description="Memory limit in MB")
+    cpu_limit_cores: float | None = Field(default=None, gt=0, description="CPU limit in cores")
+    custom_capabilities: dict[str, Any] = Field(default_factory=dict, description="Custom capability flags")
 
 
 class Agent(BaseModel):
@@ -38,14 +40,14 @@ class Agent(BaseModel):
     id: str = Field(..., description="Unique agent identifier")
     name: str = Field(..., min_length=3, max_length=100, description="Agent name")
     email: str = Field(..., description="Agent email address")
-    description: Optional[str] = Field(default=None, max_length=500, description="Agent description")
+    description: str | None = Field(default=None, max_length=500, description="Agent description")
     status: AgentStatus = Field(default=AgentStatus.PENDING, description="Agent status")
     capabilities: AgentCapabilities = Field(default_factory=AgentCapabilities, description="Agent capabilities")
-    api_key: Optional[str] = Field(default=None, description="API key (excluded from responses)")
-    api_key_hash: Optional[str] = Field(default=None, description="Hashed API key")
-    webhook_url: Optional[str] = Field(default=None, description="Webhook URL for notifications")
-    last_seen: Optional[datetime] = Field(default=None, description="Last seen timestamp")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+    api_key: str | None = Field(default=None, description="API key (excluded from responses)")
+    api_key_hash: str | None = Field(default=None, description="Hashed API key")
+    webhook_url: str | None = Field(default=None, description="Webhook URL for notifications")
+    last_seen: datetime | None = Field(default=None, description="Last seen timestamp")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Creation timestamp")
     updated_at: datetime = Field(default_factory=datetime.utcnow, description="Last update timestamp")
 
@@ -56,31 +58,31 @@ class Agent(BaseModel):
             datetime: lambda v: v.isoformat() if v else None
         }
 
-    @validator('email')
+    @validator("email")
     def validate_email(cls, v):
         """Validate email format."""
-        if '@' not in v or '.' not in v.split('@')[-1]:
-            raise ValueError('Invalid email format')
+        if "@" not in v or "." not in v.split("@")[-1]:
+            raise ValueError("Invalid email format")
         return v.lower()
 
     def dict(self, **kwargs):
         """Convert to dictionary, excluding sensitive fields."""
         # Exclude API key from dictionary output
-        exclude = kwargs.get('exclude', set())
+        exclude = kwargs.get("exclude", set())
         if isinstance(exclude, set):
-            exclude.add('api_key')
-            exclude.add('api_key_hash')
+            exclude.add("api_key")
+            exclude.add("api_key_hash")
         else:
-            exclude = {'api_key', 'api_key_hash'}
+            exclude = {"api_key", "api_key_hash"}
 
-        kwargs['exclude'] = exclude
+        kwargs["exclude"] = exclude
         return super().dict(**kwargs)
 
     def is_active(self) -> bool:
         """Check if agent is active."""
         return self.status == AgentStatus.ACTIVE
 
-    def can_handle_task(self, task_type: str, required_memory_mb: Optional[int] = None) -> bool:
+    def can_handle_task(self, task_type: str, required_memory_mb: int | None = None) -> bool:
         """
         Check if agent can handle a specific task.
 
@@ -109,16 +111,16 @@ class Agent(BaseModel):
         """Update last seen timestamp."""
         self.last_seen = datetime.now(timezone.utc)
 
-    def to_mongo_document(self) -> Dict[str, Any]:
+    def to_mongo_document(self) -> builtins.dict[str, Any]:
         """Convert to MongoDB document format."""
         data = self.dict()
         # Convert datetime to ISO format for MongoDB
-        if data.get('created_at'):
-            data['created_at'] = data['created_at'].isoformat()
-        if data.get('updated_at'):
-            data['updated_at'] = data['updated_at'].isoformat()
-        if data.get('last_seen'):
-            data['last_seen'] = data['last_seen'].isoformat()
+        if data.get("created_at"):
+            data["created_at"] = data["created_at"].isoformat()
+        if data.get("updated_at"):
+            data["updated_at"] = data["updated_at"].isoformat()
+        if data.get("last_seen"):
+            data["last_seen"] = data["last_seen"].isoformat()
         return data
 
 
@@ -127,16 +129,16 @@ class AgentRegistrationRequest(BaseModel):
 
     name: str = Field(..., min_length=3, max_length=100, description="Agent name")
     email: str = Field(..., description="Agent email address")
-    description: Optional[str] = Field(default=None, max_length=500, description="Agent description")
-    capabilities: Optional[AgentCapabilities] = Field(default=None, description="Agent capabilities")
-    webhook_url: Optional[str] = Field(default=None, description="Webhook URL")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+    description: str | None = Field(default=None, max_length=500, description="Agent description")
+    capabilities: AgentCapabilities | None = Field(default=None, description="Agent capabilities")
+    webhook_url: str | None = Field(default=None, description="Webhook URL")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
-    @validator('email')
+    @validator("email")
     def validate_email(cls, v):
         """Validate email format."""
-        if '@' not in v or '.' not in v.split('@')[-1]:
-            raise ValueError('Invalid email format')
+        if "@" not in v or "." not in v.split("@")[-1]:
+            raise ValueError("Invalid email format")
         return v.lower()
 
 

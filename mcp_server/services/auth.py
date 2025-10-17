@@ -6,28 +6,26 @@ following the Pixelated platform's security standards and HIPAA compliance requi
 """
 
 import uuid
-import hashlib
-import secrets
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
-from pydantic import BaseModel, EmailStr, Field, validator
-from motor.motor_asyncio import AsyncIOMotorDatabase
-from redis.asyncio import Redis
+from typing import Any
+
 import jwt
 import structlog
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from pydantic import BaseModel, EmailStr, Field, validator
+from redis.asyncio import Redis
 
 from mcp_server.config import settings
 from mcp_server.exceptions import (
     AuthenticationError,
-    AuthorizationError,
-    ValidationError,
+    ConflictError,
     ResourceNotFoundError,
-    ConflictError
+    ValidationError,
 )
-from mcp_server.models.agent import Agent, AgentStatus, AgentCapabilities
-from mcp_server.utils.security import hash_password, verify_password, generate_secure_token
-from .token_manager import TokenManager, get_token_manager
+from mcp_server.models.agent import Agent, AgentCapabilities, AgentStatus
+from mcp_server.utils.security import generate_secure_token, hash_password, verify_password
 
+from .token_manager import TokenManager
 
 logger = structlog.get_logger(__name__)
 
@@ -37,17 +35,17 @@ class AgentRegistrationRequest(BaseModel):
 
     name: str = Field(..., min_length=3, max_length=100, description="Agent display name")
     email: EmailStr = Field(..., description="Agent contact email")
-    description: Optional[str] = Field(None, max_length=500, description="Agent description")
+    description: str | None = Field(None, max_length=500, description="Agent description")
     capabilities: AgentCapabilities = Field(..., description="Agent capabilities and specializations")
     max_concurrent_tasks: int = Field(1, ge=1, le=100, description="Maximum concurrent tasks")
-    webhook_url: Optional[str] = Field(None, description="Webhook URL for notifications")
-    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional metadata")
+    webhook_url: str | None = Field(None, description="Webhook URL for notifications")
+    metadata: dict[str, Any] | None = Field(default_factory=dict, description="Additional metadata")
 
-    @validator('webhook_url')
+    @validator("webhook_url")
     def validate_webhook_url(cls, v):
         """Validate webhook URL format."""
-        if v and not v.startswith(('http://', 'https://')):
-            raise ValueError('Webhook URL must start with http:// or https://')
+        if v and not v.startswith(("http://", "https://")):
+            raise ValueError("Webhook URL must start with http:// or https://")
         return v
 
 
@@ -155,7 +153,7 @@ class AuthService:
 
         except Exception as e:
             logger.error("Agent registration failed", error=str(e), email=registration.email)
-            raise ValidationError(f"Failed to register agent: {str(e)}")
+            raise ValidationError(f"Failed to register agent: {e!s}")
 
     async def authenticate_agent(self, agent_id: str, api_key: str) -> AgentAuthenticationResponse:
         """
@@ -218,7 +216,7 @@ class AuthService:
             agent=agent
         )
 
-    async def validate_token(self, token: str) -> Dict[str, Any]:
+    async def validate_token(self, token: str) -> dict[str, Any]:
         """
         Validate JWT token and return token data.
 
@@ -308,7 +306,7 @@ class AuthService:
 
         return Agent(**agent_dict)
 
-    async def get_agent_by_id(self, agent_id: str) -> Optional[Agent]:
+    async def get_agent_by_id(self, agent_id: str) -> Agent | None:
         """
         Retrieve agent by ID.
 
@@ -370,7 +368,7 @@ class AuthService:
 
 
 # Global auth service instance
-_auth_service: Optional[AuthService] = None
+_auth_service: AuthService | None = None
 
 
 async def get_auth_service() -> AuthService:

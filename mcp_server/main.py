@@ -9,15 +9,13 @@ import asyncio
 import os
 import signal
 import sys
-from contextlib import asynccontextmanager
-from typing import Optional
 
 import structlog
 import uvicorn
 from fastapi import FastAPI
 
 from .app_factory import create_mcp_app
-from .config import get_config, MCPConfig
+from .config import MCPConfig, get_config
 
 # Configure structured logging
 structlog.configure(
@@ -43,8 +41,8 @@ logger = structlog.get_logger(__name__)
 
 class MCPServer:
     """MCP Server application runner."""
-    
-    def __init__(self, config: Optional[MCPConfig] = None) -> None:
+
+    def __init__(self, config: MCPConfig | None = None) -> None:
         """
         Initialize MCP server.
         
@@ -52,9 +50,9 @@ class MCPServer:
             config: MCPConfig instance. If None, uses get_config()
         """
         self.config = config or get_config()
-        self.app: Optional[FastAPI] = None
-        self.server: Optional[uvicorn.Server] = None
-        
+        self.app: FastAPI | None = None
+        self.server: uvicorn.Server | None = None
+
     def create_app(self) -> FastAPI:
         """
         Create FastAPI application.
@@ -65,7 +63,7 @@ class MCPServer:
         logger.info("Creating MCP server application")
         self.app = create_mcp_app(self.config)
         return self.app
-    
+
     async def run(self, host: str = "0.0.0.0", port: int = 8080) -> None:
         """
         Run the MCP server.
@@ -81,11 +79,11 @@ class MCPServer:
             environment=self.config.environment,
             version=self.config.api_version
         )
-        
+
         # Create application if not already created
         if not self.app:
             self.create_app()
-        
+
         # Configure Uvicorn
         config = uvicorn.Config(
             self.app,
@@ -96,18 +94,18 @@ class MCPServer:
             loop="uvloop" if hasattr(asyncio, "uvloop") else "asyncio",
             lifespan="on"
         )
-        
+
         self.server = uvicorn.Server(config)
-        
+
         # Setup signal handlers for graceful shutdown
         def signal_handler(signum: int, frame) -> None:
             logger.info(f"Received signal {signum}, shutting down gracefully")
             if self.server:
                 self.server.should_exit = True
-        
+
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
-        
+
         try:
             # Run the server
             await self.server.serve()
@@ -118,7 +116,7 @@ class MCPServer:
             raise
         finally:
             logger.info("MCP server stopped")
-    
+
     def run_sync(self, host: str = "0.0.0.0", port: int = 8080) -> None:
         """
         Run the MCP server synchronously.
@@ -135,17 +133,17 @@ def main() -> None:
     try:
         # Get configuration
         config = get_config()
-        
+
         # Create and run server
         server = MCPServer(config)
-        
+
         # Get host and port from environment or use defaults
         host = os.getenv("MCP_HOST", "0.0.0.0")
         port = int(os.getenv("MCP_PORT", "8080"))
-        
+
         # Run server
         server.run_sync(host, port)
-        
+
     except KeyboardInterrupt:
         logger.info("Server interrupted by user")
         sys.exit(0)

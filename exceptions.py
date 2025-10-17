@@ -8,7 +8,7 @@ from typing import Any
 
 
 def _load() -> ModuleType:
-    return import_module('mcp_server.exceptions')
+    return import_module("mcp_server.exceptions")
 
 
 def __getattr__(name: str) -> Any:

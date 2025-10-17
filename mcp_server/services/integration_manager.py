@@ -7,23 +7,22 @@ task delegation system, Redis queue operations, and Flask service pipeline orche
 
 import asyncio
 import json
-import logging
-from datetime import datetime
-from typing import Dict, Any, Optional, List, Callable
+from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import Any
 
 import structlog
-from redis.asyncio import Redis
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from redis.asyncio import Redis
 
 from mcp_server.config import MCPConfig
-from mcp_server.models.task import Task, TaskStatus, TaskPriority
-from mcp_server.models.agent import Agent
-from mcp_server.exceptions import IntegrationError, ValidationError, ResourceNotFoundError
-from .websocket_manager import WebSocketManager
-from .task import TaskService
+from mcp_server.exceptions import IntegrationError
+
 from .queue import RedisQueueService
+from .task import TaskService
+from .websocket_manager import WebSocketManager
 
 logger = structlog.get_logger(__name__)
 
@@ -49,14 +48,14 @@ class IntegrationEventType(Enum):
 class IntegrationEvent:
     """Integration event data structure."""
     event_type: str
-    task_id: Optional[str]
-    pipeline_id: Optional[str]
-    agent_id: Optional[str]
-    user_id: Optional[str]
-    data: Dict[str, Any]
+    task_id: str | None
+    pipeline_id: str | None
+    agent_id: str | None
+    user_id: str | None
+    data: dict[str, Any]
     timestamp: datetime
     source: str
-    target: Optional[str] = None
+    target: str | None = None
 
 
 class IntegrationManager:
@@ -94,7 +93,7 @@ class IntegrationManager:
         self.queue_channel = "mcp:queue_events"
 
         # Event handlers
-        self.event_handlers: Dict[str, List[Callable]] = {}
+        self.event_handlers: dict[str, list[Callable]] = {}
         self._initialized = False
 
     async def initialize(self) -> None:
@@ -113,7 +112,7 @@ class IntegrationManager:
 
         except Exception as e:
             self.logger.error("Failed to initialize integration manager", error=str(e))
-            raise IntegrationError(f"Integration manager initialization failed: {str(e)}")
+            raise IntegrationError(f"Integration manager initialization failed: {e!s}")
 
     def _register_event_handlers(self) -> None:
         """Register event handlers for integration events."""
@@ -181,39 +180,39 @@ class IntegrationManager:
 
         except Exception as e:
             self.logger.error("Failed to start Redis listeners", error=str(e))
-            raise IntegrationError(f"Redis listener setup failed: {str(e)}")
+            raise IntegrationError(f"Redis listener setup failed: {e!s}")
 
     async def _redis_message_listener(self) -> None:
         """Listen for Redis pub/sub messages and process them."""
         try:
             async for message in self.pubsub_client.listen():
-                if message['type'] == 'message':
-                    channel = message['channel'].decode('utf-8')
-                    data = json.loads(message['data'].decode('utf-8'))
+                if message["type"] == "message":
+                    channel = message["channel"].decode("utf-8")
+                    data = json.loads(message["data"].decode("utf-8"))
 
                     await self._process_redis_message(channel, data)
 
         except Exception as e:
             self.logger.error("Error in Redis message listener", error=str(e))
 
-    async def _process_redis_message(self, channel: str, data: Dict[str, Any]) -> None:
+    async def _process_redis_message(self, channel: str, data: dict[str, Any]) -> None:
         """Process incoming Redis message."""
         try:
-            event_type = data.get('event_type')
+            event_type = data.get("event_type")
             if not event_type:
                 return
 
             # Create integration event
             event = IntegrationEvent(
                 event_type=event_type,
-                task_id=data.get('task_id'),
-                pipeline_id=data.get('pipeline_id'),
-                agent_id=data.get('agent_id'),
-                user_id=data.get('user_id'),
-                data=data.get('data', {}),
-                timestamp=datetime.fromisoformat(data.get('timestamp', datetime.utcnow().isoformat())),
-                source=data.get('source', 'redis'),
-                target=data.get('target')
+                task_id=data.get("task_id"),
+                pipeline_id=data.get("pipeline_id"),
+                agent_id=data.get("agent_id"),
+                user_id=data.get("user_id"),
+                data=data.get("data", {}),
+                timestamp=datetime.fromisoformat(data.get("timestamp", datetime.utcnow().isoformat())),
+                source=data.get("source", "redis"),
+                target=data.get("target")
             )
 
             # Handle event
@@ -251,13 +250,13 @@ class IntegrationManager:
 
             # Broadcast to WebSocket clients
             await self.websocket_manager.publish_event(
-                'task:created',
+                "task:created",
                 {
-                    'task_id': task_id,
-                    'task_type': event.data.get('task_type'),
-                    'status': 'created',
-                    'created_at': event.timestamp.isoformat(),
-                    'metadata': event.data.get('metadata', {})
+                    "task_id": task_id,
+                    "task_type": event.data.get("task_type"),
+                    "status": "created",
+                    "created_at": event.timestamp.isoformat(),
+                    "metadata": event.data.get("metadata", {})
                 },
                 room=f"task:{task_id}"
             )
@@ -265,7 +264,7 @@ class IntegrationManager:
             self.logger.info(
                 "Task created event processed",
                 task_id=task_id,
-                task_type=event.data.get('task_type')
+                task_type=event.data.get("task_type")
             )
 
         except Exception as e:
@@ -282,22 +281,22 @@ class IntegrationManager:
 
             # Broadcast to WebSocket clients
             await self.websocket_manager.publish_event(
-                'task:assigned',
+                "task:assigned",
                 {
-                    'task_id': task_id,
-                    'agent_id': agent_id,
-                    'assigned_at': event.timestamp.isoformat(),
-                    'metadata': event.data.get('metadata', {})
+                    "task_id": task_id,
+                    "agent_id": agent_id,
+                    "assigned_at": event.timestamp.isoformat(),
+                    "metadata": event.data.get("metadata", {})
                 },
                 room=f"task:{task_id}"
             )
 
             # Also notify the agent
             await self.websocket_manager.publish_event(
-                'task:assigned_to_you',
+                "task:assigned_to_you",
                 {
-                    'task_id': task_id,
-                    'task_details': event.data.get('task_details', {})
+                    "task_id": task_id,
+                    "task_details": event.data.get("task_details", {})
                 },
                 room=f"agent:{agent_id}"
             )
@@ -319,17 +318,17 @@ class IntegrationManager:
                 return
 
             progress_data = {
-                'task_id': task_id,
-                'progress': event.data.get('progress', 0),
-                'status': event.data.get('status'),
-                'message': event.data.get('message', ''),
-                'metadata': event.data.get('metadata', {}),
-                'updated_at': event.timestamp.isoformat()
+                "task_id": task_id,
+                "progress": event.data.get("progress", 0),
+                "status": event.data.get("status"),
+                "message": event.data.get("message", ""),
+                "metadata": event.data.get("metadata", {}),
+                "updated_at": event.timestamp.isoformat()
             }
 
             # Broadcast to task subscribers
             await self.websocket_manager.publish_event(
-                'task:progress',
+                "task:progress",
                 progress_data,
                 room=f"task:{task_id}"
             )
@@ -337,7 +336,7 @@ class IntegrationManager:
             self.logger.debug(
                 "Task progress event processed",
                 task_id=task_id,
-                progress=event.data.get('progress', 0)
+                progress=event.data.get("progress", 0)
             )
 
         except Exception as e:
@@ -352,12 +351,12 @@ class IntegrationManager:
 
             # Broadcast completion to WebSocket clients
             await self.websocket_manager.publish_event(
-                'task:completed',
+                "task:completed",
                 {
-                    'task_id': task_id,
-                    'result': event.data.get('result', {}),
-                    'completed_at': event.timestamp.isoformat(),
-                    'duration_seconds': event.data.get('duration_seconds', 0)
+                    "task_id": task_id,
+                    "result": event.data.get("result", {}),
+                    "completed_at": event.timestamp.isoformat(),
+                    "duration_seconds": event.data.get("duration_seconds", 0)
                 },
                 room=f"task:{task_id}"
             )
@@ -365,7 +364,7 @@ class IntegrationManager:
             self.logger.info(
                 "Task completed event processed",
                 task_id=task_id,
-                duration_seconds=event.data.get('duration_seconds', 0)
+                duration_seconds=event.data.get("duration_seconds", 0)
             )
 
         except Exception as e:
@@ -380,12 +379,12 @@ class IntegrationManager:
 
             # Broadcast failure to WebSocket clients
             await self.websocket_manager.publish_event(
-                'task:failed',
+                "task:failed",
                 {
-                    'task_id': task_id,
-                    'error': event.data.get('error', 'Unknown error'),
-                    'error_type': event.data.get('error_type'),
-                    'failed_at': event.timestamp.isoformat()
+                    "task_id": task_id,
+                    "error": event.data.get("error", "Unknown error"),
+                    "error_type": event.data.get("error_type"),
+                    "failed_at": event.timestamp.isoformat()
                 },
                 room=f"task:{task_id}"
             )
@@ -393,7 +392,7 @@ class IntegrationManager:
             self.logger.warning(
                 "Task failed event processed",
                 task_id=task_id,
-                error_type=event.data.get('error_type')
+                error_type=event.data.get("error_type")
             )
 
         except Exception as e:
@@ -407,15 +406,15 @@ class IntegrationManager:
             if not pipeline_id:
                 return
 
-            stage_name = event.data.get('stage_name')
+            stage_name = event.data.get("stage_name")
 
             await self.websocket_manager.publish_event(
-                'pipeline:stage_start',
+                "pipeline:stage_start",
                 {
-                    'pipeline_id': pipeline_id,
-                    'stage_name': stage_name,
-                    'stage_number': event.data.get('stage_number'),
-                    'started_at': event.timestamp.isoformat()
+                    "pipeline_id": pipeline_id,
+                    "stage_name": stage_name,
+                    "stage_number": event.data.get("stage_number"),
+                    "started_at": event.timestamp.isoformat()
                 },
                 room=f"pipeline:{pipeline_id}"
             )
@@ -436,16 +435,16 @@ class IntegrationManager:
             if not pipeline_id:
                 return
 
-            stage_name = event.data.get('stage_name')
+            stage_name = event.data.get("stage_name")
 
             await self.websocket_manager.publish_event(
-                'pipeline:stage_complete',
+                "pipeline:stage_complete",
                 {
-                    'pipeline_id': pipeline_id,
-                    'stage_name': stage_name,
-                    'stage_number': event.data.get('stage_number'),
-                    'result': event.data.get('result', {}),
-                    'completed_at': event.timestamp.isoformat()
+                    "pipeline_id": pipeline_id,
+                    "stage_name": stage_name,
+                    "stage_number": event.data.get("stage_number"),
+                    "result": event.data.get("result", {}),
+                    "completed_at": event.timestamp.isoformat()
                 },
                 room=f"pipeline:{pipeline_id}"
             )
@@ -467,16 +466,16 @@ class IntegrationManager:
                 return
 
             progress_data = {
-                'pipeline_id': pipeline_id,
-                'overall_progress': event.data.get('overall_progress', 0),
-                'current_stage': event.data.get('current_stage'),
-                'stage_progress': event.data.get('stage_progress', {}),
-                'estimated_completion': event.data.get('estimated_completion'),
-                'updated_at': event.timestamp.isoformat()
+                "pipeline_id": pipeline_id,
+                "overall_progress": event.data.get("overall_progress", 0),
+                "current_stage": event.data.get("current_stage"),
+                "stage_progress": event.data.get("stage_progress", {}),
+                "estimated_completion": event.data.get("estimated_completion"),
+                "updated_at": event.timestamp.isoformat()
             }
 
             await self.websocket_manager.publish_event(
-                'pipeline:progress',
+                "pipeline:progress",
                 progress_data,
                 room=f"pipeline:{pipeline_id}"
             )
@@ -484,7 +483,7 @@ class IntegrationManager:
             self.logger.debug(
                 "Pipeline progress event processed",
                 pipeline_id=pipeline_id,
-                overall_progress=event.data.get('overall_progress', 0)
+                overall_progress=event.data.get("overall_progress", 0)
             )
 
         except Exception as e:
@@ -498,14 +497,14 @@ class IntegrationManager:
                 return
 
             await self.websocket_manager.publish_event(
-                'pipeline:complete',
+                "pipeline:complete",
                 {
-                    'pipeline_id': pipeline_id,
-                    'status': 'completed',
-                    'results': event.data.get('results', {}),
-                    'overall_quality_score': event.data.get('overall_quality_score'),
-                    'total_duration_seconds': event.data.get('total_duration_seconds'),
-                    'completed_at': event.timestamp.isoformat()
+                    "pipeline_id": pipeline_id,
+                    "status": "completed",
+                    "results": event.data.get("results", {}),
+                    "overall_quality_score": event.data.get("overall_quality_score"),
+                    "total_duration_seconds": event.data.get("total_duration_seconds"),
+                    "completed_at": event.timestamp.isoformat()
                 },
                 room=f"pipeline:{pipeline_id}"
             )
@@ -513,7 +512,7 @@ class IntegrationManager:
             self.logger.info(
                 "Pipeline complete event processed",
                 pipeline_id=pipeline_id,
-                total_duration_seconds=event.data.get('total_duration_seconds')
+                total_duration_seconds=event.data.get("total_duration_seconds")
             )
 
         except Exception as e:
@@ -528,14 +527,14 @@ class IntegrationManager:
                 return
 
             await self.websocket_manager.publish_event(
-                'agent:status_updated',
+                "agent:status_updated",
                 {
-                    'agent_id': agent_id,
-                    'status': event.data.get('status'),
-                    'capabilities': event.data.get('capabilities', []),
-                    'current_tasks': event.data.get('current_tasks', 0),
-                    'max_tasks': event.data.get('max_tasks', 0),
-                    'updated_at': event.timestamp.isoformat()
+                    "agent_id": agent_id,
+                    "status": event.data.get("status"),
+                    "capabilities": event.data.get("capabilities", []),
+                    "current_tasks": event.data.get("current_tasks", 0),
+                    "max_tasks": event.data.get("max_tasks", 0),
+                    "updated_at": event.timestamp.isoformat()
                 },
                 room=f"agent:{agent_id}"
             )
@@ -543,7 +542,7 @@ class IntegrationManager:
             self.logger.info(
                 "Agent status update event processed",
                 agent_id=agent_id,
-                status=event.data.get('status')
+                status=event.data.get("status")
             )
 
         except Exception as e:
@@ -553,28 +552,28 @@ class IntegrationManager:
     async def _handle_queue_status_update(self, event: IntegrationEvent) -> None:
         """Handle queue status update event."""
         try:
-            queue_data = event.data.get('queue_stats', {})
+            queue_data = event.data.get("queue_stats", {})
 
             await self.websocket_manager.publish_event(
-                'queue:status_updated',
+                "queue:status_updated",
                 {
-                    'total_queued': queue_data.get('total_queued', 0),
-                    'by_priority': queue_data.get('by_priority', {}),
-                    'average_queue_time_seconds': queue_data.get('average_queue_time_seconds'),
-                    'updated_at': event.timestamp.isoformat()
+                    "total_queued": queue_data.get("total_queued", 0),
+                    "by_priority": queue_data.get("by_priority", {}),
+                    "average_queue_time_seconds": queue_data.get("average_queue_time_seconds"),
+                    "updated_at": event.timestamp.isoformat()
                 }
             )
 
             self.logger.debug(
                 "Queue status update event processed",
-                total_queued=queue_data.get('total_queued', 0)
+                total_queued=queue_data.get("total_queued", 0)
             )
 
         except Exception as e:
             self.logger.error("Error handling queue status update event", error=str(e))
 
     # Public API Methods
-    async def create_pipeline_task(self, pipeline_config: Dict[str, Any],
+    async def create_pipeline_task(self, pipeline_config: dict[str, Any],
                                  user_id: str) -> str:
         """
         Create a pipeline task and initiate WebSocket notifications.
@@ -592,11 +591,11 @@ class IntegrationManager:
 
             # Create task data
             task_data = {
-                'task_id': task_id,
-                'task_type': 'pipeline_execution',
-                'pipeline_config': pipeline_config,
-                'user_id': user_id,
-                'created_at': datetime.utcnow().isoformat()
+                "task_id": task_id,
+                "task_type": "pipeline_execution",
+                "pipeline_config": pipeline_config,
+                "user_id": user_id,
+                "created_at": datetime.utcnow().isoformat()
             }
 
             # Publish task created event
@@ -617,7 +616,7 @@ class IntegrationManager:
 
         except Exception as e:
             self.logger.error("Error creating pipeline task", error=str(e))
-            raise IntegrationError(f"Failed to create pipeline task: {str(e)}")
+            raise IntegrationError(f"Failed to create pipeline task: {e!s}")
 
     async def update_task_progress(self, task_id: str, progress: float,
                                  status: str, message: str = "") -> None:
@@ -632,9 +631,9 @@ class IntegrationManager:
         """
         try:
             progress_data = {
-                'progress': progress,
-                'status': status,
-                'message': message
+                "progress": progress,
+                "status": status,
+                "message": message
             }
 
             await self.publish_integration_event(
@@ -645,14 +644,14 @@ class IntegrationManager:
 
         except Exception as e:
             self.logger.error("Error updating task progress", task_id=task_id, error=str(e))
-            raise IntegrationError(f"Failed to update task progress: {str(e)}")
+            raise IntegrationError(f"Failed to update task progress: {e!s}")
 
     async def publish_integration_event(self, event_type: IntegrationEventType,
-                                      task_id: Optional[str] = None,
-                                      pipeline_id: Optional[str] = None,
-                                      agent_id: Optional[str] = None,
-                                      user_id: Optional[str] = None,
-                                      data: Optional[Dict[str, Any]] = None) -> None:
+                                      task_id: str | None = None,
+                                      pipeline_id: str | None = None,
+                                      agent_id: str | None = None,
+                                      user_id: str | None = None,
+                                      data: dict[str, Any] | None = None) -> None:
         """
         Publish integration event to Redis and WebSocket.
 
@@ -666,14 +665,14 @@ class IntegrationManager:
         """
         try:
             event_data = {
-                'event_type': event_type.value,
-                'task_id': task_id,
-                'pipeline_id': pipeline_id,
-                'agent_id': agent_id,
-                'user_id': user_id,
-                'data': data or {},
-                'timestamp': datetime.utcnow().isoformat(),
-                'source': 'integration_manager'
+                "event_type": event_type.value,
+                "task_id": task_id,
+                "pipeline_id": pipeline_id,
+                "agent_id": agent_id,
+                "user_id": user_id,
+                "data": data or {},
+                "timestamp": datetime.utcnow().isoformat(),
+                "source": "integration_manager"
             }
 
             # Determine target channel
@@ -697,30 +696,30 @@ class IntegrationManager:
 
         except Exception as e:
             self.logger.error("Error publishing integration event", event_type=event_type.value, error=str(e))
-            raise IntegrationError(f"Failed to publish integration event: {str(e)}")
+            raise IntegrationError(f"Failed to publish integration event: {e!s}")
 
-    async def get_integration_status(self) -> Dict[str, Any]:
+    async def get_integration_status(self) -> dict[str, Any]:
         """Get integration manager status."""
         try:
             return {
-                'status': 'active' if self._initialized else 'inactive',
-                'websocket_connections': self.websocket_manager.get_connection_count(),
-                'event_handlers_registered': len(self.event_handlers),
-                'channels': {
-                    'task': self.task_channel,
-                    'pipeline': self.pipeline_channel,
-                    'agent': self.agent_channel,
-                    'queue': self.queue_channel
+                "status": "active" if self._initialized else "inactive",
+                "websocket_connections": self.websocket_manager.get_connection_count(),
+                "event_handlers_registered": len(self.event_handlers),
+                "channels": {
+                    "task": self.task_channel,
+                    "pipeline": self.pipeline_channel,
+                    "agent": self.agent_channel,
+                    "queue": self.queue_channel
                 },
-                'timestamp': datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat()
             }
 
         except Exception as e:
             self.logger.error("Error getting integration status", error=str(e))
             return {
-                'status': 'error',
-                'error': str(e),
-                'timestamp': datetime.utcnow().isoformat()
+                "status": "error",
+                "error": str(e),
+                "timestamp": datetime.utcnow().isoformat()
             }
 
     async def shutdown(self) -> None:
@@ -729,7 +728,7 @@ class IntegrationManager:
             self.logger.info("Shutting down integration manager")
 
             # Unsubscribe from Redis channels
-            if hasattr(self, 'pubsub_client'):
+            if hasattr(self, "pubsub_client"):
                 await self.pubsub_client.unsubscribe()
                 await self.pubsub_client.close()
 

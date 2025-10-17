@@ -6,15 +6,13 @@ for the MCP server following security best practices.
 """
 
 import time
-from typing import Optional
-from datetime import datetime, timedelta
-from redis.asyncio import Redis
+
 import jwt
 import structlog
+from redis.asyncio import Redis
 
 from mcp_server.config import settings
 from mcp_server.exceptions import AuthenticationError
-
 
 logger = structlog.get_logger(__name__)
 
@@ -34,7 +32,7 @@ class TokenManager:
         self.agent_token_prefix = "agent_tokens:"
         logger.info("TokenManager initialized")
 
-    async def blacklist_token(self, token: str, agent_id: str, expiration: Optional[int] = None) -> None:
+    async def blacklist_token(self, token: str, agent_id: str, expiration: int | None = None) -> None:
         """
         Add a token to the blacklist.
 
@@ -52,7 +50,7 @@ class TokenManager:
                     algorithms=["HS256"],
                     options={"verify_signature": False}
                 )
-                exp = decoded.get('exp')
+                exp = decoded.get("exp")
                 if exp:
                     # Calculate remaining time until expiration
                     remaining_time = exp - int(time.time())
@@ -107,7 +105,7 @@ class TokenManager:
         if tokens:
             # Blacklist each token with a 24-hour expiration
             for token in tokens:
-                token = token.decode('utf-8')  # Redis returns bytes
+                token = token.decode("utf-8")  # Redis returns bytes
                 token_key = f"{self.token_blacklist_prefix}{token}"
                 await self.redis.setex(token_key, 86400, "blacklisted")  # 24 hours
 
@@ -154,7 +152,7 @@ class TokenManager:
 
 
 # Global token manager instance
-_token_manager: Optional[TokenManager] = None
+_token_manager: TokenManager | None = None
 
 
 async def get_token_manager() -> TokenManager:

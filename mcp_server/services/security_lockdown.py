@@ -5,17 +5,16 @@ This is a placeholder file to satisfy documentation references.
 Full implementation will be provided in a future update.
 """
 
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
-from redis.asyncio import Redis
-import structlog
 import asyncio
+from datetime import datetime
+from typing import Any
 
+import structlog
+from redis.asyncio import Redis
+
+from ..exceptions import SecurityError
 from ..models.agent import AgentStatus
-from ..exceptions import SecurityError, AuthenticationError
 from .auth import AuthService
-from .token_manager import TokenManager
-
 
 logger = structlog.get_logger(__name__)
 
@@ -38,7 +37,7 @@ class SecurityLockdownManager:
         self.incident_prefix = "security_incidents:"
         logger.info("SecurityLockdownManager initialized")
 
-    async def initiate_emergency_lockdown(self, reason: str, initiated_by: str = "system") -> Dict[str, Any]:
+    async def initiate_emergency_lockdown(self, reason: str, initiated_by: str = "system") -> dict[str, Any]:
         """
         Initiate emergency security lockdown.
 
@@ -100,7 +99,7 @@ class SecurityLockdownManager:
         result = await self.redis.get(lockdown_key)
         return result is not None
 
-    async def get_lockdown_status(self) -> Optional[Dict[str, Any]]:
+    async def get_lockdown_status(self) -> dict[str, Any] | None:
         """
         Get current lockdown status.
 
@@ -112,12 +111,12 @@ class SecurityLockdownManager:
         if result:
             import ast
             try:
-                return ast.literal_eval(result.decode('utf-8'))
+                return ast.literal_eval(result.decode("utf-8"))
             except:
                 return {"active": True, "error": "Could not parse lockdown data"}
         return None
 
-    async def lift_lockdown(self, lifted_by: str = "system") -> Dict[str, Any]:
+    async def lift_lockdown(self, lifted_by: str = "system") -> dict[str, Any]:
         """
         Lift the security lockdown.
 
@@ -143,7 +142,7 @@ class SecurityLockdownManager:
             "previous_lockdown": lockdown_status
         }
 
-    async def initiate_agent_lockdown(self, agent_ids: List[str], reason: str, initiated_by: str = "system") -> Dict[str, Any]:
+    async def initiate_agent_lockdown(self, agent_ids: list[str], reason: str, initiated_by: str = "system") -> dict[str, Any]:
         """
         Initiate lockdown for specific agents.
 
@@ -196,7 +195,7 @@ class SecurityLockdownManager:
         return results
 
     async def log_security_incident(self, incident_type: str, severity: str, description: str,
-                                   agent_id: Optional[str] = None, source: str = "system") -> str:
+                                   agent_id: str | None = None, source: str = "system") -> str:
         """
         Log a security incident.
 
@@ -236,7 +235,7 @@ class SecurityLockdownManager:
         logger.warning("SECURITY INCIDENT LOGGED", incident_id=incident_id, **incident_data)
         return incident_id
 
-    async def get_recent_security_incidents(self, limit: int = 100) -> List[Dict[str, Any]]:
+    async def get_recent_security_incidents(self, limit: int = 100) -> list[dict[str, Any]]:
         """
         Get recent security incidents.
 
@@ -258,18 +257,18 @@ class SecurityLockdownManager:
             if incident_data:
                 import ast
                 try:
-                    incident = ast.literal_eval(incident_data.decode('utf-8'))
+                    incident = ast.literal_eval(incident_data.decode("utf-8"))
                     incidents.append(incident)
                 except:
                     # If parsing fails, store basic info
                     incidents.append({
-                        "id": incident_id.decode('utf-8'),
+                        "id": incident_id.decode("utf-8"),
                         "error": "Could not parse incident data"
                     })
 
         return incidents
 
-    async def enforce_rate_limiting_lockdown(self, agent_id: str, violation_details: Dict[str, Any]) -> None:
+    async def enforce_rate_limiting_lockdown(self, agent_id: str, violation_details: dict[str, Any]) -> None:
         """
         Enforce rate limiting lockdown for an agent.
 
@@ -308,7 +307,7 @@ class SecurityLockdownManager:
 
 
 # Global security lockdown manager instance
-_security_lockdown_manager: Optional[SecurityLockdownManager] = None
+_security_lockdown_manager: SecurityLockdownManager | None = None
 
 
 async def get_security_lockdown_manager() -> SecurityLockdownManager:

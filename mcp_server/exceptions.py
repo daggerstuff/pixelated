@@ -5,7 +5,7 @@ Defines custom exception classes for the MCP server following the
 established patterns from the Pixelated platform.
 """
 
-from typing import Optional, Dict, Any
+from typing import Any
 
 
 class MCPException(Exception):
@@ -16,8 +16,8 @@ class MCPException(Exception):
         message: str,
         error_code: str = "INTERNAL_ERROR",
         status_code: int = 500,
-        details: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None
+        details: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None
     ) -> None:
         """
         Initialize MCP exception.
@@ -118,7 +118,7 @@ class RateLimitExceededError(MCPException):
     def __init__(
         self,
         message: str = "Rate limit exceeded",
-        retry_after: Optional[int] = None,
+        retry_after: int | None = None,
         **kwargs: Any
     ) -> None:
         super().__init__(

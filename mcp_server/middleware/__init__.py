@@ -6,13 +6,13 @@ authentication, rate limiting, logging, and request ID middleware.
 """
 
 from .auth import AuthMiddleware as AuthenticationMiddleware
-from .rate_limit import RateLimitMiddleware
 from .logging import LoggingMiddleware
+from .rate_limit import RateLimitMiddleware
 from .request_id import RequestIDMiddleware
 
 __all__ = [
     "AuthenticationMiddleware",
-    "RateLimitMiddleware",
     "LoggingMiddleware",
+    "RateLimitMiddleware",
     "RequestIDMiddleware"
 ]

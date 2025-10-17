@@ -8,7 +8,6 @@ configured (returns empty lists / None) to avoid import-time/runtime
 failures during pytest collection.
 """
 
-from typing import Optional, List
 
 import structlog
 
@@ -24,20 +23,19 @@ except Exception:  # pragma: no cover - redis lib may be missing in some test ru
 
 from mcp_server.models.agent import Agent
 
-
 logger = structlog.get_logger(__name__)
 
 
 class AgentService:
     """Minimal agent service used by routers and tests."""
 
-    def __init__(self, db: Optional[AsyncIOMotorDatabase] = None, redis_client: Optional[Redis] = None):
+    def __init__(self, db: AsyncIOMotorDatabase | None = None, redis_client: Redis | None = None):
         self.db = db
         self.redis = redis_client
         # Mongo collection if provided
         self.agents_collection = getattr(db, "agents", None) if db is not None else None
 
-    async def list_agents(self, status: Optional[str] = None) -> List[Agent]:
+    async def list_agents(self, status: str | None = None) -> list[Agent]:
         """Return a list of agents. If no DB is configured, return empty list."""
         if not self.agents_collection:
             return []
@@ -52,7 +50,7 @@ class AgentService:
             logger.debug("AgentService.list_agents failed, returning empty list", error=str(e))
             return []
 
-    async def get_agent_by_id(self, agent_id: str) -> Optional[Agent]:
+    async def get_agent_by_id(self, agent_id: str) -> Agent | None:
         """Return an Agent by ID or None when not found / DB not configured."""
         if not self.agents_collection:
             return None
@@ -68,10 +66,10 @@ class AgentService:
 
 
 # Global agent service instance used by dependency injection
-_agent_service: Optional[AgentService] = None
+_agent_service: AgentService | None = None
 
 
-def init_agent_service(db: Optional[AsyncIOMotorDatabase] = None, redis_client: Optional[Redis] = None) -> AgentService:
+def init_agent_service(db: AsyncIOMotorDatabase | None = None, redis_client: Redis | None = None) -> AgentService:
     """Initialize and return the global AgentService instance."""
     global _agent_service
     _agent_service = AgentService(db=db, redis_client=redis_client)

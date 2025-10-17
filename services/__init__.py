@@ -6,11 +6,11 @@ the submodules so tests that run with the repository root on PYTHONPATH will
 find the modules.
 """
 
-from importlib import import_module
-import sys
-import types
 import importlib.util
 import os
+import sys
+import types
+from importlib import import_module
 
 
 def _load_submodule(name: str):
@@ -23,8 +23,8 @@ def _load_submodule(name: str):
     except Exception:
         # Fallback: load directly from the file system into the mcp_server
         # package name to preserve relative import behavior.
-        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        candidate = os.path.join(repo_root, 'mcp_server', 'services', f"{name}.py")
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        candidate = os.path.join(repo_root, "mcp_server", "services", f"{name}.py")
         if os.path.exists(candidate):
             mod_name = full
             if mod_name in sys.modules:
@@ -57,14 +57,12 @@ def __getattr__(name: str):
 
 
 def __dir__():
-    return list(globals().keys()) + ['integration_manager', 'flask_integration', 'websocket_manager']
+    return list(globals().keys()) + ["integration_manager", "flask_integration", "websocket_manager"]
 
 
 # Ensure Python's regular import machinery can find submodules under
 # mcp_server/services when tests do `import services.foo`.
-import sys
-import os
-repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-services_pkg_path = os.path.join(repo_root, 'mcp_server', 'services')
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+services_pkg_path = os.path.join(repo_root, "mcp_server", "services")
 if services_pkg_path not in __path__:
     __path__.append(services_pkg_path)

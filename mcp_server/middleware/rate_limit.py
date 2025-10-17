@@ -4,7 +4,8 @@ This file provides a tiny, import-safe `RateLimitMiddleware` to satisfy
 imports in other modules. It intentionally contains no external dependencies
 and performs no runtime side-effects.
 """
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 
 
 class RateLimitMiddleware:

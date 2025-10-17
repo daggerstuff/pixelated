@@ -7,16 +7,16 @@ Flask service 6-stage pipeline orchestration, and Redis event coordination.
 
 import asyncio
 import json
-import pytest
 from datetime import datetime
-from unittest.mock import Mock, AsyncMock, patch
-from typing import Dict, Any, List
+from unittest.mock import AsyncMock, Mock, patch
 
-from services.integration_manager import IntegrationManager, IntegrationEventType
+import pytest
 from services.flask_integration import FlaskIntegrationService, PipelineStatus
+from services.integration_manager import IntegrationEventType, IntegrationManager
 from services.websocket_manager import WebSocketManager
+
 from config import MCPConfig
-from exceptions import ValidationError, IntegrationError
+from exceptions import ValidationError
 
 
 class TestIntegrationWebSocketFlask:
@@ -85,19 +85,19 @@ class TestIntegrationWebSocketFlask:
     async def test_pipeline_execution_integration(self, flask_integration_service, mock_integration_manager):
         """Test complete pipeline execution with WebSocket integration."""
         # Mock aiohttp session
-        with patch('aiohttp.ClientSession') as mock_session_class:
+        with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = AsyncMock()
             mock_session_class.return_value = mock_session
 
             # Mock successful API responses for each stage
             mock_responses = []
-            for stage in ['data_ingestion', 'preprocessing', 'bias_detection', 'standardization', 'validation', 'output_generation']:
+            for stage in ["data_ingestion", "preprocessing", "bias_detection", "standardization", "validation", "output_generation"]:
                 mock_response = AsyncMock()
                 mock_response.status = 200
                 mock_response.json = AsyncMock(return_value={
-                    'status': 'completed',
-                    'data': {'stage': stage, 'result': f'{stage}_result'},
-                    'duration_seconds': 2.0
+                    "status": "completed",
+                    "data": {"stage": stage, "result": f"{stage}_result"},
+                    "duration_seconds": 2.0
                 })
                 mock_responses.append(mock_response)
 
@@ -108,16 +108,16 @@ class TestIntegrationWebSocketFlask:
 
             # Test pipeline configuration
             pipeline_config = {
-                'source_format': 'json',
-                'target_format': 'csv',
-                'input_data': {'test': 'data'},
-                'processing_options': {'bias_detection': True}
+                "source_format": "json",
+                "target_format": "csv",
+                "input_data": {"test": "data"},
+                "processing_options": {"bias_detection": True}
             }
 
             # Execute pipeline
             execution_id = await flask_integration_service.execute_pipeline(
                 pipeline_config,
-                'test_user_123'
+                "test_user_123"
             )
 
             # Verify execution was created
@@ -144,13 +144,13 @@ class TestIntegrationWebSocketFlask:
         # Test progress update event
         await mock_integration_manager.publish_integration_event(
             IntegrationEventType.PIPELINE_PROGRESS,
-            pipeline_id='test_pipeline_123',
-            user_id='test_user_123',
+            pipeline_id="test_pipeline_123",
+            user_id="test_user_123",
             data={
-                'overall_progress': 50.0,
-                'current_stage': 'bias_detection',
-                'stage_progress': {'bias_detection': 75.0},
-                'message': 'Analyzing dataset for biases'
+                "overall_progress": 50.0,
+                "current_stage": "bias_detection",
+                "stage_progress": {"bias_detection": 75.0},
+                "message": "Analyzing dataset for biases"
             }
         )
 
@@ -166,13 +166,13 @@ class TestIntegrationWebSocketFlask:
         # Test stage completion event
         await mock_integration_manager.publish_integration_event(
             IntegrationEventType.PIPELINE_STAGE_COMPLETE,
-            pipeline_id='test_pipeline_123',
-            user_id='test_user_123',
+            pipeline_id="test_pipeline_123",
+            user_id="test_user_123",
             data={
-                'stage_name': 'data_ingestion',
-                'stage_number': 1,
-                'result': {'records_processed': 1000},
-                'overall_progress': 16.67
+                "stage_name": "data_ingestion",
+                "stage_number": 1,
+                "result": {"records_processed": 1000},
+                "overall_progress": 16.67
             }
         )
 
@@ -182,55 +182,55 @@ class TestIntegrationWebSocketFlask:
         channel = call_args[0][0]
         event_data = json.loads(call_args[0][1])
 
-        assert channel == 'mcp:pipeline_events'
-        assert event_data['event_type'] == 'pipeline:stage_complete'
-        assert event_data['pipeline_id'] == 'test_pipeline_123'
-        assert event_data['data']['stage_name'] == 'data_ingestion'
+        assert channel == "mcp:pipeline_events"
+        assert event_data["event_type"] == "pipeline:stage_complete"
+        assert event_data["pipeline_id"] == "test_pipeline_123"
+        assert event_data["data"]["stage_name"] == "data_ingestion"
 
     @pytest.mark.asyncio
     async def test_pipeline_error_handling_integration(self, flask_integration_service, mock_integration_manager):
         """Test error handling with WebSocket notifications."""
         # Mock aiohttp session with error
-        with patch('aiohttp.ClientSession') as mock_session_class:
+        with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = AsyncMock()
             mock_session_class.return_value = mock_session
 
             # Mock failed API response
             mock_response = AsyncMock()
             mock_response.status = 500
-            mock_response.text = AsyncMock(return_value='Internal Server Error')
+            mock_response.text = AsyncMock(return_value="Internal Server Error")
             mock_session.post = AsyncMock(return_value=mock_response)
 
             await flask_integration_service.initialize()
 
             # Test with invalid configuration to trigger error
             pipeline_config = {
-                'source_format': 'invalid_format',
-                'target_format': 'csv',
-                'input_data': {}
+                "source_format": "invalid_format",
+                "target_format": "csv",
+                "input_data": {}
             }
 
             with pytest.raises(ValidationError):
                 await flask_integration_service.execute_pipeline(
                     pipeline_config,
-                    'test_user_123'
+                    "test_user_123"
                 )
 
     @pytest.mark.asyncio
     async def test_real_time_progress_tracking(self, mock_integration_manager):
         """Test real-time progress tracking through integration events."""
-        execution_id = 'test_execution_123'
-        user_id = 'test_user_123'
+        execution_id = "test_execution_123"
+        user_id = "test_user_123"
 
         # Simulate progress updates for each stage
         progress_updates = [
-            (0, 'initialization', 'Pipeline execution started'),
-            (16, 'data_ingestion', 'Processing input data'),
-            (33, 'preprocessing', 'Cleaning and standardizing data'),
-            (50, 'bias_detection', 'Analyzing dataset for biases'),
-            (66, 'standardization', 'Applying data standards'),
-            (83, 'validation', 'Validating data quality'),
-            (100, 'output_generation', 'Generating final output')
+            (0, "initialization", "Pipeline execution started"),
+            (16, "data_ingestion", "Processing input data"),
+            (33, "preprocessing", "Cleaning and standardizing data"),
+            (50, "bias_detection", "Analyzing dataset for biases"),
+            (66, "standardization", "Applying data standards"),
+            (83, "validation", "Validating data quality"),
+            (100, "output_generation", "Generating final output")
         ]
 
         for progress, stage, message in progress_updates:
@@ -239,10 +239,10 @@ class TestIntegrationWebSocketFlask:
                 pipeline_id=execution_id,
                 user_id=user_id,
                 data={
-                    'overall_progress': progress,
-                    'current_stage': stage,
-                    'message': message,
-                    'estimated_completion': f'{(100 - progress) * 0.3:.1f} seconds remaining'
+                    "overall_progress": progress,
+                    "current_stage": stage,
+                    "message": message,
+                    "estimated_completion": f"{(100 - progress) * 0.3:.1f} seconds remaining"
                 }
             )
 
@@ -257,14 +257,15 @@ class TestIntegrationWebSocketFlask:
     async def test_pipeline_cancellation_integration(self, flask_integration_service, mock_integration_manager):
         """Test pipeline cancellation with WebSocket notifications."""
         # Create a mock execution
-        execution_id = 'test_cancel_execution_123'
-        from mcp_server.services.flask_integration import PipelineExecution, PipelineStatus
+        execution_id = "test_cancel_execution_123"
         from datetime import datetime
+
+        from mcp_server.services.flask_integration import PipelineExecution, PipelineStatus
 
         execution = PipelineExecution(
             execution_id=execution_id,
-            user_id='test_user_123',
-            pipeline_config={'test': 'config'},
+            user_id="test_user_123",
+            pipeline_config={"test": "config"},
             status=PipelineStatus.RUNNING,
             current_stage=None,
             stage_results={},
@@ -278,7 +279,7 @@ class TestIntegrationWebSocketFlask:
         flask_integration_service.active_executions[execution_id] = execution
 
         # Cancel execution
-        success = await flask_integration_service.cancel_execution(execution_id, 'test_user_123')
+        success = await flask_integration_service.cancel_execution(execution_id, "test_user_123")
 
         assert success is True
         assert execution.status == PipelineStatus.CANCELLED
@@ -295,8 +296,8 @@ class TestIntegrationWebSocketFlask:
     @pytest.mark.asyncio
     async def test_concurrent_pipeline_executions(self, mock_integration_manager):
         """Test multiple concurrent pipeline executions."""
-        execution_ids = [f'concurrent_exec_{i}' for i in range(3)]
-        user_ids = ['user_1', 'user_2', 'user_3']
+        execution_ids = [f"concurrent_exec_{i}" for i in range(3)]
+        user_ids = ["user_1", "user_2", "user_3"]
 
         # Simulate concurrent progress updates
         async def simulate_execution(execution_id, user_id):
@@ -306,9 +307,9 @@ class TestIntegrationWebSocketFlask:
                     pipeline_id=execution_id,
                     user_id=user_id,
                     data={
-                        'overall_progress': progress,
-                        'current_stage': f'stage_{progress}',
-                        'message': f'Progress {progress}%'
+                        "overall_progress": progress,
+                        "current_stage": f"stage_{progress}",
+                        "message": f"Progress {progress}%"
                     }
                 )
                 await asyncio.sleep(0.01)  # Small delay to simulate processing
@@ -330,16 +331,16 @@ class TestIntegrationWebSocketFlask:
     async def test_error_recovery_and_fallback_mechanisms(self, flask_integration_service):
         """Test error recovery and fallback mechanisms."""
         # Mock service health check failure
-        with patch.object(flask_integration_service, 'get_service_health') as mock_health:
+        with patch.object(flask_integration_service, "get_service_health") as mock_health:
             mock_health.return_value = {
-                'status': 'unhealthy',
-                'error': 'Flask service unavailable',
-                'timestamp': datetime.utcnow().isoformat()
+                "status": "unhealthy",
+                "error": "Flask service unavailable",
+                "timestamp": datetime.utcnow().isoformat()
             }
 
             health_status = await flask_integration_service.get_service_health()
-            assert health_status['status'] == 'unhealthy'
-            assert 'error' in health_status
+            assert health_status["status"] == "unhealthy"
+            assert "error" in health_status
 
     @pytest.mark.asyncio
     async def test_integration_manager_event_processing(self, mock_integration_manager):
@@ -349,11 +350,11 @@ class TestIntegrationWebSocketFlask:
 
         test_event = IntegrationEvent(
             event_type=IntegrationEventType.PIPELINE_STAGE_START,
-            pipeline_id='test_pipeline_123',
-            user_id='test_user_123',
-            data={'stage_name': 'test_stage', 'progress': 50},
+            pipeline_id="test_pipeline_123",
+            user_id="test_user_123",
+            data={"stage_name": "test_stage", "progress": 50},
             timestamp=datetime.utcnow(),
-            source='test'
+            source="test"
         )
 
         # Process the event
@@ -366,7 +367,7 @@ class TestIntegrationWebSocketFlask:
     async def test_complete_integration_workflow(self, flask_integration_service, mock_integration_manager, mock_websocket_manager):
         """Test complete integration workflow from pipeline execution to WebSocket updates."""
         # Mock aiohttp session
-        with patch('aiohttp.ClientSession') as mock_session_class:
+        with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = AsyncMock()
             mock_session_class.return_value = mock_session
 
@@ -374,9 +375,9 @@ class TestIntegrationWebSocketFlask:
             mock_response = AsyncMock()
             mock_response.status = 200
             mock_response.json = AsyncMock(return_value={
-                'status': 'completed',
-                'data': {'result': 'success'},
-                'duration_seconds': 2.0
+                "status": "completed",
+                "data": {"result": "success"},
+                "duration_seconds": 2.0
             })
             mock_session.post = AsyncMock(return_value=mock_response)
 
@@ -384,14 +385,14 @@ class TestIntegrationWebSocketFlask:
 
             # Execute pipeline
             pipeline_config = {
-                'source_format': 'json',
-                'target_format': 'csv',
-                'input_data': {'test': 'data'}
+                "source_format": "json",
+                "target_format": "csv",
+                "input_data": {"test": "data"}
             }
 
             execution_id = await flask_integration_service.execute_pipeline(
                 pipeline_config,
-                'test_user_123'
+                "test_user_123"
             )
 
             # Wait for execution to start
@@ -404,8 +405,8 @@ class TestIntegrationWebSocketFlask:
             await mock_integration_manager.publish_integration_event(
                 IntegrationEventType.PIPELINE_PROGRESS,
                 pipeline_id=execution_id,
-                user_id='test_user_123',
-                data={'overall_progress': 50, 'current_stage': 'bias_detection'}
+                user_id="test_user_123",
+                data={"overall_progress": 50, "current_stage": "bias_detection"}
             )
 
             # Verify WebSocket manager received events
@@ -429,9 +430,9 @@ class TestIntegrationPerformance:
         for i in range(100):
             await mock_integration_manager.publish_integration_event(
                 IntegrationEventType.PIPELINE_PROGRESS,
-                pipeline_id=f'test_pipeline_{i}',
-                user_id='test_user',
-                data={'progress': i}
+                pipeline_id=f"test_pipeline_{i}",
+                user_id="test_user",
+                data={"progress": i}
             )
 
         end_time = time.time()

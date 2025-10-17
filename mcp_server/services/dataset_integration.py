@@ -12,21 +12,19 @@ and the MCP server's real-time orchestration infrastructure, enabling:
 
 import asyncio
 import json
-import logging
-from datetime import datetime
-from typing import Dict, Any, Optional, List, Callable
+from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
+from typing import Any
 
 import aiohttp
 import structlog
 from redis.asyncio import Redis
 
 from mcp_server.config import MCPConfig
-from mcp_server.exceptions import IntegrationError, ValidationError, ServiceUnavailableError
+from mcp_server.exceptions import IntegrationError, ValidationError
 from mcp_server.services.integration_manager import IntegrationEventType
-from mcp_server.services.task import TaskService, get_task_service
 from mcp_server.services.websocket_manager import WebSocketManager
 
 logger = structlog.get_logger(__name__)
@@ -60,19 +58,19 @@ class DatasetExecution:
     """Dataset execution tracking data structure."""
     execution_id: str
     user_id: str
-    dataset_config: Dict[str, Any]
+    dataset_config: dict[str, Any]
     status: DatasetStatus
-    current_stage: Optional[DatasetProcessingStage]
-    stage_results: Dict[str, Any]
+    current_stage: DatasetProcessingStage | None
+    stage_results: dict[str, Any]
     start_time: datetime
-    end_time: Optional[datetime]
+    end_time: datetime | None
     overall_progress: float
-    quality_score: Optional[float]
-    bias_score: Optional[float]
-    error_message: Optional[str]
-    source_locations: List[str]
-    output_locations: List[str]
-    metadata: Dict[str, Any]
+    quality_score: float | None
+    bias_score: float | None
+    error_message: str | None
+    source_locations: list[str]
+    output_locations: list[str]
+    metadata: dict[str, Any]
 
 
 @dataclass
@@ -82,9 +80,9 @@ class DatasetProgressUpdate:
     stage: DatasetProcessingStage
     progress: float
     message: str
-    metrics: Dict[str, Any]
+    metrics: dict[str, Any]
     timestamp: datetime
-    estimated_completion: Optional[datetime] = None
+    estimated_completion: datetime | None = None
 
 
 class DatasetIntegrationService:
@@ -100,7 +98,7 @@ class DatasetIntegrationService:
     """
 
     def __init__(self, config: MCPConfig, redis_client: Redis,
-                 integration_manager=None, websocket_manager: Optional[WebSocketManager] = None):
+                 integration_manager=None, websocket_manager: WebSocketManager | None = None):
         """
         Initialize dataset integration service.
 
@@ -117,23 +115,23 @@ class DatasetIntegrationService:
         self.logger = structlog.get_logger(__name__)
 
         # Dataset pipeline configuration
-        self.dataset_api_url = config.external_services.get('dataset_api_url', 'http://localhost:5001')
+        self.dataset_api_url = config.external_services.get("dataset_api_url", "http://localhost:5001")
         self.request_timeout = 600  # 10 minutes for large datasets
         self.session = None
 
         # Execution tracking
-        self.active_executions: Dict[str, DatasetExecution] = {}
+        self.active_executions: dict[str, DatasetExecution] = {}
         self.execution_timeout = 7200  # 2 hours for complex datasets
 
         # Storage configuration
         self.storage_config = {
-            's3': {
-                'bucket': config.external_services.get('s3_bucket', 'pixelated-datasets'),
-                'region': config.external_services.get('aws_region', 'us-east-1')
+            "s3": {
+                "bucket": config.external_services.get("s3_bucket", "pixelated-datasets"),
+                "region": config.external_services.get("aws_region", "us-east-1")
             },
-            'google_drive': {
-                'folder_id': config.external_services.get('google_drive_folder_id'),
-                'service_account_path': config.external_services.get('google_service_account_path')
+            "google_drive": {
+                "folder_id": config.external_services.get("google_drive_folder_id"),
+                "service_account_path": config.external_services.get("google_service_account_path")
             }
         }
 
@@ -144,15 +142,15 @@ class DatasetIntegrationService:
         try:
             self.session = aiohttp.ClientSession(
                 timeout=aiohttp.ClientTimeout(total=self.request_timeout),
-                headers={'Content-Type': 'application/json'}
+                headers={"Content-Type": "application/json"}
             )
             self.logger.info("Dataset integration service initialized successfully")
 
         except Exception as e:
             self.logger.error("Failed to initialize dataset integration service", error=str(e))
-            raise IntegrationError(f"Dataset integration service initialization failed: {str(e)}")
+            raise IntegrationError(f"Dataset integration service initialization failed: {e!s}")
 
-    async def process_dataset(self, dataset_config: Dict[str, Any], user_id: str) -> str:
+    async def process_dataset(self, dataset_config: dict[str, Any], user_id: str) -> str:
         """
         Process dataset through the complete pipeline with MCP orchestration.
 
@@ -191,8 +189,8 @@ class DatasetIntegrationService:
                 source_locations=[],
                 output_locations=[],
                 metadata={
-                    'created_at': datetime.utcnow().isoformat(),
-                    'config_hash': self._generate_config_hash(dataset_config)
+                    "created_at": datetime.utcnow().isoformat(),
+                    "config_hash": self._generate_config_hash(dataset_config)
                 }
             )
 
@@ -214,9 +212,9 @@ class DatasetIntegrationService:
             raise
         except Exception as e:
             self.logger.error("Error initiating dataset processing", error=str(e))
-            raise IntegrationError(f"Dataset processing initiation failed: {str(e)}")
+            raise IntegrationError(f"Dataset processing initiation failed: {e!s}")
 
-    async def _process_dataset_async(self, execution_id: str, dataset_config: Dict[str, Any], user_id: str) -> None:
+    async def _process_dataset_async(self, execution_id: str, dataset_config: dict[str, Any], user_id: str) -> None:
         """Process dataset asynchronously with real-time updates."""
         try:
             execution = self.active_executions[execution_id]
@@ -227,10 +225,10 @@ class DatasetIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'stage_name': 'initialization',
-                    'stage_number': 0,
-                    'message': 'Dataset processing started',
-                    'source_count': len(dataset_config.get('sources', []))
+                    "stage_name": "initialization",
+                    "stage_number": 0,
+                    "message": "Dataset processing started",
+                    "source_count": len(dataset_config.get("sources", []))
                 }
             )
 
@@ -259,9 +257,9 @@ class DatasetIntegrationService:
                         execution_id,
                         user_id,
                         {
-                            'stage_name': stage.value,
-                            'stage_number': i,
-                            'overall_progress': execution.overall_progress
+                            "stage_name": stage.value,
+                            "stage_number": i,
+                            "overall_progress": execution.overall_progress
                         }
                     )
 
@@ -274,10 +272,10 @@ class DatasetIntegrationService:
                     execution.stage_results[stage.value] = stage_result
 
                     # Update quality and bias scores
-                    if stage_result.get('quality_score') is not None:
-                        execution.quality_score = stage_result['quality_score']
-                    if stage_result.get('bias_score') is not None:
-                        execution.bias_score = stage_result['bias_score']
+                    if stage_result.get("quality_score") is not None:
+                        execution.quality_score = stage_result["quality_score"]
+                    if stage_result.get("bias_score") is not None:
+                        execution.bias_score = stage_result["bias_score"]
 
                     # Update progress
                     execution.overall_progress = i * 100 / len(stages)
@@ -288,18 +286,18 @@ class DatasetIntegrationService:
                         execution_id,
                         user_id,
                         {
-                            'stage_name': stage.value,
-                            'stage_number': i,
-                            'result': stage_result,
-                            'overall_progress': execution.overall_progress,
-                            'quality_score': execution.quality_score,
-                            'bias_score': execution.bias_score
+                            "stage_name": stage.value,
+                            "stage_number": i,
+                            "result": stage_result,
+                            "overall_progress": execution.overall_progress,
+                            "quality_score": execution.quality_score,
+                            "bias_score": execution.bias_score
                         }
                     )
 
                     # Check for stage failures or safety violations
-                    if stage_result.get('status') == 'failed':
-                        if stage_result.get('safety_violation'):
+                    if stage_result.get("status") == "failed":
+                        if stage_result.get("safety_violation"):
                             execution.status = DatasetStatus.VALIDATION_FAILED
                             execution.error_message = f"Safety validation failed in {stage.value}: {stage_result.get('error', 'Unknown error')}"
                         else:
@@ -312,9 +310,9 @@ class DatasetIntegrationService:
                             execution_id,
                             user_id,
                             {
-                                'stage_name': stage.value,
-                                'error': execution.error_message,
-                                'error_type': 'safety_violation' if stage_result.get('safety_violation') else 'processing_error'
+                                "stage_name": stage.value,
+                                "error": execution.error_message,
+                                "error_type": "safety_violation" if stage_result.get("safety_violation") else "processing_error"
                             }
                         )
                         return
@@ -330,9 +328,9 @@ class DatasetIntegrationService:
                         execution_id,
                         user_id,
                         {
-                            'stage_name': stage.value,
-                            'error': str(e),
-                            'error_type': type(e).__name__
+                            "stage_name": stage.value,
+                            "error": str(e),
+                            "error_type": type(e).__name__
                         }
                     )
                     return
@@ -348,12 +346,12 @@ class DatasetIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'status': 'completed',
-                    'results': execution.stage_results,
-                    'overall_quality_score': execution.quality_score,
-                    'overall_bias_score': execution.bias_score,
-                    'total_duration_seconds': (execution.end_time - execution.start_time).total_seconds(),
-                    'output_locations': execution.output_locations
+                    "status": "completed",
+                    "results": execution.stage_results,
+                    "overall_quality_score": execution.quality_score,
+                    "overall_bias_score": execution.bias_score,
+                    "total_duration_seconds": (execution.end_time - execution.start_time).total_seconds(),
+                    "output_locations": execution.output_locations
                 }
             )
 
@@ -375,91 +373,91 @@ class DatasetIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'error': str(e),
-                    'error_type': type(e).__name__
+                    "error": str(e),
+                    "error_type": type(e).__name__
                 }
             )
 
     async def _execute_stage_with_safety_validation(self, executor: Callable,
-                                                   dataset_config: Dict[str, Any],
+                                                   dataset_config: dict[str, Any],
                                                    user_id: str,
-                                                   execution_id: str) -> Dict[str, Any]:
+                                                   execution_id: str) -> dict[str, Any]:
         """Execute pipeline stage with integrated safety validation."""
         try:
             # Execute the stage
             stage_result = await executor(dataset_config, user_id)
 
             # Perform safety validation if enabled
-            if dataset_config.get('enable_safety_validation', True):
+            if dataset_config.get("enable_safety_validation", True):
                 safety_result = await self._perform_safety_validation(stage_result, execution_id)
-                stage_result['safety_validation'] = safety_result
+                stage_result["safety_validation"] = safety_result
 
-                if not safety_result.get('passed', False):
-                    stage_result['status'] = 'failed'
-                    stage_result['safety_violation'] = True
-                    stage_result['error'] = safety_result.get('message', 'Safety validation failed')
+                if not safety_result.get("passed", False):
+                    stage_result["status"] = "failed"
+                    stage_result["safety_violation"] = True
+                    stage_result["error"] = safety_result.get("message", "Safety validation failed")
 
             return stage_result
 
         except Exception as e:
-            self.logger.error(f"Stage execution with safety validation failed", execution_id=execution_id, error=str(e))
+            self.logger.error("Stage execution with safety validation failed", execution_id=execution_id, error=str(e))
             return {
-                'status': 'failed',
-                'error': str(e),
-                'safety_validation': {'passed': False, 'message': 'Stage execution failed'}
+                "status": "failed",
+                "error": str(e),
+                "safety_validation": {"passed": False, "message": "Stage execution failed"}
             }
 
-    async def _execute_data_acquisition(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_data_acquisition(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 1: Data Acquisition from multiple sources."""
         try:
             self.logger.info("Executing data acquisition stage", user_id=user_id)
 
-            sources = dataset_config.get('sources', [])
+            sources = dataset_config.get("sources", [])
             acquisition_results = []
             total_records = 0
 
             for source in sources:
-                source_type = source.get('type')
-                source_config = source.get('config', {})
+                source_type = source.get("type")
+                source_config = source.get("config", {})
 
-                if source_type == 's3':
+                if source_type == "s3":
                     result = await self._acquire_from_s3(source_config, user_id)
-                elif source_type == 'google_drive':
+                elif source_type == "google_drive":
                     result = await self._acquire_from_google_drive(source_config, user_id)
-                elif source_type == 'local':
+                elif source_type == "local":
                     result = await self._acquire_from_local(source_config, user_id)
-                elif source_type == 'huggingface':
+                elif source_type == "huggingface":
                     result = await self._acquire_from_huggingface(source_config, user_id)
                 else:
-                    result = {'status': 'failed', 'error': f'Unsupported source type: {source_type}'}
+                    result = {"status": "failed", "error": f"Unsupported source type: {source_type}"}
 
                 acquisition_results.append({
-                    'source_type': source_type,
-                    'result': result,
-                    'record_count': result.get('record_count', 0)
+                    "source_type": source_type,
+                    "result": result,
+                    "record_count": result.get("record_count", 0)
                 })
 
-                if result.get('status') == 'completed':
-                    total_records += result.get('record_count', 0)
+                if result.get("status") == "completed":
+                    total_records += result.get("record_count", 0)
 
             return {
-                'stage': 'data_acquisition',
-                'status': 'completed',
-                'sources_processed': len(sources),
-                'total_records': total_records,
-                'acquisition_results': acquisition_results,
-                'duration_seconds': 5.0
+                "stage": "data_acquisition",
+                "status": "completed",
+                "sources_processed": len(sources),
+                "total_records": total_records,
+                "acquisition_results": acquisition_results,
+                "duration_seconds": 5.0
             }
 
         except Exception as e:
             self.logger.error("Data acquisition stage failed", error=str(e))
             return {
-                'stage': 'data_acquisition',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "data_acquisition",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_data_validation(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_data_validation(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 2: Data Validation."""
         try:
             self.logger.info("Executing data validation stage", user_id=user_id)
@@ -468,9 +466,9 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/validation/validate",
                 json={
-                    'validation_type': 'comprehensive',
-                    'dataset_config': dataset_config,
-                    'validation_rules': dataset_config.get('validation_rules', {})
+                    "validation_type": "comprehensive",
+                    "dataset_config": dataset_config,
+                    "validation_rules": dataset_config.get("validation_rules", {})
                 }
             ) as response:
                 if response.status != 200:
@@ -479,23 +477,23 @@ class DatasetIntegrationService:
                 validation_result = await response.json()
 
                 return {
-                    'stage': 'data_validation',
-                    'status': 'completed',
-                    'validation_result': validation_result.get('data', {}),
-                    'validation_score': validation_result.get('quality_score', 0.0),
-                    'issues_found': validation_result.get('issues', []),
-                    'duration_seconds': validation_result.get('duration_seconds', 0)
+                    "stage": "data_validation",
+                    "status": "completed",
+                    "validation_result": validation_result.get("data", {}),
+                    "validation_score": validation_result.get("quality_score", 0.0),
+                    "issues_found": validation_result.get("issues", []),
+                    "duration_seconds": validation_result.get("duration_seconds", 0)
                 }
 
         except Exception as e:
             self.logger.error("Data validation stage failed", error=str(e))
             return {
-                'stage': 'data_validation',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "data_validation",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_data_standardization(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_data_standardization(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 3: Data Standardization."""
         try:
             self.logger.info("Executing data standardization stage", user_id=user_id)
@@ -504,8 +502,8 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/standardization/standardize",
                 json={
-                    'standardization_config': dataset_config.get('standardization', {}),
-                    'target_schema': dataset_config.get('target_schema', 'unified_dataset_schema')
+                    "standardization_config": dataset_config.get("standardization", {}),
+                    "target_schema": dataset_config.get("target_schema", "unified_dataset_schema")
                 }
             ) as response:
                 if response.status != 200:
@@ -514,23 +512,23 @@ class DatasetIntegrationService:
                 standardization_result = await response.json()
 
                 return {
-                    'stage': 'data_standardization',
-                    'status': 'completed',
-                    'standardization_result': standardization_result.get('data', {}),
-                    'fields_standardized': standardization_result.get('fields_standardized', 0),
-                    'schema_applied': standardization_result.get('schema_applied', 'unknown'),
-                    'duration_seconds': standardization_result.get('duration_seconds', 0)
+                    "stage": "data_standardization",
+                    "status": "completed",
+                    "standardization_result": standardization_result.get("data", {}),
+                    "fields_standardized": standardization_result.get("fields_standardized", 0),
+                    "schema_applied": standardization_result.get("schema_applied", "unknown"),
+                    "duration_seconds": standardization_result.get("duration_seconds", 0)
                 }
 
         except Exception as e:
             self.logger.error("Data standardization stage failed", error=str(e))
             return {
-                'stage': 'data_standardization',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "data_standardization",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_quality_assessment(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_quality_assessment(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 4: Quality Assessment."""
         try:
             self.logger.info("Executing quality assessment stage", user_id=user_id)
@@ -539,9 +537,9 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/quality/assess",
                 json={
-                    'assessment_type': 'comprehensive',
-                    'quality_thresholds': dataset_config.get('quality_thresholds', {}),
-                    'assessment_criteria': dataset_config.get('quality_criteria', [])
+                    "assessment_type": "comprehensive",
+                    "quality_thresholds": dataset_config.get("quality_thresholds", {}),
+                    "assessment_criteria": dataset_config.get("quality_criteria", [])
                 }
             ) as response:
                 if response.status != 200:
@@ -550,23 +548,23 @@ class DatasetIntegrationService:
                 quality_result = await response.json()
 
                 return {
-                    'stage': 'quality_assessment',
-                    'status': 'completed',
-                    'quality_result': quality_result.get('data', {}),
-                    'quality_score': quality_result.get('quality_score', 0.0),
-                    'quality_metrics': quality_result.get('metrics', {}),
-                    'duration_seconds': quality_result.get('duration_seconds', 0)
+                    "stage": "quality_assessment",
+                    "status": "completed",
+                    "quality_result": quality_result.get("data", {}),
+                    "quality_score": quality_result.get("quality_score", 0.0),
+                    "quality_metrics": quality_result.get("metrics", {}),
+                    "duration_seconds": quality_result.get("duration_seconds", 0)
                 }
 
         except Exception as e:
             self.logger.error("Quality assessment stage failed", error=str(e))
             return {
-                'stage': 'quality_assessment',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "quality_assessment",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_bias_detection(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_bias_detection(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 5: Bias Detection."""
         try:
             self.logger.info("Executing bias detection stage", user_id=user_id)
@@ -575,9 +573,9 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/bias/analyze",
                 json={
-                    'analysis_type': 'comprehensive_bias_detection',
-                    'bias_thresholds': dataset_config.get('bias_thresholds', {}),
-                    'protected_attributes': dataset_config.get('protected_attributes', [])
+                    "analysis_type": "comprehensive_bias_detection",
+                    "bias_thresholds": dataset_config.get("bias_thresholds", {}),
+                    "protected_attributes": dataset_config.get("protected_attributes", [])
                 }
             ) as response:
                 if response.status != 200:
@@ -586,25 +584,25 @@ class DatasetIntegrationService:
                 bias_result = await response.json()
 
                 return {
-                    'stage': 'bias_detection',
-                    'status': 'completed',
-                    'bias_result': bias_result.get('data', {}),
-                    'bias_score': bias_result.get('bias_score', 0.0),
-                    'bias_categories': bias_result.get('bias_categories', {}),
-                    'recommendations': bias_result.get('recommendations', []),
-                    'compliance_status': bias_result.get('compliance_status', 'unknown'),
-                    'duration_seconds': bias_result.get('duration_seconds', 0)
+                    "stage": "bias_detection",
+                    "status": "completed",
+                    "bias_result": bias_result.get("data", {}),
+                    "bias_score": bias_result.get("bias_score", 0.0),
+                    "bias_categories": bias_result.get("bias_categories", {}),
+                    "recommendations": bias_result.get("recommendations", []),
+                    "compliance_status": bias_result.get("compliance_status", "unknown"),
+                    "duration_seconds": bias_result.get("duration_seconds", 0)
                 }
 
         except Exception as e:
             self.logger.error("Bias detection stage failed", error=str(e))
             return {
-                'stage': 'bias_detection',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "bias_detection",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_data_fusion(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_data_fusion(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 6: Data Fusion."""
         try:
             self.logger.info("Executing data fusion stage", user_id=user_id)
@@ -613,10 +611,10 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/fusion/fuse",
                 json={
-                    'fusion_strategy': dataset_config.get('fusion_strategy', 'balanced'),
-                    'target_size': dataset_config.get('target_dataset_size'),
-                    'quality_threshold': dataset_config.get('fusion_quality_threshold', 0.7),
-                    'diversity_requirements': dataset_config.get('diversity_requirements', {})
+                    "fusion_strategy": dataset_config.get("fusion_strategy", "balanced"),
+                    "target_size": dataset_config.get("target_dataset_size"),
+                    "quality_threshold": dataset_config.get("fusion_quality_threshold", 0.7),
+                    "diversity_requirements": dataset_config.get("diversity_requirements", {})
                 }
             ) as response:
                 if response.status != 200:
@@ -625,25 +623,25 @@ class DatasetIntegrationService:
                 fusion_result = await response.json()
 
                 return {
-                    'stage': 'data_fusion',
-                    'status': 'completed',
-                    'fusion_result': fusion_result.get('data', {}),
-                    'fused_conversations': fusion_result.get('fused_conversations', []),
-                    'source_distribution': fusion_result.get('source_distribution', {}),
-                    'fusion_quality_score': fusion_result.get('fusion_quality_score', 0.0),
-                    'total_conversations': fusion_result.get('total_conversations', 0),
-                    'duration_seconds': fusion_result.get('duration_seconds', 0)
+                    "stage": "data_fusion",
+                    "status": "completed",
+                    "fusion_result": fusion_result.get("data", {}),
+                    "fused_conversations": fusion_result.get("fused_conversations", []),
+                    "source_distribution": fusion_result.get("source_distribution", {}),
+                    "fusion_quality_score": fusion_result.get("fusion_quality_score", 0.0),
+                    "total_conversations": fusion_result.get("total_conversations", 0),
+                    "duration_seconds": fusion_result.get("duration_seconds", 0)
                 }
 
         except Exception as e:
             self.logger.error("Data fusion stage failed", error=str(e))
             return {
-                'stage': 'data_fusion',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "data_fusion",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_distribution_balancing(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_distribution_balancing(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 7: Distribution Balancing."""
         try:
             self.logger.info("Executing distribution balancing stage", user_id=user_id)
@@ -652,9 +650,9 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/balancing/balance",
                 json={
-                    'balancing_strategy': dataset_config.get('balancing_strategy', 'demographic'),
-                    'target_distributions': dataset_config.get('target_distributions', {}),
-                    'balancing_constraints': dataset_config.get('balancing_constraints', {})
+                    "balancing_strategy": dataset_config.get("balancing_strategy", "demographic"),
+                    "target_distributions": dataset_config.get("target_distributions", {}),
+                    "balancing_constraints": dataset_config.get("balancing_constraints", {})
                 }
             ) as response:
                 if response.status != 200:
@@ -663,23 +661,23 @@ class DatasetIntegrationService:
                 balancing_result = await response.json()
 
                 return {
-                    'stage': 'distribution_balancing',
-                    'status': 'completed',
-                    'balancing_result': balancing_result.get('data', {}),
-                    'balanced_distribution': balancing_result.get('balanced_distribution', {}),
-                    'balancing_score': balancing_result.get('balancing_score', 0.0),
-                    'duration_seconds': balancing_result.get('duration_seconds', 0)
+                    "stage": "distribution_balancing",
+                    "status": "completed",
+                    "balancing_result": balancing_result.get("data", {}),
+                    "balanced_distribution": balancing_result.get("balanced_distribution", {}),
+                    "balancing_score": balancing_result.get("balancing_score", 0.0),
+                    "duration_seconds": balancing_result.get("duration_seconds", 0)
                 }
 
         except Exception as e:
             self.logger.error("Distribution balancing stage failed", error=str(e))
             return {
-                'stage': 'distribution_balancing',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "distribution_balancing",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_final_validation(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_final_validation(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 8: Final Validation."""
         try:
             self.logger.info("Executing final validation stage", user_id=user_id)
@@ -688,9 +686,9 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/validation/final",
                 json={
-                    'validation_level': 'comprehensive',
-                    'final_checks': dataset_config.get('final_validation_checks', []),
-                    'acceptance_criteria': dataset_config.get('acceptance_criteria', {})
+                    "validation_level": "comprehensive",
+                    "final_checks": dataset_config.get("final_validation_checks", []),
+                    "acceptance_criteria": dataset_config.get("acceptance_criteria", {})
                 }
             ) as response:
                 if response.status != 200:
@@ -699,31 +697,31 @@ class DatasetIntegrationService:
                 final_validation_result = await response.json()
 
                 return {
-                    'stage': 'final_validation',
-                    'status': 'completed',
-                    'validation_result': final_validation_result.get('data', {}),
-                    'final_score': final_validation_result.get('final_score', 0.0),
-                    'validation_passed': final_validation_result.get('passed', False),
-                    'final_report': final_validation_result.get('final_report', {}),
-                    'duration_seconds': final_validation_result.get('duration_seconds', 0)
+                    "stage": "final_validation",
+                    "status": "completed",
+                    "validation_result": final_validation_result.get("data", {}),
+                    "final_score": final_validation_result.get("final_score", 0.0),
+                    "validation_passed": final_validation_result.get("passed", False),
+                    "final_report": final_validation_result.get("final_report", {}),
+                    "duration_seconds": final_validation_result.get("duration_seconds", 0)
                 }
 
         except Exception as e:
             self.logger.error("Final validation stage failed", error=str(e))
             return {
-                'stage': 'final_validation',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "final_validation",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_output_generation(self, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_output_generation(self, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 9: Output Generation."""
         try:
             self.logger.info("Executing output generation stage", user_id=user_id)
 
             # Generate output files and store locations
-            output_config = dataset_config.get('output', {})
-            output_formats = output_config.get('formats', ['json'])
+            output_config = dataset_config.get("output", {})
+            output_formats = output_config.get("formats", ["json"])
             output_locations = []
 
             for output_format in output_formats:
@@ -736,25 +734,25 @@ class DatasetIntegrationService:
                 execution.output_locations = output_locations
 
             return {
-                'stage': 'output_generation',
-                'status': 'completed',
-                'output_formats': output_formats,
-                'output_locations': output_locations,
-                'total_size_mb': sum(loc.get('size_mb', 0) for loc in output_locations),
-                'record_count': output_config.get('expected_record_count', 0),
-                'duration_seconds': 3.0
+                "stage": "output_generation",
+                "status": "completed",
+                "output_formats": output_formats,
+                "output_locations": output_locations,
+                "total_size_mb": sum(loc.get("size_mb", 0) for loc in output_locations),
+                "record_count": output_config.get("expected_record_count", 0),
+                "duration_seconds": 3.0
             }
 
         except Exception as e:
             self.logger.error("Output generation stage failed", error=str(e))
             return {
-                'stage': 'output_generation',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "output_generation",
+                "status": "failed",
+                "error": str(e)
             }
 
     # Storage integration methods
-    async def _acquire_from_s3(self, config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _acquire_from_s3(self, config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Acquire dataset from S3."""
         try:
             self.logger.info("Acquiring dataset from S3", user_id=user_id)
@@ -764,16 +762,16 @@ class DatasetIntegrationService:
                 json=config
             ) as response:
                 if response.status != 200:
-                    return {'status': 'failed', 'error': f'S3 acquisition failed: HTTP {response.status}'}
+                    return {"status": "failed", "error": f"S3 acquisition failed: HTTP {response.status}"}
 
                 result = await response.json()
-                return result.get('data', {})
+                return result.get("data", {})
 
         except Exception as e:
             self.logger.error("S3 acquisition failed", error=str(e))
-            return {'status': 'failed', 'error': str(e)}
+            return {"status": "failed", "error": str(e)}
 
-    async def _acquire_from_google_drive(self, config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _acquire_from_google_drive(self, config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Acquire dataset from Google Drive."""
         try:
             self.logger.info("Acquiring dataset from Google Drive", user_id=user_id)
@@ -783,16 +781,16 @@ class DatasetIntegrationService:
                 json=config
             ) as response:
                 if response.status != 200:
-                    return {'status': 'failed', 'error': f'Google Drive acquisition failed: HTTP {response.status}'}
+                    return {"status": "failed", "error": f"Google Drive acquisition failed: HTTP {response.status}"}
 
                 result = await response.json()
-                return result.get('data', {})
+                return result.get("data", {})
 
         except Exception as e:
             self.logger.error("Google Drive acquisition failed", error=str(e))
-            return {'status': 'failed', 'error': str(e)}
+            return {"status": "failed", "error": str(e)}
 
-    async def _acquire_from_local(self, config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _acquire_from_local(self, config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Acquire dataset from local storage."""
         try:
             self.logger.info("Acquiring dataset from local storage", user_id=user_id)
@@ -802,16 +800,16 @@ class DatasetIntegrationService:
                 json=config
             ) as response:
                 if response.status != 200:
-                    return {'status': 'failed', 'error': f'Local acquisition failed: HTTP {response.status}'}
+                    return {"status": "failed", "error": f"Local acquisition failed: HTTP {response.status}"}
 
                 result = await response.json()
-                return result.get('data', {})
+                return result.get("data", {})
 
         except Exception as e:
             self.logger.error("Local acquisition failed", error=str(e))
-            return {'status': 'failed', 'error': str(e)}
+            return {"status": "failed", "error": str(e)}
 
-    async def _acquire_from_huggingface(self, config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _acquire_from_huggingface(self, config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Acquire dataset from Hugging Face."""
         try:
             self.logger.info("Acquiring dataset from Hugging Face", user_id=user_id)
@@ -821,16 +819,16 @@ class DatasetIntegrationService:
                 json=config
             ) as response:
                 if response.status != 200:
-                    return {'status': 'failed', 'error': f'Hugging Face acquisition failed: HTTP {response.status}'}
+                    return {"status": "failed", "error": f"Hugging Face acquisition failed: HTTP {response.status}"}
 
                 result = await response.json()
-                return result.get('data', {})
+                return result.get("data", {})
 
         except Exception as e:
             self.logger.error("Hugging Face acquisition failed", error=str(e))
-            return {'status': 'failed', 'error': str(e)}
+            return {"status": "failed", "error": str(e)}
 
-    async def _generate_output_file(self, output_format: str, dataset_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _generate_output_file(self, output_format: str, dataset_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Generate output file in specified format."""
         try:
             self.logger.info(f"Generating output file in {output_format} format", user_id=user_id)
@@ -838,119 +836,119 @@ class DatasetIntegrationService:
             async with self.session.post(
                 f"{self.dataset_api_url}/api/v1/output/generate",
                 json={
-                    'output_format': output_format,
-                    'output_config': dataset_config.get('output', {}),
-                    'compression': dataset_config.get('compression', False)
+                    "output_format": output_format,
+                    "output_config": dataset_config.get("output", {}),
+                    "compression": dataset_config.get("compression", False)
                 }
             ) as response:
                 if response.status != 200:
                     return None
 
                 result = await response.json()
-                return result.get('data', {})
+                return result.get("data", {})
 
         except Exception as e:
             self.logger.error(f"Output generation failed for {output_format}", error=str(e))
             return None
 
-    async def _perform_safety_validation(self, stage_result: Dict[str, Any], execution_id: str) -> Dict[str, Any]:
+    async def _perform_safety_validation(self, stage_result: dict[str, Any], execution_id: str) -> dict[str, Any]:
         """Perform safety validation with crisis and bias detection."""
         try:
             self.logger.info("Performing safety validation", execution_id=execution_id)
 
             # Integrate with existing crisis detection and bias detection services
             safety_checks = {
-                'crisis_detection': await self._check_crisis_indicators(stage_result),
-                'bias_validation': await self._validate_bias_levels(stage_result),
-                'content_safety': await self._validate_content_safety(stage_result),
-                'privacy_compliance': await self._check_privacy_compliance(stage_result)
+                "crisis_detection": await self._check_crisis_indicators(stage_result),
+                "bias_validation": await self._validate_bias_levels(stage_result),
+                "content_safety": await self._validate_content_safety(stage_result),
+                "privacy_compliance": await self._check_privacy_compliance(stage_result)
             }
 
             # Determine overall safety status
-            all_passed = all(check.get('passed', False) for check in safety_checks.values())
+            all_passed = all(check.get("passed", False) for check in safety_checks.values())
 
             return {
-                'passed': all_passed,
-                'checks': safety_checks,
-                'message': 'All safety checks passed' if all_passed else 'Safety validation failed',
-                'timestamp': datetime.utcnow().isoformat()
+                "passed": all_passed,
+                "checks": safety_checks,
+                "message": "All safety checks passed" if all_passed else "Safety validation failed",
+                "timestamp": datetime.utcnow().isoformat()
             }
 
         except Exception as e:
             self.logger.error("Safety validation failed", execution_id=execution_id, error=str(e))
             return {
-                'passed': False,
-                'error': str(e),
-                'message': 'Safety validation error',
-                'timestamp': datetime.utcnow().isoformat()
+                "passed": False,
+                "error": str(e),
+                "message": "Safety validation error",
+                "timestamp": datetime.utcnow().isoformat()
             }
 
-    async def _check_crisis_indicators(self, stage_result: Dict[str, Any]) -> Dict[str, Any]:
+    async def _check_crisis_indicators(self, stage_result: dict[str, Any]) -> dict[str, Any]:
         """Check for crisis indicators in dataset content."""
         try:
             # Integrate with existing crisis detection service
             # This is a placeholder - actual implementation would call the crisis detection service
             return {
-                'passed': True,
-                'crisis_indicators_found': 0,
-                'severity_level': 'none',
-                'message': 'No crisis indicators detected'
+                "passed": True,
+                "crisis_indicators_found": 0,
+                "severity_level": "none",
+                "message": "No crisis indicators detected"
             }
         except Exception as e:
             self.logger.error("Crisis detection check failed", error=str(e))
-            return {'passed': False, 'error': str(e)}
+            return {"passed": False, "error": str(e)}
 
-    async def _validate_bias_levels(self, stage_result: Dict[str, Any]) -> Dict[str, Any]:
+    async def _validate_bias_levels(self, stage_result: dict[str, Any]) -> dict[str, Any]:
         """Validate bias levels against thresholds."""
         try:
             # Use existing bias detection results if available
-            bias_score = stage_result.get('bias_score', 0.0)
+            bias_score = stage_result.get("bias_score", 0.0)
             bias_threshold = 0.3  # Configurable threshold
 
             passed = bias_score <= bias_threshold
 
             return {
-                'passed': passed,
-                'bias_score': bias_score,
-                'threshold': bias_threshold,
-                'message': f"Bias score {bias_score} is {'acceptable' if passed else 'above threshold'}"
+                "passed": passed,
+                "bias_score": bias_score,
+                "threshold": bias_threshold,
+                "message": f"Bias score {bias_score} is {'acceptable' if passed else 'above threshold'}"
             }
         except Exception as e:
             self.logger.error("Bias validation failed", error=str(e))
-            return {'passed': False, 'error': str(e)}
+            return {"passed": False, "error": str(e)}
 
-    async def _validate_content_safety(self, stage_result: Dict[str, Any]) -> Dict[str, Any]:
+    async def _validate_content_safety(self, stage_result: dict[str, Any]) -> dict[str, Any]:
         """Validate content safety and appropriateness."""
         try:
             # Placeholder for content safety validation
             # In production, this would integrate with content moderation services
             return {
-                'passed': True,
-                'inappropriate_content_found': False,
-                'message': 'Content safety validation passed'
+                "passed": True,
+                "inappropriate_content_found": False,
+                "message": "Content safety validation passed"
             }
         except Exception as e:
             self.logger.error("Content safety validation failed", error=str(e))
-            return {'passed': False, 'error': str(e)}
+            return {"passed": False, "error": str(e)}
 
-    async def _check_privacy_compliance(self, stage_result: Dict[str, Any]) -> Dict[str, Any]:
+    async def _check_privacy_compliance(self, stage_result: dict[str, Any]) -> dict[str, Any]:
         """Check privacy compliance (HIPAA, GDPR, etc.)."""
         try:
             # Placeholder for privacy compliance checks
             # In production, this would integrate with privacy compliance services
             return {
-                'passed': True,
-                'pii_detected': False,
-                'hipaa_compliant': True,
-                'gdpr_compliant': True,
-                'message': 'Privacy compliance check passed'
+                "passed": True,
+                "pii_detected": False,
+                "hipaa_compliant": True,
+                "gdpr_compliant": True,
+                "message": "Privacy compliance check passed"
             }
         except Exception as e:
             self.logger.error("Privacy compliance check failed", error=str(e))
-            return {'passed': False, 'error': str(e)}
+            return {"passed": False, "error": str(e)}
 
     async def _publish_dataset_event(self, event_type: IntegrationEventType,
-                                   execution_id: str, user_id: str, data: Dict[str, Any]) -> None:
+                                   execution_id: str, user_id: str, data: dict[str, Any]) -> None:
         """Publish dataset processing event via integration manager."""
         if self.integration_manager:
             await self.integration_manager.publish_integration_event(
@@ -960,40 +958,40 @@ class DatasetIntegrationService:
                 data=data
             )
 
-    def _validate_dataset_config(self, config: Dict[str, Any]) -> None:
+    def _validate_dataset_config(self, config: dict[str, Any]) -> None:
         """Validate dataset processing configuration."""
-        required_fields = ['sources', 'processing_config']
+        required_fields = ["sources", "processing_config"]
         missing_fields = [field for field in required_fields if field not in config]
 
         if missing_fields:
             raise ValidationError(f"Missing required dataset configuration fields: {missing_fields}")
 
         # Validate sources
-        sources = config.get('sources', [])
+        sources = config.get("sources", [])
         if not sources:
             raise ValidationError("At least one data source must be specified")
 
         for i, source in enumerate(sources):
-            if 'type' not in source:
+            if "type" not in source:
                 raise ValidationError(f"Source {i} missing required 'type' field")
 
-            source_type = source['type']
-            supported_types = ['s3', 'google_drive', 'local', 'huggingface']
+            source_type = source["type"]
+            supported_types = ["s3", "google_drive", "local", "huggingface"]
             if source_type not in supported_types:
                 raise ValidationError(f"Unsupported source type: {source_type}")
 
         # Validate processing config
-        processing_config = config.get('processing_config', {})
+        processing_config = config.get("processing_config", {})
         if not isinstance(processing_config, dict):
             raise ValidationError("processing_config must be a dictionary")
 
-    def _generate_config_hash(self, config: Dict[str, Any]) -> str:
+    def _generate_config_hash(self, config: dict[str, Any]) -> str:
         """Generate hash of configuration for deduplication."""
         import hashlib
         config_str = json.dumps(config, sort_keys=True)
         return hashlib.md5(config_str.encode()).hexdigest()[:16]
 
-    async def get_execution_status(self, execution_id: str, user_id: str) -> Dict[str, Any]:
+    async def get_execution_status(self, execution_id: str, user_id: str) -> dict[str, Any]:
         """
         Get dataset execution status.
 
@@ -1014,26 +1012,26 @@ class DatasetIntegrationService:
                 raise ValidationError("Access denied to execution")
 
             return {
-                'execution_id': execution_id,
-                'status': execution.status.value,
-                'current_stage': execution.current_stage.value if execution.current_stage else None,
-                'overall_progress': execution.overall_progress,
-                'quality_score': execution.quality_score,
-                'bias_score': execution.bias_score,
-                'stage_results': execution.stage_results,
-                'start_time': execution.start_time.isoformat(),
-                'end_time': execution.end_time.isoformat() if execution.end_time else None,
-                'error_message': execution.error_message,
-                'source_locations': execution.source_locations,
-                'output_locations': execution.output_locations,
-                'metadata': execution.metadata
+                "execution_id": execution_id,
+                "status": execution.status.value,
+                "current_stage": execution.current_stage.value if execution.current_stage else None,
+                "overall_progress": execution.overall_progress,
+                "quality_score": execution.quality_score,
+                "bias_score": execution.bias_score,
+                "stage_results": execution.stage_results,
+                "start_time": execution.start_time.isoformat(),
+                "end_time": execution.end_time.isoformat() if execution.end_time else None,
+                "error_message": execution.error_message,
+                "source_locations": execution.source_locations,
+                "output_locations": execution.output_locations,
+                "metadata": execution.metadata
             }
 
         except ValidationError:
             raise
         except Exception as e:
             self.logger.error("Error getting execution status", execution_id=execution_id, error=str(e))
-            raise IntegrationError(f"Failed to get execution status: {str(e)}")
+            raise IntegrationError(f"Failed to get execution status: {e!s}")
 
     async def cancel_execution(self, execution_id: str, user_id: str) -> bool:
         """
@@ -1068,9 +1066,9 @@ class DatasetIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'status': 'cancelled',
-                    'reason': 'User requested cancellation',
-                    'cancelled_at': datetime.utcnow().isoformat()
+                    "status": "cancelled",
+                    "reason": "User requested cancellation",
+                    "cancelled_at": datetime.utcnow().isoformat()
                 }
             )
 
@@ -1082,43 +1080,42 @@ class DatasetIntegrationService:
             raise
         except Exception as e:
             self.logger.error("Error cancelling execution", execution_id=execution_id, error=str(e))
-            raise IntegrationError(f"Failed to cancel execution: {str(e)}")
+            raise IntegrationError(f"Failed to cancel execution: {e!s}")
 
-    async def get_service_health(self) -> Dict[str, Any]:
+    async def get_service_health(self) -> dict[str, Any]:
         """Get dataset service health status."""
         try:
             if not self.session:
                 return {
-                    'status': 'unhealthy',
-                    'error': 'Service not initialized',
-                    'timestamp': datetime.utcnow().isoformat()
+                    "status": "unhealthy",
+                    "error": "Service not initialized",
+                    "timestamp": datetime.utcnow().isoformat()
                 }
 
             # Test dataset service connectivity
             async with self.session.get(f"{self.dataset_api_url}/health") as response:
                 if response.status == 200:
                     return {
-                        'status': 'healthy',
-                        'dataset_api_url': self.dataset_api_url,
-                        'active_executions': len(self.active_executions),
-                        'timestamp': datetime.utcnow().isoformat()
+                        "status": "healthy",
+                        "dataset_api_url": self.dataset_api_url,
+                        "active_executions": len(self.active_executions),
+                        "timestamp": datetime.utcnow().isoformat()
                     }
-                else:
-                    return {
-                        'status': 'unhealthy',
-                        'error': f"Dataset service returned HTTP {response.status}",
-                        'timestamp': datetime.utcnow().isoformat()
-                    }
+                return {
+                    "status": "unhealthy",
+                    "error": f"Dataset service returned HTTP {response.status}",
+                    "timestamp": datetime.utcnow().isoformat()
+                }
 
         except Exception as e:
             self.logger.error("Dataset service health check failed", error=str(e))
             return {
-                'status': 'unhealthy',
-                'error': str(e),
-                'timestamp': datetime.utcnow().isoformat()
+                "status": "unhealthy",
+                "error": str(e),
+                "timestamp": datetime.utcnow().isoformat()
             }
 
-    async def get_dataset_statistics(self, execution_id: str, user_id: str) -> Dict[str, Any]:
+    async def get_dataset_statistics(self, execution_id: str, user_id: str) -> dict[str, Any]:
         """Get comprehensive dataset statistics."""
         try:
             execution = self.active_executions.get(execution_id)
@@ -1131,44 +1128,44 @@ class DatasetIntegrationService:
 
             # Compile statistics from all stages
             statistics = {
-                'execution_summary': {
-                    'execution_id': execution_id,
-                    'status': execution.status.value,
-                    'duration_seconds': (execution.end_time - execution.start_time).total_seconds() if execution.end_time else None,
-                    'total_stages': len(execution.stage_results),
-                    'completed_stages': sum(bool(result.get('status') == 'completed')
+                "execution_summary": {
+                    "execution_id": execution_id,
+                    "status": execution.status.value,
+                    "duration_seconds": (execution.end_time - execution.start_time).total_seconds() if execution.end_time else None,
+                    "total_stages": len(execution.stage_results),
+                    "completed_stages": sum(bool(result.get("status") == "completed")
                                         for result in execution.stage_results.values())
                 },
-                'data_metrics': {},
-                'quality_metrics': {},
-                'bias_metrics': {},
-                'processing_metrics': {}
+                "data_metrics": {},
+                "quality_metrics": {},
+                "bias_metrics": {},
+                "processing_metrics": {}
             }
 
             # Extract metrics from stage results
             for stage_name, stage_result in execution.stage_results.items():
-                if stage_result.get('status') == 'completed':
+                if stage_result.get("status") == "completed":
                     # Data metrics
-                    if 'total_records' in stage_result:
-                        statistics['data_metrics']['total_records'] = stage_result['total_records']
-                    if 'sources_processed' in stage_result:
-                        statistics['data_metrics']['sources_processed'] = stage_result['sources_processed']
+                    if "total_records" in stage_result:
+                        statistics["data_metrics"]["total_records"] = stage_result["total_records"]
+                    if "sources_processed" in stage_result:
+                        statistics["data_metrics"]["sources_processed"] = stage_result["sources_processed"]
 
                     # Quality metrics
-                    if 'quality_score' in stage_result:
-                        statistics['quality_metrics'][f'{stage_name}_quality'] = stage_result['quality_score']
-                    if 'validation_score' in stage_result:
-                        statistics['quality_metrics'][f'{stage_name}_validation'] = stage_result['validation_score']
+                    if "quality_score" in stage_result:
+                        statistics["quality_metrics"][f"{stage_name}_quality"] = stage_result["quality_score"]
+                    if "validation_score" in stage_result:
+                        statistics["quality_metrics"][f"{stage_name}_validation"] = stage_result["validation_score"]
 
                     # Bias metrics
-                    if 'bias_score' in stage_result:
-                        statistics['bias_metrics'][f'{stage_name}_bias'] = stage_result['bias_score']
-                    if 'bias_categories' in stage_result:
-                        statistics['bias_metrics'][f'{stage_name}_categories'] = stage_result['bias_categories']
+                    if "bias_score" in stage_result:
+                        statistics["bias_metrics"][f"{stage_name}_bias"] = stage_result["bias_score"]
+                    if "bias_categories" in stage_result:
+                        statistics["bias_metrics"][f"{stage_name}_categories"] = stage_result["bias_categories"]
 
                     # Processing metrics
-                    if 'duration_seconds' in stage_result:
-                        statistics['processing_metrics'][f'{stage_name}_duration'] = stage_result['duration_seconds']
+                    if "duration_seconds" in stage_result:
+                        statistics["processing_metrics"][f"{stage_name}_duration"] = stage_result["duration_seconds"]
 
             return statistics
 
@@ -1176,7 +1173,7 @@ class DatasetIntegrationService:
             raise
         except Exception as e:
             self.logger.error("Error getting dataset statistics", execution_id=execution_id, error=str(e))
-            raise IntegrationError(f"Failed to get dataset statistics: {str(e)}")
+            raise IntegrationError(f"Failed to get dataset statistics: {e!s}")
 
     async def cleanup_expired_executions(self) -> int:
         """Clean up expired dataset executions."""
@@ -1223,10 +1220,11 @@ class DatasetIntegrationService:
 # Dependency injection function
 async def get_dataset_integration_service() -> DatasetIntegrationService:
     """Get dataset integration service instance."""
+    from redis.asyncio import Redis
+
     from ..config import get_config
     from ..services.integration_manager import get_integration_manager
     from ..services.websocket_manager import get_websocket_manager
-    from redis.asyncio import Redis
 
     config = get_config()
     redis_client = Redis.from_url(config.redis_config.url)

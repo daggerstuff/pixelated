@@ -5,17 +5,15 @@ This module provides cryptographic functions for password hashing, token generat
 and other security-related operations following industry best practices and HIPAA compliance.
 """
 
-import secrets
 import hashlib
 import hmac
-from typing import Optional
-from datetime import datetime, timedelta
+import secrets
+from datetime import datetime
 
 import bcrypt
 import structlog
 
 from mcp_server.config import settings
-
 
 logger = structlog.get_logger(__name__)
 
@@ -41,9 +39,9 @@ def hash_password(password: str) -> str:
 
     # Generate salt and hash password
     salt = bcrypt.gensalt(rounds=settings.auth.bcrypt_rounds)
-    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
 
-    return hashed.decode('utf-8')
+    return hashed.decode("utf-8")
 
 
 def verify_password(password: str, hashed: str) -> bool:
@@ -64,7 +62,7 @@ def verify_password(password: str, hashed: str) -> bool:
         return False
 
     try:
-        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+        return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
     except (ValueError, UnicodeDecodeError):
         logger.warning("Password verification failed due to invalid hash format")
         return False
@@ -125,7 +123,7 @@ def hash_data(data: str, algorithm: str = "sha256") -> str:
         raise ValueError(f"Unsupported hash algorithm: {algorithm}")
 
     hash_func = getattr(hashlib, algorithm)
-    return hash_func(data.encode('utf-8')).hexdigest()
+    return hash_func(data.encode("utf-8")).hexdigest()
 
 
 def create_hmac_signature(message: str, key: str, algorithm: str = "sha256") -> str:
@@ -147,8 +145,8 @@ def create_hmac_signature(message: str, key: str, algorithm: str = "sha256") -> 
         raise ValueError(f"Unsupported HMAC algorithm: {algorithm}")
 
     return hmac.new(
-        key.encode('utf-8'),
-        message.encode('utf-8'),
+        key.encode("utf-8"),
+        message.encode("utf-8"),
         getattr(hashlib, algorithm)
     ).hexdigest()
 
@@ -191,7 +189,7 @@ def sanitize_input(input_string: str, max_length: int = 1000) -> str:
         raise ValueError(f"Input exceeds maximum length of {max_length} characters")
 
     # Remove null bytes and control characters
-    sanitized = input_string.replace('\x00', '').replace('\x1f', '')
+    sanitized = input_string.replace("\x00", "").replace("\x1f", "")
 
     # Strip leading/trailing whitespace
     return sanitized.strip()
@@ -213,7 +211,7 @@ def validate_email_format(email: str) -> bool:
         return False
 
     # Basic email regex pattern
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return bool(re.match(pattern, email))
 
 
@@ -248,7 +246,7 @@ def constant_time_compare(a: str, b: str) -> bool:
     Returns:
         True if strings are equal, False otherwise
     """
-    return hmac.compare_digest(a.encode('utf-8'), b.encode('utf-8'))
+    return hmac.compare_digest(a.encode("utf-8"), b.encode("utf-8"))
 
 
 def mask_sensitive_data(data: str, visible_chars: int = 4) -> str:
@@ -352,7 +350,7 @@ def validate_password_strength(password: str) -> dict:
     return result
 
 
-def generate_secure_random_string(length: int = 16, charset: Optional[str] = None) -> str:
+def generate_secure_random_string(length: int = 16, charset: str | None = None) -> str:
     """
     Generate a secure random string using secrets module.
 
@@ -369,7 +367,7 @@ def generate_secure_random_string(length: int = 16, charset: Optional[str] = Non
     if not charset:
         raise ValueError("Character set cannot be empty")
 
-    return ''.join(secrets.choice(charset) for _ in range(length))
+    return "".join(secrets.choice(charset) for _ in range(length))
 
 
 def secure_compare_timestamps(timestamp1: datetime, timestamp2: datetime, tolerance_seconds: int = 300) -> bool:

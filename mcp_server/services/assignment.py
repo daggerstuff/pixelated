@@ -7,17 +7,16 @@ agent capabilities, current load, performance history, and task requirements.
 
 
 import random
-from datetime import datetime, timedelta, timezone
-from typing import List, Optional, Dict, Any, Tuple
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from enum import Enum
+from typing import Any
 
 import structlog
 
-from ..models.agent import Agent, AgentStatus, AgentCapability
-from ..models.task import Task, TaskPriority, TaskStatus
-from ..exceptions import ValidationError, ResourceNotFoundError
-
+from ..exceptions import ResourceNotFoundError
+from ..models.agent import Agent, AgentStatus
+from ..models.task import Task, TaskPriority
 
 logger = structlog.get_logger(__name__)
 
@@ -38,7 +37,7 @@ class AssignmentScore:
 
     agent_id: str
     score: float
-    factors: Dict[str, Any]
+    factors: dict[str, Any]
     strategy: AssignmentStrategy
 
 
@@ -47,8 +46,8 @@ class AssignmentRecommendation:
     """Task assignment recommendation."""
 
     task_id: str
-    recommended_agent_id: Optional[str]
-    scores: List[AssignmentScore]
+    recommended_agent_id: str | None
+    scores: list[AssignmentScore]
     strategy_used: AssignmentStrategy
     reasoning: str
 
@@ -75,9 +74,9 @@ class TaskAssignmentService:
     async def assign_task(
         self,
         task: Task,
-        available_agents: List[Agent],
-        strategy: Optional[AssignmentStrategy] = None,
-        agent_capacities: Optional[Dict[str, Dict[str, Any]]] = None
+        available_agents: list[Agent],
+        strategy: AssignmentStrategy | None = None,
+        agent_capacities: dict[str, dict[str, Any]] | None = None
     ) -> AssignmentRecommendation:
         """
         Assign task to best available agent using specified or default strategy.
@@ -143,10 +142,10 @@ class TaskAssignmentService:
     async def get_assignment_scores(
         self,
         task: Task,
-        agents: List[Agent],
+        agents: list[Agent],
         strategy: AssignmentStrategy,
-        agent_capacities: Optional[Dict[str, Dict[str, Any]]] = None
-    ) -> List[AssignmentScore]:
+        agent_capacities: dict[str, dict[str, Any]] | None = None
+    ) -> list[AssignmentScore]:
         """
         Get assignment scores for all agents using specified strategy.
 
@@ -163,7 +162,7 @@ class TaskAssignmentService:
             task, agents, strategy, agent_capacities
         )
 
-    def _filter_eligible_agents(self, task: Task, agents: List[Agent]) -> List[Agent]:
+    def _filter_eligible_agents(self, task: Task, agents: list[Agent]) -> list[Agent]:
         """
         Filter agents based on basic task requirements.
 
@@ -202,7 +201,7 @@ class TaskAssignmentService:
     def _select_optimal_strategy(
         self,
         task: Task,
-        agents: List[Agent]
+        agents: list[Agent]
     ) -> AssignmentStrategy:
         """
         Select optimal assignment strategy based on task and agent characteristics.
@@ -234,10 +233,10 @@ class TaskAssignmentService:
     async def _calculate_assignment_scores(
         self,
         task: Task,
-        agents: List[Agent],
+        agents: list[Agent],
         strategy: AssignmentStrategy,
-        agent_capacities: Optional[Dict[str, Dict[str, Any]]] = None
-    ) -> List[AssignmentScore]:
+        agent_capacities: dict[str, dict[str, Any]] | None = None
+    ) -> list[AssignmentScore]:
         """
         Calculate assignment scores for all agents using specified strategy.
 
@@ -291,7 +290,7 @@ class TaskAssignmentService:
 
         return scores
 
-    def _score_round_robin(self, task: Task, agent: Agent, all_agents: List[Agent]) -> AssignmentScore:
+    def _score_round_robin(self, task: Task, agent: Agent, all_agents: list[Agent]) -> AssignmentScore:
         """
         Score agent using round-robin strategy.
 
@@ -334,7 +333,7 @@ class TaskAssignmentService:
         self,
         task: Task,
         agent: Agent,
-        agent_capacities: Optional[Dict[str, Dict[str, Any]]]
+        agent_capacities: dict[str, dict[str, Any]] | None
     ) -> AssignmentScore:
         """
         Score agent based on current load.
@@ -555,21 +554,20 @@ class TaskAssignmentService:
             total = best_score.factors.get("total_requirements", 0)
             return f"Agent {agent_id} selected based on capability match ({matched}/{total} requirements met)"
 
-        elif strategy == AssignmentStrategy.LEAST_LOADED:
+        if strategy == AssignmentStrategy.LEAST_LOADED:
             load_ratio = best_score.factors.get("load_ratio", 0)
             available_slots = best_score.factors.get("available_slots", 0)
             return f"Agent {agent_id} selected as least loaded (load: {load_ratio:.1%}, available: {available_slots} slots)"
 
-        elif strategy == AssignmentStrategy.PRIORITY_BASED:
+        if strategy == AssignmentStrategy.PRIORITY_BASED:
             priority_match = best_score.factors.get("capability_match", False)
             return f"Agent {agent_id} selected based on priority handling capability (match: {priority_match})"
 
-        elif strategy == AssignmentStrategy.ROUND_ROBIN:
+        if strategy == AssignmentStrategy.ROUND_ROBIN:
             distance = best_score.factors.get("distance", 0)
             return f"Agent {agent_id} selected using round-robin strategy (distance: {distance})"
 
-        else:
-            return f"Agent {agent_id} selected using {strategy_name} strategy (score: {score:.2f})"
+        return f"Agent {agent_id} selected using {strategy_name} strategy (score: {score:.2f})"
 
 
 class AssignmentHistoryTracker:
@@ -579,7 +577,7 @@ class AssignmentHistoryTracker:
 
     def __init__(self):
         """Initialize assignment history tracker."""
-        self.assignment_history: List[Dict[str, Any]] = []
+        self.assignment_history: list[dict[str, Any]] = []
         logger.info("AssignmentHistoryTracker initialized")
 
     def record_assignment(
@@ -589,7 +587,7 @@ class AssignmentHistoryTracker:
         strategy: AssignmentStrategy,
         score: float,
         success: bool,
-        execution_time_seconds: Optional[float] = None
+        execution_time_seconds: float | None = None
     ) -> None:
         """
         Record task assignment outcome.
@@ -627,7 +625,7 @@ class AssignmentHistoryTracker:
             score=score
         )
 
-    def get_agent_performance_stats(self, agent_id: str) -> Dict[str, Any]:
+    def get_agent_performance_stats(self, agent_id: str) -> dict[str, Any]:
         """
         Get performance statistics for an agent.
 
@@ -675,7 +673,7 @@ class AssignmentHistoryTracker:
             "average_execution_time": average_execution_time
         }
 
-    def get_strategy_effectiveness(self) -> Dict[str, Any]:
+    def get_strategy_effectiveness(self) -> dict[str, Any]:
         """
         Get effectiveness statistics for each assignment strategy.
 
@@ -718,10 +716,10 @@ class AssignmentHistoryTracker:
 
 
 # Backwards-compatible singleton helpers
-_assignment_service: Optional[TaskAssignmentService] = None
+_assignment_service: TaskAssignmentService | None = None
 
 
-def init_assignment_service(service: Optional[TaskAssignmentService] = None) -> None:
+def init_assignment_service(service: TaskAssignmentService | None = None) -> None:
     """Initialize or override the global TaskAssignmentService instance.
 
     Other modules import get_assignment_service() and expect a callable

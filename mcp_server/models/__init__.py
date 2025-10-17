@@ -5,15 +5,15 @@ This package contains all data models for the MCP server following
 the Pixelated platform's established patterns.
 """
 
-from .agent import Agent, AgentStatus, AgentCapabilities
-from .task import Task, TaskStatus, TaskPriority, TaskResult
+from .agent import Agent, AgentCapabilities, AgentStatus
+from .task import Task, TaskPriority, TaskResult, TaskStatus
 
 __all__ = [
     "Agent",
-    "AgentStatus", 
     "AgentCapabilities",
+    "AgentStatus",
     "Task",
-    "TaskStatus",
     "TaskPriority",
-    "TaskResult"
+    "TaskResult",
+    "TaskStatus"
 ]

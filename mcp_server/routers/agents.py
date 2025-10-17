@@ -5,30 +5,27 @@ This module provides RESTful API endpoints for agent registration, authenticatio
 and management following the Pixelated platform's security standards.
 """
 
-from typing import List, Optional
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status, Header
-from pydantic import BaseModel, Field
 import structlog
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 
-from ..services.auth import (
-    AuthService,
-    AgentRegistrationRequest,
-    AgentAuthenticationRequest,
-    AgentAuthenticationResponse,
-    get_auth_service
-)
-from ..models.agent import Agent, AgentStatus, AgentCapabilities
 from ..exceptions import (
     AuthenticationError,
-    AuthorizationError,
-    ValidationError,
+    ConflictError,
     ResourceNotFoundError,
-    ConflictError
+    ValidationError,
 )
 from ..middleware.auth import get_current_agent
-
+from ..models.agent import Agent, AgentStatus
+from ..services.auth import (
+    AgentAuthenticationRequest,
+    AgentAuthenticationResponse,
+    AgentRegistrationRequest,
+    AuthService,
+    get_auth_service,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -36,7 +33,7 @@ logger = structlog.get_logger(__name__)
 # Request/Response Models
 class AgentRegistrationResponse(BaseModel):
     """Response model for agent registration."""
-    
+
     message: str = Field(..., description="Success message")
     agent: Agent = Field(..., description="Registered agent details")
     api_key: str = Field(..., description="API key (shown only once)")
@@ -44,8 +41,8 @@ class AgentRegistrationResponse(BaseModel):
 
 class AgentListResponse(BaseModel):
     """Response model for agent list."""
-    
-    agents: List[Agent] = Field(..., description="List of agents")
+
+    agents: list[Agent] = Field(..., description="List of agents")
     total: int = Field(..., description="Total number of agents")
     page: int = Field(1, description="Current page")
     page_size: int = Field(10, description="Page size")
@@ -53,23 +50,23 @@ class AgentListResponse(BaseModel):
 
 class AgentUpdateRequest(BaseModel):
     """Request model for agent updates."""
-    
-    name: Optional[str] = Field(None, min_length=3, max_length=100, description="Agent name")
-    description: Optional[str] = Field(None, max_length=500, description="Agent description")
-    max_concurrent_tasks: Optional[int] = Field(None, ge=1, le=100, description="Max concurrent tasks")
-    webhook_url: Optional[str] = Field(None, description="Webhook URL")
-    metadata: Optional[dict] = Field(None, description="Additional metadata")
+
+    name: str | None = Field(None, min_length=3, max_length=100, description="Agent name")
+    description: str | None = Field(None, max_length=500, description="Agent description")
+    max_concurrent_tasks: int | None = Field(None, ge=1, le=100, description="Max concurrent tasks")
+    webhook_url: str | None = Field(None, description="Webhook URL")
+    metadata: dict | None = Field(None, description="Additional metadata")
 
 
 class AgentStatusUpdateRequest(BaseModel):
     """Request model for agent status updates."""
-    
+
     status: AgentStatus = Field(..., description="New agent status")
 
 
 class RegenerateApiKeyResponse(BaseModel):
     """Response model for API key regeneration."""
-    
+
     message: str = Field(..., description="Success message")
     api_key: str = Field(..., description="New API key (shown only once)")
 
@@ -103,18 +100,18 @@ async def register_agent(
         HTTPException: If registration fails
     """
     logger.info("Agent registration requested", name=registration.name, email=registration.email)
-    
+
     try:
         agent = await auth_service.register_agent(registration)
-        
+
         logger.info("Agent registered successfully", agent_id=agent.id, name=agent.name)
-        
+
         return AgentRegistrationResponse(
             message="Agent registered successfully",
             agent=agent,
             api_key=agent.api_key  # API key is only shown once
         )
-        
+
     except ConflictError as e:
         logger.warning("Agent registration failed - conflict", error=str(e))
         raise HTTPException(
@@ -159,16 +156,16 @@ async def authenticate_agent(
         HTTPException: If authentication fails
     """
     logger.info("Agent authentication requested", agent_id=auth_request.agent_id)
-    
+
     try:
         response = await auth_service.authenticate_agent(
             auth_request.agent_id,
             auth_request.api_key
         )
-        
+
         logger.info("Agent authenticated successfully", agent_id=auth_request.agent_id)
         return response
-        
+
     except ResourceNotFoundError as e:
         logger.warning("Agent authentication failed - not found", agent_id=auth_request.agent_id)
         raise HTTPException(
@@ -237,13 +234,13 @@ async def update_current_agent_profile(
         HTTPException: If update fails
     """
     logger.info("Updating current agent profile", agent_id=current_agent.id)
-    
+
     try:
         # Build update data
         update_data = update_request.dict(exclude_unset=True)
         if not update_data:
             raise ValidationError("No update data provided")
-        
+
         # Update agent in database
         result = await auth_service.agents_collection.update_one(
             {"id": current_agent.id},
@@ -254,18 +251,18 @@ async def update_current_agent_profile(
                 }
             }
         )
-        
+
         if result.matched_count == 0:
             raise ResourceNotFoundError("Agent not found")
-        
+
         # Get updated agent
         updated_agent = await auth_service.get_agent_by_id(current_agent.id)
         if not updated_agent:
             raise ResourceNotFoundError("Agent not found after update")
-        
+
         logger.info("Agent profile updated successfully", agent_id=current_agent.id)
         return updated_agent
-        
+
     except ValidationError as e:
         logger.warning("Agent update failed - validation error", error=str(e))
         raise HTTPException(
@@ -310,17 +307,17 @@ async def regenerate_api_key(
         HTTPException: If regeneration fails
     """
     logger.info("Regenerating API key for agent", agent_id=current_agent.id)
-    
+
     try:
         new_api_key = await auth_service.regenerate_api_key(current_agent.id)
-        
+
         logger.info("API key regenerated successfully", agent_id=current_agent.id)
-        
+
         return RegenerateApiKeyResponse(
             message="API key regenerated successfully",
             api_key=new_api_key
         )
-        
+
     except ResourceNotFoundError as e:
         logger.error("API key regeneration failed - not found", error=str(e))
         raise HTTPException(
@@ -344,7 +341,7 @@ async def regenerate_api_key(
 async def list_agents(
     page: int = 1,
     page_size: int = 10,
-    status: Optional[AgentStatus] = None,
+    status: AgentStatus | None = None,
     auth_service: AuthService = Depends(get_auth_service),
     current_agent: Agent = Depends(get_current_agent)
 ) -> AgentListResponse:
@@ -365,41 +362,41 @@ async def list_agents(
         HTTPException: If not authorized or request fails
     """
     logger.info("Listing agents", page=page, page_size=page_size, status=status)
-    
+
     # For now, any authenticated agent can list other agents
     # In a production system, you might want admin-only access
-    
+
     try:
         # Build query
         query = {}
         if status:
             query["status"] = status
-        
+
         # Calculate pagination
         skip = (page - 1) * page_size
-        
+
         # Get total count
         total = await auth_service.agents_collection.count_documents(query)
-        
+
         # Get agents
         cursor = auth_service.agents_collection.find(query).skip(skip).limit(page_size)
         agents_data = await cursor.to_list(length=page_size)
-        
+
         # Convert to Agent models (exclude API key hash)
         agents = []
         for agent_data in agents_data:
             agent_dict = {k: v for k, v in agent_data.items() if k != "api_key_hash"}
             agents.append(Agent(**agent_dict))
-        
+
         logger.info("Agents listed successfully", total=total, returned=len(agents))
-        
+
         return AgentListResponse(
             agents=agents,
             total=total,
             page=page,
             page_size=page_size
         )
-        
+
     except Exception as e:
         logger.error("Failed to list agents", error=str(e))
         raise HTTPException(
@@ -434,15 +431,15 @@ async def get_agent_by_id(
         HTTPException: If agent not found
     """
     logger.info("Getting agent by ID", agent_id=agent_id)
-    
+
     try:
         agent = await auth_service.get_agent_by_id(agent_id)
         if not agent:
             raise ResourceNotFoundError("Agent not found")
-        
+
         logger.info("Agent retrieved successfully", agent_id=agent_id)
         return agent
-        
+
     except ResourceNotFoundError as e:
         logger.warning("Agent not found", agent_id=agent_id)
         raise HTTPException(
@@ -485,13 +482,13 @@ async def update_agent_status(
         HTTPException: If update fails
     """
     logger.info("Updating agent status", agent_id=agent_id, new_status=status_update.status)
-    
+
     try:
         updated_agent = await auth_service.update_agent_status(agent_id, status_update.status)
-        
+
         logger.info("Agent status updated successfully", agent_id=agent_id, status=status_update.status)
         return updated_agent
-        
+
     except ResourceNotFoundError as e:
         logger.warning("Agent status update failed - not found", agent_id=agent_id)
         raise HTTPException(

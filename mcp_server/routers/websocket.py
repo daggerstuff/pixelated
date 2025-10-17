@@ -4,19 +4,16 @@ WebSocket Router for MCP Server
 Provides HTTP endpoints for WebSocket management and real-time communication.
 """
 
-from typing import Dict, Any, Optional, List
 from datetime import datetime
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Request
-from fastapi import Body
+import structlog
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-import structlog
 
-from ..config import MCPConfig, get_config
-from ..services.websocket_manager import WebSocketManager
 from ..middleware.auth import get_current_user
-from ..exceptions import ValidationError, AuthenticationError, ServiceUnavailableError
+from ..services.websocket_manager import WebSocketManager
 
 logger = structlog.get_logger(__name__)
 
@@ -24,13 +21,13 @@ logger = structlog.get_logger(__name__)
 class WebSocketConnectionInfo(BaseModel):
     """WebSocket connection information."""
     sid: str
-    agent_id: Optional[str] = None
-    user_id: Optional[str] = None
+    agent_id: str | None = None
+    user_id: str | None = None
     status: str
     connected_at: datetime
     last_heartbeat: datetime
-    metadata: Dict[str, Any]
-    subscribed_events: List[str]
+    metadata: dict[str, Any]
+    subscribed_events: list[str]
 
 
 class WebSocketStats(BaseModel):
@@ -47,23 +44,23 @@ class TaskProgressUpdate(BaseModel):
     """Task progress update data."""
     task_id: str = Field(..., description="Task ID")
     progress: float = Field(..., ge=0, le=100, description="Progress percentage")
-    status: Optional[str] = Field(None, description="Task status")
-    message: Optional[str] = Field(None, description="Progress message")
-    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+    status: str | None = Field(None, description="Task status")
+    message: str | None = Field(None, description="Progress message")
+    metadata: dict[str, Any] | None = Field(None, description="Additional metadata")
 
 
 class AgentStatusUpdate(BaseModel):
     """Agent status update data."""
     agent_id: str = Field(..., description="Agent ID")
     status: str = Field(..., description="Agent status")
-    capabilities: Optional[List[str]] = Field(None, description="Agent capabilities")
-    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+    capabilities: list[str] | None = Field(None, description="Agent capabilities")
+    metadata: dict[str, Any] | None = Field(None, description="Additional metadata")
 
 
 class CoordinationMessage(BaseModel):
     """Coordination message data."""
     room: str = Field(..., description="Coordination room name")
-    message: Dict[str, Any] = Field(..., description="Message data")
+    message: dict[str, Any] = Field(..., description="Message data")
     event_type: str = Field(..., description="Event type")
 
 
@@ -74,7 +71,7 @@ class WebSocketAuthRequest(BaseModel):
 
 class SubscriptionRequest(BaseModel):
     """Event subscription request."""
-    events: List[str] = Field(..., description="List of events to subscribe to")
+    events: list[str] = Field(..., description="List of events to subscribe to")
 
 
 # Create router
@@ -94,7 +91,7 @@ def get_websocket_manager(request: Request) -> WebSocketManager:
     Raises:
         HTTPException: If WebSocket manager is not available
     """
-    websocket_manager = getattr(request.app.state, 'websocket_manager', None)
+    websocket_manager = getattr(request.app.state, "websocket_manager", None)
     if not websocket_manager:
         raise HTTPException(
             status_code=503,
@@ -103,11 +100,11 @@ def get_websocket_manager(request: Request) -> WebSocketManager:
     return websocket_manager
 
 
-@router.get("/connections", response_model=List[WebSocketConnectionInfo])
+@router.get("/connections", response_model=list[WebSocketConnectionInfo])
 async def get_connections(
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> List[WebSocketConnectionInfo]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> list[WebSocketConnectionInfo]:
     """
     Get list of active WebSocket connections.
 
@@ -121,10 +118,10 @@ async def get_connections(
         connections = websocket_manager.get_active_connections()
 
         # Filter connections based on user permissions
-        user_id = current_user.get('user_id')
-        user_role = current_user.get('role', 'user')
+        user_id = current_user.get("user_id")
+        user_role = current_user.get("role", "user")
 
-        if user_role != 'admin':
+        if user_role != "admin":
             # Regular users can only see their own connections
             connections = [
                 conn for conn in connections
@@ -153,7 +150,7 @@ async def get_connections(
 @router.get("/stats", response_model=WebSocketStats)
 async def get_websocket_stats(
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: dict[str, Any] = Depends(get_current_user)
 ) -> WebSocketStats:
     """
     Get WebSocket server statistics.
@@ -167,7 +164,7 @@ async def get_websocket_stats(
     try:
         # Calculate statistics
         connections = websocket_manager.get_active_connections()
-        authenticated_connections = len([c for c in connections if c.status.value == 'authenticated'])
+        authenticated_connections = len([c for c in connections if c.status.value == "authenticated"])
         active_agents = len(set([c.agent_id for c in connections if c.agent_id]))
 
         # Get server start time (placeholder - should be tracked properly)
@@ -192,11 +189,11 @@ async def get_websocket_stats(
 @router.post("/broadcast")
 async def broadcast_message(
     event: str = Query(..., description="Event name"),
-    data: Dict[str, Any] = Body(..., description="Event data"),
-    room: Optional[str] = Query(None, description="Target room"),
+    data: dict[str, Any] = Body(..., description="Event data"),
+    room: str | None = Query(None, description="Target room"),
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Broadcast a message to WebSocket clients.
 
@@ -213,8 +210,8 @@ async def broadcast_message(
     """
     try:
         # Check permissions
-        user_role = current_user.get('role', 'user')
-        if user_role not in ['admin', 'system']:
+        user_role = current_user.get("role", "user")
+        if user_role not in ["admin", "system"]:
             raise HTTPException(
                 status_code=403,
                 detail="Insufficient permissions to broadcast messages"
@@ -241,8 +238,8 @@ async def update_task_progress(
     progress_update: TaskProgressUpdate,
     task_id: str = Path(..., description="Task ID"),
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Update task progress via WebSocket.
 
@@ -259,18 +256,18 @@ async def update_task_progress(
     try:
         # Prepare progress data
         progress_data = {
-            'task_id': task_id,
-            'progress': progress_update.progress,
-            'status': progress_update.status,
-            'message': progress_update.message,
-            'metadata': progress_update.metadata or {},
-            'updated_by': current_user.get('user_id'),
-            'updated_at': datetime.utcnow().isoformat()
+            "task_id": task_id,
+            "progress": progress_update.progress,
+            "status": progress_update.status,
+            "message": progress_update.message,
+            "metadata": progress_update.metadata or {},
+            "updated_by": current_user.get("user_id"),
+            "updated_at": datetime.utcnow().isoformat()
         }
 
         # Broadcast progress update
         await websocket_manager.publish_event(
-            'task:progress',
+            "task:progress",
             progress_data,
             room=f"task:{task_id}"
         )
@@ -292,8 +289,8 @@ async def update_agent_status(
     status_update: AgentStatusUpdate,
     agent_id: str = Path(..., description="Agent ID"),
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Update agent status via WebSocket.
 
@@ -309,28 +306,28 @@ async def update_agent_status(
     """
     try:
         # Check permissions - users can only update their own agents unless admin
-        user_role = current_user.get('role', 'user')
-        user_id = current_user.get('user_id')
+        user_role = current_user.get("role", "user")
+        user_id = current_user.get("user_id")
 
-        if user_role != 'admin' and status_update.agent_id != agent_id:
+        if user_role != "admin" and status_update.agent_id != agent_id:
             # Check if this is the user's own agent
             # TODO: Implement proper agent ownership check
             pass
 
         # Prepare status data
         status_data = {
-            'agent_id': agent_id,
-            'status': status_update.status,
-            'capabilities': status_update.capabilities,
-            'metadata': status_update.metadata or {},
-            'updated_by': user_id,
+            "agent_id": agent_id,
+            "status": status_update.status,
+            "capabilities": status_update.capabilities,
+            "metadata": status_update.metadata or {},
+            "updated_by": user_id,
 
-            'updated_at': datetime.utcnow().isoformat()
+            "updated_at": datetime.utcnow().isoformat()
         }
 
         # Broadcast status update
         await websocket_manager.publish_event(
-            'agent:status_updated',
+            "agent:status_updated",
             status_data,
             room=f"agent:{agent_id}"
         )
@@ -355,8 +352,8 @@ get_connection_stats = get_websocket_stats
 async def broadcast_coordination_message(
     message: CoordinationMessage,
     websocket_manager: WebSocketManager = Depends(get_websocket_manager),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Broadcast a coordination message to a room.
 
@@ -371,8 +368,8 @@ async def broadcast_coordination_message(
     """
     try:
         # Check permissions
-        user_role = current_user.get('role', 'user')
-        if user_role not in ['admin', 'agent', 'system']:
+        user_role = current_user.get("role", "user")
+        if user_role not in ["admin", "agent", "system"]:
             raise HTTPException(
                 status_code=403,
                 detail="Insufficient permissions for coordination messages"
@@ -380,17 +377,17 @@ async def broadcast_coordination_message(
 
         # Prepare coordination message
         coord_data = {
-            'room': message.room,
-            'event_type': message.event_type,
-            'message': message.message,
-            'sender_id': current_user.get('user_id'),
-            'sender_agent_id': current_user.get('agent_id'),
-            'timestamp': datetime.utcnow().isoformat()
+            "room": message.room,
+            "event_type": message.event_type,
+            "message": message.message,
+            "sender_id": current_user.get("user_id"),
+            "sender_agent_id": current_user.get("agent_id"),
+            "timestamp": datetime.utcnow().isoformat()
         }
 
         # Broadcast to coordination room
         await websocket_manager.publish_event(
-            'coordination:message',
+            "coordination:message",
             coord_data,
             room=f"coordination:{message.room}"
         )
@@ -412,7 +409,7 @@ async def broadcast_coordination_message(
 @router.get("/health")
 async def get_websocket_health(
     websocket_manager: WebSocketManager = Depends(get_websocket_manager)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get WebSocket service health status.
 
@@ -477,11 +474,11 @@ async def general_exception_handler(request: Request, exc: Exception):
 # Register exception handlers on the router when supported. Some FastAPI
 # versions don't expose add_exception_handler on APIRouter; guard the call
 # to avoid raising during import (tests import this module during collection).
-if hasattr(router, 'add_exception_handler'):
+if hasattr(router, "add_exception_handler"):
     router.add_exception_handler(HTTPException, http_exception_handler)
     router.add_exception_handler(Exception, general_exception_handler)
 else:
     # Fallback: attach handler functions to the router object so tests or
     # application setup code can register them on the FastAPI app if needed.
-    setattr(router, 'http_exception_handler', http_exception_handler)
-    setattr(router, 'general_exception_handler', general_exception_handler)
+    router.http_exception_handler = http_exception_handler
+    router.general_exception_handler = general_exception_handler

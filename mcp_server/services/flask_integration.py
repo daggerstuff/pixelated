@@ -6,19 +6,18 @@ and the MCP server's WebSocket real-time communication infrastructure.
 """
 
 import asyncio
-import json
-import logging
-from datetime import datetime
-from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import Any
 
 import aiohttp
 import structlog
 from redis.asyncio import Redis
 
 from mcp_server.config import MCPConfig
-from mcp_server.exceptions import IntegrationError, ValidationError, ServiceUnavailableError
+from mcp_server.exceptions import IntegrationError, ValidationError
+
 from .integration_manager import IntegrationEventType
 
 logger = structlog.get_logger(__name__)
@@ -48,15 +47,15 @@ class PipelineExecution:
     """Pipeline execution data structure."""
     execution_id: str
     user_id: str
-    pipeline_config: Dict[str, Any]
+    pipeline_config: dict[str, Any]
     status: PipelineStatus
-    current_stage: Optional[PipelineStage]
-    stage_results: Dict[str, Any]
+    current_stage: PipelineStage | None
+    stage_results: dict[str, Any]
     start_time: datetime
-    end_time: Optional[datetime]
+    end_time: datetime | None
     overall_progress: float
-    quality_score: Optional[float]
-    error_message: Optional[str]
+    quality_score: float | None
+    error_message: str | None
 
 
 class FlaskIntegrationService:
@@ -87,7 +86,7 @@ class FlaskIntegrationService:
         self.session = None
 
         # Pipeline tracking
-        self.active_executions: Dict[str, PipelineExecution] = {}
+        self.active_executions: dict[str, PipelineExecution] = {}
         self.execution_timeout = 3600  # 1 hour
 
         self.logger.info("FlaskIntegrationService initialized", flask_api_url=self.flask_api_url)
@@ -97,15 +96,15 @@ class FlaskIntegrationService:
         try:
             self.session = aiohttp.ClientSession(
                 timeout=aiohttp.ClientTimeout(total=self.request_timeout),
-                headers={'Content-Type': 'application/json'}
+                headers={"Content-Type": "application/json"}
             )
             self.logger.info("Flask integration service initialized successfully")
 
         except Exception as e:
             self.logger.error("Failed to initialize Flask integration service", error=str(e))
-            raise IntegrationError(f"Flask integration service initialization failed: {str(e)}")
+            raise IntegrationError(f"Flask integration service initialization failed: {e!s}")
 
-    async def execute_pipeline(self, pipeline_config: Dict[str, Any], user_id: str) -> str:
+    async def execute_pipeline(self, pipeline_config: dict[str, Any], user_id: str) -> str:
         """
         Execute 6-stage pipeline via Flask service.
 
@@ -160,9 +159,9 @@ class FlaskIntegrationService:
             raise
         except Exception as e:
             self.logger.error("Error initiating pipeline execution", error=str(e))
-            raise IntegrationError(f"Pipeline execution initiation failed: {str(e)}")
+            raise IntegrationError(f"Pipeline execution initiation failed: {e!s}")
 
-    async def _execute_pipeline_async(self, execution_id: str, pipeline_config: Dict[str, Any], user_id: str) -> None:
+    async def _execute_pipeline_async(self, execution_id: str, pipeline_config: dict[str, Any], user_id: str) -> None:
         """Execute pipeline asynchronously with real-time updates."""
         try:
             execution = self.active_executions[execution_id]
@@ -173,9 +172,9 @@ class FlaskIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'stage_name': 'initialization',
-                    'stage_number': 0,
-                    'message': 'Pipeline execution started'
+                    "stage_name": "initialization",
+                    "stage_number": 0,
+                    "message": "Pipeline execution started"
                 }
             )
 
@@ -201,9 +200,9 @@ class FlaskIntegrationService:
                         execution_id,
                         user_id,
                         {
-                            'stage_name': stage.value,
-                            'stage_number': i,
-                            'overall_progress': execution.overall_progress
+                            "stage_name": stage.value,
+                            "stage_number": i,
+                            "overall_progress": execution.overall_progress
                         }
                     )
 
@@ -222,15 +221,15 @@ class FlaskIntegrationService:
                         execution_id,
                         user_id,
                         {
-                            'stage_name': stage.value,
-                            'stage_number': i,
-                            'result': stage_result,
-                            'overall_progress': execution.overall_progress
+                            "stage_name": stage.value,
+                            "stage_number": i,
+                            "result": stage_result,
+                            "overall_progress": execution.overall_progress
                         }
                     )
 
                     # Check for stage failures
-                    if stage_result.get('status') == 'failed':
+                    if stage_result.get("status") == "failed":
                         raise IntegrationError(f"Stage {stage.value} failed: {stage_result.get('error', 'Unknown error')}")
 
                 except Exception as e:
@@ -244,9 +243,9 @@ class FlaskIntegrationService:
                         execution_id,
                         user_id,
                         {
-                            'stage_name': stage.value,
-                            'error': str(e),
-                            'error_type': type(e).__name__
+                            "stage_name": stage.value,
+                            "error": str(e),
+                            "error_type": type(e).__name__
                         }
                     )
                     return
@@ -265,10 +264,10 @@ class FlaskIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'status': 'completed',
-                    'results': execution.stage_results,
-                    'overall_quality_score': execution.quality_score,
-                    'total_duration_seconds': (execution.end_time - execution.start_time).total_seconds()
+                    "status": "completed",
+                    "results": execution.stage_results,
+                    "overall_quality_score": execution.quality_score,
+                    "total_duration_seconds": (execution.end_time - execution.start_time).total_seconds()
                 }
             )
 
@@ -289,12 +288,12 @@ class FlaskIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'error': str(e),
-                    'error_type': type(e).__name__
+                    "error": str(e),
+                    "error_type": type(e).__name__
                 }
             )
 
-    async def _execute_data_ingestion(self, pipeline_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_data_ingestion(self, pipeline_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 1: Data Ingestion."""
         try:
             self.logger.info("Executing data ingestion stage", user_id=user_id)
@@ -303,9 +302,9 @@ class FlaskIntegrationService:
             async with self.session.post(
                 f"{self.flask_api_url}/api/v1/pipeline/stages/execute",
                 json={
-                    'stage': 'data_ingestion',
-                    'input_data': pipeline_config.get('input_data', {}),
-                    'config': pipeline_config
+                    "stage": "data_ingestion",
+                    "input_data": pipeline_config.get("input_data", {}),
+                    "config": pipeline_config
                 }
             ) as response:
                 if response.status != 200:
@@ -314,22 +313,22 @@ class FlaskIntegrationService:
                 result = await response.json()
 
                 return {
-                    'stage': 'data_ingestion',
-                    'status': 'completed',
-                    'result': result.get('data', {}),
-                    'duration_seconds': result.get('duration_seconds', 0),
-                    'processed_records': result.get('data', {}).get('record_count', 0)
+                    "stage": "data_ingestion",
+                    "status": "completed",
+                    "result": result.get("data", {}),
+                    "duration_seconds": result.get("duration_seconds", 0),
+                    "processed_records": result.get("data", {}).get("record_count", 0)
                 }
 
         except Exception as e:
             self.logger.error("Data ingestion stage failed", error=str(e))
             return {
-                'stage': 'data_ingestion',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "data_ingestion",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_preprocessing(self, pipeline_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_preprocessing(self, pipeline_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 2: Preprocessing."""
         try:
             self.logger.info("Executing preprocessing stage", user_id=user_id)
@@ -338,74 +337,74 @@ class FlaskIntegrationService:
             await asyncio.sleep(2)  # Simulate processing time
 
             return {
-                'stage': 'preprocessing',
-                'status': 'completed',
-                'operations_applied': [
-                    'data_type_conversion',
-                    'missing_value_handling',
-                    'duplicate_removal',
-                    'format_standardization'
+                "stage": "preprocessing",
+                "status": "completed",
+                "operations_applied": [
+                    "data_type_conversion",
+                    "missing_value_handling",
+                    "duplicate_removal",
+                    "format_standardization"
                 ],
-                'quality_metrics': {
-                    'completeness_score': 0.98,
-                    'consistency_score': 0.95,
-                    'accuracy_score': 0.97
+                "quality_metrics": {
+                    "completeness_score": 0.98,
+                    "consistency_score": 0.95,
+                    "accuracy_score": 0.97
                 },
-                'duration_seconds': 2.0
+                "duration_seconds": 2.0
             }
 
         except Exception as e:
             self.logger.error("Preprocessing stage failed", error=str(e))
             return {
-                'stage': 'preprocessing',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "preprocessing",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_bias_detection(self, pipeline_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_bias_detection(self, pipeline_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 3: Bias Detection."""
         try:
             self.logger.info("Executing bias detection stage", user_id=user_id)
 
             # Call bias detection service if available
-            if hasattr(self, 'bias_detection_service') and self.bias_detection_service:
+            if hasattr(self, "bias_detection_service") and self.bias_detection_service:
                 bias_result = await self.bias_detection_service.analyze_dataset(
-                    pipeline_config.get('input_data', {}),
+                    pipeline_config.get("input_data", {}),
                     user_id
                 )
             else:
                 # Simulate bias detection result
                 bias_result = {
-                    'bias_score': 0.15,  # Low bias
-                    'bias_categories': {
-                        'demographic': 0.10,
-                        'geographic': 0.05,
-                        'temporal': 0.20
+                    "bias_score": 0.15,  # Low bias
+                    "bias_categories": {
+                        "demographic": 0.10,
+                        "geographic": 0.05,
+                        "temporal": 0.20
                     },
-                    'recommendations': [
-                        'Consider increasing dataset diversity',
-                        'Review temporal bias in data collection'
+                    "recommendations": [
+                        "Consider increasing dataset diversity",
+                        "Review temporal bias in data collection"
                     ],
-                    'compliance_status': 'acceptable',
-                    'threshold_exceeded': False
+                    "compliance_status": "acceptable",
+                    "threshold_exceeded": False
                 }
 
             return {
-                'stage': 'bias_detection',
-                'status': 'completed',
-                'result': bias_result,
-                'duration_seconds': 3.0
+                "stage": "bias_detection",
+                "status": "completed",
+                "result": bias_result,
+                "duration_seconds": 3.0
             }
 
         except Exception as e:
             self.logger.error("Bias detection stage failed", error=str(e))
             return {
-                'stage': 'bias_detection',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "bias_detection",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_standardization(self, pipeline_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_standardization(self, pipeline_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 4: Standardization."""
         try:
             self.logger.info("Executing standardization stage", user_id=user_id)
@@ -413,25 +412,25 @@ class FlaskIntegrationService:
             await asyncio.sleep(1)  # Simulate processing time
 
             return {
-                'stage': 'standardization',
-                'status': 'completed',
-                'target_format': 'standardized_json',
-                'schema_applied': 'dataset_schema_v2.1',
-                'fields_standardized': 25,
-                'data_types_normalized': 8,
-                'quality_score': 0.96,
-                'duration_seconds': 1.0
+                "stage": "standardization",
+                "status": "completed",
+                "target_format": "standardized_json",
+                "schema_applied": "dataset_schema_v2.1",
+                "fields_standardized": 25,
+                "data_types_normalized": 8,
+                "quality_score": 0.96,
+                "duration_seconds": 1.0
             }
 
         except Exception as e:
             self.logger.error("Standardization stage failed", error=str(e))
             return {
-                'stage': 'standardization',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "standardization",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_validation(self, pipeline_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_validation(self, pipeline_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 5: Validation."""
         try:
             self.logger.info("Executing validation stage", user_id=user_id)
@@ -439,31 +438,31 @@ class FlaskIntegrationService:
             await asyncio.sleep(2)  # Simulate validation time
 
             return {
-                'stage': 'validation',
-                'status': 'completed',
-                'validation_checks': [
-                    'schema_validation',
-                    'data_type_validation',
-                    'completeness_check',
-                    'consistency_check',
-                    'business_rule_validation'
+                "stage": "validation",
+                "status": "completed",
+                "validation_checks": [
+                    "schema_validation",
+                    "data_type_validation",
+                    "completeness_check",
+                    "consistency_check",
+                    "business_rule_validation"
                 ],
-                'checks_passed': 5,
-                'checks_failed': 0,
-                'validation_score': 1.0,
-                'quality_score': 0.98,
-                'duration_seconds': 2.0
+                "checks_passed": 5,
+                "checks_failed": 0,
+                "validation_score": 1.0,
+                "quality_score": 0.98,
+                "duration_seconds": 2.0
             }
 
         except Exception as e:
             self.logger.error("Validation stage failed", error=str(e))
             return {
-                'stage': 'validation',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "validation",
+                "status": "failed",
+                "error": str(e)
             }
 
-    async def _execute_output_generation(self, pipeline_config: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    async def _execute_output_generation(self, pipeline_config: dict[str, Any], user_id: str) -> dict[str, Any]:
         """Execute Stage 6: Output Generation."""
         try:
             self.logger.info("Executing output generation stage", user_id=user_id)
@@ -471,72 +470,72 @@ class FlaskIntegrationService:
             execution_id = f"output_{int(datetime.utcnow().timestamp())}"
 
             return {
-                'stage': 'output_generation',
-                'status': 'completed',
-                'output_files': [
+                "stage": "output_generation",
+                "status": "completed",
+                "output_files": [
                     {
-                        'filename': f'processed_dataset_{execution_id}.json',
-                        'format': 'json',
-                        'size_mb': 2.1,
-                        'record_count': 995
+                        "filename": f"processed_dataset_{execution_id}.json",
+                        "format": "json",
+                        "size_mb": 2.1,
+                        "record_count": 995
                     },
                     {
-                        'filename': f'validation_report_{execution_id}.json',
-                        'format': 'json',
-                        'size_mb': 0.1,
-                        'record_count': 1
+                        "filename": f"validation_report_{execution_id}.json",
+                        "format": "json",
+                        "size_mb": 0.1,
+                        "record_count": 1
                     }
                 ],
-                'metadata': {
-                    'processing_timestamp': datetime.utcnow().isoformat(),
-                    'pipeline_version': '1.0.0',
-                    'bias_detection_applied': True,
-                    'quality_score': 0.96
+                "metadata": {
+                    "processing_timestamp": datetime.utcnow().isoformat(),
+                    "pipeline_version": "1.0.0",
+                    "bias_detection_applied": True,
+                    "quality_score": 0.96
                 },
-                'download_links': [
-                    f'/api/v1/pipeline/executions/{execution_id}/output/processed_dataset',
-                    f'/api/v1/pipeline/executions/{execution_id}/output/validation_report'
+                "download_links": [
+                    f"/api/v1/pipeline/executions/{execution_id}/output/processed_dataset",
+                    f"/api/v1/pipeline/executions/{execution_id}/output/validation_report"
                 ],
-                'duration_seconds': 1.5
+                "duration_seconds": 1.5
             }
 
         except Exception as e:
             self.logger.error("Output generation stage failed", error=str(e))
             return {
-                'stage': 'output_generation',
-                'status': 'failed',
-                'error': str(e)
+                "stage": "output_generation",
+                "status": "failed",
+                "error": str(e)
             }
 
-    def _validate_pipeline_config(self, config: Dict[str, Any]) -> None:
+    def _validate_pipeline_config(self, config: dict[str, Any]) -> None:
         """Validate pipeline configuration."""
-        required_fields = ['source_format', 'target_format', 'input_data']
+        required_fields = ["source_format", "target_format", "input_data"]
         missing_fields = [field for field in required_fields if field not in config]
 
         if missing_fields:
             raise ValidationError(f"Missing required pipeline configuration fields: {missing_fields}")
 
-        supported_formats = ['csv', 'json', 'jsonl', 'parquet', 'txt']
-        if config['source_format'] not in supported_formats:
+        supported_formats = ["csv", "json", "jsonl", "parquet", "txt"]
+        if config["source_format"] not in supported_formats:
             raise ValidationError(f"Unsupported source format: {config['source_format']}")
 
-        if config['target_format'] not in supported_formats:
+        if config["target_format"] not in supported_formats:
             raise ValidationError(f"Unsupported target format: {config['target_format']}")
 
-    def _calculate_overall_quality_score(self, stage_results: Dict[str, Any]) -> float:
+    def _calculate_overall_quality_score(self, stage_results: dict[str, Any]) -> float:
         """Calculate overall quality score from stage results."""
         quality_scores = []
 
         for stage_name, result in stage_results.items():
-            if result.get('status') == 'completed':
-                stage_score = result.get('quality_score') or result.get('validation_score') or 0.0
+            if result.get("status") == "completed":
+                stage_score = result.get("quality_score") or result.get("validation_score") or 0.0
                 if isinstance(stage_score, (int, float)):
                     quality_scores.append(stage_score)
 
         return sum(quality_scores) / len(quality_scores) if quality_scores else 0.0
 
     async def _publish_pipeline_event(self, event_type: IntegrationEventType,
-                                    execution_id: str, user_id: str, data: Dict[str, Any]) -> None:
+                                    execution_id: str, user_id: str, data: dict[str, Any]) -> None:
         """Publish pipeline event via integration manager."""
         if self.integration_manager:
             await self.integration_manager.publish_integration_event(
@@ -546,7 +545,7 @@ class FlaskIntegrationService:
                 data=data
             )
 
-    async def get_execution_status(self, execution_id: str, user_id: str) -> Dict[str, Any]:
+    async def get_execution_status(self, execution_id: str, user_id: str) -> dict[str, Any]:
         """
         Get pipeline execution status.
 
@@ -567,22 +566,22 @@ class FlaskIntegrationService:
                 raise ValidationError("Access denied to execution")
 
             return {
-                'execution_id': execution_id,
-                'status': execution.status.value,
-                'current_stage': execution.current_stage.value if execution.current_stage else None,
-                'overall_progress': execution.overall_progress,
-                'quality_score': execution.quality_score,
-                'stage_results': execution.stage_results,
-                'start_time': execution.start_time.isoformat(),
-                'end_time': execution.end_time.isoformat() if execution.end_time else None,
-                'error_message': execution.error_message
+                "execution_id": execution_id,
+                "status": execution.status.value,
+                "current_stage": execution.current_stage.value if execution.current_stage else None,
+                "overall_progress": execution.overall_progress,
+                "quality_score": execution.quality_score,
+                "stage_results": execution.stage_results,
+                "start_time": execution.start_time.isoformat(),
+                "end_time": execution.end_time.isoformat() if execution.end_time else None,
+                "error_message": execution.error_message
             }
 
         except ValidationError:
             raise
         except Exception as e:
             self.logger.error("Error getting execution status", execution_id=execution_id, error=str(e))
-            raise IntegrationError(f"Failed to get execution status: {str(e)}")
+            raise IntegrationError(f"Failed to get execution status: {e!s}")
 
     async def cancel_execution(self, execution_id: str, user_id: str) -> bool:
         """
@@ -617,9 +616,9 @@ class FlaskIntegrationService:
                 execution_id,
                 user_id,
                 {
-                    'status': 'cancelled',
-                    'reason': 'User requested cancellation',
-                    'cancelled_at': datetime.utcnow().isoformat()
+                    "status": "cancelled",
+                    "reason": "User requested cancellation",
+                    "cancelled_at": datetime.utcnow().isoformat()
                 }
             )
 
@@ -631,40 +630,39 @@ class FlaskIntegrationService:
             raise
         except Exception as e:
             self.logger.error("Error cancelling execution", execution_id=execution_id, error=str(e))
-            raise IntegrationError(f"Failed to cancel execution: {str(e)}")
+            raise IntegrationError(f"Failed to cancel execution: {e!s}")
 
-    async def get_service_health(self) -> Dict[str, Any]:
+    async def get_service_health(self) -> dict[str, Any]:
         """Get Flask service health status."""
         try:
             if not self.session:
                 return {
-                    'status': 'unhealthy',
-                    'error': 'Service not initialized',
-                    'timestamp': datetime.utcnow().isoformat()
+                    "status": "unhealthy",
+                    "error": "Service not initialized",
+                    "timestamp": datetime.utcnow().isoformat()
                 }
 
             # Test Flask service connectivity
             async with self.session.get(f"{self.flask_api_url}/health") as response:
                 if response.status == 200:
                     return {
-                        'status': 'healthy',
-                        'flask_api_url': self.flask_api_url,
-                        'active_executions': len(self.active_executions),
-                        'timestamp': datetime.utcnow().isoformat()
+                        "status": "healthy",
+                        "flask_api_url": self.flask_api_url,
+                        "active_executions": len(self.active_executions),
+                        "timestamp": datetime.utcnow().isoformat()
                     }
-                else:
-                    return {
-                        'status': 'unhealthy',
-                        'error': f"Flask service returned HTTP {response.status}",
-                        'timestamp': datetime.utcnow().isoformat()
-                    }
+                return {
+                    "status": "unhealthy",
+                    "error": f"Flask service returned HTTP {response.status}",
+                    "timestamp": datetime.utcnow().isoformat()
+                }
 
         except Exception as e:
             self.logger.error("Flask service health check failed", error=str(e))
             return {
-                'status': 'unhealthy',
-                'error': str(e),
-                'timestamp': datetime.utcnow().isoformat()
+                "status": "unhealthy",
+                "error": str(e),
+                "timestamp": datetime.utcnow().isoformat()
             }
 
     async def cleanup_expired_executions(self) -> int:

@@ -6,46 +6,39 @@ and Phase 6 completion tracking with integration to existing MCP services.
 
 from __future__ import annotations
 
-
 import asyncio
 import json
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from typing import Any
 
 import structlog
-from datetime import timezone
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from redis.asyncio import Redis
 
 from mcp_server.config import MCPConfig
 from mcp_server.exceptions import (
-    ValidationError,
-    ResourceNotFoundError,
     AuthenticationError,
-    IntegrationError
+    IntegrationError,
+    ResourceNotFoundError,
+    ValidationError,
 )
 from mcp_server.models.agent_handoff import (
+    AgentHandoffDashboardData,
     AgentHandoffReport,
-    AgentHandoffSubmissionRequest,
     AgentHandoffReviewRequest,
     AgentHandoffSignOffRequest,
-    AgentHandoffFilter,
     AgentHandoffStats,
-    AgentHandoffDashboardData,
-    HandoffReportStatus,
-    Phase6ComponentStatus,
-    Phase6ComponentProgress,
+    AgentHandoffSubmissionRequest,
     ComponentType,
+    HandoffReportStatus,
+    Phase6ComponentProgress,
     SignOffRecord,
     create_handoff_report_id,
     create_sign_off_id,
     get_default_phase6_components,
-    validate_phase6_completion
+    validate_phase6_completion,
 )
-from mcp_server.models.agent import Agent
-from mcp_server.models.task import Task, TaskStatus
 
 logger = structlog.get_logger(__name__)
 
@@ -58,7 +51,7 @@ class HandoffServiceConfig:
     review_timeout_days: int = 7
     sign_off_expiry_days: int = 30
     auto_approval_threshold: float = 0.9
-    required_sign_offs: List[str] = None
+    required_sign_offs: list[str] = None
     enable_notifications: bool = True
     enable_auto_validation: bool = True
 
@@ -123,7 +116,7 @@ class AgentHandoffService:
         except Exception as e:
             self.logger.error("Failed to initialize agent hand-off service", error=str(e))
             raise IntegrationError(
-                f"Agent hand-off service initialization failed: {str(e)}"
+                f"Agent hand-off service initialization failed: {e!s}"
             ) from e
 
     async def _create_indexes(self) -> None:
@@ -212,12 +205,12 @@ class AgentHandoffService:
             report_id = create_handoff_report_id()
 
             # Initialize default Phase 6 components if not provided
-            if 'phase6_components' not in kwargs or not kwargs['phase6_components']:
-                kwargs['phase6_components'] = get_default_phase6_components()
+            if "phase6_components" not in kwargs or not kwargs["phase6_components"]:
+                kwargs["phase6_components"] = get_default_phase6_components()
 
             # Set default required sign-offs if not provided
-            if 'sign_offs_required' not in kwargs or not kwargs['sign_offs_required']:
-                kwargs['sign_offs_required'] = self.service_config.required_sign_offs
+            if "sign_offs_required" not in kwargs or not kwargs["sign_offs_required"]:
+                kwargs["sign_offs_required"] = self.service_config.required_sign_offs
 
             # Create report
             report = AgentHandoffReport(
@@ -248,9 +241,9 @@ class AgentHandoffService:
             raise
         except Exception as e:
             self.logger.error("Failed to create agent hand-off report", error=str(e))
-            raise IntegrationError(f"Failed to create hand-off report: {str(e)}") from e
+            raise IntegrationError(f"Failed to create hand-off report: {e!s}") from e
 
-    async def get_report(self, report_id: str) -> Optional[AgentHandoffReport]:
+    async def get_report(self, report_id: str) -> AgentHandoffReport | None:
         """
         Get agent hand-off report by ID.
 
@@ -290,7 +283,7 @@ class AgentHandoffService:
         report_id: str,
         agent_id: str,
         **updates
-    ) -> Optional[AgentHandoffReport]:
+    ) -> AgentHandoffReport | None:
         """
         Update agent hand-off report.
 
@@ -355,12 +348,12 @@ class AgentHandoffService:
             raise
         except Exception as e:
             self.logger.error("Failed to update agent hand-off report", error=str(e))
-            raise IntegrationError(f"Failed to update hand-off report: {str(e)}") from e
+            raise IntegrationError(f"Failed to update hand-off report: {e!s}") from e
 
     async def submit_report(
         self,
         submission_request: AgentHandoffSubmissionRequest
-    ) -> Optional[AgentHandoffReport]:
+    ) -> AgentHandoffReport | None:
         """
         Submit agent hand-off report for review.
 
@@ -443,12 +436,12 @@ class AgentHandoffService:
             raise
         except Exception as e:
             self.logger.error("Failed to submit agent hand-off report", error=str(e))
-            raise IntegrationError(f"Failed to submit hand-off report: {str(e)}")
+            raise IntegrationError(f"Failed to submit hand-off report: {e!s}")
 
     async def review_report(
         self,
         review_request: AgentHandoffReviewRequest
-    ) -> Optional[AgentHandoffReport]:
+    ) -> AgentHandoffReport | None:
         """
         Review agent hand-off report.
 
@@ -530,12 +523,12 @@ class AgentHandoffService:
             raise
         except Exception as e:
             self.logger.error("Failed to review agent hand-off report", error=str(e))
-            raise IntegrationError(f"Failed to review hand-off report: {str(e)}")
+            raise IntegrationError(f"Failed to review hand-off report: {e!s}")
 
     async def sign_off_report(
         self,
         sign_off_request: AgentHandoffSignOffRequest
-    ) -> Optional[AgentHandoffReport]:
+    ) -> AgentHandoffReport | None:
         """
         Sign off on agent hand-off report.
 
@@ -628,7 +621,7 @@ class AgentHandoffService:
             raise
         except Exception as e:
             self.logger.error("Failed to sign off on agent hand-off report", error=str(e))
-            raise IntegrationError(f"Failed to sign off on hand-off report: {str(e)}")
+            raise IntegrationError(f"Failed to sign off on hand-off report: {e!s}")
 
     async def get_dashboard_data(self, force_refresh: bool = False) -> AgentHandoffDashboardData:
         """
@@ -682,7 +675,7 @@ class AgentHandoffService:
 
         except Exception as e:
             self.logger.error("Failed to get dashboard data", error=str(e))
-            raise IntegrationError(f"Failed to get dashboard data: {str(e)}")
+            raise IntegrationError(f"Failed to get dashboard data: {e!s}")
 
     async def update_component_progress(
         self,
@@ -690,7 +683,7 @@ class AgentHandoffService:
         agent_id: str,
         component_type: ComponentType,
         progress: Phase6ComponentProgress
-    ) -> Optional[AgentHandoffReport]:
+    ) -> AgentHandoffReport | None:
         """
         Update Phase 6 component progress in a report.
 
@@ -749,7 +742,7 @@ class AgentHandoffService:
             raise
         except Exception as e:
             self.logger.error("Failed to update component progress", error=str(e))
-            raise IntegrationError(f"Failed to update component progress: {str(e)}")
+            raise IntegrationError(f"Failed to update component progress: {e!s}")
 
     # Helper methods
     async def _validate_agent(self, agent_id: str) -> None:
@@ -802,7 +795,7 @@ class AgentHandoffService:
         except Exception as e:
             self.logger.warning("Failed to cache report", error=str(e))
 
-    async def _get_cached_report(self, report_id: str) -> Optional[AgentHandoffReport]:
+    async def _get_cached_report(self, report_id: str) -> AgentHandoffReport | None:
         """Get cached report from Redis."""
         try:
             cache_key = f"{self.report_cache_prefix}{report_id}"
@@ -830,7 +823,7 @@ class AgentHandoffService:
         except Exception as e:
             self.logger.warning("Failed to cache dashboard data", error=str(e))
 
-    async def _get_cached_dashboard_data(self) -> Optional[AgentHandoffDashboardData]:
+    async def _get_cached_dashboard_data(self) -> AgentHandoffDashboardData | None:
         """Get cached dashboard data from Redis."""
         try:
             cached_data = await self.redis_client.get(self.dashboard_cache_key)
@@ -1081,7 +1074,7 @@ class AgentHandoffService:
             self.logger.error("Failed to calculate statistics", error=str(e))
             return AgentHandoffStats()
 
-    async def _get_recent_reports(self, limit: int = 10) -> List[AgentHandoffReport]:
+    async def _get_recent_reports(self, limit: int = 10) -> list[AgentHandoffReport]:
         """Get recent hand-off reports."""
         try:
             reports_coll = self.database[self.reports_collection]
@@ -1098,7 +1091,7 @@ class AgentHandoffService:
             self.logger.error("Failed to get recent reports", error=str(e))
             return []
 
-    async def _get_pending_reviews(self) -> List[AgentHandoffReport]:
+    async def _get_pending_reviews(self) -> list[AgentHandoffReport]:
         """Get reports pending review."""
         try:
             reports_coll = self.database[self.reports_collection]
@@ -1117,7 +1110,7 @@ class AgentHandoffService:
             self.logger.error("Failed to get pending reviews", error=str(e))
             return []
 
-    async def _calculate_phase6_summary(self) -> Dict[str, Any]:
+    async def _calculate_phase6_summary(self) -> dict[str, Any]:
         """Calculate Phase 6 progress summary."""
         try:
             reports_coll = self.database[self.reports_collection]
@@ -1159,7 +1152,7 @@ class AgentHandoffService:
             self.logger.error("Failed to calculate Phase 6 summary", error=str(e))
             return {}
 
-    async def _calculate_completion_rates(self) -> Dict[str, float]:
+    async def _calculate_completion_rates(self) -> dict[str, float]:
         """Calculate component completion rates."""
         try:
             reports_coll = self.database[self.reports_collection]
@@ -1215,7 +1208,7 @@ class AgentHandoffService:
             self.logger.error("Failed to calculate completion rates", error=str(e))
             return {}
 
-    async def _calculate_sign_off_summary(self) -> Dict[str, Any]:
+    async def _calculate_sign_off_summary(self) -> dict[str, Any]:
         """Calculate sign-off status summary."""
         try:
             reports_coll = self.database[self.reports_collection]

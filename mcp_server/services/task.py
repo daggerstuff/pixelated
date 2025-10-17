@@ -7,14 +7,15 @@ queue management, assignment algorithms, and task lifecycle management.
 
 
 import asyncio
+import contextlib
 import uuid
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
-import contextlib
+from typing import Any
 
 import structlog
 
-from mcp_server.models.task import Task, TaskStatus, TaskPriority
+from mcp_server.models.task import Task, TaskStatus
+
 try:
     from mcp_server.models.task import TaskCreationRequest, TaskUpdateRequest
 except Exception:
@@ -26,16 +27,13 @@ except Exception:
         TaskCreationRequest = None
         TaskUpdateRequest = None
 
-from mcp_server.models.agent import Agent
 from mcp_server.exceptions import (
     ResourceNotFoundError,
     ValidationError,
-    ConflictError,
-    AuthorizationError
 )
-from mcp_server.services.queue import RedisQueueService, get_queue_service
+from mcp_server.models.agent import Agent
 from mcp_server.services.assignment import TaskAssignmentService, get_assignment_service
-
+from mcp_server.services.queue import RedisQueueService, get_queue_service
 
 logger = structlog.get_logger(__name__)
 
@@ -53,7 +51,7 @@ class TaskService:
         """
         self.queue_service = queue_service
         self.assignment_service = assignment_service
-        self._monitoring_task: Optional[asyncio.Task] = None
+        self._monitoring_task: asyncio.Task | None = None
 
     async def start(self) -> None:
         """Start task service."""
@@ -75,7 +73,7 @@ class TaskService:
 
         logger.info("Task service stopped")
 
-    async def create_task(self, request: TaskCreationRequest, creator_agent_id: Optional[str] = None) -> Task:
+    async def create_task(self, request: TaskCreationRequest, creator_agent_id: str | None = None) -> Task:
         """
         Create a new task.
 
@@ -106,8 +104,8 @@ class TaskService:
                 timeout_seconds=request.timeout_seconds,
                 metadata={
                     **request.metadata,
-                    'created_by': creator_agent_id,
-                    'created_at': datetime.utcnow().isoformat()
+                    "created_by": creator_agent_id,
+                    "created_at": datetime.utcnow().isoformat()
                 }
             )
 
@@ -152,7 +150,7 @@ class TaskService:
             logger.error("Failed to submit task", task_id=task.id, error=str(e))
             raise
 
-    async def assign_task(self, task: Task, available_agents: List[Agent]) -> Optional[str]:
+    async def assign_task(self, task: Task, available_agents: list[Agent]) -> str | None:
         """
         Assign a task to an agent.
 
@@ -187,7 +185,7 @@ class TaskService:
             logger.error("Failed to assign task", task_id=task.id, error=str(e))
             raise
 
-    async def dequeue_task_for_agent(self, agent: Agent, task_types: Optional[List[str]] = None) -> Optional[Task]:
+    async def dequeue_task_for_agent(self, agent: Agent, task_types: list[str] | None = None) -> Task | None:
         """
         Dequeue a task for an agent.
 
@@ -219,7 +217,7 @@ class TaskService:
             raise
 
     async def update_task_status(self, task_id: str, status: TaskStatus,
-                                result: Optional[Dict[str, Any]] = None) -> bool:
+                                result: dict[str, Any] | None = None) -> bool:
         """
         Update task status.
 
@@ -246,7 +244,7 @@ class TaskService:
             logger.error("Failed to update task status", task_id=task_id, error=str(e))
             raise
 
-    async def complete_task(self, task_id: str, result: Dict[str, Any]) -> bool:
+    async def complete_task(self, task_id: str, result: dict[str, Any]) -> bool:
         """
         Complete a task with result.
 
@@ -295,9 +293,9 @@ class TaskService:
         """
         try:
             result = {
-                'success': False,
-                'error': error_message,
-                'can_retry': can_retry
+                "success": False,
+                "error": error_message,
+                "can_retry": can_retry
             }
 
             success = await self.update_task_status(task_id, TaskStatus.FAILED, result)
@@ -375,7 +373,7 @@ class TaskService:
             logger.error("Failed to retry task", task_id=task_id, error=str(e))
             raise
 
-    async def get_task_status(self, task_id: str) -> Optional[TaskStatus]:
+    async def get_task_status(self, task_id: str) -> TaskStatus | None:
         """
         Get task status.
 
@@ -392,7 +390,7 @@ class TaskService:
             logger.error("Failed to get task status", task_id=task_id, error=str(e))
             return None
 
-    async def get_queue_stats(self) -> Dict[str, Any]:
+    async def get_queue_stats(self) -> dict[str, Any]:
         """
         Get queue statistics.
 
@@ -404,19 +402,19 @@ class TaskService:
 
             return {
                 **stats.dict(),
-                'service_status': 'active',
-                'timestamp': datetime.utcnow().isoformat(),
+                "service_status": "active",
+                "timestamp": datetime.utcnow().isoformat(),
             }
         except Exception as e:
             logger.error("Failed to get queue stats", error=str(e))
             return {
-                'error': str(e),
-                'service_status': 'error',
-                'timestamp': datetime.now(timezone.utc).isoformat(),
+                "error": str(e),
+                "service_status": "error",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
 
     async def get_assignment_recommendations(self, task: Task,
-                                           available_agents: List[Agent]) -> List[Dict[str, Any]]:
+                                           available_agents: list[Agent]) -> list[dict[str, Any]]:
         """
         Get assignment recommendations for a task.
 
@@ -449,12 +447,12 @@ class TaskService:
             ValidationError: If requirements are invalid
         """
         # Validate memory requirements
-        required_memory = task.requirements.get('memory_mb')
+        required_memory = task.requirements.get("memory_mb")
         if required_memory is not None and (not isinstance(required_memory, int) or required_memory <= 0):
             raise ValidationError("Memory requirement must be a positive integer")
 
         # Validate CPU requirements
-        required_cpu = task.requirements.get('cpu_cores')
+        required_cpu = task.requirements.get("cpu_cores")
         if required_cpu is not None and (not isinstance(required_cpu, (int, float)) or required_cpu <= 0):
             raise ValidationError("CPU requirement must be a positive number")
 

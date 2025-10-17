@@ -6,6 +6,7 @@ and app initialization can import and register it without pulling in
 heavy logging dependencies.
 """
 from typing import Any
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response

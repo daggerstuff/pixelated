@@ -7,7 +7,8 @@ Follows the established patterns from the Pixelated platform.
 
 import os
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 from pydantic import BaseModel, Field, validator
 from pydantic_settings import BaseSettings
 
@@ -20,10 +21,10 @@ class DatabaseConfig(BaseModel):
     min_pool_size: int = Field(default=10, ge=1, le=100, description="Minimum connection pool size")
     timeout: int = Field(default=30, ge=1, le=300, description="Connection timeout in seconds")
 
-    @validator('uri')
+    @validator("uri")
     def validate_mongodb_uri(cls, v: str) -> str:
         """Validate MongoDB URI format."""
-        if not v.startswith('mongodb://') and not v.startswith('mongodb+srv://'):
+        if not v.startswith("mongodb://") and not v.startswith("mongodb+srv://"):
             raise ValueError("MongoDB URI must start with mongodb:// or mongodb+srv://")
         return v
 
@@ -36,10 +37,10 @@ class RedisConfig(BaseModel):
     socket_timeout: int = Field(default=30, ge=1, le=300, description="Socket timeout in seconds")
     socket_connect_timeout: int = Field(default=10, ge=1, le=60, description="Socket connection timeout in seconds")
 
-    @validator('url')
+    @validator("url")
     def validate_redis_url(cls, v: str) -> str:
         """Validate Redis URL format."""
-        if not v.startswith('redis://') and not v.startswith('rediss://'):
+        if not v.startswith("redis://") and not v.startswith("rediss://"):
             raise ValueError("Redis URL must start with redis:// or rediss://")
         return v
 
@@ -52,7 +53,7 @@ class AuthConfig(BaseModel):
     token_expiration: int = Field(default=3600, ge=60, le=86400, description="Token expiration in seconds")
     refresh_token_expiration: int = Field(default=86400, ge=3600, le=604800, description="Refresh token expiration in seconds")
 
-    @validator('jwt_algorithm')
+    @validator("jwt_algorithm")
     def validate_jwt_algorithm(cls, v: str) -> str:
         """Validate JWT algorithm."""
         valid_algorithms = ["HS256", "HS384", "HS512", "RS256", "RS384", "RS512"]
@@ -77,7 +78,7 @@ class LoggingConfig(BaseModel):
     enable_request_logging: bool = Field(default=True, description="Enable request logging")
     enable_response_logging: bool = Field(default=True, description="Enable response logging")
 
-    @validator('level')
+    @validator("level")
     def validate_log_level(cls, v: str) -> str:
         """Validate log level."""
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -85,7 +86,7 @@ class LoggingConfig(BaseModel):
             raise ValueError(f"Invalid log level. Must be one of: {valid_levels}")
         return v.upper()
 
-    @validator('format')
+    @validator("format")
     def validate_log_format(cls, v: str) -> str:
         """Validate log format."""
         valid_formats = ["json", "text"]
@@ -99,21 +100,21 @@ class AuditConfig(BaseModel):
 
     enabled: bool = Field(default=True, description="Enable audit logging")
     retention_days: int = Field(default=2555, ge=1, le=3650, description="Audit log retention in days (7 years default)")
-    encryption_key: Optional[str] = Field(default=None, description="Encryption key for sensitive audit data")
+    encryption_key: str | None = Field(default=None, description="Encryption key for sensitive audit data")
 
 
 class ExternalServiceConfig(BaseModel):
     """External service configuration."""
 
     flask_api_url: str = Field(..., description="Flask API service URL")
-    openai_api_key: Optional[str] = Field(default=None, description="OpenAI API key")
-    google_ai_api_key: Optional[str] = Field(default=None, description="Google GenAI API key")
-    bias_detection_url: Optional[str] = Field(default=None, description="Bias detection service URL")
+    openai_api_key: str | None = Field(default=None, description="OpenAI API key")
+    google_ai_api_key: str | None = Field(default=None, description="Google GenAI API key")
+    bias_detection_url: str | None = Field(default=None, description="Bias detection service URL")
 
-    @validator('flask_api_url')
+    @validator("flask_api_url")
     def validate_flask_api_url(cls, v: str) -> str:
         """Validate Flask API URL format."""
-        if not re.match(r'^https?://', v):
+        if not re.match(r"^https?://", v):
             raise ValueError("Flask API URL must start with http:// or https://")
         return v
 
@@ -122,7 +123,7 @@ class WebSocketConfig(BaseModel):
     """WebSocket configuration."""
 
     enabled: bool = Field(default=True, description="Enable WebSocket support")
-    cors_allowed_origins: List[str] = Field(default=["*"], description="Allowed CORS origins for WebSocket")
+    cors_allowed_origins: list[str] = Field(default=["*"], description="Allowed CORS origins for WebSocket")
     ping_interval: int = Field(default=25, ge=1, le=300, description="Ping interval in seconds")
     ping_timeout: int = Field(default=20, ge=1, le=300, description="Ping timeout in seconds")
     max_http_buffer_size: int = Field(default=1024 * 1024, ge=1024, le=100 * 1024 * 1024, description="Maximum HTTP buffer size in bytes")
@@ -180,7 +181,7 @@ class MCPConfig(BaseSettings):
     enable_openapi: bool = Field(default=True, description="Enable OpenAPI schema")
 
     # CORS configuration
-    allowed_origins: List[str] = Field(default=["http://localhost:3000"], description="Allowed CORS origins")
+    allowed_origins: list[str] = Field(default=["http://localhost:3000"], description="Allowed CORS origins")
 
     # Security settings
     cors_enabled: bool = Field(default=True, description="Enable CORS")
@@ -215,8 +216,8 @@ class MCPConfig(BaseSettings):
         websocket_config = self._parse_websocket_config(env_vars)
 
         # Parse CORS origins
-        origins_str = env_vars.get('ALLOWED_ORIGINS', 'http://localhost:3000')
-        allowed_origins = [origin.strip() for origin in origins_str.split(',')]
+        origins_str = env_vars.get("ALLOWED_ORIGINS", "http://localhost:3000")
+        allowed_origins = [origin.strip() for origin in origins_str.split(",")]
 
         super().__init__(
             database_config=database_config,
@@ -231,87 +232,87 @@ class MCPConfig(BaseSettings):
             **kwargs
         )
 
-    def _parse_database_config(self, env_vars: Dict[str, str]) -> DatabaseConfig:
+    def _parse_database_config(self, env_vars: dict[str, str]) -> DatabaseConfig:
         """Parse database configuration from environment variables."""
         return DatabaseConfig(
-            uri=env_vars['MONGODB_URI'],
-            max_pool_size=int(env_vars.get('DB_MAX_POOL_SIZE', '100')),
-            min_pool_size=int(env_vars.get('DB_MIN_POOL_SIZE', '10')),
-            timeout=int(env_vars.get('DB_TIMEOUT', '30'))
+            uri=env_vars["MONGODB_URI"],
+            max_pool_size=int(env_vars.get("DB_MAX_POOL_SIZE", "100")),
+            min_pool_size=int(env_vars.get("DB_MIN_POOL_SIZE", "10")),
+            timeout=int(env_vars.get("DB_TIMEOUT", "30"))
         )
 
-    def _parse_redis_config(self, env_vars: Dict[str, str]) -> RedisConfig:
+    def _parse_redis_config(self, env_vars: dict[str, str]) -> RedisConfig:
         """Parse Redis configuration from environment variables."""
         return RedisConfig(
-            url=env_vars['REDIS_URL'],
-            max_connections=int(env_vars.get('REDIS_MAX_CONNECTIONS', '100')),
-            socket_timeout=int(env_vars.get('REDIS_SOCKET_TIMEOUT', '30')),
-            socket_connect_timeout=int(env_vars.get('REDIS_CONNECT_TIMEOUT', '10'))
+            url=env_vars["REDIS_URL"],
+            max_connections=int(env_vars.get("REDIS_MAX_CONNECTIONS", "100")),
+            socket_timeout=int(env_vars.get("REDIS_SOCKET_TIMEOUT", "30")),
+            socket_connect_timeout=int(env_vars.get("REDIS_CONNECT_TIMEOUT", "10"))
         )
 
-    def _parse_auth_config(self, env_vars: Dict[str, str]) -> AuthConfig:
+    def _parse_auth_config(self, env_vars: dict[str, str]) -> AuthConfig:
         """Parse authentication configuration from environment variables."""
         return AuthConfig(
-            jwt_secret=env_vars['JWT_SECRET'],
-            jwt_algorithm=env_vars.get('JWT_ALGORITHM', 'HS256'),
-            token_expiration=int(env_vars.get('TOKEN_EXPIRATION', '3600')),
-            refresh_token_expiration=int(env_vars.get('REFRESH_TOKEN_EXPIRATION', '86400'))
+            jwt_secret=env_vars["JWT_SECRET"],
+            jwt_algorithm=env_vars.get("JWT_ALGORITHM", "HS256"),
+            token_expiration=int(env_vars.get("TOKEN_EXPIRATION", "3600")),
+            refresh_token_expiration=int(env_vars.get("REFRESH_TOKEN_EXPIRATION", "86400"))
         )
 
-    def _parse_rate_limit_config(self, env_vars: Dict[str, str]) -> RateLimitConfig:
+    def _parse_rate_limit_config(self, env_vars: dict[str, str]) -> RateLimitConfig:
         """Parse rate limiting configuration from environment variables."""
         return RateLimitConfig(
-            requests_per_minute=int(env_vars.get('RATE_LIMIT_RPM', '100')),
-            burst_size=int(env_vars.get('RATE_LIMIT_BURST', '10')),
-            window_seconds=int(env_vars.get('RATE_LIMIT_WINDOW', '60'))
+            requests_per_minute=int(env_vars.get("RATE_LIMIT_RPM", "100")),
+            burst_size=int(env_vars.get("RATE_LIMIT_BURST", "10")),
+            window_seconds=int(env_vars.get("RATE_LIMIT_WINDOW", "60"))
         )
 
-    def _parse_logging_config(self, env_vars: Dict[str, str]) -> LoggingConfig:
+    def _parse_logging_config(self, env_vars: dict[str, str]) -> LoggingConfig:
         """Parse logging configuration from environment variables."""
         return LoggingConfig(
-            level=env_vars.get('LOG_LEVEL', 'INFO'),
-            format=env_vars.get('LOG_FORMAT', 'json'),
-            enable_request_logging=env_vars.get('ENABLE_REQUEST_LOGGING', 'true').lower() == 'true',
-            enable_response_logging=env_vars.get('ENABLE_RESPONSE_LOGGING', 'true').lower() == 'true'
+            level=env_vars.get("LOG_LEVEL", "INFO"),
+            format=env_vars.get("LOG_FORMAT", "json"),
+            enable_request_logging=env_vars.get("ENABLE_REQUEST_LOGGING", "true").lower() == "true",
+            enable_response_logging=env_vars.get("ENABLE_RESPONSE_LOGGING", "true").lower() == "true"
         )
 
-    def _parse_audit_config(self, env_vars: Dict[str, str]) -> AuditConfig:
+    def _parse_audit_config(self, env_vars: dict[str, str]) -> AuditConfig:
         """Parse audit configuration from environment variables."""
         return AuditConfig(
-            enabled=env_vars.get('AUDIT_ENABLED', 'true').lower() == 'true',
-            retention_days=int(env_vars.get('AUDIT_RETENTION_DAYS', '2555')),
-            encryption_key=env_vars.get('AUDIT_ENCRYPTION_KEY')
+            enabled=env_vars.get("AUDIT_ENABLED", "true").lower() == "true",
+            retention_days=int(env_vars.get("AUDIT_RETENTION_DAYS", "2555")),
+            encryption_key=env_vars.get("AUDIT_ENCRYPTION_KEY")
         )
 
-    def _parse_external_services(self, env_vars: Dict[str, str]) -> ExternalServiceConfig:
+    def _parse_external_services(self, env_vars: dict[str, str]) -> ExternalServiceConfig:
         """Parse external services configuration from environment variables."""
         return ExternalServiceConfig(
-            flask_api_url=env_vars['FLASK_API_URL'],
-            openai_api_key=env_vars.get('OPENAI_API_KEY'),
-            google_ai_api_key=env_vars.get('GOOGLE_AI_API_KEY'),
-            bias_detection_url=env_vars.get('BIAS_DETECTION_URL')
+            flask_api_url=env_vars["FLASK_API_URL"],
+            openai_api_key=env_vars.get("OPENAI_API_KEY"),
+            google_ai_api_key=env_vars.get("GOOGLE_AI_API_KEY"),
+            bias_detection_url=env_vars.get("BIAS_DETECTION_URL")
         )
 
-    def _parse_websocket_config(self, env_vars: Dict[str, str]) -> WebSocketConfig:
+    def _parse_websocket_config(self, env_vars: dict[str, str]) -> WebSocketConfig:
         """Parse WebSocket configuration from environment variables."""
         # Parse CORS origins for WebSocket
-        cors_origins_str = env_vars.get('WEBSOCKET_CORS_ORIGINS', '*')
-        cors_allowed_origins = [origin.strip() for origin in cors_origins_str.split(',')]
+        cors_origins_str = env_vars.get("WEBSOCKET_CORS_ORIGINS", "*")
+        cors_allowed_origins = [origin.strip() for origin in cors_origins_str.split(",")]
 
         return WebSocketConfig(
-            enabled=env_vars.get('WEBSOCKET_ENABLED', 'true').lower() == 'true',
+            enabled=env_vars.get("WEBSOCKET_ENABLED", "true").lower() == "true",
             cors_allowed_origins=cors_allowed_origins,
-            ping_interval=int(env_vars.get('WEBSOCKET_PING_INTERVAL', '25')),
-            ping_timeout=int(env_vars.get('WEBSOCKET_PING_TIMEOUT', '20')),
-            max_http_buffer_size=int(env_vars.get('WEBSOCKET_MAX_BUFFER_SIZE', str(1024 * 1024))),
-            allow_upgrades=env_vars.get('WEBSOCKET_ALLOW_UPGRADES', 'true').lower() == 'true',
-            http_compression=env_vars.get('WEBSOCKET_HTTP_COMPRESSION', 'true').lower() == 'true',
-            compression_threshold=int(env_vars.get('WEBSOCKET_COMPRESSION_THRESHOLD', '1024')),
-            max_connections=int(env_vars.get('WEBSOCKET_MAX_CONNECTIONS', '1000')),
-            connection_timeout=int(env_vars.get('WEBSOCKET_CONNECTION_TIMEOUT', '30')),
-            heartbeat_interval=int(env_vars.get('WEBSOCKET_HEARTBEAT_INTERVAL', '30')),
-            reconnection_attempts=int(env_vars.get('WEBSOCKET_RECONNECTION_ATTEMPTS', '5')),
-            reconnection_delay=int(env_vars.get('WEBSOCKET_RECONNECTION_DELAY', '1'))
+            ping_interval=int(env_vars.get("WEBSOCKET_PING_INTERVAL", "25")),
+            ping_timeout=int(env_vars.get("WEBSOCKET_PING_TIMEOUT", "20")),
+            max_http_buffer_size=int(env_vars.get("WEBSOCKET_MAX_BUFFER_SIZE", str(1024 * 1024))),
+            allow_upgrades=env_vars.get("WEBSOCKET_ALLOW_UPGRADES", "true").lower() == "true",
+            http_compression=env_vars.get("WEBSOCKET_HTTP_COMPRESSION", "true").lower() == "true",
+            compression_threshold=int(env_vars.get("WEBSOCKET_COMPRESSION_THRESHOLD", "1024")),
+            max_connections=int(env_vars.get("WEBSOCKET_MAX_CONNECTIONS", "1000")),
+            connection_timeout=int(env_vars.get("WEBSOCKET_CONNECTION_TIMEOUT", "30")),
+            heartbeat_interval=int(env_vars.get("WEBSOCKET_HEARTBEAT_INTERVAL", "30")),
+            reconnection_attempts=int(env_vars.get("WEBSOCKET_RECONNECTION_ATTEMPTS", "5")),
+            reconnection_delay=int(env_vars.get("WEBSOCKET_RECONNECTION_DELAY", "1"))
         )
 
     def validate(self) -> None:
@@ -340,7 +341,7 @@ class MCPConfig(BaseSettings):
 
 
 # Global configuration instance
-_config: Optional[MCPConfig] = None
+_config: MCPConfig | None = None
 
 
 def get_config() -> MCPConfig:
@@ -358,10 +359,10 @@ def get_config() -> MCPConfig:
     if _config is None:
         # Validate required environment variables
         required_vars = [
-            'MONGODB_URI',
-            'REDIS_URL',
-            'JWT_SECRET',
-            'FLASK_API_URL'
+            "MONGODB_URI",
+            "REDIS_URL",
+            "JWT_SECRET",
+            "FLASK_API_URL"
         ]
 
         missing_vars = [var for var in required_vars if var not in os.environ]
