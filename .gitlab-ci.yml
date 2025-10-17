@@ -54,14 +54,8 @@ cache: &global_cache
     - .pnpm-store/
     - node_modules/
   policy: pull-push
-  # Add timeout configuration for cache operations
-  timeout: 5m
-  # Optimize cache compression and exclude large unnecessary files
+  # Optimize cache behavior
   untracked: false
-  # Add cache size limits to prevent timeout issues
-  max_cache_size: 2GB
-  # Use faster compression algorithm
-  compression: fast
 
 # GCP authentication template
 .gcp_auth: &gcp_auth
@@ -220,17 +214,17 @@ build:
       corepack enable pnpm
       pnpm config set store-dir $PNPM_CACHE_FOLDER
       pnpm install --frozen-lockfile --prefer-offline
-      
+
       # Build with memory optimization
       NODE_OPTIONS="--max-old-space-size=4096" pnpm build
 
     - |
       # Use BuildKit for faster Docker builds with layer caching
       echo "🔧 Building container image with BuildKit optimizations..."
-      
+
       # Create a BuildKit builder instance for better caching
       docker buildx create --use --name gitlab-builder || docker buildx use gitlab-builder
-      
+
       # Build with BuildKit optimizations and layer caching
       docker buildx build \
         --file Dockerfile \
