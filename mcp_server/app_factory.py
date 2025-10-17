@@ -23,7 +23,11 @@ from .middleware.auth import AuthenticationMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.logging import LoggingMiddleware
 from .middleware.request_id import RequestIDMiddleware
-from .routers import agents, tasks, pipelines, health, discovery, websocket
+from .routers.agents import router as agents_router
+from .routers.tasks import router as tasks_router
+from .routers.pipelines import router as pipelines_router
+from .routers.health import router as health_router
+from .routers.websocket import router as websocket_router
 from .services.auth import init_auth_service
 from .services.database import DatabaseManager
 from .services.redis_manager import RedisManager
@@ -259,38 +263,34 @@ def create_mcp_app(config: Optional[MCPConfig] = None) -> FastAPI:
     
     # Include API routers with proper prefixes
     app.include_router(
-        health.router,
+        health_router,
         prefix="/api/v1/health",
         tags=["health"]
     )
     
     app.include_router(
-        agents.router,
+        agents_router,
         prefix="/api/v1/agents",
         tags=["agents"]
     )
     
     app.include_router(
-        tasks.router,
+        tasks_router,
         prefix="/api/v1/tasks",
         tags=["tasks"]
     )
     
     app.include_router(
-        pipelines.router,
+        pipelines_router,
         prefix="/api/v1/pipelines",
         tags=["pipelines"]
     )
     
-    app.include_router(
-        discovery.router,
-        prefix="/api/v1/discovery",
-        tags=["discovery"]
-    )
+
     
     # Include WebSocket router
     app.include_router(
-        websocket.router,
+        websocket_router,
         prefix="/api/v1/websocket",
         tags=["websocket"]
     )

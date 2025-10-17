@@ -182,3 +182,7 @@ coordination/orchestration/*
 claude-flow
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
+
+kubeconfig
+values.yaml
+gitlab-runner-values.yaml

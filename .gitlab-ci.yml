@@ -24,17 +24,28 @@ variables:
   CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   CONTAINER_IMAGE_CACHE: $CI_REGISTRY_IMAGE:cache
 
-  # Resource limits - standardized
-  KUBERNETES_CPU_REQUEST: "1"
+  # Resource limits - optimized for memory-intensive builds
+  KUBERNETES_CPU_REQUEST: "2"
   KUBERNETES_CPU_LIMIT: "4"
-  KUBERNETES_MEMORY_REQUEST: "2Gi"
+  KUBERNETES_MEMORY_REQUEST: "4Gi"
   KUBERNETES_MEMORY_LIMIT: "8Gi"
 
-  # Build optimization - consistent memory settings
-  NODE_OPTIONS: "--max-old-space-size=4096"
+  # Build optimization - progressive memory scaling
+  NODE_OPTIONS: "--max-old-space-size=6144"
+  # Additional memory optimization flags
+  NODE_OPTIONS_OPTIMIZED: "--max-old-space-size=6144 --optimize-for-size --gc-interval=100"
   PNPM_CACHE_FOLDER: .pnpm-store
   GIT_STRATEGY: clone
   GIT_DEPTH: 1
+  # Git fetch optimization for Kubernetes environments
+  GIT_SUBMODULE_STRATEGY: none
+  GIT_CLEAN_FLAGS: none
+  # Network timeout and retry settings
+  GIT_HTTP_LOW_SPEED_LIMIT: 1000
+  GIT_HTTP_LOW_SPEED_TIME: 60
+  GIT_HTTP_TIMEOUT: 300
+  # Reduce git fetch issues in Kubernetes
+  GIT_LFS_SKIP_SMUDGE: 1
 
   # Security
   SENTRY_RELEASE: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
@@ -123,6 +134,33 @@ validate:
   cache:
     <<: *global_cache
     policy: pull
+  before_script:
+    - |
+      echo "🔧 Configuring git for Kubernetes environment..."
+      # Git fetch retry logic for network issues
+      git config --global http.postBuffer 524288000
+      git config --global http.maxRequestBuffer 100M
+      git config --global core.compression 0
+      git config --global http.version HTTP/1.1
+      git config --global http.lowSpeedLimit 1000
+      git config --global http.lowSpeedTime 60
+      git config --global http.timeout 300
+      # Reduce pack size to prevent memory issues
+      git config --global pack.windowMemory 256m
+      git config --global pack.packSizeLimit 256m
+      git config --global pack.threads 1
+      # Retry configuration
+      git config --global http.retry 3
+      git config --global http.postBuffer 524288000
+      # Disable LFS smudge to speed up clones
+      git config --global lfs.skipSmudge 1
+      echo "✅ Git configuration optimized for Kubernetes"
+    - |
+      echo "🔧 Additional git fetch optimization for validation stage..."
+      # Enhanced git fetch retry logic for validation
+      export GIT_RETRY_COUNT=3
+      export GIT_RETRY_DELAY=5
+      echo "✅ Validation stage git configuration complete"
   parallel:
     matrix:
       - VALIDATION_TYPE: [dependencies, lint, typecheck]
@@ -131,7 +169,22 @@ validate:
     - apk add --no-cache git
     - corepack enable pnpm
     - pnpm config set store-dir $PNPM_CACHE_FOLDER
-    - pnpm install --frozen-lockfile --prefer-offline
+    - |
+      echo "📦 Installing dependencies with retry logic..."
+      # Retry pnpm install on failure
+      for i in {1..3}; do
+        if pnpm install --frozen-lockfile --prefer-offline; then
+          echo "✅ Dependencies installed successfully"
+          break
+        else
+          echo "⚠️ Install attempt $i failed, retrying in 5 seconds..."
+          sleep 5
+          if [ $i -eq 3 ]; then
+            echo "❌ All install attempts failed"
+            exit 1
+          fi
+        fi
+      done
     - |
       case $VALIDATION_TYPE in
         dependencies)
@@ -176,7 +229,30 @@ build:
     BUILDKIT_PROGRESS: plain
     # Reduce cache size by limiting what gets cached
     CACHE_COMPRESSION_LEVEL: fast
+    # Enhanced memory management for build process
+    DOCKER_BUILDKIT_MAX_PARALLELISM: "2"
+    BUILDKIT_STEP_LOG_MAX_SIZE: "1048576"
   before_script:
+    - |
+      echo "🔧 Configuring git for Kubernetes environment..."
+      # Git fetch retry logic for network issues
+      git config --global http.postBuffer 524288000
+      git config --global http.maxRequestBuffer 100M
+      git config --global core.compression 0
+      git config --global http.version HTTP/1.1
+      git config --global http.lowSpeedLimit 1000
+      git config --global http.lowSpeedTime 60
+      git config --global http.timeout 300
+      # Reduce pack size to prevent memory issues
+      git config --global pack.windowMemory 256m
+      git config --global pack.packSizeLimit 256m
+      git config --global pack.threads 1
+      # Retry configuration
+      git config --global http.retry 3
+      git config --global http.postBuffer 524288000
+      # Disable LFS smudge to speed up clones
+      git config --global lfs.skipSmudge 1
+      echo "✅ Git configuration optimized for Kubernetes"
     - apk add --no-cache docker-cli curl git
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     # Install Docker Buildx for BuildKit support
@@ -210,13 +286,48 @@ build:
   script:
     - echo "🔧 Building application and container image..."
     - |
-      # Build the application with optimized settings
+      echo "📦 Installing dependencies with enhanced retry logic..."
+      # Enhanced pnpm install with git fetch retry wrapper
       corepack enable pnpm
       pnpm config set store-dir $PNPM_CACHE_FOLDER
-      pnpm install --frozen-lockfile --prefer-offline
+      
+      # Retry pnpm install with exponential backoff
+      for i in {1..3}; do
+        echo "🔄 Install attempt $i of 3..."
+        if pnpm install --frozen-lockfile --prefer-offline; then
+          echo "✅ Dependencies installed successfully"
+          break
+        else
+          echo "⚠️ Install attempt $i failed, checking git status..."
+          git status || echo "Git status check completed"
+          
+          if [ $i -lt 3 ]; then
+            DELAY=$((5 * i))
+            echo "⏳ Retrying in $DELAY seconds..."
+            sleep $DELAY
+            
+            # Try to clean up any partial state
+            echo "🧹 Cleaning up partial installation state..."
+            rm -rf node_modules/.pnpm || true
+            pnpm store prune || true
+          else
+            echo "❌ All install attempts failed - possible network or git fetch issue"
+            echo "📊 Debug information:"
+            echo "  - Git config:"
+            git config --list | grep -E "(http|pack|lfs)" || true
+            echo "  - Network connectivity:"
+            ping -c 1 registry.npmjs.org || echo "Registry connectivity check failed"
+            exit 1
+          fi
+        fi
+      done
 
-      # Build with memory optimization
-      NODE_OPTIONS="--max-old-space-size=4096" pnpm build
+      # Build with progressive memory optimization
+      echo "🏗️ Building application with progressive memory optimization..."
+      # Use memory-optimized build script for better memory management
+      chmod +x ./scripts/memory-optimized-build.sh
+      ./scripts/memory-optimized-build.sh
+      echo "✅ Application build completed successfully"
 
     - |
       # Use BuildKit for faster Docker builds with layer caching
