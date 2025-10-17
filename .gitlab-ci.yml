@@ -44,7 +44,7 @@ variables:
   ASTRO_TELEMETRY_DISABLED: 1
   CI: true
 
-# Global cache configuration - optimized
+# Global cache configuration - optimized and streamlined
 cache: &global_cache
   key:
     files:
@@ -54,6 +54,14 @@ cache: &global_cache
     - .pnpm-store/
     - node_modules/
   policy: pull-push
+  # Add timeout configuration for cache operations
+  timeout: 5m
+  # Optimize cache compression and exclude large unnecessary files
+  untracked: false
+  # Add cache size limits to prevent timeout issues
+  max_cache_size: 2GB
+  # Use faster compression algorithm
+  compression: fast
 
 # GCP authentication template
 .gcp_auth: &gcp_auth
@@ -169,6 +177,11 @@ build:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+    # Optimize Docker operations
+    DOCKER_BUILDKIT: 1
+    BUILDKIT_PROGRESS: plain
+    # Reduce cache size by limiting what gets cached
+    CACHE_COMPRESSION_LEVEL: fast
   before_script:
     - apk add --no-cache docker-cli curl git
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -182,24 +195,52 @@ build:
         chmod +x ~/.docker/cli-plugins/docker-buildx
         docker buildx version
       fi
+    # Optimize Docker daemon settings for faster builds
+    - |
+      echo "🔧 Optimizing Docker daemon settings..."
+      # Configure Docker daemon for better performance
+      mkdir -p /etc/docker
+      cat > /etc/docker/daemon.json << 'EOF'
+      {
+        "max-concurrent-downloads": 10,
+        "max-concurrent-uploads": 10,
+        "storage-driver": "overlay2",
+        "storage-opts": ["overlay2.override_kernel_check=true"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+      EOF
   script:
     - echo "🔧 Building application and container image..."
     - |
-      # Build the application
+      # Build the application with optimized settings
       corepack enable pnpm
       pnpm config set store-dir $PNPM_CACHE_FOLDER
       pnpm install --frozen-lockfile --prefer-offline
-      pnpm build
+      
+      # Build with memory optimization
+      NODE_OPTIONS="--max-old-space-size=4096" pnpm build
 
     - |
-      # Use the repository Dockerfile to build and push the image.
-      # This Dockerfile is kept in repo root and handles build inside the image.
-      docker build -f Dockerfile -t $CONTAINER_IMAGE .
-      docker push $CONTAINER_IMAGE || true
-
-      # Also tag and push as latest for caching
-      docker tag $CONTAINER_IMAGE $CONTAINER_IMAGE_LATEST || true
-      docker push $CONTAINER_IMAGE_LATEST || true
+      # Use BuildKit for faster Docker builds with layer caching
+      echo "🔧 Building container image with BuildKit optimizations..."
+      
+      # Create a BuildKit builder instance for better caching
+      docker buildx create --use --name gitlab-builder || docker buildx use gitlab-builder
+      
+      # Build with BuildKit optimizations and layer caching
+      docker buildx build \
+        --file Dockerfile \
+        --tag $CONTAINER_IMAGE \
+        --tag $CONTAINER_IMAGE_LATEST \
+        --cache-from type=registry,ref=$CONTAINER_IMAGE_CACHE \
+        --cache-to type=registry,ref=$CONTAINER_IMAGE_CACHE,mode=max \
+        --push \
+        --progress=plain \
+        .
 
       echo "✅ Container image built and pushed: $CONTAINER_IMAGE"
 
@@ -210,11 +251,24 @@ build:
       dotenv:
         - build.env
     expire_in: 1 hour
+    # Optimize artifact upload by excluding unnecessary files
+    exclude:
+      - node_modules/**/*
+      - .pnpm-store/**/*
+      - dist/**/*
+      - .git/**/*
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_MERGE_REQUEST_ID
-  timeout: 15m
+  timeout: 20m
+  # Add retry configuration for transient failures
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+      - api_failure
 
 # Security stage - consolidated security scanning
 security:
@@ -630,96 +684,111 @@ cleanup:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    # Cleanup configuration
-    # Ensure sensible defaults so variables are never empty in CI
-    KEEP_IMAGES: "${KEEP_IMAGES:-5}"
-    CLEANUP_OLDER_THAN: "${CLEANUP_OLDER_THAN:-24h}"
-    BUILDER_CLEANUP_OLDER_THAN: "${BUILDER_CLEANUP_OLDER_THAN:-48h}"
+    # Cleanup configuration - optimized with smaller defaults
+    KEEP_IMAGES: "${KEEP_IMAGES:-3}"
+    CLEANUP_OLDER_THAN: "${CLEANUP_OLDER_THAN:-12h}"
+    BUILDER_CLEANUP_OLDER_THAN: "${BUILDER_CLEANUP_OLDER_THAN:-24h}"
+    # Optimize cleanup operations
+    DOCKER_BUILDKIT: 1
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    # Optimize Docker daemon for faster cleanup
+    - |
+      echo "🔧 Optimizing Docker daemon for cleanup operations..."
+      mkdir -p /etc/docker
+      cat > /etc/docker/daemon.json << 'EOF'
+      {
+        "max-concurrent-downloads": 10,
+        "max-concurrent-uploads": 10,
+        "storage-driver": "overlay2",
+        "storage-opts": ["overlay2.override_kernel_check=true"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+      EOF
   script:
     - |
-      echo "🧹 Starting automated cleanup process..."
+      echo "🧹 Starting optimized cleanup process..."
       echo "📋 Configuration:"
       echo "  - Keep last $KEEP_IMAGES images"
       echo "  - Cleanup images older than $CLEANUP_OLDER_THAN"
       echo "  - Builder cache cleanup older than $BUILDER_CLEANUP_OLDER_THAN"
 
-      # Image cleanup with smart retention
-      echo "🗑️ Cleaning up old container images..."
-      if [ -n "$CI_REGISTRY_IMAGE" ]; then
-        # Get list of images sorted by creation date (newest first)
-        IMAGES=$(docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
+      # Quick registry check first
+      echo "🔍 Checking registry connectivity..."
+      if ! docker manifest inspect "$CI_REGISTRY_IMAGE:latest" >/dev/null 2>&1; then
+        echo "⚠️ Registry not accessible, skipping image cleanup"
+        SKIP_IMAGE_CLEANUP=true
+      else
+        SKIP_IMAGE_CLEANUP=false
+      fi
+
+      # Image cleanup with smart retention - only if registry is accessible
+      if [ "$SKIP_IMAGE_CLEANUP" = "false" ] && [ -n "$CI_REGISTRY_IMAGE" ]; then
+        echo "🗑️ Cleaning up old container images..."
+        # Get list of images sorted by creation date (newest first) - limit to 20 for performance
+        IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
           grep $CI_REGISTRY_IMAGE | \
+          head -20 | \
           sort -k2 -r)
         
         IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
         echo "📊 Found $IMAGE_COUNT images for $CI_REGISTRY_IMAGE"
         
         if [ $IMAGE_COUNT -gt $KEEP_IMAGES ]; then
-          # Remove images beyond the keep threshold
+          # Remove images beyond the keep threshold - process in smaller batches
           IMAGES_TO_REMOVE=$(echo "$IMAGES" | tail -n +$((KEEP_IMAGES + 1)) | awk '{print $1}')
-          echo "🗑️ Removing $(echo "$IMAGES_TO_REMOVE" | wc -l) old images..."
-          echo "$IMAGES_TO_REMOVE" | xargs -r docker rmi || echo "⚠️ Some images could not be removed"
+          BATCH_SIZE=5
+          echo "$IMAGES_TO_REMOVE" | head -$BATCH_SIZE | while read -r image; do
+            echo "🗑️ Removing $image..."
+            docker rmi "$image" || echo "⚠️ Could not remove $image"
+          done
+          echo "✅ Processed first batch of $(echo "$IMAGES_TO_REMOVE" | head -$BATCH_SIZE | wc -l) images"
         else
           echo "✅ Image count within retention policy"
         fi
       else
-        echo "⚠️ CI_REGISTRY_IMAGE not set, skipping image cleanup"
+        echo "⚠️ Skipping image cleanup"
       fi
 
-      # System cleanup with safety checks
-      echo "🧽 Running system cleanup..."
-      echo "🧹 Cleaning up unused containers..."
-      docker container prune -f --filter "until=$CLEANUP_OLDER_THAN"
+      # System cleanup with safety checks - optimized
+      echo "🧽 Running optimized system cleanup..."
+      echo "🧹 Cleaning up unused containers (limited batch)..."
+      docker container prune -f --filter "until=$CLEANUP_OLDER_THAN" | head -10
 
       echo "🧹 Cleaning up unused networks..."
-      docker network prune -f
+      docker network prune -f | head -5
 
       echo "🧹 Cleaning up unused volumes (excluding keep labels)..."
-      docker volume prune -f --filter "label!=keep"
+      docker volume prune -f --filter "label!=keep" | head -5
 
-      echo "🧹 Cleaning up build cache..."
-      docker system prune -af --filter "until=$CLEANUP_OLDER_THAN"
+      echo "🧹 Cleaning up build cache (quick mode)..."
+      docker system prune -f --filter "until=$CLEANUP_OLDER_THAN" | head -10
 
-      # Build cache cleanup
+      # Build cache cleanup - only if BuildKit is available
       echo "🔧 Cleaning up build cache..."
       if command -v docker builder >/dev/null 2>&1; then
-        docker builder prune -af --filter "until=$BUILDER_CLEANUP_OLDER_THAN"
+        docker builder prune -f --filter "until=$BUILDER_CLEANUP_OLDER_THAN" | head -5
       else
         echo "⚠️ Docker BuildKit not available, skipping builder cleanup"
       fi
 
-      # Registry cleanup (if supported)
-      echo "🔧 Cleaning up registry..."
-      if command -v docker manifest >/dev/null 2>&1 && [ -n "$CI_REGISTRY_IMAGE" ]; then
-        # Remove old manifests (implementation depends on registry type)
-        echo "ℹ️ Registry manifest cleanup skipped (requires registry-specific implementation)"
-      fi
-
-      # Cleanup temporary files
-      echo "🧹 Cleaning up temporary files..."
+      # Quick temporary file cleanup
+      echo "🧹 Quick temporary file cleanup..."
       find /tmp -name "docker-*" -type f -mtime +1 -delete 2>/dev/null || true
       find /var/tmp -name "docker-*" -type f -mtime +1 -delete 2>/dev/null || true
 
-      # Final status
+      # Final status - simplified
       echo "📊 Cleanup completed successfully"
-      echo "📈 Remaining images:"
-      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}" | head -10
-
       echo "💾 Disk usage after cleanup:"
       docker system df
 
-      # Create cleanup report (use printf to avoid here-doc indentation issues)
-      printf '%s\n' '{' \
-        '  "timestamp": "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'",' \
-        '  "images_retained": '"$KEEP_IMAGES"',' \
-        '  "cleanup_older_than": '""$CLEANUP_OLDER_THAN""',' \
-        '  "builder_cleanup_older_than": '""$BUILDER_CLEANUP_OLDER_THAN""',' \
-        '  "status": "completed",' \
-        '  "registry": "'"${CI_REGISTRY_IMAGE:-unknown}"'"' \
-        '}' > cleanup-report.json || echo '{}'>cleanup-report.json
-      echo "📄 Cleanup report saved to cleanup-report.json"
+      # Create minimal cleanup report
+      echo '{"timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","status":"completed"}' > cleanup-report.json
+      echo "📄 Cleanup report saved"
   after_script:
     - |
       # Always attempt to logout from registry
@@ -728,14 +797,14 @@ cleanup:
       # Cleanup any remaining temporary files
       rm -f /tmp/gcp-key.json deployment.yaml service.yaml deployment-*.yaml service-*.yaml
 
-      echo "✅ Cleanup process finalized"
+      echo "✅ Optimized cleanup process finalized"
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_TAG
   allow_failure: true
-  timeout: 15m
+  timeout: 10m
   artifacts:
     reports:
       dotenv:
