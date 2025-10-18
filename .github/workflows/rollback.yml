@@ -10,10 +10,6 @@ env:
   NODE_VERSION: 24.8.0
   PNPM_VERSION: 10.18.2
   NODE_ENV: production
-  # Prefer a PAT with 'workflow' scope for pushes that modify workflow files;
-  # fall back to the repository token when WORKFLOW_PAT isn't set. Use the
-  # PUSH_TOKEN environment variable in git commands below.
-  PUSH_TOKEN: ${{ secrets.WORKFLOW_PAT || github.token }}
 
 jobs:
   rollback-staging:
@@ -33,7 +29,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          token: ${{ env.PUSH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch all tags
         run: git fetch --tags --force
@@ -108,25 +104,20 @@ jobs:
           echo "Computed tag: ${TAG_NAME}"
 
       - name: Dry Run Git Push
-        env:
-          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
           git tag "$TAG_NAME"
-          git push --dry-run https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+          git push --dry-run origin "$TAG_NAME"
 
       - name: Create rollback tag
-        env:
-          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_BASE=${{ steps.compute-tag-staging.outputs.tag }}
           TAG_NAME="$TAG_BASE"
-          git remote set-url origin https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git
           git fetch --tags --force
           COUNT=0
           while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
@@ -159,7 +150,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          token: ${{ env.PUSH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch all tags
         run: git fetch --tags --force
@@ -234,25 +225,20 @@ jobs:
           echo "Computed tag: ${TAG_NAME}"
 
       - name: Dry Run Git Push
-        env:
-          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
           git tag "$TAG_NAME"
-          git push --dry-run https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+          git push --dry-run origin "$TAG_NAME"
 
       - name: Create rollback tag
-        env:
-          PUSH_TOKEN: ${{ env.PUSH_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_BASE=${{ steps.compute-tag-prod.outputs.tag }}
           TAG_NAME="$TAG_BASE"
-          git remote set-url origin https://x-access-token:${PUSH_TOKEN}@github.com/pixelatedempathy/pixelated.git
           git fetch --tags --force
           COUNT=0
           while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do

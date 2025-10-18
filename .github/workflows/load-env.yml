@@ -1,0 +1,164 @@
+name: Load Environment Variables
+
+on:
+  workflow_call:
+    outputs:
+      gcp_project_id:
+        description: "GCP Project ID"
+        value: ${{ jobs.load-env.outputs.gcp_project_id }}
+      gke_cluster_name:
+        description: "GKE Cluster Name"
+        value: ${{ jobs.load-env.outputs.gke_cluster_name }}
+      gke_zone:
+        description: "GKE Zone"
+        value: ${{ jobs.load-env.outputs.gke_zone }}
+      gke_namespace:
+        description: "GKE Namespace"
+        value: ${{ jobs.load-env.outputs.gke_namespace }}
+      gke_deployment_name:
+        description: "GKE Deployment Name"
+        value: ${{ jobs.load-env.outputs.gke_deployment_name }}
+      gke_service_name:
+        description: "GKE Service Name"
+        value: ${{ jobs.load-env.outputs.gke_service_name }}
+      gke_environment_url:
+        description: "GKE Environment URL"
+        value: ${{ jobs.load-env.outputs.gke_environment_url }}
+      gcp_service_account_key:
+        description: "GCP Service Account Key"
+        value: ${{ jobs.load-env.outputs.gcp_service_account_key }}
+      sentry_auth_token:
+        description: "Sentry Auth Token"
+        value: ${{ jobs.load-env.outputs.sentry_auth_token }}
+      sentry_org:
+        description: "Sentry Organization"
+        value: ${{ jobs.load-env.outputs.sentry_org }}
+      sentry_project:
+        description: "Sentry Project"
+        value: ${{ jobs.load-env.outputs.sentry_project }}
+      sentry_dsn:
+        description: "Sentry DSN"
+        value: ${{ jobs.load-env.outputs.sentry_dsn }}
+      public_sentry_dsn:
+        description: "Public Sentry DSN"
+        value: ${{ jobs.load-env.outputs.public_sentry_dsn }}
+      slack_webhook_url:
+        description: "Slack Webhook URL"
+        value: ${{ jobs.load-env.outputs.slack_webhook_url }}
+
+jobs:
+  load-env:
+    runs-on: ubuntu-latest
+    outputs:
+      gcp_project_id: ${{ steps.set-env.outputs.gcp_project_id }}
+      gke_cluster_name: ${{ steps.set-env.outputs.gke_cluster_name }}
+      gke_zone: ${{ steps.set-env.outputs.gke_zone }}
+      gke_namespace: ${{ steps.set-env.outputs.gke_namespace }}
+      gke_deployment_name: ${{ steps.set-env.outputs.gke_deployment_name }}
+      gke_service_name: ${{ steps.set-env.outputs.gke_service_name }}
+      gke_environment_url: ${{ steps.set-env.outputs.gke_environment_url }}
+      gcp_service_account_key: ${{ steps.set-env.outputs.gcp_service_account_key }}
+      sentry_auth_token: ${{ steps.set-env.outputs.sentry_auth_token }}
+      sentry_org: ${{ steps.set-env.outputs.sentry_org }}
+      sentry_project: ${{ steps.set-env.outputs.sentry_project }}
+      sentry_dsn: ${{ steps.set-env.outputs.sentry_dsn }}
+      public_sentry_dsn: ${{ steps.set-env.outputs.public_sentry_dsn }}
+      slack_webhook_url: ${{ steps.set-env.outputs.slack_webhook_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Load environment variables
+        id: set-env
+        run: |
+          echo "🔍 Loading environment variables with fallback support..."
+          
+          # Function to get value from secrets or .env file
+          get_env_value() {
+            local secret_name=$1
+            local env_var_name=$2
+            local default_value=$3
+            
+            # First try GitHub Secrets
+            if [[ -n "${{ secrets[secret_name] }}" ]]; then
+              echo "✅ $env_var_name from GitHub Secrets"
+              echo "${env_var_name}=${{ secrets[secret_name] }}" >> $GITHUB_OUTPUT
+              return
+            fi
+            
+            # Then try .env file
+            if [[ -f ".env" ]]; then
+              local env_value=$(grep "^${env_var_name}=" .env | cut -d'=' -f2- | sed "s/^'//;s/'$//;s/^\"//;s/\"$//" | head -1)
+              if [[ -n "$env_value" ]]; then
+                echo "✅ $env_var_name from .env file"
+                echo "${env_var_name}=${env_value}" >> $GITHUB_OUTPUT
+                return
+              fi
+            fi
+            
+            # Then try .env.local file
+            if [[ -f ".env.local" ]]; then
+              local env_value=$(grep "^${env_var_name}=" .env.local | cut -d'=' -f2- | sed "s/^'//;s/'$//;s/^\"//;s/\"$//" | head -1)
+              if [[ -n "$env_value" ]]; then
+                echo "✅ $env_var_name from .env.local file"
+                echo "${env_var_name}=${env_value}" >> $GITHUB_OUTPUT
+                return
+              fi
+            fi
+            
+            # Finally use default value if provided
+            if [[ -n "$default_value" ]]; then
+              echo "⚠️ $env_var_name using default: $default_value"
+              echo "${env_var_name}=${default_value}" >> $GITHUB_OUTPUT
+            else
+              echo "❌ $env_var_name not found"
+              echo "${env_var_name}=" >> $GITHUB_OUTPUT
+            fi
+          }
+
+          # GCP Configuration
+          get_env_value "GCP_PROJECT_ID" "GCP_PROJECT_ID"
+          get_env_value "GKE_CLUSTER_NAME" "GKE_CLUSTER_NAME"
+          get_env_value "GKE_ZONE" "GKE_ZONE"
+          get_env_value "GKE_NAMESPACE" "GKE_NAMESPACE" "pixelated"
+          get_env_value "GKE_DEPLOYMENT_NAME" "GKE_DEPLOYMENT_NAME" "pixelated"
+          get_env_value "GKE_SERVICE_NAME" "GKE_SERVICE_NAME" "pixelated-service"
+          get_env_value "GKE_ENVIRONMENT_URL" "GKE_ENVIRONMENT_URL" "http://35.243.226.27"
+
+          # GCP Service Account Key (special handling for JSON)
+          if [[ -n "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" ]]; then
+            echo "✅ GCP_SERVICE_ACCOUNT_KEY from GitHub Secrets"
+            echo "gcp_service_account_key=${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" >> $GITHUB_OUTPUT
+          elif [[ -f ".env" ]] && grep -q "^GCP_SERVICE_ACCOUNT_KEY=" .env; then
+            # Extract the JSON value from .env file
+            local json_value=$(grep "^GCP_SERVICE_ACCOUNT_KEY=" .env | cut -d'=' -f2- | sed "s/^'//;s/'$//;s/^\"//;s/\"$//")
+            echo "✅ GCP_SERVICE_ACCOUNT_KEY from .env file"
+            echo "gcp_service_account_key=${json_value}" >> $GITHUB_OUTPUT
+          else
+            echo "❌ GCP_SERVICE_ACCOUNT_KEY not found"
+            echo "gcp_service_account_key=" >> $GITHUB_OUTPUT
+          fi
+
+          # Sentry Configuration
+          get_env_value "SENTRY_AUTH_TOKEN" "SENTRY_AUTH_TOKEN"
+          get_env_value "SENTRY_ORG" "SENTRY_ORG" "pixelated-empathy-dq"
+          get_env_value "SENTRY_PROJECT" "SENTRY_PROJECT" "pixel-astro"
+          get_env_value "SENTRY_DSN" "SENTRY_DSN"
+          get_env_value "PUBLIC_SENTRY_DSN" "PUBLIC_SENTRY_DSN"
+          get_env_value "SENTRY_ACCESS_TOKEN" "SENTRY_ACCESS_TOKEN"
+
+          # Slack Configuration
+          get_env_value "SLACK_WEBHOOK_URL" "SLACK_WEBHOOK_URL"
+
+          # Optional GKE Configuration
+          get_env_value "GKE_REPLICAS" "GKE_REPLICAS" "3"
+          get_env_value "GKE_MAX_SURGE" "GKE_MAX_SURGE" "1"
+          get_env_value "GKE_MAX_UNAVAILABLE" "GKE_MAX_UNAVAILABLE" "0"
+          get_env_value "CANARY_PERCENTAGE" "CANARY_PERCENTAGE" "25"
+          get_env_value "AUTO_ROLLBACK" "AUTO_ROLLBACK" "true"
+          get_env_value "HEALTH_CHECK_TIMEOUT" "HEALTH_CHECK_TIMEOUT" "300"
+          get_env_value "KEEP_IMAGES" "KEEP_IMAGES" "3"
+          get_env_value "CLEANUP_OLDER_THAN" "CLEANUP_OLDER_THAN" "12h"
+
+          echo "✅ Environment variables loaded successfully!"

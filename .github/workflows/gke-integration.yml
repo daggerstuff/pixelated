@@ -1,0 +1,155 @@
+name: GKE Integration Pipeline
+
+permissions:
+  contents: read
+  id-token: write
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+    branches:
+      - main
+      - develop
+
+jobs:
+  trigger-gke-deployment:
+    name: Trigger GKE Deployment
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Determine deployment target
+        id: deployment-target
+        run: |
+          if [[ "${{ github.event.workflow_run.head_branch }}" == "main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "strategy=rolling" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.workflow_run.head_branch }}" == "develop" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "strategy=rolling" >> $GITHUB_OUTPUT
+          else
+            echo "No deployment needed for branch: ${{ github.event.workflow_run.head_branch }}"
+            exit 0
+          fi
+
+      - name: Trigger GKE Deployment
+        if: steps.deployment-target.outputs.environment != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const environment = '${{ steps.deployment-target.outputs.environment }}';
+            const strategy = '${{ steps.deployment-target.outputs.strategy }}';
+            
+            console.log(`Triggering GKE deployment for ${environment} with strategy ${strategy}`);
+            
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'gke-deploy.yml',
+                ref: '${{ github.event.workflow_run.head_sha }}',
+                inputs: {
+                  deployment_strategy: strategy,
+                  environment: environment
+                }
+              });
+              
+              console.log(`✅ Successfully triggered GKE deployment for ${environment}`);
+            } catch (error) {
+              console.error(`❌ Failed to trigger GKE deployment:`, error);
+              throw error;
+            }
+
+  notify-deployment-status:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Send deployment notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowRun = context.payload.workflow_run;
+            const status = workflowRun.conclusion;
+            const branch = workflowRun.head_branch;
+            const sha = workflowRun.head_sha;
+            
+            let message = '';
+            let color = 'good';
+            
+            if (status === 'success') {
+              if (branch === 'main') {
+                message = `🚀 Production deployment triggered successfully!\nCommit: ${sha}\nBranch: ${branch}`;
+                color = 'good';
+              } else if (branch === 'develop') {
+                message = `🚀 Staging deployment triggered successfully!\nCommit: ${sha}\nBranch: ${branch}`;
+                color = 'good';
+              } else {
+                message = `✅ CI/CD completed successfully for ${branch}`;
+                color = 'good';
+              }
+            } else {
+              message = `❌ CI/CD failed for ${branch}\nCommit: ${sha}`;
+              color = 'danger';
+            }
+            
+            // Send Slack notification if webhook is configured
+            const slackWebhook = process.env.SLACK_WEBHOOK_URL;
+            if (slackWebhook) {
+              try {
+                await fetch(slackWebhook, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    text: message,
+                    attachments: [{
+                      color: color,
+                      fields: [
+                        { title: 'Repository', value: context.repo.repo, short: true },
+                        { title: 'Branch', value: branch, short: true },
+                        { title: 'Status', value: status, short: true },
+                        { title: 'Commit', value: sha.substring(0, 7), short: true }
+                      ]
+                    }]
+                  })
+                });
+              } catch (error) {
+                console.log('Slack notification failed:', error.message);
+              }
+            }
+            
+            console.log(`Deployment notification sent for ${branch}: ${status}`);
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  cleanup-old-deployments:
+    name: Cleanup Old Deployments
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
+    steps:
+      - name: Trigger cleanup workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('Triggering cleanup workflow for old deployments...');
+            
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'gke-deploy.yml',
+                ref: '${{ github.event.workflow_run.head_sha }}',
+                inputs: {
+                  deployment_strategy: 'cleanup',
+                  environment: 'production'
+                }
+              });
+              
+              console.log('✅ Successfully triggered cleanup workflow');
+            } catch (error) {
+              console.error('❌ Failed to trigger cleanup workflow:', error);
+              // Don't fail the job if cleanup fails
+              console.log('⚠️ Cleanup workflow failed, continuing...');
+            }
