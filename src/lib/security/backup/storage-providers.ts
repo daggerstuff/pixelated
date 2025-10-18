@@ -700,6 +700,32 @@ export class AWSS3StorageProvider implements StorageProvider {
   }
 
   private getFullKey(key: string): string {
+    // Validate key for security - prevent directory traversal in cloud storage keys
+    if (!key || typeof key !== 'string') {
+      throw new Error('Invalid key provided')
+    }
+
+    // Reject keys with directory traversal sequences
+    if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
+      throw new Error('Directory traversal sequences (..) are not allowed in keys')
+    }
+
+    // Reject keys with absolute paths
+    if (key.startsWith('/')) {
+      throw new Error('Absolute paths are not allowed in keys')
+    }
+
+    // Reject keys with unsafe characters
+    const unsafeChars = /[<>:"|?*\x00-\x1f]/
+    if (unsafeChars.test(key)) {
+      throw new Error('Key contains unsafe characters')
+    }
+
+    // Reject keys that are too long (prevent resource exhaustion)
+    if (key.length > 1024) {
+      throw new Error('Key is too long')
+    }
+
     return this.config.prefix ? `${this.config.prefix}${key}` : key
   }
 }
@@ -889,6 +915,32 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   }
 
   private getFullKey(key: string): string {
+    // Validate key for security - prevent directory traversal in cloud storage keys
+    if (!key || typeof key !== 'string') {
+      throw new Error('Invalid key provided')
+    }
+
+    // Reject keys with directory traversal sequences
+    if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
+      throw new Error('Directory traversal sequences (..) are not allowed in keys')
+    }
+
+    // Reject keys with absolute paths
+    if (key.startsWith('/')) {
+      throw new Error('Absolute paths are not allowed in keys')
+    }
+
+    // Reject keys with unsafe characters
+    const unsafeChars = /[<>:"|?*\x00-\x1f]/
+    if (unsafeChars.test(key)) {
+      throw new Error('Key contains unsafe characters')
+    }
+
+    // Reject keys that are too long (prevent resource exhaustion)
+    if (key.length > 1024) {
+      throw new Error('Key is too long')
+    }
+
     return this.config.prefix ? `${this.config.prefix}${key}` : key
   }
 }
@@ -1114,6 +1166,32 @@ export class AzureBlobStorageProvider implements StorageProvider {
   }
 
   private getFullKey(key: string): string {
+    // Validate key for security - prevent directory traversal in cloud storage keys
+    if (!key || typeof key !== 'string') {
+      throw new Error('Invalid key provided')
+    }
+
+    // Reject keys with directory traversal sequences
+    if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
+      throw new Error('Directory traversal sequences (..) are not allowed in keys')
+    }
+
+    // Reject keys with absolute paths
+    if (key.startsWith('/')) {
+      throw new Error('Absolute paths are not allowed in keys')
+    }
+
+    // Reject keys with unsafe characters
+    const unsafeChars = /[<>:"|?*\x00-\x1f]/
+    if (unsafeChars.test(key)) {
+      throw new Error('Key contains unsafe characters')
+    }
+
+    // Reject keys that are too long (prevent resource exhaustion)
+    if (key.length > 1024) {
+      throw new Error('Key is too long')
+    }
+
     return this.config.prefix ? `${this.config.prefix}${key}` : key
   }
 }

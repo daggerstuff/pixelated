@@ -35,6 +35,7 @@ dependencies = [
     "python-socketio>=5.13.0",
     "redis>=6.4.0",
     "services>=0.1.1",
+    
     "structlog>=25.4.0",
 ]
 

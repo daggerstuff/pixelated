@@ -29,13 +29,15 @@ Modified the rollback workflow to use a Personal Access Token (PAT) instead of t
 
 ### 2. Added Environment Variables to Git Push Steps
 ```yaml
-- name: Create rollback tag
-  run: |
-    # ... existing git commands ...
-    git push origin "$TAG_NAME"
-  env:
-    GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+  - name: Create rollback tag
+    run: |
+      # ... existing git commands ...
+      git push ${GIT_PUSH_REMOTE:-origin} "$TAG_NAME"
+    env:
+      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 ```
+
+Note: You can configure the push remote with the `GIT_PUSH_REMOTE` environment variable (defaults to `origin`). This helps align with local remote mapping like `origin -> GitHub` and `gitlab -> GitLab`.
 
 ## Setup Instructions
 

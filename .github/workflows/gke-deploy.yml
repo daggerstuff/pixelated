@@ -265,19 +265,24 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Create Sentry release
-        if: ${{ secrets.SENTRY_AUTH_TOKEN != '' && secrets.SENTRY_DSN != '' }}
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
           SENTRY_RELEASE: ${{ github.sha }}
         run: |
-          echo "📊 Creating Sentry release: $SENTRY_RELEASE"
-          curl -sL https://sentry.io/get-cli/ | sh
-          sentry-cli releases new "$SENTRY_RELEASE" || true
-          sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
-          sentry-cli releases finalize "$SENTRY_RELEASE" || true
-          echo "✅ Sentry release created"
+          # Check if Sentry secrets are available
+          if [ -n "${{ secrets.SENTRY_AUTH_TOKEN }}" ] && [ -n "${{ secrets.SENTRY_DSN }}" ]; then
+            echo "📊 Creating Sentry release: $SENTRY_RELEASE"
+            curl -sL https://sentry.io/get-cli/ | sh
+            sentry-cli releases new "$SENTRY_RELEASE" || true
+            sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
+            sentry-cli releases finalize "$SENTRY_RELEASE" || true
+            echo "✅ Sentry release created"
+          else
+            echo "⚠️ Sentry secrets not configured, skipping release creation"
+          fi
 
   # GKE Deployment with multiple strategies
   deploy-gke:

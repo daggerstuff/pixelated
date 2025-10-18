@@ -218,6 +218,12 @@ export class BlogPublishingService {
       const entries = await fs.readdir(dirPath, { withFileTypes: true })
 
       for (const entry of entries) {
+        // Validate entry name for security - prevent path traversal
+        if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+          logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
+          continue
+        }
+
         const fullPath = path.join(dirPath, entry.name)
 
         if (entry.isDirectory()) {

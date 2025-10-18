@@ -59,6 +59,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
+          run_install: false
 
       - name: Load environment from .env
         run: |
@@ -127,6 +128,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
+          run_install: false
 
       - name: Load environment from .env
         run: |
@@ -408,8 +410,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ env.GCP_SERVICE_ACCOUNT_KEY || secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -593,8 +595,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ env.GCP_SERVICE_ACCOUNT_KEY || secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -690,8 +692,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ env.GCP_SERVICE_ACCOUNT_KEY || secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2

@@ -104,16 +104,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          echo "🔧 Logging in to GitHub Container Registry..."
-          # Prefer a PAT (recommended) because some orgs restrict GITHUB_TOKEN package permissions for workflows.
-          if [ -n "${PERSONAL_ACCESS_TOKEN}" ]; then
-            echo "Using PERSONAL_ACCESS_TOKEN for ghcr login"
-            echo $PERSONAL_ACCESS_TOKEN | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          else
-            echo "Falling back to GITHUB_TOKEN for ghcr login"
-            echo $GITHUB_TOKEN | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          fi
+          echo "🔧 Preparing to push Docker images to GHCR..."
+          echo "Note: Ensure PERSONAL_ACCESS_TOKEN (preferred) has 'write:packages' scope and 'repo' if private repos are involved."
+          echo "If using GITHUB_TOKEN, make sure the organization allows packages: write for workflow runs."
 
+          # Use docker/login-action via a single-line CLI login fallback in the workflow run step below.
+          # The actual login will be performed by the subsequent 'uses' step which handles auth securely.
+
+          echo "📤 Will push Docker images using authenticated action step"
+
+      - name: Authenticate with GitHub Container Registry
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          # Prefer PERSONAL_ACCESS_TOKEN for broader package permissions; fallback to GITHUB_TOKEN
+          password: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker images (authenticated)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: |
           echo "📤 Pushing Docker images..."
           docker push $IMAGE_TAG_SHA
           docker push $IMAGE_TAG_BRANCH

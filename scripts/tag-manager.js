@@ -52,7 +52,8 @@ if (command === 'create') {
   try {
     execSync(`git tag -a ${tagName} -m "${message || 'Rollback tag'}"`);
     if (push) {
-      execSync(`git push origin ${tagName}`);
+      const remote = process.env.GIT_PUSH_REMOTE || 'origin';
+      execSync(`git push ${remote} ${tagName}`);
     }
     console.log(`Created tag: ${tagName}`);
     process.exit(0);

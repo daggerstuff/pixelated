@@ -110,7 +110,8 @@ jobs:
           TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
           git tag "$TAG_NAME"
-          git push --dry-run origin "$TAG_NAME"
+          GIT_PUSH_REMOTE=${{ env.GIT_PUSH_REMOTE || 'origin' }}
+          git push --dry-run "$GIT_PUSH_REMOTE" "$TAG_NAME"
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
@@ -122,7 +123,7 @@ jobs:
           TAG_NAME="$TAG_BASE"
           git fetch --tags --force
           COUNT=0
-          while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
+          while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags "$GIT_PUSH_REMOTE" refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
             COUNT=$((COUNT+1))
             if [ "$COUNT" -gt 50 ]; then
               echo "::error::Unable to compute unique tag after 50 attempts: $TAG_NAME"
@@ -131,9 +132,10 @@ jobs:
             printf -v PAD "%02d" "$COUNT"
             TAG_NAME="${TAG_BASE}-$PAD"
           done
-          echo "Creating and pushing tag: $TAG_NAME"
+          GIT_PUSH_REMOTE=${{ env.GIT_PUSH_REMOTE || 'origin' }}
+          echo "Creating and pushing tag: $TAG_NAME to $GIT_PUSH_REMOTE"
           git tag "$TAG_NAME"
-          git push origin "$TAG_NAME"
+          git push "$GIT_PUSH_REMOTE" "$TAG_NAME"
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
@@ -234,8 +236,9 @@ jobs:
           git config --global user.name "GitHub Action"
           TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
+          GIT_PUSH_REMOTE=${{ env.GIT_PUSH_REMOTE || 'origin' }}
           git tag "$TAG_NAME"
-          git push --dry-run origin "$TAG_NAME"
+          git push --dry-run "$GIT_PUSH_REMOTE" "$TAG_NAME"
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
@@ -247,7 +250,7 @@ jobs:
           TAG_NAME="$TAG_BASE"
           git fetch --tags --force
           COUNT=0
-          while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags origin refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
+          while git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null 2>&1 || git ls-remote --tags "$GIT_PUSH_REMOTE" refs/tags/$TAG_NAME | grep -q "$TAG_NAME"; do
             COUNT=$((COUNT+1))
             if [ "$COUNT" -gt 100 ]; then
               echo "::error::Unable to compute unique production tag after 100 attempts: $TAG_NAME"
@@ -256,8 +259,9 @@ jobs:
             printf -v PAD "%02d" "$COUNT"
             TAG_NAME="${TAG_BASE}-$PAD"
           done
-          echo "Creating and pushing production tag: $TAG_NAME"
+          GIT_PUSH_REMOTE=${{ env.GIT_PUSH_REMOTE || 'origin' }}
+          echo "Creating and pushing production tag: $TAG_NAME to $GIT_PUSH_REMOTE"
           git tag "$TAG_NAME"
-          git push origin "$TAG_NAME"
+          git push "$GIT_PUSH_REMOTE" "$TAG_NAME"
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
