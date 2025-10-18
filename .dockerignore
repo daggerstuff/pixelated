@@ -205,7 +205,7 @@ app.json
 Procfile
 Caddyfile
 newrelic.ini
-instrument.mjs
+
 justfile
 
 # Package manager files

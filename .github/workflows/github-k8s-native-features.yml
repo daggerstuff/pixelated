@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       feature_type:
-        description: 'GitHub-native K8s feature to demonstrate'
+        description: "GitHub-native K8s feature to demonstrate"
         required: true
         type: choice
         options:
@@ -23,11 +23,10 @@ on:
           - security-advanced
 
 env:
-  NODE_VERSION: '24'
-  PNPM_VERSION: '10.18.2'
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.18.2"
 
 jobs:
-  # GitHub-native deployment status (superior to GitLab)
   deployment-status:
     name: GitHub-Native Deployment Status
     runs-on: ubuntu-latest
@@ -63,57 +62,45 @@ jobs:
             --project ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
 
       - name: Create GitHub-native deployment
+        id: create_deployment
         uses: actions/github-script@v7
         with:
           script: |
-            // GitHub-native deployment creation (superior to GitLab)
-            const deployment = await github.rest.repos.createDeployment({
+            const cluster = process.env.GKE_CLUSTER_NAME || 'pixelcluster';
+            const namespace = process.env.GKE_NAMESPACE || 'pixelated';
+            const res = await github.rest.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: context.sha,
               environment: 'production',
-              description: `GKE Deployment: ${{ env.GKE_CLUSTER_NAME || 'pixelcluster' }} cluster`,
+              description: `GKE Deployment: ${cluster} cluster`,
               auto_merge: false,
               required_contexts: [],
-              payload: {
-                cluster: '${{ env.GKE_CLUSTER_NAME || 'pixelcluster' }}',
-                namespace: '${{ env.GKE_NAMESPACE || 'pixelated' }}',
-                strategy: 'rolling',
-                github_native_features: true
-              }
+              payload: { cluster, namespace, strategy: 'rolling', github_native_features: true }
             });
-            
-            console.log('✅ GitHub-native deployment created:', deployment.data.id);
-            console.log('🎯 Features GitLab doesn\'t have:');
-            console.log('- Native GitHub deployment API integration');
-            console.log('- Rich deployment timeline in GitHub UI');
-            console.log('- Integration with GitHub status checks');
-            console.log('- Better rollback capabilities');
-            console.log('- Enhanced security with GitHub auth');
+            console.log('✅ GitHub-native deployment created:', res.data.id);
+            return res.data.id;
 
       - name: Update deployment status
         uses: actions/github-script@v7
         with:
           script: |
-            // Update deployment with K8s health status
-            const healthCheck = {
-              pods_ready: '15/15',
-              services_healthy: '5/5',
-              deployments_stable: '3/3',
-              cluster_health: 'healthy'
-            };
-            
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: deployment.data.id,
-              state: 'success',
-              description: `K8s Health: ${healthCheck.pods_ready} pods ready`,
-              environment_url: '${{ env.GKE_ENVIRONMENT_URL || 'http://35.243.226.27' }}',
-              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            });
+            const healthCheck = { pods_ready: '15/15', services_healthy: '5/5', deployments_stable: '3/3', cluster_health: 'healthy' };
+            const deploymentId = '${{ steps.create_deployment.outputs.result }}';
+            if (!deploymentId) {
+              console.warn('No deployment_id available from previous step; skipping createDeploymentStatus');
+            } else {
+              await github.rest.repos.createDeploymentStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                deployment_id: Number(deploymentId),
+                state: 'success',
+                description: `K8s Health: ${healthCheck.pods_ready} pods ready`,
+                environment_url: process.env.GKE_ENVIRONMENT_URL || 'http://35.243.226.27',
+                log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+              });
+            }
 
-  # PR integration (GitLab doesn't have this level of PR-K8s integration)
   pr-integration:
     name: PR-Kubernetes Integration
     runs-on: ubuntu-latest
@@ -134,41 +121,39 @@ jobs:
         with:
           script: |
             const previewUrl = process.env.GKE_ENVIRONMENT_URL || 'http://35.243.226.27';
-            
-            // Create PR comment with K8s integration (GitLab can't do this)
-            const comment = `## 🚀 PR Preview Environment Ready
-            
-**Kubernetes Integration Status:** ✅ Active  
-**Preview URL:** ${previewUrl}  
-**Deployment Strategy:** Rolling Update  
+            const cluster = process.env.GKE_CLUSTER_NAME || 'pixelcluster';
+            const namespace = process.env.GKE_NAMESPACE || 'pixelated';
+            const lines = [];
+            lines.push('## 🚀 PR Preview Environment Ready');
+            lines.push('');
+            lines.push('**Kubernetes Integration Status:** ✅ Active');
+            lines.push(`**Preview URL:** ${previewUrl}`);
+            lines.push(`**Deployment Strategy:** Rolling Update`);
+            lines.push('');
+            lines.push('### 📊 K8s Health Status');
+            lines.push(`- **Cluster:** ${cluster}`);
+            lines.push(`- **Namespace:** ${namespace}`);
+            lines.push(`- **Strategy:** Rolling deployment with health checks`);
+            lines.push('');
+            lines.push('### 🔧 GitHub-Native Features (GitLab Doesn\'t Have)');
+            lines.push('- ✅ **PR Comments** - Automated deployment notifications');
+            lines.push('- ✅ **Status Checks** - K8s health integration with PR status');
+            lines.push('- ✅ **Deployment Reviews** - Required approvals before prod');
+            lines.push('- ✅ **One-click Rollback** - Direct from PR interface');
+            lines.push('- ✅ **Rich Markdown** - Better formatting than GitLab');
+            lines.push('');
+            lines.push('### 🎯 GitHub Advantages');
+            lines.push('- **Native PR workflow** - Seamless GitHub integration');
+            lines.push('- **Better commenting** - Rich markdown support');
+            lines.push('- **Status API integration** - Real-time PR status updates');
+            lines.push('- **Sophisticated approvals** - Advanced review workflows');
+            const comment = lines.join('\n');
+            if (context.issue && context.issue.number) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title: '🚀 PR Preview Environment Ready (automated)', body: comment, labels: ['preview', 'automation'] });
+            }
 
-### 📊 K8s Health Status
-- **Cluster:** ${{ env.GKE_CLUSTER_NAME || 'pixelcluster' }}
-- **Namespace:** ${{ env.GKE_NAMESPACE || 'pixelated' }}
-- **Strategy:** Rolling deployment with health checks
-
-### 🔧 GitHub-Native Features (GitLab Doesn't Have)
-- ✅ **PR Comments** - Automated deployment notifications  
-- ✅ **Status Checks** - K8s health integration with PR status
-- ✅ **Deployment Reviews** - Required approvals before prod
-- ✅ **One-click Rollback** - Direct from PR interface
-- ✅ **Rich Markdown** - Better formatting than GitLab
-
-### 🎯 GitHub Advantages
-- **Native PR workflow** - Seamless GitHub integration
-- **Better commenting** - Rich markdown support
-- **Status API integration** - Real-time PR status updates
-- **Sophisticated approvals** - Advanced review workflows
-`;
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
-
-  # Issue automation (GitLab doesn't have GitHub's issue-K8s integration)
   issue-automation:
     name: Issue-Kubernetes Automation
     runs-on: ubuntu-latest
@@ -187,55 +172,43 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const issueBody = `## 🚨 Kubernetes Deployment Issue
-            
-**Cluster:** \`${{ env.GKE_CLUSTER_NAME || 'pixelcluster' }}\`  
-**Namespace:** \`${{ env.GKE_NAMESPACE || 'pixelated' }}\`  
-**Environment:** Production  
-**Reported by:** @${{ github.actor }}
+            const cluster = process.env.GKE_CLUSTER_NAME || 'pixelcluster';
+            const namespace = process.env.GKE_NAMESPACE || 'pixelated';
+            const deployment = process.env.GKE_DEPLOYMENT_NAME || 'pixelated';
+            const issueBody = [
+              '## 🚨 Kubernetes Deployment Issue',
+              '',
+              `**Cluster:** \`${cluster}\``,
+              `**Namespace:** \`${namespace}\``,
+              '**Environment:** Production',
+              `**Reported by:** @${context.actor || github.actor || 'unknown'}`,
+              '',
+              '## 🔍 GitHub-Native Investigation Tools',
+              '',
+              '### Automated Diagnostics (GitLab doesn\'t have this)',
+              '```bash',
+              `kubectl get pods -n ${namespace}`,
+              `kubectl describe deployment ${deployment}`,
+              `kubectl logs -n ${namespace} -l app=pixelated --tail=100`,
+              '```',
+              '',
+              '### GitHub Actions Integration',
+              '- **Workflow Status:** Check Actions tab',
+              '- **Deployment History:** View deployments',
+              "- **One-click Rollback:** `gh workflow run gke-rollback.yml -f environment=production`",
+              '',
+              '### Next Steps',
+              '1. Check cluster health using commands above',
+              '2. Review deployment logs in Actions',
+              '3. Consider rollback if health checks fail',
+              '4. Monitor cost impact of any changes'
+            ].join('\n');
+            await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title: '🚨 Kubernetes Deployment Issue - Automated Detection', body: issueBody, labels: ['critical', 'kubernetes', 'deployment', 'automated'] });
 
-## 🔍 GitHub-Native Investigation Tools
-
-### Automated Diagnostics (GitLab doesn't have this)
-\`\`\`bash
-# Run these commands to investigate
-kubectl get pods -n ${{ env.GKE_NAMESPACE || 'pixelated' }}
-kubectl describe deployment ${{ env.GKE_DEPLOYMENT_NAME || 'pixelated' }}
-kubectl logs -n ${{ env.GKE_NAMESPACE || 'pixelated' }} -l app=pixelated --tail=100
-\`\`\`
-
-### GitHub Actions Integration
-- **Workflow Status:** Check [Actions tab](../actions)
-- **Deployment History:** View [deployments](../deployments)
-- **One-click Rollback:** \`gh workflow run gke-rollback.yml -f environment=production\`
-
-### Enhanced Features (GitLab Doesn't Have)
-- ✅ **One-click rollback** from issue comments
-- ✅ **Automated diagnostics** generation
-- ✅ **PR integration** with deployment status
-- ✅ **Cost tracking** with resource optimization
-- ✅ **Security scanning** with detailed reports
-
-### Next Steps
-1. **Check cluster health** using commands above
-2. **Review deployment logs** in [Actions](../actions)
-3. **Consider rollback** if health checks fail
-4. **Monitor cost impact** of any changes
-`;
-            
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '🚨 Kubernetes Deployment Issue - Automated Detection',
-              body: issueBody,
-              labels: ['critical', 'kubernetes', 'deployment', 'automated']
-            });
-
-  # GitHub CLI integration (superior to GitLab's CLI)
-  github-cli-integration:
+  github-cli:
     name: GitHub CLI Kubernetes Integration
     runs-on: ubuntu-latest
-    if: github.event.inputs.feature_type == 'github-cli-integration'
+    if: github.event.inputs.feature_type == 'github-cli'
     steps:
       - name: Demonstrate GitHub CLI K8s capabilities
         run: |
@@ -251,15 +224,7 @@ kubectl logs -n ${{ env.GKE_NAMESPACE || 'pixelated' }} -l app=pixelated --tail=
           echo "### Status Checking:"
           echo "gh api repos/${{ github.repository }}/deployments --jq '.[] | select(.environment==\"production\")'"
           echo "gh api repos/${{ github.repository }}/actions/runs --jq '.workflow_runs[] | select(.name==\"GKE Deployment Pipeline\")'"
-          echo ""
-          echo "### Enhanced Features (GitLab CLI lacks):"
-          echo "- **Cross-repo workflows** - Trigger deployments across multiple repos"
-          echo "- **Advanced filtering** - Complex query capabilities"
-          echo "- **Scripting integration** - Better automation support"
-          echo "- **Extension ecosystem** - 1000+ CLI extensions"
-          echo "- **GitHub-native auth** - Seamless authentication"
 
-  # Marketplace actions (GitLab doesn't have this ecosystem)
   marketplace-actions:
     name: GitHub Marketplace K8s Actions
     runs-on: ubuntu-latest
@@ -270,29 +235,10 @@ kubectl logs -n ${{ env.GKE_NAMESPACE || 'pixelated' }} -l app=pixelated --tail=
           echo "🛒 GitHub Marketplace provides SUPERIOR K8s tooling vs GitLab"
           echo ""
           echo "## Available K8s Actions (GitLab doesn't have this ecosystem):"
-          echo ""
-          echo "### Deployment & Operations:"
-          echo "- azure/k8s-deploy@v4 - Advanced deployment strategies"
-          echo "- azure/k8s-set-context@v3 - Multi-cluster management"
-          echo "- azure/k8s-create-secret@v4 - Secret management"
-          echo ""
-          echo "### Security & Compliance:"
-          echo "- aquasecurity/trivy-action@0.28.0 - Container vulnerability scanning"
-          echo "- github/codeql-action@v3 - Advanced security analysis"
-          echo "- bridgecrewio/checkov-action@v12 - Infrastructure compliance"
-          echo ""
-          echo "### Monitoring & Observability:"
-          echo "- influxdata/influxdb-action@v1 - Metrics collection"
-          echo "- newrelic/deployment-marker-action@v1 - APM integration"
-          echo "- datadog/synthetics-ci-visibility-action@v1 - Synthetic monitoring"
-          echo ""
-          echo "### GitHub Advantages:"
-          echo "- **2000+ actions** vs GitLab's limited built-ins"
-          echo "- **Specialized tools** - Best-of-breed solutions"
-          echo "- **Rapid innovation** - Community-driven development"
-          echo "- **Vendor-neutral** - Works with any cloud provider"
+          echo "- azure/k8s-deploy@v4"
+          echo "- azure/k8s-set-context@v3"
+          echo "- azure/k8s-create-secret@v4"
 
-  # Advanced security (better than GitLab)
   security-advanced:
     name: Advanced GitHub-Native Security
     runs-on: ubuntu-latest
@@ -302,22 +248,7 @@ kubectl logs -n ${{ env.GKE_NAMESPACE || 'pixelated' }} -l app=pixelated --tail=
         run: |
           echo "🔒 GitHub provides SUPERIOR security integration vs GitLab"
           echo ""
-          echo "## Advanced Security Features (GitLab doesn't have this level):"
-          echo ""
-          echo "### GitHub Advanced Security:"
-          echo "- **CodeQL analysis** - Semantic code analysis"
-          echo "- **Secret scanning** - Proactive secret detection"
-          echo "- **Dependency review** - Vulnerability tracking"
-          echo "- **Security advisories** - Native security workflow"
-          echo ""
-          echo "### GitHub-Native K8s Security:"
-          echo "- **Container scanning** with Trivy integration"
-          echo "- **Infrastructure compliance** with Checkov"
-          echo "- **Runtime security** with Falco integration"
-          echo "- **Policy enforcement** with OPA Gatekeeper"
-          echo ""
-          echo "### Security Advantages:"
-          echo "- **Better integration** with GitHub ecosystem"
-          echo "- **Enhanced automation** with GitHub Actions"
-          echo "- **Superior reporting** with GitHub Security tab"
-          echo "- **Community-driven** security research"
+          echo "## Advanced Security Features:"
+          echo "- CodeQL analysis"
+          echo "- Secret scanning"
+          echo "- Dependency review"

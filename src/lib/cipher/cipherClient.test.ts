@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock the missing @campfirein/cipher dependency with a minimal stub
 vi.mock("@campfirein/cipher", () => ({
-  Cipher: ,
+  Cipher: vi.fn(),
 }));
 
 import { CipherClient } from "./cipherClient";

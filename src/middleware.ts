@@ -22,9 +22,9 @@ function isProtectedRoute(request: Request) {
  * Auth middleware that uses the project's session system.
  * If a request targets a protected route and there's no session, redirect to sign-in.
  */
-const projectAuthMiddleware = async (context: Record<string, unknown>, next: () => Promise<Response>) => {
+const projectAuthMiddleware = async (context: any, next: any) => {
   const { request } = context
-
+  const locals = context.locals || {}
   // Allow non-protected routes through quickly
   if (!isProtectedRoute(request)) {
     return next()
@@ -41,6 +41,12 @@ const projectAuthMiddleware = async (context: Record<string, unknown>, next: () 
         status: 302,
         headers: { Location: signInUrl.toString() },
       })
+    }
+    
+    // Store session data in locals for use in routes
+    if (context.locals) {
+      context.locals.user = session.user
+      context.locals.session = session.session
     }
   } catch (_err) {
     // If session check fails treat as unauthenticated for protected routes

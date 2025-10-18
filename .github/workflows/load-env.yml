@@ -80,12 +80,163 @@ jobs:
             local env_var_name=$2
             local default_value=$3
             
-            # First try GitHub Secrets
-            if [[ -n "${{ secrets[secret_name] }}" ]]; then
-              echo "✅ $env_var_name from GitHub Secrets"
-              echo "${env_var_name}=${{ secrets[secret_name] }}" >> $GITHUB_OUTPUT
-              return
-            fi
+            # First try GitHub Secrets - use direct secret references
+            case "$secret_name" in
+              "GCP_PROJECT_ID")
+                if [[ -n "${{ secrets.GCP_PROJECT_ID }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_CLUSTER_NAME")
+                if [[ -n "${{ secrets.GKE_CLUSTER_NAME }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_CLUSTER_NAME }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_ZONE")
+                if [[ -n "${{ secrets.GKE_ZONE }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_ZONE }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_NAMESPACE")
+                if [[ -n "${{ secrets.GKE_NAMESPACE }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_NAMESPACE }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_DEPLOYMENT_NAME")
+                if [[ -n "${{ secrets.GKE_DEPLOYMENT_NAME }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_DEPLOYMENT_NAME }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_SERVICE_NAME")
+                if [[ -n "${{ secrets.GKE_SERVICE_NAME }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_SERVICE_NAME }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_ENVIRONMENT_URL")
+                if [[ -n "${{ secrets.GKE_ENVIRONMENT_URL }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_ENVIRONMENT_URL }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "SENTRY_AUTH_TOKEN")
+                if [[ -n "${{ secrets.SENTRY_AUTH_TOKEN }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.SENTRY_AUTH_TOKEN }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "SENTRY_ORG")
+                if [[ -n "${{ secrets.SENTRY_ORG }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.SENTRY_ORG }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "SENTRY_PROJECT")
+                if [[ -n "${{ secrets.SENTRY_PROJECT }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.SENTRY_PROJECT }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "SENTRY_DSN")
+                if [[ -n "${{ secrets.SENTRY_DSN }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.SENTRY_DSN }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "PUBLIC_SENTRY_DSN")
+                if [[ -n "${{ secrets.PUBLIC_SENTRY_DSN }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.PUBLIC_SENTRY_DSN }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "SLACK_WEBHOOK_URL")
+                if [[ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.SLACK_WEBHOOK_URL }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_REPLICAS")
+                if [[ -n "${{ secrets.GKE_REPLICAS }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_REPLICAS }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_MAX_SURGE")
+                if [[ -n "${{ secrets.GKE_MAX_SURGE }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_MAX_SURGE }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "GKE_MAX_UNAVAILABLE")
+                if [[ -n "${{ secrets.GKE_MAX_UNAVAILABLE }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.GKE_MAX_UNAVAILABLE }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "CANARY_PERCENTAGE")
+                if [[ -n "${{ secrets.CANARY_PERCENTAGE }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.CANARY_PERCENTAGE }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "AUTO_ROLLBACK")
+                if [[ -n "${{ secrets.AUTO_ROLLBACK }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.AUTO_ROLLBACK }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "HEALTH_CHECK_TIMEOUT")
+                if [[ -n "${{ secrets.HEALTH_CHECK_TIMEOUT }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.HEALTH_CHECK_TIMEOUT }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "KEEP_IMAGES")
+                if [[ -n "${{ secrets.KEEP_IMAGES }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.KEEP_IMAGES }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "CLEANUP_OLDER_THAN")
+                if [[ -n "${{ secrets.CLEANUP_OLDER_THAN }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.CLEANUP_OLDER_THAN }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+              "SENTRY_ACCESS_TOKEN")
+                if [[ -n "${{ secrets.SENTRY_ACCESS_TOKEN }}" ]]; then
+                  echo "✅ $env_var_name from GitHub Secrets"
+                  echo "${env_var_name}=${{ secrets.SENTRY_ACCESS_TOKEN }}" >> $GITHUB_OUTPUT
+                  return
+                fi
+                ;;
+            esac
             
             # Then try .env file
             if [[ -f ".env" ]]; then
