@@ -102,14 +102,10 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           echo "🔧 Preparing to push Docker images to GHCR..."
-          echo "Note: Ensure PERSONAL_ACCESS_TOKEN (preferred) has 'write:packages' scope and 'repo' if private repos are involved."
-          echo "If using GITHUB_TOKEN, make sure the organization allows packages: write for workflow runs."
-
-          # Use docker/login-action via a single-line CLI login fallback in the workflow run step below.
-          # The actual login will be performed by the subsequent 'uses' step which handles auth securely.
+          echo "Note: Using GITHUB_TOKEN for authentication."
+          echo "Ensure the repository/organization allows 'packages: write' permissions for workflow runs."
 
           echo "📤 Will push Docker images using authenticated action step"
 
@@ -119,18 +115,49 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          # Prefer PERSONAL_ACCESS_TOKEN for broader package permissions; fallback to GITHUB_TOKEN
-          password: ${{ secrets.PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+          # Use GITHUB_TOKEN for authentication (more secure, no need for separate PAT)
+          password: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: false
 
       - name: Push Docker images (authenticated)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
           echo "📤 Pushing Docker images..."
-          docker push $IMAGE_TAG_SHA
-          docker push $IMAGE_TAG_BRANCH
-          docker push $IMAGE_TAG_LATEST
 
-          echo "✅ Docker images pushed successfully"
+          # Validate that we're logged in to the registry
+          echo "🔍 Verifying registry authentication..."
+          if ! docker info | grep -q "ghcr.io"; then
+            echo "❌ Failed to authenticate with GitHub Container Registry"
+            echo "🔧 Please ensure your PERSONAL_ACCESS_TOKEN has 'write:packages' scope"
+            exit 1
+          fi
+
+          # Push images with individual error handling
+          echo "📦 Pushing $IMAGE_TAG_SHA..."
+          if docker push $IMAGE_TAG_SHA; then
+            echo "✅ Successfully pushed $IMAGE_TAG_SHA"
+          else
+            echo "❌ Failed to push $IMAGE_TAG_SHA"
+            exit 1
+          fi
+
+          echo "📦 Pushing $IMAGE_TAG_BRANCH..."
+          if docker push $IMAGE_TAG_BRANCH; then
+            echo "✅ Successfully pushed $IMAGE_TAG_BRANCH"
+          else
+            echo "❌ Failed to push $IMAGE_TAG_BRANCH"
+            exit 1
+          fi
+
+          echo "📦 Pushing $IMAGE_TAG_LATEST..."
+          if docker push $IMAGE_TAG_LATEST; then
+            echo "✅ Successfully pushed $IMAGE_TAG_LATEST"
+          else
+            echo "❌ Failed to push $IMAGE_TAG_LATEST"
+            exit 1
+          fi
+
+          echo "🎉 All Docker images pushed successfully!"
 
           # Create deployment metadata
           cat > deployment-metadata.json << EOF

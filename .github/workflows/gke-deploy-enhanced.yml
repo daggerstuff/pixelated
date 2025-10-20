@@ -53,7 +53,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -122,7 +121,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -309,6 +307,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
 
       - name: Load Sentry environment
         run: |

@@ -31,6 +31,7 @@ from .middleware.auth import AuthenticationMiddleware
 from .middleware.logging import LoggingMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.request_id import RequestIDMiddleware
+from .routers.byterover import router as byterover_router
 from .routers.agents import router as agents_router
 from .routers.health import router as health_router
 from .routers.pipelines import router as pipelines_router
@@ -270,6 +271,12 @@ def create_mcp_app(config: MCPConfig | None = None) -> FastAPI:
         agents_router,
         prefix="/api/v1/agents",
         tags=["agents"]
+    app.include_router(
+        byterover_router,
+        prefix="/api/v1/byterover",
+        tags=["byterover"]
+    )
+
     )
 
     app.include_router(
