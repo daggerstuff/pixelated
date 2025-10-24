@@ -79,7 +79,7 @@ jobs:
         run: |
           # Build image with multiple tags for different environments
           IMAGE_TAG_SHA=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
-          IMAGE_TAG_BRANCH=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.ref_name }}
+          IMAGE_TAG_BRANCH=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.ref_name }}-${{ github.sha }}
           IMAGE_TAG_LATEST=ghcr.io/${{ github.repository_owner }}/pixelated:latest
 
           echo "🔧 Building Docker image with multiple tags..."
