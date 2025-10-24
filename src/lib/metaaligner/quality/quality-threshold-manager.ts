@@ -1,4 +1,3 @@
-
 /**
  * @module quality-threshold-manager
  * @description This module provides a quality threshold management system for the MetaAligner pipeline.
@@ -14,5 +13,5 @@ export interface IQualityThresholdManager {
    * @param metrics - The metrics to check.
    * @returns A boolean indicating whether the metrics meet the thresholds.
    */
-  meetsThresholds(metrics: Record<string, number>): boolean;
+  meetsThresholds(metrics: Record<string, number>): boolean
 }

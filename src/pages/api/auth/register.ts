@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       request,
       'register',
       3, // 3 registrations per hour per IP
-      60
+      60,
     )
 
     if (!rateLimitResult.success) {
@@ -35,7 +35,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Parse and validate request body
     const body = await request.json()
-    
+
     // Validate required fields
     if (!body.email || !body.password || !body.firstName || !body.lastName) {
       return new Response(
@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
@@ -60,7 +60,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       lastName: sanitizeInput(body.lastName),
       role: sanitizeInput(body.role || 'patient'),
       phone: body.phone ? sanitizeInput(body.phone) : undefined,
-      dateOfBirth: body.dateOfBirth ? sanitizeInput(body.dateOfBirth) : undefined,
+      dateOfBirth: body.dateOfBirth
+        ? sanitizeInput(body.dateOfBirth)
+        : undefined,
     }
 
     // Register user
@@ -96,9 +98,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store, no-cache, must-revalidate, private',
         },
-      }
+      },
     )
-
   } catch (error) {
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
@@ -118,13 +119,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
     // Handle unexpected errors
     console.error('Registration error:', error)
-    
+
     await logSecurityEvent('USER_REGISTRATION_ERROR', null, {
       error: error.message,
       clientInfo,
@@ -141,7 +142,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     )
   }
 }
@@ -153,7 +154,8 @@ export const OPTIONS: APIRoute = async ({ request }) => {
     headers: {
       'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
+      'Access-Control-Allow-Headers':
+        'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
       'Access-Control-Max-Age': '86400',
     },
   })

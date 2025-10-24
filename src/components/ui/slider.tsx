@@ -21,10 +21,12 @@ const Slider: FC<SliderProps> = ({
   disabled = false,
   orientation = 'horizontal',
   onValueChange,
-  className = ''
+  className = '',
 }) => {
-  const [internalValue, setInternalValue] = React.useState(value || defaultValue)
-  
+  const [internalValue, setInternalValue] = React.useState(
+    value || defaultValue,
+  )
+
   const currentValue = value || internalValue
   const sliderValue = currentValue[0] || 0
 
@@ -39,7 +41,9 @@ const Slider: FC<SliderProps> = ({
   const isVertical = orientation === 'vertical'
 
   return (
-    <div className={`relative ${isVertical ? 'h-32 w-6' : 'w-full h-6'} ${className}`}>
+    <div
+      className={`relative ${isVertical ? 'h-32 w-6' : 'w-full h-6'} ${className}`}
+    >
       <input
         type="range"
         min={min}
@@ -56,7 +60,7 @@ const Slider: FC<SliderProps> = ({
         style={{
           background: `linear-gradient(to ${isVertical ? 'top' : 'right'}, 
             #3b82f6 0%, #3b82f6 ${((sliderValue - min) / (max - min)) * 100}%, 
-            #e5e7eb ${((sliderValue - min) / (max - min)) * 100}%, #e5e7eb 100%)`
+            #e5e7eb ${((sliderValue - min) / (max - min)) * 100}%, #e5e7eb 100%)`,
         }}
       />
     </div>

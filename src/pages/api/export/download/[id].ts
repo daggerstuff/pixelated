@@ -1,6 +1,5 @@
 export const prerender = false
 
-
 import { getSession } from '../../../../lib/auth/session'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
@@ -23,7 +22,13 @@ const exportStore: Map<string, ExportResult> = new Map<string, ExportResult>()
  * API endpoint for downloading exported conversations
  * GET /api/export/download/:id
  */
-export const GET = async ({ params, request }: { params: { id: string }, request: Request }): Promise<Response> => {
+export const GET = async ({
+  params,
+  request,
+}: {
+  params: { id: string }
+  request: Request
+}): Promise<Response> => {
   try {
     // Verify authentication
     const session = await getSession(request)

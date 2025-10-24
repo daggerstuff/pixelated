@@ -16,7 +16,7 @@
     canvas: HTMLCanvasElement,
     width = 400,
     height = 400,
-    _dpi?: number
+    _dpi?: number,
   ) {
     const ctx = canvas.getContext('2d')!
     const dpr = window.devicePixelRatio || 1
@@ -56,7 +56,7 @@
         x: number,
         y: number,
         rad: number,
-        counter: { value: number } = { value: 0 }
+        counter: { value: number } = { value: 0 },
       ) => {
         // drawing a branch
         const length = random() * LEN

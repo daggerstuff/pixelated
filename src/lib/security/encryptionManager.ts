@@ -3,7 +3,7 @@
  * Handles key rotation, perfect forward secrecy, and HSM integration
  */
 
-import type { CryptoKeyPair, JsonWebKey } from '@/types/crypto'
+import type { CryptoKeyPair } from '@/types/crypto'
 
 export interface EncryptionConfig {
   algorithm: 'AES-GCM' | 'AES-CBC' | 'RSA-OAEP'
@@ -109,19 +109,19 @@ class EncryptionManager {
     const keyId = `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
     if (this.config.algorithm.startsWith('AES')) {
-      const key = await crypto.subtle.generateKey(
+      const key = (await crypto.subtle.generateKey(
         {
           name: this.config.algorithm,
           length: this.config.keySize,
         },
         true, // extractable
-        ['encrypt', 'decrypt']
-      ) as CryptoKey
+        ['encrypt', 'decrypt'],
+      )) as CryptoKey
 
       return { id: keyId, key }
     } else {
       // RSA key generation
-      const keyPair = await crypto.subtle.generateKey(
+      const keyPair = (await crypto.subtle.generateKey(
         {
           name: 'RSA-OAEP',
           modulusLength: this.config.keySize,
@@ -129,8 +129,8 @@ class EncryptionManager {
           hash: 'SHA-256',
         },
         true,
-        ['encrypt', 'decrypt']
-      ) as CryptoKeyPair
+        ['encrypt', 'decrypt'],
+      )) as CryptoKeyPair
 
       return { id: keyId, key: keyPair.privateKey }
     }
@@ -166,7 +166,7 @@ class EncryptionManager {
           iv: iv,
         },
         key,
-        dataBuffer
+        dataBuffer,
       )
     } else if (this.config.algorithm === 'AES-CBC') {
       const aesKey = await crypto.subtle.importKey(
@@ -174,7 +174,7 @@ class EncryptionManager {
         await crypto.subtle.exportKey('raw', key),
         'AES-CBC',
         false,
-        ['encrypt']
+        ['encrypt'],
       )
 
       ciphertext = await crypto.subtle.encrypt(
@@ -183,7 +183,7 @@ class EncryptionManager {
           iv: iv,
         },
         aesKey,
-        dataBuffer
+        dataBuffer,
       )
     } else {
       throw new Error(`Unsupported algorithm: ${this.config.algorithm}`)
@@ -198,7 +198,10 @@ class EncryptionManager {
     return {
       ciphertext: this.arrayBufferToBase64(ciphertext),
       iv: this.arrayBufferToBase64(iv),
-      tag: this.config.algorithm === 'AES-GCM' ? this.extractGCMTag(ciphertext) : undefined,
+      tag:
+        this.config.algorithm === 'AES-GCM'
+          ? this.extractGCMTag(ciphertext)
+          : undefined,
       keyId: targetKeyId,
       algorithm: this.config.algorithm,
       timestamp: Date.now(),
@@ -234,7 +237,9 @@ class EncryptionManager {
 
     if (algorithm === 'AES-GCM') {
       // Combine ciphertext and tag for GCM
-      const tag = encryptedData.tag ? this.base64ToArrayBuffer(encryptedData.tag) : new Uint8Array(16)
+      const tag = encryptedData.tag
+        ? this.base64ToArrayBuffer(encryptedData.tag)
+        : new Uint8Array(16)
       const combined = this.combineCiphertextAndTag(ciphertext, tag)
 
       decrypted = await crypto.subtle.decrypt(
@@ -243,7 +248,7 @@ class EncryptionManager {
           iv: iv,
         },
         key,
-        combined
+        combined,
       )
     } else if (algorithm === 'AES-CBC') {
       decrypted = await crypto.subtle.decrypt(
@@ -252,7 +257,7 @@ class EncryptionManager {
           iv: iv,
         },
         key,
-        ciphertext
+        ciphertext,
       )
     } else {
       throw new Error(`Unsupported algorithm: ${algorithm}`)
@@ -284,7 +289,10 @@ class EncryptionManager {
     return this.arrayBufferToBase64(tag)
   }
 
-  private combineCiphertextAndTag(ciphertext: ArrayBuffer, tag: ArrayBuffer): ArrayBuffer {
+  private combineCiphertextAndTag(
+    ciphertext: ArrayBuffer,
+    tag: ArrayBuffer,
+  ): ArrayBuffer {
     const cipherBytes = new Uint8Array(ciphertext)
     const tagBytes = new Uint8Array(tag)
     const combined = new Uint8Array(cipherBytes.length + tagBytes.length)
@@ -319,10 +327,13 @@ class EncryptionManager {
     }
 
     // Mark old key for cleanup after grace period
-    setTimeout(() => {
-      this.keyStore.delete(oldKeyId)
-      this.keyMetadata.delete(oldKeyId)
-    }, 7 * 24 * 60 * 60 * 1000) // 7 days
+    setTimeout(
+      () => {
+        this.keyStore.delete(oldKeyId)
+        this.keyMetadata.delete(oldKeyId)
+      },
+      7 * 24 * 60 * 60 * 1000,
+    ) // 7 days
 
     return { oldKeyId, newKeyId: newKeyPair.id }
   }
@@ -395,7 +406,7 @@ class EncryptionManager {
         length: 256,
       },
       false,
-      ['encrypt', 'decrypt']
+      ['encrypt', 'decrypt'],
     )
 
     // Replace the key with session key
@@ -416,19 +427,30 @@ class EncryptionManager {
     decryptionOperations: number
   } {
     const totalKeys = this.keyMetadata.size
-    const activeKeys = Array.from(this.keyMetadata.values()).filter(k => k.status === 'active').length
+    const activeKeys = Array.from(this.keyMetadata.values()).filter(
+      (k) => k.status === 'active',
+    ).length
     const currentKey = this.getCurrentKeyInfo()
-    const currentKeyAge = currentKey ? Date.now() - currentKey.created.getTime() : 0
+    const currentKeyAge = currentKey
+      ? Date.now() - currentKey.created.getTime()
+      : 0
 
     return {
       totalKeys,
       activeKeys,
       currentKeyAge,
-      keysRotated: Array.from(this.keyMetadata.values()).reduce((sum, k) => sum + k.rotationCount, 0),
-      encryptionOperations: Array.from(this.keyMetadata.values()).reduce((sum, k) =>
-        sum + k.usage.filter(u => u === 'encrypt').length, 0),
-      decryptionOperations: Array.from(this.keyMetadata.values()).reduce((sum, k) =>
-        sum + k.usage.filter(u => u === 'decrypt').length, 0),
+      keysRotated: Array.from(this.keyMetadata.values()).reduce(
+        (sum, k) => sum + k.rotationCount,
+        0,
+      ),
+      encryptionOperations: Array.from(this.keyMetadata.values()).reduce(
+        (sum, k) => sum + k.usage.filter((u) => u === 'encrypt').length,
+        0,
+      ),
+      decryptionOperations: Array.from(this.keyMetadata.values()).reduce(
+        (sum, k) => sum + k.usage.filter((u) => u === 'decrypt').length,
+        0,
+      ),
     }
   }
 }

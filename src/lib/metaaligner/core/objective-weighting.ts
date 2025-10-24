@@ -217,7 +217,7 @@ export class ObjectiveWeightingEngine {
       weights[objectiveId] =
         (contextual as Record<string, number>)[objectiveId] ?? base
     }
-    const {userProfile} = context
+    const { userProfile } = context
 
     if (userProfile?.preferences?.objectiveWeightAdjustments) {
       for (const [objectiveId, multiplier] of Object.entries(
@@ -363,7 +363,13 @@ export class ObjectiveWeightingEngine {
       case ContextType.GENERAL:
       default:
         // GENERAL and fallback: Make all objectives equal priority to encourage balanced evaluation.
-        priorities.push('empathy', 'safety', 'correctness', 'professionalism', 'informativeness')
+        priorities.push(
+          'empathy',
+          'safety',
+          'correctness',
+          'professionalism',
+          'informativeness',
+        )
         break
     }
 
@@ -516,19 +522,19 @@ export const ObjectiveBalancer = {
         detectedContext: ContextType.GENERAL,
       },
       timestamp: new Date(),
-    };
+    }
   },
 
   extractScores(
     evaluationResults: Record<string, ObjectiveEvaluationResult>,
   ): Record<string, number> {
-    const scores: Record<string, number> = {};
+    const scores: Record<string, number> = {}
 
     for (const [objectiveId, result] of Object.entries(evaluationResults)) {
-      scores[objectiveId] = result.score;
+      scores[objectiveId] = result.score
     }
 
-    return scores;
+    return scores
   },
 
   normalizeScores(
@@ -546,13 +552,11 @@ export const ObjectiveBalancer = {
         return this.zScoreNormalize(scores)
 
       case NormalizationMethod.SIGMOID:
-        return this.sigmoidNormalize(scores);
+        return this.sigmoidNormalize(scores)
     }
   },
 
-  minMaxNormalize(
-    scores: Record<string, number>,
-  ): Record<string, number> {
+  minMaxNormalize(scores: Record<string, number>): Record<string, number> {
     const values = Object.values(scores)
     const min = Math.min(...values)
     const max = Math.max(...values)
@@ -570,9 +574,7 @@ export const ObjectiveBalancer = {
     return normalized
   },
 
-  zScoreNormalize(
-    scores: Record<string, number>,
-  ): Record<string, number> {
+  zScoreNormalize(scores: Record<string, number>): Record<string, number> {
     const values = Object.values(scores)
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length
     const variance =
@@ -592,9 +594,7 @@ export const ObjectiveBalancer = {
     return normalized
   },
 
-  sigmoidNormalize(
-    scores: Record<string, number>,
-  ): Record<string, number> {
+  sigmoidNormalize(scores: Record<string, number>): Record<string, number> {
     const normalized: Record<string, number> = {}
 
     for (const [id, score] of Object.entries(scores)) {
@@ -691,7 +691,7 @@ export const ObjectiveBalancer = {
     }
 
     return totalWeight > 0 ? Math.exp(logSum / totalWeight) : 0
-  }
+  },
 }
 
 // DEFAULT_CONTEXT_MULTIPLIERS is no longer needed as weights are now sourced from

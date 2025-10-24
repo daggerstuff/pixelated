@@ -1,46 +1,58 @@
 // Use type-only imports so we can reference Collection/ObjectId/Db as types without pulling runtime mongodb
-import type { Collection as MongoCollection, ObjectId as MongoObjectId, Db } from 'mongodb'
+import type {
+  Collection as MongoCollection,
+  ObjectId as MongoObjectId,
+  Db,
+} from 'mongodb'
 
 // Runtime shape of our MongoDB wrapper (from src/config/mongodb.config.ts)
-type MongoRuntime = { connect: () => Promise<Db>; getDb: () => Db; client?: unknown }
+type MongoRuntime = {
+  connect: () => Promise<Db>
+  getDb: () => Db
+  client?: unknown
+}
 
 class MockObjectId {
-    public id: string
-    constructor(id?: string) {
-        this.id = id || 'mock-object-id'
-    }
-    toString() { return this.id }
-    toHexString() { return this.id }
+  public id: string
+  constructor(id?: string) {
+    this.id = id || 'mock-object-id'
+  }
+  toString() {
+    return this.id
+  }
+  toHexString() {
+    return this.id
+  }
 }
 
 // Use conditional imports to prevent MongoDB from being bundled on client side
 let mongodb: MongoRuntime | null = null
-let ObjectId: typeof MongoObjectId | typeof MockObjectId | null = null;
+let ObjectId: typeof MongoObjectId | typeof MockObjectId | null = null
 
-let serverDepsPromise: Promise<void> | null = null;
+let serverDepsPromise: Promise<void> | null = null
 
 async function initializeDependencies() {
-    if (serverDepsPromise) {
-        return serverDepsPromise;
-    }
-    if (typeof window === 'undefined') {
-        serverDepsPromise = (async () => {
-            try {
-                const mod = await import('../config/mongodb.config');
-                mongodb = mod.default as unknown as MongoRuntime;
-                const mongodbLib = await import('mongodb');
-                ObjectId = mongodbLib.ObjectId;
-            } catch {
-                mongodb = null;
-                ObjectId = MockObjectId;
-            }
-        })();
-    } else {
-        mongodb = null;
-        ObjectId = MockObjectId;
-        serverDepsPromise = Promise.resolve();
-    }
-    return serverDepsPromise;
+  if (serverDepsPromise) {
+    return serverDepsPromise
+  }
+  if (typeof window === 'undefined') {
+    serverDepsPromise = (async () => {
+      try {
+        const mod = await import('../config/mongodb.config')
+        mongodb = mod.default as unknown as MongoRuntime
+        const mongodbLib = await import('mongodb')
+        ObjectId = mongodbLib.ObjectId
+      } catch {
+        mongodb = null
+        ObjectId = MockObjectId
+      }
+    })()
+  } else {
+    mongodb = null
+    ObjectId = MockObjectId
+    serverDepsPromise = Promise.resolve()
+  }
+  return serverDepsPromise
 }
 import type {
   AIMetrics,
@@ -53,12 +65,12 @@ import type {
 
 export class TodoDAO {
   private async getCollection(): Promise<MongoCollection<Todo>> {
-    await initializeDependencies();
+    await initializeDependencies()
     if (!mongodb) {
-      throw new Error('MongoDB client not initialized');
+      throw new Error('MongoDB client not initialized')
     }
-    const db = await mongodb.connect();
-    return db.collection<Todo>('todos');
+    const db = await mongodb.connect()
+    return db.collection<Todo>('todos')
   }
 
   async create(
@@ -122,17 +134,20 @@ export class TodoDAO {
 
 export class AIMetricsDAO {
   private async getCollection(): Promise<MongoCollection<AIMetrics>> {
-    console.log('Initializing dependencies for AI Metrics DAO...');
-    await initializeDependencies();
-    console.log('Dependencies initialized. MongoDB client status:', mongodb ? 'defined' : 'undefined');
+    console.log('Initializing dependencies for AI Metrics DAO...')
+    await initializeDependencies()
+    console.log(
+      'Dependencies initialized. MongoDB client status:',
+      mongodb ? 'defined' : 'undefined',
+    )
     if (!mongodb) {
-      console.error('MongoDB client not initialized in AI Metrics DAO');
-      throw new Error('MongoDB client not initialized');
+      console.error('MongoDB client not initialized in AI Metrics DAO')
+      throw new Error('MongoDB client not initialized')
     }
-    console.log('Attempting to connect to MongoDB for AI Metrics...');
-    const db = await mongodb.connect();
-    console.log('MongoDB connected successfully for AI Metrics DAO');
-    return db.collection<AIMetrics>('ai_metrics');
+    console.log('Attempting to connect to MongoDB for AI Metrics...')
+    const db = await mongodb.connect()
+    console.log('MongoDB connected successfully for AI Metrics DAO')
+    return db.collection<AIMetrics>('ai_metrics')
   }
 
   async create(metrics: Omit<AIMetrics, '_id'>): Promise<AIMetrics> {
@@ -186,27 +201,29 @@ export class AIMetricsDAO {
     ]
 
     const result = await collection.aggregate(pipeline).toArray()
-    const stats = result[0] as {
-      totalRequests: number
-      totalTokens: number
-      averageResponseTime: number
-    } | undefined
+    const stats = result[0] as
+      | {
+          totalRequests: number
+          totalTokens: number
+          averageResponseTime: number
+        }
+      | undefined
 
-    return (
-      stats || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
-    )
+    return stats || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
   }
 }
 
 export class BiasDetectionDAO {
   private async getCollection(): Promise<MongoCollection<BiasDetection>> {
-    await initializeDependencies();
+    await initializeDependencies()
     if (!mongodb) {
       // Defensive: initialization failed, do not call connect()
-      throw new Error('MongoDB dependency is null: initialization failed or misconfigured. Did not attempt mongodb.connect().');
+      throw new Error(
+        'MongoDB dependency is null: initialization failed or misconfigured. Did not attempt mongodb.connect().',
+      )
     }
-    const db = await mongodb.connect();
-    return db.collection<BiasDetection>('bias_detection');
+    const db = await mongodb.connect()
+    return db.collection<BiasDetection>('bias_detection')
   }
 
   async create(detection: Omit<BiasDetection, '_id'>): Promise<BiasDetection> {
@@ -240,12 +257,12 @@ export class BiasDetectionDAO {
 
 export class TreatmentPlanDAO {
   private async getCollection(): Promise<MongoCollection<TreatmentPlan>> {
-    await initializeDependencies();
+    await initializeDependencies()
     if (!mongodb) {
-      throw new Error('MongoDB client not initialized');
+      throw new Error('MongoDB client not initialized')
     }
-    const db = await mongodb.connect();
-    return db.collection<TreatmentPlan>('treatment_plans');
+    const db = await mongodb.connect()
+    return db.collection<TreatmentPlan>('treatment_plans')
   }
 
   async create(
@@ -307,12 +324,12 @@ export class TreatmentPlanDAO {
 
 export class CrisisSessionFlagDAO {
   private async getCollection(): Promise<MongoCollection<CrisisSessionFlag>> {
-    await initializeDependencies();
+    await initializeDependencies()
     if (!mongodb) {
-      throw new Error('MongoDB client not initialized');
+      throw new Error('MongoDB client not initialized')
     }
-    const db = await mongodb.connect();
-    return db.collection<CrisisSessionFlag>('crisis_session_flags');
+    const db = await mongodb.connect()
+    return db.collection<CrisisSessionFlag>('crisis_session_flags')
   }
 
   async create(
@@ -336,7 +353,9 @@ export class CrisisSessionFlagDAO {
 
   async findActiveFlags(userId?: string): Promise<CrisisSessionFlag[]> {
     const collection = await this.getCollection()
-  const filter: { resolved: boolean; userId?: MongoObjectId } = { resolved: false }
+    const filter: { resolved: boolean; userId?: MongoObjectId } = {
+      resolved: false,
+    }
     if (userId) {
       filter.userId = new ObjectId!(userId) as any
     }
@@ -373,12 +392,12 @@ export class CrisisSessionFlagDAO {
 
 export class ConsentManagementDAO {
   private async getCollection(): Promise<MongoCollection<ConsentManagement>> {
-    await initializeDependencies();
+    await initializeDependencies()
     if (!mongodb) {
-      throw new Error('MongoDB client not initialized (null or undefined)');
+      throw new Error('MongoDB client not initialized (null or undefined)')
     }
-    const db = await mongodb.connect();
-    return db.collection<ConsentManagement>('consent_management');
+    const db = await mongodb.connect()
+    return db.collection<ConsentManagement>('consent_management')
   }
 
   async create(

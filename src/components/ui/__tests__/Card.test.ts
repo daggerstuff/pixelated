@@ -29,7 +29,9 @@ describe('Card Components', () => {
 
     it('applies custom classes', async () => {
       const customClass = 'custom-card'
-      const { astroContainer } = await renderAstro(Card as unknown, { class: customClass })
+      const { astroContainer } = await renderAstro(Card as unknown, {
+        class: customClass,
+      })
       const card = astroContainer.querySelector('[data-slot="card"]')
 
       expect(card).toHaveClass(customClass)

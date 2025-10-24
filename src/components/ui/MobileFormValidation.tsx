@@ -59,46 +59,90 @@ export function MobileFormValidation({
   }, [])
 
   // Validate a specific field
-  const validateField = useCallback((name: string, value: string): string => {
-    const rules = validationRules[name]
-    if (!rules) {
-      return ''
-    }
-
-    for (const rule of rules) {
-      if (!rule.test(value)) {
-        return rule.message
+  const validateField = useCallback(
+    (name: string, value: string): string => {
+      const rules = validationRules[name]
+      if (!rules) {
+        return ''
       }
-    }
 
-    return ''
-  }, [validationRules])
+      for (const rule of rules) {
+        if (!rule.test(value)) {
+          return rule.message
+        }
+      }
+
+      return ''
+    },
+    [validationRules],
+  )
 
   // Handle input changes
-  const handleChange = useCallback((e: Event) => {
-    const input = e.target as
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | HTMLSelectElement
-    const name = input.getAttribute('name')
-    if (!name) {
-      return
-    }
+  const handleChange = useCallback(
+    (e: Event) => {
+      const input = e.target as
+        | HTMLInputElement
+        | HTMLTextAreaElement
+        | HTMLSelectElement
+      const name = input.getAttribute('name')
+      if (!name) {
+        return
+      }
 
-    // Mark field as touched
-    setTouchedFields((prev) => {
-      const newSet = new Set(prev)
-      newSet.add(name)
-      return newSet
-    })
+      // Mark field as touched
+      setTouchedFields((prev) => {
+        const newSet = new Set(prev)
+        newSet.add(name)
+        return newSet
+      })
 
-    if (validateOnChange) {
+      if (validateOnChange) {
+        const { value } = input
+        const error = validateField(name, value)
+
+        let newErrors: Record<string, string> = {}
+        setErrors((prev) => {
+          newErrors = { ...prev }
+          if (error) {
+            newErrors[name] = error
+          } else {
+            delete newErrors[name]
+          }
+          return newErrors
+        })
+
+        // Update ARIA attributes
+        input.setAttribute('aria-invalid', error ? 'true' : 'false')
+
+        if (onValidationChange) {
+          onValidationChange(Object.keys(newErrors).length === 0, newErrors)
+        }
+      }
+    },
+    [validateOnChange, validateField, onValidationChange],
+  )
+
+  // Handle input blur
+  const handleBlur = useCallback(
+    (e: Event) => {
+      if (!validateOnBlur) {
+        return
+      }
+
+      const input = e.target as
+        | HTMLInputElement
+        | HTMLTextAreaElement
+        | HTMLSelectElement
+      const name = input.getAttribute('name')
+      if (!name) {
+        return
+      }
+
       const { value } = input
       const error = validateField(name, value)
 
-      let newErrors: Record<string, string> = {};
       setErrors((prev) => {
-        newErrors = { ...prev }
+        const newErrors = { ...prev }
         if (error) {
           newErrors[name] = error
         } else {
@@ -109,44 +153,9 @@ export function MobileFormValidation({
 
       // Update ARIA attributes
       input.setAttribute('aria-invalid', error ? 'true' : 'false')
-
-      if (onValidationChange) {
-        onValidationChange(Object.keys(newErrors).length === 0, newErrors)
-      }
-    }
-  }, [validateOnChange, validateField, onValidationChange])
-
-  // Handle input blur
-  const handleBlur = useCallback((e: Event) => {
-    if (!validateOnBlur) {
-      return
-    }
-
-    const input = e.target as
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | HTMLSelectElement
-    const name = input.getAttribute('name')
-    if (!name) {
-      return
-    }
-
-    const { value } = input
-    const error = validateField(name, value)
-
-    setErrors((prev) => {
-      const newErrors = { ...prev }
-      if (error) {
-        newErrors[name] = error
-      } else {
-        delete newErrors[name]
-      }
-      return newErrors
-    })
-
-    // Update ARIA attributes
-    input.setAttribute('aria-invalid', error ? 'true' : 'false')
-  }, [validateOnBlur, validateField])
+    },
+    [validateOnBlur, validateField],
+  )
 
   // Find and enhance all form inputs with validation attributes
   useEffect(() => {
@@ -186,8 +195,6 @@ export function MobileFormValidation({
     }
   }, [validationRules, isMobile, handleChange, handleBlur, formRef])
 
-
-
   // Validate all fields in the form
   const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {}
@@ -226,8 +233,6 @@ export function MobileFormValidation({
     return newErrors
   }
 
-
-
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     if (validateOnSubmit) {
@@ -264,25 +269,25 @@ export function MobileFormValidation({
             )
             if (firstErrorField && 'scrollIntoView' in firstErrorField) {
               // Smooth scroll to the field
-            firstErrorField.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-            })
+              firstErrorField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              })
 
-            // Wait for scroll to complete before focusing
-            setTimeout(() => {
-              if (firstErrorField instanceof HTMLElement) {
-                firstErrorField.focus()
+              // Wait for scroll to complete before focusing
+              setTimeout(() => {
+                if (firstErrorField instanceof HTMLElement) {
+                  firstErrorField.focus()
 
-                // Vibrate for haptic feedback on mobile
-                if (isMobile && 'vibrate' in navigator) {
-                  navigator.vibrate([50, 100, 50])
+                  // Vibrate for haptic feedback on mobile
+                  if (isMobile && 'vibrate' in navigator) {
+                    navigator.vibrate([50, 100, 50])
+                  }
                 }
-              }
-            }, 500)
+              }, 500)
+            }
           }
         }
-      }
 
         // Notify screen readers about validation errors
         if (isMobile) {
@@ -354,7 +359,9 @@ export function MobileFormValidation({
                   href={`#${field}`}
                   onClick={(e) => {
                     e.preventDefault()
-                    const element = document.querySelector(`[name="${field}"]`) as HTMLElement
+                    const element = document.querySelector(
+                      `[name="${field}"]`,
+                    ) as HTMLElement
                     if (element instanceof HTMLElement) {
                       element.focus()
                       element.scrollIntoView({

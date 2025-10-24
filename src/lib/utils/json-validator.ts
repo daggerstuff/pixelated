@@ -1,18 +1,20 @@
 // Type-safe JSON parsing utilities with validation
-export type ValidationResult<T> = {
-  success: true
-  data: T
-} | {
-  success: false
-  error: string
-}
+export type ValidationResult<T> =
+  | {
+      success: true
+      data: T
+    }
+  | {
+      success: false
+      error: string
+    }
 
 /**
  * Validates that all required properties exist and types match
  */
 function validateObjectShape<T extends Record<string, unknown>>(
   obj: unknown,
-  requiredProps: Record<keyof T, string> // Property name -> expected type description
+  requiredProps: Record<keyof T, string>, // Property name -> expected type description
 ): ValidationResult<T> {
   if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
     return { success: false, error: 'Expected an object' }
@@ -57,7 +59,7 @@ function validateObjectShape<T extends Record<string, unknown>>(
  */
 export function parseJsonSafely<T>(
   json: string,
-  validator: (obj: unknown) => ValidationResult<T>
+  validator: (obj: unknown) => ValidationResult<T>,
 ): ValidationResult<T> {
   try {
     const parsed = JSON.parse(json)
@@ -65,7 +67,7 @@ export function parseJsonSafely<T>(
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : 'Invalid JSON'
+      error: err instanceof Error ? err.message : 'Invalid JSON',
     }
   }
 }
@@ -105,7 +107,9 @@ export type AnalysisResults = {
 /**
  * Validates AnalysisResults structure
  */
-export function validateAnalysisResults(obj: unknown): ValidationResult<AnalysisResults> {
+export function validateAnalysisResults(
+  obj: unknown,
+): ValidationResult<AnalysisResults> {
   if (!obj || typeof obj !== 'object') {
     return { success: false, error: 'Expected an object' }
   }
@@ -134,7 +138,11 @@ export function validateAnalysisResults(obj: unknown): ValidationResult<Analysis
     }
 
     const e = entity as Record<string, unknown>
-    if (typeof e['text'] !== 'string' || typeof e['type'] !== 'string' || typeof e['confidence'] !== 'number') {
+    if (
+      typeof e['text'] !== 'string' ||
+      typeof e['type'] !== 'string' ||
+      typeof e['confidence'] !== 'number'
+    ) {
       return { success: false, error: `Entity ${i} has invalid structure` }
     }
   }
@@ -147,7 +155,10 @@ export function validateAnalysisResults(obj: unknown): ValidationResult<Analysis
     }
 
     const c = concept as Record<string, unknown>
-    if (typeof c['concept'] !== 'string' || typeof c['relevance'] !== 'number') {
+    if (
+      typeof c['concept'] !== 'string' ||
+      typeof c['relevance'] !== 'number'
+    ) {
       return { success: false, error: `Concept ${i} has invalid structure` }
     }
   }
@@ -176,7 +187,13 @@ export function validateAnalysisResults(obj: unknown): ValidationResult<Analysis
     }
 
     const meta = data['metadata'] as Record<string, unknown>
-    const requiredMetaProps = ['processingTime', 'wordCount', 'sentenceCount', 'complexity', 'readabilityScore']
+    const requiredMetaProps = [
+      'processingTime',
+      'wordCount',
+      'sentenceCount',
+      'complexity',
+      'readabilityScore',
+    ]
 
     for (const prop of requiredMetaProps) {
       if (!(prop in meta) || typeof meta[prop] !== 'number') {
@@ -232,21 +249,23 @@ export type CrisisDetectionResponseData = {
 /**
  * Validates CrisisDetectionApiResponse structure
  */
-export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<CrisisDetectionResponseData> {
+export function validateCrisisDetectionResponse(
+  obj: unknown,
+): ValidationResult<CrisisDetectionResponseData> {
   const validation = validateObjectShape(obj, {
     assessment: 'object',
     riskFactors: 'array',
     protectiveFactors: 'array',
     recommendations: 'object',
     resources: 'object',
-    metadata: 'object'
+    metadata: 'object',
   })
 
   if (!validation.success) {
     return validation
   }
 
-  const {data} = validation
+  const { data } = validation
 
   // Validate assessment structure
   const assessmentShape = validateObjectShape(data.assessment, {
@@ -254,7 +273,7 @@ export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<
     suicidalIdeation: 'object',
     selfHarm: 'object',
     agitation: 'object',
-    substanceUse: 'object'
+    substanceUse: 'object',
   })
 
   if (!assessmentShape.success) {
@@ -262,13 +281,17 @@ export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<
   }
 
   // Validate overallRisk enum values
-  if (!['none', 'low', 'moderate', 'high', 'imminent'].includes(assessmentShape.data.overallRisk as string)) {
+  if (
+    !['none', 'low', 'moderate', 'high', 'imminent'].includes(
+      assessmentShape.data.overallRisk as string,
+    )
+  ) {
     return { success: false, error: 'assessment.overallRisk has invalid value' }
   }
 
   // Validate metadata.confidenceScore
   const metadataShape = validateObjectShape(data.metadata, {
-    confidenceScore: 'number'
+    confidenceScore: 'number',
   })
 
   if (!metadataShape.success) {
@@ -283,11 +306,11 @@ export function validateCrisisDetectionResponse(obj: unknown): ValidationResult<
  */
 export async function parseApiResponse<T>(
   response: Response,
-  validator: (obj: unknown) => ValidationResult<T>
+  validator: (obj: unknown) => ValidationResult<T>,
 ): Promise<{ success: true; data: T } | { success: false; error: string }> {
   try {
     if (!response.ok) {
-      const { status, statusText } = response;
+      const { status, statusText } = response
       return { success: false, error: `HTTP ${status}: ${statusText}` }
     }
 
@@ -300,7 +323,7 @@ export async function parseApiResponse<T>(
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : 'Response parsing failed'
+      error: err instanceof Error ? err.message : 'Response parsing failed',
     }
   }
 }

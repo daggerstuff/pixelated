@@ -68,8 +68,6 @@ export interface DataExportResult {
   success: boolean
 }
 
-
-
 // Define the PatientProfile interface
 export interface PatientProfile {
   patient_id?: string
@@ -682,7 +680,7 @@ export async function getAllDataExportRequests(filters?: {
   dateRange?: { start: string; end: string }
 }): Promise<DataExportRequest[]> {
   try {
-// TODO: Replace with MongoDB implementation
+    // TODO: Replace with MongoDB implementation
     let allExports = await mockDb.dataExport.findUnique({ where: {} }) // This should be a findMany in real MongoDB code
 
     // Apply filters manually (since mockDb is a stub)
@@ -713,26 +711,6 @@ export async function getAllDataExportRequests(filters?: {
     throw error
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * Interface for the parameters required to cancel an export request
@@ -1206,5 +1184,3 @@ const mockDb = {
     },
   },
 }
-
-

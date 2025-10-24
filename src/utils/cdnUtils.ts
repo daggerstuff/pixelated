@@ -8,7 +8,9 @@ export async function getAssetUrl(path: string): Promise<string> {
   let assetMap: Record<string, string> = {}
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    assetMap = await import('../cdn-asset-map.json').then(m => m.default) as Record<string, string>
+    assetMap = (await import('../cdn-asset-map.json').then(
+      (m) => m.default,
+    )) as Record<string, string>
   } catch {
     // Asset map not found, use fallback
   }

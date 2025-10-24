@@ -301,7 +301,7 @@ export class DocumentationSystem extends EventEmitter {
           createdBy: session.therapistId || 'system',
           sessionType: 'individual',
           duration: 60,
-          modality: 'in-person'
+          modality: 'in-person',
         },
       }
 
@@ -500,9 +500,10 @@ export class DocumentationSystem extends EventEmitter {
         sessionId,
         ehrSystem: options.format,
         success: result.success,
-        documentId: result.data && typeof result.data === 'object' && 'id' in result.data
-          ? (result.data as { id?: string }).id
-          : undefined,
+        documentId:
+          result.data && typeof result.data === 'object' && 'id' in result.data
+            ? (result.data as { id?: string }).id
+            : undefined,
       })
 
       return result

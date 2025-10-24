@@ -283,8 +283,14 @@ export class EducationalContextRecognizer {
             return adaptedPattern
           }
         } catch (error: unknown) {
-          logger.warn('AI analysis failed, using adapted pattern result:', error)
-          const adapted = this.adaptResultToUserProfile(patternResult, userProfile)
+          logger.warn(
+            'AI analysis failed, using adapted pattern result:',
+            error,
+          )
+          const adapted = this.adaptResultToUserProfile(
+            patternResult,
+            userProfile,
+          )
           if (normalizedInitial.includes('what is depression')) {
             adapted.complexity = 'basic'
           }
@@ -319,7 +325,11 @@ export class EducationalContextRecognizer {
         learningObjectives: [],
         recommendedResources: [],
         priorKnowledgeRequired: [],
-        metadata: { conceptualDepth: 0.1, practicalApplications: [], relatedTopics: [] },
+        metadata: {
+          conceptualDepth: 0.1,
+          practicalApplications: [],
+          relatedTopics: [],
+        },
       }
     }
   }
@@ -339,7 +349,10 @@ export class EducationalContextRecognizer {
     const adapted = { ...result }
 
     // Use shared adaptation helpers to ensure consistent behavior across code paths
-    adapted.complexity = this.adaptComplexityToUser(result.complexity, userProfile)
+    adapted.complexity = this.adaptComplexityToUser(
+      result.complexity,
+      userProfile,
+    )
     adapted.recommendedResources = this.adaptResourcesToUser(
       result.recommendedResources,
       userProfile,
@@ -398,44 +411,46 @@ export class EducationalContextRecognizer {
     let bestMatch = { type: EducationalType.DEFINITION, confidence: 0 }
     let topicArea = TopicArea.GENERAL_MENTAL_HEALTH
 
-   // Prioritize symptom pattern over definition if both match
-   let matchedTypes: { type: EducationalType; confidence: number }[] = []
-   for (const [type, patterns] of Object.entries(this.educationalPatterns)) {
-     for (const pattern of patterns) {
-       if (pattern.test(query)) {
-         const confidence = 0.76 // Base confidence for pattern match
-         matchedTypes.push({ type: type as EducationalType, confidence })
-       }
-     }
-   }
-   // If symptoms matched, use it; else use highest confidence with tie-break priority
-   const symptomMatch = matchedTypes.find(mt => mt.type === EducationalType.SYMPTOMS)
+    // Prioritize symptom pattern over definition if both match
+    let matchedTypes: { type: EducationalType; confidence: number }[] = []
+    for (const [type, patterns] of Object.entries(this.educationalPatterns)) {
+      for (const pattern of patterns) {
+        if (pattern.test(query)) {
+          const confidence = 0.76 // Base confidence for pattern match
+          matchedTypes.push({ type: type as EducationalType, confidence })
+        }
+      }
+    }
+    // If symptoms matched, use it; else use highest confidence with tie-break priority
+    const symptomMatch = matchedTypes.find(
+      (mt) => mt.type === EducationalType.SYMPTOMS,
+    )
     if (symptomMatch) {
-     bestMatch = symptomMatch
-   } else if (matchedTypes.length > 0) {
-     const priority: Record<EducationalType, number> = {
-       [EducationalType.SYMPTOMS]: 3,
-       [EducationalType.EXPLANATION]: 2,
-       [EducationalType.DEFINITION]: 1,
-       [EducationalType.COMPARISON]: 2,
-       [EducationalType.MECHANISM]: 2,
-       [EducationalType.CAUSES]: 2,
-       [EducationalType.TREATMENT]: 2,
-       [EducationalType.PREVENTION]: 2,
-       [EducationalType.RESEARCH]: 2,
-       [EducationalType.STATISTICS]: 1,
-       [EducationalType.MYTH_BUSTING]: 1,
-       [EducationalType.DEVELOPMENTAL]: 1,
-     }
-     bestMatch = matchedTypes.reduce((a, b) => {
-       if (a.confidence !== b.confidence) {
-         return a.confidence > b.confidence ? a : b
-       }
-       const ap = priority[a.type] ?? 0
-       const bp = priority[b.type] ?? 0
-       return ap >= bp ? a : b
-     })
-   }
+      bestMatch = symptomMatch
+    } else if (matchedTypes.length > 0) {
+      const priority: Record<EducationalType, number> = {
+        [EducationalType.SYMPTOMS]: 3,
+        [EducationalType.EXPLANATION]: 2,
+        [EducationalType.DEFINITION]: 1,
+        [EducationalType.COMPARISON]: 2,
+        [EducationalType.MECHANISM]: 2,
+        [EducationalType.CAUSES]: 2,
+        [EducationalType.TREATMENT]: 2,
+        [EducationalType.PREVENTION]: 2,
+        [EducationalType.RESEARCH]: 2,
+        [EducationalType.STATISTICS]: 1,
+        [EducationalType.MYTH_BUSTING]: 1,
+        [EducationalType.DEVELOPMENTAL]: 1,
+      }
+      bestMatch = matchedTypes.reduce((a, b) => {
+        if (a.confidence !== b.confidence) {
+          return a.confidence > b.confidence ? a : b
+        }
+        const ap = priority[a.type] ?? 0
+        const bp = priority[b.type] ?? 0
+        return ap >= bp ? a : b
+      })
+    }
 
     // Determine topic area
     for (const [topic, keywords] of Object.entries(this.topicKeywords)) {
@@ -452,7 +467,13 @@ export class EducationalContextRecognizer {
     const isEducational = bestMatch.confidence > 0.5
 
     // Final override: if query is "what is depression", always return basic
-    if (query.toLowerCase().replace(/[?.]/g, '').trim().includes('what is depression')) {
+    if (
+      query
+        .toLowerCase()
+        .replace(/[?.]/g, '')
+        .trim()
+        .includes('what is depression')
+    ) {
       return {
         isEducational,
         confidence: Math.min(bestMatch.confidence, 1.0),
@@ -460,7 +481,11 @@ export class EducationalContextRecognizer {
         complexity: 'basic',
         topicArea,
         learningObjectives: isEducational
-          ? this.generateLearningObjectives(bestMatch.type, topicArea, bestMatch.confidence)
+          ? this.generateLearningObjectives(
+              bestMatch.type,
+              topicArea,
+              bestMatch.confidence,
+            )
           : [],
         recommendedResources: isEducational
           ? this.getBasicResources(bestMatch.type)
@@ -481,7 +506,11 @@ export class EducationalContextRecognizer {
       complexity,
       topicArea,
       learningObjectives: isEducational
-        ? this.generateLearningObjectives(bestMatch.type, topicArea, bestMatch.confidence)
+        ? this.generateLearningObjectives(
+            bestMatch.type,
+            topicArea,
+            bestMatch.confidence,
+          )
         : [],
       recommendedResources: isEducational
         ? this.getBasicResources(bestMatch.type)
@@ -527,12 +556,18 @@ Adapt complexity and resource recommendations accordingly.`
       { role: 'user', content: queryWithContext },
     ]
 
-    const response: unknown = await this.aiService.createChatCompletion(messages, {
-      model: this.model,
-    })
+    const response: unknown = await this.aiService.createChatCompletion(
+      messages,
+      {
+        model: this.model,
+      },
+    )
 
     // Use unknown instead of any for type safety
-    const r = response as { choices?: Array<{ message?: { content?: unknown } }>; content?: unknown }
+    const r = response as {
+      choices?: Array<{ message?: { content?: unknown } }>
+      content?: unknown
+    }
     let content: unknown = r?.choices?.[0]?.message?.content ?? r?.content ?? r
     if (content && typeof content !== 'string') {
       try {
@@ -546,7 +581,7 @@ Adapt complexity and resource recommendations accordingly.`
       throw new Error('Empty AI response')
     }
     // Return raw parsed result; caller will handle adaptation to avoid double-adjusting
-    return this.parseAIResponse(content as string);
+    return this.parseAIResponse(content as string)
   }
 
   /**
@@ -663,7 +698,7 @@ Adapt complexity and resource recommendations accordingly.`
     if (userProfile && this.adaptToUserLevel) {
       result.complexity = this.adaptComplexityToUser(
         result.complexity,
-        userProfile
+        userProfile,
       )
       result.recommendedResources = this.adaptResourcesToUser(
         result.recommendedResources,
@@ -715,7 +750,7 @@ Adapt complexity and resource recommendations accordingly.`
     query: string,
   ): 'basic' | 'intermediate' | 'advanced' {
     // Guarantee "What is depression?" is always basic
-    const normalized = normalizeQuery(query);
+    const normalized = normalizeQuery(query)
     if (normalized.includes('what is depression')) {
       return 'basic'
     }
@@ -727,7 +762,7 @@ Adapt complexity and resource recommendations accordingly.`
       'tell me about',
       'simple',
       'basic',
-      'introduction'
+      'introduction',
     ]
     const advancedIndicators = [
       'mechanism',
@@ -762,11 +797,16 @@ Adapt complexity and resource recommendations accordingly.`
     topic: TopicArea,
     confidence: number,
   ): string[] {
-    const objectives = [`Understand ${type.replace('_', ' ')} related to ${topic.replace('_', ' ')}`]
+    const objectives = [
+      `Understand ${type.replace('_', ' ')} related to ${topic.replace('_', ' ')}`,
+    ]
 
     // Add additional objectives for high-confidence patterns
     if (confidence >= 0.8) {
-      if (type === EducationalType.DEFINITION && topic === TopicArea.DEPRESSION) {
+      if (
+        type === EducationalType.DEFINITION &&
+        topic === TopicArea.DEPRESSION
+      ) {
         objectives.push('Learn basic symptoms')
       } else if (type === EducationalType.SYMPTOMS) {
         objectives.push('Recognize warning signs')
@@ -817,20 +857,26 @@ Adapt complexity and resource recommendations accordingly.`
     // Adjust based on user's knowledge level
     if (knowledge === 'none' || education === 'high_school') {
       if (complexity === 'advanced') {
-        logger.info('Downgrading advanced to intermediate for low knowledge/education')
+        logger.info(
+          'Downgrading advanced to intermediate for low knowledge/education',
+        )
         return 'intermediate'
       }
       if (complexity === 'intermediate') {
-        logger.info('Downgrading intermediate to basic for low knowledge/education')
+        logger.info(
+          'Downgrading intermediate to basic for low knowledge/education',
+        )
         return 'basic'
       }
       return complexity
     }
     // Upgrade for mid-level users to at least intermediate
-    if ((knowledge === 'intermediate' ||
-          education === 'undergraduate') && complexity === 'basic') {
-          logger.info('Upgrading basic to intermediate for mid-level user')
-          return 'intermediate'
+    if (
+      (knowledge === 'intermediate' || education === 'undergraduate') &&
+      complexity === 'basic'
+    ) {
+      logger.info('Upgrading basic to intermediate for mid-level user')
+      return 'intermediate'
     }
 
     // Aggressively upgrade for advanced/professional users
@@ -840,11 +886,15 @@ Adapt complexity and resource recommendations accordingly.`
       education === 'professional'
     ) {
       if (complexity === 'basic') {
-        logger.info('Upgrading basic to advanced for advanced/professional user')
+        logger.info(
+          'Upgrading basic to advanced for advanced/professional user',
+        )
         return 'advanced'
       }
       if (complexity === 'intermediate') {
-        logger.info('Upgrading intermediate to advanced for advanced/professional user')
+        logger.info(
+          'Upgrading intermediate to advanced for advanced/professional user',
+        )
         return 'advanced'
       }
       return complexity
@@ -863,12 +913,15 @@ Adapt complexity and resource recommendations accordingly.`
 
     let adapted = [...resources]
     const ensureSciArticlesForHigherLevel = () => {
-      if ((userProfile.educationLevel === 'graduate' ||
-              userProfile.educationLevel === 'professional' ||
-              userProfile.priorMentalHealthKnowledge === 'advanced' ||
-              userProfile.priorMentalHealthKnowledge === 'intermediate') && !adapted.includes(ResourceType.SCIENTIFIC_ARTICLES)) {
-            logger.info('Adding scientific articles for higher-level user')
-            adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
+      if (
+        (userProfile.educationLevel === 'graduate' ||
+          userProfile.educationLevel === 'professional' ||
+          userProfile.priorMentalHealthKnowledge === 'advanced' ||
+          userProfile.priorMentalHealthKnowledge === 'intermediate') &&
+        !adapted.includes(ResourceType.SCIENTIFIC_ARTICLES)
+      ) {
+        logger.info('Adding scientific articles for higher-level user')
+        adapted.unshift(ResourceType.SCIENTIFIC_ARTICLES)
       }
     }
 
@@ -959,9 +1012,9 @@ Adapt complexity and resource recommendations accordingly.`
     complexity: 'basic' | 'intermediate' | 'advanced',
   ): string {
     const timeMap = {
-  // Adjusted to match test expectations
-  basic: '15-30 minutes',
-  intermediate: '30-45 minutes',
+      // Adjusted to match test expectations
+      basic: '15-30 minutes',
+      intermediate: '30-45 minutes',
       advanced: '45-60 minutes',
     }
 
@@ -974,7 +1027,7 @@ function normalizeQuery(q: string): string {
   return q
     .toLowerCase()
     .replace(/[^\w\s]|_/g, '') // remove all punctuation
-    .replace(/\s+/g, ' ')      // collapse multiple spaces
+    .replace(/\s+/g, ' ') // collapse multiple spaces
     .trim()
 }
 

@@ -9,7 +9,7 @@ export const ALLOWED_DOMAINS = [
   'pixelatedempathy.com',
   'pixelatedempathy.tech',
   'goat.pixelatedempathy.tech',
-  'git.pixelatedempathy.tech'
+  'git.pixelatedempathy.tech',
   // Add any additional domains your application needs here
   // 'your-domain.com',
   // 'api.your-service.com',

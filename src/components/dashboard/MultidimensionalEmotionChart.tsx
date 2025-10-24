@@ -17,7 +17,7 @@ interface MultidimensionalEmotionChartProps {
 
 const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
   emotionData = [],
-  isLoading = false
+  isLoading = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [rotation, setRotation] = useState({ x: 0, y: 0 })
@@ -26,14 +26,70 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
 
   // Mock data for demo purposes
   const mockData: EmotionDataPoint[] = [
-    { id: '1', timestamp: new Date('2024-01-01'), valence: 0.3, arousal: 0.2, dominance: 0.1, emotion: 'Content' },
-    { id: '2', timestamp: new Date('2024-01-02'), valence: -0.2, arousal: 0.5, dominance: -0.1, emotion: 'Anxious' },
-    { id: '3', timestamp: new Date('2024-01-03'), valence: 0.7, arousal: 0.6, dominance: 0.4, emotion: 'Excited' },
-    { id: '4', timestamp: new Date('2024-01-04'), valence: -0.4, arousal: -0.3, dominance: -0.2, emotion: 'Sad' },
-    { id: '5', timestamp: new Date('2024-01-05'), valence: 0.1, arousal: -0.1, dominance: 0.2, emotion: 'Calm' },
-    { id: '6', timestamp: new Date('2024-01-06'), valence: 0.5, arousal: 0.3, dominance: 0.3, emotion: 'Happy' },
-    { id: '7', timestamp: new Date('2024-01-07'), valence: -0.1, arousal: 0.7, dominance: 0.1, emotion: 'Stressed' },
-    { id: '8', timestamp: new Date('2024-01-08'), valence: 0.8, arousal: 0.4, dominance: 0.6, emotion: 'Confident' }
+    {
+      id: '1',
+      timestamp: new Date('2024-01-01'),
+      valence: 0.3,
+      arousal: 0.2,
+      dominance: 0.1,
+      emotion: 'Content',
+    },
+    {
+      id: '2',
+      timestamp: new Date('2024-01-02'),
+      valence: -0.2,
+      arousal: 0.5,
+      dominance: -0.1,
+      emotion: 'Anxious',
+    },
+    {
+      id: '3',
+      timestamp: new Date('2024-01-03'),
+      valence: 0.7,
+      arousal: 0.6,
+      dominance: 0.4,
+      emotion: 'Excited',
+    },
+    {
+      id: '4',
+      timestamp: new Date('2024-01-04'),
+      valence: -0.4,
+      arousal: -0.3,
+      dominance: -0.2,
+      emotion: 'Sad',
+    },
+    {
+      id: '5',
+      timestamp: new Date('2024-01-05'),
+      valence: 0.1,
+      arousal: -0.1,
+      dominance: 0.2,
+      emotion: 'Calm',
+    },
+    {
+      id: '6',
+      timestamp: new Date('2024-01-06'),
+      valence: 0.5,
+      arousal: 0.3,
+      dominance: 0.3,
+      emotion: 'Happy',
+    },
+    {
+      id: '7',
+      timestamp: new Date('2024-01-07'),
+      valence: -0.1,
+      arousal: 0.7,
+      dominance: 0.1,
+      emotion: 'Stressed',
+    },
+    {
+      id: '8',
+      timestamp: new Date('2024-01-08'),
+      valence: 0.8,
+      arousal: 0.4,
+      dominance: 0.6,
+      emotion: 'Confident',
+    },
   ]
 
   const data = emotionData.length > 0 ? emotionData : mockData
@@ -88,7 +144,7 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
       return {
         x: centerX + x1 * scale,
         y: centerY - y1 * scale,
-        z: z2
+        z: z2,
       }
     }
 
@@ -131,17 +187,17 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
     // Draw emotion data points
     data.forEach((point, index) => {
       const projected = project3D(point.valence, point.arousal, point.dominance)
-      
+
       // Color based on time (newer = brighter)
       const intensity = (index + 1) / data.length
-      const hue = 240 - (intensity * 120) // Blue to green gradient
+      const hue = 240 - intensity * 120 // Blue to green gradient
       ctx.fillStyle = `hsl(${hue}, 70%, ${50 + intensity * 30}%)`
-      
+
       // Draw point
       ctx.beginPath()
       ctx.arc(projected.x, projected.y, 6, 0, 2 * Math.PI)
       ctx.fill()
-      
+
       // Draw emotion label
       if (point.emotion) {
         ctx.fillStyle = '#333'
@@ -156,24 +212,31 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
       ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)'
       ctx.lineWidth = 1
       ctx.beginPath()
-      
+
       const firstPoint = data[0]
       if (firstPoint) {
-        const projectedFirst = project3D(firstPoint.valence, firstPoint.arousal, firstPoint.dominance)
+        const projectedFirst = project3D(
+          firstPoint.valence,
+          firstPoint.arousal,
+          firstPoint.dominance,
+        )
         ctx.moveTo(projectedFirst.x, projectedFirst.y)
-        
+
         for (let i = 1; i < data.length; i++) {
           const currentPoint = data[i]
           if (currentPoint) {
-            const point = project3D(currentPoint.valence, currentPoint.arousal, currentPoint.dominance)
+            const point = project3D(
+              currentPoint.valence,
+              currentPoint.arousal,
+              currentPoint.dominance,
+            )
             ctx.lineTo(point.x, point.y)
           }
         }
-        
+
         ctx.stroke()
       }
     }
-
   }, [data, rotation, isLoading])
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -189,9 +252,9 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
     const deltaX = e.clientX - dragStart.x
     const deltaY = e.clientY - dragStart.y
 
-    setRotation(prev => ({
+    setRotation((prev) => ({
       x: prev.x + deltaY * 0.01,
-      y: prev.y + deltaX * 0.01
+      y: prev.y + deltaX * 0.01,
     }))
 
     setDragStart({ x: e.clientX, y: e.clientY })
@@ -211,13 +274,20 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       />
-      
+
       <div className="absolute top-4 left-4 bg-white bg-opacity-90 p-3 rounded-lg shadow-md">
         <h3 className="text-sm font-semibold mb-2">3D Emotion Space</h3>
         <div className="text-xs space-y-1">
-          <div><span className="font-medium">Valence:</span> Pleasure/Displeasure</div>
-          <div><span className="font-medium">Arousal:</span> Activation/Deactivation</div>
-          <div><span className="font-medium">Dominance:</span> Control/Submission</div>
+          <div>
+            <span className="font-medium">Valence:</span> Pleasure/Displeasure
+          </div>
+          <div>
+            <span className="font-medium">Arousal:</span>{' '}
+            Activation/Deactivation
+          </div>
+          <div>
+            <span className="font-medium">Dominance:</span> Control/Submission
+          </div>
         </div>
         <div className="text-xs mt-2 text-gray-600">
           Click and drag to rotate
@@ -228,7 +298,9 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-gray-500 text-center">
             <div className="text-lg mb-2">No emotion data available</div>
-            <div className="text-sm">Start a therapy session to see emotion patterns</div>
+            <div className="text-sm">
+              Start a therapy session to see emotion patterns
+            </div>
           </div>
         </div>
       )}

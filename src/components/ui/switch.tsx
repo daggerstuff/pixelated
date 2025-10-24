@@ -2,7 +2,8 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-interface SwitchProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'type'> {
+interface SwitchProps
+  extends Omit<React.ComponentPropsWithoutRef<'input'>, 'type'> {
   checked?: boolean
   onCheckedChange?: (checked: boolean) => void
 }
@@ -33,13 +34,13 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
           <div
             className={cn(
               'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform',
-              checked ? 'translate-x-5' : 'translate-x-0'
+              checked ? 'translate-x-5' : 'translate-x-0',
             )}
           />
         </div>
       </label>
     )
-  }
+  },
 )
 Switch.displayName = 'Switch'
 

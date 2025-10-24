@@ -8,7 +8,6 @@ import type {
   ExportData,
 } from '../../../../lib/types/bias-detection'
 
-
 export const POST = async ({ request }) => {
   try {
     const body = await request.json()

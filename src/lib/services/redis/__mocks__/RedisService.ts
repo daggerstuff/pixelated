@@ -180,7 +180,7 @@ export class RedisService extends EventEmitter {
       }
     }
 
-  return removed
+    return removed
   }
 
   async llen(key: string): Promise<number> {
@@ -275,7 +275,7 @@ export class RedisService extends EventEmitter {
     }
     // Convert to array sorted by score ascending
     const entries = Array.from(zset.entries()).sort((a, b) => a[1] - b[1])
-    return entries.slice(start, stop + 1).map(([member]) => member);
+    return entries.slice(start, stop + 1).map(([member]) => member)
   }
 
   async zpopmin(key: string): Promise<{ value: string; score: number }[]> {
@@ -319,7 +319,6 @@ export class RedisService extends EventEmitter {
 
     return value
   }
-
 
   async zremrangebyscore(
     key: string,

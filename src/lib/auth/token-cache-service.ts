@@ -63,14 +63,14 @@ export class TokenCacheService {
       compressionThreshold: 1024, // 1KB
       cleanupInterval: 300, // 5 minutes
       maxAccessCount: 1000,
-      ...config
+      ...config,
     }
 
     this.statistics = {
       hits: 0,
       misses: 0,
       totalResponseTime: 0,
-      requestCount: 0
+      requestCount: 0,
     }
 
     this.startCleanupTimer()
@@ -79,9 +79,13 @@ export class TokenCacheService {
   /**
    * Cache a token with payload and metadata
    */
-  async cacheToken(tokenId: string, payload: any, customTTL?: number): Promise<void> {
+  async cacheToken(
+    tokenId: string,
+    payload: any,
+    customTTL?: number,
+  ): Promise<void> {
     const startTime = Date.now()
-    
+
     try {
       const ttl = customTTL || this.config.defaultTTL
       const now = Math.floor(Date.now() / 1000)
@@ -93,7 +97,7 @@ export class TokenCacheService {
         cachedAt: now,
         expiresAt,
         accessCount: 0,
-        lastAccessed: now
+        lastAccessed: now,
       }
 
       // Check cache size limits
@@ -101,7 +105,10 @@ export class TokenCacheService {
 
       // Compress payload if enabled and above threshold
       let dataToStore = JSON.stringify(cachedToken)
-      if (this.config.enableCompression && dataToStore.length > this.config.compressionThreshold) {
+      if (
+        this.config.enableCompression &&
+        dataToStore.length > this.config.compressionThreshold
+      ) {
         dataToStore = await this.compressData(dataToStore)
       }
 
@@ -120,8 +127,10 @@ export class TokenCacheService {
       // Update statistics
       this.updateStatistics(Date.now() - startTime, 'cache')
 
-      logger.debug(`Token ${tokenId} cached successfully`, { ttl, compressed: this.config.enableCompression })
-
+      logger.debug(`Token ${tokenId} cached successfully`, {
+        ttl,
+        compressed: this.config.enableCompression,
+      })
     } catch (error) {
       logger.error(`Failed to cache token ${tokenId}`, error)
       throw new AuthenticationError('Token caching failed')
@@ -133,11 +142,11 @@ export class TokenCacheService {
    */
   async getCachedToken(tokenId: string): Promise<CachedToken | null> {
     const startTime = Date.now()
-    
+
     try {
       const cacheKey = `token:cache:${tokenId}`
       const cachedData = await this.redis.get(cacheKey)
-      
+
       if (!cachedData) {
         this.statistics.misses++
         this.updateStatistics(Date.now() - startTime, 'miss')
@@ -151,7 +160,10 @@ export class TokenCacheService {
       }
 
       // Decompress if needed
-      if (this.config.enableCompression && dataToParse.startsWith('COMPRESSED:')) {
+      if (
+        this.config.enableCompression &&
+        dataToParse.startsWith('COMPRESSED:')
+      ) {
         dataToParse = await this.decompressData(dataToParse)
       }
 
@@ -167,13 +179,12 @@ export class TokenCacheService {
       this.statistics.hits++
       this.updateStatistics(Date.now() - startTime, 'hit')
 
-      logger.debug(`Token ${tokenId} retrieved from cache`, { 
+      logger.debug(`Token ${tokenId} retrieved from cache`, {
         accessCount: cachedToken.accessCount,
-        cachedFor: cachedToken.lastAccessed - cachedToken.cachedAt 
+        cachedFor: cachedToken.lastAccessed - cachedToken.cachedAt,
       })
 
       return cachedToken
-
     } catch (error) {
       logger.error(`Error retrieving cached token ${tokenId}`, error)
       this.statistics.misses++
@@ -189,14 +200,13 @@ export class TokenCacheService {
     try {
       const cacheKey = `token:cache:${tokenId}`
       const result = await this.redis.del(cacheKey)
-      
+
       // Remove from cache index
       await this.removeFromCacheIndex(tokenId)
 
       if (result > 0) {
         logger.debug(`Token ${tokenId} invalidated from cache`)
       }
-
     } catch (error) {
       logger.error(`Error invalidating cached token ${tokenId}`, error)
     }
@@ -205,9 +215,11 @@ export class TokenCacheService {
   /**
    * Batch cache multiple tokens
    */
-  async batchCacheTokens(tokens: Array<{ tokenId: string; payload: any; ttl?: number }>): Promise<void> {
+  async batchCacheTokens(
+    tokens: Array<{ tokenId: string; payload: any; ttl?: number }>,
+  ): Promise<void> {
     const pipeline = this.redis.pipeline()
-    
+
     for (const token of tokens) {
       const ttl = token.ttl || this.config.defaultTTL
       const now = Math.floor(Date.now() / 1000)
@@ -219,23 +231,26 @@ export class TokenCacheService {
         cachedAt: now,
         expiresAt,
         accessCount: 0,
-        lastAccessed: now
+        lastAccessed: now,
       }
 
       let dataToStore = JSON.stringify(cachedToken)
-      
+
       // Apply compression and encryption if enabled
-      if (this.config.enableCompression && dataToStore.length > this.config.compressionThreshold) {
+      if (
+        this.config.enableCompression &&
+        dataToStore.length > this.config.compressionThreshold
+      ) {
         dataToStore = await this.compressData(dataToStore)
       }
-      
+
       if (this.config.enableEncryption) {
         dataToStore = await this.encryptData(dataToStore)
       }
 
       const cacheKey = `token:cache:${token.tokenId}`
       pipeline.setex(cacheKey, ttl, dataToStore)
-      
+
       // Add to cache index
       pipeline.zadd('token:cache:index', expiresAt, token.tokenId)
     }
@@ -252,9 +267,11 @@ export class TokenCacheService {
   /**
    * Batch retrieve multiple cached tokens
    */
-  async batchGetCachedTokens(tokenIds: string[]): Promise<Array<CachedToken | null>> {
+  async batchGetCachedTokens(
+    tokenIds: string[],
+  ): Promise<Array<CachedToken | null>> {
     const pipeline = this.redis.pipeline()
-    
+
     for (const tokenId of tokenIds) {
       const cacheKey = `token:cache:${tokenId}`
       pipeline.get(cacheKey)
@@ -266,7 +283,7 @@ export class TokenCacheService {
 
       for (let i = 0; i < results.length; i++) {
         const [error, data] = results[i]
-        
+
         if (error || !data) {
           tokens.push(null)
           this.statistics.misses++
@@ -279,20 +296,22 @@ export class TokenCacheService {
           if (this.config.enableEncryption) {
             dataToParse = await this.decryptData(dataToParse)
           }
-          if (this.config.enableCompression && dataToParse.startsWith('COMPRESSED:')) {
+          if (
+            this.config.enableCompression &&
+            dataToParse.startsWith('COMPRESSED:')
+          ) {
             dataToParse = await this.decompressData(dataToParse)
           }
 
           const cachedToken: CachedToken = JSON.parse(dataToParse)
           cachedToken.accessCount++
           cachedToken.lastAccessed = Math.floor(Date.now() / 1000)
-          
+
           tokens.push(cachedToken)
           this.statistics.hits++
 
           // Update in cache with new access stats
           await this.updateCachedToken(tokenIds[i], cachedToken)
-
         } catch (parseError) {
           logger.error(`Error parsing cached token ${tokenIds[i]}`, parseError)
           tokens.push(null)
@@ -301,7 +320,6 @@ export class TokenCacheService {
       }
 
       return tokens
-
     } catch (error) {
       logger.error('Error in batch get operation', error)
       return new Array(tokenIds.length).fill(null)
@@ -311,11 +329,14 @@ export class TokenCacheService {
   /**
    * Update cached token with new access statistics
    */
-  private async updateCachedToken(tokenId: string, cachedToken: CachedToken): Promise<void> {
+  private async updateCachedToken(
+    tokenId: string,
+    cachedToken: CachedToken,
+  ): Promise<void> {
     try {
       const cacheKey = `token:cache:${tokenId}`
       const ttl = cachedToken.expiresAt - Math.floor(Date.now() / 1000)
-      
+
       if (ttl <= 0) {
         // Token has expired, remove it
         await this.invalidateToken(tokenId)
@@ -323,18 +344,20 @@ export class TokenCacheService {
       }
 
       let dataToStore = JSON.stringify(cachedToken)
-      
+
       // Apply compression and encryption if enabled
-      if (this.config.enableCompression && dataToStore.length > this.config.compressionThreshold) {
+      if (
+        this.config.enableCompression &&
+        dataToStore.length > this.config.compressionThreshold
+      ) {
         dataToStore = await this.compressData(dataToStore)
       }
-      
+
       if (this.config.enableEncryption) {
         dataToStore = await this.encryptData(dataToStore)
       }
 
       await this.redis.setex(cacheKey, ttl, dataToStore)
-
     } catch (error) {
       logger.error(`Error updating cached token ${tokenId}`, error)
     }
@@ -347,21 +370,28 @@ export class TokenCacheService {
     try {
       const cacheKeys = await this.redis.keys('token:cache:*')
       const totalCached = cacheKeys.length
-      
-      const hitRate = this.statistics.requestCount > 0 
-        ? (this.statistics.hits / this.statistics.requestCount) * 100 
-        : 0
-      
-      const avgResponseTime = this.statistics.requestCount > 0
-        ? this.statistics.totalResponseTime / this.statistics.requestCount
-        : 0
+
+      const hitRate =
+        this.statistics.requestCount > 0
+          ? (this.statistics.hits / this.statistics.requestCount) * 100
+          : 0
+
+      const avgResponseTime =
+        this.statistics.requestCount > 0
+          ? this.statistics.totalResponseTime / this.statistics.requestCount
+          : 0
 
       // Get oldest and newest tokens
       let oldestToken = 0
       let newestToken = 0
-      
+
       if (totalCached > 0) {
-        const indexData = await this.redis.zrange('token:cache:index', 0, -1, 'WITHSCORES')
+        const indexData = await this.redis.zrange(
+          'token:cache:index',
+          0,
+          -1,
+          'WITHSCORES',
+        )
         if (indexData.length > 0) {
           oldestToken = parseInt(indexData[1]) // First element's score
           newestToken = parseInt(indexData[indexData.length - 1]) // Last element's score
@@ -379,9 +409,8 @@ export class TokenCacheService {
         avgResponseTime,
         memoryUsage,
         oldestToken,
-        newestToken
+        newestToken,
       }
-
     } catch (error) {
       logger.error('Error generating cache statistics', error)
       return {
@@ -392,7 +421,7 @@ export class TokenCacheService {
         avgResponseTime: 0,
         memoryUsage: 0,
         oldestToken: 0,
-        newestToken: 0
+        newestToken: 0,
       }
     }
   }
@@ -406,20 +435,19 @@ export class TokenCacheService {
       if (cacheKeys.length > 0) {
         await this.redis.del(...cacheKeys)
       }
-      
+
       // Clear cache index
       await this.redis.del('token:cache:index')
-      
+
       // Reset statistics
       this.statistics = {
         hits: 0,
         misses: 0,
         totalResponseTime: 0,
-        requestCount: 0
+        requestCount: 0,
       }
 
       logger.info(`Cleared ${cacheKeys.length} cached tokens`)
-
     } catch (error) {
       logger.error('Error clearing cache', error)
       throw new AuthenticationError('Cache clear failed')
@@ -432,19 +460,24 @@ export class TokenCacheService {
   private async enforceCacheSizeLimits(): Promise<void> {
     try {
       const currentSize = await this.redis.zcard('token:cache:index')
-      
+
       if (currentSize >= this.config.maxCacheSize) {
         // Remove oldest tokens
         const tokensToRemove = Math.ceil(this.config.maxCacheSize * 0.1) // Remove 10%
-        const oldestTokens = await this.redis.zrange('token:cache:index', 0, tokensToRemove - 1)
-        
+        const oldestTokens = await this.redis.zrange(
+          'token:cache:index',
+          0,
+          tokensToRemove - 1,
+        )
+
         for (const tokenId of oldestTokens) {
           await this.invalidateToken(tokenId)
         }
-        
-        logger.info(`Enforced cache size limit by removing ${oldestTokens.length} oldest tokens`)
-      }
 
+        logger.info(
+          `Enforced cache size limit by removing ${oldestTokens.length} oldest tokens`,
+        )
+      }
     } catch (error) {
       logger.error('Error enforcing cache size limits', error)
     }
@@ -453,7 +486,10 @@ export class TokenCacheService {
   /**
    * Update cache index with token expiration
    */
-  private async updateCacheIndex(tokenId: string, expiresAt: number): Promise<void> {
+  private async updateCacheIndex(
+    tokenId: string,
+    expiresAt: number,
+  ): Promise<void> {
     await this.redis.zadd('token:cache:index', expiresAt, tokenId)
   }
 
@@ -467,10 +503,13 @@ export class TokenCacheService {
   /**
    * Update performance statistics
    */
-  private updateStatistics(responseTime: number, type: 'hit' | 'miss' | 'cache'): void {
+  private updateStatistics(
+    responseTime: number,
+    type: 'hit' | 'miss' | 'cache',
+  ): void {
     this.statistics.totalResponseTime += responseTime
     this.statistics.requestCount++
-    
+
     if (type === 'hit') {
       this.statistics.hits++
     } else if (type === 'miss') {
@@ -533,7 +572,7 @@ export class TokenCacheService {
     }, this.config.cleanupInterval * 1000)
 
     // Run initial cleanup
-    this.cleanupExpiredTokens().catch(error => {
+    this.cleanupExpiredTokens().catch((error) => {
       logger.error('Error in initial cache cleanup', error)
     })
   }
@@ -544,17 +583,21 @@ export class TokenCacheService {
   private async cleanupExpiredTokens(): Promise<number> {
     try {
       const now = Math.floor(Date.now() / 1000)
-      
+
       // Get expired tokens from index
-      const expiredTokens = await this.redis.zrangebyscore('token:cache:index', 0, now)
-      
+      const expiredTokens = await this.redis.zrangebyscore(
+        'token:cache:index',
+        0,
+        now,
+      )
+
       if (expiredTokens.length === 0) {
         return 0
       }
 
       // Remove expired tokens
       const pipeline = this.redis.pipeline()
-      
+
       for (const tokenId of expiredTokens) {
         const cacheKey = `token:cache:${tokenId}`
         pipeline.del(cacheKey)
@@ -562,10 +605,11 @@ export class TokenCacheService {
       }
 
       await pipeline.exec()
-      
-      logger.debug(`Cleaned up ${expiredTokens.length} expired tokens from cache`)
-      return expiredTokens.length
 
+      logger.debug(
+        `Cleaned up ${expiredTokens.length} expired tokens from cache`,
+      )
+      return expiredTokens.length
     } catch (error) {
       logger.error('Error cleaning up expired tokens', error)
       return 0

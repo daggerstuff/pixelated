@@ -69,27 +69,27 @@ const DEFAULT_CONFIG: PIIDetectionConfig = {
  * Interface for FHE Service
  */
 interface FHEService {
-  isInitialized(): boolean;
+  isInitialized(): boolean
   processEncrypted(
     text: string,
     operation: FHEOperation,
     options: {
-      operation: string;
-      threshold: number;
-      patterns: string[];
-    }
+      operation: string
+      threshold: number
+      patterns: string[]
+    },
   ): Promise<{
     data: {
-      hasPII: string;
-      confidence: string;
-      types: string;
-      redacted?: string;
-    };
+      hasPII: string
+      confidence: string
+      types: string
+      redacted?: string
+    }
     metadata: {
-      operation: FHEOperation;
-      timestamp: number;
-    };
-  }>;
+      operation: FHEOperation
+      timestamp: number
+    }
+  }>
 }
 
 /**
@@ -389,9 +389,9 @@ class PIIDetectionService {
   ): Promise<PIIDetectionResult> {
     try {
       // Ensure FHE service is available
-      const fheServiceTyped = fheService as FHEService;
+      const fheServiceTyped = fheService as FHEService
       if (!fheServiceTyped.isInitialized()) {
-        throw new Error('FHE service not initialized');
+        throw new Error('FHE service not initialized')
       }
 
       // Process encrypted data using FHE operations
@@ -405,13 +405,13 @@ class PIIDetectionService {
             .flat()
             .map((p) => p.source),
         },
-      );
+      )
 
       // Return encrypted result
       return {
         data: { hasPII: 'false', confidence: '0', types: '' },
         metadata: { operation: FHEOperation.ANALYZE, timestamp: Date.now() },
-      };
+      }
 
       // Parse the result
       // In a real FHE implementation, this would decrypt the result

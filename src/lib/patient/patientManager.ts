@@ -3,7 +3,11 @@
  * Comprehensive patient data management with privacy and security
  */
 
-import type { PatientProfile, TreatmentPlan, ProgressMetrics } from '@/types/patient'
+import type {
+  PatientProfile,
+  TreatmentPlan,
+  ProgressMetrics,
+} from '@/types/patient'
 import encryptionManager from '@/lib/security/encryptionManager'
 
 export interface PatientSearchCriteria {
@@ -46,8 +50,14 @@ class PatientManager {
 
   private initializeSearchIndex(): void {
     // Initialize search index categories
-    const categories = ['name', 'diagnosis', 'riskLevel', 'therapistId', 'treatmentStatus']
-    categories.forEach(category => {
+    const categories = [
+      'name',
+      'diagnosis',
+      'riskLevel',
+      'therapistId',
+      'treatmentStatus',
+    ]
+    categories.forEach((category) => {
       this.searchIndex.set(category, new Set())
     })
   }
@@ -55,7 +65,9 @@ class PatientManager {
   /**
    * Create new patient profile with encryption
    */
-  async createPatient(patientData: Omit<PatientProfile, 'id' | 'createdAt' | 'updatedAt'>): Promise<PatientProfile> {
+  async createPatient(
+    patientData: Omit<PatientProfile, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<PatientProfile> {
     const patientId = this.generatePatientId()
     const now = new Date()
 
@@ -102,28 +114,44 @@ class PatientManager {
   /**
    * Search patients with advanced filtering
    */
-  async searchPatients(criteria: PatientSearchCriteria): Promise<PatientProfile[]> {
+  async searchPatients(
+    criteria: PatientSearchCriteria,
+  ): Promise<PatientProfile[]> {
     let matchingPatients = new Set<string>()
 
     // Get patients matching each criterion
     if (criteria.name) {
       const nameMatches = this.searchIndex.get('name') || new Set()
-      matchingPatients = matchingPatients.size === 0 ? nameMatches : new Set([...matchingPatients].filter(id => nameMatches.has(id)))
+      matchingPatients =
+        matchingPatients.size === 0
+          ? nameMatches
+          : new Set([...matchingPatients].filter((id) => nameMatches.has(id)))
     }
 
     if (criteria.therapistId) {
       const therapistMatches = this.searchIndex.get('therapistId') || new Set()
-      matchingPatients = matchingPatients.size === 0 ? therapistMatches : new Set([...matchingPatients].filter(id => therapistMatches.has(id)))
+      matchingPatients =
+        matchingPatients.size === 0
+          ? therapistMatches
+          : new Set(
+              [...matchingPatients].filter((id) => therapistMatches.has(id)),
+            )
     }
 
     if (criteria.riskLevel) {
       const riskMatches = this.searchIndex.get('riskLevel') || new Set()
-      matchingPatients = matchingPatients.size === 0 ? riskMatches : new Set([...matchingPatients].filter(id => riskMatches.has(id)))
+      matchingPatients =
+        matchingPatients.size === 0
+          ? riskMatches
+          : new Set([...matchingPatients].filter((id) => riskMatches.has(id)))
     }
 
     if (criteria.treatmentStatus) {
       const statusMatches = this.searchIndex.get('treatmentStatus') || new Set()
-      matchingPatients = matchingPatients.size === 0 ? statusMatches : new Set([...matchingPatients].filter(id => statusMatches.has(id)))
+      matchingPatients =
+        matchingPatients.size === 0
+          ? statusMatches
+          : new Set([...matchingPatients].filter((id) => statusMatches.has(id)))
     }
 
     // If no specific criteria, return all patients
@@ -139,13 +167,17 @@ class PatientManager {
       if (!patient) continue
 
       // Apply date filters
-      if (criteria.lastSeenBefore && patient.lastSeen > criteria.lastSeenBefore) continue
-      if (criteria.lastSeenAfter && patient.lastSeen < criteria.lastSeenAfter) continue
+      if (criteria.lastSeenBefore && patient.lastSeen > criteria.lastSeenBefore)
+        continue
+      if (criteria.lastSeenAfter && patient.lastSeen < criteria.lastSeenAfter)
+        continue
 
       // Apply diagnosis filter
       if (criteria.diagnosis && criteria.diagnosis.length > 0) {
-        const hasMatchingDiagnosis = criteria.diagnosis.some(diag =>
-          patient.diagnosis.some(pDiag => pDiag.toLowerCase().includes(diag.toLowerCase()))
+        const hasMatchingDiagnosis = criteria.diagnosis.some((diag) =>
+          patient.diagnosis.some((pDiag) =>
+            pDiag.toLowerCase().includes(diag.toLowerCase()),
+          ),
         )
         if (!hasMatchingDiagnosis) continue
       }
@@ -192,7 +224,7 @@ class PatientManager {
     patientId: string,
     updateData: PatientUpdateData,
     updatedBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<PatientProfile> {
     const patient = this.patientCache.get(patientId)
     if (!patient) {
@@ -207,11 +239,17 @@ class PatientManager {
     }
 
     if (updateData.emergencyContact) {
-      patient.emergencyContact = { ...patient.emergencyContact, ...updateData.emergencyContact }
+      patient.emergencyContact = {
+        ...patient.emergencyContact,
+        ...updateData.emergencyContact,
+      }
     }
 
     if (updateData.treatmentPlan) {
-      patient.treatmentPlan = { ...patient.treatmentPlan, ...updateData.treatmentPlan }
+      patient.treatmentPlan = {
+        ...patient.treatmentPlan,
+        ...updateData.treatmentPlan,
+      }
     }
 
     if (updateData.notes) {
@@ -219,7 +257,10 @@ class PatientManager {
     }
 
     if (updateData.customFields) {
-      patient.customFields = { ...patient.customFields, ...updateData.customFields }
+      patient.customFields = {
+        ...patient.customFields,
+        ...updateData.customFields,
+      }
     }
 
     patient.updatedAt = new Date()
@@ -228,7 +269,14 @@ class PatientManager {
     this.updateSearchIndex(patient)
 
     // Create audit trail entry
-    await this.createAuditEntry(patientId, 'UPDATE', oldPatient, patient, updatedBy, reason)
+    await this.createAuditEntry(
+      patientId,
+      'UPDATE',
+      oldPatient,
+      patient,
+      updatedBy,
+      reason,
+    )
 
     console.log(`Updated patient: ${patientId}`)
 
@@ -243,7 +291,8 @@ class PatientManager {
     transferId: string
     warnings?: string[]
   }> {
-    const { fromTherapistId, toTherapistId, patientConsent, reason } = transferRequest
+    const { fromTherapistId, toTherapistId, patientConsent, reason } =
+      transferRequest
 
     // Validate transfer request
     const warnings: string[] = []
@@ -265,13 +314,15 @@ class PatientManager {
         patient.id,
         { therapistId: toTherapistId },
         'SYSTEM',
-        `Patient transfer: ${reason}`
+        `Patient transfer: ${reason}`,
       )
     }
 
     const transferId = `transfer_${Date.now()}`
 
-    console.log(`Transferred ${patients.length} patients from ${fromTherapistId} to ${toTherapistId}`)
+    console.log(
+      `Transferred ${patients.length} patients from ${fromTherapistId} to ${toTherapistId}`,
+    )
 
     return {
       success: true,
@@ -285,7 +336,7 @@ class PatientManager {
    */
   async generatePatientReport(
     patientId: string,
-    reportType: 'summary' | 'detailed' | 'progress' | 'discharge'
+    reportType: 'summary' | 'detailed' | 'progress' | 'discharge',
   ): Promise<{
     reportId: string
     patient: PatientProfile
@@ -304,16 +355,16 @@ class PatientManager {
 
     switch (reportType) {
       case 'summary':
-        sections.push(...await this.generateSummarySections(patient))
+        sections.push(...(await this.generateSummarySections(patient)))
         break
       case 'detailed':
-        sections.push(...await this.generateDetailedSections(patient))
+        sections.push(...(await this.generateDetailedSections(patient)))
         break
       case 'progress':
-        sections.push(...await this.generateProgressSections(patient))
+        sections.push(...(await this.generateProgressSections(patient)))
         break
       case 'discharge':
-        sections.push(...await this.generateDischargeSections(patient))
+        sections.push(...(await this.generateDischargeSections(patient)))
         break
     }
 
@@ -326,7 +377,9 @@ class PatientManager {
     }
   }
 
-  private async generateSummarySections(patient: PatientProfile): Promise<ReportSection[]> {
+  private async generateSummarySections(
+    patient: PatientProfile,
+  ): Promise<ReportSection[]> {
     return [
       {
         title: 'Patient Information',
@@ -360,9 +413,11 @@ class PatientManager {
     ]
   }
 
-  private async generateDetailedSections(patient: PatientProfile): Promise<ReportSection[]> {
+  private async generateDetailedSections(
+    patient: PatientProfile,
+  ): Promise<ReportSection[]> {
     return [
-      ...await this.generateSummarySections(patient),
+      ...(await this.generateSummarySections(patient)),
       {
         title: 'Session History',
         type: 'session_history',
@@ -382,7 +437,9 @@ class PatientManager {
     ]
   }
 
-  private async generateProgressSections(patient: PatientProfile): Promise<ReportSection[]> {
+  private async generateProgressSections(
+    patient: PatientProfile,
+  ): Promise<ReportSection[]> {
     return [
       {
         title: 'Progress Metrics',
@@ -406,9 +463,11 @@ class PatientManager {
     ]
   }
 
-  private async generateDischargeSections(patient: PatientProfile): Promise<ReportSection[]> {
+  private async generateDischargeSections(
+    patient: PatientProfile,
+  ): Promise<ReportSection[]> {
     return [
-      ...await this.generateDetailedSections(patient),
+      ...(await this.generateDetailedSections(patient)),
       {
         title: 'Discharge Summary',
         type: 'discharge_summary',
@@ -437,30 +496,36 @@ class PatientManager {
 
   private analyzeSessionPatterns(sessions: any[]): any {
     // Analyze patterns in session data
-    const moodTrends = sessions.map(s => s.emotionAnalysis?.moodScore).filter(Boolean)
-    const avgMood = moodTrends.reduce((sum, mood) => sum + mood, 0) / moodTrends.length
+    const moodTrends = sessions
+      .map((s) => s.emotionAnalysis?.moodScore)
+      .filter(Boolean)
+    const avgMood =
+      moodTrends.reduce((sum, mood) => sum + mood, 0) / moodTrends.length
 
     return {
       totalSessions: sessions.length,
       averageMood: avgMood || 0,
-      moodTrend: moodTrends.length > 1 ?
-        (moodTrends[moodTrends.length - 1] - moodTrends[0]) / moodTrends.length : 0,
+      moodTrend:
+        moodTrends.length > 1
+          ? (moodTrends[moodTrends.length - 1] - moodTrends[0]) /
+            moodTrends.length
+          : 0,
       mostCommonEmotions: this.getMostCommonEmotions(sessions),
     }
   }
 
   private getMostCommonEmotions(sessions: any[]): string[] {
     const emotions = sessions
-      .map(s => s.emotionAnalysis?.dominantEmotion)
+      .map((s) => s.emotionAnalysis?.dominantEmotion)
       .filter(Boolean)
 
     const counts: Record<string, number> = {}
-    emotions.forEach(emotion => {
+    emotions.forEach((emotion) => {
       counts[emotion] = (counts[emotion] || 0) + 1
     })
 
     return Object.entries(counts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([emotion]) => emotion)
   }
@@ -485,7 +550,13 @@ class PatientManager {
 
     return {
       treatmentDuration: Date.now() - patient.createdAt.getTime(),
-      sessionsPerWeek: sessions.length / Math.max(1, (Date.now() - patient.createdAt.getTime()) / (7 * 24 * 60 * 60 * 1000)),
+      sessionsPerWeek:
+        sessions.length /
+        Math.max(
+          1,
+          (Date.now() - patient.createdAt.getTime()) /
+            (7 * 24 * 60 * 60 * 1000),
+        ),
       improvementRate: this.calculateImprovementRate(recentSessions),
       treatmentAdherence: 0.92, // Mock data
       outcomePrediction: this.predictTreatmentOutcome(patient),
@@ -498,13 +569,23 @@ class PatientManager {
     const firstHalf = sessions.slice(0, Math.floor(sessions.length / 2))
     const secondHalf = sessions.slice(Math.floor(sessions.length / 2))
 
-    const firstHalfAvg = firstHalf.reduce((sum, s) => sum + (s.emotionAnalysis?.moodScore || 0.5), 0) / firstHalf.length
-    const secondHalfAvg = secondHalf.reduce((sum, s) => sum + (s.emotionAnalysis?.moodScore || 0.5), 0) / secondHalf.length
+    const firstHalfAvg =
+      firstHalf.reduce(
+        (sum, s) => sum + (s.emotionAnalysis?.moodScore || 0.5),
+        0,
+      ) / firstHalf.length
+    const secondHalfAvg =
+      secondHalf.reduce(
+        (sum, s) => sum + (s.emotionAnalysis?.moodScore || 0.5),
+        0,
+      ) / secondHalf.length
 
     return (secondHalfAvg - firstHalfAvg) / firstHalfAvg
   }
 
-  private predictTreatmentOutcome(patient: PatientProfile): 'excellent' | 'good' | 'fair' | 'poor' {
+  private predictTreatmentOutcome(
+    patient: PatientProfile,
+  ): 'excellent' | 'good' | 'fair' | 'poor' {
     // Simple prediction based on current progress and engagement
     const progress = patient.progress
     const sessionsCount = patient.sessionHistory?.length || 0
@@ -522,7 +603,7 @@ class PatientManager {
     oldData: any,
     newData: any,
     performedBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     // Create audit trail entry
     const auditEntry = {
@@ -543,7 +624,7 @@ class PatientManager {
     const changes: any = {}
 
     // Compare top-level fields
-    Object.keys(newData).forEach(key => {
+    Object.keys(newData).forEach((key) => {
       if (JSON.stringify(oldData[key]) !== JSON.stringify(newData[key])) {
         changes[key] = {
           from: oldData[key],
@@ -569,17 +650,25 @@ class PatientManager {
     return patient || null
   }
 
-  private async decryptPatientData(patient: PatientProfile): Promise<PatientProfile> {
+  private async decryptPatientData(
+    patient: PatientProfile,
+  ): Promise<PatientProfile> {
     const decrypted = { ...patient }
 
-    if (patient.encryptedFields.includes('contact.email') && patient.contact?.email) {
+    if (
+      patient.encryptedFields.includes('contact.email') &&
+      patient.contact?.email
+    ) {
       decrypted.contact = {
         ...decrypted.contact,
         email: await encryptionManager.decrypt(patient.contact.email as any),
       }
     }
 
-    if (patient.encryptedFields.includes('contact.phone') && patient.contact?.phone) {
+    if (
+      patient.encryptedFields.includes('contact.phone') &&
+      patient.contact?.phone
+    ) {
       decrypted.contact = {
         ...decrypted.contact,
         phone: await encryptionManager.decrypt(patient.contact.phone as any),
@@ -596,7 +685,7 @@ class PatientManager {
     patientIds: string[],
     updates: PatientUpdateData,
     updatedBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<{
     successCount: number
     failureCount: number
@@ -612,7 +701,9 @@ class PatientManager {
         successCount++
       } catch (error) {
         failureCount++
-        errors.push(`Patient ${patientId}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        errors.push(
+          `Patient ${patientId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        )
       }
     }
 
@@ -622,7 +713,10 @@ class PatientManager {
   /**
    * Export patient data for portability
    */
-  async exportPatientData(patientId: string, format: 'json' | 'pdf' | 'csv'): Promise<{
+  async exportPatientData(
+    patientId: string,
+    format: 'json' | 'pdf' | 'csv',
+  ): Promise<{
     data: any
     format: string
     exportedAt: Date
@@ -669,7 +763,7 @@ class PatientManager {
       ['Progress', patient.progress],
     ]
 
-    return [headers, ...rows].map(row => row.join(',')).join('\n')
+    return [headers, ...rows].map((row) => row.join(',')).join('\n')
   }
 
   private async convertToPDF(patient: PatientProfile): Promise<string> {
@@ -681,7 +775,7 @@ class PatientManager {
     let hash = 0
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
+      hash = (hash << 5) - hash + char
       hash = hash & hash // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(36)
@@ -700,7 +794,9 @@ class PatientManager {
     const patients = Array.from(this.patientCache.values())
 
     const totalPatients = patients.length
-    const activePatients = patients.filter(p => p.treatmentStatus === 'active').length
+    const activePatients = patients.filter(
+      (p) => p.treatmentStatus === 'active',
+    ).length
 
     const byRiskLevel: Record<string, number> = {
       low: 0,
@@ -709,15 +805,19 @@ class PatientManager {
       critical: 0,
     }
 
-    patients.forEach(patient => {
+    patients.forEach((patient) => {
       byRiskLevel[patient.riskLevel] = (byRiskLevel[patient.riskLevel] || 0) + 1
     })
 
-    const averageProgress = patients.reduce((sum, p) => sum + p.progress, 0) / Math.max(totalPatients, 1)
+    const averageProgress =
+      patients.reduce((sum, p) => sum + p.progress, 0) /
+      Math.max(totalPatients, 1)
 
     // Patients active in last 30 days
-    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000)
-    const recentActivity = patients.filter(p => p.updatedAt.getTime() > thirtyDaysAgo).length
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000
+    const recentActivity = patients.filter(
+      (p) => p.updatedAt.getTime() > thirtyDaysAgo,
+    ).length
 
     return {
       totalPatients,

@@ -56,7 +56,7 @@ describe('FHEParameterOptimizer', () => {
 
   it('setConstraints updates the constraints with partial updates', () => {
     optimizer.setConstraints({
-  minimumSecurityLevel: SecurityLevel.TC192,
+      minimumSecurityLevel: SecurityLevel.TC192,
       maximumMemoryMB: 2048,
     })
 
@@ -68,7 +68,7 @@ describe('FHEParameterOptimizer', () => {
       )?.get?.call(optimizer) || {}
 
     expect(constraints).toEqual({
-  minimumSecurityLevel: SecurityLevel.TC192,
+      minimumSecurityLevel: SecurityLevel.TC192,
       maximumMemoryMB: 2048,
       minimumPrecisionBits: 20,
       maximumLatencyMs: 500,

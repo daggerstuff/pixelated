@@ -8,9 +8,9 @@ import { ThemeContext } from '@/components/theme/ThemeProvider'
 
 // Define the MentalHealthAnalysis interface with the properties we need
 interface MentalHealthAnalysis {
-  category: string;
-  hasMentalHealthIssue: boolean;
-  [key: string]: unknown;
+  category: string
+  hasMentalHealthIssue: boolean
+  [key: string]: unknown
 }
 
 interface ExtendedMessage extends Message {

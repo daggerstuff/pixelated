@@ -78,7 +78,8 @@ export async function initializeSecurity(): Promise<void> {
     }
     logger.error('Failed to initialize security system:', errorDetails)
     throw new Error(
-      `Security initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
+      `Security initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+      { cause: error },
     )
   }
 }

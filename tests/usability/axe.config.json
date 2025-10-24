@@ -11,12 +11,7 @@
     "link-purpose": { "enabled": true },
     "page-title": { "enabled": true }
   },
-  "tags": [
-    "wcag2a",
-    "wcag2aa",
-    "wcag21aa",
-    "best-practice"
-  ],
+  "tags": ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"],
   "locale": "en",
   "reporter": "v2"
 }

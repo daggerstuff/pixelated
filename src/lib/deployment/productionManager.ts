@@ -3,7 +3,7 @@
  * Orchestrates deployment, rollback, and environment management
  */
 
-import type { DeploymentConfig, DeploymentStatus, RollbackPlan } from '@/types/deployment'
+import type { DeploymentConfig, RollbackPlan } from '@/types/deployment'
 
 export interface EnvironmentConfig {
   name: string
@@ -41,12 +41,15 @@ export interface DeploymentArtifact {
 
 export interface DeploymentHealth {
   status: 'healthy' | 'warning' | 'critical' | 'unknown'
-  checks: Record<string, {
-    status: 'pass' | 'fail' | 'warn'
-    responseTime: number
-    lastChecked: Date
-    error?: string
-  }>
+  checks: Record<
+    string,
+    {
+      status: 'pass' | 'fail' | 'warn'
+      responseTime: number
+      lastChecked: Date
+      error?: string
+    }
+  >
   overallUptime: number
   activeUsers: number
 }
@@ -140,7 +143,7 @@ class ProductionManager {
       },
     ]
 
-    environments.forEach(env => {
+    environments.forEach((env) => {
       this.environments.set(env.name, env)
     })
   }
@@ -151,7 +154,7 @@ class ProductionManager {
   async deploy(
     environment: string,
     artifact: DeploymentArtifact,
-    strategy: 'blue-green' | 'canary' | 'rolling' = 'blue-green'
+    strategy: 'blue-green' | 'canary' | 'rolling' = 'blue-green',
   ): Promise<{
     deploymentId: string
     status: 'success' | 'failed' | 'rollback'
@@ -166,7 +169,9 @@ class ProductionManager {
     const deploymentId = `deploy_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
     const startTime = Date.now()
 
-    console.log(`Starting deployment to ${environment} with strategy: ${strategy}`)
+    console.log(
+      `Starting deployment to ${environment} with strategy: ${strategy}`,
+    )
 
     try {
       // Pre-deployment checks
@@ -195,20 +200,24 @@ class ProductionManager {
       const duration = Date.now() - startTime
       this.deployments.set(deploymentId, artifact)
 
-      console.log(`Deployment to ${environment} completed successfully in ${duration}ms`)
+      console.log(
+        `Deployment to ${environment} completed successfully in ${duration}ms`,
+      )
 
       return {
         deploymentId,
         status: 'success',
         duration,
       }
-
     } catch (error) {
       console.error(`Deployment to ${environment} failed:`, error)
 
       // Auto-rollback if enabled
       if (this.config.enableAutoRollback) {
-        const rollbackPlan = await this.createRollbackPlan(environment, artifact)
+        const rollbackPlan = await this.createRollbackPlan(
+          environment,
+          artifact,
+        )
 
         try {
           await this.rollback(environment, rollbackPlan)
@@ -231,7 +240,10 @@ class ProductionManager {
     }
   }
 
-  private async runPreDeploymentChecks(environment: string, artifact: DeploymentArtifact): Promise<void> {
+  private async runPreDeploymentChecks(
+    environment: string,
+    artifact: DeploymentArtifact,
+  ): Promise<void> {
     console.log(`Running pre-deployment checks for ${environment}...`)
 
     // Check artifact integrity
@@ -253,12 +265,16 @@ class ProductionManager {
     await this.validateDependencies(artifact)
   }
 
-  private async validateArtifactChecksum(artifact: DeploymentArtifact): Promise<boolean> {
+  private async validateArtifactChecksum(
+    artifact: DeploymentArtifact,
+  ): Promise<boolean> {
     // In real implementation, would calculate actual checksum
     return artifact.checksum === 'mock_checksum_validation'
   }
 
-  private async checkEnvironmentReadiness(environment: string): Promise<boolean> {
+  private async checkEnvironmentReadiness(
+    environment: string,
+  ): Promise<boolean> {
     // Check if environment is accepting deployments
     const env = this.environments.get(environment)
     if (!env) return false
@@ -267,26 +283,31 @@ class ProductionManager {
     return Math.random() > 0.1 // 90% success rate
   }
 
-  private async validateDatabaseMigrations(artifact: DeploymentArtifact): Promise<void> {
+  private async validateDatabaseMigrations(
+    artifact: DeploymentArtifact,
+  ): Promise<void> {
     // Validate that database migrations are compatible
     console.log('Database migrations validated')
   }
 
-  private async validateDependencies(artifact: DeploymentArtifact): Promise<void> {
+  private async validateDependencies(
+    artifact: DeploymentArtifact,
+  ): Promise<void> {
     // Validate dependency versions and compatibility
     console.log('Dependencies validated')
   }
 
-  private async deployBlueGreen(environment: string, artifact: DeploymentArtifact): Promise<void> {
-    const env = this.environments.get(environment)!
-
+  private async deployBlueGreen(
+    environment: string,
+    artifact: DeploymentArtifact,
+  ): Promise<void> {
     console.log(`Deploying ${artifact.version} to ${environment} (blue-green)`)
 
     // Switch traffic to new version
     await this.switchTraffic(environment, 'green')
 
     // Wait for health checks
-    await new Promise(resolve => setTimeout(resolve, 5000))
+    await new Promise((resolve) => setTimeout(resolve, 5000))
 
     // Validate deployment
     const health = await this.runHealthChecks(environment)
@@ -295,9 +316,10 @@ class ProductionManager {
     }
   }
 
-  private async deployCanary(environment: string, artifact: DeploymentArtifact): Promise<void> {
-    const env = this.environments.get(environment)!
-
+  private async deployCanary(
+    environment: string,
+    artifact: DeploymentArtifact,
+  ): Promise<void> {
     console.log(`Deploying ${artifact.version} to ${environment} (canary)`)
 
     // Deploy to canary (10% of traffic)
@@ -314,7 +336,10 @@ class ProductionManager {
     }
   }
 
-  private async deployRolling(environment: string, artifact: DeploymentArtifact): Promise<void> {
+  private async deployRolling(
+    environment: string,
+    artifact: DeploymentArtifact,
+  ): Promise<void> {
     console.log(`Deploying ${artifact.version} to ${environment} (rolling)`)
 
     // Deploy to instances one by one
@@ -326,12 +351,15 @@ class ProductionManager {
       await this.deployToInstances(batch, artifact)
 
       // Wait and validate before next batch
-      await new Promise(resolve => setTimeout(resolve, 10000))
+      await new Promise((resolve) => setTimeout(resolve, 10000))
       await this.validateBatchDeployment(batch)
     }
   }
 
-  private async switchTraffic(environment: string, target: 'blue' | 'green'): Promise<void> {
+  private async switchTraffic(
+    environment: string,
+    target: 'blue' | 'green',
+  ): Promise<void> {
     console.log(`Switching traffic to ${target} environment`)
     // In real implementation, would update load balancer configuration
   }
@@ -341,7 +369,9 @@ class ProductionManager {
     // Mock canary deployment
   }
 
-  private async monitorCanaryDeployment(environment: string): Promise<DeploymentHealth> {
+  private async monitorCanaryDeployment(
+    environment: string,
+  ): Promise<DeploymentHealth> {
     // Monitor canary deployment performance
     return {
       status: 'healthy',
@@ -355,19 +385,33 @@ class ProductionManager {
     }
   }
 
-  private async increaseCanaryTraffic(environment: string, percentages: number[]): Promise<void> {
+  private async increaseCanaryTraffic(
+    environment: string,
+    percentages: number[],
+  ): Promise<void> {
     for (const percentage of percentages) {
       console.log(`Increasing canary traffic to ${percentage}%`)
-      await new Promise(resolve => setTimeout(resolve, 5000)) // Wait 5 seconds between increases
+      await new Promise((resolve) => setTimeout(resolve, 5000)) // Wait 5 seconds between increases
     }
   }
 
-  private async getEnvironmentInstances(environment: string): Promise<string[]> {
+  private async getEnvironmentInstances(
+    environment: string,
+  ): Promise<string[]> {
     // Mock instance discovery
-    return ['instance-1', 'instance-2', 'instance-3', 'instance-4', 'instance-5']
+    return [
+      'instance-1',
+      'instance-2',
+      'instance-3',
+      'instance-4',
+      'instance-5',
+    ]
   }
 
-  private async deployToInstances(instances: string[], artifact: DeploymentArtifact): Promise<void> {
+  private async deployToInstances(
+    instances: string[],
+    artifact: DeploymentArtifact,
+  ): Promise<void> {
     console.log(`Deploying to instances: ${instances.join(', ')}`)
     // Mock instance deployment
   }
@@ -377,11 +421,15 @@ class ProductionManager {
     // Mock validation
   }
 
-  private async runHealthChecks(environment: string): Promise<DeploymentHealth> {
+  private async runHealthChecks(
+    environment: string,
+  ): Promise<DeploymentHealth> {
     const checks: Record<string, any> = {}
 
     // API health check
-    checks.api = await this.checkEndpoint(`${this.environments.get(environment)?.apiUrl}/health`)
+    checks.api = await this.checkEndpoint(
+      `${this.environments.get(environment)?.apiUrl}/health`,
+    )
 
     // Database health check
     checks.database = await this.checkDatabaseConnection(environment)
@@ -390,8 +438,12 @@ class ProductionManager {
     checks.realtime = await this.checkRealtimeService(environment)
 
     // Determine overall status
-    const criticalCount = Object.values(checks).filter((check: any) => check.status === 'fail').length
-    const warningCount = Object.values(checks).filter((check: any) => check.status === 'warn').length
+    const criticalCount = Object.values(checks).filter(
+      (check: any) => check.status === 'fail',
+    ).length
+    const warningCount = Object.values(checks).filter(
+      (check: any) => check.status === 'warn',
+    ).length
 
     let status: 'healthy' | 'warning' | 'critical' | 'unknown' = 'healthy'
     if (criticalCount > 0) status = 'critical'
@@ -400,12 +452,19 @@ class ProductionManager {
     return {
       status,
       checks,
-      overallUptime: 99.9 - (criticalCount * 0.1), // Mock uptime calculation
+      overallUptime: 99.9 - criticalCount * 0.1, // Mock uptime calculation
       activeUsers: Math.floor(Math.random() * 1000) + 100,
     }
   }
 
-  private async checkEndpoint(url: string): Promise<{ status: 'pass' | 'fail' | 'warn'; responseTime: number; lastChecked: Date; error?: string }> {
+  private async checkEndpoint(
+    url: string,
+  ): Promise<{
+    status: 'pass' | 'fail' | 'warn'
+    responseTime: number
+    lastChecked: Date
+    error?: string
+  }> {
     const startTime = Date.now()
 
     try {
@@ -415,26 +474,50 @@ class ProductionManager {
       if (response.ok && responseTime < 100) {
         return { status: 'pass', responseTime, lastChecked: new Date() }
       } else if (responseTime < 500) {
-        return { status: 'warn', responseTime, lastChecked: new Date(), error: 'Slow response' }
+        return {
+          status: 'warn',
+          responseTime,
+          lastChecked: new Date(),
+          error: 'Slow response',
+        }
       } else {
-        return { status: 'fail', responseTime, lastChecked: new Date(), error: 'Unacceptable response time' }
+        return {
+          status: 'fail',
+          responseTime,
+          lastChecked: new Date(),
+          error: 'Unacceptable response time',
+        }
       }
     } catch (error) {
       return {
         status: 'fail',
         responseTime: Date.now() - startTime,
         lastChecked: new Date(),
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
 
-  private async checkDatabaseConnection(environment: string): Promise<{ status: 'pass' | 'fail' | 'warn'; responseTime: number; lastChecked: Date; error?: string }> {
+  private async checkDatabaseConnection(
+    environment: string,
+  ): Promise<{
+    status: 'pass' | 'fail' | 'warn'
+    responseTime: number
+    lastChecked: Date
+    error?: string
+  }> {
     // Mock database health check
     return { status: 'pass', responseTime: 12, lastChecked: new Date() }
   }
 
-  private async checkRealtimeService(environment: string): Promise<{ status: 'pass' | 'fail' | 'warn'; responseTime: number; lastChecked: Date; error?: string }> {
+  private async checkRealtimeService(
+    environment: string,
+  ): Promise<{
+    status: 'pass' | 'fail' | 'warn'
+    responseTime: number
+    lastChecked: Date
+    error?: string
+  }> {
     // Mock real-time service health check
     return { status: 'pass', responseTime: 8, lastChecked: new Date() }
   }
@@ -442,7 +525,10 @@ class ProductionManager {
   /**
    * Create rollback plan
    */
-  async createRollbackPlan(environment: string, failedArtifact: DeploymentArtifact): Promise<RollbackPlan> {
+  async createRollbackPlan(
+    environment: string,
+    failedArtifact: DeploymentArtifact,
+  ): Promise<RollbackPlan> {
     const previousDeployment = this.findPreviousDeployment(environment)
 
     if (!previousDeployment) {
@@ -467,10 +553,12 @@ class ProductionManager {
     }
   }
 
-  private findPreviousDeployment(environment: string): DeploymentArtifact | null {
+  private findPreviousDeployment(
+    environment: string,
+  ): DeploymentArtifact | null {
     // Find most recent successful deployment
     const deployments = Array.from(this.deployments.values())
-      .filter(d => d.version !== 'current') // Exclude current deployment
+      .filter((d) => d.version !== 'current') // Exclude current deployment
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
 
     return deployments[0] || null
@@ -479,7 +567,10 @@ class ProductionManager {
   /**
    * Execute rollback
    */
-  async rollback(environment: string, rollbackPlan: RollbackPlan): Promise<{
+  async rollback(
+    environment: string,
+    rollbackPlan: RollbackPlan,
+  ): Promise<{
     success: boolean
     duration: number
     error?: string
@@ -499,21 +590,24 @@ class ProductionManager {
       console.log(`Rollback completed successfully in ${duration}ms`)
 
       return { success: true, duration }
-
     } catch (error) {
       console.error('Rollback failed:', error)
       return {
         success: false,
         duration: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown rollback error'
+        error:
+          error instanceof Error ? error.message : 'Unknown rollback error',
       }
     }
   }
 
-  private async executeRollbackStep(step: string, environment: string): Promise<void> {
+  private async executeRollbackStep(
+    step: string,
+    environment: string,
+  ): Promise<void> {
     // Mock rollback step execution
     const delay = Math.random() * 2000 + 1000 // 1-3 seconds
-    await new Promise(resolve => setTimeout(resolve, delay))
+    await new Promise((resolve) => setTimeout(resolve, delay))
   }
 
   /**
@@ -542,14 +636,23 @@ class ProductionManager {
     }
   }
 
-  private findCurrentDeployment(environment: string): DeploymentArtifact | undefined {
+  private findCurrentDeployment(
+    environment: string,
+  ): DeploymentArtifact | undefined {
     // Find deployment marked as current for this environment
-    return Array.from(this.deployments.values()).find(d => d.version === 'current')
+    return Array.from(this.deployments.values()).find(
+      (d) => d.version === 'current',
+    )
   }
 
-  private getRecentDeployments(environment: string, limit: number): DeploymentArtifact[] {
+  private getRecentDeployments(
+    environment: string,
+    limit: number,
+  ): DeploymentArtifact[] {
     return Array.from(this.deployments.values())
-      .filter(d => d.branch === environment || d.version.includes(environment))
+      .filter(
+        (d) => d.branch === environment || d.version.includes(environment),
+      )
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit)
   }
@@ -561,7 +664,7 @@ class ProductionManager {
     environment: string,
     artifact: DeploymentArtifact,
     scheduledTime: Date,
-    strategy: 'blue-green' | 'canary' | 'rolling' = 'blue-green'
+    strategy: 'blue-green' | 'canary' | 'rolling' = 'blue-green',
   ): Promise<{
     scheduledDeploymentId: string
     estimatedDuration: number
@@ -569,7 +672,9 @@ class ProductionManager {
   }> {
     const scheduledDeploymentId = `scheduled_${Date.now()}`
 
-    console.log(`Deployment scheduled for ${scheduledTime.toISOString()} in ${environment}`)
+    console.log(
+      `Deployment scheduled for ${scheduledTime.toISOString()} in ${environment}`,
+    )
 
     // In real implementation, would add to deployment queue
     setTimeout(async () => {
@@ -601,7 +706,9 @@ class ProductionManager {
     const deployments = Array.from(this.deployments.values())
 
     const totalDeployments = deployments.length
-    const successfulDeployments = deployments.filter(d => d.version !== 'failed').length
+    const successfulDeployments = deployments.filter(
+      (d) => d.version !== 'failed',
+    ).length
     const failedDeployments = totalDeployments - successfulDeployments
     const averageDeploymentTime = deployments.length > 0 ? 180000 : 0 // Mock average
     const rollbackCount = Math.floor(totalDeployments * 0.1) // Mock rollback rate
@@ -626,7 +733,7 @@ class ProductionManager {
    */
   async validateDeploymentReadiness(
     environment: string,
-    artifact: DeploymentArtifact
+    artifact: DeploymentArtifact,
   ): Promise<{
     ready: boolean
     blockers: string[]
@@ -638,13 +745,16 @@ class ProductionManager {
     const recommendations: string[] = []
 
     // Check artifact size
-    if (artifact.size > 100 * 1024 * 1024) { // 100MB
+    if (artifact.size > 100 * 1024 * 1024) {
+      // 100MB
       warnings.push('Large artifact size may increase deployment time')
     }
 
     // Check dependencies
     if (artifact.dependencies.length > 20) {
-      recommendations.push('Consider reducing dependencies for faster deployments')
+      recommendations.push(
+        'Consider reducing dependencies for faster deployments',
+      )
     }
 
     // Check environment capacity
@@ -656,7 +766,9 @@ class ProductionManager {
     // Check for breaking changes
     const hasBreakingChanges = this.detectBreakingChanges(artifact)
     if (hasBreakingChanges) {
-      recommendations.push('Consider using canary deployment for breaking changes')
+      recommendations.push(
+        'Consider using canary deployment for breaking changes',
+      )
     }
 
     return {
@@ -675,7 +787,10 @@ class ProductionManager {
   /**
    * Emergency stop deployment
    */
-  async emergencyStop(environment: string, reason: string): Promise<{
+  async emergencyStop(
+    environment: string,
+    reason: string,
+  ): Promise<{
     stopped: boolean
     affectedUsers: number
     notificationSent: boolean

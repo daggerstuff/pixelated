@@ -105,9 +105,9 @@ export const SECURITY_CONFIG = {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      fontSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "ws:", "wss:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      fontSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'", 'ws:', 'wss:'],
       frameAncestors: ["'none'"],
     },
     hsts: {
@@ -135,14 +135,8 @@ export const RBAC_CONFIG = {
       'read:research_data',
       'write:research_notes',
     ],
-    patient: [
-      'read:own_data',
-      'write:own_notes',
-      'read:own_analytics',
-    ],
-    guest: [
-      'read:public_content',
-    ],
+    patient: ['read:own_data', 'write:own_notes', 'read:own_analytics'],
+    guest: ['read:public_content'],
   },
   roleHierarchy: {
     admin: 100,
@@ -229,20 +223,30 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
   }
 
   // Validate database configuration
-  if (!BETTER_AUTH_CONFIG.database.url && process.env.NODE_ENV === 'production') {
+  if (
+    !BETTER_AUTH_CONFIG.database.url &&
+    process.env.NODE_ENV === 'production'
+  ) {
     errors.push('DATABASE_URL is required in production')
   }
 
   // Validate session secret
-  if (!BETTER_AUTH_CONFIG.security.sessionSecret && process.env.NODE_ENV === 'production') {
+  if (
+    !BETTER_AUTH_CONFIG.security.sessionSecret &&
+    process.env.NODE_ENV === 'production'
+  ) {
     errors.push('SESSION_SECRET is required in production')
   }
 
   // Validate social provider configuration
-  if (BETTER_AUTH_CONFIG.socialProviders.google.enabled && 
-      (!BETTER_AUTH_CONFIG.socialProviders.google.clientId || 
-       !BETTER_AUTH_CONFIG.socialProviders.google.clientSecret)) {
-    errors.push('Google OAuth client ID and secret are required when Google auth is enabled')
+  if (
+    BETTER_AUTH_CONFIG.socialProviders.google.enabled &&
+    (!BETTER_AUTH_CONFIG.socialProviders.google.clientId ||
+      !BETTER_AUTH_CONFIG.socialProviders.google.clientSecret)
+  ) {
+    errors.push(
+      'Google OAuth client ID and secret are required when Google auth is enabled',
+    )
   }
 
   return {

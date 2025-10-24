@@ -1,23 +1,23 @@
-import { useState, type FC } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState, type FC } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardHeader,
   CardContent,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types';
-import type { BackupType, BackupStatus } from '../../../lib/security/backup';
-import { toast } from '@/components/ui/toast';
+} from '@/components/ui/select'
+import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types'
+import type { BackupType, BackupStatus } from '../../../lib/security/backup'
+import { toast } from '@/components/ui/toast'
 
 // Define the enum locally to avoid server-side imports
 enum TestEnvironmentType {
@@ -96,30 +96,30 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
   backups,
   recoveryHistory: initialRecoveryHistory,
 }) => {
-  const [selectedBackupId, setSelectedBackupId] = useState<string>('');
-  const [isTesting, setIsTesting] = useState(false);
+  const [selectedBackupId, setSelectedBackupId] = useState<string>('')
+  const [isTesting, setIsTesting] = useState(false)
   const [latestTestResult, setLatestTestResult] = useState<RecoveryTest | null>(
     null,
-  );
+  )
   const [recoveryHistory, setRecoveryHistory] = useState<RecoveryTest[]>(
     initialRecoveryHistory,
-  );
-  const [selectedTest, setSelectedTest] = useState<string | null>(null);
+  )
+  const [selectedTest, setSelectedTest] = useState<string | null>(null)
 
   const [testEnvironment, setTestEnvironment] = useState<TestEnvironmentType>(
     TestEnvironmentType.Sandbox,
-  );
+  )
 
-  const selectedBackup = backups.find((b) => b.id === selectedBackupId);
+  const selectedBackup = backups.find((b) => b.id === selectedBackupId)
 
   const handleRunTest = async () => {
     if (!selectedBackup) {
-      toast.error('Please select a backup to test.');
-      return;
+      toast.error('Please select a backup to test.')
+      return
     }
 
-    setIsTesting(true);
-    setLatestTestResult(null);
+    setIsTesting(true)
+    setLatestTestResult(null)
 
     try {
       const response = await fetch('/api/admin/backup/recovery-test', {
@@ -131,45 +131,45 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
           backupId: selectedBackup.id,
           environment: testEnvironment,
         }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to run recovery test.');
+        throw new Error(data.error || 'Failed to run recovery test.')
       }
 
-      setLatestTestResult(data);
-      setRecoveryHistory([data, ...recoveryHistory]);
-      toast.success('Recovery test completed successfully!');
+      setLatestTestResult(data)
+      setRecoveryHistory([data, ...recoveryHistory])
+      toast.success('Recovery test completed successfully!')
     } catch (error: unknown) {
-      console.error('Recovery test failed:', error);
+      console.error('Recovery test failed:', error)
 
       // Type guard to safely access String(error)
       const errorMessage =
         error instanceof Error
           ? String(error)
           : typeof error === 'object' && error !== null && 'message' in error
-          ? String((error as { message: unknown }).message)
-          : 'An unexpected error occurred.';
+            ? String((error as { message: unknown }).message)
+            : 'An unexpected error occurred.'
 
-      toast.error(errorMessage);
+      toast.error(errorMessage)
     } finally {
-      setIsTesting(false);
+      setIsTesting(false)
     }
-  };
+  }
 
   const handleSelectTest = (testId: string) => {
     if (selectedTest === testId) {
-      setSelectedTest(null);
+      setSelectedTest(null)
     } else {
-      setSelectedTest(testId);
+      setSelectedTest(testId)
     }
-  };
+  }
 
   const availableBackups = backups.filter(
     (b) => b.status === 'completed' || b.status === 'verified',
-  );
+  )
 
   return (
     <div className="space-y-6">
@@ -301,7 +301,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             ) : (
               <div className="divide-y">
                 {recoveryHistory.map((test) => {
-                  const backup = backups.find((b) => b.id === test.backupId);
+                  const backup = backups.find((b) => b.id === test.backupId)
 
                   return (
                     <div key={test.id}>
@@ -443,7 +443,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                         </div>
                       )}
                     </div>
-                  );
+                  )
                 })}
               </div>
             )}
@@ -451,7 +451,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
         </CardContent>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default BackupRecoveryTab;
+export default BackupRecoveryTab

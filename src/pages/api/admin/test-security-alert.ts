@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+import type { APIRoute } from 'astro'
 import { getCurrentUser } from '../../../lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // import type { AuthAPIContext } from '@lib/auth/apiRouteTypes.ts'
@@ -113,4 +113,4 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       },
     )
   }
-};
+}

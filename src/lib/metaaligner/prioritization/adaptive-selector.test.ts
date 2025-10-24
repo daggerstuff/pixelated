@@ -13,20 +13,18 @@ import {
 } from '../core/objectives' // Import UserProfile
 import type { AIService } from '../../ai/models/types'
 import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
- // Import WeightingStrategy
+// Import WeightingStrategy
 
 // Mock dependencies
 const mockAIService: AIService = {
-  getModelInfo: vi
-    .fn()
-    .mockReturnValue({
-      id: 'test-model',
-      name: 'Test Model',
-      provider: 'test',
-      capabilities: [],
-      contextWindow: 4096,
-      maxTokens: 2048,
-    }),
+  getModelInfo: vi.fn().mockReturnValue({
+    id: 'test-model',
+    name: 'Test Model',
+    provider: 'test',
+    capabilities: [],
+    contextWindow: 4096,
+    maxTokens: 2048,
+  }),
   createChatCompletion: vi.fn(),
   createStreamingChatCompletion: vi.fn(),
   dispose: vi.fn(),

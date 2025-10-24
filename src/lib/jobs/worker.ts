@@ -16,29 +16,29 @@ const logger = createBuildSafeLogger('JobsWorker')
 // TherapeuticSession type is now imported from bias-detection/types
 
 interface User {
-  id: string;
-  name: string;
-  role: string;
-  metadata: Record<string, unknown>;
+  id: string
+  name: string
+  role: string
+  metadata: Record<string, unknown>
 }
 
 interface RequestInfo {
-  id: string;
-  timestamp: string;
-  source: string;
-  metadata: Record<string, unknown>;
+  id: string
+  timestamp: string
+  source: string
+  metadata: Record<string, unknown>
 }
 
 interface TimeRange {
-  start: string;
-  end: string;
+  start: string
+  end: string
 }
 
 interface ReportOptions {
-  format: string;
-  includeDetails: boolean;
-  groupBy?: string;
-  filters?: Record<string, unknown>;
+  format: string
+  includeDetails: boolean
+  groupBy?: string
+  filters?: Record<string, unknown>
 }
 
 // Initialize BiasDetectionEngine (singleton)
@@ -53,7 +53,7 @@ async function initializeEngine() {
 
 const WORKER_INTERVAL_MS = 5000 // Check for new jobs every 5 seconds
 const MAX_CONCURRENT_JOBS = 2 // Limit concurrent long-running jobs
-let processingJobs = false;
+let processingJobs = false
 
 let activeJobs = 0
 let workerInterval: NodeJS.Timeout | undefined
@@ -64,7 +64,7 @@ const jobsWorker = {
     await initializeEngine()
 
     workerInterval = setInterval(() => {
-      this.processJobs().catch(err => logger.error('processJobs error', err))
+      this.processJobs().catch((err) => logger.error('processJobs error', err))
     }, WORKER_INTERVAL_MS)
 
     logger.info('Background Jobs Worker started successfully.')
@@ -85,7 +85,7 @@ const jobsWorker = {
       logger.debug('processJobs is already running.')
       return
     }
-    processingJobs = true;
+    processingJobs = true
     try {
       if (activeJobs >= MAX_CONCURRENT_JOBS) {
         logger.debug('Max concurrent jobs reached, waiting...')
@@ -112,7 +112,7 @@ const jobsWorker = {
         logger.debug('No jobs in queue.')
       }
     } finally {
-      processingJobs = false;
+      processingJobs = false
     }
   },
 
@@ -134,7 +134,7 @@ const jobsWorker = {
       switch (job.type) {
         case 'bias-analysis-batch':
           // Payload contains sessions, user, and request information
-          ; ({ sessions, user, request } = job.payload as {
+          ;({ sessions, user, request } = job.payload as {
             sessions: TherapeuticSession[]
             user: User
             request: RequestInfo
@@ -143,8 +143,14 @@ const jobsWorker = {
             sessions,
             user,
             {
-              ipAddress: typeof request?.metadata?.['ipAddress'] === 'string' ? request.metadata['ipAddress'] : '',
-              userAgent: typeof request?.metadata?.['userAgent'] === 'string' ? request.metadata['userAgent'] : '',
+              ipAddress:
+                typeof request?.metadata?.['ipAddress'] === 'string'
+                  ? request.metadata['ipAddress']
+                  : '',
+              userAgent:
+                typeof request?.metadata?.['userAgent'] === 'string'
+                  ? request.metadata['userAgent']
+                  : '',
             },
           )
           await jobQueue.updateJobStatus(job.id, JobStatus.COMPLETED, {
@@ -152,34 +158,33 @@ const jobsWorker = {
             completedAt: new Date().toISOString(),
           })
           break
-        case 'report-generation':
-          // Payload contains sessions, timeRange, and options
-          { ; ({
-            sessions,
-            timeRange,
-            options,
-          } = job.payload as {
+        case 'report-generation': // Payload contains sessions, timeRange, and options
+        {
+          ;({ sessions, timeRange, options } = job.payload as {
             sessions: TherapeuticSession[]
             timeRange: TimeRange
             options: ReportOptions
           })
           // restrict options.format to allowed values
-          const allowedFormats: ReadonlyArray<unknown> = ["json", "csv", "pdf"];
-          const safeFormat = allowedFormats.includes(options?.format as unknown) ? options.format as "json" | "csv" | "pdf" : undefined;
-          const safeOptions = { ...options, format: safeFormat };
+          const allowedFormats: ReadonlyArray<unknown> = ['json', 'csv', 'pdf']
+          const safeFormat = allowedFormats.includes(options?.format as unknown)
+            ? (options.format as 'json' | 'csv' | 'pdf')
+            : undefined
+          const safeOptions = { ...options, format: safeFormat }
           report = await biasDetectionEngine.generateBiasReport(
             sessions,
             {
               start: new Date(timeRange.start),
-              end: new Date(timeRange.end)
+              end: new Date(timeRange.end),
             },
-            safeOptions
+            safeOptions,
           )
           await jobQueue.updateJobStatus(job.id, JobStatus.COMPLETED, {
             result: report,
             completedAt: new Date().toISOString(),
           })
-          break }
+          break
+        }
         // TODO: Add other job types as needed (e.g., data-cleanup, metric-aggregation)
         default:
           throw new Error(`Unknown job type: ${job.type}`)

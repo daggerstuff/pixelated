@@ -412,7 +412,6 @@ export class SealPatternRecognitionService implements FHEService {
     try {
       const correlations: RiskCorrelation[] = []
       for (const _encryptedData of encryptedCorrelations) {
-
         // Generate synthetic correlations
         const factorTypes = ['depression', 'anxiety', 'suicidal']
         for (let i = 0; i < 2; i++) {
@@ -523,10 +522,19 @@ export class SealPatternRecognitionService implements FHEService {
     features.push(0, 0, 0) // default valence, arousal, dominance
 
     // Extract session duration if available
-    const duration = session.startTime && session.endTime 
-      ? ((session.endTime instanceof Date ? session.endTime : new Date(session.endTime)).getTime() - 
-         (session.startTime instanceof Date ? session.startTime : new Date(session.startTime)).getTime()) / 60000 / 60
-      : 0
+    const duration =
+      session.startTime && session.endTime
+        ? ((session.endTime instanceof Date
+            ? session.endTime
+            : new Date(session.endTime)
+          ).getTime() -
+            (session.startTime instanceof Date
+              ? session.startTime
+              : new Date(session.startTime)
+            ).getTime()) /
+          60000 /
+          60
+        : 0
     features.push(duration)
 
     // Add additional features with default values
@@ -648,7 +656,8 @@ export class SealPatternRecognitionService implements FHEService {
     const patternCount = 1 + Math.floor(Math.random() * 3)
 
     for (let i = 0; i < patternCount; i++) {
-      const type = patternTypes[Math.floor(Math.random() * patternTypes.length)]!
+      const type =
+        patternTypes[Math.floor(Math.random() * patternTypes.length)]!
       const confidence = threshold + Math.random() * (1 - threshold)
 
       results.push({
@@ -706,7 +715,7 @@ export class SealPatternRecognitionService implements FHEService {
         row.push(
           i === j
             ? 1 // Self-correlation is always 1
-            : 0.4 + Math.random() * 0.5 // Random correlation between 0.4 and 0.9
+            : 0.4 + Math.random() * 0.5, // Random correlation between 0.4 and 0.9
         )
       }
       matrix.push(row)

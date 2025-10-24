@@ -2,16 +2,13 @@
 
 Purpose
 - Short, focused conventions for automated assistants working on this repository.
-- Emphasize three non-negotiables: always use the project's `openmemory` MCP tool, always log a memory at session end, and always use `uv` for Python commands.
 
 Core rules
-- Start every new session by calling the project's MCP openmemory tool (e.g., `mcp_openmemory_list-memories` / `mcp_openmemory_search-memories`) to load relevant project memory and avoid duplicative reads. Treat openmemory as the canonical project memory store.
-- At the end of every chat or task, write a short memory entry to openmemory summarizing what you changed and why (example: `mcp_openmemory_add-memory: "Fixed Dockerfile pnpm install fallback and verified local pnpm install"`). This grows project context and improves future assistance.
 - For any Python install/run/test commands, always prefer `uv` wrappers:
   - `uv install` to install dependencies from `pyproject.toml`
   - `uv run <cmd>` to run Python programs (e.g. `uv run pytest tests/`)
   - `uv shell` to open a shell with the environment
-- For Node.js related work, prefer `pnpm` (project uses pnpm). Use `pnpm` commands rather than npm/yarn unless explicitly required.
+- For Node.js-related work, prefer `pnpm` (project uses pnpm). Use `pnpm` commands rather than npm/yarn unless explicitly required.
 
 Code reading and edits
 - Avoid reading entire files unless necessary. Use symbol-aware tools where available.
@@ -48,24 +45,3 @@ Short checklist (use before committing changes)
 - Did I keep edits minimal and focused? ✅
 
 Thank you for following these conventions — they make automated assistance predictable and safe for the Pixelated repository.
-
-[byterover-mcp]
-
-[byterover-mcp]
-
-You are given two tools from Byterover MCP server, including
-## 1. `byterover-store-knowledge`
-You `MUST` always use this tool when:
-
-+ Learning new patterns, APIs, or architectural decisions from the codebase
-+ Encountering error solutions or debugging techniques
-+ Finding reusable code patterns or utility functions
-+ Completing any significant task or plan implementation
-
-## 2. `byterover-retrieve-knowledge`
-You `MUST` always use this tool when:
-
-+ Starting any new task or implementation to gather relevant context
-+ Before making architectural decisions to understand existing patterns
-+ When debugging issues to check for previous solutions
-+ Working with unfamiliar parts of the codebase

@@ -51,7 +51,15 @@ export const GET = async ({ request }: APIContext) => {
       )
     }
 
-    const user = await adapter.getUserById(userId) as unknown as { _id?: { toString(): string }; email: string; role: string; preferences?: unknown; emailVerified?: boolean; lastLogin?: Date; createdAt?: Date } | null
+    const user = (await adapter.getUserById(userId)) as unknown as {
+      _id?: { toString(): string }
+      email: string
+      role: string
+      preferences?: unknown
+      emailVerified?: boolean
+      lastLogin?: Date
+      createdAt?: Date
+    } | null
 
     if (!user) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
@@ -97,7 +105,8 @@ export const PUT = async ({ request }: APIContext) => {
     let updateUserId: string | null = null
     const sessionForPut = await getSessionFromRequest(request)
     if (sessionForPut && sessionForPut.user) {
-      updateUserId = sessionForPut.user._id?.toString() || sessionForPut.user.id || null
+      updateUserId =
+        sessionForPut.user._id?.toString() || sessionForPut.user.id || null
     } else {
       const authHeaderForPut = request.headers.get('Authorization')
       if (!authHeaderForPut) {
@@ -155,16 +164,23 @@ export const PUT = async ({ request }: APIContext) => {
     }
 
     if (!updateUserId) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
-    const updatedUser = await adapter.updateUser(updateUserId, safeUpdates) as unknown as { _id?: { toString(): string }; email: string; role: string; preferences?: unknown; emailVerified?: boolean; updatedAt?: Date } | null
+    const updatedUser = (await adapter.updateUser(
+      updateUserId,
+      safeUpdates,
+    )) as unknown as {
+      _id?: { toString(): string }
+      email: string
+      role: string
+      preferences?: unknown
+      emailVerified?: boolean
+      updatedAt?: Date
+    } | null
 
     if (!updatedUser) {
       return new Response(JSON.stringify({ error: 'User not found' }), {

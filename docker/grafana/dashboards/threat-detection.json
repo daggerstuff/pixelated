@@ -544,11 +544,7 @@
   "refresh": "30s",
   "schemaVersion": 27,
   "style": "dark",
-  "tags": [
-    "threat",
-    "detection",
-    "security"
-  ],
+  "tags": ["threat", "detection", "security"],
   "templating": {
     "list": []
   },

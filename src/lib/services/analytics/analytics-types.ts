@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-
 // Event type definitions
 export enum EventType {
   PAGE_VIEW = 'page_view',
@@ -54,7 +53,14 @@ export type Metric = z.infer<typeof MetricSchema>
 export interface RedisClient {
   [x: string]: unknown
   lRange(arg0: string, arg1: number, arg2: number): unknown
-  zrangebyscore(arg0: string, start: string | number, end: string | number, arg3: string, offset: number, limit: number): string[] | PromiseLike<string[]>
+  zrangebyscore(
+    arg0: string,
+    start: string | number,
+    end: string | number,
+    arg3: string,
+    offset: number,
+    limit: number,
+  ): string[] | PromiseLike<string[]>
   lpush(key: string, value: string): Promise<void>
   lrange(key: string, start: number, stop: number): Promise<string[]>
   lrem(key: string, count: number, value: string): Promise<void>
@@ -136,7 +142,7 @@ export class AnalyticsError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly details?: unknown
+    public readonly details?: unknown,
   ) {
     super(message)
     this.name = 'AnalyticsError'

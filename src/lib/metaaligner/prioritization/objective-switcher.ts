@@ -2,7 +2,10 @@
 // Updates system objectives upon context transition using mapping and weighting functions.
 
 import { ContextEvent, ContextTransition } from './context-transition-detector'
-import { getContextObjectives, ObjectivePriority } from './context-objective-mapping'
+import {
+  getContextObjectives,
+  ObjectivePriority,
+} from './context-objective-mapping'
 import { defaultWeightingStrategy } from './objective-weighting-strategy'
 
 // Tracks the current stack/objectives for use by downstream modules
@@ -23,14 +26,17 @@ export class ObjectiveSwitcher {
    */
   public onContextTransition(
     transition: ContextTransition,
-    weightingParams?: Record<string, any>
+    weightingParams?: Record<string, any>,
   ) {
     if (!transition.detected) {
       return
     }
 
     const objectivesList = getContextObjectives(transition.to.contextType)
-    this.currentObjectives = defaultWeightingStrategy(objectivesList, weightingParams || {})
+    this.currentObjectives = defaultWeightingStrategy(
+      objectivesList,
+      weightingParams || {},
+    )
     this.lastContext = transition.to
   }
 

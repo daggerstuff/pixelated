@@ -24,9 +24,12 @@ function getEnvVar(key: string): string | undefined {
   // This is a fallback for build-time environment variables
   if (
     typeof globalThis !== 'undefined' &&
-    (globalThis as unknown as { process?: { env?: Record<string, string> } }).process?.env
+    (globalThis as unknown as { process?: { env?: Record<string, string> } })
+      .process?.env
   ) {
-    return (globalThis as unknown as { process?: { env?: Record<string, string> } }).process?.env?.[key]
+    return (
+      globalThis as unknown as { process?: { env?: Record<string, string> } }
+    ).process?.env?.[key]
   }
   return undefined
 }

@@ -1,12 +1,16 @@
 /**
  * Secure Random Number Generation Utilities
- * 
+ *
  * This module provides cryptographically secure alternatives to Math.random()
  * for all security-sensitive operations including ID generation, token creation,
  * random selection, and cryptographic operations.
  */
 
-import { getRandomBytes, secureRandomInt, randomInt as secureRandomIntRange } from '../utils.js'
+import {
+  getRandomBytes,
+  secureRandomInt,
+  randomInt as secureRandomIntRange,
+} from '../utils.js'
 
 /**
  * Generates a cryptographically secure random string for IDs
@@ -16,7 +20,7 @@ import { getRandomBytes, secureRandomInt, randomInt as secureRandomIntRange } fr
  */
 export function secureRandomString(
   length = 8,
-  charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
 ): string {
   if (length <= 0) {
     throw new Error('Length must be positive')
@@ -24,7 +28,7 @@ export function secureRandomString(
 
   const bytes = getRandomBytes(length)
   let result = ''
-  
+
   for (let i = 0; i < length; i++) {
     const byte = bytes[i]
     if (byte === undefined) {
@@ -32,7 +36,7 @@ export function secureRandomString(
     }
     result += charset.charAt(byte % charset.length)
   }
-  
+
   return result
 }
 
@@ -45,13 +49,15 @@ export function secureUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID()
   }
-  
+
   // Fallback to secure random bytes
   const bytes = getRandomBytes(16)
   bytes[6] = (bytes[6]! & 0x0f) | 0x40 // Version 4
   bytes[8] = (bytes[8]! & 0x3f) | 0x80 // Variant 10
-  
-  const hex = Array.from(bytes, (byte: number) => byte.toString(16).padStart(2, '0')).join('')
+
+  const hex = Array.from(bytes, (byte: number) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('')
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
 
@@ -130,7 +136,7 @@ export function secureTimestampId(prefix = 'id'): string {
 export function secureRandomFloat(): number {
   const bytes = getRandomBytes(4)
   const uint32 = new DataView(bytes.buffer).getUint32(0, false)
-  return uint32 / 0xFFFFFFFF
+  return uint32 / 0xffffffff
 }
 
 /**
@@ -143,7 +149,7 @@ export function secureRandomSubset<T>(array: readonly T[], count: number): T[] {
   if (count >= array.length) {
     return [...array]
   }
-  
+
   if (count <= 0) {
     return []
   }
@@ -159,5 +165,7 @@ export function secureRandomSubset<T>(array: readonly T[], count: number): T[] {
  */
 export function secureRandomHex(length = 16): string {
   const bytes = getRandomBytes(length)
-  return Array.from(bytes, (byte: number) => byte.toString(16).padStart(2, '0')).join('')
+  return Array.from(bytes, (byte: number) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('')
 }

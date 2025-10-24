@@ -1,5 +1,5 @@
-import type { BaseAPIContext } from '../../lib/auth/apiRouteTypes';
-import { requirePageAuth } from '../../lib/auth';
+import type { BaseAPIContext } from '../../lib/auth/apiRouteTypes'
+import { requirePageAuth } from '../../lib/auth'
 
 /**
  * Handles GET requests for the admin audit logs endpoint.
@@ -12,16 +12,16 @@ import { requirePageAuth } from '../../lib/auth';
  *   A Response object indicating whether the user is authorized.
  */
 export async function GET(context: BaseAPIContext): Promise<Response> {
-  const authResult = await requirePageAuth(context, 'admin');
+  const authResult = await requirePageAuth(context, 'admin')
   if (authResult) {
-    return authResult;
+    return authResult
   }
-  
+
   // Auth passed, return success response
   return new Response(JSON.stringify({ success: true, authorized: true }), {
     status: 200,
     headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+      'Content-Type': 'application/json',
+    },
+  })
 }

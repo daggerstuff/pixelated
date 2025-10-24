@@ -1,10 +1,10 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import Card from '@/components/ui/Card.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardDescription from '@/components/ui/CardDescription.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
+import Card from '@/components/ui/Card.astro'
+import CardContent from '@/components/ui/CardContent.astro'
+import CardDescription from '@/components/ui/CardDescription.astro'
+import CardHeader from '@/components/ui/CardHeader.astro'
+import CardTitle from '@/components/ui/CardTitle.astro'
 import Badge from '@/components/ui/Badge.astro'
 import Button from '@/components/ui/Button.astro'
 
@@ -200,9 +200,7 @@ const universityResults = [
                   <div class="text-2xl font-bold text-red-400 mb-1">
                     {spec.value}
                   </div>
-                  <div class="text-xs text-red-200/70">
-                    {spec.comparison}
-                  </div>
+                  <div class="text-xs text-red-200/70">{spec.comparison}</div>
                 </CardContent>
               </Card>
             ))
@@ -672,7 +670,7 @@ const universityResults = [
         action: string,
         params: {
           [key: string]: any
-        }
+        },
       ) => void
     }
   }
@@ -680,7 +678,9 @@ const universityResults = [
   // Analytics tracking for demo interactions
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // Track page view
-    const variantElement = document.querySelector('[data-variant]') as HTMLElement | null
+    const variantElement = document.querySelector(
+      '[data-variant]',
+    ) as HTMLElement | null
     const variant = variantElement?.dataset?.variant || 'unknown'
 
     if (typeof window.gtag !== 'undefined') {
@@ -696,7 +696,7 @@ const universityResults = [
       button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
-        
+
         const action = target.dataset?.demoAction
 
         if (!action) return
@@ -730,7 +730,7 @@ const universityResults = [
       button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
-        
+
         const ctaType = target.dataset?.demoCta
         const ctaVariant = target.dataset?.variant
 

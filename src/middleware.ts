@@ -4,9 +4,7 @@ import { sequence } from 'astro/middleware'
 import { getSession } from './lib/auth/session'
 
 // Simple route matcher for protected API routes
-const protectedRoutePatterns: RegExp[] = [
-  /\/api\/protected(.*)/,
-]
+const protectedRoutePatterns: RegExp[] = [/\/api\/protected(.*)/]
 
 function isProtectedRoute(request: Request) {
   try {
@@ -24,7 +22,7 @@ function isProtectedRoute(request: Request) {
  */
 const projectAuthMiddleware = async (context: any, next: any) => {
   const { request } = context
-  const locals = context.locals || {}
+
   // Allow non-protected routes through quickly
   if (!isProtectedRoute(request)) {
     return next()
@@ -42,7 +40,7 @@ const projectAuthMiddleware = async (context: any, next: any) => {
         headers: { Location: signInUrl.toString() },
       })
     }
-    
+
     // Store session data in locals for use in routes
     if (context.locals) {
       context.locals.user = session.user
@@ -62,4 +60,8 @@ const projectAuthMiddleware = async (context: any, next: any) => {
 }
 
 // Single, clean middleware sequence
-export const onRequest = sequence(generateCspNonce, securityHeaders, projectAuthMiddleware)
+export const onRequest = sequence(
+  generateCspNonce,
+  securityHeaders,
+  projectAuthMiddleware,
+)

@@ -12,10 +12,10 @@ const logger = createBuildSafeLogger('support-context-identifier')
  * Interface for user emotional profile
  */
 export interface UserEmotionalProfile {
-  baselineEmotionalState?: EmotionalState;
-  typicalCopingStrategies?: string[];
-  emotionalTriggers?: string[];
-  supportPreferences?: string[];
+  baselineEmotionalState?: EmotionalState
+  typicalCopingStrategies?: string[]
+  emotionalTriggers?: string[]
+  supportPreferences?: string[]
 }
 
 export interface SupportContextResult {
@@ -109,8 +109,8 @@ const nonSupportPatterns = [
   /\b(?:temperature|degrees|fahrenheit|celsius|weather|72|outside)\b/i,
   /\b(?:capital of|largest city|president|who is|when was|explain|how does|can you explain|what is|define|history of|population|data shows|statistics|recipe|directions)\b/i,
   /\b(?:how was your day|weekend plans|watch the game|did you see|favorite color|what did you eat|where are you from|tell me a joke|good morning|good night|thank you|just checking in|hi |hello |bye |see you)\b/i,
-  /\b(?:capital of france|how depression medication works|casual conversation)\b/i
-];
+  /\b(?:capital of france|how depression medication works|casual conversation)\b/i,
+]
 
 /**
  * System prompt for support context identification
@@ -434,10 +434,10 @@ export class SupportContextIdentifier {
     responseStyle: {
       tone: 'warm' | 'professional' | 'gentle' | 'direct'
       approach:
-      | 'validating'
-      | 'solution-focused'
-      | 'exploratory'
-      | 'stabilizing'
+        | 'validating'
+        | 'solution-focused'
+        | 'exploratory'
+        | 'stabilizing'
       language: 'simple' | 'detailed' | 'metaphorical' | 'clinical'
     }
   } {
@@ -923,8 +923,8 @@ Consider this context in your assessment.`
         urgency: this.validateUrgency(parsed.urgency || ''),
         supportNeeds: Array.isArray(parsed.supportNeeds)
           ? parsed.supportNeeds
-            .map((n: unknown) => this.validateSupportNeed(n as string))
-            .filter((need): need is SupportNeed => need !== null)
+              .map((n: unknown) => this.validateSupportNeed(n as string))
+              .filter((need): need is SupportNeed => need !== null)
           : [],
         recommendedApproach: this.validateRecommendedApproach(
           parsed.recommendedApproach || '',

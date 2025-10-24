@@ -90,7 +90,11 @@ const TreatmentForecastForm: FC = () => {
       }
       setResults(data.data.forecasts)
     } catch (err: unknown) {
-      setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Unknown error')
+      setError(
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'Unknown error',
+      )
     } finally {
       setLoading(false)
     }

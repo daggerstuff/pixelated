@@ -96,7 +96,13 @@
     "access_key": "${AWS_ACCESS_KEY_STAGING}",
     "secret_key": "${AWS_SECRET_KEY_STAGING}",
     "max_file_size": "50MB",
-    "allowed_types": ["image/jpeg", "image/png", "image/gif", "application/pdf", "text/plain"]
+    "allowed_types": [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "application/pdf",
+      "text/plain"
+    ]
   },
   "email": {
     "provider": "ses",

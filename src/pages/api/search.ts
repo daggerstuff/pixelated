@@ -1,4 +1,3 @@
-
 // Redirect to the versioned API endpoint
 export const GET = async ({ url }) => {
   const newUrl = new URL(url)

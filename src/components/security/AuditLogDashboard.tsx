@@ -57,8 +57,8 @@ const Table: FC<React.PropsWithChildren> = ({ children }) => {
     >
       {children}
     </UITable>
-  );
-};
+  )
+}
 
 interface AuditLogFilters {
   eventType: string
@@ -101,20 +101,20 @@ export function AuditLogDashboard() {
 
   const fetchLogs = React.useCallback(async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       // Build query parameters
-      const params = new URLSearchParams();
+      const params = new URLSearchParams()
       if (filters.eventType) {
-        params.append('eventType', filters.eventType);
+        params.append('eventType', filters.eventType)
       }
       if (filters.userId) {
-        params.append('userId', filters.userId);
+        params.append('userId', filters.userId)
       }
       // Optionally handle pagination/limits here if desired
 
-      const res = await fetch('/api/admin/audit-logs?' + params.toString());
-      const data = await res.json();
-      let fetchedLogs: AuditLogEntry[] = data.logs || [];
+      const res = await fetch('/api/admin/audit-logs?' + params.toString())
+      const data = await res.json()
+      let fetchedLogs: AuditLogEntry[] = data.logs || []
 
       // Apply date range filter if set
       if (filters.startDate || filters.endDate) {

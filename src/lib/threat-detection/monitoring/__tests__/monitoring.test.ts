@@ -1,22 +1,22 @@
 /**
  * Unit Tests for Enhanced Monitoring & Alerting System
- * 
+ *
  * These tests verify the monitoring functionality including
  * AI-powered insights, alerting, and performance tracking.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { EnhancedMonitoringService } from '../enhanced-monitoring-service'
-import { 
+import {
   calculateAlertSeverity,
   shouldEscalateAlert,
   getAlertStatistics,
-  generateAlertReport
+  generateAlertReport,
 } from '../alert-utils'
-import { 
+import {
   calculateMetricsSummary,
   detectMetricAnomalies,
-  getPerformanceMetrics
+  getPerformanceMetrics,
 } from '../metrics-utils'
 
 // Mock dependencies
@@ -47,24 +47,28 @@ describe('Enhanced Monitoring Service', () => {
       hincrby: vi.fn(),
       lpush: vi.fn(),
       lrange: vi.fn(),
-      rpop: vi.fn()
+      rpop: vi.fn(),
     }
 
     // Setup mock orchestrator
     mockOrchestrator = {
       analyzeThreat: vi.fn(),
       executeResponse: vi.fn(),
-      getStatistics: vi.fn()
+      getStatistics: vi.fn(),
     }
 
     // Setup mock AI service
     mockAIService = {
       analyzePattern: vi.fn(),
       predictAnomaly: vi.fn(),
-      generateInsights: vi.fn()
+      generateInsights: vi.fn(),
     }
 
-    service = new EnhancedMonitoringService(mockRedis, mockOrchestrator, mockAIService)
+    service = new EnhancedMonitoringService(
+      mockRedis,
+      mockOrchestrator,
+      mockAIService,
+    )
   })
 
   afterEach(() => {
@@ -83,25 +87,29 @@ describe('Enhanced Monitoring Service', () => {
     })
 
     it('should use default configuration when none provided', () => {
-      const defaultService = new EnhancedMonitoringService(mockRedis, mockOrchestrator, mockAIService)
+      const defaultService = new EnhancedMonitoringService(
+        mockRedis,
+        mockOrchestrator,
+        mockAIService,
+      )
       expect(defaultService.config).toEqual({
         enabled: true,
         alertThresholds: {
           critical: 0.9,
           high: 0.7,
           medium: 0.5,
-          low: 0.3
+          low: 0.3,
         },
         escalationRules: {
           critical: { minutes: 5, levels: ['admin', 'security'] },
           high: { minutes: 15, levels: ['security'] },
           medium: { minutes: 30, levels: ['operations'] },
-          low: { minutes: 60, levels: ['monitoring'] }
+          low: { minutes: 60, levels: ['monitoring'] },
         },
         enableAIInsights: true,
         maxAlertHistory: 1000,
         metricsRetention: 86400000, // 24 hours
-        enableRealTimeAlerting: true
+        enableRealTimeAlerting: true,
       })
     })
 
@@ -112,19 +120,24 @@ describe('Enhanced Monitoring Service', () => {
           critical: 0.95,
           high: 0.8,
           medium: 0.6,
-          low: 0.4
+          low: 0.4,
         },
         escalationRules: {
           critical: { minutes: 2, levels: ['admin', 'security', 'executive'] },
-          high: { minutes: 10, levels: ['security', 'operations'] }
+          high: { minutes: 10, levels: ['security', 'operations'] },
         },
         enableAIInsights: false,
         maxAlertHistory: 500,
         metricsRetention: 43200000,
-        enableRealTimeAlerting: false
+        enableRealTimeAlerting: false,
       }
 
-      const customService = new EnhancedMonitoringService(mockRedis, mockOrchestrator, mockAIService, customConfig)
+      const customService = new EnhancedMonitoringService(
+        mockRedis,
+        mockOrchestrator,
+        mockAIService,
+        customConfig,
+      )
       expect(customService.config).toEqual(customConfig)
     })
   })
@@ -139,8 +152,8 @@ describe('Enhanced Monitoring Service', () => {
         metadata: {
           userId: 'user_123',
           anomalyType: 'unusual_login',
-          confidence: 0.85
-        }
+          confidence: 0.85,
+        },
       }
 
       mockRedis.incr.mockResolvedValue(1)
@@ -158,7 +171,7 @@ describe('Enhanced Monitoring Service', () => {
       expect(mockRedis.set).toHaveBeenCalledWith(
         `alert:alert_1`,
         expect.any(String),
-        expect.any(Number)
+        expect.any(Number),
       )
     })
 
@@ -166,7 +179,7 @@ describe('Enhanced Monitoring Service', () => {
       const alertId = 'alert_1'
       const updateData = {
         status: 'investigating',
-        notes: 'Under investigation by security team'
+        notes: 'Under investigation by security team',
       }
 
       const existingAlert = {
@@ -174,7 +187,7 @@ describe('Enhanced Monitoring Service', () => {
         title: 'Test Alert',
         severity: 'high',
         status: 'active',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
 
       mockRedis.get.mockResolvedValue(JSON.stringify(existingAlert))
@@ -196,7 +209,7 @@ describe('Enhanced Monitoring Service', () => {
         severity: 'critical',
         status: 'active',
         createdAt: new Date().toISOString(),
-        escalationCount: 0
+        escalationCount: 0,
       }
 
       mockRedis.get.mockResolvedValue(JSON.stringify(alert))
@@ -215,7 +228,7 @@ describe('Enhanced Monitoring Service', () => {
       const resolutionData = {
         resolvedBy: 'security_team',
         resolutionNotes: 'False positive, user verified',
-        resolvedAt: new Date().toISOString()
+        resolvedAt: new Date().toISOString(),
       }
 
       const existingAlert = {
@@ -223,7 +236,7 @@ describe('Enhanced Monitoring Service', () => {
         title: 'Test Alert',
         severity: 'medium',
         status: 'active',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
 
       mockRedis.get.mockResolvedValue(JSON.stringify(existingAlert))
@@ -244,7 +257,7 @@ describe('Enhanced Monitoring Service', () => {
         title: 'Test Alert',
         severity: 'high',
         status: 'active',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
 
       mockRedis.get.mockResolvedValue(JSON.stringify(alert))
@@ -267,10 +280,17 @@ describe('Enhanced Monitoring Service', () => {
     it('should get active alerts', async () => {
       const activeAlerts = [
         { id: 'alert_1', title: 'Alert 1', severity: 'high', status: 'active' },
-        { id: 'alert_2', title: 'Alert 2', severity: 'medium', status: 'active' }
+        {
+          id: 'alert_2',
+          title: 'Alert 2',
+          severity: 'medium',
+          status: 'active',
+        },
       ]
 
-      mockRedis.lrange.mockResolvedValue(activeAlerts.map(a => JSON.stringify(a)))
+      mockRedis.lrange.mockResolvedValue(
+        activeAlerts.map((a) => JSON.stringify(a)),
+      )
 
       const result = await service.getActiveAlerts()
 
@@ -280,11 +300,23 @@ describe('Enhanced Monitoring Service', () => {
 
     it('should get alerts by severity', async () => {
       const highSeverityAlerts = [
-        { id: 'alert_1', title: 'Critical Alert', severity: 'critical', status: 'active' },
-        { id: 'alert_2', title: 'High Alert', severity: 'high', status: 'active' }
+        {
+          id: 'alert_1',
+          title: 'Critical Alert',
+          severity: 'critical',
+          status: 'active',
+        },
+        {
+          id: 'alert_2',
+          title: 'High Alert',
+          severity: 'high',
+          status: 'active',
+        },
       ]
 
-      mockRedis.lrange.mockResolvedValue(highSeverityAlerts.map(a => JSON.stringify(a)))
+      mockRedis.lrange.mockResolvedValue(
+        highSeverityAlerts.map((a) => JSON.stringify(a)),
+      )
 
       const result = await service.getAlertsBySeverity('high')
 
@@ -299,7 +331,7 @@ describe('Enhanced Monitoring Service', () => {
         severity: 'high',
         confidence: 0.8,
         impact: 'data_breach',
-        velocity: 'rapid'
+        velocity: 'rapid',
       }
 
       const severity = calculateAlertSeverity(threatData)
@@ -312,7 +344,7 @@ describe('Enhanced Monitoring Service', () => {
         severity: 'critical',
         status: 'active',
         createdAt: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
-        escalationCount: 0
+        escalationCount: 0,
       }
 
       const shouldEscalate = shouldEscalateAlert(alert)
@@ -326,7 +358,7 @@ describe('Enhanced Monitoring Service', () => {
         status: 'escalated',
         createdAt: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
         escalationCount: 1,
-        lastEscalatedAt: new Date(Date.now() - 60000).toISOString() // 1 minute ago
+        lastEscalatedAt: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
       }
 
       const shouldEscalate = shouldEscalateAlert(alert)
@@ -343,14 +375,14 @@ describe('Enhanced Monitoring Service', () => {
           critical: 10,
           high: 25,
           medium: 45,
-          low: 70
+          low: 70,
         },
         bySource: {
           rate_limiting: 60,
           behavioral_analysis: 50,
-          threat_intelligence: 40
+          threat_intelligence: 40,
         },
-        avgResolutionTime: 3600000
+        avgResolutionTime: 3600000,
       }
 
       mockRedis.hgetall.mockResolvedValue({
@@ -363,7 +395,7 @@ describe('Enhanced Monitoring Service', () => {
         low: '70',
         rate_limiting: '60',
         behavioral_analysis: '50',
-        threat_intelligence: '40'
+        threat_intelligence: '40',
       })
 
       const stats = await getAlertStatistics(mockRedis)
@@ -373,14 +405,26 @@ describe('Enhanced Monitoring Service', () => {
 
     it('should generate alert report', async () => {
       const alerts = [
-        { id: 'alert_1', title: 'Alert 1', severity: 'high', status: 'resolved', createdAt: new Date().toISOString() },
-        { id: 'alert_2', title: 'Alert 2', severity: 'medium', status: 'active', createdAt: new Date().toISOString() }
+        {
+          id: 'alert_1',
+          title: 'Alert 1',
+          severity: 'high',
+          status: 'resolved',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'alert_2',
+          title: 'Alert 2',
+          severity: 'medium',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
       ]
 
       const report = await generateAlertReport(alerts, {
         timeRange: '24h',
         includeMetrics: true,
-        includeRecommendations: true
+        includeRecommendations: true,
       })
 
       expect(report).toBeDefined()
@@ -397,7 +441,7 @@ describe('Enhanced Monitoring Service', () => {
         name: 'response_time',
         value: 150,
         tags: { endpoint: '/api/data', method: 'GET' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       mockRedis.incr.mockResolvedValue(1)
@@ -409,17 +453,25 @@ describe('Enhanced Monitoring Service', () => {
       expect(mockRedis.set).toHaveBeenCalledWith(
         `metric:response_time:${Date.now()}`,
         expect.any(String),
-        expect.any(Number)
+        expect.any(Number),
       )
     })
 
     it('should get metrics for time range', async () => {
       const metrics = [
-        { name: 'response_time', value: 150, timestamp: new Date().toISOString() },
-        { name: 'error_rate', value: 0.05, timestamp: new Date().toISOString() }
+        {
+          name: 'response_time',
+          value: 150,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          name: 'error_rate',
+          value: 0.05,
+          timestamp: new Date().toISOString(),
+        },
       ]
 
-      mockRedis.lrange.mockResolvedValue(metrics.map(m => JSON.stringify(m)))
+      mockRedis.lrange.mockResolvedValue(metrics.map((m) => JSON.stringify(m)))
 
       const result = await service.getMetrics('response_time', '1h')
 
@@ -429,9 +481,21 @@ describe('Enhanced Monitoring Service', () => {
 
     it('should calculate metrics summary', async () => {
       const metrics = [
-        { name: 'response_time', value: 100, timestamp: new Date().toISOString() },
-        { name: 'response_time', value: 150, timestamp: new Date().toISOString() },
-        { name: 'response_time', value: 200, timestamp: new Date().toISOString() }
+        {
+          name: 'response_time',
+          value: 100,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          name: 'response_time',
+          value: 150,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          name: 'response_time',
+          value: 200,
+          timestamp: new Date().toISOString(),
+        },
       ]
 
       const summary = await calculateMetricsSummary(metrics)
@@ -445,15 +509,27 @@ describe('Enhanced Monitoring Service', () => {
 
     it('should detect metric anomalies', async () => {
       const metrics = [
-        { name: 'response_time', value: 100, timestamp: new Date().toISOString() },
-        { name: 'response_time', value: 150, timestamp: new Date().toISOString() },
-        { name: 'response_time', value: 500, timestamp: new Date().toISOString() } // Anomaly
+        {
+          name: 'response_time',
+          value: 100,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          name: 'response_time',
+          value: 150,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          name: 'response_time',
+          value: 500,
+          timestamp: new Date().toISOString(),
+        }, // Anomaly
       ]
 
       mockAIService.predictAnomaly.mockResolvedValue({
         isAnomaly: true,
         confidence: 0.9,
-        severity: 'high'
+        severity: 'high',
       })
 
       const anomalies = await detectMetricAnomalies(metrics, mockAIService)
@@ -468,18 +544,18 @@ describe('Enhanced Monitoring Service', () => {
         system: {
           cpu: 45,
           memory: 60,
-          disk: 30
+          disk: 30,
         },
         application: {
           responseTime: 150,
           throughput: 1000,
-          errorRate: 0.02
+          errorRate: 0.02,
         },
         database: {
           connections: 25,
           queryTime: 50,
-          cacheHitRate: 0.85
-        }
+          cacheHitRate: 0.85,
+        },
       }
 
       mockRedis.hgetall.mockResolvedValue(JSON.stringify(performanceMetrics))
@@ -493,20 +569,40 @@ describe('Enhanced Monitoring Service', () => {
   describe('AI-Powered Insights', () => {
     it('should generate AI insights from metrics', async () => {
       const metrics = [
-        { name: 'response_time', value: 150, timestamp: new Date().toISOString() },
-        { name: 'error_rate', value: 0.05, timestamp: new Date().toISOString() },
-        { name: 'throughput', value: 1000, timestamp: new Date().toISOString() }
+        {
+          name: 'response_time',
+          value: 150,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          name: 'error_rate',
+          value: 0.05,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          name: 'throughput',
+          value: 1000,
+          timestamp: new Date().toISOString(),
+        },
       ]
 
       mockAIService.generateInsights.mockResolvedValue({
         insights: [
-          { type: 'trend', description: 'Response times increasing', severity: 'medium' },
-          { type: 'anomaly', description: 'Error rate spike detected', severity: 'high' }
+          {
+            type: 'trend',
+            description: 'Response times increasing',
+            severity: 'medium',
+          },
+          {
+            type: 'anomaly',
+            description: 'Error rate spike detected',
+            severity: 'high',
+          },
         ],
         recommendations: [
           'Investigate database performance',
-          'Add caching layer for frequently accessed data'
-        ]
+          'Add caching layer for frequently accessed data',
+        ],
       })
 
       const insights = await service.generateAIInsights(metrics)
@@ -519,16 +615,39 @@ describe('Enhanced Monitoring Service', () => {
 
     it('should analyze patterns in alert data', async () => {
       const alerts = [
-        { id: 'alert_1', title: 'Data Breach', severity: 'critical', source: 'threat_intelligence' },
-        { id: 'alert_2', title: 'Suspicious Login', severity: 'high', source: 'behavioral_analysis' },
-        { id: 'alert_3', title: 'Rate Limit Exceeded', severity: 'medium', source: 'rate_limiting' }
+        {
+          id: 'alert_1',
+          title: 'Data Breach',
+          severity: 'critical',
+          source: 'threat_intelligence',
+        },
+        {
+          id: 'alert_2',
+          title: 'Suspicious Login',
+          severity: 'high',
+          source: 'behavioral_analysis',
+        },
+        {
+          id: 'alert_3',
+          title: 'Rate Limit Exceeded',
+          severity: 'medium',
+          source: 'rate_limiting',
+        },
       ]
 
       mockAIService.analyzePattern.mockResolvedValue({
         patterns: [
-          { type: 'temporal', description: 'Alerts clustered in time', confidence: 0.8 },
-          { type: 'spatial', description: 'Common source IP addresses', confidence: 0.7 }
-        ]
+          {
+            type: 'temporal',
+            description: 'Alerts clustered in time',
+            confidence: 0.8,
+          },
+          {
+            type: 'spatial',
+            description: 'Common source IP addresses',
+            confidence: 0.7,
+          },
+        ],
       })
 
       const patterns = await service.analyzeAlertPatterns(alerts)
@@ -540,16 +659,25 @@ describe('Enhanced Monitoring Service', () => {
 
     it('should predict future anomalies', async () => {
       const historicalData = [
-        { timestamp: new Date(Date.now() - 86400000).toISOString(), value: 100 },
-        { timestamp: new Date(Date.now() - 43200000).toISOString(), value: 120 },
-        { timestamp: new Date(Date.now() - 21600000).toISOString(), value: 150 }
+        {
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          value: 100,
+        },
+        {
+          timestamp: new Date(Date.now() - 43200000).toISOString(),
+          value: 120,
+        },
+        {
+          timestamp: new Date(Date.now() - 21600000).toISOString(),
+          value: 150,
+        },
       ]
 
       mockAIService.predictAnomaly.mockResolvedValue({
         isAnomaly: true,
         confidence: 0.85,
         predictedValue: 300,
-        timeWindow: '1h'
+        timeWindow: '1h',
       })
 
       const prediction = await service.predictFutureAnomalies(historicalData)
@@ -566,18 +694,20 @@ describe('Enhanced Monitoring Service', () => {
       const monitoringData = {
         metrics: [
           { name: 'cpu_usage', value: 75, timestamp: new Date().toISOString() },
-          { name: 'memory_usage', value: 80, timestamp: new Date().toISOString() }
+          {
+            name: 'memory_usage',
+            value: 80,
+            timestamp: new Date().toISOString(),
+          },
         ],
-        alerts: [
-          { id: 'alert_1', severity: 'high', status: 'active' }
-        ],
-        systemHealth: 'degraded'
+        alerts: [{ id: 'alert_1', severity: 'high', status: 'active' }],
+        systemHealth: 'degraded',
       }
 
       mockRedis.lrange.mockResolvedValue([])
       mockAIService.generateInsights.mockResolvedValue({
         insights: [],
-        recommendations: []
+        recommendations: [],
       })
 
       const result = await service.performRealTimeMonitoring(monitoringData)
@@ -594,7 +724,7 @@ describe('Enhanced Monitoring Service', () => {
         name: 'cpu_usage',
         value: 95, // Above critical threshold
         tags: { host: 'server-1' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       mockRedis.incr.mockResolvedValue(1)
@@ -610,7 +740,7 @@ describe('Enhanced Monitoring Service', () => {
       const monitoringData = {
         metrics: [],
         alerts: [],
-        systemHealth: 'unknown'
+        systemHealth: 'unknown',
       }
 
       // Simulate timeout by not resolving AI service promise
@@ -631,7 +761,7 @@ describe('Enhanced Monitoring Service', () => {
         title: 'Test Alert',
         description: 'Test description',
         severity: 'medium',
-        source: 'test'
+        source: 'test',
       }
 
       mockRedis.incr.mockRejectedValue(new Error('Redis connection failed'))
@@ -646,7 +776,7 @@ describe('Enhanced Monitoring Service', () => {
       const invalidAlertData = {
         title: '', // Invalid empty title
         description: 'Test description',
-        severity: 'invalid_severity' as any // Invalid severity
+        severity: 'invalid_severity' as any, // Invalid severity
       }
 
       mockRedis.incr.mockResolvedValue(1)
@@ -662,7 +792,7 @@ describe('Enhanced Monitoring Service', () => {
         name: 'response_time',
         value: 150,
         tags: { endpoint: '/api/data' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       mockRedis.set.mockRejectedValue(new Error('Redis error'))
@@ -680,14 +810,14 @@ describe('Enhanced Monitoring Service', () => {
         title: 'Test Alert',
         description: 'Test description',
         severity: 'medium',
-        source: 'test'
+        source: 'test',
       }
 
       mockRedis.incr.mockResolvedValue(1)
       mockRedis.set.mockResolvedValue('OK')
 
-      const alerts = Array.from({ length: 10 }, (_, i) => 
-        service.createAlert({ ...alertData, title: `Alert ${i}` })
+      const alerts = Array.from({ length: 10 }, (_, i) =>
+        service.createAlert({ ...alertData, title: `Alert ${i}` }),
       )
 
       const results = await Promise.all(alerts)
@@ -705,7 +835,7 @@ describe('Enhanced Monitoring Service', () => {
         name: 'response_time',
         value: 100 + Math.random() * 200,
         tags: { endpoint: `/api/data/${i % 10}` },
-        timestamp: new Date(Date.now() - i * 60000).toISOString()
+        timestamp: new Date(Date.now() - i * 60000).toISOString(),
       }))
 
       mockRedis.set.mockResolvedValue('OK')
@@ -721,9 +851,10 @@ describe('Enhanced Monitoring Service', () => {
       const alerts = Array.from({ length: 100 }, (_, i) => ({
         id: `alert_${i}`,
         title: `Alert ${i}`,
-        severity: i < 10 ? 'critical' : i < 30 ? 'high' : i < 60 ? 'medium' : 'low',
+        severity:
+          i < 10 ? 'critical' : i < 30 ? 'high' : i < 60 ? 'medium' : 'low',
         status: i < 80 ? 'active' : 'resolved',
-        createdAt: new Date(Date.now() - i * 3600000).toISOString()
+        createdAt: new Date(Date.now() - i * 3600000).toISOString(),
       }))
 
       const startTime = Date.now()
@@ -743,7 +874,7 @@ describe('Enhanced Monitoring Service', () => {
         name: 'error_rate',
         value: 0.15, // High error rate
         tags: { endpoint: '/api/payment' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       mockRedis.incr.mockResolvedValue(1)
@@ -757,14 +888,28 @@ describe('Enhanced Monitoring Service', () => {
 
     it('should integrate AI insights with alerting', async () => {
       const alerts = [
-        { id: 'alert_1', title: 'Data Breach', severity: 'critical', source: 'threat_intelligence' },
-        { id: 'alert_2', title: 'Suspicious Activity', severity: 'high', source: 'behavioral_analysis' }
+        {
+          id: 'alert_1',
+          title: 'Data Breach',
+          severity: 'critical',
+          source: 'threat_intelligence',
+        },
+        {
+          id: 'alert_2',
+          title: 'Suspicious Activity',
+          severity: 'high',
+          source: 'behavioral_analysis',
+        },
       ]
 
       mockAIService.analyzePattern.mockResolvedValue({
         patterns: [
-          { type: 'coordinated', description: 'Coordinated attack pattern', confidence: 0.9 }
-        ]
+          {
+            type: 'coordinated',
+            description: 'Coordinated attack pattern',
+            confidence: 0.9,
+          },
+        ],
       })
 
       const insights = await service.analyzeAlertPatterns(alerts)
@@ -780,7 +925,7 @@ describe('Enhanced Monitoring Service', () => {
         name: 'cpu_usage',
         value: 85,
         tags: { host: 'server-1' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       mockRedis.incr.mockResolvedValue(1)
@@ -792,9 +937,13 @@ describe('Enhanced Monitoring Service', () => {
       const metrics = [metricData]
       mockAIService.generateInsights.mockResolvedValue({
         insights: [
-          { type: 'threshold', description: 'CPU usage above threshold', severity: 'high' }
+          {
+            type: 'threshold',
+            description: 'CPU usage above threshold',
+            severity: 'high',
+          },
         ],
-        recommendations: ['Scale up server resources']
+        recommendations: ['Scale up server resources'],
       })
 
       const insights = await service.generateAIInsights(metrics)
@@ -807,8 +956,8 @@ describe('Enhanced Monitoring Service', () => {
         source: 'ai_analysis',
         metadata: {
           insightType: insights.insights[0].type,
-          recommendation: insights.recommendations[0]
-        }
+          recommendation: insights.recommendations[0],
+        },
       }
 
       const alert = await service.createAlert(alertData)

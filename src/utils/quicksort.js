@@ -1,29 +1,29 @@
-// Simple quicksort implementation (in-place) with exported function
-function quicksort(arr, left = 0, right = arr.length - 1) {
-    if (!Array.isArray(arr)) throw new TypeError('Expected an array')
-    if (left >= right) return arr
-
-    const pivotIndex = partition(arr, left, right)
-    quicksort(arr, left, pivotIndex - 1)
-    quicksort(arr, pivotIndex + 1, right)
+/**
+ * QuickSort implementation in JavaScript
+ * @param {number[]} arr - Array of numbers to sort
+ * @returns {number[]} - Sorted array
+ */
+function quicksort(arr) {
+  if (arr.length <= 1) {
     return arr
-}
+  }
 
-function partition(arr, left, right) {
-    const pivot = arr[right]
-    let i = left - 1
-    for (let j = left; j < right; j++) {
-        if (arr[j] <= pivot) {
-            i += 1
-                ;[arr[i], arr[j]] = [arr[j], arr[i]]
-        }
+  const pivot = arr[Math.floor(arr.length / 2)]
+  const left = []
+  const right = []
+  const equal = []
+
+  for (const element of arr) {
+    if (element < pivot) {
+      left.push(element)
+    } else if (element > pivot) {
+      right.push(element)
+    } else {
+      equal.push(element)
     }
-    ;[arr[i + 1], arr[right]] = [arr[right], arr[i + 1]]
-    return i + 1
+  }
+
+  return [...quicksort(left), ...equal, ...quicksort(right)]
 }
 
-// Export for CommonJS and ESM
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { quicksort }
-}
 export { quicksort }

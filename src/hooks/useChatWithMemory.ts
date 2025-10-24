@@ -10,6 +10,7 @@ export interface ChatWithMemoryOptions {
   enableMemory?: boolean
   enableAnalysis?: boolean
   maxMemoryContext?: number
+  api?: string // Allow API endpoint override
 }
 
 export type UseChatWithMemoryReturn = UseChatReturn & {
@@ -23,7 +24,10 @@ export function useChatWithMemory(
   const { initialMessages = [], sessionId } = options
   const [isLoading, setIsLoading] = useState(false)
 
-  const chat = useChat({ initialMessages })
+  const chat = useChat({ 
+    initialMessages,
+    api: options.api || '/api/chat'
+  })
   const memory = useMemory({
     userId: sessionId,
     category: 'conversation',
@@ -35,13 +39,10 @@ export function useChatWithMemory(
       setIsLoading(true)
       try {
         if (options.enableMemory) {
-          await memory.addMemory(
-            `user: ${message}`,
-            {
-              role: 'user',
-              sessionId,
-            },
-          )
+          await memory.addMemory(`user: ${message}`, {
+            role: 'user',
+            sessionId,
+          })
         }
 
         // This is a bit of a hack to get the form submission to work
@@ -55,13 +56,10 @@ export function useChatWithMemory(
         const responseContent = lastMessage?.content
 
         if (options.enableMemory && responseContent) {
-          await memory.addMemory(
-            `assistant: ${responseContent}`,
-            {
-              role: 'assistant',
-              sessionId,
-            },
-          )
+          await memory.addMemory(`assistant: ${responseContent}`, {
+            role: 'assistant',
+            sessionId,
+          })
         }
 
         return responseContent

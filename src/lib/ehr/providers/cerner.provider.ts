@@ -100,7 +100,10 @@ export class CernerProvider extends BaseEHRProvider {
           `Failed to verify Cerner endpoint ${endpoint}:`,
           error,
         )
-        throw new Error(`Required Cerner endpoint ${endpoint} is not available`)
+        throw new Error(
+          `Required Cerner endpoint ${endpoint} is not available`,
+          { cause: error },
+        )
       }
     }
   }

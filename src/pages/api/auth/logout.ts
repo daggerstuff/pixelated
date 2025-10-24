@@ -49,7 +49,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
@@ -77,9 +77,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store, no-cache, must-revalidate, private',
         },
-      }
+      },
     )
-
   } catch (error) {
     // Handle unexpected errors
     console.error('Logout error:', error)
@@ -99,7 +98,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     )
   }
 }
@@ -111,7 +110,8 @@ export const OPTIONS: APIRoute = async ({ request }) => {
     headers: {
       'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID, X-Session-ID',
+      'Access-Control-Allow-Headers':
+        'Content-Type, Authorization, X-CSRF-Token, X-Device-ID, X-Session-ID',
       'Access-Control-Max-Age': '86400',
     },
   })

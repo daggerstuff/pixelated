@@ -4,18 +4,18 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import type { APIContext } from 'astro'
-import { 
-  authenticateRequest, 
-  requireRole, 
-  rateLimitMiddleware, 
-  csrfProtection, 
+
+import {
+  authenticateRequest,
+  requireRole,
+  rateLimitMiddleware,
+  csrfProtection,
   securityHeaders,
   type AuthenticatedRequest,
-  type UserRole
+  type UserRole,
 } from '../middleware'
 import { validateToken } from '../jwt-service'
-import { getUserById, } from '../better-auth-integration'
+import { getUserById } from '../better-auth-integration'
 import { logSecurityEvent } from '../../security'
 import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 
@@ -37,7 +37,7 @@ vi.mock('../../security', () => ({
     AUTHORIZATION_FAILED: 'AUTHORIZATION_FAILED',
     RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
     CSRF_VIOLATION: 'CSRF_VIOLATION',
-  }
+  },
 }))
 
 vi.mock('../../mcp/phase6-integration', () => ({
@@ -50,7 +50,7 @@ describe('Authentication Middleware', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    
+
     // Create mock request
     mockRequest = new Request('https://example.com/api/test', {
       method: 'GET',
@@ -64,7 +64,7 @@ describe('Authentication Middleware', () => {
 
     // Create mock response
     _mockResponse = new Response(JSON.stringify({ success: true }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     })
   })
 
@@ -111,11 +111,14 @@ describe('Authentication Middleware', () => {
     })
 
     it('should reject request with invalid token format', async () => {
-      const requestWithInvalidToken = new Request('https://example.com/api/test', {
-        headers: {
-          'Authorization': 'InvalidFormat token',
+      const requestWithInvalidToken = new Request(
+        'https://example.com/api/test',
+        {
+          headers: {
+            Authorization: 'InvalidFormat token',
+          },
         },
-      })
+      )
 
       const result = await authenticateRequest(requestWithInvalidToken)
 
@@ -216,7 +219,7 @@ describe('Authentication Middleware', () => {
         expect.objectContaining({
           tokenId: 'token123',
           endpoint: '/api/test',
-        })
+        }),
       )
     })
 
@@ -234,7 +237,7 @@ describe('Authentication Middleware', () => {
         expect.objectContaining({
           error: 'Invalid token signature',
           endpoint: '/api/test',
-        })
+        }),
       )
     })
 
@@ -259,7 +262,7 @@ describe('Authentication Middleware', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         'user123',
-        'authentication_success'
+        'authentication_success',
       )
     })
   })
@@ -278,7 +281,10 @@ describe('Authentication Middleware', () => {
         tokenId: 'token123',
       } as AuthenticatedRequest
 
-      const result = await requireRole(authenticatedRequest, ['admin', 'therapist'])
+      const result = await requireRole(authenticatedRequest, [
+        'admin',
+        'therapist',
+      ])
 
       expect(result.success).toBe(true)
       expect(result.request).toBe(authenticatedRequest)
@@ -297,7 +303,10 @@ describe('Authentication Middleware', () => {
         tokenId: 'token123',
       } as AuthenticatedRequest
 
-      const result = await requireRole(authenticatedRequest, ['admin', 'therapist'])
+      const result = await requireRole(authenticatedRequest, [
+        'admin',
+        'therapist',
+      ])
 
       expect(result.success).toBe(false)
       expect(result.response?.status).toBe(403)
@@ -344,12 +353,14 @@ describe('Authentication Middleware', () => {
         expect.objectContaining({
           requiredRoles: ['admin'],
           userRole: 'patient',
-        })
+        }),
       )
     })
 
     it('should reject request without user', async () => {
-      const result = await requireRole(mockRequest as AuthenticatedRequest, ['admin'])
+      const result = await requireRole(mockRequest as AuthenticatedRequest, [
+        'admin',
+      ])
 
       expect(result.success).toBe(false)
       expect(result.response?.status).toBe(401)
@@ -360,7 +371,7 @@ describe('Authentication Middleware', () => {
   describe('rateLimitMiddleware', () => {
     it('should allow requests within rate limit', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       // Mock no previous requests
       vi.mocked(getFromCache).mockResolvedValue(null)
       vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
@@ -375,7 +386,7 @@ describe('Authentication Middleware', () => {
 
     it('should block requests exceeding rate limit', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       // Mock 5 previous requests (at limit)
       vi.mocked(getFromCache).mockResolvedValue({
         count: 5,
@@ -391,7 +402,7 @@ describe('Authentication Middleware', () => {
 
     it('should reset counter after time window', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       // Mock expired rate limit data
       vi.mocked(getFromCache).mockResolvedValue({
         count: 5,
@@ -410,13 +421,13 @@ describe('Authentication Middleware', () => {
         expect.objectContaining({
           count: 1,
         }),
-        3600
+        3600,
       )
     })
 
     it('should use different rate limits for different endpoints', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue(null)
       vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
         return true
@@ -424,7 +435,7 @@ describe('Authentication Middleware', () => {
 
       // Login endpoint - 5 requests per hour
       await rateLimitMiddleware(mockRequest, 'login', 5, 60)
-      
+
       // API endpoint - 100 requests per hour
       await rateLimitMiddleware(mockRequest, 'api', 100, 60)
 
@@ -432,18 +443,18 @@ describe('Authentication Middleware', () => {
       expect(setInCache).toHaveBeenCalledWith(
         expect.stringContaining('rate_limit:login:'),
         expect.any(Object),
-        3600
+        3600,
       )
       expect(setInCache).toHaveBeenCalledWith(
         expect.stringContaining('rate_limit:api:'),
         expect.any(Object),
-        3600
+        3600,
       )
     })
 
     it('should log rate limit violations', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue({
         count: 10,
         resetTime: Date.now() + 60000,
@@ -458,13 +469,13 @@ describe('Authentication Middleware', () => {
           endpoint: 'login',
           currentCount: 10,
           limit: 5,
-        })
+        }),
       )
     })
 
     it('should identify clients by IP address', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         // Verify IP is used in rate limit key
         expect(key).toContain('127.0.0.1')
@@ -482,7 +493,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         // Should use some identifier even without IP
         expect(key).toBeDefined()
@@ -514,7 +525,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'valid-csrf-token', expiresAt: Date.now() + 3600000 }
@@ -549,7 +560,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'different-token', expiresAt: Date.now() + 3600000 }
@@ -573,7 +584,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'expired-token', expiresAt: Date.now() - 1000 } // Expired
@@ -597,7 +608,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'different-token', expiresAt: Date.now() + 3600000 }
@@ -613,16 +624,16 @@ describe('Authentication Middleware', () => {
         expect.objectContaining({
           reason: 'invalid_token',
           endpoint: '/api/test',
-        })
+        }),
       )
     })
 
     it('should handle other HTTP methods that require CSRF protection', async () => {
       const methods = ['PUT', 'PATCH', 'DELETE']
-      
+
       for (const method of methods) {
         vi.clearAllMocks()
-        
+
         const request = new Request('https://example.com/api/test', {
           method,
           headers: {
@@ -631,7 +642,7 @@ describe('Authentication Middleware', () => {
         })
 
         const { getFromCache } = await import('../../redis')
-        
+
         vi.mocked(getFromCache).mockImplementation(async (key) => {
           if (key.startsWith('csrf:')) {
             return { token: 'valid-token', expiresAt: Date.now() + 3600000 }
@@ -649,7 +660,7 @@ describe('Authentication Middleware', () => {
   describe('securityHeaders', () => {
     it('should add security headers to response', async () => {
       const response = new Response(JSON.stringify({ success: true }), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       })
 
       const result = await securityHeaders(mockRequest, response)
@@ -657,13 +668,17 @@ describe('Authentication Middleware', () => {
       expect(result.headers.get('X-Content-Type-Options')).toBe('nosniff')
       expect(result.headers.get('X-Frame-Options')).toBe('DENY')
       expect(result.headers.get('X-XSS-Protection')).toBe('1; mode=block')
-      expect(result.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains')
-      expect(result.headers.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin')
+      expect(result.headers.get('Strict-Transport-Security')).toBe(
+        'max-age=31536000; includeSubDomains',
+      )
+      expect(result.headers.get('Referrer-Policy')).toBe(
+        'strict-origin-when-cross-origin',
+      )
     })
 
     it('should add Content-Security-Policy header', async () => {
       const response = new Response(JSON.stringify({ success: true }), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       })
 
       const result = await securityHeaders(mockRequest, response)
@@ -676,17 +691,23 @@ describe('Authentication Middleware', () => {
     })
 
     it('should add HIPAA-compliant headers for healthcare data', async () => {
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
-      expect(result.headers.get('Cache-Control')).toBe('no-store, no-cache, must-revalidate, private')
+      expect(result.headers.get('Cache-Control')).toBe(
+        'no-store, no-cache, must-revalidate, private',
+      )
       expect(result.headers.get('Pragma')).toBe('no-cache')
       expect(result.headers.get('Expires')).toBe('0')
     })
 
     it('should remove sensitive headers', async () => {
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
       response.headers.set('X-Powered-By', 'Express')
       response.headers.set('Server', 'Apache')
 
@@ -697,7 +718,9 @@ describe('Authentication Middleware', () => {
     })
 
     it('should handle requests without existing response headers', async () => {
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -708,18 +731,28 @@ describe('Authentication Middleware', () => {
     it('should add CORS headers for API requests', async () => {
       const apiRequest = new Request('https://example.com/api/test', {
         headers: {
-          'Origin': 'https://app.example.com',
+          Origin: 'https://app.example.com',
         },
       })
 
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       const result = await securityHeaders(apiRequest, response)
 
-      expect(result.headers.get('Access-Control-Allow-Origin')).toBe('https://app.example.com')
-      expect(result.headers.get('Access-Control-Allow-Credentials')).toBe('true')
-      expect(result.headers.get('Access-Control-Allow-Methods')).toContain('GET')
-      expect(result.headers.get('Access-Control-Allow-Methods')).toContain('POST')
+      expect(result.headers.get('Access-Control-Allow-Origin')).toBe(
+        'https://app.example.com',
+      )
+      expect(result.headers.get('Access-Control-Allow-Credentials')).toBe(
+        'true',
+      )
+      expect(result.headers.get('Access-Control-Allow-Methods')).toContain(
+        'GET',
+      )
+      expect(result.headers.get('Access-Control-Allow-Methods')).toContain(
+        'POST',
+      )
     })
 
     it('should handle preflight OPTIONS requests', async () => {
@@ -735,8 +768,12 @@ describe('Authentication Middleware', () => {
 
       const result = await securityHeaders(optionsRequest, response)
 
-      expect(result.headers.get('Access-Control-Allow-Origin')).toBe('https://app.example.com')
-      expect(result.headers.get('Access-Control-Allow-Methods')).toContain('POST')
+      expect(result.headers.get('Access-Control-Allow-Origin')).toBe(
+        'https://app.example.com',
+      )
+      expect(result.headers.get('Access-Control-Allow-Methods')).toContain(
+        'POST',
+      )
       expect(result.headers.get('Access-Control-Max-Age')).toBe('86400')
     })
   })
@@ -760,22 +797,22 @@ describe('Authentication Middleware', () => {
       vi.mocked(getUserById).mockResolvedValue(mockUser)
 
       const start = performance.now()
-      
+
       await authenticateRequest(mockRequest)
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(10)
     })
 
     it('should meet sub-5ms rate limiting target', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue(null)
 
       const start = performance.now()
-      
+
       await rateLimitMiddleware(mockRequest, 'api', 100, 60)
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(5)
     })
@@ -784,7 +821,7 @@ describe('Authentication Middleware', () => {
   describe('Security Requirements', () => {
     it('should prevent timing attacks in authentication', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       // Test with valid token but no user
       vi.mocked(validateToken).mockResolvedValue({
         valid: true,
@@ -793,7 +830,7 @@ describe('Authentication Middleware', () => {
         tokenId: 'token123',
         expiresAt: Date.now() + 3600000,
       })
-      
+
       vi.mocked(getUserById).mockResolvedValue(null)
 
       const start1 = performance.now()
@@ -834,19 +871,21 @@ describe('Authentication Middleware', () => {
       await authenticateRequest(mockRequest)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // Should not log full user agent or IP
       expect(JSON.stringify(loggedData)).not.toContain('Mozilla/5.0')
       expect(JSON.stringify(loggedData)).not.toContain('127.0.0.1')
     })
 
     it('should enforce strict CSP policies', async () => {
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
       const csp = result.headers.get('Content-Security-Policy')
-      
+
       expect(csp).toContain("default-src 'self'")
       expect(csp).toContain("object-src 'none'")
       expect(csp).toContain("base-uri 'self'")
@@ -854,16 +893,22 @@ describe('Authentication Middleware', () => {
     })
 
     it('should prevent clickjacking attacks', async () => {
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
       expect(result.headers.get('X-Frame-Options')).toBe('DENY')
-      expect(result.headers.get('Content-Security-Policy')).toContain("frame-ancestors 'none'")
+      expect(result.headers.get('Content-Security-Policy')).toContain(
+        "frame-ancestors 'none'",
+      )
     })
 
     it('should prevent MIME type sniffing', async () => {
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -871,7 +916,9 @@ describe('Authentication Middleware', () => {
     })
 
     it('should enforce HTTPS', async () => {
-      const response = new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+      const response = new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -903,20 +950,22 @@ describe('Authentication Middleware', () => {
       await authenticateRequest(mockRequest)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // Should not log medical record numbers or health data
       expect(JSON.stringify(loggedData)).not.toContain('MRN123456')
       expect(JSON.stringify(loggedData)).not.toContain('medical')
     })
 
     it('should enforce strict cache control for health data', async () => {
-      const response = new Response({ 
-        patient: { name: 'John Doe', condition: 'Anxiety' } 
+      const response = new Response({
+        patient: { name: 'John Doe', condition: 'Anxiety' },
       })
 
       const result = await securityHeaders(mockRequest, response)
 
-      expect(result.headers.get('Cache-Control')).toBe('no-store, no-cache, must-revalidate, private')
+      expect(result.headers.get('Cache-Control')).toBe(
+        'no-store, no-cache, must-revalidate, private',
+      )
       expect(result.headers.get('Pragma')).toBe('no-cache')
     })
 
@@ -940,7 +989,7 @@ describe('Authentication Middleware', () => {
       await authenticateRequest(mockRequest)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // IP should be masked or not included
       if (loggedData.clientInfo) {
         expect(loggedData.clientInfo.ip).toBeUndefined()
@@ -973,7 +1022,7 @@ describe('Authentication Middleware', () => {
         expect.objectContaining({
           timestamp: expect.any(Number),
           retention: expect.any(Number),
-        })
+        }),
       )
     })
   })
@@ -1000,7 +1049,7 @@ describe('Authentication Middleware', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         'user123',
-        'authentication_success'
+        'authentication_success',
       )
     })
 
@@ -1021,13 +1070,13 @@ describe('Authentication Middleware', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         'user123',
-        'authorization_failed'
+        'authorization_failed',
       )
     })
 
     it('should track rate limiting events', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockResolvedValue({
         count: 10,
         resetTime: Date.now() + 60000,
@@ -1037,7 +1086,7 @@ describe('Authentication Middleware', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         null,
-        'rate_limit_exceeded'
+        'rate_limit_exceeded',
       )
     })
 
@@ -1050,7 +1099,7 @@ describe('Authentication Middleware', () => {
       })
 
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
           return { token: 'different-token', expiresAt: Date.now() + 3600000 }
@@ -1062,7 +1111,7 @@ describe('Authentication Middleware', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         null,
-        'csrf_violation'
+        'csrf_violation',
       )
     })
   })

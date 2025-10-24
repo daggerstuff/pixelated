@@ -57,18 +57,21 @@ const formatDate = (dateString?: string | Date) => {
   }
 }
 
-interface ClientSideNewObjective extends Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>, 
-  Omit<NewTreatmentObjectiveData, 'description' | 'status'> {
+interface ClientSideNewObjective
+  extends Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>,
+    Omit<NewTreatmentObjectiveData, 'description' | 'status'> {
   tempId: string
 }
 
-interface ClientSideNewGoal extends Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>, 
-  Omit<NewTreatmentGoalData, 'description' | 'status'> {
+interface ClientSideNewGoal
+  extends Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>,
+    Omit<NewTreatmentGoalData, 'description' | 'status'> {
   tempId: string
   objectives: ClientSideNewObjective[]
 }
 
-interface FormNewPlanData extends Omit<NewTreatmentPlanData, 'goals' | 'startDate'> {
+interface FormNewPlanData
+  extends Omit<NewTreatmentPlanData, 'goals' | 'startDate'> {
   userId: string
   startDate?: string
   goals: ClientSideNewGoal[]
@@ -131,7 +134,9 @@ const TreatmentPlanManager: FC = () => {
       setPlans(data)
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'An unknown error occurred'
       setError(errorMessage)
       toast.error(`Failed to load plans: ${errorMessage}`)
     } finally {
@@ -206,7 +211,8 @@ const TreatmentPlanManager: FC = () => {
     if (isEdit && editingPlanData) {
       const updatedGoals = [...(editingPlanData.goals || [])]
       if (updatedGoals[index]) {
-        ;(updatedGoals[index] as EditableGoal)[field as keyof EditableGoal] = value as never // Type-safe cast for EditableGoal union
+        ;(updatedGoals[index] as EditableGoal)[field as keyof EditableGoal] =
+          value as never // Type-safe cast for EditableGoal union
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
           prev ? { ...prev, goals: updatedGoals } : null,
         )
@@ -214,7 +220,9 @@ const TreatmentPlanManager: FC = () => {
     } else {
       const updatedGoals = [...newPlanData.goals]
       if (updatedGoals[index]) {
-        ;(updatedGoals[index] as ClientSideNewGoal)[field as keyof ClientSideNewGoal] = value as never // ClientSideNewGoal is more straightforward
+        ;(updatedGoals[index] as ClientSideNewGoal)[
+          field as keyof ClientSideNewGoal
+        ] = value as never // ClientSideNewGoal is more straightforward
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
           goals: updatedGoals,
@@ -294,7 +302,9 @@ const TreatmentPlanManager: FC = () => {
         updatedGoals[goalIndex] &&
         updatedGoals[goalIndex].objectives[objIndex]
       ) {
-        ;(updatedGoals[goalIndex].objectives[objIndex] as EditableObjective)[field as keyof EditableObjective] = value as never
+        ;(updatedGoals[goalIndex].objectives[objIndex] as EditableObjective)[
+          field as keyof EditableObjective
+        ] = value as never
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
           prev ? { ...prev, goals: updatedGoals } : null,
         )
@@ -307,7 +317,11 @@ const TreatmentPlanManager: FC = () => {
         updatedNewGoals[goalIndex] &&
         updatedNewGoals[goalIndex].objectives[objIndex]
       ) {
-        ;(updatedNewGoals[goalIndex].objectives[objIndex] as ClientSideNewObjective)[field as keyof ClientSideNewObjective] = value as never
+        ;(
+          updatedNewGoals[goalIndex].objectives[
+            objIndex
+          ] as ClientSideNewObjective
+        )[field as keyof ClientSideNewObjective] = value as never
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
           goals: updatedNewGoals,
@@ -392,7 +406,9 @@ const TreatmentPlanManager: FC = () => {
       toast.success('Treatment plan created successfully!')
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'An unknown error occurred'
       toast.error(`Failed to create plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -417,7 +433,9 @@ const TreatmentPlanManager: FC = () => {
       toast.success('Treatment plan deleted successfully!')
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'An unknown error occurred'
       toast.error(`Failed to delete plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -459,7 +477,9 @@ const TreatmentPlanManager: FC = () => {
       toast.success('Treatment plan updated successfully!')
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'An unknown error occurred'
       toast.error(`Failed to update plan: ${errorMessage}`)
     } finally {
       setIsLoading(false)
@@ -829,8 +849,8 @@ const TreatmentPlanManager: FC = () => {
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
-              treatment plan titled &quot;<strong>{planToDelete?.title}</strong>&quot; and
-              all its associated goals and objectives.
+              treatment plan titled &quot;<strong>{planToDelete?.title}</strong>
+              &quot; and all its associated goals and objectives.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

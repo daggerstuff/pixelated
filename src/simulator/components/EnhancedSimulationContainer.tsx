@@ -84,8 +84,7 @@ export function EnhancedSimulationContainer({
 
   // Convert DetectedTechnique[] to TherapeuticTechnique[] for the component
   const mappedTechniques: TherapeuticTechnique[] = detectedTechniques.map(
-    (technique: DetectedTechnique) =>
-      technique.name as TherapeuticTechnique,
+    (technique: DetectedTechnique) => technique.name as TherapeuticTechnique,
   )
 
   // Speech recognition

@@ -7,7 +7,7 @@ export const GET: APIRoute = async ({ url }) => {
     // Initialize database connection if not already done
     initializeDatabase()
 
-    const {searchParams} = url
+    const { searchParams } = url
     const days = parseInt(searchParams.get('days') || '30')
     const cache = getCache()
 
@@ -16,14 +16,17 @@ export const GET: APIRoute = async ({ url }) => {
 
     if (cachedData) {
       console.log('✅ Analytics data served from cache')
-      return new Response(JSON.stringify({
-        ...cachedData,
-        cached: true,
-        cacheTimestamp: new Date().toISOString()
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return new Response(
+        JSON.stringify({
+          ...cachedData,
+          cached: true,
+          cacheTimestamp: new Date().toISOString(),
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     console.log('🔄 Computing fresh analytics data...')
@@ -105,39 +108,41 @@ export const GET: APIRoute = async ({ url }) => {
 
     // Cache the computed data
     const computedData = {
-      historical: historicalResult.rows.map(row => ({
+      historical: historicalResult.rows.map((row) => ({
         date: row.date,
         biasScore: parseFloat(row.avg_bias_score || '0'),
         sessionCount: parseInt(row.session_count || '0'),
         alertCount: parseInt(row.alert_count || '0'),
         minBias: parseFloat(row.min_bias || '0'),
-        maxBias: parseFloat(row.max_bias || '0')
+        maxBias: parseFloat(row.max_bias || '0'),
       })),
-      demographics: demographicResult.rows.map(row => ({
+      demographics: demographicResult.rows.map((row) => ({
         gender: row.gender || 'Unknown',
         ethnicity: row.ethnicity || 'Unknown',
         ageGroup: row.age_group || 'Unknown',
         count: parseInt(row.count || '0'),
-        avgBias: parseFloat(row.avg_bias || '0')
+        avgBias: parseFloat(row.avg_bias || '0'),
       })),
-      distribution: distributionResult.rows.map(row => ({
+      distribution: distributionResult.rows.map((row) => ({
         range: row.bias_range,
-        count: parseInt(row.count || '0')
+        count: parseInt(row.count || '0'),
       })),
-      patterns: patternsResult.rows.map(row => ({
+      patterns: patternsResult.rows.map((row) => ({
         layer: row.layer || 'Unknown',
         avgScore: parseFloat(row.avg_score || '0'),
-        occurrences: parseInt(row.occurrences || '0')
+        occurrences: parseInt(row.occurrences || '0'),
       })),
       metadata: {
         days,
         totalRecords: historicalResult.rows.length,
         dateRange: {
-          start: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          end: new Date().toISOString().split('T')[0]
+          start: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .split('T')[0],
+          end: new Date().toISOString().split('T')[0],
         },
-        generatedAt: new Date().toISOString()
-      }
+        generatedAt: new Date().toISOString(),
+      },
     }
 
     // Cache the data for 15 minutes
@@ -146,54 +151,59 @@ export const GET: APIRoute = async ({ url }) => {
 
     // Format response
     const response = {
-      historical: historicalResult.rows.map(row => ({
+      historical: historicalResult.rows.map((row) => ({
         date: row.date,
         biasScore: parseFloat(row.avg_bias_score || '0'),
         sessionCount: parseInt(row.session_count || '0'),
         alertCount: parseInt(row.alert_count || '0'),
         minBias: parseFloat(row.min_bias || '0'),
-        maxBias: parseFloat(row.max_bias || '0')
+        maxBias: parseFloat(row.max_bias || '0'),
       })),
-      demographics: demographicResult.rows.map(row => ({
+      demographics: demographicResult.rows.map((row) => ({
         gender: row.gender || 'Unknown',
         ethnicity: row.ethnicity || 'Unknown',
         ageGroup: row.age_group || 'Unknown',
         count: parseInt(row.count || '0'),
-        avgBias: parseFloat(row.avg_bias || '0')
+        avgBias: parseFloat(row.avg_bias || '0'),
       })),
-      distribution: distributionResult.rows.map(row => ({
+      distribution: distributionResult.rows.map((row) => ({
         range: row.bias_range,
-        count: parseInt(row.count || '0')
+        count: parseInt(row.count || '0'),
       })),
-      patterns: patternsResult.rows.map(row => ({
+      patterns: patternsResult.rows.map((row) => ({
         layer: row.layer || 'Unknown',
         avgScore: parseFloat(row.avg_score || '0'),
-        occurrences: parseInt(row.occurrences || '0')
+        occurrences: parseInt(row.occurrences || '0'),
       })),
       metadata: {
         days,
         totalRecords: historicalResult.rows.length,
         dateRange: {
-          start: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          end: new Date().toISOString().split('T')[0]
+          start: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .split('T')[0],
+          end: new Date().toISOString().split('T')[0],
         },
-        generatedAt: new Date().toISOString()
-      }
+        generatedAt: new Date().toISOString(),
+      },
     }
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     })
-
   } catch (error: any) {
     console.error('Analytics API error:', error)
-    return new Response(JSON.stringify({
-      error: 'Failed to fetch analytics data',
-      details: process.env['NODE_ENV'] === 'development' ? error.message : undefined
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to fetch analytics data',
+        details:
+          process.env['NODE_ENV'] === 'development' ? error.message : undefined,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }

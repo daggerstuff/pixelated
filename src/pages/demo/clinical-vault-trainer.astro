@@ -116,7 +116,9 @@ const universityResults = [
   <section class="brutalist-section">
     <div class="brutalist-container">
       <div class="text-center mb-12">
-        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+        <div
+          class="status-indicator status-indicator--warning inline-flex mb-6"
+        >
           <div class="pulse-dot pulse-dot--blue"></div>
           <span class="font-bold">CRISIS TRAINING ACTIVE</span>
         </div>
@@ -159,9 +161,12 @@ const universityResults = [
           <div class="border-b border-gray-700 pb-4">
             <div class="flex justify-between items-start">
               <div>
-                <h3 class="brutalist-subheading text-2xl mb-2">🚨 LIVE CRISIS INTERVENTION DEMO</h3>
+                <h3 class="brutalist-subheading text-2xl mb-2">
+                  🚨 LIVE CRISIS INTERVENTION DEMO
+                </h3>
                 <p class="text-gray-400">
-                  Experience a real training scenario with AI patient "Sarah" presenting with suicidal ideation
+                  Experience a real training scenario with AI patient "Sarah"
+                  presenting with suicidal ideation
                 </p>
               </div>
               <div class="status-indicator status-indicator--warning">
@@ -174,28 +179,40 @@ const universityResults = [
           <div class="chat-container">
             <div class="chat-header">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                <div
+                  class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center"
+                >
                   <span class="text-red-400">👤</span>
                 </div>
                 <div>
                   <div class="text-red-300 font-medium">AI Patient: Sarah</div>
-                  <div class="text-red-200/70 text-sm">Presenting with acute suicidal ideation</div>
+                  <div class="text-red-200/70 text-sm">
+                    Presenting with acute suicidal ideation
+                  </div>
                 </div>
               </div>
             </div>
-            
+
             <div class="chat-messages">
               <div class="message message--ai">
-                "I don't see the point anymore. Everything I try just fails. Maybe everyone would be better off without me..."
+                "I don't see the point anymore. Everything I try just fails.
+                Maybe everyone would be better off without me..."
               </div>
             </div>
 
             <div class="chat-input-area">
               <div class="flex gap-3">
-                <BrutalistButton variant="primary" class="flex-1" data-demo-action="crisis-response">
+                <BrutalistButton
+                  variant="primary"
+                  class="flex-1"
+                  data-demo-action="crisis-response"
+                >
                   PRACTICE CRISIS RESPONSE
                 </BrutalistButton>
-                <BrutalistButton variant="outline" data-demo-action="view-techniques">
+                <BrutalistButton
+                  variant="outline"
+                  data-demo-action="view-techniques"
+                >
                   VIEW TECHNIQUES
                 </BrutalistButton>
               </div>
@@ -226,7 +243,8 @@ const universityResults = [
           <span class="text-red-400">IMPOSSIBLE BEFORE</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-4xl mx-auto">
-          These scenarios were too dangerous, too rare, or too ethically complex to practice with real patients
+          These scenarios were too dangerous, too rare, or too ethically complex
+          to practice with real patients
         </p>
       </div>
 
@@ -240,7 +258,9 @@ const universityResults = [
                   PREVIOUSLY IMPOSSIBLE TO PRACTICE SAFELY
                 </div>
                 <h3 class="brutalist-subheading text-lg">{scenario.title}</h3>
-                <p class="text-gray-400 leading-relaxed">{scenario.description}</p>
+                <p class="text-gray-400 leading-relaxed">
+                  {scenario.description}
+                </p>
               </div>
             </BrutalistCard>
           ))
@@ -259,7 +279,8 @@ const universityResults = [
           <span class="confidence-boost">LEADING UNIVERSITIES</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-4xl mx-auto">
-          Universities using ClinicalVault report unprecedented improvements in training outcomes
+          Universities using ClinicalVault report unprecedented improvements in
+          training outcomes
         </p>
       </div>
 
@@ -269,9 +290,15 @@ const universityResults = [
             <BrutalistCard hover={true}>
               <div class="text-center space-y-4">
                 <div class="text-5xl">🏛️</div>
-                <h3 class="brutalist-subheading text-lg">{result.university}</h3>
-                <div class="text-2xl font-bold text-green-400">{result.result}</div>
-                <p class="text-gray-400 text-sm leading-relaxed">{result.detail}</p>
+                <h3 class="brutalist-subheading text-lg">
+                  {result.university}
+                </h3>
+                <div class="text-2xl font-bold text-green-400">
+                  {result.result}
+                </div>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                  {result.detail}
+                </p>
               </div>
             </BrutalistCard>
           ))
@@ -290,7 +317,10 @@ const universityResults = [
             BEYOND HIPAA. BEYOND COMPLIANCE.
           </h3>
           <p class="text-lg text-gray-300 leading-relaxed">
-            Your training sessions are protected by military-grade encryption. We use Fully Homomorphic Encryption (FHE) - our AI analyzes your sessions while they stay completely encrypted. Even we can't see your training conversations.
+            Your training sessions are protected by military-grade encryption.
+            We use Fully Homomorphic Encryption (FHE) - our AI analyzes your
+            sessions while they stay completely encrypted. Even we can't see
+            your training conversations.
           </p>
           <div class="flex flex-wrap justify-center gap-6">
             <div class="flex items-center gap-2">
@@ -317,7 +347,9 @@ const universityResults = [
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
         <div class="text-6xl mb-6">🎯</div>
 
-        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+        <div
+          class="status-indicator status-indicator--warning inline-flex mb-6"
+        >
           <div class="pulse-dot pulse-dot--blue"></div>
           <span class="font-bold">LIMITED BETA ACCESS AVAILABLE</span>
         </div>
@@ -329,22 +361,23 @@ const universityResults = [
         </h2>
 
         <p class="text-xl text-gray-300 mb-8 leading-relaxed">
-          Join the universities already using ClinicalVault to train more confident, competent therapists.
+          Join the universities already using ClinicalVault to train more
+          confident, competent therapists.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <BrutalistButton 
-            href="/contact" 
-            variant="primary" 
+          <BrutalistButton
+            href="/contact"
+            variant="primary"
             size="lg"
             data-demo-cta="primary"
             data-variant={variantKey}
           >
             {currentVariant?.['cta']}
           </BrutalistButton>
-          <BrutalistButton 
-            href="/demo-hub" 
-            variant="secondary" 
+          <BrutalistButton
+            href="/demo-hub"
+            variant="secondary"
             size="lg"
             data-demo-cta="secondary"
           >
@@ -353,16 +386,20 @@ const universityResults = [
         </div>
 
         <div class="flex flex-wrap justify-center gap-4">
-          <div class="brutalist-badge brutalist-badge--success">🎓 MADE FOR UNIVERSITIES</div>
-          <div class="brutalist-badge brutalist-badge--info">🔒 YOUR DATA STAYS PRIVATE</div>
-          <div class="brutalist-badge brutalist-badge--success">💛 LOVED BY THERAPY PROGRAMS</div>
+          <div class="brutalist-badge brutalist-badge--success">
+            🎓 MADE FOR UNIVERSITIES
+          </div>
+          <div class="brutalist-badge brutalist-badge--info">
+            🔒 YOUR DATA STAYS PRIVATE
+          </div>
+          <div class="brutalist-badge brutalist-badge--success">
+            💛 LOVED BY THERAPY PROGRAMS
+          </div>
         </div>
       </div>
     </div>
   </section>
 </BaseLayout>
-
-
 
 <script>
   // Type definitions
@@ -373,7 +410,7 @@ const universityResults = [
         action: string,
         params: {
           [key: string]: any
-        }
+        },
       ) => void
     }
   }
@@ -396,7 +433,7 @@ const universityResults = [
       button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
-        
+
         const action = target.dataset?.demoAction
 
         if (!action) return
@@ -434,7 +471,7 @@ const universityResults = [
       button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
-        
+
         const ctaType = target.dataset?.['demoCta']
         const variant = target.dataset?.['variant']
 

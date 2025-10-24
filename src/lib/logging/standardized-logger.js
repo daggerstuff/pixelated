@@ -8,22 +8,34 @@ function makeProxy(name) {
   return {
     info: (message, ...args) => {
       const target = getLogger(name)
-      const fn = target && typeof target.info === 'function' ? target.info.bind(target) : console.info.bind(console)
+      const fn =
+        target && typeof target.info === 'function'
+          ? target.info.bind(target)
+          : console.info.bind(console)
       fn(message, ...args)
     },
     warn: (message, ...args) => {
       const target = getLogger(name)
-      const fn = target && typeof target.warn === 'function' ? target.warn.bind(target) : console.warn.bind(console)
+      const fn =
+        target && typeof target.warn === 'function'
+          ? target.warn.bind(target)
+          : console.warn.bind(console)
       fn(message, ...args)
     },
     error: (message, ...args) => {
       const target = getLogger(name)
-      const fn = target && typeof target.error === 'function' ? target.error.bind(target) : console.error.bind(console)
+      const fn =
+        target && typeof target.error === 'function'
+          ? target.error.bind(target)
+          : console.error.bind(console)
       fn(message, ...args)
     },
     debug: (message, ...args) => {
       const target = getLogger(name)
-      const fn = target && typeof target.debug === 'function' ? target.debug.bind(target) : console.debug.bind(console)
+      const fn =
+        target && typeof target.debug === 'function'
+          ? target.debug.bind(target)
+          : console.debug.bind(console)
       fn(message, ...args)
     },
   }
@@ -59,7 +71,9 @@ function getSecurityLogger(scope) {
 
 function getAdvancedPHILogger(config) {
   const loggerConfig = config || {}
-  return getLogger(`advanced-phi${loggerConfig.enableLogCollection ? ':collect' : ''}`)
+  return getLogger(
+    `advanced-phi${loggerConfig.enableLogCollection ? ':collect' : ''}`,
+  )
 }
 
 function getHipaaCompliantLogger(scope) {

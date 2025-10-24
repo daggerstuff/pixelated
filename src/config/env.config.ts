@@ -31,7 +31,7 @@ const envSchema = z.object({
   MONGODB_USERNAME: z.string().optional(),
   MONGODB_PASSWORD: z.string().optional(),
   MONGODB_CLUSTER: z.string().optional(),
-  
+
   // Legacy database (PostgreSQL) - kept for migration purposes
   POSTGRES_URL: z.string().optional(),
   POSTGRES_PRISMA_URL: z.string().optional(),
@@ -247,7 +247,7 @@ export const config = {
     mongoUsername: (): string | undefined => env().MONGODB_USERNAME,
     mongoPassword: (): string | undefined => env().MONGODB_PASSWORD,
     mongoCluster: (): string | undefined => env().MONGODB_CLUSTER,
-    
+
     // Legacy PostgreSQL support
     url: (): string | undefined => env().POSTGRES_URL,
     prismaUrl: (): string | undefined => env().POSTGRES_PRISMA_URL,

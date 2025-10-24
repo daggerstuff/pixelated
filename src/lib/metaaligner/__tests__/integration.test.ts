@@ -77,14 +77,17 @@ describe('MetaAligner Integration Tests', () => {
         ...obj,
         evaluationFunction: (response: string, context: AlignmentContext) => {
           // Return very low scores for the "poorResponse" to ensure enhancement is triggered
-          if (response.includes('should probably calm down') && context.detectedContext === ContextType.CRISIS) {
-                if (obj.id === 'safety') {
-                  return 0.1
-                }
-                if (obj.id === 'empathy') {
-                  return 0.1
-                }
-                return 0.2
+          if (
+            response.includes('should probably calm down') &&
+            context.detectedContext === ContextType.CRISIS
+          ) {
+            if (obj.id === 'safety') {
+              return 0.1
+            }
+            if (obj.id === 'empathy') {
+              return 0.1
+            }
+            return 0.2
           }
           // Default scores for other responses/contexts
           if (obj.id === 'safety') {

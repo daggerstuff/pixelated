@@ -8,14 +8,14 @@
  * Interface representing a security breach
  */
 export interface ComplianceBreach {
-  id: string;
-  severity: string;
-  timestamp: number;
-  notificationStatus?: string;
-  notificationDelay?: number;
-  documentationComplete?: boolean;
-  type: string;
-  affectedUsers: string[];
+  id: string
+  severity: string
+  timestamp: number
+  notificationStatus?: string
+  notificationDelay?: number
+  documentationComplete?: boolean
+  type: string
+  affectedUsers: string[]
 }
 
 /**
@@ -24,7 +24,9 @@ export interface ComplianceBreach {
  * @param breaches Array of breach objects to analyze
  * @returns A compliance score between 0 and 1
  */
-export async function calculateScore(breaches: ComplianceBreach[]): Promise<number> {
+export async function calculateScore(
+  breaches: ComplianceBreach[],
+): Promise<number> {
   // Mock implementation
   if (!breaches.length) {
     return 1.0

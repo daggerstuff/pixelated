@@ -87,7 +87,9 @@ function createMockRedis() {
   const _ping = async () => 'PONG'
   const _disconnect = async () => undefined
   const _hset = async (key, field, value) => {
-    if (!hashStore.has(key)) { hashStore.set(key, new Map()) }
+    if (!hashStore.has(key)) {
+      hashStore.set(key, new Map())
+    }
     const hash = hashStore.get(key)!
     const existed = hash.has(field)
     hash.set(field, String(value))
@@ -101,7 +103,9 @@ function createMockRedis() {
 
   const _hgetall = async (key) => {
     const hash = hashStore.get(key)
-    if (!hash) { return {} }
+    if (!hash) {
+      return {}
+    }
     const out = {}
     hash.forEach((v, f) => (out[f] = v))
     return out
@@ -109,11 +113,15 @@ function createMockRedis() {
 
   const _hdel = async (key, field) => {
     const hash = hashStore.get(key)
-    if (!hash) { return 0 }
+    if (!hash) {
+      return 0
+    }
     return hash.delete(field) ? 1 : 0
   }
   const _sadd = async (key, member) => {
-    if (!setStore.has(key)) { setStore.set(key, new Set()) }
+    if (!setStore.has(key)) {
+      setStore.set(key, new Set())
+    }
     const s = setStore.get(key)!
     const existed = s.has(member)
     s.add(member)
@@ -121,13 +129,18 @@ function createMockRedis() {
   }
 
   const _srem = async (key, member) => {
-    if (!setStore.has(key)) { return 0 }
+    if (!setStore.has(key)) {
+      return 0
+    }
     return setStore.get(key)!.delete(member) ? 1 : 0
   }
 
-  const _smembers = async (key) => (setStore.has(key) ? Array.from(setStore.get(key)!) : [])
+  const _smembers = async (key) =>
+    setStore.has(key) ? Array.from(setStore.get(key)!) : []
   const _zadd = async (key, score, member) => {
-    if (!zsetStore.has(key)) { zsetStore.set(key, new Map()) }
+    if (!zsetStore.has(key)) {
+      zsetStore.set(key, new Map())
+    }
     const z = zsetStore.get(key)!
     const existed = z.has(member)
     z.set(member, Number(score))
@@ -136,16 +149,23 @@ function createMockRedis() {
 
   const _zrem = async (key, member) => {
     const z = zsetStore.get(key)
-    if (!z) { return 0 }
+    if (!z) {
+      return 0
+    }
     return z.delete(member) ? 1 : 0
   }
 
   const _zrange = async (key, start, stop, withScores) => {
     const z = zsetStore.get(key) as Map<any, number> | undefined
-    if (!z) { return [] }
-  const entries: [any, number][] = Array.from((z as Map<any, number>).entries())
-  const sorted = entries.sort((a, b) => (a[1] as number) - (b[1] as number))
-    const slice = stop === -1 ? sorted.slice(start) : sorted.slice(start, stop + 1)
+    if (!z) {
+      return []
+    }
+    const entries: [any, number][] = Array.from(
+      (z as Map<any, number>).entries(),
+    )
+    const sorted = entries.sort((a, b) => (a[1] as number) - (b[1] as number))
+    const slice =
+      stop === -1 ? sorted.slice(start) : sorted.slice(start, stop + 1)
     if (withScores === 'WITHSCORES') {
       return slice.map((entry) => ({ value: entry[0], score: entry[1] }))
     }
@@ -154,14 +174,18 @@ function createMockRedis() {
 
   const _zpopmin = async (key) => {
     const z = zsetStore.get(key) as Map<any, number> | undefined
-    if (!z || z.size === 0) { return [] }
-  const entries: [any, number][] = Array.from((z as Map<any, number>).entries())
-  const sorted = entries.sort((a, b) => (a[1] as number) - (b[1] as number))
+    if (!z || z.size === 0) {
+      return []
+    }
+    const entries: [any, number][] = Array.from(
+      (z as Map<any, number>).entries(),
+    )
+    const sorted = entries.sort((a, b) => (a[1] as number) - (b[1] as number))
     const [member, score] = sorted[0]!
     z.delete(member)
     return [{ value: member, score }]
   }
-    // Counters and TTLs
+  // Counters and TTLs
   const _incr = async (key) => {
     const val = store.get(key)
     const num = val ? parseInt(val, 10) + 1 : 1
@@ -175,23 +199,31 @@ function createMockRedis() {
     store.set(key, String(num))
     return num
   }
-    // TTL helpers: ttl returns seconds remaining, pttl returns ms
+  // TTL helpers: ttl returns seconds remaining, pttl returns ms
   const _ttl = async (key) => {
-    if (!store.has(key)) { return -2 }
+    if (!store.has(key)) {
+      return -2
+    }
     const exp = expirations.get(key)
-    if (!exp) { return -1 }
+    if (!exp) {
+      return -1
+    }
     const secs = Math.ceil((exp - Date.now()) / 1000)
     return secs > 0 ? secs : -2
   }
 
   const _pttl = async (key) => {
-    if (!store.has(key)) { return -2 }
+    if (!store.has(key)) {
+      return -2
+    }
     const exp = expirations.get(key)
-    if (!exp) { return -1 }
+    if (!exp) {
+      return -1
+    }
     const ms = exp - Date.now()
     return ms > 0 ? ms : -2
   }
-    // setex and expire
+  // setex and expire
   const _setex = async (key, ttlSeconds, value) => {
     store.set(key, String(value))
     expirations.set(key, Date.now() + Number(ttlSeconds) * 1000)
@@ -199,17 +231,20 @@ function createMockRedis() {
   }
 
   const _expire = async (key, ttlSeconds) => {
-    if (!store.has(key)) { return 0 }
+    if (!store.has(key)) {
+      return 0
+    }
     expirations.set(key, Date.now() + Number(ttlSeconds) * 1000)
     return 1
   }
-    // mget/mset
-  const _mget = async (...keys: string[]) => keys.map((k) => (store.has(k) ? store.get(k) : null))
+  // mget/mset
+  const _mget = async (...keys: string[]) =>
+    keys.map((k) => (store.has(k) ? store.get(k) : null))
   const _mset = async (obj: Record<string, any>) => {
     Object.entries(obj).forEach(([k, v]) => store.set(k, String(v)))
     return 'OK'
   }
-    // incrby/decrby
+  // incrby/decrby
   const _incrby = async (key, by) => {
     const val = store.get(key)
     const num = val ? parseInt(val, 10) + Number(by) : Number(by)
@@ -282,7 +317,9 @@ function createMockRedis() {
             results.push([null, 'OK'])
           } else if (c.cmd === 'sadd') {
             const [k, member] = c.args
-            if (!setStore.has(k)) { setStore.set(k, new Set()) }
+            if (!setStore.has(k)) {
+              setStore.set(k, new Set())
+            }
             const s = setStore.get(k)!
             const existed = s.has(member)
             s.add(member)
@@ -299,7 +336,9 @@ function createMockRedis() {
             const keys = c.args as string[]
             let deleted = 0
             for (const k of keys) {
-              if (store.delete(k)) { deleted++ }
+              if (store.delete(k)) {
+                deleted++
+              }
               expirations.delete(k)
             }
             results.push([null, deleted])
@@ -318,7 +357,12 @@ function createMockRedis() {
   // pipeline helper intentionally removed; use multi()/pipeline returned from mock
   const _isHealthy = async () => true
   const _connect = async () => undefined
-  const _getPoolStats = async () => ({ totalConnections: 1, activeConnections: 1, idleConnections: 0, waitingClients: 0 })
+  const _getPoolStats = async () => ({
+    totalConnections: 1,
+    activeConnections: 1,
+    idleConnections: 0,
+    waitingClients: 0,
+  })
   // pub/sub (no-op for tests)
   const _publish = async (_channel: string, _message: any) => 0
   const _subscribe = async (_channel: string) => undefined
@@ -338,7 +382,9 @@ function createMockRedis() {
   const _getClient = () => mock
   const _lpush = async (key, value) => {
     const listKey = `__list__:${key}`
-    if (!store.has(listKey)) { store.set(listKey, JSON.stringify([])) }
+    if (!store.has(listKey)) {
+      store.set(listKey, JSON.stringify([]))
+    }
     const arr = JSON.parse(store.get(listKey))
     arr.unshift(value)
     store.set(listKey, JSON.stringify(arr))
@@ -349,7 +395,9 @@ function createMockRedis() {
     const srcKey = `__list__:${src}`
     const destKey = `__list__:${dest}`
     const srcArr = store.has(srcKey) ? JSON.parse(store.get(srcKey)) : []
-    if (srcArr.length === 0) { return null }
+    if (srcArr.length === 0) {
+      return null
+    }
     const val = srcArr.pop()
     store.set(srcKey, JSON.stringify(srcArr))
     const destArr = store.has(destKey) ? JSON.parse(store.get(destKey)) : []
@@ -381,7 +429,9 @@ function createMockRedis() {
   const _brpop = async (key) => {
     const listKey = `__list__:${key}`
     const arr = store.has(listKey) ? JSON.parse(store.get(listKey)) : []
-    if (arr.length === 0) { return null }
+    if (arr.length === 0) {
+      return null
+    }
     const val = arr.pop()
     store.set(listKey, JSON.stringify(arr))
     return [key, val]

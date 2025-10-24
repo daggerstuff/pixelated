@@ -10,7 +10,7 @@ export interface QueuedRequest {
   url: string
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   headers: Record<string, string>
-  body?: any
+  body?: unknown
   timestamp: number
   retryCount: number
   maxRetries: number
@@ -65,7 +65,8 @@ class RequestQueue {
   private sortQueue(): void {
     this.queue.sort((a, b) => {
       // Sort by priority first (higher priority first)
-      const priorityDiff = this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)
+      const priorityDiff =
+        this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)
       if (priorityDiff !== 0) return priorityDiff
 
       // Then by timestamp (older first)
@@ -87,9 +88,11 @@ class RequestQueue {
     if (!this.options.enablePersistence) return
 
     try {
-      const stored = storageManager.get(this.options.storageKey, { defaultValue: [] })
+      const stored = storageManager.get(this.options.storageKey, {
+        defaultValue: [],
+      })
       if (Array.isArray(stored)) {
-        this.queue = stored.filter(req => {
+        this.queue = stored.filter((req) => {
           // Filter out expired requests (older than 24 hours)
           const maxAge = 24 * 60 * 60 * 1000 // 24 hours
           return Date.now() - req.timestamp < maxAge
@@ -104,16 +107,20 @@ class RequestQueue {
   /**
    * Add a request to the queue
    */
-  add(request: Omit<QueuedRequest, 'id' | 'timestamp' | 'retryCount'>): boolean {
+  add(
+    request: Omit<QueuedRequest, 'id' | 'timestamp' | 'retryCount'>,
+  ): boolean {
     try {
       if (this.queue.length >= this.options.maxQueueSize) {
         // Remove oldest low-priority requests to make room
         const lowPriorityRequests = this.queue
-          .filter(req => req.priority === 'low')
+          .filter((req) => req.priority === 'low')
           .sort((a, b) => a.timestamp - b.timestamp)
 
         if (lowPriorityRequests.length > 0) {
-          this.queue = this.queue.filter(req => req.id !== lowPriorityRequests[0].id)
+          this.queue = this.queue.filter(
+            (req) => req.id !== lowPriorityRequests[0].id,
+          )
         } else {
           console.warn('Request queue is full, dropping oldest request')
           this.queue.shift()
@@ -141,7 +148,9 @@ class RequestQueue {
   /**
    * Process the queue when back online
    */
-  async processQueue(onRequestSuccess?: (request: QueuedRequest) => void): Promise<void> {
+  async processQueue(
+    onRequestSuccess?: (request: QueuedRequest) => void,
+  ): Promise<void> {
     if (this.isProcessing || this.queue.length === 0) return
 
     this.isProcessing = true
@@ -154,7 +163,11 @@ class RequestQueue {
           const response = await fetch(request.url, {
             method: request.method,
             headers: request.headers,
-            body: request.body ? JSON.stringify(request.body) : undefined,
+            body: request.body
+              ? typeof request.body === 'string'
+                ? request.body
+                : JSON.stringify(request.body)
+              : undefined,
           })
 
           if (response.ok) {
@@ -171,11 +184,15 @@ class RequestQueue {
 
           if (request.retryCount >= request.maxRetries) {
             // Max retries reached, remove from queue
-            console.warn(`Request ${request.id} failed after ${request.maxRetries} retries, removing from queue`)
+            console.warn(
+              `Request ${request.id} failed after ${request.maxRetries} retries, removing from queue`,
+            )
             this.queue.shift()
           } else {
             // Wait before retrying
-            await new Promise(resolve => setTimeout(resolve, this.options.retryDelay * request.retryCount))
+            await new Promise((resolve) =>
+              setTimeout(resolve, this.options.retryDelay * request.retryCount),
+            )
             continue // Retry the same request
           }
         }
@@ -190,7 +207,7 @@ class RequestQueue {
    */
   remove(id: string): boolean {
     const initialLength = this.queue.length
-    this.queue = this.queue.filter(req => req.id !== id)
+    this.queue = this.queue.filter((req) => req.id !== id)
 
     if (this.queue.length < initialLength) {
       this.saveToStorage()
@@ -226,7 +243,7 @@ class RequestQueue {
     let oldestRequest: number | null = null
     let newestRequest: number | null = null
 
-    this.queue.forEach(req => {
+    this.queue.forEach((req) => {
       byPriority[req.priority]++
 
       if (oldestRequest === null || req.timestamp < oldestRequest) {

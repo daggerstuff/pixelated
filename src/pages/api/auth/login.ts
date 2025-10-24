@@ -5,7 +5,10 @@
 
 import type { APIRoute } from 'astro'
 import { authenticateWithBetterAuth } from '../../../lib/auth/better-auth-integration'
-import { rateLimitMiddleware, csrfProtection } from '../../../lib/auth/middleware'
+import {
+  rateLimitMiddleware,
+  csrfProtection,
+} from '../../../lib/auth/middleware'
 import { sanitizeInput } from '../../../lib/auth/utils'
 import { logSecurityEvent } from '../../../lib/security'
 
@@ -31,7 +34,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       request,
       'login',
       10, // 10 login attempts per hour per IP
-      60
+      60,
     )
 
     if (!rateLimitResult.success) {
@@ -40,7 +43,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Parse and validate request body
     const body = await request.json()
-    
+
     // Validate required fields
     if (!body.email || !body.password) {
       return new Response(
@@ -53,7 +56,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
@@ -62,7 +65,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const password = body.password // Don't sanitize password
 
     // Attempt login
-    const result = await authenticateWithBetterAuth({ email, password }, clientInfo)
+    const result = await authenticateWithBetterAuth(
+      { email, password },
+      clientInfo,
+    )
 
     // Log successful login
     await logSecurityEvent('USER_LOGIN_SUCCESS', result.user.id, {
@@ -91,9 +97,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store, no-cache, must-revalidate, private',
         },
-      }
+      },
     )
-
   } catch (error) {
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
@@ -113,13 +118,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
     // Handle unexpected errors
     console.error('Login error:', error)
-    
+
     await logSecurityEvent('USER_LOGIN_ERROR', null, {
       error: error.message,
       clientInfo,
@@ -136,7 +141,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     )
   }
 }
@@ -148,7 +153,8 @@ export const OPTIONS: APIRoute = async ({ request }) => {
     headers: {
       'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
+      'Access-Control-Allow-Headers':
+        'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
       'Access-Control-Max-Age': '86400',
     },
   })

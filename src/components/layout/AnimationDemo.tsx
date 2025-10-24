@@ -10,7 +10,7 @@ import {
   GlowOnHover,
   StaggerContainer,
   SkeletonLoader,
-  ScrollReveal
+  ScrollReveal,
 } from './AdvancedAnimations'
 import { ResponsiveContainer, ResponsiveText } from './ResponsiveUtils'
 
@@ -28,10 +28,26 @@ export const AnimationDemo: FC = () => {
   }, [])
 
   const demoItems = [
-    { title: 'Enhanced UX', description: 'Smooth animations create better user experiences', icon: '✨' },
-    { title: 'Accessibility', description: 'Respects reduced motion preferences', icon: '♿' },
-    { title: 'Performance', description: 'Optimized animations with GPU acceleration', icon: '⚡' },
-    { title: 'Responsive', description: 'Animations adapt to different screen sizes', icon: '📱' },
+    {
+      title: 'Enhanced UX',
+      description: 'Smooth animations create better user experiences',
+      icon: '✨',
+    },
+    {
+      title: 'Accessibility',
+      description: 'Respects reduced motion preferences',
+      icon: '♿',
+    },
+    {
+      title: 'Performance',
+      description: 'Optimized animations with GPU acceleration',
+      icon: '⚡',
+    },
+    {
+      title: 'Responsive',
+      description: 'Animations adapt to different screen sizes',
+      icon: '📱',
+    },
   ]
 
   return (
@@ -131,7 +147,9 @@ export const AnimationDemo: FC = () => {
                 <span className="text-2xl">{item.icon}</span>
                 <div>
                   <h3 className="font-medium">{item.title}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{item.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {item.description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -144,7 +162,9 @@ export const AnimationDemo: FC = () => {
 
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Loading content...</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Loading content...
+              </span>
               <SkeletonLoader lines={1} className="w-32" />
             </div>
 
@@ -160,7 +180,9 @@ export const AnimationDemo: FC = () => {
             {Array.from({ length: 3 }).map((_, index) => (
               <ScrollReveal key={index}>
                 <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border">
-                  <h3 className="font-medium mb-2">Scroll-triggered Animation #{index + 1}</h3>
+                  <h3 className="font-medium mb-2">
+                    Scroll-triggered Animation #{index + 1}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     This content animates in when it enters the viewport
                   </p>

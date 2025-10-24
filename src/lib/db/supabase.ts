@@ -30,9 +30,7 @@ function createMockClient() {
 
 // Use MongoDB client if credentials are available, otherwise use mock
 export const mongoClient =
-  mongoUri && mongoDbName
-    ? mongodb
-    : (createMockClient() as unknown)
+  mongoUri && mongoDbName ? mongodb : (createMockClient() as unknown)
 
 // Export MongoDB auth service as main auth interface
 // Prefer adapter for new codepaths

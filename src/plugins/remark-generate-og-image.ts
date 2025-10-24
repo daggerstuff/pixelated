@@ -27,8 +27,11 @@ const chalk = {
 export function remarkGenerateOgImage() {
   return (tree: Root, file: any) => {
     // Simple implementation - just log the processing
-    console.log(chalk.blue('Processing OG image generation for:'), file?.path || 'unknown file')
-    
+    console.log(
+      chalk.blue('Processing OG image generation for:'),
+      file?.path || 'unknown file',
+    )
+
     // Add metadata for OG image generation
     if (file?.data) {
       file.data.ogImage = {
@@ -36,7 +39,7 @@ export function remarkGenerateOgImage() {
         description: extractDescription(tree),
       }
     }
-    
+
     return tree
   }
 }
@@ -44,7 +47,7 @@ export function remarkGenerateOgImage() {
 function extractTitle(tree: Root): string {
   // Extract title from heading
   let title = 'Default Title'
-  
+
   function walk(node: any) {
     if (node.type === 'heading' && node.depth === 1) {
       if (node.children && node.children[0] && node.children[0].value) {
@@ -55,7 +58,7 @@ function extractTitle(tree: Root): string {
       node.children.forEach(walk)
     }
   }
-  
+
   walk(tree)
   return title
 }
@@ -64,7 +67,7 @@ function extractDescription(tree: Root): string {
   // Extract first paragraph as description
   let description = 'Default description'
   let foundFirstParagraph = false
-  
+
   function walk(node: any) {
     if (node.type === 'paragraph' && !foundFirstParagraph) {
       if (node.children && node.children[0] && node.children[0].value) {
@@ -76,7 +79,7 @@ function extractDescription(tree: Root): string {
       node.children.forEach(walk)
     }
   }
-  
+
   walk(tree)
   return description
 }

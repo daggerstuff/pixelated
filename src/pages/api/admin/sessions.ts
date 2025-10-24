@@ -3,7 +3,6 @@ import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-
 // Initialize logger
 const logger = createBuildSafeLogger('default')
 

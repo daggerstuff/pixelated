@@ -1,82 +1,95 @@
 ---
 // ConsentDashboard.astro - Admin dashboard for consent management
-import Card from '@/components/ui/Card.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
+import Card from '@/components/ui/Card.astro'
+import CardHeader from '@/components/ui/CardHeader.astro'
+import CardContent from '@/components/ui/CardContent.astro'
+import CardTitle from '@/components/ui/CardTitle.astro'
 import Badge from '@/components/ui/Badge.astro'
 import mongodb from '@/config/mongodb.config'
 import SafeIcon from '../../ui/SafeIcon.astro'
 
 function formatDate(dateInput: any, options: any = {}) {
-  if (!dateInput) return '-';
-  const date = new Date(dateInput);
-  const defaultOptions = { year: 'numeric', month: 'long', day: 'numeric' } as any;
-  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options });
+  if (!dateInput) return '-'
+  const date = new Date(dateInput)
+  const defaultOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  } as any
+  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options })
 }
 
 // Define interfaces for data structures
 // Fetch data with proper typing
-const db = await mongodb.connect();
+const db = await mongodb.connect()
 
-const activeConsents = await db.collection('user_consents').aggregate([
-  { $match: { is_active: true } },
-  {
-    $lookup: {
-      from: 'consent_versions',
-      localField: 'consent_version_id',
-      foreignField: '_id',
-      as: 'consent_versions'
-    }
-  },
-  { $unwind: '$consent_versions' },
-  {
-    $lookup: {
-      from: 'consent_types',
-      localField: 'consent_versions.consent_type_id',
-      foreignField: '_id',
-      as: 'consent_versions.consent_types'
-    }
-  },
-  { $unwind: '$consent_versions.consent_types' }
-]).toArray();
-
-const withdrawnConsents = await db.collection('user_consents').aggregate([
-  { $match: { is_active: false, withdrawal_date: { $ne: null } } },
+const activeConsents = await db
+  .collection('user_consents')
+  .aggregate([
+    { $match: { is_active: true } },
     {
-    $lookup: {
-      from: 'consent_versions',
-      localField: 'consent_version_id',
-      foreignField: '_id',
-      as: 'consent_versions'
-    }
-  },
-  { $unwind: '$consent_versions' },
-  {
-    $lookup: {
-      from: 'consent_types',
-      localField: 'consent_versions.consent_type_id',
-      foreignField: '_id',
-      as: 'consent_versions.consent_types'
-    }
-  },
-  { $unwind: '$consent_versions.consent_types' }
-]).toArray();
+      $lookup: {
+        from: 'consent_versions',
+        localField: 'consent_version_id',
+        foreignField: '_id',
+        as: 'consent_versions',
+      },
+    },
+    { $unwind: '$consent_versions' },
+    {
+      $lookup: {
+        from: 'consent_types',
+        localField: 'consent_versions.consent_type_id',
+        foreignField: '_id',
+        as: 'consent_versions.consent_types',
+      },
+    },
+    { $unwind: '$consent_versions.consent_types' },
+  ])
+  .toArray()
 
-const consentTypes = await db.collection('consent_types').find().toArray();
+const withdrawnConsents = await db
+  .collection('user_consents')
+  .aggregate([
+    { $match: { is_active: false, withdrawal_date: { $ne: null } } },
+    {
+      $lookup: {
+        from: 'consent_versions',
+        localField: 'consent_version_id',
+        foreignField: '_id',
+        as: 'consent_versions',
+      },
+    },
+    { $unwind: '$consent_versions' },
+    {
+      $lookup: {
+        from: 'consent_types',
+        localField: 'consent_versions.consent_type_id',
+        foreignField: '_id',
+        as: 'consent_versions.consent_types',
+      },
+    },
+    { $unwind: '$consent_versions.consent_types' },
+  ])
+  .toArray()
 
-const consentVersions = await db.collection('consent_versions').aggregate([
-  {
-    $lookup: {
-      from: 'consent_types',
-      localField: 'consent_type_id',
-      foreignField: '_id',
-      as: 'consent_types'
-    }
-  },
-  { $unwind: '$consent_types' },
-  { $sort: { 'consent_types.name': 1, effective_date: -1 } }
-]).toArray();
+const consentTypes = await db.collection('consent_types').find().toArray()
+
+const consentVersions = await db
+  .collection('consent_versions')
+  .aggregate([
+    {
+      $lookup: {
+        from: 'consent_types',
+        localField: 'consent_type_id',
+        foreignField: '_id',
+        as: 'consent_types',
+      },
+    },
+    { $unwind: '$consent_types' },
+    { $sort: { 'consent_types.name': 1, 'effective_date': -1 } },
+  ])
+  .toArray()
 
 // Type for consent version with joined data from consent_types
 interface ConsentVersionWithTypeName {
@@ -108,37 +121,39 @@ interface UserConsentWithDetails {
 }
 
 // Type assertions for the data
-const typedConsentVersions = consentVersions as unknown as ConsentVersionWithTypeName[] | null;
-const typedActiveConsents  = activeConsents    as unknown as UserConsentWithDetails[]     | null;
-const typedWithdrawnConsents = withdrawnConsents as unknown as UserConsentWithDetails[]  | null;
+const typedConsentVersions = consentVersions as unknown as
+  | ConsentVersionWithTypeName[]
+  | null
+const typedActiveConsents = activeConsents as unknown as
+  | UserConsentWithDetails[]
+  | null
+const typedWithdrawnConsents = withdrawnConsents as unknown as
+  | UserConsentWithDetails[]
+  | null
 
 // Calculate overall stats
-const totalActiveConsents    = (typedActiveConsents    || []).length;
-const totalWithdrawnConsents = (typedWithdrawnConsents || []).length;
-const totalConsentTypes      = consentTypes?.length       || 0;
-const totalConsentVersions   = typedConsentVersions?.length || 0;
+const totalActiveConsents = (typedActiveConsents || []).length
+const totalWithdrawnConsents = (typedWithdrawnConsents || []).length
+const totalConsentTypes = consentTypes?.length || 0
+const totalConsentVersions = typedConsentVersions?.length || 0
 
 // Group consents by type
-const consentsByType: Record<string, number> = {};
+const consentsByType: Record<string, number> = {}
 ;(typedActiveConsents || []).forEach((consent) => {
-  const typeName = consent.consent_versions?.consent_types?.name;
+  const typeName = consent.consent_versions?.consent_types?.name
   if (typeName) {
-    consentsByType[typeName] = (consentsByType[typeName] || 0) + 1;
+    consentsByType[typeName] = (consentsByType[typeName] || 0) + 1
   }
-});
+})
 
 // Group withdrawals by type
-const withdrawalsByType: Record<string, number> = {};
+const withdrawalsByType: Record<string, number> = {}
 ;(typedWithdrawnConsents || []).forEach((consent) => {
-  const typeName = consent.consent_versions?.consent_types?.name;
+  const typeName = consent.consent_versions?.consent_types?.name
   if (typeName) {
-    withdrawalsByType[typeName] = (withdrawalsByType[typeName] || 0) + 1;
+    withdrawalsByType[typeName] = (withdrawalsByType[typeName] || 0) + 1
   }
-});
-
-
-
-
+})
 ---
 
 <div class="space-y-6">
@@ -162,8 +177,6 @@ const withdrawalsByType: Record<string, number> = {};
     </div>
   </div>
 
-  
-
   <!-- Dashboard Stats Cards -->
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
     <Card>
@@ -185,8 +198,7 @@ const withdrawalsByType: Record<string, number> = {};
       <CardHeader
         class="flex flex-row items-center justify-between space-y-0 pb-2"
       >
-        <CardTitle class="text-sm font-medium">Withdrawn Consents</CardTitle
-        >
+        <CardTitle class="text-sm font-medium">Withdrawn Consents</CardTitle>
         <SafeIcon name="tabler:circle-x" class="h-4 w-4 text-red-500" />
       </CardHeader>
       <CardContent>
@@ -241,7 +253,9 @@ const withdrawalsByType: Record<string, number> = {};
                     </p>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <Badge variant={type['is_active'] ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={type['is_active'] ? 'default' : 'secondary'}
+                    >
                       {type['is_active'] ? 'Active' : 'Inactive'}
                     </Badge>
                     <span class="text-sm font-medium">
@@ -272,13 +286,16 @@ const withdrawalsByType: Record<string, number> = {};
           {
             typedConsentVersions &&
               typedConsentVersions
-                .filter((v): v is ConsentVersionWithTypeName => 
-                  v.is_current && !!v.consent_types?.name
+                .filter(
+                  (v): v is ConsentVersionWithTypeName =>
+                    v.is_current && !!v.consent_types?.name,
                 )
                 .map((version) => (
                   <div class="flex items-center justify-between border-b pb-2">
                     <div>
-                      <p class="font-medium">{version.consent_types?.name || 'Unknown'}</p>
+                      <p class="font-medium">
+                        {version.consent_types?.name || 'Unknown'}
+                      </p>
                       <p class="text-xs text-muted-foreground">
                         Version {version.version} • Effective:{' '}
                         {formatDate(version.effective_date, { month: 'short' })}
@@ -291,113 +308,123 @@ const withdrawalsByType: Record<string, number> = {};
 
           {
             (!typedConsentVersions ||
-              typedConsentVersions.filter(v => v.is_current).length === 0) && (
+              typedConsentVersions.filter((v) => v.is_current).length ===
+                0) && (
               <p class="text-center text-muted-foreground py-4">
                 No current versions found
               </p>
             )
           }
-      </CardContent>
-    </Card>
-  </div>
-
-  <!-- Consent Analytics -->
-  <Card>
-    <CardHeader>
-      <CardTitle>Consent Analytics</CardTitle>
-    </CardHeader>
-    <CardContent>
-      {
-        Object.keys(consentsByType).length > 0 ? (
-          <div class="space-y-8">
-            <div>
-              <h3 class="text-sm font-medium mb-2">Active Consents by Type</h3>
-              <div class="space-y-2">
-                {Object.entries(consentsByType).map(([typeName, count]) => (
-                  <div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-sm">{typeName}</span>
-                      <span class="text-sm font-medium">{count}</span>
-                    </div>
-                    <div class="h-2 w-full mt-1 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        class="bg-green-500 h-full rounded-full"
-                        style={`width: ${Math.min(100, Math.round((count / totalActiveConsents) * 100))}%`}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {Object.keys(withdrawalsByType).length > 0 && (
-              <div>
-                <h3 class="text-sm font-medium mb-2">Withdrawals by Type</h3>
-                <div class="space-y-2">
-                  {Object.entries(withdrawalsByType).map(
-                    ([typeName, count]) => (
-                      <div>
-                        <div class="flex items-center justify-between">
-                          <span class="text-sm">{typeName}</span>
-                          <span class="text-sm font-medium">{count}</span>
-                        </div>
-                        <div class="h-2 w-full mt-1 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            class="bg-red-500 h-full rounded-full"
-                            style={`width: ${Math.min(100, Math.round((count / totalWithdrawnConsents) * 100))}%`}
-                          />
-                        </div>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div class="text-center py-8">
-            <SafeIcon
-              name="tabler:chart-bar"
-              class="h-12 w-12 text-gray-300 mx-auto mb-3"
-            />
-            <p class="text-muted-foreground">
-              No consent data available for analysis
-            </p>
-          </div>
-        )
-      }
-    </CardContent>
-  </Card>
-
-  <!-- Recent Withdrawals -->
-  {typedWithdrawnConsents && typedWithdrawnConsents.length > 0 && (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Consent Withdrawals</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          {typedWithdrawnConsents.slice(0, 5).map((consent) => (
-            <div class="border-b pb-4">
-              <div class="flex items-center justify-between mb-2">
-                <div>
-                  <Badge variant="outline">
-                    {consent.consent_versions?.consent_types?.name || 'Unknown'}
-                  </Badge>
-                  <span class="text-xs text-muted-foreground ml-2">
-                    Withdrawn on {formatDate(consent.withdrawal_date, { month: 'short' })}
-                  </span>
-                </div>
-              </div>
-              {consent.withdrawal_reason && (
-                <p class="text-sm border-l-2 border-red-200 pl-3 text-gray-600 italic">
-                  "{consent.withdrawal_reason}"
-                </p>
-              )}
-            </div>
-          ))}
         </div>
       </CardContent>
     </Card>
-  )}
+
+    <!-- Consent Analytics -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Consent Analytics</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {
+          Object.keys(consentsByType).length > 0 ? (
+            <div class="space-y-8">
+              <div>
+                <h3 class="text-sm font-medium mb-2">
+                  Active Consents by Type
+                </h3>
+                <div class="space-y-2">
+                  {Object.entries(consentsByType).map(([typeName, count]) => (
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm">{typeName}</span>
+                        <span class="text-sm font-medium">{count}</span>
+                      </div>
+                      <div class="h-2 w-full mt-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          class="bg-green-500 h-full rounded-full"
+                          style={`width: ${Math.min(100, Math.round((count / totalActiveConsents) * 100))}%`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {Object.keys(withdrawalsByType).length > 0 && (
+                <div>
+                  <h3 class="text-sm font-medium mb-2">Withdrawals by Type</h3>
+                  <div class="space-y-2">
+                    {Object.entries(withdrawalsByType).map(
+                      ([typeName, count]) => (
+                        <div>
+                          <div class="flex items-center justify-between">
+                            <span class="text-sm">{typeName}</span>
+                            <span class="text-sm font-medium">{count}</span>
+                          </div>
+                          <div class="h-2 w-full mt-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              class="bg-red-500 h-full rounded-full"
+                              style={`width: ${Math.min(100, Math.round((count / totalWithdrawnConsents) * 100))}%`}
+                            />
+                          </div>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div class="text-center py-8">
+              <SafeIcon
+                name="tabler:chart-bar"
+                class="h-12 w-12 text-gray-300 mx-auto mb-3"
+              />
+              <p class="text-muted-foreground">
+                No consent data available for analysis
+              </p>
+            </div>
+          )
+        }
+      </CardContent>
+    </Card>
+
+    <!-- Recent Withdrawals -->
+    {
+      typedWithdrawnConsents && typedWithdrawnConsents.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Consent Withdrawals</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="space-y-4">
+              {typedWithdrawnConsents.slice(0, 5).map((consent) => (
+                <div class="border-b pb-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <div>
+                      <Badge variant="outline">
+                        {consent.consent_versions?.consent_types?.name ||
+                          'Unknown'}
+                      </Badge>
+                      <span class="text-xs text-muted-foreground ml-2">
+                        Withdrawn on{' '}
+                        {formatDate(consent.withdrawal_date, {
+                          month: 'short',
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  {consent.withdrawal_reason && (
+                    <p class="text-sm border-l-2 border-red-200 pl-3 text-gray-600 italic">
+                      "{consent.withdrawal_reason}"
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )
+    }
+  </div>
 </div>

@@ -22,16 +22,16 @@ export class RedisCache {
       db: parseInt(process.env['REDIS_DB'] || '0'),
       ttl: parseInt(process.env['REDIS_TTL'] || '3600'), // 1 hour default
       keyPrefix: process.env['REDIS_KEY_PREFIX'] || 'pixelated:',
-      ...config
+      ...config,
     }
 
     this.client = createClient({
       socket: {
         host: this.config.host,
-        port: this.config.port
+        port: this.config.port,
       },
       password: this.config.password,
-      database: this.config.db
+      database: this.config.db,
     })
 
     this.setupEventHandlers()
@@ -133,7 +133,7 @@ export class RedisCache {
   async getOrSet<T>(
     key: string,
     factory: () => Promise<T>,
-    ttl?: number
+    ttl?: number,
   ): Promise<T> {
     // Try to get from cache first
     const cached = await this.get<T>(key)
@@ -196,14 +196,14 @@ export class RedisCache {
       return {
         connected: this.connected,
         keys,
-        memory: this.parseRedisInfo(info)
+        memory: this.parseRedisInfo(info),
       }
     } catch (error) {
       console.warn('Redis cache stats error:', error)
       return {
         connected: false,
         keys: 0,
-        memory: null
+        memory: null,
       }
     }
   }
@@ -212,7 +212,7 @@ export class RedisCache {
     const lines = info.split('\n')
     const result: any = {}
 
-    lines.forEach(line => {
+    lines.forEach((line) => {
       if (line.includes(':')) {
         const parts = line.split(':')
         if (parts.length >= 2) {

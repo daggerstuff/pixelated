@@ -5,18 +5,15 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import jwt from 'jsonwebtoken'
-import { 
-  generateTokenPair, 
-  validateToken, 
-  refreshAccessToken, 
-  revokeToken, 
+import {
+  generateTokenPair,
+  validateToken,
+  refreshAccessToken,
+  revokeToken,
   cleanupExpiredTokens,
   AuthenticationError,
-  type ClientInfo
+  type ClientInfo,
 } from '../jwt-service'
-
-
-
 
 // Mock dependencies
 vi.mock('../../redis', () => ({
@@ -40,7 +37,7 @@ vi.mock('../../security', () => ({
     TOKEN_REFRESHED: 'TOKEN_REFRESHED',
     TOKEN_REVOKED: 'TOKEN_REVOKED',
     TOKEN_CLEANED_UP: 'TOKEN_CLEANED_UP',
-  }
+  },
 }))
 
 vi.mock('../../mcp/phase6-integration', () => ({
@@ -84,19 +81,22 @@ describe('JWT Service', () => {
     })
 
     it('should throw error for invalid parameters', async () => {
-      await expect(generateTokenPair('', 'admin', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
-      
-      await expect(generateTokenPair('user123', '' as any, mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
-      
-      await expect(generateTokenPair('user123', 'admin', {} as any))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        generateTokenPair('', 'admin', mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
+
+      await expect(
+        generateTokenPair('user123', '' as any, mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
+
+      await expect(
+        generateTokenPair('user123', 'admin', {} as any),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should store token metadata in Redis', async () => {
       const { setInCache } = await import('../../redis')
-      
+
       await generateTokenPair('user123', 'admin', mockClientInfo)
 
       expect(setInCache).toHaveBeenCalledTimes(2) // Once for access token, once for refresh token
@@ -107,13 +107,13 @@ describe('JWT Service', () => {
           role: 'admin',
           type: 'access',
         }),
-        expect.any(Number)
+        expect.any(Number),
       )
     })
 
     it('should log security event', async () => {
       const { logSecurityEvent } = await import('../../security')
-      
+
       await generateTokenPair('user123', 'admin', mockClientInfo)
 
       expect(logSecurityEvent).toHaveBeenCalledWith(
@@ -121,18 +121,20 @@ describe('JWT Service', () => {
         'user123',
         expect.objectContaining({
           clientInfo: mockClientInfo,
-        })
+        }),
       )
     })
 
     it('should update Phase 6 MCP server', async () => {
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
-      
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
+
       await generateTokenPair('user123', 'admin', mockClientInfo)
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         'user123',
-        'token_generated'
+        'token_generated',
       )
     })
   })
@@ -140,10 +142,14 @@ describe('JWT Service', () => {
   describe('validateToken', () => {
     it('should validate valid token and return user info', async () => {
       const { setInCache } = await import('../../redis')
-      
+
       // Generate a token first
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       // Mock Redis to return valid metadata
       vi.mocked(setInCache).mockImplementation(async (key, data) => {
         if (key.startsWith('token:')) {
@@ -186,8 +192,12 @@ describe('JWT Service', () => {
     })
 
     it('should reject tampered tokens', async () => {
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       // Tamper with the token
       const tamperedToken = tokenPair.accessToken.slice(0, -10) + 'tampered123'
 
@@ -199,9 +209,13 @@ describe('JWT Service', () => {
 
     it('should reject revoked tokens', async () => {
       const { getFromCache } = await import('../../redis')
-      
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       // Mock revoked token
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('revoked:')) {
@@ -217,8 +231,12 @@ describe('JWT Service', () => {
     })
 
     it('should reject tokens with wrong type', async () => {
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       // Try to validate access token as refresh token
       const result = await validateToken(tokenPair.accessToken, 'refresh')
 
@@ -228,7 +246,7 @@ describe('JWT Service', () => {
 
     it('should log validation failure', async () => {
       const { logSecurityEvent } = await import('../../security')
-      
+
       const invalidToken = 'invalid.jwt.token'
       await validateToken(invalidToken, 'access')
 
@@ -238,7 +256,7 @@ describe('JWT Service', () => {
         expect.objectContaining({
           error: expect.any(String),
           tokenType: 'access',
-        })
+        }),
       )
     })
   })
@@ -246,9 +264,13 @@ describe('JWT Service', () => {
   describe('refreshAccessToken', () => {
     it('should generate new token pair with valid refresh token', async () => {
       const { setInCache } = await import('../../redis')
-      
-      const originalTokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+
+      const originalTokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       // Mock Redis responses for refresh flow
       vi.mocked(setInCache).mockImplementation(async (key, data) => {
         if (key.startsWith('token:')) {
@@ -257,7 +279,10 @@ describe('JWT Service', () => {
         return true
       })
 
-      const newTokenPair = await refreshAccessToken(originalTokenPair.refreshToken, mockClientInfo)
+      const newTokenPair = await refreshAccessToken(
+        originalTokenPair.refreshToken,
+        mockClientInfo,
+      )
 
       expect(newTokenPair).toHaveProperty('accessToken')
       expect(newTokenPair).toHaveProperty('refreshToken')
@@ -267,9 +292,13 @@ describe('JWT Service', () => {
 
     it('should revoke old tokens after refresh', async () => {
       const { setInCache, removeFromCache } = await import('../../redis')
-      
-      const originalTokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+
+      const originalTokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       // Mock Redis responses
       vi.mocked(setInCache).mockImplementation(async (key, data) => {
         if (key.startsWith('token:')) {
@@ -290,23 +319,28 @@ describe('JWT Service', () => {
         expect.objectContaining({
           reason: expect.stringContaining('refresh_token_used'),
         }),
-        expect.any(Number)
+        expect.any(Number),
       )
     })
 
     it('should throw error for invalid refresh token', async () => {
-      await expect(refreshAccessToken('invalid.token.here', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        refreshAccessToken('invalid.token.here', mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
   })
 
   describe('revokeToken', () => {
     it('should revoke token and clean up metadata', async () => {
       const { setInCache, removeFromCache } = await import('../../redis')
-      
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
+
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
       const decoded = jwt.decode(tokenPair.accessToken) as any
-      
+
       // Mock Redis responses
       vi.mocked(setInCache).mockImplementation(async (key, data) => {
         return true
@@ -323,16 +357,20 @@ describe('JWT Service', () => {
         expect.objectContaining({
           reason: 'user_logout',
         }),
-        expect.any(Number)
+        expect.any(Number),
       )
-      
+
       expect(removeFromCache).toHaveBeenCalledWith(`token:${decoded.jti}`)
     })
 
     it('should log revocation event', async () => {
       const { logSecurityEvent } = await import('../../security')
-      
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
+
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
       const decoded = jwt.decode(tokenPair.accessToken) as any
 
       await revokeToken(decoded.jti, 'security_breach')
@@ -343,28 +381,43 @@ describe('JWT Service', () => {
         expect.objectContaining({
           tokenId: decoded.jti,
           reason: 'security_breach',
-        })
+        }),
       )
     })
   })
 
   describe('cleanupExpiredTokens', () => {
     it('should clean up expired tokens', async () => {
-      const { getFromCache, removeFromCache, redis } = await import('../../redis')
-      
+      const { getFromCache, removeFromCache, redis } = await import(
+        '../../redis'
+      )
+
       // Mock Redis keys
-      vi.mocked(redis.keys).mockResolvedValue(['token:123', 'token:456', 'token:789'])
-      
+      vi.mocked(redis.keys).mockResolvedValue([
+        'token:123',
+        'token:456',
+        'token:789',
+      ])
+
       // Mock token metadata - some expired, some not
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key === 'token:123') {
-          return { userId: 'user123', expiresAt: Math.floor(Date.now() / 1000) - 3600 } // expired
+          return {
+            userId: 'user123',
+            expiresAt: Math.floor(Date.now() / 1000) - 3600,
+          } // expired
         }
         if (key === 'token:456') {
-          return { userId: 'user456', expiresAt: Math.floor(Date.now() / 1000) + 3600 } // not expired
+          return {
+            userId: 'user456',
+            expiresAt: Math.floor(Date.now() / 1000) + 3600,
+          } // not expired
         }
         if (key === 'token:789') {
-          return { userId: 'user789', expiresAt: Math.floor(Date.now() / 1000) - 7200 } // expired
+          return {
+            userId: 'user789',
+            expiresAt: Math.floor(Date.now() / 1000) - 7200,
+          } // expired
         }
         return null
       })
@@ -378,7 +431,7 @@ describe('JWT Service', () => {
       expect(result.cleanedTokens).toBe(2) // Should clean up 2 expired tokens
       expect(result.timestamp).toBeDefined()
       expect(result.nextCleanup).toBeDefined()
-      
+
       expect(removeFromCache).toHaveBeenCalledWith('token:123')
       expect(removeFromCache).toHaveBeenCalledWith('token:789')
       expect(removeFromCache).not.toHaveBeenCalledWith('token:456')
@@ -387,11 +440,11 @@ describe('JWT Service', () => {
     it('should log cleanup events', async () => {
       const { logSecurityEvent } = await import('../../security')
       const { redis } = await import('../../redis')
-      
+
       vi.mocked(redis.keys).mockResolvedValue(['token:123'])
       vi.mocked(getFromCache).mockResolvedValue({
         userId: 'user123',
-        expiresAt: Math.floor(Date.now() / 1000) - 3600
+        expiresAt: Math.floor(Date.now() / 1000) - 3600,
       })
 
       await cleanupExpiredTokens()
@@ -401,7 +454,7 @@ describe('JWT Service', () => {
         'user123',
         expect.objectContaining({
           reason: 'expired_cleanup',
-        })
+        }),
       )
     })
   })
@@ -409,8 +462,11 @@ describe('JWT Service', () => {
   describe('measureTokenOperation', () => {
     it('should measure operation performance', async () => {
       const mockOperation = vi.fn().mockResolvedValue('success')
-      
-      const result = await measureTokenOperation(mockOperation, 'test_operation')
+
+      const result = await measureTokenOperation(
+        mockOperation,
+        'test_operation',
+      )
 
       expect(result).toBe('success')
       expect(mockOperation).toHaveBeenCalled()
@@ -418,34 +474,37 @@ describe('JWT Service', () => {
 
     it('should log slow operations', async () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-      
+
       const slowOperation = vi.fn().mockImplementation(async () => {
-        await new Promise(resolve => setTimeout(resolve, 150)) // 150ms delay
+        await new Promise((resolve) => setTimeout(resolve, 150)) // 150ms delay
         return 'slow_result'
       })
 
       await measureTokenOperation(slowOperation, 'slow_operation')
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('slow_operation took')
+        expect.stringContaining('slow_operation took'),
       )
-      
+
       consoleSpy.mockRestore()
     })
 
     it('should log operation failures', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-      
-      const failingOperation = vi.fn().mockRejectedValue(new Error('Operation failed'))
 
-      await expect(measureTokenOperation(failingOperation, 'failing_operation'))
-        .rejects.toThrow('Operation failed')
+      const failingOperation = vi
+        .fn()
+        .mockRejectedValue(new Error('Operation failed'))
+
+      await expect(
+        measureTokenOperation(failingOperation, 'failing_operation'),
+      ).rejects.toThrow('Operation failed')
 
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('failing_operation failed after'),
-        expect.any(Error)
+        expect.any(Error),
       )
-      
+
       consoleSpy.mockRestore()
     })
   })
@@ -453,20 +512,24 @@ describe('JWT Service', () => {
   describe('Performance Requirements', () => {
     it('should meet sub-100ms token generation target', async () => {
       const start = performance.now()
-      
+
       await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(100)
     })
 
     it('should meet sub-50ms token validation target', async () => {
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       const start = performance.now()
-      
+
       await validateToken(tokenPair.accessToken, 'access')
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(50)
     })
@@ -474,7 +537,8 @@ describe('JWT Service', () => {
 
   describe('Security Requirements', () => {
     it('should reject tokens with invalid signatures', async () => {
-      const invalidToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwicm9sZSI6ImFkbWluIiwidHlwZSI6ImFjY2VzcyIsImp0aSI6InRlc3QtaWQtMTIzIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE2MDAwMDA5MDB9.INVALID_SIGNATURE'
+      const invalidToken =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwicm9sZSI6ImFkbWluIiwidHlwZSI6ImFjY2VzcyIsImp0aSI6InRlc3QtaWQtMTIzIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE2MDAwMDA5MDB9.INVALID_SIGNATURE'
 
       const result = await validateToken(invalidToken, 'access')
 
@@ -484,14 +548,18 @@ describe('JWT Service', () => {
 
     it('should validate token device binding', async () => {
       const { setInCache } = await import('../../redis')
-      
-      const tokenPair = await generateTokenPair('user123', 'admin', mockClientInfo)
-      
+
+      const tokenPair = await generateTokenPair(
+        'user123',
+        'admin',
+        mockClientInfo,
+      )
+
       // Mock different device ID in metadata
       vi.mocked(setInCache).mockImplementation(async (key, data) => {
         if (key.startsWith('token:')) {
           // Store metadata with different device ID
-          
+
           return true
         }
         return true
@@ -529,11 +597,11 @@ describe('JWT Service', () => {
   describe('HIPAA Compliance', () => {
     it('should not log sensitive user data in security events', async () => {
       const { logSecurityEvent } = await import('../../security')
-      
+
       await generateTokenPair('user123', 'admin', mockClientInfo)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // Should not contain sensitive data like passwords or full tokens
       expect(JSON.stringify(loggedData)).not.toContain('password')
       expect(JSON.stringify(loggedData)).not.toContain(mockClientInfo.userAgent)
@@ -541,11 +609,11 @@ describe('JWT Service', () => {
 
     it('should mask IP addresses in logs when required', async () => {
       const { logSecurityEvent } = await import('../../security')
-      
+
       await generateTokenPair('user123', 'admin', mockClientInfo)
 
       const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
-      
+
       // IP should be masked or not included in logs
       if (loggedData.clientInfo) {
         expect(loggedData.clientInfo.ip).toBeUndefined()

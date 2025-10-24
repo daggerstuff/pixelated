@@ -17,8 +17,8 @@ jest.mock('@/hooks/usePipelineWebSocket', () => ({
     disconnect: jest.fn(),
     sendMessage: jest.fn(),
     sendProgressRequest: jest.fn(),
-    sendStatusRequest: jest.fn()
-  }))
+    sendStatusRequest: jest.fn(),
+  })),
 }))
 
 jest.mock('@/hooks/usePipelineAPI', () => ({
@@ -28,8 +28,13 @@ jest.mock('@/hooks/usePipelineAPI', () => ({
     startExecution: jest.fn(),
     getExecutionStatus: jest.fn(),
     getAvailableDatasets: jest.fn(() => Promise.resolve([])),
-    healthCheck: jest.fn(() => Promise.resolve({ status: 'healthy', timestamp: new Date().toISOString() }))
-  }))
+    healthCheck: jest.fn(() =>
+      Promise.resolve({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+      }),
+    ),
+  })),
 }))
 
 // Mock WebSocket
@@ -38,7 +43,7 @@ global.WebSocket = jest.fn(() => ({
   close: jest.fn(),
   addEventListener: jest.fn(),
   removeEventListener: jest.fn(),
-  readyState: WebSocket.CONNECTING
+  readyState: WebSocket.CONNECTING,
 })) as any
 
 describe('PipelineDashboard', () => {
@@ -46,7 +51,7 @@ describe('PipelineDashboard', () => {
     className: 'test-class',
     onExecutionStart: jest.fn(),
     onExecutionComplete: jest.fn(),
-    onError: jest.fn()
+    onError: jest.fn(),
   }
 
   const renderComponent = (props = {}) => {
@@ -55,7 +60,7 @@ describe('PipelineDashboard', () => {
         <PipelineAPIProvider>
           <PipelineDashboard {...mockProps} {...props} />
         </PipelineAPIProvider>
-      </WebSocketProvider>
+      </WebSocketProvider>,
     )
   }
 
@@ -66,34 +71,40 @@ describe('PipelineDashboard', () => {
   describe('Rendering', () => {
     it('renders the main dashboard container', () => {
       renderComponent()
-      
+
       expect(screen.getByRole('tablist')).toBeInTheDocument()
       expect(screen.getByText('Pipeline Dashboard')).toBeInTheDocument()
     })
 
     it('renders all three entry point tabs', () => {
       renderComponent()
-      
-      expect(screen.getByRole('tab', { name: /web frontend/i })).toBeInTheDocument()
-      expect(screen.getByRole('tab', { name: /cli interface/i })).toBeInTheDocument()
-      expect(screen.getByRole('tab', { name: /mcp connection/i })).toBeInTheDocument()
+
+      expect(
+        screen.getByRole('tab', { name: /web frontend/i }),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('tab', { name: /cli interface/i }),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('tab', { name: /mcp connection/i }),
+      ).toBeInTheDocument()
     })
 
     it('applies custom className', () => {
       const { container } = renderComponent()
-      
+
       expect(container.firstChild).toHaveClass('test-class')
     })
 
     it('renders WebSocket status indicator', () => {
       renderComponent()
-      
+
       expect(screen.getByText(/websocket status/i)).toBeInTheDocument()
     })
 
     it('renders HIPAA compliance notice', () => {
       renderComponent()
-      
+
       expect(screen.getByText(/hipaa\+\+ compliant/i)).toBeInTheDocument()
     })
   })
@@ -101,36 +112,38 @@ describe('PipelineDashboard', () => {
   describe('Tab Navigation', () => {
     it('switches between tabs when clicked', async () => {
       renderComponent()
-      
+
       const webFrontendTab = screen.getByRole('tab', { name: /web frontend/i })
       const cliTab = screen.getByRole('tab', { name: /cli interface/i })
-      
+
       // Initially Web Frontend should be active
       expect(webFrontendTab).toHaveAttribute('aria-selected', 'true')
-      
+
       // Click CLI tab
       await userEvent.click(cliTab)
-      
+
       expect(cliTab).toHaveAttribute('aria-selected', 'true')
       expect(webFrontendTab).toHaveAttribute('aria-selected', 'false')
     })
 
     it('renders correct content for each tab', async () => {
       renderComponent()
-      
+
       // Web Frontend content
-      expect(screen.getByText(/drag and drop your dataset/i)).toBeInTheDocument()
-      
+      expect(
+        screen.getByText(/drag and drop your dataset/i),
+      ).toBeInTheDocument()
+
       // Switch to CLI tab
       const cliTab = screen.getByRole('tab', { name: /cli interface/i })
       await userEvent.click(cliTab)
-      
+
       expect(screen.getByText(/cli command interface/i)).toBeInTheDocument()
-      
+
       // Switch to MCP tab
       const mcpTab = screen.getByRole('tab', { name: /mcp connection/i })
       await userEvent.click(mcpTab)
-      
+
       expect(screen.getByText(/mcp agent connection/i)).toBeInTheDocument()
     })
   })
@@ -138,7 +151,7 @@ describe('PipelineDashboard', () => {
   describe('WebSocket Integration', () => {
     it('displays connection status', () => {
       renderComponent()
-      
+
       expect(screen.getByText(/disconnected/i)).toBeInTheDocument()
     })
 
@@ -155,12 +168,12 @@ describe('PipelineDashboard', () => {
           disconnect: jest.fn(),
           sendMessage: jest.fn(),
           sendProgressRequest: jest.fn(),
-          sendStatusRequest: jest.fn()
-        }))
+          sendStatusRequest: jest.fn(),
+        })),
       }))
-      
+
       renderComponent()
-      
+
       expect(screen.getByText(/reconnecting/i)).toBeInTheDocument()
     })
   })
@@ -174,18 +187,23 @@ describe('PipelineDashboard', () => {
           startExecution: jest.fn(),
           getExecutionStatus: jest.fn(),
           getAvailableDatasets: jest.fn(() => Promise.resolve([])),
-          healthCheck: jest.fn(() => Promise.resolve({ status: 'healthy', timestamp: new Date().toISOString() }))
-        }))
+          healthCheck: jest.fn(() =>
+            Promise.resolve({
+              status: 'healthy',
+              timestamp: new Date().toISOString(),
+            }),
+          ),
+        })),
       }))
-      
+
       renderComponent()
-      
+
       expect(screen.getByText(/api connection failed/i)).toBeInTheDocument()
     })
 
     it('calls onError callback when errors occur', async () => {
       const mockOnError = jest.fn()
-      
+
       jest.mock('@/hooks/usePipelineAPI', () => ({
         usePipelineAPI: jest.fn(() => ({
           isLoading: false,
@@ -193,12 +211,17 @@ describe('PipelineDashboard', () => {
           startExecution: jest.fn(),
           getExecutionStatus: jest.fn(),
           getAvailableDatasets: jest.fn(() => Promise.resolve([])),
-          healthCheck: jest.fn(() => Promise.resolve({ status: 'healthy', timestamp: new Date().toISOString() }))
-        }))
+          healthCheck: jest.fn(() =>
+            Promise.resolve({
+              status: 'healthy',
+              timestamp: new Date().toISOString(),
+            }),
+          ),
+        })),
       }))
-      
+
       renderComponent({ onError: mockOnError })
-      
+
       await waitFor(() => {
         expect(mockOnError).toHaveBeenCalledWith(expect.any(Error))
       })
@@ -208,30 +231,35 @@ describe('PipelineDashboard', () => {
   describe('Accessibility', () => {
     it('has proper ARIA labels', () => {
       renderComponent()
-      
-      expect(screen.getByRole('tablist')).toHaveAttribute('aria-label', 'Pipeline entry points')
+
+      expect(screen.getByRole('tablist')).toHaveAttribute(
+        'aria-label',
+        'Pipeline entry points',
+      )
     })
 
     it('supports keyboard navigation', async () => {
       renderComponent()
-      
+
       const webFrontendTab = screen.getByRole('tab', { name: /web frontend/i })
-      
+
       webFrontendTab.focus()
-      
+
       // Tab to next tab
       fireEvent.keyDown(webFrontendTab, { key: 'ArrowRight' })
-      
+
       const cliTab = screen.getByRole('tab', { name: /cli interface/i })
       expect(cliTab).toHaveAttribute('aria-selected', 'true')
     })
 
     it('has proper contrast ratios', () => {
       const { container } = renderComponent()
-      
+
       // Check for sufficient contrast in status indicators
-      const statusElements = container.querySelectorAll('.text-muted-foreground')
-      statusElements.forEach(element => {
+      const statusElements = container.querySelectorAll(
+        '.text-muted-foreground',
+      )
+      statusElements.forEach((element) => {
         const styles = window.getComputedStyle(element)
         // This would need actual color contrast testing in a real scenario
         expect(styles.color).toBeDefined()
@@ -242,28 +270,28 @@ describe('PipelineDashboard', () => {
   describe('Performance', () => {
     it('renders within acceptable time', async () => {
       const startTime = performance.now()
-      
+
       renderComponent()
-      
+
       const endTime = performance.now()
       const renderTime = endTime - startTime
-      
+
       // Should render in under 100ms for optimal performance
       expect(renderTime).toBeLessThan(100)
     })
 
     it('does not re-render unnecessarily', () => {
       const { rerender } = renderComponent()
-      
+
       const initialRenderCount = jest.fn()
       rerender(
         <WebSocketProvider>
           <PipelineAPIProvider>
             <PipelineDashboard {...mockProps} />
           </PipelineAPIProvider>
-        </WebSocketProvider>
+        </WebSocketProvider>,
       )
-      
+
       // Component should not re-render with same props
       expect(initialRenderCount).toHaveBeenCalledTimes(0)
     })
@@ -272,19 +300,21 @@ describe('PipelineDashboard', () => {
   describe('HIPAA Compliance', () => {
     it('displays privacy notice', () => {
       renderComponent()
-      
-      expect(screen.getByText(/all data is encrypted and processed securely/i)).toBeInTheDocument()
+
+      expect(
+        screen.getByText(/all data is encrypted and processed securely/i),
+      ).toBeInTheDocument()
     })
 
     it('shows audit logging indicator', () => {
       renderComponent()
-      
+
       expect(screen.getByText(/audit logging enabled/i)).toBeInTheDocument()
     })
 
     it('includes data retention information', () => {
       renderComponent()
-      
+
       expect(screen.getByText(/data retention: 30 days/i)).toBeInTheDocument()
     })
   })
@@ -297,10 +327,12 @@ describe('PipelineDashboard Integration', () => {
         <PipelineAPIProvider>
           <PipelineDashboard />
         </PipelineAPIProvider>
-      </WebSocketProvider>
+      </WebSocketProvider>,
     )
-    
-    expect(container.querySelector('[data-testid="websocket-status"]')).toBeInTheDocument()
+
+    expect(
+      container.querySelector('[data-testid="websocket-status"]'),
+    ).toBeInTheDocument()
   })
 
   it('integrates with API context', () => {
@@ -309,10 +341,12 @@ describe('PipelineDashboard Integration', () => {
         <PipelineAPIProvider>
           <PipelineDashboard />
         </PipelineAPIProvider>
-      </WebSocketProvider>
+      </WebSocketProvider>,
     )
-    
-    expect(container.querySelector('[data-testid="api-status"]')).toBeInTheDocument()
+
+    expect(
+      container.querySelector('[data-testid="api-status"]'),
+    ).toBeInTheDocument()
   })
 })
 
@@ -329,12 +363,12 @@ describe('PipelineDashboard Error Scenarios', () => {
         disconnect: jest.fn(),
         sendMessage: jest.fn(),
         sendProgressRequest: jest.fn(),
-        sendStatusRequest: jest.fn()
-      }))
+        sendStatusRequest: jest.fn(),
+      })),
     }))
-    
+
     renderComponent()
-    
+
     expect(screen.getByText(/connection error/i)).toBeInTheDocument()
   })
 
@@ -345,13 +379,17 @@ describe('PipelineDashboard Error Scenarios', () => {
         error: new Error('API service unavailable'),
         startExecution: jest.fn(),
         getExecutionStatus: jest.fn(),
-        getAvailableDatasets: jest.fn(() => Promise.reject(new Error('API unavailable'))),
-        healthCheck: jest.fn(() => Promise.reject(new Error('API unavailable')))
-      }))
+        getAvailableDatasets: jest.fn(() =>
+          Promise.reject(new Error('API unavailable')),
+        ),
+        healthCheck: jest.fn(() =>
+          Promise.reject(new Error('API unavailable')),
+        ),
+      })),
     }))
-    
+
     renderComponent()
-    
+
     expect(screen.getByText(/api service unavailable/i)).toBeInTheDocument()
   })
 
@@ -366,9 +404,9 @@ describe('PipelineDashboard Error Scenarios', () => {
         }
       }),
       removeEventListener: jest.fn(),
-      readyState: WebSocket.OPEN
+      readyState: WebSocket.OPEN,
     }
-    
+
     jest.mock('@/hooks/usePipelineWebSocket', () => ({
       usePipelineWebSocket: jest.fn(() => ({
         socket: mockWebSocket,
@@ -380,10 +418,10 @@ describe('PipelineDashboard Error Scenarios', () => {
         disconnect: jest.fn(),
         sendMessage: jest.fn(),
         sendProgressRequest: jest.fn(),
-        sendStatusRequest: jest.fn()
-      }))
+        sendStatusRequest: jest.fn(),
+      })),
     }))
-    
+
     // Should not throw error
     expect(() => renderComponent()).not.toThrow()
   })

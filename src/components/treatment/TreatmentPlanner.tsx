@@ -55,7 +55,10 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
       }
       setRecommendations(data.data.recommendations as TreatmentRecommendation[])
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? (err as Error)?.message || String(err) : 'Unknown error'
+      const errorMessage =
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'Unknown error'
       setError(errorMessage)
     } finally {
       setLoading(false)

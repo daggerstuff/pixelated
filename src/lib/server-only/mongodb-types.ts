@@ -45,7 +45,7 @@ export async function getServerMongoExports() {
   }
 
   try {
-    return await import('mongodb');
+    return await import('mongodb')
   } catch (err) {
     console.warn('MongoDB not available, using mock ObjectId')
     return {

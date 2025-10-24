@@ -105,7 +105,7 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
           if (request.method() === 'POST') {
             emailRequests.push({
               url: request.url(),
-              postData: JSON.parse(request.postData() as unknown || '{}'),
+              postData: JSON.parse((request.postData() as unknown) || '{}'),
             })
             await route.fulfill({ status: 200 })
           }
@@ -196,7 +196,9 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
         if (request.method() === 'POST') {
           emailRequests.push({
             url: request.url(),
-            postData: JSON.parse((await request.postData() as unknown) || '{}'),
+            postData: JSON.parse(
+              ((await request.postData()) as unknown) || '{}',
+            ),
           })
           await route.fulfill({ status: 200 })
         }
@@ -304,7 +306,9 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
         ) {
           emailRequests.push({
             url: request.url(),
-            postData: JSON.parse((await request.postData() as unknown) || '{}'),
+            postData: JSON.parse(
+              ((await request.postData()) as unknown) || '{}',
+            ),
           })
           await route.fulfill({ status: 200 })
         }

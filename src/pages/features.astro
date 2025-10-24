@@ -4,110 +4,130 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 
 const coreFeatures = [
   {
-    category: "CRISIS TRAINING",
-    icon: "⚠",
+    category: 'CRISIS TRAINING',
+    icon: '⚠',
     features: [
       {
-        name: "Suicidal Ideation Scenarios",
-        description: "Practice assessment and intervention with AI clients presenting various levels of suicidal risk.",
-        metric: "300% faster competency",
-        status: "ACTIVE"
+        name: 'Suicidal Ideation Scenarios',
+        description:
+          'Practice assessment and intervention with AI clients presenting various levels of suicidal risk.',
+        metric: '300% faster competency',
+        status: 'ACTIVE',
       },
       {
-        name: "Psychotic Episode Management", 
-        description: "Learn to navigate delusions, hallucinations, and disorganized thinking safely.",
-        metric: "Zero harm incidents",
-        status: "ACTIVE"
+        name: 'Psychotic Episode Management',
+        description:
+          'Learn to navigate delusions, hallucinations, and disorganized thinking safely.',
+        metric: 'Zero harm incidents',
+        status: 'ACTIVE',
       },
       {
-        name: "Acute Trauma Response",
-        description: "Handle fresh trauma presentations with appropriate stabilization techniques.",
-        metric: "95% confidence boost",
-        status: "ACTIVE"
-      }
-    ]
+        name: 'Acute Trauma Response',
+        description:
+          'Handle fresh trauma presentations with appropriate stabilization techniques.',
+        metric: '95% confidence boost',
+        status: 'ACTIVE',
+      },
+    ],
   },
   {
-    category: "BIAS DETECTION",
-    icon: "⚡",
+    category: 'BIAS DETECTION',
+    icon: '⚡',
     features: [
       {
-        name: "Real-Time Cultural Analysis",
-        description: "Instant feedback on cultural assumptions and biases during therapy sessions.",
-        metric: "200+ patterns detected",
-        status: "ACTIVE"
+        name: 'Real-Time Cultural Analysis',
+        description:
+          'Instant feedback on cultural assumptions and biases during therapy sessions.',
+        metric: '200+ patterns detected',
+        status: 'ACTIVE',
       },
       {
-        name: "Microaggression Identification",
-        description: "Catch subtle biases that could harm therapeutic relationships.",
-        metric: "78% bias reduction",
-        status: "ACTIVE"
+        name: 'Microaggression Identification',
+        description:
+          'Catch subtle biases that could harm therapeutic relationships.',
+        metric: '78% bias reduction',
+        status: 'ACTIVE',
       },
       {
-        name: "Inclusive Language Coaching",
-        description: "Learn culturally appropriate language for diverse client populations.",
-        metric: "89% improvement",
-        status: "ACTIVE"
-      }
-    ]
+        name: 'Inclusive Language Coaching',
+        description:
+          'Learn culturally appropriate language for diverse client populations.',
+        metric: '89% improvement',
+        status: 'ACTIVE',
+      },
+    ],
   },
   {
-    category: "DIAGNOSTIC TRAINING",
-    icon: "🎯",
+    category: 'DIAGNOSTIC TRAINING',
+    icon: '🎯',
     features: [
       {
-        name: "Differential Diagnosis Practice",
-        description: "Complex cases requiring careful diagnostic consideration and ruling out alternatives.",
-        metric: "85% accuracy boost",
-        status: "ACTIVE"
+        name: 'Differential Diagnosis Practice',
+        description:
+          'Complex cases requiring careful diagnostic consideration and ruling out alternatives.',
+        metric: '85% accuracy boost',
+        status: 'ACTIVE',
       },
       {
-        name: "Comorbidity Recognition",
-        description: "Identify multiple co-occurring conditions in realistic client presentations.",
-        metric: "92% detection rate",
-        status: "ACTIVE"
+        name: 'Comorbidity Recognition',
+        description:
+          'Identify multiple co-occurring conditions in realistic client presentations.',
+        metric: '92% detection rate',
+        status: 'ACTIVE',
       },
       {
-        name: "Assessment Tool Mastery",
-        description: "Practice with standardized assessments and learn proper administration.",
-        metric: "Complete coverage",
-        status: "ACTIVE"
-      }
-    ]
+        name: 'Assessment Tool Mastery',
+        description:
+          'Practice with standardized assessments and learn proper administration.',
+        metric: 'Complete coverage',
+        status: 'ACTIVE',
+      },
+    ],
   },
   {
-    category: "SECURITY & PRIVACY",
-    icon: "🔒",
+    category: 'SECURITY & PRIVACY',
+    icon: '🔒',
     features: [
       {
-        name: "Zero-Knowledge Encryption",
-        description: "Your training sessions are encrypted before leaving your device. We cannot read them.",
-        metric: "Military-grade AES-256",
-        status: "ACTIVE"
+        name: 'Zero-Knowledge Encryption',
+        description:
+          'Your training sessions are encrypted before leaving your device. We cannot read them.',
+        metric: 'Military-grade AES-256',
+        status: 'ACTIVE',
       },
       {
-        name: "Homomorphic Computing",
-        description: "AI analyzes encrypted data without ever decrypting your conversations.",
-        metric: "Invisible processing",
-        status: "ACTIVE"
+        name: 'Homomorphic Computing',
+        description:
+          'AI analyzes encrypted data without ever decrypting your conversations.',
+        metric: 'Invisible processing',
+        status: 'ACTIVE',
       },
       {
-        name: "HIPAA++ Compliance",
-        description: "Exceeds all healthcare privacy requirements with additional protections.",
-        metric: "Beyond compliance",
-        status: "ACTIVE"
-      }
-    ]
-  }
+        name: 'HIPAA++ Compliance',
+        description:
+          'Exceeds all healthcare privacy requirements with additional protections.',
+        metric: 'Beyond compliance',
+        status: 'ACTIVE',
+      },
+    ],
+  },
 ]
 
 const platformStats = [
-  { value: "50,000+", label: "AI Personas", description: "Complete clinical spectrum" },
-  { value: "15+", label: "Universities", description: "Elite institutions" },
-  { value: "2,500+", label: "Students", description: "Successfully trained" },
-  { value: "0", label: "Patient Harm", description: "Perfect safety record" },
-  { value: "200+", label: "Bias Patterns", description: "Real-time detection" },
-  { value: "85%", label: "Accuracy Boost", description: "Diagnostic improvement" }
+  {
+    value: '50,000+',
+    label: 'AI Personas',
+    description: 'Complete clinical spectrum',
+  },
+  { value: '15+', label: 'Universities', description: 'Elite institutions' },
+  { value: '2,500+', label: 'Students', description: 'Successfully trained' },
+  { value: '0', label: 'Patient Harm', description: 'Perfect safety record' },
+  { value: '200+', label: 'Bias Patterns', description: 'Real-time detection' },
+  {
+    value: '85%',
+    label: 'Accuracy Boost',
+    description: 'Diagnostic improvement',
+  },
 ]
 ---
 
@@ -123,15 +143,17 @@ const platformStats = [
           <div class="pulse-dot pulse-dot--green"></div>
           <span class="font-bold">FULL FEATURE ACCESS</span>
         </div>
-        
+
         <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
           COMPLETE THERAPY
           <br />
           <span class="confidence-boost">TRAINING ARSENAL</span>
         </h1>
-        
+
         <p class="text-xl text-gray-300 mb-8 max-w-4xl mx-auto">
-          Every tool you need to master therapy. From crisis interventions to cultural competency, we've built the most comprehensive training platform ever created.
+          Every tool you need to master therapy. From crisis interventions to
+          cultural competency, we've built the most comprehensive training
+          platform ever created.
         </p>
 
         <div class="flex flex-wrap justify-center gap-4 mb-12">
@@ -163,13 +185,15 @@ const platformStats = [
       </div>
 
       <div class="brutalist-grid brutalist-grid--3">
-        {platformStats.map((stat) => (
-          <div class="metric-card hover-lift">
-            <div class="metric-value">{stat.value}</div>
-            <div class="metric-label">{stat.label}</div>
-            <div class="text-xs text-gray-500 mt-2">{stat.description}</div>
-          </div>
-        ))}
+        {
+          platformStats.map((stat) => (
+            <div class="metric-card hover-lift">
+              <div class="metric-value">{stat.value}</div>
+              <div class="metric-label">{stat.label}</div>
+              <div class="text-xs text-gray-500 mt-2">{stat.description}</div>
+            </div>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -183,49 +207,62 @@ const platformStats = [
           <span class="confidence-boost">CAPABILITIES</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-3xl mx-auto">
-          Four pillars of comprehensive therapy training, each with specialized sub-modules.
+          Four pillars of comprehensive therapy training, each with specialized
+          sub-modules.
         </p>
       </div>
 
       <div class="space-y-16">
-        {coreFeatures.map((category) => (
-          <div class="space-y-8">
-            {/* Category Header */}
-            <div class="text-center">
-              <div class="text-5xl mb-4">{category.icon}</div>
-              <h3 class="brutalist-heading text-2xl md:text-4xl mb-4">
-                {category.category}
-              </h3>
-            </div>
+        {
+          coreFeatures.map((category) => (
+            <div class="space-y-8">
+              {/* Category Header */}
+              <div class="text-center">
+                <div class="text-5xl mb-4">{category.icon}</div>
+                <h3 class="brutalist-heading text-2xl md:text-4xl mb-4">
+                  {category.category}
+                </h3>
+              </div>
 
-            {/* Features Grid */}
-            <div class="brutalist-grid brutalist-grid--3">
-              {category.features.map((feature) => (
-                <div class="brutalist-card hover-lift">
-                  <div class="flex items-center justify-between mb-4">
-                    <h4 class="brutalist-subheading text-lg">{feature.name}</h4>
-                    <div class={`brutalist-badge ${
-                      feature.status === 'ACTIVE' ? 'brutalist-badge--success' : 'brutalist-badge--warning'
-                    } text-xs`}>
-                      {feature.status}
+              {/* Features Grid */}
+              <div class="brutalist-grid brutalist-grid--3">
+                {category.features.map((feature) => (
+                  <div class="brutalist-card hover-lift">
+                    <div class="flex items-center justify-between mb-4">
+                      <h4 class="brutalist-subheading text-lg">
+                        {feature.name}
+                      </h4>
+                      <div
+                        class={`brutalist-badge ${
+                          feature.status === 'ACTIVE'
+                            ? 'brutalist-badge--success'
+                            : 'brutalist-badge--warning'
+                        } text-xs`}
+                      >
+                        {feature.status}
+                      </div>
+                    </div>
+
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+                      {feature.description}
+                    </p>
+
+                    <div class="border-t border-gray-700 pt-4">
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500 uppercase tracking-wide">
+                          Impact
+                        </span>
+                        <span class="text-sm font-bold text-green-400">
+                          {feature.metric}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  
-                  <p class="text-gray-400 text-sm mb-4 leading-relaxed">
-                    {feature.description}
-                  </p>
-                  
-                  <div class="border-t border-gray-700 pt-4">
-                    <div class="flex items-center justify-between">
-                      <span class="text-xs text-gray-500 uppercase tracking-wide">Impact</span>
-                      <span class="text-sm font-bold text-green-400">{feature.metric}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </div>
   </section>
@@ -316,7 +353,8 @@ const platformStats = [
           <span class="confidence-boost">INTEGRATION</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-3xl mx-auto">
-          Fits into your existing curriculum with minimal disruption and maximum impact.
+          Fits into your existing curriculum with minimal disruption and maximum
+          impact.
         </p>
       </div>
 
@@ -327,25 +365,45 @@ const platformStats = [
             INTEGRATION OPTIONS
           </h3>
           <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">LMS Integration</span>
-              <span class="brutalist-badge brutalist-badge--success">AVAILABLE</span>
+              <span class="brutalist-badge brutalist-badge--success"
+                >AVAILABLE</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">Single Sign-On (SSO)</span>
-              <span class="brutalist-badge brutalist-badge--success">AVAILABLE</span>
+              <span class="brutalist-badge brutalist-badge--success"
+                >AVAILABLE</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">Grade Passback</span>
-              <span class="brutalist-badge brutalist-badge--success">AVAILABLE</span>
+              <span class="brutalist-badge brutalist-badge--success"
+                >AVAILABLE</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">Custom Branding</span>
-              <span class="brutalist-badge brutalist-badge--success">AVAILABLE</span>
+              <span class="brutalist-badge brutalist-badge--success"
+                >AVAILABLE</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">API Access</span>
-              <span class="brutalist-badge brutalist-badge--info">ENTERPRISE</span>
+              <span class="brutalist-badge brutalist-badge--info"
+                >ENTERPRISE</span
+              >
             </div>
           </div>
         </div>
@@ -356,25 +414,45 @@ const platformStats = [
             SUPPORT & TRAINING
           </h3>
           <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">24/7 Technical Support</span>
-              <span class="brutalist-badge brutalist-badge--success">INCLUDED</span>
+              <span class="brutalist-badge brutalist-badge--success"
+                >INCLUDED</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">Faculty Training Program</span>
-              <span class="brutalist-badge brutalist-badge--success">INCLUDED</span>
+              <span class="brutalist-badge brutalist-badge--success"
+                >INCLUDED</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">Implementation Consulting</span>
-              <span class="brutalist-badge brutalist-badge--success">INCLUDED</span>
+              <span class="brutalist-badge brutalist-badge--success"
+                >INCLUDED</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">Custom Scenario Development</span>
-              <span class="brutalist-badge brutalist-badge--info">AVAILABLE</span>
+              <span class="brutalist-badge brutalist-badge--info"
+                >AVAILABLE</span
+              >
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
+            >
               <span class="font-medium">Research Collaboration</span>
-              <span class="brutalist-badge brutalist-badge--warning">SELECTIVE</span>
+              <span class="brutalist-badge brutalist-badge--warning"
+                >SELECTIVE</span
+              >
             </div>
           </div>
         </div>
@@ -402,7 +480,9 @@ const platformStats = [
             <div class="p-4 font-bold text-white">FEATURE</div>
             <div class="p-4 font-bold text-center text-white">TRADITIONAL</div>
             <div class="p-4 font-bold text-center text-white">COMPETITORS</div>
-            <div class="p-4 font-bold text-center text-green-400">PIXELATED EMPATHY</div>
+            <div class="p-4 font-bold text-center text-green-400">
+              PIXELATED EMPATHY
+            </div>
           </div>
 
           {/* Table Rows */}
@@ -450,30 +530,43 @@ const platformStats = [
     <div class="brutalist-container">
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
         <div class="text-5xl mb-6 text-green-400">🚀</div>
-        
+
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
           READY TO UPGRADE
           <br />
           <span class="confidence-boost">YOUR PROGRAM?</span>
         </h2>
-        
+
         <p class="text-xl text-gray-300 mb-8">
-          Join the institutions setting new standards in therapy education. Your students deserve the best training available.
+          Join the institutions setting new standards in therapy education. Your
+          students deserve the best training available.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <a href="/demo-hub" class="brutalist-button brutalist-button--primary text-lg px-8 py-4">
+          <a
+            href="/demo-hub"
+            class="brutalist-button brutalist-button--primary text-lg px-8 py-4"
+          >
             TRY ALL DEMOS →
           </a>
-          <a href="/contact" class="brutalist-button brutalist-button--secondary text-lg px-8 py-4">
+          <a
+            href="/contact"
+            class="brutalist-button brutalist-button--secondary text-lg px-8 py-4"
+          >
             SCHEDULE CONSULTATION
           </a>
         </div>
 
         <div class="flex flex-wrap justify-center gap-4 text-sm">
-          <span class="brutalist-badge brutalist-badge--success">✓ 30-DAY TRIAL</span>
-          <span class="brutalist-badge brutalist-badge--info">✓ FULL SUPPORT</span>
-          <span class="brutalist-badge brutalist-badge--warning">✓ MONEY-BACK GUARANTEE</span>
+          <span class="brutalist-badge brutalist-badge--success"
+            >✓ 30-DAY TRIAL</span
+          >
+          <span class="brutalist-badge brutalist-badge--info"
+            >✓ FULL SUPPORT</span
+          >
+          <span class="brutalist-badge brutalist-badge--warning"
+            >✓ MONEY-BACK GUARANTEE</span
+          >
         </div>
       </div>
     </div>

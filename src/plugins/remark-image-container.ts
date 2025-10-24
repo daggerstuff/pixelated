@@ -43,9 +43,14 @@ interface ParagraphNode extends Node {
 }
 
 // Simple visit function implementation - local version
-function visit(tree: Node, test: string | ((node: Node) => boolean), callback: (node: Node) => void) {
-  const testFn = typeof test === 'string' ? (node: Node) => node.type === test : test
-  
+function visit(
+  tree: Node,
+  test: string | ((node: Node) => boolean),
+  callback: (node: Node) => void,
+) {
+  const testFn =
+    typeof test === 'string' ? (node: Node) => node.type === test : test
+
   function walk(node: Node) {
     if (testFn(node)) {
       callback(node)
@@ -54,7 +59,7 @@ function visit(tree: Node, test: string | ((node: Node) => boolean), callback: (
       node.children.forEach(walk)
     }
   }
-  
+
   walk(tree)
 }
 
@@ -62,11 +67,13 @@ export function remarkImageContainer() {
   return (tree: Root) => {
     visit(tree, 'paragraph', (node: any) => {
       const paragraph = node as ParagraphNode
-      
+
       // Check if paragraph contains only images
       if (paragraph.children && paragraph.children.length > 0) {
-        const hasOnlyImages = paragraph.children.every((child: any) => child.type === 'image')
-        
+        const hasOnlyImages = paragraph.children.every(
+          (child: any) => child.type === 'image',
+        )
+
         if (hasOnlyImages) {
           // Transform paragraph to image container
           paragraph.data = {

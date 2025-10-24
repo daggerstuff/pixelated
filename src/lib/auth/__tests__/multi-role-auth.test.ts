@@ -18,16 +18,13 @@ import {
   verifyTwoFactorToken,
   isTwoFactorRequired,
 } from '../two-factor-auth'
-import {
-  createSession,
-  validateSession,
-  } from '../session-management'
+import { createSession, validateSession } from '../session-management'
 import {
   requestRoleTransition,
   processRoleTransitionApproval,
   getRoleTransitionAuditTrail,
 } from '../role-transitions'
-import { generateTokenPair, validateToken, } from '../jwt-service'
+import { generateTokenPair, validateToken } from '../jwt-service'
 import type { SessionData, DeviceInfo } from '../session-management'
 import type { TwoFactorVerification } from '../two-factor-auth'
 
@@ -54,7 +51,7 @@ vi.mock('../../security', () => ({
     SESSION_VALIDATED: 'SESSION_VALIDATED',
     ROLE_TRANSITION_REQUESTED: 'ROLE_TRANSITION_REQUESTED',
     ROLE_TRANSITION_APPROVED: 'ROLE_TRANSITION_APPROVED',
-  }
+  },
 }))
 
 vi.mock('../../mcp/phase6-integration', () => ({
@@ -66,7 +63,7 @@ vi.mock('otplib', () => ({
     generateSecret: vi.fn(() => 'test-secret'),
     verify: vi.fn(() => true),
     keyuri: vi.fn(() => 'otpauth://test'),
-  }
+  },
 }))
 
 vi.mock('qrcode', () => ({
@@ -77,7 +74,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
   const mockUserId = 'user_123'
   const mockSessionId = 'sess_abc123'
   const mockDeviceId = 'device_xyz789'
-  
+
   const mockDeviceInfo: DeviceInfo = {
     deviceId: mockDeviceId,
     deviceName: 'Test Device',
@@ -122,9 +119,16 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
   describe('6-Role Permission Matrix', () => {
     it('should define all 6 roles correctly', () => {
-      const expectedRoles: UserRole[] = ['admin', 'therapist', 'patient', 'researcher', 'support', 'guest']
-      
-      expectedRoles.forEach(role => {
+      const expectedRoles: UserRole[] = [
+        'admin',
+        'therapist',
+        'patient',
+        'researcher',
+        'support',
+        'guest',
+      ]
+
+      expectedRoles.forEach((role) => {
         expect(ROLE_DEFINITIONS[role]).toBeDefined()
         expect(ROLE_DEFINITIONS[role].name).toBe(role)
       })
@@ -188,17 +192,13 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       const { setInCache } = await import('../../redis')
       vi.mocked(setInCache).mockResolvedValue(true)
 
-      const result = await setupTwoFactorAuth(
-        mockUserId,
-        'test@example.com',
-        {
-          deviceId: mockDeviceId,
-          deviceName: 'Test Device',
-          deviceType: 'desktop',
-          ipAddress: mockClientInfo.ipAddress,
-          userAgent: mockClientInfo.userAgent,
-        }
-      )
+      const result = await setupTwoFactorAuth(mockUserId, 'test@example.com', {
+        deviceId: mockDeviceId,
+        deviceName: 'Test Device',
+        deviceType: 'desktop',
+        ipAddress: mockClientInfo.ipAddress,
+        userAgent: mockClientInfo.userAgent,
+      })
 
       expect(result).toHaveProperty('secret')
       expect(result).toHaveProperty('qrCode')
@@ -209,7 +209,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should complete 2FA setup with valid token', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:setup:')) {
           return {
@@ -221,27 +221,23 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       await expect(
-        completeTwoFactorSetup(
-          mockUserId,
-          '123456',
-          {
-            deviceId: mockDeviceId,
-            deviceName: 'Test Device',
-            deviceType: 'desktop',
-            ipAddress: mockClientInfo.ipAddress,
-            userAgent: mockClientInfo.userAgent,
-          }
-        )
+        completeTwoFactorSetup(mockUserId, '123456', {
+          deviceId: mockDeviceId,
+          deviceName: 'Test Device',
+          deviceType: 'desktop',
+          ipAddress: mockClientInfo.ipAddress,
+          userAgent: mockClientInfo.userAgent,
+        }),
       ).resolves.not.toThrow()
     })
 
     it('should verify 2FA token successfully', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return {
@@ -270,7 +266,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should handle 2FA lockout after failed attempts', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return {
@@ -292,12 +288,14 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         deviceId: mockDeviceId,
       }
 
-      await expect(verifyTwoFactorToken(verification)).rejects.toThrow('Account is locked')
+      await expect(verifyTwoFactorToken(verification)).rejects.toThrow(
+        'Account is locked',
+      )
     })
 
     it('should check if 2FA is required based on role', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: false } // 2FA not enabled for user
@@ -306,11 +304,19 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       })
 
       // Admin should require 2FA
-      const adminRequired = await isTwoFactorRequired(mockUserId, 'admin', mockDeviceId)
+      const adminRequired = await isTwoFactorRequired(
+        mockUserId,
+        'admin',
+        mockDeviceId,
+      )
       expect(adminRequired).toBe(true)
 
       // Patient should not require 2FA by default
-      const patientRequired = await isTwoFactorRequired(mockUserId, 'patient', mockDeviceId)
+      const patientRequired = await isTwoFactorRequired(
+        mockUserId,
+        'patient',
+        mockDeviceId,
+      )
       expect(patientRequired).toBe(false)
     })
   })
@@ -340,7 +346,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should validate session successfully', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       const mockSession = {
         ...mockSessionData,
         expiresAt: Date.now() + 3600000, // 1 hour from now
@@ -357,7 +363,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         mockSessionId,
         mockDeviceInfo,
         mockClientInfo.ipAddress,
-        mockClientInfo.userAgent
+        mockClientInfo.userAgent,
       )
 
       expect(result.valid).toBe(true)
@@ -367,7 +373,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should reject expired session', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       const expiredSession = {
         ...mockSessionData,
         expiresAt: Date.now() - 3600000, // 1 hour ago
@@ -384,7 +390,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         mockSessionId,
         mockDeviceInfo,
         mockClientInfo.ipAddress,
-        mockClientInfo.userAgent
+        mockClientInfo.userAgent,
       )
 
       expect(result.valid).toBe(false)
@@ -393,7 +399,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should detect device binding mismatch', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       const mockSession = {
         ...mockSessionData,
         expiresAt: Date.now() + 3600000,
@@ -413,7 +419,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         mockSessionId,
         mockDeviceInfo,
         mockClientInfo.ipAddress,
-        mockClientInfo.userAgent
+        mockClientInfo.userAgent,
       )
 
       expect(result.valid).toBe(false)
@@ -422,19 +428,21 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should enforce concurrent session limit', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       // Mock existing sessions at limit
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key === `user:sessions:${mockUserId}`) {
-          return Array(5).fill(null).map((_, i) => ({
-            sessionId: `old_session_${i}`,
-            expiresAt: Date.now() + 3600000,
-            lastActivity: Date.now() - 1000,
-          }))
+          return Array(5)
+            .fill(null)
+            .map((_, i) => ({
+              sessionId: `old_session_${i}`,
+              expiresAt: Date.now() + 3600000,
+              lastActivity: Date.now() - 1000,
+            }))
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       const session = await createSession({
@@ -454,7 +462,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
   describe('Role Transition Workflows', () => {
     it('should request role transition successfully', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
@@ -464,7 +472,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       const request = await requestRoleTransition(
@@ -473,7 +481,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         'I have completed my therapy certification',
         mockUserId,
         mockSessionData,
-        mockClientInfo
+        mockClientInfo,
       )
 
       expect(request).toHaveProperty('id')
@@ -486,7 +494,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should approve role transition request', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       const mockRequest = {
         id: 'role_req_test123',
         userId: mockUserId,
@@ -513,7 +521,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       const approval = await processRoleTransitionApproval(
@@ -527,7 +535,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
           timestamp: Date.now(),
         },
         { ...mockSessionData, role: 'admin' },
-        mockClientInfo
+        mockClientInfo,
       )
 
       expect(approval.status).toBe('approved')
@@ -537,7 +545,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should reject role transition request', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       const mockRequest = {
         id: 'role_req_test123',
         userId: mockUserId,
@@ -561,7 +569,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       const result = await processRoleTransitionApproval(
@@ -575,7 +583,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
           timestamp: Date.now(),
         },
         { ...mockSessionData, role: 'admin' },
-        mockClientInfo
+        mockClientInfo,
       )
 
       expect(result.status).toBe('rejected')
@@ -584,7 +592,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should get role transition audit trail', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       const mockAuditIds = ['audit_1', 'audit_2', 'audit_3']
       const mockAuditLogs = mockAuditIds.map((id, index) => ({
         id,
@@ -608,13 +616,13 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         if (key.startsWith('role_transition:audit:')) {
           const auditId = key.split(':')[2]
-          return mockAuditLogs.find(log => log.id === auditId)
+          return mockAuditLogs.find((log) => log.id === auditId)
         }
         return null
       })
 
       const auditTrail = await getRoleTransitionAuditTrail(mockUserId, 10)
-      
+
       expect(auditTrail).toHaveLength(3)
       expect(auditTrail[0].timestamp).toBeGreaterThan(auditTrail[1].timestamp) // Newest first
     })
@@ -625,11 +633,10 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       const { setInCache } = await import('../../redis')
       vi.mocked(setInCache).mockResolvedValue(true)
 
-      const tokenPair = await generateTokenPair(
-        mockUserId,
-        'patient',
-        { ip: mockClientInfo.ipAddress, userAgent: mockClientInfo.userAgent }
-      )
+      const tokenPair = await generateTokenPair(mockUserId, 'patient', {
+        ip: mockClientInfo.ipAddress,
+        userAgent: mockClientInfo.userAgent,
+      })
 
       expect(tokenPair).toHaveProperty('accessToken')
       expect(tokenPair).toHaveProperty('refreshToken')
@@ -640,7 +647,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should validate token successfully', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       const mockTokenData = {
         sub: mockUserId,
         role: 'patient',
@@ -665,7 +672,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       // This would require actual JWT signing/verification
       // For testing, we'll mock the validation result
       const result = await validateToken('mock.jwt.token', 'access')
-      
+
       // Since we're mocking, we can't test the actual JWT validation
       // But we can verify the function structure
       expect(result).toHaveProperty('valid')
@@ -675,10 +682,9 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
   describe('Security and Compliance', () => {
     it('should enforce HIPAA compliance for patient data access', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       // Mock patient data access attempt
-      
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('user_auth:')) {
           return {
@@ -692,7 +698,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       // Verify therapist can access patient data
       expect(hasPermission('therapist', 'read:patients')).toBe(true)
       expect(hasPermission('therapist', 'write:patient_notes')).toBe(true)
-      
+
       // But cannot access admin functions
       expect(hasPermission('therapist', 'manage:roles')).toBe(false)
     })
@@ -706,7 +712,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should audit all role transitions', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
@@ -716,7 +722,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       const request = await requestRoleTransition(
@@ -725,13 +731,16 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         'Certification completed',
         mockUserId,
         mockSessionData,
-        mockClientInfo
+        mockClientInfo,
       )
 
       // Verify audit logging was called
       expect(request).toHaveProperty('id')
       expect(request.metadata).toHaveProperty('sessionId', mockSessionId)
-      expect(request.metadata).toHaveProperty('ipAddress', mockClientInfo.ipAddress)
+      expect(request.metadata).toHaveProperty(
+        'ipAddress',
+        mockClientInfo.ipAddress,
+      )
     })
   })
 
@@ -741,7 +750,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       vi.mocked(setInCache).mockResolvedValue(true)
 
       const start = performance.now()
-      
+
       await createSession({
         userId: mockUserId,
         role: 'patient',
@@ -750,16 +759,16 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         userAgent: mockClientInfo.userAgent,
         permissions: ['read:own_profile'],
       })
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(100)
     })
 
     it('should meet sub-50ms permission check target', async () => {
       const start = performance.now()
-      
+
       const result = hasPermission('therapist', 'read:patients')
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(50)
       expect(result).toBe(true)
@@ -767,9 +776,9 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should meet sub-30ms role validation target', async () => {
       const start = performance.now()
-      
+
       const result = hasRequiredRole('admin', 'therapist')
-      
+
       const duration = performance.now() - start
       expect(duration).toBeLessThan(30)
       expect(result).toBe(true)
@@ -782,7 +791,12 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       vi.mocked(getFromCache).mockResolvedValue(null)
 
       await expect(
-        validateSession('nonexistent_session', mockDeviceInfo, mockClientInfo.ipAddress, mockClientInfo.userAgent)
+        validateSession(
+          'nonexistent_session',
+          mockDeviceInfo,
+          mockClientInfo.ipAddress,
+          mockClientInfo.userAgent,
+        ),
       ).resolves.toMatchObject({
         valid: false,
         error: 'Session not found',
@@ -791,7 +805,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should handle 2FA setup for already enabled user', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
@@ -800,23 +814,19 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       })
 
       await expect(
-        setupTwoFactorAuth(
-          mockUserId,
-          'test@example.com',
-          {
-            deviceId: mockDeviceId,
-            deviceName: 'Test Device',
-            deviceType: 'desktop',
-            ipAddress: mockClientInfo.ipAddress,
-            userAgent: mockClientInfo.userAgent,
-          }
-        )
+        setupTwoFactorAuth(mockUserId, 'test@example.com', {
+          deviceId: mockDeviceId,
+          deviceName: 'Test Device',
+          deviceType: 'desktop',
+          ipAddress: mockClientInfo.ipAddress,
+          userAgent: mockClientInfo.userAgent,
+        }),
       ).rejects.toThrow('2FA is already enabled')
     })
 
     it('should handle role transition with insufficient permissions', async () => {
       const { getFromCache } = await import('../../redis')
-      
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
@@ -833,26 +843,28 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
           'I want to be admin',
           mockUserId,
           patientSession,
-          mockClientInfo
-        )
+          mockClientInfo,
+        ),
       ).rejects.toThrow('Insufficient permissions')
     })
 
     it('should handle concurrent session limit enforcement', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      
+
       // Mock maximum sessions reached
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key === `user:sessions:${mockUserId}`) {
-          return Array(5).fill(null).map((_, i) => ({
-            sessionId: `session_${i}`,
-            expiresAt: Date.now() + 3600000,
-            lastActivity: Date.now(),
-          }))
+          return Array(5)
+            .fill(null)
+            .map((_, i) => ({
+              sessionId: `session_${i}`,
+              expiresAt: Date.now() + 3600000,
+              lastActivity: Date.now(),
+            }))
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       const session = await createSession({
@@ -872,8 +884,10 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
   describe('Integration with Phase 6 MCP Server', () => {
     it('should track authentication progress through all phases', async () => {
       const { setInCache } = await import('../../redis')
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
-      
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       // Session creation should update MCP
@@ -888,32 +902,30 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         mockUserId,
-        'session_created'
+        'session_created',
       )
 
       // 2FA setup should update MCP
-      await setupTwoFactorAuth(
-        mockUserId,
-        'test@example.com',
-        {
-          deviceId: mockDeviceId,
-          deviceName: 'Test Device',
-          deviceType: 'desktop',
-          ipAddress: mockClientInfo.ipAddress,
-          userAgent: mockClientInfo.userAgent,
-        }
-      )
+      await setupTwoFactorAuth(mockUserId, 'test@example.com', {
+        deviceId: mockDeviceId,
+        deviceName: 'Test Device',
+        deviceType: 'desktop',
+        ipAddress: mockClientInfo.ipAddress,
+        userAgent: mockClientInfo.userAgent,
+      })
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         mockUserId,
-        '2fa_setup_initiated'
+        '2fa_setup_initiated',
       )
     })
 
     it('should track role transition progress', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
-      
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
+
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
@@ -923,7 +935,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         return null
       })
-      
+
       vi.mocked(setInCache).mockResolvedValue(true)
 
       await requestRoleTransition(
@@ -932,12 +944,12 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         'Certification completed',
         mockUserId,
         mockSessionData,
-        mockClientInfo
+        mockClientInfo,
       )
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         mockUserId,
-        'role_transition_requested'
+        'role_transition_requested',
       )
     })
   })

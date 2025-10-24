@@ -28,17 +28,17 @@
             },
             "thresholds": {
               "steps": [
-                {"color": "red", "value": 0},
-                {"color": "green", "value": 1}
+                { "color": "red", "value": 0 },
+                { "color": "green", "value": 1 }
               ]
             },
             "mappings": [
-              {"options": {"0": {"text": "DOWN"}}, "type": "value"},
-              {"options": {"1": {"text": "UP"}}, "type": "value"}
+              { "options": { "0": { "text": "DOWN" } }, "type": "value" },
+              { "options": { "1": { "text": "UP" } }, "type": "value" }
             ]
           }
         },
-        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
       },
       {
         "id": 2,
@@ -53,10 +53,10 @@
         "fieldConfig": {
           "defaults": {
             "unit": "reqps",
-            "color": {"mode": "palette-classic"}
+            "color": { "mode": "palette-classic" }
           }
         },
-        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 }
       },
       {
         "id": 3,
@@ -71,17 +71,17 @@
         "fieldConfig": {
           "defaults": {
             "unit": "reqps",
-            "color": {"mode": "thresholds"},
+            "color": { "mode": "thresholds" },
             "thresholds": {
               "steps": [
-                {"color": "green", "value": 0},
-                {"color": "yellow", "value": 0.01},
-                {"color": "red", "value": 0.1}
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 0.01 },
+                { "color": "red", "value": 0.1 }
               ]
             }
           }
         },
-        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 }
       },
       {
         "id": 4,
@@ -96,17 +96,17 @@
         "fieldConfig": {
           "defaults": {
             "unit": "s",
-            "color": {"mode": "thresholds"},
+            "color": { "mode": "thresholds" },
             "thresholds": {
               "steps": [
-                {"color": "green", "value": 0},
-                {"color": "yellow", "value": 1},
-                {"color": "red", "value": 2}
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 1 },
+                { "color": "red", "value": 2 }
               ]
             }
           }
         },
-        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 }
       },
       {
         "id": 5,
@@ -118,11 +118,8 @@
             "legendFormat": "{{method}} {{status}}"
           }
         ],
-        "yAxes": [
-          {"label": "Requests/sec", "min": 0},
-          {"show": false}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+        "yAxes": [{ "label": "Requests/sec", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
       },
       {
         "id": 6,
@@ -142,11 +139,8 @@
             "legendFormat": "99th percentile"
           }
         ],
-        "yAxes": [
-          {"label": "Seconds", "min": 0},
-          {"show": false}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+        "yAxes": [{ "label": "Seconds", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
       },
       {
         "id": 7,
@@ -162,11 +156,8 @@
             "legendFormat": "Virtual Memory"
           }
         ],
-        "yAxes": [
-          {"label": "Bytes", "min": 0},
-          {"show": false}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+        "yAxes": [{ "label": "Bytes", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
       },
       {
         "id": 8,
@@ -179,10 +170,10 @@
           }
         ],
         "yAxes": [
-          {"label": "Percent", "min": 0, "max": 100},
-          {"show": false}
+          { "label": "Percent", "min": 0, "max": 100 },
+          { "show": false }
         ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
       },
       {
         "id": 9,
@@ -198,11 +189,8 @@
             "legendFormat": "Max Connections"
           }
         ],
-        "yAxes": [
-          {"label": "Connections", "min": 0},
-          {"show": false}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+        "yAxes": [{ "label": "Connections", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
       },
       {
         "id": 10,
@@ -218,11 +206,8 @@
             "legendFormat": "Max Memory"
           }
         ],
-        "yAxes": [
-          {"label": "Bytes", "min": 0},
-          {"show": false}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+        "yAxes": [{ "label": "Bytes", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
       }
     ]
   }

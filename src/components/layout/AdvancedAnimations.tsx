@@ -3,7 +3,15 @@ import React from 'react'
 
 interface AnimationWrapperProps {
   children: ReactNode
-  animation?: 'fadeIn' | 'slideUp' | 'slideDown' | 'slideLeft' | 'slideRight' | 'scale' | 'bounce' | 'none'
+  animation?:
+    | 'fadeIn'
+    | 'slideUp'
+    | 'slideDown'
+    | 'slideLeft'
+    | 'slideRight'
+    | 'scale'
+    | 'bounce'
+    | 'none'
   duration?: 'fast' | 'normal' | 'slow' | 'custom'
   delay?: number
   className?: string
@@ -60,25 +68,37 @@ export const AnimationWrapper: FC<AnimationWrapperProps> = ({
 }
 
 // Pre-configured animation components for common use cases
-export const FadeIn: FC<{ children: ReactNode; delay?: number }> = ({ children, delay = 0 }) => (
+export const FadeIn: FC<{ children: ReactNode; delay?: number }> = ({
+  children,
+  delay = 0,
+}) => (
   <AnimationWrapper animation="fadeIn" delay={delay}>
     {children}
   </AnimationWrapper>
 )
 
-export const SlideUp: FC<{ children: ReactNode; delay?: number }> = ({ children, delay = 0 }) => (
+export const SlideUp: FC<{ children: ReactNode; delay?: number }> = ({
+  children,
+  delay = 0,
+}) => (
   <AnimationWrapper animation="slideUp" delay={delay}>
     {children}
   </AnimationWrapper>
 )
 
-export const SlideDown: FC<{ children: ReactNode; delay?: number }> = ({ children, delay = 0 }) => (
+export const SlideDown: FC<{ children: ReactNode; delay?: number }> = ({
+  children,
+  delay = 0,
+}) => (
   <AnimationWrapper animation="slideDown" delay={delay}>
     {children}
   </AnimationWrapper>
 )
 
-export const ScaleIn: FC<{ children: ReactNode; delay?: number }> = ({ children, delay = 0 }) => (
+export const ScaleIn: FC<{ children: ReactNode; delay?: number }> = ({
+  children,
+  delay = 0,
+}) => (
   <AnimationWrapper animation="scale" delay={delay}>
     {children}
   </AnimationWrapper>
@@ -87,7 +107,7 @@ export const ScaleIn: FC<{ children: ReactNode; delay?: number }> = ({ children,
 // Micro-interaction components
 export const HoverLift: FC<{ children: ReactNode; lift?: number }> = ({
   children,
-  lift = 4
+  lift = 4,
 }) => (
   <div
     className="transition-transform duration-200 ease-out hover:translate-y-[-4px]"
@@ -99,17 +119,17 @@ export const HoverLift: FC<{ children: ReactNode; lift?: number }> = ({
 
 export const PressEffect: FC<{ children: ReactNode; scale?: number }> = ({
   children,
-  scale = 0.98
+  scale = 0.98,
 }) => (
   <div className="transition-transform duration-75 ease-out active:scale-98">
     {children}
   </div>
 )
 
-export const GlowOnHover: FC<{ children: ReactNode; intensity?: 'subtle' | 'medium' | 'strong' }> = ({
-  children,
-  intensity = 'medium'
-}) => {
+export const GlowOnHover: FC<{
+  children: ReactNode
+  intensity?: 'subtle' | 'medium' | 'strong'
+}> = ({ children, intensity = 'medium' }) => {
   const intensityClasses = {
     subtle: 'hover:shadow-lg',
     medium: 'hover:shadow-xl hover:shadow-blue-500/25',
@@ -117,7 +137,9 @@ export const GlowOnHover: FC<{ children: ReactNode; intensity?: 'subtle' | 'medi
   }
 
   return (
-    <div className={`transition-shadow duration-300 ${intensityClasses[intensity]}`}>
+    <div
+      className={`transition-shadow duration-300 ${intensityClasses[intensity]}`}
+    >
       {children}
     </div>
   )
@@ -128,11 +150,7 @@ export const StaggerContainer: FC<{
   children: ReactNode
   staggerDelay?: number
   animation?: 'fadeIn' | 'slideUp' | 'slideLeft'
-}> = ({
-  children,
-  staggerDelay = 100,
-  animation = 'fadeIn'
-}) => {
+}> = ({ children, staggerDelay = 100, animation = 'fadeIn' }) => {
   const childrenArray = React.Children.toArray(children)
 
   return (
@@ -153,7 +171,7 @@ export const StaggerContainer: FC<{
 // Loading skeleton animations
 export const SkeletonLoader: FC<{ className?: string; lines?: number }> = ({
   className = '',
-  lines = 1
+  lines = 1,
 }) => (
   <div className={`space-y-3 ${className}`}>
     {Array.from({ length: lines }).map((_, index) => (
@@ -171,11 +189,7 @@ export const ScrollReveal: FC<{
   children: ReactNode
   threshold?: number
   rootMargin?: string
-}> = ({
-  children,
-  threshold = 0.1,
-  rootMargin = '0px 0px -50px 0px'
-}) => {
+}> = ({ children, threshold = 0.1, rootMargin = '0px 0px -50px 0px' }) => {
   const [isVisible, setIsVisible] = React.useState(false)
   const ref = React.useRef<HTMLDivElement>(null)
 
@@ -187,7 +201,7 @@ export const ScrollReveal: FC<{
           observer.disconnect()
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     )
 
     if (ref.current) {
@@ -201,9 +215,7 @@ export const ScrollReveal: FC<{
     <div
       ref={ref}
       className={`transition-all duration-700 ease-out ${
-        isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-8'
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
     >
       {children}

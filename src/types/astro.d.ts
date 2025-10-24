@@ -89,12 +89,12 @@ declare module 'astro:content' {
 declare module '*.md' {
   // Define a proper interface for markdown content
   interface MarkdownContent {
-    frontmatter: Record<string, unknown>;
-    file: string;
-    rawContent: () => string;
-    compiledContent: () => string;
-    getHeadings: () => Array<{ depth: number; slug: string; text: string }>;
-    default: unknown;
+    frontmatter: Record<string, unknown>
+    file: string
+    rawContent: () => string
+    compiledContent: () => string
+    getHeadings: () => Array<{ depth: number; slug: string; text: string }>
+    default: unknown
   }
 
   const MarkdownFile: MarkdownContent

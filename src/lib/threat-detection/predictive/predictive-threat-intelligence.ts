@@ -3,22 +3,22 @@ import crypto from 'crypto'
 function _secureId(prefix = ''): string {
   try {
     const nodeCrypto = crypto as unknown as {
-      randomUUID?: () => string;
-      randomBytes?: (n: number) => Buffer;
-    };
+      randomUUID?: () => string
+      randomBytes?: (n: number) => Buffer
+    }
 
     if (typeof nodeCrypto.randomUUID === 'function') {
-      return `${prefix}${nodeCrypto.randomUUID()}`;
+      return `${prefix}${nodeCrypto.randomUUID()}`
     }
 
     if (typeof nodeCrypto.randomBytes === 'function') {
-      return `${prefix}${nodeCrypto.randomBytes(16).toString('hex')}`;
+      return `${prefix}${nodeCrypto.randomBytes(16).toString('hex')}`
     }
   } catch (_e) {
     // ignore errors when crypto is unavailable
   }
 
-  return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
 /**
@@ -26,202 +26,240 @@ function _secureId(prefix = ''): string {
  * Provides time series forecasting, emerging threat detection, and threat propagation modeling
  */
 
-import { Redis } from 'ioredis';
-import { MongoClient } from 'mongodb';
-import { EventEmitter } from 'events';
-import * as tf from '@tensorflow/tfjs';
+import { Redis } from 'ioredis'
+import { MongoClient } from 'mongodb'
+import { EventEmitter } from 'events'
+import * as tf from '@tensorflow/tfjs'
 
 export interface ThreatData {
-  threatId: string;
-  threatType: string;
-  severity: number;
-  confidence: number;
-  timestamp: Date;
-  indicators: ThreatIndicator[];
-  context: ThreatContext;
-  attribution?: ThreatAttribution;
+  threatId: string
+  threatType: string
+  severity: number
+  confidence: number
+  timestamp: Date
+  indicators: ThreatIndicator[]
+  context: ThreatContext
+  attribution?: ThreatAttribution
 }
 
 export interface ThreatIndicator {
-  indicatorId: string;
-  indicatorType: string;
-  value: string;
-  confidence: number;
-  source: string;
-  timestamp: Date;
+  indicatorId: string
+  indicatorType: string
+  value: string
+  confidence: number
+  source: string
+  timestamp: Date
 }
 
 export interface ThreatContext {
-  geographicLocation?: string;
-  affectedSystems?: string[];
-  industrySector?: string;
-  timeWindow?: TimeWindow;
-  threatActor?: string;
-  campaign?: string;
+  geographicLocation?: string
+  affectedSystems?: string[]
+  industrySector?: string
+  timeWindow?: TimeWindow
+  threatActor?: string
+  campaign?: string
 }
 
 export interface ThreatAttribution {
-  actor: string;
-  motivation: string;
-  sophistication: string;
-  resources: string;
-  attributionConfidence: number;
+  actor: string
+  motivation: string
+  sophistication: string
+  resources: string
+  attributionConfidence: number
 }
 
 export interface ThreatForecast {
-  forecastId: string;
-  timeframe: TimeWindow;
-  predictedThreats: PredictedThreat[];
-  confidenceIntervals: ConfidenceInterval[];
-  trendAnalysis: TrendAnalysis;
-  seasonalPatterns: SeasonalPattern[];
-  modelPerformance: ModelPerformanceMetrics;
+  forecastId: string
+  timeframe: TimeWindow
+  predictedThreats: PredictedThreat[]
+  confidenceIntervals: ConfidenceInterval[]
+  trendAnalysis: TrendAnalysis
+  seasonalPatterns: SeasonalPattern[]
+  modelPerformance: ModelPerformanceMetrics
 }
 
 export interface PredictedThreat {
-  threatType: string;
-  predictedSeverity: number;
-  confidence: number;
-  probability: number;
-  contributingFactors: string[];
-  timeHorizon: string;
+  threatType: string
+  predictedSeverity: number
+  confidence: number
+  probability: number
+  contributingFactors: string[]
+  timeHorizon: string
 }
 
 export interface NovelThreat {
-  threatId: string;
-  noveltyScore: number;
-  similarityToKnown: number;
-  potentialImpact: number;
-  detectionConfidence: number;
-  characteristics: ThreatCharacteristics;
-  recommendations: string[];
+  threatId: string
+  noveltyScore: number
+  similarityToKnown: number
+  potentialImpact: number
+  detectionConfidence: number
+  characteristics: ThreatCharacteristics
+  recommendations: string[]
 }
 
 export interface PropagationModel {
-  modelId: string;
-  initialThreat: Threat;
-  networkGraph: NetworkGraph;
-  propagationProbability: number;
-  affectedNodes: NetworkNode[];
-  timeToPropagation: number;
-  containmentStrategies: ContainmentStrategy[];
+  modelId: string
+  initialThreat: Threat
+  networkGraph: NetworkGraph
+  propagationProbability: number
+  affectedNodes: NetworkNode[]
+  timeToPropagation: number
+  containmentStrategies: ContainmentStrategy[]
 }
 
 export interface SeasonalPattern {
-  patternId: string;
-  seasonalityType: 'daily' | 'weekly' | 'monthly' | 'yearly';
-  amplitude: number;
-  phase: number;
-  frequency: number;
-  confidence: number;
-  statisticalSignificance: number;
+  patternId: string
+  seasonalityType: 'daily' | 'weekly' | 'monthly' | 'yearly'
+  amplitude: number
+  phase: number
+  frequency: number
+  confidence: number
+  statisticalSignificance: number
 }
 
 export interface RiskAssessment {
-  assessmentId: string;
-  threats: Threat[];
-  overallRiskScore: number;
-  riskBreakdown: RiskBreakdown;
-  uncertaintyQuantification: UncertaintyQuantification;
-  recommendations: RiskRecommendation[];
-  confidenceLevel: number;
+  assessmentId: string
+  threats: Threat[]
+  overallRiskScore: number
+  riskBreakdown: RiskBreakdown
+  uncertaintyQuantification: UncertaintyQuantification
+  recommendations: RiskRecommendation[]
+  confidenceLevel: number
 }
 
 export interface TimeSeriesForecast {
-  forecastId: string;
-  series: ThreatTimeSeries[];
-  predictions: TimeSeriesPrediction[];
-  confidenceBands: ConfidenceBand[];
-  modelParameters: ModelParameters;
-  validationMetrics: ValidationMetrics;
+  forecastId: string
+  series: ThreatTimeSeries[]
+  predictions: TimeSeriesPrediction[]
+  confidenceBands: ConfidenceBand[]
+  modelParameters: ModelParameters
+  validationMetrics: ValidationMetrics
 }
 
 export interface PredictiveThreatIntelligence {
-  predictThreatTrends(historicalData: ThreatData[], timeframe: TimeWindow): Promise<ThreatForecast>;
-  detectEmergingThreats(currentData: ThreatData[], baseline: ThreatData[]): Promise<NovelThreat[]>;
-  modelThreatPropagation(initialThreat: Threat, network: NetworkGraph): Promise<PropagationModel>;
-  identifySeasonalPatterns(data: ThreatData[]): Promise<SeasonalPattern[]>;
-  assessRisk(threats: Threat[], context: SecurityContext): Promise<RiskAssessment>;
-  forecastThreatTimeSeries(series: ThreatTimeSeries[]): Promise<TimeSeriesForecast>;
+  predictThreatTrends(
+    historicalData: ThreatData[],
+    timeframe: TimeWindow,
+  ): Promise<ThreatForecast>
+  detectEmergingThreats(
+    currentData: ThreatData[],
+    baseline: ThreatData[],
+  ): Promise<NovelThreat[]>
+  modelThreatPropagation(
+    initialThreat: Threat,
+    network: NetworkGraph,
+  ): Promise<PropagationModel>
+  identifySeasonalPatterns(data: ThreatData[]): Promise<SeasonalPattern[]>
+  assessRisk(
+    threats: Threat[],
+    context: SecurityContext,
+  ): Promise<RiskAssessment>
+  forecastThreatTimeSeries(
+    series: ThreatTimeSeries[],
+  ): Promise<TimeSeriesForecast>
 }
 
-export class AdvancedPredictiveThreatIntelligence extends EventEmitter implements PredictiveThreatIntelligence {
-  private redis: Redis;
-  private mongoClient: MongoClient;
-  private timeSeriesForecaster: TimeSeriesForecaster;
-  private noveltyDetector: NoveltyDetector;
-  private propagationModeler: PropagationModeler;
-  seasonalAnalyzer: SeasonalAnalyzer;
-  private riskAssessor: RiskAssessor;
-  private modelRegistry: ModelRegistry;
+export class AdvancedPredictiveThreatIntelligence
+  extends EventEmitter
+  implements PredictiveThreatIntelligence
+{
+  private redis: Redis
+  private mongoClient: MongoClient
+  private timeSeriesForecaster: TimeSeriesForecaster
+  private noveltyDetector: NoveltyDetector
+  private propagationModeler: PropagationModeler
+  seasonalAnalyzer: SeasonalAnalyzer
+  private riskAssessor: RiskAssessor
+  private modelRegistry: ModelRegistry
 
   constructor(
     private config: {
-      redisUrl: string;
-      mongoUrl: string;
-      modelRegistryUrl: string;
-      forecastingConfig: ForecastingConfig;
-      noveltyConfig: NoveltyConfig;
-      propagationConfig: PropagationConfig;
-    }
+      redisUrl: string
+      mongoUrl: string
+      modelRegistryUrl: string
+      forecastingConfig: ForecastingConfig
+      noveltyConfig: NoveltyConfig
+      propagationConfig: PropagationConfig
+    },
   ) {
-    super();
-    this.initializeServices();
+    super()
+    this.initializeServices()
   }
 
   private async initializeServices(): Promise<void> {
-    this.redis = new Redis(this.config.redisUrl);
-    this.mongoClient = new MongoClient(this.config.mongoUrl);
+    this.redis = new Redis(this.config.redisUrl)
+    this.mongoClient = new MongoClient(this.config.mongoUrl)
 
-    this.timeSeriesForecaster = new LSTMTimeSeriesForecaster(this.config.forecastingConfig);
+    this.timeSeriesForecaster = new LSTMTimeSeriesForecaster(
+      this.config.forecastingConfig,
+    )
     this.noveltyDetector = class MLNoveltyDetector {
-      async detectNovelThreats(_data: ThreatData[], _baseline: ThreatData[]): Promise<NovelThreat[]> {
+      async detectNovelThreats(
+        _data: ThreatData[],
+        _baseline: ThreatData[],
+      ): Promise<NovelThreat[]> {
         // Implement ML-based novelty detection
-        return [];
+        return []
       }
-    };
-    this.propagationModeler = new GraphPropagationModeler(this.config.propagationConfig);
-    this.seasonalAnalyzer = new StatisticalSeasonalAnalyzer();
-    this.riskAssessor = new ProbabilisticRiskAssessor();
-    this.modelRegistry = new ThreatModelRegistry(this.mongoClient);
+    }
+    this.propagationModeler = new GraphPropagationModeler(
+      this.config.propagationConfig,
+    )
+    this.seasonalAnalyzer = new StatisticalSeasonalAnalyzer()
+    this.riskAssessor = new ProbabilisticRiskAssessor()
+    this.modelRegistry = new ThreatModelRegistry(this.mongoClient)
 
-    await this.mongoClient.connect();
-    this.emit('services_initialized');
+    await this.mongoClient.connect()
+    this.emit('services_initialized')
   }
 
-  async predictThreatTrends(historicalData: ThreatData[], _timeframe: TimeWindow): Promise<ThreatForecast> {
+  async predictThreatTrends(
+    historicalData: ThreatData[],
+    _timeframe: TimeWindow,
+  ): Promise<ThreatForecast> {
     try {
       // Validate input data
       if (!historicalData || historicalData.length === 0) {
-        throw new Error('Historical data is required for threat trend prediction');
+        throw new Error(
+          'Historical data is required for threat trend prediction',
+        )
       }
 
       // Preprocess historical data
-      const processedData = await this.preprocessThreatData(historicalData);
+      const processedData = await this.preprocessThreatData(historicalData)
 
       // Extract time series features
-      const timeSeries = this.extractTimeSeries(processedData);
+      const timeSeries = this.extractTimeSeries(processedData)
 
       // Apply seasonal decomposition
-      const seasonalComponents = await this.seasonalAnalyzer.decompose(timeSeries);
+      const seasonalComponents =
+        await this.seasonalAnalyzer.decompose(timeSeries)
 
       // Train forecasting models
-      const models = await this.trainForecastingModels(timeSeries, seasonalComponents);
+      const models = await this.trainForecastingModels(
+        timeSeries,
+        seasonalComponents,
+      )
 
       // Generate predictions
-      const predictions = await this.generatePredictions(models, timeframe);
+      const predictions = await this.generatePredictions(models, timeframe)
 
       // Calculate confidence intervals
-      const confidenceIntervals = await this.calculateConfidenceIntervals(predictions);
+      const confidenceIntervals =
+        await this.calculateConfidenceIntervals(predictions)
 
       // Analyze trends
-      const trendAnalysis = await this.analyzeTrends(timeSeries, predictions);
+      const trendAnalysis = await this.analyzeTrends(timeSeries, predictions)
 
       // Identify seasonal patterns
-      const seasonalPatterns = await this.identifySeasonalPatterns(processedData);
+      const seasonalPatterns =
+        await this.identifySeasonalPatterns(processedData)
 
       // Evaluate model performance
-      const modelPerformance = await this.evaluateModelPerformance(models, timeSeries);
+      const modelPerformance = await this.evaluateModelPerformance(
+        models,
+        timeSeries,
+      )
 
       const forecast: ThreatForecast = {
         forecastId: this.generateForecastId(),
@@ -230,108 +268,124 @@ export class AdvancedPredictiveThreatIntelligence extends EventEmitter implement
         confidenceIntervals,
         trendAnalysis,
         seasonalPatterns,
-        modelPerformance
-      };
+        modelPerformance,
+      }
 
       // Cache forecast for future reference
-      await this.cacheForecast(forecast);
+      await this.cacheForecast(forecast)
 
-      this.emit('threat_forecast_generated', { forecastId: forecast.forecastId });
-      return forecast;
-
+      this.emit('threat_forecast_generated', {
+        forecastId: forecast.forecastId,
+      })
+      return forecast
     } catch (error) {
-      this.emit('threat_forecast_error', { error });
-      throw error;
+      this.emit('threat_forecast_error', { error })
+      throw error
     }
   }
 
-  async detectEmergingThreats(currentData: ThreatData[], baseline: ThreatData[]): Promise<NovelThreat[]> {
+  async detectEmergingThreats(
+    currentData: ThreatData[],
+    baseline: ThreatData[],
+  ): Promise<NovelThreat[]> {
     try {
       // Validate input data
       if (!currentData || !baseline) {
-        throw new Error('Both current and baseline data are required for emerging threat detection');
+        throw new Error(
+          'Both current and baseline data are required for emerging threat detection',
+        )
       }
 
       // Preprocess data
-      const processedCurrent = await this.preprocessThreatData(currentData);
-      const processedBaseline = await this.preprocessThreatData(baseline);
+      const processedCurrent = await this.preprocessThreatData(currentData)
+      const processedBaseline = await this.preprocessThreatData(baseline)
 
       // Extract features
-      const currentFeatures = await this.extractThreatFeatures(processedCurrent);
-      const baselineFeatures = await this.extractThreatFeatures(processedBaseline);
+      const currentFeatures = await this.extractThreatFeatures(processedCurrent)
+      const baselineFeatures =
+        await this.extractThreatFeatures(processedBaseline)
 
       // Apply novelty detection algorithms
       const novelThreats = await this.noveltyDetector.detectNovelThreats(
         processedCurrent,
-        processedBaseline
-      );
+        processedBaseline,
+      )
 
       // Calculate novelty scores
       const scoredNovelThreats = await this.calculateNoveltyScores(
         novelThreats,
         currentFeatures,
-        baselineFeatures
-      );
+        baselineFeatures,
+      )
 
       // Filter by significance
       const significantNovelThreats = scoredNovelThreats.filter(
-        threat => threat.noveltyScore > 0.7 && threat.detectionConfidence > 0.8
-      );
+        (threat) =>
+          threat.noveltyScore > 0.7 && threat.detectionConfidence > 0.8,
+      )
 
       // Generate recommendations
-      const threatsWithRecommendations = await this.generateNovelThreatRecommendations(
-        significantNovelThreats
-      );
+      const threatsWithRecommendations =
+        await this.generateNovelThreatRecommendations(significantNovelThreats)
 
       // Store detected novel threats
-      await this.storeNovelThreats(threatsWithRecommendations);
+      await this.storeNovelThreats(threatsWithRecommendations)
 
       this.emit('emerging_threats_detected', {
-        threatCount: threatsWithRecommendations.length
-      });
+        threatCount: threatsWithRecommendations.length,
+      })
 
-      return threatsWithRecommendations;
-
+      return threatsWithRecommendations
     } catch (error) {
-      this.emit('emerging_threat_detection_error', { error });
-      throw error;
+      this.emit('emerging_threat_detection_error', { error })
+      throw error
     }
   }
 
-  async modelThreatPropagation(initialThreat: Threat, _network: NetworkGraph): Promise<PropagationModel> {
+  async modelThreatPropagation(
+    initialThreat: Threat,
+    _network: NetworkGraph,
+  ): Promise<PropagationModel> {
     try {
       // Validate inputs
       if (!initialThreat || !network) {
-        throw new Error('Initial threat and network graph are required for propagation modeling');
+        throw new Error(
+          'Initial threat and network graph are required for propagation modeling',
+        )
       }
 
       // Build propagation graph
-      const propagationGraph = await this.buildPropagationGraph(initialThreat, network);
+      const propagationGraph = await this.buildPropagationGraph(
+        initialThreat,
+        network,
+      )
 
       // Calculate propagation probabilities
-      const propagationProbabilities = await this.calculatePropagationProbabilities(
-        propagationGraph,
-        initialThreat
-      );
+      const propagationProbabilities =
+        await this.calculatePropagationProbabilities(
+          propagationGraph,
+          initialThreat,
+        )
 
       // Simulate propagation
       const simulation = await this.simulateThreatPropagation(
         propagationGraph,
         propagationProbabilities,
-        initialThreat
-      );
+        initialThreat,
+      )
 
       // Identify affected nodes
-      const affectedNodes = await this.identifyAffectedNodes(simulation);
+      const affectedNodes = await this.identifyAffectedNodes(simulation)
 
       // Calculate time to propagation
-      const timeToPropagation = await this.calculateTimeToPropagation(simulation);
+      const timeToPropagation =
+        await this.calculateTimeToPropagation(simulation)
 
       // Generate containment strategies
       const containmentStrategies = await this.generateContainmentStrategies(
         simulation,
-        affectedNodes
-      );
+        affectedNodes,
+      )
 
       const propagationModel: PropagationModel = {
         modelId: this.generateModelId(),
@@ -340,88 +394,99 @@ export class AdvancedPredictiveThreatIntelligence extends EventEmitter implement
         propagationProbability: propagationProbabilities.overallProbability,
         affectedNodes,
         timeToPropagation,
-        containmentStrategies
-      };
+        containmentStrategies,
+      }
 
       // Store propagation model
-      await this.storePropagationModel(propagationModel);
+      await this.storePropagationModel(propagationModel)
 
-      this.emit('threat_propagation_modeled', { modelId: propagationModel.modelId });
-      return propagationModel;
-
+      this.emit('threat_propagation_modeled', {
+        modelId: propagationModel.modelId,
+      })
+      return propagationModel
     } catch (error) {
-      this.emit('threat_propagation_modeling_error', { error });
-      throw error;
+      this.emit('threat_propagation_modeling_error', { error })
+      throw error
     }
   }
 
-  async identifySeasonalPatterns(data: ThreatData[]): Promise<SeasonalPattern[]> {
+  async identifySeasonalPatterns(
+    data: ThreatData[],
+  ): Promise<SeasonalPattern[]> {
     try {
       // Validate input data
       if (!data || data.length === 0) {
-        throw new Error('Threat data is required for seasonal pattern identification');
+        throw new Error(
+          'Threat data is required for seasonal pattern identification',
+        )
       }
 
       // Preprocess data
-      const processedData = await this.preprocessThreatData(data);
+      const processedData = await this.preprocessThreatData(data)
 
       // Extract time series
-      const timeSeries = this.extractTimeSeries(processedData);
+      const timeSeries = this.extractTimeSeries(processedData)
 
       // Apply seasonal decomposition
-      const seasonalComponents = await this.seasonalAnalyzer.decompose(timeSeries);
+      const seasonalComponents =
+        await this.seasonalAnalyzer.decompose(timeSeries)
 
       // Identify patterns at different time scales
-      const patterns: SeasonalPattern[] = [];
+      const patterns: SeasonalPattern[] = []
 
       // Daily patterns
-      const dailyPattern = await this.identifyDailyPattern(seasonalComponents);
+      const dailyPattern = await this.identifyDailyPattern(seasonalComponents)
       if (dailyPattern) {
-        patterns.push(dailyPattern);
+        patterns.push(dailyPattern)
       }
 
       // Weekly patterns
-      const weeklyPattern = await this.identifyWeeklyPattern(seasonalComponents);
+      const weeklyPattern = await this.identifyWeeklyPattern(seasonalComponents)
       if (weeklyPattern) {
-        patterns.push(weeklyPattern);
+        patterns.push(weeklyPattern)
       }
 
       // Monthly patterns
-      const monthlyPattern = await this.identifyMonthlyPattern(seasonalComponents);
+      const monthlyPattern =
+        await this.identifyMonthlyPattern(seasonalComponents)
       if (monthlyPattern) {
-        patterns.push(monthlyPattern);
+        patterns.push(monthlyPattern)
       }
 
       // Yearly patterns
-      const yearlyPattern = await this.identifyYearlyPattern(seasonalComponents);
+      const yearlyPattern = await this.identifyYearlyPattern(seasonalComponents)
       if (yearlyPattern) {
-        patterns.push(yearlyPattern);
+        patterns.push(yearlyPattern)
       }
 
       // Validate statistical significance
-      const significantPatterns = await this.validateStatisticalSignificance(patterns);
+      const significantPatterns =
+        await this.validateStatisticalSignificance(patterns)
 
       // Store identified patterns
-      await this.storeSeasonalPatterns(significantPatterns);
+      await this.storeSeasonalPatterns(significantPatterns)
 
-      this.emit('seasonal_patterns_identified', { patternCount: significantPatterns.length });
-      return significantPatterns;
-
+      this.emit('seasonal_patterns_identified', {
+        patternCount: significantPatterns.length,
+      })
+      return significantPatterns
     } catch (error) {
-      this.emit('seasonal_pattern_identification_error', { error });
-      throw error;
+      this.emit('seasonal_pattern_identification_error', { error })
+      throw error
     }
   }
 
   // Renamed to avoid duplicate identifier
   private async extractSeasonalPatternsFromComponents(
-    seasonalComponents: SeasonalComponents
+    seasonalComponents: SeasonalComponents,
   ): Promise<SeasonalPattern[]> {
-    const patterns: SeasonalPattern[] = [];
+    const patterns: SeasonalPattern[] = []
 
     // Analyze daily patterns
     if (seasonalComponents.daily) {
-      const dailyPattern = await this.analyzeDailySeasonality(seasonalComponents.daily);
+      const dailyPattern = await this.analyzeDailySeasonality(
+        seasonalComponents.daily,
+      )
       if (dailyPattern.isSignificant) {
         patterns.push({
           patternId: 'daily_pattern',
@@ -430,14 +495,16 @@ export class AdvancedPredictiveThreatIntelligence extends EventEmitter implement
           phase: dailyPattern.phase,
           frequency: dailyPattern.frequency,
           confidence: dailyPattern.confidence,
-          statisticalSignificance: dailyPattern.pValue
-        });
+          statisticalSignificance: dailyPattern.pValue,
+        })
       }
     }
 
     // Analyze weekly patterns
     if (seasonalComponents.weekly) {
-      const weeklyPattern = await this.analyzeWeeklySeasonality(seasonalComponents.weekly);
+      const weeklyPattern = await this.analyzeWeeklySeasonality(
+        seasonalComponents.weekly,
+      )
       if (weeklyPattern.isSignificant) {
         patterns.push({
           patternId: 'weekly_pattern',
@@ -446,59 +513,75 @@ export class AdvancedPredictiveThreatIntelligence extends EventEmitter implement
           phase: weeklyPattern.phase,
           frequency: weeklyPattern.frequency,
           confidence: weeklyPattern.confidence,
-          statisticalSignificance: weeklyPattern.pValue
-        });
+          statisticalSignificance: weeklyPattern.pValue,
+        })
       }
     }
 
-    return patterns;
+    return patterns
   }
 
-  async assessRisk(threats: Threat[], context: SecurityContext): Promise<RiskAssessment> {
+  async assessRisk(
+    threats: Threat[],
+    context: SecurityContext,
+  ): Promise<RiskAssessment> {
     try {
       // Validate inputs
       if (!threats || threats.length === 0) {
-        throw new Error('Threats are required for risk assessment');
+        throw new Error('Threats are required for risk assessment')
       }
 
       // Preprocess threats
-      const processedThreats = await this.preprocessThreats(threats);
+      const processedThreats = await this.preprocessThreats(threats)
 
       // Extract risk factors
-      await this.extractRiskFactors(processedThreats, context);
+      await this.extractRiskFactors(processedThreats, context)
 
       // Calculate individual risk components
-      const likelihood = await this.calculateThreatLikelihood(processedThreats, context);
-      const impact = await this.calculateThreatImpact(processedThreats, context);
-      const vulnerability = await this.calculateVulnerability(processedThreats, context);
+      const likelihood = await this.calculateThreatLikelihood(
+        processedThreats,
+        context,
+      )
+      const impact = await this.calculateThreatImpact(processedThreats, context)
+      const vulnerability = await this.calculateVulnerability(
+        processedThreats,
+        context,
+      )
 
       // Combine risk components
-      const overallRiskScore = this.combineRiskComponents(likelihood, impact, vulnerability);
+      const overallRiskScore = this.combineRiskComponents(
+        likelihood,
+        impact,
+        vulnerability,
+      )
 
       // Calculate risk breakdown
-      const riskBreakdown = await this.calculateRiskBreakdown(processedThreats, context);
+      const riskBreakdown = await this.calculateRiskBreakdown(
+        processedThreats,
+        context,
+      )
 
       // Quantify uncertainty
       const uncertaintyQuantification = await this.quantifyUncertainty(
         processedThreats,
         context,
-        overallRiskScore
-      );
+        overallRiskScore,
+      )
 
       // Generate recommendations
       const recommendations = await this.generateRiskRecommendations(
         processedThreats,
         context,
-        riskBreakdown
-      );
+        riskBreakdown,
+      )
 
       // Calculate confidence level
       const confidenceLevel = this.calculateRiskConfidence(
         likelihood,
         impact,
         vulnerability,
-        uncertaintyQuantification
-      );
+        uncertaintyQuantification,
+      )
 
       const riskAssessment: RiskAssessment = {
         assessmentId: this.generateAssessmentId(),
@@ -507,48 +590,61 @@ export class AdvancedPredictiveThreatIntelligence extends EventEmitter implement
         riskBreakdown,
         uncertaintyQuantification,
         recommendations,
-        confidenceLevel
-      };
+        confidenceLevel,
+      }
 
       // Store risk assessment
-      await this.storeRiskAssessment(riskAssessment);
+      await this.storeRiskAssessment(riskAssessment)
 
-      this.emit('risk_assessment_completed', { assessmentId: riskAssessment.assessmentId });
-      return riskAssessment;
-
+      this.emit('risk_assessment_completed', {
+        assessmentId: riskAssessment.assessmentId,
+      })
+      return riskAssessment
     } catch (error) {
-      this.emit('risk_assessment_error', { error });
-      throw error;
+      this.emit('risk_assessment_error', { error })
+      throw error
     }
   }
 
-  async forecastThreatTimeSeries(series: ThreatTimeSeries[]): Promise<TimeSeriesForecast> {
+  async forecastThreatTimeSeries(
+    series: ThreatTimeSeries[],
+  ): Promise<TimeSeriesForecast> {
     try {
       // Validate input
       if (!series || series.length === 0) {
-        throw new Error('Time series data is required for forecasting');
+        throw new Error('Time series data is required for forecasting')
       }
 
       // Preprocess time series
-      const processedSeries = await this.preprocessTimeSeries(series);
+      const processedSeries = await this.preprocessTimeSeries(series)
 
       // Extract features
-      const features = await this.extractTimeSeriesFeatures(processedSeries);
+      const features = await this.extractTimeSeriesFeatures(processedSeries)
 
       // Train forecasting model
-      const model = await this.timeSeriesForecaster.train(processedSeries, features);
+      const model = await this.timeSeriesForecaster.train(
+        processedSeries,
+        features,
+      )
 
       // Generate predictions
-      const predictions = await this.timeSeriesForecaster.forecast(model, features);
+      const predictions = await this.timeSeriesForecaster.forecast(
+        model,
+        features,
+      )
 
       // Calculate confidence bands
-      const confidenceBands = await this.calculateTimeSeriesConfidenceBands(predictions);
+      const confidenceBands =
+        await this.calculateTimeSeriesConfidenceBands(predictions)
 
       // Extract model parameters
-      const modelParameters = await this.extractModelParameters(model);
+      const modelParameters = await this.extractModelParameters(model)
 
       // Calculate validation metrics
-      const validationMetrics = await this.calculateValidationMetrics(model, processedSeries);
+      const validationMetrics = await this.calculateValidationMetrics(
+        model,
+        processedSeries,
+      )
 
       const forecast: TimeSeriesForecast = {
         forecastId: this.generateForecastId(),
@@ -556,96 +652,99 @@ export class AdvancedPredictiveThreatIntelligence extends EventEmitter implement
         predictions,
         confidenceBands,
         modelParameters,
-        validationMetrics
-      };
+        validationMetrics,
+      }
 
       // Store forecast
-      await this.storeTimeSeriesForecast(forecast);
+      await this.storeTimeSeriesForecast(forecast)
 
-      this.emit('time_series_forecast_generated', { forecastId: forecast.forecastId });
-      return forecast;
-
+      this.emit('time_series_forecast_generated', {
+        forecastId: forecast.forecastId,
+      })
+      return forecast
     } catch (error) {
-      this.emit('time_series_forecast_error', { error });
-      throw error;
+      this.emit('time_series_forecast_error', { error })
+      throw error
     }
   }
 
-  private async preprocessThreatData(data: ThreatData[]): Promise<ThreatData[]> {
+  private async preprocessThreatData(
+    data: ThreatData[],
+  ): Promise<ThreatData[]> {
     // Remove duplicates
-    const uniqueData = this.removeDuplicateThreats(data);
+    const uniqueData = this.removeDuplicateThreats(data)
 
     // Sort by timestamp
-    const sortedData = uniqueData.sort((a, b) =>
-      a.timestamp.getTime() - b.timestamp.getTime()
-    );
+    const sortedData = uniqueData.sort(
+      (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
+    )
 
     // Handle missing values
-    const imputedData = await this.imputeMissingValues(sortedData);
+    const imputedData = await this.imputeMissingValues(sortedData)
 
     // Normalize data
-    return await this.normalizeThreatData(imputedData);
+    return await this.normalizeThreatData(imputedData)
   }
 
   private extractTimeSeries(data: ThreatData[]): ThreatTimeSeries[] {
     // Group by threat type
-    const groupedData = this.groupByThreatType(data);
+    const groupedData = this.groupByThreatType(data)
 
     // Convert to time series format
-    const timeSeries: ThreatTimeSeries[] = [];
+    const timeSeries: ThreatTimeSeries[] = []
 
     for (const [threatType, threats] of Object.entries(groupedData)) {
       const series: ThreatTimeSeries = {
         seriesId: `series_${threatType}`,
         threatType,
-        dataPoints: threats.map(threat => ({
+        dataPoints: threats.map((threat) => ({
           timestamp: threat.timestamp,
           value: threat.severity,
           confidence: threat.confidence,
           metadata: {
             threatId: threat.threatId,
             indicators: threat.indicators.length,
-            context: threat.context
-          }
-        }))
-      };
+            context: threat.context,
+          },
+        })),
+      }
 
-      timeSeries.push(series);
+      timeSeries.push(series)
     }
 
-    return timeSeries;
+    return timeSeries
   }
 
   private async trainForecastingModels(
     timeSeries: ThreatTimeSeries[],
-    seasonalComponents: SeasonalComponents
+    seasonalComponents: SeasonalComponents,
   ): Promise<ForecastingModel[]> {
-    const models: ForecastingModel[] = [];
+    const models: ForecastingModel[] = []
 
     for (const series of timeSeries) {
       // Train LSTM model
-      const lstmModel = await this.trainLSTMModel(series, seasonalComponents);
+      const lstmModel = await this.trainLSTMModel(series, seasonalComponents)
 
       // Train ARIMA model for comparison
-      const arimaModel = await this.trainARIMAModel(series, seasonalComponents);
+      const arimaModel = await this.trainARIMAModel(series, seasonalComponents)
 
       // Train ensemble model
-      const ensembleModel = await this.trainEnsembleModel(lstmModel, arimaModel);
+      const ensembleModel = await this.trainEnsembleModel(lstmModel, arimaModel)
 
-      models.push(ensembleModel);
+      models.push(ensembleModel)
     }
 
-    return models;
+    return models
   }
 
   private async generatePredictions(
     models: ForecastingModel[],
-    timeframe: TimeWindow
+    timeframe: TimeWindow,
   ): Promise<PredictedThreat[]> {
-    const predictions: PredictedThreat[] = [];
+    const predictions: PredictedThreat[] = []
 
     for (const model of models) {
-      const prediction = await model.predict(timeframe);
+      const prediction = await model.predict(timeframe)
 
       predictions.push({
         threatType: model.threatType,
@@ -653,521 +752,556 @@ export class AdvancedPredictiveThreatIntelligence extends EventEmitter implement
         confidence: prediction.confidence,
         probability: prediction.probability,
         contributingFactors: prediction.factors,
-        timeHorizon: this.calculateTimeHorizon(timeframe)
-      });
+        timeHorizon: this.calculateTimeHorizon(timeframe),
+      })
     }
 
-    return predictions;
+    return predictions
   }
 
   private async calculateConfidenceIntervals(
-    predictions: PredictedThreat[]
+    predictions: PredictedThreat[],
   ): Promise<ConfidenceInterval[]> {
-    const intervals: ConfidenceInterval[] = [];
+    const intervals: ConfidenceInterval[] = []
 
     for (const prediction of predictions) {
-      const interval = await this.calculatePredictionInterval(prediction);
-      intervals.push(interval);
+      const interval = await this.calculatePredictionInterval(prediction)
+      intervals.push(interval)
     }
 
-    return intervals;
+    return intervals
   }
 
   private async calculateNoveltyScores(
     novelThreats: NovelThreat[],
     currentFeatures: ThreatFeatures,
-    baselineFeatures: ThreatFeatures
+    baselineFeatures: ThreatFeatures,
   ): Promise<NovelThreat[]> {
-    const scoredThreats: NovelThreat[] = [];
+    const scoredThreats: NovelThreat[] = []
 
     for (const threat of novelThreats) {
       // Calculate similarity to known threats
       const similarity = await this.calculateSimilarityToKnownThreats(
         threat,
-        baselineFeatures
-      );
+        baselineFeatures,
+      )
 
       // Calculate novelty score
-      const noveltyScore = 1 - similarity; // Higher novelty = lower similarity
+      const noveltyScore = 1 - similarity // Higher novelty = lower similarity
 
       // Update threat with scores
       scoredThreats.push({
         ...threat,
         similarityToKnown: similarity,
         noveltyScore: noveltyScore,
-        detectionConfidence: Math.min(noveltyScore * 1.2, 1.0) // Cap at 1.0
-      });
+        detectionConfidence: Math.min(noveltyScore * 1.2, 1.0), // Cap at 1.0
+      })
     }
 
-    return scoredThreats;
+    return scoredThreats
   }
 
   private async buildPropagationGraph(
     initialThreat: Threat,
-    _network: NetworkGraph
+    _network: NetworkGraph,
   ): Promise<PropagationGraph> {
     // Create propagation graph based on threat characteristics and network topology
     const propagationGraph: PropagationGraph = {
       graphId: this.generateGraphId(),
-      nodes: network.nodes.map(node => ({
+      nodes: network.nodes.map((node) => ({
         ...node,
-        infectionProbability: this.calculateInfectionProbability(node, initialThreat),
+        infectionProbability: this.calculateInfectionProbability(
+          node,
+          initialThreat,
+        ),
         recoveryRate: this.calculateRecoveryRate(node),
-        vulnerabilityScore: this.calculateVulnerabilityScore(node)
+        vulnerabilityScore: this.calculateVulnerabilityScore(node),
       })),
-      edges: network.edges.map(edge => ({
+      edges: network.edges.map((edge) => ({
         ...edge,
-        transmissionProbability: this.calculateTransmissionProbability(edge, initialThreat),
-        transmissionRate: this.calculateTransmissionRate(edge)
-      }))
-    };
+        transmissionProbability: this.calculateTransmissionProbability(
+          edge,
+          initialThreat,
+        ),
+        transmissionRate: this.calculateTransmissionRate(edge),
+      })),
+    }
 
-    return propagationGraph;
+    return propagationGraph
   }
 
   private async calculatePropagationProbabilities(
     _propagationGraph: PropagationGraph,
-    _initialThreat: Threat
+    _initialThreat: Threat,
   ): Promise<PropagationProbabilities> {
     // Use epidemic modeling techniques (SIR, SEIR, etc.)
     const probabilities: PropagationProbabilities = {
       overallProbability: 0,
       nodeProbabilities: new Map(),
       edgeProbabilities: new Map(),
-      timeDependentProbabilities: []
-    };
+      timeDependentProbabilities: [],
+    }
 
     // Calculate basic reproduction number (R0)
-    const r0 = await this.calculateBasicReproductionNumber(propagationGraph, initialThreat);
-    probabilities.overallProbability = Math.min(r0 / 10, 1.0); // Normalize
+    const r0 = await this.calculateBasicReproductionNumber(
+      propagationGraph,
+      initialThreat,
+    )
+    probabilities.overallProbability = Math.min(r0 / 10, 1.0) // Normalize
 
     // Calculate individual node and edge probabilities
     for (const node of propagationGraph.nodes) {
-      const nodeProb = await this.calculateNodeInfectionProbability(node, propagationGraph);
-      probabilities.nodeProbabilities.set(node.nodeId, nodeProb);
+      const nodeProb = await this.calculateNodeInfectionProbability(
+        node,
+        propagationGraph,
+      )
+      probabilities.nodeProbabilities.set(node.nodeId, nodeProb)
     }
 
     for (const edge of propagationGraph.edges) {
-      const edgeProb = await this.calculateEdgeTransmissionProbability(edge, propagationGraph);
-      probabilities.edgeProbabilities.set(edge.edgeId, edgeProb);
+      const edgeProb = await this.calculateEdgeTransmissionProbability(
+        edge,
+        propagationGraph,
+      )
+      probabilities.edgeProbabilities.set(edge.edgeId, edgeProb)
     }
 
-    return probabilities;
+    return probabilities
   }
-
-
 
   private combineRiskComponents(
     likelihood: number,
     impact: number,
-    vulnerability: number
+    vulnerability: number,
   ): number {
     // Use a weighted combination or more sophisticated risk model
-    const weights = { likelihood: 0.4, impact: 0.4, vulnerability: 0.2 };
+    const weights = { likelihood: 0.4, impact: 0.4, vulnerability: 0.2 }
     return (
       likelihood * weights.likelihood +
       impact * weights.impact +
       vulnerability * weights.vulnerability
-    );
+    )
   }
 
   private async quantifyUncertainty(
     threats: Threat[],
     context: SecurityContext,
-    riskScore: number
+    riskScore: number,
   ): Promise<UncertaintyQuantification> {
     // Use Bayesian methods or other uncertainty quantification techniques
     const uncertainty: UncertaintyQuantification = {
       epistemic: 0.2, // Uncertainty due to lack of knowledge
-      aleatory: 0.1,  // Uncertainty due to inherent randomness
+      aleatory: 0.1, // Uncertainty due to inherent randomness
       total: 0.3,
       confidenceIntervals: {
         lower: riskScore * (1 - 0.3),
-        upper: riskScore * (1 + 0.3)
-      }
-    };
+        upper: riskScore * (1 + 0.3),
+      },
+    }
 
-    return uncertainty;
+    return uncertainty
   }
 
   private generateForecastId(): string {
-    return `forecast_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`;
+    return `forecast_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`
   }
 
   private generateModelId(): string {
-    return `model_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`;
+    return `model_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`
   }
 
   private generateAssessmentId(): string {
-    return `assessment_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`;
+    return `assessment_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`
   }
 
   private generateGraphId(): string {
-    return `graph_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`;
+    return `graph_${(crypto as unknown as { randomUUID: () => string }).randomUUID()}`
   }
 
   private async cacheForecast(forecast: ThreatForecast): Promise<void> {
     await this.redis.setex(
       `threat_forecast:${forecast.forecastId}`,
       7200, // 2 hours TTL
-      JSON.stringify(forecast)
-    );
+      JSON.stringify(forecast),
+    )
   }
 
   private async storeNovelThreats(threats: NovelThreat[]): Promise<void> {
     if (threats.length === 0) {
-      return;
+      return
     }
 
-    const db = this.mongoClient.db('threat_detection');
-    const collection = db.collection('novel_threats');
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('novel_threats')
 
-    await collection.insertMany(threats);
+    await collection.insertMany(threats)
   }
 
   private async storePropagationModel(model: PropagationModel): Promise<void> {
-    const db = this.mongoClient.db('threat_detection');
-    const collection = db.collection('propagation_models');
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('propagation_models')
 
-    await collection.insertOne(model);
+    await collection.insertOne(model)
   }
 
-  private async storeSeasonalPatterns(patterns: SeasonalPattern[]): Promise<void> {
+  private async storeSeasonalPatterns(
+    patterns: SeasonalPattern[],
+  ): Promise<void> {
     if (patterns.length === 0) {
-      return;
+      return
     }
 
-    const db = this.mongoClient.db('threat_detection');
-    const collection = db.collection('seasonal_patterns');
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('seasonal_patterns')
 
-    await collection.insertMany(patterns);
+    await collection.insertMany(patterns)
   }
 
   private async storeRiskAssessment(assessment: RiskAssessment): Promise<void> {
-    const db = this.mongoClient.db('threat_detection');
-    const collection = db.collection('risk_assessments');
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('risk_assessments')
 
-    await collection.insertOne(assessment);
+    await collection.insertOne(assessment)
   }
 
-  private async storeTimeSeriesForecast(forecast: TimeSeriesForecast): Promise<void> {
-    const db = this.mongoClient.db('threat_detection');
-    const collection = db.collection('time_series_forecasts');
+  private async storeTimeSeriesForecast(
+    forecast: TimeSeriesForecast,
+  ): Promise<void> {
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('time_series_forecasts')
 
-    await collection.insertOne(forecast);
+    await collection.insertOne(forecast)
   }
 
   async shutdown(): Promise<void> {
-    await this.redis.quit();
-    await this.mongoClient.close();
-    this.emit('shutdown');
+    await this.redis.quit()
+    await this.mongoClient.close()
+    this.emit('shutdown')
   }
 }
 
 // Supporting interfaces and types
 interface TimeWindow {
-  start: Date;
-  end: Date;
+  start: Date
+  end: Date
 }
 
 interface Threat {
-  threatId: string;
-  threatType: string;
-  severity: number;
-  confidence: number;
-  timestamp: Date;
+  threatId: string
+  threatType: string
+  severity: number
+  confidence: number
+  timestamp: Date
 }
 
 interface NetworkGraph {
-  nodes: NetworkNode[];
-  edges: NetworkEdge[];
+  nodes: NetworkNode[]
+  edges: NetworkEdge[]
 }
 
 interface NetworkNode {
-  nodeId: string;
-  nodeType: string;
-  properties: Record<string, unknown>;
+  nodeId: string
+  nodeType: string
+  properties: Record<string, unknown>
 }
 
 interface NetworkEdge {
-  edgeId: string;
-  sourceId: string;
-  targetId: string;
-  edgeType: string;
-  properties: Record<string, unknown>;
+  edgeId: string
+  sourceId: string
+  targetId: string
+  edgeType: string
+  properties: Record<string, unknown>
 }
 
 interface SecurityContext {
-  organizationSize: string;
-  industry: string;
-  geographicRegion: string;
-  securityMaturity: string;
-  complianceRequirements: string[];
+  organizationSize: string
+  industry: string
+  geographicRegion: string
+  securityMaturity: string
+  complianceRequirements: string[]
 }
 
 interface ThreatTimeSeries {
-  seriesId: string;
-  threatType: string;
-  dataPoints: TimeSeriesDataPoint[];
+  seriesId: string
+  threatType: string
+  dataPoints: TimeSeriesDataPoint[]
 }
 
 interface TimeSeriesDataPoint {
-  timestamp: Date;
-  value: number;
-  confidence: number;
-  metadata?: Record<string, unknown>;
+  timestamp: Date
+  value: number
+  confidence: number
+  metadata?: Record<string, unknown>
 }
 
 interface ForecastingConfig {
-  modelType: 'lstm' | 'arima' | 'ensemble';
-  lookbackWindow: number;
-  predictionHorizon: number;
-  updateFrequency: number;
-  confidenceLevel: number;
+  modelType: 'lstm' | 'arima' | 'ensemble'
+  lookbackWindow: number
+  predictionHorizon: number
+  updateFrequency: number
+  confidenceLevel: number
 }
 
 interface NoveltyConfig {
-  detectionThreshold: number;
-  similarityThreshold: number;
-  clusteringAlgorithm: string;
-  featureExtractionMethod: string;
+  detectionThreshold: number
+  similarityThreshold: number
+  clusteringAlgorithm: string
+  featureExtractionMethod: string
 }
 
 interface PropagationConfig {
-  modelType: 'sir' | 'seir' | 'network';
-  transmissionRate: number;
-  recoveryRate: number;
-  timeStep: number;
-  simulationDuration: number;
+  modelType: 'sir' | 'seir' | 'network'
+  transmissionRate: number
+  recoveryRate: number
+  timeStep: number
+  simulationDuration: number
 }
 
 interface ForecastingModel {
-  threatType: string;
-  predict(_timeframe: TimeWindow): Promise<PredictionResult>;
+  threatType: string
+  predict(_timeframe: TimeWindow): Promise<PredictionResult>
 }
 
 interface PredictionResult {
-  value: number;
-  confidence: number;
-  probability: number;
-  factors: string[];
+  value: number
+  confidence: number
+  probability: number
+  factors: string[]
 }
 
 interface ConfidenceInterval {
-  intervalId: string;
-  threatType: string;
-  lowerBound: number;
-  upperBound: number;
-  confidenceLevel: number;
-  predictionHorizon: string;
+  intervalId: string
+  threatType: string
+  lowerBound: number
+  upperBound: number
+  confidenceLevel: number
+  predictionHorizon: string
 }
 
 interface TrendAnalysis {
-  trendDirection: 'increasing' | 'decreasing' | 'stable';
-  trendStrength: number;
-  changePoints: ChangePoint[];
-  seasonalityStrength: number;
-  noiseLevel: number;
+  trendDirection: 'increasing' | 'decreasing' | 'stable'
+  trendStrength: number
+  changePoints: ChangePoint[]
+  seasonalityStrength: number
+  noiseLevel: number
 }
 
 interface ChangePoint {
-  timestamp: Date;
-  changeMagnitude: number;
-  changeType: 'abrupt' | 'gradual';
-  confidence: number;
+  timestamp: Date
+  changeMagnitude: number
+  changeType: 'abrupt' | 'gradual'
+  confidence: number
 }
 
 interface ConfidenceBand {
-  bandId: string;
-  upperBand: number[];
-  lowerBand: number[];
-  confidenceLevel: number;
-  timestamps: Date[];
+  bandId: string
+  upperBand: number[]
+  lowerBand: number[]
+  confidenceLevel: number
+  timestamps: Date[]
 }
 
 interface ModelParameters {
-  modelType: string;
-  parameters: Record<string, unknown>;
-  trainingMetrics: TrainingMetrics;
+  modelType: string
+  parameters: Record<string, unknown>
+  trainingMetrics: TrainingMetrics
 }
 
 interface TrainingMetrics {
-  loss: number;
-  accuracy: number;
-  epochs: number;
-  trainingTime: number;
+  loss: number
+  accuracy: number
+  epochs: number
+  trainingTime: number
 }
 
 interface ValidationMetrics {
-  mae: number;
-  mse: number;
-  rmse: number;
-  mape: number;
-  r2: number;
+  mae: number
+  mse: number
+  rmse: number
+  mape: number
+  r2: number
 }
 
 interface PropagationGraph extends NetworkGraph {
-  graphId: string;
-  nodes: PropagationNode[];
-  edges: PropagationEdge[];
+  graphId: string
+  nodes: PropagationNode[]
+  edges: PropagationEdge[]
 }
 
 interface PropagationNode extends NetworkNode {
-  infectionProbability: number;
-  recoveryRate: number;
-  vulnerabilityScore: number;
+  infectionProbability: number
+  recoveryRate: number
+  vulnerabilityScore: number
 }
 
 interface PropagationEdge extends NetworkEdge {
-  transmissionProbability: number;
-  transmissionRate: number;
+  transmissionProbability: number
+  transmissionRate: number
 }
 
 interface PropagationProbabilities {
-  overallProbability: number;
-  nodeProbabilities: Map<string, number>;
-  edgeProbabilities: Map<string, number>;
-  timeDependentProbabilities: TimeDependentProbability[];
+  overallProbability: number
+  nodeProbabilities: Map<string, number>
+  edgeProbabilities: Map<string, number>
+  timeDependentProbabilities: TimeDependentProbability[]
 }
 
 interface TimeDependentProbability {
-  timestamp: Date;
-  probabilities: Record<string, number>;
+  timestamp: Date
+  probabilities: Record<string, number>
 }
 
 interface ContainmentStrategy {
-  strategyId: string;
-  strategyType: 'isolation' | 'vaccination' | 'patching' | 'monitoring';
-  targetNodes: string[];
-  effectiveness: number;
-  cost: number;
-  implementationTime: number;
-  sideEffects: string[];
+  strategyId: string
+  strategyType: 'isolation' | 'vaccination' | 'patching' | 'monitoring'
+  targetNodes: string[]
+  effectiveness: number
+  cost: number
+  implementationTime: number
+  sideEffects: string[]
 }
 
 interface SeasonalComponents {
-  trend?: TimeSeriesComponent;
-  seasonal?: TimeSeriesComponent;
-  residual?: TimeSeriesComponent;
-  daily?: TimeSeriesComponent;
-  weekly?: TimeSeriesComponent;
-  monthly?: TimeSeriesComponent;
+  trend?: TimeSeriesComponent
+  seasonal?: TimeSeriesComponent
+  residual?: TimeSeriesComponent
+  daily?: TimeSeriesComponent
+  weekly?: TimeSeriesComponent
+  monthly?: TimeSeriesComponent
 }
 
 interface TimeSeriesComponent {
-  timestamps: Date[];
-  values: number[];
-  componentType: string;
+  timestamps: Date[]
+  values: number[]
+  componentType: string
 }
 
-
-
 interface RiskBreakdown {
-  byThreatType: Record<string, number>;
-  bySeverity: Record<string, number>;
-  byLikelihood: Record<string, number>;
-  byImpact: Record<string, number>;
+  byThreatType: Record<string, number>
+  bySeverity: Record<string, number>
+  byLikelihood: Record<string, number>
+  byImpact: Record<string, number>
 }
 
 interface UncertaintyQuantification {
-  epistemic: number;
-  aleatory: number;
-  total: number;
+  epistemic: number
+  aleatory: number
+  total: number
   confidenceIntervals: {
-    lower: number;
-    upper: number;
-  };
+    lower: number
+    upper: number
+  }
 }
 
 interface RiskRecommendation {
-  recommendationId: string;
-  recommendationType: 'mitigation' | 'prevention' | 'detection' | 'response';
-  description: string;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  implementationCost: number;
-  expectedEffectiveness: number;
-  timeToImplement: number;
+  recommendationId: string
+  recommendationType: 'mitigation' | 'prevention' | 'detection' | 'response'
+  description: string
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  implementationCost: number
+  expectedEffectiveness: number
+  timeToImplement: number
 }
 
 interface ThreatFeatures {
-  statistical: StatisticalFeatures;
-  temporal: TemporalFeatures;
-  spatial: SpatialFeatures;
-  categorical: CategoricalFeatures;
+  statistical: StatisticalFeatures
+  temporal: TemporalFeatures
+  spatial: SpatialFeatures
+  categorical: CategoricalFeatures
 }
 
 interface StatisticalFeatures {
-  mean: number;
-  variance: number;
-  skewness: number;
-  kurtosis: number;
-  percentiles: Record<string, number>;
+  mean: number
+  variance: number
+  skewness: number
+  kurtosis: number
+  percentiles: Record<string, number>
 }
 
 interface TemporalFeatures {
-  trend: number;
-  seasonality: number;
-  autocorrelation: number;
-  changeRate: number;
+  trend: number
+  seasonality: number
+  autocorrelation: number
+  changeRate: number
 }
 
 interface SpatialFeatures {
-  geographicSpread: number;
-  clustering: number;
-  distanceMetrics: Record<string, number>;
+  geographicSpread: number
+  clustering: number
+  distanceMetrics: Record<string, number>
 }
 
 interface CategoricalFeatures {
-  threatTypeDistribution: Record<string, number>;
-  severityDistribution: Record<string, number>;
-  attributionDistribution: Record<string, number>;
+  threatTypeDistribution: Record<string, number>
+  severityDistribution: Record<string, number>
+  attributionDistribution: Record<string, number>
 }
-
-
 
 // Abstract base classes for extensibility
 abstract class TimeSeriesForecaster {
-  abstract train(_data: ThreatTimeSeries[], _features: ThreatFeatures): Promise<ForecastingModel>;
-  abstract forecast(_model: ForecastingModel, _features: ThreatFeatures): Promise<PredictionResult[]>;
+  abstract train(
+    _data: ThreatTimeSeries[],
+    _features: ThreatFeatures,
+  ): Promise<ForecastingModel>
+  abstract forecast(
+    _model: ForecastingModel,
+    _features: ThreatFeatures,
+  ): Promise<PredictionResult[]>
 }
 
 abstract class NoveltyDetector {
-  abstract detectNovelThreats(current: ThreatData[], baseline: ThreatData[]): Promise<NovelThreat[]>;
+  abstract detectNovelThreats(
+    current: ThreatData[],
+    baseline: ThreatData[],
+  ): Promise<NovelThreat[]>
 }
 
 abstract class PropagationModeler {
-  abstract buildPropagationGraph(_threat: Threat, _network: NetworkGraph): Promise<PropagationGraph>;
+  abstract buildPropagationGraph(
+    _threat: Threat,
+    _network: NetworkGraph,
+  ): Promise<PropagationGraph>
   abstract simulatePropagation(
     _graph: PropagationGraph,
     _probabilities: PropagationProbabilities,
-    _threat: Threat
-  ): Promise<PropagationSimulation>;
+    _threat: Threat,
+  ): Promise<PropagationSimulation>
 }
 
 abstract class SeasonalAnalyzer {
-  abstract decompose(_timeSeries: ThreatTimeSeries[]): Promise<SeasonalComponents>;
-  abstract identifyPatterns(_components: SeasonalComponents): Promise<SeasonalPattern[]>;
+  abstract decompose(
+    _timeSeries: ThreatTimeSeries[],
+  ): Promise<SeasonalComponents>
+  abstract identifyPatterns(
+    _components: SeasonalComponents,
+  ): Promise<SeasonalPattern[]>
 }
 
 abstract class RiskAssessor {
-  abstract assessRisk(_threats: Threat[], _context: SecurityContext): Promise<RiskAssessment>;
+  abstract assessRisk(
+    _threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<RiskAssessment>
 }
 
 // Concrete implementations
 class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
-  private model: tf.Sequential | null = null;
-  private isTraining = false;
+  private model: tf.Sequential | null = null
+  private isTraining = false
 
   constructor(private config: ForecastingConfig) {
-    super();
+    super()
   }
 
-  async train(data: ThreatTimeSeries[], _features: ThreatFeatures): Promise<ForecastingModel> {
+  async train(
+    data: ThreatTimeSeries[],
+    _features: ThreatFeatures,
+  ): Promise<ForecastingModel> {
     if (this.isTraining) {
-      throw new Error('Training already in progress');
+      throw new Error('Training already in progress')
     }
 
-    this.isTraining = true;
+    this.isTraining = true
     try {
       // Wrap model creation, data tensors, and training inside tf.tidy to dispose intermediate tensors
       // Note: model.fit is async so we create and compile the model inside tidy, prepare xs/ys there,
@@ -1177,41 +1311,47 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return await tf.tidy(() => {
         // Create LSTM model architecture
-        const model = tf.sequential();
+        const model = tf.sequential()
 
         // Add LSTM layers
-        model.add(tf.layers.lstm({
-          units: 64,
-          inputShape: [this.config.lookbackWindow, 1],
-          returnSequences: true,
-          activation: 'tanh'
-        }));
+        model.add(
+          tf.layers.lstm({
+            units: 64,
+            inputShape: [this.config.lookbackWindow, 1],
+            returnSequences: true,
+            activation: 'tanh',
+          }),
+        )
 
-        model.add(tf.layers.dropout({ rate: 0.2 }));
+        model.add(tf.layers.dropout({ rate: 0.2 }))
 
-        model.add(tf.layers.lstm({
-          units: 32,
-          returnSequences: false,
-          activation: 'tanh'
-        }));
+        model.add(
+          tf.layers.lstm({
+            units: 32,
+            returnSequences: false,
+            activation: 'tanh',
+          }),
+        )
 
-        model.add(tf.layers.dropout({ rate: 0.1 }));
+        model.add(tf.layers.dropout({ rate: 0.1 }))
 
         // Output layer
-        model.add(tf.layers.dense({
-          units: this.config.predictionHorizon,
-          activation: 'linear'
-        }));
+        model.add(
+          tf.layers.dense({
+            units: this.config.predictionHorizon,
+            activation: 'linear',
+          }),
+        )
 
         // Compile model
         model.compile({
           optimizer: tf.train.adam(0.001),
           loss: 'meanSquaredError',
-          metrics: ['mae']
-        });
+          metrics: ['mae'],
+        })
 
         // Prepare training data
-        const { xs, ys } = this.prepareTrainingData(data);
+        const { xs, ys } = this.prepareTrainingData(data)
 
         // Train the model
         const trainingPromise = model.fit(xs, ys, {
@@ -1220,10 +1360,10 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
           validationSplit: 0.2,
           callbacks: {
             onEpochEnd: (epoch, logs) => {
-              console.log(`Epoch ${epoch}: loss = ${logs?.loss}`);
-            }
-          }
-        });
+              console.log(`Epoch ${epoch}: loss = ${logs?.loss}`)
+            },
+          },
+        })
 
         // Await inside the outer async function by returning a promise that resolves after training
         return trainingPromise.then(() => {
@@ -1231,138 +1371,165 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
           // Note: tidy will not dispose objects reachable from the returned value; returning the model
           // directly would risk disposal of internal tensors. Instead, assign to this.model here and
           // return the ForecastingModel wrapper.
-          this.model = model;
-          return this.createForecastingModel('general', model);
-        });
-      });
-
+          this.model = model
+          return this.createForecastingModel('general', model)
+        })
+      })
     } finally {
-      this.isTraining = false;
+      this.isTraining = false
     }
   }
 
-  async forecast(model: ForecastingModel, _features: ThreatFeatures): Promise<PredictionResult[]> {
+  async forecast(
+    model: ForecastingModel,
+    _features: ThreatFeatures,
+  ): Promise<PredictionResult[]> {
     if (!this.model) {
-      throw new Error('Model not trained yet');
+      throw new Error('Model not trained yet')
     }
 
     // Generate predictions for the specified horizon
-    const predictions: PredictionResult[] = [];
+    const predictions: PredictionResult[] = []
 
     for (let i = 0; i < this.config.predictionHorizon; i++) {
       const prediction = await model.predict({
         start: new Date(Date.now() + i * 24 * 60 * 60 * 1000),
-        end: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000)
-      });
+        end: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000),
+      })
 
-      predictions.push(prediction);
+      predictions.push(prediction)
     }
 
-    return predictions;
+    return predictions
   }
 
-  private prepareTrainingData(data: ThreatTimeSeries[]): { xs: tf.Tensor, ys: tf.Tensor } {
-    const dataPoints = data.flatMap(series => series.dataPoints);
+  private prepareTrainingData(data: ThreatTimeSeries[]): {
+    xs: tf.Tensor
+    ys: tf.Tensor
+  } {
+    const dataPoints = data.flatMap((series) => series.dataPoints)
 
     if (dataPoints.length < this.config.lookbackWindow) {
-      throw new Error('Insufficient data for training');
+      throw new Error('Insufficient data for training')
     }
 
-    const xs: number[][] = [];
-    const ys: number[] = [];
+    const xs: number[][] = []
+    const ys: number[] = []
 
-    for (let i = 0; i <= dataPoints.length - this.config.lookbackWindow - this.config.predictionHorizon; i++) {
-      const xWindow = dataPoints.slice(i, i + this.config.lookbackWindow);
-      const yWindow = dataPoints.slice(i + this.config.lookbackWindow,
-        i + this.config.lookbackWindow + this.config.predictionHorizon);
+    for (
+      let i = 0;
+      i <=
+      dataPoints.length -
+        this.config.lookbackWindow -
+        this.config.predictionHorizon;
+      i++
+    ) {
+      const xWindow = dataPoints.slice(i, i + this.config.lookbackWindow)
+      const yWindow = dataPoints.slice(
+        i + this.config.lookbackWindow,
+        i + this.config.lookbackWindow + this.config.predictionHorizon,
+      )
 
-      xs.push(xWindow.map(dp => dp.value));
-      ys.push(...yWindow.map(dp => dp.value));
+      xs.push(xWindow.map((dp) => dp.value))
+      ys.push(...yWindow.map((dp) => dp.value))
     }
 
     return {
       xs: tf.tensor2d(xs),
-      ys: tf.tensor1d(ys)
-    };
+      ys: tf.tensor1d(ys),
+    }
   }
 
-  private createForecastingModel(threatType: string, model: tf.Sequential): ForecastingModel {
+  private createForecastingModel(
+    threatType: string,
+    model: tf.Sequential,
+  ): ForecastingModel {
     return {
       threatType,
       predict: async (_timeframe: TimeWindow): Promise<PredictionResult> => {
         // Create dummy input for prediction (in real implementation, use recent data)
-        const inputShape = [1, this.config.lookbackWindow, 1];
-        const dummyInput = tf.zeros(inputShape);
+        const inputShape = [1, this.config.lookbackWindow, 1]
+        const dummyInput = tf.zeros(inputShape)
 
         const value = await tf.tidy(async () => {
-          const prediction = model.predict(dummyInput) as tf.Tensor;
-          const data = await prediction.data();
-          return data[0] as number;
+          const prediction = model.predict(dummyInput) as tf.Tensor
+          const data = await prediction.data()
+          return data[0] as number
         })
 
         return {
           value: Math.max(0, Math.min(1, value)), // Clamp between 0 and 1
           confidence: 0.8,
           probability: Math.max(0, Math.min(1, value)),
-          factors: ['lstm_prediction']
-        };
-      }
-    };
+          factors: ['lstm_prediction'],
+        }
+      },
+    }
   }
 
   async dispose(): Promise<void> {
     if (this.model) {
-      this.model.dispose();
-      this.model = null;
+      this.model.dispose()
+      this.model = null
     }
   }
 }
 
 class GraphPropagationModeler extends PropagationModeler {
   constructor(private config: PropagationConfig) {
-    super();
+    super()
   }
 
-  async buildPropagationGraph(_threat: Threat, _network: NetworkGraph): Promise<PropagationGraph> {
+  async buildPropagationGraph(
+    _threat: Threat,
+    _network: NetworkGraph,
+  ): Promise<PropagationGraph> {
     // Implement graph-based propagation modeling
     return {
       graphId: 'prop_graph_123',
       nodes: [],
-      edges: []
-    };
+      edges: [],
+    }
   }
 
   async simulatePropagation(
     _graph: PropagationGraph,
     _probabilities: PropagationProbabilities,
-    _threat: Threat
+    _threat: Threat,
   ): Promise<PropagationSimulation> {
     // Implement propagation simulation
     return {
       simulationId: 'sim_123',
-      results: []
-    };
+      results: [],
+    }
   }
 }
 
 class StatisticalSeasonalAnalyzer extends SeasonalAnalyzer {
-  async decompose(_timeSeries: ThreatTimeSeries[]): Promise<SeasonalComponents> {
+  async decompose(
+    _timeSeries: ThreatTimeSeries[],
+  ): Promise<SeasonalComponents> {
     // Implement statistical seasonal decomposition (STL, X-13ARIMA-SEATS, etc.)
     return {
       trend: undefined,
       seasonal: undefined,
-      residual: undefined
-    };
+      residual: undefined,
+    }
   }
 
-  async identifyPatterns(_components: SeasonalComponents): Promise<SeasonalPattern[]> {
+  async identifyPatterns(
+    _components: SeasonalComponents,
+  ): Promise<SeasonalPattern[]> {
     // Implement pattern identification
-    return [];
+    return []
   }
 }
 
 class ProbabilisticRiskAssessor extends RiskAssessor {
-  async assessRisk(threats: Threat[], _context: SecurityContext): Promise<RiskAssessment> {
+  async assessRisk(
+    threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<RiskAssessment> {
     // Implement probabilistic risk assessment
     return {
       assessmentId: 'risk_123',
@@ -1372,18 +1539,18 @@ class ProbabilisticRiskAssessor extends RiskAssessor {
         byThreatType: {},
         bySeverity: {},
         byLikelihood: {},
-        byImpact: {}
+        byImpact: {},
       },
       uncertaintyQuantification: {
         epistemic: 0.1,
         aleatory: 0.1,
         total: 0.2,
-        confidenceIntervals: { lower: 0.4, upper: 0.6 }
+        confidenceIntervals: { lower: 0.4, upper: 0.6 },
       },
       recommendations: [],
-      confidenceLevel: 0.8
-    };
+      confidenceLevel: 0.8,
+    }
   }
 }
 
-export { AdvancedPredictiveThreatIntelligence };
+export { AdvancedPredictiveThreatIntelligence }

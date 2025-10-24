@@ -1,0 +1,47 @@
+name: GKE Production Deploy
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+
+jobs:
+  production-deploy:
+    name: Deploy to GKE (Production)
+    runs-on: ubuntu-latest
+    env:
+      # Read deployment parameters from repository secrets where available.
+      # These should be configured in Settings → Secrets in the repo/organization.
+      RELEASE: ${{ secrets.RELEASE_NAME }}
+      NAMESPACE: ${{ secrets.NAMESPACE }}
+      IMAGE: ${{ secrets.IMAGE }}
+      TAG: ${{ secrets.TAG }}
+      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy with Helm
+        run: |
+          # apply safe defaults if secrets are not set
+          RELEASE="${RELEASE:-pixelated}"
+          NAMESPACE="${NAMESPACE:-production}"
+          IMAGE="${IMAGE:-ghcr.io/pixelated/ai-service}"
+          TAG="${TAG:-}"
+          if [ -n "$KUBECONFIG_B64" ]; then
+            echo "$KUBECONFIG_B64" | base64 -d > $HOME/.kube/config
+          fi
+
+          bash scripts/deploy/production_deploy.sh \
+            -r "$RELEASE" \
+            -n "$NAMESPACE" \
+            -i "$IMAGE" \
+            -t "$TAG" \
+            --wait

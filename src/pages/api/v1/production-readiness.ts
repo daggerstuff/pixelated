@@ -27,48 +27,48 @@ interface ProductionReadiness {
 export const GET = async () => {
   try {
     const checks: ProductionReadinessCheck[] = []
-    
+
     // Task 81: Crisis Detection Accuracy
     checks.push(await checkCrisisDetection())
-    
+
     // Task 82: Test Coverage
     checks.push(await checkTestCoverage())
-    
+
     // Task 83: Performance Standards
     checks.push(await checkPerformanceStandards())
-    
+
     // Task 84: Reliability Standards
     checks.push(await checkReliabilityStandards())
-    
+
     // Task 85: Security Standards
     checks.push(await checkSecurityStandards())
-    
+
     // Task 86: Documentation Standards
     checks.push(await checkDocumentationStandards())
-    
+
     // Task 87: Compliance Standards
     checks.push(await checkComplianceStandards())
-    
+
     // Task 88: Usability Standards
     checks.push(await checkUsabilityStandards())
-    
+
     // Tasks 89-100: Additional production checks
-    checks.push(...await checkAdditionalProductionRequirements())
-    
+    checks.push(...(await checkAdditionalProductionRequirements()))
+
     // Calculate overall status
-    const passed = checks.filter(c => c.status === 'pass').length
-    const failed = checks.filter(c => c.status === 'fail').length
-    const warnings = checks.filter(c => c.status === 'warning').length
-    
+    const passed = checks.filter((c) => c.status === 'pass').length
+    const failed = checks.filter((c) => c.status === 'fail').length
+    const warnings = checks.filter((c) => c.status === 'warning').length
+
     const overallScore = (passed / checks.length) * 100
     let overallStatus: 'ready' | 'not-ready' | 'warning' = 'ready'
-    
+
     if (failed > 0) {
       overallStatus = 'not-ready'
     } else if (warnings > 0) {
       overallStatus = 'warning'
     }
-    
+
     const result: ProductionReadiness = {
       overallStatus,
       overallScore: Math.round(overallScore * 100) / 100,
@@ -78,10 +78,10 @@ export const GET = async () => {
         passed,
         failed,
         warnings,
-        total: checks.length
-      }
+        total: checks.length,
+      },
     }
-    
+
     return new Response(JSON.stringify(result, null, 2), {
       status: 200,
       headers: {
@@ -90,13 +90,19 @@ export const GET = async () => {
       },
     })
   } catch (error: unknown) {
-    return new Response(JSON.stringify({
-      error: error instanceof Error ? String(error) : 'Production readiness check failed',
-      timestamp: new Date().toISOString()
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({
+        error:
+          error instanceof Error
+            ? String(error)
+            : 'Production readiness check failed',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }
 
@@ -110,14 +116,14 @@ async function checkCrisisDetection(): Promise<ProductionReadinessCheck> {
         status: 'fail',
         score: 0,
         target: 95,
-        message: 'Crisis detection service not found'
+        message: 'Crisis detection service not found',
       }
     }
-    
+
     // Simulate crisis detection accuracy check
     // In production, this would run actual tests
     const accuracy = 85 // Simulated accuracy
-    
+
     return {
       id: 'crisis-detection',
       name: 'Crisis Detection Accuracy',
@@ -125,7 +131,7 @@ async function checkCrisisDetection(): Promise<ProductionReadinessCheck> {
       score: accuracy,
       target: 95,
       message: `Crisis detection accuracy: ${accuracy}%`,
-      details: { target: '≥95%', current: `${accuracy}%` }
+      details: { target: '≥95%', current: `${accuracy}%` },
     }
   } catch (error: unknown) {
     return {
@@ -134,7 +140,7 @@ async function checkCrisisDetection(): Promise<ProductionReadinessCheck> {
       status: 'fail',
       score: 0,
       target: 95,
-      message: `Crisis detection check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Crisis detection check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
@@ -143,7 +149,7 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
   try {
     // Simulate test coverage check
     const coverage = 92 // Simulated coverage
-    
+
     return {
       id: 'test-coverage',
       name: 'Test Coverage',
@@ -151,7 +157,7 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
       score: coverage,
       target: 90,
       message: `Test coverage: ${coverage}%`,
-      details: { target: '≥90%', current: `${coverage}%` }
+      details: { target: '≥90%', current: `${coverage}%` },
     }
   } catch (error: unknown) {
     return {
@@ -160,7 +166,7 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
       status: 'fail',
       score: 0,
       target: 90,
-      message: `Test coverage check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Test coverage check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
@@ -175,21 +181,29 @@ async function checkPerformanceStandards(): Promise<ProductionReadinessCheck> {
         status: 'fail',
         score: 0,
         target: 1000,
-        message: 'Performance validation script not found'
+        message: 'Performance validation script not found',
       }
     }
-    
+
     // Simulate performance check
     const conversationsPerMinute = 850 // Simulated performance
-    
+
     return {
       id: 'performance',
       name: 'Performance Standards',
-      status: conversationsPerMinute >= 1000 ? 'pass' : conversationsPerMinute >= 800 ? 'warning' : 'fail',
+      status:
+        conversationsPerMinute >= 1000
+          ? 'pass'
+          : conversationsPerMinute >= 800
+            ? 'warning'
+            : 'fail',
       score: conversationsPerMinute,
       target: 1000,
       message: `Performance: ${conversationsPerMinute} conversations/minute`,
-      details: { target: '≥1000/min', current: `${conversationsPerMinute}/min` }
+      details: {
+        target: '≥1000/min',
+        current: `${conversationsPerMinute}/min`,
+      },
     }
   } catch (error: unknown) {
     return {
@@ -198,7 +212,7 @@ async function checkPerformanceStandards(): Promise<ProductionReadinessCheck> {
       status: 'fail',
       score: 0,
       target: 1000,
-      message: `Performance check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Performance check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
@@ -206,8 +220,8 @@ async function checkPerformanceStandards(): Promise<ProductionReadinessCheck> {
 async function checkReliabilityStandards(): Promise<ProductionReadinessCheck> {
   try {
     const uptimeStats = uptimeMonitor.getStats(24)
-    const {uptime} = uptimeStats
-    
+    const { uptime } = uptimeStats
+
     return {
       id: 'reliability',
       name: 'Reliability Standards',
@@ -215,12 +229,12 @@ async function checkReliabilityStandards(): Promise<ProductionReadinessCheck> {
       score: uptime,
       target: 99.9,
       message: `Uptime: ${uptime}%`,
-      details: { 
-        target: '≥99.9%', 
+      details: {
+        target: '≥99.9%',
         current: `${uptime}%`,
         period: '24h',
-        totalChecks: uptimeStats.totalChecks
-      }
+        totalChecks: uptimeStats.totalChecks,
+      },
     }
   } catch (error: unknown) {
     return {
@@ -229,7 +243,7 @@ async function checkReliabilityStandards(): Promise<ProductionReadinessCheck> {
       status: 'fail',
       score: 0,
       target: 99.9,
-      message: `Reliability check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Reliability check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
@@ -239,27 +253,29 @@ async function checkSecurityStandards(): Promise<ProductionReadinessCheck> {
     const securityChecks = [
       existsSync('./.github/workflows/security-scanning.yml'),
       existsSync('./security-baseline.json'),
-      existsSync('./src/lib/security')
+      existsSync('./src/lib/security'),
     ]
-    
-    const securityScore = (securityChecks.filter(Boolean).length / securityChecks.length) * 100
-    
+
+    const securityScore =
+      (securityChecks.filter(Boolean).length / securityChecks.length) * 100
+
     return {
       id: 'security',
       name: 'Security Standards',
-      status: securityScore >= 90 ? 'pass' : securityScore >= 70 ? 'warning' : 'fail',
+      status:
+        securityScore >= 90 ? 'pass' : securityScore >= 70 ? 'warning' : 'fail',
       score: securityScore,
       target: 90,
       message: `Security measures: ${securityScore}% implemented`,
-      details: { 
-        target: '≥90%', 
+      details: {
+        target: '≥90%',
         current: `${securityScore}%`,
         checks: {
           'Security Workflow': securityChecks[0],
           'Security Baseline': securityChecks[1],
-          'Security Library': securityChecks[2]
-        }
-      }
+          'Security Library': securityChecks[2],
+        },
+      },
     }
   } catch (error: unknown) {
     return {
@@ -268,7 +284,7 @@ async function checkSecurityStandards(): Promise<ProductionReadinessCheck> {
       status: 'fail',
       score: 0,
       target: 90,
-      message: `Security check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Security check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
@@ -279,11 +295,11 @@ async function checkDocumentationStandards(): Promise<ProductionReadinessCheck> 
       existsSync('./README.md'),
       existsSync('./src/content/docs'),
       existsSync('./docs'),
-      existsSync('./src/content/docs/api.md')
+      existsSync('./src/content/docs/api.md'),
     ]
-    
+
     const docScore = (docChecks.filter(Boolean).length / docChecks.length) * 100
-    
+
     return {
       id: 'documentation',
       name: 'Documentation Standards',
@@ -291,7 +307,7 @@ async function checkDocumentationStandards(): Promise<ProductionReadinessCheck> 
       score: docScore,
       target: 80,
       message: `Documentation: ${docScore}% complete`,
-      details: { target: '≥80%', current: `${docScore}%` }
+      details: { target: '≥80%', current: `${docScore}%` },
     }
   } catch (error: unknown) {
     return {
@@ -300,7 +316,7 @@ async function checkDocumentationStandards(): Promise<ProductionReadinessCheck> 
       status: 'fail',
       score: 0,
       target: 80,
-      message: `Documentation check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Documentation check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
@@ -310,19 +326,26 @@ async function checkComplianceStandards(): Promise<ProductionReadinessCheck> {
     const complianceChecks = [
       existsSync('./security-baseline.json'),
       existsSync('./src/content/docs/compliance'),
-      existsSync('./PRIVACY.md') || existsSync('./src/content/docs/privacy-policy.md')
+      existsSync('./PRIVACY.md') ||
+        existsSync('./src/content/docs/privacy-policy.md'),
     ]
-    
-    const complianceScore = (complianceChecks.filter(Boolean).length / complianceChecks.length) * 100
-    
+
+    const complianceScore =
+      (complianceChecks.filter(Boolean).length / complianceChecks.length) * 100
+
     return {
       id: 'compliance',
       name: 'Compliance Standards',
-      status: complianceScore >= 70 ? 'pass' : complianceScore >= 50 ? 'warning' : 'fail',
+      status:
+        complianceScore >= 70
+          ? 'pass'
+          : complianceScore >= 50
+            ? 'warning'
+            : 'fail',
       score: complianceScore,
       target: 70,
       message: `Compliance: ${complianceScore}% documented`,
-      details: { target: '≥70%', current: `${complianceScore}%` }
+      details: { target: '≥70%', current: `${complianceScore}%` },
     }
   } catch (error: unknown) {
     return {
@@ -331,7 +354,7 @@ async function checkComplianceStandards(): Promise<ProductionReadinessCheck> {
       status: 'fail',
       score: 0,
       target: 70,
-      message: `Compliance check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Compliance check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
@@ -342,19 +365,25 @@ async function checkUsabilityStandards(): Promise<ProductionReadinessCheck> {
       existsSync('./src/components'),
       existsSync('./src/pages'),
       existsSync('./src/layouts'),
-      existsSync('./uno.config.ts') || existsSync('./uno.config.js')
+      existsSync('./uno.config.ts') || existsSync('./uno.config.js'),
     ]
-    
-    const usabilityScore = (usabilityChecks.filter(Boolean).length / usabilityChecks.length) * 100
-    
+
+    const usabilityScore =
+      (usabilityChecks.filter(Boolean).length / usabilityChecks.length) * 100
+
     return {
       id: 'usability',
       name: 'Usability Standards',
-      status: usabilityScore >= 75 ? 'pass' : usabilityScore >= 50 ? 'warning' : 'fail',
+      status:
+        usabilityScore >= 75
+          ? 'pass'
+          : usabilityScore >= 50
+            ? 'warning'
+            : 'fail',
       score: usabilityScore,
       target: 75,
       message: `Usability: ${usabilityScore}% components available`,
-      details: { target: '≥75%', current: `${usabilityScore}%` }
+      details: { target: '≥75%', current: `${usabilityScore}%` },
     }
   } catch (error: unknown) {
     return {
@@ -363,24 +392,30 @@ async function checkUsabilityStandards(): Promise<ProductionReadinessCheck> {
       status: 'fail',
       score: 0,
       target: 75,
-      message: `Usability check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`
+      message: `Usability check failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
     }
   }
 }
 
-async function checkAdditionalProductionRequirements(): Promise<ProductionReadinessCheck[]> {
+async function checkAdditionalProductionRequirements(): Promise<
+  ProductionReadinessCheck[]
+> {
   const checks: ProductionReadinessCheck[] = []
-  
+
   // Deployment readiness
   checks.push({
     id: 'deployment',
     name: 'Deployment Readiness',
-    status: existsSync('./scripts') && existsSync('./package.json') ? 'pass' : 'fail',
+    status:
+      existsSync('./scripts') && existsSync('./package.json') ? 'pass' : 'fail',
     score: existsSync('./scripts') && existsSync('./package.json') ? 100 : 0,
     target: 100,
-    message: existsSync('./scripts') && existsSync('./package.json') ? 'Deployment scripts available' : 'Missing deployment configuration'
+    message:
+      existsSync('./scripts') && existsSync('./package.json')
+        ? 'Deployment scripts available'
+        : 'Missing deployment configuration',
   })
-  
+
   // Monitoring systems
   checks.push({
     id: 'monitoring',
@@ -388,18 +423,27 @@ async function checkAdditionalProductionRequirements(): Promise<ProductionReadin
     status: existsSync('./src/pages/api/v1/health.ts') ? 'pass' : 'fail',
     score: existsSync('./src/pages/api/v1/health.ts') ? 100 : 0,
     target: 100,
-    message: existsSync('./src/pages/api/v1/health.ts') ? 'Health monitoring operational' : 'Health monitoring not found'
+    message: existsSync('./src/pages/api/v1/health.ts')
+      ? 'Health monitoring operational'
+      : 'Health monitoring not found',
   })
-  
+
   // Environment configuration
   checks.push({
     id: 'environment',
     name: 'Environment Configuration',
-    status: existsSync('./.env.example') || existsSync('./src/config') ? 'pass' : 'warning',
-    score: existsSync('./.env.example') || existsSync('./src/config') ? 100 : 50,
+    status:
+      existsSync('./.env.example') || existsSync('./src/config')
+        ? 'pass'
+        : 'warning',
+    score:
+      existsSync('./.env.example') || existsSync('./src/config') ? 100 : 50,
     target: 100,
-    message: existsSync('./.env.example') || existsSync('./src/config') ? 'Environment configuration available' : 'Environment configuration incomplete'
+    message:
+      existsSync('./.env.example') || existsSync('./src/config')
+        ? 'Environment configuration available'
+        : 'Environment configuration incomplete',
   })
-  
+
   return checks
 }

@@ -51,14 +51,17 @@ describe('auditLoggingService', () => {
         auditLoggingService.logEvent(testEntry),
       ).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalled()
-      const loggedEntry = JSON.parse(mockLogger.info.mock.calls[0][0]) as unknown
+      const loggedEntry = JSON.parse(
+        mockLogger.info.mock.calls[0][0],
+      ) as unknown
       expect(loggedEntry.details.password).toBe('[REDACTED]')
     })
 
     it('should handle logging errors gracefully', async () => {
-      vi.spyOn(auditLoggingService as unknown, 'storeLogEntry').mockRejectedValue(
-        new Error('Storage failed'),
-      )
+      vi.spyOn(
+        auditLoggingService as unknown,
+        'storeLogEntry',
+      ).mockRejectedValue(new Error('Storage failed'))
       await expect(auditLoggingService.logEvent(testEntry)).rejects.toThrow(
         'Failed to log audit event',
       )

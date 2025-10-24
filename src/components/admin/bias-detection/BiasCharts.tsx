@@ -1,4 +1,3 @@
-
 import {
   XAxis,
   YAxis,
@@ -19,18 +18,23 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from 'recharts';
+} from 'recharts'
 
 interface BiasChartsProps {
-  biasData: Array<{ name: string; value: number }>;
-  demographicData: Array<{ name: string; value: number }>;
-  timeSeriesData: Array<{ date: string; bias: number; accuracy: number }>;
-  radarData: Array<{ subject: string; A: number; B: number; fullMark: number }>;
+  biasData: Array<{ name: string; value: number }>
+  demographicData: Array<{ name: string; value: number }>
+  timeSeriesData: Array<{ date: string; bias: number; accuracy: number }>
+  radarData: Array<{ subject: string; A: number; B: number; fullMark: number }>
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
 
-export function BiasCharts({ biasData, demographicData, timeSeriesData, radarData }: BiasChartsProps) {
+export function BiasCharts({
+  biasData,
+  demographicData,
+  timeSeriesData,
+  radarData,
+}: BiasChartsProps) {
   return (
     <>
       {/* Bias Distribution Chart */}
@@ -57,13 +61,18 @@ export function BiasCharts({ biasData, demographicData, timeSeriesData, radarDat
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }: { name: string; percent?: number }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+              label={({ name, percent }: { name: string; percent?: number }) =>
+                `${name} ${((percent || 0) * 100).toFixed(0)}%`
+              }
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
             >
               {demographicData.map((_entry, index: number) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
             <Tooltip />
@@ -81,7 +90,13 @@ export function BiasCharts({ biasData, demographicData, timeSeriesData, radarDat
             <YAxis />
             <Tooltip />
             <Legend />
-            <Area type="monotone" dataKey="biasScore" stackId="1" stroke="#8884d8" fill="#8884d8" />
+            <Area
+              type="monotone"
+              dataKey="biasScore"
+              stackId="1"
+              stroke="#8884d8"
+              fill="#8884d8"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -93,11 +108,17 @@ export function BiasCharts({ biasData, demographicData, timeSeriesData, radarDat
             <PolarGrid />
             <PolarAngleAxis dataKey="subject" />
             <PolarRadiusAxis />
-            <Radar name="Bias Score" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+            <Radar
+              name="Bias Score"
+              dataKey="A"
+              stroke="#8884d8"
+              fill="#8884d8"
+              fillOpacity={0.6}
+            />
             <Legend />
           </RadarChart>
         </ResponsiveContainer>
       </div>
     </>
-  );
+  )
 }

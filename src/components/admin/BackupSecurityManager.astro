@@ -266,15 +266,19 @@ const mockBackupConfig: BackupConfig = {
 const handleCreateBackup = async (type: BackupType): Promise<Backup> => {
   // In production this would call backupManager.createBackup(type)
   console.log(`Creating ${type} backup`)
-  return mockBackups[0] || {
-    id: 'default-backup',
-    type: BackupType.FULL,
-    timestamp: new Date().toISOString(),
-    size: 0,
-    location: StorageLocation.PRIMARY,
-    status: BackupStatus.PENDING,
-    retentionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-  }
+  return (
+    mockBackups[0] || {
+      id: 'default-backup',
+      type: BackupType.FULL,
+      timestamp: new Date().toISOString(),
+      size: 0,
+      location: StorageLocation.PRIMARY,
+      status: BackupStatus.PENDING,
+      retentionDate: new Date(
+        Date.now() + 365 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+    }
+  )
 }
 
 const handleVerifyBackup = async (backupId: string): Promise<boolean> => {

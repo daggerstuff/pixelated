@@ -14,7 +14,7 @@ interface BiasAnalyticsChartProps {
 export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
   data,
   title,
-  height = 300
+  height = 300,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -40,9 +40,9 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
     const chartHeight = height - padding * 2
 
     // Data ranges
-    const biasScores = data.map(d => d.biasScore)
-    const sessionCounts = data.map(d => d.sessionCount)
-    const alertCounts = data.map(d => d.alertCount)
+    const biasScores = data.map((d) => d.biasScore)
+    const sessionCounts = data.map((d) => d.sessionCount)
+    const alertCounts = data.map((d) => d.alertCount)
 
     const maxBias = Math.max(...biasScores, 1)
     const maxSessions = Math.max(...sessionCounts, 1)
@@ -65,7 +65,11 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
       ctx.fillStyle = '#9CA3AF'
       ctx.font = '12px system-ui'
       ctx.textAlign = 'right'
-      ctx.fillText((maxBias * (5 - i) / 5 * 100).toFixed(0) + '%', padding - 10, y + 4)
+      ctx.fillText(
+        (((maxBias * (5 - i)) / 5) * 100).toFixed(0) + '%',
+        padding - 10,
+        y + 4,
+      )
     }
 
     ctx.setLineDash([])
@@ -77,7 +81,8 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
 
     data.forEach((point, index) => {
       const x = padding + (chartWidth * index) / (data.length - 1)
-      const y = padding + chartHeight - (chartHeight * point.biasScore) / maxBias
+      const y =
+        padding + chartHeight - (chartHeight * point.biasScore) / maxBias
 
       if (index === 0) {
         ctx.moveTo(x, y)
@@ -95,11 +100,12 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
     ctx.stroke()
 
     // Draw session count bars
-    const barWidth = chartWidth / data.length * 0.3
+    const barWidth = (chartWidth / data.length) * 0.3
     ctx.fillStyle = '#3B82F6'
 
     data.forEach((point, index) => {
-      const x = padding + (chartWidth * index) / (data.length - 1) - barWidth / 2
+      const x =
+        padding + (chartWidth * index) / (data.length - 1) - barWidth / 2
       const barHeight = (chartHeight * point.sessionCount) / maxSessions
       const y = padding + chartHeight - barHeight
 
@@ -114,7 +120,8 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
 
     data.forEach((point, index) => {
       const x = padding + (chartWidth * index) / (data.length - 1)
-      const y = padding + chartHeight - (chartHeight * point.alertCount) / maxAlerts
+      const y =
+        padding + chartHeight - (chartHeight * point.alertCount) / maxAlerts
 
       if (index === 0) {
         ctx.moveTo(x, y)
@@ -132,10 +139,14 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
     ctx.textAlign = 'center'
 
     data.forEach((point, index) => {
-      if (index % Math.ceil(data.length / 7) === 0) { // Show every nth label
+      if (index % Math.ceil(data.length / 7) === 0) {
+        // Show every nth label
         const x = padding + (chartWidth * index) / (data.length - 1)
         const date = new Date(point.date)
-        const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        const label = date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        })
         ctx.fillText(label, x, height - 20)
       }
     })
@@ -145,7 +156,7 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
     const legendItems = [
       { color: '#EF4444', label: 'Bias Score' },
       { color: '#3B82F6', label: 'Sessions' },
-      { color: '#F59E0B', label: 'Alerts' }
+      { color: '#F59E0B', label: 'Alerts' },
     ]
 
     legendItems.forEach((item, index) => {
@@ -161,7 +172,6 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
       ctx.textAlign = 'left'
       ctx.fillText(item.label, x + 16, legendY)
     })
-
   }, [data, height])
 
   return (

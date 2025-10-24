@@ -11,7 +11,6 @@ import { RedisService } from '../RedisService'
 import { RedisErrorCode, RedisServiceError } from '../types'
 import { cleanupTestKeys, generateTestKey } from './test-utils'
 
-
 // Set required environment variables for tests using process.env directly
 // This is acceptable in tests since we're explicitly setting up the test environment
 process.env['REDIS_URL'] = 'redis://localhost:6379'

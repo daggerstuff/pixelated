@@ -58,6 +58,7 @@ export function formatDate(
   } catch (error: unknown) {
     throw new Error(
       `Failed to format date: ${error instanceof Error ? String(error) : 'Unknown error'}`,
+      { cause: error },
     )
   }
 }

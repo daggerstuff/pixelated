@@ -29,29 +29,25 @@ export const ShowOnDesktop: FC<{ children: ReactNode }> = ({ children }) => (
 )
 
 // Responsive spacing utilities
-export const ResponsivePadding: FC<{ children: ReactNode; className?: string }> = ({
-  children,
-  className = '',
-}) => (
-  <div className={`p-4 sm:p-6 lg:p-8 ${className}`}>
-    {children}
-  </div>
+export const ResponsivePadding: FC<{
+  children: ReactNode
+  className?: string
+}> = ({ children, className = '' }) => (
+  <div className={`p-4 sm:p-6 lg:p-8 ${className}`}>{children}</div>
 )
 
-export const ResponsiveMargin: FC<{ children: ReactNode; className?: string }> = ({
-  children,
-  className = '',
-}) => (
-  <div className={`m-2 sm:m-4 lg:m-6 ${className}`}>
-    {children}
-  </div>
+export const ResponsiveMargin: FC<{
+  children: ReactNode
+  className?: string
+}> = ({ children, className = '' }) => (
+  <div className={`m-2 sm:m-4 lg:m-6 ${className}`}>{children}</div>
 )
 
 // Responsive container with max-width constraints
-export const ResponsiveContainer: FC<{ children: ReactNode; size?: 'sm' | 'md' | 'lg' | 'xl' | 'full' }> = ({
-  children,
-  size = 'lg',
-}) => {
+export const ResponsiveContainer: FC<{
+  children: ReactNode
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+}> = ({ children, size = 'lg' }) => {
   const sizeClasses = {
     sm: 'max-w-sm mx-auto',
     md: 'max-w-md mx-auto',
@@ -60,11 +56,7 @@ export const ResponsiveContainer: FC<{ children: ReactNode; size?: 'sm' | 'md' |
     full: 'w-full',
   }
 
-  return (
-    <div className={`${sizeClasses[size]} w-full`}>
-      {children}
-    </div>
-  )
+  return <div className={`${sizeClasses[size]} w-full`}>{children}</div>
 }
 
 // Touch-friendly button wrapper for mobile
@@ -72,7 +64,9 @@ export const TouchTarget: FC<{ children: ReactNode; className?: string }> = ({
   children,
   className = '',
 }) => (
-  <div className={`min-h-[44px] min-w-[44px] flex items-center justify-center ${className}`}>
+  <div
+    className={`min-h-[44px] min-w-[44px] flex items-center justify-center ${className}`}
+  >
     {children}
   </div>
 )
@@ -82,11 +76,7 @@ export const ResponsiveText: FC<{
   children: ReactNode
   size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl'
   className?: string
-}> = ({
-  children,
-  size = 'base',
-  className = '',
-}) => {
+}> = ({ children, size = 'base', className = '' }) => {
   const sizeClasses = {
     xs: 'text-xs sm:text-sm',
     sm: 'text-sm sm:text-base',
@@ -95,11 +85,7 @@ export const ResponsiveText: FC<{
     xl: 'text-xl sm:text-2xl',
   }
 
-  return (
-    <div className={`${sizeClasses[size]} ${className}`}>
-      {children}
-    </div>
-  )
+  return <div className={`${sizeClasses[size]} ${className}`}>{children}</div>
 }
 
 // Responsive hook for window size detection
@@ -133,23 +119,22 @@ export const useResponsive = () => {
 
 // Breakpoint constants for consistent usage
 export const BREAKPOINTS = {
-  xs: 0,
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
+  'xs': 0,
+  'sm': 640,
+  'md': 768,
+  'lg': 1024,
+  'xl': 1280,
   '2xl': 1536,
 } as const
 
 export type Breakpoint = keyof typeof BREAKPOINTS
 
 // Main responsive utils component (for any additional wrapper functionality)
-export const ResponsiveUtils: FC<ResponsiveUtilsProps> = ({ children, className = '' }) => {
-  return (
-    <div className={`responsive-utils ${className}`}>
-      {children}
-    </div>
-  )
+export const ResponsiveUtils: FC<ResponsiveUtilsProps> = ({
+  children,
+  className = '',
+}) => {
+  return <div className={`responsive-utils ${className}`}>{children}</div>
 }
 
 export default ResponsiveUtils

@@ -92,7 +92,10 @@ export function addFocusVisiblePolyfill() {
  * to guide developers in improving accessibility
  */
 export function checkAccessibility() {
-  if (typeof window === 'undefined' || process.env['NODE_ENV'] !== 'development') {
+  if (
+    typeof window === 'undefined' ||
+    process.env['NODE_ENV'] !== 'development'
+  ) {
     return
   }
 
@@ -125,7 +128,9 @@ export function checkAccessibility() {
     document.querySelectorAll('input, select, textarea').forEach((input) => {
       const id = input.getAttribute('id')
       if (id) {
-        const hasLabel = document.querySelector(`label[for="${id}"]`) as HTMLElement
+        const hasLabel = document.querySelector(
+          `label[for="${id}"]`,
+        ) as HTMLElement
         const hasAriaLabel =
           input.hasAttribute('aria-label') ||
           input.hasAttribute('aria-labelledby')
@@ -167,6 +172,9 @@ export function checkAccessibility() {
 }
 
 // Auto-initialize in development mode
-if (typeof window !== 'undefined' && process.env['NODE_ENV'] === 'development') {
+if (
+  typeof window !== 'undefined' &&
+  process.env['NODE_ENV'] === 'development'
+) {
   document.addEventListener('astro:page-load', checkAccessibility)
 }

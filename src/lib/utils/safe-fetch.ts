@@ -91,7 +91,9 @@ export const safeFetch = async (
         receivedLength += chunk.length
         if (receivedLength > maxResponseSize) {
           controller.error(
-            new Error(`Response size exceeds the limit of ${maxResponseSize} bytes.`),
+            new Error(
+              `Response size exceeds the limit of ${maxResponseSize} bytes.`,
+            ),
           )
         } else {
           controller.enqueue(chunk)
@@ -111,7 +113,7 @@ export const safeFetch = async (
     clearTimeout(timeoutId)
 
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Request timeout after ${timeout}ms`)
+      throw new Error(`Request timeout after ${timeout}ms`, { cause: error })
     }
 
     throw error
@@ -133,7 +135,7 @@ export const retryFetchWithSSRFProtection = async (
         throw error
       }
       // Exponential backoff
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000))
+      await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 1000))
     }
   }
   throw new Error('Retry logic failed to return a response.')

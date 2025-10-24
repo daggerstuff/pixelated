@@ -189,7 +189,7 @@ export class MentalHealthService {
         ? analyses.reduce((sum, a) => sum + a.confidence, 0) / analyses.length
         : 0
 
-  return {
+    return {
       totalMessages: messages.length,
       userMessages: userMessages.length,
       analyzedMessages: analyzedMessages.length,

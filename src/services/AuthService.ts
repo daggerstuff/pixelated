@@ -18,9 +18,18 @@ export const getUserById = adapter.getUserById
 export const updateUser = adapter.updateUser
 export const changePassword = async (userId: string, newPassword: string) => {
   // delegate to the runtime mongoAuthService implementation if available
-  const svc = (await import('@/services/mongoAuth.service')).mongoAuthService as unknown
-  if (svc && typeof (svc as unknown as Record<string, unknown>)['changePassword'] === 'function') {
-    return await (svc as unknown as { changePassword: (u: string, p: string) => Promise<void> }).changePassword(userId, newPassword)
+  const svc = (await import('@/services/mongoAuth.service'))
+    .mongoAuthService as unknown
+  if (
+    svc &&
+    typeof (svc as unknown as Record<string, unknown>)['changePassword'] ===
+      'function'
+  ) {
+    return await (
+      svc as unknown as {
+        changePassword: (u: string, p: string) => Promise<void>
+      }
+    ).changePassword(userId, newPassword)
   }
   throw new Error('changePassword not available')
 }

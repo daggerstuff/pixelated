@@ -25,12 +25,30 @@
           "participant_demographics": { "type": "object" },
           "training_scenario": { "type": "object" },
           "content": { "type": "object" },
-          "ai_responses": { "type": "array", "maxItems": 1000, "items": { "type": "object" } },
-          "expected_outcomes": { "type": "array", "maxItems": 1000, "items": { "type": "object" } },
-          "transcripts": { "type": "array", "maxItems": 1000, "items": { "type": "object" } },
+          "ai_responses": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": { "type": "object" }
+          },
+          "expected_outcomes": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": { "type": "object" }
+          },
+          "transcripts": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": { "type": "object" }
+          },
           "metadata": { "type": "object" }
         },
-        "required": ["session_id", "participant_demographics", "training_scenario", "content", "ai_responses"]
+        "required": [
+          "session_id",
+          "participant_demographics",
+          "training_scenario",
+          "content",
+          "ai_responses"
+        ]
       },
       "SessionAnalysisResponse": {
         "type": "object",
@@ -41,8 +59,16 @@
           "alert_level": { "type": "string" },
           "analysis_timestamp": { "type": "string", "format": "date-time" },
           "processing_time_ms": { "type": "integer" },
-          "layer_results": { "type": "array", "maxItems": 1000, "items": { "type": "object" } },
-          "recommendations": { "type": "array", "maxItems": 1000, "items": { "type": "string" } },
+          "layer_results": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": { "type": "object" }
+          },
+          "recommendations": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": { "type": "string" }
+          },
           "compliance": { "type": "object" }
         }
       }
@@ -75,7 +101,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SessionAnalysisRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/SessionAnalysisRequest"
+              }
             }
           }
         },
@@ -84,7 +112,9 @@
             "description": "Analysis result",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SessionAnalysisResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/SessionAnalysisResponse"
+                }
               }
             }
           },
@@ -99,8 +129,16 @@
         "description": "Retrieve aggregated bias detection data for dashboard visualization.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
-          { "name": "start_date", "in": "query", "schema": { "type": "string", "format": "date" } },
-          { "name": "end_date", "in": "query", "schema": { "type": "string", "format": "date" } },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" }
+          },
           { "name": "group_by", "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {

@@ -22,9 +22,14 @@ interface DirectiveNode extends Node {
 }
 
 // Simple visit function implementation - local version
-function visit(tree: Node, test: string | ((node: Node) => boolean), callback: (node: Node) => void) {
-  const testFn = typeof test === 'string' ? (node: Node) => node.type === test : test
-  
+function visit(
+  tree: Node,
+  test: string | ((node: Node) => boolean),
+  callback: (node: Node) => void,
+) {
+  const testFn =
+    typeof test === 'string' ? (node: Node) => node.type === test : test
+
   function walk(node: Node) {
     if (testFn(node)) {
       callback(node)
@@ -33,7 +38,7 @@ function visit(tree: Node, test: string | ((node: Node) => boolean), callback: (
       node.children.forEach(walk)
     }
   }
-  
+
   walk(tree)
 }
 
@@ -43,7 +48,7 @@ export function remarkDirectiveSugar() {
       // Process directive nodes
       if (node.type && node.type.includes('Directive')) {
         const directiveNode = node as DirectiveNode
-        
+
         // Handle different directive types
         switch (directiveNode.name) {
           case 'note':
@@ -58,7 +63,7 @@ export function remarkDirectiveSugar() {
               }
             }
             break
-            
+
           case 'warning':
             // Transform warning directives
             if (directiveNode.children) {
@@ -71,7 +76,7 @@ export function remarkDirectiveSugar() {
               }
             }
             break
-            
+
           case 'tip':
             // Transform tip directives
             if (directiveNode.children) {

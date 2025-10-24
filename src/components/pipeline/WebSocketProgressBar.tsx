@@ -10,7 +10,8 @@ function isProgressMessage(obj: unknown): obj is ProgressMessage {
   if (typeof obj !== 'object' || obj === null) return false
   const o = obj as Record<string, unknown>
   return (
-    typeof o['type'] === 'string' && (o['type'] === 'progress_update' || o['type'] === 'status_update')
+    typeof o['type'] === 'string' &&
+    (o['type'] === 'progress_update' || o['type'] === 'status_update')
   )
 }
 
@@ -23,7 +24,13 @@ export function WebSocketProgressBar(props: {
   reconnectDelay?: number
   connectionAttempts?: number
 }) {
-  const { executionId, webSocket = null, onProgressUpdate = () => {}, showMetrics = false, connectionAttempts = 0 } = props
+  const {
+    executionId,
+    webSocket = null,
+    onProgressUpdate = () => {},
+    showMetrics = false,
+    connectionAttempts = 0,
+  } = props
   const [progress, setProgress] = useState(0)
   const [stage, setStage] = useState('initializing')
   const [statusText, setStatusText] = useState('connecting')
@@ -36,19 +43,25 @@ export function WebSocketProgressBar(props: {
 
     const handleMessage = (ev: MessageEvent<unknown>) => {
       try {
-        const parsed = typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data
+        const parsed =
+          typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data
         if (!isProgressMessage(parsed)) return
         const msg = parsed
         if (msg.executionId && msg.executionId !== executionId) return
         if (msg.type === 'progress_update') {
           const data = msg.data as Record<string, unknown> | undefined
-          const p = Number((data?.['progress'] as number) ?? Number(data?.['progress'] ?? 0))
+          const p = Number(
+            (data?.['progress'] as number) ?? Number(data?.['progress'] ?? 0),
+          )
           const st = (data?.['stage'] as string) ?? ''
           setProgress(p)
           setStage(st)
           onProgressUpdate(p, st)
         } else if (msg.type === 'status_update') {
-          const status = ((msg.data as Record<string, unknown> | undefined)?.['status'] as string) ?? ''
+          const status =
+            ((msg.data as Record<string, unknown> | undefined)?.[
+              'status'
+            ] as string) ?? ''
           setStatusText(status)
         }
       } catch (err) {
@@ -86,8 +99,18 @@ export function WebSocketProgressBar(props: {
     <div>
       <div>WebSocket status</div>
       <div role="status">{statusText}</div>
-      <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)} aria-valuetext={`${stage} ${progress.toFixed(1)}%`}>
-        <div className={`h-3 rounded-full ${progressColor}`} style={{ width: `${progress}%` }} data-testid="progress-fill" />
+      <div
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(progress)}
+        aria-valuetext={`${stage} ${progress.toFixed(1)}%`}
+      >
+        <div
+          className={`h-3 rounded-full ${progressColor}`}
+          style={{ width: `${progress}%` }}
+          data-testid="progress-fill"
+        />
       </div>
       <div>{progress.toFixed(1)}%</div>
       <div>{stage}</div>
@@ -97,7 +120,9 @@ export function WebSocketProgressBar(props: {
           <div data-testid="trending-up-icon">^</div>
         </div>
       )}
-      {connectionAttempts ? <div>Reconnection attempt {connectionAttempts}/5</div> : null}
+      {connectionAttempts ? (
+        <div>Reconnection attempt {connectionAttempts}/5</div>
+      ) : null}
     </div>
   )
 }
@@ -141,7 +166,11 @@ type MessageRecord = {
   executionId?: string
 }
 
-export function WebSocketMessageLogger(props: { messages: Array<MessageRecord>; maxMessages?: number; autoScroll?: boolean }) {
+export function WebSocketMessageLogger(props: {
+  messages: Array<MessageRecord>
+  maxMessages?: number
+  autoScroll?: boolean
+}) {
   const { messages = [], maxMessages = 100 } = props
   const shown = messages.slice(0, maxMessages)
 
@@ -152,10 +181,14 @@ export function WebSocketMessageLogger(props: { messages: Array<MessageRecord>; 
   return (
     <div>
       <div>WebSocket message log</div>
-      <div>Showing {shown.length} of {messages.length} messages</div>
+      <div>
+        Showing {shown.length} of {messages.length} messages
+      </div>
       <ul>
-        {shown.map(m => (
-          <li key={m.id}>{m.type} - {JSON.stringify(m.data).toLowerCase()}</li>
+        {shown.map((m) => (
+          <li key={m.id}>
+            {m.type} - {JSON.stringify(m.data).toLowerCase()}
+          </li>
         ))}
       </ul>
     </div>

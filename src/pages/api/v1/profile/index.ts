@@ -14,12 +14,28 @@ const logger = createBuildSafeLogger('profile-api')
 export const GET = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
+})(async ({
+  locals,
+}: {
+  params: Record<string, string | undefined>
+  request: Request
+  locals: { user: AuthUser }
+}) => {
   try {
     const { user } = locals
 
     // Get user profile from MongoDB
-    const userProfile = await adapter.getUserById(user.id) as unknown as { _id: { toString(): string }; fullName?: string; avatarUrl?: string | null; email: string; role: string; lastLogin?: Date; updatedAt?: Date; createdAt?: Date; preferences?: unknown } | null
+    const userProfile = (await adapter.getUserById(user.id)) as unknown as {
+      _id: { toString(): string }
+      fullName?: string
+      avatarUrl?: string | null
+      email: string
+      role: string
+      lastLogin?: Date
+      updatedAt?: Date
+      createdAt?: Date
+      preferences?: unknown
+    } | null
 
     if (!userProfile) {
       logger.error(`Profile not found for user ${user.id}`)
@@ -72,7 +88,14 @@ export const GET = protectRoute({
 export const PUT = protectRoute({
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ request, locals }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
+})(async ({
+  request,
+  locals,
+}: {
+  params: Record<string, string | undefined>
+  request: Request
+  locals: { user: AuthUser }
+}) => {
   try {
     const { user } = locals
     const data = await request.json()
@@ -93,7 +116,20 @@ export const PUT = protectRoute({
     }
 
     // Update profile in MongoDB
-    const updatedUser = await adapter.updateUser(user.id, updates) as unknown as { _id: { toString(): string }; fullName?: string; avatarUrl?: string | null; email: string; role: string; lastLogin?: Date; updatedAt?: Date; createdAt?: Date; preferences?: unknown } | null
+    const updatedUser = (await adapter.updateUser(
+      user.id,
+      updates,
+    )) as unknown as {
+      _id: { toString(): string }
+      fullName?: string
+      avatarUrl?: string | null
+      email: string
+      role: string
+      lastLogin?: Date
+      updatedAt?: Date
+      createdAt?: Date
+      preferences?: unknown
+    } | null
 
     if (!updatedUser) {
       logger.error(`Error updating profile for user ${user.id}`)

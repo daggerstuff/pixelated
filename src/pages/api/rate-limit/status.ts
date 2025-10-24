@@ -4,7 +4,11 @@
  */
 
 import type { APIRoute } from 'astro'
-import { rateLimitAnalytics, getRateLimitStatus, checkRateLimitHealth } from '@/lib/rate-limiting'
+import {
+  rateLimitAnalytics,
+  getRateLimitStatus,
+  checkRateLimitHealth,
+} from '@/lib/rate-limiting'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('rate-limit-status')
@@ -33,16 +37,16 @@ export const GET: APIRoute = async ({ request }) => {
 
     const [status, health] = await Promise.all([
       getRateLimitStatus(),
-      checkRateLimitHealth()
+      checkRateLimitHealth(),
     ])
 
     const response: ApiResponse = {
       status: 'success',
       data: {
         system: status,
-        health
+        health,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
 
     // Include analytics if requested
@@ -61,10 +65,9 @@ export const GET: APIRoute = async ({ request }) => {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
+        'Cache-Control': 'no-cache',
+      },
     })
-
   } catch (error) {
     logger.error('Rate limit status API error:', { error })
 
@@ -73,14 +76,14 @@ export const GET: APIRoute = async ({ request }) => {
         status: 'error',
         message: 'Failed to retrieve rate limiting status',
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+          'Content-Type': 'application/json',
+        },
+      },
     )
   }
 }
@@ -102,9 +105,9 @@ export const POST: APIRoute = async ({ request }) => {
           return new Response(
             JSON.stringify({
               status: 'error',
-              message: 'Missing required monitor parameters'
+              message: 'Missing required monitor parameters',
             }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } }
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
           )
         }
 
@@ -117,7 +120,7 @@ export const POST: APIRoute = async ({ request }) => {
           'log-alert': (alert) => {
             logger.warn('Rate limit alert triggered', {
               alert,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
             })
           },
 
@@ -128,11 +131,16 @@ export const POST: APIRoute = async ({ request }) => {
               // Use ES6 import syntax instead of CommonJS require
               // This assumes Sentry is properly configured in the application
               // We're using a safe approach that won't break if Sentry isn't available
-              import('@sentry/node').then(({ captureMessage }) => {
-                captureMessage(`Rate limit alert triggered: ${JSON.stringify(alert)}`, 'warning')
-              }).catch(error => {
-                logger.error('Failed to load Sentry module', { error })
-              })
+              import('@sentry/node')
+                .then(({ captureMessage }) => {
+                  captureMessage(
+                    `Rate limit alert triggered: ${JSON.stringify(alert)}`,
+                    'warning',
+                  )
+                })
+                .catch((error) => {
+                  logger.error('Failed to load Sentry module', { error })
+                })
             } catch (error) {
               logger.error('Failed to send alert to Sentry', { error })
             }
@@ -144,7 +152,9 @@ export const POST: APIRoute = async ({ request }) => {
             // This assumes webhook URL is configured in environment variables
             const webhookUrl = process.env.RATE_LIMIT_WEBHOOK_URL
             if (!webhookUrl) {
-              logger.warn('RATE_LIMIT_WEBHOOK_URL not configured, skipping webhook')
+              logger.warn(
+                'RATE_LIMIT_WEBHOOK_URL not configured, skipping webhook',
+              )
               return
             }
 
@@ -152,25 +162,28 @@ export const POST: APIRoute = async ({ request }) => {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': 'Pixelated-Rate-Limiter'
+                'User-Agent': 'Pixelated-Rate-Limiter',
               },
               body: JSON.stringify({
                 type: 'rate_limit_alert',
                 alert,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  logger.error('Webhook request failed', {
+                    status: response.status,
+                    url: webhookUrl,
+                  })
+                }
               })
-            })
-            .then(response => {
-              if (!response.ok) {
+              .catch((error) => {
                 logger.error('Webhook request failed', {
-                  status: response.status,
-                  url: webhookUrl
+                  error,
+                  url: webhookUrl,
                 })
-              }
-            })
-            .catch(error => {
-              logger.error('Webhook request failed', { error, url: webhookUrl })
-            })
+              })
           },
 
           // Send email notification to administrators
@@ -180,7 +193,9 @@ export const POST: APIRoute = async ({ request }) => {
             const adminEmail = process.env.ADMIN_EMAIL
 
             if (!emailServiceUrl || !adminEmail) {
-              logger.warn('Email service not configured, skipping email notification')
+              logger.warn(
+                'Email service not configured, skipping email notification',
+              )
               return
             }
 
@@ -188,26 +203,29 @@ export const POST: APIRoute = async ({ request }) => {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.EMAIL_SERVICE_TOKEN}`
+                'Authorization': `Bearer ${process.env.EMAIL_SERVICE_TOKEN}`,
               },
               body: JSON.stringify({
                 to: adminEmail,
                 subject: 'Rate Limit Alert: Potential Attack Detected',
-                body: `A rate limit alert has been triggered:\n\n${JSON.stringify(alert, null, 2)}\n\nTimestamp: ${new Date().toISOString()}`
+                body: `A rate limit alert has been triggered:\n\n${JSON.stringify(alert, null, 2)}\n\nTimestamp: ${new Date().toISOString()}`,
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  logger.error('Email notification failed', {
+                    status: response.status,
+                    url: emailServiceUrl,
+                  })
+                }
               })
-            })
-            .then(response => {
-              if (!response.ok) {
+              .catch((error) => {
                 logger.error('Email notification failed', {
-                  status: response.status,
-                  url: emailServiceUrl
+                  error,
+                  url: emailServiceUrl,
                 })
-              }
-            })
-            .catch(error => {
-              logger.error('Email notification failed', { error, url: emailServiceUrl })
-            })
-          }
+              })
+          },
         }
 
         const monitor = {
@@ -221,7 +239,7 @@ export const POST: APIRoute = async ({ request }) => {
               throw new Error(`Invalid handler type: ${handler}`)
             }
             return safeHandler
-          })
+          }),
         }
 
         rateLimitAnalytics.addMonitor(monitor)
@@ -230,9 +248,9 @@ export const POST: APIRoute = async ({ request }) => {
           JSON.stringify({
             status: 'success',
             message: 'Monitor added successfully',
-            data: { monitor: name }
+            data: { monitor: name },
           }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
         )
       }
 
@@ -244,9 +262,9 @@ export const POST: APIRoute = async ({ request }) => {
           return new Response(
             JSON.stringify({
               status: 'error',
-              message: 'Monitor name is required'
+              message: 'Monitor name is required',
             }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } }
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
           )
         }
 
@@ -256,9 +274,9 @@ export const POST: APIRoute = async ({ request }) => {
           JSON.stringify({
             status: 'success',
             message: 'Monitor removed successfully',
-            data: { monitor: name }
+            data: { monitor: name },
           }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
         )
       }
 
@@ -272,9 +290,9 @@ export const POST: APIRoute = async ({ request }) => {
           JSON.stringify({
             status: 'success',
             message: 'Analytics cleanup completed',
-            data: { olderThanDays }
+            data: { olderThanDays },
           }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
         )
       }
 
@@ -282,9 +300,9 @@ export const POST: APIRoute = async ({ request }) => {
         return new Response(
           JSON.stringify({
             status: 'error',
-            message: `Unknown action: ${action}`
+            message: `Unknown action: ${action}`,
           }),
-          { status: 400, headers: { 'Content-Type': 'application/json' } }
+          { status: 400, headers: { 'Content-Type': 'application/json' } },
         )
     }
   } catch (error) {
@@ -295,14 +313,14 @@ export const POST: APIRoute = async ({ request }) => {
         status: 'error',
         message: 'Failed to process monitor addition',
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+          'Content-Type': 'application/json',
+        },
+      },
     )
   }
 }

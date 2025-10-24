@@ -3,7 +3,7 @@
  * High-performance queries with proper indexing, connection pooling, and query optimization
  */
 
-import { Pool, PoolClient, QueryResult } from 'pg'
+import { PoolClient, QueryResult } from 'pg'
 import { getPool } from './index'
 import { getLogger } from '@/lib/logging'
 
@@ -15,7 +15,7 @@ const QUERY_CONFIG = {
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
   SLOW_QUERY_THRESHOLD_MS: 1000,
-  CONNECTION_TIMEOUT_MS: 5000
+  CONNECTION_TIMEOUT_MS: 5000,
 }
 
 // Optimized query plans and indexes
@@ -25,18 +25,18 @@ const OPTIMIZED_INDEXES = {
     'CREATE INDEX IF NOT EXISTS idx_bias_analyses_content_hash ON bias_analyses(content_hash)',
     'CREATE INDEX IF NOT EXISTS idx_bias_analyses_alert_level ON bias_analyses(alert_level)',
     'CREATE INDEX IF NOT EXISTS idx_bias_analyses_score ON bias_analyses(overall_bias_score)',
-    'CREATE INDEX IF NOT EXISTS idx_bias_analyses_created_date ON bias_analyses(DATE(created_at))'
+    'CREATE INDEX IF NOT EXISTS idx_bias_analyses_created_date ON bias_analyses(DATE(created_at))',
   ],
   SESSIONS: [
     'CREATE INDEX IF NOT EXISTS idx_sessions_therapist_state ON sessions(therapist_id, state)',
     'CREATE INDEX IF NOT EXISTS idx_sessions_created ON sessions(created_at DESC)',
-    'CREATE INDEX IF NOT EXISTS idx_sessions_therapist_created ON sessions(therapist_id, created_at DESC)'
+    'CREATE INDEX IF NOT EXISTS idx_sessions_therapist_created ON sessions(therapist_id, created_at DESC)',
   ],
   USERS: [
     'CREATE INDEX IF NOT EXISTS idx_users_email_active ON users(email, is_active)',
     'CREATE INDEX IF NOT EXISTS idx_users_role_active ON users(role, is_active)',
-    'CREATE INDEX IF NOT EXISTS idx_users_created ON users(created_at DESC)'
-  ]
+    'CREATE INDEX IF NOT EXISTS idx_users_created ON users(created_at DESC)',
+  ],
 }
 
 /**
@@ -49,70 +49,75 @@ export async function executeQuery<T = any>(
     timeout?: number
     retries?: number
     name?: string
-  } = {}
+  } = {},
 ): Promise<QueryResult<T>> {
   const startTime = Date.now()
   const queryName = options.name || 'unnamed'
   const timeout = options.timeout || QUERY_CONFIG.TIMEOUT_MS
   const maxRetries = options.retries || QUERY_CONFIG.MAX_RETRIES
-  
+
   let lastError: Error | null = null
-  
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       // Create timeout promise
-      const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error(`Query timeout: ${queryName}`)), timeout)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`Query timeout: ${queryName}`)),
+          timeout,
+        ),
       )
-      
+
       // Execute query with timeout
       const queryPromise = getPool().query(text, params)
       const result = await Promise.race([queryPromise, timeoutPromise])
-      
+
       const executionTime = Date.now() - startTime
-      
+
       // Log slow queries
       if (executionTime > QUERY_CONFIG.SLOW_QUERY_THRESHOLD_MS) {
         logger.warn('Slow query detected', {
           queryName,
           executionTime,
           text: text.substring(0, 100), // First 100 chars
-          attempt
+          attempt,
         })
       }
-      
+
       // Log successful query
       logger.debug('Query executed successfully', {
         queryName,
         executionTime,
         rows: result.rowCount,
-        attempt
+        attempt,
       })
-      
+
       return result
-      
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error))
-      
+
       logger.warn(`Query attempt ${attempt} failed`, {
         queryName,
         error: lastError.message,
-        attempt
+        attempt,
       })
-      
+
       // Don't retry on timeout or connection errors
-      if (lastError.message.includes('timeout') || lastError.message.includes('connection')) {
+      if (
+        lastError.message.includes('timeout') ||
+        lastError.message.includes('connection')
+      ) {
         throw lastError
       }
-      
+
       // Wait before retry (exponential backoff)
       if (attempt < maxRetries) {
         const delay = QUERY_CONFIG.RETRY_DELAY_MS * Math.pow(2, attempt - 1)
-        await new Promise(resolve => setTimeout(resolve, delay))
+        await new Promise((resolve) => setTimeout(resolve, delay))
       }
     }
   }
-  
+
   throw lastError
 }
 
@@ -124,47 +129,45 @@ export async function executeTransaction<T>(
   options: {
     timeout?: number
     name?: string
-  } = {}
+  } = {},
 ): Promise<T> {
   const startTime = Date.now()
   const transactionName = options.name || 'unnamed'
   const timeout = options.timeout || QUERY_CONFIG.TIMEOUT_MS
-  
+
   const client = await getPool().connect()
-  
+
   try {
     // Set statement timeout for this connection
     await client.query(`SET statement_timeout = ${timeout}`)
-    
+
     await client.query('BEGIN')
-    
+
     const result = await callback(client)
-    
+
     await client.query('COMMIT')
-    
+
     const executionTime = Date.now() - startTime
-    
+
     logger.debug('Transaction completed successfully', {
       transactionName,
-      executionTime
+      executionTime,
     })
-    
+
     return result
-    
   } catch (error) {
     await client.query('ROLLBACK')
-    
+
     const executionTime = Date.now() - startTime
     const errorMessage = error instanceof Error ? error.message : String(error)
-    
+
     logger.error('Transaction failed', {
       transactionName,
       executionTime,
-      error: errorMessage
+      error: errorMessage,
     })
-    
+
     throw error
-    
   } finally {
     client.release()
   }
@@ -177,17 +180,19 @@ export class OptimizedBiasQueries {
   /**
    * Get bias analyses with pagination and filtering
    */
-  async getBiasAnalyses(options: {
-    therapistId?: string
-    clientId?: string
-    alertLevels?: string[]
-    dateFrom?: Date
-    dateTo?: Date
-    limit?: number
-    offset?: number
-    orderBy?: 'created_at' | 'overall_bias_score'
-    orderDirection?: 'ASC' | 'DESC'
-  } = {}): Promise<{
+  async getBiasAnalyses(
+    options: {
+      therapistId?: string
+      clientId?: string
+      alertLevels?: string[]
+      dateFrom?: Date
+      dateTo?: Date
+      limit?: number
+      offset?: number
+      orderBy?: 'created_at' | 'overall_bias_score'
+      orderDirection?: 'ASC' | 'DESC'
+    } = {},
+  ): Promise<{
     analyses: any[]
     total: number
     page: number
@@ -202,41 +207,42 @@ export class OptimizedBiasQueries {
       limit = 50,
       offset = 0,
       orderBy = 'created_at',
-      orderDirection = 'DESC'
+      orderDirection = 'DESC',
     } = options
-    
+
     // Build WHERE conditions
     const conditions: string[] = []
     const params: any[] = []
     let paramIndex = 1
-    
+
     if (therapistId) {
       conditions.push(`ba.therapist_id = $${paramIndex++}`)
       params.push(therapistId)
     }
-    
+
     if (clientId) {
       conditions.push(`s.client_id = $${paramIndex++}`)
       params.push(clientId)
     }
-    
+
     if (alertLevels && alertLevels.length > 0) {
       conditions.push(`ba.alert_level = ANY($${paramIndex++})`)
       params.push(alertLevels)
     }
-    
+
     if (dateFrom) {
       conditions.push(`ba.created_at >= $${paramIndex++}`)
       params.push(dateFrom)
     }
-    
+
     if (dateTo) {
       conditions.push(`ba.created_at <= $${paramIndex++}`)
       params.push(dateTo)
     }
-    
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
-    
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
     // Optimized query with proper joins and indexes
     const query = `
       SELECT 
@@ -259,12 +265,14 @@ export class OptimizedBiasQueries {
       ORDER BY ba.${orderBy} ${orderDirection}
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `
-    
+
     params.push(limit, offset)
-    
+
     // Execute main query
-    const result = await executeQuery(query, params, { name: 'getBiasAnalyses' })
-    
+    const result = await executeQuery(query, params, {
+      name: 'getBiasAnalyses',
+    })
+
     // Get total count for pagination
     const countQuery = `
       SELECT COUNT(*) as total
@@ -272,18 +280,20 @@ export class OptimizedBiasQueries {
       JOIN sessions s ON ba.session_id = s.id
       ${whereClause}
     `
-    
-    const countResult = await executeQuery(countQuery, params.slice(0, -2), { name: 'getBiasAnalysesCount' })
+
+    const countResult = await executeQuery(countQuery, params.slice(0, -2), {
+      name: 'getBiasAnalysesCount',
+    })
     const total = parseInt(countResult.rows[0].total)
-    
+
     return {
       analyses: result.rows,
       total,
       page: Math.floor(offset / limit) + 1,
-      pageSize: limit
+      pageSize: limit,
     }
   }
-  
+
   /**
    * Get cached analysis by content hash (optimized)
    */
@@ -304,19 +314,22 @@ export class OptimizedBiasQueries {
       ORDER BY ba.created_at DESC
       LIMIT 1
     `
-    
-    const result = await executeQuery(query, [contentHash], { 
+
+    const result = await executeQuery(query, [contentHash], {
       name: 'getCachedAnalysis',
-      timeout: 2000 // 2 second timeout for cache lookups
+      timeout: 2000, // 2 second timeout for cache lookups
     })
-    
+
     return result.rows[0] || null
   }
-  
+
   /**
    * Get bias trend analysis for therapist
    */
-  async getBiasTrend(therapistId: string, days: number = 30): Promise<{
+  async getBiasTrend(
+    therapistId: string,
+    days: number = 30,
+  ): Promise<{
     daily_scores: Array<{
       date: string
       avg_score: number
@@ -338,24 +351,32 @@ export class OptimizedBiasQueries {
       GROUP BY DATE(ba.created_at)
       ORDER BY date DESC
     `
-    
-    const result = await executeQuery(query, [therapistId], { name: 'getBiasTrend' })
-    
+
+    const result = await executeQuery(query, [therapistId], {
+      name: 'getBiasTrend',
+    })
+
     // Calculate trend
     const dailyScores = result.rows
     let overallTrend: 'improving' | 'stable' | 'worsening' = 'stable'
     let avgScoreChange = 0
-    
+
     if (dailyScores.length >= 7) {
       const recentWeek = dailyScores.slice(0, 7)
       const previousWeek = dailyScores.slice(7, 14)
-      
+
       if (recentWeek.length > 0 && previousWeek.length > 0) {
-        const recentAvg = recentWeek.reduce((sum, day) => sum + parseFloat(day.avg_score), 0) / recentWeek.length
-        const previousAvg = previousWeek.reduce((sum, day) => sum + parseFloat(day.avg_score), 0) / previousWeek.length
-        
+        const recentAvg =
+          recentWeek.reduce((sum, day) => sum + parseFloat(day.avg_score), 0) /
+          recentWeek.length
+        const previousAvg =
+          previousWeek.reduce(
+            (sum, day) => sum + parseFloat(day.avg_score),
+            0,
+          ) / previousWeek.length
+
         avgScoreChange = recentAvg - previousAvg
-        
+
         if (avgScoreChange < -0.05) {
           overallTrend = 'improving'
         } else if (avgScoreChange > 0.05) {
@@ -363,14 +384,14 @@ export class OptimizedBiasQueries {
         }
       }
     }
-    
+
     return {
       daily_scores: dailyScores,
       overall_trend: overallTrend,
-      avg_score_change: Math.round(avgScoreChange * 1000) / 1000
+      avg_score_change: Math.round(avgScoreChange * 1000) / 1000,
     }
   }
-  
+
   /**
    * Get high-risk analyses for monitoring
    */
@@ -394,12 +415,14 @@ export class OptimizedBiasQueries {
       ORDER BY ba.overall_bias_score DESC, ba.created_at DESC
       LIMIT $1
     `
-    
-    const result = await executeQuery(query, [limit], { name: 'getHighRiskAnalyses' })
-    
+
+    const result = await executeQuery(query, [limit], {
+      name: 'getHighRiskAnalyses',
+    })
+
     return result.rows
   }
-  
+
   /**
    * Get performance metrics for bias analysis
    */
@@ -422,10 +445,12 @@ export class OptimizedBiasQueries {
       FROM bias_analyses ba
       WHERE ba.created_at >= NOW() - INTERVAL '${days} days'
     `
-    
-    const result = await executeQuery(query, [], { name: 'getPerformanceMetrics' })
+
+    const result = await executeQuery(query, [], {
+      name: 'getPerformanceMetrics',
+    })
     const row = result.rows[0]
-    
+
     // Calculate cache hit rate from recent analyses with low processing time
     const cacheHitQuery = `
       SELECT 
@@ -437,16 +462,18 @@ export class OptimizedBiasQueries {
       WHERE created_at >= NOW() - INTERVAL '1 day'
         AND processing_time_ms IS NOT NULL
     `
-    
-    const cacheResult = await executeQuery(cacheHitQuery, [], { name: 'getCacheHitRate' })
+
+    const cacheResult = await executeQuery(cacheHitQuery, [], {
+      name: 'getCacheHitRate',
+    })
     const cacheHitRate = cacheResult.rows[0]?.cache_hit_rate || 0
-    
+
     return {
       total_analyses: parseInt(row.total_analyses),
       avg_processing_time: parseFloat(row.avg_processing_time),
       cache_hit_rate: parseFloat(cacheHitRate),
       slow_queries: parseInt(row.slow_queries),
-      error_rate: 0 // Would need error tracking table for real calculation
+      error_rate: 0, // Would need error tracking table for real calculation
     }
   }
 }
@@ -460,7 +487,7 @@ export class DatabaseOptimizer {
    */
   async createOptimizedIndexes(): Promise<void> {
     logger.info('Creating optimized database indexes')
-    
+
     for (const [table, indexes] of Object.entries(OPTIMIZED_INDEXES)) {
       for (const indexSql of indexes) {
         try {
@@ -471,16 +498,16 @@ export class DatabaseOptimizer {
         }
       }
     }
-    
+
     logger.info('Database index optimization completed')
   }
-  
+
   /**
    * Analyze table statistics for query optimization
    */
   async analyzeTableStats(): Promise<void> {
     const tables = ['bias_analyses', 'sessions', 'users']
-    
+
     for (const table of tables) {
       try {
         await executeQuery(`ANALYZE ${table}`, [], { name: `analyze_${table}` })
@@ -490,23 +517,25 @@ export class DatabaseOptimizer {
       }
     }
   }
-  
+
   /**
    * Vacuum tables to reclaim storage
    */
   async vacuumTables(): Promise<void> {
     const tables = ['bias_analyses', 'sessions', 'users']
-    
+
     for (const table of tables) {
       try {
-        await executeQuery(`VACUUM ANALYZE ${table}`, [], { name: `vacuum_${table}` })
+        await executeQuery(`VACUUM ANALYZE ${table}`, [], {
+          name: `vacuum_${table}`,
+        })
         logger.info(`Vacuumed table ${table}`)
       } catch (error) {
         logger.warn(`Failed to vacuum table ${table}`, { error })
       }
     }
   }
-  
+
   /**
    * Get database performance statistics
    */
@@ -524,9 +553,11 @@ export class DatabaseOptimizer {
       FROM pg_catalog.pg_statio_user_tables
       ORDER BY pg_total_relation_size(relid) DESC
     `
-    
-    const tableSizeResult = await executeQuery(tableSizeQuery, [], { name: 'getTableSizes' })
-    
+
+    const tableSizeResult = await executeQuery(tableSizeQuery, [], {
+      name: 'getTableSizes',
+    })
+
     // Get index usage
     const indexUsageQuery = `
       SELECT 
@@ -536,12 +567,18 @@ export class DatabaseOptimizer {
       ORDER BY usage DESC
       LIMIT 10
     `
-    
-    const indexUsageResult = await executeQuery(indexUsageQuery, [], { name: 'getIndexUsage' })
-    
+
+    const indexUsageResult = await executeQuery(indexUsageQuery, [], {
+      name: 'getIndexUsage',
+    })
+
     // Get query performance (if pg_stat_statements is enabled)
-    let queryPerformance: Array<{ query: string; avg_time: number; calls: number }> = []
-    
+    let queryPerformance: Array<{
+      query: string
+      avg_time: number
+      calls: number
+    }> = []
+
     try {
       const queryPerfQuery = `
         SELECT 
@@ -552,17 +589,19 @@ export class DatabaseOptimizer {
         ORDER BY mean_exec_time DESC
         LIMIT 10
       `
-      
-      const queryPerfResult = await executeQuery(queryPerfQuery, [], { name: 'getQueryPerformance' })
+
+      const queryPerfResult = await executeQuery(queryPerfQuery, [], {
+        name: 'getQueryPerformance',
+      })
       queryPerformance = queryPerfResult.rows
     } catch (error) {
       logger.warn('pg_stat_statements not available', { error })
     }
-    
+
     return {
       table_sizes: tableSizeResult.rows,
       index_usage: indexUsageResult.rows,
-      query_performance: queryPerformance
+      query_performance: queryPerformance,
     }
   }
 }
@@ -574,20 +613,24 @@ export const databaseOptimizer = new DatabaseOptimizer()
 // Performance monitoring
 export async function monitorQueryPerformance(): Promise<void> {
   const stats = await databaseOptimizer.getDatabaseStats()
-  
+
   logger.info('Database performance monitoring', {
     tableCount: stats.table_sizes.length,
-    totalRows: stats.table_sizes.reduce((sum, table) => sum + parseInt(table.rows), 0),
-    slowQueries: stats.query_performance.length
+    totalRows: stats.table_sizes.reduce(
+      (sum, table) => sum + parseInt(table.rows),
+      0,
+    ),
+    slowQueries: stats.query_performance.length,
   })
-  
+
   // Alert on slow queries
-  stats.query_performance.forEach(query => {
-    if (query.avg_time > 1000) { // Queries taking more than 1 second
+  stats.query_performance.forEach((query) => {
+    if (query.avg_time > 1000) {
+      // Queries taking more than 1 second
       logger.warn('Slow query detected', {
         query: query.query,
         avgTime: query.avg_time,
-        calls: query.calls
+        calls: query.calls,
       })
     }
   })

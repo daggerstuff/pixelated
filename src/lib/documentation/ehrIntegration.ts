@@ -474,4 +474,4 @@ export class EHRIntegration {
     return Buffer.from(JSON.stringify(document)).toString('base64')
   }
 }
-export type { EHRExportOptions, EHRExportResult } from './types';
+export type { EHRExportOptions, EHRExportResult } from './types'

@@ -66,7 +66,10 @@ export class AnalyticsService {
       })
 
       // Queue event for processing
-      await this.redisClient.lpush('analytics:events:queue', JSON.stringify(event))
+      await this.redisClient.lpush(
+        'analytics:events:queue',
+        JSON.stringify(event),
+      )
 
       // Store event in time series
       await this.storeEventInTimeSeries(event)
@@ -168,16 +171,13 @@ export class AnalyticsService {
    * Get events by type and time range
    */
   async getEvents(options: EventQueryOptions): Promise<Event[]> {
-    const {
-      type,
-      limit = 100,
-      offset = 0,
-    } = options
+    const { type, limit = 100, offset = 0 } = options
 
     try {
       // Get events from time series
       // ioredis compatibility: use zrangebyscore and limit as needed
-      const start = typeof options.startTime === 'number' ? options.startTime : '-inf'
+      const start =
+        typeof options.startTime === 'number' ? options.startTime : '-inf'
       const end = typeof options.endTime === 'number' ? options.endTime : '+inf'
       let eventJsons: string[] = []
       if (typeof offset === 'number' && typeof limit === 'number') {
@@ -187,13 +187,13 @@ export class AnalyticsService {
           end,
           'LIMIT',
           offset,
-          limit
+          limit,
         )
       } else {
         eventJsons = await this.redisClient.zrangebyscore(
           `analytics:events:time:${type}`,
           start,
-          end
+          end,
         )
       }
 
@@ -221,20 +221,18 @@ export class AnalyticsService {
    * Get metric values by name and time range
    */
   async getMetrics(options: MetricQueryOptions): Promise<Metric[]> {
-    const {
-      name,
-      tags,
-    } = options
+    const { name, tags } = options
 
     try {
       // Get metrics from time series
       // ioredis compatibility: use zrangebyscore
-      const start = typeof options.startTime === 'number' ? options.startTime : '-inf'
+      const start =
+        typeof options.startTime === 'number' ? options.startTime : '-inf'
       const end = typeof options.endTime === 'number' ? options.endTime : '+inf'
       const metricJsons = await this.redisClient.zrangebyscore(
         `analytics:metrics:${name}`,
         start,
-        end
+        end,
       )
 
       const metrics = metricJsons

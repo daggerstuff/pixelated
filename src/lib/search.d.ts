@@ -10,13 +10,13 @@ export interface SearchDocument {
 
 // Define search options interface
 export interface SearchOptions {
-  limit?: number;
-  threshold?: number;
-  fuzzy?: boolean;
-  boost?: Record<string, number>;
-  includeScore?: boolean;
-  includeMatches?: boolean;
-  keys?: string[];
+  limit?: number
+  threshold?: number
+  fuzzy?: boolean
+  boost?: Record<string, number>
+  includeScore?: boolean
+  includeMatches?: boolean
+  keys?: string[]
 }
 
 export interface ISearchClient {

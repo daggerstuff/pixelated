@@ -37,7 +37,7 @@ interface FormErrors {
 export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
   onSubmit,
   isLoading = false,
-  maxLength = 10000
+  maxLength = 10000,
 }) => {
   const [formData, setFormData] = useState<BiasAnalysisRequest>({
     text: '',
@@ -46,10 +46,10 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
       gender: '',
       ethnicity: '',
       age: '',
-      primaryLanguage: ''
+      primaryLanguage: '',
     },
     sessionType: 'individual',
-    therapistNotes: ''
+    therapistNotes: '',
   })
 
   const [errors, setErrors] = useState<FormErrors>({})
@@ -94,67 +94,79 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
     const sanitizedText = InputValidator.sanitizeString(formData.text)
 
     if (sanitizedText !== formData.text) {
-      newErrors.text = 'Text contains potentially harmful content that has been sanitized'
+      newErrors.text =
+        'Text contains potentially harmful content that has been sanitized'
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }, [formData, maxLength])
 
-  const handleTextChange = useCallback((value: string) => {
-    setFormData(prev => ({ ...prev, text: value }))
-    setCharacterCount(value.length)
+  const handleTextChange = useCallback(
+    (value: string) => {
+      setFormData((prev) => ({ ...prev, text: value }))
+      setCharacterCount(value.length)
 
-    if (errors.text) {
-      setErrors(prev => ({ ...prev, text: undefined }))
-    }
-  }, [errors.text])
-
-  const handleDemographicsChange = useCallback((field: keyof BiasAnalysisRequest['demographics'], value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      demographics: {
-        ...prev.demographics,
-        [field]: value
+      if (errors.text) {
+        setErrors((prev) => ({ ...prev, text: undefined }))
       }
-    }))
+    },
+    [errors.text],
+  )
 
-    // Clear demographics error when user makes selection
-    if (errors.demographics?.[field]) {
-      setErrors(prev => ({
+  const handleDemographicsChange = useCallback(
+    (field: keyof BiasAnalysisRequest['demographics'], value: string) => {
+      setFormData((prev) => ({
         ...prev,
         demographics: {
           ...prev.demographics,
-          [field]: undefined
-        }
+          [field]: value,
+        },
       }))
-    }
-  }, [errors.demographics])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      // Focus first error field
-      const firstErrorField = Object.keys(errors)[0]
-      if (firstErrorField === 'text' && textAreaRef.current) {
-        textAreaRef.current.focus()
+      // Clear demographics error when user makes selection
+      if (errors.demographics?.[field]) {
+        setErrors((prev) => ({
+          ...prev,
+          demographics: {
+            ...prev.demographics,
+            [field]: undefined,
+          },
+        }))
       }
-      return
-    }
+    },
+    [errors.demographics],
+  )
 
-    try {
-      await onSubmit({
-        ...formData,
-        text: InputValidator.sanitizeString(formData.text),
-        context: InputValidator.sanitizeString(formData.context),
-        therapistNotes: formData.therapistNotes ? InputValidator.sanitizeString(formData.therapistNotes) : undefined
-      })
-    } catch (error) {
-      console.error('Form submission error:', error)
-      setErrors({ submit: 'Failed to submit analysis. Please try again.' })
-    }
-  }, [formData, validateForm, onSubmit, errors])
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+
+      if (!validateForm()) {
+        // Focus first error field
+        const firstErrorField = Object.keys(errors)[0]
+        if (firstErrorField === 'text' && textAreaRef.current) {
+          textAreaRef.current.focus()
+        }
+        return
+      }
+
+      try {
+        await onSubmit({
+          ...formData,
+          text: InputValidator.sanitizeString(formData.text),
+          context: InputValidator.sanitizeString(formData.context),
+          therapistNotes: formData.therapistNotes
+            ? InputValidator.sanitizeString(formData.therapistNotes)
+            : undefined,
+        })
+      } catch (error) {
+        console.error('Form submission error:', error)
+        setErrors({ submit: 'Failed to submit analysis. Please try again.' })
+      }
+    },
+    [formData, validateForm, onSubmit, errors],
+  )
 
   const clearForm = useCallback(() => {
     setFormData({
@@ -164,10 +176,10 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
         gender: '',
         ethnicity: '',
         age: '',
-        primaryLanguage: ''
+        primaryLanguage: '',
       },
       sessionType: 'individual',
-      therapistNotes: ''
+      therapistNotes: '',
     })
     setErrors({})
     setCharacterCount(0)
@@ -195,11 +207,10 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
             maxLength={maxLength}
             disabled={isLoading}
           />
-          {errors.text && (
-            <div className="form-error">{errors.text}</div>
-          )}
+          {errors.text && <div className="form-error">{errors.text}</div>}
           <div className="text-sm text-gray-400 mt-1">
-            Include therapist-patient dialogue, observations, and key interactions
+            Include therapist-patient dialogue, observations, and key
+            interactions
           </div>
         </div>
 
@@ -211,15 +222,15 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
           <textarea
             id="session-context"
             value={formData.context}
-            onChange={(e) => setFormData(prev => ({ ...prev, context: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, context: e.target.value }))
+            }
             className={`form-textarea ${errors.context ? 'error' : ''}`}
             placeholder="Describe the session context, goals, and any relevant background..."
             rows={3}
             disabled={isLoading}
           />
-          {errors.context && (
-            <div className="form-error">{errors.context}</div>
-          )}
+          {errors.context && <div className="form-error">{errors.context}</div>}
         </div>
 
         {/* Demographics */}
@@ -228,11 +239,15 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Gender */}
             <div>
-              <label htmlFor="gender" className="form-label">Gender *</label>
+              <label htmlFor="gender" className="form-label">
+                Gender *
+              </label>
               <select
                 id="gender"
                 value={formData.demographics.gender}
-                onChange={(e) => handleDemographicsChange('gender', e.target.value)}
+                onChange={(e) =>
+                  handleDemographicsChange('gender', e.target.value)
+                }
                 className={`form-select ${errors.demographics?.gender ? 'error' : ''}`}
                 disabled={isLoading}
               >
@@ -249,11 +264,15 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
 
             {/* Ethnicity */}
             <div>
-              <label htmlFor="ethnicity" className="form-label">Ethnicity *</label>
+              <label htmlFor="ethnicity" className="form-label">
+                Ethnicity *
+              </label>
               <select
                 id="ethnicity"
                 value={formData.demographics.ethnicity}
-                onChange={(e) => handleDemographicsChange('ethnicity', e.target.value)}
+                onChange={(e) =>
+                  handleDemographicsChange('ethnicity', e.target.value)
+                }
                 className={`form-select ${errors.demographics?.ethnicity ? 'error' : ''}`}
                 disabled={isLoading}
               >
@@ -268,17 +287,23 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
                 <option value="other">Other</option>
               </select>
               {errors.demographics?.ethnicity && (
-                <div className="form-error">{errors.demographics.ethnicity}</div>
+                <div className="form-error">
+                  {errors.demographics.ethnicity}
+                </div>
               )}
             </div>
 
             {/* Age Group */}
             <div>
-              <label htmlFor="age" className="form-label">Age Group *</label>
+              <label htmlFor="age" className="form-label">
+                Age Group *
+              </label>
               <select
                 id="age"
                 value={formData.demographics.age}
-                onChange={(e) => handleDemographicsChange('age', e.target.value)}
+                onChange={(e) =>
+                  handleDemographicsChange('age', e.target.value)
+                }
                 className={`form-select ${errors.demographics?.age ? 'error' : ''}`}
                 disabled={isLoading}
               >
@@ -297,11 +322,15 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
 
             {/* Primary Language */}
             <div>
-              <label htmlFor="language" className="form-label">Primary Language *</label>
+              <label htmlFor="language" className="form-label">
+                Primary Language *
+              </label>
               <select
                 id="language"
                 value={formData.demographics.primaryLanguage}
-                onChange={(e) => handleDemographicsChange('primaryLanguage', e.target.value)}
+                onChange={(e) =>
+                  handleDemographicsChange('primaryLanguage', e.target.value)
+                }
                 className={`form-select ${errors.demographics?.primaryLanguage ? 'error' : ''}`}
                 disabled={isLoading}
               >
@@ -320,7 +349,9 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
                 <option value="other">Other</option>
               </select>
               {errors.demographics?.primaryLanguage && (
-                <div className="form-error">{errors.demographics.primaryLanguage}</div>
+                <div className="form-error">
+                  {errors.demographics.primaryLanguage}
+                </div>
               )}
             </div>
           </div>
@@ -328,11 +359,15 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
 
         {/* Session Type */}
         <div className="form-group">
-          <label htmlFor="session-type" className="form-label">Session Type</label>
+          <label htmlFor="session-type" className="form-label">
+            Session Type
+          </label>
           <select
             id="session-type"
             value={formData.sessionType}
-            onChange={(e) => setFormData(prev => ({ ...prev, sessionType: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, sessionType: e.target.value }))
+            }
             className="form-select"
             disabled={isLoading}
           >
@@ -353,7 +388,12 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
           <textarea
             id="therapist-notes"
             value={formData.therapistNotes || ''}
-            onChange={(e) => setFormData(prev => ({ ...prev, therapistNotes: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                therapistNotes: e.target.value,
+              }))
+            }
             className="form-textarea"
             placeholder="Any additional context, observations, or notes..."
             rows={3}

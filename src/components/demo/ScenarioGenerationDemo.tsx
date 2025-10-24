@@ -22,63 +22,69 @@ export default function ScenarioGenerationDemo() {
     { id: 'anxiety', label: 'Anxiety Disorder', icon: '😰' },
     { id: 'depression', label: 'Depression', icon: '😔' },
     { id: 'trauma', label: 'Trauma/PTSD', icon: '💔' },
-    { id: 'personality', label: 'Personality Disorder', icon: '🎭' }
+    { id: 'personality', label: 'Personality Disorder', icon: '🎭' },
   ]
 
   const generateScenario = async () => {
     setIsGenerating(true)
-    
+
     // Simulate generation delay
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+
     const scenarios = {
       anxiety: {
         client: {
           name: 'Sarah Martinez',
           age: '28',
           occupation: 'Marketing Manager',
-          presenting: 'Generalized anxiety with panic attacks'
+          presenting: 'Generalized anxiety with panic attacks',
         },
-        background: 'Recent promotion at work has increased responsibilities and stress. History of perfectionism and people-pleasing behaviors.',
+        background:
+          'Recent promotion at work has increased responsibilities and stress. History of perfectionism and people-pleasing behaviors.',
         symptoms: [
           'Persistent worry about work performance',
           'Physical symptoms: racing heart, sweating',
           'Avoidance of social situations',
-          'Sleep disturbances'
+          'Sleep disturbances',
         ],
-        formulation: 'GAD with panic disorder, likely triggered by increased work stress and perfectionist tendencies',
+        formulation:
+          'GAD with panic disorder, likely triggered by increased work stress and perfectionist tendencies',
         treatment: [
           'CBT focusing on cognitive restructuring',
           'Exposure therapy for panic responses',
           'Stress management techniques',
-          'Mindfulness-based interventions'
-        ]
+          'Mindfulness-based interventions',
+        ],
       },
       depression: {
         client: {
           name: 'Michael Chen',
           age: '35',
           occupation: 'Software Developer',
-          presenting: 'Major depressive episode'
+          presenting: 'Major depressive episode',
         },
-        background: 'Recent divorce and isolation from social support. History of mild depression in college.',
+        background:
+          'Recent divorce and isolation from social support. History of mild depression in college.',
         symptoms: [
           'Persistent low mood for 3+ months',
           'Loss of interest in activities',
           'Fatigue and low energy',
-          'Feelings of worthlessness'
+          'Feelings of worthlessness',
         ],
-        formulation: 'Major Depressive Disorder, single episode, moderate severity, precipitated by major life changes',
+        formulation:
+          'Major Depressive Disorder, single episode, moderate severity, precipitated by major life changes',
         treatment: [
           'Cognitive Behavioral Therapy',
           'Behavioral activation techniques',
           'Social support rebuilding',
-          'Consider medication referral'
-        ]
-      }
+          'Consider medication referral',
+        ],
+      },
     }
 
-    setScenario(scenarios[selectedType as keyof typeof scenarios] || scenarios.anxiety)
+    setScenario(
+      scenarios[selectedType as keyof typeof scenarios] || scenarios.anxiety,
+    )
     setIsGenerating(false)
   }
 
@@ -87,10 +93,16 @@ export default function ScenarioGenerationDemo() {
       <div className="space-y-6">
         {/* Scenario Type Selection */}
         <div>
-          <label htmlFor="scenario-type" className="block text-sm font-medium text-slate-200 mb-3">
+          <label
+            htmlFor="scenario-type"
+            className="block text-sm font-medium text-slate-200 mb-3"
+          >
             Select Scenario Type
           </label>
-          <div id="scenario-type" className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div
+            id="scenario-type"
+            className="grid grid-cols-2 md:grid-cols-4 gap-3"
+          >
             {scenarioTypes.map((type) => (
               <button
                 key={type.id}
@@ -115,7 +127,9 @@ export default function ScenarioGenerationDemo() {
             disabled={isGenerating}
             className="px-8 py-3 bg-orange-600 hover:bg-orange-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
           >
-            {isGenerating ? 'Generating Scenario...' : 'Generate Clinical Scenario'}
+            {isGenerating
+              ? 'Generating Scenario...'
+              : 'Generate Clinical Scenario'}
           </button>
         </div>
 
@@ -124,33 +138,52 @@ export default function ScenarioGenerationDemo() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Client Profile */}
             <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
-              <h3 className="text-lg font-semibold text-white mb-4">Client Profile</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">
+                Client Profile
+              </h3>
               <div className="space-y-3">
                 <div>
-                  <div className="text-orange-400 font-medium">Name & Demographics</div>
-                  <div className="text-white">{scenario.client.name}, {scenario.client.age}</div>
-                  <div className="text-slate-300 text-sm">{scenario.client.occupation}</div>
+                  <div className="text-orange-400 font-medium">
+                    Name & Demographics
+                  </div>
+                  <div className="text-white">
+                    {scenario.client.name}, {scenario.client.age}
+                  </div>
+                  <div className="text-slate-300 text-sm">
+                    {scenario.client.occupation}
+                  </div>
                 </div>
                 <div>
-                  <div className="text-orange-400 font-medium">Presenting Concern</div>
+                  <div className="text-orange-400 font-medium">
+                    Presenting Concern
+                  </div>
                   <div className="text-white">{scenario.client.presenting}</div>
                 </div>
                 <div>
                   <div className="text-orange-400 font-medium">Background</div>
-                  <div className="text-slate-300 text-sm">{scenario.background}</div>
+                  <div className="text-slate-300 text-sm">
+                    {scenario.background}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Clinical Information */}
             <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
-              <h3 className="text-lg font-semibold text-white mb-4">Clinical Presentation</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">
+                Clinical Presentation
+              </h3>
               <div className="space-y-3">
                 <div>
-                  <div className="text-green-400 font-medium mb-2">Key Symptoms</div>
+                  <div className="text-green-400 font-medium mb-2">
+                    Key Symptoms
+                  </div>
                   <ul className="space-y-1">
                     {scenario.symptoms.map((symptom: string) => (
-                      <li key={symptom} className="text-slate-300 text-sm flex items-start gap-2">
+                      <li
+                        key={symptom}
+                        className="text-slate-300 text-sm flex items-start gap-2"
+                      >
                         <span className="text-green-400 text-xs mt-1">•</span>
                         {symptom}
                       </li>
@@ -158,19 +191,30 @@ export default function ScenarioGenerationDemo() {
                   </ul>
                 </div>
                 <div>
-                  <div className="text-blue-400 font-medium">Clinical Formulation</div>
-                  <div className="text-slate-300 text-sm">{scenario.formulation}</div>
+                  <div className="text-blue-400 font-medium">
+                    Clinical Formulation
+                  </div>
+                  <div className="text-slate-300 text-sm">
+                    {scenario.formulation}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Treatment Plan */}
             <div className="lg:col-span-2 bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
-              <h3 className="text-lg font-semibold text-white mb-4">Suggested Treatment Approach</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">
+                Suggested Treatment Approach
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {scenario.treatment.map((treatment: string, index: number) => (
-                  <div key={`treatment-${index}-${treatment.slice(0, 20)}`} className="flex items-start gap-3 p-3 bg-slate-700/30 rounded-lg">
-                    <span className="text-cyan-400 font-bold text-sm">{index + 1}</span>
+                  <div
+                    key={`treatment-${index}-${treatment.slice(0, 20)}`}
+                    className="flex items-start gap-3 p-3 bg-slate-700/30 rounded-lg"
+                  >
+                    <span className="text-cyan-400 font-bold text-sm">
+                      {index + 1}
+                    </span>
                     <span className="text-slate-300 text-sm">{treatment}</span>
                   </div>
                 ))}

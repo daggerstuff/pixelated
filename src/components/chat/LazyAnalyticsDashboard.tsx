@@ -1,15 +1,15 @@
-import { Suspense, lazy } from 'react';
-import type { SecurityLevel } from '../../hooks/useSecurity';
-import type { Message } from '../../types/chat';
+import { Suspense, lazy } from 'react'
+import type { SecurityLevel } from '../../hooks/useSecurity'
+import type { Message } from '../../types/chat'
 
 // Lazy load the heavy analytics dashboard
-const AnalyticsDashboardReact = lazy(() => import('./AnalyticsDashboardReact'));
+const AnalyticsDashboardReact = lazy(() => import('./AnalyticsDashboardReact'))
 
 interface LazyAnalyticsDashboardProps {
-  messages: Message[];
-  securityLevel: SecurityLevel;
-  encryptionEnabled: boolean;
-  scenario: string;
+  messages: Message[]
+  securityLevel: SecurityLevel
+  encryptionEnabled: boolean
+  scenario: string
 }
 
 function AnalyticsLoadingFallback() {
@@ -31,7 +31,9 @@ function AnalyticsLoadingFallback() {
           <div className="flex flex-col items-center space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
             <div className="text-center">
-              <p className="text-lg font-medium text-purple-300">Loading Analytics Dashboard</p>
+              <p className="text-lg font-medium text-purple-300">
+                Loading Analytics Dashboard
+              </p>
               <p className="text-sm text-purple-300/70 mt-1">
                 Initializing secure analytics engine...
               </p>
@@ -40,13 +42,15 @@ function AnalyticsLoadingFallback() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default function LazyAnalyticsDashboard(props: LazyAnalyticsDashboardProps) {
+export default function LazyAnalyticsDashboard(
+  props: LazyAnalyticsDashboardProps,
+) {
   return (
     <Suspense fallback={<AnalyticsLoadingFallback />}>
       <AnalyticsDashboardReact {...props} />
     </Suspense>
-  );
+  )
 }

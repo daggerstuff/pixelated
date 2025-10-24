@@ -14,7 +14,7 @@ declare module 'astro:content' {
     projects: ProjectsSchema
     changelog: PostSchema
     streams: StreamsSchema
-  feeds: unknown
+    feeds: unknown
     releases: ProjectsSchema
     prs: PrsSchema
     highlights: ProjectsSchema

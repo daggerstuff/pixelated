@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
-import type { TherapistSession } from "@/types/dashboard";
+import { useEffect, useState } from 'react'
+import type { TherapistSession } from '@/types/dashboard'
 
 export type SkillProgress = {
-  skill: string;
-  score: number;
-  trend: "up" | "down" | "stable";
-};
+  skill: string
+  score: number
+  trend: 'up' | 'down' | 'stable'
+}
 
 type UseSkillProgressResult = {
-  data: SkillProgress[] | null;
-  loading: boolean;
-  error: Error | null;
-};
+  data: SkillProgress[] | null
+  loading: boolean
+  error: Error | null
+}
 
 /**
  * useSkillProgress - returns skill progress for a therapist session.
@@ -20,68 +20,70 @@ type UseSkillProgressResult = {
  * is intentionally lightweight so it can be replaced by a real API
  * call (useQuery/React Query, SWR, or fetch) in the future.
  */
-export function useSkillProgress(session?: TherapistSession): UseSkillProgressResult {
-  const [data, setData] = useState<SkillProgress[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+export function useSkillProgress(
+  session?: TherapistSession,
+): UseSkillProgressResult {
+  const [data, setData] = useState<SkillProgress[] | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    let mounted = true;
+    let mounted = true
 
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
-    (async () => {
+    ;(async () => {
       try {
         if (!session) {
           if (mounted) {
-            setData([]);
+            setData([])
           }
-          return;
+          return
         }
 
         // If session directly contains skill progress, use it.
         if ((session as any).skills && Array.isArray((session as any).skills)) {
           const normalized = (session as any).skills.map((s: any) => ({
-            skill: String(s.skill || s.name || "Unknown"),
+            skill: String(s.skill || s.name || 'Unknown'),
             score: Number(s.score ?? 0),
-            trend: s.trend === "up" || s.trend === "down" ? s.trend : "stable",
-          })) as SkillProgress[];
+            trend: s.trend === 'up' || s.trend === 'down' ? s.trend : 'stable',
+          })) as SkillProgress[]
 
           if (mounted) {
-            setData(normalized);
+            setData(normalized)
           }
         } else {
           // Placeholder: simulate fetching derived metrics from a local calculation or service
           // In production, replace with an API call or a call to a context/service.
-          await new Promise((r) => setTimeout(r, 250));
+          await new Promise((r) => setTimeout(r, 250))
           const derived: SkillProgress[] = [
-            { skill: "Active Listening", score: 0, trend: "stable" },
-            { skill: "Empathy", score: 0, trend: "stable" },
-            { skill: "Questioning", score: 0, trend: "stable" },
-          ];
+            { skill: 'Active Listening', score: 0, trend: 'stable' },
+            { skill: 'Empathy', score: 0, trend: 'stable' },
+            { skill: 'Questioning', score: 0, trend: 'stable' },
+          ]
 
           if (mounted) {
-            setData(derived);
+            setData(derived)
           }
         }
       } catch (err: any) {
         if (mounted) {
-          setError(err instanceof Error ? err : new Error(String(err)));
+          setError(err instanceof Error ? err : new Error(String(err)))
         }
       } finally {
         if (mounted) {
-          setLoading(false);
+          setLoading(false)
         }
       }
-    })();
+    })()
 
     return () => {
-      mounted = false;
-    };
-  }, [session]);
+      mounted = false
+    }
+  }, [session])
 
-  return { data, loading, error };
+  return { data, loading, error }
 }
 
-export default useSkillProgress;
+export default useSkillProgress

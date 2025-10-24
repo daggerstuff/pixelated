@@ -13,7 +13,12 @@ const messages = [
   { role: 'assistant', content: 'Bot response', name: 'Assistant' },
   { role: 'system', content: 'System note', name: 'System' },
   // Simulate legacy "type" or junk prop
-  { role: 'assistant', content: 'Should not see type', name: 'System', type: 'legacyType' },
+  {
+    role: 'assistant',
+    content: 'Should not see type',
+    name: 'System',
+    type: 'legacyType',
+  },
 ]
 
 describe('Contract propagation in ChatContainer and ChatMessage', () => {
@@ -36,7 +41,11 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
 
   it('maps therapy/patient/therapist roles to bot/user/system correctly', () => {
     const therapyMessages = [
-      { role: 'therapist', content: 'Therapist acting as user', name: 'Therapist' },
+      {
+        role: 'therapist',
+        content: 'Therapist acting as user',
+        name: 'Therapist',
+      },
       { role: 'patient', content: 'Patient acting as bot', name: 'Patient' },
       { role: 'system', content: 'System message', name: 'System' },
     ]
@@ -47,8 +56,8 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
         msg.role === 'therapist'
           ? 'user'
           : msg.role === 'patient'
-          ? 'assistant'
-          : msg.role,
+            ? 'assistant'
+            : msg.role,
     }))
     render(
       <ThemeProvider>

@@ -209,7 +209,6 @@ async function checkRateLimit(ip: string): Promise<boolean> {
   }
 }
 
-
 /**
  * Utility for monitoring and logging out suspicious activity
  */
@@ -275,20 +274,23 @@ export async function requirePageAuth({
  */
 export function protectRoute<
   _Props extends Record<string, unknown> = Record<string, unknown>,
-  Params extends Record<string, string | undefined> = Record<string, string | undefined>
+  Params extends Record<string, string | undefined> = Record<
+    string,
+    string | undefined
+  >,
 >(
   options: {
     requiredRole?: AuthRole
     validateIPMatch?: boolean
     validateUserAgent?: boolean
-  } = {}
+  } = {},
 ) {
   return (
     handler: (context: {
       params: Params
       request: Request
       locals: { user: AuthUser }
-    }) => Response | Promise<Response>
+    }) => Response | Promise<Response>,
   ) => {
     return async (context: {
       params: Params
@@ -297,8 +299,11 @@ export function protectRoute<
     }): Promise<Response> => {
       try {
         // Get client IP
-        const requestIp = 
-          context.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        const requestIp =
+          context.request.headers
+            .get('x-forwarded-for')
+            ?.split(',')[0]
+            ?.trim() ||
           context.request.headers.get('x-real-ip') ||
           'unknown'
 
@@ -314,44 +319,43 @@ export function protectRoute<
 
         if (!authResult.authenticated) {
           return new Response(
-            JSON.stringify({ 
+            JSON.stringify({
               error: 'Authentication required',
-              reason: authResult.reason 
+              reason: authResult.reason,
             }),
             {
               status: 401,
-              headers: { 'Content-Type': 'application/json' }
-            }
+              headers: { 'Content-Type': 'application/json' },
+            },
           )
         }
 
         if (!authResult.user) {
-          return new Response(
-            JSON.stringify({ error: 'User not found' }),
-            {
-              status: 401,
-              headers: { 'Content-Type': 'application/json' }
-            }
-          )
+          return new Response(JSON.stringify({ error: 'User not found' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          })
         }
 
         // Add user to locals
         context.locals.user = authResult.user
 
         // Call the handler with the authenticated context
-        return handler(context as {
-          params: Params
-          request: Request
-          locals: { user: AuthUser }
-        })
+        return handler(
+          context as {
+            params: Params
+            request: Request
+            locals: { user: AuthUser }
+          },
+        )
       } catch (error: unknown) {
         logger.error('Error in protected route', { error })
         return new Response(
           JSON.stringify({ error: 'Internal server error' }),
           {
             status: 500,
-            headers: { 'Content-Type': 'application/json' }
-          }
+            headers: { 'Content-Type': 'application/json' },
+          },
         )
       }
     }

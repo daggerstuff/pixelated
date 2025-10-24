@@ -1,10 +1,13 @@
 ---
 // Simple enterprise logo wall with accessible placeholders
 export interface Props {
-  title?: string;
-  subtitle?: string;
+  title?: string
+  subtitle?: string
 }
-const { title = 'Trusted by forward‑thinking institutions', subtitle = 'Select partners and collaborators' } = Astro.props;
+const {
+  title = 'Trusted by forward‑thinking institutions',
+  subtitle = 'Select partners and collaborators',
+} = Astro.props
 ---
 
 <section aria-label="Trusted institutions" class="logo-wall-section">
@@ -13,41 +16,85 @@ const { title = 'Trusted by forward‑thinking institutions', subtitle = 'Select
       <p class="brutalist-caption">{subtitle}</p>
       <h3 class="brutalist-subheading text-xl md:text-2xl">{title}</h3>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 items-center justify-items-center">
-      <div class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Harvard University">
-        <img src="/images/logos/harvard-university.png" alt="Harvard University" class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+    <div
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 items-center justify-items-center"
+    >
+      <div
+        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        aria-label="Harvard University"
+      >
+        <img
+          src="/images/logos/harvard-university.png"
+          alt="Harvard University"
+          class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+        />
       </div>
-      <div class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Johns Hopkins">
-        <img src="/images/logos/johns-hopkins.png" alt="Johns Hopkins" class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+      <div
+        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        aria-label="Johns Hopkins"
+      >
+        <img
+          src="/images/logos/johns-hopkins.png"
+          alt="Johns Hopkins"
+          class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+        />
       </div>
-      <div class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Mayo Clinic">
-        <img src="/images/logos/mayo-clinic.png" alt="Mayo Clinic" class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+      <div
+        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        aria-label="Mayo Clinic"
+      >
+        <img
+          src="/images/logos/mayo-clinic.png"
+          alt="Mayo Clinic"
+          class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+        />
       </div>
-      <div class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="VA Health">
-        <img src="/images/logos/va-health.png" alt="VA Health" class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+      <div
+        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        aria-label="VA Health"
+      >
+        <img
+          src="/images/logos/va-health.png"
+          alt="VA Health"
+          class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+        />
       </div>
-      <div class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="Kaiser Permanente">
-        <img src="/images/logos/kaiser-permanente.png" alt="Kaiser Permanente" class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+      <div
+        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        aria-label="Kaiser Permanente"
+      >
+        <img
+          src="/images/logos/kaiser-permanente.png"
+          alt="Kaiser Permanente"
+          class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+        />
       </div>
-      <div class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300" aria-label="NIMH">
-        <img src="/images/logos/nih.png" alt="NIMH" class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+      <div
+        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        aria-label="NIMH"
+      >
+        <img
+          src="/images/logos/nih.png"
+          alt="NIMH"
+          class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+        />
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .logo-wall-section { 
-    padding-top: var(--space-12); 
-    padding-bottom: var(--space-12); 
+  .logo-wall-section {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-12);
   }
-  
+
   /* Ensure proper spacing and alignment for mobile */
   .logo-wall-container {
     max-width: 100%;
     margin: 0 auto;
   }
-  
+
   /* Ensure logos are properly contained and responsive */
   .logo-item {
     width: 100%;
@@ -56,13 +103,13 @@ const { title = 'Trusted by forward‑thinking institutions', subtitle = 'Select
     align-items: center;
     justify-content: center;
   }
-  
+
   .logo-item img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
   }
-  
+
   /* Improve mobile spacing */
   @media (max-width: 768px) {
     .logo-wall-section {
@@ -71,4 +118,3 @@ const { title = 'Trusted by forward‑thinking institutions', subtitle = 'Select
     }
   }
 </style>
-

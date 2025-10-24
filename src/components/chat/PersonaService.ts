@@ -21,33 +21,36 @@ export interface PersonaServiceConfig {
 
 // Default persona context (inject via scenario in demo)
 const DEFAULT_PERSONA_CONTEXT: PersonaContext = {
-  scenario: 'Client: Sarah, 28, presenting with anxiety and relationship concerns.',
+  scenario:
+    'Client: Sarah, 28, presenting with anxiety and relationship concerns.',
   tone: 'anxious, defensive, emotional',
   traits: ['ruminative', 'relationship-focused', 'hesitant'],
 }
 
 // Returns persona context (deterministic by default, eventually switchable to LLM-driven)
-export function getPersonaContext(config?: PersonaServiceConfig): PersonaContext {
+export function getPersonaContext(
+  config?: PersonaServiceConfig,
+): PersonaContext {
   if (config?.mode === 'llm' && config.getPersonaContext) {
     // In production, delegate to LLM-generated persona API or hook here
     return config.getPersonaContext()
   }
   // Always return deep copy to avoid accidental mutation
-  return JSON.parse(JSON.stringify(config?.personaPreset ?? DEFAULT_PERSONA_CONTEXT))
+  return JSON.parse(
+    JSON.stringify(config?.personaPreset ?? DEFAULT_PERSONA_CONTEXT),
+  )
 }
 
 // Generate a ChatMessage (client, therapist, or system) with persona injection
-export function createPersonaMessage(
-  params: {
-    content: string
-    role: 'user' | 'bot' | 'system'
-    baseId?: string | number
-    config?: PersonaServiceConfig
-    metadata?: Record<string, unknown>
-    // Optionally override timestamp if desired
-    timestamp?: Date
-  }
-): ChatMessage {
+export function createPersonaMessage(params: {
+  content: string
+  role: 'user' | 'bot' | 'system'
+  baseId?: string | number
+  config?: PersonaServiceConfig
+  metadata?: Record<string, unknown>
+  // Optionally override timestamp if desired
+  timestamp?: Date
+}): ChatMessage {
   const persona = getPersonaContext(params.config)
   return {
     id: params.baseId ? params.baseId.toString() : Date.now().toString(),
@@ -78,5 +81,3 @@ export function personaScenarioString(persona: PersonaContext): string {
  * Roadmap: For LLM-driven personality, pass all persona data as part of system prompt / call external LLM tool here.
  *    Optionally, record user-selected persona or inject via scenario picker UI.
  */
-
-  

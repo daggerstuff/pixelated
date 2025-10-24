@@ -227,8 +227,12 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         const encryptedData =
           typeof encryptedMessage === 'string' &&
           encryptedMessage.startsWith('{')
-            ? (isEncryptedData(JSON.parse(encryptedMessage) as unknown) ? JSON.parse(encryptedMessage) as unknown : { id: '', data: null, dataType: 'object' })
-            : (isEncryptedData(encryptedMessage) ? encryptedMessage : { id: '', data: null, dataType: 'object' })
+            ? isEncryptedData(JSON.parse(encryptedMessage) as unknown)
+              ? (JSON.parse(encryptedMessage) as unknown)
+              : { id: '', data: null, dataType: 'object' }
+            : isEncryptedData(encryptedMessage)
+              ? encryptedMessage
+              : { id: '', data: null, dataType: 'object' }
 
         // Perform decryption
         const decrypted = await fheService.decrypt(encryptedData)
@@ -297,8 +301,12 @@ export const useFHEStore = create<FHEState>()((set, get) => {
           const encryptedData =
             typeof encryptedMessage === 'string' &&
             encryptedMessage.startsWith('{')
-              ? (isEncryptedData(JSON.parse(encryptedMessage) as unknown) ? JSON.parse(encryptedMessage) as unknown : { id: '', data: null, dataType: 'object' })
-              : (isEncryptedData(encryptedMessage) ? encryptedMessage : { id: '', data: null, dataType: 'object' })
+              ? isEncryptedData(JSON.parse(encryptedMessage) as unknown)
+                ? (JSON.parse(encryptedMessage) as unknown)
+                : { id: '', data: null, dataType: 'object' }
+              : isEncryptedData(encryptedMessage)
+                ? encryptedMessage
+                : { id: '', data: null, dataType: 'object' }
 
           let processedData: unknown
           switch (operation) {

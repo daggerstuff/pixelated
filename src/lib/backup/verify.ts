@@ -91,7 +91,10 @@ export class BackupVerificationService extends EventEmitter {
 
       return results
     } catch (error: unknown) {
-      throw new Error(`Failed to verify backups: ${error?.['message'] || 'Unknown error'}`)
+      throw new Error(
+        `Failed to verify backups: ${error?.['message'] || 'Unknown error'}`,
+        { cause: error },
+      )
     }
   }
 
@@ -257,7 +260,9 @@ export class BackupVerificationService extends EventEmitter {
       // Verify restoration capability
       await this.verifyRestoration(backup)
     } catch (error: unknown) {
-      throw new Error(`Backup content verification failed: ${String(error)}`)
+      throw new Error(`Backup content verification failed: ${String(error)}`, {
+        cause: error,
+      })
     }
   }
 
@@ -289,9 +294,15 @@ export class BackupVerificationService extends EventEmitter {
     // Extract a small sample of each data type
     const typedData = data as Record<string, unknown>
     return {
-      users: Array.isArray(typedData?.['users']) ? (typedData['users'] as unknown[]).slice(0, 5) : [],
-      sessions: Array.isArray(typedData?.['sessions']) ? (typedData['sessions'] as unknown[]).slice(0, 5) : [],
-      analytics: Array.isArray(typedData?.['analytics']) ? (typedData['analytics'] as unknown[]).slice(0, 5) : [],
+      users: Array.isArray(typedData?.['users'])
+        ? (typedData['users'] as unknown[]).slice(0, 5)
+        : [],
+      sessions: Array.isArray(typedData?.['sessions'])
+        ? (typedData['sessions'] as unknown[]).slice(0, 5)
+        : [],
+      analytics: Array.isArray(typedData?.['analytics'])
+        ? (typedData['analytics'] as unknown[]).slice(0, 5)
+        : [],
     }
   }
 
@@ -301,10 +312,15 @@ export class BackupVerificationService extends EventEmitter {
   ): Promise<void> {
     // Implement test data restoration logic
     const typedData = data as Record<string, unknown>
-    const users = Array.isArray(typedData?.['users']) ? (typedData['users'] as unknown[]) : []
+    const users = Array.isArray(typedData?.['users'])
+      ? (typedData['users'] as unknown[])
+      : []
     for (const user of users) {
       if (user && typeof user === 'object' && 'id' in user) {
-        await redis.set(`user:${(user as { id: string }).id}`, JSON.stringify(user))
+        await redis.set(
+          `user:${(user as { id: string }).id}`,
+          JSON.stringify(user),
+        )
       }
     }
     // ... similar for other data types
@@ -316,12 +332,14 @@ export class BackupVerificationService extends EventEmitter {
   ): Promise<void> {
     // Verify restored data matches original
     const typedData = data as Record<string, unknown>
-    const users = Array.isArray(typedData?.['users']) ? (typedData['users'] as unknown[]) : []
+    const users = Array.isArray(typedData?.['users'])
+      ? (typedData['users'] as unknown[])
+      : []
     for (const user of users) {
       if (user && typeof user === 'object' && 'id' in user) {
         const userId = (user as { id: string }).id
         const restored = await redis.get(`user:${userId}`)
-        if (!restored || JSON.parse(restored) as unknown.id !== userId) {
+        if (!restored || (JSON.parse(restored) as unknown.id) !== userId) {
           throw new Error(`Restoration verification failed for user: ${userId}`)
         }
       }

@@ -29,7 +29,11 @@ declare module 'k6/http' {
   }
 
   export function get(url: string, params?: HttpParams): Response
-  export function post(url: string, body?: string | object, params?: HttpParams): Response
+  export function post(
+    url: string,
+    body?: string | object,
+    params?: HttpParams,
+  ): Response
 
   const http: {
     get: typeof get

@@ -4,177 +4,186 @@
  * Integrates with Pixelated's AI and monitoring systems
  */
 
-import { EventEmitter } from 'events';
-import { MongoClient, Db, Collection } from 'mongodb';
-import { Redis } from 'ioredis';
-import { v4 as uuidv4 } from 'uuid';
-import { logger } from '../../logger';
-
-
+import { EventEmitter } from 'events'
+import { MongoClient, Db, Collection } from 'mongodb'
+import { Redis } from 'ioredis'
+import { v4 as uuidv4 } from 'uuid'
+import { logger } from '../../logger'
 
 // Types
 export interface ThreatHunt {
-  id: string;
-  name: string;
-  description: string;
-  hunt_type: 'network' | 'endpoint' | 'user_behavior' | 'malware' | 'lateral_movement';
-  status: 'active' | 'paused' | 'completed' | 'failed';
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  scope: HuntScope;
-  query: HuntQuery;
-  schedule?: HuntSchedule;
-  results: HuntResult[];
-  false_positives: FalsePositive[];
-  created_by: string;
-  created_at: Date;
-  updated_at: Date;
-  last_run?: Date;
-  next_run?: Date;
+  id: string
+  name: string
+  description: string
+  hunt_type:
+    | 'network'
+    | 'endpoint'
+    | 'user_behavior'
+    | 'malware'
+    | 'lateral_movement'
+  status: 'active' | 'paused' | 'completed' | 'failed'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  scope: HuntScope
+  query: HuntQuery
+  schedule?: HuntSchedule
+  results: HuntResult[]
+  false_positives: FalsePositive[]
+  created_by: string
+  created_at: Date
+  updated_at: Date
+  last_run?: Date
+  next_run?: Date
 }
 
 export interface HuntScope {
-  regions: string[];
-  systems: string[];
+  regions: string[]
+  systems: string[]
   time_range: {
-    start: Date;
-    end: Date;
-  };
-  data_sources: string[];
+    start: Date
+    end: Date
+  }
+  data_sources: string[]
 }
 
 export interface HuntQuery {
-  type: 'sql' | 'kql' | 'yara' | 'sigma' | 'custom';
-  query: string;
-  parameters?: Record<string, any>;
-  expected_output?: string[];
+  type: 'sql' | 'kql' | 'yara' | 'sigma' | 'custom'
+  query: string
+  parameters?: Record<string, any>
+  expected_output?: string[]
 }
 
 export interface HuntSchedule {
-  enabled: boolean;
-  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';
-  cron_expression?: string;
-  max_concurrent: number;
-  timeout: number;
+  enabled: boolean
+  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly'
+  cron_expression?: string
+  max_concurrent: number
+  timeout: number
 }
 
 export interface HuntResult {
-  id: string;
-  hunt_id: string;
-  timestamp: Date;
-  findings: HuntFinding[];
-  statistics: HuntStatistics;
-  execution_log: ExecutionLogEntry[];
-  status: 'success' | 'partial_success' | 'failed' | 'timeout';
-  execution_time: number;
+  id: string
+  hunt_id: string
+  timestamp: Date
+  findings: HuntFinding[]
+  statistics: HuntStatistics
+  execution_log: ExecutionLogEntry[]
+  status: 'success' | 'partial_success' | 'failed' | 'timeout'
+  execution_time: number
 }
 
 export interface HuntFinding {
-  id: string;
-  type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  confidence: number;
-  description: string;
-  evidence: Evidence[];
-  indicators: ThreatIndicator[];
-  affected_systems: string[];
-  remediation_suggested: string[];
-  requires_investigation: boolean;
+  id: string
+  type: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  description: string
+  evidence: Evidence[]
+  indicators: ThreatIndicator[]
+  affected_systems: string[]
+  remediation_suggested: string[]
+  requires_investigation: boolean
 }
 
 export interface Evidence {
-  type: 'log_entry' | 'network_connection' | 'file_hash' | 'registry_key' | 'process' | 'user_activity';
-  data: Record<string, any>;
-  source: string;
-  timestamp: Date;
-  confidence: number;
+  type:
+    | 'log_entry'
+    | 'network_connection'
+    | 'file_hash'
+    | 'registry_key'
+    | 'process'
+    | 'user_activity'
+  data: Record<string, any>
+  source: string
+  timestamp: Date
+  confidence: number
 }
 
 export interface ThreatIndicator {
-  type: 'ip' | 'domain' | 'hash' | 'url' | 'email' | 'file' | 'behavior';
-  value: string;
-  confidence: number;
-  source: string;
+  type: 'ip' | 'domain' | 'hash' | 'url' | 'email' | 'file' | 'behavior'
+  value: string
+  confidence: number
+  source: string
 }
 
 export interface HuntStatistics {
-  total_findings: number;
-  by_severity: Record<string, number>;
-  by_type: Record<string, number>;
-  systems_scanned: number;
-  data_volume_processed: number;
-  execution_time: number;
+  total_findings: number
+  by_severity: Record<string, number>
+  by_type: Record<string, number>
+  systems_scanned: number
+  data_volume_processed: number
+  execution_time: number
 }
 
 export interface FalsePositive {
-  id: string;
-  finding_id: string;
-  reason: string;
-  validated_by: string;
-  validated_at: Date;
-  confidence: number;
+  id: string
+  finding_id: string
+  reason: string
+  validated_by: string
+  validated_at: Date
+  confidence: number
 }
 
 export interface ExecutionLogEntry {
-  timestamp: Date;
-  level: 'info' | 'warn' | 'error' | 'debug';
-  message: string;
-  details?: Record<string, any>;
+  timestamp: Date
+  level: 'info' | 'warn' | 'error' | 'debug'
+  message: string
+  details?: Record<string, any>
 }
 
 export interface ThreatHuntingSystemConfig {
   mongodb: {
-    url: string;
-    database: string;
-  };
+    url: string
+    database: string
+  }
   redis: {
-    url: string;
-    password?: string;
-  };
-  hunt_templates: HuntTemplate[];
+    url: string
+    password?: string
+  }
+  hunt_templates: HuntTemplate[]
   ai_assistance: {
-    enabled: boolean;
-    model: string;
-    confidence_threshold: number;
-  };
+    enabled: boolean
+    model: string
+    confidence_threshold: number
+  }
   execution_limits: {
-    max_concurrent_hunts: number;
-    max_findings_per_hunt: number;
-    default_timeout: number;
-  };
+    max_concurrent_hunts: number
+    max_findings_per_hunt: number
+    default_timeout: number
+  }
   integration_apis: {
-    siem_api: string;
-    edr_api: string;
-    network_monitoring_api: string;
-    log_aggregation_api: string;
-  };
+    siem_api: string
+    edr_api: string
+    network_monitoring_api: string
+    log_aggregation_api: string
+  }
 }
 
 export interface HuntTemplate {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  query: HuntQuery;
-  scope: HuntScope;
-  schedule?: HuntSchedule;
-  enabled: boolean;
+  id: string
+  name: string
+  description: string
+  category: string
+  query: HuntQuery
+  scope: HuntScope
+  schedule?: HuntSchedule
+  enabled: boolean
 }
 
 export class ThreatHuntingSystem extends EventEmitter {
-  private mongoClient: MongoClient;
-  private db: Db;
-  private huntsCollection: Collection<ThreatHunt>;
-  private resultsCollection: Collection<HuntResult>;
-  private falsePositivesCollection: Collection<FalsePositive>;
-  private redis: Redis;
-  private isInitialized = false;
-  private huntQueue: string[] = [];
-  private isProcessing = false;
-  private activeHunts = new Map<string, ThreatHunt>();
+  private mongoClient: MongoClient
+  private db: Db
+  private huntsCollection: Collection<ThreatHunt>
+  private resultsCollection: Collection<HuntResult>
+  private falsePositivesCollection: Collection<FalsePositive>
+  private redis: Redis
+  private isInitialized = false
+  private huntQueue: string[] = []
+  private isProcessing = false
+  private activeHunts = new Map<string, ThreatHunt>()
 
   constructor(private config: ThreatHuntingSystemConfig) {
-    super();
-    this.setMaxListeners(0);
+    super()
+    this.setMaxListeners(0)
   }
 
   /**
@@ -182,44 +191,50 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   async initialize(): Promise<void> {
     try {
-      logger.info('Initializing Threat Hunting System');
+      logger.info('Initializing Threat Hunting System')
 
       // Initialize MongoDB connection
-      this.mongoClient = new MongoClient(this.config.mongodb.url);
-      await this.mongoClient.connect();
-      this.db = this.mongoClient.db(this.config.mongodb.database);
+      this.mongoClient = new MongoClient(this.config.mongodb.url)
+      await this.mongoClient.connect()
+      this.db = this.mongoClient.db(this.config.mongodb.database)
 
       // Initialize collections
-      this.huntsCollection = this.db.collection<ThreatHunt>('threat_hunts');
-      this.resultsCollection = this.db.collection<HuntResult>('hunt_results');
-      this.falsePositivesCollection = this.db.collection<FalsePositive>('false_positives');
+      this.huntsCollection = this.db.collection<ThreatHunt>('threat_hunts')
+      this.resultsCollection = this.db.collection<HuntResult>('hunt_results')
+      this.falsePositivesCollection =
+        this.db.collection<FalsePositive>('false_positives')
 
       // Create indexes for performance
-      await this.createIndexes();
+      await this.createIndexes()
 
       // Initialize Redis connection
       this.redis = new Redis(this.config.redis.url, {
         password: this.config.redis.password,
         enableReadyCheck: true,
         maxRetriesPerRequest: 3,
-      });
+      })
 
       // Set up Redis pub/sub for real-time coordination
-      await this.setupRedisPubSub();
+      await this.setupRedisPubSub()
 
       // Initialize hunt templates
-      await this.initializeHuntTemplates();
+      await this.initializeHuntTemplates()
 
       // Start background processing
-      this.startHuntProcessing();
+      this.startHuntProcessing()
 
-      this.isInitialized = true;
-      logger.info('Threat Hunting System initialized successfully');
+      this.isInitialized = true
+      logger.info('Threat Hunting System initialized successfully')
 
-      this.emit('initialized', { timestamp: new Date() });
+      this.emit('initialized', { timestamp: new Date() })
     } catch (error) {
-      logger.error('Failed to initialize Threat Hunting System', { error: error.message });
-      throw new Error(`Failed to initialize threat hunting system: ${error.message}`);
+      logger.error('Failed to initialize Threat Hunting System', {
+        error: error.message,
+      })
+      throw new Error(
+        `Failed to initialize threat hunting system: ${error.message}`,
+        { cause: error },
+      )
     }
   }
 
@@ -247,12 +262,14 @@ export class ThreatHuntingSystem extends EventEmitter {
         this.falsePositivesCollection.createIndex({ id: 1 }, { unique: true }),
         this.falsePositivesCollection.createIndex({ finding_id: 1 }),
         this.falsePositivesCollection.createIndex({ validated_at: -1 }),
-      ]);
+      ])
 
-      logger.info('Database indexes created successfully');
+      logger.info('Database indexes created successfully')
     } catch (error) {
-      logger.error('Failed to create database indexes', { error: error.message });
-      throw error;
+      logger.error('Failed to create database indexes', {
+        error: error.message,
+      })
+      throw error
     }
   }
 
@@ -261,33 +278,37 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate();
-      await subscriber.connect();
+      const subscriber = this.redis.duplicate()
+      await subscriber.connect()
 
       // Subscribe to hunt execution requests
       await subscriber.subscribe('hunt:execute', async (message) => {
         try {
-          const huntData = JSON.parse(message);
-          await this.executeHunt(huntData.hunt_id);
+          const huntData = JSON.parse(message)
+          await this.executeHunt(huntData.hunt_id)
         } catch (error) {
-          logger.error('Failed to process hunt execution request', { error: error.message });
+          logger.error('Failed to process hunt execution request', {
+            error: error.message,
+          })
         }
-      });
+      })
 
       // Subscribe to new data availability events
       await subscriber.subscribe('data:available', async (message) => {
         try {
-          const dataInfo = JSON.parse(message);
-          await this.handleNewDataAvailable(dataInfo);
+          const dataInfo = JSON.parse(message)
+          await this.handleNewDataAvailable(dataInfo)
         } catch (error) {
-          logger.error('Failed to process data availability event', { error: error.message });
+          logger.error('Failed to process data availability event', {
+            error: error.message,
+          })
         }
-      });
+      })
 
-      logger.info('Redis pub/sub setup completed');
+      logger.info('Redis pub/sub setup completed')
     } catch (error) {
-      logger.error('Failed to setup Redis pub/sub', { error: error.message });
-      throw error;
+      logger.error('Failed to setup Redis pub/sub', { error: error.message })
+      throw error
     }
   }
 
@@ -297,8 +318,8 @@ export class ThreatHuntingSystem extends EventEmitter {
   private async initializeHuntTemplates(): Promise<void> {
     try {
       for (const template of this.config.hunt_templates) {
-        const existing = await this.huntsCollection.findOne({ id: template.id });
-        
+        const existing = await this.huntsCollection.findOne({ id: template.id })
+
         if (!existing) {
           const hunt: ThreatHunt = {
             id: template.id,
@@ -315,15 +336,17 @@ export class ThreatHuntingSystem extends EventEmitter {
             created_by: 'system',
             created_at: new Date(),
             updated_at: new Date(),
-          };
+          }
 
-          await this.huntsCollection.insertOne(hunt);
-          logger.info('Hunt template initialized', { hunt_id: template.id });
+          await this.huntsCollection.insertOne(hunt)
+          logger.info('Hunt template initialized', { hunt_id: template.id })
         }
       }
     } catch (error) {
-      logger.error('Failed to initialize hunt templates', { error: error.message });
-      throw error;
+      logger.error('Failed to initialize hunt templates', {
+        error: error.message,
+      })
+      throw error
     }
   }
 
@@ -332,12 +355,12 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   async createHunt(huntData: Partial<ThreatHunt>): Promise<string> {
     if (!this.isInitialized) {
-      throw new Error('Threat hunting system not initialized');
+      throw new Error('Threat hunting system not initialized')
     }
 
     try {
-      const huntId = uuidv4();
-      const now = new Date();
+      const huntId = uuidv4()
+      const now = new Date()
 
       const hunt: ThreatHunt = {
         id: huntId,
@@ -365,23 +388,23 @@ export class ThreatHuntingSystem extends EventEmitter {
         created_by: huntData.created_by || 'system',
         created_at: now,
         updated_at: now,
-      };
+      }
 
-      await this.huntsCollection.insertOne(hunt);
+      await this.huntsCollection.insertOne(hunt)
 
       // Schedule next run if applicable
       if (hunt.schedule?.enabled) {
-        await this.scheduleNextHuntRun(huntId);
+        await this.scheduleNextHuntRun(huntId)
       }
 
-      logger.info('Threat hunt created', { hunt_id: huntId });
+      logger.info('Threat hunt created', { hunt_id: huntId })
 
-      this.emit('hunt:created', { hunt_id: huntId });
+      this.emit('hunt:created', { hunt_id: huntId })
 
-      return huntId;
+      return huntId
     } catch (error) {
-      logger.error('Failed to create threat hunt', { error: error.message });
-      throw error;
+      logger.error('Failed to create threat hunt', { error: error.message })
+      throw error
     }
   }
 
@@ -390,74 +413,82 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   async executeHunt(huntId: string): Promise<HuntResult> {
     if (!this.isInitialized) {
-      throw new Error('Threat hunting system not initialized');
+      throw new Error('Threat hunting system not initialized')
     }
 
-    const startTime = Date.now();
-    const resultId = uuidv4();
+    const startTime = Date.now()
+    const resultId = uuidv4()
 
     try {
-      const hunt = await this.huntsCollection.findOne({ id: huntId });
-      
+      const hunt = await this.huntsCollection.findOne({ id: huntId })
+
       if (!hunt) {
-        throw new Error(`Hunt not found: ${huntId}`);
+        throw new Error(`Hunt not found: ${huntId}`)
       }
 
       if (hunt.status !== 'active') {
-        throw new Error(`Hunt is not active: ${huntId}`);
+        throw new Error(`Hunt is not active: ${huntId}`)
       }
 
-      logger.info('Executing threat hunt', { 
+      logger.info('Executing threat hunt', {
         hunt_id: huntId,
         hunt_type: hunt.hunt_type,
         name: hunt.name,
-      });
+      })
 
       // Update hunt status and timing
       await this.huntsCollection.updateOne(
         { id: huntId },
-        { 
-          $set: { 
+        {
+          $set: {
             last_run: new Date(),
             updated_at: new Date(),
-          } 
-        }
-      );
+          },
+        },
+      )
 
-      const executionLog: ExecutionLogEntry[] = [];
-      const findings: HuntFinding[] = [];
+      const executionLog: ExecutionLogEntry[] = []
+      const findings: HuntFinding[] = []
 
       // Execute hunt based on type
       switch (hunt.hunt_type) {
         case 'network':
-          findings.push(...await this.executeNetworkHunt(hunt, executionLog));
-          break;
+          findings.push(...(await this.executeNetworkHunt(hunt, executionLog)))
+          break
         case 'endpoint':
-          findings.push(...await this.executeEndpointHunt(hunt, executionLog));
-          break;
+          findings.push(...(await this.executeEndpointHunt(hunt, executionLog)))
+          break
         case 'user_behavior':
-          findings.push(...await this.executeUserBehaviorHunt(hunt, executionLog));
-          break;
+          findings.push(
+            ...(await this.executeUserBehaviorHunt(hunt, executionLog)),
+          )
+          break
         case 'malware':
-          findings.push(...await this.executeMalwareHunt(hunt, executionLog));
-          break;
+          findings.push(...(await this.executeMalwareHunt(hunt, executionLog)))
+          break
         case 'lateral_movement':
-          findings.push(...await this.executeLateralMovementHunt(hunt, executionLog));
-          break;
+          findings.push(
+            ...(await this.executeLateralMovementHunt(hunt, executionLog)),
+          )
+          break
         default:
-          throw new Error(`Unknown hunt type: ${hunt.hunt_type}`);
+          throw new Error(`Unknown hunt type: ${hunt.hunt_type}`)
       }
 
       // Apply AI assistance if enabled
       if (this.config.ai_assistance.enabled) {
-        await this.applyAIAssistance(findings, executionLog);
+        await this.applyAIAssistance(findings, executionLog)
       }
 
       // Filter out false positives
-      const filteredFindings = await this.filterFalsePositives(findings);
+      const filteredFindings = await this.filterFalsePositives(findings)
 
       // Calculate statistics
-      const statistics = this.calculateHuntStatistics(filteredFindings, executionLog, startTime);
+      const statistics = this.calculateHuntStatistics(
+        filteredFindings,
+        executionLog,
+        startTime,
+      )
 
       // Create hunt result
       const result: HuntResult = {
@@ -469,44 +500,43 @@ export class ThreatHuntingSystem extends EventEmitter {
         execution_log: executionLog,
         status: filteredFindings.length > 0 ? 'success' : 'success',
         execution_time: Date.now() - startTime,
-      };
+      }
 
       // Store result
-      await this.resultsCollection.insertOne(result);
+      await this.resultsCollection.insertOne(result)
 
       // Update hunt with result reference
       await this.huntsCollection.updateOne(
         { id: huntId },
-        { 
+        {
           $push: { results: result },
           $set: { updated_at: new Date() },
-        }
-      );
+        },
+      )
 
       // Schedule next run if applicable
       if (hunt.schedule?.enabled) {
-        await this.scheduleNextHuntRun(huntId);
+        await this.scheduleNextHuntRun(huntId)
       }
 
-      logger.info('Threat hunt completed', { 
+      logger.info('Threat hunt completed', {
         hunt_id: huntId,
         findings_count: filteredFindings.length,
         execution_time: result.execution_time,
-      });
+      })
 
-      this.emit('hunt:completed', { 
+      this.emit('hunt:completed', {
         hunt_id: huntId,
         result_id: resultId,
         findings_count: filteredFindings.length,
-      });
+      })
 
-      return result;
-
+      return result
     } catch (error) {
-      logger.error('Failed to execute threat hunt', { 
+      logger.error('Failed to execute threat hunt', {
         error: error.message,
         hunt_id: huntId,
-      });
+      })
 
       // Create failed result
       const failedResult: HuntResult = {
@@ -515,25 +545,30 @@ export class ThreatHuntingSystem extends EventEmitter {
         timestamp: new Date(),
         findings: [],
         statistics: this.calculateHuntStatistics([], [], startTime),
-        execution_log: [{
-          timestamp: new Date(),
-          level: 'error',
-          message: `Hunt execution failed: ${error.message}`,
-        }],
+        execution_log: [
+          {
+            timestamp: new Date(),
+            level: 'error',
+            message: `Hunt execution failed: ${error.message}`,
+          },
+        ],
         status: 'failed',
         execution_time: Date.now() - startTime,
-      };
+      }
 
-      await this.resultsCollection.insertOne(failedResult);
-      throw error;
+      await this.resultsCollection.insertOne(failedResult)
+      throw error
     }
   }
 
   /**
    * Execute network-based threat hunt
    */
-  private async executeNetworkHunt(hunt: ThreatHunt, executionLog: ExecutionLogEntry[]): Promise<HuntFinding[]> {
-    const findings: HuntFinding[] = [];
+  private async executeNetworkHunt(
+    hunt: ThreatHunt,
+    executionLog: ExecutionLogEntry[],
+  ): Promise<HuntFinding[]> {
+    const findings: HuntFinding[] = []
 
     try {
       executionLog.push({
@@ -541,13 +576,16 @@ export class ThreatHuntingSystem extends EventEmitter {
         level: 'info',
         message: 'Starting network threat hunt',
         details: { hunt_id: hunt.id, query_type: hunt.query.type },
-      });
+      })
 
       // Simulate network data collection and analysis
-      const networkData = await this.collectNetworkData(hunt.scope);
+      const networkData = await this.collectNetworkData(hunt.scope)
 
       // Apply hunt query to network data
-      const suspiciousConnections = this.analyzeNetworkConnections(networkData, hunt.query);
+      const suspiciousConnections = this.analyzeNetworkConnections(
+        networkData,
+        hunt.query,
+      )
 
       for (const connection of suspiciousConnections) {
         const finding: HuntFinding = {
@@ -556,13 +594,15 @@ export class ThreatHuntingSystem extends EventEmitter {
           severity: this.determineNetworkFindingSeverity(connection),
           confidence: connection.confidence || 0.7,
           description: `Suspicious network connection detected: ${connection.source_ip} -> ${connection.dest_ip}`,
-          evidence: [{
-            type: 'network_connection',
-            data: connection,
-            source: 'network_monitoring',
-            timestamp: new Date(),
-            confidence: connection.confidence || 0.7,
-          }],
+          evidence: [
+            {
+              type: 'network_connection',
+              data: connection,
+              source: 'network_monitoring',
+              timestamp: new Date(),
+              confidence: connection.confidence || 0.7,
+            },
+          ],
           indicators: [
             {
               type: 'ip',
@@ -578,50 +618,59 @@ export class ThreatHuntingSystem extends EventEmitter {
             },
           ],
           affected_systems: [connection.source_system, connection.dest_system],
-          remediation_suggested: ['Block suspicious IP addresses', 'Investigate source system', 'Review firewall rules'],
+          remediation_suggested: [
+            'Block suspicious IP addresses',
+            'Investigate source system',
+            'Review firewall rules',
+          ],
           requires_investigation: true,
-        };
+        }
 
-        findings.push(finding);
+        findings.push(finding)
       }
 
       executionLog.push({
         timestamp: new Date(),
         level: 'info',
         message: `Network hunt completed with ${findings.length} findings`,
-      });
-
+      })
     } catch (error: any) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
         message: `Network hunt failed: ${error.message}`,
         details: { error: error.message },
-      });
-      throw error;
+      })
+      throw error
     }
 
-    return findings;
+    return findings
   }
 
   /**
    * Execute endpoint-based threat hunt
    */
-  private async executeEndpointHunt(hunt: ThreatHunt, executionLog: ExecutionLogEntry[]): Promise<HuntFinding[]> {
-    const findings: HuntFinding[] = [];
+  private async executeEndpointHunt(
+    hunt: ThreatHunt,
+    executionLog: ExecutionLogEntry[],
+  ): Promise<HuntFinding[]> {
+    const findings: HuntFinding[] = []
 
     try {
       executionLog.push({
         timestamp: new Date(),
         level: 'info',
         message: 'Starting endpoint threat hunt',
-      });
+      })
 
       // Collect endpoint data
-      const endpointData = await this.collectEndpointData(hunt.scope);
+      const endpointData = await this.collectEndpointData(hunt.scope)
 
       // Analyze for suspicious processes
-      const suspiciousProcesses = this.analyzeProcesses(endpointData, hunt.query);
+      const suspiciousProcesses = this.analyzeProcesses(
+        endpointData,
+        hunt.query,
+      )
 
       for (const process of suspiciousProcesses) {
         const finding: HuntFinding = {
@@ -630,13 +679,15 @@ export class ThreatHuntingSystem extends EventEmitter {
           severity: this.determineProcessFindingSeverity(process),
           confidence: process.confidence || 0.8,
           description: `Suspicious process detected: ${process.name} (PID: ${process.pid})`,
-          evidence: [{
-            type: 'process',
-            data: process,
-            source: 'endpoint_detection',
-            timestamp: new Date(),
-            confidence: process.confidence || 0.8,
-          }],
+          evidence: [
+            {
+              type: 'process',
+              data: process,
+              source: 'endpoint_detection',
+              timestamp: new Date(),
+              confidence: process.confidence || 0.8,
+            },
+          ],
           indicators: [
             {
               type: 'hash',
@@ -646,43 +697,49 @@ export class ThreatHuntingSystem extends EventEmitter {
             },
           ],
           affected_systems: [process.system_id],
-          remediation_suggested: ['Isolate affected endpoint', 'Quarantine suspicious files', 'Investigate process origin'],
+          remediation_suggested: [
+            'Isolate affected endpoint',
+            'Quarantine suspicious files',
+            'Investigate process origin',
+          ],
           requires_investigation: true,
-        };
+        }
 
-        findings.push(finding);
+        findings.push(finding)
       }
-
     } catch (error: any) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
         message: `Endpoint hunt failed: ${error.message}`,
-      });
-      throw error;
+      })
+      throw error
     }
 
-    return findings;
+    return findings
   }
 
   /**
    * Execute user behavior threat hunt
    */
-  private async executeUserBehaviorHunt(hunt: ThreatHunt, executionLog: ExecutionLogEntry[]): Promise<HuntFinding[]> {
-    const findings: HuntFinding[] = [];
+  private async executeUserBehaviorHunt(
+    hunt: ThreatHunt,
+    executionLog: ExecutionLogEntry[],
+  ): Promise<HuntFinding[]> {
+    const findings: HuntFinding[] = []
 
     try {
       executionLog.push({
         timestamp: new Date(),
         level: 'info',
         message: 'Starting user behavior threat hunt',
-      });
+      })
 
       // Collect user activity data
-      const userData = await this.collectUserActivityData(hunt.scope);
+      const userData = await this.collectUserActivityData(hunt.scope)
 
       // Analyze for anomalous behavior
-      const anomalousBehaviors = this.analyzeUserBehavior(userData, hunt.query);
+      const anomalousBehaviors = this.analyzeUserBehavior(userData, hunt.query)
 
       for (const behavior of anomalousBehaviors) {
         const finding: HuntFinding = {
@@ -691,13 +748,15 @@ export class ThreatHuntingSystem extends EventEmitter {
           severity: this.determineBehaviorFindingSeverity(behavior),
           confidence: behavior.confidence || 0.6,
           description: `Anomalous user behavior detected for user: ${behavior.user_id}`,
-          evidence: [{
-            type: 'user_activity',
-            data: behavior,
-            source: 'user_behavior_analytics',
-            timestamp: new Date(),
-            confidence: behavior.confidence || 0.6,
-          }],
+          evidence: [
+            {
+              type: 'user_activity',
+              data: behavior,
+              source: 'user_behavior_analytics',
+              timestamp: new Date(),
+              confidence: behavior.confidence || 0.6,
+            },
+          ],
           indicators: [
             {
               type: 'behavior',
@@ -707,43 +766,52 @@ export class ThreatHuntingSystem extends EventEmitter {
             },
           ],
           affected_systems: behavior.affected_systems || [],
-          remediation_suggested: ['Review user access permissions', 'Investigate unusual activity', 'Consider account lockout'],
+          remediation_suggested: [
+            'Review user access permissions',
+            'Investigate unusual activity',
+            'Consider account lockout',
+          ],
           requires_investigation: true,
-        };
+        }
 
-        findings.push(finding);
+        findings.push(finding)
       }
-
     } catch (error: any) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
         message: `User behavior hunt failed: ${error.message}`,
-      });
-      throw error;
+      })
+      throw error
     }
 
-    return findings;
+    return findings
   }
 
   /**
    * Execute malware threat hunt
    */
-  private async executeMalwareHunt(hunt: ThreatHunt, executionLog: ExecutionLogEntry[]): Promise<HuntFinding[]> {
-    const findings: HuntFinding[] = [];
+  private async executeMalwareHunt(
+    hunt: ThreatHunt,
+    executionLog: ExecutionLogEntry[],
+  ): Promise<HuntFinding[]> {
+    const findings: HuntFinding[] = []
 
     try {
       executionLog.push({
         timestamp: new Date(),
         level: 'info',
         message: 'Starting malware threat hunt',
-      });
+      })
 
       // Collect file and process data
-      const fileData = await this.collectFileData(hunt.scope);
+      const fileData = await this.collectFileData(hunt.scope)
 
       // Analyze for malware indicators
-      const malwareIndicators = this.analyzeMalwareIndicators(fileData, hunt.query);
+      const malwareIndicators = this.analyzeMalwareIndicators(
+        fileData,
+        hunt.query,
+      )
 
       for (const indicator of malwareIndicators) {
         const finding: HuntFinding = {
@@ -752,13 +820,15 @@ export class ThreatHuntingSystem extends EventEmitter {
           severity: this.determineMalwareFindingSeverity(indicator),
           confidence: indicator.confidence || 0.9,
           description: `Malware indicator detected: ${indicator.description}`,
-          evidence: [{
-            type: 'file',
-            data: indicator,
-            source: 'malware_detection',
-            timestamp: new Date(),
-            confidence: indicator.confidence || 0.9,
-          }],
+          evidence: [
+            {
+              type: 'file',
+              data: indicator,
+              source: 'malware_detection',
+              timestamp: new Date(),
+              confidence: indicator.confidence || 0.9,
+            },
+          ],
           indicators: [
             {
               type: 'hash',
@@ -768,43 +838,49 @@ export class ThreatHuntingSystem extends EventEmitter {
             },
           ],
           affected_systems: indicator.affected_systems || [],
-          remediation_suggested: ['Quarantine affected files', 'Run antivirus scan', 'Investigate file origin'],
+          remediation_suggested: [
+            'Quarantine affected files',
+            'Run antivirus scan',
+            'Investigate file origin',
+          ],
           requires_investigation: true,
-        };
+        }
 
-        findings.push(finding);
+        findings.push(finding)
       }
-
     } catch (error: any) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
         message: `Malware hunt failed: ${error.message}`,
-      });
-      throw error;
+      })
+      throw error
     }
 
-    return findings;
+    return findings
   }
 
   /**
    * Execute lateral movement threat hunt
    */
-  private async executeLateralMovementHunt(hunt: ThreatHunt, executionLog: ExecutionLogEntry[]): Promise<HuntFinding[]> {
-    const findings: HuntFinding[] = [];
+  private async executeLateralMovementHunt(
+    hunt: ThreatHunt,
+    executionLog: ExecutionLogEntry[],
+  ): Promise<HuntFinding[]> {
+    const findings: HuntFinding[] = []
 
     try {
       executionLog.push({
         timestamp: new Date(),
         level: 'info',
         message: 'Starting lateral movement threat hunt',
-      });
+      })
 
       // Collect authentication and access data
-      const authData = await this.collectAuthenticationData(hunt.scope);
+      const authData = await this.collectAuthenticationData(hunt.scope)
 
       // Analyze for lateral movement patterns
-      const lateralMovements = this.analyzeLateralMovement(authData, hunt.query);
+      const lateralMovements = this.analyzeLateralMovement(authData, hunt.query)
 
       for (const movement of lateralMovements) {
         const finding: HuntFinding = {
@@ -813,13 +889,15 @@ export class ThreatHuntingSystem extends EventEmitter {
           severity: this.determineLateralMovementSeverity(movement),
           confidence: movement.confidence || 0.8,
           description: `Potential lateral movement detected: ${movement.user_id} accessing ${movement.target_system}`,
-          evidence: [{
-            type: 'user_activity',
-            data: movement,
-            source: 'authentication_logs',
-            timestamp: new Date(),
-            confidence: movement.confidence || 0.8,
-          }],
+          evidence: [
+            {
+              type: 'user_activity',
+              data: movement,
+              source: 'authentication_logs',
+              timestamp: new Date(),
+              confidence: movement.confidence || 0.8,
+            },
+          ],
           indicators: [
             {
               type: 'behavior',
@@ -829,23 +907,26 @@ export class ThreatHuntingSystem extends EventEmitter {
             },
           ],
           affected_systems: [movement.source_system, movement.target_system],
-          remediation_suggested: ['Review user access patterns', 'Investigate unusual authentication', 'Consider access revocation'],
+          remediation_suggested: [
+            'Review user access patterns',
+            'Investigate unusual authentication',
+            'Consider access revocation',
+          ],
           requires_investigation: true,
-        };
+        }
 
-        findings.push(finding);
+        findings.push(finding)
       }
-
     } catch (error: any) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
         message: `Lateral movement hunt failed: ${error.message}`,
-      });
-      throw error;
+      })
+      throw error
     }
 
-    return findings;
+    return findings
   }
 
   /**
@@ -862,7 +943,7 @@ export class ThreatHuntingSystem extends EventEmitter {
         confidence: 0.8,
         timestamp: new Date(),
       },
-    ];
+    ]
   }
 
   private async collectEndpointData(scope: HuntScope): Promise<any[]> {
@@ -876,7 +957,7 @@ export class ThreatHuntingSystem extends EventEmitter {
         confidence: 0.9,
         timestamp: new Date(),
       },
-    ];
+    ]
   }
 
   private async collectUserActivityData(scope: HuntScope): Promise<any[]> {
@@ -889,7 +970,7 @@ export class ThreatHuntingSystem extends EventEmitter {
         confidence: 0.7,
         timestamp: new Date(),
       },
-    ];
+    ]
   }
 
   private async collectFileData(scope: HuntScope): Promise<any[]> {
@@ -902,7 +983,7 @@ export class ThreatHuntingSystem extends EventEmitter {
         confidence: 0.9,
         timestamp: new Date(),
       },
-    ];
+    ]
   }
 
   private async collectAuthenticationData(scope: HuntScope): Promise<any[]> {
@@ -915,7 +996,7 @@ export class ThreatHuntingSystem extends EventEmitter {
         confidence: 0.8,
         timestamp: new Date(),
       },
-    ];
+    ]
   }
 
   /**
@@ -923,98 +1004,112 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private analyzeNetworkConnections(data: any[], query: HuntQuery): any[] {
     // Simulate network connection analysis
-    return data.filter(connection => connection.confidence > 0.5);
+    return data.filter((connection) => connection.confidence > 0.5)
   }
 
   private analyzeProcesses(data: any[], query: HuntQuery): any[] {
     // Simulate process analysis
-    return data.filter(process => process.confidence > 0.7);
+    return data.filter((process) => process.confidence > 0.7)
   }
 
   private analyzeUserBehavior(data: any[], query: HuntQuery): any[] {
     // Simulate user behavior analysis
-    return data.filter(behavior => behavior.confidence > 0.6);
+    return data.filter((behavior) => behavior.confidence > 0.6)
   }
 
   private analyzeMalwareIndicators(data: any[], query: HuntQuery): any[] {
     // Simulate malware indicator analysis
-    return data.filter(indicator => indicator.confidence > 0.8);
+    return data.filter((indicator) => indicator.confidence > 0.8)
   }
 
   private analyzeLateralMovement(data: any[], query: HuntQuery): any[] {
     // Simulate lateral movement analysis
-    return data.filter(movement => movement.confidence > 0.7);
+    return data.filter((movement) => movement.confidence > 0.7)
   }
 
   /**
    * Severity determination methods
    */
-  private determineNetworkFindingSeverity(connection: any): 'low' | 'medium' | 'high' | 'critical' {
-    if (connection.confidence > 0.9) return 'critical';
-    if (connection.confidence > 0.7) return 'high';
-    if (connection.confidence > 0.5) return 'medium';
-    return 'low';
+  private determineNetworkFindingSeverity(
+    connection: any,
+  ): 'low' | 'medium' | 'high' | 'critical' {
+    if (connection.confidence > 0.9) return 'critical'
+    if (connection.confidence > 0.7) return 'high'
+    if (connection.confidence > 0.5) return 'medium'
+    return 'low'
   }
 
-  private determineProcessFindingSeverity(process: any): 'low' | 'medium' | 'high' | 'critical' {
-    if (process.confidence > 0.9) return 'critical';
-    if (process.confidence > 0.7) return 'high';
-    if (process.confidence > 0.5) return 'medium';
-    return 'low';
+  private determineProcessFindingSeverity(
+    process: any,
+  ): 'low' | 'medium' | 'high' | 'critical' {
+    if (process.confidence > 0.9) return 'critical'
+    if (process.confidence > 0.7) return 'high'
+    if (process.confidence > 0.5) return 'medium'
+    return 'low'
   }
 
-  private determineBehaviorFindingSeverity(behavior: any): 'low' | 'medium' | 'high' | 'critical' {
-    if (behavior.confidence > 0.9) return 'critical';
-    if (behavior.confidence > 0.7) return 'high';
-    if (behavior.confidence > 0.5) return 'medium';
-    return 'low';
+  private determineBehaviorFindingSeverity(
+    behavior: any,
+  ): 'low' | 'medium' | 'high' | 'critical' {
+    if (behavior.confidence > 0.9) return 'critical'
+    if (behavior.confidence > 0.7) return 'high'
+    if (behavior.confidence > 0.5) return 'medium'
+    return 'low'
   }
 
-  private determineMalwareFindingSeverity(indicator: any): 'low' | 'medium' | 'high' | 'critical' {
-    if (indicator.confidence > 0.9) return 'critical';
-    if (indicator.confidence > 0.7) return 'high';
-    if (indicator.confidence > 0.5) return 'medium';
-    return 'low';
+  private determineMalwareFindingSeverity(
+    indicator: any,
+  ): 'low' | 'medium' | 'high' | 'critical' {
+    if (indicator.confidence > 0.9) return 'critical'
+    if (indicator.confidence > 0.7) return 'high'
+    if (indicator.confidence > 0.5) return 'medium'
+    return 'low'
   }
 
-  private determineLateralMovementSeverity(movement: any): 'low' | 'medium' | 'high' | 'critical' {
-    if (movement.confidence > 0.9) return 'critical';
-    if (movement.confidence > 0.7) return 'high';
-    if (movement.confidence > 0.5) return 'medium';
-    return 'low';
+  private determineLateralMovementSeverity(
+    movement: any,
+  ): 'low' | 'medium' | 'high' | 'critical' {
+    if (movement.confidence > 0.9) return 'critical'
+    if (movement.confidence > 0.7) return 'high'
+    if (movement.confidence > 0.5) return 'medium'
+    return 'low'
   }
 
   /**
    * Apply AI assistance to findings
    */
-  private async applyAIAssistance(findings: HuntFinding[], executionLog: ExecutionLogEntry[]): Promise<void> {
+  private async applyAIAssistance(
+    findings: HuntFinding[],
+    executionLog: ExecutionLogEntry[],
+  ): Promise<void> {
     try {
       executionLog.push({
         timestamp: new Date(),
         level: 'info',
         message: 'Applying AI assistance to findings',
-      });
+      })
 
       for (const finding of findings) {
         // Simulate AI analysis
-        const aiAnalysis = await this.simulateAIAnalysis(finding);
-        
-        if (aiAnalysis.confidence > this.config.ai_assistance.confidence_threshold) {
-          finding.confidence = Math.min(finding.confidence + 0.1, 1.0);
-          finding.description += ` | AI Analysis: ${aiAnalysis.insight}`;
-          
+        const aiAnalysis = await this.simulateAIAnalysis(finding)
+
+        if (
+          aiAnalysis.confidence > this.config.ai_assistance.confidence_threshold
+        ) {
+          finding.confidence = Math.min(finding.confidence + 0.1, 1.0)
+          finding.description += ` | AI Analysis: ${aiAnalysis.insight}`
+
           if (aiAnalysis.additional_indicators) {
-            finding.indicators.push(...aiAnalysis.additional_indicators);
+            finding.indicators.push(...aiAnalysis.additional_indicators)
           }
         }
       }
-
     } catch (error: any) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
         message: `AI assistance failed: ${error.message}`,
-      });
+      })
     }
   }
 
@@ -1023,59 +1118,65 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private async simulateAIAnalysis(finding: HuntFinding): Promise<any> {
     // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
     return {
       confidence: 0.8,
       insight: 'AI confirms suspicious activity pattern',
       additional_indicators: [],
-    };
+    }
   }
 
   /**
    * Filter out false positives
    */
-  private async filterFalsePositives(findings: HuntFinding[]): Promise<HuntFinding[]> {
-    const filtered: HuntFinding[] = [];
+  private async filterFalsePositives(
+    findings: HuntFinding[],
+  ): Promise<HuntFinding[]> {
+    const filtered: HuntFinding[] = []
 
     for (const finding of findings) {
-      const isFalsePositive = await this.checkFalsePositive(finding.id);
-      
+      const isFalsePositive = await this.checkFalsePositive(finding.id)
+
       if (!isFalsePositive) {
-        filtered.push(finding);
+        filtered.push(finding)
       }
     }
 
-    return filtered;
+    return filtered
   }
 
   /**
    * Check if finding is a false positive
    */
   private async checkFalsePositive(findingId: string): Promise<boolean> {
-    const falsePositive = await this.falsePositivesCollection.findOne({ 
-      finding_id: findingId 
-    });
-    
-    return !!falsePositive;
+    const falsePositive = await this.falsePositivesCollection.findOne({
+      finding_id: findingId,
+    })
+
+    return !!falsePositive
   }
 
   /**
    * Calculate hunt statistics
    */
-  private calculateHuntStatistics(findings: HuntFinding[], executionLog: ExecutionLogEntry[], startTime: number): HuntStatistics {
+  private calculateHuntStatistics(
+    findings: HuntFinding[],
+    executionLog: ExecutionLogEntry[],
+    startTime: number,
+  ): HuntStatistics {
     const bySeverity: Record<string, number> = {
       low: 0,
       medium: 0,
       high: 0,
       critical: 0,
-    };
+    }
 
-    const byType: Record<string, number> = {};
+    const byType: Record<string, number> = {}
 
     for (const finding of findings) {
-      bySeverity[finding.severity]++;
-      byType[finding.type] = (byType[finding.type] || 0) + 1;
+      bySeverity[finding.severity]++
+      byType[finding.type] = (byType[finding.type] || 0) + 1
     }
 
     return {
@@ -1085,7 +1186,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       systems_scanned: 1, // Simplified for demo
       data_volume_processed: 1000, // Simplified for demo
       execution_time: Date.now() - startTime,
-    };
+    }
   }
 
   /**
@@ -1093,47 +1194,46 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private async scheduleNextHuntRun(huntId: string): Promise<void> {
     try {
-      const hunt = await this.huntsCollection.findOne({ id: huntId });
-      
+      const hunt = await this.huntsCollection.findOne({ id: huntId })
+
       if (!hunt || !hunt.schedule?.enabled) {
-        return;
+        return
       }
 
-      let nextRun: Date;
-      const now = new Date();
+      let nextRun: Date
+      const now = new Date()
 
       switch (hunt.schedule.frequency) {
         case 'hourly':
-          nextRun = new Date(now.getTime() + 60 * 60 * 1000);
-          break;
+          nextRun = new Date(now.getTime() + 60 * 60 * 1000)
+          break
         case 'daily':
-          nextRun = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-          break;
+          nextRun = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+          break
         case 'weekly':
-          nextRun = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-          break;
+          nextRun = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+          break
         case 'monthly':
-          nextRun = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-          break;
+          nextRun = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+          break
         default:
-          return;
+          return
       }
 
       await this.huntsCollection.updateOne(
         { id: huntId },
-        { $set: { next_run: nextRun } }
-      );
+        { $set: { next_run: nextRun } },
+      )
 
-      logger.debug('Next hunt run scheduled', { 
+      logger.debug('Next hunt run scheduled', {
         hunt_id: huntId,
         next_run: nextRun,
-      });
-
+      })
     } catch (error) {
-      logger.error('Failed to schedule next hunt run', { 
+      logger.error('Failed to schedule next hunt run', {
         error: error.message,
         hunt_id: huntId,
-      });
+      })
     }
   }
 
@@ -1143,20 +1243,23 @@ export class ThreatHuntingSystem extends EventEmitter {
   private async handleNewDataAvailable(dataInfo: any): Promise<void> {
     try {
       // Find hunts that might be interested in this data
-      const relevantHunts = await this.huntsCollection.find({
-        status: 'active',
-        'scope.data_sources': dataInfo.data_source,
-      }).toArray();
+      const relevantHunts = await this.huntsCollection
+        .find({
+          'status': 'active',
+          'scope.data_sources': dataInfo.data_source,
+        })
+        .toArray()
 
       for (const hunt of relevantHunts) {
         // Queue hunt for execution if it meets criteria
         if (this.shouldExecuteHuntOnData(hunt, dataInfo)) {
-          await this.queueHuntForExecution(hunt.id);
+          await this.queueHuntForExecution(hunt.id)
         }
       }
-
     } catch (error) {
-      logger.error('Failed to handle new data availability', { error: error.message });
+      logger.error('Failed to handle new data availability', {
+        error: error.message,
+      })
     }
   }
 
@@ -1165,8 +1268,10 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private shouldExecuteHuntOnData(hunt: ThreatHunt, dataInfo: any): boolean {
     // Simple logic - execute if hunt is active and data is relevant
-    return hunt.status === 'active' && 
-           hunt.scope.data_sources.includes(dataInfo.data_source);
+    return (
+      hunt.status === 'active' &&
+      hunt.scope.data_sources.includes(dataInfo.data_source)
+    )
   }
 
   /**
@@ -1174,23 +1279,25 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private async queueHuntForExecution(huntId: string): Promise<void> {
     try {
-      this.huntQueue.push(huntId);
+      this.huntQueue.push(huntId)
 
       // Limit queue size
       if (this.huntQueue.length > 500) {
-        this.huntQueue = this.huntQueue.slice(-250);
+        this.huntQueue = this.huntQueue.slice(-250)
       }
 
       // Publish execution event
-      await this.redis.publish('hunt:execute', JSON.stringify({ hunt_id: huntId }));
+      await this.redis.publish(
+        'hunt:execute',
+        JSON.stringify({ hunt_id: huntId }),
+      )
 
-      logger.debug('Hunt queued for execution', { hunt_id: huntId });
-
+      logger.debug('Hunt queued for execution', { hunt_id: huntId })
     } catch (error) {
-      logger.error('Failed to queue hunt for execution', { 
+      logger.error('Failed to queue hunt for execution', {
         error: error.message,
         hunt_id: huntId,
-      });
+      })
     }
   }
 
@@ -1200,49 +1307,48 @@ export class ThreatHuntingSystem extends EventEmitter {
   private startHuntProcessing(): void {
     setInterval(async () => {
       if (this.huntQueue.length > 0 && !this.isProcessing) {
-        await this.processHuntQueue();
+        await this.processHuntQueue()
       }
-    }, 5000); // Check every 5 seconds
+    }, 5000) // Check every 5 seconds
 
     // Also process scheduled hunts
     setInterval(async () => {
-      await this.processScheduledHunts();
-    }, 60000); // Check every minute
+      await this.processScheduledHunts()
+    }, 60000) // Check every minute
   }
 
   /**
    * Process hunt queue
    */
   private async processHuntQueue(): Promise<void> {
-    this.isProcessing = true;
+    this.isProcessing = true
 
     try {
       const batchSize = Math.min(
         this.huntQueue.length,
-        this.config.execution_limits.max_concurrent_hunts
-      );
+        this.config.execution_limits.max_concurrent_hunts,
+      )
 
-      const huntIds = this.huntQueue.splice(0, batchSize);
-      logger.info('Processing hunt execution batch', { count: huntIds.length });
+      const huntIds = this.huntQueue.splice(0, batchSize)
+      logger.info('Processing hunt execution batch', { count: huntIds.length })
 
       const executionPromises = huntIds.map(async (huntId) => {
         try {
-          return await this.executeHunt(huntId);
+          return await this.executeHunt(huntId)
         } catch (error) {
-          logger.error('Failed to execute hunt', { 
+          logger.error('Failed to execute hunt', {
             error: error.message,
             hunt_id: huntId,
-          });
-          return null;
+          })
+          return null
         }
-      });
+      })
 
-      await Promise.allSettled(executionPromises);
-
+      await Promise.allSettled(executionPromises)
     } catch (error) {
-      logger.error('Failed to process hunt queue', { error: error.message });
+      logger.error('Failed to process hunt queue', { error: error.message })
     } finally {
-      this.isProcessing = false;
+      this.isProcessing = false
     }
   }
 
@@ -1251,18 +1357,21 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private async processScheduledHunts(): Promise<void> {
     try {
-      const now = new Date();
-      const scheduledHunts = await this.huntsCollection.find({
-        status: 'active',
-        next_run: { $lte: now },
-      }).toArray();
+      const now = new Date()
+      const scheduledHunts = await this.huntsCollection
+        .find({
+          status: 'active',
+          next_run: { $lte: now },
+        })
+        .toArray()
 
       for (const hunt of scheduledHunts) {
-        await this.queueHuntForExecution(hunt.id);
+        await this.queueHuntForExecution(hunt.id)
       }
-
     } catch (error) {
-      logger.error('Failed to process scheduled hunts', { error: error.message });
+      logger.error('Failed to process scheduled hunts', {
+        error: error.message,
+      })
     }
   }
 
@@ -1272,7 +1381,7 @@ export class ThreatHuntingSystem extends EventEmitter {
   async markFalsePositive(
     findingId: string,
     reason: string,
-    validatedBy: string
+    validatedBy: string,
   ): Promise<void> {
     try {
       const falsePositive: FalsePositive = {
@@ -1282,21 +1391,20 @@ export class ThreatHuntingSystem extends EventEmitter {
         validated_by: validatedBy,
         validated_at: new Date(),
         confidence: 0.9,
-      };
+      }
 
-      await this.falsePositivesCollection.insertOne(falsePositive);
+      await this.falsePositivesCollection.insertOne(falsePositive)
 
-      logger.info('Finding marked as false positive', { 
+      logger.info('Finding marked as false positive', {
         finding_id: findingId,
         reason,
-      });
-
+      })
     } catch (error) {
-      logger.error('Failed to mark false positive', { 
+      logger.error('Failed to mark false positive', {
         error: error.message,
         finding_id: findingId,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1305,26 +1413,35 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   async getHuntById(huntId: string): Promise<ThreatHunt | null> {
     try {
-      return await this.huntsCollection.findOne({ id: huntId });
+      return await this.huntsCollection.findOne({ id: huntId })
     } catch (error) {
-      logger.error('Failed to get hunt by ID', { error: error.message, hunt_id: huntId });
-      throw error;
+      logger.error('Failed to get hunt by ID', {
+        error: error.message,
+        hunt_id: huntId,
+      })
+      throw error
     }
   }
 
   /**
    * Get hunt results
    */
-  async getHuntResults(huntId: string, limit: number = 100): Promise<HuntResult[]> {
+  async getHuntResults(
+    huntId: string,
+    limit: number = 100,
+  ): Promise<HuntResult[]> {
     try {
       return await this.resultsCollection
         .find({ hunt_id: huntId })
         .sort({ timestamp: -1 })
         .limit(limit)
-        .toArray();
+        .toArray()
     } catch (error) {
-      logger.error('Failed to get hunt results', { error: error.message, hunt_id: huntId });
-      throw error;
+      logger.error('Failed to get hunt results', {
+        error: error.message,
+        hunt_id: huntId,
+      })
+      throw error
     }
   }
 
@@ -1332,41 +1449,37 @@ export class ThreatHuntingSystem extends EventEmitter {
    * Get hunting statistics
    */
   async getHuntingStats(): Promise<{
-    total_hunts: number;
-    active_hunts: number;
-    total_findings: number;
-    by_hunt_type: Record<string, number>;
-    by_severity: Record<string, number>;
-    false_positive_rate: number;
+    total_hunts: number
+    active_hunts: number
+    total_findings: number
+    by_hunt_type: Record<string, number>
+    by_severity: Record<string, number>
+    false_positive_rate: number
   }> {
     try {
-      const [
-        totalHunts,
-        activeHunts,
-        allResults,
-        falsePositives,
-      ] = await Promise.all([
-        this.huntsCollection.countDocuments(),
-        this.huntsCollection.countDocuments({ status: 'active' }),
-        this.resultsCollection.find().toArray(),
-        this.falsePositivesCollection.countDocuments(),
-      ]);
+      const [totalHunts, activeHunts, allResults, falsePositives] =
+        await Promise.all([
+          this.huntsCollection.countDocuments(),
+          this.huntsCollection.countDocuments({ status: 'active' }),
+          this.resultsCollection.find().toArray(),
+          this.falsePositivesCollection.countDocuments(),
+        ])
 
       // Calculate findings by type and severity
-      const byHuntType: Record<string, number> = {};
-      const bySeverity: Record<string, number> = {};
-      let totalFindings = 0;
+      const byHuntType: Record<string, number> = {}
+      const bySeverity: Record<string, number> = {}
+      let totalFindings = 0
 
       for (const result of allResults) {
         for (const finding of result.findings) {
-          totalFindings++;
-          byHuntType[finding.type] = (byHuntType[finding.type] || 0) + 1;
-          bySeverity[finding.severity] = (bySeverity[finding.severity] || 0) + 1;
+          totalFindings++
+          byHuntType[finding.type] = (byHuntType[finding.type] || 0) + 1
+          bySeverity[finding.severity] = (bySeverity[finding.severity] || 0) + 1
         }
       }
 
-      const falsePositiveRate = totalFindings > 0 ? 
-        (falsePositives / totalFindings) * 100 : 0;
+      const falsePositiveRate =
+        totalFindings > 0 ? (falsePositives / totalFindings) * 100 : 0
 
       return {
         total_hunts: totalHunts,
@@ -1375,10 +1488,10 @@ export class ThreatHuntingSystem extends EventEmitter {
         by_hunt_type: byHuntType,
         by_severity: bySeverity,
         false_positive_rate: falsePositiveRate,
-      };
+      }
     } catch (error) {
-      logger.error('Failed to get hunting statistics', { error: error.message });
-      throw error;
+      logger.error('Failed to get hunting statistics', { error: error.message })
+      throw error
     }
   }
 
@@ -1387,34 +1500,41 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   async shutdown(): Promise<void> {
     try {
-      logger.info('Shutting down Threat Hunting System');
+      logger.info('Shutting down Threat Hunting System')
 
       // Wait for active hunts to complete
       if (this.activeHunts.size > 0) {
-        logger.info(`Waiting for ${this.activeHunts.size} active hunts to complete`);
-        
-        const maxWaitTime = 60000; // 60 seconds
-        const startTime = Date.now();
-        
-        while (this.activeHunts.size > 0 && (Date.now() - startTime) < maxWaitTime) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        logger.info(
+          `Waiting for ${this.activeHunts.size} active hunts to complete`,
+        )
+
+        const maxWaitTime = 60000 // 60 seconds
+        const startTime = Date.now()
+
+        while (
+          this.activeHunts.size > 0 &&
+          Date.now() - startTime < maxWaitTime
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
         }
-        
+
         if (this.activeHunts.size > 0) {
-          logger.warn(`Force shutting down with ${this.activeHunts.size} active hunts`);
+          logger.warn(
+            `Force shutting down with ${this.activeHunts.size} active hunts`,
+          )
         }
       }
 
-      await this.redis.quit();
-      await this.mongoClient.close();
+      await this.redis.quit()
+      await this.mongoClient.close()
 
-      this.isInitialized = false;
-      this.emit('shutdown', { timestamp: new Date() });
+      this.isInitialized = false
+      this.emit('shutdown', { timestamp: new Date() })
 
-      logger.info('Threat Hunting System shutdown completed');
+      logger.info('Threat Hunting System shutdown completed')
     } catch (error) {
-      logger.error('Error during shutdown', { error: error.message });
-      throw error;
+      logger.error('Error during shutdown', { error: error.message })
+      throw error
     }
   }
 
@@ -1422,15 +1542,15 @@ export class ThreatHuntingSystem extends EventEmitter {
    * Get initialization status
    */
   get isReady(): boolean {
-    return this.isInitialized;
+    return this.isInitialized
   }
 
   /**
    * Get current configuration
    */
   get config(): ThreatHuntingSystemConfig {
-    return this.config;
+    return this.config
   }
 }
 
-export default ThreatHuntingSystem;
+export default ThreatHuntingSystem

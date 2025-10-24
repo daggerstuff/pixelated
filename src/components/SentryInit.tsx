@@ -22,7 +22,7 @@ if (typeof window !== 'undefined' && !sentryInitialised) {
     integrations: (defaultIntegrations: Array<{ name?: string }> = []) => {
       // Optionally add Sentry.launchDarklyIntegration() if available:
       const base = defaultIntegrations.filter(
-        (integration) => integration && integration.name !== 'Spotlight'
+        (integration) => integration && integration.name !== 'Spotlight',
       )
       // Use dynamic property to avoid breaking if not present
       if (typeof sentryWithLD.launchDarklyIntegration === 'function') {
@@ -44,8 +44,10 @@ if (typeof window !== 'undefined' && !sentryInitialised) {
         typeof sentryWithLD.buildLaunchDarklyFlagUsedHandler === 'function'
           ? sentryWithLD.buildLaunchDarklyFlagUsedHandler()
           : undefined,
-      ].filter((inspector): inspector is LaunchDarkly.LDInspection => Boolean(inspector)),
-    }
+      ].filter((inspector): inspector is LaunchDarkly.LDInspection =>
+        Boolean(inspector),
+      ),
+    },
   )
 
   // Demo: Evaluate a flag and capture a Sentry exception after client is ready

@@ -3,7 +3,11 @@ import { SITE } from '@/config'
 /**
  * Formats a given date into a human-readable string.
  */
-export function formatDate(d: Date | string, showYear = true, useUTC = false): string {
+export function formatDate(
+  d: Date | string,
+  showYear = true,
+  useUTC = false,
+): string {
   const date = typeof d === 'string' ? new Date(d) : d
   if (Number.isNaN(date.getTime())) {
     throw new Error('Invalid Date')

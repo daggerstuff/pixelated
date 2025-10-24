@@ -97,12 +97,12 @@ export interface ValidationRuleCreators {
  * Form field validation props
  */
 export interface FormFieldValidationProps {
-  name: string
+  'name': string
   'aria-invalid'?: boolean
   'aria-describedby'?: string
   'aria-required'?: boolean
-  onBlur?: (event: React.FocusEvent) => void
-  onChange?: (event: React.ChangeEvent) => void
+  'onBlur'?: (event: React.FocusEvent) => void
+  'onChange'?: (event: React.ChangeEvent) => void
 }
 
 /**
@@ -122,20 +122,28 @@ export interface FormValidationContext<T extends FormValues = FormValues> {
 /**
  * Type guard to check if a value is a form field
  */
-export function isFormField(element: Element): element is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
-  return element instanceof HTMLInputElement ||
-         element instanceof HTMLTextAreaElement ||
-         element instanceof HTMLSelectElement
+export function isFormField(
+  element: Element,
+): element is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
+  return (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLSelectElement
+  )
 }
 
 /**
  * Type guard to check if an error is a validation error
  */
-export function isValidationError(error: unknown): error is { message: string } {
-  return typeof error === 'object' && 
-         error !== null && 
-         'message' in error &&
-         typeof (error as { message: unknown }).message === 'string'
+export function isValidationError(
+  error: unknown,
+): error is { message: string } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as { message: unknown }).message === 'string'
+  )
 }
 
 /**
@@ -146,18 +154,26 @@ export type FieldValue<T extends FormValues, K extends keyof T> = T[K]
 /**
  * Helper type for form field validation rules
  */
-export type FieldValidationRules<T extends FormValues, K extends keyof T> = ValidationRule<T[K]>[]
+export type FieldValidationRules<
+  T extends FormValues,
+  K extends keyof T,
+> = ValidationRule<T[K]>[]
 
 /**
  * Helper function to create a validation rule with proper typing
  */
-export function createValidationRule<T>(test: (value: T) => boolean, message: string): ValidationRule<T> {
+export function createValidationRule<T>(
+  test: (value: T) => boolean,
+  message: string,
+): ValidationRule<T> {
   return { test, message }
 }
 
 /**
  * Helper function to create a validation config with proper typing
  */
-export function createValidationConfig<T extends FormValues>(config: ValidationConfig<T>): ValidationConfig<T> {
+export function createValidationConfig<T extends FormValues>(
+  config: ValidationConfig<T>,
+): ValidationConfig<T> {
   return config
 }

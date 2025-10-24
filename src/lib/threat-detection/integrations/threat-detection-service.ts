@@ -1,6 +1,6 @@
 /**
  * Threat Detection Service - Main Integration Hub
- * 
+ *
  * This service orchestrates all threat detection components and integrates
  * them with the rate limiting system. It provides a unified interface for
  * threat detection across the entire application.
@@ -11,11 +11,11 @@ import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
 import { RateLimitingBridge } from './rate-limiting-bridge'
 import { ThreatDetectionMiddleware } from './api-middleware'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type { 
-  ThreatData, 
+import type {
+  ThreatData,
   ThreatResponse,
   RateLimitResult,
-  ThreatAnalysis 
+  ThreatAnalysis,
 } from '../response-orchestration'
 import type { RateLimitIntegrationConfig } from './rate-limiting-bridge'
 
@@ -78,7 +78,7 @@ export class ThreatDetectionService {
   constructor(
     orchestrator: unknown,
     rateLimiter: unknown,
-    config: ThreatDetectionConfig
+    config: ThreatDetectionConfig,
   ) {
     this.orchestrator = orchestrator as any
     this.rateLimiter = rateLimiter as any
@@ -88,17 +88,14 @@ export class ThreatDetectionService {
     this.rateLimitingBridge = createRateLimitingBridge(
       rateLimiter,
       orchestrator,
-      config.rateLimitConfig
+      config.rateLimitConfig,
     )
 
     // Initialize middleware
-    this.middleware = createThreatDetectionMiddleware(
-      this.rateLimitingBridge,
-      {
-        enabled: config.enabled,
-        enableLogging: true
-      }
-    )
+    this.middleware = createThreatDetectionMiddleware(this.rateLimitingBridge, {
+      enabled: config.enabled,
+      enableLogging: true,
+    })
   }
 
   /**
@@ -113,7 +110,7 @@ export class ThreatDetectionService {
       logger.info('Analyzing threat', {
         threatId: threatData.threatId,
         source: threatData.source,
-        severity: threatData.severity
+        severity: threatData.severity,
       })
 
       // Perform comprehensive threat analysis
@@ -125,16 +122,16 @@ export class ThreatDetectionService {
         {
           ...threatData,
           analysis,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       )
 
       // Apply rate limiting if enabled
       if (this.config.enableRateLimiting) {
-        await this.rateLimitingBridge.applyThreatBasedRateLimiting(
-          response,
-          { threatId: threatData.threatId, ...threatData.riskFactors }
-        )
+        await this.rateLimitingBridge.applyThreatBasedRateLimiting(response, {
+          threatId: threatData.threatId,
+          ...threatData.riskFactors,
+        })
       }
 
       // Log the response
@@ -142,12 +139,15 @@ export class ThreatDetectionService {
         threatId: threatData.threatId,
         severity: response.severity,
         actions: response.actions.length,
-        blocked: response.actions.some(a => a.actionType === 'block')
+        blocked: response.actions.some((a) => a.actionType === 'block'),
       })
 
       return response
     } catch (error) {
-      logger.error('Threat analysis failed:', { error, threatId: threatData.threatId })
+      logger.error('Threat analysis failed:', {
+        error,
+        threatId: threatData.threatId,
+      })
       return this.createEmptyResponse(threatData.threatId)
     }
   }
@@ -164,7 +164,7 @@ export class ThreatDetectionService {
       userAgent?: string
       method?: string
       headers?: Record<string, string>
-    }
+    },
   ): Promise<{
     allowed: boolean
     rateLimitResult?: RateLimitResult
@@ -174,29 +174,30 @@ export class ThreatDetectionService {
     if (!this.config.enabled) {
       return {
         allowed: true,
-        shouldBlock: false
+        shouldBlock: false,
       }
     }
 
     try {
       // Use rate limiting bridge to check both rate limits and threats
-      const result = await this.rateLimitingBridge.checkRateLimitWithThreatDetection(
-        identifier,
-        context
-      )
+      const result =
+        await this.rateLimitingBridge.checkRateLimitWithThreatDetection(
+          identifier,
+          context,
+        )
 
       return {
         allowed: result.rateLimitResult.allowed,
         rateLimitResult: result.rateLimitResult,
         threatResponse: result.threatResponse,
-        shouldBlock: result.shouldBlock
+        shouldBlock: result.shouldBlock,
       }
     } catch (error) {
       logger.error('Request check failed:', { error, identifier })
       // Fail open - allow request if check fails
       return {
         allowed: true,
-        shouldBlock: false
+        shouldBlock: false,
       }
     }
   }
@@ -204,12 +205,14 @@ export class ThreatDetectionService {
   /**
    * Perform comprehensive threat analysis
    */
-  private async performThreatAnalysis(threatData: ThreatData): Promise<ThreatAnalysis> {
+  private async performThreatAnalysis(
+    threatData: ThreatData,
+  ): Promise<ThreatAnalysis> {
     const analysis: ThreatAnalysis = {
       confidence: 0,
       patterns: [],
       riskFactors: [],
-      recommendations: []
+      recommendations: [],
     }
 
     // Analyze based on threat source
@@ -239,7 +242,10 @@ export class ThreatDetectionService {
     }
 
     // Generate recommendations
-    analysis.recommendations = this.generateRecommendations(threatData, analysis)
+    analysis.recommendations = this.generateRecommendations(
+      threatData,
+      analysis,
+    )
 
     return analysis
   }
@@ -289,7 +295,9 @@ export class ThreatDetectionService {
   /**
    * Analyze behavioral threats
    */
-  private async analyzeBehavioralThreat(threatData: ThreatData): Promise<number> {
+  private async analyzeBehavioralThreat(
+    threatData: ThreatData,
+  ): Promise<number> {
     // This would integrate with the behavioral analysis service
     // For now, return a placeholder confidence score
     return 0.5
@@ -298,7 +306,9 @@ export class ThreatDetectionService {
   /**
    * Detect behavioral patterns
    */
-  private async detectBehavioralPatterns(threatData: ThreatData): Promise<string[]> {
+  private async detectBehavioralPatterns(
+    threatData: ThreatData,
+  ): Promise<string[]> {
     // This would integrate with the behavioral analysis service
     // For now, return empty array
     return []
@@ -307,7 +317,9 @@ export class ThreatDetectionService {
   /**
    * Analyze predictive threats
    */
-  private async analyzePredictiveThreat(threatData: ThreatData): Promise<number> {
+  private async analyzePredictiveThreat(
+    threatData: ThreatData,
+  ): Promise<number> {
     // This would integrate with the predictive threat intelligence service
     // For now, return a placeholder confidence score
     return 0.6
@@ -316,7 +328,9 @@ export class ThreatDetectionService {
   /**
    * Detect predictive patterns
    */
-  private async detectPredictivePatterns(threatData: ThreatData): Promise<string[]> {
+  private async detectPredictivePatterns(
+    threatData: ThreatData,
+  ): Promise<string[]> {
     // This would integrate with the predictive threat intelligence service
     // For now, return empty array
     return []
@@ -328,11 +342,16 @@ export class ThreatDetectionService {
   private analyzeGenericThreat(threatData: ThreatData): number {
     // Base confidence based on severity
     switch (threatData.severity) {
-      case 'critical': return 0.9
-      case 'high': return 0.7
-      case 'medium': return 0.5
-      case 'low': return 0.3
-      default: return 0.5
+      case 'critical':
+        return 0.9
+      case 'high':
+        return 0.7
+      case 'medium':
+        return 0.5
+      case 'low':
+        return 0.3
+      default:
+        return 0.5
     }
   }
 
@@ -363,7 +382,7 @@ export class ThreatDetectionService {
    */
   private generateRecommendations(
     threatData: ThreatData,
-    analysis: ThreatAnalysis
+    analysis: ThreatAnalysis,
   ): string[] {
     const recommendations: string[] = []
 
@@ -418,8 +437,8 @@ export class ThreatDetectionService {
       metadata: {
         source: 'threat_detection_service',
         timestamp: new Date().toISOString(),
-        reason: 'service_disabled_or_error'
-      }
+        reason: 'service_disabled_or_error',
+      },
     }
   }
 
@@ -447,21 +466,24 @@ export class ThreatDetectionService {
     try {
       const [bridgeStatus, orchestratorHealthy] = await Promise.all([
         this.rateLimitingBridge.getStatus(),
-        this.orchestrator.isHealthy()
+        this.orchestrator.isHealthy(),
       ])
 
       const middlewareStatus = await this.middleware.getHealthStatus()
 
       return {
-        healthy: bridgeStatus.healthy && orchestratorHealthy && middlewareStatus.healthy,
+        healthy:
+          bridgeStatus.healthy &&
+          orchestratorHealthy &&
+          middlewareStatus.healthy,
         components: {
           orchestrator: orchestratorHealthy,
           rateLimiter: bridgeStatus.rateLimiterHealthy,
           bridge: bridgeStatus.healthy,
-          middleware: middlewareStatus.healthy
+          middleware: middlewareStatus.healthy,
         },
         recentThreats: 0, // Would be populated from analytics
-        recentResponses: bridgeStatus.recentIntegrations
+        recentResponses: bridgeStatus.recentIntegrations,
       }
     } catch (error) {
       logger.error('Failed to get health status:', { error })
@@ -471,10 +493,10 @@ export class ThreatDetectionService {
           orchestrator: false,
           rateLimiter: false,
           bridge: false,
-          middleware: false
+          middleware: false,
         },
         recentThreats: 0,
-        recentResponses: 0
+        recentResponses: 0,
       }
     }
   }
@@ -497,7 +519,7 @@ export class ThreatDetectionService {
         blockedRequests: 0,
         averageResponseTime: 0,
         threatDistribution: {},
-        responseDistribution: {}
+        responseDistribution: {},
       }
     } catch (error) {
       logger.error('Failed to get statistics:', { error })
@@ -506,7 +528,7 @@ export class ThreatDetectionService {
         blockedRequests: 0,
         averageResponseTime: 0,
         threatDistribution: {},
-        responseDistribution: {}
+        responseDistribution: {},
       }
     }
   }
@@ -518,7 +540,7 @@ export class ThreatDetectionService {
 export function createThreatDetectionService(
   orchestrator: unknown,
   rateLimiter: unknown,
-  customConfig?: Partial<ThreatDetectionConfig>
+  customConfig?: Partial<ThreatDetectionConfig>,
 ): ThreatDetectionService {
   const defaultConfig: ThreatDetectionConfig = {
     enabled: true,
@@ -534,36 +556,36 @@ export function createThreatDetectionService(
           name: 'low_threat',
           maxRequests: 100,
           windowMs: 60000,
-          enableAttackDetection: false
+          enableAttackDetection: false,
         },
         medium: {
           name: 'medium_threat',
           maxRequests: 50,
           windowMs: 60000,
-          enableAttackDetection: true
+          enableAttackDetection: true,
         },
         high: {
           name: 'high_threat',
           maxRequests: 10,
           windowMs: 60000,
-          enableAttackDetection: true
+          enableAttackDetection: true,
         },
         critical: {
           name: 'critical_threat',
           maxRequests: 1,
           windowMs: 300000,
-          enableAttackDetection: true
-        }
+          enableAttackDetection: true,
+        },
       },
       bypassRules: {
         allowedRoles: ['admin', 'system'],
         allowedIPRanges: ['127.0.0.1', '::1'],
-        allowedEndpoints: ['/api/health', '/api/status']
+        allowedEndpoints: ['/api/health', '/api/status'],
       },
       escalationConfig: {
         autoEscalateThreshold: 5,
-        escalationWindowMs: 3600000
-      }
+        escalationWindowMs: 3600000,
+      },
     },
     responseConfig: {
       enableAutoResponses: true,
@@ -572,21 +594,25 @@ export function createThreatDetectionService(
         low: 3,
         medium: 5,
         high: 8,
-        critical: 10
-      }
+        critical: 10,
+      },
     },
     behavioralConfig: {
       enableProfiling: true,
       anomalyThreshold: 0.8,
-      baselineUpdateInterval: 86400000 // 24 hours
+      baselineUpdateInterval: 86400000, // 24 hours
     },
     predictiveConfig: {
       enableForecasting: true,
       forecastingWindow: 24,
-      confidenceThreshold: 0.7
-    }
+      confidenceThreshold: 0.7,
+    },
   }
 
   const config = { ...defaultConfig, ...customConfig }
-  return new ThreatDetectionService(orchestrator as any, rateLimiter as any, config)
+  return new ThreatDetectionService(
+    orchestrator as any,
+    rateLimiter as any,
+    config,
+  )
 }

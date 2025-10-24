@@ -9,9 +9,12 @@ function setupStagewise() {
         plugins: [],
       }
       initToolbar(stagewiseConfig)
-    } catch (error) {
+    } catch (error: unknown) {
       // Toolbar not available, continue without it
-      console.debug('Development toolbar not available, continuing without it')
+      console.debug(
+        'Development toolbar not available, continuing without it',
+        String(error),
+      )
     }
   }
 }

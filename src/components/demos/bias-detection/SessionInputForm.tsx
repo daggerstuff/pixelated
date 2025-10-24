@@ -107,7 +107,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
     <form onSubmit={handleSubmit} className="session-input-form space-y-4">
       {/* Scenario Name (Optional) */}
       <div>
-        <label htmlFor="scenario" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="scenario"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Scenario Name (Optional)
         </label>
         <input
@@ -128,7 +131,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Age Group */}
           <div>
-            <label htmlFor="age-group" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="age-group"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Age Group
             </label>
             <select
@@ -149,7 +155,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
 
           {/* Gender */}
           <div>
-            <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="gender"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Gender
             </label>
             <select
@@ -171,7 +180,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
 
           {/* Ethnicity */}
           <div>
-            <label htmlFor="ethnicity" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="ethnicity"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Ethnicity
             </label>
             <select
@@ -196,7 +208,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
 
           {/* Primary Language */}
           <div>
-            <label htmlFor="primary-language" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="primary-language"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Primary Language
             </label>
             <select
@@ -227,7 +242,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
 
       {/* Content */}
       <div>
-        <label htmlFor="therapeutic-content" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="therapeutic-content"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Therapeutic Content <span className="text-red-500">*</span>
         </label>
         <textarea

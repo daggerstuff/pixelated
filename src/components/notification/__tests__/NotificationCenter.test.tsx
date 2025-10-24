@@ -53,7 +53,6 @@ describe('notificationCenter', () => {
   })
 
   it('displays notifications when they are received', () => {
-
     vi.mocked(useWebSocket).mockReturnValue({
       isConnected: true,
       error: null,
@@ -124,7 +123,6 @@ describe('notificationCenter', () => {
   it('updates notification list when new notification is received', () => {
     const { rerender } = render(<NotificationCenter />)
     fireEvent.click(screen.getByRole('button'))
-
 
     vi.mocked(useWebSocket).mockReturnValue({
       isConnected: true,

@@ -2,7 +2,11 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
 import { DocumentationService } from '../../../lib/documentation'
 import { AIRepository } from '../../../lib/db/ai/repository'
-import { AIMessage, AIServiceOptions, createTogetherAIService } from '../../../lib/ai/AIService'
+import {
+  AIMessage,
+  AIServiceOptions,
+  createTogetherAIService,
+} from '../../../lib/ai/AIService'
 
 const logger = createBuildSafeLogger('documentation-api')
 
@@ -10,10 +14,10 @@ const logger = createBuildSafeLogger('documentation-api')
 const repository = new AIRepository()
 const togetherConfig = {
   togetherApiKey: process.env['TOGETHER_API_KEY'] || 'dummy-key',
-  apiKey: process.env['TOGETHER_API_KEY'] || 'dummy-key'
-};
+  apiKey: process.env['TOGETHER_API_KEY'] || 'dummy-key',
+}
 // Create the base service
-const baseAiService = createTogetherAIService(togetherConfig);
+const baseAiService = createTogetherAIService(togetherConfig)
 // Add a stub getModelInfo to satisfy the AIService interface
 const aiService = {
   ...baseAiService,
@@ -25,10 +29,13 @@ const aiService = {
     contextWindow: 2048,
     maxTokens: 1024,
   }),
-  generateCompletion: async (messages: AIMessage[], options: AIServiceOptions | undefined) => {
-    const result = await baseAiService.generateCompletion(messages, options);
+  generateCompletion: async (
+    messages: AIMessage[],
+    options: AIServiceOptions | undefined,
+  ) => {
+    const result = await baseAiService.generateCompletion(messages, options)
     if ('id' in result) {
-      return result;
+      return result
     }
     // Convert plain result to minimal AICompletion
     return {
@@ -51,9 +58,9 @@ const aiService = {
       },
       provider: 'together',
       content: result.content,
-    } as import('../../../lib/ai/models/ai-types').AICompletion;
-  }
-};
+    } as import('../../../lib/ai/models/ai-types').AICompletion
+  },
+}
 const documentationService = new DocumentationService(repository, aiService)
 
 export const POST = async ({ request }: APIContext) => {
@@ -61,15 +68,15 @@ export const POST = async ({ request }: APIContext) => {
     // Authenticate request
     // To get cookies in Astro API route, use the request.headers
     // We'll create a minimal cookies API compatible with getCurrentUser
-    const cookieHeader = request.headers.get('cookie') || '';
+    const cookieHeader = request.headers.get('cookie') || ''
     const cookies = {
       get: (name: string) => {
-        const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`));
-        return match ? { value: match[1] } : undefined;
+        const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))
+        return match ? { value: match[1] } : undefined
       },
-    };
+    }
 
-    const user = await getCurrentUser(cookies);
+    const user = await getCurrentUser(cookies)
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -82,7 +89,7 @@ export const POST = async ({ request }: APIContext) => {
             'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
 
     // Check admin permission
@@ -98,7 +105,7 @@ export const POST = async ({ request }: APIContext) => {
             'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
 
     // Parse request body
@@ -121,7 +128,10 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Generate documentation
-    const result = await documentationService.generateDocumentation(section, options)
+    const result = await documentationService.generateDocumentation(
+      section,
+      options,
+    )
 
     return new Response(JSON.stringify(result), {
       status: 200,

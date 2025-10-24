@@ -2,13 +2,13 @@
  * Default configuration for the rate limiting system
  */
 
-import type { 
-  RateLimitConfig, 
-  RateLimitRuleSet, 
-  RateLimitBypassRule, 
+import type {
+  RateLimitConfig,
+  RateLimitRuleSet,
+  RateLimitBypassRule,
   DDoSProtectionConfig,
   BetterAuthRateLimitConfig,
-  WebSocketRateLimitConfig
+  WebSocketRateLimitConfig,
 } from './types'
 
 /**
@@ -19,13 +19,13 @@ export const defaultRateLimitConfig: RateLimitConfig = {
     enabled: true,
     defaultWindowMs: 60000, // 1 minute
     enableAttackDetection: true,
-    enableAnalytics: true
+    enableAnalytics: true,
   },
   redis: {
     keyPrefix: 'rate_limit:',
     analyticsRetentionDays: 30,
-    securityEventRetentionDays: 7
-  }
+    securityEventRetentionDays: 7,
+  },
 }
 
 /**
@@ -43,7 +43,7 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 100,
         enableAttackDetection: true,
         description: 'Strict rate limiting for sensitive endpoints',
-        tags: ['strict', 'sensitive']
+        tags: ['strict', 'sensitive'],
       },
       {
         name: 'moderate',
@@ -52,7 +52,7 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 50,
         enableAttackDetection: true,
         description: 'Moderate rate limiting for general API endpoints',
-        tags: ['moderate', 'api']
+        tags: ['moderate', 'api'],
       },
       {
         name: 'lenient',
@@ -61,9 +61,9 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 10,
         enableAttackDetection: false,
         description: 'Lenient rate limiting for public endpoints',
-        tags: ['lenient', 'public']
-      }
-    ]
+        tags: ['lenient', 'public'],
+      },
+    ],
   },
   {
     name: 'auth_endpoints',
@@ -76,7 +76,7 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 100,
         enableAttackDetection: true,
         description: 'Login attempt rate limiting',
-        tags: ['auth', 'login', 'security']
+        tags: ['auth', 'login', 'security'],
       },
       {
         name: 'password_reset',
@@ -85,7 +85,7 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 90,
         enableAttackDetection: true,
         description: 'Password reset rate limiting',
-        tags: ['auth', 'password', 'security']
+        tags: ['auth', 'password', 'security'],
       },
       {
         name: 'registration',
@@ -94,9 +94,9 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 80,
         enableAttackDetection: true,
         description: 'Registration rate limiting',
-        tags: ['auth', 'register', 'security']
-      }
-    ]
+        tags: ['auth', 'register', 'security'],
+      },
+    ],
   },
   {
     name: 'ai_services',
@@ -109,7 +109,7 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 100,
         enableAttackDetection: true,
         description: 'AI completion endpoint rate limiting',
-        tags: ['ai', 'completion', 'expensive']
+        tags: ['ai', 'completion', 'expensive'],
       },
       {
         name: 'bias_detection',
@@ -118,10 +118,10 @@ export const defaultRuleSets: RateLimitRuleSet[] = [
         priority: 90,
         enableAttackDetection: true,
         description: 'Bias detection endpoint rate limiting',
-        tags: ['ai', 'bias', 'analysis']
-      }
-    ]
-  }
+        tags: ['ai', 'bias', 'analysis'],
+      },
+    ],
+  },
 ]
 
 /**
@@ -132,19 +132,25 @@ export const defaultBypassRules: RateLimitBypassRule[] = [
     name: 'admin_users',
     description: 'Bypass for admin users',
     conditions: {
-      roles: ['admin', 'superadmin', 'system']
-    }
+      roles: ['admin', 'superadmin', 'system'],
+    },
   },
   {
     name: 'internal_services',
     description: 'Bypass for internal service calls',
     conditions: {
-      ips: ['127.0.0.1', '::1', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'],
+      ips: [
+        '127.0.0.1',
+        '::1',
+        '10.0.0.0/8',
+        '172.16.0.0/12',
+        '192.168.0.0/16',
+      ],
       custom: async (context) => {
         // Check for internal service headers
         return context.metadata?.['x-internal-service'] === 'true'
-      }
-    }
+      },
+    },
   },
   {
     name: 'health_checks',
@@ -155,9 +161,9 @@ export const defaultBypassRules: RateLimitBypassRule[] = [
         // Check for health check user agents
         const userAgent = context.userAgent?.toLowerCase() || ''
         return userAgent.includes('health') || userAgent.includes('monitor')
-      }
-    }
-  }
+      },
+    },
+  },
 ]
 
 /**
@@ -169,7 +175,7 @@ export const defaultDDoSConfig: DDoSProtectionConfig = {
   windowMs: 1000, // 1 second window
   blockDurationMs: 300000, // 5 minute block
   enableAutoBlock: true,
-  enableAlerting: true
+  enableAlerting: true,
 }
 
 /**
@@ -186,7 +192,7 @@ export const defaultBetterAuthConfig: BetterAuthRateLimitConfig = {
       windowMs: 300000, // 5 minutes
       priority: 100,
       enableAttackDetection: true,
-      description: 'Better-Auth login rate limiting'
+      description: 'Better-Auth login rate limiting',
     },
     register: {
       name: 'betterauth_register',
@@ -194,7 +200,7 @@ export const defaultBetterAuthConfig: BetterAuthRateLimitConfig = {
       windowMs: 3600000, // 1 hour
       priority: 90,
       enableAttackDetection: true,
-      description: 'Better-Auth registration rate limiting'
+      description: 'Better-Auth registration rate limiting',
     },
     passwordReset: {
       name: 'betterauth_password_reset',
@@ -202,7 +208,7 @@ export const defaultBetterAuthConfig: BetterAuthRateLimitConfig = {
       windowMs: 3600000, // 1 hour
       priority: 80,
       enableAttackDetection: true,
-      description: 'Better-Auth password reset rate limiting'
+      description: 'Better-Auth password reset rate limiting',
     },
     emailVerification: {
       name: 'betterauth_email_verification',
@@ -210,9 +216,9 @@ export const defaultBetterAuthConfig: BetterAuthRateLimitConfig = {
       windowMs: 3600000, // 1 hour
       priority: 70,
       enableAttackDetection: true,
-      description: 'Better-Auth email verification rate limiting'
-    }
-  }
+      description: 'Better-Auth email verification rate limiting',
+    },
+  },
 }
 
 /**
@@ -222,7 +228,7 @@ export const defaultWebSocketConfig: WebSocketRateLimitConfig = {
   enabled: true,
   maxMessagesPerConnection: 100,
   maxConnectionsPerIp: 5,
-  connectionTimeoutMs: 300000 // 5 minutes
+  connectionTimeoutMs: 300000, // 5 minutes
 }
 
 /**
@@ -236,8 +242,8 @@ export const getEnvironmentConfig = (env: string) => {
         global: {
           ...defaultRateLimitConfig.global,
           enableAttackDetection: true,
-          enableAnalytics: true
-        }
+          enableAnalytics: true,
+        },
       }
     case 'staging':
       return {
@@ -245,8 +251,8 @@ export const getEnvironmentConfig = (env: string) => {
         global: {
           ...defaultRateLimitConfig.global,
           enableAttackDetection: true,
-          enableAnalytics: true
-        }
+          enableAnalytics: true,
+        },
       }
     case 'development':
       return {
@@ -254,8 +260,8 @@ export const getEnvironmentConfig = (env: string) => {
         global: {
           ...defaultRateLimitConfig.global,
           enableAttackDetection: true,
-          enableAnalytics: false // Disable analytics in dev for performance
-        }
+          enableAnalytics: false, // Disable analytics in dev for performance
+        },
       }
     case 'test':
       return {
@@ -264,8 +270,8 @@ export const getEnvironmentConfig = (env: string) => {
           ...defaultRateLimitConfig.global,
           enabled: false, // Disable rate limiting in tests
           enableAttackDetection: false,
-          enableAnalytics: false
-        }
+          enableAnalytics: false,
+        },
       }
     default:
       return defaultRateLimitConfig
@@ -277,42 +283,42 @@ export const getEnvironmentConfig = (env: string) => {
  */
 export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
   const config: Partial<RateLimitConfig> = {}
-  
+
   if (process.env.RATE_LIMIT_ENABLED) {
     config.global = {
       ...config.global,
-      enabled: process.env.RATE_LIMIT_ENABLED === 'true'
+      enabled: process.env.RATE_LIMIT_ENABLED === 'true',
     }
   }
-  
+
   if (process.env.RATE_LIMIT_DEFAULT_WINDOW_MS) {
     config.global = {
       ...config.global,
-      defaultWindowMs: parseInt(process.env.RATE_LIMIT_DEFAULT_WINDOW_MS)
+      defaultWindowMs: parseInt(process.env.RATE_LIMIT_DEFAULT_WINDOW_MS),
     }
   }
-  
+
   if (process.env.RATE_LIMIT_ATTACK_DETECTION) {
     config.global = {
       ...config.global,
-      enableAttackDetection: process.env.RATE_LIMIT_ATTACK_DETECTION === 'true'
+      enableAttackDetection: process.env.RATE_LIMIT_ATTACK_DETECTION === 'true',
     }
   }
-  
+
   if (process.env.RATE_LIMIT_ANALYTICS) {
     config.global = {
       ...config.global,
-      enableAnalytics: process.env.RATE_LIMIT_ANALYTICS === 'true'
+      enableAnalytics: process.env.RATE_LIMIT_ANALYTICS === 'true',
     }
   }
-  
+
   if (process.env.RATE_LIMIT_REDIS_PREFIX) {
     config.redis = {
       ...config.redis,
-      keyPrefix: process.env.RATE_LIMIT_REDIS_PREFIX
+      keyPrefix: process.env.RATE_LIMIT_REDIS_PREFIX,
     }
   }
-  
+
   return config
 }
 
@@ -323,17 +329,17 @@ export const getMergedConfig = (): RateLimitConfig => {
   const env = process.env.NODE_ENV || 'development'
   const envConfig = getEnvironmentConfig(env)
   const envVarConfig = getConfigFromEnv()
-  
+
   return {
     ...envConfig,
     ...envVarConfig,
     global: {
       ...envConfig.global,
-      ...envVarConfig.global
+      ...envVarConfig.global,
     },
     redis: {
       ...envConfig.redis,
-      ...envVarConfig.redis
-    }
+      ...envVarConfig.redis,
+    },
   }
 }

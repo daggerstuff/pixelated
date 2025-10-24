@@ -92,7 +92,7 @@ Add these secrets to your GitHub repository:
 
 - `GCP_SERVICE_ACCOUNT_EMAIL`: The service account email:
   ```
-  github-actions-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com
+  action@pixelatedempathy.com
   ```
 
 ## Required GitHub Repository Permissions

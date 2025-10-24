@@ -100,7 +100,10 @@ export class PluginRegistry {
     this.events.on(event, listener as (...args: unknown[]) => void)
   }
 
-  off<T extends unknown[]>(event: string, listener: (...args: T) => void): void {
+  off<T extends unknown[]>(
+    event: string,
+    listener: (...args: T) => void,
+  ): void {
     this.events.off(event, listener as (...args: unknown[]) => void)
   }
 }

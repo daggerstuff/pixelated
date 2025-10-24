@@ -1,4 +1,3 @@
-
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createResourceAuditLog, AuditEventType } from '../../../../lib/audit'
@@ -38,7 +37,12 @@ export const GET = protectRoute({
 
     // TODO: Replace with actual database implementation
     // For now, return empty result to prevent build errors
-    const data: Array<{ id: string; email: string; role: string; createdAt: string }> = []
+    const data: Array<{
+      id: string
+      email: string
+      role: string
+      createdAt: string
+    }> = []
     const count = 0
 
     await createResourceAuditLog(

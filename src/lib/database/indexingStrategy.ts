@@ -44,7 +44,10 @@ export interface IndexingPlan {
 class IndexingStrategy {
   private config: DatabaseConfig
   private queryPatterns: QueryPattern[] = []
-  private indexHistory = new Map<string, { created: Date; performance: number }>()
+  private indexHistory = new Map<
+    string,
+    { created: Date; performance: number }
+  >()
 
   constructor(config: DatabaseConfig) {
     this.config = config
@@ -70,7 +73,8 @@ class IndexingStrategy {
 
       // Session analytics queries
       {
-        pattern: 'SELECT patient_id, COUNT(*), AVG(duration) FROM sessions WHERE created_at >= ? GROUP BY patient_id',
+        pattern:
+          'SELECT patient_id, COUNT(*), AVG(duration) FROM sessions WHERE created_at >= ? GROUP BY patient_id',
         frequency: 'high',
         performance: 'critical',
         tables: ['sessions'],
@@ -90,7 +94,8 @@ class IndexingStrategy {
 
       // Real-time analytics
       {
-        pattern: 'SELECT * FROM session_data WHERE session_id = ? AND timestamp >= ? ORDER BY timestamp DESC',
+        pattern:
+          'SELECT * FROM session_data WHERE session_id = ? AND timestamp >= ? ORDER BY timestamp DESC',
         frequency: 'high',
         performance: 'critical',
         tables: ['session_data'],
@@ -110,7 +115,8 @@ class IndexingStrategy {
 
       // Search queries
       {
-        pattern: 'SELECT * FROM patients WHERE search_vector @@ plainto_tsquery(?)',
+        pattern:
+          'SELECT * FROM patients WHERE search_vector @@ plainto_tsquery(?)',
         frequency: 'medium',
         performance: 'important',
         tables: ['patients'],
@@ -125,7 +131,8 @@ class IndexingStrategy {
 
       // Audit log queries
       {
-        pattern: 'SELECT * FROM audit_logs WHERE user_id = ? AND created_at >= ? ORDER BY created_at DESC LIMIT ?',
+        pattern:
+          'SELECT * FROM audit_logs WHERE user_id = ? AND created_at >= ? ORDER BY created_at DESC LIMIT ?',
         frequency: 'medium',
         performance: 'important',
         tables: ['audit_logs'],
@@ -140,7 +147,8 @@ class IndexingStrategy {
 
       // Reporting queries
       {
-        pattern: 'SELECT therapist_id, COUNT(DISTINCT patient_id), SUM(duration) FROM sessions WHERE created_at >= ? AND created_at <= ? GROUP BY therapist_id',
+        pattern:
+          'SELECT therapist_id, COUNT(DISTINCT patient_id), SUM(duration) FROM sessions WHERE created_at >= ? AND created_at <= ? GROUP BY therapist_id',
         frequency: 'low',
         performance: 'normal',
         tables: ['sessions'],
@@ -211,13 +219,16 @@ class IndexingStrategy {
     ]
   }
 
-  private async identifyUnusedIndexes(currentIndexes: IndexDefinition[]): Promise<IndexDefinition[]> {
+  private async identifyUnusedIndexes(
+    currentIndexes: IndexDefinition[],
+  ): Promise<IndexDefinition[]> {
     // Analyze index usage statistics
     const unused: IndexDefinition[] = []
 
     for (const index of currentIndexes) {
       const usage = await this.getIndexUsage(index.name)
-      if (usage < 0.01) { // Less than 1% usage
+      if (usage < 0.01) {
+        // Less than 1% usage
         unused.push(index)
       }
     }
@@ -227,21 +238,25 @@ class IndexingStrategy {
 
   private identifyMissingIndexes(): QueryPattern[] {
     // Identify query patterns that don't have optimal indexes
-    return this.queryPatterns.filter(pattern => {
+    return this.queryPatterns.filter((pattern) => {
       // Check if pattern has corresponding indexes
-      return pattern.suggestedIndexes.some(suggestedIndex => {
+      return pattern.suggestedIndexes.some((suggestedIndex) => {
         // Check if this index pattern exists
-        return !this.queryPatterns.some(existing => {
-          return existing.suggestedIndexes.some(existingIndex =>
-            existingIndex.columns.every(col => suggestedIndex.columns.includes(col)) &&
-            existingIndex.type === suggestedIndex.type
+        return !this.queryPatterns.some((existing) => {
+          return existing.suggestedIndexes.some(
+            (existingIndex) =>
+              existingIndex.columns.every((col) =>
+                suggestedIndex.columns.includes(col),
+              ) && existingIndex.type === suggestedIndex.type,
           )
         })
       })
     })
   }
 
-  private generateRecommendedIndexes(missingPatterns: QueryPattern[]): IndexDefinition[] {
+  private generateRecommendedIndexes(
+    missingPatterns: QueryPattern[],
+  ): IndexDefinition[] {
     const recommendations: IndexDefinition[] = []
 
     missingPatterns.forEach((pattern, patternIndex) => {
@@ -262,9 +277,9 @@ class IndexingStrategy {
     // In a real implementation, this would query pg_stat_user_indexes
     // For now, return mock data
     const mockUsage: Record<string, number> = {
-      'idx_patients_therapist_status': 0.85,
-      'idx_sessions_patient_created': 0.72,
-      'idx_patients_search': 0.23,
+      idx_patients_therapist_status: 0.85,
+      idx_sessions_patient_created: 0.72,
+      idx_patients_search: 0.23,
     }
 
     return mockUsage[indexName] || 0.01
@@ -284,22 +299,23 @@ class IndexingStrategy {
    * Generate SQL for creating recommended indexes
    */
   generateIndexSQL(indexes: IndexDefinition[]): string {
-    return indexes.map(index => {
-      const unique = index.unique ? 'UNIQUE' : ''
-      const where = index.where ? ` WHERE ${index.where}` : ''
-      const columns = index.columns.join(', ')
+    return indexes
+      .map((index) => {
+        const where = index.where ? ` WHERE ${index.where}` : ''
+        const columns = index.columns.join(', ')
 
-      return `CREATE ${index.unique ? 'UNIQUE ' : ''}INDEX ${index.name} ON ${index.table} USING ${index.type} (${columns})${where};`
-    }).join('\n')
+        return `CREATE ${index.unique ? 'UNIQUE ' : ''}INDEX ${index.name} ON ${index.table} USING ${index.type} (${columns})${where};`
+      })
+      .join('\n')
   }
 
   /**
    * Generate SQL for dropping unused indexes
    */
   generateDropSQL(indexes: IndexDefinition[]): string {
-    return indexes.map(index =>
-      `DROP INDEX IF EXISTS ${index.name};`
-    ).join('\n')
+    return indexes
+      .map((index) => `DROP INDEX IF EXISTS ${index.name};`)
+      .join('\n')
   }
 
   /**
@@ -332,7 +348,10 @@ class IndexingStrategy {
     indexStats: Record<string, { size: number; usage: number; lastUsed: Date }>
     recommendations: string[]
   }> {
-    const stats: Record<string, { size: number; usage: number; lastUsed: Date }> = {}
+    const stats: Record<
+      string,
+      { size: number; usage: number; lastUsed: Date }
+    > = {}
     const recommendations: string[] = []
 
     // Gather statistics for all indexes
@@ -342,7 +361,9 @@ class IndexingStrategy {
         stats[indexName] = {
           size: Math.floor(Math.random() * 1000) + 100, // Mock size in MB
           usage: Math.random(),
-          lastUsed: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000), // Random last 30 days
+          lastUsed: new Date(
+            Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000,
+          ), // Random last 30 days
         }
       }
     }

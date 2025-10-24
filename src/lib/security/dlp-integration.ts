@@ -62,9 +62,12 @@ export function withDLPProtection(
     checkResponseBody?: boolean
   } = {},
 ) {
-  const { checkRequestBody = false, checkResponseBody = true } = options
+  const { checkRequestBody = false } = options
 
-  return async (request: Request, context: Record<string, any>): Promise<Response | undefined> => {
+  return async (
+    request: Request,
+    context: Record<string, any>,
+  ): Promise<Response | undefined> => {
     try {
       const userId = context.user?.id || 'unknown'
 
@@ -91,7 +94,7 @@ export function withDLPProtection(
             {
               status: 403,
               headers: { 'Content-Type': 'application/json' },
-            }
+            },
           )
         }
 

@@ -14,7 +14,10 @@ export function isCI(): boolean {
  * Get the base URL for tests
  */
 export function getBaseUrl(): string {
-  return getEnv('BASE_URL') || (isCI() ? 'http://localhost:3000' : 'http://localhost:4321')
+  return (
+    getEnv('BASE_URL') ||
+    (isCI() ? 'http://localhost:3000' : 'http://localhost:4321')
+  )
 }
 
 /**

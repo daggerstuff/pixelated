@@ -237,8 +237,8 @@ export const ExportControls: FC<ExportControlsProps> = ({
             onClick={() => setExportFormat('json')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setExportFormat('json');
+                e.preventDefault()
+                setExportFormat('json')
               }
             }}
             tabIndex={0}
@@ -273,8 +273,8 @@ export const ExportControls: FC<ExportControlsProps> = ({
             onClick={() => setExportFormat('csv')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setExportFormat('csv');
+                e.preventDefault()
+                setExportFormat('csv')
               }
             }}
             tabIndex={0}
@@ -309,8 +309,8 @@ export const ExportControls: FC<ExportControlsProps> = ({
             onClick={() => setExportFormat('pdf')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setExportFormat('pdf');
+                e.preventDefault()
+                setExportFormat('pdf')
               }
             }}
             tabIndex={0}
@@ -326,7 +326,9 @@ export const ExportControls: FC<ExportControlsProps> = ({
                 onChange={() => setExportFormat('pdf')}
                 className="mr-2"
               />
-              <label htmlFor="pdf-format" className="font-medium text-gray-900">PDF Report</label>
+              <label htmlFor="pdf-format" className="font-medium text-gray-900">
+                PDF Report
+              </label>
             </div>
             <p className="text-sm text-gray-600">
               Formatted report for documentation and sharing

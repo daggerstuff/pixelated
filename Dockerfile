@@ -25,10 +25,18 @@ WORKDIR /app
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 
+# Copy package files and install production dependencies
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
+
+# Enable pnpm and install only production dependencies
+RUN corepack enable pnpm && \
+    pnpm install --prod --frozen-lockfile && \
+    pnpm store prune
+
 # Copy built output and public assets from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/start-server.mjs ./start-server.mjs
 COPY --from=builder /app/instrument.mjs ./instrument.mjs
 

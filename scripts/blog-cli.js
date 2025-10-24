@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* jshint esversion: 6, node: true */
+
 /**
  * 🌟 Pixelated Blog Helper CLI 🌟
  * A lightweight command-line interface for the blog publishing system
@@ -8,6 +10,7 @@
 // Import dependencies
 import { createInterface } from 'readline'
 import { spawnSync } from 'child_process'
+import { fileURLToPath } from 'url'
 
 // ANSI colors for pretty output
 const colors = {
@@ -29,10 +32,16 @@ const rl = createInterface({
 })
 
 // Helper functions
+/**
+ * Clear the console
+ */
 function clear() {
   console.clear()
 }
 
+/**
+ * Display the application header
+ */
 function showHeader() {
   clear()
   console.log(
@@ -47,24 +56,44 @@ function showHeader() {
   console.log('')
 }
 
+/**
+ * Display success message
+ * @param {string} message - The success message to display
+ */
 function success(message) {
   console.log(`${colors.green}✓ ${message}${colors.reset}`)
 }
 
+/**
+ * Display info message
+ * @param {string} message - The info message to display
+ */
 function info(message) {
   console.log(`${colors.blue}ℹ ${message}${colors.reset}`)
 }
 
+/**
+ * Display warning message
+ * @param {string} message - The warning message to display
+ */
 function warning(message) {
   console.log(`${colors.yellow}⚠ ${message}${colors.reset}`)
 }
 
+/**
+ * Display error message
+ * @param {string} message - The error message to display
+ */
 function error(message) {
   console.log(`${colors.red}✗ ${message}${colors.reset}`)
 }
 
 // Run blog publisher command safely
-// Lightweight arg parser that respects single and double quotes
+/**
+ * Lightweight arg parser that respects single and double quotes
+ * @param {string} command - The command string to parse
+ * @returns {string[]} Array of parsed arguments
+ */
 function parseArgs(command) {
   const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g
   const args = []
@@ -75,6 +104,11 @@ function parseArgs(command) {
   return args
 }
 
+/**
+ * Validate if a token is safe for command execution
+ * @param {string} token - The token to validate
+ * @returns {boolean} True if the token is safe, false otherwise
+ */
 function isSafeToken(token) {
   if (typeof token !== 'string' || token.length === 0) {
     return false
@@ -93,8 +127,17 @@ const ALLOWED_TOP_LEVEL = new Set([
   'publish',
 ])
 
+/**
+ * Run a blog publisher command safely
+ * @param {string} command - The command to execute
+ * @returns {Object} Result object with success status, output, and error message
+ */
 function runCommand(command) {
   try {
+    if (typeof command !== 'string' || command.trim().length === 0) {
+      return { success: false, error: 'Command must be a non-empty string' }
+    }
+
     const tokens = parseArgs(command)
     if (tokens.length === 0) {
       return { success: false, error: 'Empty command' }
@@ -113,7 +156,11 @@ function runCommand(command) {
     }
 
     const args = ['run', 'blog-publisher', '--', ...tokens]
-    const proc = spawnSync('pnpm', args, { encoding: 'utf8', stdio: 'pipe', shell: false })
+    const proc = spawnSync('pnpm', args, {
+      encoding: 'utf8',
+      stdio: 'pipe',
+      shell: false,
+    })
 
     if (proc.error) {
       return { success: false, error: proc.error.message }
@@ -123,13 +170,21 @@ function runCommand(command) {
       return { success: true, output: (proc.stdout || '').toString().trim() }
     }
 
-    return { success: false, error: (proc.stderr || proc.error || 'Unknown error').toString(), output: (proc.stdout || '').toString().trim() }
+    return {
+      success: false,
+      error: (proc.stderr || proc.error || 'Unknown error').toString(),
+      output: (proc.stdout || '').toString().trim(),
+    }
   } catch (err) {
-    return { success: false, error: err.message }
+    // Handle unknown errors with proper typing
+    const errorMessage = err instanceof Error ? err.message : String(err)
+    return { success: false, error: errorMessage }
   }
 }
 
-// Show available commands
+/**
+ * Show available commands
+ */
 function showCommands() {
   console.log(`${colors.cyan}Available commands:${colors.reset}`)
   console.log(
@@ -158,7 +213,9 @@ function showCommands() {
   console.log('')
 }
 
-// Main menu
+/**
+ * Main menu prompt handler
+ */
 function mainPrompt() {
   rl.question(
     `${colors.bright}${colors.purple}blog>${colors.reset} `,
@@ -287,7 +344,9 @@ function mainPrompt() {
   )
 }
 
-// Start the CLI
+/**
+ * Start the CLI application
+ */
 async function start() {
   showHeader()
   console.log(`${colors.cyan}Welcome to the Blog CLI!${colors.reset}`)
@@ -308,12 +367,17 @@ async function start() {
   mainPrompt()
 }
 
-// Handle clean exit
+/**
+ * Handle clean exit
+ */
 rl.on('close', () => {
   process.exit(0)
 })
 
-// Start the CLI
-start()
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="10334f97-4b6c-538b-8a25-0e6bf4dcd9d4")}catch(e){}}();
-//# debugId=10334f97-4b6c-538b-8a25-0e6bf4dcd9d4
+// Start the CLI only when executed directly (prevents side-effects on import)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  start()
+}
+
+// Export helpers for testing
+export { parseArgs, isSafeToken, runCommand, start }

@@ -5,10 +5,7 @@ interface PercentileBarProps {
   label?: string
 }
 
-export const PercentileBar: FC<PercentileBarProps> = ({
-  rank,
-  label,
-}) => {
+export const PercentileBar: FC<PercentileBarProps> = ({ rank, label }) => {
   // Validate rank is between 0 and 100
   const validRank = Math.min(Math.max(0, isNaN(rank) ? 0 : rank), 100)
 

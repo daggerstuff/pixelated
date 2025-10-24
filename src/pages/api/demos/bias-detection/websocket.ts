@@ -1,6 +1,5 @@
 // WebSocket endpoint for real-time bias detection analysis
 
-
 export const GET = async ({ request }) => {
   // Check if the request is a WebSocket upgrade request
   const upgrade = request.headers.get('upgrade')

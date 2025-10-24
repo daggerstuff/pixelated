@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 import fs from 'node:fs/promises'
+import path from 'node:path'
+import crypto from 'node:crypto'
 import { FEATURES } from '../lib/browser/feature-detection'
 
 // Define types for compatibility results
@@ -69,21 +71,19 @@ testGroup('Cross-Browser Compatibility', () => {
     }
 
     // Save results securely (prevent path traversal)
-    const path = require('node:path')
-    const crypto = require('node:crypto')
-    const resultsDir = path.resolve(__dirname, '../../test-artifacts');
-    await fs.mkdir(resultsDir, { recursive: true });
-    const uniqueId = crypto.randomUUID();
-    const fileName = `browser-compatibility-results-${uniqueId}.json`;
-    const resolvedPath = path.resolve(resultsDir, fileName);
-    const relative = path.relative(resultsDir, resolvedPath);
+    const resultsDir = path.resolve(__dirname, '../../test-artifacts')
+    await fs.mkdir(resultsDir, { recursive: true })
+    const uniqueId = crypto.randomUUID()
+    const fileName = `browser-compatibility-results-${uniqueId}.json`
+    const resolvedPath = path.resolve(resultsDir, fileName)
+    const relative = path.relative(resultsDir, resolvedPath)
     if (relative.startsWith('..') || path.isAbsolute(relative)) {
-      throw new Error('Invalid results path detected');
+      throw new Error('Invalid results path detected')
     }
     await fs.writeFile(
       resolvedPath,
       JSON.stringify(compatibilityResults, null, 2),
-    );
+    )
 
     // Basic assertion to ensure test ran
     expect(Object.keys(compatibilityResults.browsers)).toHaveLength(1)

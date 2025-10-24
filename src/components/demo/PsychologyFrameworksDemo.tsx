@@ -4,7 +4,14 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Search, BookOpen, Brain, Users, Target, ChevronRight } from 'lucide-react'
+import {
+  Search,
+  BookOpen,
+  Brain,
+  Users,
+  Target,
+  ChevronRight,
+} from 'lucide-react'
 
 interface Framework {
   id: string
@@ -35,7 +42,9 @@ export default function PsychologyFrameworksDemo() {
   const [filteredFrameworks, setFilteredFrameworks] = useState<Framework[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  const [selectedFramework, setSelectedFramework] = useState<Framework | null>(null)
+  const [selectedFramework, setSelectedFramework] = useState<Framework | null>(
+    null,
+  )
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedCondition, setSelectedCondition] = useState<string>('all')
@@ -45,23 +54,30 @@ export default function PsychologyFrameworksDemo() {
 
     // Filter by search term
     if (searchTerm.trim()) {
-      filtered = filtered.filter(fw =>
-        fw.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fw.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fw.techniques.some(t => t.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        fw.conditions.some(c => c.toLowerCase().includes(searchTerm.toLowerCase()))
+      filtered = filtered.filter(
+        (fw) =>
+          fw.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          fw.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          fw.techniques.some((t) =>
+            t.toLowerCase().includes(searchTerm.toLowerCase()),
+          ) ||
+          fw.conditions.some((c) =>
+            c.toLowerCase().includes(searchTerm.toLowerCase()),
+          ),
       )
     }
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(fw => fw.category === selectedCategory)
+      filtered = filtered.filter((fw) => fw.category === selectedCategory)
     }
 
     // Filter by condition
     if (selectedCondition !== 'all') {
-      filtered = filtered.filter(fw => 
-        fw.conditions.some(c => c.toLowerCase().includes(selectedCondition.toLowerCase()))
+      filtered = filtered.filter((fw) =>
+        fw.conditions.some((c) =>
+          c.toLowerCase().includes(selectedCondition.toLowerCase()),
+        ),
       )
     }
 
@@ -93,78 +109,125 @@ export default function PsychologyFrameworksDemo() {
       }
 
       const result: FrameworksResponse = await response.json()
-      
+
       setFrameworks(result.frameworks)
       setCategories(result.categories)
-      
+
       // Auto-select first framework if available
       if (result.frameworks.length > 0) {
         setSelectedFramework(result.frameworks[0] || null)
       }
-
     } catch (error: unknown) {
       console.error('Failed to load frameworks:', error)
-      
+
       // Fallback to demo data
       const demoFrameworks: Framework[] = [
         {
           id: 'cbt',
           name: 'Cognitive Behavioral Therapy (CBT)',
           category: 'Cognitive-Behavioral',
-          description: 'Evidence-based therapeutic approach focusing on identifying and changing negative thought patterns and behaviors.',
-          techniques: ['Cognitive Restructuring', 'Behavioral Activation', 'Exposure Therapy', 'Thought Records'],
+          description:
+            'Evidence-based therapeutic approach focusing on identifying and changing negative thought patterns and behaviors.',
+          techniques: [
+            'Cognitive Restructuring',
+            'Behavioral Activation',
+            'Exposure Therapy',
+            'Thought Records',
+          ],
           conditions: ['Depression', 'Anxiety Disorders', 'PTSD', 'OCD'],
           evidenceLevel: 'Strong',
           keyPrinciples: [
             'Thoughts, feelings, and behaviors are interconnected',
             'Focus on present-moment problems',
             'Active, collaborative approach',
-            'Skills-based intervention'
+            'Skills-based intervention',
           ],
           developers: ['Aaron Beck', 'Albert Ellis'],
           yearDeveloped: 1960,
-          applications: ['Individual Therapy', 'Group Therapy', 'Self-Help', 'Digital Interventions']
+          applications: [
+            'Individual Therapy',
+            'Group Therapy',
+            'Self-Help',
+            'Digital Interventions',
+          ],
         },
         {
           id: 'dbt',
           name: 'Dialectical Behavior Therapy (DBT)',
           category: 'Mindfulness-Based',
-          description: 'Comprehensive treatment approach combining CBT techniques with mindfulness and distress tolerance skills.',
-          techniques: ['Mindfulness', 'Distress Tolerance', 'Emotion Regulation', 'Interpersonal Effectiveness'],
-          conditions: ['Borderline Personality Disorder', 'Suicidal Ideation', 'Self-Harm', 'Emotional Dysregulation'],
+          description:
+            'Comprehensive treatment approach combining CBT techniques with mindfulness and distress tolerance skills.',
+          techniques: [
+            'Mindfulness',
+            'Distress Tolerance',
+            'Emotion Regulation',
+            'Interpersonal Effectiveness',
+          ],
+          conditions: [
+            'Borderline Personality Disorder',
+            'Suicidal Ideation',
+            'Self-Harm',
+            'Emotional Dysregulation',
+          ],
           evidenceLevel: 'Strong',
           keyPrinciples: [
             'Dialectical thinking',
             'Mindfulness as core skill',
             'Distress tolerance',
-            'Validation and change balance'
+            'Validation and change balance',
           ],
           developers: ['Marsha Linehan'],
           yearDeveloped: 1980,
-          applications: ['Individual Therapy', 'Group Skills Training', 'Intensive Outpatient', 'Residential Treatment']
+          applications: [
+            'Individual Therapy',
+            'Group Skills Training',
+            'Intensive Outpatient',
+            'Residential Treatment',
+          ],
         },
         {
           id: 'act',
           name: 'Acceptance and Commitment Therapy (ACT)',
           category: 'Mindfulness-Based',
-          description: 'Behavioral approach using mindfulness and acceptance strategies to increase psychological flexibility.',
-          techniques: ['Values Clarification', 'Mindfulness Exercises', 'Defusion Techniques', 'Committed Action'],
-          conditions: ['Chronic Pain', 'Anxiety', 'Depression', 'Substance Use'],
+          description:
+            'Behavioral approach using mindfulness and acceptance strategies to increase psychological flexibility.',
+          techniques: [
+            'Values Clarification',
+            'Mindfulness Exercises',
+            'Defusion Techniques',
+            'Committed Action',
+          ],
+          conditions: [
+            'Chronic Pain',
+            'Anxiety',
+            'Depression',
+            'Substance Use',
+          ],
           evidenceLevel: 'Moderate',
           keyPrinciples: [
             'Psychological flexibility',
             'Values-based living',
             'Acceptance over control',
-            'Present-moment awareness'
+            'Present-moment awareness',
           ],
           developers: ['Steven Hayes'],
           yearDeveloped: 1990,
-          applications: ['Individual Therapy', 'Group Therapy', 'Workplace Interventions', 'Health Psychology']
-        }
+          applications: [
+            'Individual Therapy',
+            'Group Therapy',
+            'Workplace Interventions',
+            'Health Psychology',
+          ],
+        },
       ]
 
       setFrameworks(demoFrameworks)
-      setCategories(['Cognitive-Behavioral', 'Mindfulness-Based', 'Psychodynamic', 'Humanistic'])
+      setCategories([
+        'Cognitive-Behavioral',
+        'Mindfulness-Based',
+        'Psychodynamic',
+        'Humanistic',
+      ])
       if (demoFrameworks.length > 0) {
         setSelectedFramework(demoFrameworks[0] || null)
       }
@@ -174,16 +237,20 @@ export default function PsychologyFrameworksDemo() {
   }
 
   const getUniqueConditions = () => {
-    const allConditions = frameworks.flatMap(fw => fw.conditions)
+    const allConditions = frameworks.flatMap((fw) => fw.conditions)
     return Array.from(new Set(allConditions)).sort()
   }
 
   const getEvidenceBadgeColor = (level: string) => {
     switch (level.toLowerCase()) {
-      case 'strong': return 'bg-green-100 text-green-800 border-green-200'
-      case 'moderate': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'emerging': return 'bg-blue-100 text-blue-800 border-blue-200'
-      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+      case 'strong':
+        return 'bg-green-100 text-green-800 border-green-200'
+      case 'moderate':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'emerging':
+        return 'bg-blue-100 text-blue-800 border-blue-200'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
   }
 
@@ -196,8 +263,9 @@ export default function PsychologyFrameworksDemo() {
           Psychology Frameworks Browser
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Explore evidence-based therapeutic frameworks with detailed information about techniques, 
-          applications, and clinical evidence. Perfect for training, research, and clinical practice.
+          Explore evidence-based therapeutic frameworks with detailed
+          information about techniques, applications, and clinical evidence.
+          Perfect for training, research, and clinical practice.
         </p>
       </div>
 
@@ -223,8 +291,10 @@ export default function PsychologyFrameworksDemo() {
               className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Categories</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
 
@@ -235,14 +305,17 @@ export default function PsychologyFrameworksDemo() {
               className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Conditions</option>
-              {getUniqueConditions().map(condition => (
-                <option key={condition} value={condition}>{condition}</option>
+              {getUniqueConditions().map((condition) => (
+                <option key={condition} value={condition}>
+                  {condition}
+                </option>
               ))}
             </select>
           </div>
 
           <div className="mt-4 text-sm text-gray-600">
-            Showing {filteredFrameworks.length} of {frameworks.length} frameworks
+            Showing {filteredFrameworks.length} of {frameworks.length}{' '}
+            frameworks
           </div>
         </CardContent>
       </Card>
@@ -260,14 +333,14 @@ export default function PsychologyFrameworksDemo() {
               <Brain className="w-5 h-5" />
               Frameworks ({filteredFrameworks.length})
             </h2>
-            
+
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {filteredFrameworks.map((framework) => (
                 <Card
                   key={framework.id}
                   className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedFramework?.id === framework.id 
-                      ? 'ring-2 ring-blue-500 bg-blue-50' 
+                    selectedFramework?.id === framework.id
+                      ? 'ring-2 ring-blue-500 bg-blue-50'
                       : 'hover:bg-gray-50'
                   }`}
                   onClick={() => setSelectedFramework(framework)}
@@ -283,8 +356,8 @@ export default function PsychologyFrameworksDemo() {
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className={`text-xs ${getEvidenceBadgeColor(framework.evidenceLevel)}`}
                         >
                           {framework.evidenceLevel}
@@ -311,37 +384,52 @@ export default function PsychologyFrameworksDemo() {
                       <CardTitle className="text-xl text-gray-900">
                         {selectedFramework.name}
                       </CardTitle>
-                      <p className="text-gray-600 mt-1">{selectedFramework.category}</p>
+                      <p className="text-gray-600 mt-1">
+                        {selectedFramework.category}
+                      </p>
                     </div>
-                    <Badge 
+                    <Badge
                       variant="outline"
-                      className={getEvidenceBadgeColor(selectedFramework.evidenceLevel)}
+                      className={getEvidenceBadgeColor(
+                        selectedFramework.evidenceLevel,
+                      )}
                     >
                       {selectedFramework.evidenceLevel} Evidence
                     </Badge>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-6">
                   <Tabs defaultValue="overview" className="w-full">
                     <TabsList className="grid w-full grid-cols-4">
                       <TabsTrigger value="overview">Overview</TabsTrigger>
                       <TabsTrigger value="techniques">Techniques</TabsTrigger>
-                      <TabsTrigger value="applications">Applications</TabsTrigger>
+                      <TabsTrigger value="applications">
+                        Applications
+                      </TabsTrigger>
                       <TabsTrigger value="details">Details</TabsTrigger>
                     </TabsList>
-                    
+
                     <TabsContent value="overview" className="space-y-4 mt-6">
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-2">Description</h4>
-                        <p className="text-gray-700">{selectedFramework.description}</p>
+                        <h4 className="font-medium text-gray-900 mb-2">
+                          Description
+                        </h4>
+                        <p className="text-gray-700">
+                          {selectedFramework.description}
+                        </p>
                       </div>
-                      
+
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-2">Key Principles</h4>
+                        <h4 className="font-medium text-gray-900 mb-2">
+                          Key Principles
+                        </h4>
                         <ul className="space-y-1">
                           {selectedFramework.keyPrinciples.map((principle) => (
-                            <li key={principle} className="flex items-start gap-2 text-gray-700">
+                            <li
+                              key={principle}
+                              className="flex items-start gap-2 text-gray-700"
+                            >
                               <Target className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                               {principle}
                             </li>
@@ -350,64 +438,97 @@ export default function PsychologyFrameworksDemo() {
                       </div>
 
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-2">Primary Conditions</h4>
+                        <h4 className="font-medium text-gray-900 mb-2">
+                          Primary Conditions
+                        </h4>
                         <div className="flex flex-wrap gap-2">
                           {selectedFramework.conditions.map((condition) => (
-                            <Badge key={condition} variant="outline" className="text-xs">
+                            <Badge
+                              key={condition}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {condition}
                             </Badge>
                           ))}
                         </div>
                       </div>
                     </TabsContent>
-                    
+
                     <TabsContent value="techniques" className="space-y-4 mt-6">
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-3">Core Techniques</h4>
+                        <h4 className="font-medium text-gray-900 mb-3">
+                          Core Techniques
+                        </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {selectedFramework.techniques.map((technique) => (
-                            <div key={technique} className="p-3 bg-gray-50 rounded-lg border">
-                              <div className="font-medium text-gray-900 text-sm">{technique}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="applications" className="space-y-4 mt-6">
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-3">Clinical Applications</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {selectedFramework.applications.map((application) => (
-                            <div key={application} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                              <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-blue-900 text-sm">{application}</span>
+                            <div
+                              key={technique}
+                              className="p-3 bg-gray-50 rounded-lg border"
+                            >
+                              <div className="font-medium text-gray-900 text-sm">
+                                {technique}
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     </TabsContent>
-                    
+
+                    <TabsContent
+                      value="applications"
+                      className="space-y-4 mt-6"
+                    >
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-3">
+                          Clinical Applications
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {selectedFramework.applications.map((application) => (
+                            <div
+                              key={application}
+                              className="p-3 bg-blue-50 rounded-lg border border-blue-200"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Users className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-blue-900 text-sm">
+                                  {application}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </TabsContent>
+
                     <TabsContent value="details" className="space-y-4 mt-6">
                       {selectedFramework.developers && (
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Developers</h4>
-                          <p className="text-gray-700">{selectedFramework.developers.join(', ')}</p>
+                          <h4 className="font-medium text-gray-900 mb-2">
+                            Developers
+                          </h4>
+                          <p className="text-gray-700">
+                            {selectedFramework.developers.join(', ')}
+                          </p>
                         </div>
                       )}
-                      
+
                       {selectedFramework.yearDeveloped && (
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Year Developed</h4>
-                          <p className="text-gray-700">{selectedFramework.yearDeveloped}</p>
+                          <h4 className="font-medium text-gray-900 mb-2">
+                            Year Developed
+                          </h4>
+                          <p className="text-gray-700">
+                            {selectedFramework.yearDeveloped}
+                          </p>
                         </div>
                       )}
-                      
+
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-2">Evidence Level</h4>
-                        <Badge 
+                        <h4 className="font-medium text-gray-900 mb-2">
+                          Evidence Level
+                        </h4>
+                        <Badge
                           variant="outline"
                           className={`${getEvidenceBadgeColor(selectedFramework.evidenceLevel)} text-sm`}
                         >
@@ -426,7 +547,8 @@ export default function PsychologyFrameworksDemo() {
                     Select a Framework
                   </h3>
                   <p className="text-gray-600">
-                    Choose a therapeutic framework from the list to view detailed information
+                    Choose a therapeutic framework from the list to view
+                    detailed information
                   </p>
                 </CardContent>
               </Card>
@@ -439,8 +561,8 @@ export default function PsychologyFrameworksDemo() {
       <Card className="border-gray-200">
         <CardContent className="p-6">
           <div className="flex flex-wrap gap-4 justify-center">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={loadFrameworks}
               disabled={loading}
               className="flex items-center gap-2"
@@ -448,7 +570,7 @@ export default function PsychologyFrameworksDemo() {
               <Brain className="w-4 h-4" />
               Refresh Frameworks
             </Button>
-            <Button 
+            <Button
               variant="outline"
               onClick={() => {
                 setSearchTerm('')

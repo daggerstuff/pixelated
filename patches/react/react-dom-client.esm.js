@@ -15,5 +15,22 @@ export default {
   createRoot,
   hydrateRoot,
 }
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="62989174-49ef-58df-b11e-a95e4aa4ea6e")}catch(e){}}();
+!(function () {
+  try {
+    var e =
+        'undefined' != typeof window
+          ? window
+          : 'undefined' != typeof global
+            ? global
+            : 'undefined' != typeof globalThis
+              ? globalThis
+              : 'undefined' != typeof self
+                ? self
+                : {},
+      n = new e.Error().stack
+    n &&
+      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      (e._sentryDebugIds[n] = '62989174-49ef-58df-b11e-a95e4aa4ea6e'))
+  } catch (e) {}
+})()
 //# debugId=62989174-49ef-58df-b11e-a95e4aa4ea6e

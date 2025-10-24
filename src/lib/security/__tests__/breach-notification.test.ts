@@ -218,7 +218,9 @@ describe('breachNotificationSystem', () => {
         notificationStatus: 'completed',
       }
 
-      ;(redis.get as unknown).mockResolvedValue(JSON.stringify(mockStoredBreach))
+      ;(redis.get as unknown).mockResolvedValue(
+        JSON.stringify(mockStoredBreach),
+      )
 
       const breach =
         await BreachNotificationSystem.getBreachStatus('test_breach')
@@ -296,7 +298,10 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should filter out invalid breach data', async () => {
-      ;(redis.keys as unknown).mockResolvedValue(['breach:valid', 'breach:invalid'])
+      ;(redis.keys as unknown).mockResolvedValue([
+        'breach:valid',
+        'breach:invalid',
+      ])
       ;(redis.get as unknown)
         .mockResolvedValueOnce(
           JSON.stringify({

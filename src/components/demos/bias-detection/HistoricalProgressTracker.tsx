@@ -8,9 +8,10 @@ interface HistoricalProgressTrackerProps {
   currentScore: number
 }
 
-export const HistoricalProgressTracker: FC<
-  HistoricalProgressTrackerProps
-> = ({ comparison, currentScore }) => {
+export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
+  comparison,
+  currentScore,
+}) => {
   // Helper function to get trend styling
   const getTrendStyle = (trend: string) => {
     switch (trend) {

@@ -70,8 +70,13 @@ const CLIENT_PROFILES = {
       gender: 'Female',
       background: 'Marketing professional, college educated, stable housing',
       presentingConcern: 'Work-related stress and mild anxiety',
-      history: 'No previous therapy experience, supportive family, generally good coping skills',
-      challenges: ['Time management', 'Setting boundaries at work', 'Perfectionism']
+      history:
+        'No previous therapy experience, supportive family, generally good coping skills',
+      challenges: [
+        'Time management',
+        'Setting boundaries at work',
+        'Perfectionism',
+      ],
     },
     {
       name: 'Mike Chen',
@@ -80,8 +85,12 @@ const CLIENT_PROFILES = {
       background: 'Software engineer, married with one child',
       presentingConcern: 'Adjustment difficulties after job change',
       history: 'One previous brief counseling episode, good social support',
-      challenges: ['Career transition stress', 'Work-life balance', 'Imposter syndrome']
-    }
+      challenges: [
+        'Career transition stress',
+        'Work-life balance',
+        'Imposter syndrome',
+      ],
+    },
   ],
   intermediate: [
     {
@@ -90,8 +99,14 @@ const CLIENT_PROFILES = {
       gender: 'Female',
       background: 'Physician, divorced, two teenage children',
       presentingConcern: 'Burnout and depression following divorce',
-      history: 'High-functioning depression, previous therapy with mixed results',
-      challenges: ['Professional identity crisis', 'Co-parenting conflicts', 'Perfectionism', 'Emotional numbness']
+      history:
+        'High-functioning depression, previous therapy with mixed results',
+      challenges: [
+        'Professional identity crisis',
+        'Co-parenting conflicts',
+        'Perfectionism',
+        'Emotional numbness',
+      ],
     },
     {
       name: 'James Rodriguez',
@@ -100,8 +115,12 @@ const CLIENT_PROFILES = {
       background: 'College student, first-generation immigrant family',
       presentingConcern: 'Social anxiety and academic pressure',
       history: 'Cultural stigma around mental health, family expectations',
-      challenges: ['Cultural identity conflicts', 'Performance anxiety', 'Family loyalty vs. independence']
-    }
+      challenges: [
+        'Cultural identity conflicts',
+        'Performance anxiety',
+        'Family loyalty vs. independence',
+      ],
+    },
   ],
   advanced: [
     {
@@ -110,8 +129,14 @@ const CLIENT_PROFILES = {
       gender: 'Non-binary',
       background: 'Artist, history of trauma, unstable housing',
       presentingConcern: 'Complex PTSD and relationship difficulties',
-      history: 'Multiple previous therapists, some negative experiences, trust issues',
-      challenges: ['Attachment difficulties', 'Emotional dysregulation', 'Identity exploration', 'Trauma processing']
+      history:
+        'Multiple previous therapists, some negative experiences, trust issues',
+      challenges: [
+        'Attachment difficulties',
+        'Emotional dysregulation',
+        'Identity exploration',
+        'Trauma processing',
+      ],
     },
     {
       name: 'Robert Kim',
@@ -119,78 +144,163 @@ const CLIENT_PROFILES = {
       gender: 'Male',
       background: 'Veteran, small business owner, married',
       presentingConcern: 'PTSD, substance use, and anger management',
-      history: 'Military trauma, previous unsuccessful treatment attempts, family strain',
-      challenges: ['Combat trauma', 'Alcohol dependence', 'Marital conflict', 'Emotional avoidance']
-    }
-  ]
+      history:
+        'Military trauma, previous unsuccessful treatment attempts, family strain',
+      challenges: [
+        'Combat trauma',
+        'Alcohol dependence',
+        'Marital conflict',
+        'Emotional avoidance',
+      ],
+    },
+  ],
 }
 
 const THERAPEUTIC_FRAMEWORKS_DETAILED = {
-  'CBT': {
+  CBT: {
     name: 'Cognitive Behavioral Therapy',
     interventions: [
-      { technique: 'Thought Record', rationale: 'Identify cognitive distortions', implementation: 'Have client track thoughts, feelings, and situations', expectedOutcome: 'Increased awareness of thought patterns' },
-      { technique: 'Behavioral Activation', rationale: 'Increase pleasant activities', implementation: 'Schedule meaningful activities', expectedOutcome: 'Improved mood and engagement' },
-      { technique: 'Cognitive Restructuring', rationale: 'Challenge negative thoughts', implementation: 'Examine evidence for/against thoughts', expectedOutcome: 'More balanced thinking' }
+      {
+        technique: 'Thought Record',
+        rationale: 'Identify cognitive distortions',
+        implementation: 'Have client track thoughts, feelings, and situations',
+        expectedOutcome: 'Increased awareness of thought patterns',
+      },
+      {
+        technique: 'Behavioral Activation',
+        rationale: 'Increase pleasant activities',
+        implementation: 'Schedule meaningful activities',
+        expectedOutcome: 'Improved mood and engagement',
+      },
+      {
+        technique: 'Cognitive Restructuring',
+        rationale: 'Challenge negative thoughts',
+        implementation: 'Examine evidence for/against thoughts',
+        expectedOutcome: 'More balanced thinking',
+      },
     ],
-    assessmentAreas: ['Thought identification', 'Homework completion', 'Skill application', 'Therapeutic rapport']
+    assessmentAreas: [
+      'Thought identification',
+      'Homework completion',
+      'Skill application',
+      'Therapeutic rapport',
+    ],
   },
-  'DBT': {
+  DBT: {
     name: 'Dialectical Behavior Therapy',
     interventions: [
-      { technique: 'Distress Tolerance Skills', rationale: 'Manage crisis situations', implementation: 'Teach TIPP skills (Temperature, Intense exercise, Paced breathing, Paired muscle relaxation)', expectedOutcome: 'Reduced impulsive behaviors' },
-      { technique: 'Emotion Regulation', rationale: 'Understand and manage emotions', implementation: 'Emotion identification and PLEASE skills', expectedOutcome: 'Better emotional control' },
-      { technique: 'Mindfulness', rationale: 'Present-moment awareness', implementation: 'Observe, describe, participate exercises', expectedOutcome: 'Increased self-awareness' }
+      {
+        technique: 'Distress Tolerance Skills',
+        rationale: 'Manage crisis situations',
+        implementation:
+          'Teach TIPP skills (Temperature, Intense exercise, Paced breathing, Paired muscle relaxation)',
+        expectedOutcome: 'Reduced impulsive behaviors',
+      },
+      {
+        technique: 'Emotion Regulation',
+        rationale: 'Understand and manage emotions',
+        implementation: 'Emotion identification and PLEASE skills',
+        expectedOutcome: 'Better emotional control',
+      },
+      {
+        technique: 'Mindfulness',
+        rationale: 'Present-moment awareness',
+        implementation: 'Observe, describe, participate exercises',
+        expectedOutcome: 'Increased self-awareness',
+      },
     ],
-    assessmentAreas: ['Skills practice', 'Crisis management', 'Emotion regulation', 'Interpersonal effectiveness']
+    assessmentAreas: [
+      'Skills practice',
+      'Crisis management',
+      'Emotion regulation',
+      'Interpersonal effectiveness',
+    ],
   },
-  'ACT': {
+  ACT: {
     name: 'Acceptance and Commitment Therapy',
     interventions: [
-      { technique: 'Values Clarification', rationale: 'Identify core values', implementation: 'Values card sort and discussion', expectedOutcome: 'Clear value direction' },
-      { technique: 'Cognitive Defusion', rationale: 'Reduce impact of difficult thoughts', implementation: 'Thought observation exercises', expectedOutcome: 'Psychological flexibility' },
-      { technique: 'Mindful Acceptance', rationale: 'Accept difficult emotions', implementation: 'Present-moment awareness exercises', expectedOutcome: 'Reduced avoidance' }
+      {
+        technique: 'Values Clarification',
+        rationale: 'Identify core values',
+        implementation: 'Values card sort and discussion',
+        expectedOutcome: 'Clear value direction',
+      },
+      {
+        technique: 'Cognitive Defusion',
+        rationale: 'Reduce impact of difficult thoughts',
+        implementation: 'Thought observation exercises',
+        expectedOutcome: 'Psychological flexibility',
+      },
+      {
+        technique: 'Mindful Acceptance',
+        rationale: 'Accept difficult emotions',
+        implementation: 'Present-moment awareness exercises',
+        expectedOutcome: 'Reduced avoidance',
+      },
     ],
-    assessmentAreas: ['Value identification', 'Psychological flexibility', 'Mindfulness practice', 'Behavioral commitment']
-  }
+    assessmentAreas: [
+      'Value identification',
+      'Psychological flexibility',
+      'Mindfulness practice',
+      'Behavioral commitment',
+    ],
+  },
 }
 
 function generateUniqueId(): string {
   return `scenario_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
-function selectClientProfile(difficulty: string, clientProfile?: Partial<GenerateScenarioRequest['clientProfile']>): GenerateScenarioResponse['scenario']['clientProfile'] {
-  const profiles = CLIENT_PROFILES[difficulty as keyof typeof CLIENT_PROFILES] || CLIENT_PROFILES.beginner
+function selectClientProfile(
+  difficulty: string,
+  clientProfile?: Partial<GenerateScenarioRequest['clientProfile']>,
+): GenerateScenarioResponse['scenario']['clientProfile'] {
+  const profiles =
+    CLIENT_PROFILES[difficulty as keyof typeof CLIENT_PROFILES] ||
+    CLIENT_PROFILES.beginner
   const baseProfile = profiles[Math.floor(Math.random() * profiles.length)]
-  
+
   return {
     ...baseProfile,
-    ...clientProfile
+    ...clientProfile,
   }
 }
 
-function generateSessionContext(difficulty: string): GenerateScenarioResponse['scenario']['sessionContext'] {
+function generateSessionContext(
+  difficulty: string,
+): GenerateScenarioResponse['scenario']['sessionContext'] {
   const sessionNumbers = {
     beginner: Math.floor(Math.random() * 3) + 1, // 1-3
     intermediate: Math.floor(Math.random() * 5) + 3, // 3-7
-    advanced: Math.floor(Math.random() * 8) + 5 // 5-12
+    advanced: Math.floor(Math.random() * 8) + 5, // 5-12
   }
 
-  const sessionNumber = sessionNumbers[difficulty as keyof typeof sessionNumbers] || 1
+  const sessionNumber =
+    sessionNumbers[difficulty as keyof typeof sessionNumbers] || 1
 
-  const previousSessions = sessionNumber > 1 ? [
-    'Initial assessment and rapport building',
-    'Identified presenting concerns and goals',
-    ...(sessionNumber > 2 ? ['Explored background and history'] : []),
-    ...(sessionNumber > 3 ? ['Introduced therapeutic interventions'] : []),
-    ...(sessionNumber > 5 ? ['Addressed resistance and challenges'] : [])
-  ].slice(0, sessionNumber - 1) : []
+  const previousSessions =
+    sessionNumber > 1
+      ? [
+          'Initial assessment and rapport building',
+          'Identified presenting concerns and goals',
+          ...(sessionNumber > 2 ? ['Explored background and history'] : []),
+          ...(sessionNumber > 3
+            ? ['Introduced therapeutic interventions']
+            : []),
+          ...(sessionNumber > 5 ? ['Addressed resistance and challenges'] : []),
+        ].slice(0, sessionNumber - 1)
+      : []
 
   return {
     sessionNumber,
     previousSessions,
     currentGoals: generateGoals(difficulty),
-    therapeuticAlliance: sessionNumber <= 2 ? 'building' : sessionNumber <= 5 ? 'established' : 'strong'
+    therapeuticAlliance:
+      sessionNumber <= 2
+        ? 'building'
+        : sessionNumber <= 5
+          ? 'established'
+          : 'strong',
   }
 }
 
@@ -199,67 +309,102 @@ function generateGoals(difficulty: string): string[] {
     beginner: [
       'Reduce work-related stress',
       'Improve time management skills',
-      'Develop healthy coping strategies'
+      'Develop healthy coping strategies',
     ],
     intermediate: [
       'Process grief and loss',
       'Improve interpersonal relationships',
       'Develop emotional regulation skills',
-      'Address cognitive distortions'
+      'Address cognitive distortions',
     ],
     advanced: [
       'Process traumatic experiences safely',
       'Develop healthy attachment patterns',
       'Integrate fragmented aspects of identity',
       'Build distress tolerance skills',
-      'Address substance use patterns'
-    ]
+      'Address substance use patterns',
+    ],
   }
 
-  const goals = goalSets[difficulty as keyof typeof goalSets] || goalSets.beginner
+  const goals =
+    goalSets[difficulty as keyof typeof goalSets] || goalSets.beginner
   return goals.slice(0, Math.floor(Math.random() * 2) + 2) // 2-3 goals
 }
 
-function generateInterventions(framework: string, difficulty: string): Array<{ technique: string; rationale: string; implementation: string; expectedOutcome: string }> {
-  const frameworkData = THERAPEUTIC_FRAMEWORKS_DETAILED[framework as keyof typeof THERAPEUTIC_FRAMEWORKS_DETAILED] || THERAPEUTIC_FRAMEWORKS_DETAILED.CBT
-  
-  const numInterventions = difficulty === 'beginner' ? 2 : difficulty === 'intermediate' ? 3 : 4
-  
+function generateInterventions(
+  framework: string,
+  difficulty: string,
+): Array<{
+  technique: string
+  rationale: string
+  implementation: string
+  expectedOutcome: string
+}> {
+  const frameworkData =
+    THERAPEUTIC_FRAMEWORKS_DETAILED[
+      framework as keyof typeof THERAPEUTIC_FRAMEWORKS_DETAILED
+    ] || THERAPEUTIC_FRAMEWORKS_DETAILED.CBT
+
+  const numInterventions =
+    difficulty === 'beginner' ? 2 : difficulty === 'intermediate' ? 3 : 4
+
   return frameworkData.interventions.slice(0, numInterventions)
 }
 
-function generateAssessmentCriteria(framework: string): Array<{ category: string; criteria: string[]; weight: number }> {
-  const frameworkData = THERAPEUTIC_FRAMEWORKS_DETAILED[framework as keyof typeof THERAPEUTIC_FRAMEWORKS_DETAILED] || THERAPEUTIC_FRAMEWORKS_DETAILED.CBT
-  
+function generateAssessmentCriteria(
+  framework: string,
+): Array<{ category: string; criteria: string[]; weight: number }> {
+  const frameworkData =
+    THERAPEUTIC_FRAMEWORKS_DETAILED[
+      framework as keyof typeof THERAPEUTIC_FRAMEWORKS_DETAILED
+    ] || THERAPEUTIC_FRAMEWORKS_DETAILED.CBT
+
   return [
     {
       category: 'Therapeutic Relationship',
-      criteria: ['Demonstrates empathy and warmth', 'Maintains appropriate boundaries', 'Shows cultural sensitivity'],
-      weight: 25
+      criteria: [
+        'Demonstrates empathy and warmth',
+        'Maintains appropriate boundaries',
+        'Shows cultural sensitivity',
+      ],
+      weight: 25,
     },
     {
       category: 'Clinical Skills',
-      criteria: frameworkData.assessmentAreas.map(area => `Demonstrates competency in ${area}`),
-      weight: 40
+      criteria: frameworkData.assessmentAreas.map(
+        (area) => `Demonstrates competency in ${area}`,
+      ),
+      weight: 40,
     },
     {
       category: 'Ethical Practice',
-      criteria: ['Maintains confidentiality', 'Recognizes scope of practice', 'Documents appropriately'],
-      weight: 20
+      criteria: [
+        'Maintains confidentiality',
+        'Recognizes scope of practice',
+        'Documents appropriately',
+      ],
+      weight: 20,
     },
     {
       category: 'Professional Development',
-      criteria: ['Seeks supervision when needed', 'Reflects on practice', 'Continues learning'],
-      weight: 15
-    }
+      criteria: [
+        'Seeks supervision when needed',
+        'Reflects on practice',
+        'Continues learning',
+      ],
+      weight: 15,
+    },
   ]
 }
 
-function generateSupervisionNotes(difficulty: string, framework: string): string[] {
+function generateSupervisionNotes(
+  difficulty: string,
+  framework: string,
+): string[] {
   const notes = [
     `Focus on ${framework} technique implementation`,
     'Monitor for countertransference reactions',
-    'Assess safety and risk factors regularly'
+    'Assess safety and risk factors regularly',
   ]
 
   if (difficulty === 'intermediate') {
@@ -267,7 +412,11 @@ function generateSupervisionNotes(difficulty: string, framework: string): string
   }
 
   if (difficulty === 'advanced') {
-    notes.push('Trauma-informed care essential', 'Consider consultation needs', 'Monitor therapist self-care')
+    notes.push(
+      'Trauma-informed care essential',
+      'Consider consultation needs',
+      'Monitor therapist self-care',
+    )
   }
 
   return notes
@@ -276,23 +425,30 @@ function generateSupervisionNotes(difficulty: string, framework: string): string
 export const POST = async ({ request }: APIContext) => {
   try {
     const body: GenerateScenarioRequest = await request.json()
-    
+
     if (!body.context || typeof body.context !== 'string') {
-      return new Response(JSON.stringify({ 
-        error: 'Invalid request: context is required and must be a string' 
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid request: context is required and must be a string',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     if (!['beginner', 'intermediate', 'advanced'].includes(body.difficulty)) {
-      return new Response(JSON.stringify({ 
-        error: 'Invalid difficulty level: must be beginner, intermediate, or advanced' 
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return new Response(
+        JSON.stringify({
+          error:
+            'Invalid difficulty level: must be beginner, intermediate, or advanced',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     const framework = body.framework || 'CBT'
@@ -300,12 +456,15 @@ export const POST = async ({ request }: APIContext) => {
       includeAssessment: true,
       includeLearningObjectives: true,
       includeInterventions: true,
-      ...body.options
+      ...body.options,
     }
 
-    const clientProfile = selectClientProfile(body.difficulty, body.clientProfile)
+    const clientProfile = selectClientProfile(
+      body.difficulty,
+      body.clientProfile,
+    )
     const sessionContext = generateSessionContext(body.difficulty)
-    
+
     const scenario = {
       id: generateUniqueId(),
       title: `${body.difficulty.charAt(0).toUpperCase() + body.difficulty.slice(1)} Case: ${clientProfile.name}`,
@@ -317,24 +476,38 @@ export const POST = async ({ request }: APIContext) => {
         background: clientProfile.background,
         presentingConcern: clientProfile.presentingConcern,
         history: clientProfile.history,
-        currentSituation: `Client presents for session ${sessionContext.sessionNumber} with ongoing concerns about ${body.context}. ${clientProfile.challenges ? 'Current challenges include: ' + clientProfile.challenges.join(', ') + '.' : ''}`
+        currentSituation: `Client presents for session ${sessionContext.sessionNumber} with ongoing concerns about ${body.context}. ${clientProfile.challenges ? 'Current challenges include: ' + clientProfile.challenges.join(', ') + '.' : ''}`,
       },
       sessionContext,
       challengeLevel: `${body.difficulty} level case requiring ${framework} intervention skills`,
-      estimatedDuration: body.difficulty === 'beginner' ? '45-50 minutes' : body.difficulty === 'intermediate' ? '50-60 minutes' : '60-75 minutes'
+      estimatedDuration:
+        body.difficulty === 'beginner'
+          ? '45-50 minutes'
+          : body.difficulty === 'intermediate'
+            ? '50-60 minutes'
+            : '60-75 minutes',
     }
 
-    const learningObjectives = options.includeLearningObjectives ? [
-      `Apply ${framework} techniques appropriately`,
-      `Demonstrate therapeutic rapport and alliance building`,
-      `Assess and manage risk factors`,
-      `Implement culturally sensitive interventions`,
-      `Document session notes according to professional standards`
-    ] : []
+    const learningObjectives = options.includeLearningObjectives
+      ? [
+          `Apply ${framework} techniques appropriately`,
+          `Demonstrate therapeutic rapport and alliance building`,
+          `Assess and manage risk factors`,
+          `Implement culturally sensitive interventions`,
+          `Document session notes according to professional standards`,
+        ]
+      : []
 
-    const assessmentCriteria = options.includeAssessment ? generateAssessmentCriteria(framework) : []
-    const suggestedInterventions = options.includeInterventions ? generateInterventions(framework, body.difficulty) : []
-    const supervision_notes = generateSupervisionNotes(body.difficulty, framework)
+    const assessmentCriteria = options.includeAssessment
+      ? generateAssessmentCriteria(framework)
+      : []
+    const suggestedInterventions = options.includeInterventions
+      ? generateInterventions(framework, body.difficulty)
+      : []
+    const supervision_notes = generateSupervisionNotes(
+      body.difficulty,
+      framework,
+    )
 
     const response: GenerateScenarioResponse = {
       scenario,
@@ -346,26 +519,28 @@ export const POST = async ({ request }: APIContext) => {
         difficulty: body.difficulty,
         framework,
         generatedAt: new Date().toISOString(),
-        version: '1.0'
-      }
+        version: '1.0',
+      },
     }
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        'X-Scenario-ID': scenario.id
-      }
+        'X-Scenario-ID': scenario.id,
+      },
     })
-
   } catch (error: unknown) {
     console.error('Psychology scenario generation error:', error)
-    return new Response(JSON.stringify({ 
-      error: 'Internal server error during scenario generation',
-      details: error instanceof Error ? String(error) : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        error: 'Internal server error during scenario generation',
+        details: error instanceof Error ? String(error) : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }

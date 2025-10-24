@@ -114,7 +114,9 @@ export default function EmotionTrackingChart({
           <select
             className="text-sm border rounded px-2 py-1"
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as 'full' | '5min' | '10min')}
+            onChange={(e) =>
+              setTimeRange(e.target.value as 'full' | '5min' | '10min')
+            }
             aria-label="Select time range"
           >
             <option value="full">Full Session</option>

@@ -37,7 +37,7 @@ All three authentication steps were updated to use Workload Identity Federation.
 
 ### Add These Secrets:
 - `GCP_WORKLOAD_IDENTITY_PROVIDER` - Format: `projects/{PROJECT_NUMBER}/locations/global/workloadIdentityPools/{POOL_NAME}/providers/{PROVIDER_NAME}`
-- `GCP_SERVICE_ACCOUNT_EMAIL` - Format: `{SERVICE_ACCOUNT_NAME}@{PROJECT_ID}.iam.gserviceaccount.com`
+- `GCP_SERVICE_ACCOUNT_EMAIL` - Format: `action@pixelatedempathy.com`
 
 ### Keep These Secrets (unchanged):
 - `GCP_PROJECT_ID`

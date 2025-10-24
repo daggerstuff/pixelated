@@ -135,18 +135,24 @@ const activityLogs: DLPActivityLog[] = [
     }
     // Listen for custom events from the DLP components
     document.addEventListener('dlp:rule-updated', (e) => {
-      const detail = (e as CustomEvent<RuleUpdatedDetail>).detail;
-      (window as any).showDLPAlert('success', `Rule "${detail.name}" has been ${detail.isActive ? 'enabled' : 'disabled'}.`);
-    });
+      const detail = (e as CustomEvent<RuleUpdatedDetail>).detail
+      ;(window as any).showDLPAlert(
+        'success',
+        `Rule "${detail.name}" has been ${detail.isActive ? 'enabled' : 'disabled'}.`,
+      )
+    })
 
     document.addEventListener('dlp:rule-saved', (e) => {
-      const detail = (e as CustomEvent<RuleSavedDetail>).detail;
-      (window as any).showDLPAlert('success', `Rule has been ${detail.isEditing ? 'updated' : 'created'} successfully.`);
-    });
+      const detail = (e as CustomEvent<RuleSavedDetail>).detail
+      ;(window as any).showDLPAlert(
+        'success',
+        `Rule has been ${detail.isEditing ? 'updated' : 'created'} successfully.`,
+      )
+    })
 
     document.addEventListener('dlp:error', (e) => {
-      const detail = (e as CustomEvent<DlpErrorDetail>).detail;
-      (window as any).showDLPAlert('error', detail.message);
-    });
-  });
+      const detail = (e as CustomEvent<DlpErrorDetail>).detail
+      ;(window as any).showDLPAlert('error', detail.message)
+    })
+  })
 </script>

@@ -6,18 +6,27 @@ interface Props {
   defaultMessage?: string
 }
 
-export const FHEDemo: FC<Props> = ({ defaultMessage = 'Your data is protected with FHE technology' }) => {
-  const [plainText, setPlainText] = useState('Therapist: How are you feeling today?')
-  const [operation, setOperation] = useState<FHEOperation | 'word_count' | 'sentiment'>('word_count')
+export const FHEDemo: FC<Props> = ({
+  defaultMessage = 'Your data is protected with FHE technology',
+}) => {
+  const [plainText, setPlainText] = useState(
+    'Therapist: How are you feeling today?',
+  )
+  const [operation, setOperation] = useState<
+    FHEOperation | 'word_count' | 'sentiment'
+  >('word_count')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<unknown>(null)
 
-  const operations = useMemo(() => [
-    { value: 'word_count', label: 'Word Count' },
-    { value: 'character_count', label: 'Character Count' },
-    { value: 'SENTIMENT', label: 'Sentiment (demo)' },
-  ], [])
+  const operations = useMemo(
+    () => [
+      { value: 'word_count', label: 'Word Count' },
+      { value: 'character_count', label: 'Character Count' },
+      { value: 'SENTIMENT', label: 'Sentiment (demo)' },
+    ],
+    [],
+  )
 
   const encryptLocally = useCallback(async (text: string) => {
     // Demo local "encryption" shim so we can send something that looks encrypted
@@ -61,10 +70,14 @@ export const FHEDemo: FC<Props> = ({ defaultMessage = 'Your data is protected wi
     try {
       setIsLoading(true)
       setError(null)
-      await fetchJSONWithRetry('/api/fhe/rotate-keys', { method: 'POST' }, {
-        retries: 2,
-        timeout: 8000,
-      })
+      await fetchJSONWithRetry(
+        '/api/fhe/rotate-keys',
+        { method: 'POST' },
+        {
+          retries: 2,
+          timeout: 8000,
+        },
+      )
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to rotate keys')
     } finally {
@@ -96,7 +109,11 @@ export const FHEDemo: FC<Props> = ({ defaultMessage = 'Your data is protected wi
             <select
               className="w-full rounded border bg-background p-2 mt-1"
               value={operation}
-              onChange={(e) => setOperation(e.target.value as FHEOperation | 'word_count' | 'sentiment')}
+              onChange={(e) =>
+                setOperation(
+                  e.target.value as FHEOperation | 'word_count' | 'sentiment',
+                )
+              }
             >
               {operations.map((op) => (
                 <option key={op.value} value={op.value}>
@@ -132,7 +149,9 @@ export const FHEDemo: FC<Props> = ({ defaultMessage = 'Your data is protected wi
 
       <div className="rounded border p-4">
         <h3 className="mb-2 text-lg font-semibold">Result</h3>
-        <pre className="overflow-auto text-sm">{JSON.stringify(result, null, 2)}</pre>
+        <pre className="overflow-auto text-sm">
+          {JSON.stringify(result, null, 2)}
+        </pre>
       </div>
     </div>
   )

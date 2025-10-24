@@ -227,17 +227,17 @@ export function useSpeechRecognition({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-	domain,
-	config,
-	onInterimResult,
-	onFinalResult,
-	autoRestart,
-	autoStart,
-	onError,
-	startListening,
-	isListening,
-	finalTranscript
-]) // Only re-initialize when domain changes
+    domain,
+    config,
+    onInterimResult,
+    onFinalResult,
+    autoRestart,
+    autoStart,
+    onError,
+    startListening,
+    isListening,
+    finalTranscript,
+  ]) // Only re-initialize when domain changes
 
   // Start listening function
   const startListening = useCallback(() => {

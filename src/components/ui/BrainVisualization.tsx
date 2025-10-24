@@ -29,7 +29,7 @@ interface BrainVisualizationProps {
 export const BrainVisualization: FC<BrainVisualizationProps> = ({
   moodVector,
   archetype,
-  className = ""
+  className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(undefined)
@@ -51,7 +51,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
         z: 30,
         activity: moodVector.cognitive_clarity,
         color: '#3B82F6',
-        size: 25
+        size: 25,
       },
       // Limbic System - Emotional Intensity
       {
@@ -62,7 +62,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
         z: 0,
         activity: moodVector.emotional_intensity,
         color: '#EF4444',
-        size: 20
+        size: 20,
       },
       // Brain Stem - Energy Level
       {
@@ -73,7 +73,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
         z: -10,
         activity: moodVector.energy_level,
         color: '#F59E0B',
-        size: 15
+        size: 15,
       },
       // Temporal Lobe - Social Connection
       {
@@ -84,7 +84,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
         z: 0,
         activity: moodVector.social_connection,
         color: '#10B981',
-        size: 18
+        size: 18,
       },
       {
         id: 'temporal_right',
@@ -94,7 +94,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
         z: 0,
         activity: moodVector.social_connection,
         color: '#10B981',
-        size: 18
+        size: 18,
       },
       // Parietal Lobe - Coherence
       {
@@ -105,10 +105,9 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
         z: -20,
         activity: moodVector.coherence_index,
         color: '#8B5CF6',
-        size: 22
-      }
+        size: 22,
+      },
     ]
-
   }, [moodVector])
 
   // Animation function
@@ -149,23 +148,21 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
 
         const distance = Math.sqrt(
           Math.pow(region.x - otherRegion.x, 2) +
-          Math.pow(region.y - otherRegion.y, 2) +
-          Math.pow(region.z - otherRegion.z, 2)
+            Math.pow(region.y - otherRegion.y, 2) +
+            Math.pow(region.z - otherRegion.z, 2),
         )
 
         if (distance < 50) {
-          const connectionStrength = (region.activity + otherRegion.activity) / 2
-          
+          const connectionStrength =
+            (region.activity + otherRegion.activity) / 2
+
           ctx.strokeStyle = `rgba(99, 102, 241, ${connectionStrength * 0.3})`
           ctx.lineWidth = connectionStrength * 2
           ctx.beginPath()
-          ctx.moveTo(
-            centerX + region.x * scale,
-            centerY + region.y * scale
-          )
+          ctx.moveTo(centerX + region.x * scale, centerY + region.y * scale)
           ctx.lineTo(
             centerX + otherRegion.x * scale,
-            centerY + otherRegion.y * scale
+            centerY + otherRegion.y * scale,
           )
           ctx.stroke()
         }
@@ -176,9 +173,11 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
     brainRegions.forEach((region) => {
       const x = centerX + region.x * scale
       const y = centerY + region.y * scale
-      
+
       // Pulsing effect based on activity
-      const pulse = 1 + Math.sin(timeRef.current * 3 + region.x * 0.1) * 0.2 * region.activity
+      const pulse =
+        1 +
+        Math.sin(timeRef.current * 3 + region.x * 0.1) * 0.2 * region.activity
       const radius = (region.size * region.activity * pulse) / 2
 
       // Glow effect
@@ -283,12 +282,15 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
               const activityInfo = getActivityLevel(region.activity)
               return (
                 <div key={region.id} className="flex items-center space-x-2">
-                  <div 
+                  <div
                     className={`w-2 h-2 rounded-full ${activityInfo.color}`}
                     style={{ backgroundColor: region.color }}
                   />
                   <span className="text-gray-600 truncate">{region.name}</span>
-                  <Badge variant="outline" className="text-xs py-0 px-1 ml-auto">
+                  <Badge
+                    variant="outline"
+                    className="text-xs py-0 px-1 ml-auto"
+                  >
                     {Math.round(region.activity * 100)}%
                   </Badge>
                 </div>
@@ -306,9 +308,11 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
                 <Zap className="h-4 w-4 text-yellow-500" />
                 <span className="font-medium">
                   {Math.round(
-                    (Object.values(moodVector).reduce((a, b) => a + b, 0) / 
-                     Object.values(moodVector).length) * 100
-                  )}%
+                    (Object.values(moodVector).reduce((a, b) => a + b, 0) /
+                      Object.values(moodVector).length) *
+                      100,
+                  )}
+                  %
                 </span>
               </div>
             </div>

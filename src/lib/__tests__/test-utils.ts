@@ -4,7 +4,7 @@ import { vi } from 'vitest'
 // Type-safe global mocking helper
 export function mockGlobal<T extends keyof typeof globalThis>(
   property: T,
-  mockImplementation: typeof globalThis[T]
+  mockImplementation: (typeof globalThis)[T],
 ): { restore: () => void } {
   const original = globalThis[property]
   globalThis[property] = mockImplementation
@@ -12,7 +12,7 @@ export function mockGlobal<T extends keyof typeof globalThis>(
   return {
     restore: () => {
       globalThis[property] = original
-    }
+    },
   }
 }
 
@@ -63,7 +63,9 @@ export function createMockWebSocket(): {
 // Fetch mocking with proper Response typing
 export function createMockResponse(
   data: unknown,
-  options: Partial<Omit<Response, 'clone' | 'bodyUsed'>> & { status?: number } = {}
+  options: Partial<Omit<Response, 'clone' | 'bodyUsed'>> & {
+    status?: number
+  } = {},
 ): Response {
   const {
     status = 200,
@@ -76,12 +78,19 @@ export function createMockResponse(
     ...rest,
     status,
     statusText,
-    headers: headers instanceof Headers ? headers : new Headers(headers as Record<string, string>),
+    headers:
+      headers instanceof Headers
+        ? headers
+        : new Headers(headers as Record<string, string>),
     ok: status >= 200 && status < 300,
     clone: vi.fn(() => createMockResponse(data, { ...options, status })),
     bodyUsed: false,
     json: vi.fn().mockResolvedValue(data),
-    text: vi.fn().mockResolvedValue(typeof data === 'string' ? data : JSON.stringify(data)),
+    text: vi
+      .fn()
+      .mockResolvedValue(
+        typeof data === 'string' ? data : JSON.stringify(data),
+      ),
     arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(0)),
     blob: vi.fn().mockResolvedValue(new Blob()),
     formData: vi.fn().mockResolvedValue(new FormData()),
@@ -105,7 +114,7 @@ export function mockURLMethods(): { restore: () => void } {
     restore: () => {
       URL.createObjectURL = originals.createObjectURL
       URL.revokeObjectURL = originals.revokeObjectURL
-    }
+    },
   }
 }
 
@@ -119,34 +128,40 @@ export function createMockTimer(): {
 } {
   let currentTime = 0
 
-  const mockSetInterval = vi.fn().mockImplementation((fn: (...args: any[]) => void, _delay: number) => {
-    const intervalId = { id: Math.random(), active: true }
-    const wrappedFn = () => fn()
-    // Simulate immediate execution for testing
-    wrappedFn()
-    return intervalId
-  })
+  const mockSetInterval = vi
+    .fn()
+    .mockImplementation((fn: (...args: any[]) => void, _delay: number) => {
+      const intervalId = { id: Math.random(), active: true }
+      const wrappedFn = () => fn()
+      // Simulate immediate execution for testing
+      wrappedFn()
+      return intervalId
+    })
 
-  const mockSetTimeout = vi.fn().mockImplementation((fn: (...args: any[]) => void, delay: number) => {
-    const timeoutId = { id: Math.random(), active: true }
-    setTimeout(() => {
-      if (timeoutId.active) {
-        currentTime += delay
-        fn()
-      }
-    }, 0)
-    return timeoutId
-  })
+  const mockSetTimeout = vi
+    .fn()
+    .mockImplementation((fn: (...args: any[]) => void, delay: number) => {
+      const timeoutId = { id: Math.random(), active: true }
+      setTimeout(() => {
+        if (timeoutId.active) {
+          currentTime += delay
+          fn()
+        }
+      }, 0)
+      return timeoutId
+    })
 
   return {
     mockSetInterval,
     mockSetTimeout,
     currentTime,
-    advanceTime: (ms: number) => { currentTime += ms },
+    advanceTime: (ms: number) => {
+      currentTime += ms
+    },
     cleanup: () => {
       mockSetInterval.mockRestore()
       mockSetTimeout.mockRestore()
-    }
+    },
   }
 }
 
@@ -164,7 +179,7 @@ export function mockCrypto(): { restore: () => void } {
   return {
     restore: () => {
       Object.assign(global, { crypto: originalCrypto })
-    }
+    },
   }
 }
 
@@ -179,9 +194,15 @@ export function mockLocalStorage(): {
 } {
   const storage = new Map<string, string>()
 
-  const mockGetItem = vi.fn().mockImplementation((key: string) => storage.get(key) ?? null)
-  const mockSetItem = vi.fn().mockImplementation((key: string, value: string) => storage.set(key, value))
-  const mockRemoveItem = vi.fn().mockImplementation((key: string) => storage.delete(key))
+  const mockGetItem = vi
+    .fn()
+    .mockImplementation((key: string) => storage.get(key) ?? null)
+  const mockSetItem = vi
+    .fn()
+    .mockImplementation((key: string, value: string) => storage.set(key, value))
+  const mockRemoveItem = vi
+    .fn()
+    .mockImplementation((key: string) => storage.delete(key))
   const mockClear = vi.fn().mockImplementation(() => storage.clear())
 
   const mocklocalStorage = {
@@ -189,7 +210,9 @@ export function mockLocalStorage(): {
     setItem: mockSetItem,
     removeItem: mockRemoveItem,
     clear: mockClear,
-    key: vi.fn().mockImplementation((index: number) => Array.from(storage.keys())[index]),
+    key: vi
+      .fn()
+      .mockImplementation((index: number) => Array.from(storage.keys())[index]),
     length: vi.fn().mockImplementation(() => storage.size),
   } as Storage
 
@@ -204,7 +227,7 @@ export function mockLocalStorage(): {
     mockClear,
     restore: () => {
       Object.assign(global, { localStorage: originalLocalStorage })
-    }
+    },
   }
 }
 
@@ -237,6 +260,6 @@ export function mockConsole(): {
       console.warn = originalConsole.warn
       console.error = originalConsole.error
       console.log = originalConsole.log
-    }
+    },
   }
 }

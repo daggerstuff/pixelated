@@ -7,13 +7,13 @@ import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { createRateLimiter } from './rate-limiter'
 import { getMergedConfig, defaultRuleSets, defaultBypassRules } from './config'
-import type { 
-  RateLimitMiddlewareConfig, 
-  RateLimitContext, 
-  RateLimitRule, 
+import type {
+  RateLimitMiddlewareConfig,
+  RateLimitContext,
+  RateLimitRule,
   RateLimitResult,
   RateLimitHeaders,
-  BetterAuthRateLimitConfig
+  BetterAuthRateLimitConfig,
 } from './types'
 
 const logger = createBuildSafeLogger('rate-limit-middleware')
@@ -21,13 +21,15 @@ const logger = createBuildSafeLogger('rate-limit-middleware')
 /**
  * Rate limiting middleware for Astro API routes
  */
-export function createRateLimitMiddleware(config: RateLimitMiddlewareConfig = {}) {
+export function createRateLimitMiddleware(
+  config: RateLimitMiddlewareConfig = {},
+) {
   const mergedConfig = {
     ruleSets: config.ruleSets || defaultRuleSets,
     bypassRules: config.bypassRules || defaultBypassRules,
     ddosProtection: config.ddosProtection,
     globalConfig: config.globalConfig,
-    redisConfig: config.redisConfig
+    redisConfig: config.redisConfig,
   }
 
   const rateLimiter = createRateLimiter(getMergedConfig())
@@ -45,18 +47,28 @@ export function createRateLimitMiddleware(config: RateLimitMiddlewareConfig = {}
 
         // Extract request context
         const rateLimitContext = await extractRateLimitContext(context)
-        
+
         // Check bypass rules
-        const shouldBypass = await checkBypassRules(rateLimitContext, mergedConfig.bypassRules)
+        const shouldBypass = await checkBypassRules(
+          rateLimitContext,
+          mergedConfig.bypassRules,
+        )
         if (shouldBypass) {
-          logger.debug('Request bypassed rate limiting', { identifier: rateLimitContext.identifier })
+          logger.debug('Request bypassed rate limiting', {
+            identifier: rateLimitContext.identifier,
+          })
           return handler(context)
         }
 
         // Determine which rule to apply
-        const rule = await determineRule(rateLimitContext, mergedConfig.ruleSets)
+        const rule = await determineRule(
+          rateLimitContext,
+          mergedConfig.ruleSets,
+        )
         if (!rule) {
-          logger.warn('No rate limit rule found for request', { context: rateLimitContext })
+          logger.warn('No rate limit rule found for request', {
+            context: rateLimitContext,
+          })
           return handler(context)
         }
 
@@ -64,7 +76,7 @@ export function createRateLimitMiddleware(config: RateLimitMiddlewareConfig = {}
         const result = await rateLimiter.checkLimit(
           rateLimitContext.identifier,
           rule,
-          rateLimitContext.metadata
+          rateLimitContext.metadata,
         )
 
         // Add rate limit headers to response
@@ -78,49 +90,60 @@ export function createRateLimitMiddleware(config: RateLimitMiddlewareConfig = {}
               message: `Too many requests. Please try again in ${result.retryAfter} seconds.`,
               retryAfter: result.retryAfter,
               limit: result.limit,
-              resetTime: result.resetTime.toISOString()
+              resetTime: result.resetTime.toISOString(),
             }),
             {
               status: 429,
               headers: {
                 'Content-Type': 'application/json',
                 ...headers,
-                'Retry-After': result.retryAfter!.toString()
-              }
-            }
+                'Retry-After': result.retryAfter!.toString(),
+              },
+            },
           )
         }
 
         // Add headers to response
-        context.request.headers.set('X-RateLimit-Limit', headers['X-RateLimit-Limit'])
-        context.request.headers.set('X-RateLimit-Remaining', headers['X-RateLimit-Remaining'])
-        context.request.headers.set('X-RateLimit-Reset', headers['X-RateLimit-Reset'])
+        context.request.headers.set(
+          'X-RateLimit-Limit',
+          headers['X-RateLimit-Limit'],
+        )
+        context.request.headers.set(
+          'X-RateLimit-Remaining',
+          headers['X-RateLimit-Remaining'],
+        )
+        context.request.headers.set(
+          'X-RateLimit-Reset',
+          headers['X-RateLimit-Reset'],
+        )
         if (headers['X-RateLimit-Rule']) {
-          context.request.headers.set('X-RateLimit-Rule', headers['X-RateLimit-Rule'])
+          context.request.headers.set(
+            'X-RateLimit-Rule',
+            headers['X-RateLimit-Rule'],
+          )
         }
 
         // Continue to the actual handler
         const response = await handler(context)
-        
+
         // Add rate limit headers to the response
         if (response instanceof Response) {
           const newHeaders = new Headers(response.headers)
           Object.entries(headers).forEach(([key, value]) => {
             newHeaders.set(key, value)
           })
-          
+
           return new Response(response.body, {
             status: response.status,
             statusText: response.statusText,
-            headers: newHeaders
+            headers: newHeaders,
           })
         }
-        
-        return response
 
+        return response
       } catch (error) {
         logger.error('Rate limiting middleware error:', { error })
-        
+
         // Fail open - allow request if middleware fails
         return handler(context)
       }
@@ -131,17 +154,20 @@ export function createRateLimitMiddleware(config: RateLimitMiddlewareConfig = {}
 /**
  * Extract rate limit context from Astro API context
  */
-async function extractRateLimitContext(context: APIContext): Promise<RateLimitContext> {
+async function extractRateLimitContext(
+  context: APIContext,
+): Promise<RateLimitContext> {
   const request = context.request
   const url = new URL(request.url)
-  
+
   // Get client IP (considering proxies)
   const forwarded = request.headers.get('x-forwarded-for')
   const realIp = request.headers.get('x-real-ip')
-  const identifier = forwarded?.split(',')[0].trim() || 
-                    realIp || 
-                    context.clientAddress || 
-                    'unknown'
+  const identifier =
+    forwarded?.split(',')[0].trim() ||
+    realIp ||
+    context.clientAddress ||
+    'unknown'
 
   // Get user role if authenticated (Better-Auth integration)
   let userRole: string | undefined
@@ -166,8 +192,8 @@ async function extractRateLimitContext(context: APIContext): Promise<RateLimitCo
     metadata: {
       url: url.toString(),
       headers: Object.fromEntries(request.headers.entries()),
-      timestamp: Date.now()
-    }
+      timestamp: Date.now(),
+    },
   }
 }
 
@@ -175,33 +201,33 @@ async function extractRateLimitContext(context: APIContext): Promise<RateLimitCo
  * Check if request should bypass rate limiting
  */
 async function checkBypassRules(
-  context: RateLimitContext, 
-  bypassRules: RateLimitMiddlewareConfig['bypassRules'] = []
+  context: RateLimitContext,
+  bypassRules: RateLimitMiddlewareConfig['bypassRules'] = [],
 ): Promise<boolean> {
   for (const rule of bypassRules) {
     const { conditions } = rule
-    
+
     // Check role-based bypass
     if (conditions.roles && context.userRole) {
       if (conditions.roles.includes(context.userRole)) {
         return true
       }
     }
-    
+
     // Check IP-based bypass
     if (conditions.ips && context.identifier) {
       if (isIpInRange(context.identifier, conditions.ips)) {
         return true
       }
     }
-    
+
     // Check path-based bypass
     if (conditions.paths && context.path) {
       if (matchesPath(context.path, conditions.paths)) {
         return true
       }
     }
-    
+
     // Check custom condition
     if (conditions.custom) {
       try {
@@ -210,11 +236,14 @@ async function checkBypassRules(
           return true
         }
       } catch (error) {
-        logger.error('Bypass rule custom condition failed:', { error, rule: rule.name })
+        logger.error('Bypass rule custom condition failed:', {
+          error,
+          rule: rule.name,
+        })
       }
     }
   }
-  
+
   return false
 }
 
@@ -222,8 +251,8 @@ async function checkBypassRules(
  * Determine which rate limit rule to apply
  */
 async function determineRule(
-  context: RateLimitContext, 
-  ruleSets: RateLimitMiddlewareConfig['ruleSets'] = []
+  context: RateLimitContext,
+  ruleSets: RateLimitMiddlewareConfig['ruleSets'] = [],
 ): Promise<RateLimitRule | null> {
   // Find matching rule set
   for (const ruleSet of ruleSets) {
@@ -234,7 +263,7 @@ async function determineRule(
       }
     }
   }
-  
+
   return null
 }
 
@@ -248,23 +277,23 @@ function matchesRule(context: RateLimitContext, rule: RateLimitRule): boolean {
     if (rule.tags.includes('strict') && isSensitivePath(context.path)) {
       return true
     }
-    
+
     // Auth rule for auth endpoints
     if (rule.tags.includes('auth') && isAuthPath(context.path)) {
       return true
     }
-    
+
     // AI rule for AI endpoints
     if (rule.tags.includes('ai') && isAiPath(context.path)) {
       return true
     }
-    
+
     // Public rule for public endpoints
     if (rule.tags.includes('public') && isPublicPath(context.path)) {
       return true
     }
   }
-  
+
   return false
 }
 
@@ -279,9 +308,9 @@ function isSensitivePath(path?: string): boolean {
     '/api/billing',
     '/api/payment',
     '/api/user/delete',
-    '/api/user/update-password'
+    '/api/user/update-password',
   ]
-  return sensitivePatterns.some(pattern => path.includes(pattern))
+  return sensitivePatterns.some((pattern) => path.includes(pattern))
 }
 
 /**
@@ -295,9 +324,9 @@ function isAuthPath(path?: string): boolean {
     '/api/auth/reset-password',
     '/api/auth/verify',
     '/api/auth/signin',
-    '/api/auth/signup'
+    '/api/auth/signup',
   ]
-  return authPatterns.some(pattern => path.includes(pattern))
+  return authPatterns.some((pattern) => path.includes(pattern))
 }
 
 /**
@@ -309,9 +338,9 @@ function isAiPath(path?: string): boolean {
     '/api/ai',
     '/api/bias-detection',
     '/api/mental-health',
-    '/api/psychology'
+    '/api/psychology',
   ]
-  return aiPatterns.some(pattern => path.includes(pattern))
+  return aiPatterns.some((pattern) => path.includes(pattern))
 }
 
 /**
@@ -323,9 +352,9 @@ function isPublicPath(path?: string): boolean {
     '/api/health',
     '/api/docs',
     '/api/public',
-    '/api/status'
+    '/api/status',
   ]
-  return publicPatterns.some(pattern => path.includes(pattern))
+  return publicPatterns.some((pattern) => path.includes(pattern))
 }
 
 /**
@@ -333,7 +362,7 @@ function isPublicPath(path?: string): boolean {
  */
 function isIpInRange(ip: string, ranges: string[]): boolean {
   // Simple implementation - can be enhanced with proper IP range checking
-  return ranges.some(range => {
+  return ranges.some((range) => {
     if (range.includes('/')) {
       // CIDR notation - simplified check
       const [network] = range.split('/')
@@ -347,7 +376,7 @@ function isIpInRange(ip: string, ranges: string[]): boolean {
  * Check if path matches any of the patterns
  */
 function matchesPath(path: string, patterns: string[]): boolean {
-  return patterns.some(pattern => {
+  return patterns.some((pattern) => {
     if (pattern.includes('*')) {
       // Wildcard pattern
       const regex = new RegExp(pattern.replace(/\*/g, '.*'))
@@ -360,12 +389,17 @@ function matchesPath(path: string, patterns: string[]): boolean {
 /**
  * Create rate limit headers from result
  */
-function createRateLimitHeaders(result: RateLimitResult, rule: RateLimitRule): RateLimitHeaders {
+function createRateLimitHeaders(
+  result: RateLimitResult,
+  rule: RateLimitRule,
+): RateLimitHeaders {
   return {
     'X-RateLimit-Limit': result.limit.toString(),
     'X-RateLimit-Remaining': result.remaining.toString(),
-    'X-RateLimit-Reset': Math.floor(result.resetTime.getTime() / 1000).toString(),
-    'X-RateLimit-Rule': rule.name
+    'X-RateLimit-Reset': Math.floor(
+      result.resetTime.getTime() / 1000,
+    ).toString(),
+    'X-RateLimit-Rule': rule.name,
   }
 }
 
@@ -373,7 +407,7 @@ function createRateLimitHeaders(result: RateLimitResult, rule: RateLimitRule): R
  * Create Better-Auth specific rate limiting middleware
  */
 export function createBetterAuthRateLimitMiddleware(
-  authConfig: BetterAuthRateLimitConfig = { enabled: true }
+  authConfig: BetterAuthRateLimitConfig = { enabled: true },
 ) {
   if (!authConfig.enabled) {
     return (handler: APIRoute) => handler
@@ -382,11 +416,13 @@ export function createBetterAuthRateLimitMiddleware(
   const authRuleSet = {
     name: 'betterauth',
     description: 'Better-Auth specific rate limiting',
-    rules: Object.values(authConfig.authRules || {}).filter(Boolean) as RateLimitRule[]
+    rules: Object.values(authConfig.authRules || {}).filter(
+      Boolean,
+    ) as RateLimitRule[],
   }
 
   const authBypassRules: RateLimitBypassRule[] = []
-  
+
   if (authConfig.bypassAuthenticated) {
     authBypassRules.push({
       name: 'authenticated_users',
@@ -395,8 +431,8 @@ export function createBetterAuthRateLimitMiddleware(
         custom: async (context) => {
           // Check if user is authenticated (has user role)
           return !!context.userRole && context.userRole !== 'anonymous'
-        }
-      }
+        },
+      },
     })
   }
 
@@ -405,54 +441,53 @@ export function createBetterAuthRateLimitMiddleware(
       name: 'privileged_roles',
       description: 'Bypass rate limiting for privileged roles',
       conditions: {
-        roles: authConfig.bypassRoles
-      }
+        roles: authConfig.bypassRoles,
+      },
     })
   }
 
   return createRateLimitMiddleware({
     ruleSets: [authRuleSet],
-    bypassRules: authBypassRules
+    bypassRules: authBypassRules,
   })
 }
 
 /**
  * Create a comprehensive rate limiting middleware with all features
  */
-export function createComprehensiveRateLimitMiddleware(options: {
-  /** Custom rule sets */
-  customRuleSets?: RateLimitMiddlewareConfig['ruleSets']
-  /** Custom bypass rules */
-  customBypassRules?: RateLimitMiddlewareConfig['bypassRules']
-  /** Enable DDoS protection */
-  enableDDoS?: boolean
-  /** Enable Better-Auth integration */
-  enableBetterAuth?: boolean
-  /** Better-Auth configuration */
-  betterAuthConfig?: BetterAuthRateLimitConfig
-} = {}) {
-  const ruleSets = [
-    ...(options.customRuleSets || []),
-    ...defaultRuleSets
-  ]
+export function createComprehensiveRateLimitMiddleware(
+  options: {
+    /** Custom rule sets */
+    customRuleSets?: RateLimitMiddlewareConfig['ruleSets']
+    /** Custom bypass rules */
+    customBypassRules?: RateLimitMiddlewareConfig['bypassRules']
+    /** Enable DDoS protection */
+    enableDDoS?: boolean
+    /** Enable Better-Auth integration */
+    enableBetterAuth?: boolean
+    /** Better-Auth configuration */
+    betterAuthConfig?: BetterAuthRateLimitConfig
+  } = {},
+) {
+  const ruleSets = [...(options.customRuleSets || []), ...defaultRuleSets]
 
   const bypassRules = [
     ...(options.customBypassRules || []),
-    ...defaultBypassRules
+    ...defaultBypassRules,
   ]
 
   let middleware = createRateLimitMiddleware({
     ruleSets,
     bypassRules,
-    ddosProtection: options.enableDDoS ? undefined : undefined
+    ddosProtection: options.enableDDoS ? undefined : undefined,
   })
 
   // Add Better-Auth integration if enabled
   if (options.enableBetterAuth) {
     const authMiddleware = createBetterAuthRateLimitMiddleware(
-      options.betterAuthConfig || { enabled: true }
+      options.betterAuthConfig || { enabled: true },
     )
-    
+
     // Chain middlewares
     const originalMiddleware = middleware
     middleware = (handler: APIRoute) => {

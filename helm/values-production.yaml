@@ -1,0 +1,77 @@
+# Helm production values for Pixelated
+
+image:
+  repository: ghcr.io/pixelated/ai-service
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+replicaCount: 3
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "2"
+    memory: "4Gi"
+
+env:
+  - name: NODE_ENV
+    value: production
+  - name: PIXEL_ENV
+    value: production
+  - name: SENTRY_DSN
+    valueFrom:
+      secretKeyRef:
+        name: pixelated-secrets
+        key: SENTRY_DSN
+  - name: LOG_LEVEL
+    value: info
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 3000
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 3000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+    - host: pixelated.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - pixelated.example.com
+      secretName: pixelated-tls
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+nodeSelector: {}
+
+ tolerations: []
+
+ affinity: {}

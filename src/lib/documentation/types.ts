@@ -4,32 +4,32 @@
 
 // Production-grade types
 export interface TreatmentGoal {
-  description: string;
-  progress: number;
-  notes: string;
+  description: string
+  progress: number
+  notes: string
 }
 
 export interface TreatmentProgress {
-  goals: TreatmentGoal[];
-  overallAssessment: string;
+  goals: TreatmentGoal[]
+  overallAssessment: string
 }
 
 export interface TherapeuticTechnique {
-  name: string;
-  description: string;
-  effectiveness: number;
+  name: string
+  description: string
+  effectiveness: number
 }
 
 export interface EmotionalPattern {
-  pattern: string;
-  significance: string;
+  pattern: string
+  significance: string
 }
 
 export interface OutcomePrediction {
-  technique: string;
-  predictedEfficacy: number;
-  confidence: number;
-  rationale: string;
+  technique: string
+  predictedEfficacy: number
+  confidence: number
+  rationale: string
 }
 
 export interface SessionDocumentation {

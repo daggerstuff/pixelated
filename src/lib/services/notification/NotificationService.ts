@@ -317,7 +317,10 @@ export class NotificationService {
     }
 
     // Add to queue
-    await (redis as unknown as RedisCommands).lpush(this.queueKey, JSON.stringify(notification))
+    await (redis as unknown as RedisCommands).lpush(
+      this.queueKey,
+      JSON.stringify(notification),
+    )
 
     logger.info('Notification queued', {
       id: notification.id,
@@ -335,12 +338,17 @@ export class NotificationService {
   async processQueue(): Promise<void> {
     while (true) {
       // Move item from queue to processing
-      const item = await (redis as unknown as RedisCommands).rpoplpush(this.queueKey, this.processingKey)
+      const item = await (redis as unknown as RedisCommands).rpoplpush(
+        this.queueKey,
+        this.processingKey,
+      )
       if (!item) {
         break
       }
 
-      const notification = NotificationItemSchema.parse(JSON.parse(item) as unknown)
+      const notification = NotificationItemSchema.parse(
+        JSON.parse(item) as unknown,
+      )
 
       try {
         // Process each channel
@@ -373,7 +381,11 @@ export class NotificationService {
         )
 
         // Remove from processing queue
-        await (redis as unknown as RedisCommands).lrem(this.processingKey, 1, item)
+        await (redis as unknown as RedisCommands).lrem(
+          this.processingKey,
+          1,
+          item,
+        )
 
         logger.info('Notification delivered', {
           id: notification.id,
@@ -395,7 +407,11 @@ export class NotificationService {
         )
 
         // Remove from processing queue
-        await (redis as unknown as RedisCommands).lrem(this.processingKey, 1, item)
+        await (redis as unknown as RedisCommands).lrem(
+          this.processingKey,
+          1,
+          item,
+        )
 
         logger.error('Notification delivery failed', {
           id: notification.id,
@@ -420,7 +436,9 @@ export class NotificationService {
       throw new Error('Notification not found')
     }
 
-  const parsed = NotificationItemSchema.parse(JSON.parse(notification as string) as NotificationItem)
+    const parsed = NotificationItemSchema.parse(
+      JSON.parse(notification as string) as NotificationItem,
+    )
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
 
@@ -439,13 +457,19 @@ export class NotificationService {
     limit = 50,
     offset = 0,
   ): Promise<NotificationItem[]> {
-  const notifications = await (redis as unknown as RedisCommands).hgetall(`notifications:${userId}`)
+    const notifications = await (redis as unknown as RedisCommands).hgetall(
+      `notifications:${userId}`,
+    )
     if (!notifications) {
       return []
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as NotificationItem))
+      .map((n) =>
+        NotificationItemSchema.parse(
+          JSON.parse(n as string) as NotificationItem,
+        ),
+      )
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(offset, offset + limit)
   }
@@ -454,13 +478,19 @@ export class NotificationService {
    * Get unread notification count for a user
    */
   async getUnreadCount(userId: string): Promise<number> {
-    const notifications = await (redis as unknown as RedisCommands).hgetall(`notifications:${userId}`)
+    const notifications = await (redis as unknown as RedisCommands).hgetall(
+      `notifications:${userId}`,
+    )
     if (!notifications) {
       return 0
     }
 
     return Object.values(notifications)
-      .map((n) => NotificationItemSchema.parse(JSON.parse(n as string) as NotificationItem))
+      .map((n) =>
+        NotificationItemSchema.parse(
+          JSON.parse(n as string) as NotificationItem,
+        ),
+      )
       .filter((n) => n.status !== NotificationStatus.READ).length
   }
 
@@ -488,7 +518,11 @@ export class NotificationService {
     userId: string,
     subscription: PushSubscription,
   ): Promise<void> {
-  await (redis as unknown as RedisCommands).hset(this.subscriptionKey, userId, JSON.stringify(subscription))
+    await (redis as unknown as RedisCommands).hset(
+      this.subscriptionKey,
+      userId,
+      JSON.stringify(subscription),
+    )
     logger.info('Push subscription stored', { userId })
   }
 
@@ -496,7 +530,7 @@ export class NotificationService {
    * Remove a push subscription for a user
    */
   async removePushSubscription(userId: string): Promise<void> {
-  await (redis as unknown as RedisCommands).hdel(this.subscriptionKey, userId)
+    await (redis as unknown as RedisCommands).hdel(this.subscriptionKey, userId)
     logger.info('Push subscription removed', { userId })
   }
 
@@ -506,11 +540,14 @@ export class NotificationService {
   private async getPushSubscription(
     userId: string,
   ): Promise<PushSubscription | null> {
-  const subscription = await (redis as unknown as RedisCommands).hget(this.subscriptionKey, userId)
+    const subscription = await (redis as unknown as RedisCommands).hget(
+      this.subscriptionKey,
+      userId,
+    )
     if (!subscription) {
       return null
     }
-  return JSON.parse(subscription as string) as PushSubscription | null
+    return JSON.parse(subscription as string) as PushSubscription | null
   }
 
   /**
@@ -549,7 +586,10 @@ export class NotificationService {
         notificationId: notification.id,
       })
     } catch (error: unknown) {
-      if (error instanceof Error && (error as Error)?.name === 'ExpiredSubscriptionError') {
+      if (
+        error instanceof Error &&
+        (error as Error)?.name === 'ExpiredSubscriptionError'
+      ) {
         await this.removePushSubscription(notification.userId)
         logger.info('Removed expired push subscription', {
           userId: notification.userId,

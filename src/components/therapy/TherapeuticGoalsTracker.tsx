@@ -300,15 +300,24 @@ export function TherapeuticGoalsTracker({
           >
             {(() => {
               switch (category) {
-                case GoalCategory.EMOTIONAL_REGULATION: return 'Emotional Regulation';
-                case GoalCategory.COGNITIVE_RESTRUCTURING: return 'Cognitive Restructuring';
-                case GoalCategory.BEHAVIORAL_CHANGE: return 'Behavioral Change';
-                case GoalCategory.SYMPTOM_REDUCTION: return 'Symptom Reduction';
-                case GoalCategory.RELATIONSHIP_IMPROVEMENT: return 'Relationship Improvement';
-                case GoalCategory.COPING_SKILLS: return 'Coping Skills';
-                case GoalCategory.TRAUMA_RECOVERY: return 'Trauma Recovery';
-                case GoalCategory.LIFESTYLE_CHANGES: return 'Lifestyle Changes';
-                default: return category;
+                case GoalCategory.EMOTIONAL_REGULATION:
+                  return 'Emotional Regulation'
+                case GoalCategory.COGNITIVE_RESTRUCTURING:
+                  return 'Cognitive Restructuring'
+                case GoalCategory.BEHAVIORAL_CHANGE:
+                  return 'Behavioral Change'
+                case GoalCategory.SYMPTOM_REDUCTION:
+                  return 'Symptom Reduction'
+                case GoalCategory.RELATIONSHIP_IMPROVEMENT:
+                  return 'Relationship Improvement'
+                case GoalCategory.COPING_SKILLS:
+                  return 'Coping Skills'
+                case GoalCategory.TRAUMA_RECOVERY:
+                  return 'Trauma Recovery'
+                case GoalCategory.LIFESTYLE_CHANGES:
+                  return 'Lifestyle Changes'
+                default:
+                  return category
               }
             })()}
           </Button>
@@ -334,12 +343,12 @@ export function TherapeuticGoalsTracker({
       {showModal && (
         <Dialog
           open={showModal}
-          onOpenChange={(open) => { if (!open) closeModal() }}
+          onOpenChange={(open) => {
+            if (!open) closeModal()
+          }}
         >
           <form onSubmit={handleFormSubmit} className="space-y-4">
-            <DialogTitle>
-              {editGoal ? 'Edit Goal' : 'Add Goal'}
-            </DialogTitle>
+            <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
             <Input
               name="title"
               value={form.title || ''}
@@ -367,15 +376,24 @@ export function TherapeuticGoalsTracker({
                 <option key={cat} value={cat}>
                   {(() => {
                     switch (cat) {
-                      case GoalCategory.EMOTIONAL_REGULATION: return 'Emotional Regulation';
-                      case GoalCategory.COGNITIVE_RESTRUCTURING: return 'Cognitive Restructuring';
-                      case GoalCategory.BEHAVIORAL_CHANGE: return 'Behavioral Change';
-                      case GoalCategory.SYMPTOM_REDUCTION: return 'Symptom Reduction';
-                      case GoalCategory.RELATIONSHIP_IMPROVEMENT: return 'Relationship Improvement';
-                      case GoalCategory.COPING_SKILLS: return 'Coping Skills';
-                      case GoalCategory.TRAUMA_RECOVERY: return 'Trauma Recovery';
-                      case GoalCategory.LIFESTYLE_CHANGES: return 'Lifestyle Changes';
-                      default: return cat;
+                      case GoalCategory.EMOTIONAL_REGULATION:
+                        return 'Emotional Regulation'
+                      case GoalCategory.COGNITIVE_RESTRUCTURING:
+                        return 'Cognitive Restructuring'
+                      case GoalCategory.BEHAVIORAL_CHANGE:
+                        return 'Behavioral Change'
+                      case GoalCategory.SYMPTOM_REDUCTION:
+                        return 'Symptom Reduction'
+                      case GoalCategory.RELATIONSHIP_IMPROVEMENT:
+                        return 'Relationship Improvement'
+                      case GoalCategory.COPING_SKILLS:
+                        return 'Coping Skills'
+                      case GoalCategory.TRAUMA_RECOVERY:
+                        return 'Trauma Recovery'
+                      case GoalCategory.LIFESTYLE_CHANGES:
+                        return 'Lifestyle Changes'
+                      default:
+                        return cat
                     }
                   })()}
                 </option>
@@ -426,7 +444,7 @@ export function TherapeuticGoalsTracker({
                         : goal.status === GoalStatus.ON_HOLD
                           ? 'bg-yellow-100 text-yellow-800'
                           : goal.status === GoalStatus.CANCELLED
-                              ? 'bg-red-100 text-red-800'
+                            ? 'bg-red-100 text-red-800'
                             : 'bg-gray-100 text-gray-800'
                   }`}
                 >
@@ -496,7 +514,10 @@ export function TherapeuticGoalsTracker({
           <h5 className="font-medium mb-2 text-sm">Progress Checkpoints</h5>
           <div className="space-y-3 mb-4">
             {activeGoal.checkpoints.map((checkpoint) => (
-              <div key={`checkpoint-${checkpoint.id}`} className="flex items-start">
+              <div
+                key={`checkpoint-${checkpoint.id}`}
+                className="flex items-start"
+              >
                 <div
                   className={`h-5 w-5 mt-0.5 rounded-full mr-3 flex items-center justify-center ${
                     checkpoint.isCompleted ? 'bg-green-500' : 'bg-gray-200'
@@ -575,23 +596,22 @@ export function TherapeuticGoalsTracker({
               <h5 className="font-medium mb-2 text-sm">Recent Interventions</h5>
               <div className="space-y-2">
                 {getRelatedInterventions(activeGoal.id).length > 0 ? (
-                  getRelatedInterventions(activeGoal.id).map(
-                    (intervention) => (
-                      <div key={`intervention-${intervention.type}-${intervention.timestamp.toISOString()}`} className="text-sm">
-                        <div className="flex justify-between">
-                          <span className="font-medium">
-                            {intervention.type}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {intervention.timestamp.toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-600">
-                          {intervention.outcome}
-                        </p>
+                  getRelatedInterventions(activeGoal.id).map((intervention) => (
+                    <div
+                      key={`intervention-${intervention.type}-${intervention.timestamp.toISOString()}`}
+                      className="text-sm"
+                    >
+                      <div className="flex justify-between">
+                        <span className="font-medium">{intervention.type}</span>
+                        <span className="text-xs text-gray-500">
+                          {intervention.timestamp.toLocaleDateString()}
+                        </span>
                       </div>
-                    ),
-                  )
+                      <p className="text-xs text-gray-600">
+                        {intervention.outcome}
+                      </p>
+                    </div>
+                  ))
                 ) : (
                   <p className="text-sm text-gray-500 italic">
                     No recent interventions for this goal
@@ -788,18 +808,11 @@ function issueToCategory(issue: string): GoalCategory {
     lowerIssue.includes('sleep')
   ) {
     return GoalCategory.LIFESTYLE_CHANGES
-  } else if (
-    lowerIssue.includes('coping') ||
-    lowerIssue.includes('skills')
-  ) {
+  } else if (lowerIssue.includes('coping') || lowerIssue.includes('skills')) {
     return GoalCategory.COPING_SKILLS
-  } else if (
-    lowerIssue.includes('trauma')
-  ) {
+  } else if (lowerIssue.includes('trauma')) {
     return GoalCategory.TRAUMA_RECOVERY
-  } else if (
-    lowerIssue.includes('symptom')
-  ) {
+  } else if (lowerIssue.includes('symptom')) {
     return GoalCategory.SYMPTOM_REDUCTION
   } else {
     // Default to emotional regulation if we can't determine

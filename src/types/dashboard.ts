@@ -67,4 +67,5 @@ export interface TherapistDashboardProps {
     sessionId: string,
     action: 'start' | 'pause' | 'resume' | 'end',
   ) => void
-  children?: React.ReactNode}
+  children?: React.ReactNode
+}

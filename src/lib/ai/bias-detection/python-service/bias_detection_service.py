@@ -81,7 +81,12 @@ except ImportError:
         # Create a mock placeholder adapter if import fails
         class MockPlaceholderAdapters:
             def fairlearn_placeholder_predictions(self, y, sensitive_features):
-                return [0.5] * len(y)
+                # Simple deterministic prediction: predict 1 for even indices, 0 for odd
+                # This ensures consistent test results while maintaining some variance
+                # Use sensitive_features in the calculation to avoid unused parameter warning
+                # (Use top-level numpy imported as np instead of importing here)
+                feature_sum = np.sum(sensitive_features) if len(sensitive_features) > 0 else 0
+                return np.array([1 if (i + int(feature_sum)) % 2 == 0 else 0 for i in range(len(y))])
 
             def interpretability_placeholder_analysis(self):
                 return {"bias_score": 0.5}
@@ -192,12 +197,12 @@ logger = logging.getLogger(__name__)
 
 # Initialize Celery integration after logger setup
 try:
+    from celery import Celery
     from tasks import (
         analyze_session_async,
         batch_analyze_sessions,
         validate_dataset_quality,
     )
-    from celery import Celery
 
     # Initialize celery_app
     celery_app = Celery("bias_detection")
@@ -1537,8 +1542,8 @@ def analyze_session():
         return jsonify(result)
 
     except Exception as e:
-        logger.error(f"Analysis endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Analysis endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 @app.route("/dashboard", methods=["GET"])
@@ -1556,8 +1561,8 @@ def get_dashboard_data():
         return jsonify(dashboard_data)
 
     except Exception as e:
-        logger.error(f"Dashboard endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Dashboard endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 @app.route("/export", methods=["POST"])
@@ -1604,8 +1609,8 @@ def export_data():
         return jsonify(export_data)
 
     except Exception as e:
-        logger.error(f"Export endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Export endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 # Celery-enabled distributed processing endpoints
@@ -1644,8 +1649,8 @@ def analyze_session_async_endpoint():
         )
 
     except Exception as e:
-        logger.error(f"Async analysis endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Async analysis endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 @app.route("/batch/analyze", methods=["POST"])
@@ -1686,8 +1691,8 @@ def batch_analyze_sessions_endpoint():
         )
 
     except Exception as e:
-        logger.error(f"Batch analysis endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Batch analysis endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 @app.route("/dataset/validate", methods=["POST"])
@@ -1722,8 +1727,8 @@ def validate_dataset_quality_endpoint():
         )
 
     except Exception as e:
-        logger.error(f"Dataset validation endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Dataset validation endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 @app.route("/task/<task_id>", methods=["GET"])
@@ -1757,8 +1762,8 @@ def get_task_status(task_id):
         return jsonify(response)
 
     except Exception as e:
-        logger.error(f"Task status endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Task status endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 @app.route("/workers/status", methods=["GET"])
@@ -1802,8 +1807,8 @@ def get_workers_status():
         )
 
     except Exception as e:
-        logger.error(f"Workers status endpoint error: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Workers status endpoint error: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred. Please contact support."}), 500
 
 
 @app.errorhandler(404)

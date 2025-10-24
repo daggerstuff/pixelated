@@ -24,7 +24,11 @@ export interface ApiMiddlewareConfig {
   /** Custom context extraction function */
   getContext?: (req: Request) => ThreatDetectionContext
   /** Response handler for rate limited requests */
-  rateLimitHandler?: (req: Request, res: Response, result: RateLimitCheckResult) => void
+  rateLimitHandler?: (
+    req: Request,
+    res: Response,
+    result: RateLimitCheckResult,
+  ) => void
   /** Skip middleware for certain paths */
   skipPaths?: string[]
   /** Enable logging */
@@ -72,7 +76,7 @@ export class ThreatDetectionMiddleware {
       enabled: true,
       enableLogging: true,
       skipPaths: ['/health', '/status', '/metrics'],
-      ...config
+      ...config,
     }
   }
 
@@ -96,10 +100,11 @@ export class ThreatDetectionMiddleware {
         const context = this.getContext(req)
 
         // Check rate limit with threat detection
-        const result = await this.config.bridge.checkRateLimitWithThreatDetection(
-          identifier,
-          context
-        )
+        const result =
+          await this.config.bridge.checkRateLimitWithThreatDetection(
+            identifier,
+            context,
+          )
 
         // Log the check if enabled
         if (this.config.enableLogging) {
@@ -109,7 +114,7 @@ export class ThreatDetectionMiddleware {
             identifier,
             allowed: result.rateLimitResult.allowed,
             shouldBlock: result.shouldBlock,
-            threatDetected: !!result.threatResponse
+            threatDetected: !!result.threatResponse,
           })
         }
 
@@ -126,13 +131,16 @@ export class ThreatDetectionMiddleware {
         // Add threat detection context to request (typed via declaration merging above)
         req.threatDetection = {
           result,
-          threatResponse: result.threatResponse
+          threatResponse: result.threatResponse,
         }
 
         // Continue to next middleware
         next()
       } catch (error: unknown) {
-        logger.error('Threat detection middleware error:', { error, path: req.path })
+        logger.error('Threat detection middleware error:', {
+          error,
+          path: req.path,
+        })
 
         // Fail open - allow request if middleware fails
         next()
@@ -144,9 +152,11 @@ export class ThreatDetectionMiddleware {
    * Check if middleware should be skipped for this path
    */
   private shouldSkip(path: string): boolean {
-    return this.config.skipPaths?.some(skipPath =>
-      path.startsWith(skipPath) || path === skipPath
-    ) || false
+    return (
+      this.config.skipPaths?.some(
+        (skipPath) => path.startsWith(skipPath) || path === skipPath,
+      ) || false
+    )
   }
 
   /**
@@ -182,7 +192,7 @@ export class ThreatDetectionMiddleware {
       method: req.method,
       path: req.path,
       userAgent: req.get('User-Agent'),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
 
     // Add user context if available
@@ -199,8 +209,9 @@ export class ThreatDetectionMiddleware {
     // Add request headers (filtered)
     const sensitiveHeaders = ['authorization', 'cookie', 'set-cookie']
     context.headers = Object.fromEntries(
-      Object.entries(req.headers)
-        .filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase()))
+      Object.entries(req.headers).filter(
+        ([key]) => !sensitiveHeaders.includes(key.toLowerCase()),
+      ),
     )
 
     // Add request body for certain methods (filtered)
@@ -208,8 +219,9 @@ export class ThreatDetectionMiddleware {
       // Filter sensitive fields
       const sensitiveFields = ['password', 'token', 'secret', 'key']
       context.body = Object.fromEntries(
-        Object.entries(req.body)
-          .filter(([key]) => !sensitiveFields.includes(key.toLowerCase()))
+        Object.entries(req.body).filter(
+          ([key]) => !sensitiveFields.includes(key.toLowerCase()),
+        ),
       )
     }
 
@@ -227,7 +239,7 @@ export class ThreatDetectionMiddleware {
   private defaultRateLimitHandler(
     req: Request,
     res: Response,
-    result: RateLimitCheckResult
+    result: RateLimitCheckResult,
   ): void {
     const { rateLimitResult, threatResponse } = result
 
@@ -236,7 +248,7 @@ export class ThreatDetectionMiddleware {
       'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
       'X-RateLimit-Reset': rateLimitResult.resetTime.toISOString(),
       'X-RateLimit-Retry-After': rateLimitResult.retryAfter?.toString() || '0',
-      'X-Threat-Detected': threatResponse ? 'true' : 'false'
+      'X-Threat-Detected': threatResponse ? 'true' : 'false',
     })
 
     if (threatResponse) {
@@ -256,9 +268,9 @@ export class ThreatDetectionMiddleware {
         threatResponse: {
           id: threatResponse.responseId,
           severity: threatResponse.severity,
-          actions: threatResponse.actions.length
-        }
-      })
+          actions: threatResponse.actions.length,
+        },
+      }),
     })
   }
 
@@ -278,7 +290,7 @@ export class ThreatDetectionMiddleware {
         healthy: bridgeStatus.healthy,
         bridgeHealthy: bridgeStatus.healthy,
         enabled: this.config.enabled,
-        recentRequests: bridgeStatus.recentIntegrations
+        recentRequests: bridgeStatus.recentIntegrations,
       }
     } catch (error) {
       logger.error('Failed to get middleware health status:', { error })
@@ -286,7 +298,7 @@ export class ThreatDetectionMiddleware {
         healthy: false,
         bridgeHealthy: false,
         enabled: this.config.enabled,
-        recentRequests: 0
+        recentRequests: 0,
       }
     }
   }
@@ -297,12 +309,12 @@ export class ThreatDetectionMiddleware {
  */
 export function createThreatDetectionMiddleware(
   bridge: RateLimitingBridge,
-  customConfig?: Partial<ApiMiddlewareConfig>
+  customConfig?: Partial<ApiMiddlewareConfig>,
 ): ThreatDetectionMiddleware {
   const config: ApiMiddlewareConfig = {
     enabled: true,
     bridge,
-    ...customConfig
+    ...customConfig,
   }
 
   return new ThreatDetectionMiddleware(config)
@@ -313,7 +325,7 @@ export function createThreatDetectionMiddleware(
  */
 export function threatDetection(
   bridge: RateLimitingBridge,
-  config?: Partial<ApiMiddlewareConfig>
+  config?: Partial<ApiMiddlewareConfig>,
 ): RequestHandler {
   const middleware = createThreatDetectionMiddleware(bridge, config)
   return middleware.middleware()

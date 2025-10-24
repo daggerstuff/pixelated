@@ -37,7 +37,7 @@ export enum RevocationReason {
   REFRESH_CYCLE = 'refresh_cycle',
   LINKED_REVOCATION = 'linked_revocation',
   ADMIN_ACTION = 'admin_action',
-  SESSION_TIMEOUT = 'session_timeout'
+  SESSION_TIMEOUT = 'session_timeout',
 }
 
 export interface RevocationServiceConfig {
@@ -66,7 +66,7 @@ export class TokenRevocationService {
       enableAuditLogging: true,
       maxRevocationsPerUser: 1000,
       cleanupInterval: 3600, // 1 hour
-      ...config
+      ...config,
     }
 
     this.startCleanupTimer()
@@ -75,7 +75,11 @@ export class TokenRevocationService {
   /**
    * Revoke a specific token by ID
    */
-  async revokeToken(tokenId: string, reason: RevocationReason, metadata: Record<string, unknown> = {}): Promise<RevocationResult> {
+  async revokeToken(
+    tokenId: string,
+    reason: RevocationReason,
+    metadata: Record<string, unknown> = {},
+  ): Promise<RevocationResult> {
     try {
       // Validate token ID
       if (!tokenId || typeof tokenId !== 'string') {
@@ -90,7 +94,7 @@ export class TokenRevocationService {
           success: true,
           tokenId,
           reason: existingRevocation.reason,
-          revokedAt: existingRevocation.revokedAt
+          revokedAt: existingRevocation.revokedAt,
         }
       }
 
@@ -103,7 +107,8 @@ export class TokenRevocationService {
 
       const userId = tokenMetadata?.userId || 'unknown'
       const now = Math.floor(Date.now() / 1000)
-      const expiresAt = tokenMetadata?.expiresAt || (now + this.config.revocationListTTL)
+      const expiresAt =
+        tokenMetadata?.expiresAt || now + this.config.revocationListTTL
 
       // Create revocation record
       const revocationRecord: RevocationRecord = {
@@ -112,7 +117,7 @@ export class TokenRevocationService {
         reason,
         revokedAt: now,
         expiresAt,
-        metadata
+        metadata,
       }
 
       // Store revocation record
@@ -126,7 +131,12 @@ export class TokenRevocationService {
 
       // Audit log the revocation
       if (this.config.enableAuditLogging) {
-        await this.securityLogger.logTokenRevocation(userId, tokenId, reason, metadata)
+        await this.securityLogger.logTokenRevocation(
+          userId,
+          tokenId,
+          reason,
+          metadata,
+        )
       }
 
       // Notify distributed systems if enabled
@@ -134,18 +144,22 @@ export class TokenRevocationService {
         await this.notifyDistributedRevocation(revocationRecord)
       }
 
-      logger.info(`Token ${tokenId} revoked for user ${userId}`, { reason, revokedAt: now })
+      logger.info(`Token ${tokenId} revoked for user ${userId}`, {
+        reason,
+        revokedAt: now,
+      })
 
       return {
         success: true,
         tokenId,
         reason,
-        revokedAt: now
+        revokedAt: now,
       }
-
     } catch (error) {
       logger.error(`Failed to revoke token ${tokenId}`, error)
-      throw error instanceof AuthenticationError ? error : new AuthenticationError('Token revocation failed')
+      throw error instanceof AuthenticationError
+        ? error
+        : new AuthenticationError('Token revocation failed')
     }
   }
 
@@ -157,7 +171,7 @@ export class TokenRevocationService {
       if (!tokenId) return false
 
       const revocationRecord = await this.getRevocationRecord(tokenId)
-      
+
       if (!revocationRecord) {
         return false
       }
@@ -171,9 +185,11 @@ export class TokenRevocationService {
       }
 
       return true
-
     } catch (error) {
-      logger.error(`Error checking revocation status for token ${tokenId}`, error)
+      logger.error(
+        `Error checking revocation status for token ${tokenId}`,
+        error,
+      )
       // Fail closed - assume revoked if we can't verify
       return true
     }
@@ -186,9 +202,9 @@ export class TokenRevocationService {
     try {
       const key = `token:revocation:${tokenId}`
       const data = await this.redis.get(key)
-      
+
       if (!data) return null
-      
+
       return JSON.parse(data) as RevocationRecord
     } catch (error) {
       logger.error(`Error retrieving revocation record for ${tokenId}`, error)
@@ -199,25 +215,33 @@ export class TokenRevocationService {
   /**
    * Revoke all tokens for a specific user
    */
-  async revokeAllUserTokens(userId: string, reason: RevocationReason, metadata: Record<string, unknown> = {}): Promise<number> {
+  async revokeAllUserTokens(
+    userId: string,
+    reason: RevocationReason,
+    metadata: Record<string, unknown> = {},
+  ): Promise<number> {
     try {
       const userRevocationsKey = `user:revocations:${userId}`
       const tokenIds = await this.redis.smembers(userRevocationsKey)
-      
+
       let revokedCount = 0
-      
+
       for (const tokenId of tokenIds) {
         try {
           await this.revokeToken(tokenId, reason, metadata)
           revokedCount++
         } catch (error) {
-          logger.warn(`Failed to revoke token ${tokenId} for user ${userId}`, error)
+          logger.warn(
+            `Failed to revoke token ${tokenId} for user ${userId}`,
+            error,
+          )
         }
       }
 
-      logger.info(`Revoked ${revokedCount} tokens for user ${userId}`, { reason })
+      logger.info(`Revoked ${revokedCount} tokens for user ${userId}`, {
+        reason,
+      })
       return revokedCount
-
     } catch (error) {
       logger.error(`Failed to revoke all tokens for user ${userId}`, error)
       throw new AuthenticationError('Failed to revoke user tokens')
@@ -231,7 +255,7 @@ export class TokenRevocationService {
     try {
       const userRevocationsKey = `user:revocations:${userId}`
       const tokenIds = await this.redis.smembers(userRevocationsKey)
-      
+
       const revocations: RevocationRecord[] = []
       const now = Math.floor(Date.now() / 1000)
 
@@ -243,7 +267,6 @@ export class TokenRevocationService {
       }
 
       return revocations.sort((a, b) => b.revokedAt - a.revokedAt)
-
     } catch (error) {
       logger.error(`Error retrieving revocations for user ${userId}`, error)
       return []
@@ -256,7 +279,7 @@ export class TokenRevocationService {
   private async storeRevocationRecord(record: RevocationRecord): Promise<void> {
     const key = `token:revocation:${record.tokenId}`
     const ttl = record.expiresAt - Math.floor(Date.now() / 1000)
-    
+
     if (ttl <= 0) {
       throw new AuthenticationError('Cannot store expired revocation record')
     }
@@ -275,12 +298,15 @@ export class TokenRevocationService {
   /**
    * Add token to user's revocation list for tracking
    */
-  private async addToUserRevocationList(userId: string, tokenId: string): Promise<void> {
+  private async addToUserRevocationList(
+    userId: string,
+    tokenId: string,
+  ): Promise<void> {
     const userRevocationsKey = `user:revocations:${userId}`
-    
+
     // Add to set with expiration based on revocation list TTL
     await this.redis.sadd(userRevocationsKey, tokenId)
-    
+
     // Set TTL on the set itself
     await this.redis.expire(userRevocationsKey, this.config.revocationListTTL)
   }
@@ -291,17 +317,20 @@ export class TokenRevocationService {
   private async enforceRevocationLimits(userId: string): Promise<void> {
     const userRevocationsKey = `user:revocations:${userId}`
     const revocationCount = await this.redis.scard(userRevocationsKey)
-    
+
     if (revocationCount > this.config.maxRevocationsPerUser) {
       logger.warn(`User ${userId} exceeded revocation limit`, {
         count: revocationCount,
-        limit: this.config.maxRevocationsPerUser
+        limit: this.config.maxRevocationsPerUser,
       })
-      
+
       // Remove oldest revocations
       const tokensToRemove = revocationCount - this.config.maxRevocationsPerUser
-      const oldestTokens = await this.redis.srandmember(userRevocationsKey, tokensToRemove)
-      
+      const oldestTokens = await this.redis.srandmember(
+        userRevocationsKey,
+        tokensToRemove,
+      )
+
       for (const tokenId of oldestTokens) {
         await this.removeRevocationRecord(tokenId)
         await this.redis.srem(userRevocationsKey, tokenId)
@@ -316,9 +345,9 @@ export class TokenRevocationService {
     try {
       const key = `token:metadata:${tokenId}`
       const data = await this.redis.get(key)
-      
+
       if (!data) return null
-      
+
       return JSON.parse(data)
     } catch (error) {
       logger.error(`Error retrieving token metadata for ${tokenId}`, error)
@@ -329,10 +358,15 @@ export class TokenRevocationService {
   /**
    * Notify distributed systems of revocation (placeholder for future implementation)
    */
-  private async notifyDistributedRevocation(record: RevocationRecord): Promise<void> {
+  private async notifyDistributedRevocation(
+    record: RevocationRecord,
+  ): Promise<void> {
     // TODO: Implement distributed revocation notification
     // This could use message queues, webhooks, or other distributed communication methods
-    logger.info('Distributed revocation notification', { tokenId: record.tokenId, reason: record.reason })
+    logger.info('Distributed revocation notification', {
+      tokenId: record.tokenId,
+      reason: record.reason,
+    })
   }
 
   /**
@@ -345,24 +379,25 @@ export class TokenRevocationService {
 
       // Get all revocation keys
       const revocationKeys = await this.redis.keys('token:revocation:*')
-      
+
       for (const key of revocationKeys) {
-        const revocation = await this.getRevocationRecord(key.replace('token:revocation:', ''))
-        
+        const revocation = await this.getRevocationRecord(
+          key.replace('token:revocation:', ''),
+        )
+
         if (revocation && revocation.expiresAt < now) {
           await this.removeRevocationRecord(revocation.tokenId)
-          
+
           // Remove from user revocation list
           const userRevocationsKey = `user:revocations:${revocation.userId}`
           await this.redis.srem(userRevocationsKey, revocation.tokenId)
-          
+
           cleanedCount++
         }
       }
 
       logger.info(`Cleaned up ${cleanedCount} expired revocation records`)
       return cleanedCount
-
     } catch (error) {
       logger.error('Error during revocation cleanup', error)
       return 0
@@ -382,7 +417,7 @@ export class TokenRevocationService {
     try {
       const now = Math.floor(Date.now() / 1000)
       const revocationKeys = await this.redis.keys('token:revocation:*')
-      
+
       let totalRevocations = 0
       let activeRevocations = 0
       let expiredRevocations = 0
@@ -390,11 +425,13 @@ export class TokenRevocationService {
       const userRevocationCounts: Record<string, number> = {}
 
       for (const key of revocationKeys) {
-        const revocation = await this.getRevocationRecord(key.replace('token:revocation:', ''))
-        
+        const revocation = await this.getRevocationRecord(
+          key.replace('token:revocation:', ''),
+        )
+
         if (revocation) {
           totalRevocations++
-          
+
           if (revocation.expiresAt > now) {
             activeRevocations++
           } else {
@@ -402,10 +439,12 @@ export class TokenRevocationService {
           }
 
           // Count by reason
-          revocationsByReason[revocation.reason] = (revocationsByReason[revocation.reason] || 0) + 1
+          revocationsByReason[revocation.reason] =
+            (revocationsByReason[revocation.reason] || 0) + 1
 
           // Count by user
-          userRevocationCounts[revocation.userId] = (userRevocationCounts[revocation.userId] || 0) + 1
+          userRevocationCounts[revocation.userId] =
+            (userRevocationCounts[revocation.userId] || 0) + 1
         }
       }
 
@@ -420,9 +459,8 @@ export class TokenRevocationService {
         activeRevocations,
         expiredRevocations,
         revocationsByReason,
-        topUsersByRevocations
+        topUsersByRevocations,
       }
-
     } catch (error) {
       logger.error('Error generating revocation statistics', error)
       return {
@@ -430,7 +468,7 @@ export class TokenRevocationService {
         activeRevocations: 0,
         expiredRevocations: 0,
         revocationsByReason: {},
-        topUsersByRevocations: []
+        topUsersByRevocations: [],
       }
     }
   }
@@ -452,7 +490,7 @@ export class TokenRevocationService {
     }, this.config.cleanupInterval * 1000)
 
     // Run initial cleanup
-    this.cleanupExpiredRevocations().catch(error => {
+    this.cleanupExpiredRevocations().catch((error) => {
       logger.error('Error in initial revocation cleanup', error)
     })
   }

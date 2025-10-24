@@ -54,6 +54,7 @@ export function createCryptoSystem(options: CryptoSystemOptions): CryptoSystem {
       } catch (error: unknown) {
         throw new Error(
           `Decryption failed: ${error instanceof Error ? String(error) : String(error)}`,
+          { cause: error },
         )
       }
     },

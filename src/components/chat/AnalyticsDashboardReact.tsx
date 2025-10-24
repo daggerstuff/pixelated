@@ -8,10 +8,13 @@ import { useEffect, useMemo, useState } from 'react'
 // Dynamic FHE imports
 async function loadFHE() {
   const [fheService, fheAnalytics] = await Promise.all([
-    import('../../lib/fhe').then(m => m.fheService),
-    import('../../lib/fhe/analytics').then(m => ({ AnalyticsType: m.AnalyticsType, fheAnalytics: m.fheAnalytics }))
-  ]);
-  return { fheService, ...fheAnalytics };
+    import('../../lib/fhe').then((m) => m.fheService),
+    import('../../lib/fhe/analytics').then((m) => ({
+      AnalyticsType: m.AnalyticsType,
+      fheAnalytics: m.fheAnalytics,
+    })),
+  ])
+  return { fheService, ...fheAnalytics }
 }
 
 // Temporary type definition for AnalyticsType
@@ -113,7 +116,7 @@ export default function AnalyticsDashboard({
     const initFHE = async () => {
       try {
         // Dynamically load FHE services
-        const { fheService, fheAnalytics } = await loadFHE();
+        const { fheService, fheAnalytics } = await loadFHE()
 
         const encryptionMode =
           securityLevel === 'maximum'
@@ -160,7 +163,7 @@ export default function AnalyticsDashboard({
 
     try {
       // Dynamically load FHE analytics
-      const { fheAnalytics } = await loadFHE();
+      const { fheAnalytics } = await loadFHE()
 
       // Create configuration based on security level
       const config = {
@@ -184,9 +187,7 @@ export default function AnalyticsDashboard({
       const processedResults = await Promise.all(
         results.map(async (result) => {
           if (result.isEncrypted && typeof result.data === 'string') {
-            const parsedData = JSON.parse(
-              result.data,
-            ) as AnalyticsData
+            const parsedData = JSON.parse(result.data) as AnalyticsData
             return {
               ...result,
               data: parsedData,

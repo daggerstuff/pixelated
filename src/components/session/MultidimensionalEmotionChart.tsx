@@ -9,7 +9,12 @@ async function loadThreeWithTypes() {
     import('three'),
     import('three/examples/jsm/controls/OrbitControls.js'),
   ])
-  return { THREE: (threeModule as typeof import('three')), OrbitControls: (orbitModule as typeof import('three/examples/jsm/controls/OrbitControls.js')).OrbitControls }
+  return {
+    THREE: threeModule as typeof import('three'),
+    OrbitControls: (
+      orbitModule as typeof import('three/examples/jsm/controls/OrbitControls.js')
+    ).OrbitControls,
+  }
 }
 
 // Types for dimensional emotion data and patterns
@@ -513,16 +518,16 @@ export default function MultidimensionalEmotionChart({
             ),
           )
           scene.traverse((object: THREE.Object3D) => {
-                if ((object as any).userData?.['isCullable']) {
-                  const { boundingSphere: sphere } = (object as any).userData
-                  if (sphere) {
-                    object.visible = frustum.intersectsSphere(
-                      sphere as THREE.Sphere,
-                    )
-                  } else {
-                    object.visible = true
-                  }
-                }
+            if ((object as any).userData?.['isCullable']) {
+              const { boundingSphere: sphere } = (object as any).userData
+              if (sphere) {
+                object.visible = frustum.intersectsSphere(
+                  sphere as THREE.Sphere,
+                )
+              } else {
+                object.visible = true
+              }
+            }
           })
         }
 

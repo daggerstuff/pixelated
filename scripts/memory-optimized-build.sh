@@ -10,9 +10,9 @@ MEMORY_SAFE="4096"       # 4GB safe mode
 MEMORY_CRITICAL="2048"   # 2GB critical mode
 
 # Build optimization flags
-NODE_FLAGS_OPTIMIZED="--max-old-space-size=${MEMORY_THRESHOLD} --optimize-for-size --gc-interval=100"
-NODE_FLAGS_SAFE="--max-old-space-size=${MEMORY_SAFE} --optimize-for-size"
-NODE_FLAGS_CRITICAL="--max-old-space-size=${MEMORY_CRITICAL} --optimize-for-size --gc-interval=50"
+NODE_FLAGS_OPTIMIZED="--max-old-space-size=${MEMORY_THRESHOLD}"
+NODE_FLAGS_SAFE="--max-old-space-size=${MEMORY_SAFE}"
+NODE_FLAGS_CRITICAL="--max-old-space-size=${MEMORY_CRITICAL}"
 
 # Function to detect available memory
 detect_memory() {
@@ -103,9 +103,11 @@ cleanup_memory() {
         pnpm store prune || true
     fi
     
-    # Clear system caches
-    sync
-    echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+    # Clear system caches (skip if not running as root)
+    if [ "$(id -u)" -eq 0 ]; then
+        sync
+        echo 3 > /proc/sys/vm/drop_caches 2>/dev/null
+    fi
     
     echo "✅ Memory cleanup completed"
 }

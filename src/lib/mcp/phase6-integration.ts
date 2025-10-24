@@ -7,7 +7,9 @@
 // Stub implementation to prevent build failures
 // The full implementation exists in src/lib/auth/phase6-integration.ts but needs to be migrated
 
-export type AuthenticationEvent = 
+import { secureRandomUUID } from '@/lib/crypto/secure-random' // new import (uses project alias)
+
+export type AuthenticationEvent =
   | 'user_created'
   | 'user_registered'
   | 'user_logged_out'
@@ -47,21 +49,28 @@ export type AuthenticationEvent =
 export async function updatePhase6AuthenticationProgress(
   userId: string | null,
   event: AuthenticationEvent,
-  metadata: Record<string, unknown> = {}
+  metadata: Record<string, unknown> = {},
 ): Promise<void> {
   try {
-    // Log the event for debugging
-    console.debug('[Phase6] Authentication progress:', { userId, event, metadata })
-    
+    // Generate a cryptographically secure event id for traceability
+    const eventId = secureRandomUUID()
+
+    // Log the event for debugging (now includes secure eventId)
+    console.debug('[Phase6] Authentication progress:', {
+      eventId,
+      userId,
+      event,
+      metadata,
+    })
+
     // In a full implementation, this would:
     // 1. Connect to Phase 6 MCP server
     // 2. Track authentication progress
     // 3. Update security metrics
     // 4. Trigger sign-off workflows if needed
-    
+
     // For now, just return successfully to not block authentication flows
     return Promise.resolve()
-    
   } catch (error) {
     // Don't throw errors - Phase 6 integration is optional
     console.warn('[Phase6] Failed to update authentication progress:', error)

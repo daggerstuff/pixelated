@@ -63,7 +63,8 @@ test('basic browser compatibility check', async ({ page, browser }) => {
   // Wait for results to be populated
   await page.waitForFunction(
     () => {
-      const content = (document.getElementById('results') as HTMLElement)?.textContent
+      const content = (document.getElementById('results') as HTMLElement)
+        ?.textContent
       return content && content !== 'Running tests...'
     },
     { timeout: 5000 },
@@ -110,6 +111,8 @@ test('basic browser compatibility check', async ({ page, browser }) => {
   } catch (err: unknown) {
     console.error('Error parsing features JSON:', err)
     // Include the content in the error message for better debugging
-    throw new Error(`Failed to parse features JSON. Content: ${content}`)
+    throw new Error(`Failed to parse features JSON. Content: ${content}`, {
+      cause: err,
+    })
   }
 })

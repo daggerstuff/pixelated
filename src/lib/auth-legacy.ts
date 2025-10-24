@@ -35,7 +35,9 @@ export async function getCurrentUser(
   }
 
   try {
-    const decoded = await (await import('@/adapters/betterAuthMongoAdapter')).verifyToken(accessToken)
+    const decoded = await (
+      await import('@/adapters/betterAuthMongoAdapter')
+    ).verifyToken(accessToken)
     if (!decoded) {
       return null
     }
@@ -44,13 +46,17 @@ export async function getCurrentUser(
     const { userId } = decoded
 
     // Fetch user from the database
-    const user = await (await import('@/adapters/betterAuthMongoAdapter')).getUserById(userId)
+    const user = await (
+      await import('@/adapters/betterAuthMongoAdapter')
+    ).getUserById(userId)
     if (!user) {
       return null
     }
 
     // Type assertion for user profile to handle the unknown type
-    const userProfile = user.profile as { firstName?: string; lastName?: string; avatarUrl?: string } | undefined
+    const userProfile = user.profile as
+      | { firstName?: string; lastName?: string; avatarUrl?: string }
+      | undefined
 
     return {
       id: user._id.toString(),
@@ -72,9 +78,7 @@ export async function getCurrentUser(
 /**
  * Check if the user is authenticated
  */
-export async function isAuthenticated(
-  cookies: AstroCookies,
-): Promise<boolean> {
+export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
   // Always return false in the browser context to prevent redirects
   if (typeof window !== 'undefined') {
     return false
@@ -213,9 +217,7 @@ export async function requireRole({
 }
 
 export class Auth {
-  async verifySession(
-    request: Request,
-  ): Promise<{ userId: string } | null> {
+  async verifySession(request: Request): Promise<{ userId: string } | null> {
     const cookies = this.getCookiesFromRequest(request)
     const user = await getCurrentUser(cookies)
     return user ? { userId: user.id } : null

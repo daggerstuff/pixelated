@@ -35,7 +35,10 @@ export const buttonVariants = cva(
   },
 )
 
-const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
+const Button = React.forwardRef<
+  HTMLButtonElement | HTMLAnchorElement,
+  ButtonProps
+>(
   (
     {
       className,
@@ -54,7 +57,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
       rel,
       ...props
     }: ButtonProps,
-    ref: React.ForwardedRef<HTMLButtonElement | HTMLAnchorElement>
+    ref: React.ForwardedRef<HTMLButtonElement | HTMLAnchorElement>,
   ) => {
     // Determine if this should be a link
     const isLink = isLinkButton({ href })
@@ -74,13 +77,14 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
     }
 
     // Render spinner if loading
-    const loadingSpinner = loading && showSpinner ? (
-      <span
-        className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-        role="status"
-        aria-label="Loading"
-      />
-    ) : null
+    const loadingSpinner =
+      loading && showSpinner ? (
+        <span
+          className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+          role="status"
+          aria-label="Loading"
+        />
+      ) : null
 
     // Content wrapper
     const contentWrapper = (
@@ -95,7 +99,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
     // Render as link if href is provided
     if (isLink) {
       // Remove 'type' from commonProps for anchor
-  const { type: _type, ...anchorProps } = commonProps as { type?: string }
+      const { type: _type, ...anchorProps } = commonProps as { type?: string }
       return (
         <a
           ref={ref as React.ForwardedRef<HTMLAnchorElement>}

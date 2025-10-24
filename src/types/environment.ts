@@ -47,7 +47,7 @@ export interface DatabaseEnvironmentVariables {
   readonly MONGODB_USERNAME?: string | undefined
   readonly MONGODB_PASSWORD?: ApiKey | undefined
   readonly MONGODB_CLUSTER?: string | undefined
-  
+
   // Legacy database support
   readonly DATABASE_URL?: DatabaseUrl | undefined
 }

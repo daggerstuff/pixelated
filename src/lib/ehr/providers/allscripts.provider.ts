@@ -107,6 +107,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
         )
         throw new Error(
           `Required Allscripts endpoint ${endpoint} is not available`,
+          { cause: error },
         )
       }
     }

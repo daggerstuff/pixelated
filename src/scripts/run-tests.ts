@@ -112,14 +112,14 @@ async function main() {
     runTests(filteredArgs)
 
     process.exit(0)
-  } catch {
-    console.error('\n❌ Error')
+  } catch (error: unknown) {
+    console.error('\n❌ Error', String(error))
     process.exit(1)
   }
 }
 
 // Run the scrip
-main().catch(() => {
-  console.error('Unhandled error')
+main().catch((error: unknown) => {
+  console.error('Unhandled error', String(error))
   process.exit(1)
 })

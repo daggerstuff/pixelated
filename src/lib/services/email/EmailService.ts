@@ -64,7 +64,9 @@ export class EmailService {
   constructor() {
     const apiKey = env.email.resendApiKey()
     if (!apiKey) {
-      throw new Error('RESEND_API_KEY is not configured in environment variables')
+      throw new Error(
+        'RESEND_API_KEY is not configured in environment variables',
+      )
     }
     this.resend = new Resend(apiKey)
   }
@@ -113,7 +115,9 @@ export class EmailService {
       try {
         // Check if we should retry based on last attempt and delay
         if (queueItem.lastAttempt) {
-          const delay = this.retryDelays[queueItem.attempts - 1] ?? this.retryDelays[this.retryDelays.length - 1]
+          const delay =
+            this.retryDelays[queueItem.attempts - 1] ??
+            this.retryDelays[this.retryDelays.length - 1]
           if (delay === undefined) {
             throw new Error('Failed to determine retry delay')
           }
@@ -160,8 +164,8 @@ export class EmailService {
               filename: att.name,
               content: att.content,
               content_type: att.contentType,
-            }))
-          })
+            })),
+          }),
         }
 
         // Send email using Resend

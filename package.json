@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.18.2",
+  "packageManager": "pnpm@10.19.0",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -221,6 +221,7 @@
     "@iconify-json/ri": "^1.2.6",
     "@iconify-json/uil": "^1.2.3",
     "@playwright/test": "^1.56.0",
+    "@smithery/cli": "^1.6.3",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -426,6 +427,6 @@
     "unrs-resolver"
   ],
   "overrides": {
-    "esbuild": "^0.25.9"
+    "esbuild": "^0.25.10"
   }
 }

@@ -8,12 +8,12 @@ import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { AuthenticationError } from './jwt-service'
-import { 
-  UserRole, 
-  ROLE_DEFINITIONS, 
-  validateRoleTransition, 
+import {
+  UserRole,
+  ROLE_DEFINITIONS,
+  validateRoleTransition,
   canAssignRole,
-  } from './roles'
+} from './roles'
 import { isTwoFactorRequired, verifyTwoFactorToken } from './two-factor-auth'
 import type { SessionData } from './session-management'
 
@@ -63,7 +63,13 @@ export interface RoleTransitionAuditLog {
   id: string
   requestId: string
   userId: string
-  action: 'requested' | 'approved' | 'rejected' | 'cancelled' | 'expired' | 'completed'
+  action:
+    | 'requested'
+    | 'approved'
+    | 'rejected'
+    | 'cancelled'
+    | 'expired'
+    | 'completed'
   roleFrom: UserRole
   roleTo: UserRole
   actorId: string
@@ -107,7 +113,7 @@ export async function requestRoleTransition(
   clientInfo: {
     ipAddress: string
     userAgent: string
-  }
+  },
 ): Promise<RoleTransitionRequest> {
   try {
     // Get current user role
@@ -115,15 +121,19 @@ export async function requestRoleTransition(
 
     // Validate role transition
     const validation = validateRoleTransition(currentRole, requestedRole)
-    
+
     if (!validation.requiresApproval) {
-      throw new AuthenticationError('Role transition does not require approval process')
+      throw new AuthenticationError(
+        'Role transition does not require approval process',
+      )
     }
 
     // Check if user has pending requests
     const pendingRequests = await getPendingRoleRequests(userId)
     if (pendingRequests.length >= ROLE_TRANSITION_CONFIG.maxPendingRequests) {
-      throw new AuthenticationError('Maximum pending role transition requests reached')
+      throw new AuthenticationError(
+        'Maximum pending role transition requests reached',
+      )
     }
 
     // Verify 2FA if required
@@ -135,14 +145,16 @@ export async function requestRoleTransition(
       })
 
       if (!is2FAValid) {
-        throw new AuthenticationError('2FA verification required for role transition')
+        throw new AuthenticationError(
+          '2FA verification required for role transition',
+        )
       }
     }
 
     // Create transition request
     const requestId = `role_req_${nanoid(16)}`
     const now = Date.now()
-    
+
     const transitionRequest: RoleTransitionRequest = {
       id: requestId,
       userId,
@@ -166,7 +178,7 @@ export async function requestRoleTransition(
     await setInCache(
       `role_transition:request:${requestId}`,
       transitionRequest,
-      Math.floor(ROLE_TRANSITION_CONFIG.approvalTimeout / 1000)
+      Math.floor(ROLE_TRANSITION_CONFIG.approvalTimeout / 1000),
     )
 
     // Add to user's pending requests
@@ -193,18 +205,26 @@ export async function requestRoleTransition(
     await notifyRoleTransitionRequest(transitionRequest)
 
     // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(userId, 'role_transition_requested')
+    await updatePhase6AuthenticationProgress(
+      userId,
+      'role_transition_requested',
+    )
 
     return transitionRequest
-
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED, userId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      requestedRole,
-      requestedBy,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED,
+      userId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        requestedRole,
+        requestedBy,
+      },
+    )
 
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('Failed to request role transition')
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('Failed to request role transition')
   }
 }
 
@@ -217,10 +237,17 @@ export async function processRoleTransitionApproval(
   clientInfo: {
     ipAddress: string
     userAgent: string
-  }
+  },
 ): Promise<RoleTransitionRequest> {
   try {
-    const { requestId, approverId, approverRole, decision, reason, twoFactorToken } = approval
+    const {
+      requestId,
+      approverId,
+      approverRole,
+      decision,
+      reason,
+      twoFactorToken,
+    } = approval
 
     // Get the transition request
     const request = await getFromCache(`role_transition:request:${requestId}`)
@@ -230,7 +257,9 @@ export async function processRoleTransitionApproval(
 
     // Check if request is still pending
     if (request.status !== 'pending') {
-      throw new AuthenticationError('Role transition request is no longer pending')
+      throw new AuthenticationError(
+        'Role transition request is no longer pending',
+      )
     }
 
     // Check if request has expired
@@ -241,11 +270,17 @@ export async function processRoleTransitionApproval(
 
     // Verify approver has permission to approve this role transition
     if (!canApproveRoleTransition(approverRole, request.requestedRole)) {
-      throw new AuthenticationError('Insufficient permissions to approve this role transition')
+      throw new AuthenticationError(
+        'Insufficient permissions to approve this role transition',
+      )
     }
 
     // Verify 2FA for approver
-    const requires2FA = await isTwoFactorRequired(approverId, approverRole, approverSession.deviceId)
+    const requires2FA = await isTwoFactorRequired(
+      approverId,
+      approverRole,
+      approverSession.deviceId,
+    )
     if (requires2FA) {
       const is2FAValid = await verifyTwoFactorToken({
         userId: approverId,
@@ -254,7 +289,9 @@ export async function processRoleTransitionApproval(
       })
 
       if (!is2FAValid) {
-        throw new AuthenticationError('2FA verification required for role transition approval')
+        throw new AuthenticationError(
+          '2FA verification required for role transition approval',
+        )
       }
     }
 
@@ -271,7 +308,7 @@ export async function processRoleTransitionApproval(
     await setInCache(
       `role_transition:request:${requestId}`,
       request,
-      Math.floor((request.expiresAt - now) / 1000)
+      Math.floor((request.expiresAt - now) / 1000),
     )
 
     // Log approval/rejection
@@ -303,18 +340,26 @@ export async function processRoleTransitionApproval(
     await notifyRoleTransitionDecision(request, approverId, decision)
 
     // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(request.userId, `role_transition_${decision}`)
+    await updatePhase6AuthenticationProgress(
+      request.userId,
+      `role_transition_${decision}`,
+    )
 
     return request
-
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED, approverId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      requestId,
-      decision,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED,
+      approverId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        requestId,
+        decision,
+      },
+    )
 
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('Failed to process role transition approval')
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('Failed to process role transition approval')
   }
 }
 
@@ -323,7 +368,7 @@ export async function processRoleTransitionApproval(
  */
 async function executeRoleTransition(
   request: RoleTransitionRequest,
-  approverSession: SessionData
+  approverSession: SessionData,
 ): Promise<void> {
   try {
     // Get user's current authentication data
@@ -338,7 +383,11 @@ async function executeRoleTransition(
     userAuth.updatedAt = Date.now()
 
     // Store updated user authentication
-    await setInCache(`user_auth:${request.userId}`, userAuth, 365 * 24 * 60 * 60) // 1 year
+    await setInCache(
+      `user_auth:${request.userId}`,
+      userAuth,
+      365 * 24 * 60 * 60,
+    ) // 1 year
 
     // Update user's permissions based on new role
     const newPermissions = getRolePermissions(request.requestedRole)
@@ -365,13 +414,19 @@ async function executeRoleTransition(
     await notifyRoleTransitionSuccess(request)
 
     // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(request.userId, 'role_transition_completed')
-
+    await updatePhase6AuthenticationProgress(
+      request.userId,
+      'role_transition_completed',
+    )
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED, request.userId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      requestId: request.id,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED,
+      request.userId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        requestId: request.id,
+      },
+    )
 
     throw new AuthenticationError('Failed to execute role transition')
   }
@@ -388,7 +443,7 @@ export async function cancelRoleTransitionRequest(
   clientInfo: {
     ipAddress: string
     userAgent: string
-  }
+  },
 ): Promise<void> {
   try {
     // Get the transition request
@@ -399,12 +454,16 @@ export async function cancelRoleTransitionRequest(
 
     // Verify user can cancel this request
     if (request.userId !== userId && request.requestedBy !== userId) {
-      throw new AuthenticationError('Unauthorized to cancel this role transition request')
+      throw new AuthenticationError(
+        'Unauthorized to cancel this role transition request',
+      )
     }
 
     // Check if request is still pending
     if (request.status !== 'pending') {
-      throw new AuthenticationError('Cannot cancel non-pending role transition request')
+      throw new AuthenticationError(
+        'Cannot cancel non-pending role transition request',
+      )
     }
 
     // Update request status
@@ -416,7 +475,7 @@ export async function cancelRoleTransitionRequest(
     await setInCache(
       `role_transition:request:${requestId}`,
       request,
-      Math.floor((request.expiresAt - Date.now()) / 1000)
+      Math.floor((request.expiresAt - Date.now()) / 1000),
     )
 
     // Remove from pending requests
@@ -443,15 +502,23 @@ export async function cancelRoleTransitionRequest(
     await notifyRoleTransitionCancellation(request, userId, reason)
 
     // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(request.userId, 'role_transition_cancelled')
-
+    await updatePhase6AuthenticationProgress(
+      request.userId,
+      'role_transition_cancelled',
+    )
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED, userId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      requestId,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED,
+      userId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        requestId,
+      },
+    )
 
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('Failed to cancel role transition request')
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('Failed to cancel role transition request')
   }
 }
 
@@ -460,11 +527,11 @@ export async function cancelRoleTransitionRequest(
  */
 export async function getUserRoleTransitionRequests(
   userId: string,
-  status?: 'pending' | 'approved' | 'rejected' | 'expired' | 'cancelled'
+  status?: 'pending' | 'approved' | 'rejected' | 'expired' | 'cancelled',
 ): Promise<RoleTransitionRequest[]> {
   try {
     const requestsKey = `user:role_requests:${userId}`
-    const requestIds = await getFromCache(requestsKey) || []
+    const requestIds = (await getFromCache(requestsKey)) || []
 
     const requests: RoleTransitionRequest[] = []
 
@@ -479,7 +546,6 @@ export async function getUserRoleTransitionRequests(
     requests.sort((a, b) => b.requestedAt - a.requestedAt)
 
     return requests
-
   } catch (error) {
     console.error('Error getting user role transition requests:', error)
     return []
@@ -490,21 +556,23 @@ export async function getUserRoleTransitionRequests(
  * Get pending role transition requests for approval
  */
 export async function getPendingRoleTransitionRequests(
-  approverRole: UserRole
+  approverRole: UserRole,
 ): Promise<RoleTransitionRequest[]> {
   try {
     // Get all pending request IDs (simplified implementation)
     const pendingKey = 'role_transition:pending'
-    const requestIds = await getFromCache(pendingKey) || []
+    const requestIds = (await getFromCache(pendingKey)) || []
 
     const eligibleRequests: RoleTransitionRequest[] = []
 
     for (const requestId of requestIds) {
       const request = await getFromCache(`role_transition:request:${requestId}`)
-      if (request && 
-          request.status === 'pending' && 
-          Date.now() <= request.expiresAt &&
-          canApproveRoleTransition(approverRole, request.requestedRole)) {
+      if (
+        request &&
+        request.status === 'pending' &&
+        Date.now() <= request.expiresAt &&
+        canApproveRoleTransition(approverRole, request.requestedRole)
+      ) {
         eligibleRequests.push(request)
       }
     }
@@ -513,7 +581,6 @@ export async function getPendingRoleTransitionRequests(
     eligibleRequests.sort((a, b) => a.requestedAt - b.requestedAt)
 
     return eligibleRequests
-
   } catch (error) {
     console.error('Error getting pending role transition requests:', error)
     return []
@@ -523,7 +590,10 @@ export async function getPendingRoleTransitionRequests(
 /**
  * Check if role can approve role transitions
  */
-function canApproveRoleTransition(approverRole: UserRole, targetRole: UserRole): boolean {
+function canApproveRoleTransition(
+  approverRole: UserRole,
+  targetRole: UserRole,
+): boolean {
   const approverDef = ROLE_DEFINITIONS[approverRole]
   const targetDef = ROLE_DEFINITIONS[targetRole]
 
@@ -553,15 +623,17 @@ function getRolePermissions(role: UserRole): string[] {
 /**
  * Add user pending request
  */
-async function addUserPendingRequest(userId: string, requestId: string): Promise<void> {
+async function addUserPendingRequest(
+  userId: string,
+  requestId: string,
+): Promise<void> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    let pendingRequests = await getFromCache(pendingKey) || []
+    let pendingRequests = (await getFromCache(pendingKey)) || []
 
     pendingRequests.push(requestId)
 
     await setInCache(pendingKey, pendingRequests, 7 * 24 * 60 * 60) // 7 days
-
   } catch (error) {
     console.error('Error adding user pending request:', error)
   }
@@ -570,10 +642,13 @@ async function addUserPendingRequest(userId: string, requestId: string): Promise
 /**
  * Remove user pending request
  */
-async function removeUserPendingRequest(userId: string, requestId: string): Promise<void> {
+async function removeUserPendingRequest(
+  userId: string,
+  requestId: string,
+): Promise<void> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    let pendingRequests = await getFromCache(pendingKey) || []
+    let pendingRequests = (await getFromCache(pendingKey)) || []
 
     pendingRequests = pendingRequests.filter((id: string) => id !== requestId)
 
@@ -582,7 +657,6 @@ async function removeUserPendingRequest(userId: string, requestId: string): Prom
     } else {
       await removeFromCache(pendingKey)
     }
-
   } catch (error) {
     console.error('Error removing user pending request:', error)
   }
@@ -591,10 +665,12 @@ async function removeUserPendingRequest(userId: string, requestId: string): Prom
 /**
  * Get pending role requests for user
  */
-async function getPendingRoleRequests(userId: string): Promise<RoleTransitionRequest[]> {
+async function getPendingRoleRequests(
+  userId: string,
+): Promise<RoleTransitionRequest[]> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    const requestIds = await getFromCache(pendingKey) || []
+    const requestIds = (await getFromCache(pendingKey)) || []
 
     const requests: RoleTransitionRequest[] = []
 
@@ -606,7 +682,6 @@ async function getPendingRoleRequests(userId: string): Promise<RoleTransitionReq
     }
 
     return requests
-
   } catch (error) {
     console.error('Error getting pending role requests:', error)
     return []
@@ -622,11 +697,11 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
     if (!request) return
 
     request.status = 'expired'
-    
+
     await setInCache(
       `role_transition:request:${requestId}`,
       request,
-      Math.floor((request.expiresAt - Date.now()) / 1000)
+      Math.floor((request.expiresAt - Date.now()) / 1000),
     )
 
     // Remove from pending requests
@@ -648,7 +723,6 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
       userAgent: 'system',
       sessionId: 'system',
     })
-
   } catch (error) {
     console.error('Error expiring role transition request:', error)
   }
@@ -657,37 +731,46 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
 /**
  * Log role transition audit event
  */
-async function logRoleTransitionAudit(auditLog: RoleTransitionAuditLog): Promise<void> {
+async function logRoleTransitionAudit(
+  auditLog: RoleTransitionAuditLog,
+): Promise<void> {
   try {
     // Store audit log
     await setInCache(
       `role_transition:audit:${auditLog.id}`,
       auditLog,
-      ROLE_TRANSITION_CONFIG.auditRetentionDays * 24 * 60 * 60
+      ROLE_TRANSITION_CONFIG.auditRetentionDays * 24 * 60 * 60,
     )
 
     // Add to user's audit trail
     const userAuditKey = `user:role_audit:${auditLog.userId}`
-    let userAuditTrail = await getFromCache(userAuditKey) || []
-    
+    let userAuditTrail = (await getFromCache(userAuditKey)) || []
+
     userAuditTrail.push(auditLog.id)
-    
+
     // Keep only last 100 entries
     if (userAuditTrail.length > 100) {
       userAuditTrail = userAuditTrail.slice(-100)
     }
-    
-    await setInCache(userAuditKey, userAuditTrail, ROLE_TRANSITION_CONFIG.auditRetentionDays * 24 * 60 * 60)
+
+    await setInCache(
+      userAuditKey,
+      userAuditTrail,
+      ROLE_TRANSITION_CONFIG.auditRetentionDays * 24 * 60 * 60,
+    )
 
     // Log security event
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_AUDIT, auditLog.userId, {
-      action: auditLog.action,
-      roleFrom: auditLog.roleFrom,
-      roleTo: auditLog.roleTo,
-      actorId: auditLog.actorId,
-      actorRole: auditLog.actorRole,
-    })
-
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_AUDIT,
+      auditLog.userId,
+      {
+        action: auditLog.action,
+        roleFrom: auditLog.roleFrom,
+        roleTo: auditLog.roleTo,
+        actorId: auditLog.actorId,
+        actorRole: auditLog.actorRole,
+      },
+    )
   } catch (error) {
     console.error('Error logging role transition audit:', error)
   }
@@ -696,29 +779,37 @@ async function logRoleTransitionAudit(auditLog: RoleTransitionAuditLog): Promise
 /**
  * Notification functions (implement based on your notification service)
  */
-async function notifyRoleTransitionRequest(request: RoleTransitionRequest): Promise<void> {
+async function notifyRoleTransitionRequest(
+  request: RoleTransitionRequest,
+): Promise<void> {
   // Implement notification logic
-  console.log(`Role transition requested: ${request.userId} from ${request.currentRole} to ${request.requestedRole}`)
+  console.log(
+    `Role transition requested: ${request.userId} from ${request.currentRole} to ${request.requestedRole}`,
+  )
 }
 
 async function notifyRoleTransitionDecision(
   request: RoleTransitionRequest,
   approverId: string,
-  decision: 'approve' | 'reject'
+  decision: 'approve' | 'reject',
 ): Promise<void> {
   // Implement notification logic
   console.log(`Role transition ${decision}: ${request.userId} by ${approverId}`)
 }
 
-async function notifyRoleTransitionSuccess(request: RoleTransitionRequest): Promise<void> {
+async function notifyRoleTransitionSuccess(
+  request: RoleTransitionRequest,
+): Promise<void> {
   // Implement notification logic
-  console.log(`Role transition completed: ${request.userId} is now ${request.requestedRole}`)
+  console.log(
+    `Role transition completed: ${request.userId} is now ${request.requestedRole}`,
+  )
 }
 
 async function notifyRoleTransitionCancellation(
   request: RoleTransitionRequest,
   cancellerId: string,
-  reason: string
+  reason: string,
 ): Promise<void> {
   // Implement notification logic
   console.log(`Role transition cancelled: ${request.userId} by ${cancellerId}`)
@@ -729,17 +820,17 @@ async function notifyRoleTransitionCancellation(
  */
 export async function getRoleTransitionAuditTrail(
   userId: string,
-  limit: number = 50
+  limit: number = 50,
 ): Promise<RoleTransitionAuditLog[]> {
   try {
     const userAuditKey = `user:role_audit:${userId}`
-    const auditIds = await getFromCache(userAuditKey) || []
+    const auditIds = (await getFromCache(userAuditKey)) || []
 
     const auditLogs: RoleTransitionAuditLog[] = []
 
     // Get most recent audit entries
     const recentIds = auditIds.slice(-limit)
-    
+
     for (const auditId of recentIds) {
       const auditLog = await getFromCache(`role_transition:audit:${auditId}`)
       if (auditLog) {
@@ -751,7 +842,6 @@ export async function getRoleTransitionAuditTrail(
     auditLogs.sort((a, b) => b.timestamp - a.timestamp)
 
     return auditLogs
-
   } catch (error) {
     console.error('Error getting role transition audit trail:', error)
     return []
@@ -767,7 +857,7 @@ export async function validateRoleAssignment(
   targetUserId: string,
   targetRole: UserRole,
   sessionData: SessionData,
-  twoFactorToken: string
+  twoFactorToken: string,
 ): Promise<RoleTransitionValidation> {
   try {
     const validation: RoleTransitionValidation = {
@@ -781,12 +871,16 @@ export async function validateRoleAssignment(
 
     // Check if assigner can assign the target role
     if (!canAssignRole(assignerRole, targetRole)) {
-      validation.restrictions.push('Insufficient permissions to assign this role')
+      validation.restrictions.push(
+        'Insufficient permissions to assign this role',
+      )
       return validation
     }
 
     // Check if 2FA is required
-    if (await isTwoFactorRequired(assignerId, assignerRole, sessionData.deviceId)) {
+    if (
+      await isTwoFactorRequired(assignerId, assignerRole, sessionData.deviceId)
+    ) {
       if (!twoFactorToken) {
         validation.requiresMFA = true
         validation.restrictions.push('2FA verification required')
@@ -809,13 +903,17 @@ export async function validateRoleAssignment(
     const targetRoleDef = ROLE_DEFINITIONS[targetRole]
     if (targetRoleDef.requiresApproval) {
       validation.requiresApproval = true
-      validation.warnings.push('This role assignment requires approval workflow')
+      validation.warnings.push(
+        'This role assignment requires approval workflow',
+      )
     }
 
     // Check if security review is required
-    if (targetRoleDef.permissions.includes('manage:roles') || 
-        targetRoleDef.permissions.includes('*') ||
-        targetRole === 'admin') {
+    if (
+      targetRoleDef.permissions.includes('manage:roles') ||
+      targetRoleDef.permissions.includes('*') ||
+      targetRole === 'admin'
+    ) {
       validation.requiresSecurityReview = true
       validation.warnings.push('This role assignment requires security review')
     }
@@ -831,7 +929,10 @@ export async function validateRoleAssignment(
 
       // Validate role transition
       try {
-        const transitionValidation = validateRoleTransition(currentRole, targetRole)
+        const transitionValidation = validateRoleTransition(
+          currentRole,
+          targetRole,
+        )
         if (transitionValidation.requiresApproval) {
           validation.requiresApproval = true
         }
@@ -843,7 +944,6 @@ export async function validateRoleAssignment(
 
     validation.canTransition = validation.restrictions.length === 0
     return validation
-
   } catch (error) {
     console.error('Error validating role assignment:', error)
     validation.restrictions.push('Validation failed due to system error')

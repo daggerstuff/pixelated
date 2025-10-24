@@ -1,6 +1,5 @@
 export const prerender = false
 
-
 /**
  * API endpoint for fetching system metrics (admin only)
  * GET /api/admin/metrics

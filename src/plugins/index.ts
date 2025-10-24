@@ -10,7 +10,9 @@ function rehypeHeadingIds() {
     // Simple implementation - add IDs to headings
     function walk(node: any) {
       if (node.type === 'heading' && node.children) {
-        const text = node.children.map((child: any) => child.value || '').join('')
+        const text = node.children
+          .map((child: any) => child.value || '')
+          .join('')
         if (text) {
           node.data = node.data || {}
           node.data.hProperties = node.data.hProperties || {}
@@ -45,7 +47,7 @@ export function rehypeHeadingIdsPlugin(): AstroIntegration {
 // Placeholder for unist-util-visit functionality
 export function visit(tree: any, type: string, callback: (node: any) => void) {
   if (!tree || !tree.children) return
-  
+
   for (const child of tree.children) {
     if (child.type === type) {
       callback(child)

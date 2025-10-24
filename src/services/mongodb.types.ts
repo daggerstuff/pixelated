@@ -5,13 +5,13 @@
 
 // Use conditional import to prevent MongoDB from being bundled on client side
 declare class ObjectId {
-  constructor(id?: string | number);
-  toString(): string;
-  toHexString(): string;
-  static isValid(id: unknown): boolean;
+  constructor(id?: string | number)
+  toString(): string
+  toHexString(): string
+  static isValid(id: unknown): boolean
 }
 
-type MongoObjectId = ObjectId;
+type MongoObjectId = ObjectId
 
 export interface User {
   _id: MongoObjectId

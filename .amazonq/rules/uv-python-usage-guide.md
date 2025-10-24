@@ -118,7 +118,7 @@ This creates:
 - `main.py` - Initial Python file
 
 ### Project Structure
-```
+```text
 my-project/
 ├── .venv/               # Virtual environment (created on first use)
 ├── .python-version      # Python version specification
@@ -355,7 +355,7 @@ done
 ## Best Practices
 
 ### 1. Project Structure
-```
+```text
 my-project/
 ├── .git/
 ├── .gitignore
@@ -605,7 +605,7 @@ CMD ["uv", "run", "python", "-m", "my_project"]
 ## Advanced Package Management
 
 ### Monorepo Support
-```
+```text
 monorepo/
 ├── .git/
 ├── pyproject.toml      # Workspace configuration

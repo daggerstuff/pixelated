@@ -16,7 +16,6 @@ interface ChatDemoProps {
   maxMessages?: number
 }
 
-
 /**
  * Production-ready chat interface with AI analysis capabilities
  * Features: Authentication, rate limiting, crisis management, error boundaries
@@ -462,7 +461,7 @@ export class ChatDemoErrorBoundary extends React.Component<
         )
       )
     }
-  
+
     return this.props.children
   }
 }

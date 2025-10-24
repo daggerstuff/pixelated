@@ -10,9 +10,7 @@ const logger = createBuildSafeLogger('auth-utils')
  * @param request The request object or Astro cookies
  * @returns True if the user is authenticated, false otherwise
  */
-export async function isAuthenticated(
-  request?: Request,
-): Promise<boolean> {
+export async function isAuthenticated(request?: Request): Promise<boolean> {
   try {
     if (!request) {
       logger.info('No request provided for authentication check')

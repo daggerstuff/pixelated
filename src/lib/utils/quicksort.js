@@ -8,57 +8,59 @@
  * @returns {T[]} Sorted array (new array)
  */
 export function quicksort(arr, compareFn) {
-    if (!Array.isArray(arr)) {
-        throw new TypeError('quicksort expects an array')
-    }
+  if (!Array.isArray(arr)) {
+    throw new TypeError('quicksort expects an array')
+  }
 
-    const cmp = typeof compareFn === 'function'
-        ? compareFn
-        : (a, b) => {
-            if (a === b) return 0
-            // Handle undefined/null safely
-            if (a == null) return -1
-            if (b == null) return 1
-            // Use localeCompare for strings for a better ordering
-            if (typeof a === 'string' && typeof b === 'string') return a.localeCompare(b)
-            return a < b ? -1 : 1
+  const cmp =
+    typeof compareFn === 'function'
+      ? compareFn
+      : (a, b) => {
+          if (a === b) return 0
+          // Handle undefined/null safely
+          if (a == null) return -1
+          if (b == null) return 1
+          // Use localeCompare for strings for a better ordering
+          if (typeof a === 'string' && typeof b === 'string')
+            return a.localeCompare(b)
+          return a < b ? -1 : 1
         }
 
-    // Make a shallow copy to avoid mutating the input
-    const array = arr.slice()
+  // Make a shallow copy to avoid mutating the input
+  const array = arr.slice()
 
-    // Iterative quicksort using stack to avoid recursion depth issues on large arrays
-    const stack = [{ left: 0, right: array.length - 1 }]
+  // Iterative quicksort using stack to avoid recursion depth issues on large arrays
+  const stack = [{ left: 0, right: array.length - 1 }]
 
-    while (stack.length) {
-        const { left, right } = stack.pop()
-        if (left >= right) continue
+  while (stack.length) {
+    const { left, right } = stack.pop()
+    if (left >= right) continue
 
-        // Partition
-        const pivotIndex = Math.floor((left + right) / 2)
-        const pivot = array[pivotIndex]
-        let i = left
-        let j = right
+    // Partition
+    const pivotIndex = Math.floor((left + right) / 2)
+    const pivot = array[pivotIndex]
+    let i = left
+    let j = right
 
-        while (i <= j) {
-            while (cmp(array[i], pivot) < 0) i++
-            while (cmp(array[j], pivot) > 0) j--
-            if (i <= j) {
-                // swap
-                const tmp = array[i]
-                array[i] = array[j]
-                array[j] = tmp
-                i++
-                j--
-            }
-        }
-
-        // Push subranges
-        if (left < j) stack.push({ left, right: j })
-        if (i < right) stack.push({ left: i, right })
+    while (i <= j) {
+      while (cmp(array[i], pivot) < 0) i++
+      while (cmp(array[j], pivot) > 0) j--
+      if (i <= j) {
+        // swap
+        const tmp = array[i]
+        array[i] = array[j]
+        array[j] = tmp
+        i++
+        j--
+      }
     }
 
-    return array
+    // Push subranges
+    if (left < j) stack.push({ left, right: j })
+    if (i < right) stack.push({ left: i, right })
+  }
+
+  return array
 }
 
 // Default export for convenience

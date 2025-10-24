@@ -222,11 +222,9 @@ function remarkDirectiveSugar() {
           } else if (id) {
             // github scope
             if (id.match(GITHUB_USERNAME_REGEXP)) {
-
               _resolvedStyle = _resolvedStyle || 'rounded'
               _resolvedText = _resolvedText || id.substring(1)
             } else if (id.match(GITHUB_REPO_REGEXP)) {
-
               _resolvedStyle = _resolvedStyle || 'rounded'
               _resolvedText = _resolvedText || id.substring(1)
             }

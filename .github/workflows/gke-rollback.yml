@@ -8,25 +8,25 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to rollback'
+        description: "Environment to rollback"
         required: true
         type: choice
         options:
           - production
           - staging
       revision:
-        description: 'Specific revision to rollback to (optional)'
+        description: "Specific revision to rollback to (optional)"
         required: false
         type: string
       auto_rollback:
-        description: 'Enable automatic rollback on failure'
+        description: "Enable automatic rollback on failure"
         required: false
         type: boolean
         default: true
 
 env:
-  NODE_VERSION: '24'
-  PNPM_VERSION: '10.18.2'
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.19.0"
 
 jobs:
   rollback-staging:
@@ -111,6 +111,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          universe: googleapis.com
+          cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -127,15 +132,15 @@ jobs:
           AUTO_ROLLBACK: ${{ github.event.inputs.auto_rollback }}
         run: |
           echo "🔄 Rolling back GKE deployment to: $ROLLBACK_TARGET"
-          
+
           # Check rollout history
           echo "📊 Rollout history:"
           kubectl rollout history deployment/${{ secrets.GKE_DEPLOYMENT_NAME }}
-          
+
           # Get current image for comparison
           CURRENT_IMAGE=$(kubectl get deployment ${{ secrets.GKE_DEPLOYMENT_NAME }} -o jsonpath='{.spec.template.spec.containers[0].image}')
           echo "📋 Current image: $CURRENT_IMAGE"
-          
+
           # Rollback to previous revision
           if kubectl rollout undo deployment/${{ secrets.GKE_DEPLOYMENT_NAME }}; then
             echo "✅ Rollback initiated"
@@ -181,10 +186,10 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          
+
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
           TAG_NAME="rollback-staging-${TIMESTAMP}"
-          
+
           echo "Creating rollback tag: $TAG_NAME"
           git tag "$TAG_NAME" -m "Rollback to $ROLLBACK_TARGET on $(date)"
           GIT_PUSH_REMOTE=${{ env.GIT_PUSH_REMOTE || 'origin' }}
@@ -273,6 +278,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          universe: googleapis.com
+          cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -289,15 +299,15 @@ jobs:
           AUTO_ROLLBACK: ${{ github.event.inputs.auto_rollback }}
         run: |
           echo "🔄 Rolling back GKE deployment to: $ROLLBACK_TARGET"
-          
+
           # Check rollout history
           echo "📊 Rollout history:"
           kubectl rollout history deployment/${{ secrets.GKE_DEPLOYMENT_NAME }}
-          
+
           # Get current image for comparison
           CURRENT_IMAGE=$(kubectl get deployment ${{ secrets.GKE_DEPLOYMENT_NAME }} -o jsonpath='{.spec.template.spec.containers[0].image}')
           echo "📋 Current image: $CURRENT_IMAGE"
-          
+
           # Rollback to previous revision
           if kubectl rollout undo deployment/${{ secrets.GKE_DEPLOYMENT_NAME }}; then
             echo "✅ Rollback initiated"
@@ -343,10 +353,10 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          
+
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
           TAG_NAME="rollback-production-${TIMESTAMP}"
-          
+
           echo "Creating rollback tag: $TAG_NAME"
           git tag "$TAG_NAME" -m "Rollback to $ROLLBACK_TARGET on $(date)"
           GIT_PUSH_REMOTE=${{ env.GIT_PUSH_REMOTE || 'origin' }}

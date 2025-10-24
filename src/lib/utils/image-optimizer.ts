@@ -3,9 +3,9 @@
  * Compress and optimize static assets for better performance
  */
 
-import { readFile, writeFile, mkdir } from 'fs/promises'
+import { readFile, mkdir } from 'fs/promises'
 import { existsSync, statSync } from 'fs'
-import { join, dirname } from 'path'
+import { join } from 'path'
 import { getLogger } from '@/lib/logging'
 
 const logger = getLogger('image-optimizer')
@@ -17,37 +17,37 @@ const IMAGE_CONFIG = {
     jpeg: {
       quality: 85,
       progressive: true,
-      mozjpeg: true
+      mozjpeg: true,
     },
     png: {
       quality: 85,
       compressionLevel: 6,
-      palette: true
+      palette: true,
     },
     webp: {
       quality: 85,
       effort: 6,
-      lossless: false
+      lossless: false,
     },
     avif: {
       quality: 80,
-      effort: 6
-    }
+      effort: 6,
+    },
   },
 
   // Size thresholds
   THRESHOLDS: {
     LARGE_FILE: 500 * 1024, // 500KB
     MEDIUM_FILE: 100 * 1024, // 100KB
-    SMALL_FILE: 10 * 1024   // 10KB
+    SMALL_FILE: 10 * 1024, // 10KB
   },
 
   // Output directories
   OUTPUT_DIRS: {
     optimized: './public/assets/optimized',
     webp: './public/assets/webp',
-    avif: './public/assets/avif'
-  }
+    avif: './public/assets/avif',
+  },
 }
 
 /**
@@ -76,7 +76,7 @@ export class ImageOptimizer {
     this.outputDirs = [
       IMAGE_CONFIG.OUTPUT_DIRS.optimized,
       IMAGE_CONFIG.OUTPUT_DIRS.webp,
-      IMAGE_CONFIG.OUTPUT_DIRS.avif
+      IMAGE_CONFIG.OUTPUT_DIRS.avif,
     ]
     this.ensureOutputDirectories()
   }
@@ -112,7 +112,7 @@ export class ImageOptimizer {
       logger.info('Starting image optimization', {
         imagePath,
         originalSize,
-        sizeKB: Math.round(originalSize / 1024)
+        sizeKB: Math.round(originalSize / 1024),
       })
 
       // Read image file
@@ -123,12 +123,15 @@ export class ImageOptimizer {
 
       // Skip optimization for very small files
       if (originalSize < IMAGE_CONFIG.THRESHOLDS.SMALL_FILE) {
-        logger.info('Skipping optimization for small file', { imagePath, size: originalSize })
+        logger.info('Skipping optimization for small file', {
+          imagePath,
+          size: originalSize,
+        })
         return {
           originalPath: imagePath,
           originalSize,
           savings: 0,
-          compressionRatio: 1
+          compressionRatio: 1,
         }
       }
 
@@ -137,7 +140,7 @@ export class ImageOptimizer {
         originalPath: imagePath,
         originalSize,
         savings: 0,
-        compressionRatio: 1
+        compressionRatio: 1,
       }
 
       // Generate optimized versions
@@ -160,7 +163,7 @@ export class ImageOptimizer {
       // Calculate total savings
       const totalOptimizedSize = (result.webpSize || 0) + (result.avifSize || 0)
       if (totalOptimizedSize > 0) {
-        result.savings = originalSize - (totalOptimizedSize / 2) // Average savings
+        result.savings = originalSize - totalOptimizedSize / 2 // Average savings
         result.compressionRatio = originalSize / (totalOptimizedSize / 2)
       }
 
@@ -172,15 +175,14 @@ export class ImageOptimizer {
         totalOptimizedSize,
         savings: result.savings,
         compressionRatio: Math.round(result.compressionRatio * 100) / 100,
-        processingTime
+        processingTime,
       })
 
       return result
-
     } catch (error) {
       logger.error('Image optimization failed', {
         imagePath,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       })
 
       throw error
@@ -205,8 +207,16 @@ export class ImageOptimizer {
 
     if (magic.startsWith('ffd8ff')) return 'jpeg'
     if (magic.startsWith('89504e47')) return 'png'
-    if (magic.startsWith('52494646') && buffer.slice(8, 12).toString('hex') === '57454250') return 'webp'
-    if (magic.startsWith('52494646') && buffer.slice(8, 12).toString('hex') === '41564946') return 'avif'
+    if (
+      magic.startsWith('52494646') &&
+      buffer.slice(8, 12).toString('hex') === '57454250'
+    )
+      return 'webp'
+    if (
+      magic.startsWith('52494646') &&
+      buffer.slice(8, 12).toString('hex') === '41564946'
+    )
+      return 'avif'
 
     // Default to jpeg if unknown
     return 'jpeg'
@@ -215,14 +225,17 @@ export class ImageOptimizer {
   /**
    * Generate WebP version of image
    */
-  private async generateWebP(imagePath: string, buffer: Buffer): Promise<{ path: string; size: number } | null> {
+  private async generateWebP(
+    imagePath: string,
+    buffer: Buffer,
+  ): Promise<{ path: string; size: number } | null> {
     try {
       // This would use sharp or similar library for actual conversion
       // For now, return a placeholder implementation
 
       const outputPath = join(
         IMAGE_CONFIG.OUTPUT_DIRS.webp,
-        this.getOptimizedFilename(imagePath, 'webp')
+        this.getOptimizedFilename(imagePath, 'webp'),
       )
 
       // Placeholder: in real implementation, would convert to WebP
@@ -231,17 +244,17 @@ export class ImageOptimizer {
       logger.info('WebP generation completed', {
         inputPath: imagePath,
         outputPath,
-        estimatedSize
+        estimatedSize,
       })
 
       return {
         path: outputPath,
-        size: estimatedSize
+        size: estimatedSize,
       }
     } catch (error) {
       logger.warn('WebP generation failed', {
         imagePath,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       })
       return null
     }
@@ -250,14 +263,17 @@ export class ImageOptimizer {
   /**
    * Generate AVIF version of image
    */
-  private async generateAVIF(imagePath: string, buffer: Buffer): Promise<{ path: string; size: number } | null> {
+  private async generateAVIF(
+    imagePath: string,
+    buffer: Buffer,
+  ): Promise<{ path: string; size: number } | null> {
     try {
       // This would use sharp or similar library for actual conversion
       // For now, return a placeholder implementation
 
       const outputPath = join(
         IMAGE_CONFIG.OUTPUT_DIRS.avif,
-        this.getOptimizedFilename(imagePath, 'avif')
+        this.getOptimizedFilename(imagePath, 'avif'),
       )
 
       // Placeholder: in real implementation, would convert to AVIF
@@ -266,17 +282,17 @@ export class ImageOptimizer {
       logger.info('AVIF generation completed', {
         inputPath: imagePath,
         outputPath,
-        estimatedSize
+        estimatedSize,
       })
 
       return {
         path: outputPath,
-        size: estimatedSize
+        size: estimatedSize,
       }
     } catch (error) {
       logger.warn('AVIF generation failed', {
         imagePath,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       })
       return null
     }
@@ -286,7 +302,11 @@ export class ImageOptimizer {
    * Generate optimized filename
    */
   private getOptimizedFilename(originalPath: string, format: string): string {
-    const basename = originalPath.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'image'
+    const basename =
+      originalPath
+        .split('/')
+        .pop()
+        ?.replace(/\.[^/.]+$/, '') || 'image'
     return `${basename}-optimized.${format}`
   }
 
@@ -297,7 +317,7 @@ export class ImageOptimizer {
     const results: OptimizationResult[] = []
 
     logger.info('Starting batch image optimization', {
-      count: imagePaths.length
+      count: imagePaths.length,
     })
 
     // Process in batches to avoid overwhelming the system
@@ -305,19 +325,25 @@ export class ImageOptimizer {
     for (let i = 0; i < imagePaths.length; i += batchSize) {
       const batch = imagePaths.slice(i, i + batchSize)
 
-      const batchPromises = batch.map(path => this.optimizeImage(path))
+      const batchPromises = batch.map((path) => this.optimizeImage(path))
       const batchResults = await Promise.all(batchPromises)
 
       results.push(...batchResults)
 
       // Small delay between batches
       if (i + batchSize < imagePaths.length) {
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
       }
     }
 
-    const totalOriginalSize = results.reduce((sum, r) => sum + r.originalSize, 0)
-    const totalOptimizedSize = results.reduce((sum, r) => sum + (r.webpSize || r.originalSize), 0)
+    const totalOriginalSize = results.reduce(
+      (sum, r) => sum + r.originalSize,
+      0,
+    )
+    const totalOptimizedSize = results.reduce(
+      (sum, r) => sum + (r.webpSize || r.originalSize),
+      0,
+    )
     const totalSavings = totalOriginalSize - totalOptimizedSize
 
     logger.info('Batch image optimization completed', {
@@ -325,7 +351,8 @@ export class ImageOptimizer {
       totalOriginalSize: Math.round(totalOriginalSize / 1024),
       totalOptimizedSize: Math.round(totalOptimizedSize / 1024),
       totalSavings: Math.round(totalSavings / 1024),
-      avgCompressionRatio: Math.round((totalOptimizedSize / totalOriginalSize) * 100) / 100
+      avgCompressionRatio:
+        Math.round((totalOptimizedSize / totalOriginalSize) * 100) / 100,
     })
 
     return results
@@ -335,7 +362,11 @@ export class ImageOptimizer {
    * Generate responsive image HTML
    */
   generateResponsiveImage(result: OptimizationResult): string {
-    const alt = result.originalPath.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'image'
+    const alt =
+      result.originalPath
+        .split('/')
+        .pop()
+        ?.replace(/\.[^/.]+$/, '') || 'image'
 
     let html = `<!-- Responsive image: ${alt} -->\n`
     html += `<picture>\n`
@@ -369,17 +400,23 @@ export class ImageOptimizer {
     avgCompressionRatio: number
     formatBreakdown: Record<string, number>
   } {
-    const totalOriginalSize = results.reduce((sum, r) => sum + r.originalSize, 0)
-    const totalOptimizedSize = results.reduce((sum, r) => {
-      return sum + (r.webpSize || r.originalSize) + (r.avifSize || 0)
-    }, 0) / 2 // Average of available formats
+    const totalOriginalSize = results.reduce(
+      (sum, r) => sum + r.originalSize,
+      0,
+    )
+    const totalOptimizedSize =
+      results.reduce((sum, r) => {
+        return sum + (r.webpSize || r.originalSize) + (r.avifSize || 0)
+      }, 0) / 2 // Average of available formats
 
     const totalSavings = totalOriginalSize - totalOptimizedSize
 
     const formatBreakdown: Record<string, number> = {}
-    results.forEach(result => {
-      if (result.webpSize) formatBreakdown.webp = (formatBreakdown.webp || 0) + 1
-      if (result.avifSize) formatBreakdown.avif = (formatBreakdown.avif || 0) + 1
+    results.forEach((result) => {
+      if (result.webpSize)
+        formatBreakdown.webp = (formatBreakdown.webp || 0) + 1
+      if (result.avifSize)
+        formatBreakdown.avif = (formatBreakdown.avif || 0) + 1
     })
 
     return {
@@ -388,7 +425,7 @@ export class ImageOptimizer {
       totalOptimizedSize,
       totalSavings,
       avgCompressionRatio: totalOriginalSize / Math.max(totalOptimizedSize, 1),
-      formatBreakdown
+      formatBreakdown,
     }
   }
 }
@@ -404,22 +441,22 @@ export const imageOptimizer = new ImageOptimizer()
 export async function optimizePublicImages(): Promise<void> {
   logger.info('Starting public image optimization')
 
-  const publicDir = './public'
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp']
   const imagePaths: string[] = []
 
   // Recursively find all images (this would need a proper implementation)
   // For now, we'll work with a placeholder
 
   logger.info('Public image optimization completed', {
-    optimized: imagePaths.length
+    optimized: imagePaths.length,
   })
 }
 
 /**
  * Generate image optimization report
  */
-export async function generateOptimizationReport(results: OptimizationResult[]): Promise<string> {
+export async function generateOptimizationReport(
+  results: OptimizationResult[],
+): Promise<string> {
   const stats = imageOptimizer.getOptimizationStats(results)
 
   let report = `# Image Optimization Report\n\n`

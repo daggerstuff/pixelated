@@ -361,9 +361,15 @@ const defaultPreferences = {
 
 <script>
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
-    const form = document.getElementById('ai-preferences-form') as HTMLFormElement | null
-    const resetButton = document.getElementById('reset-defaults') as HTMLButtonElement | null
-    const loadingIndicator = document.getElementById('ai-preferences-loading') as HTMLElement | null
+    const form = document.getElementById(
+      'ai-preferences-form',
+    ) as HTMLFormElement | null
+    const resetButton = document.getElementById(
+      'reset-defaults',
+    ) as HTMLButtonElement | null
+    const loadingIndicator = document.getElementById(
+      'ai-preferences-loading',
+    ) as HTMLElement | null
 
     async function fetchPreferences() {
       loadingIndicator?.classList.remove('hidden')
@@ -381,44 +387,71 @@ const defaultPreferences = {
 
     function setFormValues(prefs: any) {
       if (!prefs || !form) return
-      
-      const defaultModelElement = form.elements.namedItem('defaultModel') as HTMLSelectElement
+
+      const defaultModelElement = form.elements.namedItem(
+        'defaultModel',
+      ) as HTMLSelectElement
       if (defaultModelElement) defaultModelElement.value = prefs.defaultModel
-      
-      const preferredModelsElements = form.querySelectorAll('input[name="preferredModels"]') as NodeListOf<HTMLInputElement>
+
+      const preferredModelsElements = form.querySelectorAll(
+        'input[name="preferredModels"]',
+      ) as NodeListOf<HTMLInputElement>
       preferredModelsElements.forEach((cb) => {
         cb.checked = prefs.preferredModels?.includes(cb.value)
       })
-      
-      const responseLengthElements = form.querySelectorAll('input[name="responseLength"]') as NodeListOf<HTMLInputElement>
+
+      const responseLengthElements = form.querySelectorAll(
+        'input[name="responseLength"]',
+      ) as NodeListOf<HTMLInputElement>
       responseLengthElements.forEach((rb) => {
         rb.checked = rb.value === prefs.responseLength
       })
-      
-      const responseStyleElements = form.querySelectorAll('input[name="responseStyle"]') as NodeListOf<HTMLInputElement>
+
+      const responseStyleElements = form.querySelectorAll(
+        'input[name="responseStyle"]',
+      ) as NodeListOf<HTMLInputElement>
       responseStyleElements.forEach((rb) => {
         rb.checked = rb.value === prefs.responseStyle
       })
-      
-      const enableSentimentAnalysisElement = form.elements.namedItem('enableSentimentAnalysis') as HTMLInputElement
-      if (enableSentimentAnalysisElement) enableSentimentAnalysisElement.checked = !!prefs.enableSentimentAnalysis
-      
-      const enableCrisisDetectionElement = form.elements.namedItem('enableCrisisDetection') as HTMLInputElement
-      if (enableCrisisDetectionElement) enableCrisisDetectionElement.checked = !!prefs.enableCrisisDetection
-      
-      const crisisDetectionSensitivityElement = form.elements.namedItem('crisisDetectionSensitivity') as HTMLSelectElement
-      if (crisisDetectionSensitivityElement) crisisDetectionSensitivityElement.value = prefs.crisisDetectionSensitivity
-      
-      const saveAnalysisResultsElement = form.elements.namedItem('saveAnalysisResults') as HTMLInputElement
-      if (saveAnalysisResultsElement) saveAnalysisResultsElement.checked = !!prefs.saveAnalysisResults
-      
-      const aiSuggestionsElement = form.elements.namedItem('aiSuggestions') as HTMLInputElement
-      if (aiSuggestionsElement) aiSuggestionsElement.checked = !!prefs.aiSuggestions
-      
+
+      const enableSentimentAnalysisElement = form.elements.namedItem(
+        'enableSentimentAnalysis',
+      ) as HTMLInputElement
+      if (enableSentimentAnalysisElement)
+        enableSentimentAnalysisElement.checked = !!prefs.enableSentimentAnalysis
+
+      const enableCrisisDetectionElement = form.elements.namedItem(
+        'enableCrisisDetection',
+      ) as HTMLInputElement
+      if (enableCrisisDetectionElement)
+        enableCrisisDetectionElement.checked = !!prefs.enableCrisisDetection
+
+      const crisisDetectionSensitivityElement = form.elements.namedItem(
+        'crisisDetectionSensitivity',
+      ) as HTMLSelectElement
+      if (crisisDetectionSensitivityElement)
+        crisisDetectionSensitivityElement.value =
+          prefs.crisisDetectionSensitivity
+
+      const saveAnalysisResultsElement = form.elements.namedItem(
+        'saveAnalysisResults',
+      ) as HTMLInputElement
+      if (saveAnalysisResultsElement)
+        saveAnalysisResultsElement.checked = !!prefs.saveAnalysisResults
+
+      const aiSuggestionsElement = form.elements.namedItem(
+        'aiSuggestions',
+      ) as HTMLInputElement
+      if (aiSuggestionsElement)
+        aiSuggestionsElement.checked = !!prefs.aiSuggestions
+
       // Show/hide crisis sensitivity
-      const crisisDetectionSensitivityGroup = document.getElementById('crisisDetectionSensitivityGroup')
+      const crisisDetectionSensitivityGroup = document.getElementById(
+        'crisisDetectionSensitivityGroup',
+      )
       if (crisisDetectionSensitivityGroup && enableCrisisDetectionElement) {
-        crisisDetectionSensitivityGroup.style.display = enableCrisisDetectionElement.checked ? 'block' : 'none'
+        crisisDetectionSensitivityGroup.style.display =
+          enableCrisisDetectionElement.checked ? 'block' : 'none'
       }
     }
 

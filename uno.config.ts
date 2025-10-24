@@ -9,20 +9,22 @@ import {
 export default defineConfig({
   rules: [
     // Match problematic icon patterns and ignore them
-    [/^i-(-)?$/, () => ({})],           // Matches 'i-' and 'i--'
-    [/^i--.*/, () => ({})],             // Matches anything starting with 'i--'
-    [/^i-$/, () => ({})],               // Matches just 'i-'
-    [/^i-\s*$/, () => ({})],            // Matches 'i-' with whitespace
+    [/^i-(-)?$/, () => ({})], // Matches 'i-' and 'i--'
+    [/^i--.*/, () => ({})], // Matches anything starting with 'i--'
+    [/^i-$/, () => ({})], // Matches just 'i-'
+    [/^i-\s*$/, () => ({})], // Matches 'i-' with whitespace
   ],
   safelist: [
     // Prevent UnoCSS from trying to generate invalid icon classes
-    'i-', 'i--', 'i---'
+    'i-',
+    'i--',
+    'i---',
   ],
   blocklist: [
     // Block problematic icon patterns
-    /^i-(-)*$/,     // Block 'i-', 'i--', 'i---', etc.
-    /^i-\s*$/,      // Block 'i-' with whitespace
-    /^icon-(-)*$/,  // Block similar 'icon-' patterns
+    /^i-(-)*$/, // Block 'i-', 'i--', 'i---', etc.
+    /^i-\s*$/, // Block 'i-' with whitespace
+    /^icon-(-)*$/, // Block similar 'icon-' patterns
   ],
   shortcuts: [
     [

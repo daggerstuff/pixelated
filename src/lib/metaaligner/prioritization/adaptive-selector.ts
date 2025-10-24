@@ -49,11 +49,13 @@ export class AdaptiveSelector {
     this.aiService = config.aiService
     this.contextDetector = new ContextDetector({
       aiService: this.aiService,
-      enableCrisisIntegration: config.contextDetectorConfig?.enableCrisisIntegration ?? true,
+      enableCrisisIntegration:
+        config.contextDetectorConfig?.enableCrisisIntegration ?? true,
       enableEducationalRecognition:
         config.contextDetectorConfig?.enableEducationalRecognition ?? true,
       model: config.contextDetectorConfig?.model ?? 'gpt-4',
-      crisisDetectionService: config.contextDetectorConfig?.crisisDetectionService,
+      crisisDetectionService:
+        config.contextDetectorConfig?.crisisDetectionService,
       educationalContextRecognizer:
         config.contextDetectorConfig?.educationalContextRecognizer,
     })
@@ -77,7 +79,10 @@ export class AdaptiveSelector {
     )
 
     // Add simple transition metadata expected by tests
-    if (this.lastDetectedContext && this.lastDetectedContext !== detection.detectedContext) {
+    if (
+      this.lastDetectedContext &&
+      this.lastDetectedContext !== detection.detectedContext
+    ) {
       detection.metadata = detection.metadata || {}
       ;(detection.metadata as Record<string, unknown>)['transition'] = {
         from: this.lastDetectedContext,
@@ -116,12 +121,11 @@ export class AdaptiveSelector {
     )
 
     // Map selected objectives
-    const selectedObjectives: SelectedObjective[] = CORE_MENTAL_HEALTH_OBJECTIVES.map(
-      (objective) => ({
+    const selectedObjectives: SelectedObjective[] =
+      CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
         objective,
         weight: weightCalc.weights[objective.id] ?? 0,
-      }),
-    )
+      }))
 
     return {
       contextDetectionResult: detection,
@@ -131,5 +135,3 @@ export class AdaptiveSelector {
     }
   }
 }
-
-

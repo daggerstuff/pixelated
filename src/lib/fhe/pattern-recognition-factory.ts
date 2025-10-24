@@ -161,6 +161,7 @@ export async function createPatternRecognitionFHEService(
     logger.error('Failed to create pattern recognition FHE service', { error })
     throw new Error(
       `Pattern recognition FHE service creation failed: ${error instanceof Error ? String(error) : String(error)}`,
+      { cause: error },
     )
   }
 }

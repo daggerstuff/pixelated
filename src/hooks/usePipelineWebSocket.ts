@@ -15,7 +15,7 @@ export function usePipelineWebSocket({
   onStatusChange,
   onError,
   onConnect,
-  onDisconnect
+  onDisconnect,
 }: {
   url: string
   executionId: string
@@ -29,7 +29,9 @@ export function usePipelineWebSocket({
   onDisconnect?: () => void
 }) {
   const [socket, setSocket] = useState<WebSocket | null>(null)
-  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected')
+  const [connectionStatus, setConnectionStatus] = useState<
+    'disconnected' | 'connecting' | 'connected' | 'error'
+  >('disconnected')
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null)
   const [connectionAttempts, setConnectionAttempts] = useState(0)
   const [isReconnecting, setIsReconnecting] = useState(false)
@@ -62,7 +64,7 @@ export function usePipelineWebSocket({
           type: 'subscribe',
           executionId,
           timestamp: new Date().toISOString(),
-          data: { executionId }
+          data: { executionId },
         }
 
         ws.send(JSON.stringify(subscribeMessage))
@@ -86,15 +88,15 @@ export function usePipelineWebSocket({
         if (!isMountedRef.current) return
 
         setConnectionStatus('disconnected')
-  setSocket(null)
-  socketRef.current = null
+        setSocket(null)
+        socketRef.current = null
         onDisconnect?.()
 
         // Auto-reconnect logic
         if (autoConnect && connectionAttempts < maxRetries) {
           setIsReconnecting(true)
           reconnectTimerRef.current = setTimeout(() => {
-            setConnectionAttempts(prev => prev + 1)
+            setConnectionAttempts((prev) => prev + 1)
             connect()
           }, retryDelay)
         }
@@ -104,7 +106,9 @@ export function usePipelineWebSocket({
         if (!isMountedRef.current) return
 
         setConnectionStatus('error')
-        const errorMessage = new Error(`WebSocket connection error: ${error.type}`)
+        const errorMessage = new Error(
+          `WebSocket connection error: ${error.type}`,
+        )
         onError?.(errorMessage)
       }
 
@@ -133,7 +137,9 @@ export function usePipelineWebSocket({
 
             case 'error':
               if (message.executionId === executionId) {
-                const error = new Error(message.data.message || 'Unknown WebSocket error')
+                const error = new Error(
+                  message.data.message || 'Unknown WebSocket error',
+                )
                 onError?.(error)
               }
               break
@@ -155,9 +161,23 @@ export function usePipelineWebSocket({
       if (!isMountedRef.current) return
 
       setConnectionStatus('error')
-      onError?.(error instanceof Error ? error : new Error('Unknown connection error'))
+      onError?.(
+        error instanceof Error ? error : new Error('Unknown connection error'),
+      )
     }
-  }, [url, executionId, autoConnect, maxRetries, retryDelay, onConnect, onDisconnect, onError, onProgressUpdate, onStatusChange, connectionAttempts])
+  }, [
+    url,
+    executionId,
+    autoConnect,
+    maxRetries,
+    retryDelay,
+    onConnect,
+    onDisconnect,
+    onError,
+    onProgressUpdate,
+    onStatusChange,
+    connectionAttempts,
+  ])
 
   const disconnect = useCallback(() => {
     if (reconnectTimerRef.current) {
@@ -185,25 +205,31 @@ export function usePipelineWebSocket({
     }
   }, [])
 
-  const sendProgressRequest = useCallback((requestData: unknown) => {
-    const message: WebSocketMessage = {
-      type: 'progress_request',
-      executionId,
-      timestamp: new Date().toISOString(),
-      data: requestData as unknown
-    }
-    sendMessage(message)
-  }, [executionId, sendMessage])
+  const sendProgressRequest = useCallback(
+    (requestData: unknown) => {
+      const message: WebSocketMessage = {
+        type: 'progress_request',
+        executionId,
+        timestamp: new Date().toISOString(),
+        data: requestData as unknown,
+      }
+      sendMessage(message)
+    },
+    [executionId, sendMessage],
+  )
 
-  const sendStatusRequest = useCallback((requestData: unknown) => {
-    const message: WebSocketMessage = {
-      type: 'status_request',
-      executionId,
-      timestamp: new Date().toISOString(),
-      data: requestData as unknown
-    }
-    sendMessage(message)
-  }, [executionId, sendMessage])
+  const sendStatusRequest = useCallback(
+    (requestData: unknown) => {
+      const message: WebSocketMessage = {
+        type: 'status_request',
+        executionId,
+        timestamp: new Date().toISOString(),
+        data: requestData as unknown,
+      }
+      sendMessage(message)
+    },
+    [executionId, sendMessage],
+  )
 
   useEffect(() => {
     if (autoConnect) {
@@ -226,7 +252,7 @@ export function usePipelineWebSocket({
     disconnect,
     sendMessage,
     sendProgressRequest,
-    sendStatusRequest
+    sendStatusRequest,
   }
 }
 
@@ -244,15 +270,24 @@ export function useMultiPipelineWebSocket({
   onStatusChange,
   onError,
   onConnect,
-  onDisconnect
+  onDisconnect,
 }: {
   urls: string[]
   executionIds: string[]
   autoConnect?: boolean
   maxRetries?: number
   retryDelay?: number
-  onProgressUpdate?: (executionId: string, progress: number, stage?: string, data?: unknown) => void
-  onStatusChange?: (executionId: string, status: string, message?: string) => void
+  onProgressUpdate?: (
+    executionId: string,
+    progress: number,
+    stage?: string,
+    data?: unknown,
+  ) => void
+  onStatusChange?: (
+    executionId: string,
+    status: string,
+    message?: string,
+  ) => void
   onError?: (executionId: string, error: Error) => void
   onConnect?: (executionId: string) => void
   onDisconnect?: (executionId: string) => void
@@ -263,15 +298,23 @@ export function useMultiPipelineWebSocket({
     autoConnect: boolean
     maxRetries: number
     retryDelay: number
-    onProgressUpdate?: (progress: number, stage?: string, data?: unknown) => void
+    onProgressUpdate?: (
+      progress: number,
+      stage?: string,
+      data?: unknown,
+    ) => void
     onStatusChange?: (status: string, message?: string) => void
     onError?: (error: Error) => void
     onConnect?: () => void
     onDisconnect?: () => void
   }
 
-  const [connections, setConnections] = useState<Map<string, Connection>>(new Map())
-  const [overallStatus, setOverallStatus] = useState<'disconnected' | 'partial' | 'connected'>('disconnected')
+  const [connections, setConnections] = useState<Map<string, Connection>>(
+    new Map(),
+  )
+  const [overallStatus, setOverallStatus] = useState<
+    'disconnected' | 'partial' | 'connected'
+  >('disconnected')
 
   useEffect(() => {
     if (urls.length !== executionIds.length) {
@@ -279,7 +322,7 @@ export function useMultiPipelineWebSocket({
       return
     }
 
-  const newConnections = new Map<string, Connection>()
+    const newConnections = new Map<string, Connection>()
 
     urls.forEach((url, index) => {
       const executionId = executionIds[index]
@@ -291,7 +334,11 @@ export function useMultiPipelineWebSocket({
         autoConnect,
         maxRetries,
         retryDelay,
-        onProgressUpdate: (progress: number, stage?: string, data?: unknown) => {
+        onProgressUpdate: (
+          progress: number,
+          stage?: string,
+          data?: unknown,
+        ) => {
           onProgressUpdate?.(executionId, progress, stage, data)
         },
         onStatusChange: (status: string, message?: string) => {
@@ -305,7 +352,7 @@ export function useMultiPipelineWebSocket({
         },
         onDisconnect: () => {
           onDisconnect?.(executionId)
-        }
+        },
       }
 
       newConnections.set(executionId, connection)
@@ -319,7 +366,18 @@ export function useMultiPipelineWebSocket({
         // Disconnect logic placeholder
       })
     }
-  }, [urls, executionIds, autoConnect, maxRetries, retryDelay, onProgressUpdate, onStatusChange, onError, onConnect, onDisconnect])
+  }, [
+    urls,
+    executionIds,
+    autoConnect,
+    maxRetries,
+    retryDelay,
+    onProgressUpdate,
+    onStatusChange,
+    onError,
+    onConnect,
+    onDisconnect,
+  ])
 
   useEffect(() => {
     // This would need to be implemented differently since we can't track connection status
@@ -327,9 +385,12 @@ export function useMultiPipelineWebSocket({
     setOverallStatus('partial') // Placeholder
   }, [connections])
 
-  const getConnection = useCallback((executionId: string) => {
-    return connections.get(executionId)
-  }, [connections])
+  const getConnection = useCallback(
+    (executionId: string) => {
+      return connections.get(executionId)
+    },
+    [connections],
+  )
 
   const disconnectAll = useCallback(() => {
     connections.forEach((_connection) => {
@@ -348,7 +409,7 @@ export function useMultiPipelineWebSocket({
     overallStatus,
     getConnection,
     disconnectAll,
-    reconnectAll
+    reconnectAll,
   }
 }
 
@@ -356,51 +417,62 @@ export function useMultiPipelineWebSocket({
  * Custom hook for managing WebSocket message history and debugging
  */
 export function useWebSocketMessageHistory(maxMessages = 100) {
-  const [messages, setMessages] = useState<Array<{
-    id: string
-    timestamp: Date
-    type: 'sent' | 'received' | 'error' | 'system'
-    data: unknown
-    executionId?: string
-  }>>([])
+  const [messages, setMessages] = useState<
+    Array<{
+      id: string
+      timestamp: Date
+      type: 'sent' | 'received' | 'error' | 'system'
+      data: unknown
+      executionId?: string
+    }>
+  >([])
 
-  const addMessage = useCallback((message: {
-    type: 'sent' | 'received' | 'error' | 'system'
-    data: unknown
-    executionId?: string
-  }) => {
-    const newMessage = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: new Date(),
-      ...message
-    }
+  const addMessage = useCallback(
+    (message: {
+      type: 'sent' | 'received' | 'error' | 'system'
+      data: unknown
+      executionId?: string
+    }) => {
+      const newMessage = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: new Date(),
+        ...message,
+      }
 
-    setMessages(prev => {
-      const updated = [...prev, newMessage]
-      // Keep only the most recent messages
-      return updated.slice(-maxMessages)
-    })
+      setMessages((prev) => {
+        const updated = [...prev, newMessage]
+        // Keep only the most recent messages
+        return updated.slice(-maxMessages)
+      })
 
-    return newMessage.id
-  }, [maxMessages])
+      return newMessage.id
+    },
+    [maxMessages],
+  )
 
   const clearMessages = useCallback(() => {
     setMessages([])
   }, [])
 
-  const getMessagesByExecutionId = useCallback((executionId: string) => {
-    return messages.filter(msg => msg.executionId === executionId)
-  }, [messages])
+  const getMessagesByExecutionId = useCallback(
+    (executionId: string) => {
+      return messages.filter((msg) => msg.executionId === executionId)
+    },
+    [messages],
+  )
 
-  const getMessagesByType = useCallback((type: 'sent' | 'received' | 'error' | 'system') => {
-    return messages.filter(msg => msg.type === type)
-  }, [messages])
+  const getMessagesByType = useCallback(
+    (type: 'sent' | 'received' | 'error' | 'system') => {
+      return messages.filter((msg) => msg.type === type)
+    },
+    [messages],
+  )
 
   return {
     messages,
     addMessage,
     clearMessages,
     getMessagesByExecutionId,
-    getMessagesByType
+    getMessagesByType,
   }
 }

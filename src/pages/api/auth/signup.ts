@@ -42,7 +42,17 @@ export const POST = async ({ request }) => {
       )
     }
 
-    const user = await adapter.createUser({ email, password, role }) as unknown as { _id?: { toString: () => string }; id?: string; email: string; role: string; emailVerified: boolean }
+    const user = (await adapter.createUser({
+      email,
+      password,
+      role,
+    })) as unknown as {
+      _id?: { toString: () => string }
+      id?: string
+      email: string
+      role: string
+      emailVerified: boolean
+    }
 
     return new Response(
       JSON.stringify({

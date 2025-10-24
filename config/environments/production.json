@@ -61,7 +61,10 @@
     "port": 3000,
     "cors": {
       "enabled": true,
-      "origins": ["https://pixelated-empathy.com", "https://www.pixelated-empathy.com"],
+      "origins": [
+        "https://pixelated-empathy.com",
+        "https://www.pixelated-empathy.com"
+      ],
       "credentials": true
     },
     "rate_limiting": {
@@ -112,7 +115,13 @@
     "access_key": "${AWS_ACCESS_KEY_PROD}",
     "secret_key": "${AWS_SECRET_KEY_PROD}",
     "max_file_size": "100MB",
-    "allowed_types": ["image/jpeg", "image/png", "image/gif", "application/pdf", "text/plain"],
+    "allowed_types": [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "application/pdf",
+      "text/plain"
+    ],
     "cdn": {
       "enabled": true,
       "domain": "${CDN_DOMAIN}"

@@ -7,10 +7,10 @@ import {
 import { initSentry } from './src/lib/sentry/config'
 
 const sentryConfig = initSentry({
-  integrations: (defaultIntegrations) => {
-    const withoutSpotlight = defaultIntegrations.filter(
-      (integration) => integration && integration.name !== 'Spotlight'
-    )
+  integrations: function (defaultIntegrations) {
+    var withoutSpotlight = defaultIntegrations.filter(function (integration) {
+      return integration && integration.name !== 'Spotlight'
+    })
     return [
       ...withoutSpotlight,
       browserTracingIntegration(),

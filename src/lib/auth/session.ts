@@ -1,6 +1,10 @@
 import * as adapter from '../../adapters/betterAuthMongoAdapter'
 import type { Session, User } from '../../types/mongodb.types'
-import { AuditEventStatus, AuditEventType, createAuditLog } from '../../lib/audit'
+import {
+  AuditEventStatus,
+  AuditEventType,
+  createAuditLog,
+} from '../../lib/audit'
 
 export interface SessionData {
   user: User
@@ -33,7 +37,9 @@ export async function getSession(
     const tokenPayload = await adapter.verifyToken(token)
 
     // Get the user from the database via adapter
-    const user = await adapter.getUserById((tokenPayload as unknown as { userId: string }).userId) as unknown as User | null
+    const user = (await adapter.getUserById(
+      (tokenPayload as unknown as { userId: string }).userId,
+    )) as unknown as User | null
     if (!user) {
       console.log('User not found for token')
       return null

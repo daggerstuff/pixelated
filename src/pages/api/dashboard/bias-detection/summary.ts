@@ -67,40 +67,44 @@ export const GET: APIRoute = async () => {
     const response = {
       metrics: {
         'total-sessions': metrics.total_sessions || 0,
-        'avg-bias-score': ((metrics.avg_bias_score || 0) * 100).toFixed(1) + '%',
+        'avg-bias-score':
+          ((metrics.avg_bias_score || 0) * 100).toFixed(1) + '%',
         'active-alerts': metrics.active_alerts || 0,
-        'system-uptime': uptime > 24 ? '99.7%' : '98.5%'
+        'system-uptime': uptime > 24 ? '99.7%' : '98.5%',
       },
-      recentAnalyses: recentAnalysesResult.rows.map(row => ({
+      recentAnalyses: recentAnalysesResult.rows.map((row) => ({
         sessionId: row.session_id,
         biasScore: parseFloat(row.bias_score || '0'),
         alertLevel: row.alert_level,
         timestamp: row.created_at,
-        sessionType: row.session_type || 'Unknown'
+        sessionType: row.session_type || 'Unknown',
       })),
-      activeAlerts: alertsResult.rows.map(row => ({
+      activeAlerts: alertsResult.rows.map((row) => ({
         id: row.id,
         title: row.title,
         description: row.description,
         severity: row.severity,
-        timestamp: row.created_at
+        timestamp: row.created_at,
       })),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     })
-
   } catch (error: any) {
     console.error('Dashboard summary API error:', error)
-    return new Response(JSON.stringify({
-      error: 'Failed to fetch dashboard data',
-      details: process.env['NODE_ENV'] === 'development' ? error.message : undefined
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to fetch dashboard data',
+        details:
+          process.env['NODE_ENV'] === 'development' ? error.message : undefined,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }

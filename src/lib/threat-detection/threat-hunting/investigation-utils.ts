@@ -17,7 +17,7 @@ export function analyzeThreatIndicators(indicators: ThreatIndicator[]): {
     return {
       riskLevel: 'low',
       confidence: 0,
-      keyIndicators: []
+      keyIndicators: [],
     }
   }
 
@@ -26,13 +26,14 @@ export function analyzeThreatIndicators(indicators: ThreatIndicator[]): {
   let confidenceScore = 0
   const keyIndicators: ThreatIndicator[] = []
 
-  indicators.forEach(indicator => {
-    const severityWeight = {
-      low: 1,
-      medium: 3,
-      high: 5,
-      critical: 10
-    }[indicator.severity] || 1
+  indicators.forEach((indicator) => {
+    const severityWeight =
+      {
+        low: 1,
+        medium: 3,
+        high: 5,
+        critical: 10,
+      }[indicator.severity] || 1
 
     riskScore += severityWeight
     confidenceScore += indicator.confidence || 50
@@ -59,7 +60,7 @@ export function analyzeThreatIndicators(indicators: ThreatIndicator[]): {
   return {
     riskLevel,
     confidence: Math.min(avgConfidence, 100),
-    keyIndicators
+    keyIndicators,
   }
 }
 
@@ -68,11 +69,11 @@ export function analyzeThreatIndicators(indicators: ThreatIndicator[]): {
  */
 export function generateInvestigationReport(
   hunt: ThreatHunt,
-  results: InvestigationResult[]
+  results: InvestigationResult[],
 ): string {
   const timestamp = new Date().toISOString()
   const summary = analyzeThreatIndicators(
-    results.flatMap(r => r.indicators || [])
+    results.flatMap((r) => r.indicators || []),
   )
 
   return `
@@ -88,30 +89,44 @@ export function generateInvestigationReport(
 - **Indicators Found:** ${results.length}
 
 ## Key Findings
-${summary.keyIndicators.map(indicator => 
-  `- **${indicator.type}** (${indicator.severity}): ${indicator.description}`
-).join('\n')}
+${summary.keyIndicators
+  .map(
+    (indicator) =>
+      `- **${indicator.type}** (${indicator.severity}): ${indicator.description}`,
+  )
+  .join('\n')}
 
 ## Detailed Results
-${results.map(result => `
+${results
+  .map(
+    (result) => `
 ### ${result.source} (${result.timestamp})
 - **Status:** ${result.status}
 - **Indicators:** ${result.indicators?.length || 0}
 - **Evidence:** ${result.evidence?.length || 0} items
-`).join('\n')}
+`,
+  )
+  .join('\n')}
 
 ## Recommendations
-${summary.riskLevel === 'critical' ? '**IMMEDIATE ACTION REQUIRED** - Critical threats detected' :
-  summary.riskLevel === 'high' ? '**URGENT** - High-risk threats require attention' :
-  summary.riskLevel === 'medium' ? '**MODERATE** - Review and monitor threats' :
-  '**LOW RISK** - Continue monitoring'}
+${
+  summary.riskLevel === 'critical'
+    ? '**IMMEDIATE ACTION REQUIRED** - Critical threats detected'
+    : summary.riskLevel === 'high'
+      ? '**URGENT** - High-risk threats require attention'
+      : summary.riskLevel === 'medium'
+        ? '**MODERATE** - Review and monitor threats'
+        : '**LOW RISK** - Continue monitoring'
+}
 `
 }
 
 /**
  * Validate investigation result
  */
-export function validateInvestigationResult(result: InvestigationResult): boolean {
+export function validateInvestigationResult(
+  result: InvestigationResult,
+): boolean {
   // Basic validation
   if (!result.source || !result.timestamp || !result.status) {
     return false
@@ -135,7 +150,9 @@ export function validateInvestigationResult(result: InvestigationResult): boolea
 /**
  * Merge multiple investigation results
  */
-export function mergeInvestigationResults(results: InvestigationResult[]): InvestigationResult {
+export function mergeInvestigationResults(
+  results: InvestigationResult[],
+): InvestigationResult {
   if (results.length === 0) {
     throw new Error('Cannot merge empty results array')
   }
@@ -145,9 +162,14 @@ export function mergeInvestigationResults(results: InvestigationResult[]): Inves
   }
 
   // Merge indicators
-  const allIndicators = results.flatMap(r => r.indicators || [])
-  const uniqueIndicators = allIndicators.filter((indicator, index, array) => 
-    index === array.findIndex(i => i.type === indicator.type && i.description === indicator.description)
+  const allIndicators = results.flatMap((r) => r.indicators || [])
+  const uniqueIndicators = allIndicators.filter(
+    (indicator, index, array) =>
+      index ===
+      array.findIndex(
+        (i) =>
+          i.type === indicator.type && i.description === indicator.description,
+      ),
   )
 
   // Determine overall status (worst case)
@@ -155,19 +177,25 @@ export function mergeInvestigationResults(results: InvestigationResult[]): Inves
     failed: 4,
     warning: 3,
     success: 2,
-    info: 1
+    info: 1,
   }
 
   const overallStatus = results.reduce((worst, current) => {
-    const currentPriority = statusPriority[current.status as keyof typeof statusPriority] || 0
-    const worstPriority = statusPriority[worst as keyof typeof statusPriority] || 0
+    const currentPriority =
+      statusPriority[current.status as keyof typeof statusPriority] || 0
+    const worstPriority =
+      statusPriority[worst as keyof typeof statusPriority] || 0
     return currentPriority > worstPriority ? current.status : worst
   }, results[0].status)
 
   // Merge evidence
-  const allEvidence = results.flatMap(r => r.evidence || [])
-  const uniqueEvidence = allEvidence.filter((evidence, index, array) => 
-    index === array.findIndex(e => e.type === evidence.type && e.data === evidence.data)
+  const allEvidence = results.flatMap((r) => r.evidence || [])
+  const uniqueEvidence = allEvidence.filter(
+    (evidence, index, array) =>
+      index ===
+      array.findIndex(
+        (e) => e.type === evidence.type && e.data === evidence.data,
+      ),
   )
 
   return {
@@ -178,8 +206,8 @@ export function mergeInvestigationResults(results: InvestigationResult[]): Inves
     evidence: uniqueEvidence,
     metadata: {
       mergedResults: results.length,
-      originalSources: results.map(r => r.source)
-    }
+      originalSources: results.map((r) => r.source),
+    },
   }
 }
 
@@ -188,17 +216,17 @@ export function mergeInvestigationResults(results: InvestigationResult[]): Inves
  */
 export function filterResultsBySeverity(
   results: InvestigationResult[],
-  minSeverity: 'low' | 'medium' | 'high' | 'critical'
+  minSeverity: 'low' | 'medium' | 'high' | 'critical',
 ): InvestigationResult[] {
   const severityOrder = ['low', 'medium', 'high', 'critical']
   const minSeverityIndex = severityOrder.indexOf(minSeverity)
 
-  return results.filter(result => {
+  return results.filter((result) => {
     if (!result.indicators || result.indicators.length === 0) {
       return minSeverity === 'low' // Include empty results only if filtering for low
     }
 
-    return result.indicators.some(indicator => {
+    return result.indicators.some((indicator) => {
       const indicatorSeverityIndex = severityOrder.indexOf(indicator.severity)
       return indicatorSeverityIndex >= minSeverityIndex
     })
@@ -225,15 +253,15 @@ export function calculateInvestigationMetrics(results: InvestigationResult[]): {
       low: 0,
       medium: 0,
       high: 0,
-      critical: 0
+      critical: 0,
     },
-    averageConfidence: 0
+    averageConfidence: 0,
   }
 
   let totalConfidence = 0
   let confidenceCount = 0
 
-  results.forEach(result => {
+  results.forEach((result) => {
     // Count by status
     if (result.status === 'success') {
       metrics.successfulResults++
@@ -244,7 +272,7 @@ export function calculateInvestigationMetrics(results: InvestigationResult[]): {
     // Count indicators and severity
     if (result.indicators) {
       metrics.totalIndicators += result.indicators.length
-      result.indicators.forEach(indicator => {
+      result.indicators.forEach((indicator) => {
         if (indicator.severity in metrics.severityBreakdown) {
           metrics.severityBreakdown[indicator.severity]++
         }
@@ -256,7 +284,8 @@ export function calculateInvestigationMetrics(results: InvestigationResult[]): {
     }
   })
 
-  metrics.averageConfidence = confidenceCount > 0 ? totalConfidence / confidenceCount : 0
+  metrics.averageConfidence =
+    confidenceCount > 0 ? totalConfidence / confidenceCount : 0
 
   return metrics
 }

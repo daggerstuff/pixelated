@@ -411,7 +411,9 @@ export function StatePersistenceDebugger() {
           id="import-input"
         />
         <button
-          onClick={() => (document.getElementById('import-input') as HTMLElement)?.click()}
+          onClick={() =>
+            (document.getElementById('import-input') as HTMLElement)?.click()
+          }
         >
           Import
         </button>

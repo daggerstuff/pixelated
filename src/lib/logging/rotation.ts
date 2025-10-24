@@ -166,7 +166,9 @@ export class LogRotationService {
       // Get all rotated log files
       const files = await fs.readdir(dirname)
       const rotatedFiles = files
-        .filter((file) => prefix && file.startsWith(prefix) && file !== baseFile)
+        .filter(
+          (file) => prefix && file.startsWith(prefix) && file !== baseFile,
+        )
         .map((file) => ({ name: file, path: path.join(dirname, file) }))
 
       // Sort by modification time (newest first)

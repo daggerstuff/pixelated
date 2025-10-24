@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 const team = [
   {
@@ -10,45 +10,83 @@ const team = [
     bio: 'For over 15 years, Chad has been a self-taught programmer, developing a deep expertise in Python, TypeScript, and Rust, and contributing to numerous open-source projects. His journey into the mental health field, driven by a passion to improve the quality of care, led him to pursue a counseling degree. It was during his studies that he identified a critical gap in traditional training: the lack of safe, repeatable, and diverse practice opportunities for aspiring therapists. This realization inspired him to create Pixelated Empathy, a platform designed to empower the next generation of mental health professionals with the skills and confidence to excel.',
   },
   // More team members can be added here
-];
+]
 ---
 
 <BaseLayout title="About Us - Pixelated Empathy">
   <div class="bg-gray-900 py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div class="mx-auto max-w-2xl lg:mx-0">
-        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Our Mission</h2>
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          Our Mission
+        </h2>
         <p class="mt-6 text-lg leading-8 text-gray-300">
-          Pixelated Empathy is dedicated to revolutionizing mental health training. We provide therapists, counselors, and students with a safe, AI-powered platform to practice and master their skills. By simulating a diverse range of client personas and challenging scenarios, we empower mental health professionals to build confidence, identify and overcome biases, and ultimately deliver more effective and empathetic care.
+          Pixelated Empathy is dedicated to revolutionizing mental health
+          training. We provide therapists, counselors, and students with a safe,
+          AI-powered platform to practice and master their skills. By simulating
+          a diverse range of client personas and challenging scenarios, we
+          empower mental health professionals to build confidence, identify and
+          overcome biases, and ultimately deliver more effective and empathetic
+          care.
         </p>
         <div class="mt-10">
-          <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">The Problem We Solve</h3>
+          <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            The Problem We Solve
+          </h3>
           <p class="mt-4 text-lg leading-8 text-gray-300">
-            Traditional therapist training often lacks sufficient opportunities for realistic, hands-on practice, especially with high-stakes scenarios like crisis intervention or with diverse client populations. This can lead to gaps in preparedness, confidence, and cultural competency. Pixelated Empathy bridges this gap by providing a standardized, on-demand training environment that is both safe and effective.
+            Traditional therapist training often lacks sufficient opportunities
+            for realistic, hands-on practice, especially with high-stakes
+            scenarios like crisis intervention or with diverse client
+            populations. This can lead to gaps in preparedness, confidence, and
+            cultural competency. Pixelated Empathy bridges this gap by providing
+            a standardized, on-demand training environment that is both safe and
+            effective.
           </p>
         </div>
         <div class="mt-10">
-          <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">Our Target Audience</h3>
+          <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            Our Target Audience
+          </h3>
           <p class="mt-4 text-lg leading-8 text-gray-300">
-            Our platform is designed for educational institutions with psychology, counseling, and social work programs; mental health clinics and hospitals; and individual practitioners seeking to enhance their skills. We serve students, trainees, and licensed professionals who are committed to lifelong learning and providing the best possible care to their clients.
+            Our platform is designed for educational institutions with
+            psychology, counseling, and social work programs; mental health
+            clinics and hospitals; and individual practitioners seeking to
+            enhance their skills. We serve students, trainees, and licensed
+            professionals who are committed to lifelong learning and providing
+            the best possible care to their clients.
           </p>
         </div>
       </div>
       <div class="mx-auto mt-16 max-w-2xl lg:mx-0 lg:max-w-none">
-        <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">Our Team</h3>
-        <ul role="list" class="mt-6 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {team.map((person) => (
-            <li>
-              <div class="flex items-center gap-x-6">
-                <img class="h-16 w-16 rounded-full" src={person.imageUrl} alt={person.name} />
-                <div>
-                  <h4 class="text-base font-semibold leading-7 tracking-tight text-white">{person.name}</h4>
-                  <p class="text-sm font-semibold leading-6 text-indigo-400">{person.role}</p>
+        <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          Our Team
+        </h3>
+        <ul
+          role="list"
+          class="mt-6 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {
+            team.map((person) => (
+              <li>
+                <div class="flex items-center gap-x-6">
+                  <img
+                    class="h-16 w-16 rounded-full"
+                    src={person.imageUrl}
+                    alt={person.name}
+                  />
+                  <div>
+                    <h4 class="text-base font-semibold leading-7 tracking-tight text-white">
+                      {person.name}
+                    </h4>
+                    <p class="text-sm font-semibold leading-6 text-indigo-400">
+                      {person.role}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <p class="mt-4 text-sm leading-6 text-gray-400">{person.bio}</p>
-            </li>
-          ))}
+                <p class="mt-4 text-sm leading-6 text-gray-400">{person.bio}</p>
+              </li>
+            ))
+          }
         </ul>
       </div>
     </div>

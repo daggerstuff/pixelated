@@ -27,7 +27,7 @@ class MongoDB {
   private constructor() {
     // Build MongoDB URI from environment variables
     const mongoUri = this.buildMongoDBUri()
-    
+
     this.config = {
       uri: mongoUri,
       dbName: process.env['MONGODB_DB_NAME'] || 'pixelated_empathy',
@@ -58,7 +58,7 @@ class MongoDB {
    */
   private buildMongoDBUri(): string {
     const mongoUri = process.env['MONGODB_URI']
-    
+
     if (mongoUri) {
       return mongoUri
     }
@@ -67,7 +67,7 @@ class MongoDB {
     const username = process.env['MONGODB_USERNAME']
     const password = process.env['MONGODB_PASSWORD']
     const cluster = process.env['MONGODB_CLUSTER']
-    
+
     if (username && password && cluster) {
       return `mongodb+srv://${encodeURIComponent(username)}:${encodeURIComponent(password)}@${cluster}/?retryWrites=true&w=majority`
     }

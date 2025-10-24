@@ -2,8 +2,14 @@ import type { FC } from 'react'
 import React from 'react'
 import { useOfflineManager } from '@/hooks/useOfflineManager'
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
-import { AnimationWrapper, FadeIn } from '@/components/layout/AdvancedAnimations'
-import { ResponsiveContainer, ResponsiveText } from '@/components/layout/ResponsiveUtils'
+import {
+  AnimationWrapper,
+  FadeIn,
+} from '@/components/layout/AdvancedAnimations'
+import {
+  ResponsiveContainer,
+  ResponsiveText,
+} from '@/components/layout/ResponsiveUtils'
 
 interface DemoData {
   id: string
@@ -17,7 +23,6 @@ interface DemoData {
 export const OfflineDemo: FC = () => {
   const {
     isOnline,
-    isOffline,
     connectionQuality,
     hasPendingRequests,
     queueStats,
@@ -53,7 +58,7 @@ export const OfflineDemo: FC = () => {
             message: `Demo message ${Date.now()}`,
             type: isCritical ? 'critical' : 'normal',
           }),
-        }
+        },
       )
 
       if (response.status === 202) {
@@ -63,7 +68,7 @@ export const OfflineDemo: FC = () => {
           message: `Request queued for sync (${isCritical ? 'critical' : 'normal'})`,
           timestamp: Date.now(),
         }
-        setLocalData(prev => [newData, ...prev])
+        setLocalData((prev) => [newData, ...prev])
       } else {
         // Request succeeded
         const result = await response.json()
@@ -72,7 +77,7 @@ export const OfflineDemo: FC = () => {
           message: `Request succeeded: ${result.message || 'OK'}`,
           timestamp: Date.now(),
         }
-        setLocalData(prev => [newData, ...prev])
+        setLocalData((prev) => [newData, ...prev])
       }
     } catch (error) {
       const newData: DemoData = {
@@ -80,7 +85,7 @@ export const OfflineDemo: FC = () => {
         message: `Request failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: Date.now(),
       }
-      setLocalData(prev => [newData, ...prev])
+      setLocalData((prev) => [newData, ...prev])
     } finally {
       setIsLoading(false)
     }
@@ -109,7 +114,9 @@ export const OfflineDemo: FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <div
+                    className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}
+                  />
                   <span className="font-medium">
                     Status: {isOnline ? 'Online' : 'Offline'}
                   </span>
@@ -117,8 +124,13 @@ export const OfflineDemo: FC = () => {
 
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   <div>Connection Quality: {connectionQuality}</div>
-                  <div>Effective Type: {navigator.connection?.effectiveType || 'Unknown'}</div>
-                  <div>Downlink: {navigator.connection?.downlink || 0} Mbps</div>
+                  <div>
+                    Effective Type:{' '}
+                    {navigator.connection?.effectiveType || 'Unknown'}
+                  </div>
+                  <div>
+                    Downlink: {navigator.connection?.downlink || 0} Mbps
+                  </div>
                   <div>RTT: {navigator.connection?.rtt || 0} ms</div>
                 </div>
               </div>
@@ -207,9 +219,7 @@ export const OfflineDemo: FC = () => {
                         {new Date(item.timestamp).toLocaleTimeString()}
                       </div>
                     </div>
-                    <div className="text-xs text-gray-400">
-                      {item.id}
-                    </div>
+                    <div className="text-xs text-gray-400">{item.id}</div>
                   </div>
                 </AnimationWrapper>
               ))}
@@ -230,9 +240,12 @@ export const OfflineDemo: FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <h3 className="font-medium text-blue-900 dark:text-blue-100">Request Queuing</h3>
+                <h3 className="font-medium text-blue-900 dark:text-blue-100">
+                  Request Queuing
+                </h3>
                 <p className="text-sm text-blue-700 dark:text-blue-200">
-                  Network requests are automatically queued when offline and processed when connectivity returns.
+                  Network requests are automatically queued when offline and
+                  processed when connectivity returns.
                 </p>
                 <ul className="text-sm text-blue-700 dark:text-blue-200 space-y-1">
                   <li>• Critical requests get priority processing</li>
@@ -242,9 +255,12 @@ export const OfflineDemo: FC = () => {
               </div>
 
               <div className="space-y-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <h3 className="font-medium text-green-900 dark:text-green-100">Smart Fallbacks</h3>
+                <h3 className="font-medium text-green-900 dark:text-green-100">
+                  Smart Fallbacks
+                </h3>
                 <p className="text-sm text-green-700 dark:text-green-200">
-                  The system adapts to network conditions and user preferences automatically.
+                  The system adapts to network conditions and user preferences
+                  automatically.
                 </p>
                 <ul className="text-sm text-green-700 dark:text-green-200 space-y-1">
                   <li>• Respects "Save Data" mode preferences</li>
@@ -262,11 +278,18 @@ export const OfflineDemo: FC = () => {
             <h2 className="text-2xl font-semibold mb-4">How to Test</h2>
 
             <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-              <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">Testing Offline Mode:</h3>
+              <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">
+                Testing Offline Mode:
+              </h3>
               <ol className="text-sm text-yellow-700 dark:text-yellow-200 space-y-1 list-decimal list-inside">
-                <li>Disable your network connection or use browser dev tools to go offline</li>
+                <li>
+                  Disable your network connection or use browser dev tools to go
+                  offline
+                </li>
                 <li>Try sending requests - they'll be queued automatically</li>
-                <li>Re-enable your connection to see requests sync automatically</li>
+                <li>
+                  Re-enable your connection to see requests sync automatically
+                </li>
                 <li>Use "Force Sync" to manually trigger synchronization</li>
               </ol>
             </div>

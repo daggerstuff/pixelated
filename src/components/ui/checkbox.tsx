@@ -21,14 +21,16 @@ export const Checkbox: FC<CheckboxProps> = ({
   value,
   onChange,
   className = '',
-  children
+  children,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(e.target.checked)
   }
 
   return (
-    <label className={`flex items-center cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}>
+    <label
+      className={`flex items-center cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+    >
       <input
         type="checkbox"
         checked={checked}

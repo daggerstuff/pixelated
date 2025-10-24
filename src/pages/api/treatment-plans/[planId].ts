@@ -100,7 +100,11 @@ export const GET: APIRoute = async ({ params, locals }: APIContext) => {
   }
 }
 
-export const PUT: APIRoute = async ({ params, request, locals }: APIContext) => {
+export const PUT: APIRoute = async ({
+  params,
+  request,
+  locals,
+}: APIContext) => {
   try {
     // TODO: Replace with actual authentication check
     const { user } = locals

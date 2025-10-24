@@ -296,7 +296,7 @@ export class EmailService {
     // For now, we'll simulate sending it immediately
     logger.info('Email queued', {
       to: email.to,
-      templateAlias: email.templateAlias
+      templateAlias: email.templateAlias,
     })
 
     // Simulate immediate sending
@@ -304,7 +304,7 @@ export class EmailService {
       to: email.to,
       subject: `Template: ${email.templateAlias}`,
       htmlContent: `<p>Template: ${email.templateAlias}</p><pre>${JSON.stringify(email.templateModel, null, 2)}</pre>`,
-      textContent: `Template: ${email.templateAlias}\n${JSON.stringify(email.templateModel, null, 2)}`
+      textContent: `Template: ${email.templateAlias}\n${JSON.stringify(email.templateModel, null, 2)}`,
     })
   }
 

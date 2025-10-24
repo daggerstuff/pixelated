@@ -8,7 +8,8 @@ import type {
   SortDirection,
 } from './table-types'
 
-export interface TableProps<T extends TableRowData> extends React.HTMLAttributes<HTMLTableElement> {
+export interface TableProps<T extends TableRowData>
+  extends React.HTMLAttributes<HTMLTableElement> {
   /** Column definitions */
   columns: TableColumn<T>[]
   /** Data source */
@@ -94,8 +95,14 @@ function Table<T extends TableRowData>({
               <TableHead
                 key={column.id}
                 sortable={column.sortable}
-                sortAsc={tableState.sort?.sortBy === column.id && tableState.sort.direction === 'asc'}
-                sortDesc={tableState.sort?.sortBy === column.id && tableState.sort.direction === 'desc'}
+                sortAsc={
+                  tableState.sort?.sortBy === column.id &&
+                  tableState.sort.direction === 'asc'
+                }
+                sortDesc={
+                  tableState.sort?.sortBy === column.id &&
+                  tableState.sort.direction === 'desc'
+                }
                 onSort={() => column.sortable && handleSort(column.id)}
                 style={{ width: column.width }}
                 className={cn({
@@ -119,7 +126,10 @@ function Table<T extends TableRowData>({
             </TableRow>
           ) : dataSource.error ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="text-center py-8 text-red-500">
+              <TableCell
+                colSpan={columns.length}
+                className="text-center py-8 text-red-500"
+              >
                 {dataSource.error}
               </TableCell>
             </TableRow>
@@ -167,7 +177,9 @@ function Table<T extends TableRowData>({
           onPageChange={(page) => onStateChange({ currentPage: page })}
           showPageSize
           pageSize={tableState.pageSize}
-          onPageSizeChange={(size) => onStateChange({ pageSize: size, currentPage: 1 })}
+          onPageSizeChange={(size) =>
+            onStateChange({ pageSize: size, currentPage: 1 })
+          }
         />
       )}
     </div>
@@ -216,11 +228,18 @@ function TableFooter({ className, ...props }: TableFooterProps) {
   )
 }
 
-export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement>, Pick<TableRowData, 'selected' | 'disabled'> {
+export interface TableRowProps
+  extends React.HTMLAttributes<HTMLTableRowElement>,
+    Pick<TableRowData, 'selected' | 'disabled'> {
   className?: string
 }
 
-function TableRow({ selected = false, disabled = false, className, ...props }: TableRowProps) {
+function TableRow({
+  selected = false,
+  disabled = false,
+  className,
+  ...props
+}: TableRowProps) {
   return (
     <tr
       className={cn(
@@ -239,7 +258,8 @@ function TableRow({ selected = false, disabled = false, className, ...props }: T
   )
 }
 
-export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+export interface TableHeadProps
+  extends React.ThHTMLAttributes<HTMLTableCellElement> {
   /** Whether the column is sortable */
   sortable?: boolean
   /** Whether the column is currently sorted ascending */
@@ -284,16 +304,28 @@ function TableHead({
         className,
       )}
       onClick={sortable ? onSort : undefined}
-      onKeyDown={sortable ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSort?.();
-        }
-      } : undefined}
+      onKeyDown={
+        sortable
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onSort?.()
+              }
+            }
+          : undefined
+      }
       style={{ ...style, width }}
       tabIndex={sortable ? 0 : undefined}
-      role={sortable ? "button" : undefined}
-      aria-sort={sortable ? (sortAsc ? 'ascending' : sortDesc ? 'descending' : 'none') : undefined}
+      role={sortable ? 'button' : undefined}
+      aria-sort={
+        sortable
+          ? sortAsc
+            ? 'ascending'
+            : sortDesc
+              ? 'descending'
+              : 'none'
+          : undefined
+      }
       {...props}
     >
       {sortable ? (
@@ -345,7 +377,8 @@ function TableHead({
   )
 }
 
-export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+export interface TableCellProps
+  extends React.TdHTMLAttributes<HTMLTableCellElement> {
   /** Cell alignment */
   align?: 'left' | 'center' | 'right'
   /** Whether to hide on mobile */
@@ -353,7 +386,12 @@ export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElem
   className?: string
 }
 
-function TableCell({ align = 'left', hideMobile = false, className, ...props }: TableCellProps) {
+function TableCell({
+  align = 'left',
+  hideMobile = false,
+  className,
+  ...props
+}: TableCellProps) {
   return (
     <td
       className={cn(

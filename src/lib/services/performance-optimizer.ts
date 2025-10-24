@@ -1,6 +1,6 @@
 /**
  * Performance Optimization Module for Phase 3
- * 
+ *
  * Provides comprehensive performance optimization tools including:
  * - Connection pooling
  * - Caching strategies
@@ -60,9 +60,22 @@ export class PerformanceOptimizer {
   private config: OptimizationConfig
   private metrics: PerformanceMetrics
   private connectionPool: Map<string, unknown[]>
-  private cache: Map<string, { value: unknown; timestamp: number; accessCount: number }>
-  private circuitBreakers: Map<string, { failures: number; lastFailure: number; state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' }>
-  private batchQueues: Map<string, { items: unknown[]; timer: NodeJS.Timeout | null }>
+  private cache: Map<
+    string,
+    { value: unknown; timestamp: number; accessCount: number }
+  >
+  private circuitBreakers: Map<
+    string,
+    {
+      failures: number
+      lastFailure: number
+      state: 'CLOSED' | 'OPEN' | 'HALF_OPEN'
+    }
+  >
+  private batchQueues: Map<
+    string,
+    { items: unknown[]; timer: NodeJS.Timeout | null }
+  >
   private metricsHistory: PerformanceMetrics[]
   private activeCounts: Map<string, number>
 
@@ -73,34 +86,34 @@ export class PerformanceOptimizer {
         minConnections: 5,
         acquireTimeout: 5000,
         idleTimeout: 30000,
-        ...config.connectionPool
+        ...config.connectionPool,
       },
       cache: {
         maxSize: 10000,
         ttl: 300000, // 5 minutes
         strategy: 'LRU',
-        ...config.cache
+        ...config.cache,
       },
       circuitBreaker: {
         failureThreshold: 5,
         resetTimeout: 60000,
         monitoringPeriod: 10000,
-        ...config.circuitBreaker
+        ...config.circuitBreaker,
       },
       batching: {
         maxBatchSize: 100,
         batchTimeout: 100,
-        ...config.batching
+        ...config.batching,
       },
       monitoring: {
         metricsInterval: 5000,
         alertThresholds: {
           responseTime: 1000,
           errorRate: 0.05,
-          memoryUsage: 0.8
+          memoryUsage: 0.8,
         },
-        ...config.monitoring
-      }
+        ...config.monitoring,
+      },
     }
 
     this.metrics = {
@@ -110,7 +123,7 @@ export class PerformanceOptimizer {
       memoryUsage: 0,
       cpuUsage: 0,
       activeConnections: 0,
-      cacheHitRate: 0
+      cacheHitRate: 0,
     }
 
     this.connectionPool = new Map()
@@ -118,8 +131,8 @@ export class PerformanceOptimizer {
     this.circuitBreakers = new Map()
     this.batchQueues = new Map()
     this.metricsHistory = []
-  this.activeCounts = new Map()
-  this.metricsIntervalId = null
+    this.activeCounts = new Map()
+    this.metricsIntervalId = null
 
     this.startMonitoring()
   }
@@ -127,7 +140,10 @@ export class PerformanceOptimizer {
   /**
    * Connection Pool Management
    */
-  async acquireConnection(poolName: string, factory: () => Promise<unknown>): Promise<unknown> {
+  async acquireConnection(
+    poolName: string,
+    factory: () => Promise<unknown>,
+  ): Promise<unknown> {
     if (!this.connectionPool.has(poolName)) {
       this.connectionPool.set(poolName, [])
     }
@@ -149,7 +165,9 @@ export class PerformanceOptimizer {
         this.activeCounts.set(poolName, getActive() + 1)
         return connection
       } catch (error: unknown) {
-        logger.error(`Failed to create connection for pool: ${poolName}`, { error })
+        logger.error(`Failed to create connection for pool: ${poolName}`, {
+          error,
+        })
         throw error
       }
     }
@@ -177,7 +195,7 @@ export class PerformanceOptimizer {
     }
 
     const pool = this.connectionPool.get(poolName)!
-  const active = this.activeCounts.get(poolName) ?? 0
+    const active = this.activeCounts.get(poolName) ?? 0
     if (active > 0) {
       this.activeCounts.set(poolName, active - 1)
     }
@@ -203,7 +221,7 @@ export class PerformanceOptimizer {
     this.cache.set(key, {
       value,
       timestamp: now,
-      accessCount: 1
+      accessCount: 1,
     })
   }
 
@@ -237,8 +255,8 @@ export class PerformanceOptimizer {
       return
     }
 
-  let keyToEvict: string | undefined
-    
+    let keyToEvict: string | undefined
+
     switch (this.config.cache.strategy) {
       case 'LRU':
         keyToEvict = this.findLRUKey()
@@ -253,10 +271,10 @@ export class PerformanceOptimizer {
         keyToEvict = this.cache.keys().next().value
     }
 
-  if (!keyToEvict) {
-    return
-  }
-  this.cache.delete(keyToEvict)
+    if (!keyToEvict) {
+      return
+    }
+    this.cache.delete(keyToEvict)
   }
 
   private findLRUKey(): string {
@@ -293,10 +311,10 @@ export class PerformanceOptimizer {
   async executeWithCircuitBreaker<T>(
     serviceName: string,
     operation: () => Promise<T>,
-    fallback?: () => Promise<T>
+    fallback?: () => Promise<T>,
   ): Promise<T> {
     const breaker = this.getCircuitBreaker(serviceName)
-    
+
     if (breaker.state === 'OPEN') {
       const now = Date.now()
       if (now - breaker.lastFailure > this.config.circuitBreaker.resetTimeout) {
@@ -311,35 +329,39 @@ export class PerformanceOptimizer {
 
     try {
       const result = await operation()
-      
+
       if (breaker.state === 'HALF_OPEN') {
         breaker.state = 'CLOSED'
         breaker.failures = 0
       }
-      
+
       return result
     } catch (error: unknown) {
       breaker.failures++
       breaker.lastFailure = Date.now()
-      
+
       if (breaker.failures >= this.config.circuitBreaker.failureThreshold) {
         breaker.state = 'OPEN'
       }
-      
+
       if (fallback) {
         return await fallback()
       }
-      
+
       throw error
     }
   }
 
-  private getCircuitBreaker(serviceName: string): { failures: number; lastFailure: number; state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' } {
+  private getCircuitBreaker(serviceName: string): {
+    failures: number
+    lastFailure: number
+    state: 'CLOSED' | 'OPEN' | 'HALF_OPEN'
+  } {
     if (!this.circuitBreakers.has(serviceName)) {
       this.circuitBreakers.set(serviceName, {
         failures: 0,
         lastFailure: 0,
-        state: 'CLOSED'
+        state: 'CLOSED',
       })
     }
     return this.circuitBreakers.get(serviceName)!
@@ -351,12 +373,12 @@ export class PerformanceOptimizer {
   async addToBatch<T>(
     batchName: string,
     item: T,
-    processor: (items: T[]) => Promise<void>
+    processor: (items: T[]) => Promise<void>,
   ): Promise<void> {
     if (!this.batchQueues.has(batchName)) {
       this.batchQueues.set(batchName, {
         items: [],
-        timer: null
+        timer: null,
       })
     }
 
@@ -379,17 +401,17 @@ export class PerformanceOptimizer {
 
   private async processBatch<T>(
     batchName: string,
-    processor: (items: T[]) => Promise<void>
+    processor: (items: T[]) => Promise<void>,
   ): Promise<void> {
     const batch = this.batchQueues.get(batchName)
     if (!batch || batch.items.length === 0) {
       return
     }
 
-  // stored items are any[]; cast to T[] for the processor
-  const items = [...batch.items] as unknown as T[]
+    // stored items are any[]; cast to T[] for the processor
+    const items = [...batch.items] as unknown as T[]
     batch.items = []
-    
+
     if (batch.timer) {
       clearTimeout(batch.timer)
       batch.timer = null
@@ -398,7 +420,10 @@ export class PerformanceOptimizer {
     try {
       await processor(items)
     } catch (error: unknown) {
-      logger.error(`Batch processing failed for: ${batchName}`, { error, itemCount: items.length })
+      logger.error(`Batch processing failed for: ${batchName}`, {
+        error,
+        itemCount: items.length,
+      })
     }
   }
 
@@ -414,14 +439,18 @@ export class PerformanceOptimizer {
 
   private updateMetrics() {
     // Update cache hit rate
-    const totalCacheAccesses = Array.from(this.cache.values())
-      .reduce((sum, entry) => sum + entry.accessCount, 0)
+    const totalCacheAccesses = Array.from(this.cache.values()).reduce(
+      (sum, entry) => sum + entry.accessCount,
+      0,
+    )
     const cacheHits = this.cache.size
-    this.metrics.cacheHitRate = totalCacheAccesses > 0 ? cacheHits / totalCacheAccesses : 0
+    this.metrics.cacheHitRate =
+      totalCacheAccesses > 0 ? cacheHits / totalCacheAccesses : 0
 
     // Update active connections
-    this.metrics.activeConnections = Array.from(this.connectionPool.values())
-      .reduce((sum, pool) => sum + pool.length, 0)
+    this.metrics.activeConnections = Array.from(
+      this.connectionPool.values(),
+    ).reduce((sum, pool) => sum + pool.length, 0)
 
     // Update memory usage
     if (typeof process !== 'undefined' && process.memoryUsage) {
@@ -442,21 +471,21 @@ export class PerformanceOptimizer {
     if (this.metrics.averageResponseTime > thresholds.responseTime) {
       logger.warn('High response time detected', {
         current: this.metrics.averageResponseTime,
-        threshold: thresholds.responseTime
+        threshold: thresholds.responseTime,
       })
     }
 
     if (this.metrics.errorRate > thresholds.errorRate) {
       logger.warn('High error rate detected', {
         current: this.metrics.errorRate,
-        threshold: thresholds.errorRate
+        threshold: thresholds.errorRate,
       })
     }
 
     if (this.metrics.memoryUsage > thresholds.memoryUsage) {
       logger.warn('High memory usage detected', {
         current: this.metrics.memoryUsage,
-        threshold: thresholds.memoryUsage
+        threshold: thresholds.memoryUsage,
       })
     }
   }
@@ -468,26 +497,37 @@ export class PerformanceOptimizer {
     const recommendations: string[] = []
 
     if (this.metrics.cacheHitRate < 0.7) {
-      recommendations.push('Cache hit rate is low. Consider increasing cache size or TTL.')
+      recommendations.push(
+        'Cache hit rate is low. Consider increasing cache size or TTL.',
+      )
     }
 
     if (this.metrics.averageResponseTime > 500) {
-      recommendations.push('Response times are high. Consider connection pooling or request batching.')
+      recommendations.push(
+        'Response times are high. Consider connection pooling or request batching.',
+      )
     }
 
     if (this.metrics.memoryUsage > 0.8) {
-      recommendations.push('Memory usage is high. Implement garbage collection or reduce cache size.')
+      recommendations.push(
+        'Memory usage is high. Implement garbage collection or reduce cache size.',
+      )
     }
 
     if (this.metrics.errorRate > 0.02) {
-      recommendations.push('Error rate is elevated. Check circuit breaker configuration.')
+      recommendations.push(
+        'Error rate is elevated. Check circuit breaker configuration.',
+      )
     }
 
-    const openCircuitBreakers = Array.from(this.circuitBreakers.entries())
-      .filter(([_, breaker]) => breaker.state === 'OPEN')
-    
+    const openCircuitBreakers = Array.from(
+      this.circuitBreakers.entries(),
+    ).filter(([_, breaker]) => breaker.state === 'OPEN')
+
     if (openCircuitBreakers.length > 0) {
-      recommendations.push(`Circuit breakers are open for: ${openCircuitBreakers.map(([name]) => name).join(', ')}`)
+      recommendations.push(
+        `Circuit breakers are open for: ${openCircuitBreakers.map(([name]) => name).join(', ')}`,
+      )
     }
 
     return recommendations

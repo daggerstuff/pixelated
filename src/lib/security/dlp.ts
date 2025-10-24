@@ -157,7 +157,7 @@ export class DLPService {
    * @param ruleId Rule ID to delete
    */
   deleteRule(ruleId: string): void {
-    this.removeRule(ruleId);
+    this.removeRule(ruleId)
   }
 
   /**

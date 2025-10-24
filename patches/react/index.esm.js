@@ -43,5 +43,22 @@ export const {
   startTransition,
   version,
 } = React
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c5aa5b90-80ce-55cc-9749-c2dc9f463a61")}catch(e){}}();
+!(function () {
+  try {
+    var e =
+        'undefined' != typeof window
+          ? window
+          : 'undefined' != typeof global
+            ? global
+            : 'undefined' != typeof globalThis
+              ? globalThis
+              : 'undefined' != typeof self
+                ? self
+                : {},
+      n = new e.Error().stack
+    n &&
+      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      (e._sentryDebugIds[n] = 'c5aa5b90-80ce-55cc-9749-c2dc9f463a61'))
+  } catch (e) {}
+})()
 //# debugId=c5aa5b90-80ce-55cc-9749-c2dc9f463a61

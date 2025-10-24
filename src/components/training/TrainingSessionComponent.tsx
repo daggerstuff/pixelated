@@ -124,15 +124,17 @@ export function TrainingSessionComponent() {
 
   return (
     <div className="max-w-2xl mx-auto p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
-      <h2 className="text-2xl font-bold text-white mb-6">Therapist Training Session</h2>
-      
+      <h2 className="text-2xl font-bold text-white mb-6">
+        Therapist Training Session
+      </h2>
+
       <div className="mb-6 space-y-4 max-h-96 overflow-y-auto">
         {conversation.map((entry, idx) => (
-          <div 
-            key={idx} 
+          <div
+            key={idx}
             className={`p-4 rounded-lg ${
-              entry.role === 'client' 
-                ? 'bg-blue-500/20 border-l-4 border-blue-500' 
+              entry.role === 'client'
+                ? 'bg-blue-500/20 border-l-4 border-blue-500'
                 : 'bg-green-500/20 border-l-4 border-green-500'
             }`}
           >
@@ -152,9 +154,9 @@ export function TrainingSessionComponent() {
           className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Type your therapeutic response..."
         />
-        
-        <button 
-          onClick={handleResponse} 
+
+        <button
+          onClick={handleResponse}
           disabled={!therapistResponse.trim()}
           className="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
         >

@@ -4,7 +4,7 @@
  */
 
 import requestQueue, { type QueuedRequest } from './requestQueue'
-import useOfflineDetection, { type OfflineState } from '@/hooks/useOfflineDetection'
+import { type OfflineState } from '@/hooks/useOfflineDetection'
 
 export interface OfflineManagerConfig {
   enableRequestQueue?: boolean
@@ -25,23 +25,17 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
     enableRequestQueue = true,
     criticalPaths = [],
     onRequestQueued,
-    onRequestProcessed,
   } = config
 
-  return async (
-    url: string,
-    options: RequestInit = {}
-  ): Promise<Response> => {
-    const isCriticalPath = criticalPaths.some(path => url.includes(path))
+  return async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const isCriticalPath = criticalPaths.some((path) => url.includes(path))
 
     try {
       // Try the request immediately if online
       const response = await fetch(url, {
         ...options,
         // Add timeout for critical requests
-        signal: isCriticalPath
-          ? AbortSignal.timeout(5000)
-          : options.signal,
+        signal: isCriticalPath ? AbortSignal.timeout(5000) : options.signal,
       })
 
       if (response.ok) {
@@ -57,7 +51,7 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
         const queued = requestQueue.add({
           url,
           method: (options.method as any) || 'GET',
-          headers: options.headers as Record<string, string> || {},
+          headers: (options.headers as Record<string, string>) || {},
           body: options.body,
           priority,
           maxRetries: isCriticalPath ? 5 : 3,
@@ -68,7 +62,7 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
             id: `req_${Date.now()}`,
             url,
             method: (options.method as any) || 'GET',
-            headers: options.headers as Record<string, string> || {},
+            headers: (options.headers as Record<string, string>) || {},
             body: options.body,
             timestamp: Date.now(),
             retryCount: 0,
@@ -88,7 +82,7 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
             status: 202,
             statusText: 'Queued',
             headers: { 'Content-Type': 'application/json' },
-          }
+          },
         )
       }
 
@@ -104,7 +98,7 @@ class OfflineManager {
   private config: Required<OfflineManagerConfig>
   private syncInterval: NodeJS.Timeout | null = null
   private networkState: OfflineState | null = null
-  private listeners: Map<string, Set<Function>> = new Map()
+  private listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
 
   constructor(config: OfflineManagerConfig = {}) {
     this.config = {
@@ -124,11 +118,10 @@ class OfflineManager {
 
   private initialize(): void {
     // Monitor network state
-    const { useOfflineDetection } = require('@/hooks/useOfflineDetection')
-    const networkDetection = useOfflineDetection({
-      onOnline: this.handleOnline.bind(this),
-      onOffline: this.handleOffline.bind(this),
-    })
+    // NOTE: We intentionally avoid importing or calling React hooks at module
+    // initialization time. The type `OfflineState` is imported at top-level
+    // for typing purposes; any runtime hookup to React should occur inside a
+    // React component where hooks are legal.
 
     // Set up auto-sync interval
     if (this.config.enableAutoSync) {
@@ -138,7 +131,10 @@ class OfflineManager {
     // Handle visibility change for sync optimization
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && this.networkState?.isOnline) {
+        if (
+          document.visibilityState === 'visible' &&
+          this.networkState?.isOnline
+        ) {
           this.sync()
         }
       })
@@ -146,7 +142,11 @@ class OfflineManager {
   }
 
   private handleOnline(): void {
-    this.networkState = { ...this.networkState, isOnline: true, isOffline: false } as OfflineState
+    this.networkState = {
+      ...this.networkState,
+      isOnline: true,
+      isOffline: false,
+    } as OfflineState
     this.emit('online')
 
     // Immediately try to sync when coming back online
@@ -154,7 +154,11 @@ class OfflineManager {
   }
 
   private handleOffline(): void {
-    this.networkState = { ...this.networkState, isOnline: false, isOffline: true } as OfflineState
+    this.networkState = {
+      ...this.networkState,
+      isOnline: false,
+      isOffline: true,
+    } as OfflineState
     this.emit('offline')
   }
 
@@ -177,17 +181,25 @@ class OfflineManager {
     }
   }
 
-  private emit(event: string, data?: any): void {
+  private emit(event: string, data?: unknown): void {
     const eventListeners = this.listeners.get(event)
     if (eventListeners) {
-      eventListeners.forEach(listener => listener(data))
+      eventListeners.forEach((listener) => listener(data))
     }
   }
 
   /**
    * Subscribe to offline manager events
    */
-  on(event: 'online' | 'offline' | 'syncStart' | 'syncComplete' | 'requestQueued', listener: Function): () => void {
+  on(
+    event:
+      | 'online'
+      | 'offline'
+      | 'syncStart'
+      | 'syncComplete'
+      | 'requestQueued',
+    listener: (payload?: unknown) => void,
+  ): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set())
     }

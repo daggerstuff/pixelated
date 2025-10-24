@@ -13,27 +13,27 @@ on:
   workflow_dispatch:
     inputs:
       deployment_strategy:
-        description: 'Deployment strategy (rolling, blue-green, canary)'
+        description: "Deployment strategy (rolling, blue-green, canary)"
         required: false
-        default: 'rolling'
+        default: "rolling"
         type: choice
         options:
           - rolling
           - blue-green
           - canary
       environment:
-        description: 'Target environment'
+        description: "Target environment"
         required: false
-        default: 'production'
+        default: "production"
         type: choice
         options:
           - production
           - staging
 
 env:
-  NODE_VERSION: '24'
-  PNPM_VERSION: '10.18.2'
-  PYTHON_VERSION: '3.11'
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.19.0"
+  PYTHON_VERSION: "3.11"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
@@ -58,6 +58,19 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Load environment from .env
+        run: |
+          if [[ -f ".env" ]]; then
+            echo "ℹ️ Loading environment variables from .env file"
+            # Export variables that might be in .env
+            while IFS= read -r line; do
+              if [[ $line =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+                export "$line"
+              fi
+            done < .env
+          fi
 
       - name: Install dependencies
         run: |
@@ -113,6 +126,19 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Load environment from .env
+        run: |
+          if [[ -f ".env" ]]; then
+            echo "ℹ️ Loading environment variables from .env file"
+            # Export variables that might be in .env
+            while IFS= read -r line; do
+              if [[ $line =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+                export "$line"
+              fi
+            done < .env
+          fi
 
       - name: Install dependencies
         run: |
@@ -176,6 +202,26 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Load Sentry environment
+        run: |
+          # Load Sentry variables from .env if available
+          if [[ -f ".env" ]]; then
+            echo "ℹ️ Loading Sentry configuration from .env"
+            SENTRY_DSN=$(grep "^SENTRY_DSN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            PUBLIC_SENTRY_DSN=$(grep "^PUBLIC_SENTRY_DSN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            SENTRY_AUTH_TOKEN=$(grep "^SENTRY_AUTH_TOKEN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            
+            if [[ -n "$SENTRY_DSN" ]]; then
+              echo "SENTRY_DSN=${SENTRY_DSN}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$PUBLIC_SENTRY_DSN" ]]; then
+              echo "PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$SENTRY_AUTH_TOKEN" ]]; then
+              echo "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}" >> $GITHUB_ENV
+            fi
+          fi
+
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v5
@@ -188,9 +234,9 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_DSN=${{ secrets.SENTRY_DSN }}
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
-            PUBLIC_SENTRY_DSN=${{ secrets.PUBLIC_SENTRY_DSN }}
+            SENTRY_DSN=${{ env.SENTRY_DSN || secrets.SENTRY_DSN }}
+            SENTRY_AUTH_TOKEN=${{ env.SENTRY_AUTH_TOKEN || secrets.SENTRY_AUTH_TOKEN }}
+            PUBLIC_SENTRY_DSN=${{ env.PUBLIC_SENTRY_DSN || secrets.PUBLIC_SENTRY_DSN }}
 
       - name: Output image info
         run: |
@@ -214,15 +260,15 @@ jobs:
         continue-on-error: true
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          format: "sarif"
+          output: "trivy-results.sarif"
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         continue-on-error: true
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
 
       - name: Container security check
         run: |
@@ -241,7 +287,7 @@ jobs:
           else
             echo "✅ Container configured with non-root user: $USER_ID"
           fi
-          
+
           # Check exposed ports
           EXPOSED_PORTS=$(docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
           echo "ℹ️ Exposed ports: ${EXPOSED_PORTS:-none}"
@@ -262,25 +308,54 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Load Sentry environment
+        run: |
+          # Load Sentry variables from .env if available
+          if [[ -f ".env" ]]; then
+            echo "ℹ️ Loading Sentry configuration from .env"
+            SENTRY_DSN=$(grep "^SENTRY_DSN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            PUBLIC_SENTRY_DSN=$(grep "^PUBLIC_SENTRY_DSN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            SENTRY_AUTH_TOKEN=$(grep "^SENTRY_AUTH_TOKEN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            SENTRY_ORG=$(grep "^SENTRY_ORG=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            SENTRY_PROJECT=$(grep "^SENTRY_PROJECT=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            
+            if [[ -n "$SENTRY_DSN" ]]; then
+              echo "SENTRY_DSN=${SENTRY_DSN}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$PUBLIC_SENTRY_DSN" ]]; then
+              echo "PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$SENTRY_AUTH_TOKEN" ]]; then
+              echo "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$SENTRY_ORG" ]]; then
+              echo "SENTRY_ORG=${SENTRY_ORG}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$SENTRY_PROJECT" ]]; then
+              echo "SENTRY_PROJECT=${SENTRY_PROJECT}" >> $GITHUB_ENV
+            fi
+          fi
+
       - name: Create Sentry release
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        if: ${{ env.SENTRY_AUTH_TOKEN != '' && env.SENTRY_DSN != '' }}
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN || secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ env.SENTRY_ORG || secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || secrets.SENTRY_PROJECT }}
           SENTRY_RELEASE: ${{ github.sha }}
         run: |
-          # Check if Sentry secrets are available
-          if [ -n "${{ secrets.SENTRY_AUTH_TOKEN }}" ] && [ -n "${{ secrets.SENTRY_DSN }}" ]; then
-            echo "📊 Creating Sentry release: $SENTRY_RELEASE"
-            curl -sL https://sentry.io/get-cli/ | sh
-            sentry-cli releases new "$SENTRY_RELEASE" || true
-            sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
-            sentry-cli releases finalize "$SENTRY_RELEASE" || true
-            echo "✅ Sentry release created"
-          else
-            echo "⚠️ Sentry secrets not configured, skipping release creation"
-          fi
+          echo "📊 Creating Sentry release: $SENTRY_RELEASE"
+          curl -sL https://sentry.io/get-cli/ | sh
+          sentry-cli releases new "$SENTRY_RELEASE" || true
+          sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
+          sentry-cli releases finalize "$SENTRY_RELEASE" || true
+          echo "✅ Sentry release created"
 
   # GKE Deployment with multiple strategies
   deploy-gke:
@@ -296,61 +371,113 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Load GCP environment
+        run: |
+          # Load GCP variables from .env if available
+          if [[ -f ".env" ]]; then
+            echo "ℹ️ Loading GCP configuration from .env"
+            GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_CLUSTER_NAME=$(grep "^GKE_CLUSTER_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_ZONE=$(grep "^GKE_ZONE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_NAMESPACE=$(grep "^GKE_NAMESPACE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_DEPLOYMENT_NAME=$(grep "^GKE_DEPLOYMENT_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_SERVICE_NAME=$(grep "^GKE_SERVICE_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_ENVIRONMENT_URL=$(grep "^GKE_ENVIRONMENT_URL=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GCP_SERVICE_ACCOUNT_KEY=$(grep "^GCP_SERVICE_ACCOUNT_KEY=" .env | cut -d'=' -f2- | sed 's/^'\''//;s/'\''$//' || echo "")
+            
+            if [[ -n "$GCP_PROJECT_ID" ]]; then
+              echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_CLUSTER_NAME" ]]; then
+              echo "GKE_CLUSTER_NAME=${GKE_CLUSTER_NAME}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_ZONE" ]]; then
+              echo "GKE_ZONE=${GKE_ZONE}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_NAMESPACE" ]]; then
+              echo "GKE_NAMESPACE=${GKE_NAMESPACE}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_DEPLOYMENT_NAME" ]]; then
+              echo "GKE_DEPLOYMENT_NAME=${GKE_DEPLOYMENT_NAME}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_SERVICE_NAME" ]]; then
+              echo "GKE_SERVICE_NAME=${GKE_SERVICE_NAME}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_ENVIRONMENT_URL" ]]; then
+              echo "GKE_ENVIRONMENT_URL=${GKE_ENVIRONMENT_URL}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GCP_SERVICE_ACCOUNT_KEY" ]]; then
+              echo "GCP_SERVICE_ACCOUNT_KEY=${GCP_SERVICE_ACCOUNT_KEY}" >> $GITHUB_ENV
+            fi
+          fi
+
+      - name: Verify Workload Identity Configuration
+        run: |
+          echo "🔍 Verifying workload identity configuration..."
+          echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
+          echo "Workload Identity Provider: projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          echo "Service Account: action@pixelatedempathy.com"
+      - name: Verify Workload Identity Configuration
+        run: |
+          echo "🔍 Verifying workload identity configuration..."
+          echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
+          echo "Workload Identity Provider: projects/${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          echo "Service Account: action@pixelatedempathy.com"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          universe: googleapis.com
+          cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Install gke-gcloud-auth-plugin
-        run: |
-          gcloud components install gke-gcloud-auth-plugin --quiet
-          echo "/usr/lib/google-cloud-sdk/bin" >> $GITHUB_PATH
-
       - name: Get GKE credentials
         run: |
-          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} \
-            --zone ${{ secrets.GKE_ZONE }} \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud container clusters get-credentials ${{ env.GKE_CLUSTER_NAME || secrets.GKE_CLUSTER_NAME }} \
+            --zone ${{ env.GKE_ZONE || secrets.GKE_ZONE }} \
+            --project ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
 
       - name: Configure kubectl
         run: |
           echo "🔧 Configuring kubectl..."
           kubectl config current-context
           kubectl cluster-info
-          
+
           # Create namespace if it doesn't exist
-          kubectl create namespace ${{ secrets.GKE_NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
-          kubectl config set-context --current --namespace=${{ secrets.GKE_NAMESPACE }}
+          kubectl create namespace ${{ env.GKE_NAMESPACE || secrets.GKE_NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl config set-context --current --namespace=${{ env.GKE_NAMESPACE || secrets.GKE_NAMESPACE }}
 
       - name: Deploy to GKE
         id: deploy
         env:
           CONTAINER_IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          GKE_DEPLOYMENT_NAME: ${{ secrets.GKE_DEPLOYMENT_NAME }}
-          GKE_SERVICE_NAME: ${{ secrets.GKE_SERVICE_NAME }}
-          GKE_NAMESPACE: ${{ secrets.GKE_NAMESPACE }}
-          REPLICAS: ${{ secrets.GKE_REPLICAS }}
-          MAX_SURGE: ${{ secrets.GKE_MAX_SURGE }}
-          MAX_UNAVAILABLE: ${{ secrets.GKE_MAX_UNAVAILABLE }}
+          GKE_DEPLOYMENT_NAME: ${{ env.GKE_DEPLOYMENT_NAME || secrets.GKE_DEPLOYMENT_NAME }}
+          GKE_SERVICE_NAME: ${{ env.GKE_SERVICE_NAME || secrets.GKE_SERVICE_NAME }}
+          GKE_NAMESPACE: ${{ env.GKE_NAMESPACE || secrets.GKE_NAMESPACE }}
+          REPLICAS: ${{ env.GKE_REPLICAS || secrets.GKE_REPLICAS || '3' }}
+          MAX_SURGE: ${{ env.GKE_MAX_SURGE || secrets.GKE_MAX_SURGE || '1' }}
+          MAX_UNAVAILABLE: ${{ env.GKE_MAX_UNAVAILABLE || secrets.GKE_MAX_UNAVAILABLE || '0' }}
           DEPLOYMENT_STRATEGY: ${{ github.event.inputs.deployment_strategy || 'rolling' }}
-          CANARY_PERCENTAGE: ${{ secrets.CANARY_PERCENTAGE }}
-          AUTO_ROLLBACK_ENABLED: ${{ secrets.AUTO_ROLLBACK }}
-          HEALTH_CHECK_TIMEOUT: ${{ secrets.HEALTH_CHECK_TIMEOUT }}
+          CANARY_PERCENTAGE: ${{ env.CANARY_PERCENTAGE || secrets.CANARY_PERCENTAGE || '25' }}
+          AUTO_ROLLBACK_ENABLED: ${{ env.AUTO_ROLLBACK || secrets.AUTO_ROLLBACK || 'true' }}
+          HEALTH_CHECK_TIMEOUT: ${{ env.HEALTH_CHECK_TIMEOUT || secrets.HEALTH_CHECK_TIMEOUT || '300' }}
         run: |
-          echo "🚀 Deploying to GKE cluster: ${{ secrets.GKE_CLUSTER_NAME }}"
+          echo "🚀 Deploying to GKE cluster: ${{ env.GKE_CLUSTER_NAME || secrets.GKE_CLUSTER_NAME }}"
           echo "📦 Container image: $CONTAINER_IMAGE"
           echo "🎯 Deployment strategy: $DEPLOYMENT_STRATEGY"
-          
+
           # Set deployment variables
           export CI_COMMIT_SHORT_SHA=${{ github.sha }}
-          
+
           # Pre-deployment validation
           echo "🔍 Pre-deployment validation..."
-          
+
           # Check deployment strategy and validate
           case $DEPLOYMENT_STRATEGY in
             rolling|blue-green|canary)
@@ -361,10 +488,10 @@ jobs:
               exit 1
               ;;
           esac
-          
+
           # Apply Kubernetes manifests based on strategy
           echo "📋 Applying Kubernetes manifests using $DEPLOYMENT_STRATEGY strategy..."
-          
+
           case $DEPLOYMENT_STRATEGY in
             rolling)
               # Standard rolling update
@@ -379,7 +506,7 @@ jobs:
               . ./scripts/deploy-canary.sh
               ;;
           esac
-          
+
           # Wait for rollout based on strategy
           echo "⏳ Waiting for deployment rollout..."
           case $DEPLOYMENT_STRATEGY in
@@ -409,10 +536,10 @@ jobs:
               fi
               ;;
           esac
-          
+
           # Post-deployment validation with health checks
           echo "🔍 Post-deployment validation..."
-          
+
           # Run comprehensive health checks
           if ! . ./scripts/health-check-comprehensive.sh; then
             echo "❌ Health checks failed"
@@ -422,7 +549,7 @@ jobs:
             fi
             exit 1
           fi
-          
+
           # Performance validation for canary deployments
           if [ "$DEPLOYMENT_STRATEGY" = "canary" ]; then
             echo "📈 Validating canary performance..."
@@ -435,11 +562,11 @@ jobs:
               exit 1
             fi
           fi
-          
+
           echo "✅ GKE deployment completed successfully"
-          echo "🌐 Application URL: ${{ secrets.GKE_ENVIRONMENT_URL }}"
+          echo "🌐 Application URL: ${{ env.GKE_ENVIRONMENT_URL || secrets.GKE_ENVIRONMENT_URL }}"
           echo "📊 Deployment strategy: $DEPLOYMENT_STRATEGY"
-          
+
           # Store deployment metadata
           echo "status=success" >> $GITHUB_OUTPUT
           echo "strategy=$DEPLOYMENT_STRATEGY" >> $GITHUB_OUTPUT
@@ -454,45 +581,83 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Load GCP environment
+        run: |
+          # Load GCP variables from .env if available
+          if [[ -f ".env" ]]; then
+            echo "ℹ️ Loading GCP configuration from .env"
+            GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_CLUSTER_NAME=$(grep "^GKE_CLUSTER_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_ZONE=$(grep "^GKE_ZONE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_NAMESPACE=$(grep "^GKE_NAMESPACE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_SERVICE_NAME=$(grep "^GKE_SERVICE_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GCP_SERVICE_ACCOUNT_KEY=$(grep "^GCP_SERVICE_ACCOUNT_KEY=" .env | cut -d'=' -f2- | sed 's/^'\''//;s/'\''$//' || echo "")
+            
+            if [[ -n "$GCP_PROJECT_ID" ]]; then
+              echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_CLUSTER_NAME" ]]; then
+              echo "GKE_CLUSTER_NAME=${GKE_CLUSTER_NAME}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_ZONE" ]]; then
+              echo "GKE_ZONE=${GKE_ZONE}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_NAMESPACE" ]]; then
+              echo "GKE_NAMESPACE=${GKE_NAMESPACE}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_SERVICE_NAME" ]]; then
+              echo "GKE_SERVICE_NAME=${GKE_SERVICE_NAME}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GCP_SERVICE_ACCOUNT_KEY" ]]; then
+              echo "GCP_SERVICE_ACCOUNT_KEY=${GCP_SERVICE_ACCOUNT_KEY}" >> $GITHUB_ENV
+            fi
+          fi
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          universe: googleapis.com
+          cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Get GKE credentials
         run: |
-          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} \
-            --zone ${{ secrets.GKE_ZONE }} \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud container clusters get-credentials ${{ env.GKE_CLUSTER_NAME || secrets.GKE_CLUSTER_NAME }} \
+            --zone ${{ env.GKE_ZONE || secrets.GKE_ZONE }} \
+            --project ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
 
       - name: Run health checks
         env:
-          GKE_SERVICE_NAME: ${{ secrets.GKE_SERVICE_NAME }}
+          GKE_SERVICE_NAME: ${{ env.GKE_SERVICE_NAME || secrets.GKE_SERVICE_NAME }}
+          GKE_ENVIRONMENT_URL: ${{ env.GKE_ENVIRONMENT_URL || secrets.GKE_ENVIRONMENT_URL }}
         run: |
           echo "🏥 Running GKE health checks..."
-          
+
           # Check deployment health
           echo "📊 Deployment status:"
           kubectl get deployment pixelated -o wide
-          
+
           # Check pod health
           echo "🔍 Pod health:"
           kubectl get pods -l app=pixelated -o wide
-          
+
           # Check service status
           echo "🌐 Service status:"
           kubectl get service $GKE_SERVICE_NAME
-          
+
           # Detailed health check
           READY_PODS=$(kubectl get pods -l app=pixelated -o json | jq '[.items[] | select(.status.phase == "Running" and (.status.containerStatuses[]?.ready // false))] | length')
           TOTAL_PODS=$(kubectl get pods -l app=pixelated -o json | jq '.items | length')
-          
+
           echo "📈 Health summary: $READY_PODS/$TOTAL_PODS pods ready"
-          
+
           if [ "$READY_PODS" -eq 0 ]; then
             echo "❌ No healthy pods found"
             kubectl describe pods -l app=pixelated
@@ -503,17 +668,17 @@ jobs:
           else
             echo "✅ All pods are healthy"
           fi
-          
+
           # Test internal connectivity if possible
-          if [ -n "${{ secrets.GKE_ENVIRONMENT_URL }}" ]; then
+          if [ -n "$GKE_ENVIRONMENT_URL" ]; then
             echo "🌐 Testing external connectivity..."
-            if curl -f --connect-timeout 10 --max-time 30 "${{ secrets.GKE_ENVIRONMENT_URL }}/api/health" >/dev/null 2>&1; then
+            if curl -f --connect-timeout 10 --max-time 30 "$GKE_ENVIRONMENT_URL/api/health" >/dev/null 2>&1; then
               echo "✅ External health check passed"
             else
               echo "⚠️ External health check failed"
             fi
           fi
-          
+
           echo "✅ GKE health check completed"
 
   # Cleanup job - runs after deployments
@@ -526,11 +691,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Load GCP environment
+        run: |
+          # Load GCP variables from .env if available
+          if [[ -f ".env" ]]; then
+            echo "ℹ️ Loading GCP configuration from .env"
+            GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_CLUSTER_NAME=$(grep "^GKE_CLUSTER_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GKE_ZONE=$(grep "^GKE_ZONE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
+            GCP_SERVICE_ACCOUNT_KEY=$(grep "^GCP_SERVICE_ACCOUNT_KEY=" .env | cut -d'=' -f2- | sed 's/^'\''//;s/'\''$//' || echo "")
+            
+            if [[ -n "$GCP_PROJECT_ID" ]]; then
+              echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_CLUSTER_NAME" ]]; then
+              echo "GKE_CLUSTER_NAME=${GKE_CLUSTER_NAME}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GKE_ZONE" ]]; then
+              echo "GKE_ZONE=${GKE_ZONE}" >> $GITHUB_ENV
+            fi
+            if [[ -n "$GCP_SERVICE_ACCOUNT_KEY" ]]; then
+              echo "GCP_SERVICE_ACCOUNT_KEY=${GCP_SERVICE_ACCOUNT_KEY}" >> $GITHUB_ENV
+            fi
+          fi
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          universe: googleapis.com
+          cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -544,23 +738,23 @@ jobs:
 
       - name: Cleanup old images
         env:
-          KEEP_IMAGES: ${{ secrets.KEEP_IMAGES || '3' }}
-          CLEANUP_OLDER_THAN: ${{ secrets.CLEANUP_OLDER_THAN || '12h' }}
+          KEEP_IMAGES: ${{ env.KEEP_IMAGES || secrets.KEEP_IMAGES || '3' }}
+          CLEANUP_OLDER_THAN: ${{ env.CLEANUP_OLDER_THAN || secrets.CLEANUP_OLDER_THAN || '12h' }}
         run: |
           echo "🧹 Starting optimized cleanup process..."
           echo "📋 Configuration:"
           echo "  - Keep last $KEEP_IMAGES images"
           echo "  - Cleanup images older than $CLEANUP_OLDER_THAN"
-          
+
           # Get list of images sorted by creation date (newest first)
           IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
             grep ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} | \
             head -20 | \
             sort -k2 -r)
-          
+
           IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
           echo "📊 Found $IMAGE_COUNT images for ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
-          
+
           if [ $IMAGE_COUNT -gt $KEEP_IMAGES ]; then
             # Remove images beyond the keep threshold
             IMAGES_TO_REMOVE=$(echo "$IMAGES" | tail -n +$((KEEP_IMAGES + 1)) | awk '{print $1}')
@@ -573,5 +767,5 @@ jobs:
           else
             echo "✅ Image count within retention policy"
           fi
-          
+
           echo "📊 Cleanup completed successfully"

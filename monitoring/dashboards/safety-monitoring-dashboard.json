@@ -1,0 +1,35 @@
+{
+  "title": "Pixel Safety Monitoring",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total Safety Events",
+      "targets": [{ "expr": "sum(pixel_events_total)" }],
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+    },
+    {
+      "type": "bargauge",
+      "title": "Events by Category",
+      "targets": [
+        { "expr": "sum by (category) (pixel_gate_violations)" },
+        { "expr": "sum by (category) (pixel_invalidations)" },
+        { "expr": "sum by (category) (pixel_pii)" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 6, "y": 0 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Severity Counters",
+      "targets": [
+        { "expr": "pixel_severity_info" },
+        { "expr": "pixel_severity_warning" },
+        { "expr": "pixel_severity_error" },
+        { "expr": "pixel_severity_critical" }
+      ],
+      "gridPos": { "h": 8, "w": 18, "x": 0, "y": 8 }
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}

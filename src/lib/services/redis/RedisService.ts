@@ -307,7 +307,8 @@ export class RedisService extends EventEmitter implements IRedisService {
           return []
         }
         const sorted = Array.from(zset.entries()).sort((a, b) => a[1] - b[1])
-        const slice = stop === -1 ? sorted.slice(start) : sorted.slice(start, stop + 1)
+        const slice =
+          stop === -1 ? sorted.slice(start) : sorted.slice(start, stop + 1)
 
         if (withScores === 'WITHSCORES') {
           return slice.flatMap(([member, score]) => [{ value: member, score }])

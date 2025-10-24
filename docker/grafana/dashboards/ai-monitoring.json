@@ -549,11 +549,7 @@
   "refresh": "30s",
   "schemaVersion": 27,
   "style": "dark",
-  "tags": [
-    "ai",
-    "monitoring",
-    "performance"
-  ],
+  "tags": ["ai", "monitoring", "performance"],
   "templating": {
     "list": []
   },

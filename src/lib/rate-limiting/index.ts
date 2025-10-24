@@ -16,7 +16,7 @@ export { RateLimitAnalytics, rateLimitAnalytics } from './analytics'
 export {
   createRateLimitMiddleware,
   createBetterAuthRateLimitMiddleware,
-  createComprehensiveRateLimitMiddleware
+  createComprehensiveRateLimitMiddleware,
 } from './middleware'
 
 export {
@@ -28,7 +28,7 @@ export {
   defaultWebSocketConfig,
   getEnvironmentConfig,
   getConfigFromEnv,
-  getMergedConfig
+  getMergedConfig,
 } from './config'
 
 export type {
@@ -47,33 +47,35 @@ export type {
   BetterAuthRateLimitConfig,
   WebSocketRateLimitConfig,
   RateLimitAlert,
-  RateLimitMonitor
+  RateLimitMonitor,
 } from './types'
 
 /**
  * Quick setup function for comprehensive rate limiting
  */
-export function setupRateLimiting(options: {
-  /** Enable all features */
-  comprehensive?: boolean
-  /** Enable Better-Auth integration */
-  betterAuth?: boolean
-  /** Enable DDoS protection */
-  ddosProtection?: boolean
-  /** Custom rule sets */
-  customRuleSets?: import('./types').RateLimitRuleSet[]
-  /** Custom bypass rules */
-  customBypassRules?: import('./types').RateLimitBypassRule[]
-  /** Better-Auth configuration */
-  betterAuthConfig?: import('./types').BetterAuthRateLimitConfig
-} = {}) {
+export function setupRateLimiting(
+  options: {
+    /** Enable all features */
+    comprehensive?: boolean
+    /** Enable Better-Auth integration */
+    betterAuth?: boolean
+    /** Enable DDoS protection */
+    ddosProtection?: boolean
+    /** Custom rule sets */
+    customRuleSets?: import('./types').RateLimitRuleSet[]
+    /** Custom bypass rules */
+    customBypassRules?: import('./types').RateLimitBypassRule[]
+    /** Better-Auth configuration */
+    betterAuthConfig?: import('./types').BetterAuthRateLimitConfig
+  } = {},
+) {
   const {
     comprehensive = true,
     betterAuth = true,
     ddosProtection = true,
     customRuleSets = [],
     customBypassRules = [],
-    betterAuthConfig
+    betterAuthConfig,
   } = options
 
   if (comprehensive) {
@@ -82,7 +84,7 @@ export function setupRateLimiting(options: {
       customBypassRules,
       enableDDoS: ddosProtection,
       enableBetterAuth: betterAuth,
-      betterAuthConfig
+      betterAuthConfig,
     })
   }
 
@@ -92,7 +94,7 @@ export function setupRateLimiting(options: {
 
   return createRateLimitMiddleware({
     ruleSets: customRuleSets,
-    bypassRules: customBypassRules
+    bypassRules: customBypassRules,
   })
 }
 
@@ -109,12 +111,13 @@ export async function checkRateLimitHealth(): Promise<{
   }
 }> {
   try {
-    const redisHealthy = await redis.ping() === 'PONG'
+    const redisHealthy = (await redis.ping()) === 'PONG'
 
     const analyticsHealthy = rateLimitAnalytics !== undefined
 
     const monitorCount =
-      (rateLimitAnalytics as unknown as { monitors?: unknown[] }).monitors?.length || 0
+      (rateLimitAnalytics as unknown as { monitors?: unknown[] }).monitors
+        ?.length || 0
 
     const recentAlerts = await rateLimitAnalytics.getRecentAlerts(10)
 
@@ -122,7 +125,7 @@ export async function checkRateLimitHealth(): Promise<{
       redis: redisHealthy,
       analytics: analyticsHealthy,
       monitors: monitorCount,
-      recentAlerts: recentAlerts.length
+      recentAlerts: recentAlerts.length,
     }
 
     let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
@@ -141,8 +144,8 @@ export async function checkRateLimitHealth(): Promise<{
         redis: false,
         analytics: false,
         monitors: 0,
-        recentAlerts: 0
-      }
+        recentAlerts: 0,
+      },
     }
   }
 }
@@ -160,7 +163,7 @@ export async function getRateLimitStatus(): Promise<{
 }> {
   const [analytics, health] = await Promise.all([
     rateLimitAnalytics.getRealTimeMetrics(),
-    checkRateLimitHealth()
+    checkRateLimitHealth(),
   ])
 
   return {
@@ -169,7 +172,7 @@ export async function getRateLimitStatus(): Promise<{
     monitors: (rateLimitAnalytics as unknown).monitors?.length || 0,
     recentAlerts: (await rateLimitAnalytics.getRecentAlerts(10)).length,
     analytics,
-    health
+    health,
   }
 }
 
@@ -197,5 +200,5 @@ export default {
   getMergedConfig,
 
   checkRateLimitHealth,
-  getRateLimitStatus
+  getRateLimitStatus,
 }

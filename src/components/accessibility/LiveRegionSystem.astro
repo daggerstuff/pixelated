@@ -26,7 +26,8 @@
     aria-live="polite"
     aria-atomic="true"
     class="sr-only live-region"
-  ></div>
+  >
+  </div>
 
   <!-- Alert announcements (assertive) -->
   <div
@@ -35,7 +36,8 @@
     aria-live="assertive"
     aria-atomic="true"
     class="sr-only live-region"
-  ></div>
+  >
+  </div>
 
   <!-- Log announcements (polite, not atomic) -->
   <div
@@ -43,7 +45,8 @@
     aria-live="polite"
     aria-atomic="false"
     class="sr-only live-region"
-  ></div>
+  >
+  </div>
 
   <!-- Progress announcements (polite) -->
   <div
@@ -51,7 +54,8 @@
     aria-live="polite"
     aria-atomic="true"
     class="sr-only live-region"
-  ></div>
+  >
+  </div>
 </div>
 
 <style>
@@ -128,7 +132,11 @@
     /**
      * Announce a progress update (polite)
      */
-    announceProgress: (value: string | number, max: string | number, label: string) => {
+    announceProgress: (
+      value: string | number,
+      max: string | number,
+      label: string,
+    ) => {
       const region = document.getElementById('progress-live-region')
       if (!region) return
 

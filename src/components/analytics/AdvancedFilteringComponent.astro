@@ -109,18 +109,20 @@ const {
         <div class="space-y-2">
           <Label>Emotion Types</Label>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-            {availableEmotionTypes.map((type: string) => (
-              <div class="flex items-center space-x-2">
-                <Checkbox
-                  id={`emotion-${type}`}
-                  value={type}
-                  className="emotion-type-checkbox"
-                />
-                <Label htmlFor={`emotion-${type}`} className="cursor-pointer">
-                  {type}
-                </Label>
-              </div>
-            ))}
+            {
+              availableEmotionTypes.map((type: string) => (
+                <div class="flex items-center space-x-2">
+                  <Checkbox
+                    id={`emotion-${type}`}
+                    value={type}
+                    className="emotion-type-checkbox"
+                  />
+                  <Label htmlFor={`emotion-${type}`} className="cursor-pointer">
+                    {type}
+                  </Label>
+                </div>
+              ))
+            }
           </div>
         </div>
 
@@ -133,12 +135,7 @@ const {
           </div>
           <div class="pt-2 px-2">
             <div id="intensity-range-slider-wrapper">
-              <Slider
-                data-min="0"
-                data-max="1"
-                data-start="0"
-                data-end="1"
-              />
+              <Slider data-min="0" data-max="1" data-start="0" data-end="1" />
             </div>
           </div>
         </div>
@@ -241,11 +238,7 @@ const {
           </div>
           <div class="pt-2 px-2">
             <div id="strength-slider-wrapper">
-              <Slider
-                data-min="0"
-                data-max="1"
-                data-value="0"
-              />
+              <Slider data-min="0" data-max="1" data-value="0" />
             </div>
           </div>
         </div>
@@ -259,11 +252,7 @@ const {
           </div>
           <div class="pt-2 px-2">
             <div id="confidence-slider-wrapper">
-              <Slider
-                data-min="0"
-                data-max="1"
-                data-value="0"
-              />
+              <Slider data-min="0" data-max="1" data-value="0" />
             </div>
           </div>
         </div>
@@ -317,12 +306,7 @@ const {
             </span>
           </div>
           <div class="pt-2 px-2">
-            <Slider
-              min={0}
-              max={10}
-              defaultValue={[0]}
-              step={1}
-            />
+            <Slider min={0} max={10} defaultValue={[0]} step={1} />
           </div>
         </div>
 
@@ -447,27 +431,47 @@ const {
     const customDateRange = component.querySelector('#custom-date-range')
     const startDateInput = component.querySelector('#start-date')
     const endDateInput = component.querySelector('#end-date')
-    const emotionTypeCheckboxes = component.querySelectorAll('.emotion-type-checkbox')
-    const intensityRangeSlider = component.querySelector('#intensity-range-slider')
-    const intensityRangeDisplay = component.querySelector('#intensity-range-display')
+    const emotionTypeCheckboxes = component.querySelectorAll(
+      '.emotion-type-checkbox',
+    )
+    const intensityRangeSlider = component.querySelector(
+      '#intensity-range-slider',
+    )
+    const intensityRangeDisplay = component.querySelector(
+      '#intensity-range-display',
+    )
     const valenceRangeSlider = component.querySelector('#valence-range-slider')
-    const valenceRangeDisplay = component.querySelector('#valence-range-display')
+    const valenceRangeDisplay = component.querySelector(
+      '#valence-range-display',
+    )
     const arousalRangeSlider = component.querySelector('#arousal-range-slider')
-    const arousalRangeDisplay = component.querySelector('#arousal-range-display')
-    const dominanceRangeSlider = component.querySelector('#dominance-range-slider')
-    const dominanceRangeDisplay = component.querySelector('#dominance-range-display')
-    const patternTypeCheckboxes = component.querySelectorAll('.pattern-type-checkbox')
+    const arousalRangeDisplay = component.querySelector(
+      '#arousal-range-display',
+    )
+    const dominanceRangeSlider = component.querySelector(
+      '#dominance-range-slider',
+    )
+    const dominanceRangeDisplay = component.querySelector(
+      '#dominance-range-display',
+    )
+    const patternTypeCheckboxes = component.querySelectorAll(
+      '.pattern-type-checkbox',
+    )
     const strengthSlider = component.querySelector('#strength-slider')
     const strengthDisplay = component.querySelector('#strength-display')
     const confidenceSlider = component.querySelector('#confidence-slider')
     const confidenceDisplay = component.querySelector('#confidence-display')
-    const patternCategoryCheckboxes = component.querySelectorAll('.pattern-category-checkbox')
+    const patternCategoryCheckboxes = component.querySelectorAll(
+      '.pattern-category-checkbox',
+    )
     const groupBySelect = component.querySelector('#group-by-select')
     const smoothingSlider = component.querySelector('#smoothing-slider')
     const smoothingDisplay = component.querySelector('#smoothing-display')
     const showRawDataSwitch = component.querySelector('#show-raw-data')
     const showTrendlinesSwitch = component.querySelector('#show-trendlines')
-    const showConfidenceIntervalsSwitch = component.querySelector('#show-confidence-intervals')
+    const showConfidenceIntervalsSwitch = component.querySelector(
+      '#show-confidence-intervals',
+    )
     const showAnnotationsSwitch = component.querySelector('#show-annotations')
     const resetButton = component.querySelector('#reset-filters')
     const applyButton = component.querySelector('#apply-filters')
@@ -477,7 +481,7 @@ const {
       if (button instanceof HTMLElement) {
         button.addEventListener('click', (_event) => {
           const tab = button.getAttribute('data-tab')
-    
+
           // Update active tab button
           tabButtons.forEach((btn) => {
             if (btn instanceof HTMLElement) {
@@ -487,7 +491,7 @@ const {
           })
           button.classList.remove('border-transparent')
           button.classList.add('border-primary')
-    
+
           // Show active section
           filterSections.forEach((section) => {
             if (section.getAttribute('data-section') === tab) {
@@ -502,50 +506,49 @@ const {
 
     // Time range select
     if (timeRangeSelect instanceof HTMLElement) {
-      timeRangeSelect.addEventListener(
-        'valueChange',
-        (e: Event) => {
-          const event = e as CustomEvent<{ value: string }>
-          const value = event.detail?.value || (event.detail as any)
-          options.timeRange.presetRange = value
-    
-          if (value === 'custom') {
-            if (customDateRange instanceof HTMLElement) customDateRange.classList.remove('hidden')
-          } else {
-            if (customDateRange instanceof HTMLElement) customDateRange.classList.add('hidden')
-    
-            // Calculate dates based on preset
-            const today = new Date()
-            let startDate: Date | undefined
-    
-            switch (value) {
-              case 'day':
-                startDate = new Date(today)
-                startDate.setDate(today.getDate() - 1)
-                break
-              case 'week':
-                startDate = new Date(today)
-                startDate.setDate(today.getDate() - 7)
-                break
-              case 'month':
-                startDate = new Date(today)
-                startDate.setMonth(today.getMonth() - 1)
-                break
-              case 'quarter':
-                startDate = new Date(today)
-                startDate.setMonth(today.getMonth() - 3)
-                break
-              case 'year':
-                startDate = new Date(today)
-                startDate.setFullYear(today.getFullYear() - 1)
-                break
-            }
-    
-            options.timeRange.startDate = startDate ?? undefined
-            options.timeRange.endDate = today
+      timeRangeSelect.addEventListener('valueChange', (e: Event) => {
+        const event = e as CustomEvent<{ value: string }>
+        const value = event.detail?.value || (event.detail as any)
+        options.timeRange.presetRange = value
+
+        if (value === 'custom') {
+          if (customDateRange instanceof HTMLElement)
+            customDateRange.classList.remove('hidden')
+        } else {
+          if (customDateRange instanceof HTMLElement)
+            customDateRange.classList.add('hidden')
+
+          // Calculate dates based on preset
+          const today = new Date()
+          let startDate: Date | undefined
+
+          switch (value) {
+            case 'day':
+              startDate = new Date(today)
+              startDate.setDate(today.getDate() - 1)
+              break
+            case 'week':
+              startDate = new Date(today)
+              startDate.setDate(today.getDate() - 7)
+              break
+            case 'month':
+              startDate = new Date(today)
+              startDate.setMonth(today.getMonth() - 1)
+              break
+            case 'quarter':
+              startDate = new Date(today)
+              startDate.setMonth(today.getMonth() - 3)
+              break
+            case 'year':
+              startDate = new Date(today)
+              startDate.setFullYear(today.getFullYear() - 1)
+              break
           }
-        },
-      )
+
+          options.timeRange.startDate = startDate ?? undefined
+          options.timeRange.endDate = today
+        }
+      })
     }
 
     // Date inputs
@@ -577,7 +580,10 @@ const {
       )
     }
 
-    if (valenceRangeSlider instanceof HTMLElement && valenceRangeDisplay instanceof HTMLElement) {
+    if (
+      valenceRangeSlider instanceof HTMLElement &&
+      valenceRangeDisplay instanceof HTMLElement
+    ) {
       initializeSlider(
         valenceRangeSlider,
         valenceRangeDisplay,
@@ -585,7 +591,11 @@ const {
           if (values.length === 2 && values[0] != null && values[1] != null) {
             const [min, max] = values
             if (!options.emotions.dimensionalRanges) {
-              options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
+              options.emotions.dimensionalRanges = {
+                valence: undefined,
+                arousal: undefined,
+                dominance: undefined,
+              }
             }
             options.emotions.dimensionalRanges.valence = [min, max]
             valenceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
@@ -594,7 +604,10 @@ const {
       )
     }
 
-    if (arousalRangeSlider instanceof HTMLElement && arousalRangeDisplay instanceof HTMLElement) {
+    if (
+      arousalRangeSlider instanceof HTMLElement &&
+      arousalRangeDisplay instanceof HTMLElement
+    ) {
       initializeSlider(
         arousalRangeSlider,
         arousalRangeDisplay,
@@ -602,7 +615,11 @@ const {
           if (values.length === 2 && values[0] != null && values[1] != null) {
             const [min, max] = values
             if (!options.emotions.dimensionalRanges) {
-              options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
+              options.emotions.dimensionalRanges = {
+                valence: undefined,
+                arousal: undefined,
+                dominance: undefined,
+              }
             }
             options.emotions.dimensionalRanges.arousal = [min, max]
             arousalRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
@@ -611,7 +628,10 @@ const {
       )
     }
 
-    if (dominanceRangeSlider instanceof HTMLElement && dominanceRangeDisplay instanceof HTMLElement) {
+    if (
+      dominanceRangeSlider instanceof HTMLElement &&
+      dominanceRangeDisplay instanceof HTMLElement
+    ) {
       initializeSlider(
         dominanceRangeSlider,
         dominanceRangeDisplay,
@@ -619,7 +639,11 @@ const {
           if (values.length === 2 && values[0] != null && values[1] != null) {
             const [min, max] = values
             if (!options.emotions.dimensionalRanges) {
-              options.emotions.dimensionalRanges = { valence: undefined, arousal: undefined, dominance: undefined }
+              options.emotions.dimensionalRanges = {
+                valence: undefined,
+                arousal: undefined,
+                dominance: undefined,
+              }
             }
             options.emotions.dimensionalRanges.dominance = [min, max]
             dominanceRangeDisplay.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`
@@ -628,7 +652,10 @@ const {
       )
     }
 
-    if (strengthSlider instanceof HTMLElement && strengthDisplay instanceof HTMLElement) {
+    if (
+      strengthSlider instanceof HTMLElement &&
+      strengthDisplay instanceof HTMLElement
+    ) {
       initializeSlider(
         strengthSlider,
         strengthDisplay,
@@ -643,7 +670,10 @@ const {
       )
     }
 
-    if (confidenceSlider instanceof HTMLElement && confidenceDisplay instanceof HTMLElement) {
+    if (
+      confidenceSlider instanceof HTMLElement &&
+      confidenceDisplay instanceof HTMLElement
+    ) {
       initializeSlider(
         confidenceSlider,
         confidenceDisplay,
@@ -658,7 +688,10 @@ const {
       )
     }
 
-    if (smoothingSlider instanceof HTMLElement && smoothingDisplay instanceof HTMLElement) {
+    if (
+      smoothingSlider instanceof HTMLElement &&
+      smoothingDisplay instanceof HTMLElement
+    ) {
       initializeSlider(
         smoothingSlider,
         smoothingDisplay,
@@ -734,34 +767,45 @@ const {
 
     // Group by select
     if (groupBySelect instanceof HTMLElement) {
-      groupBySelect.addEventListener(
-        'valueChange',
-        (e: Event) => {
-          const event = e as CustomEvent<{ value: string }>
-          options.visualization.groupBy = event.detail?.value || (event.detail as any)
-        },
-      )
+      groupBySelect.addEventListener('valueChange', (e: Event) => {
+        const event = e as CustomEvent<{ value: string }>
+        options.visualization.groupBy =
+          event.detail?.value || (event.detail as any)
+      })
     }
 
     // Reset button
     if (resetButton) {
       resetButton.addEventListener('click', (_event) => {
         // Reset the options object with proper types
-        options.timeRange = { presetRange: undefined, startDate: undefined, endDate: undefined }
-        options.emotions = { 
-          types: [], 
-          minIntensity: undefined, 
-          maxIntensity: undefined, 
-          dimensionalRanges: { valence: undefined, arousal: undefined, dominance: undefined } 
+        options.timeRange = {
+          presetRange: undefined,
+          startDate: undefined,
+          endDate: undefined,
         }
-        options.patterns = { types: [], minStrength: undefined, minConfidence: undefined, categories: [] }
-        options.visualization = { 
-          groupBy: undefined, 
-          smoothing: undefined, 
-          showRawData: undefined, 
-          showTrendlines: undefined, 
-          showConfidenceIntervals: undefined, 
-          showAnnotations: undefined 
+        options.emotions = {
+          types: [],
+          minIntensity: undefined,
+          maxIntensity: undefined,
+          dimensionalRanges: {
+            valence: undefined,
+            arousal: undefined,
+            dominance: undefined,
+          },
+        }
+        options.patterns = {
+          types: [],
+          minStrength: undefined,
+          minConfidence: undefined,
+          categories: [],
+        }
+        options.visualization = {
+          groupBy: undefined,
+          smoothing: undefined,
+          showRawData: undefined,
+          showTrendlines: undefined,
+          showConfidenceIntervals: undefined,
+          showAnnotations: undefined,
         }
 
         // Reset UI elements
@@ -837,7 +881,7 @@ const {
 
       // Type-safe property access
       const categoryObj = options[category] as any
-      
+
       // Ensure the property exists and is an array
       if (!Array.isArray(categoryObj[key])) {
         categoryObj[key] = []

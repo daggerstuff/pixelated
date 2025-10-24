@@ -1,6 +1,6 @@
 /**
  * Analytics Dashboard API Endpoint
- * 
+ *
  * Production-grade API endpoint for serving analytics dashboard data
  * with proper error handling, validation, and HIPAA compliance.
  */
@@ -33,7 +33,10 @@ function validateFilters(filters: unknown): AnalyticsFilters {
     throw new Error('Invalid filters object')
   }
 
-  const { timeRange, userSegment, skillCategory } = filters as Record<string, unknown>
+  const { timeRange, userSegment, skillCategory } = filters as Record<
+    string,
+    unknown
+  >
 
   // Validate timeRange
   if (!timeRange || !['7d', '30d', '90d', '1y'].includes(timeRange as string)) {
@@ -41,19 +44,34 @@ function validateFilters(filters: unknown): AnalyticsFilters {
   }
 
   // Validate userSegment (optional)
-  if (userSegment && !['all', 'new', 'returning'].includes(userSegment as string)) {
+  if (
+    userSegment &&
+    !['all', 'new', 'returning'].includes(userSegment as string)
+  ) {
     throw new Error('Invalid userSegment. Must be one of: all, new, returning')
   }
 
   // Validate skillCategory (optional)
-  if (skillCategory && !['all', 'therapeutic', 'technical', 'interpersonal'].includes(skillCategory as string)) {
-    throw new Error('Invalid skillCategory. Must be one of: all, therapeutic, technical, interpersonal')
+  if (
+    skillCategory &&
+    !['all', 'therapeutic', 'technical', 'interpersonal'].includes(
+      skillCategory as string,
+    )
+  ) {
+    throw new Error(
+      'Invalid skillCategory. Must be one of: all, therapeutic, technical, interpersonal',
+    )
   }
 
   return {
     timeRange: timeRange as '7d' | '30d' | '90d' | '1y',
     userSegment: (userSegment as 'all' | 'new' | 'returning') || 'all',
-    skillCategory: (skillCategory as 'all' | 'therapeutic' | 'technical' | 'interpersonal') || 'all',
+    skillCategory:
+      (skillCategory as
+        | 'all'
+        | 'therapeutic'
+        | 'technical'
+        | 'interpersonal') || 'all',
   }
 }
 
@@ -73,7 +91,10 @@ function getTimeRangeInMs(timeRange: string): number {
 /**
  * Aggregate session data from events
  */
-function aggregateSessionData(events: Event[], timeRange: string): SessionData[] {
+function aggregateSessionData(
+  events: Event[],
+  timeRange: string,
+): SessionData[] {
   const daysMapping = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 } as const
   const daysCount = daysMapping[timeRange as keyof typeof daysMapping] ?? 7
   const groupedData = new Map<string, SessionData>()
@@ -94,7 +115,7 @@ function aggregateSessionData(events: Event[], timeRange: string): SessionData[]
   }
 
   // Aggregate events by date
-  events.forEach(event => {
+  events.forEach((event) => {
     const date = new Date(event.timestamp).toISOString().split('T')[0]
     if (date) {
       const existing = groupedData.get(date)
@@ -107,7 +128,8 @@ function aggregateSessionData(events: Event[], timeRange: string): SessionData[]
           existing.returningUsers = (existing.returningUsers || 0) + 1
         }
         if (typeof event.properties?.['duration'] === 'number') {
-          existing.averageDuration = ((existing.averageDuration || 0) + event.properties['duration']) / 2
+          existing.averageDuration =
+            ((existing.averageDuration || 0) + event.properties['duration']) / 2
         }
       }
     }
@@ -119,7 +141,9 @@ function aggregateSessionData(events: Event[], timeRange: string): SessionData[]
 /**
  * Process skill progress data
  */
-function processSkillProgress(metrics: Record<string, Metric[]>): SkillProgressData[] {
+function processSkillProgress(
+  metrics: Record<string, Metric[]>,
+): SkillProgressData[] {
   const skillCategories = {
     active_listening: 'interpersonal' as const,
     empathy: 'therapeutic' as const,
@@ -129,20 +153,31 @@ function processSkillProgress(metrics: Record<string, Metric[]>): SkillProgressD
 
   return Object.entries(metrics).map(([skillName, skillMetrics]) => {
     const currentScore = skillMetrics[skillMetrics.length - 1]?.value || 0
-    const previousScore = skillMetrics.length > 1 ? skillMetrics[skillMetrics.length - 2]?.value : currentScore
+    const previousScore =
+      skillMetrics.length > 1
+        ? skillMetrics[skillMetrics.length - 2]?.value
+        : currentScore
 
-    const trend = (previousScore !== undefined) ? 
-      (currentScore > previousScore ? 'up' : currentScore < previousScore ? 'down' : 'stable') : 
-      'stable'
+    const trend =
+      previousScore !== undefined
+        ? currentScore > previousScore
+          ? 'up'
+          : currentScore < previousScore
+            ? 'down'
+            : 'stable'
+        : 'stable'
 
     return {
-      skill: skillName.split('_').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' '),
+      skill: skillName
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' '),
       score: Math.round(currentScore),
       previousScore: Math.round(previousScore ?? currentScore),
       trend,
-      category: skillCategories[skillName as keyof typeof skillCategories] || 'technical',
+      category:
+        skillCategories[skillName as keyof typeof skillCategories] ||
+        'technical',
     }
   })
 }
@@ -153,8 +188,11 @@ function processSkillProgress(metrics: Record<string, Metric[]>): SkillProgressD
 async function calculateTrend(
   analyticsService: AnalyticsService,
   metricName: string,
-  timeRange: string
-): Promise<{ value: number; direction: 'up' | 'down' | 'stable'; period: string } | undefined> {
+  timeRange: string,
+): Promise<
+  | { value: number; direction: 'up' | 'down' | 'stable'; period: string }
+  | undefined
+> {
   try {
     const currentPeriod = getTimeRangeInMs(timeRange)
     const endTime = Date.now()
@@ -176,7 +214,7 @@ async function calculateTrend(
 
     const currentValue = current.reduce((sum, m) => sum + m.value, 0)
     const previousValue = previous.reduce((sum, m) => sum + m.value, 0)
-    
+
     if (previousValue === 0) {
       return undefined
     }
@@ -185,7 +223,8 @@ async function calculateTrend(
 
     return {
       value: Math.abs(Math.round(changePercent)),
-      direction: changePercent > 0 ? 'up' : changePercent < 0 ? 'down' : 'stable',
+      direction:
+        changePercent > 0 ? 'up' : changePercent < 0 ? 'down' : 'stable',
       period: `vs previous ${timeRange}`,
     }
   } catch (error: unknown) {
@@ -203,17 +242,17 @@ async function calculateTrend(
  */
 export const POST = async ({ request }) => {
   const startTime = Date.now()
-  
+
   try {
     // Parse and validate request body
     const body = await request.json()
     const filters = validateFilters(body)
-    
+
     logger.info('Processing analytics dashboard request', { filters })
-    
+
     // Initialize analytics service
     const analyticsService = new AnalyticsService()
-    
+
     // Calculate time range
     const timeRangeMs = getTimeRangeInMs(filters.timeRange)
     const endTime = Date.now()
@@ -227,53 +266,105 @@ export const POST = async ({ request }) => {
         startTime: startTimeQuery,
         endTime,
       }),
-      
+
       // Skill metrics
       Promise.all([
-        analyticsService.getMetrics({ name: 'active_listening', startTime: startTimeQuery, endTime }),
-        analyticsService.getMetrics({ name: 'empathy', startTime: startTimeQuery, endTime }),
-        analyticsService.getMetrics({ name: 'cbt_techniques', startTime: startTimeQuery, endTime }),
-        analyticsService.getMetrics({ name: 'crisis_management', startTime: startTimeQuery, endTime }),
-      ]).then(results => ({
+        analyticsService.getMetrics({
+          name: 'active_listening',
+          startTime: startTimeQuery,
+          endTime,
+        }),
+        analyticsService.getMetrics({
+          name: 'empathy',
+          startTime: startTimeQuery,
+          endTime,
+        }),
+        analyticsService.getMetrics({
+          name: 'cbt_techniques',
+          startTime: startTimeQuery,
+          endTime,
+        }),
+        analyticsService.getMetrics({
+          name: 'crisis_management',
+          startTime: startTimeQuery,
+          endTime,
+        }),
+      ]).then((results) => ({
         active_listening: results[0],
         empathy: results[1],
         cbt_techniques: results[2],
         crisis_management: results[3],
       })),
-      
+
       // Summary metrics
       Promise.all([
-        analyticsService.getMetrics({ name: 'total_sessions', startTime: startTimeQuery, endTime }),
-        analyticsService.getMetrics({ name: 'completion_rate', startTime: startTimeQuery, endTime }),
-        analyticsService.getMetrics({ name: 'average_rating', startTime: startTimeQuery, endTime }),
+        analyticsService.getMetrics({
+          name: 'total_sessions',
+          startTime: startTimeQuery,
+          endTime,
+        }),
+        analyticsService.getMetrics({
+          name: 'completion_rate',
+          startTime: startTimeQuery,
+          endTime,
+        }),
+        analyticsService.getMetrics({
+          name: 'average_rating',
+          startTime: startTimeQuery,
+          endTime,
+        }),
       ]),
     ])
 
     // Process the data
-    const sessionMetrics = aggregateSessionData(sessionEvents, filters.timeRange)
+    const sessionMetrics = aggregateSessionData(
+      sessionEvents,
+      filters.timeRange,
+    )
     const skillProgress = processSkillProgress(skillMetrics)
 
     // Calculate summary statistics with trends
     const [sessionCount, completionRate, avgRating] = summaryMetrics
-    
+
     const summaryStats: MetricSummary[] = [
       {
         value: sessionCount.reduce((sum, m) => sum + m.value, 0),
         label: 'Total Sessions',
         color: 'blue',
-        trend: await calculateTrend(analyticsService, 'total_sessions', filters.timeRange),
+        trend: await calculateTrend(
+          analyticsService,
+          'total_sessions',
+          filters.timeRange,
+        ),
       },
       {
-        value: Math.round((completionRate.reduce((sum, m) => sum + m.value, 0) / Math.max(completionRate.length, 1)) * 100),
+        value: Math.round(
+          (completionRate.reduce((sum, m) => sum + m.value, 0) /
+            Math.max(completionRate.length, 1)) *
+            100,
+        ),
         label: 'Completion Rate (%)',
         color: 'green',
-        trend: await calculateTrend(analyticsService, 'completion_rate', filters.timeRange),
+        trend: await calculateTrend(
+          analyticsService,
+          'completion_rate',
+          filters.timeRange,
+        ),
       },
       {
-        value: Math.round((avgRating.reduce((sum, m) => sum + m.value, 0) / Math.max(avgRating.length, 1)) * 10) / 10,
+        value:
+          Math.round(
+            (avgRating.reduce((sum, m) => sum + m.value, 0) /
+              Math.max(avgRating.length, 1)) *
+              10,
+          ) / 10,
         label: 'Avg. Rating',
         color: 'purple',
-        trend: await calculateTrend(analyticsService, 'average_rating', filters.timeRange),
+        trend: await calculateTrend(
+          analyticsService,
+          'average_rating',
+          filters.timeRange,
+        ),
       },
     ]
 
@@ -284,14 +375,14 @@ export const POST = async ({ request }) => {
     }
 
     const processingTime = Date.now() - startTime
-    logger.info('Analytics dashboard request completed', { 
-      filters, 
+    logger.info('Analytics dashboard request completed', {
+      filters,
       processingTime,
       dataPoints: {
         sessions: sessionMetrics.length,
         skills: skillProgress.length,
         summaries: summaryStats.length,
-      }
+      },
     })
 
     return new Response(JSON.stringify(responseData), {
@@ -301,14 +392,20 @@ export const POST = async ({ request }) => {
         'Cache-Control': 'private, max-age=300', // Cache for 5 minutes
       },
     })
-
   } catch (error: unknown) {
     const processingTime = Date.now() - startTime
-    logger.error('Analytics dashboard request failed', { error, processingTime })
+    logger.error('Analytics dashboard request failed', {
+      error,
+      processingTime,
+    })
 
     const apiError: ApiError = {
-      code: error instanceof Error && String(error).includes('Invalid') ? 'VALIDATION_ERROR' : 'PROCESSING_ERROR',
-      message: error instanceof Error ? String(error) : 'An unexpected error occurred',
+      code:
+        error instanceof Error && String(error).includes('Invalid')
+          ? 'VALIDATION_ERROR'
+          : 'PROCESSING_ERROR',
+      message:
+        error instanceof Error ? String(error) : 'An unexpected error occurred',
       details: {
         processingTime,
         timestamp: new Date().toISOString(),
@@ -316,7 +413,8 @@ export const POST = async ({ request }) => {
     }
 
     return new Response(JSON.stringify(apiError), {
-      status: error instanceof Error && String(error).includes('Invalid') ? 400 : 500,
+      status:
+        error instanceof Error && String(error).includes('Invalid') ? 400 : 500,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -331,14 +429,17 @@ export const POST = async ({ request }) => {
  * GET endpoint for retrieving analytics dashboard data
  */
 export const GET = async () => {
-  return new Response(JSON.stringify({ 
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0',
-  }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
+  return new Response(
+    JSON.stringify({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+    }),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     },
-  })
+  )
 }

@@ -25,7 +25,9 @@ export interface TrainingMaterials {
  * Local helper to get user by ID.
  * Replace with real implementation as needed.
  */
-async function getUserById(userId: string): Promise<{ id: string; email: string; name: string }> {
+async function getUserById(
+  userId: string,
+): Promise<{ id: string; email: string; name: string }> {
   // Mock implementation that returns definite string values
   return {
     id: userId,
@@ -83,9 +85,10 @@ export async function reportBreach(
   try {
     // Use crypto.randomUUID when available, otherwise use secure random bytes
     const cryptoLib = await import('crypto')
-    const uuidPart = typeof cryptoLib.randomUUID === 'function'
-      ? cryptoLib.randomUUID()
-      : cryptoLib.randomBytes(8).toString('hex')
+    const uuidPart =
+      typeof cryptoLib.randomUUID === 'function'
+        ? cryptoLib.randomUUID()
+        : cryptoLib.randomBytes(8).toString('hex')
     const id = `breach_${Date.now()}_${uuidPart}`
     const breach: BreachDetails = {
       ...details,
@@ -312,7 +315,7 @@ export async function getBreachStatus(
 ): Promise<BreachDetails | null> {
   try {
     const breach = await redis.get(getBreachKey(id))
-    return breach ? JSON.parse(breach) as BreachDetails : null
+    return breach ? (JSON.parse(breach) as BreachDetails) : null
   } catch (error: unknown) {
     logger.error('Failed to get breach status:', error)
     throw error
@@ -331,7 +334,10 @@ export async function listRecentBreaches(): Promise<BreachDetails[]> {
 
     return breaches
       .filter((item): item is BreachDetails => Boolean(item))
-      .sort((a, b) => (b as BreachDetails).timestamp - (a as BreachDetails).timestamp)
+      .sort(
+        (a, b) =>
+          (b as BreachDetails).timestamp - (a as BreachDetails).timestamp,
+      )
   } catch (error: unknown) {
     logger.error('Failed to list recent breaches:', error)
     throw error
@@ -545,4 +551,4 @@ export const BreachNotificationSystem = {
   runTestScenario,
   updateMetrics,
   getTrainingMaterials,
-};
+}

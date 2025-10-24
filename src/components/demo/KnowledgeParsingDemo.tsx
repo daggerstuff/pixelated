@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
+import {
   Loader2,
   Brain,
   Tag,
@@ -15,9 +15,8 @@ import {
   AlertTriangle,
   BarChart3,
   Download,
-  History
+  History,
 } from 'lucide-react'
-
 
 interface Entity {
   text: string
@@ -77,18 +76,24 @@ export default function KnowledgeParsingDemo() {
   const realTimeTimeout = useRef<NodeJS.Timeout | null>(null)
 
   // Save to history
-  const saveToHistory = useCallback((text: string, result: AnalysisResults, processingTime: number) => {
-    const historyItem: AnalysisHistory = {
-      id: Date.now().toString(),
-      text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-      result,
-      timestamp: Date.now(),
-      processingTime
-    }
-    const newHistory = [historyItem, ...analysisHistory.slice(0, 9)] // Keep last 10
-    setAnalysisHistory(newHistory)
-    localStorage.setItem('knowledgeParsingHistory', JSON.stringify(newHistory))
-  }, [analysisHistory])
+  const saveToHistory = useCallback(
+    (text: string, result: AnalysisResults, processingTime: number) => {
+      const historyItem: AnalysisHistory = {
+        id: Date.now().toString(),
+        text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+        result,
+        timestamp: Date.now(),
+        processingTime,
+      }
+      const newHistory = [historyItem, ...analysisHistory.slice(0, 9)] // Keep last 10
+      setAnalysisHistory(newHistory)
+      localStorage.setItem(
+        'knowledgeParsingHistory',
+        JSON.stringify(newHistory),
+      )
+    },
+    [analysisHistory],
+  )
 
   const analyze = useCallback(async () => {
     if (!inputText.trim()) {
@@ -118,9 +123,9 @@ export default function KnowledgeParsingDemo() {
             identifyFrameworks: true,
             includeConfidence: true,
             includeSuggestions: true,
-            includeMetadata: true
-          }
-        })
+            includeMetadata: true,
+          },
+        }),
       })
 
       if (!response.ok) {
@@ -140,24 +145,34 @@ export default function KnowledgeParsingDemo() {
           processingTime: requestTime,
           wordCount: inputText.split(/\s+/).length,
           sentenceCount: inputText.split(/[.!?]+/).length - 1,
-          complexity: Math.min(100, inputText.split(/\s+/).length / 10 * 15),
-          readabilityScore: Math.max(0, 100 - inputText.split(/\s+/).length / 20 * 10)
-        }
+          complexity: Math.min(100, (inputText.split(/\s+/).length / 10) * 15),
+          readabilityScore: Math.max(
+            0,
+            100 - (inputText.split(/\s+/).length / 20) * 10,
+          ),
+        },
       }
 
       setResults(enhancedResults)
-      
+
       // Calculate overall confidence
-      const avgConfidence = enhancedResults.entities.reduce((acc, entity) => acc + entity.confidence, 0) / enhancedResults.entities.length || 0
+      const avgConfidence =
+        enhancedResults.entities.reduce(
+          (acc, entity) => acc + entity.confidence,
+          0,
+        ) / enhancedResults.entities.length || 0
       setConfidence(avgConfidence * 100)
 
       // Save to history
       saveToHistory(inputText, enhancedResults, requestTime)
-
     } catch (err: unknown) {
       console.error('Analysis failed:', err)
-      setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Analysis failed. Please try again.')
-      
+      setError(
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'Analysis failed. Please try again.',
+      )
+
       // Fallback to demo data for demonstration
       const demoResults: AnalysisResults = {
         entities: [
@@ -180,8 +195,8 @@ export default function KnowledgeParsingDemo() {
           wordCount: inputText.split(/\s+/).length,
           sentenceCount: inputText.split(/[.!?]+/).length - 1,
           complexity: 65,
-          readabilityScore: 78
-        }
+          readabilityScore: 78,
+        },
       }
       setResults(demoResults)
       setConfidence(88.3)
@@ -234,15 +249,17 @@ export default function KnowledgeParsingDemo() {
     if (!results) {
       return
     }
-    
+
     const exportData = {
       text: inputText,
       results,
       timestamp: new Date().toISOString(),
-      processingTime
+      processingTime,
     }
-    
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json',
+    })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -262,7 +279,9 @@ export default function KnowledgeParsingDemo() {
                 <Brain className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <CardTitle className="text-2xl">Enterprise Knowledge Parsing</CardTitle>
+                <CardTitle className="text-2xl">
+                  Enterprise Knowledge Parsing
+                </CardTitle>
                 <p className="text-gray-600 mt-1">
                   Advanced clinical text analysis with real-time monitoring
                 </p>
@@ -297,15 +316,20 @@ export default function KnowledgeParsingDemo() {
                 className="min-h-[120px] text-sm"
               />
               <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                <span>{inputText.length} characters, {inputText.split(/\s+/).filter(w => w).length} words</span>
+                <span>
+                  {inputText.length} characters,{' '}
+                  {inputText.split(/\s+/).filter((w) => w).length} words
+                </span>
                 {isRealTimeMode && inputText.length > 10 && (
-                  <span className="text-green-600">Real-time analysis active</span>
+                  <span className="text-green-600">
+                    Real-time analysis active
+                  </span>
                 )}
               </div>
             </div>
             <div className="space-y-3">
-              <Button 
-                onClick={analyze} 
+              <Button
+                onClick={analyze}
                 disabled={isAnalyzing || !inputText.trim()}
                 className="w-full"
               >
@@ -321,7 +345,7 @@ export default function KnowledgeParsingDemo() {
                   </>
                 )}
               </Button>
-              
+
               {processingTime && (
                 <div className="text-center">
                   <Badge variant="outline" className="text-xs">
@@ -391,14 +415,22 @@ export default function KnowledgeParsingDemo() {
               <CardContent>
                 <div className="grid gap-3">
                   {results.entities.map((entity) => (
-                    <div key={entity.text + entity.type} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={entity.text + entity.type}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
                         <Badge variant="outline">{entity.type}</Badge>
                         <span className="font-medium">{entity.text}</span>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-medium">{(entity.confidence * 100).toFixed(1)}%</div>
-                        <Progress value={entity.confidence * 100} className="w-20 h-2 mt-1" />
+                        <div className="text-sm font-medium">
+                          {(entity.confidence * 100).toFixed(1)}%
+                        </div>
+                        <Progress
+                          value={entity.confidence * 100}
+                          className="w-20 h-2 mt-1"
+                        />
                       </div>
                     </div>
                   ))}
@@ -418,11 +450,19 @@ export default function KnowledgeParsingDemo() {
               <CardContent>
                 <div className="grid gap-3">
                   {results.concepts.map((concept) => (
-                    <div key={concept.concept} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={concept.concept}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <span className="font-medium">{concept.concept}</span>
                       <div className="text-right">
-                        <div className="text-sm font-medium">{(concept.relevance * 100).toFixed(1)}%</div>
-                        <Progress value={concept.relevance * 100} className="w-20 h-2 mt-1" />
+                        <div className="text-sm font-medium">
+                          {(concept.relevance * 100).toFixed(1)}%
+                        </div>
+                        <Progress
+                          value={concept.relevance * 100}
+                          className="w-20 h-2 mt-1"
+                        />
                       </div>
                     </div>
                   ))}
@@ -442,14 +482,19 @@ export default function KnowledgeParsingDemo() {
               <CardContent>
                 <div className="grid gap-3">
                   {results.riskFactors.map((risk) => (
-                    <div key={risk.factor} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={risk.factor}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <span className="font-medium">{risk.factor}</span>
                       <Badge
                         variant="outline"
                         className={
-                          risk.severity === 'High' ? 'border-red-200 text-red-700 bg-red-50' :
-                          risk.severity === 'Moderate' ? 'border-yellow-200 text-yellow-700 bg-yellow-50' :
-                          'border-green-200 text-green-700 bg-green-50'
+                          risk.severity === 'High'
+                            ? 'border-red-200 text-red-700 bg-red-50'
+                            : risk.severity === 'Moderate'
+                              ? 'border-yellow-200 text-yellow-700 bg-yellow-50'
+                              : 'border-green-200 text-green-700 bg-green-50'
                         }
                       >
                         {risk.severity}
@@ -473,19 +518,29 @@ export default function KnowledgeParsingDemo() {
                 {results.insights && results.insights.length > 0 ? (
                   <div className="grid gap-3">
                     {results.insights.map((insight) => (
-                      <div key={insight.category + insight.insight} className="p-4 border rounded-lg bg-blue-50">
+                      <div
+                        key={insight.category + insight.insight}
+                        className="p-4 border rounded-lg bg-blue-50"
+                      >
                         <div className="flex items-start justify-between mb-2">
                           <Badge variant="outline">{insight.category}</Badge>
-                          <span className="text-sm text-gray-600">{(insight.confidence * 100).toFixed(1)}% confidence</span>
+                          <span className="text-sm text-gray-600">
+                            {(insight.confidence * 100).toFixed(1)}% confidence
+                          </span>
                         </div>
-                        <p className="text-sm text-gray-700">{insight.insight}</p>
+                        <p className="text-sm text-gray-700">
+                          {insight.insight}
+                        </p>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <Brain className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>Clinical insights will appear here based on advanced analysis</p>
+                    <p>
+                      Clinical insights will appear here based on advanced
+                      analysis
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -505,24 +560,42 @@ export default function KnowledgeParsingDemo() {
                   {results.metadata && (
                     <div className="space-y-4">
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Processing Time</span>
-                        <span className="font-medium">{results.metadata.processingTime}ms</span>
+                        <span className="text-sm text-gray-600">
+                          Processing Time
+                        </span>
+                        <span className="font-medium">
+                          {results.metadata.processingTime}ms
+                        </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Word Count</span>
-                        <span className="font-medium">{results.metadata.wordCount}</span>
+                        <span className="text-sm text-gray-600">
+                          Word Count
+                        </span>
+                        <span className="font-medium">
+                          {results.metadata.wordCount}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Sentences</span>
-                        <span className="font-medium">{results.metadata.sentenceCount}</span>
+                        <span className="font-medium">
+                          {results.metadata.sentenceCount}
+                        </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Complexity Score</span>
-                        <span className="font-medium">{results.metadata.complexity.toFixed(1)}/100</span>
+                        <span className="text-sm text-gray-600">
+                          Complexity Score
+                        </span>
+                        <span className="font-medium">
+                          {results.metadata.complexity.toFixed(1)}/100
+                        </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Readability Score</span>
-                        <span className="font-medium">{results.metadata.readabilityScore.toFixed(1)}/100</span>
+                        <span className="text-sm text-gray-600">
+                          Readability Score
+                        </span>
+                        <span className="font-medium">
+                          {results.metadata.readabilityScore.toFixed(1)}/100
+                        </span>
                       </div>
                     </div>
                   )}
@@ -540,24 +613,42 @@ export default function KnowledgeParsingDemo() {
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">Analysis Confidence</span>
-                        <span className="font-medium">{confidence.toFixed(1)}%</span>
+                        <span className="text-sm text-gray-600">
+                          Analysis Confidence
+                        </span>
+                        <span className="font-medium">
+                          {confidence.toFixed(1)}%
+                        </span>
                       </div>
                       <Progress value={confidence} className="h-2" />
                     </div>
                     <div>
                       <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">Entity Detection</span>
-                        <span className="font-medium">{results.entities.length} found</span>
+                        <span className="text-sm text-gray-600">
+                          Entity Detection
+                        </span>
+                        <span className="font-medium">
+                          {results.entities.length} found
+                        </span>
                       </div>
-                      <Progress value={Math.min(100, results.entities.length * 10)} className="h-2" />
+                      <Progress
+                        value={Math.min(100, results.entities.length * 10)}
+                        className="h-2"
+                      />
                     </div>
                     <div>
                       <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">Risk Assessment</span>
-                        <span className="font-medium">{results.riskFactors.length} factors</span>
+                        <span className="text-sm text-gray-600">
+                          Risk Assessment
+                        </span>
+                        <span className="font-medium">
+                          {results.riskFactors.length} factors
+                        </span>
                       </div>
-                      <Progress value={Math.min(100, results.riskFactors.length * 15)} className="h-2" />
+                      <Progress
+                        value={Math.min(100, results.riskFactors.length * 15)}
+                        className="h-2"
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -590,9 +681,12 @@ export default function KnowledgeParsingDemo() {
                   onClick={() => loadFromHistory(item)}
                 >
                   <div>
-                    <p className="text-sm font-medium truncate max-w-md">{item.text}</p>
+                    <p className="text-sm font-medium truncate max-w-md">
+                      {item.text}
+                    </p>
                     <p className="text-xs text-gray-500">
-                      {new Date(item.timestamp).toLocaleString()} • {item.processingTime}ms
+                      {new Date(item.timestamp).toLocaleString()} •{' '}
+                      {item.processingTime}ms
                     </p>
                   </div>
                   <div className="text-right">

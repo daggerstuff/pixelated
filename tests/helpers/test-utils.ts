@@ -21,7 +21,11 @@ export const TEST_PAGES: TestPageInfo[] = [
 /**
  * Navigate to a page with proper error handling
  */
-export async function navigateToPage(page: Page, url: string, options: { timeout?: number } = {}) {
+export async function navigateToPage(
+  page: Page,
+  url: string,
+  options: { timeout?: number } = {},
+) {
   const { timeout = 30000 } = options
 
   try {
@@ -33,7 +37,9 @@ export async function navigateToPage(page: Page, url: string, options: { timeout
     }
 
     if (!response || !response.ok()) {
-      throw new Error(`Navigation failed: ${response ? response.status() : 'No response'}`)
+      throw new Error(
+        `Navigation failed: ${response ? response.status() : 'No response'}`,
+      )
     }
 
     return response
@@ -58,12 +64,26 @@ export async function verifyPageElements(page: Page, pageInfo: TestPageInfo) {
     await waitForPageStable(page, { timeout: 30000 })
 
     const hasLoginForm = (await page.locator('form').count()) > 0
-    const hasEmailInput = (await page.locator('input[type="email"], input#email, input[name="email"], input[aria-label*="email" i]').count()) > 0
-    const hasPasswordInput = (await page.locator('input[type="password"], input#password, input[name="password"], input[aria-label*="password" i]').count()) > 0
+    const hasEmailInput =
+      (await page
+        .locator(
+          'input[type="email"], input#email, input[name="email"], input[aria-label*="email" i]',
+        )
+        .count()) > 0
+    const hasPasswordInput =
+      (await page
+        .locator(
+          'input[type="password"], input#password, input[name="password"], input[aria-label*="password" i]',
+        )
+        .count()) > 0
 
-    const mainVisible = (await page.locator('main').count()) > 0 && (await page.locator('main').isVisible())
+    const mainVisible =
+      (await page.locator('main').count()) > 0 &&
+      (await page.locator('main').isVisible())
 
-    expect((hasLoginForm && hasEmailInput && hasPasswordInput) || mainVisible).toBeTruthy()
+    expect(
+      (hasLoginForm && hasEmailInput && hasPasswordInput) || mainVisible,
+    ).toBeTruthy()
   } else {
     await expect(page.locator('main')).toBeVisible({ timeout: 30000 })
   }
@@ -72,7 +92,11 @@ export async function verifyPageElements(page: Page, pageInfo: TestPageInfo) {
 /**
  * Check for horizontal overflow on mobile
  */
-export async function checkHorizontalOverflow(page: Page, deviceName: string, pageName: string) {
+export async function checkHorizontalOverflow(
+  page: Page,
+  deviceName: string,
+  pageName: string,
+) {
   const overflowInfo = await page.evaluate(() => {
     const bodyWidth = document.body.scrollWidth
     const viewportWidth = window.innerWidth
@@ -87,8 +111,8 @@ export async function checkHorizontalOverflow(page: Page, deviceName: string, pa
   if (overflowInfo.hasOverflow) {
     console.warn(
       `Horizontal overflow detected on ${pageName} page on ${deviceName}: ` +
-      `Body width: ${overflowInfo.bodyWidth}px, Viewport: ${overflowInfo.viewportWidth}px, ` +
-      `Overflow: ${overflowInfo.difference}px`
+        `Body width: ${overflowInfo.bodyWidth}px, Viewport: ${overflowInfo.viewportWidth}px, ` +
+        `Overflow: ${overflowInfo.difference}px`,
     )
 
     // Take screenshot for debugging
@@ -98,7 +122,9 @@ export async function checkHorizontalOverflow(page: Page, deviceName: string, pa
 
     // Only fail for significant overflow (> 50px)
     if (overflowInfo.difference > 50) {
-      throw new Error(`Significant horizontal overflow: ${overflowInfo.difference}px`)
+      throw new Error(
+        `Significant horizontal overflow: ${overflowInfo.difference}px`,
+      )
     }
   }
 
@@ -108,7 +134,10 @@ export async function checkHorizontalOverflow(page: Page, deviceName: string, pa
 /**
  * Wait for page to be fully loaded and stable
  */
-export async function waitForPageStable(page: Page, options: { timeout?: number } = {}) {
+export async function waitForPageStable(
+  page: Page,
+  options: { timeout?: number } = {},
+) {
   const { timeout = 30000 } = options
 
   // Wait for network to be idle

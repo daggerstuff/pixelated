@@ -11,7 +11,9 @@ import { listRecentBreaches } from '../security/breach-notification'
 import type { BreachDetails } from '../security/breach-notification'
 
 // Adapter function to convert BreachDetails to SecurityBreach
-function convertToSecurityBreach(breach: BreachDetails): RiskScoring.SecurityBreach {
+function convertToSecurityBreach(
+  breach: BreachDetails,
+): RiskScoring.SecurityBreach {
   return {
     id: breach.id,
     severity: breach.severity as RiskScoring.BreachSeverity,
@@ -21,25 +23,39 @@ function convertToSecurityBreach(breach: BreachDetails): RiskScoring.SecurityBre
     attackVector: breach.detectionMethod, // Use detectionMethod as attackVector
     detectionTime: new Date(breach.timestamp),
     responseTime: new Date(breach.timestamp + 3600000), // Add 1 hour default response time
-    remediationStatus: breach.notificationStatus === 'completed' ? 'completed' : 
-                      breach.notificationStatus === 'in_progress' ? 'in_progress' : 'pending',
+    remediationStatus:
+      breach.notificationStatus === 'completed'
+        ? 'completed'
+        : breach.notificationStatus === 'in_progress'
+          ? 'in_progress'
+          : 'pending',
     description: breach.description,
-    metadata: {}
+    metadata: {},
   }
 }
 
 // Adapter function to convert BreachDetails to Breach (for notifications)
-function convertToBreach(breach: BreachDetails): NotificationEffectiveness.Breach {
+function convertToBreach(
+  breach: BreachDetails,
+): NotificationEffectiveness.Breach {
   return {
     id: breach.id,
     timestamp: new Date(breach.timestamp),
     severity: {
       level: breach.severity as 'critical' | 'high' | 'medium' | 'low',
-      score: breach.severity === 'critical' ? 1.0 : 
-             breach.severity === 'high' ? 0.8 : 
-             breach.severity === 'medium' ? 0.6 : 0.4
+      score:
+        breach.severity === 'critical'
+          ? 1.0
+          : breach.severity === 'high'
+            ? 0.8
+            : breach.severity === 'medium'
+              ? 0.6
+              : 0.4,
     },
-    notificationStatus: breach.notificationStatus === 'in_progress' ? 'in-progress' : breach.notificationStatus as 'pending' | 'completed' | 'failed',
+    notificationStatus:
+      breach.notificationStatus === 'in_progress'
+        ? 'in-progress'
+        : (breach.notificationStatus as 'pending' | 'completed' | 'failed'),
     notifications: {
       total: 1,
       delivered: 1,
@@ -47,9 +63,9 @@ function convertToBreach(breach: BreachDetails): NotificationEffectiveness.Breac
       acknowledged: breach.notificationStatus === 'completed' ? 1 : 0,
       actioned: breach.notificationStatus === 'completed' ? 1 : 0,
       timeToNotify: 1,
-      timeToAcknowledge: 2
+      timeToAcknowledge: 2,
     },
-    regulatoryFrameworks: ['GDPR'] // Default regulatory framework
+    regulatoryFrameworks: ['GDPR'], // Default regulatory framework
   }
 }
 
@@ -135,11 +151,12 @@ export async function generateMetrics(
 
     // Calculate advanced metrics
     const riskScore = await RiskScoring.calculateOverallRisk(
-      filteredBreaches.map(convertToSecurityBreach)
+      filteredBreaches.map(convertToSecurityBreach),
     )
     const complianceScore = await calculateScore(filteredBreaches)
-    const notificationEffectiveness =
-      await NotificationEffectiveness.calculate(filteredBreaches.map(convertToBreach))
+    const notificationEffectiveness = await NotificationEffectiveness.calculate(
+      filteredBreaches.map(convertToBreach),
+    )
 
     return {
       ...metrics,
@@ -236,7 +253,7 @@ async function calculateTrendPoint(timestamp: Date): Promise<TrendPoint> {
   )
 
   const riskScore = await RiskScoring.calculateDailyRisk(
-    dayBreaches.map(convertToSecurityBreach)
+    dayBreaches.map(convertToSecurityBreach),
   )
 
   return {
@@ -247,7 +264,9 @@ async function calculateTrendPoint(timestamp: Date): Promise<TrendPoint> {
       0,
     ),
     notificationRate: (
-      await NotificationEffectiveness.calculateDaily(dayBreaches.map(convertToBreach))
+      await NotificationEffectiveness.calculateDaily(
+        dayBreaches.map(convertToBreach),
+      )
     ).overall,
     responseTime: await calculateAverageResponseTime(dayBreaches),
     riskScore: riskScore.overallScore,
@@ -417,17 +436,17 @@ export async function generateInsights(): Promise<SecurityInsight[]> {
 // Define interface for the analytics report
 interface BreachAnalyticsReport {
   timeframe: {
-    from: string;
-    to: string;
-  };
+    from: string
+    to: string
+  }
   metrics: BreachMetrics & {
-    encryptedData: string;
-  };
-  trends: TrendPoint[];
-  predictions: BreachPrediction[];
-  riskFactors: RiskFactor[];
-  insights: SecurityInsight[];
-  generatedAt: string;
+    encryptedData: string
+  }
+  trends: TrendPoint[]
+  predictions: BreachPrediction[]
+  riskFactors: RiskFactor[]
+  insights: SecurityInsight[]
+  generatedAt: string
 }
 
 export async function generateReport(

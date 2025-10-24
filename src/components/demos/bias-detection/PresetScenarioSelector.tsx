@@ -29,7 +29,9 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
   }, [scenarios])
 
   const riskLevels = useMemo(() => {
-    const levels = [...new Set(scenarios.map((s: PresetScenario) => s.riskLevel))]
+    const levels = [
+      ...new Set(scenarios.map((s: PresetScenario) => s.riskLevel)),
+    ]
     return levels.sort((a, b) => {
       const order = { low: 1, medium: 2, high: 3, critical: 4 }
       return order[a as keyof typeof order] - order[b as keyof typeof order]
@@ -85,7 +87,10 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Category Filter */}
           <div>
-            <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="category-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Category
             </label>
             <select
@@ -106,7 +111,10 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
 
           {/* Risk Level Filter */}
           <div>
-            <label htmlFor="risk-level-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="risk-level-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Risk Level
             </label>
             <select
@@ -145,8 +153,8 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
             onClick={() => !disabled && onScenarioSelect(scenario)}
             onKeyDown={(e) => {
               if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
-                e.preventDefault();
-                onScenarioSelect(scenario);
+                e.preventDefault()
+                onScenarioSelect(scenario)
               }
             }}
             tabIndex={disabled ? -1 : 0}
@@ -221,14 +229,12 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
                 Learning Objectives:
               </div>
               <ul className="text-xs text-gray-600 space-y-1">
-                {scenario.learningObjectives
-                  .slice(0, 2)
-                  .map((objective) => (
-                    <li key={objective} className="flex items-start">
-                      <span className="text-blue-500 mr-1">•</span>
-                      {objective}
-                    </li>
-                  ))}
+                {scenario.learningObjectives.slice(0, 2).map((objective) => (
+                  <li key={objective} className="flex items-start">
+                    <span className="text-blue-500 mr-1">•</span>
+                    {objective}
+                  </li>
+                ))}
                 {scenario.learningObjectives.length > 2 && (
                   <li className="text-gray-500 italic">
                     +{scenario.learningObjectives.length - 2} more objectives
@@ -330,14 +336,12 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
                   All Learning Objectives:
                 </h4>
                 <ul className="text-sm text-gray-600 space-y-1">
-                  {previewScenario.learningObjectives.map(
-                    (objective) => (
-                      <li key={objective} className="flex items-start">
-                        <span className="text-blue-500 mr-2">•</span>
-                        {objective}
-                      </li>
-                    ),
-                  )}
+                  {previewScenario.learningObjectives.map((objective) => (
+                    <li key={objective} className="flex items-start">
+                      <span className="text-blue-500 mr-2">•</span>
+                      {objective}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>

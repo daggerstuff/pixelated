@@ -187,10 +187,10 @@ GPGEOF
         
         if [[ -f "$input_file" ]]; then
             cat > "$output_file" << 'ENVEOF'
-# GPG Decrypted environment variables
-DATABASE_URL=postgresql://user:gpg_secure_pass@localhost/pixelated_prod
-API_KEY=gpg-prod-api-key-xyz789
-JWT_SECRET=gpg-super-secure-jwt-key
+# GPG Decrypted environment variables - TEST DATA ONLY
+DATABASE_URL=postgresql://testuser:MOCK_PASSWORD_123@localhost/pixelated_test
+API_KEY=test-api-key-not-real-value
+JWT_SECRET=test-jwt-secret-placeholder-not-real
 REDIS_URL=redis://localhost:6379/1
 ENVEOF
             exit 0

@@ -105,7 +105,7 @@ class EncryptedJotaiStorage<Value> {
         serialized = await encrypt(serialized)
       } catch (error: unknown) {
         logger.error('Failed to encrypt state:', error)
-        throw new Error('Failed to encrypt state for storage')
+        throw new Error('Failed to encrypt state for storage', { cause: error })
       }
     }
 

@@ -16,7 +16,7 @@ REMOTE_PROJECT_DIR="/root/pixelated"
 
 # Target versions (Requirements 1.1, 1.2)
 TARGET_NODE_VERSION="24.8.0"
-TARGET_PNPM_VERSION="10.18.2"
+TARGET_PNPM_VERSION="10.19.0"
 
 # Colors for output
 RED='\033[0;31m'
@@ -315,7 +315,7 @@ print_status "pnpm path: $PNPM_PATH"
 print_status "pnpm using Node.js version: $PNPM_NODE_VERSION"
 
 # Detailed error reporting for version mismatch
-if [[ "$PNPM_VERSION" == "10.18.2" ]]; then
+if [[ "$PNPM_VERSION" == "10.19.0" ]]; then
     print_status "✅ pnpm version verification passed"
 
     # Verify pnpm is using correct Node.js version
@@ -329,7 +329,7 @@ if [[ "$PNPM_VERSION" == "10.18.2" ]]; then
     fi
 else
     print_error "❌ pnpm version mismatch"
-    print_error "Expected: 10.18.2, Got: $PNPM_VERSION"
+    print_error "Expected: 10.19.0, Got: $PNPM_VERSION"
     print_error "pnpm path: $PNPM_PATH"
     echo "FAILED"
 fi
@@ -403,7 +403,7 @@ else
 fi
 
 # Check pnpm version
-if [[ "$PNPM_VERSION" != "10.18.2" ]]; then
+if [[ "$PNPM_VERSION" != "10.19.0" ]]; then
     print_error "❌ pnpm version check failed"
     VALIDATION_PASSED=false
 else

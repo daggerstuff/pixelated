@@ -120,7 +120,9 @@
     }
 
     const toggleThemeButton = document.getElementById('theme-switch')
-    toggleThemeButton?.addEventListener('click', (event: Event) => handleToggle(event as MouseEvent))
+    toggleThemeButton?.addEventListener('click', (event: Event) =>
+      handleToggle(event as MouseEvent),
+    )
 
     /* Listening system changes */
     window

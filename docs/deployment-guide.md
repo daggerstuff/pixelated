@@ -577,3 +577,37 @@ spec:
 **Deployment Status**: ✅ Production Ready (95% Complete)
 **Last Updated**: 2024-12-19
 **Version**: 1.0.0
+
+---
+
+## Production Deployment (Helm + GKE)
+
+This section describes how to deploy the Pixelated app to production using Helm and the GKE workflows.
+
+### Prerequisites
+- kubectl and helm installed
+- Access to the target Kubernetes cluster
+- Container image published to the registry (e.g., GHCR)
+
+### Helm Production Values
+Use the provided production overrides in `helm/values-production.yaml`.
+
+### Deploy via Script
+```
+./scripts/deploy/production_deploy.sh \
+  -r pixelated \
+  -n production \
+  -i ghcr.io/pixelated/ai-service \
+  -t <IMAGE_TAG> \
+  --wait
+```
+
+### Deploy via GitHub Actions
+Use the `GKE Production Deploy` workflow (`.github/workflows/gke-production-deploy.yml`) with `workflow_dispatch` inputs:
+- release, namespace, image, tag
+Optionally provide a base64 kubeconfig if not using GKE auth steps in the workflow.
+
+### Post-Deployment
+- Verify rollout status in the script output
+- Check service health endpoints `/healthz` and `/readyz`
+- Monitor safety metrics dashboard and alert rules

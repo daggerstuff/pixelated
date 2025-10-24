@@ -21,54 +21,66 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
     transcribedText,
     isConnected,
   } = {
-    isSpeechRecognitionEnabled: (simulator as {
-      isSpeechRecognitionEnabled?: boolean
-      toggleSpeechRecognition?: () => void
-      isUsingEnhancedModels?: boolean
-      toggleEnhancedModels?: (enabled: boolean) => void
-      transcribedText?: string
-      isConnected?: boolean
-    })?.isSpeechRecognitionEnabled,
-    toggleSpeechRecognition: (simulator as {
-      isSpeechRecognitionEnabled?: boolean
-      toggleSpeechRecognition?: () => void
-      isUsingEnhancedModels?: boolean
-      toggleEnhancedModels?: (enabled: boolean) => void
-      transcribedText?: string
-      isConnected?: boolean
-    })?.toggleSpeechRecognition,
-    isUsingEnhancedModels: (simulator as {
-      isSpeechRecognitionEnabled?: boolean
-      toggleSpeechRecognition?: () => void
-      isUsingEnhancedModels?: boolean
-      toggleEnhancedModels?: (enabled: boolean) => void
-      transcribedText?: string
-      isConnected?: boolean
-    })?.isUsingEnhancedModels,
-    toggleEnhancedModels: (simulator as {
-      isSpeechRecognitionEnabled?: boolean
-      toggleSpeechRecognition?: () => void
-      isUsingEnhancedModels?: boolean
-      toggleEnhancedModels?: (enabled: boolean) => void
-      transcribedText?: string
-      isConnected?: boolean
-    })?.toggleEnhancedModels,
-    transcribedText: (simulator as {
-      isSpeechRecognitionEnabled?: boolean
-      toggleSpeechRecognition?: () => void
-      isUsingEnhancedModels?: boolean
-      toggleEnhancedModels?: (enabled: boolean) => void
-      transcribedText?: string
-      isConnected?: boolean
-    })?.transcribedText,
-    isConnected: (simulator as {
-      isSpeechRecognitionEnabled?: boolean
-      toggleSpeechRecognition?: () => void
-      isUsingEnhancedModels?: boolean
-      toggleEnhancedModels?: (enabled: boolean) => void
-      transcribedText?: string
-      isConnected?: boolean
-    })?.isConnected,
+    isSpeechRecognitionEnabled: (
+      simulator as {
+        isSpeechRecognitionEnabled?: boolean
+        toggleSpeechRecognition?: () => void
+        isUsingEnhancedModels?: boolean
+        toggleEnhancedModels?: (enabled: boolean) => void
+        transcribedText?: string
+        isConnected?: boolean
+      }
+    )?.isSpeechRecognitionEnabled,
+    toggleSpeechRecognition: (
+      simulator as {
+        isSpeechRecognitionEnabled?: boolean
+        toggleSpeechRecognition?: () => void
+        isUsingEnhancedModels?: boolean
+        toggleEnhancedModels?: (enabled: boolean) => void
+        transcribedText?: string
+        isConnected?: boolean
+      }
+    )?.toggleSpeechRecognition,
+    isUsingEnhancedModels: (
+      simulator as {
+        isSpeechRecognitionEnabled?: boolean
+        toggleSpeechRecognition?: () => void
+        isUsingEnhancedModels?: boolean
+        toggleEnhancedModels?: (enabled: boolean) => void
+        transcribedText?: string
+        isConnected?: boolean
+      }
+    )?.isUsingEnhancedModels,
+    toggleEnhancedModels: (
+      simulator as {
+        isSpeechRecognitionEnabled?: boolean
+        toggleSpeechRecognition?: () => void
+        isUsingEnhancedModels?: boolean
+        toggleEnhancedModels?: (enabled: boolean) => void
+        transcribedText?: string
+        isConnected?: boolean
+      }
+    )?.toggleEnhancedModels,
+    transcribedText: (
+      simulator as {
+        isSpeechRecognitionEnabled?: boolean
+        toggleSpeechRecognition?: () => void
+        isUsingEnhancedModels?: boolean
+        toggleEnhancedModels?: (enabled: boolean) => void
+        transcribedText?: string
+        isConnected?: boolean
+      }
+    )?.transcribedText,
+    isConnected: (
+      simulator as {
+        isSpeechRecognitionEnabled?: boolean
+        toggleSpeechRecognition?: () => void
+        isUsingEnhancedModels?: boolean
+        toggleEnhancedModels?: (enabled: boolean) => void
+        transcribedText?: string
+        isConnected?: boolean
+      }
+    )?.isConnected,
   }
 
   return (
@@ -99,7 +111,9 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               id="enhancedModelsCheckbox"
               type="checkbox"
               checked={isUsingEnhancedModels}
-              onChange={(e) => toggleEnhancedModels(e.target?.['checked'] || false)}
+              onChange={(e) =>
+                toggleEnhancedModels(e.target?.['checked'] || false)
+              }
               disabled={!isConnected}
             />
 

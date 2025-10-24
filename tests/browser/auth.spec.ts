@@ -26,7 +26,7 @@ test('login form shows validation errors', async ({ page }) => {
   // Focus email field and blur to trigger validation
   await page.focus('input[type="email"]')
   await page.keyboard.press('Tab') // Tab away to trigger blur
-  
+
   // Focus password field and blur to trigger validation
   await page.focus('input[type="password"]')
   await page.keyboard.press('Tab') // Tab away to trigger blur
@@ -42,7 +42,7 @@ test('login form shows validation errors', async ({ page }) => {
   // Fill email but not password
   await page.fill('input[type="email"]', 'test@example.com')
   await page.keyboard.press('Tab') // Tab away to validate email
-  
+
   // Check that only password error is shown
   await expect(passwordError).toBeVisible({ timeout: 10000 })
   // Email error should be gone since we filled a valid email
@@ -85,23 +85,29 @@ test('login page has proper transitions', async ({ page }) => {
   const passwordResetButton = page
     .locator('button, a')
     .filter({ hasText: /forgot.*password/i })
-  
+
   // Check if the forgot password element exists
   const resetButtonCount = await passwordResetButton.count()
-  
+
   if (resetButtonCount > 0) {
     await expect(passwordResetButton).toBeVisible({ timeout: 5000 })
-    
+
     // Click to switch to reset mode
     await passwordResetButton.click()
     await page.waitForTimeout(1000)
-    
+
     // Verify we're in reset mode (check for reset form elements)
-    await expect(page.locator('text=Reset Password')).toBeVisible({ timeout: 10000 })
-    await expect(page.locator('text=Send Reset Link')).toBeVisible({ timeout: 10000 })
+    await expect(page.locator('text=Reset Password')).toBeVisible({
+      timeout: 10000,
+    })
+    await expect(page.locator('text=Send Reset Link')).toBeVisible({
+      timeout: 10000,
+    })
   } else {
     // If forgot password functionality is not implemented, just verify the login form is working
-    console.log('Forgot password functionality not found, skipping transition test')
+    console.log(
+      'Forgot password functionality not found, skipping transition test',
+    )
     await expect(page.locator('form')).toBeVisible()
     await expect(page.locator('input[type="email"]')).toBeVisible()
     await expect(page.locator('input[type="password"]')).toBeVisible()

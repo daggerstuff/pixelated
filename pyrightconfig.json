@@ -1,6 +1,15 @@
 {
   "include": ["src", "tests", "ai"],
-  "exclude": ["**/node_modules/**", "**/stubs/**", "**/.venv/**", "**/.env", "**/build/**", "**/dist/**", "**/datasets/**", ".coveragerc"],
+  "exclude": [
+    "**/node_modules/**",
+    "**/stubs/**",
+    "**/.venv/**",
+    "**/.env",
+    "**/build/**",
+    "**/dist/**",
+    "**/datasets/**",
+    ".coveragerc"
+  ],
   "extraPaths": ["stubs"],
   "typeCheckingMode": "basic",
   "reportMissingTypeStubs": false,

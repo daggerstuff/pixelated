@@ -164,7 +164,12 @@ export class FileSystemStorageProvider implements StorageProvider {
 
         for (const entry of entries) {
           // Validate entry name for security
-          if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+          if (
+            !entry.name ||
+            entry.name.includes('..') ||
+            entry.name.includes('/') ||
+            entry.name.includes('\\')
+          ) {
             logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
             continue
           }
@@ -353,7 +358,12 @@ export class MockCloudStorageProvider implements StorageProvider {
           }
 
           // Validate entry name for security
-          if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+          if (
+            !entry.name ||
+            entry.name.includes('..') ||
+            entry.name.includes('/') ||
+            entry.name.includes('\\')
+          ) {
             logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
             continue
           }
@@ -445,9 +455,9 @@ export class AWSS3StorageProvider implements StorageProvider {
     const endpoint = config['endpoint'] as string | undefined
     const credentials = config['credentials'] as
       | {
-        accessKeyId: string
-        secretAccessKey: string
-      }
+          accessKeyId: string
+          secretAccessKey: string
+        }
       | undefined
 
     this.config = {
@@ -707,7 +717,9 @@ export class AWSS3StorageProvider implements StorageProvider {
 
     // Reject keys with directory traversal sequences
     if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
-      throw new Error('Directory traversal sequences (..) are not allowed in keys')
+      throw new Error(
+        'Directory traversal sequences (..) are not allowed in keys',
+      )
     }
 
     // Reject keys with absolute paths
@@ -800,7 +812,9 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       }
 
       if (!Storage) {
-        throw new Error('Failed to load GCS Storage constructor', { cause: new Error('Missing Storage export') })
+        throw new Error('Failed to load GCS Storage constructor', {
+          cause: new Error('Missing Storage export'),
+        })
       }
 
       this.storage = new Storage(options) as unknown as GCSStorage
@@ -922,7 +936,9 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 
     // Reject keys with directory traversal sequences
     if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
-      throw new Error('Directory traversal sequences (..) are not allowed in keys')
+      throw new Error(
+        'Directory traversal sequences (..) are not allowed in keys',
+      )
     }
 
     // Reject keys with absolute paths
@@ -1173,7 +1189,9 @@ export class AzureBlobStorageProvider implements StorageProvider {
 
     // Reject keys with directory traversal sequences
     if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
-      throw new Error('Directory traversal sequences (..) are not allowed in keys')
+      throw new Error(
+        'Directory traversal sequences (..) are not allowed in keys',
+      )
     }
 
     // Reject keys with absolute paths

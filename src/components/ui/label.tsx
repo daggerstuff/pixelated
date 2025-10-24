@@ -2,7 +2,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 interface LabelProps extends React.ComponentPropsWithoutRef<'label'> {
-  htmlFor?: string; // Make htmlFor explicit in the interface
+  htmlFor?: string // Make htmlFor explicit in the interface
 }
 
 const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
@@ -10,7 +10,7 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
     // Warn if no htmlFor is provided
     if (process.env['NODE_ENV'] !== 'production' && !htmlFor) {
       console.warn(
-        'Label component should have an htmlFor prop to associate it with a form control'
+        'Label component should have an htmlFor prop to associate it with a form control',
       )
     }
 
@@ -25,7 +25,7 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
         {...props}
       />
     )
-  }
+  },
 )
 Label.displayName = 'Label'
 

@@ -166,11 +166,18 @@ export function useComparativeProgress(
 
       setData(result.data)
     } catch (err: unknown) {
-      if (err instanceof DOMException && (err as Error)?.name === 'AbortError') {
+      if (
+        err instanceof DOMException &&
+        (err as Error)?.name === 'AbortError'
+      ) {
         // Request was aborted, do not update state
         return
       }
-      setError(err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred')
+      setError(
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : 'An unknown error occurred',
+      )
     } finally {
       setLoading(false)
     }

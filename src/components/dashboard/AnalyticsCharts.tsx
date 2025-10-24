@@ -32,7 +32,9 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
     <div className="flex items-center justify-between">
       <div>
-        <h4 className="text-red-800 font-medium">Unable to load analytics data</h4>
+        <h4 className="text-red-800 font-medium">
+          Unable to load analytics data
+        </h4>
         <p className="text-red-600 text-sm mt-1">{String(error)}</p>
       </div>
       <button
@@ -86,7 +88,7 @@ interface SessionChartProps {
 
 const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
   const maxSessions = useMemo(() => {
-    return Math.max(...data.map(d => d.sessions), 1)
+    return Math.max(...data.map((d) => d.sessions), 1)
   }, [data])
 
   if (isLoading) {
@@ -99,16 +101,18 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
       <div className="flex items-end space-x-2 h-48">
         {data.map((day) => (
           <div key={day.date} className="flex-1 flex flex-col items-center">
-            <div 
+            <div
               className="bg-blue-500 w-full rounded-t transition-all duration-300 hover:bg-blue-600"
-              style={{ 
+              style={{
                 height: `${(day.sessions / maxSessions) * 100}%`,
-                minHeight: '4px'
+                minHeight: '4px',
               }}
               title={`${day.sessions} sessions on ${new Date(day.date).toLocaleDateString()}`}
             />
             <span className="text-xs mt-2 text-gray-600">
-              {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
+              {new Date(day.date).toLocaleDateString('en-US', {
+                weekday: 'short',
+              })}
             </span>
             <span className="text-xs text-gray-500">{day.sessions}</span>
           </div>
@@ -131,17 +135,23 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return '↗'
-      case 'down': return '↘'
-      case 'stable': return '→'
+      case 'up':
+        return '↗'
+      case 'down':
+        return '↘'
+      case 'stable':
+        return '→'
     }
   }
 
   const getTrendColor = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return 'text-green-600'
-      case 'down': return 'text-red-600'
-      case 'stable': return 'text-gray-600'
+      case 'up':
+        return 'text-green-600'
+      case 'down':
+        return 'text-red-600'
+      case 'stable':
+        return 'text-gray-600'
     }
   }
 
@@ -161,7 +171,7 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
               <span className="text-sm text-gray-600">{skill.score}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-green-500 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${skill.score}%` }}
               />
@@ -183,7 +193,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="bg-white p-4 rounded-lg shadow">
             <LoadingSkeleton />
           </div>
@@ -194,29 +204,51 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
 
   const getColorClasses = (color?: string) => {
     switch (color) {
-      case 'blue': return 'text-blue-600'
-      case 'green': return 'text-green-600'
-      case 'purple': return 'text-purple-600'
-      case 'orange': return 'text-orange-600'
-      case 'red': return 'text-red-600'
-      default: return 'text-gray-600'
+      case 'blue':
+        return 'text-blue-600'
+      case 'green':
+        return 'text-green-600'
+      case 'purple':
+        return 'text-purple-600'
+      case 'orange':
+        return 'text-orange-600'
+      case 'red':
+        return 'text-red-600'
+      default:
+        return 'text-gray-600'
     }
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {data.map((stat) => (
-        <div key={stat.label} className="bg-white p-4 rounded-lg shadow text-center">
+        <div
+          key={stat.label}
+          className="bg-white p-4 rounded-lg shadow text-center"
+        >
           <div className={`text-2xl font-bold ${getColorClasses(stat.color)}`}>
-            {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+            {typeof stat.value === 'number'
+              ? stat.value.toLocaleString()
+              : stat.value}
           </div>
           <div className="text-sm text-gray-600">{stat.label}</div>
           {stat.trend && (
             <div className="text-xs text-gray-500 mt-1">
-              <span className={stat.trend.direction === 'up' ? 'text-green-600' : 
-                             stat.trend.direction === 'down' ? 'text-red-600' : 'text-gray-600'}>
-                {stat.trend.direction === 'up' ? '↗' : 
-                 stat.trend.direction === 'down' ? '↘' : '→'} {stat.trend.value}%
+              <span
+                className={
+                  stat.trend.direction === 'up'
+                    ? 'text-green-600'
+                    : stat.trend.direction === 'down'
+                      ? 'text-red-600'
+                      : 'text-gray-600'
+                }
+              >
+                {stat.trend.direction === 'up'
+                  ? '↗'
+                  : stat.trend.direction === 'down'
+                    ? '↘'
+                    : '→'}{' '}
+                {stat.trend.value}%
               </span>
               <span className="ml-1">{stat.trend.period}</span>
             </div>
@@ -248,7 +280,7 @@ export const AnalyticsCharts: FC = () => {
 
   // Handle time range change
   const handleTimeRangeChange = useCallback((timeRange: TimeRange) => {
-    setFilters(prev => ({ ...prev, timeRange }))
+    setFilters((prev) => ({ ...prev, timeRange }))
   }, [])
 
   // Render error state
@@ -257,7 +289,10 @@ export const AnalyticsCharts: FC = () => {
       <div className="analytics-charts space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Analytics Overview</h2>
-          <TimeRangeSelector value={filters.timeRange} onChange={handleTimeRangeChange} />
+          <TimeRangeSelector
+            value={filters.timeRange}
+            onChange={handleTimeRangeChange}
+          />
         </div>
         <ErrorDisplay error={error} onRetry={handleRetry} />
       </div>
@@ -269,26 +304,20 @@ export const AnalyticsCharts: FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Analytics Overview</h2>
-        <TimeRangeSelector value={filters.timeRange} onChange={handleTimeRangeChange} />
+        <TimeRangeSelector
+          value={filters.timeRange}
+          onChange={handleTimeRangeChange}
+        />
       </div>
 
       {/* Summary Statistics */}
-      <SummaryStats 
-        data={data?.summaryStats || []} 
-        isLoading={isLoading} 
-      />
+      <SummaryStats data={data?.summaryStats || []} isLoading={isLoading} />
 
       {/* Session Activity Chart */}
-      <SessionChart 
-        data={data?.sessionMetrics || []} 
-        isLoading={isLoading} 
-      />
+      <SessionChart data={data?.sessionMetrics || []} isLoading={isLoading} />
 
       {/* Skill Progress */}
-      <SkillProgress 
-        data={data?.skillProgress || []} 
-        isLoading={isLoading} 
-      />
+      <SkillProgress data={data?.skillProgress || []} isLoading={isLoading} />
 
       {/* Data freshness indicator */}
       {data && !isLoading && (

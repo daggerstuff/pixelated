@@ -76,7 +76,10 @@ const TOPIC_KEYWORDS = {
   [TopicArea.GENERAL_MENTAL_HEALTH]: ['mental health', 'ptsd', 'bipolar'],
 }
 
-function matchEducationalType(query: string): { type: EducationalType | null; confidence: number } {
+function matchEducationalType(query: string): {
+  type: EducationalType | null
+  confidence: number
+} {
   const lower = query.toLowerCase()
 
   for (const [type, patterns] of Object.entries(EDUCATIONAL_PATTERNS)) {
@@ -94,7 +97,7 @@ function matchTopicArea(query: string): TopicArea {
   const lower = query.toLowerCase()
 
   for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
-    if (keywords.some(keyword => lower.includes(keyword))) {
+    if (keywords.some((keyword) => lower.includes(keyword))) {
       return topic as TopicArea
     }
   }
@@ -108,7 +111,8 @@ export class EducationalContextRecognizer {
   constructor(config: EducationalRecognizerConfig = {}) {
     this.config = {
       model: config.model ?? 'gpt-4',
-      includeResourceRecommendations: config.includeResourceRecommendations ?? true,
+      includeResourceRecommendations:
+        config.includeResourceRecommendations ?? true,
       adaptToUserLevel: config.adaptToUserLevel ?? true,
       enableTopicMapping: config.enableTopicMapping ?? true,
       aiService: config.aiService,
@@ -121,7 +125,9 @@ export class EducationalContextRecognizer {
   ): Promise<EducationalContextResult> {
     // Step 1: Pattern-based recognition
     const { type, confidence: patternConfidence } = matchEducationalType(query)
-    const topicArea = this.config.enableTopicMapping ? matchTopicArea(query) : TopicArea.GENERAL_MENTAL_HEALTH
+    const topicArea = this.config.enableTopicMapping
+      ? matchTopicArea(query)
+      : TopicArea.GENERAL_MENTAL_HEALTH
 
     // If no educational pattern found, return non-educational result
     if (!type) {
@@ -137,13 +143,22 @@ export class EducationalContextRecognizer {
       learningObjectives: [`Learn about ${topicArea.replace('_', ' ')}`],
       recommendedResources: this.getDefaultResources(type),
       priorKnowledgeRequired: [],
-      metadata: { conceptualDepth: patternConfidence * 0.8, practicalApplications: [], relatedTopics: [] },
+      metadata: {
+        conceptualDepth: patternConfidence * 0.8,
+        practicalApplications: [],
+        relatedTopics: [],
+      },
     }
 
     // Step 2: AI enhancement (if available and pattern confidence is high)
     if (this.config.aiService && patternConfidence > 0.7) {
       try {
-        const aiResult = await this.performAIAnalysis(query, userProfile, type, topicArea)
+        const aiResult = await this.performAIAnalysis(
+          query,
+          userProfile,
+          type,
+          topicArea,
+        )
         if (aiResult) {
           finalResult = this.combineResults(finalResult, aiResult)
         }
@@ -171,17 +186,36 @@ export class EducationalContextRecognizer {
       learningObjectives: [],
       recommendedResources: [],
       priorKnowledgeRequired: [],
-      metadata: { conceptualDepth: 0.1, practicalApplications: [], relatedTopics: [] },
+      metadata: {
+        conceptualDepth: 0.1,
+        practicalApplications: [],
+        relatedTopics: [],
+      },
     }
   }
 
   private getDefaultResources(type: EducationalType): ResourceType[] {
     const resourceMap: Record<EducationalType, ResourceType[]> = {
-      [EducationalType.DEFINITION]: [ResourceType.EDUCATIONAL_VIDEOS, ResourceType.INFOGRAPHICS],
-      [EducationalType.EXPLANATION]: [ResourceType.EDUCATIONAL_VIDEOS, ResourceType.INTERACTIVE_TOOLS],
-      [EducationalType.COMPARISON]: [ResourceType.INFOGRAPHICS, ResourceType.SCIENTIFIC_ARTICLES],
-      [EducationalType.SYMPTOMS]: [ResourceType.INFOGRAPHICS, ResourceType.EDUCATIONAL_VIDEOS],
-      [EducationalType.RESEARCH]: [ResourceType.SCIENTIFIC_ARTICLES, ResourceType.BOOKS],
+      [EducationalType.DEFINITION]: [
+        ResourceType.EDUCATIONAL_VIDEOS,
+        ResourceType.INFOGRAPHICS,
+      ],
+      [EducationalType.EXPLANATION]: [
+        ResourceType.EDUCATIONAL_VIDEOS,
+        ResourceType.INTERACTIVE_TOOLS,
+      ],
+      [EducationalType.COMPARISON]: [
+        ResourceType.INFOGRAPHICS,
+        ResourceType.SCIENTIFIC_ARTICLES,
+      ],
+      [EducationalType.SYMPTOMS]: [
+        ResourceType.INFOGRAPHICS,
+        ResourceType.EDUCATIONAL_VIDEOS,
+      ],
+      [EducationalType.RESEARCH]: [
+        ResourceType.SCIENTIFIC_ARTICLES,
+        ResourceType.BOOKS,
+      ],
     }
 
     return resourceMap[type] || [ResourceType.EDUCATIONAL_VIDEOS]
@@ -200,7 +234,8 @@ export class EducationalContextRecognizer {
     const messages = [
       {
         role: 'system',
-        content: 'You are an educational context analyzer. Return a JSON object with educational analysis.',
+        content:
+          'You are an educational context analyzer. Return a JSON object with educational analysis.',
       },
       {
         role: 'user',
@@ -208,9 +243,12 @@ export class EducationalContextRecognizer {
       },
     ]
 
-    const response = await this.config.aiService.createChatCompletion(messages, {
-      model: this.config.model,
-    })
+    const response = await this.config.aiService.createChatCompletion(
+      messages,
+      {
+        model: this.config.model,
+      },
+    )
 
     const content = response?.choices?.[0]?.message?.content
     if (!content) {
@@ -225,13 +263,28 @@ export class EducationalContextRecognizer {
         educationalType: type, // Use pattern-detected type
         complexity: this.validateComplexity(parsed.complexity),
         topicArea, // Use pattern-detected topic
-        learningObjectives: Array.isArray(parsed.learningObjectives) ? parsed.learningObjectives : [],
-        recommendedResources: this.validateResources(parsed.recommendedResources),
-        priorKnowledgeRequired: Array.isArray(parsed.priorKnowledgeRequired) ? parsed.priorKnowledgeRequired : [],
+        learningObjectives: Array.isArray(parsed.learningObjectives)
+          ? parsed.learningObjectives
+          : [],
+        recommendedResources: this.validateResources(
+          parsed.recommendedResources,
+        ),
+        priorKnowledgeRequired: Array.isArray(parsed.priorKnowledgeRequired)
+          ? parsed.priorKnowledgeRequired
+          : [],
         metadata: {
-          conceptualDepth: Math.max(0, Math.min(1, parsed.metadata?.conceptualDepth || 0.5)),
-          practicalApplications: Array.isArray(parsed.metadata?.practicalApplications) ? parsed.metadata.practicalApplications : [],
-          relatedTopics: Array.isArray(parsed.metadata?.relatedTopics) ? parsed.metadata.relatedTopics : [],
+          conceptualDepth: Math.max(
+            0,
+            Math.min(1, parsed.metadata?.conceptualDepth || 0.5),
+          ),
+          practicalApplications: Array.isArray(
+            parsed.metadata?.practicalApplications,
+          )
+            ? parsed.metadata.practicalApplications
+            : [],
+          relatedTopics: Array.isArray(parsed.metadata?.relatedTopics)
+            ? parsed.metadata.relatedTopics
+            : [],
         },
       }
     } catch {
@@ -239,12 +292,21 @@ export class EducationalContextRecognizer {
     }
   }
 
-  private combineResults(patternResult: EducationalContextResult, aiResult: EducationalContextResult): EducationalContextResult {
+  private combineResults(
+    patternResult: EducationalContextResult,
+    aiResult: EducationalContextResult,
+  ): EducationalContextResult {
     return {
       ...patternResult,
       confidence: Math.max(patternResult.confidence, aiResult.confidence),
-      learningObjectives: aiResult.learningObjectives.length > 0 ? aiResult.learningObjectives : patternResult.learningObjectives,
-      recommendedResources: aiResult.recommendedResources.length > 0 ? aiResult.recommendedResources : patternResult.recommendedResources,
+      learningObjectives:
+        aiResult.learningObjectives.length > 0
+          ? aiResult.learningObjectives
+          : patternResult.learningObjectives,
+      recommendedResources:
+        aiResult.recommendedResources.length > 0
+          ? aiResult.recommendedResources
+          : patternResult.recommendedResources,
       priorKnowledgeRequired: aiResult.priorKnowledgeRequired,
       metadata: {
         ...patternResult.metadata,
@@ -253,18 +315,30 @@ export class EducationalContextRecognizer {
     }
   }
 
-  private adaptToUserProfile(result: EducationalContextResult, userProfile: Record<string, unknown>): EducationalContextResult {
+  private adaptToUserProfile(
+    result: EducationalContextResult,
+    userProfile: Record<string, unknown>,
+  ): EducationalContextResult {
     const adapted = { ...result }
 
     // Adapt complexity based on education level
-    if ((userProfile as { educationLevel?: string }).educationLevel === 'graduate') {
+    if (
+      (userProfile as { educationLevel?: string }).educationLevel === 'graduate'
+    ) {
       adapted.complexity = 'advanced'
-    } else if ((userProfile as { educationLevel?: string }).educationLevel === 'high_school') {
-      adapted.complexity = result.complexity === 'advanced' ? 'intermediate' : 'basic'
+    } else if (
+      (userProfile as { educationLevel?: string }).educationLevel ===
+      'high_school'
+    ) {
+      adapted.complexity =
+        result.complexity === 'advanced' ? 'intermediate' : 'basic'
     }
 
     // Adapt resources based on learning style
-    if ((userProfile as { preferredLearningStyle?: string }).preferredLearningStyle === 'visual') {
+    if (
+      (userProfile as { preferredLearningStyle?: string })
+        .preferredLearningStyle === 'visual'
+    ) {
       const resources = [...adapted.recommendedResources]
       if (!resources.includes(ResourceType.INFOGRAPHICS)) {
         resources.push(ResourceType.INFOGRAPHICS)
@@ -276,7 +350,9 @@ export class EducationalContextRecognizer {
   }
 
   private validateComplexity(complexity: string): string {
-    return ['basic', 'intermediate', 'advanced'].includes(complexity) ? complexity : 'basic'
+    return ['basic', 'intermediate', 'advanced'].includes(complexity)
+      ? complexity
+      : 'basic'
   }
 
   private validateResources(resources: unknown): ResourceType[] {
@@ -284,12 +360,16 @@ export class EducationalContextRecognizer {
       return []
     }
     return resources
-      .filter(r => Object.values(ResourceType).includes(r))
+      .filter((r) => Object.values(ResourceType).includes(r))
       .slice(0, 5) // Limit to 5 resources
   }
 
-  async recognizeBatch(queries: { query: string }[]): Promise<EducationalContextResult[]> {
-    return Promise.all(queries.map(q => this.recognizeEducationalContext(q.query)))
+  async recognizeBatch(
+    queries: { query: string }[],
+  ): Promise<EducationalContextResult[]> {
+    return Promise.all(
+      queries.map((q) => this.recognizeEducationalContext(q.query)),
+    )
   }
 
   generateLearningPathway(result: EducationalContextResult): any {
@@ -302,11 +382,15 @@ export class EducationalContextRecognizer {
   }
 }
 
-export function createEducationalContextRecognizer(config: EducationalRecognizerConfig): EducationalContextRecognizer {
+export function createEducationalContextRecognizer(
+  config: EducationalRecognizerConfig,
+): EducationalContextRecognizer {
   return new EducationalContextRecognizer(config)
 }
 
-export function getDefaultEducationalRecognizerConfig(aiService: unknown): EducationalRecognizerConfig {
+export function getDefaultEducationalRecognizerConfig(
+  aiService: unknown,
+): EducationalRecognizerConfig {
   return {
     aiService,
     model: 'gpt-4',

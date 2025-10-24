@@ -4,25 +4,25 @@ declare module '@react-three/drei' {
 
   // Define a proper interface for OrbitControls props
   interface OrbitControlsProps {
-    makeDefault?: boolean;
-    camera?: THREE.Camera;
-    domElement?: HTMLElement;
-    enableDamping?: boolean;
-    enablePan?: boolean;
-    enableRotate?: boolean;
-    enableZoom?: boolean;
-    minDistance?: number;
-    maxDistance?: number;
-    minPolarAngle?: number;
-    maxPolarAngle?: number;
-    minAzimuthAngle?: number;
-    maxAzimuthAngle?: number;
-    dampingFactor?: number;
-    rotateSpeed?: number;
-    panSpeed?: number;
-    zoomSpeed?: number;
-    target?: [number, number, number] | THREE.Vector3;
-    [key: string]: unknown;
+    makeDefault?: boolean
+    camera?: THREE.Camera
+    domElement?: HTMLElement
+    enableDamping?: boolean
+    enablePan?: boolean
+    enableRotate?: boolean
+    enableZoom?: boolean
+    minDistance?: number
+    maxDistance?: number
+    minPolarAngle?: number
+    maxPolarAngle?: number
+    minAzimuthAngle?: number
+    maxAzimuthAngle?: number
+    dampingFactor?: number
+    rotateSpeed?: number
+    panSpeed?: number
+    zoomSpeed?: number
+    target?: [number, number, number] | THREE.Vector3
+    [key: string]: unknown
   }
 
   export const OrbitControls: React.FC<OrbitControlsProps>

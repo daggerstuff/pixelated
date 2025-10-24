@@ -211,7 +211,7 @@ test.describe('Health Check Monitoring', () => {
       .locator('nav a, header a, .nav a, .navbar a, .navigation a')
       .all()
 
-    const mainNavLinks: Array<{href: string, text: string}> = []
+    const mainNavLinks: Array<{ href: string; text: string }> = []
     for (const link of navigationItems) {
       const href = await link.getAttribute('href')
       if (
@@ -244,11 +244,11 @@ test.describe('Health Check Monitoring', () => {
       await page.goto(baseUrl)
 
       // Use a full URL if the href is relative
-      const link = mainNavLinks[i];
+      const link = mainNavLinks[i]
       if (!link) {
-        continue;
+        continue
       }
-      
+
       const fullUrl = link.href.startsWith('/')
         ? `${baseUrl}${link.href}`
         : link.href

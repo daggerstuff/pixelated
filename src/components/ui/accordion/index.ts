@@ -3,5 +3,5 @@ export {
   Accordion,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent
+  AccordionContent,
 } from './accordion'

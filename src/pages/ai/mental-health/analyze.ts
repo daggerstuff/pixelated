@@ -23,8 +23,8 @@ export const POST: (context: APIContext) => Promise<Response> = async ({
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
-    logger.error('Error analyzing mental health', { error })
+  } catch (error: unknown) {
+    logger.error('Error analyzing mental health', { error: String(error) })
     return new Response('Error analyzing mental health', { status: 500 })
   }
 }

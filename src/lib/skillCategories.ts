@@ -1,5 +1,9 @@
-export const SKILL_CATEGORIES = ['therapeutic', 'technical', 'interpersonal'] as const;
-export type SkillCategory = (typeof SKILL_CATEGORIES)[number];
+export const SKILL_CATEGORIES = [
+  'therapeutic',
+  'technical',
+  'interpersonal',
+] as const
+export type SkillCategory = (typeof SKILL_CATEGORIES)[number]
 
 // Predefined mapping of known skill name tokens to categories. Keys are expected to be lowercase.
 const SKILL_NAME_MAP: Record<string, SkillCategory> = {
@@ -16,14 +20,14 @@ const SKILL_NAME_MAP: Record<string, SkillCategory> = {
   'technical assessment': 'technical',
   'technical skill': 'technical',
   'documentation': 'technical',
-};
+}
 
 export function isValidCategory(cat?: string): cat is SkillCategory {
   if (!cat) {
-    return false;
+    return false
   }
 
-  return (SKILL_CATEGORIES as readonly string[]).includes(cat);
+  return (SKILL_CATEGORIES as readonly string[]).includes(cat)
 }
 
 /**
@@ -32,43 +36,55 @@ export function isValidCategory(cat?: string): cat is SkillCategory {
  * - If the skill name matches a mapping entry (exact or substring), return mapped category.
  * - Otherwise fallback to a small set of heuristics and finally 'therapeutic'.
  */
-export function getSkillCategory(skillName: string, explicitCategory?: string): SkillCategory {
+export function getSkillCategory(
+  skillName: string,
+  explicitCategory?: string,
+): SkillCategory {
   if (explicitCategory && isValidCategory(explicitCategory)) {
-    return explicitCategory;
+    return explicitCategory
   }
 
-  const name = (skillName || '').toLowerCase().trim();
+  const name = (skillName || '').toLowerCase().trim()
   if (!name) {
-    return 'therapeutic';
+    return 'therapeutic'
   }
 
   // Exact mapping
   if (SKILL_NAME_MAP[name]) {
-    return SKILL_NAME_MAP[name] as SkillCategory;
+    return SKILL_NAME_MAP[name] as SkillCategory
   }
 
   // Substring mapping
   for (const key of Object.keys(SKILL_NAME_MAP)) {
     if (name.includes(key)) {
-      return SKILL_NAME_MAP[key] as SkillCategory;
+      return SKILL_NAME_MAP[key] as SkillCategory
     }
   }
 
   // Keyword heuristics
-  if (name.includes('technical') || name.includes('code') || name.includes('documentation')) {
-    return 'technical';
+  if (
+    name.includes('technical') ||
+    name.includes('code') ||
+    name.includes('documentation')
+  ) {
+    return 'technical'
   }
 
-  if (name.includes('interpersonal') || name.includes('listening') || name.includes('rapport') || name.includes('empathy')) {
-    return 'interpersonal';
+  if (
+    name.includes('interpersonal') ||
+    name.includes('listening') ||
+    name.includes('rapport') ||
+    name.includes('empathy')
+  ) {
+    return 'interpersonal'
   }
 
   // Default
-  return 'therapeutic';
+  return 'therapeutic'
 }
 
 export default {
   SKILL_CATEGORIES,
   getSkillCategory,
   isValidCategory,
-};
+}

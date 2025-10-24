@@ -1,10 +1,14 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react'
 
 // Lazy load the heavy bias dashboard
-const BiasDashboard = lazy(() => import('./BiasDashboard').then(module => ({ default: module.BiasDashboard })));
+const BiasDashboard = lazy(() =>
+  import('./BiasDashboard').then((module) => ({
+    default: module.BiasDashboard,
+  })),
+)
 
 interface LazyBiasDashboardProps {
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 function BiasLoadingFallback() {
@@ -28,7 +32,10 @@ function BiasLoadingFallback() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div
+              key={i}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse"></div>
@@ -43,7 +50,10 @@ function BiasLoadingFallback() {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div
+              key={i}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+            >
               <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-48 mb-4 animate-pulse"></div>
               <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded animate-pulse"></div>
             </div>
@@ -59,7 +69,7 @@ function BiasLoadingFallback() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default function LazyBiasDashboard(props: LazyBiasDashboardProps) {
@@ -67,5 +77,5 @@ export default function LazyBiasDashboard(props: LazyBiasDashboardProps) {
     <Suspense fallback={<BiasLoadingFallback />}>
       <BiasDashboard {...props} />
     </Suspense>
-  );
+  )
 }

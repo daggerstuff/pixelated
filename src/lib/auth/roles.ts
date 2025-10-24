@@ -3,7 +3,13 @@
  * Defines the 6-role permission matrix for the Pixelated mental health platform
  */
 
-export type UserRole = 'admin' | 'therapist' | 'patient' | 'researcher' | 'support' | 'guest'
+export type UserRole =
+  | 'admin'
+  | 'therapist'
+  | 'patient'
+  | 'researcher'
+  | 'support'
+  | 'guest'
 
 export interface RoleDefinition {
   name: UserRole
@@ -24,7 +30,7 @@ export interface Permission {
   auditRequired: boolean
 }
 
-export type PermissionCategory = 
+export type PermissionCategory =
   | 'user_management'
   | 'patient_data'
   | 'therapy_sessions'
@@ -48,11 +54,12 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
     isAssignable: false, // Only through secure admin creation process
     requiresApproval: false,
   },
-  
+
   therapist: {
     name: 'therapist',
     displayName: 'Mental Health Professional',
-    description: 'Licensed mental health professionals providing therapy services',
+    description:
+      'Licensed mental health professionals providing therapy services',
     hierarchyLevel: 80,
     permissions: [
       'read:patients',
@@ -77,11 +84,12 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
     isAssignable: true,
     requiresApproval: true,
   },
-  
+
   patient: {
     name: 'patient',
     displayName: 'Patient',
-    description: 'Individuals receiving mental health support and therapy services',
+    description:
+      'Individuals receiving mental health support and therapy services',
     hierarchyLevel: 40,
     permissions: [
       'read:own_profile',
@@ -106,7 +114,7 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
     isAssignable: true,
     requiresApproval: false,
   },
-  
+
   researcher: {
     name: 'researcher',
     displayName: 'Researcher',
@@ -132,7 +140,7 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
     isAssignable: true,
     requiresApproval: true,
   },
-  
+
   support: {
     name: 'support',
     displayName: 'Support Staff',
@@ -158,7 +166,7 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
     isAssignable: true,
     requiresApproval: true,
   },
-  
+
   guest: {
     name: 'guest',
     displayName: 'Guest',
@@ -208,7 +216,7 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     requiresMFA: true,
     auditRequired: true,
   },
-  
+
   // Patient Data Permissions
   'read:patients': {
     name: 'read:patients',
@@ -229,7 +237,7 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     category: 'patient_data',
     auditRequired: true,
   },
-  
+
   // Therapy Session Permissions
   'write:therapy_sessions': {
     name: 'write:therapy_sessions',
@@ -244,7 +252,7 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     category: 'therapy_sessions',
     auditRequired: true,
   },
-  
+
   // Research Data Permissions
   'read:anonymized_data': {
     name: 'read:anonymized_data',
@@ -259,7 +267,7 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     requiresMFA: true,
     auditRequired: true,
   },
-  
+
   // System Administration Permissions
   'manage:roles': {
     name: 'manage:roles',
@@ -274,7 +282,7 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     category: 'system_admin',
     auditRequired: true,
   },
-  
+
   // Content Management Permissions
   'manage:announcements': {
     name: 'manage:announcements',
@@ -282,7 +290,7 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     category: 'content_management',
     auditRequired: true,
   },
-  
+
   // Analytics Permissions
   'read:analytics': {
     name: 'read:analytics',
@@ -296,7 +304,7 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     category: 'analytics',
     auditRequired: true,
   },
-  
+
   // Security Permissions
   'manage:security_settings': {
     name: 'manage:security_settings',
@@ -310,7 +318,14 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
 /**
  * Role hierarchy for permission inheritance
  */
-export const ROLE_HIERARCHY: UserRole[] = ['guest', 'patient', 'support', 'researcher', 'therapist', 'admin']
+export const ROLE_HIERARCHY: UserRole[] = [
+  'guest',
+  'patient',
+  'support',
+  'researcher',
+  'therapist',
+  'admin',
+]
 
 /**
  * Check if a role has a specific permission
@@ -318,22 +333,25 @@ export const ROLE_HIERARCHY: UserRole[] = ['guest', 'patient', 'support', 'resea
 export function hasPermission(role: UserRole, permission: string): boolean {
   const roleDef = ROLE_DEFINITIONS[role]
   if (!roleDef) return false
-  
+
   // Admin has all permissions
   if (roleDef.permissions.includes('*')) return true
-  
+
   return roleDef.permissions.includes(permission)
 }
 
 /**
  * Check if a role has required hierarchy level
  */
-export function hasRequiredRole(userRole: UserRole, requiredRole: UserRole): boolean {
+export function hasRequiredRole(
+  userRole: UserRole,
+  requiredRole: UserRole,
+): boolean {
   const userRoleDef = ROLE_DEFINITIONS[userRole]
   const requiredRoleDef = ROLE_DEFINITIONS[requiredRole]
-  
+
   if (!userRoleDef || !requiredRoleDef) return false
-  
+
   return userRoleDef.hierarchyLevel >= requiredRoleDef.hierarchyLevel
 }
 
@@ -343,12 +361,12 @@ export function hasRequiredRole(userRole: UserRole, requiredRole: UserRole): boo
 export function getRolePermissions(role: UserRole): string[] {
   const roleDef = ROLE_DEFINITIONS[role]
   if (!roleDef) return []
-  
+
   if (roleDef.permissions.includes('*')) {
     // Return all available permissions for admin
     return Object.keys(PERMISSION_DEFINITIONS)
   }
-  
+
   return [...roleDef.permissions]
 }
 
@@ -383,18 +401,21 @@ export function getRoleByHierarchy(level: number): UserRole | null {
 /**
  * Validate role assignment
  */
-export function canAssignRole(assignerRole: UserRole, targetRole: UserRole): boolean {
+export function canAssignRole(
+  assignerRole: UserRole,
+  targetRole: UserRole,
+): boolean {
   const assignerDef = ROLE_DEFINITIONS[assignerRole]
   const targetDef = ROLE_DEFINITIONS[targetRole]
-  
+
   if (!assignerDef || !targetDef) return false
-  
+
   // Cannot assign roles higher than your own
   if (targetDef.hierarchyLevel >= assignerDef.hierarchyLevel) return false
-  
+
   // Target role must be assignable
   if (!targetDef.isAssignable) return false
-  
+
   return true
 }
 
@@ -404,10 +425,8 @@ export function canAssignRole(assignerRole: UserRole, targetRole: UserRole): boo
 export function getAssignableRoles(role: UserRole): UserRole[] {
   const roleDef = ROLE_DEFINITIONS[role]
   if (!roleDef) return []
-  
-  return ROLE_HIERARCHY.filter(targetRole => 
-    canAssignRole(role, targetRole)
-  )
+
+  return ROLE_HIERARCHY.filter((targetRole) => canAssignRole(role, targetRole))
 }
 
 /**
@@ -421,30 +440,34 @@ export interface RoleTransition {
   auditRequired: boolean
 }
 
-export function validateRoleTransition(fromRole: UserRole, toRole: UserRole): RoleTransition {
+export function validateRoleTransition(
+  fromRole: UserRole,
+  toRole: UserRole,
+): RoleTransition {
   const fromDef = ROLE_DEFINITIONS[fromRole]
   const toDef = ROLE_DEFINITIONS[toRole]
-  
+
   if (!fromDef || !toDef) {
     throw new Error('Invalid role specified')
   }
-  
+
   // Cannot transition to same role
   if (fromRole === toRole) {
     throw new Error('Cannot transition to same role')
   }
-  
+
   // Check if target role requires approval
   const requiresApproval = toDef.requiresApproval
-  
+
   // MFA required for sensitive role transitions
-  const requiresMFA = toDef.hierarchyLevel > fromDef.hierarchyLevel || 
-                     toDef.permissions.includes('manage:roles') ||
-                     toDef.permissions.includes('*')
-  
+  const requiresMFA =
+    toDef.hierarchyLevel > fromDef.hierarchyLevel ||
+    toDef.permissions.includes('manage:roles') ||
+    toDef.permissions.includes('*')
+
   // All role transitions require audit logging
   const auditRequired = true
-  
+
   return {
     fromRole,
     toRole,
